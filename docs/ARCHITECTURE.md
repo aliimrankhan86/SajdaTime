@@ -398,7 +398,14 @@ curl "https://api.aladhan.com/v1/timings/DD-MM-YYYY?latitude=..&longitude=..&met
 
 ## 8. Porting to iOS
 
-The `core/` package contains no Android imports. Everything in section 3 transfers directly.
+Every calculation file in `core/` — `PrayerModels.kt`, `PrayerEngine.kt`, `QiblaEngine.kt`,
+`WatchSyncContract.kt` — contains no Android imports, so everything in section 3 transfers
+directly.
+
+The one exception is `PrayerLabels.kt`, which maps `PrayerSlot` and `CalcMethod` to
+translatable display names and therefore needs `android.content.Context`. It is kept in its
+own file precisely so the port can ignore it and supply a `Localizable.strings` lookup
+instead. The enums themselves carry no text.
 
 1. Use [adhan-swift](https://github.com/batoulapps/adhan-swift), whose API mirrors
    adhan-java. Translate `PrayerEngine.kt` more or less line for line.

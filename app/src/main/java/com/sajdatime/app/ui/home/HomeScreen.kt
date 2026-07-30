@@ -22,6 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material.icons.filled.Brightness5
 import androidx.compose.material.icons.filled.Brightness6
@@ -65,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.labelRes
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
@@ -161,12 +163,24 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
         Icon(
             Icons.Outlined.LocationOn,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(18.dp),
         )
         Spacer(Modifier.width(6.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = city, style = MaterialTheme.typography.titleMedium)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = city, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.width(4.dp))
+                // A pin alone reads as a label. The caret is what says "you can change
+                // this", which is the single most common thing a traveller needs and was
+                // previously discoverable only by guessing the city name was a button.
+                Icon(
+                    Icons.Filled.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
             val hijri = hijriToday(now)
             if (hijri.isNotBlank()) {
                 Text(
@@ -227,7 +241,7 @@ private fun NextPrayerCard(state: UiState) {
                     horizontalArrangement = Arrangement.Center,
                 ) {
                     Text(
-                        text = next.slot.label,
+                        text = stringResource(next.slot.labelRes),
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.semantics { heading() },
@@ -246,7 +260,7 @@ private fun NextPrayerCard(state: UiState) {
                 // the digits are hidden and a readable summary is announced instead.
                 val spokenCountdown = stringResource(
                     R.string.home_countdown_a11y,
-                    next.slot.label,
+                    stringResource(next.slot.labelRes),
                     rememberRemainingText(state.now, next.at),
                 )
                 Text(
@@ -486,7 +500,7 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
         )
         Spacer(Modifier.width(14.dp))
         Text(
-            text = slot.label,
+            text = stringResource(slot.labelRes),
             style = MaterialTheme.typography.bodyLarge,
             color = contentColor,
             modifier = Modifier.weight(1f),

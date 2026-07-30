@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Names shown on BOTH the phone and the watch, so they live in the shared module rather
+  than being duplicated in each. Sect and madhab names stay in app/values/strings.xml
+  because only the phone ever shows them.
+
+  Translators: these are the most sensitive strings in the app. Prayer names are usually
+  left as the Arabic transliteration even in translated apps (Urdu and Indonesian users
+  expect "Fajr", not a local translation of "dawn"), so change them only on the advice of
+  a native speaker. Calculation methods are the names of real organisations and mostly
+  should not be translated at all.
+-->
+<resources>
+
+    <string name="prayer_fajr">Fajr</string>
+    <string name="prayer_sunrise">Sunrise</string>
+    <string name="prayer_dhuhr">Dhuhr</string>
+    <string name="prayer_asr">Asr</string>
+    <string name="prayer_maghrib">Maghrib</string>
+    <string name="prayer_isha">Isha</string>
+
+    <string name="method_auto">Automatic</string>
+    <string name="method_muslim_world_league">Muslim World League</string>
+    <string name="method_egyptian">Egyptian General Authority</string>
+    <string name="method_karachi">University of Karachi</string>
+    <string name="method_umm_al_qura">Umm al-Qura, Makkah</string>
+    <string name="method_dubai">Dubai</string>
+    <string name="method_moon_sighting">Moonsighting Committee</string>
+    <string name="method_north_america">ISNA, North America</string>
+    <string name="method_kuwait">Kuwait</string>
+    <string name="method_qatar">Qatar</string>
+    <string name="method_singapore">Singapore</string>
+    <string name="method_turkey">Diyanet, Turkey</string>
+    <string name="method_jafari">Jafari (Ithna Ashari)</string>
+    <string name="method_tehran">Institute of Geophysics, Tehran</string>
+
+</resources>

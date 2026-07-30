@@ -40,6 +40,7 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.labelRes
 import com.sajdatime.core.QiblaEngine
 import java.time.Duration
 import java.time.Instant
@@ -113,7 +114,7 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                     modifier = Modifier.padding(top = 44.dp),
                 ) {
                     Text(
-                        text = next?.slot?.label ?: "",
+                        text = next?.slot?.let { stringResource(it.labelRes) } ?: "",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -142,7 +143,7 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Text(
-                            text = slot.label,
+                            text = stringResource(slot.labelRes),
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (isNext) {
                                 MaterialTheme.colorScheme.primary

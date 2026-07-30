@@ -122,11 +122,12 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (4 source files, 3 test files)
+**`:core`** (5 source files, 3 test files, and `res/values/strings.xml` — prayer and method names live here because the phone and the watch both show them)
 
 | File | Contains |
 |---|---|
-| `PrayerModels.kt` | `Sect`, `Madhab`, `CalcMethod` (14 methods, each with a `label`), `PrayerSlot` (with `isPrayer`), `Coordinates`, `DayPrayerTimes` (with `prayersOnly`), `CalculationPrefs`, `NextPrayer` |
+| `PrayerModels.kt` | `Sect`, `Madhab`, `CalcMethod` (14 methods), `PrayerSlot` (with `isPrayer`), `Coordinates`, `DayPrayerTimes` (with `prayersOnly`), `CalculationPrefs`, `NextPrayer`. **No display names** — see `PrayerLabels.kt`. This file has no `android.*` import and lifts straight into an iOS or KMP target. |
+| `PrayerLabels.kt` | Display names for `PrayerSlot` and `CalcMethod`, as `labelRes` (for Compose) and `label(context)` (for notifications, the tile and the PDF). The one Android-touching file in `:core`; an iOS port supplies its own. |
 | `PrayerEngine.kt` | **The heart of the app.** `compute`, `computeRange`, `nextPrayer`, `resolveMethod`. All the business rules in §5. |
 | `QiblaEngine.kt` | `KAABA`, `bearingToKaaba`, `trueToMagnetic`, `relativeTurn`, `isAligned`, `distanceToKaabaKm`, `normalise` |
 | `WatchSyncContract.kt` | The phone↔watch Data Layer path and keys, shared so the two modules cannot drift |
@@ -225,11 +226,27 @@ fixed top reference dot. Bearing and distance in km. Guidance text ("Turn right 
 accuracy is low; a manual bearing readout when there is no compass at all.
 
 ### Settings
-School of thought (Sunni/Shia) · Madhab (hidden for Shia, since Jafari fixes Asr anyway) ·
-Calculation method · **How you are told** (Notification / Alarm) · Alarm sound picker ·
-Do Not Disturb access warning · Exact alarm warning · Per-prayer notification switches ·
-Ongoing badge switch · Change location · About (version, disclaimer, privacy, charity
-statement, "Made by Ali Imran Khan, as an ongoing charity for the Ummah").
+Reorganised from a flat list of ~25 controls into **three groups of tappable rows**, each
+opening one focused chooser. Every row shows its current answer as its subtitle, so a
+user's whole setup is readable without opening anything.
+
+Anything the system is withholding — exact-alarm permission, Do Not Disturb access —
+appears **above** the groups. Those are problems, not preferences, and inside a group
+nobody found them.
+
+| Group | Rows |
+|---|---|
+| **PRAYER TIMES** | Location (pin icon, city as subtitle) · School of thought ("Sunni · Hanafi") · Calculation method |
+| **REMINDERS** | How you are told (Notification / Alarm, with the sound picker and DND warning inside) · Which prayers ("All five" / "3 of 5") · Next-prayer badge switch, inline |
+| **ABOUT** | Version · Disclaimer · Privacy (opens the hosted policy) · Free, forever · Made by · Data and libraries |
+
+Any row that opens something carries a chevron, so "this is tappable" is never a guess.
+Madhab sits inside the School chooser and is hidden for Shia users, since Jafari fixes the
+Asr rule anyway.
+
+**The dua request lives at the end of the disclaimer**, which is shown once automatically
+after onboarding and is reachable any time from About. It appears nowhere else: asking
+twice for the same thing is asking too often.
 
 ### Notifications
 - **Default: notification + vibration + silent badge.** Alarm is **off** by default — this
@@ -239,8 +256,14 @@ statement, "Made by Ali Imran Khan, as an ongoing charity for the Ummah").
 - Optional silent ongoing "next prayer" badge in the shade.
 
 ### PDF export
-`Range.TODAY` / `Range.NEXT_7_DAYS` / `Range.THIS_MONTH`, labelled "Today", "Next 7 days", "This month". A4 at 72 dpi (595×842 pt) via `PdfDocument`, shared through
-`FileProvider` with `ClipData` set so the share sheet can render a preview.
+`Range.TODAY` / `Range.NEXT_7_DAYS` / `Range.THIS_MONTH`. A4 at 72 dpi (595×842 pt) via
+`PdfDocument`.
+
+**Saved into the public Downloads folder** via `MediaStore` on API 29+, and the user is
+told the filename. Below API 29 there is no Downloads collection to write to without
+holding `WRITE_EXTERNAL_STORAGE`, so those devices fall back to a `FileProvider` share
+sheet with `ClipData` set. A failure at any point raises a message — it used to fail
+silently, which looked like the button doing nothing.
 
 ### Wear OS
 Standalone watch app (works with the phone off or unpaired) — two swipeable pages (times,
@@ -596,9 +619,31 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 9. **No bundled adhan audio** (deliberate: licensing + tens of MB). Alarm mode plays a tone
    the user picks.
 10. **City search needs a network** unless the phone's own geocoder can answer offline.
-11. **Localisation is prepared but not done.** All 129 strings are externalised; no
-    translations exist yet. Arabic and Urdu would be the obvious first two, and Arabic will
-    need RTL checking (`supportsRtl="true"` is already set).
+11. **Localisation is ready to receive translations, but none exist yet.**
+
+    Every user-facing string is now a resource, including the ones that were hardest to
+    move: prayer names and calculation-method names used to be English constants on the
+    `PrayerSlot` and `CalcMethod` enums, shown directly on the main screen, the watch, the
+    tile, the notifications and the PDF. They are resources in `:core` now, so the phone
+    and the watch share one set. The PDF's own headings went with them.
+
+    **Adding a language is a file drop, no code change:** create
+    `app/src/main/res/values-<lang>/strings.xml` and
+    `core/src/main/res/values-<lang>/strings.xml`. Android then picks it up from the
+    phone's language automatically — the user is never asked to choose, which is correct.
+
+    Two things follow the *first* translation, and only then:
+    - `android:localeConfig` on the manifest plus `res/xml/locales_config.xml`, which gives
+      Android 13+ a per-app language picker in system Settings for free. Adding it now with
+      only English listed would show a picker with one entry.
+    - An in-app language row, for phones below Android 13, which have no system picker.
+
+    ⚠️ **Do not machine-translate this app.** Prayer names, madhab names and the disclaimer
+    are religious content, and Indonesian or Urdu speakers expect "Fajr", not a local
+    translation of "dawn". `core/src/main/res/values/strings.xml` carries a note to
+    translators saying so. Each language needs a native speaker to review it before it
+    ships. Arabic and Urdu are the obvious first two; both are RTL, and `supportsRtl="true"`
+    is already set but has never been exercised.
 12. **No CI.** No GitHub Actions workflow; all verification is run locally.
 13. **Play Store listing assets are done.** `docs/store/` holds the 512 × 512 icon, the
     1024 × 500 feature graphic, five phone screenshots, two Wear screenshots, and

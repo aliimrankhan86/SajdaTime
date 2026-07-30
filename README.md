@@ -15,13 +15,18 @@ No accounts. No analytics. No ads. No tracking. Your location never leaves your 
 - Local notifications at each prayer time, working even when the app is closed
 - Optional alarm mode with a sound you choose, able to sound through Do Not Disturb
 - Optional silent "next prayer" badge in the notification shade
-- PDF export of today, the next 7 days, or the whole month
+- PDF timetable for today, the next 7 days, or the whole month, saved to Downloads
 - A Wear OS app and tile that work on their own, with or without the phone nearby
 - Light and dark themes, both verified against WCAG 2.1 AA contrast
 
 ## Build and run
 
-Requires JDK 17+ and the Android SDK.
+Requires the Android SDK and JDK 17 or later. Everything here is built and verified with
+JDK 21:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+```
 
 ```bash
 ./gradlew :app:assembleDebug :wear:assembleDebug
@@ -39,26 +44,28 @@ Run the checks:
 ./gradlew :core:testDebugUnitTest :app:testDebugUnitTest :wear:testDebugUnitTest :app:lintDebug :wear:lintDebug :core:lintDebug
 ```
 
-### One-time setup note
+### Keep this project out of iCloud
 
-This repo currently lives under `~/Documents`, which macOS syncs to iCloud Drive. iCloud
-writes conflict copies (`SomeClass 2.class`) into `app/build/` mid-build, which makes
-dexing fail with `Failed to process: .../compileDebugKotlin/classes`.
+The project lives in `~/Developer/SajdaTime` deliberately. It used to sit under
+`~/Documents`, which macOS syncs to iCloud Drive, and iCloud wrote conflict copies
+(`SomeClass 2.class`) into `app/build/` mid-build. Dexing then failed with
+`Failed to process: .../compileDebugKotlin/classes`. It cost three separate debugging
+sessions before the cause was found.
 
-If a build fails that way, clear the duplicates and rebuild:
+**Do not move it back under `~/Documents`, `~/Desktop`, or any other synced folder.**
+`.gitignore` carries a `* [0-9].*` rule as a second line of defence. If you ever see that
+error, clear the duplicates and rebuild:
 
 ```bash
 find . -name '* [0-9].*' -not -path './.git/*' -delete && ./gradlew clean
 ```
 
-The permanent fix is to move the project somewhere iCloud does not sync, for example
-`~/Developer/SajdaTime`.
-
 ## Project layout
 
 ```
-core/   Prayer and Qibla calculation. No Android imports, so it ports to iOS as is.
-        Shared by the phone and the watch.
+core/   Prayer and Qibla calculation, shared by the phone and the watch. The calculation
+        itself has no Android imports and ports to iOS as is; only PrayerLabels.kt, which
+        maps the enums to translatable names, touches the Android framework.
 
 app/    The phone app.
   data/         Local settings (DataStore), location, compass, city lookup, watch sync.

@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -49,12 +54,16 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
+import com.sajdatime.core.labelRes
 import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.onboarding.madhabLabel
+
+/** Which chooser is currently open, if any. Only one can be at a time. */
+private enum class Chooser { SCHOOL, METHOD, ALERTS, PRAYERS, LOCATION, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -70,9 +79,7 @@ fun SettingsScreen(
     onSearchCity: (String) -> Unit,
 ) {
     val context = LocalContext.current
-    var methodPicker by remember { mutableStateOf(false) }
-    var locationSheet by remember { mutableStateOf(false) }
-    var disclaimer by remember { mutableStateOf(false) }
+    var open by remember { mutableStateOf<Chooser?>(null) }
     val settings = state.settings
 
     Column(
@@ -89,139 +96,88 @@ fun SettingsScreen(
                 .semantics { heading() },
         )
 
-        Group(stringResource(R.string.settings_group_school)) {
-            Column(Modifier.selectableGroup()) {
-                Sect.entries.forEach { sect ->
-                    RadioRow(
-                        label = stringResource(
-                            if (sect == Sect.SUNNI) R.string.sect_sunni else R.string.sect_shia,
-                        ),
-                        selected = settings.sect == sect,
-                        onSelect = { onSetSect(sect) },
-                    )
-                }
-            }
+        // Anything the system is withholding goes at the very top, above the settings
+        // themselves. These are not preferences, they are problems, and burying them
+        // inside the group they belong to meant nobody found them.
+        if (!PrayerAlarmScheduler.canScheduleExact(context)) {
+            WarningRow(
+                title = stringResource(R.string.settings_exact_alarms_title),
+                body = stringResource(R.string.settings_exact_alarms_desc),
+                onClick = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        runCatching {
+                            context.startActivity(
+                                Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                                    .setData("package:${context.packageName}".toUri()),
+                            )
+                        }
+                    }
+                },
+            )
         }
-
-        // Madhab only changes the Asr rule, which the Jafari school fixes anyway, so it
-        // is hidden entirely for Shia users rather than shown disabled.
-        if (settings.sect == Sect.SUNNI) {
-            Group(stringResource(R.string.settings_group_madhab)) {
-                Column(Modifier.selectableGroup()) {
-                    Madhab.entries.forEach { madhab ->
-                        RadioRow(
-                            label = madhabLabel(madhab),
-                            supporting = stringResource(
-                                if (madhab == Madhab.HANAFI) R.string.madhab_hanafi_desc
-                                else R.string.madhab_standard_desc,
-                            ),
-                            selected = settings.madhab == madhab,
-                            onSelect = { onSetMadhab(madhab) },
+        if (settings.alertStyle == AlertStyle.ALARM && !Notifications.hasDndAccess(context)) {
+            WarningRow(
+                title = stringResource(R.string.settings_dnd_title),
+                body = stringResource(R.string.settings_dnd_desc),
+                onClick = {
+                    runCatching {
+                        context.startActivity(
+                            Intent(SystemSettings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS),
                         )
                     }
-                }
-            }
+                },
+            )
         }
 
-        Group(stringResource(R.string.settings_group_method)) {
+        Group(stringResource(R.string.settings_group_prayer_times)) {
             SettingRow(
+                icon = Icons.Outlined.LocationOn,
+                title = stringResource(R.string.settings_location),
+                subtitle = settings.cityName.ifBlank {
+                    stringResource(R.string.location_set_generic)
+                },
+                onClick = { open = Chooser.LOCATION },
+            )
+            SettingRow(
+                icon = Icons.Outlined.Schedule,
+                title = stringResource(R.string.settings_school),
+                subtitle = schoolSummary(settings.sect, settings.madhab),
+                onClick = { open = Chooser.SCHOOL },
+            )
+            SettingRow(
+                icon = Icons.Outlined.Tune,
                 title = stringResource(R.string.settings_method),
                 subtitle = if (settings.method == CalcMethod.AUTO) {
                     stringResource(
                         R.string.settings_method_auto,
-                        PrayerEngine.resolveMethod(settings.calculationPrefs).label,
+                        stringResource(PrayerEngine.resolveMethod(settings.calculationPrefs).labelRes),
                     )
                 } else {
-                    settings.method.label
+                    stringResource(settings.method.labelRes)
                 },
-                onClick = { methodPicker = true },
+                onClick = { open = Chooser.METHOD },
             )
         }
 
-        Group(stringResource(R.string.settings_group_alerts)) {
-            if (!PrayerAlarmScheduler.canScheduleExact(context)) {
-                WarningRow(
-                    title = stringResource(R.string.settings_exact_alarms_title),
-                    body = stringResource(R.string.settings_exact_alarms_desc),
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            runCatching {
-                                context.startActivity(
-                                    Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                        .setData("package:${context.packageName}".toUri()),
-                                )
-                            }
-                        }
-                    },
-                )
-            }
-
-            Column(Modifier.selectableGroup()) {
-                RadioRow(
-                    label = stringResource(R.string.alert_style_notification),
-                    supporting = stringResource(R.string.alert_style_notification_desc),
-                    selected = settings.alertStyle == AlertStyle.NOTIFICATION,
-                    onSelect = { onSetAlertStyle(AlertStyle.NOTIFICATION) },
-                )
-                RadioRow(
-                    label = stringResource(R.string.alert_style_alarm),
-                    supporting = stringResource(R.string.alert_style_alarm_desc),
-                    selected = settings.alertStyle == AlertStyle.ALARM,
-                    onSelect = { onSetAlertStyle(AlertStyle.ALARM) },
-                )
-            }
-
-            // Sound and Do Not Disturb only matter in alarm mode, so they appear only
-            // once it is chosen rather than sitting there greyed out.
-            if (settings.alertStyle == AlertStyle.ALARM) {
-                SettingRow(
-                    title = stringResource(R.string.settings_alarm_sound),
-                    // Naming the chosen tone is the only confirmation the user gets that
-                    // the pick stuck. The generic hint stays until something is chosen.
-                    subtitle = rememberRingtoneTitle(settings.alarmSoundUri)
-                        ?: stringResource(R.string.settings_alarm_sound_desc),
-                    onClick = onPickAlarmSound,
-                )
-                if (!Notifications.hasDndAccess(context)) {
-                    WarningRow(
-                        title = stringResource(R.string.settings_dnd_title),
-                        body = stringResource(R.string.settings_dnd_desc),
-                        onClick = {
-                            runCatching {
-                                context.startActivity(
-                                    Intent(SystemSettings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS),
-                                )
-                            }
-                        },
-                    )
-                }
-            }
-        }
-
-        Group(stringResource(R.string.settings_group_notifications)) {
-            PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
-                SwitchRow(
-                    title = slot.label,
-                    checked = slot in settings.notifyFor,
-                    onCheckedChange = { onSetNotify(slot, it) },
-                )
-            }
-            HorizontalDivider(Modifier.padding(horizontal = 20.dp))
+        Group(stringResource(R.string.settings_group_reminders)) {
+            SettingRow(
+                icon = Icons.Outlined.NotificationsActive,
+                title = stringResource(R.string.settings_alerts),
+                subtitle = alertSummary(settings.alertStyle),
+                onClick = { open = Chooser.ALERTS },
+            )
+            SettingRow(
+                title = stringResource(R.string.settings_which_prayers),
+                subtitle = prayerCountSummary(settings.notifyFor.size),
+                onClick = { open = Chooser.PRAYERS },
+            )
+            // A plain on/off stays inline. Sending the user into a chooser to flip one
+            // switch would be worse than the flat list this screen replaced.
             SwitchRow(
                 title = stringResource(R.string.settings_ongoing_badge),
                 subtitle = stringResource(R.string.settings_ongoing_badge_desc),
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
-            )
-        }
-
-        Group(stringResource(R.string.settings_group_location)) {
-            SettingRow(
-                title = stringResource(R.string.action_change_location),
-                subtitle = settings.cityName.ifBlank {
-                    stringResource(R.string.location_set_generic)
-                },
-                onClick = { locationSheet = true },
             )
         }
 
@@ -233,7 +189,7 @@ fun SettingsScreen(
             SettingRow(
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
-                onClick = { disclaimer = true },
+                onClick = { open = Chooser.DISCLAIMER },
             )
             // Play requires a privacy policy reachable from inside the app, not only from
             // the Console field. Opening the hosted policy satisfies that.
@@ -259,45 +215,141 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
             )
-            // The one thing the app ever asks for in return. Given its own card rather
-            // than another grey subtitle so it is actually read, and placed last so it is
-            // what the About screen leaves you with.
-            DuaRequest()
         }
     }
 
-    if (methodPicker) {
-        MethodPickerDialog(
+    when (open) {
+        null -> Unit
+
+        Chooser.SCHOOL -> SchoolDialog(
+            sect = settings.sect,
+            madhab = settings.madhab,
+            onSelectSect = onSetSect,
+            onSelectMadhab = onSetMadhab,
+            onDismiss = { open = null },
+        )
+
+        Chooser.METHOD -> MethodPickerDialog(
             current = settings.method,
             sect = settings.sect,
-            onDismiss = { methodPicker = false },
+            onDismiss = { open = null },
             onSelect = {
                 onSetMethod(it)
-                methodPicker = false
+                open = null
             },
         )
-    }
 
-    if (locationSheet) {
-        LocationSheet(
+        Chooser.ALERTS -> AlertsDialog(
+            style = settings.alertStyle,
+            alarmSoundUri = settings.alarmSoundUri,
+            onSelectStyle = onSetAlertStyle,
+            onPickAlarmSound = onPickAlarmSound,
+            onDismiss = { open = null },
+        )
+
+        Chooser.PRAYERS -> PrayersDialog(
+            enabled = settings.notifyFor,
+            onSetNotify = onSetNotify,
+            onDismiss = { open = null },
+        )
+
+        Chooser.LOCATION -> LocationSheet(
             state = state,
-            onDismiss = { locationSheet = false },
+            onDismiss = { open = null },
             onUseGps = onRefreshLocation,
             onSearchCity = onSearchCity,
         )
-    }
 
-    if (disclaimer) {
-        AlertDialog(
-            onDismissRequest = { disclaimer = false },
+        Chooser.DISCLAIMER -> AlertDialog(
+            onDismissRequest = { open = null },
             confirmButton = {
-                TextButton(onClick = { disclaimer = false }) {
+                TextButton(onClick = { open = null }) {
                     Text(stringResource(R.string.action_got_it))
                 }
             },
             title = { Text(stringResource(R.string.disclaimer_title)) },
             text = { Text(stringResource(R.string.disclaimer_body)) },
         )
+    }
+}
+
+// --- summaries shown under each row ------------------------------------------------------
+
+/** "Sunni · Hanafi", or just "Shia" — the Jafari school fixes the Asr rule anyway. */
+@Composable
+private fun schoolSummary(sect: Sect, madhab: Madhab): String = when (sect) {
+    Sect.SUNNI -> stringResource(
+        R.string.settings_value_pair,
+        stringResource(R.string.sect_sunni),
+        madhabLabel(madhab),
+    )
+
+    Sect.SHIA -> stringResource(R.string.sect_shia)
+}
+
+@Composable
+private fun alertSummary(style: AlertStyle): String = stringResource(
+    when (style) {
+        AlertStyle.NOTIFICATION -> R.string.alert_style_notification
+        AlertStyle.ALARM -> R.string.alert_style_alarm
+    },
+)
+
+@Composable
+private fun prayerCountSummary(count: Int): String = when (count) {
+    0 -> stringResource(R.string.settings_which_prayers_none)
+    5 -> stringResource(R.string.settings_which_prayers_all)
+    else -> stringResource(R.string.settings_which_prayers_some, count)
+}
+
+// --- choosers ----------------------------------------------------------------------------
+
+/**
+ * Sect and madhab together, because they are one decision to the user. Madhab only
+ * changes the Asr rule, which the Jafari school fixes anyway, so it is hidden entirely
+ * for Shia users rather than shown disabled.
+ */
+@Composable
+private fun SchoolDialog(
+    sect: Sect,
+    madhab: Madhab,
+    onSelectSect: (Sect) -> Unit,
+    onSelectMadhab: (Madhab) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_school), onDismiss = onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            Sect.entries.forEach { entry ->
+                RadioRow(
+                    label = stringResource(
+                        if (entry == Sect.SUNNI) R.string.sect_sunni else R.string.sect_shia,
+                    ),
+                    supporting = stringResource(
+                        if (entry == Sect.SUNNI) R.string.sect_sunni_desc else R.string.sect_shia_desc,
+                    ),
+                    selected = sect == entry,
+                    onSelect = { onSelectSect(entry) },
+                )
+            }
+        }
+
+        if (sect == Sect.SUNNI) {
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            SectionLabel(stringResource(R.string.settings_madhab))
+            Column(Modifier.selectableGroup()) {
+                Madhab.entries.forEach { entry ->
+                    RadioRow(
+                        label = madhabLabel(entry),
+                        supporting = stringResource(
+                            if (entry == Madhab.HANAFI) R.string.madhab_hanafi_desc
+                            else R.string.madhab_standard_desc,
+                        ),
+                        selected = madhab == entry,
+                        onSelect = { onSelectMadhab(entry) },
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -315,27 +367,96 @@ private fun MethodPickerDialog(
         method == CalcMethod.AUTO || if (sect == Sect.SHIA) shiaOnly else !shiaOnly
     }
 
+    ChooserDialog(title = stringResource(R.string.settings_method), onDismiss = onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            available.forEach { method ->
+                RadioRow(
+                    label = stringResource(method.labelRes),
+                    selected = current == method,
+                    onSelect = { onSelect(method) },
+                )
+            }
+        }
+    }
+}
+
+/** Alert style, and the sound that goes with it once alarm mode is chosen. */
+@Composable
+private fun AlertsDialog(
+    style: AlertStyle,
+    alarmSoundUri: String,
+    onSelectStyle: (AlertStyle) -> Unit,
+    onPickAlarmSound: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_alerts), onDismiss = onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            RadioRow(
+                label = stringResource(R.string.alert_style_notification),
+                supporting = stringResource(R.string.alert_style_notification_desc),
+                selected = style == AlertStyle.NOTIFICATION,
+                onSelect = { onSelectStyle(AlertStyle.NOTIFICATION) },
+            )
+            RadioRow(
+                label = stringResource(R.string.alert_style_alarm),
+                supporting = stringResource(R.string.alert_style_alarm_desc),
+                selected = style == AlertStyle.ALARM,
+                onSelect = { onSelectStyle(AlertStyle.ALARM) },
+            )
+        }
+
+        // Only meaningful once alarm mode is on, so it appears then rather than sitting
+        // greyed out.
+        if (style == AlertStyle.ALARM) {
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            SettingRow(
+                title = stringResource(R.string.settings_alarm_sound),
+                // Naming the chosen tone is the only confirmation the user gets that the
+                // pick stuck. The generic hint stays until something is chosen.
+                subtitle = rememberRingtoneTitle(alarmSoundUri)
+                    ?: stringResource(R.string.settings_alarm_sound_desc),
+                onClick = onPickAlarmSound,
+                horizontalPadding = 0.dp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun PrayersDialog(
+    enabled: Set<PrayerSlot>,
+    onSetNotify: (PrayerSlot, Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_which_prayers), onDismiss = onDismiss) {
+        PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
+            SwitchRow(
+                title = stringResource(slot.labelRes),
+                checked = slot in enabled,
+                onCheckedChange = { onSetNotify(slot, it) },
+                horizontalPadding = 0.dp,
+            )
+        }
+    }
+}
+
+/**
+ * The one dialog shape every chooser uses. Scrollable, because the method list is long
+ * and a raised system font size makes even the short ones taller than a phone.
+ */
+@Composable
+private fun ChooserDialog(
+    title: String,
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(stringResource(R.string.settings_method)) },
-        text = {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(rememberScrollState())
-                    .selectableGroup(),
-            ) {
-                available.forEach { method ->
-                    RadioRow(
-                        label = method.label,
-                        selected = current == method,
-                        onSelect = { onSelect(method) },
-                    )
-                }
-            }
-        },
+        title = { Text(title) },
+        text = { Column(Modifier.verticalScroll(rememberScrollState())) { content() } },
     )
 }
 
@@ -356,31 +477,15 @@ private fun Group(title: String, content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun DuaRequest() {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-        ),
+private fun SectionLabel(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-    ) {
-        Column(Modifier.padding(20.dp)) {
-            Text(
-                text = stringResource(R.string.about_dua),
-                style = MaterialTheme.typography.labelMedium,
-                // Full opacity, not a faded label: dimming this to 75% lands at 4.65:1 in
-                // the dark theme, which clears AA by a margin too thin to leave untested.
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-            Spacer(Modifier.height(6.dp))
-            Text(
-                text = stringResource(R.string.about_dua_desc),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
-    }
+            .padding(vertical = 8.dp)
+            .semantics { heading() },
+    )
 }
 
 @Composable
@@ -409,9 +514,20 @@ private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
     }
 }
 
+/**
+ * A settings row. Anything tappable carries a chevron, so "this opens something" never
+ * has to be guessed at from the text alone.
+ */
 @Composable
-private fun SettingRow(title: String, subtitle: String? = null, onClick: (() -> Unit)? = null) {
-    Column(
+private fun SettingRow(
+    title: String,
+    subtitle: String? = null,
+    icon: ImageVector? = null,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp,
+    onClick: (() -> Unit)? = null,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .then(
@@ -422,14 +538,34 @@ private fun SettingRow(title: String, subtitle: String? = null, onClick: (() -> 
                 },
             )
             .heightIn(min = 56.dp)
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .padding(horizontal = horizontalPadding, vertical = 12.dp),
     ) {
-        Text(text = title, style = MaterialTheme.typography.bodyLarge)
-        subtitle?.let {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.bodyLarge)
+            subtitle?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        if (onClick != null) {
+            Spacer(Modifier.width(12.dp))
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForwardIos,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.size(14.dp),
             )
         }
     }
@@ -448,7 +584,7 @@ private fun RadioRow(
             .fillMaxWidth()
             .clickable(role = Role.RadioButton, onClick = onSelect)
             .heightIn(min = 56.dp)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
     ) {
         RadioButton(selected = selected, onClick = null)
         Spacer(Modifier.width(8.dp))
@@ -471,6 +607,7 @@ private fun SwitchRow(
     subtitle: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -478,7 +615,7 @@ private fun SwitchRow(
             .fillMaxWidth()
             .clickable(role = Role.Switch) { onCheckedChange(!checked) }
             .heightIn(min = 56.dp)
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(horizontal = horizontalPadding, vertical = 8.dp),
     ) {
         Column(Modifier.weight(1f)) {
             Text(text = title, style = MaterialTheme.typography.bodyLarge)

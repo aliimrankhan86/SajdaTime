@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.R
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.label
 import com.sajdatime.app.data.AlertStyle
 import java.time.Instant
 
@@ -146,11 +147,11 @@ object Notifications {
 
         val builder = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(context.getString(R.string.notif_prayer_title, slot.label))
+            .setContentTitle(context.getString(R.string.notif_prayer_title, slot.label(context)))
             .setContentText(
                 context.getString(
                     R.string.notif_prayer_body,
-                    slot.label,
+                    slot.label(context),
                     TimeFormat.clock(context, at),
                 ),
             )
@@ -185,7 +186,7 @@ object Notifications {
         val notification = NotificationCompat.Builder(context, CHANNEL_ONGOING)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(
-                context.getString(R.string.notif_next_title, slot.label, TimeFormat.clock(context, at)),
+                context.getString(R.string.notif_next_title, slot.label(context), TimeFormat.clock(context, at)),
             )
             .setContentText(
                 context.getString(R.string.notif_next_body, TimeFormat.remaining(context, now, at)),

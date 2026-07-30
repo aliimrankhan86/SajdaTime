@@ -16,6 +16,7 @@ import androidx.wear.tiles.TileService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.label
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -60,7 +61,7 @@ class NextPrayerTileService : TileService() {
             )
             val remaining = Duration.between(now, next.at)
             Triple(
-                next.slot.label,
+                next.slot.label(applicationContext),
                 getString(
                     R.string.wear_tile_detail,
                     TileFormat.clock(applicationContext, next.at),

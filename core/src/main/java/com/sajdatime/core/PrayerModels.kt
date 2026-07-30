@@ -21,30 +21,30 @@ enum class Madhab { HANAFI, SHAFII, MALIKI, HANBALI }
  * Calculation convention. [AUTO] resolves from the user's sect at compute time,
  * so a user who never opens advanced settings still gets a sane convention.
  */
-enum class CalcMethod(val label: String) {
-    AUTO("Automatic"),
-    MUSLIM_WORLD_LEAGUE("Muslim World League"),
-    EGYPTIAN("Egyptian General Authority"),
-    KARACHI("University of Karachi"),
-    UMM_AL_QURA("Umm al-Qura, Makkah"),
-    DUBAI("Dubai"),
-    MOON_SIGHTING("Moonsighting Committee"),
-    NORTH_AMERICA("ISNA, North America"),
-    KUWAIT("Kuwait"),
-    QATAR("Qatar"),
-    SINGAPORE("Singapore"),
-    TURKEY("Diyanet, Turkey"),
-    JAFARI("Jafari (Ithna Ashari)"),
-    TEHRAN("Institute of Geophysics, Tehran"),
+enum class CalcMethod {
+    AUTO,
+    MUSLIM_WORLD_LEAGUE,
+    EGYPTIAN,
+    KARACHI,
+    UMM_AL_QURA,
+    DUBAI,
+    MOON_SIGHTING,
+    NORTH_AMERICA,
+    KUWAIT,
+    QATAR,
+    SINGAPORE,
+    TURKEY,
+    JAFARI,
+    TEHRAN,
 }
 
-enum class PrayerSlot(val label: String) {
-    FAJR("Fajr"),
-    SUNRISE("Sunrise"),
-    DHUHR("Dhuhr"),
-    ASR("Asr"),
-    MAGHRIB("Maghrib"),
-    ISHA("Isha"),
+enum class PrayerSlot {
+    FAJR,
+    SUNRISE,
+    DHUHR,
+    ASR,
+    MAGHRIB,
+    ISHA,
     ;
 
     /** Sunrise is a time marker, not a prayer — it is never notified. */

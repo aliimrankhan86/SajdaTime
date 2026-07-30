@@ -86,7 +86,11 @@ involve and what it might break before you write any code.
 A session that has actually read the handover will:
 
 - know the app is a charity project with no ads, no accounts and no tracking
-- know the disclaimer is a hard requirement and never remove it
+- know the disclaimer is a hard requirement and never remove it, including the dua request
+  in its last paragraph — which belongs there and **nowhere else**, so the user is asked
+  once and never nagged
+- never machine-translate the app: prayer and madhab names are religious content and each
+  language needs a native speaker before it ships
 - run the full test suite before and after changes
 - **run the app on an emulator** rather than saying "it compiles, so it works"
 - check prayer times against the Aladhan API instead of trusting its own reasoning
