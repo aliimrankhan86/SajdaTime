@@ -4,10 +4,10 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.core.net.toUri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,8 +33,6 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -52,10 +50,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -65,6 +66,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.labelRes
@@ -105,9 +107,9 @@ fun HomeScreen(
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         ExactAlarmBanner()
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp))
         TodayTimeline(state)
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(24.dp))
         ExportButton(enabled = state.today != null, onClick = { exportSheet = true })
     }
 
@@ -198,90 +200,90 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
 private fun NextPrayerCard(state: UiState) {
     val next = state.next
     val context = LocalContext.current
+    val scheme = MaterialTheme.colorScheme
 
-    Card(
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        modifier = Modifier.fillMaxWidth(),
+    // ponytail: a flat container, not the time-of-day gradient this used to carry. The
+    // gradient shifted the background under the countdown as the day moved, so the one
+    // number the screen exists to show had a different contrast ratio at Isha than at
+    // Fajr. A single verified surface is the thing the design system asks for, and it is
+    // the thing that can actually be tested.
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(scheme.primaryContainer)
+            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
+            .padding(horizontal = 20.dp, vertical = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(heroGradient(next?.slot)),
-            contentAlignment = Alignment.Center,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp, vertical = 30.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
-                if (next == null) {
-                    Text(
-                        text = stringResource(R.string.home_no_location),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center,
-                    )
-                    return@Column
-                }
-
-                Text(
-                    text = stringResource(R.string.home_next_prayer),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(Modifier.height(10.dp))
-
-                // Name and time share one optical line so the block reads as a single
-                // centred unit rather than three stacked fragments.
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    Text(
-                        text = stringResource(next.slot.labelRes),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.semantics { heading() },
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = TimeFormat.clock(context, next.at),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
-                    )
-                }
-
-                Spacer(Modifier.height(18.dp))
-
-                // A per-second live region would interrupt a screen reader constantly, so
-                // the digits are hidden and a readable summary is announced instead.
-                val spokenCountdown = stringResource(
-                    R.string.home_countdown_a11y,
-                    stringResource(next.slot.labelRes),
-                    rememberRemainingText(state.now, next.at),
-                )
-                Text(
-                    text = TimeFormat.countdownClock(state.now, next.at),
-                    style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.clearAndSetSemantics {
-                        contentDescription = spokenCountdown
-                    },
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = stringResource(R.string.home_until),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center,
-                )
-            }
+        if (next == null) {
+            Text(
+                text = stringResource(R.string.home_no_location),
+                style = MaterialTheme.typography.titleMedium,
+                color = scheme.onSurface,
+                textAlign = TextAlign.Center,
+            )
+            return@Column
         }
+
+        // ponytail: letterspaced, not uppercased in code. The design draws this label in
+        // capitals, but String.uppercase() on a translated string is a trap — Turkish
+        // dotted/dotless i, and scripts with no case at all. If a language wants capitals
+        // its translator writes them into the string.
+        Text(
+            text = stringResource(R.string.home_next_prayer),
+            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.6.sp),
+            color = scheme.onPrimaryContainer,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(8.dp))
+
+        // Name and time share one optical line so the block reads as a single
+        // centred unit rather than three stacked fragments.
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = stringResource(next.slot.labelRes),
+                style = MaterialTheme.typography.headlineMedium,
+                color = scheme.onSurface,
+                modifier = Modifier.semantics { heading() },
+            )
+            Spacer(Modifier.width(10.dp))
+            Text(
+                text = TimeFormat.clock(context, next.at),
+                style = MaterialTheme.typography.headlineMedium,
+                color = scheme.secondary,
+            )
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // A per-second live region would interrupt a screen reader constantly, so
+        // the digits are hidden and a readable summary is announced instead.
+        val spokenCountdown = stringResource(
+            R.string.home_countdown_a11y,
+            stringResource(next.slot.labelRes),
+            rememberRemainingText(state.now, next.at),
+        )
+        Text(
+            text = TimeFormat.countdownClock(state.now, next.at),
+            style = MaterialTheme.typography.displayLarge,
+            color = scheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clearAndSetSemantics {
+                contentDescription = spokenCountdown
+            },
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            text = stringResource(R.string.home_until),
+            style = MaterialTheme.typography.labelMedium,
+            color = scheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -404,34 +406,42 @@ private fun ExactAlarmBanner() {
     )
 }
 
+/**
+ * "The system is withholding something you asked for." Amber container, amber icon and
+ * amber-on-amber text, so it reads as a warning at a glance rather than as one more grey
+ * card in a stack of grey cards — which is what it looked like before, and why the exact
+ * alarm notice went unnoticed.
+ */
 @Composable
 private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
+    val scheme = MaterialTheme.colorScheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button, onClick = onClick),
+            .clip(RoundedCornerShape(16.dp))
+            .background(scheme.tertiaryContainer)
+            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(16.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                Icons.Outlined.WarningAmber,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary,
+        Icon(
+            Icons.Outlined.WarningAmber,
+            contentDescription = null,
+            tint = scheme.tertiary,
+        )
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = scheme.onTertiaryContainer,
             )
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(text = title, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    text = body,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = scheme.onTertiaryContainer,
+            )
         }
     }
 }
@@ -451,58 +461,91 @@ private fun TodayTimeline(state: UiState) {
             .semantics { heading() },
     )
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        modifier = Modifier.fillMaxWidth(),
+    val scheme = MaterialTheme.colorScheme
+    val slots = PrayerSlot.entries.filter { today.times[it] != null }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp)),
     ) {
-        Column(Modifier.padding(vertical = 4.dp)) {
-            PrayerSlot.entries.forEach { slot ->
-                val at = today.times[slot] ?: return@forEach
-                val isNext = next != null && slot == next.slot && !next.isTomorrow
-                PrayerRow(
-                    slot = slot,
-                    time = TimeFormat.clock(context, at),
-                    isNext = isNext,
-                )
+        slots.forEachIndexed { index, slot ->
+            PrayerRow(
+                slot = slot,
+                time = TimeFormat.clock(context, today.times.getValue(slot)),
+                isNext = next != null && slot == next.slot && !next.isTomorrow,
+            )
+            if (index != slots.lastIndex) {
+                HorizontalDivider(color = scheme.outlineVariant)
             }
         }
     }
 }
 
+/**
+ * One row of the day.
+ *
+ * Three states, and each is carried by more than colour, because "which prayer is next"
+ * is the only question this screen has to answer and a colour wash alone answers it for
+ * nobody using a greyscale display or a colour-blind palette:
+ *
+ *  - next    — highlighted surface, a 3dp accent bar down the leading edge, and a "Next"
+ *              pill in words
+ *  - sunrise — dimmed and set in smaller type, because it is not a prayer and it should
+ *              not compete with the five that are
+ *  - the rest — plain
+ */
 @Composable
 private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
-    val background = if (isNext) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        Color.Transparent
+    val scheme = MaterialTheme.colorScheme
+    val dimmed = !slot.isPrayer && !isNext
+
+    val background = when {
+        isNext -> scheme.primaryContainer
+        dimmed -> scheme.surfaceContainerLow
+        else -> Color.Transparent
     }
-    val contentColor = if (isNext) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurface
+    val contentColor = when {
+        isNext -> scheme.onSurface
+        dimmed -> scheme.onSurfaceVariant
+        else -> scheme.onSurface
     }
+    val iconColor = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant
+    val accent = scheme.primary
+    val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 2.dp)
-            .background(background, RoundedCornerShape(12.dp))
-            // Vertical padding, not a fixed height: at a large system font size the row
-            // has to grow rather than crop the prayer name.
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .heightIn(min = 52.dp),
+            .background(background)
+            // drawBehind rather than a sibling Box: a full-height stripe next to a row
+            // whose height is driven by the text needs intrinsic measurement, and this
+            // gets the same pixels without asking the layout to measure twice.
+            .drawBehind {
+                if (isNext) drawRect(accent, size = Size(barWidth, size.height))
+            }
+            // Vertical padding plus a floor, not a fixed height: at a large system font
+            // size the row has to grow rather than crop the prayer name.
+            .heightIn(min = 56.dp)
+            .padding(horizontal = 18.dp, vertical = 12.dp),
     ) {
         Icon(
             imageVector = slotIcon(slot),
             contentDescription = null,
-            tint = contentColor,
-            modifier = Modifier.size(20.dp),
+            tint = iconColor,
+            modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
         )
         Spacer(Modifier.width(14.dp))
         Text(
             text = stringResource(slot.labelRes),
-            style = MaterialTheme.typography.bodyLarge,
+            style = if (dimmed) {
+                MaterialTheme.typography.bodyMedium
+            } else {
+                MaterialTheme.typography.bodyLarge
+            },
             color = contentColor,
             modifier = Modifier.weight(1f),
         )
@@ -511,13 +554,17 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
             Text(
                 text = stringResource(R.string.home_next_marker),
                 style = MaterialTheme.typography.labelMedium,
-                color = contentColor,
+                color = scheme.onPrimary,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(accent)
+                    .padding(horizontal = 9.dp, vertical = 3.dp),
             )
             Spacer(Modifier.width(10.dp))
         }
         Text(
             text = time,
-            style = PrayerTimeTextStyle,
+            style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
             color = contentColor,
         )
     }
@@ -530,20 +577,6 @@ private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
     PrayerSlot.ASR -> Icons.Filled.Brightness5
     PrayerSlot.MAGHRIB -> Icons.Filled.Brightness6
     PrayerSlot.ISHA -> Icons.Filled.NightsStay
-}
-
-/**
- * The hero gradient shifts with the time of day so the card feels like the sky outside:
- * cool before dawn, warm at Maghrib, deep at Isha.
- */
-@Composable
-private fun heroGradient(slot: PrayerSlot?): Brush {
-    val scheme = MaterialTheme.colorScheme
-    val end = when (slot) {
-        PrayerSlot.MAGHRIB, PrayerSlot.ISHA -> scheme.tertiary.copy(alpha = 0.28f)
-        else -> scheme.primary.copy(alpha = 0.22f)
-    }
-    return Brush.verticalGradient(listOf(scheme.primaryContainer, end))
 }
 
 /**

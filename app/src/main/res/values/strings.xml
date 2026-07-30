@@ -73,7 +73,7 @@
       from Settings, so it stays available without ever being repeated unprompted.
       Do not remove the last paragraph.
     -->
-    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two — when it matters, check there.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
     <string name="home_next_prayer">NEXT PRAYER</string>
@@ -120,6 +120,7 @@
     <string name="qibla_needs_location">Set your location to find the Qibla.</string>
     <string name="qibla_facing">You are facing the Qibla</string>
     <string name="qibla_heading_now">You are facing %1$d°</string>
+    <string name="qibla_legend_facing">Where you are facing</string>
     <string name="qibla_turn_left">Turn left %1$d°</string>
     <string name="qibla_turn_right">Turn right %1$d°</string>
     <string name="qibla_no_compass">Face %1$d° from true north</string>

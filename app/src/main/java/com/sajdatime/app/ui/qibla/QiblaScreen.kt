@@ -3,6 +3,8 @@ package com.sajdatime.app.ui.qibla
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -100,6 +102,10 @@ fun QiblaScreen(state: UiState) {
         CompassDial(state = state, qiblaTrueBearing = qibla)
         Spacer(Modifier.height(24.dp))
         GuidanceText(state = state, qiblaTrueBearing = qibla)
+        if (state.compassHeading != null) {
+            Spacer(Modifier.height(14.dp))
+            DialLegend()
+        }
         Spacer(Modifier.height(16.dp))
         AccuracyNotice(state.compassAccuracy)
     }
@@ -133,7 +139,12 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     )
 
     val aligned = heading != null && QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0)
-    val needleColour = if (aligned) scheme.primary else scheme.tertiary
+
+    // The arc is the turn still owed, measured from the fixed "facing" tick at the top
+    // round to the Qibla arrow. Signed, so a left turn sweeps anticlockwise and the user
+    // is never told to walk the long way round. It is the same number GuidanceText speaks
+    // aloud, drawn instead of said.
+    val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qiblaTrueBearing) else 0.0
 
     Box(
         modifier = Modifier
@@ -155,17 +166,24 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
             val radius = size.minDimension / 2f
             val centre = Offset(size.width / 2f, size.height / 2f)
 
+            // Aligned fills the dial and switches its edge to the accent. That, the
+            // vanishing arc and the changed wording are three independent signals of the
+            // same fact, none of which is colour on its own.
             drawCircle(
-                color = scheme.surfaceVariant,
+                color = if (aligned) scheme.primaryContainer else scheme.surfaceVariant,
                 radius = radius,
                 center = centre,
             )
             drawCircle(
-                color = scheme.outlineVariant,
+                color = if (aligned) scheme.primary else scheme.outlineVariant,
                 radius = radius,
                 center = centre,
                 style = Stroke(width = 2f),
             )
+
+            if (heading != null && !aligned) {
+                drawTurnArc(centre, radius, turn.toFloat(), scheme.primary)
+            }
 
             rotate(degrees = dialRotation, pivot = centre) {
                 drawTicks(centre, radius, scheme.outline)
@@ -173,20 +191,47 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
 
                 // Qibla needle, drawn in dial space so it tracks true north correctly.
                 rotate(degrees = qiblaTrueBearing.toFloat(), pivot = centre) {
-                    drawNeedle(centre, radius, needleColour)
+                    drawNeedle(centre, radius, scheme.primary)
                 }
             }
 
-            // Fixed reference mark at the top: "you are pointing here".
-            drawCircle(
-                color = scheme.onSurface,
-                radius = 5f,
-                center = Offset(centre.x, centre.y - radius + 14f),
+            // Fixed reference mark at the top: "you are pointing here". A tick rather
+            // than a dot, because it is the origin the arc is measured from and a dot
+            // does not read as an origin.
+            drawLine(
+                color = scheme.outline,
+                start = Offset(centre.x, centre.y - radius),
+                end = Offset(centre.x, centre.y - radius * 0.78f),
+                strokeWidth = 5f,
             )
         }
         // Nothing is drawn over the centre. An icon and a heading readout there sat
         // directly on top of the needle and made both harder to read.
     }
+}
+
+/**
+ * The turn still owed, as a band just inside the rim.
+ *
+ * `sweep` is signed: positive turns clockwise from the top, negative anticlockwise, so
+ * the band always shows the shorter way round rather than a full lap. Compose measures
+ * arcs from three o'clock, hence the -90 start.
+ */
+private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, sweep: Float, colour: Color) {
+    val thickness = radius * 0.13f
+    val inset = thickness / 2f + 3f
+    drawArc(
+        color = colour,
+        startAngle = -90f,
+        sweepAngle = sweep,
+        useCenter = false,
+        topLeft = Offset(centre.x - radius + inset, centre.y - radius + inset),
+        size = androidx.compose.ui.geometry.Size(
+            (radius - inset) * 2f,
+            (radius - inset) * 2f,
+        ),
+        style = Stroke(width = thickness),
+    )
 }
 
 private fun DrawScope.drawTicks(centre: Offset, radius: Float, colour: Color) {
@@ -294,6 +339,43 @@ private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
     }
 }
 
+/**
+ * Two swatches naming the two marks on the dial. Without it the green arrow and the grey
+ * tick are just shapes, and "which one am I?" is the first thing anyone asks. Hidden when
+ * there is no compass, because then there is no "facing" mark to explain.
+ */
+@Composable
+private fun DialLegend() {
+    val scheme = MaterialTheme.colorScheme
+
+    @Composable
+    fun Swatch(colour: Color, label: String) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier
+                    .size(width = 14.dp, height = 6.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(colour),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = scheme.onSurfaceVariant,
+            )
+        }
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(18.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.clearAndSetSemantics { },
+    ) {
+        Swatch(scheme.primary, stringResource(R.string.qibla_title))
+        Swatch(scheme.outline, stringResource(R.string.qibla_legend_facing))
+    }
+}
+
 @Composable
 private fun AccuracyNotice(accuracy: CompassAccuracy) {
     // Only surfaced when it changes what the user should do. A "high accuracy" badge on
@@ -305,28 +387,27 @@ private fun AccuracyNotice(accuracy: CompassAccuracy) {
         CompassAccuracy.HIGH -> return
     }
 
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        ),
-        modifier = Modifier.fillMaxWidth(),
+    val scheme = MaterialTheme.colorScheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(scheme.tertiaryContainer)
+            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .padding(16.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-        ) {
-            Icon(
-                Icons.Outlined.WarningAmber,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.tertiary,
-            )
-            Spacer(Modifier.width(14.dp))
-            Text(
-                text = stringResource(messageRes),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        }
+        Icon(
+            Icons.Outlined.WarningAmber,
+            contentDescription = null,
+            tint = scheme.tertiary,
+        )
+        Spacer(Modifier.width(14.dp))
+        Text(
+            text = stringResource(messageRes),
+            style = MaterialTheme.typography.bodyMedium,
+            color = scheme.onTertiaryContainer,
+        )
     }
 }

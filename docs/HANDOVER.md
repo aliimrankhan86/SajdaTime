@@ -483,19 +483,28 @@ pocket, not startling in a quiet room.
 
 ## 7. Design system
 
+**The full reference is [`docs/DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)** — every token, every
+component pattern, and the reasoning behind each. What follows is the short version.
+
 ### Palette (`ui/theme/Color.kt`)
 Deep green (traditionally associated with Islam) as primary, warm gold as the single
-accent, warm-neutral paper surfaces. No decorative colour.
+accent. Light keeps warm-neutral paper surfaces; **dark is near-neutral, not green-tinted**
+— on an OLED panel a tinted dark grey reads as a colour cast, and the green then has to
+shout to be seen as an accent.
 
 | Role | Light | Dark |
 |---|---|---|
-| primary | `#14624B` | `#7FD1AE` |
-| accent / tertiary | `#8A5200` | `#E3B341` |
-| background | `#FBFAF7` | `#0E1512` |
-| surface | `#FFFFFF` | `#18211D` |
-| onSurface | `#12211C` | `#E8EEEA` |
-| onSurfaceVariant | `#43524B` | `#B3C2BA` |
-| secondaryContainer | `#D3E4DA` | `#2A473B` |
+| primary | `#14624B` | `#4FC48F` |
+| accent / tertiary | `#8A5200` | `#E8B14A` |
+| tertiaryContainer (warnings) | `#FBEEDA` | `#2A2113` |
+| background | `#FBFAF7` | `#101312` |
+| surface | `#FFFFFF` | `#171B1A` |
+| primaryContainer (highlight) | `#D7EAE0` | `#143028` |
+| onSurface | `#12211C` | `#E7EAE8` |
+| onSurfaceVariant | `#43524B` | `#A9B2AE` |
+| outline | `#6B7A73` | `#8B948F` |
+| outlineVariant (borders) | `#C9D2CD` | `#2A312E` |
+| secondaryContainer (nav pill) | `#D3E4DA` | `#1E4034` |
 
 > ⚠️ **Set every Material 3 colour role, not just the obvious ones.** This bit the project
 > **three separate times**: dialogs, bottom sheets and the nav pill all rendered in
@@ -509,7 +518,17 @@ themes, including the tonal containers. **Edit a colour below AA and the build f
 
 ### Typography
 System font family. `PrayerTimeTextStyle` uses **tabular figures** (`tnum`) so the
-countdown does not jitter as digits change width.
+countdown does not jitter as digits change width. Section labels are letterspaced but
+**never uppercased in code** — `String.uppercase()` on a translated string is a trap.
+
+### Component patterns that must not be simplified away
+- The next prayer is marked **three ways** (highlight, leading accent bar, "Next" pill),
+  because colour alone marks it for nobody on a greyscale or colour-blind display.
+- The Qibla **aligned** state is marked three ways too (arc clears, dial fills, wording
+  changes).
+- The next-prayer card is **flat**. It once carried a time-of-day gradient; that moved the
+  background under the countdown as the day went on, so the number the screen exists to
+  show had a different contrast ratio at Isha than at Fajr. Do not reintroduce it.
 
 ### Accessibility
 Contrast enforced by test · the Qibla dial is `clearAndSetSemantics {}` (decorative) with
@@ -645,6 +664,32 @@ made it taller than the screen and pushed the turn instruction off the bottom.
 `minWidth` to the full width, and a later `widthIn` cap can never win against it. It has to
 be `widthIn(...).fillMaxWidth()`. This looked correct on the screen and was only caught by
 measuring the running app.
+
+### The dark design system (v1.1.0), verified by screenshot
+
+Every claim below is from a capture of the running app, not from reading the diff.
+
+| Checked | Result |
+|---|---|
+| Times, dark | Flat next-prayer card, bordered day list, dividers, sunrise dimmed one type step |
+| The "next" row | Clock moved to 12:00 so a *today* prayer was next — accent bar, "Next" pill and highlight all present. At 23:48 none of it appears, correctly, because the next Fajr is tomorrow's |
+| Times, light | Same three treatments carry over; the light palette was not touched |
+| Qibla, dark | Green arc sweeping 118° from the facing tick to the arrow, legend beneath |
+| Settings, both | Amber warning banner, letterspaced green section labels, bordered group cards |
+| Settings at `font_scale 1.5` | Group cards and rows grow; nothing clipped |
+| Disclaimer at `font_scale 1.5` | Scrolls, and the dua request at the end is reachable |
+| Watch | New palette on both pages; the Qibla dial's arc and facing tick match the phone |
+
+**What the screenshots caught that the code review did not.** The disclaimer gained a
+paragraph about watch accuracy, which made it five paragraphs. `AlertDialog` does **not**
+scroll its body for you — and both places the disclaimer appears passed a bare `Text`. At a
+raised font size the last paragraph, the dua request, was exactly what would have fallen
+off the bottom unread. Both are wrapped in a `verticalScroll` now. Adding a sentence to a
+string is not a text change; it is a layout change.
+
+**Store screenshots are part of the diff.** All five phone captures and both watch captures
+were retaken and `tools/build-store-assets.sh` re-run. A theme change that leaves
+`docs/store/screenshots/` alone ships a listing that does not match the app.
 
 ### Useful device-testing recipes
 
@@ -820,6 +865,12 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
 location, cloud backup, a server of any kind.
 
+**Also: features the dark design system deliberately leaves out.** The design it came from
+was drawn against the shipping feature set on purpose — no prayer tracker, no day stepper
+on the Times screen, no per-row notification mute. They are absent from the mockups because
+they are absent from the app, not because they were forgotten. A future design pass should
+stay inside the feature set unless the feature itself has been agreed first.
+
 ---
 
 ## 12. Development environment
@@ -905,7 +956,8 @@ script after editing the markdown.**
 | `e693fa1` | Fixed 13 defects found in a full ship-readiness audit |
 | `6a6dbcd` | Made the app translatable, reorganised Settings, asked for duas once |
 | `985adc8` | Fixed nine defects found by running the app rather than reading it — including the watch calculating Asr with the wrong madhab |
-| *(this)* | **(current)** Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
+| `f49dc5d` | Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
+| *(this)* | **(current)** Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
 
 ---
 
@@ -930,15 +982,23 @@ script after editing the markdown.**
    absolutely nothing, because `fillMaxWidth()` pins `minWidth` and a `widthIn` placed after
    it can never win. Only screenshotting the running app caught it. Order is not cosmetic,
    and "the change looks right" is not evidence that it works.
-7. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+7. **Adding a sentence to a string is a layout change.** The disclaimer gained one
+   paragraph and became five. `AlertDialog` does not scroll its body for you, and both
+   places that dialog appears passed a bare `Text` — so at a raised font size the last
+   paragraph, the dua request, fell off the bottom. Nothing about that is visible in the
+   diff. Screenshot the screen at `font_scale 1.5` after touching any string that grows.
+8. **A visual change is not finished until `docs/store/screenshots/` is retaken.** Those
+   images are a published listing. Recapture into `raw/` and re-run
+   `tools/build-store-assets.sh`; the script reframes and copies, it does not re-shoot.
+9. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
    shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-8. The owner is **not technical**. Explain in plain language, state what is verified versus
-   assumed, and never present something as done when it is untested. He also has **no access
-   to physical devices** — if you cannot test it on an emulator, say so plainly rather than
-   suggesting he go and try it himself.
-9. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
-   Code alone loses the reasoning, and the reasoning is what stops the next session
-   undoing a decision it does not know was deliberate.
+10. The owner is **not technical**. Explain in plain language, state what is verified versus
+    assumed, and never present something as done when it is untested. He also has **no
+    access to physical devices** — if you cannot test it on an emulator, say so plainly
+    rather than suggesting he go and try it himself.
+11. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+    Code alone loses the reasoning, and the reasoning is what stops the next session
+    undoing a decision it does not know was deliberate.
 
 ---
 

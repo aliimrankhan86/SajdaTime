@@ -2,6 +2,8 @@ package com.sajdatime.app
 
 import androidx.compose.ui.graphics.Color
 import com.sajdatime.app.ui.theme.DarkAccent
+import com.sajdatime.app.ui.theme.DarkAccentContainer
+import com.sajdatime.app.ui.theme.DarkOnAccentContainer
 import com.sajdatime.app.ui.theme.DarkInverseOnSurface
 import com.sajdatime.app.ui.theme.DarkInverseSurface
 import com.sajdatime.app.ui.theme.DarkOnSecondaryContainer
@@ -31,6 +33,8 @@ import com.sajdatime.app.ui.theme.DarkSecondary
 import com.sajdatime.app.ui.theme.DarkSurface
 import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
+import com.sajdatime.app.ui.theme.LightAccentContainer
+import com.sajdatime.app.ui.theme.LightOnAccentContainer
 import com.sajdatime.app.ui.theme.LightBackground
 import com.sajdatime.app.ui.theme.LightOnAccent
 import com.sajdatime.app.ui.theme.LightOnBackground
@@ -77,6 +81,8 @@ class ColorContrastTest {
         Pair("light onPrimaryContainer/primaryContainer", LightOnPrimaryContainer, LightPrimaryContainer, 4.5),
         Pair("light onSecondary/secondary", LightOnSecondary, LightSecondary, 4.5),
         Pair("light onAccent/accent", LightOnAccent, LightAccent, 4.5),
+        // The amber warning banner: its text, and its icon against its own container.
+        Pair("light onAccentContainer/accentContainer", LightOnAccentContainer, LightAccentContainer, 4.5),
         // The section headings in Settings are primary-on-background.
         Pair("light primary/background", LightPrimary, LightBackground, 4.5),
         Pair("light primary/surface", LightPrimary, LightSurface, 4.5),
@@ -101,6 +107,7 @@ class ColorContrastTest {
         Pair("dark onPrimaryContainer/primaryContainer", DarkOnPrimaryContainer, DarkPrimaryContainer, 4.5),
         Pair("dark onSecondary/secondary", DarkOnSecondary, DarkSecondary, 4.5),
         Pair("dark onAccent/accent", DarkOnAccent, DarkAccent, 4.5),
+        Pair("dark onAccentContainer/accentContainer", DarkOnAccentContainer, DarkAccentContainer, 4.5),
         Pair("dark primary/background", DarkPrimary, DarkBackground, 4.5),
         Pair("dark primary/surface", DarkPrimary, DarkSurface, 4.5),
         Pair("dark accent/surface", DarkAccent, DarkSurface, 4.5),
@@ -119,6 +126,8 @@ class ColorContrastTest {
         Pair("light outline/background", LightOutline, LightBackground, 3.0),
         Pair("dark outline/surface", DarkOutline, DarkSurface, 3.0),
         Pair("dark outline/background", DarkOutline, DarkBackground, 3.0),
+        Pair("light accent/accentContainer", LightAccent, LightAccentContainer, 3.0),
+        Pair("dark accent/accentContainer", DarkAccent, DarkAccentContainer, 3.0),
     )
 
     @Test

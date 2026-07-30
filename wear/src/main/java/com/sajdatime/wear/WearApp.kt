@@ -26,8 +26,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -409,13 +411,18 @@ private fun QiblaPage(state: WearUiState) {
 
             val heading = state.heading
             val aligned = heading != null && QiblaEngine.isAligned(heading, qibla, 5.0)
-            val needleColour = if (aligned) {
-                MaterialTheme.colorScheme.primary
+            // Green, aligned or not — the same rule as the phone. The arrow's job is
+            // "the Qibla is that way", and a colour that changes underneath it invites
+            // the reading that the direction itself has changed.
+            val needleColour = MaterialTheme.colorScheme.primary
+            val dialColour = if (aligned) {
+                MaterialTheme.colorScheme.primaryContainer
             } else {
-                MaterialTheme.colorScheme.tertiary
+                MaterialTheme.colorScheme.surfaceContainer
             }
-            val dialColour = MaterialTheme.colorScheme.surfaceContainer
             val tickColour = MaterialTheme.colorScheme.onSurfaceVariant
+            val arcColour = MaterialTheme.colorScheme.primary
+            val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qibla) else 0.0
 
             Canvas(
                 Modifier
@@ -425,6 +432,22 @@ private fun QiblaPage(state: WearUiState) {
                 val radius = size.minDimension / 2f
                 val centre = Offset(size.width / 2f, size.height / 2f)
                 drawCircle(color = dialColour, radius = radius, center = centre)
+
+                // The turn still owed, from the fixed tick at the top round to the
+                // arrow. Same idea as the phone dial, at watch scale.
+                if (heading != null && !aligned) {
+                    val thickness = radius * 0.12f
+                    val inset = thickness / 2f
+                    drawArc(
+                        color = arcColour,
+                        startAngle = -90f,
+                        sweepAngle = turn.toFloat(),
+                        useCenter = false,
+                        topLeft = Offset(centre.x - radius + inset, centre.y - radius + inset),
+                        size = Size((radius - inset) * 2f, (radius - inset) * 2f),
+                        style = Stroke(width = thickness),
+                    )
+                }
 
                 rotate(degrees = -(heading ?: 0.0).toFloat(), pivot = centre) {
                     for (degrees in 0 until 360 step 30) {
@@ -455,6 +478,17 @@ private fun QiblaPage(state: WearUiState) {
                             color = needleColour,
                         )
                     }
+                }
+
+                // Fixed "you are pointing here" tick, the origin the arc is measured
+                // from. Drawn outside the rotate block so it stays at the top.
+                if (heading != null) {
+                    drawLine(
+                        color = tickColour,
+                        start = Offset(centre.x, centre.y - radius),
+                        end = Offset(centre.x, centre.y - radius * 0.74f),
+                        strokeWidth = 4f,
+                    )
                 }
             }
 

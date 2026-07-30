@@ -5,6 +5,8 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.net.toUri
 import android.provider.Settings as SystemSettings
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
@@ -44,6 +47,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,6 +55,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Madhab
@@ -273,7 +278,12 @@ fun SettingsScreen(
                 }
             },
             title = { Text(stringResource(R.string.disclaimer_title)) },
-            text = { Text(stringResource(R.string.disclaimer_body)) },
+            // Scrollable for the same reason every chooser on this screen is.
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(stringResource(R.string.disclaimer_body))
+                }
+            },
         )
     }
 }
@@ -467,25 +477,42 @@ private fun ChooserDialog(
 
 // --- small building blocks -------------------------------------------------------------
 
+/**
+ * A titled group of rows, drawn as one bounded card.
+ *
+ * The rows used to run edge to edge under a coloured heading, which left the screen as a
+ * single unbroken column and made "where does Prayer times end and Reminders begin"
+ * something you worked out by reading. A border is faster than reading.
+ */
 @Composable
 private fun Group(title: String, content: @Composable () -> Unit) {
-    Spacer(Modifier.height(20.dp))
+    val scheme = MaterialTheme.colorScheme
+    Spacer(Modifier.height(24.dp))
     Text(
         text = title,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.primary,
+        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
+        color = scheme.primary,
         modifier = Modifier
             .padding(horizontal = 20.dp, vertical = 8.dp)
             .semantics { heading() },
     )
-    content()
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(scheme.surface)
+            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(20.dp)),
+    ) {
+        content()
+    }
 }
 
 @Composable
 private fun SectionLabel(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.labelMedium,
+        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
         color = MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .padding(vertical = 8.dp)
@@ -493,27 +520,37 @@ private fun SectionLabel(title: String) {
     )
 }
 
+/** Same amber treatment as the banners on Times, so a warning looks like a warning. */
 @Composable
 private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(scheme.tertiaryContainer)
+            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
         Icon(
             Icons.Outlined.WarningAmber,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.tertiary,
+            tint = scheme.tertiary,
         )
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = scheme.onTertiaryContainer,
+            )
             Text(
                 text = body,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                color = scheme.onTertiaryContainer,
             )
         }
     }
@@ -528,7 +565,7 @@ private fun SettingRow(
     title: String,
     subtitle: String? = null,
     icon: ImageVector? = null,
-    horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 16.dp,
     onClick: (() -> Unit)? = null,
 ) {
     Row(
@@ -613,7 +650,7 @@ private fun SwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     icon: ImageVector? = null,
-    horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp,
+    horizontalPadding: androidx.compose.ui.unit.Dp = 16.dp,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

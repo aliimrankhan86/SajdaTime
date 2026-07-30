@@ -82,6 +82,9 @@ session inherits it instead of relearning it.
   be errors in the test rather than the code, so check both sides.
 - **Measure the fix, do not just read it.** A modifier change that looked right and reviewed
   clean did nothing at all until it was screenshotted.
+- **Colours come from `docs/DESIGN_SYSTEM.md`, never from a hex in a composable.** Every
+  one is a Material 3 role, and `ColorContrastTest` fails the build if a pair drops below
+  WCAG AA. A visual change is not finished until `docs/store/screenshots/` is retaken.
 - **Ponytail discipline:** stdlib and platform first, no speculative abstractions, shortest
   working diff. Mark deliberate simplifications with a `ponytail:` comment.
 - **The owner is not technical and has no physical test devices.** Explain in plain language,

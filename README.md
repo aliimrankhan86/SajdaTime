@@ -84,6 +84,8 @@ wear/   The Wear OS app and the next-prayer tile.
   business rule, what is verified, what is not, what is left to do, and the build traps.
 - [docs/NEW-SESSION.md](docs/NEW-SESSION.md) - how to pick the project back up in a fresh
   session, and what to say to get a useful one.
+- [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) - every colour token, spacing step and
+  component pattern, and why each one is the way it is.
 - [docs/RELEASING.md](docs/RELEASING.md) - the Google Play checklist, including the three
   steps only the owner can do.
 - [docs/store/LISTING.md](docs/store/LISTING.md) - the Play Console listing text and assets,

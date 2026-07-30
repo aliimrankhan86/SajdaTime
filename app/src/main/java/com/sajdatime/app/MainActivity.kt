@@ -13,11 +13,15 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.app.ui.ExportEvent
@@ -117,7 +121,15 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 title = { Text(stringResource(R.string.disclaimer_title)) },
-                                text = { Text(stringResource(R.string.disclaimer_body)) },
+                                // Scrollable. AlertDialog does not scroll its body for
+                                // you, and this text is now five paragraphs — at a large
+                                // system font size the last of them, the dua request, is
+                                // exactly what would fall off the bottom unread.
+                                text = {
+                                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                                        Text(stringResource(R.string.disclaimer_body))
+                                    }
+                                },
                             )
                         }
                     }
