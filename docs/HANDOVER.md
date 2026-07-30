@@ -7,8 +7,10 @@ business rule, what is verified, what is not, and what is left to do.
 - **Repo:** `git@github.com:aliimrankhan86/SajdaTime.git`
 - **Local path:** `/Users/aliimrankhan/Developer/SajdaTime`
 - **Branch:** `main`
-- **Version:** 1.1.0 (`versionCode` 2 on phone, 3 on the watch — they share an
-  `applicationId`, and Play refuses two bundles with the same code)
+- **Version:** 1.1.0 (`versionCode` 2 on phone, **1000** on the watch — they share an
+  `applicationId`, so codes must be unique across both modules; each has its own band so
+  the two sequences can never collide. The watch also ships on a **separate Play release
+  track**, not in the phone's release — see `docs/RELEASING.md` Step 7.)
 - **Status:** feature-complete, tested, and prepared for Play. **Not shippable yet — the
   release is unsigned because only the owner may hold the key.** See §11.
 - **Companion docs:** `docs/ARCHITECTURE.md` (the technical spec, including the exact
@@ -555,11 +557,11 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 > **Play Store status at a glance.** Developer account created (personal, ID
 > 6284685113064492750, developer name "Ali Imran Khan"). Android-device check **passed**.
 > Privacy policy **live** at <https://aliimrankhan86.github.io/SajdaTime/privacy.html>. All
-> store assets and listing text **done** in `docs/store/`. Waiting on Google's identity
-> review (a few days; the contact-phone check unlocks automatically when it passes — it
-> cannot be done before then, so do not treat it as a task). **The signing key is the only
-> outstanding item anybody can act on, and it is the owner's alone.** After that, the
-> 12-testers-for-14-days closed test is the long pole.
+> store assets and listing text **done** in `docs/store/`. **Account verification is fully
+> complete** — identity documents approved, contact phone verified, device check passed.
+> Nothing is waiting on Google. **The signing key is the only outstanding item, and it is
+> the owner's alone.** After that: create the listing, then the 12-testers-for-14-days
+> closed test, which is the long pole.
 
 1. **The app is unsigned, and only the owner can change that.** The Gradle side *is* done:
    both modules read a `keystore.properties` from the project root and sign the release with
@@ -615,11 +617,11 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     account: it requires the Play Console app on a *physical* phone and an emulator does not
     satisfy it — the one step in this whole project that cannot be done on an emulator.
 
-    Still outstanding: **Google's identity review**. The contact-phone check is gated behind
-    it and unlocks on its own, so it is not a task. See `docs/RELEASING.md` for the account
-    facts and the full checklist.
+    **All account verification has now cleared** — identity documents approved and the
+    contact phone verified. Nothing on Google's side is outstanding. See
+    `docs/RELEASING.md` for the account facts and the full checklist.
 
-    **The next actual step, once verification clears:** Play Console → Create app → paste
+    **The next actual step:** Play Console → Create app → paste
     the fields from `docs/store/LISTING.md`, upload the assets from `docs/store/`, complete
     the data safety form (the LISTING.md notes explain the one nuance about the geocoding
     lookup), then Closed testing with 12 testers for 14 continuous days.

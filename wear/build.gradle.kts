@@ -27,10 +27,14 @@ android {
         // not worth the maintenance for a solo project.
         minSdk = 30
         targetSdk = 36
-        // Phone and watch share an applicationId, so Play treats them as one listing and
-        // refuses two bundles with the same version code. The watch is kept one ahead of
-        // the phone; keep it that way on every future bump.
-        versionCode = 3
+        // Phone and watch share an applicationId, so version codes must be unique across
+        // BOTH modules — Play scopes them per app, not per release track. Rather than
+        // interleave two sequences and have to dodge each other's numbers forever, the
+        // watch gets its own band starting at 1000 while the phone stays in the low range.
+        // Google recommends exactly this (an independent scheme per form factor) in
+        // https://developer.android.com/training/wearables/packaging. Bump freely; the two
+        // sequences can never collide. Version codes can never be reused or decreased.
+        versionCode = 1000
         versionName = "1.1.0"
     }
 

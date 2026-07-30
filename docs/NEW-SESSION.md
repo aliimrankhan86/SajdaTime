@@ -59,10 +59,10 @@ the store assets are already prepared. Tell me what is actually outstanding
 before you do anything.
 ```
 
-The honest answer, as of the last session: Google's identity review (waiting, nothing to
-do), and the signing key (the owner's alone). Everything else — privacy policy, screenshots,
-icon, feature graphic, listing text, Gradle signing wiring — is finished and in the repo.
-A session that offers to "prepare the store assets" has not read the handover.
+The honest answer, as of the last session: the developer account is **fully verified** and
+the signing key (the owner's alone) is the only blocker. Everything else — privacy policy,
+screenshots, icon, feature graphic, listing text, Gradle signing wiring — is finished and in
+the repo. A session that offers to "prepare the store assets" has not read the handover.
 
 **To fix something a user reported**
 

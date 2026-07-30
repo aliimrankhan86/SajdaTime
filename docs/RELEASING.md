@@ -7,25 +7,67 @@ Written for the owner, who is not a developer. Follow it top to bottom. Anything
 
 ## Step 0 — Before anything else: the 12-tester rule
 
-If you create a **personal** (individual, not company) Google Play developer account, Google
-requires you to run a **closed test with at least 12 testers who stay opted in for 14
-continuous days** before you may apply for production access.
+This account is a **personal** one created well after 13 November 2023, so the rule applies.
+Verified against Google's [App testing requirements for new personal developer
+accounts](https://support.google.com/googleplay/android-developer/answer/14151465), which
+still reads:
 
-This applies to accounts created from late 2023 onward. It is the single biggest surprise
-for solo developers and it means **you cannot publish publicly on day one**. Plan for it:
-line up 12 people (family, friends, the mosque) who will install the app from a test link
-and leave it installed for two weeks.
+> "At least 12 testers must be opted-in to your closed test when you apply for production
+> access. They must have been opted-in for the last 14 days continuously."
 
-Check the current rule in the Play Console when you sign up, because Google adjusts it.
+It is the single biggest surprise for solo developers and it means **you cannot publish
+publicly on day one**. There is **no charity, nonprofit or free-app exemption** — the only
+exemptions are account-based (organisation accounts, and personal accounts created on or
+before 13 November 2023).
+
+### The details that actually catch people out
+
+- **The 14 days are per tester, not a headcount.** Google: *"we won't count testers who
+  opted in, tested for less than 14 days, and then opted out"*, and even if they rejoin,
+  *"these 14 days must be consecutive"*. So one person dropping out on day 13 resets **their
+  slot** to zero — not everyone else's, but you are then 14 days from having 12 again.
+- **Therefore recruit 16–20, not 12.** The buffer is the whole point.
+- **The clock starts when the release is live and testers have opted in**, not when you
+  create the track. The opt-in link does not even exist until the release passes review.
+- **Pushing new builds does not reset the clock.** The counter tracks tester opt-in, not
+  releases — so keep shipping fixes into the same track. That is also what gives you
+  something real to write in the production-access form.
+- **Testers must click the opt-in link** while signed into the exact Google account you
+  listed. Being on your email list is not enough.
+- **Internal testing does not count.** It is capped at 100 testers and is a different track.
+  The requirement names *closed* testing specifically.
+- Then budget **another ~7 days** for the production-access review on top of the 14. Google:
+  *"This usually takes 7 days or less, but may occasionally take longer."*
+
+Realistic floor from a standing start: **about three weeks.**
+
+> **Ignore the paid "12 testers" services.** They dominate the search results for this topic
+> and have a direct financial interest in making the rule sound harsher than it is. Several
+> of their specific claims — that emulators are detected and rejected, that testers must open
+> the app repeatedly, that a rejection restarts the 14 days — appear **nowhere in Google's
+> documentation**, and two of them contradict each other on the same site.
 
 **The owner's plan is to start recruiting testers only once account verification has
 cleared**, rather than in parallel. That is a deliberate decision — do not keep pressing for
-it earlier. Note only that the 14 days are *continuous* and start from the closed test going
-live, so the calendar cost lands after verification, not before.
+it earlier.
+
+### The Wear OS wrinkle
+
+Google has **never published** whether the 12-tester counter aggregates across the phone
+track and the separate Wear OS track, or is evaluated per track. Its own requirements page
+does not contain the word "Wear" at all. The only sources claiming "phone testers count for
+your watch app" are the paid tester services, which sell that exact workaround.
+
+Product Experts on Google's forum have been asked directly for a Wear OS exemption and
+declined: *"the 20 testers, 14 days remains"* (February 2024, when the number was still 20).
+
+**Practical reading:** run the closed test on the **phone** track, which is what unblocks
+production access. Recruit a few genuine Wear OS owners if you can, but do not let the search
+for them hold up the phone launch.
 
 ---
 
-## Step 1 — Google Play developer account · **DONE, verification pending**
+## Step 1 — Google Play developer account · **DONE, fully verified**
 
 Created as a **personal** account:
 
@@ -46,14 +88,11 @@ full address is only shown if you monetise, which this app does not.
 | Task | State |
 |---|---|
 | Access to a real Android device | ✅ **Done** — Play Console app on a physical phone |
-| Identity documents | ⏳ Uploaded, Google reviewing. A few days. |
-| Contact phone number | 🔒 **Blocked** — Google will not let you verify the phone until the identity documents are approved |
+| Identity documents | ✅ **Done** — approved by Google |
+| Contact phone number | ✅ **Done** — verified once the identity review passed |
 
-The phone number is not something you can act on. It unlocks by itself once the identity
-review passes; the account owner gets an email when that happens. Nothing else in the
-project is waiting on it.
-
-Track both at <https://play.google.com/console> → Home.
+**All account verification is complete.** Nothing on the Google side is outstanding. The
+account can create and publish apps.
 
 > The device check is worth remembering for any future account: it requires the **Play
 > Console app on a physical Android phone**, and an emulator does not satisfy it. Every
@@ -133,10 +172,11 @@ unzip -l app/build/outputs/bundle/release/app-release.aab | grep META-INF
 You should see a `.RSA` and a `.SF` file. If you see neither, `keystore.properties` was not
 found or has a wrong path in it.
 
-> Phone is `versionCode = 2`, watch is `versionCode = 3`. They share an `applicationId`, so
-> Play treats them as one listing and refuses two bundles with the same version code — keep
-> the watch one ahead of the phone on every future bump. Every update must also *increase*
-> the number; Play never accepts the same one twice.
+> Phone is `versionCode = 2`, watch is `versionCode = 1000`. They share an `applicationId`,
+> so Play requires every version code to be unique across **both** modules — the number is
+> scoped to the app, not to the release track. Each module now has its own band, so bump
+> either freely and they can never collide. Every update must *increase* the number; Play
+> never accepts the same one twice, and a code can never be reused or lowered.
 
 ---
 
@@ -214,15 +254,68 @@ You must complete all of these before you can publish:
 ## Step 7 — Upload and roll out
 
 1. Play Console → **Create app** → name **SajdaTime**, free, app (not game).
+   **"Free" is a one-way door.** Google: *"Once your app has been offered for free, the app
+   can't be changed to paid."* That is exactly what this app wants, but know it is permanent.
+   The `applicationId` is likewise permanent from the first upload.
 2. Fill in the store listing (Step 5) and all the forms (Step 6).
-3. **Testing → Closed testing** → create a release → upload **both** `app-release.aab` and
-   `wear-release.aab` into the **same release**. They share an `applicationId`, so they
-   belong to one listing; Play delivers the right one per device.
-4. Add your 12 testers by email, share the opt-in link, and wait out the 14 days.
-5. Apply for production access, then **Production → Create release** and roll out.
+3. **Testing → Closed testing** → **Countries/regions** → add **all** countries. Closed
+   tracks inherit production availability, and if production availability was never set your
+   testers hit "app not available in your country". This is the single most common reason a
+   closed test appears broken.
+4. Same track → **Releases → Create new release** → upload **`app-release.aab` only**.
+5. Add your 12 testers by email, share the opt-in link, and wait out the 14 days.
+6. Apply for production access, then **Production → Create release** and roll out.
 
-Tick the box that says the app supports **Wear OS**, and attach the watch screenshots, or
-it will not be discoverable on watches.
+### The watch bundle does NOT go in the same release
+
+**This corrects an earlier version of this document, which said to upload both bundles into
+one release. Play will refuse it.** Since March 2023 Wear OS has its own release track, and
+Google's [Manage different form factor releases on dedicated
+tracks](https://support.google.com/googleplay/android-developer/answer/13295490) is explicit:
+
+> "If you want to continue distributing your app to Wear OS devices, you must use dedicated
+> Wear OS tracks and create new releases on these tracks."
+
+Putting `wear-release.aab` in the phones track produces the error *"This APK or bundle
+requires the Wear OS system feature android.hardware.type.watch. To publish this release on
+the current track, remove this artifact."*
+
+The watch still shares the listing, the `applicationId` and the signing key — that part was
+always right, and Google requires it (Wear quality rule WO-G7). Only the *track* is separate.
+The order is:
+
+1. Ship the phone app first. Nothing about it depends on the watch.
+2. **Test and release → Advanced settings → Form factors → Add form factor → Wear OS.**
+   (Not under Grow → Store presence.) This is gated on already having a release in a closed
+   testing track.
+3. Upload the Wear screenshots, then **Manage → Use a dedicated release track for Wear OS**.
+4. Upload `wear-release.aab` with the form-factor selector set to **Wear OS**, not phones.
+5. Agree to the Wear OS review policy. This triggers a **separate human review** against the
+   [Wear OS app quality guidelines](https://developer.android.com/docs/quality-guidelines/wear-app-quality),
+   on top of the normal app review. Outcome shows as Pending / Approved / Not approved.
+
+**Version codes are unique per app, not per track.** Phone is `2`; the watch is `1000` and
+climbs in its own band, so the two sequences can never collide. See `wear/build.gradle.kts`.
+
+### What the Wear review actually checks
+
+Google publishes its own list of the most common Wear OS rejections. Against this app:
+
+| Rejection cause | Where we stand |
+|---|---|
+| Listing doesn't say **"Wear OS"** | ✅ The full description says "A Wear OS app and watch tile". Must be the exact phrase — "WearOS" and "Android Wear" both get rejected. **This applies to every localised listing too.** |
+| No Wear OS screenshot | ✅ Two, 384 × 384, 1:1, no device frame, no added text — all as required |
+| Basic functionality broken / screenshots inaccurate | ⚠️ `w1-times.png` cuts "Dhuhr 13:1…" mid-glyph at the bottom edge. It is only the scroll boundary, but it reads as a broken layout. **Recapture it scrolled to a clean stop.** |
+| Not formatted for round displays | ⚠️ Never checked on a round emulator. Do this before opting in — 192dp and 227dp round. |
+| Font scaling (WO-V1 / WO-V14) | ⚠️ Never tested with the system font size raised. A top real-world rejection cause. |
+| Black background (WO-V13) | ✅ Confirmed in the screenshots |
+
+Two Wear hypotheses worth *not* worrying about: tiles and complications are **not** required
+for approval, and rotary-input support stopped being a requirement in February 2024.
+
+> **Deadline: 15 September 2026 — 64-bit support becomes mandatory for Wear OS apps.** This
+> app is pure Kotlin with no native libraries, so it should be unaffected, but confirm before
+> that date.
 
 ---
 
@@ -260,17 +353,16 @@ Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradl
 
 ## What is genuinely blocking, right now
 
-The developer account exists, the device check has passed, and GitHub Pages is live. **Two**
-things remain:
+The developer account is **fully verified** — identity, phone and device checks have all
+passed — and GitHub Pages is live. Nothing is waiting on Google. **One** thing remains
+before a bundle can be uploaded:
 
-1. **Google's identity review** — out of everyone's hands, a few days. The contact phone
-   number unlocks automatically when it passes. Nothing to do but wait for the email.
-2. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
-   Nobody else should ever generate or hold this. **This is the only remaining task anyone
-   can actually act on**, and it does not depend on Google at all — it can be done right now.
+1. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
+   Nobody else should ever generate or hold this. **This is the only task blocking a
+   release build**, and it depends on nothing and nobody else.
 
-Then the 12-tester clock (Step 0) starts, and that is the long pole — line testers up now
-rather than waiting for the rest.
+After that: create the listing (Step 7), then the 12-tester clock (Step 0) starts, and that
+is the long pole — 14 continuous days that cannot be shortened.
 
 Everything else is done and in the repo: the live privacy policy, the store screenshots, the
 icon, the feature graphic, all the listing text, and the Gradle signing wiring.

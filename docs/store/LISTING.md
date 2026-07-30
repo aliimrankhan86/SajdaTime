@@ -123,21 +123,82 @@ Live once GitHub Pages is switched on — see `docs/RELEASING.md`, Step 4.
 
 ## Data safety form answers
 
-Google asks these one at a time. The honest answers:
+Google asks these one at a time.
+
+> **This section was previously wrong and has been corrected.** It used to say answer **No**
+> to the collection question. That is a misdeclaration, and misdeclaration is one of the
+> most common causes of an app being pulled after it goes live.
+
+**Why it is Yes.** Google's [Data safety
+page](https://support.google.com/googleplay/android-developer/answer/10787469) defines the
+term narrowly and mechanically:
+
+> "'Collect' means transmitting data from your app off a user's device."
+
+When a user types a city name, that name leaves the device. That is collection by Google's
+definition, regardless of the fact that nothing is stored and there is no server of ours for
+it to be stored on.
+
+**The good news is that declaring it honestly costs you nothing publicly.** The same page:
+
+> "User data transmitted off device that is processed ephemerally needs to be included in
+> your form response, but if it meets the standard below, it will **not** be disclosed in
+> your app's Data safety section on Google Play."
+
+So the store listing still shows a clean privacy card — you get there by declaring it, not by
+staying silent about it.
 
 | Question | Answer |
 |---|---|
-| Does your app collect or share any of the required user data types? | **No** |
-| Is all user data encrypted in transit? | Yes (the one optional lookup uses HTTPS) |
-| Do you provide a way for users to request data deletion? | Not applicable — no data is retained |
+| Does your app collect or share any of the required user data types? | **Yes** |
+| Which data type? | **Location → Approximate location** (Google's own definition names "the city a user is in") |
+| Collected? | **Yes** |
+| Shared? | **No** — Open-Meteo processes the query on our behalf and only because the user typed it, which is Google's "service provider" and "user-initiated action" carve-out. If you are ever unsure, answering Yes is the safe direction. |
+| Is this data processed ephemerally? | **Yes** — it is held in memory only, for the length of one request, and used for nothing else. This is the checkbox that keeps it off the public card. |
+| Purpose | **App functionality** only. Not analytics, not advertising, not personalisation. |
+| Is it required, or can users choose? | **Users can choose** — the app works from device location, or from a typed city, or not at all |
+| Is all user data encrypted in transit? | **Yes** — HTTPS |
+| Can users request deletion? | **No / not applicable** — nothing is retained to delete |
+| Crash logs, diagnostics, device IDs | **None.** No Crashlytics, no analytics SDK, nothing. Leave every box unticked. |
 
-**The one nuance to declare.** If a user types a city name instead of using their location,
-that name is sent once to a geocoding service to get coordinates back. Google's own guidance
-is that data which is only processed in the moment and never stored does **not** count as
-"collected". Declare it that way if the form gives you the option, and if an "approximate
-location" checkbox is unavoidable, mark it as **processed ephemerally, not collected, not
-shared**. Never claim nothing at all touches the network — the privacy policy already says
-it does, and the two must agree.
+Never claim nothing at all touches the network — the privacy policy already says it does, and
+the two must agree.
+
+---
+
+## Advertising ID declaration
+
+**Answer: No.** There are no ads, no analytics and no attribution SDK.
+
+Before you answer, confirm nothing pulled the permission in transitively — a Play Services
+library can merge `AD_ID` into the manifest without you asking. A mismatch between this
+answer and the merged manifest is a Console error:
+
+```bash
+grep -r "AD_ID" app/build/intermediates/merged_manifests/ 2>/dev/null || echo "clean — answer No"
+```
+
+---
+
+## The other App content declarations
+
+Work down **Policy → App content** in this order. All of these gate a closed test, not just
+production.
+
+| Form | Answer |
+|---|---|
+| Privacy policy | `https://aliimrankhan86.github.io/SajdaTime/privacy.html` — must be a live web page, not a PDF |
+| App access | **All functionality is available without special access** — there is no login |
+| Ads | **No** |
+| Content ratings | Complete the IARC questionnaire. Unrated apps have been prohibited on Play since July 2026, so this is not optional. |
+| Target audience and content | **13+**. Not directed at children — ticking any under-13 bracket pulls you into Families policy and a great deal of extra work. |
+| News apps | **No** |
+| COVID-19 contact tracing and status | **No** (this section still exists) |
+| Data safety | See above |
+| Government apps | **No** |
+| Financial features | **My app doesn't provide any financial features** |
+| Health apps | No health features |
+| Advertising ID | **No** — see above |
 
 ---
 
