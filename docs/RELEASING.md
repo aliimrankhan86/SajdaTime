@@ -36,16 +36,23 @@ Created as a **personal** account:
 Public on the Play listing: legal name, country ("United Kingdom"), developer email. The
 full address is only shown if you monetise, which this app does not.
 
-### Three verification tasks remain
+### Verification status
 
-1. **Identity documents** — uploaded, Google is reviewing. Takes a few days.
-2. **Access to a real Android device** — install the **Play Console app** on a physical
-   Android phone and sign in as the owner account. **An emulator will not satisfy this** —
-   defeating emulators is the point of the check. If you do not own an Android phone you
-   must borrow one; publishing is impossible without it.
-3. **Contact phone number** — locked until the identity documents are approved.
+| Task | State |
+|---|---|
+| Access to a real Android device | ✅ **Done** — Play Console app on a physical phone |
+| Identity documents | ⏳ Uploaded, Google reviewing. A few days. |
+| Contact phone number | 🔒 **Blocked** — Google will not let you verify the phone until the identity documents are approved |
 
-Track all three at <https://play.google.com/console> → Home.
+The phone number is not something you can act on. It unlocks by itself once the identity
+review passes; the account owner gets an email when that happens. Nothing else in the
+project is waiting on it.
+
+Track both at <https://play.google.com/console> → Home.
+
+> The device check is worth remembering for any future account: it requires the **Play
+> Console app on a physical Android phone**, and an emulator does not satisfy it. Every
+> other test in this project runs on emulators, so it is the one step that cannot.
 
 ---
 
@@ -248,15 +255,14 @@ Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradl
 
 ## What is genuinely blocking, right now
 
-The developer account exists and GitHub Pages is live. Three things remain, all needing the
-owner personally:
+The developer account exists, the device check has passed, and GitHub Pages is live. **Two**
+things remain:
 
-1. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
-   Nobody else should ever generate or hold this. **Nothing else in the project is waiting
-   on anything but this.**
-2. **Android device verification** (Step 1, task 2) — the Play Console app on a real phone.
-   No emulator. Cannot publish without it.
-3. **Google's identity review** (Step 1, task 1) — out of everyone's hands, a few days.
+1. **Google's identity review** — out of everyone's hands, a few days. The contact phone
+   number unlocks automatically when it passes. Nothing to do but wait for the email.
+2. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
+   Nobody else should ever generate or hold this. **This is the only remaining task anyone
+   can actually act on**, and it does not depend on Google at all — it can be done right now.
 
 Then the 12-tester clock (Step 0) starts, and that is the long pole — line testers up now
 rather than waiting for the rest.

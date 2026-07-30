@@ -552,6 +552,15 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Blocker for release
 
+> **Play Store status at a glance.** Developer account created (personal, ID
+> 6284685113064492750, developer name "Ali Imran Khan"). Android-device check **passed**.
+> Privacy policy **live** at <https://aliimrankhan86.github.io/SajdaTime/privacy.html>. All
+> store assets and listing text **done** in `docs/store/`. Waiting on Google's identity
+> review (a few days; the contact-phone check unlocks automatically when it passes — it
+> cannot be done before then, so do not treat it as a task). **The signing key is the only
+> outstanding item anybody can act on, and it is the owner's alone.** After that, the
+> 12-testers-for-14-days closed test is the long pole.
+
 1. **The app is unsigned, and only the owner can change that.** The Gradle side *is* done:
    both modules read a `keystore.properties` from the project root and sign the release with
    it, falling back to unsigned output when the file is absent. That was verified with a
@@ -594,12 +603,26 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     `LISTING.md` with every field of Console text (name, short and full description,
     category, data safety answers) already within Google's character limits. The privacy
     policy is **live** at <https://aliimrankhan86.github.io/SajdaTime/privacy.html> (GitHub
-    Pages, serving `main` / `/docs`), with a landing page at the site root. The Play
-    developer account also **exists** — personal account, ID 6284685113064492750, developer
-    name "Ali Imran Khan", declared as not earning money so the street address stays off the
-    public listing. Still outstanding: Google's identity review, and **verifying access to a
-    real Android device via the Play Console app — an emulator will not do**. See
-    `docs/RELEASING.md`.
+    Pages, serving `main` / `/docs`), with a landing page at the site root.
+
+    The Play developer account **exists**: personal, ID 6284685113064492750, developer name
+    "Ali Imran Khan", public developer email `aikstudies@gmail.com` (deliberately separate
+    from the private contact address `aliimrankhan86@gmail.com`), declared as **not earning
+    money** — which is what keeps the street address off the public listing. Google shows
+    only legal name, country and developer email.
+
+    The **Android-device verification has passed**. Worth remembering for any future
+    account: it requires the Play Console app on a *physical* phone and an emulator does not
+    satisfy it — the one step in this whole project that cannot be done on an emulator.
+
+    Still outstanding: **Google's identity review**. The contact-phone check is gated behind
+    it and unlocks on its own, so it is not a task. See `docs/RELEASING.md` for the account
+    facts and the full checklist.
+
+    **The next actual step, once verification clears:** Play Console → Create app → paste
+    the fields from `docs/store/LISTING.md`, upload the assets from `docs/store/`, complete
+    the data safety form (the LISTING.md notes explain the one nuance about the geocoding
+    lookup), then Closed testing with 12 testers for 14 continuous days.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
