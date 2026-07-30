@@ -377,10 +377,23 @@ Google publishes its own list of the most common Wear OS rejections. Against thi
 |---|---|
 | Listing doesn't say **"Wear OS"** | ✅ The full description says "A Wear OS app and watch tile". Must be the exact phrase — "WearOS" and "Android Wear" both get rejected. **This applies to every localised listing too.** |
 | No Wear OS screenshot | ✅ Two, 384 × 384, 1:1, no device frame, no added text — all as required |
-| Basic functionality broken / screenshots inaccurate | ⚠️ `w1-times.png` cuts "Dhuhr 13:1…" mid-glyph at the bottom edge. It is only the scroll boundary, but it reads as a broken layout. **Recapture it scrolled to a clean stop.** |
-| Not formatted for round displays | ⚠️ Never checked on a round emulator. Do this before opting in — 192dp and 227dp round. |
-| Font scaling (WO-V1 / WO-V14) | ⚠️ Never tested with the system font size raised. A top real-world rejection cause. |
+| Basic functionality broken / screenshots inaccurate | ✅ `w1-times.png` was recaptured at a scroll position where the bottom edge falls between rows rather than through a glyph. The list still shows it continues below, which is how a ScalingLazyColumn is meant to look, but nothing is chopped. |
+| Not formatted for round displays | ⚠️ **Half done.** Verified on the 192dp round AVD (`sajdawear`, 384px at 320dpi, corner radius 192 = a true circle): both pages, nothing clipped, nothing unreachable. **227dp round is still unverified** — see the note below. |
+| Font scaling (WO-V1 / WO-V14) | ✅ Tested at `font_scale 1.3` on the 192dp round AVD. Both pages: no overlap, no truncation, nothing made unreachable. The times list grows and scrolls, which is what it is meant to do. |
 | Black background (WO-V13) | ✅ Confirmed in the screenshots |
+
+> **Why 227dp is still open, and why the obvious shortcut does not work.**
+>
+> Forcing the existing AVD to the larger size with `adb shell wm size 454x454` looks like
+> it should do the job. It does not. The rounded-corner overlay is computed once for the
+> device's real 384px panel, so after the resize the mask sits at the wrong radius and
+> paints **straight vertical cuts** through the middle of the text — "2:54 A|M" and so on.
+> Those artefacts are the stale mask, not the app, and a real round display cannot produce
+> a straight vertical edge. The layout underneath is fine, but the capture cannot be
+> trusted as evidence and must not be presented as such.
+>
+> Doing this properly needs a second AVD on a genuine 227dp round Wear profile. That is
+> the outstanding item.
 
 Two Wear hypotheses worth *not* worrying about: tiles and complications are **not** required
 for approval, and rotary-input support stopped being a requirement in February 2024.

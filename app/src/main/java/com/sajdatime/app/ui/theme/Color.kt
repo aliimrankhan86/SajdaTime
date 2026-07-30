@@ -5,9 +5,12 @@ import androidx.compose.ui.graphics.Color
 /**
  * SajdaTime palette.
  *
- * Deep green (traditionally associated with Islam) as the primary, warm gold as the
- * single accent, warm-neutral paper surfaces. No decorative colour: every hue here
- * carries meaning, which keeps the interface calm and keeps contrast easy to control.
+ * Deep green (traditionally associated with Islam) as the primary, and one amber accent
+ * reserved for warnings. Warm-neutral paper surfaces in light, near-neutral ones in dark.
+ * No decorative colour: every hue here carries meaning, which keeps the interface calm and
+ * keeps contrast easy to control.
+ *
+ * The full token set and the reasoning behind each value is in docs/DESIGN_SYSTEM.md.
  *
  * Every foreground/background pair used in the UI is asserted against WCAG 2.1 AA in
  * ColorContrastTest — if a colour is edited below AA, the build fails.
@@ -142,4 +145,6 @@ val DarkSurfaceBright = Color(0xFF2E3532)
 val DarkSurfaceDim = Color(0xFF101312)
 val DarkInverseSurface = Color(0xFFE7EAE8)
 val DarkInverseOnSurface = Color(0xFF171B1A)
-val DarkInversePrimary = Color(0xFF14624B)
+// The inverse roles are each other's primary, so these two move together with the palette.
+// This one was missed when light changed and sat on the old #14624B for a commit.
+val DarkInversePrimary = Color(0xFF0E6B4F)

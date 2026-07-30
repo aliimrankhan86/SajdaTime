@@ -40,7 +40,8 @@ these files in this order:
 |---|---|---|
 | 1 | `docs/HANDOVER.md` | **The essential one.** Everything: vision, stack, features, rules, what is done, what is pending. |
 | 2 | `docs/ARCHITECTURE.md` | Only if the work touches prayer or Qibla calculation. The exact business rules. |
-| 3 | `docs/RELEASING.md` | Only if the work is about publishing to Google Play. |
+| 3 | `docs/DESIGN_SYSTEM.md` | Only if the work touches the look of any screen. Every colour token and component pattern. |
+| 4 | `docs/RELEASING.md` | Only if the work is about publishing to Google Play. |
 
 For most conversations, **file 1 on its own is enough**.
 

@@ -723,6 +723,15 @@ recorded with the arithmetic in `docs/DESIGN_SYSTEM.md`. **A design tool's ratio
 a claim, not a measurement** — check it, because every one of these errs in the direction
 that ships an unreadable app.
 
+### Wear OS checks closed by this session's audit
+
+| Checked | Result |
+|---|---|
+| Round display, 192dp | Verified on `sajdawear` — 384px at 320dpi, corner radius 192, i.e. a true circle. Both pages, nothing clipped, nothing unreachable |
+| Wear font scaling, 1.3× | Both pages: no overlap, no truncation. The times list grows and scrolls, which is what it is for |
+| `w1-times.png` chopping a glyph | Recaptured at a scroll position where the bottom edge falls between rows. This had been flagged in `RELEASING.md` and left open |
+| Round display, 227dp | **Still open.** `adb shell wm size 454x454` does not substitute for a real AVD: the rounded-corner overlay stays at the 384px radius, so the mask paints straight vertical cuts through the text. Those artefacts are the stale mask, not the app — and a capture that cannot be trusted must not be filed as evidence |
+
 **Store screenshots are part of the diff.** All five phone captures and both watch captures
 were retaken and `tools/build-store-assets.sh` re-run. A theme change that leaves
 `docs/store/screenshots/` alone ships a listing that does not match the app.
@@ -1000,7 +1009,8 @@ script after editing the markdown.**
 | `985adc8` | Fixed nine defects found by running the app rather than reading it — including the watch calculating Asr with the wrong madhab |
 | `f49dc5d` | Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
 | `6e57e49` | Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
-| *(this)* | **(current)** Applied the light design system and added the Follow phone / Light / Dark setting |
+| `6a16bd1` | Applied the light design system and added the Follow phone / Light / Dark setting |
+| *(this)* | **(current)** Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
 
 ---
 

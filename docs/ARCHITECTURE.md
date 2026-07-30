@@ -263,17 +263,39 @@ battery cost for information already visible in the app.
 
 ### Palette
 
-Deep green (traditionally associated with Islam) as the primary, one warm gold accent,
-warm-neutral paper surfaces. Every hue carries meaning; nothing is decorative.
+Deep green (traditionally associated with Islam) as the primary, one amber accent reserved
+for warnings, warm-neutral paper surfaces in light and near-neutral ones in dark. Every hue
+carries meaning; nothing is decorative.
 
 | Role | Light | Dark |
 |---|---|---|
-| Primary | `#14624B` | `#7FD1AE` |
-| Accent | `#8A5200` | `#E3B341` |
-| Background | `#FBFAF7` | `#0E1512` |
-| Surface | `#FFFFFF` | `#18211D` |
-| On surface | `#12211C` | `#E8EEEA` |
-| Secondary text | `#43524B` | `#B3C2BA` |
+| Primary | `#0E6B4F` | `#4FC48F` |
+| Accent (warnings) | `#9A6208` | `#E8B14A` |
+| Background | `#F7F5F3` | `#101312` |
+| Surface | `#FDFCFB` | `#171B1A` |
+| On surface | `#1B211E` | `#E7EAE8` |
+| Secondary text | `#5A605C` | `#A9B2AE` |
+
+**The full token set, and the reasoning behind each choice, is in
+[`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).** An iOS port should reproduce that document, not
+this table — this is a summary.
+
+Two structural rules an implementation has to carry, not just the hex values:
+
+- **Surfaces separate themselves by shadow in light and by a hairline border in dark.** A
+  shadow on a dark surface is invisible; a border in light is a hard line the design does
+  not want.
+- **The next-prayer card is a fixed mint-to-sand gradient in light and flat in dark.** It
+  must never be driven by the time of day: a background that moves through the day gives
+  the countdown a different contrast ratio at Isha than at Fajr, and there is then no fixed
+  pair left to assert.
+
+### Choosing a theme
+
+`ThemeChoice` — `SYSTEM` (default), `LIGHT`, `DARK` — is persisted with the rest of the
+user's settings. `SYSTEM` resolves to light wherever the platform expresses no preference,
+so light is the effective default. The watch does not follow it; a wrist display is glanced
+at, and white on black is right on an OLED panel whatever the phone is set to.
 
 **Accessibility is enforced, not asserted.** `ColorContrastTest` computes the WCAG 2.1
 relative luminance of every foreground/background pair the UI actually uses and fails the
