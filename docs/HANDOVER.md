@@ -94,6 +94,28 @@ Do not remove, soften, or bury this. It is a stated requirement, not decoration.
 - **A DI framework.** Three repositories constructed in one ViewModel.
 - **A navigation library.** Two screens plus onboarding. A boolean is enough.
 - **Retrofit / OkHttp / Moshi / Gson.** One GET request.
+- **The Aladhan API at runtime, in any form, including as a "fallback".** This one gets
+  proposed by almost every fresh session, because Aladhan appears all over these docs as the
+  reference we verify against — so read this before suggesting it again. The owner was asked
+  directly and said no, and said he would say no if asked twice.
+
+  He is right, and the reasoning is not merely about privacy:
+
+  1. **There is no failure state to fall back *from*.** `adhan-java` is arithmetic over a
+     date, two coordinates and an angle. It cannot time out, cannot rate-limit, cannot 500,
+     and does not need a network. The only input that breaks it — no coordinates — breaks a
+     network API identically. A fallback would be a parachute for a fall that cannot happen.
+  2. **It would put the user's GPS coordinates on the wire to a third party**, on every
+     calculation, for a whole month at a time when the PDF is exported. That directly
+     contradicts `docs/privacy.html`, which promises coordinates never leave the device.
+     Shipping it would make the published privacy policy a lie.
+  3. **It would make the app worse offline**, which is the case it exists for: a phone in a
+     mosque basement with no signal.
+  4. **It would introduce non-determinism** into times that must be reproducible (§5.7), and
+     a silent accuracy drift the day Aladhan changes a default.
+
+  Verifying *against* Aladhan during development is correct and encouraged (§15 item 3).
+  Calling it from the shipped app is not. These are not the same thing.
 
 ---
 
@@ -877,7 +899,13 @@ script after editing the markdown.**
 | `41fc109` | Initial commit |
 | `ac12c85` | v1.0.0: offline prayer times, notifications, PDF export |
 | `f5bb071` | Qibla compass, Wear OS app, alarm mode, shared `:core` module |
-| `30cb5eb` | **(current)** Fixed the silently-wrong city search; first real run of the watch app; alarm mode verified on device |
+| `30cb5eb` | Fixed the silently-wrong city search; first real run of the watch app; alarm mode verified on device |
+| `6e91cdc` | Corrected two Play Store errors found by research; added 8 localised listings |
+| `1792d0a` | Closed two compliance gaps found in research; recorded the non-risks |
+| `e693fa1` | Fixed 13 defects found in a full ship-readiness audit |
+| `6a6dbcd` | Made the app translatable, reorganised Settings, asked for duas once |
+| `985adc8` | Fixed nine defects found by running the app rather than reading it — including the watch calculating Asr with the wrong madhab |
+| *(this)* | **(current)** Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
 
 ---
 
@@ -892,10 +920,25 @@ script after editing the markdown.**
    turned out to be errors in the *test* rather than the code, so check both sides.
 4. **Compiling is not working.** The watch app compiled and linted clean for an entire
    release while being unable to ever obtain a location. Run it.
-5. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+5. **Run the phone and the watch at the same time, and compare them.** The single worst bug
+   ever found in this project — the watch showing Asr 69 minutes early — was invisible in
+   either module alone, because *neither module was wrong*. Each was correct for the
+   settings it held; the settings simply never crossed between them. A defect that only
+   exists in the gap between two components cannot be found by reading either one.
+6. **A fix you have not measured may be a no-op.** A Compose modifier cap was added to bound
+   the Qibla dial in landscape. It compiled, it read correctly, it was reviewed, and it did
+   absolutely nothing, because `fillMaxWidth()` pins `minWidth` and a `widthIn` placed after
+   it can never win. Only screenshotting the running app caught it. Order is not cosmetic,
+   and "the change looks right" is not evidence that it works.
+7. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
    shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-6. The owner is **not technical**. Explain in plain language, state what is verified versus
-   assumed, and never present something as done when it is untested.
+8. The owner is **not technical**. Explain in plain language, state what is verified versus
+   assumed, and never present something as done when it is untested. He also has **no access
+   to physical devices** — if you cannot test it on an emulator, say so plainly rather than
+   suggesting he go and try it himself.
+9. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+   Code alone loses the reasoning, and the reasoning is what stops the next session
+   undoing a decision it does not know was deliberate.
 
 ---
 

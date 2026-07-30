@@ -13,6 +13,11 @@ what you think the next step is, before you change any code.
 That is all. **You do not need to attach any files.** The handover lives inside the repo,
 so the assistant can read it, along with all the code, straight from disk.
 
+There is also a `CLAUDE.md` at the top of the project, which Claude Code loads on its own
+before you type anything. It carries the hard rules — the disclaimer, the privacy promise,
+the signing key, the no-network-at-runtime decision — so a session cannot miss them even if
+it skips the handover. You do not need to mention it; it is already working.
+
 ---
 
 ## Which folder to open

@@ -78,6 +78,8 @@ wear/   The Wear OS app and the next-prayer tile.
 
 ## Documentation
 
+- [CLAUDE.md](CLAUDE.md) - the standing rules for any AI working on this project, loaded
+  automatically by Claude Code. The hard requirements, the commit rule, and how to work here.
 - [docs/HANDOVER.md](docs/HANDOVER.md) - **start here.** Vision, stack, every feature and
   business rule, what is verified, what is not, what is left to do, and the build traps.
 - [docs/NEW-SESSION.md](docs/NEW-SESSION.md) - how to pick the project back up in a fresh
