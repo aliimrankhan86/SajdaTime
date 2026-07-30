@@ -33,6 +33,12 @@ import com.sajdatime.app.ui.theme.DarkSecondary
 import com.sajdatime.app.ui.theme.DarkSurface
 import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
+import com.sajdatime.app.ui.theme.LightHeroEnd
+import com.sajdatime.app.ui.theme.LightHeroMiddle
+import com.sajdatime.app.ui.theme.LightHeroStart
+import com.sajdatime.app.ui.theme.LightOnHero
+import com.sajdatime.app.ui.theme.LightOnHeroLabel
+import com.sajdatime.app.ui.theme.LightOnHeroSecondary
 import com.sajdatime.app.ui.theme.LightAccentContainer
 import com.sajdatime.app.ui.theme.LightOnAccentContainer
 import com.sajdatime.app.ui.theme.LightBackground
@@ -135,6 +141,34 @@ class ColorContrastTest {
 
     @Test
     fun `non-text colours meet WCAG AA`() = assertAll(nonTextPairs)
+
+    /**
+     * The light next-prayer card is drawn on a three-stop gradient, which is the only
+     * gradient in the app and is allowed only because it is fixed rather than driven by
+     * the time of day — so every stop can be checked against every colour drawn on it.
+     * Nine assertions, because the countdown must be readable at the top of the card, at
+     * the bottom, and everywhere between.
+     */
+    @Test
+    fun `light hero gradient is readable at every stop`() {
+        val stops = listOf(
+            "start" to LightHeroStart,
+            "middle" to LightHeroMiddle,
+            "end" to LightHeroEnd,
+        )
+        val inks = listOf(
+            "countdown" to LightOnHero,
+            "label" to LightOnHeroLabel,
+            "time" to LightOnHeroSecondary,
+        )
+        assertAll(
+            stops.flatMap { (stopName, stop) ->
+                inks.map { (inkName, ink) ->
+                    Pair("light hero $inkName on $stopName", ink, stop, 4.5)
+                }
+            },
+        )
+    }
 
     /**
      * The next-prayer row is highlighted with primaryContainer. It must be visibly

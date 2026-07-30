@@ -45,7 +45,7 @@ WHAT YOU GET
 • An optional quiet badge in the notification shade showing the next prayer
 • A printable PDF timetable for today, the next seven days, or the whole month
 • A Wear OS app and watch tile that work on their own, with or without your phone
-• Light and dark themes, both checked for readability
+• Light and dark themes, following your phone or set by hand, both checked for readability
 
 
 BUILT FOR YOUR SCHOOL OF THOUGHT

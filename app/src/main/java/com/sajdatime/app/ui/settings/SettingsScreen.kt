@@ -8,6 +8,7 @@ import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,12 +20,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
@@ -48,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -69,6 +74,8 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.onboarding.madhabLabel
+import com.sajdatime.app.ui.theme.ThemeChoice
+import com.sajdatime.app.ui.theme.sajdaSurface
 
 /** Which chooser is currently open, if any. Only one can be at a time. */
 private enum class Chooser { SCHOOL, METHOD, ALERTS, PRAYERS, LOCATION, DISCLAIMER }
@@ -85,6 +92,7 @@ fun SettingsScreen(
     onPickAlarmSound: () -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
+    onSetThemeChoice: (ThemeChoice) -> Unit,
 ) {
     val context = LocalContext.current
     var open by rememberSaveable { mutableStateOf<Chooser?>(null) }
@@ -165,6 +173,10 @@ fun SettingsScreen(
                 },
                 onClick = { open = Chooser.METHOD },
             )
+        }
+
+        Group(stringResource(R.string.settings_group_appearance)) {
+            ThemeRow(current = settings.themeChoice, onSelect = onSetThemeChoice)
         }
 
         Group(stringResource(R.string.settings_group_reminders)) {
@@ -500,9 +512,7 @@ private fun Group(title: String, content: @Composable () -> Unit) {
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(scheme.surface)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(20.dp)),
+            .sajdaSurface(RoundedCornerShape(20.dp)),
     ) {
         content()
     }
@@ -520,6 +530,79 @@ private fun SectionLabel(title: String) {
     )
 }
 
+/**
+ * Light, dark, or follow the phone.
+ *
+ * Three chips rather than a chooser dialog, because unlike every other setting on this
+ * screen the result is visible the instant it is tapped — sending the user into a dialog
+ * to see a change that happens behind the dialog would be perverse.
+ *
+ * "Follow the phone" is first and is the default. On a device that expresses no dark
+ * preference it resolves to light, which is what the plain-English label promises.
+ */
+@Composable
+private fun ThemeRow(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    val labels = mapOf(
+        ThemeChoice.SYSTEM to R.string.theme_system,
+        ThemeChoice.LIGHT to R.string.theme_light,
+        ThemeChoice.DARK to R.string.theme_dark,
+    )
+
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Outlined.Contrast,
+                contentDescription = null,
+                tint = scheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+            Text(
+                text = stringResource(R.string.settings_theme),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.semantics { heading() },
+            )
+        }
+        Spacer(Modifier.height(10.dp))
+        // A FlowRow, not a Row: at a large font size three chips no longer fit across a
+        // phone, and a fixed Row would clip the third one — which is "Dark", the whole
+        // reason anyone opens this.
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier
+                .padding(start = 38.dp)
+                .selectableGroup(),
+        ) {
+            ThemeChoice.entries.forEach { choice ->
+                val selected = current == choice
+                Text(
+                    text = stringResource(labels.getValue(choice)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (selected) scheme.onSecondaryContainer else scheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(if (selected) scheme.secondaryContainer else Color.Transparent)
+                        .border(
+                            width = 1.dp,
+                            color = if (selected) scheme.primary else scheme.outline,
+                            shape = RoundedCornerShape(50),
+                        )
+                        // selectable, not clickable: a screen reader should say "selected"
+                        // on the active chip, and three chips are one choice, not three.
+                        .selectable(
+                            selected = selected,
+                            role = Role.RadioButton,
+                            onClick = { onSelect(choice) },
+                        )
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                )
+            }
+        }
+    }
+}
+
 /** Same amber treatment as the banners on Times, so a warning looks like a warning. */
 @Composable
 private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
@@ -529,8 +612,7 @@ private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(scheme.tertiaryContainer)
+            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
             .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 14.dp),

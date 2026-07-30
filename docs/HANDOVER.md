@@ -200,6 +200,7 @@ data class AppSettings(
     val alarmSoundUri: String = "",        // empty = device default alarm
     val disclaimerSeen: Boolean = false,
     val usingDefaultLocation: Boolean = false,  // true once Makkah was used as fallback
+    val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,  // SYSTEM resolves to light
 )
 ```
 
@@ -250,7 +251,7 @@ fixed top reference dot. Bearing and distance in km. Guidance text ("Turn right 
 accuracy is low; a manual bearing readout when there is no compass at all.
 
 ### Settings
-Reorganised from a flat list of ~25 controls into **three groups of tappable rows**, each
+Reorganised from a flat list of ~25 controls into **four groups of tappable rows**, each
 opening one focused chooser. Every row shows its current answer as its subtitle, so a
 user's whole setup is readable without opening anything.
 
@@ -261,6 +262,7 @@ nobody found them.
 | Group | Rows |
 |---|---|
 | **PRAYER TIMES** | Location (pin icon, city as subtitle) · School of thought ("Sunni · Hanafi") · Calculation method |
+| **APPEARANCE** | Theme — three chips, Follow phone / Light / Dark. Chips rather than a chooser because the result is visible the instant it is tapped, and a dialog would sit on top of the change it just made |
 | **REMINDERS** | How you are told (Notification / Alarm, with the sound picker and DND warning inside) · Which prayers ("All five" / "3 of 5") · Next-prayer badge switch, inline |
 | **ABOUT** | Version · Disclaimer · Privacy (opens the hosted policy) · Free, forever · Made by · Data and libraries |
 
@@ -487,24 +489,24 @@ pocket, not startling in a quiet room.
 component pattern, and the reasoning behind each. What follows is the short version.
 
 ### Palette (`ui/theme/Color.kt`)
-Deep green (traditionally associated with Islam) as primary, warm gold as the single
-accent. Light keeps warm-neutral paper surfaces; **dark is near-neutral, not green-tinted**
-— on an OLED panel a tinted dark grey reads as a colour cast, and the green then has to
-shout to be seen as an accent.
+Deep green (traditionally associated with Islam) as primary, amber as the single accent.
+Light keeps warm-neutral paper surfaces; **dark is near-neutral, not green-tinted** — on an
+OLED panel a tinted dark grey reads as a colour cast, and the green then has to shout to be
+seen as an accent.
 
 | Role | Light | Dark |
 |---|---|---|
-| primary | `#14624B` | `#4FC48F` |
-| accent / tertiary | `#8A5200` | `#E8B14A` |
-| tertiaryContainer (warnings) | `#FBEEDA` | `#2A2113` |
-| background | `#FBFAF7` | `#101312` |
-| surface | `#FFFFFF` | `#171B1A` |
+| primary | `#0E6B4F` | `#4FC48F` |
+| accent / tertiary | `#9A6208` | `#E8B14A` |
+| tertiaryContainer (warnings) | `#FBF1DC` | `#2A2113` |
+| background | `#F7F5F3` | `#101312` |
+| surface | `#FDFCFB` | `#171B1A` |
 | primaryContainer (highlight) | `#D7EAE0` | `#143028` |
-| onSurface | `#12211C` | `#E7EAE8` |
-| onSurfaceVariant | `#43524B` | `#A9B2AE` |
-| outline | `#6B7A73` | `#8B948F` |
-| outlineVariant (borders) | `#C9D2CD` | `#2A312E` |
-| secondaryContainer (nav pill) | `#D3E4DA` | `#1E4034` |
+| onSurface | `#1B211E` | `#E7EAE8` |
+| onSurfaceVariant | `#5A605C` | `#A9B2AE` |
+| outline | `#757C77` | `#8B948F` |
+| outlineVariant (borders) | `#C9CFC9` | `#2A312E` |
+| secondaryContainer (nav pill) | `#CDE3D7` | `#1E4034` |
 
 > ⚠️ **Set every Material 3 colour role, not just the obvious ones.** This bit the project
 > **three separate times**: dialogs, bottom sheets and the nav pill all rendered in
@@ -521,14 +523,29 @@ System font family. `PrayerTimeTextStyle` uses **tabular figures** (`tnum`) so t
 countdown does not jitter as digits change width. Section labels are letterspaced but
 **never uppercased in code** — `String.uppercase()` on a translated string is a trap.
 
+### Which theme, and who decides
+`ThemeChoice` is **SYSTEM** (default), **LIGHT** or **DARK**, persisted under
+`theme_choice` and set from **Settings → Appearance**. `SYSTEM` reads
+`isSystemInDarkTheme()`, which is `false` when the OS expresses no preference — so
+following the phone resolves to **light**, and light is the effective default.
+
+Components must read `LocalDarkTheme`, **not** `isSystemInDarkTheme()`: once the user can
+override the system, the system is no longer the answer. The watch is unaffected and always
+draws dark.
+
 ### Component patterns that must not be simplified away
 - The next prayer is marked **three ways** (highlight, leading accent bar, "Next" pill),
   because colour alone marks it for nobody on a greyscale or colour-blind display.
 - The Qibla **aligned** state is marked three ways too (arc clears, dial fills, wording
   changes).
-- The next-prayer card is **flat**. It once carried a time-of-day gradient; that moved the
-  background under the countdown as the day went on, so the number the screen exists to
-  show had a different contrast ratio at Isha than at Fajr. Do not reintroduce it.
+- Surfaces separate themselves by **shadow in light, hairline border in dark** — one
+  helper, `Modifier.sajdaSurface`. A shadow on a dark surface is invisible; a border in
+  light is a hard line the design does not want.
+- The next-prayer card carries a **fixed** mint-to-sand gradient in light and is flat in
+  dark. It once carried a **time-of-day** gradient in both, which moved the background
+  under the countdown as the day went on, so the number the screen exists to show had a
+  different contrast ratio at Isha than at Fajr and could not be asserted at all. Fixed
+  gradient, testable, allowed. Moving gradient, not — do not reintroduce that one.
 
 ### Accessibility
 Contrast enforced by test · the Qibla dial is `clearAndSetSemantics {}` (decorative) with
@@ -687,6 +704,25 @@ raised font size the last paragraph, the dua request, was exactly what would hav
 off the bottom unread. Both are wrapped in a `verticalScroll` now. Adding a sentence to a
 string is not a text change; it is a layout change.
 
+### The light design system and the theme setting (v1.1.0), verified by screenshot
+
+| Checked | Result |
+|---|---|
+| Times, light | Mint-to-sand hero gradient, shadowed cards, dividers, sunrise dimmed, next row with accent bar and pill |
+| Qibla, light | Pale dial face, deep green arc sweeping 118° from the facing tick, legend |
+| Settings, light | Amber banner, green letterspaced labels, shadowed group cards, the new Appearance chips |
+| Dark tapped while the phone is on light | Whole app flips immediately; status-bar icons flip with it; cards revert from shadows to hairline borders |
+| Force-stop and relaunch | Still dark, phone still light — the choice is persisted, not a session flag |
+| Follow phone tapped again | Back to light |
+
+**What the two designs got wrong, in the same way, twice.** Both halves of the source
+design overstate a contrast ratio for the token Material spends on chevrons and tick
+marks: dark `outline` claimed 3.1:1 and is 1.85:1, light `outline` claimed 3.0:1 and is
+1.55:1. The light half also claims 4.6:1 for its amber, which is 3.76:1. All three are
+recorded with the arithmetic in `docs/DESIGN_SYSTEM.md`. **A design tool's ratio column is
+a claim, not a measurement** — check it, because every one of these errs in the direction
+that ships an unreadable app.
+
 **Store screenshots are part of the diff.** All five phone captures and both watch captures
 were retaken and `tools/build-store-assets.sh` re-run. A theme change that leaves
 `docs/store/screenshots/` alone ships a listing that does not match the app.
@@ -772,6 +808,12 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Not done, in rough priority order
 
+1. **One light frame at cold start when the theme is overridden.**
+   `android:windowBackground` is a resource, resolved by the system from the *system's*
+   night setting before any app code runs, so a user who has chosen Dark on a light phone
+   sees a single pale frame before Compose draws. Fixing it means writing the window
+   background from the activity once settings load, which trades one flash for a flash in
+   the other direction. Left deliberately; revisit only if someone actually complains.
 2. **No instrumented UI tests.** Logic and colour are unit-tested; every screen on both
    phone and watch is verified by hand only. A Compose UI test suite would make refactoring
    much safer.
@@ -957,7 +999,8 @@ script after editing the markdown.**
 | `6a6dbcd` | Made the app translatable, reorganised Settings, asked for duas once |
 | `985adc8` | Fixed nine defects found by running the app rather than reading it — including the watch calculating Asr with the wrong madhab |
 | `f49dc5d` | Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
-| *(this)* | **(current)** Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
+| `6e57e49` | Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
+| *(this)* | **(current)** Applied the light design system and added the Follow phone / Light / Dark setting |
 
 ---
 

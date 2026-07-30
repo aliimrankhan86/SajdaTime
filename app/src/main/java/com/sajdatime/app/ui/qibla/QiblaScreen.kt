@@ -53,6 +53,7 @@ import com.sajdatime.core.QiblaEngine
 import com.sajdatime.app.data.CompassAccuracy
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.sajdaSurface
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -393,8 +394,7 @@ private fun AccuracyNotice(accuracy: CompassAccuracy) {
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(scheme.tertiaryContainer)
+            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
             .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
             .padding(16.dp),
     ) {

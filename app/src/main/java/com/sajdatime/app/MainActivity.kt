@@ -60,8 +60,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            SajdaTimeTheme {
-                val state by viewModel.state.collectAsStateWithLifecycle()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+            // Read outside the theme, not inside it: the choice decides which scheme the
+            // theme builds, so it cannot come from within the theme's own content.
+            SajdaTimeTheme(choice = state.settings.themeChoice) {
 
                 // The export result is a user-visible side effect, so it fires once per
                 // attempt and is then consumed. Failures are reported too: a tap that
@@ -108,6 +110,7 @@ class MainActivity : ComponentActivity() {
                             onRefreshLocation = ::requestLocation,
                             onSearchCity = viewModel::searchCity,
                             onQiblaVisible = viewModel::setQiblaVisible,
+                            onSetThemeChoice = viewModel::setThemeChoice,
                         )
 
                         // Shown once, immediately after setup. The app is a convenience,

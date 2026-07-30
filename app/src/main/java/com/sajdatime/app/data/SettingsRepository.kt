@@ -14,6 +14,7 @@ import com.sajdatime.core.Coordinates
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
+import com.sajdatime.app.ui.theme.ThemeChoice
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -55,6 +56,11 @@ data class AppSettings(
     val disclaimerSeen: Boolean = false,
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
+    /**
+     * Light, dark, or whatever the phone is set to. Following the system is the default,
+     * and on a device that expresses no preference that resolves to light.
+     */
+    val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(sect = sect, madhab = madhab, method = method)
@@ -96,6 +102,8 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
 
+    suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
+
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
 
     suspend fun markDisclaimerSeen() = edit { it[Keys.DISCLAIMER] = true }
@@ -129,6 +137,7 @@ class SettingsRepository(private val context: Context) {
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
+        val THEME = stringPreferencesKey("theme_choice")
     }
 
     private companion object {
@@ -162,6 +171,7 @@ class SettingsRepository(private val context: Context) {
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
+            themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
         )
     }
 

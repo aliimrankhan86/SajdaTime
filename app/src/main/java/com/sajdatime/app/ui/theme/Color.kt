@@ -14,31 +14,50 @@ import androidx.compose.ui.graphics.Color
  */
 
 // --- Light ---------------------------------------------------------------------------
-val LightPrimary = Color(0xFF14624B)
+//
+// The light half of the design system (docs/DESIGN_SYSTEM.md). Same structure, spacing
+// and copy as dark; only the roles change. Warm-neutral paper surfaces, deep green
+// primary, amber for warnings.
+//
+// Two deliberate departures from the design document, both for contrast, and both the
+// same class of error as the one in its dark half:
+//
+//  - Its `outline` (#C9CFC9) is listed at 3.0:1 and is actually **1.55:1** against its own
+//    surface. Fine as a hairline card border; not fine for the chevrons and tick marks
+//    Material spends `outline` on. So #C9CFC9 is `outlineVariant` here and `outline` takes
+//    the grey the design uses for its chevrons.
+//  - Its `warning` (#B4740B) is listed at 4.6:1 and is actually **3.76:1** on surface,
+//    with white on it at 3.86:1. #9A6208 is the nearest value on the same hue that clears
+//    4.5:1 both ways.
+val LightPrimary = Color(0xFF0E6B4F)
 val LightOnPrimary = Color(0xFFFFFFFF)
+// #D7EAE0 rather than the design's #DDEDE4: at 1.18:1 against the surface behind it, that
+// value is below the floor ColorContrastTest sets for "the highlighted row must be
+// visibly a different colour". This is the nearest step that clears it.
 val LightPrimaryContainer = Color(0xFFD7EAE0)
-val LightOnPrimaryContainer = Color(0xFF05271C)
-val LightSecondary = Color(0xFF3F5B50)
+val LightOnPrimaryContainer = Color(0xFF0F2A1F)
+val LightSecondary = Color(0xFF3E5C4C)
 val LightOnSecondary = Color(0xFFFFFFFF)
 // Used by the navigation bar's selected pill and by chips. Left unset it falls back to
 // Material's lilac baseline, which looks like a different app pasted into the tab bar.
-val LightSecondaryContainer = Color(0xFFD3E4DA)
-val LightOnSecondaryContainer = Color(0xFF12211C)
-val LightAccent = Color(0xFF8A5200)
+val LightSecondaryContainer = Color(0xFFCDE3D7)
+val LightOnSecondaryContainer = Color(0xFF12372A)
+val LightAccent = Color(0xFF9A6208)
 val LightOnAccent = Color(0xFFFFFFFF)
 // The banner behind "the system is withholding something you asked for". Amber, not red:
 // prayer alerts still arrive, they are just at the mercy of the scheduler, and an error
 // colour would say the app is broken when it is not.
-val LightAccentContainer = Color(0xFFFBEEDA)
-val LightOnAccentContainer = Color(0xFF3A2A00)
-val LightBackground = Color(0xFFFBFAF7)
-val LightOnBackground = Color(0xFF12211C)
-val LightSurface = Color(0xFFFFFFFF)
-val LightOnSurface = Color(0xFF12211C)
-val LightSurfaceVariant = Color(0xFFEDF1EE)
-val LightOnSurfaceVariant = Color(0xFF43524B)
-val LightOutline = Color(0xFF6B7A73)
-val LightOutlineVariant = Color(0xFFC9D2CD)
+val LightAccentContainer = Color(0xFFFBF1DC)
+val LightOnAccentContainer = Color(0xFF5A4408)
+val LightBackground = Color(0xFFF7F5F3)
+val LightOnBackground = Color(0xFF1B211E)
+val LightSurface = Color(0xFFFDFCFB)
+val LightOnSurface = Color(0xFF1B211E)
+// The Qibla dial face.
+val LightSurfaceVariant = Color(0xFFEDEFE8)
+val LightOnSurfaceVariant = Color(0xFF5A605C)
+val LightOutline = Color(0xFF757C77)
+val LightOutlineVariant = Color(0xFFC9CFC9)
 val LightError = Color(0xFFB3261E)
 val LightOnError = Color(0xFFFFFFFF)
 
@@ -46,15 +65,32 @@ val LightOnError = Color(0xFFFFFFFF)
 // these roles — leaving them unset makes those components fall back to Material's default
 // purple-tinted baseline, which is jarring next to the green identity.
 val LightSurfaceContainerLowest = Color(0xFFFFFFFF)
-val LightSurfaceContainerLow = Color(0xFFF7F6F2)
-val LightSurfaceContainer = Color(0xFFF2F2ED)
-val LightSurfaceContainerHigh = Color(0xFFEBEDE8)
-val LightSurfaceContainerHighest = Color(0xFFE5E8E3)
-val LightSurfaceBright = Color(0xFFFBFAF7)
-val LightSurfaceDim = Color(0xFFDCDED9)
+val LightSurfaceContainerLow = Color(0xFFFAF8F5)
+val LightSurfaceContainer = Color(0xFFF1EEE8)
+val LightSurfaceContainerHigh = Color(0xFFEDEFE8)
+val LightSurfaceContainerHighest = Color(0xFFE7E4DE)
+val LightSurfaceBright = Color(0xFFFDFCFB)
+val LightSurfaceDim = Color(0xFFE7E4DE)
 val LightInverseSurface = Color(0xFF2A322E)
 val LightInverseOnSurface = Color(0xFFF0F2EE)
-val LightInversePrimary = Color(0xFF7FD1AE)
+val LightInversePrimary = Color(0xFF4FC48F)
+
+// --- The light hero gradient -----------------------------------------------------------
+//
+// Mint at the top, sand at the bottom. **Light theme only** — in dark the same card is a
+// flat surface with a hairline border, and that asymmetry is the design's, not an
+// oversight.
+//
+// This is not the old time-of-day gradient, and the difference is the whole point. That
+// one changed colour with the prayer slot, so the contrast ratio under the countdown was
+// different at Isha than at Fajr and could not be asserted. These three stops are fixed,
+// so every one of them is checked against the text drawn on top in ColorContrastTest.
+val LightHeroStart = Color(0xFFD6E8DC)
+val LightHeroMiddle = Color(0xFFDDE2CE)
+val LightHeroEnd = Color(0xFFE4D2B4)
+val LightOnHero = Color(0xFF0A2419)
+val LightOnHeroLabel = Color(0xFF2C4A3C)
+val LightOnHeroSecondary = Color(0xFF3E5C4C)
 
 // --- Dark ----------------------------------------------------------------------------
 //

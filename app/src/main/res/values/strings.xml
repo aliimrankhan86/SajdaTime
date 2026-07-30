@@ -139,6 +139,11 @@
     -->
     <string name="title_settings">Settings</string>
     <string name="settings_group_prayer_times">PRAYER TIMES</string>
+    <string name="settings_group_appearance">APPEARANCE</string>
+    <string name="settings_theme">Theme</string>
+    <string name="theme_system">Follow phone</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="settings_group_reminders">REMINDERS</string>
     <string name="settings_group_about">ABOUT</string>
 

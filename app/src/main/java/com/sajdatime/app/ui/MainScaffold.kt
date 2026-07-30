@@ -41,6 +41,7 @@ import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.settings.SettingsScreen
+import com.sajdatime.app.ui.theme.ThemeChoice
 
 /** Top-level destinations. Three is comfortably inside the five-item guidance. */
 enum class Destination(
@@ -67,6 +68,7 @@ fun MainScaffold(
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onQiblaVisible: (Boolean) -> Unit,
+    onSetThemeChoice: (ThemeChoice) -> Unit,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -138,6 +140,7 @@ fun MainScaffold(
                         onPickAlarmSound = onPickAlarmSound,
                         onRefreshLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
+                        onSetThemeChoice = onSetThemeChoice,
                     )
                 }
             }

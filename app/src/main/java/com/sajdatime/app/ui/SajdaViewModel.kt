@@ -14,6 +14,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
 import com.sajdatime.app.data.CompassAccuracy
@@ -174,6 +175,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
+
+    fun setThemeChoice(choice: ThemeChoice) =
+        viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 
     fun completeOnboarding() = viewModelScope.launch { settingsRepository.completeOnboarding() }
 

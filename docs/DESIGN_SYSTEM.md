@@ -37,9 +37,39 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 
 ### Light
 
-Unchanged from 1.0. Deep green primary `#14624B`, warm gold accent `#8A5200`, paper
-background `#FBFAF7`, white surfaces. The one addition is the warning banner:
-`tertiaryContainer` `#FBEEDA` with `onTertiaryContainer` `#3A2A00`.
+| Token | Role | Hex | Where it lands |
+|---|---|---|---|
+| background | `background` | `#F7F5F3` | The page behind everything |
+| surface | `surface` | `#FDFCFB` | Cards, list containers |
+| surfaceLow | `surfaceContainerLow` | `#FAF8F5` | The dimmed sunrise row |
+| surfaceHigh | `surfaceContainerHigh` | `#EDEFE8` | Nav bar, dialogs, sheets |
+| surfaceHighlight | `primaryContainer` | `#D7EAE0` | Next-prayer row, aligned dial |
+| onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
+| dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
+| primary | `primary` | `#0E6B4F` | Accent bar, Qibla arrow and arc, "Next" pill |
+| onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
+| navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
+| onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
+| onSurfaceVariant | `onSurfaceVariant` | `#5A605C` | Secondary text, icons |
+| outline | `outline` | `#757C77` | Chevrons, tick marks, the facing tick |
+| outlineVariant | `outlineVariant` | `#C9CFC9` | Row dividers |
+| warning | `tertiary` | `#9A6208` | The warning icon |
+| warningSurface | `tertiaryContainer` | `#FBF1DC` | The warning banner |
+| onWarningSurface | `onTertiaryContainer` | `#5A4408` | Text in that banner |
+
+### The light hero gradient
+
+The next-prayer card in **light only** is a fixed three-stop gradient, mint at the top to
+sand at the bottom: `#D6E8DC` → `#DDE2CE` → `#E4D2B4`. On it: countdown and prayer name
+`#0A2419`, the section label `#2C4A3C`, the time and "until it begins" `#3E5C4C`.
+
+Nine contrast assertions cover it — every ink against every stop. That is the whole reason
+a gradient is permitted here: it is **fixed**. The gradient this replaced changed with the
+prayer slot, so the contrast under the countdown was different at Isha than at Fajr and
+could not be asserted at all. Fixed gradient, testable. Moving gradient, not.
+
+In **dark** the same card is a flat `primaryContainer` with a hairline border — never a
+gradient. That asymmetry is the design's and is deliberate.
 
 ### The rule that has bitten this project four times
 
@@ -49,17 +79,34 @@ and the navigation pill all rendered in Material's default **lilac** because
 happened a fourth time on the watch, which was using Wear's default scheme. If anything
 looks purple, an unset role is the cause.
 
+### Light and dark separate surfaces differently
+
+**Light: a level-1 shadow, no border. Dark: a hairline `outlineVariant` border, no
+shadow.** A shadow on a dark surface is invisible; a border in light adds a hard line the
+design does not want. Both live in one place, `Modifier.sajdaSurface(shape, colour)` in
+`Theme.kt`, rather than branching at every call site — a card that is invisible in one
+theme is a silent failure, and silent failures should have exactly one place to go wrong.
+
+That helper reads `LocalDarkTheme`, **not** `isSystemInDarkTheme()`. Once the user can
+override the system setting, the system setting is no longer the answer.
+
 ### Contrast is enforced, not aspired to
 
 `ColorContrastTest` asserts **WCAG 2.1 AA** for every foreground/background pair in both
 themes — 4.5:1 for text, 3:1 for icons and boundaries under 1.4.11. **Edit a colour below
 threshold and the build fails.** Add the pair to the test when you add a role.
 
-> The design document this palette came from listed its `outline` (`#3A4441`) at 3.1:1.
-> It is **1.85:1** against its own background. A colour that is only ever a hairline card
-> border can get away with that; Material spends `outline` on chevrons and tick marks,
-> which cannot. So `#3A4441` became `outlineVariant` (decorative) and `outline` took the
-> grey the design uses for its facing tick. Check the arithmetic, not the label.
+> **Both halves of the source design overstated a contrast ratio, in the same place.**
+>
+> | Design token | Claimed | Actual | What was done |
+> |---|---|---|---|
+> | dark `outline` `#3A4441` | 3.1:1 | **1.85:1** | Became `outlineVariant`; `outline` took the design's facing-tick grey |
+> | light `outline` `#C9CFC9` | 3.0:1 | **1.55:1** | Same treatment |
+> | light `warning` `#B4740B` | 4.6:1 | **3.76:1** | Darkened on the same hue to `#9A6208`, the nearest value clearing 4.5:1 both ways |
+> | light `primaryContainer` `#DDEDE4` | — | 1.18:1 vs surface | `#D7EAE0`, the nearest step clearing the highlight floor |
+>
+> Check the arithmetic, not the label. A design tool's ratio column is a claim, and every
+> one of these was wrong in the direction that ships an unreadable app.
 
 ---
 
@@ -146,7 +193,34 @@ asked for": exact alarms, Do Not Disturb access, compass calibration.
 
 ---
 
-## 5. Wear OS
+## 5. Choosing a theme
+
+`ThemeChoice` is `SYSTEM` (default), `LIGHT` or `DARK`, persisted in DataStore under
+`theme_choice`, and shown as three chips under **Settings → Appearance**.
+
+`SYSTEM` reads `isSystemInDarkTheme()`, which reports **false** when the OS expresses no
+preference — on older devices, and on any device where the user has never chosen. So
+following the phone resolves to light, and light is the effective default.
+
+Chips rather than a chooser dialog, because unlike every other setting on that screen the
+result is visible the instant it is tapped, and a dialog would sit on top of the change it
+just made. They are `selectable` with `Role.RadioButton`, not `clickable`, so a screen
+reader announces the active one as selected and treats the three as one choice.
+
+> Known gap: `android:windowBackground` is a resource, resolved by the system from the
+> **system's** night setting before any of the app's code runs. A user who has chosen Dark
+> on a light phone therefore sees one light frame at cold start. Fixing it means writing
+> the window background from the activity once settings load, which trades a one-frame
+> flash for a one-frame flash in the other direction. Left alone deliberately.
+
+---
+
+## 6. Wear OS
+
+**The watch does not follow the phone's theme choice.** It has one scheme and always will:
+a wrist display is glanced at, and the correct thing to draw on an OLED panel at a glance
+is white on black regardless of what the phone is set to. The `ThemeChoice` setting is a
+phone setting.
 
 Same tokens, one deliberate difference: the background is **pure black** `#000000`, not the
 phone's `#101312`. Every Wear device ships an OLED panel, where black pixels are switched
@@ -163,11 +237,17 @@ nothing clips on a round display.
 
 ---
 
-## 6. Where this came from
+## 7. Where this came from
 
-The dark palette and the component treatments are from a design produced in Claude Design
-and applied in the "dark theme and design system" commit. What was taken: the tokens, the
+Both palettes and all the component treatments are from designs produced in Claude Design,
+applied in the "dark design system" and "light design system" commits. What was taken: the tokens, the
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
 and it should stay that way.
+
+One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
+and 52sp in dark, on the argument that dark text on a pale background carries more optical
+weight. That is a fair argument, and acting on it means a whole second `Typography` that
+exists to change one number by 6sp. Not worth the machinery. Noted here so the next
+session knows it was considered rather than missed.

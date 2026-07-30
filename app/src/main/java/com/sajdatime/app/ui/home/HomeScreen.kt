@@ -77,6 +77,8 @@ import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.rememberRemainingText
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.heroStyle
+import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.Instant
 import java.time.ZoneId
 import java.time.chrono.HijrahDate
@@ -202,17 +204,16 @@ private fun NextPrayerCard(state: UiState) {
     val context = LocalContext.current
     val scheme = MaterialTheme.colorScheme
 
-    // ponytail: a flat container, not the time-of-day gradient this used to carry. The
-    // gradient shifted the background under the countdown as the day moved, so the one
-    // number the screen exists to show had a different contrast ratio at Isha than at
-    // Fajr. A single verified surface is the thing the design system asks for, and it is
-    // the thing that can actually be tested.
+    // Light draws the design's mint-to-sand gradient here; dark draws a flat container.
+    // Both are fixed, which is the point — the old gradient changed with the prayer slot,
+    // so the contrast under the countdown was different at Isha than at Fajr and could not
+    // be asserted. Every stop of this one is checked in ColorContrastTest.
+    val hero = heroStyle()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(scheme.primaryContainer)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp))
+            .sajdaSurface(RoundedCornerShape(24.dp), hero.brush)
             .padding(horizontal = 20.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -221,7 +222,7 @@ private fun NextPrayerCard(state: UiState) {
             Text(
                 text = stringResource(R.string.home_no_location),
                 style = MaterialTheme.typography.titleMedium,
-                color = scheme.onSurface,
+                color = hero.prominent,
                 textAlign = TextAlign.Center,
             )
             return@Column
@@ -234,7 +235,7 @@ private fun NextPrayerCard(state: UiState) {
         Text(
             text = stringResource(R.string.home_next_prayer),
             style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.6.sp),
-            color = scheme.onPrimaryContainer,
+            color = hero.label,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(8.dp))
@@ -248,14 +249,14 @@ private fun NextPrayerCard(state: UiState) {
             Text(
                 text = stringResource(next.slot.labelRes),
                 style = MaterialTheme.typography.headlineMedium,
-                color = scheme.onSurface,
+                color = hero.prominent,
                 modifier = Modifier.semantics { heading() },
             )
             Spacer(Modifier.width(10.dp))
             Text(
                 text = TimeFormat.clock(context, next.at),
                 style = MaterialTheme.typography.headlineMedium,
-                color = scheme.secondary,
+                color = hero.secondary,
             )
         }
 
@@ -271,7 +272,7 @@ private fun NextPrayerCard(state: UiState) {
         Text(
             text = TimeFormat.countdownClock(state.now, next.at),
             style = MaterialTheme.typography.displayLarge,
-            color = scheme.onSurface,
+            color = hero.prominent,
             textAlign = TextAlign.Center,
             modifier = Modifier.clearAndSetSemantics {
                 contentDescription = spokenCountdown
@@ -281,7 +282,7 @@ private fun NextPrayerCard(state: UiState) {
         Text(
             text = stringResource(R.string.home_until),
             style = MaterialTheme.typography.labelMedium,
-            color = scheme.onSurfaceVariant,
+            color = hero.secondary,
             textAlign = TextAlign.Center,
         )
     }
@@ -419,8 +420,7 @@ private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(scheme.tertiaryContainer)
+            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
             .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .padding(16.dp),
@@ -467,9 +467,7 @@ private fun TodayTimeline(state: UiState) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(scheme.surface)
-            .border(1.dp, scheme.outlineVariant, RoundedCornerShape(24.dp)),
+            .sajdaSurface(RoundedCornerShape(24.dp)),
     ) {
         slots.forEachIndexed { index, slot ->
             PrayerRow(

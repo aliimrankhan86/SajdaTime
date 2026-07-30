@@ -17,7 +17,8 @@ No accounts. No analytics. No ads. No tracking. Your location never leaves your 
 - Optional silent "next prayer" badge in the notification shade
 - PDF timetable for today, the next 7 days, or the whole month, saved to Downloads
 - A Wear OS app and tile that work on their own, with or without the phone nearby
-- Light and dark themes, both verified against WCAG 2.1 AA contrast
+- Light and dark themes, following your phone by default or set by hand, both verified
+  against WCAG 2.1 AA contrast
 
 ## Build and run
 
