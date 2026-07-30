@@ -13,6 +13,9 @@
 
     <!-- Onboarding -->
     <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
+    <!-- Spoken instead of the Arabic glyphs, which a screen reader set to another
+         language will otherwise mangle. -->
+    <string name="bismillah_a11y">Bismillah ir-Rahman ir-Raheem</string>
     <string name="welcome_tagline">Your private prayer companion. Free, always.</string>
     <string name="action_begin">Begin</string>
 
@@ -92,6 +95,8 @@
     <string name="export_week_desc">Today and the six days after it</string>
     <string name="export_month">This whole month</string>
     <string name="export_month_desc">Every day from the 1st to the end of the month</string>
+    <string name="export_saved">Saved to Downloads as %1$s</string>
+    <string name="export_failed">Could not create the PDF. Please try again.</string>
 
     <!-- Qibla -->
     <string name="qibla_title">Qibla</string>
@@ -144,6 +149,12 @@
     <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
     <string name="about_credits">Made by</string>
     <string name="about_credits_desc">Ali Imran Khan, as an ongoing charity for the Ummah</string>
+    <!--
+      The only thing ever asked of the user in return for the app. It is the reason the
+      app is free and it must not be removed, shortened, or moved somewhere quieter.
+    -->
+    <string name="about_dua">A request</string>
+    <string name="about_dua_desc">Please remember me, my family, and my parents in your duas.</string>
     <!-- Open-Meteo publishes under CC BY 4.0, which requires attribution. This row is a
          licence obligation, not a courtesy — do not remove it. -->
     <string name="about_data">Data and libraries</string>

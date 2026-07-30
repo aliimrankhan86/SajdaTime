@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Same house style as the phone module: plain words, short sentences, no em dashes,
+  no semicolons, UK spelling. Everything the watch shows lives here so it can be
+  translated without touching code.
+-->
 <resources>
     <string name="app_name">SajdaTime</string>
     <string name="tile_label">Next prayer</string>
     <string name="tile_description">The next prayer and how long you have</string>
+    <string name="tile_needs_setup">Set up on your phone</string>
+
+    <string name="wear_locating">Finding your location</string>
+    <string name="wear_no_location_title">No location yet</string>
+    <string name="wear_no_location_body">Open SajdaTime on your phone, or use Makkah for now.</string>
+    <string name="wear_use_makkah">Use Makkah</string>
+
+    <!--
+      The watch had no disclaimer at all, so a user who only ever glanced at their wrist
+      never saw one. Shortened to fit the screen, saying the same thing as the phone.
+      Do not remove it.
+    -->
+    <string name="wear_disclaimer">A helper, not a religious authority. Check with your local mosque if a time looks wrong.</string>
+
+    <string name="wear_qibla_needs_location">Set your location to find the Qibla</string>
+    <string name="wear_qibla_facing">Facing Qibla</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">from true north</string>
+
+    <!-- Countdowns. Kept short: a tile line has room for about eight characters. -->
+    <string name="wear_duration_h_m">%1$dh %2$dm</string>
+    <string name="wear_duration_m">%1$dm</string>
+    <string name="wear_in_h_m">in %1$dh %2$dm</string>
+    <string name="wear_in_m">in %1$dm</string>
+    <!-- Time and countdown on one tile line, e.g. "05:14  ·  in 2h 10m". -->
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
 </resources>

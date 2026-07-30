@@ -92,9 +92,12 @@ FREE, AND STAYING FREE
 
 There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely
 as an ongoing charity for the Ummah.
+
+Only one thing is ever asked in return: please remember me, my family, and my parents in
+your duas.
 ```
 
-`2,897 / 4000`
+`2,977 / 4000`
 
 ---
 

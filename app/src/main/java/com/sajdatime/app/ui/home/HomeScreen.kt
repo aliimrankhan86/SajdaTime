@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -96,7 +97,7 @@ fun HomeScreen(
             .padding(bottom = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        LocationHeader(state = state, onClick = { locationSheet = true })
+        LocationHeader(state = state, now = state.now, onClick = { locationSheet = true })
         Spacer(Modifier.height(12.dp))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
@@ -142,7 +143,7 @@ fun HomeScreen(
  * traveller needs, and burying it in Settings makes them hunt for it.
  */
 @Composable
-private fun LocationHeader(state: UiState, onClick: () -> Unit) {
+private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
     val city = state.settings.cityName.ifBlank {
         stringResource(R.string.location_set_generic)
     }
@@ -166,7 +167,7 @@ private fun LocationHeader(state: UiState, onClick: () -> Unit) {
         Spacer(Modifier.width(6.dp))
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(text = city, style = MaterialTheme.typography.titleMedium)
-            val hijri = hijriToday()
+            val hijri = hijriToday(now)
             if (hijri.isNotBlank()) {
                 Text(
                     text = hijri,
@@ -278,7 +279,7 @@ private fun ExportButton(enabled: Boolean, onClick: () -> Unit) {
         enabled = enabled,
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .heightIn(min = 56.dp),
     ) {
         Icon(Icons.Outlined.PictureAsPdf, contentDescription = null)
         Spacer(Modifier.width(10.dp))
@@ -424,7 +425,7 @@ private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
 private fun TodayTimeline(state: UiState) {
     val today = state.today ?: return
     val context = LocalContext.current
-    val currentSlot = state.next?.slot
+    val next = state.next
 
     Text(
         text = stringResource(R.string.home_today),
@@ -442,7 +443,7 @@ private fun TodayTimeline(state: UiState) {
         Column(Modifier.padding(vertical = 4.dp)) {
             PrayerSlot.entries.forEach { slot ->
                 val at = today.times[slot] ?: return@forEach
-                val isNext = slot == currentSlot && state.next?.isTomorrow == false
+                val isNext = next != null && slot == next.slot && !next.isTomorrow
                 PrayerRow(
                     slot = slot,
                     time = TimeFormat.clock(context, at),
@@ -472,8 +473,10 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 2.dp)
             .background(background, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp)
-            .height(52.dp),
+            // Vertical padding, not a fixed height: at a large system font size the row
+            // has to grow rather than crop the prayer name.
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .heightIn(min = 52.dp),
     ) {
         Icon(
             imageVector = slotIcon(slot),
@@ -536,11 +539,14 @@ private fun heroGradient(slot: PrayerSlot?): Brush {
  * month as a bare number.
  */
 @Composable
-private fun hijriToday(): String {
+private fun hijriToday(now: Instant): String {
     val months = stringArrayResource(R.array.hijri_months)
-    val parts = remember(months) {
+    // Keyed on the calendar date, not computed once. Left open overnight the header
+    // otherwise kept yesterday's Hijri date until the app was killed.
+    val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
+    val parts = remember(months, date) {
         runCatching {
-            val today = HijrahDate.from(Instant.now().atZone(ZoneId.systemDefault()).toLocalDate())
+            val today = HijrahDate.from(date)
             Triple(
                 today.get(ChronoField.DAY_OF_MONTH),
                 today.get(ChronoField.MONTH_OF_YEAR),

@@ -46,6 +46,18 @@ enum class LocationProblem {
     CITY_NOT_FOUND,
 }
 
+/**
+ * The result of an export, delivered to the UI once and then cleared.
+ *
+ * [Failed] exists because the previous version swallowed every export error: the user
+ * tapped "Save timetable as PDF", chose a range, and absolutely nothing happened.
+ */
+sealed interface ExportEvent {
+    data class Saved(val fileName: String) : ExportEvent
+    data class Share(val uri: Uri) : ExportEvent
+    data object Failed : ExportEvent
+}
+
 data class UiState(
     val loading: Boolean = true,
     val settings: AppSettings = AppSettings(),
@@ -54,7 +66,7 @@ data class UiState(
     val now: Instant = Instant.now(),
     val problem: LocationProblem? = null,
     val resolvingLocation: Boolean = false,
-    val exportedFile: Uri? = null,
+    val exportEvent: ExportEvent? = null,
     /** Device heading in degrees from true north. Null when there is no compass. */
     val compassHeading: Double? = null,
     val compassAccuracy: CompassAccuracy = CompassAccuracy.UNAVAILABLE,
@@ -181,21 +193,35 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun exportPdf(range: PrayerPdfExporter.Range) {
         val settings = _state.value.settings
-        val coordinates = settings.coordinates ?: return
+        val coordinates = settings.coordinates ?: run {
+            _state.update { it.copy(exportEvent = ExportEvent.Failed) }
+            return
+        }
         viewModelScope.launch {
-            val uri = runCatching {
+            val event = runCatching {
                 exporter.export(
                     range = range,
                     coordinates = coordinates,
                     cityName = settings.cityName,
                     prefs = settings.calculationPrefs,
                 )
-            }.getOrNull()
-            _state.update { it.copy(exportedFile = uri) }
+            }.fold(
+                onSuccess = { outcome ->
+                    when (outcome) {
+                        is PrayerPdfExporter.Outcome.SavedToDownloads ->
+                            ExportEvent.Saved(outcome.fileName)
+
+                        is PrayerPdfExporter.Outcome.ReadyToShare ->
+                            ExportEvent.Share(outcome.uri)
+                    }
+                },
+                onFailure = { ExportEvent.Failed },
+            )
+            _state.update { it.copy(exportEvent = event) }
         }
     }
 
-    fun consumeExportedFile() = _state.update { it.copy(exportedFile = null) }
+    fun consumeExportEvent() = _state.update { it.copy(exportEvent = null) }
 
     // --- qibla -----------------------------------------------------------------------
 
@@ -224,7 +250,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             compassRepository.headings(coordinates).collect { reading ->
                 _state.update {
                     it.copy(
-                        compassHeading = reading.trueHeading,
+                        // UNAVAILABLE carries a placeholder heading of zero. Passing that
+                        // through would draw a needle and say "turn right 143 degrees"
+                        // off a reading that does not exist; null makes the Qibla screen
+                        // fall back to the written bearing instead.
+                        compassHeading = reading.trueHeading
+                            .takeIf { reading.accuracy != CompassAccuracy.UNAVAILABLE },
                         compassAccuracy = reading.accuracy,
                     )
                 }

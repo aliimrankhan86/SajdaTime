@@ -20,6 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
 import com.sajdatime.app.ui.onboarding.OnboardingScreen
@@ -58,13 +59,17 @@ class MainActivity : ComponentActivity() {
             SajdaTimeTheme {
                 val state by viewModel.state.collectAsStateWithLifecycle()
 
-                // Sharing the export is a user-visible side effect, so it fires once per
-                // generated file and is then consumed.
-                LaunchedEffect(state.exportedFile) {
-                    state.exportedFile?.let { uri ->
-                        sharePdf(uri)
-                        viewModel.consumeExportedFile()
+                // The export result is a user-visible side effect, so it fires once per
+                // attempt and is then consumed. Failures are reported too: a tap that
+                // silently does nothing is worse than an error.
+                LaunchedEffect(state.exportEvent) {
+                    when (val event = state.exportEvent) {
+                        null -> Unit
+                        is ExportEvent.Share -> sharePdf(event.uri)
+                        is ExportEvent.Saved -> toast(getString(R.string.export_saved, event.fileName))
+                        ExportEvent.Failed -> toast(getString(R.string.export_failed))
                     }
+                    if (state.exportEvent != null) viewModel.consumeExportEvent()
                 }
 
                 when {
@@ -151,6 +156,9 @@ class MainActivity : ComponentActivity() {
         }
         runCatching { alarmSoundPicker.launch(intent) }
     }
+
+    private fun toast(message: String) =
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
 
     private fun sharePdf(uri: Uri) {
         val share = Intent(Intent.ACTION_SEND)

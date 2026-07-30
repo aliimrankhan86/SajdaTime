@@ -1,5 +1,7 @@
 package com.sajdatime.wear
 
+import android.content.Context
+import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +26,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,12 +76,13 @@ fun WearApp(viewModel: WearViewModel) {
 @Composable
 private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
     val listState = rememberScalingLazyListState()
+    val context = LocalContext.current
 
     ScreenScaffold(scrollState = listState) { contentPadding ->
         if (state.locating) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Finding your location",
+                    text = stringResource(R.string.wear_locating),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -117,7 +122,7 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                         style = MaterialTheme.typography.displaySmall,
                     )
                     Text(
-                        text = next?.let { clock(it.at) } ?: "",
+                        text = next?.let { clock(context, it.at) } ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -146,7 +151,7 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                             },
                         )
                         Text(
-                            text = clock(at),
+                            text = clock(context, at),
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (isNext) {
                                 MaterialTheme.colorScheme.primary
@@ -155,6 +160,16 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                             },
                         )
                     }
+                }
+
+                item {
+                    Text(
+                        text = stringResource(R.string.wear_disclaimer),
+                        style = MaterialTheme.typography.bodyExtraSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    )
                 }
             }
         }
@@ -176,13 +191,13 @@ private fun NoLocation(onUseDefaultLocation: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "No location yet",
+            text = stringResource(R.string.wear_no_location_title),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = "Open SajdaTime on your phone, or use Makkah for now.",
+            text = stringResource(R.string.wear_no_location_body),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -192,7 +207,7 @@ private fun NoLocation(onUseDefaultLocation: () -> Unit) {
             onClick = onUseDefaultLocation,
             label = {
                 Text(
-                    text = "Use Makkah",
+                    text = stringResource(R.string.wear_use_makkah),
                     style = MaterialTheme.typography.labelMedium,
                 )
             },
@@ -207,7 +222,7 @@ private fun QiblaPage(state: WearUiState) {
             val qibla = state.qiblaBearing
             if (qibla == null) {
                 Text(
-                    text = "Set your location to find the Qibla",
+                    text = stringResource(R.string.wear_qibla_needs_location),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 20.dp),
@@ -268,13 +283,17 @@ private fun QiblaPage(state: WearUiState) {
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = if (aligned) "Facing Qibla" else "${qibla.roundToInt()}°",
+                    text = if (aligned) {
+                        stringResource(R.string.wear_qibla_facing)
+                    } else {
+                        stringResource(R.string.wear_qibla_bearing, qibla.roundToInt())
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     color = needleColour,
                 )
                 if (heading == null) {
                     Text(
-                        text = "from true north",
+                        text = stringResource(R.string.wear_qibla_from_true_north),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -284,13 +303,24 @@ private fun QiblaPage(state: WearUiState) {
     }
 }
 
-private fun clock(instant: Instant): String =
-    DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
+/**
+ * Clock time, honouring the watch's own 12/24-hour setting. This used to be hardcoded to
+ * 24-hour, which showed "17:14" to users whose watch was set to show "5:14 PM".
+ */
+private fun clock(context: Context, instant: Instant): String {
+    val pattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
+    return DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
         .format(instant.atZone(ZoneId.systemDefault()))
+}
 
+@Composable
 private fun countdown(from: Instant, to: Instant): String {
     val duration = Duration.between(from, to).let { if (it.isNegative) Duration.ZERO else it }
     val hours = duration.toHours()
     val minutes = duration.toMinutes() % 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
+    return if (hours > 0) {
+        stringResource(R.string.wear_duration_h_m, hours, minutes)
+    } else {
+        stringResource(R.string.wear_duration_m, minutes)
+    }
 }

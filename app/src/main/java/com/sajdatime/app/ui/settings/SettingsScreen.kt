@@ -21,6 +21,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -257,6 +259,10 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
             )
+            // The one thing the app ever asks for in return. Given its own card rather
+            // than another grey subtitle so it is actually read, and placed last so it is
+            // what the About screen leaves you with.
+            DuaRequest()
         }
     }
 
@@ -347,6 +353,34 @@ private fun Group(title: String, content: @Composable () -> Unit) {
             .semantics { heading() },
     )
     content()
+}
+
+@Composable
+private fun DuaRequest() {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Text(
+                text = stringResource(R.string.about_dua),
+                style = MaterialTheme.typography.labelMedium,
+                // Full opacity, not a faded label: dimming this to 75% lands at 4.65:1 in
+                // the dark theme, which clears AA by a margin too thin to leave untested.
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stringResource(R.string.about_dua_desc),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+            )
+        }
+    }
 }
 
 @Composable

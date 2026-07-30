@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -117,7 +118,7 @@ fun LocationSheet(
                 enabled = !state.resolvingLocation,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .heightIn(min = 52.dp),
             ) {
                 Icon(Icons.Outlined.MyLocation, contentDescription = null)
                 Spacer(Modifier.width(10.dp))
@@ -181,7 +182,7 @@ fun LocationSheet(
                 enabled = query.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
+                    .heightIn(min = 48.dp),
             ) {
                 Icon(Icons.Outlined.Search, contentDescription = null)
                 Spacer(Modifier.width(10.dp))

@@ -9,6 +9,8 @@ import androidx.core.content.ContextCompat
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.app.MainActivity
+import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.AppSettings
 import java.time.Instant
 import java.time.LocalDate
@@ -46,7 +48,7 @@ object PrayerAlarmScheduler {
 
         upcoming(coordinates, settings, today, now)
             .filter { (slot, _) -> slot in settings.notifyFor }
-            .forEach { (slot, at) -> schedule(context, manager, slot, at) }
+            .forEach { (slot, at) -> schedule(context, manager, slot, at, settings.alertStyle) }
     }
 
     /** Prayer slots between [now] and the end of the scheduling horizon, in order. */
@@ -84,15 +86,30 @@ object PrayerAlarmScheduler {
         manager: AlarmManager,
         slot: PrayerSlot,
         at: Instant,
+        style: AlertStyle,
     ) {
         val pendingIntent = alarmIntent(context, slot, at)
         val triggerAt = at.toEpochMilli()
 
         val scheduled = runCatching {
-            if (canScheduleExact(manager)) {
-                manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
-            } else {
-                manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+            when {
+                !canScheduleExact(manager) ->
+                    manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
+
+                // Alarm mode gets setAlarmClock, the only alarm the system treats as a
+                // user-facing wake-up: it is exempt from Doze deferral and from the
+                // once-per-9-minutes throttle that applies to setExactAndAllowWhileIdle.
+                // It also surfaces in the system's "next alarm" UI, which is honest —
+                // the user asked to be woken for Fajr. Notification mode keeps the
+                // quieter alarm so it does not claim a status bar icon it has not earned.
+                style == AlertStyle.ALARM ->
+                    manager.setAlarmClock(
+                        AlarmManager.AlarmClockInfo(triggerAt, openAppIntent(context)),
+                        pendingIntent,
+                    )
+
+                else ->
+                    manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pendingIntent)
             }
         }
 
@@ -155,6 +172,16 @@ object PrayerAlarmScheduler {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
+
+    /** Where the system sends the user if they tap the alarm-clock icon in the status bar. */
+    private fun openAppIntent(context: Context): PendingIntent =
+        PendingIntent.getActivity(
+            context,
+            0,
+            Intent(context, MainActivity::class.java)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
 
     /** Stable per (slot, calendar day) so rescheduling replaces rather than duplicates. */
     private fun requestCode(slot: PrayerSlot, date: LocalDate): Int =

@@ -46,7 +46,11 @@ class NextPrayerTileService : TileService() {
         val now = Instant.now()
 
         val (headline, detail, refreshAfter) = if (coordinates == null) {
-            Triple(getString(R.string.tile_label), "Set up on your phone", Duration.ofHours(1))
+            Triple(
+                getString(R.string.tile_label),
+                getString(R.string.tile_needs_setup),
+                Duration.ofHours(1),
+            )
         } else {
             val next = PrayerEngine.nextPrayer(
                 coordinates = coordinates,
@@ -57,7 +61,11 @@ class NextPrayerTileService : TileService() {
             val remaining = Duration.between(now, next.at)
             Triple(
                 next.slot.label,
-                "${TileFormat.clock(next.at)}  ·  ${TileFormat.humanise(remaining)}",
+                getString(
+                    R.string.wear_tile_detail,
+                    TileFormat.clock(applicationContext, next.at),
+                    TileFormat.humanise(applicationContext, remaining),
+                ),
                 TileFormat.freshness(remaining),
             )
         }

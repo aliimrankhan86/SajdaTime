@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -148,6 +149,7 @@ private fun StepScaffold(
 
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
+    val bismillahSpoken = stringResource(R.string.bismillah_a11y)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -163,7 +165,7 @@ private fun WelcomeStep(onNext: () -> Unit) {
             // Screen readers should announce the meaning, not attempt the Arabic glyphs
             // in the user's own locale voice.
             modifier = Modifier.clearAndSetSemantics {
-                contentDescription = "Bismillah ir-Rahman ir-Raheem"
+                contentDescription = bismillahSpoken
             },
         )
         Spacer(Modifier.height(32.dp))
@@ -184,7 +186,7 @@ private fun WelcomeStep(onNext: () -> Unit) {
             onClick = onNext,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
         ) {
             Text(stringResource(R.string.action_begin))
         }
@@ -228,7 +230,7 @@ private fun PermissionStep(
                 enabled = !state.resolvingLocation,
                 modifier = Modifier
                     .weight(1f)
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
             ) {
                 Icon(Icons.Outlined.LocationOn, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
@@ -310,7 +312,7 @@ private fun PermissionStep(
                 enabled = city.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp),
+                    .heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.action_find_city))
             }
@@ -332,7 +334,7 @@ private fun PermissionStep(
             enabled = located,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
         ) {
             Text(stringResource(R.string.action_continue))
         }
@@ -414,7 +416,7 @@ private fun MadhabStep(
                 onClick = onBack,
                 modifier = Modifier
                     .weight(1f)
-                    .height(52.dp),
+                    .heightIn(min = 52.dp),
             ) {
                 Text(stringResource(R.string.action_back))
             }
@@ -423,7 +425,7 @@ private fun MadhabStep(
                 onClick = onSkip,
                 modifier = Modifier
                     .weight(1f)
-                    .height(52.dp),
+                    .heightIn(min = 52.dp),
             ) {
                 Text(stringResource(R.string.action_skip))
             }
@@ -465,7 +467,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
             onClick = onFinish,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
         ) {
             Text(stringResource(R.string.action_finish))
         }

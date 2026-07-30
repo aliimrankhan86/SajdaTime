@@ -1,10 +1,13 @@
 package com.sajdatime.app.pdf
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Paint
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
@@ -14,6 +17,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.notify.TimeFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -28,20 +32,28 @@ import java.util.Locale
  */
 class PrayerPdfExporter(private val context: Context) {
 
-    enum class Range(val label: String) {
-        TODAY("Today"),
-        NEXT_7_DAYS("Next 7 days"),
-        THIS_MONTH("This month"),
+    enum class Range { TODAY, NEXT_7_DAYS, THIS_MONTH }
+
+    /** Where the finished PDF ended up, which decides what the app tells the user. */
+    sealed interface Outcome {
+        /** Written into the public Downloads folder, where the user can go and find it. */
+        data class SavedToDownloads(val uri: Uri, val fileName: String) : Outcome
+
+        /** No Downloads collection available, so the file is offered through a share sheet. */
+        data class ReadyToShare(val uri: Uri) : Outcome
     }
 
-    /** Generates the PDF and returns a shareable content:// Uri. */
+    /**
+     * Generates the PDF. Throws if it cannot be written — the caller turns that into a
+     * message rather than letting the tap appear to do nothing.
+     */
     suspend fun export(
         range: Range,
         coordinates: Coordinates,
         cityName: String,
         prefs: CalculationPrefs,
         today: LocalDate = LocalDate.now(),
-    ): Uri = withContext(Dispatchers.IO) {
+    ): Outcome = withContext(Dispatchers.IO) {
         val (start, days) = when (range) {
             Range.TODAY -> today to 1
             Range.NEXT_7_DAYS -> today to 7
@@ -49,21 +61,59 @@ class PrayerPdfExporter(private val context: Context) {
         }
 
         val rows = PrayerEngine.computeRange(coordinates, start, days, prefs)
-        val file = File(exportDir(), fileName(range, start))
-        writePdf(file, rows, cityName, range, start)
+        val name = fileName(range, start)
+        val bytes = renderPdf(rows, cityName, range, start)
 
-        FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+        // Downloads first: the button says "save", so the file should be somewhere the
+        // user can actually go and look for it afterwards. The share sheet alone left
+        // people wondering where the timetable had gone.
+        saveToDownloads(name, bytes)?.let { return@withContext Outcome.SavedToDownloads(it, name) }
+
+        val file = File(exportDir(), name)
+        file.writeBytes(bytes)
+        Outcome.ReadyToShare(
+            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file),
+        )
+    }
+
+    /**
+     * Writes into the public Downloads collection. Returns null below API 29, where doing
+     * this would mean asking for WRITE_EXTERNAL_STORAGE — a permission this app has no
+     * business holding just to save a timetable. Those devices fall back to the share
+     * sheet, which needs no permission at all.
+     */
+    private fun saveToDownloads(name: String, bytes: ByteArray): Uri? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        val resolver = context.contentResolver
+        return runCatching {
+            val pending = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, name)
+                put(MediaStore.Downloads.MIME_TYPE, "application/pdf")
+                // Marked pending so nothing can open a half-written file, and so
+                // MediaStore renames rather than clobbers an existing timetable.
+                put(MediaStore.Downloads.IS_PENDING, 1)
+            }
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, pending)
+                ?: return null
+            resolver.openOutputStream(uri)?.use { it.write(bytes) } ?: return null
+            resolver.update(
+                uri,
+                ContentValues().apply { put(MediaStore.Downloads.IS_PENDING, 0) },
+                null,
+                null,
+            )
+            uri
+        }.getOrNull()
     }
 
     // --- drawing ---------------------------------------------------------------------
 
-    private fun writePdf(
-        file: File,
+    private fun renderPdf(
         rows: List<DayPrayerTimes>,
         cityName: String,
         range: Range,
         start: LocalDate,
-    ) {
+    ): ByteArray {
         val document = PdfDocument()
         try {
             var index = 0
@@ -96,8 +146,7 @@ class PrayerPdfExporter(private val context: Context) {
                 pageNumber++
             }
 
-            file.parentFile?.mkdirs()
-            file.outputStream().use { document.writeTo(it) }
+            return ByteArrayOutputStream().also { document.writeTo(it) }.toByteArray()
         } finally {
             document.close()
         }
@@ -215,7 +264,13 @@ class PrayerPdfExporter(private val context: Context) {
     }
 
     private val dayNameFormat = DateTimeFormatter.ofPattern("EEEE", Locale.getDefault())
-    private val dateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.getDefault())
+
+    /**
+     * Abbreviated month, not the full name. The Date column is 91pt wide and the cell text
+     * is 10pt, so "30 September 2026" ran within a few points of the Fajr column and a
+     * longer month name in another language ran straight into it.
+     */
+    private val dateFormat = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
     private val monthYearFormat = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())
 
     private companion object {

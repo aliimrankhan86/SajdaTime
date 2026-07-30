@@ -1,6 +1,7 @@
 package com.sajdatime.wear
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.time.Duration
@@ -9,19 +10,22 @@ import java.time.ZoneId
 
 class TileFormatTest {
 
+    // The wording lives in strings.xml now, so these assert the numbers the wording is
+    // built from. Same coverage, still no device needed.
+
     @Test
-    fun `countdown under an hour omits the hours part`() {
-        assertEquals("in 42m", TileFormat.humanise(Duration.ofMinutes(42)))
+    fun `countdown under an hour has no hours part`() {
+        assertEquals(0L to 42L, TileFormat.remaining(Duration.ofMinutes(42)))
     }
 
     @Test
-    fun `countdown over an hour shows hours and minutes`() {
-        assertEquals("in 3h 7m", TileFormat.humanise(Duration.ofMinutes(187)))
+    fun `countdown over an hour splits into hours and minutes`() {
+        assertEquals(3L to 7L, TileFormat.remaining(Duration.ofMinutes(187)))
     }
 
     @Test
     fun `an exact hour still reads sensibly`() {
-        assertEquals("in 2h 0m", TileFormat.humanise(Duration.ofHours(2)))
+        assertEquals(2L to 0L, TileFormat.remaining(Duration.ofHours(2)))
     }
 
     /**
@@ -30,8 +34,8 @@ class TileFormatTest {
      */
     @Test
     fun `a prayer that has just passed never counts down negatively`() {
-        assertEquals("in 0m", TileFormat.humanise(Duration.ofSeconds(-30)))
-        assertEquals("in 0m", TileFormat.humanise(Duration.ofMinutes(-90)))
+        assertEquals(0L to 0L, TileFormat.remaining(Duration.ofSeconds(-30)))
+        assertEquals(0L to 0L, TileFormat.remaining(Duration.ofMinutes(-90)))
     }
 
     @Test
@@ -68,6 +72,28 @@ class TileFormatTest {
     fun `clock renders 24 hour time in the given zone`() {
         // 2026-06-21T18:42:00Z, read in London where the offset is +1 in June.
         val instant = Instant.parse("2026-06-21T18:42:00Z")
-        assertEquals("19:42", TileFormat.clock(instant, ZoneId.of("Europe/London")))
+        assertEquals(
+            "19:42",
+            TileFormat.clock(instant, ZoneId.of("Europe/London"), use24Hour = true),
+        )
+    }
+
+    /**
+     * The tile used to hardcode 24-hour time, so a watch set to 12-hour showed "19:42"
+     * where every other app on it showed "7:42 pm".
+     *
+     * The meridiem marker itself is not asserted: it is "PM" under en-US and "pm" under
+     * en-GB, so pinning the text would only test which locale the build machine happens
+     * to run in. What matters is that the hour rolls back to 7 and that the two settings
+     * genuinely differ.
+     */
+    @Test
+    fun `clock honours a 12 hour device`() {
+        val instant = Instant.parse("2026-06-21T18:42:00Z")
+        val london = ZoneId.of("Europe/London")
+        val twelveHour = TileFormat.clock(instant, london, use24Hour = false)
+
+        assertTrue("expected a 12-hour reading, got $twelveHour", twelveHour.startsWith("7:42"))
+        assertNotEquals(twelveHour, TileFormat.clock(instant, london, use24Hour = true))
     }
 }
