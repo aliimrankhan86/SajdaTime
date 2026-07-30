@@ -7,8 +7,10 @@ business rule, what is verified, what is not, and what is left to do.
 - **Repo:** `git@github.com:aliimrankhan86/SajdaTime.git`
 - **Local path:** `/Users/aliimrankhan/Developer/SajdaTime`
 - **Branch:** `main`
-- **Version:** 1.1.0 (`versionCode` 2) on both phone and watch
-- **Status:** feature-complete and tested; **not shippable yet — the app is unsigned**
+- **Version:** 1.1.0 (`versionCode` 2 on phone, 3 on the watch — they share an
+  `applicationId`, and Play refuses two bundles with the same code)
+- **Status:** feature-complete, tested, and prepared for Play. **Not shippable yet — the
+  release is unsigned because only the owner may hold the key.** See §11.
 - **Companion docs:** `docs/ARCHITECTURE.md` (the technical spec, including the exact
   business rules an iOS port must reproduce) and `README.md` (the short public-facing one).
 
@@ -190,7 +192,9 @@ Both phone and watch have this path.
 
 The launcher icon and notification icon are a **mihrab arch** (`ic_launcher_foreground.xml`,
 `ic_notification.xml`, and `tile_preview.xml` on the watch) — all vector drawables, no
-raster assets anywhere in the project.
+raster assets anywhere in the app itself. The Play Store icon and feature graphic in
+`docs/store/` are the only rasters, and they are generated from those same path data by
+`tools/build-store-assets.sh` rather than drawn by hand, so they cannot drift.
 
 ---
 
@@ -491,7 +495,10 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
 ```
 
 Expected: BUILD SUCCESSFUL, 47 tests, 0 failures, lint informational-only, phone release
-APK ~1.9 MB and watch ~2.6 MB (both **unsigned**).
+APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties` is present).
+
+For Play, build bundles rather than APKs — `:app:bundleRelease :wear:bundleRelease`, which
+give ~4.3 MB and ~3.5 MB `.aab` files.
 
 `JAVA_HOME` matters — see §12. If any of it fails, check §13 first.
 
@@ -545,11 +552,13 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Blocker for release
 
-1. **The app is unsigned.** Release builds produce `app-release-unsigned.apk` and
-   `wear-release-unsigned.apk`. A release keystore must be generated and a `signingConfig`
-   added to both modules before this can go on Google Play. **This needs the owner** — an
-   agent should not generate or hold the signing key. This is the only thing between the
-   project and shipping.
+1. **The app is unsigned, and only the owner can change that.** The Gradle side *is* done:
+   both modules read a `keystore.properties` from the project root and sign the release with
+   it, falling back to unsigned output when the file is absent. That was verified with a
+   throwaway key — both `.aab` files came out carrying a real signature — after which the
+   throwaway key was destroyed. What is missing is the owner's real upload key. **An agent
+   must never generate, hold, or see it.** `keystore.properties`, `*.jks` and `*.keystore`
+   are gitignored. Full instructions: `docs/RELEASING.md` Step 2.
 
 ### Not done, in rough priority order
 
@@ -580,8 +589,13 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     translations exist yet. Arabic and Urdu would be the obvious first two, and Arabic will
     need RTL checking (`supportsRtl="true"` is already set).
 12. **No CI.** No GitHub Actions workflow; all verification is run locally.
-13. **No Play Store listing assets** — no screenshots, feature graphic, privacy policy URL,
-    or store description.
+13. **Play Store listing assets are done.** `docs/store/` holds the 512 × 512 icon, the
+    1024 × 500 feature graphic, five phone screenshots, two Wear screenshots, and
+    `LISTING.md` with every field of Console text (name, short and full description,
+    category, data safety answers) already within Google's character limits. The privacy
+    policy page is `docs/privacy.html` with a landing page at `docs/index.html`. What
+    remains is the owner turning GitHub Pages on so the policy has a public URL —
+    `docs/RELEASING.md` Step 4.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SajdaTime — Privacy Policy</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0 auto; padding: 40px 24px 80px; max-width: 720px;
+    font: 17px/1.65 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #12211c; background: #fbfaf7;
+  }
+  h1 { font-size: 32px; line-height: 1.2; margin: 0 0 4px; }
+  h2 { font-size: 21px; margin: 40px 0 8px; color: #14624b; }
+  .updated { color: #43524b; margin: 0 0 32px; font-size: 15px; }
+  .lede { font-size: 19px; border-left: 4px solid #14624b; padding-left: 16px; margin: 0 0 8px; }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  code { background: #edf1ee; padding: 1px 5px; border-radius: 4px; font-size: 15px; }
+  a { color: #14624b; }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid #c9d2cd; font-size: 15px; color: #43524b; }
+  @media (prefers-color-scheme: dark) {
+    body { color: #e2e6e3; background: #101613; }
+    h2 { color: #7fd1ae; }
+    .updated, footer { color: #b4ccc0; }
+    .lede { border-color: #7fd1ae; }
+    code { background: #19221e; }
+    footer { border-color: #2a322e; }
+    a { color: #7fd1ae; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy for SajdaTime</h1>
+<p class="updated">Last updated: 30 July 2026</p>
+
+<p class="lede">SajdaTime does not collect, store, or share any personal information. There
+are no accounts, no analytics, no advertising, and no tracking of any kind.</p>
+
+<h2>What the app needs, and why</h2>
+<p>SajdaTime works out prayer times and the direction of the Qibla from your approximate
+location. To do that it asks for the <strong>approximate location</strong> permission
+(<code>ACCESS_COARSE_LOCATION</code>). It reads your location only while the app is open,
+never in the background.</p>
+<p>Your coordinates are saved on your own device so the app still works with no signal.
+<strong>They are never sent to us or to anyone else.</strong> We have no server, so there is
+nowhere for them to go.</p>
+<p>You can refuse the location permission entirely and type a city name instead. The app is
+fully usable that way.</p>
+
+<h2>The one time something leaves your device</h2>
+<p>If you choose to type a city name rather than use your location, that name has to be
+turned into coordinates. The app first tries to do this using the lookup service built into
+Android itself. If your device cannot resolve it, and only then, the city name you typed is
+sent once to <a href="https://open-meteo.com/">Open-Meteo</a>, a free geocoding service, which
+sends back the coordinates.</p>
+<p>What is sent is the place name you typed and nothing else — no identifier, no device
+information, no account, nothing that says the request came from you. The app tells you this
+is going to happen before it does it. Nothing about that lookup is stored by SajdaTime beyond
+the coordinates it gives back, which stay on your device.</p>
+
+<h2>If you have a Wear OS watch</h2>
+<p>When a paired watch is present, your settings and location are sent to it over Google's
+local Data Layer so the watch can work out prayer times on its own. This travels directly
+between two devices that belong to you. It does not go to a server, and it does not reach us.</p>
+
+<h2>What SajdaTime never does</h2>
+<ul>
+  <li>No user accounts, sign-in, or email collection</li>
+  <li>No analytics, crash reporting, or usage measurement</li>
+  <li>No advertising and no advertising identifiers</li>
+  <li>No third-party trackers or SDKs of any kind</li>
+  <li>No selling or sharing of data — there is no data to sell</li>
+  <li>No cloud backup: Android's automatic backup is switched off
+      (<code>allowBackup="false"</code>) so your cached location cannot be copied to a
+      backup server</li>
+</ul>
+
+<h2>Children</h2>
+<p>SajdaTime is suitable for all ages and is not directed at children specifically. It
+collects nothing from anyone, of any age.</p>
+
+<h2>Permissions in full</h2>
+<ul>
+  <li><code>ACCESS_COARSE_LOCATION</code> — to calculate prayer times and the Qibla. Foreground only.</li>
+  <li><code>POST_NOTIFICATIONS</code> — to tell you when a prayer time arrives.</li>
+  <li><code>SCHEDULE_EXACT_ALARM</code> — so a prayer alert arrives at the right minute
+      rather than whenever the system feels like it.</li>
+  <li><code>RECEIVE_BOOT_COMPLETED</code> — to restore your prayer alerts after the phone restarts.</li>
+  <li><code>INTERNET</code> — used only for the optional city-name lookup described above.</li>
+  <li>On the watch, <code>WAKE_LOCK</code> — so the tile can refresh its countdown.</li>
+</ul>
+
+<h2>Changes to this policy</h2>
+<p>If this policy ever changes, the updated version will be published on this page with a new
+date at the top.</p>
+
+<h2>Contact</h2>
+<p>Questions about privacy, or about the app in general, can be raised at
+<a href="https://github.com/aliimrankhan86/SajdaTime/issues">github.com/aliimrankhan86/SajdaTime/issues</a>.</p>
+
+<footer>
+  <p><strong>Disclaimer:</strong> SajdaTime is a helper, not a religious authority. It was
+  built with the help of artificial intelligence and may get things wrong. If a time or a
+  direction looks off, please check with your local mosque or someone qualified to advise you.</p>
+  <p>SajdaTime is free, with no ads and no charge, as an ongoing charity for the Ummah.</p>
+</footer>
+
+</body>
+</html>

@@ -1,7 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
 }
+
+// Same upload key as the phone app — see the note in app/build.gradle.kts.
+val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.exists() }
+    ?.let { file -> Properties().apply { file.inputStream().use(::load) } }
 
 /**
  * Wear OS companion.
@@ -21,12 +27,27 @@ android {
         // not worth the maintenance for a solo project.
         minSdk = 30
         targetSdk = 36
-        versionCode = 2
+        // Phone and watch share an applicationId, so Play treats them as one listing and
+        // refuses two bundles with the same version code. The watch is kept one ahead of
+        // the phone; keep it that way on every future bump.
+        versionCode = 3
         versionName = "1.1.0"
+    }
+
+    signingConfigs {
+        keystoreProperties?.let { props ->
+            create("release") {
+                storeFile = file(props.getProperty("storeFile"))
+                storePassword = props.getProperty("storePassword")
+                keyAlias = props.getProperty("keyAlias")
+                keyPassword = props.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
