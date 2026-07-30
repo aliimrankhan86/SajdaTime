@@ -32,9 +32,13 @@
       to Google's servers, which directly contradicts the promise that their location
       never leaves the device. Settings are two taps to re-enter; the privacy guarantee
       is worth more.
+
+      allowBackup covers Android 11 and below. From Android 12 it stops cloud backup but
+      not device-to-device transfer, so data_extraction_rules.xml shuts both off there.
     -->
     <application
         android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"

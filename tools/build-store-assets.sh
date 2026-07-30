@@ -97,6 +97,31 @@ HTML
   done
 fi
 
+# --- Wear OS screenshots -------------------------------------------------------------
+# Copied through untouched. 384x384 is already exactly what Play wants, so there is no
+# reframing to do, and nothing here should invent pixels the device did not produce.
+#
+# A circular mask was tried and removed. The idea was that adb screencap returns the whole
+# square framebuffer including corners a round display never shows, so masking would only
+# remove what was already invisible. That is true, and it is also worth nothing here: this
+# UI is white on black, so the corners it would blacken are already black. All it bought
+# was an assumption about the emulator's geometry, on an image that is otherwise exactly
+# what the device produced. Not worth it.
+#
+# The last row of times being cut by the bottom edge is the list telling the user there is
+# more below, which is how a ScalingLazyColumn is meant to look. What was worth fixing was
+# the cut landing mid-glyph, and that is fixed by choosing the scroll position when
+# capturing, not by post-processing. Note that ScreenScaffold hides the watch face clock
+# once the list is scrolled off the top, so capture after the fade has finished or the
+# clock is caught half drawn.
+#
+# Sources live in raw/wear/ rather than raw/ so the phone loop's raw/*.png glob does not
+# reframe a watch onto a 1080x1920 phone canvas.
+for src in "$out/screenshots/raw/wear"/*.png; do
+  [ -e "$src" ] || continue
+  cp "$src" "$out/screenshots/$(basename "$src")"
+done
+
 echo "Wrote:"
 for f in "$out/icon-512.png" "$out/feature-graphic-1024.png" "$out/screenshots"/*.png; do
   printf '  %-9s %s\n' "$(sips -g pixelWidth -g pixelHeight "$f" | awk '/pixel/{printf "%sx", $2}' | sed 's/x$//')" "${f#"$root/"}"

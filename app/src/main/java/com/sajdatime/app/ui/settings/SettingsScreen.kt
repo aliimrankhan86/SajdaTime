@@ -21,8 +21,10 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.NotificationsActive
+import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -38,6 +40,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -79,7 +82,7 @@ fun SettingsScreen(
     onSearchCity: (String) -> Unit,
 ) {
     val context = LocalContext.current
-    var open by remember { mutableStateOf<Chooser?>(null) }
+    var open by rememberSaveable { mutableStateOf<Chooser?>(null) }
     val settings = state.settings
 
     Column(
@@ -167,6 +170,7 @@ fun SettingsScreen(
                 onClick = { open = Chooser.ALERTS },
             )
             SettingRow(
+                icon = Icons.Outlined.Checklist,
                 title = stringResource(R.string.settings_which_prayers),
                 subtitle = prayerCountSummary(settings.notifyFor.size),
                 onClick = { open = Chooser.PRAYERS },
@@ -174,6 +178,7 @@ fun SettingsScreen(
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
             SwitchRow(
+                icon = Icons.Outlined.PushPin,
                 title = stringResource(R.string.settings_ongoing_badge),
                 subtitle = stringResource(R.string.settings_ongoing_badge_desc),
                 checked = settings.ongoingBadge,
@@ -607,6 +612,7 @@ private fun SwitchRow(
     subtitle: String? = null,
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
+    icon: ImageVector? = null,
     horizontalPadding: androidx.compose.ui.unit.Dp = 20.dp,
 ) {
     Row(
@@ -617,6 +623,17 @@ private fun SwitchRow(
             .heightIn(min = 56.dp)
             .padding(horizontal = horizontalPadding, vertical = 8.dp),
     ) {
+        // Same 22dp icon and 16dp gutter as SettingRow, so titles in a group line up
+        // whether the row ends in a chevron or a switch.
+        if (icon != null) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp),
+            )
+            Spacer(Modifier.width(16.dp))
+        }
         Column(Modifier.weight(1f)) {
             Text(text = title, style = MaterialTheme.typography.bodyLarge)
             subtitle?.let {

@@ -45,6 +45,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -73,7 +74,7 @@ fun OnboardingScreen(
     onSelectMadhab: (Madhab) -> Unit,
     onFinish: () -> Unit,
 ) {
-    var step by remember { mutableStateOf(Step.WELCOME) }
+    var step by rememberSaveable { mutableStateOf(Step.WELCOME) }
 
     Scaffold { padding ->
         AnimatedContent(
@@ -201,8 +202,8 @@ private fun PermissionStep(
     onUseDefaultLocation: () -> Unit,
     onNext: () -> Unit,
 ) {
-    var explaining by remember { mutableStateOf(false) }
-    var city by remember { mutableStateOf("") }
+    var explaining by rememberSaveable { mutableStateOf(false) }
+    var city by rememberSaveable { mutableStateOf("") }
     val denied = state.problem == LocationProblem.PERMISSION_DENIED ||
         state.problem == LocationProblem.NO_FIX
     val located = state.settings.coordinates != null

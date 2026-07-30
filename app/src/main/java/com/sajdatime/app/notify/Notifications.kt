@@ -107,12 +107,20 @@ object Notifications {
                 setSound(
                     resolveAlarmSound(soundUri),
                     AudioAttributes.Builder()
-                        // USAGE_ALARM is what lets the sound through Do Not Disturb once
-                        // the user has granted notification policy access.
+                        // USAGE_ALARM is what actually carries this through Do Not Disturb,
+                        // together with CATEGORY_ALARM on the notification itself. DND
+                        // allows alarms by default, so this needs no special permission.
+                        // Verified on an API 36 emulator under ZEN_MODE_IMPORTANT_
+                        // INTERRUPTIONS: the prayer alarm posted with mIntercept=false
+                        // while the silent next-prayer badge was correctly intercepted.
                         .setUsage(AudioAttributes.USAGE_ALARM)
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build(),
                 )
+                // Best-effort only, and not the mechanism above. The platform ignores this
+                // unless the app holds notification policy access, which SajdaTime neither
+                // asks for nor needs — the channel really does read back mBypassDnd=false.
+                // Kept because it costs nothing and takes effect if the user ever grants it.
                 setBypassDnd(true)
             },
         )

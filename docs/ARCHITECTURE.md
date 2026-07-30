@@ -361,9 +361,15 @@ Two rules came out of that, and both should carry to any port:
 | Typed city name (fallback only) | Resolved on-device where possible, otherwise sent once to Open-Meteo | Only if the phone's own geocoder cannot answer, and with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 
-Cloud backup is **disabled** (`allowBackup="false"`). Android's backup service would
-otherwise copy the cached coordinates to Google's servers, contradicting the app's own
+Cloud backup **and device-to-device transfer** are both disabled. Android's backup service
+would otherwise copy the cached coordinates off the device, contradicting the app's own
 privacy promise. Re-entering settings takes two taps; the guarantee is worth more.
+
+Two declarations are needed, not one. `allowBackup="false"` covers Android 11 and below.
+From Android 12 it stops cloud backup but leaves device-to-device transfer enabled on many
+devices, so both modules also set `android:dataExtractionRules`, excluding every domain
+from `<cloud-backup>` and `<device-transfer>`. An iOS port needs the same care: the
+equivalent is excluding the store from iCloud and iTunes backup.
 
 Permissions requested: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`,
 `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`, `INTERNET`. No fine location, no

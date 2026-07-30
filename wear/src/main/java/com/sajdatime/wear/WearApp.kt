@@ -20,6 +20,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -28,6 +31,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,10 +41,13 @@ import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
 import com.sajdatime.core.labelRes
 import com.sajdatime.core.QiblaEngine
 import java.time.Duration
@@ -59,15 +67,34 @@ fun WearApp(viewModel: WearViewModel) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     // Two pages, swiped left and right. On a small round screen this beats a menu.
     val pager = rememberPagerState(pageCount = { 2 })
+    var choosingSchool by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(pager.currentPage) {
         viewModel.setQiblaVisible(pager.currentPage == PAGE_QIBLA)
     }
 
     AppScaffold {
+        if (choosingSchool) {
+            // A full screen rather than a third pager page. Two pages are already the most
+            // a user will discover by swiping; a setting they touch once does not deserve
+            // to sit permanently between the times and the Qibla.
+            SchoolPage(
+                sect = state.settings.sect,
+                madhab = state.settings.madhab,
+                onSelectSect = viewModel::setSect,
+                onSelectMadhab = viewModel::setMadhab,
+                onDone = { choosingSchool = false },
+            )
+            return@AppScaffold
+        }
         HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {
-                PAGE_TIMES -> TimesPage(state, viewModel::useDefaultLocation)
+                PAGE_TIMES -> TimesPage(
+                    state = state,
+                    onUseDefaultLocation = viewModel::useDefaultLocation,
+                    onChooseSchool = { choosingSchool = true },
+                )
+
                 else -> QiblaPage(state)
             }
         }
@@ -75,8 +102,18 @@ fun WearApp(viewModel: WearViewModel) {
 }
 
 @Composable
-private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
-    val listState = rememberScalingLazyListState()
+private fun TimesPage(
+    state: WearUiState,
+    onUseDefaultLocation: () -> Unit,
+    onChooseSchool: () -> Unit,
+) {
+    // initialCenterItemIndex = 0, not the default 1. ScalingLazyColumn otherwise opens
+    // centred on the second item, which scrolled the countdown card up far enough that
+    // the watch face clock sat on top of the prayer name. The 44dp of top padding inside
+    // that card was never the problem — it was correct, and simply scrolled off. This is
+    // the first thing a user sees when they raise their wrist, so it has to be right on
+    // launch and not one flick later.
+    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     val context = LocalContext.current
 
     ScreenScaffold(scrollState = listState) { contentPadding ->
@@ -163,6 +200,23 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
                     }
                 }
 
+                // Always visible, directly under the times it produced. A watch that
+                // never received the phone's settings is otherwise indistinguishable
+                // from one that did, and the difference is over an hour of Asr.
+                item {
+                    Button(
+                        onClick = onChooseSchool,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        label = {
+                            Text(
+                                text = schoolSummary(state.settings.sect, state.settings.madhab),
+                                style = MaterialTheme.typography.labelMedium,
+                                textAlign = TextAlign.Center,
+                            )
+                        },
+                    )
+                }
+
                 item {
                     Text(
                         text = stringResource(R.string.wear_disclaimer),
@@ -175,6 +229,128 @@ private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+private fun schoolSummary(sect: Sect, madhab: Madhab): String = when (sect) {
+    Sect.SHIA -> stringResource(R.string.wear_sect_shia)
+    Sect.SUNNI -> stringResource(
+        R.string.wear_school_pair,
+        stringResource(R.string.wear_sect_sunni),
+        stringResource(madhabLabelRes(madhab)),
+    )
+}
+
+private fun madhabLabelRes(madhab: Madhab): Int = when (madhab) {
+    Madhab.HANAFI -> R.string.wear_madhab_hanafi
+    Madhab.SHAFII -> R.string.wear_madhab_shafii
+    Madhab.MALIKI -> R.string.wear_madhab_maliki
+    Madhab.HANBALI -> R.string.wear_madhab_hanbali
+}
+
+/**
+ * Sect and madhab, chosen on the watch. Same two-step shape as the phone: pick Sunni or
+ * Shia, and only Sunni goes on to offer a madhab, because Jafari has no madhab to pick.
+ */
+@Composable
+private fun SchoolPage(
+    sect: Sect,
+    madhab: Madhab,
+    onSelectSect: (Sect) -> Unit,
+    onSelectMadhab: (Madhab) -> Unit,
+    onDone: () -> Unit,
+) {
+    val listState = rememberScalingLazyListState()
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        ScalingLazyColumn(
+            state = listState,
+            contentPadding = contentPadding,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            item {
+                Text(
+                    text = stringResource(R.string.wear_school),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 44.dp, bottom = 4.dp),
+                )
+            }
+            items(Sect.entries.toList()) { entry ->
+                ChoiceChip(
+                    label = stringResource(
+                        if (entry == Sect.SUNNI) R.string.wear_sect_sunni else R.string.wear_sect_shia,
+                    ),
+                    isSelected = sect == entry,
+                    onClick = { onSelectSect(entry) },
+                )
+            }
+            if (sect == Sect.SUNNI) {
+                item {
+                    Text(
+                        text = stringResource(R.string.wear_madhab_note),
+                        style = MaterialTheme.typography.bodyExtraSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                }
+                items(Madhab.entries.toList()) { entry ->
+                    ChoiceChip(
+                        label = stringResource(madhabLabelRes(entry)),
+                        isSelected = madhab == entry,
+                        onClick = { onSelectMadhab(entry) },
+                    )
+                }
+            }
+            item {
+                Button(
+                    onClick = onDone,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    label = {
+                        Text(
+                            text = stringResource(android.R.string.ok),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
+
+/**
+ * A full-width selectable row. Wear has no radio button worth using at 192dp, so the
+ * selected option is carried by the filled versus outlined treatment instead.
+ */
+@Composable
+private fun ChoiceChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
+    val colours = if (isSelected) {
+        ButtonDefaults.buttonColors()
+    } else {
+        ButtonDefaults.outlinedButtonColors()
+    }
+    Button(
+        onClick = onClick,
+        colors = colours,
+        // Without the border the unselected options render as bare text on black and stop
+        // looking tappable at all, which on a 192dp screen is the difference between an
+        // option and a label.
+        border = if (isSelected) null else ButtonDefaults.outlinedButtonBorder(enabled = true),
+        // Filled versus outlined is the only visual cue, so the selected state has to be
+        // stated outright for a screen reader rather than left to the colours.
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 2.dp)
+            .semantics { selected = isSelected },
+        label = {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+    )
 }
 
 /**

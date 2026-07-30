@@ -206,10 +206,14 @@ class PrayerPdfExporter(private val context: Context) {
 
     private fun subtitle(): String = context.getString(R.string.pdf_subtitle)
 
+    // PrayerTimes_July2026.pdf / PrayerTimes_30Jul2026.pdf. Locale.US is deliberate and is
+    // the one place in the app that ignores the user's language: this string is a file name
+    // in a shared Downloads folder, and it has to stay sortable, ASCII, and safe on the
+    // FAT-derived filesystems that USB and SD transfers still land on.
     private fun fileName(range: Range, start: LocalDate): String {
         val stamp = when (range) {
-            Range.THIS_MONTH -> start.format(DateTimeFormatter.ofPattern("MMMM_yyyy", Locale.US))
-            else -> start.format(DateTimeFormatter.ofPattern("dd_MMM_yyyy", Locale.US))
+            Range.THIS_MONTH -> start.format(DateTimeFormatter.ofPattern("MMMMyyyy", Locale.US))
+            else -> start.format(DateTimeFormatter.ofPattern("ddMMMyyyy", Locale.US))
         }
         return "PrayerTimes_$stamp.pdf"
     }

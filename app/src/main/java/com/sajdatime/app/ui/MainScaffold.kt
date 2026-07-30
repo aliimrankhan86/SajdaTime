@@ -25,7 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -68,7 +68,11 @@ fun MainScaffold(
     onSearchCity: (String) -> Unit,
     onQiblaVisible: (Boolean) -> Unit,
 ) {
-    var destination by remember { mutableStateOf(Destination.TIMES) }
+    // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
+    // composition from scratch and dropped the user back on Times — so anyone holding
+    // the Qibla compass and turning the phone sideways to line it up lost the screen
+    // they were using, which is precisely when they were using it.
+    var destination by rememberSaveable { mutableStateOf(Destination.TIMES) }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
     DisposableEffect(destination) {

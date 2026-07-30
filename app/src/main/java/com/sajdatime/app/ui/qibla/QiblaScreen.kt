@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,7 +42,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.core.QiblaEngine
@@ -102,6 +105,19 @@ fun QiblaScreen(state: UiState) {
     }
 }
 
+/**
+ * How wide the dial is allowed to be.
+ *
+ * 320dp is wider than a portrait phone, so portrait keeps the full-width dial it always
+ * had. The height term is what matters in landscape: the dial is square, so its width is
+ * also its height, and it has to leave room for the turn instruction underneath. Roughly
+ * a third of the screen height does that on every landscape phone size, and it also keeps
+ * the dial sane at a large font scale, where the text around it grows and the dial cannot.
+ */
+@Composable
+private fun dialMaxWidth(): Dp =
+    minOf(320.dp, (LocalConfiguration.current.screenHeightDp * 0.36f).dp)
+
 @Composable
 private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     val heading = state.compassHeading
@@ -121,6 +137,14 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
 
     Box(
         modifier = Modifier
+            // widthIn before fillMaxWidth, and the order is the whole point: fillMaxWidth
+            // pins minWidth to the full width, after which a widthIn cap can never win.
+            //
+            // Uncapped, fillMaxWidth + aspectRatio(1f) makes the dial as tall as the
+            // screen is wide. In landscape that is taller than the display, so
+            // "Turn right 118°" — the part that actually tells you where to stand — sat
+            // off the bottom of a scroll nobody would think to perform.
+            .widthIn(max = dialMaxWidth())
             .fillMaxWidth()
             .aspectRatio(1f)
             // The dial is decorative; the spoken direction lives in GuidanceText.

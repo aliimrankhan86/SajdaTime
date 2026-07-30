@@ -17,9 +17,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.QiblaEngine
+import com.sajdatime.core.Sect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -165,6 +167,25 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             store.setLocation(QiblaEngine.KAABA, "Makkah")
         }
+    }
+
+    /**
+     * School of thought, set on the wrist.
+     *
+     * The watch is declared standalone, so it runs on whatever it has locally. Until the
+     * phone's settings reach it over the Data Layer — and on a watch whose owner never
+     * installs the phone app at all, that is never — it falls back to its own defaults,
+     * which are Sunni and Shafi'i. For a Hanafi user that puts Asr out by more than an
+     * hour with nothing on screen to suggest anything is wrong. Being able to say so on
+     * the watch itself is the only fix that does not depend on a pairing that may not
+     * exist. The store already recalculates on change, so nothing else has to happen here.
+     */
+    fun setSect(sect: Sect) {
+        viewModelScope.launch { store.setSect(sect) }
+    }
+
+    fun setMadhab(madhab: Madhab) {
+        viewModelScope.launch { store.setMadhab(madhab) }
     }
 
     fun setQiblaVisible(visible: Boolean) {

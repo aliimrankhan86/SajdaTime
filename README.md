@@ -100,8 +100,8 @@ Coordinates are stored on the device and never transmitted.
 One optional feature touches the network: you can type a city name instead of using
 location. Your phone resolves it on its own where it can, and only if it cannot is the
 name you typed sent once to a free lookup service. The app tells you this before it
-happens. Cloud backup is switched off so your cached location cannot be copied to a backup
-server.
+happens. Cloud backup and device-to-device transfer are both switched off, so your cached
+location is neither copied to a backup server nor carried across to a new phone.
 
 If you have a paired Wear OS watch, your settings are sent to it over Google's local Data
 Layer so the watch can calculate times itself. That travels between two devices you own

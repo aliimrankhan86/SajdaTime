@@ -22,6 +22,28 @@
     -->
     <string name="wear_disclaimer">A helper, not a religious authority. Check with your local mosque if a time looks wrong.</string>
 
+    <!--
+      School of thought, on the wrist.
+
+      The watch is standalone, so it cannot assume the phone app exists or that its
+      settings ever arrived. Its own default is Sunni and Shafi'i, which puts Asr out by
+      more than an hour for a Hanafi user. The row at the bottom of the times list always
+      shows which school produced the times on screen, so a wrong one is visible rather
+      than silent, and can be corrected without the phone.
+
+      Translators: these are the same terms as the phone app. Keep them identical, and
+      leave the school names as proper nouns rather than translating them.
+    -->
+    <string name="wear_school">School</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">Sunni</string>
+    <string name="wear_sect_shia">Shia</string>
+    <string name="wear_madhab_hanafi">Hanafi</string>
+    <string name="wear_madhab_shafii">Shafi\'i</string>
+    <string name="wear_madhab_maliki">Maliki</string>
+    <string name="wear_madhab_hanbali">Hanbali</string>
+    <string name="wear_madhab_note">Only Asr changes. Hanafi is later.</string>
+
     <string name="wear_qibla_needs_location">Set your location to find the Qibla</string>
     <string name="wear_qibla_facing">Facing Qibla</string>
     <string name="wear_qibla_bearing">%1$d°</string>

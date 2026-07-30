@@ -43,8 +43,9 @@ Three constraints shaped the whole architecture:
 
 The user is not technical and asked for the app to be "fit for the masses". Wording is
 plain and calm throughout — UK spelling, no jargon, no em dashes or semicolons in UI
-strings. All 129 user-facing strings are in `app/src/main/res/values/strings.xml`, ready
-for translation. Nothing is hardcoded in a composable.
+strings. All 193 user-facing strings are resources, ready for translation, and nothing is
+hardcoded in a composable: 146 in `app`, 27 in `wear`, and 20 in `core` (the prayer and
+calculation-method names, which live there because both the phone and the watch show them).
 
 ### The religious disclaimer (non-negotiable)
 
@@ -143,14 +144,15 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Screens | `ui/home/HomeScreen.kt`, `ui/qibla/QiblaScreen.kt`, `ui/settings/SettingsScreen.kt`, `ui/onboarding/OnboardingScreen.kt`, `ui/components/Common.kt` (`LocationSheet`, `SectionHeading`, `rememberRemainingText`) |
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` |
+| Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
 
 **`:wear`** (8 source files, 2 test files)
 
 | File | Contains |
 |---|---|
 | `WearMainActivity.kt` | Entry, requests location permission |
-| `WearApp.kt` | `HorizontalPager`: page 0 times, page 1 Qibla; the "No location yet / Use Makkah" screen |
-| `WearViewModel.kt` | Own `LocationManager`, own rotation-vector compass, `useDefaultLocation()` |
+| `WearApp.kt` | `HorizontalPager`: page 0 times, page 1 Qibla; the "No location yet / Use Makkah" screen; the on-wrist school picker (`SchoolPage`, `ChoiceChip`) |
+| `WearViewModel.kt` | Own `LocationManager`, own rotation-vector compass, `useDefaultLocation()`, `setSect`/`setMadhab` |
 | `WearSettings.kt` | `WearSettings` + `WearSettingsStore` (the watch's own DataStore) |
 | `SettingsSyncService.kt` | `WearableListenerService` receiving phone settings |
 | `NextPrayerTileService.kt` | The tile |
@@ -252,7 +254,18 @@ twice for the same thing is asking too often.
 - **Default: notification + vibration + silent badge.** Alarm is **off** by default — this
   was an explicit user instruction.
 - **Alarm mode is opt-in** and requires the user to pick their own tone. No adhan audio is
-  bundled (licensing + APK size). Alarm mode uses `USAGE_ALARM` and `setBypassDnd(true)`.
+  bundled (licensing + APK size).
+- **What actually carries an alarm through Do Not Disturb is `USAGE_ALARM` on the channel
+  plus `CATEGORY_ALARM` on the notification**, not `setBypassDnd(true)`. That call is a
+  no-op without notification policy access, which this app does not ask for: read the
+  channel back and it says `mBypassDnd=false`. It is kept only because it costs nothing if
+  the user ever grants the access. Verified on an API 36 emulator under
+  `ZEN_MODE_IMPORTANT_INTERRUPTIONS`: the prayer alarm posted with `mIntercept=false` while
+  the silent next-prayer badge was intercepted, which is the behaviour wanted for both.
+- **The alarm survives Doze.** `setAlarmClock` in alarm mode, `setExactAndAllowWhileIdle`
+  otherwise; both carry `FLAG_WAKE_FROM_IDLE`. Verified under forced deep idle: `dumpsys
+  alarm` named SajdaTime as `Next wake from idle`, `whenElapsed` was not deferred, and
+  crossing the trigger time posted "Time for Asr" and rolled the badge on to Maghrib.
 - Optional silent ongoing "next prayer" badge in the shade.
 
 ### PDF export
@@ -265,10 +278,27 @@ holding `WRITE_EXTERNAL_STORAGE`, so those devices fall back to a `FileProvider`
 sheet with `ClipData` set. A failure at any point raises a message — it used to fail
 silently, which looked like the button doing nothing.
 
+Names are `PrayerTimes_July2026.pdf` and `PrayerTimes_30Jul2026.pdf`, formatted with
+`Locale.US` on purpose — this is the one string in the app that ignores the user's
+language, because it is a file name in a shared folder and has to stay ASCII, sortable and
+safe on the FAT-derived filesystems that USB and SD transfers still land on.
+
+Verified on an API 36 emulator: exporting the month wrote `PrayerTimes_July2026.pdf` to
+`MediaStore` `Download/`, with the columns Day / Date / Fajr / Sunrise / Dhuhr / Asr /
+Maghrib / Isha, all 31 days, and 12-hour times matching the phone's locale.
+
 ### Wear OS
 Standalone watch app (works with the phone off or unpaired) — two swipeable pages (times,
 Qibla compass) — plus a **next-prayer tile** for the watch face carousel. Settings sync
 one-way from the phone over the Data Layer.
+
+Because that sync is unverified and a watch may have no phone app at all, the times list
+ends in a button showing the school the times were calculated with, which opens a sect and
+madhab picker. See item 7 under "Not done" for why that is not optional.
+
+The times list opens with `initialCenterItemIndex = 0`. The default is 1, which centred
+the second item and slid the countdown card up until the watch face clock sat on top of
+the prayer name — the one thing the app exists to show.
 
 ---
 
@@ -478,9 +508,20 @@ descriptions on the tappable location header.
 | **Typed city name** (fallback only) | Resolved on-device where possible | Only if the phone's own geocoder cannot answer, then once to Open-Meteo, with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 
-**Cloud backup is disabled** (`allowBackup="false"`). Android's backup service would
-otherwise copy the cached coordinates to Google's servers, contradicting the app's own
+**Cloud backup and device-to-device transfer are both disabled.** Android's backup service
+would otherwise copy the cached coordinates off the device, contradicting the app's own
 privacy promise. Re-entering settings takes two taps; the guarantee is worth more.
+
+This needs **two** declarations, and for a long time it only had one. `allowBackup="false"`
+covers Android 11 and below. From Android 12 that attribute stops cloud backup but, on many
+manufacturers' devices, leaves **device-to-device transfer switched on** — so the cached
+coordinates would still have been copied out when the user set up a new phone. Both modules
+now also carry `android:dataExtractionRules="@xml/data_extraction_rules"`, which excludes
+every domain from `<cloud-backup>` and `<device-transfer>` alike.
+
+Lint will complain that `dataExtractionRules` should be paired with `fullBackupContent`.
+Ignore it: it does not reason about `allowBackup="false"`, which already disables backup
+outright on every version `fullBackupContent` would apply to.
 
 Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`,
 `RECEIVE_BOOT_COMPLETED`, `INTERNET`. **No fine location. No background location.**
@@ -547,12 +588,80 @@ sheet auto-closing).
 **Watch — verified working:** app launches · acquires its own location · shows correct
 Manchester times · Qibla page (118°, on-brand colours) · permission prompt · **the "No
 location yet / Use Makkah" fallback, tapped through to Makkah times** · **the tile
-rendering live data** ("Maghrib · 17:01 · in 1h 14m", matching the app).
+rendering live data** ("Maghrib · 17:01 · in 1h 14m", matching the app) · **the on-wrist
+school picker** (switching to Hanafi moved Asr from 5:28 PM to 6:37 PM, after which every
+time matched the phone exactly).
+
+**What running both emulators side by side caught.** The watch said Asr 5:28 PM while the
+phone, set to Hanafi, said 6:37 PM. Fajr, Dhuhr, Maghrib and Isha all matched to the
+minute. The watch was not miscalculating — it was correct for Shafi'i, its own default,
+because the phone's setting had never reached it. Nothing on the watch admitted that. This
+is the strongest argument in the repo for running two devices at once rather than one: no
+amount of reading either module alone would have shown it, because neither module was
+wrong.
+
+**The three things that used to be "static review only" are now verified.** Each had been
+reasoned about in code and never watched run, and two of them were wrong.
+
+| Claim | How it was actually proved |
+|---|---|
+| The compass remaps for screen rotation | Portrait read "Turn right 118°, facing 0°". Rotating to landscape, with the device never physically moving, read "Turn right 28°" — a 90° shift, which is `remapCoordinateSystem(AXIS_Y, AXIS_MINUS_X)` doing its job. |
+| Alarms survive Doze | Under forced deep idle, `dumpsys alarm` named SajdaTime as `Next wake from idle` with `whenElapsed` undeferred and `flags=0x3` (`FLAG_WAKE_FROM_IDLE`). Crossing the trigger posted "Time for Asr" and rolled the badge to Maghrib. |
+| Alarms pass Do Not Disturb | Under `ZEN_MODE_IMPORTANT_INTERRUPTIONS`, both prayer alarms posted with `mIntercept=false`; the silent badge posted with `mIntercept=true`, which is correct for a silent ongoing notification. |
+| The PDF lands in Downloads | Monthly export wrote `PrayerTimes_July2026.pdf` into `MediaStore` `Download/`; pulled off and rendered to check columns, 31 rows and 12-hour times. |
+| Everything scales to a large font | `font_scale 1.5` on every screen: no clipping, no truncation, no overlap. |
+
+**What rotation testing caught that reading the code did not.** Every screen's state was
+held in `remember`, not `rememberSaveable`, so rotating the phone reset the selected tab,
+closed any open dialog or sheet, threw away a half-typed city name, and — worst — sent a
+user part-way through first-run setup back to the welcome step. All seven are saveable now.
+It also caught the Qibla dial being `fillMaxWidth().aspectRatio(1f)`, which in landscape
+made it taller than the screen and pushed the turn instruction off the bottom.
+
+**Modifier order is not cosmetic.** The first attempt at capping that dial was
+`fillMaxWidth().widthIn(max = 320.dp)`, which does nothing at all: `fillMaxWidth` pins
+`minWidth` to the full width, and a later `widthIn` cap can never win against it. It has to
+be `widthIn(...).fillMaxWidth()`. This looked correct on the screen and was only caught by
+measuring the running app.
 
 ### Useful device-testing recipes
 
 ```bash
-# Fire a real alarm: move the clock to just before a prayer time
+# Fire a real alarm: move the clock to just before a prayer time.
+# `date MMDDhhmmYYYY.ss` may be rejected; epoch seconds is more reliable.
+adb -s emulator-5556 shell settings put global auto_time 0
+adb -s emulator-5556 shell su 0 date @1785528410
+```
+
+```bash
+# Doze and Do Not Disturb
+adb -s emulator-5556 shell dumpsys battery unplug
+adb -s emulator-5556 shell dumpsys deviceidle force-idle
+adb -s emulator-5556 shell dumpsys alarm | grep -A5 PRAYER_ALARM
+adb -s emulator-5556 shell cmd notification set_dnd priority
+# mIntercept=false means it got through DND:
+adb -s emulator-5556 shell dumpsys notification --noredact | grep -E 'sajdatime|mIntercept'
+adb -s emulator-5556 shell dumpsys deviceidle unforce
+adb -s emulator-5556 shell cmd notification set_dnd off
+```
+
+```bash
+# Rotation. Always confirm it landed before screenshotting — the setting takes a
+# few seconds, and capturing too early reads the previous orientation.
+adb -s emulator-5556 shell settings put system accelerometer_rotation 0
+adb -s emulator-5556 shell settings put system user_rotation 1   # 0 = portrait
+adb -s emulator-5556 shell dumpsys window | grep -m1 -oE 'mRotation=[0-9]+'
+```
+
+```bash
+# Read the screen as text rather than guessing from a picture. This is the single
+# most useful command here: it says what is actually laid out and visible.
+adb -s emulator-5556 shell uiautomator dump /sdcard/u.xml
+adb -s emulator-5556 shell cat /sdcard/u.xml | tr '>' '\n' | grep -oE 'text="[^"]+"'
+```
+
+```bash
+# Old form, kept because it still works on some images
 adb -s emulator-5556 root
 adb -s emulator-5556 shell "date 073021342026.40"   # MMDDhhmmYYYY.ss
 # ...wait, then check it landed:
@@ -599,8 +708,10 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 2. **No instrumented UI tests.** Logic and colour are unit-tested; every screen on both
    phone and watch is verified by hand only. A Compose UI test suite would make refactoring
    much safer.
-3. **The watch has no settings of its own.** Sect, madhab and method arrive from the phone.
-   A watch that is never paired calculates with the defaults and cannot be changed on-wrist.
+3. **The watch has no calculation-method setting of its own.** Sect and madhab can now be
+   set on the wrist (see the note under item 7), but `CalcMethod` still only arrives from
+   the phone. That matters far less: `AUTO` resolves a sane convention from the sect, and
+   unlike the madhab it does not move a prayer by an hour.
 4. **Times display in the phone's timezone, not the chosen city's.** Correct for the
    traveller the feature is built for (their phone follows them), confusing for someone
    checking a distant city from home. Decide whether to show the city's local time, or
@@ -614,7 +725,19 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 7. **The phone↔watch Data Layer sync has never been observed working.** Both sides are
    implemented against the shared `WatchSyncContract` and unit-tested, but the two emulators
    were never actually paired, so a real phone→watch settings push is **unverified**. The
-   watch works standalone regardless, which is why this is not a blocker.
+   phone emulator has no Wear companion app installed, which is why: `dumpsys` on the watch
+   reports `0 connected out of 1`. Pairing needs a Play-services phone image plus the Wear
+   OS companion app, and is the one setup step that would let this finally be tested.
+
+   **What this cost, and what was done about it.** Running both emulators side by side
+   showed the watch reporting Asr at 5:28 PM while the phone, set to Hanafi, said 6:37 PM.
+   Every other time matched to the minute. The watch was not wrong — it was calculating
+   correctly for its own default, Shafi'i, because the phone's setting had never reached
+   it. On a watch declared `standalone=true` that is a silently wrong prayer time with
+   nothing on screen to hint at it. So the watch now shows the school it is using as a
+   button at the foot of the times list, and that button opens a sect and madhab picker.
+   An unsynced watch is now visibly, and correctably, unsynced. Verified on the emulator:
+   switching to Hanafi moved Asr to 6:37 PM and every time then matched the phone exactly.
 8. **No home screen widget** and **no tablet-optimised layout**.
 9. **No bundled adhan audio** (deliberate: licensing + tens of MB). Alarm mode plays a tone
    the user picks.
