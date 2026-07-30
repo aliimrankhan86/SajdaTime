@@ -15,4 +15,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SajdaTime"
+include(":core")
 include(":app")
+include(":wear")

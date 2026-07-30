@@ -3,25 +3,26 @@ package com.sajdatime.app
 import android.Manifest
 import android.content.ClipData
 import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.core.content.FileProvider
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
-import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.onboarding.OnboardingScreen
-import com.sajdatime.app.ui.settings.SettingsScreen
 import com.sajdatime.app.ui.theme.SajdaTimeTheme
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +37,19 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestPermission(),
     ) { /* Declining only silences alerts; times still display. */ }
 
+    /**
+     * The system ringtone picker. It already lists alarms, ringtones and any audio the
+     * user has added themselves, so there is no need to bundle an adhan recording —
+     * which would also raise licensing questions and inflate a charity app's download.
+     */
+    private val alarmSoundPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val uri = result.data
+            ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        viewModel.setAlarmSound(uri?.toString().orEmpty())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -43,7 +57,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             SajdaTimeTheme {
                 val state by viewModel.state.collectAsStateWithLifecycle()
-                var showSettings by remember { mutableStateOf(false) }
 
                 // Sharing the export is a user-visible side effect, so it fires once per
                 // generated file and is then consumed.
@@ -61,6 +74,7 @@ class MainActivity : ComponentActivity() {
                         state = state,
                         onRequestLocationPermission = ::requestLocation,
                         onSearchCity = viewModel::searchCity,
+                        onUseDefaultLocation = viewModel::useDefaultLocation,
                         onSelectSect = viewModel::setSect,
                         onSelectMadhab = viewModel::setMadhab,
                         onFinish = {
@@ -69,24 +83,39 @@ class MainActivity : ComponentActivity() {
                         },
                     )
 
-                    showSettings -> SettingsScreen(
-                        state = state,
-                        // Without this, the system back gesture would close the app
-                        // instead of returning to the prayer times.
-                        onBack = { showSettings = false },
-                        onSetSect = viewModel::setSect,
-                        onSetMadhab = viewModel::setMadhab,
-                        onSetMethod = viewModel::setMethod,
-                        onSetNotify = viewModel::setNotify,
-                        onSetOngoingBadge = viewModel::setOngoingBadge,
-                        onRefreshLocation = ::requestLocation,
-                    )
+                    else -> {
+                        MainScaffold(
+                            state = state,
+                            onExport = viewModel::exportPdf,
+                            onSetSect = viewModel::setSect,
+                            onSetMadhab = viewModel::setMadhab,
+                            onSetMethod = viewModel::setMethod,
+                            onSetNotify = viewModel::setNotify,
+                            onSetOngoingBadge = viewModel::setOngoingBadge,
+                            onSetAlertStyle = viewModel::setAlertStyle,
+                            onPickAlarmSound = {
+                                openAlarmSoundPicker(state.settings.alarmSoundUri)
+                            },
+                            onRefreshLocation = ::requestLocation,
+                            onSearchCity = viewModel::searchCity,
+                            onQiblaVisible = viewModel::setQiblaVisible,
+                        )
 
-                    else -> HomeScreen(
-                        state = state,
-                        onOpenSettings = { showSettings = true },
-                        onExport = viewModel::exportPdf,
-                    )
+                        // Shown once, immediately after setup. The app is a convenience,
+                        // not a religious authority, and saying so should not be buried.
+                        if (!state.settings.disclaimerSeen) {
+                            AlertDialog(
+                                onDismissRequest = { },
+                                confirmButton = {
+                                    TextButton(onClick = { viewModel.markDisclaimerSeen() }) {
+                                        Text(stringResource(R.string.action_understood))
+                                    }
+                                },
+                                title = { Text(stringResource(R.string.disclaimer_title)) },
+                                text = { Text(stringResource(R.string.disclaimer_body)) },
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -100,11 +129,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestLocation() {
-        locationPermission.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ),
-        )
+        locationPermission.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION))
     }
 
     private fun requestNotificationsIfNeeded() {
@@ -113,14 +138,36 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun sharePdf(uri: android.net.Uri) {
+    private fun openAlarmSoundPicker(current: String) {
+        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.settings_alarm_sound))
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            putExtra(
+                RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                current.takeIf { it.isNotBlank() }?.let(Uri::parse)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
+            )
+        }
+        runCatching { alarmSoundPicker.launch(intent) }
+    }
+
+    private fun sharePdf(uri: Uri) {
         val share = Intent(Intent.ACTION_SEND)
             .setType("application/pdf")
             .putExtra(Intent.EXTRA_STREAM, uri)
             // ClipData is what actually grants the share sheet permission to read the
             // file; without it the chooser cannot render a preview of the timetable.
-            .apply { clipData = ClipData.newRawUri(getString(R.string.action_export_pdf), uri) }
+            .apply { clipData = ClipData.newRawUri(getString(R.string.action_save_timetable), uri) }
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(Intent.createChooser(share, getString(R.string.action_export_pdf)))
+        startActivity(Intent.createChooser(share, getString(R.string.action_save_timetable)))
     }
 }
+
+@Suppress("DEPRECATION")
+private inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(name: String): T? =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        getParcelableExtra(name, T::class.java)
+    } else {
+        getParcelableExtra(name)
+    }

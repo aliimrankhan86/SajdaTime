@@ -4,6 +4,10 @@ import androidx.compose.ui.graphics.Color
 import com.sajdatime.app.ui.theme.DarkAccent
 import com.sajdatime.app.ui.theme.DarkInverseOnSurface
 import com.sajdatime.app.ui.theme.DarkInverseSurface
+import com.sajdatime.app.ui.theme.DarkOnSecondaryContainer
+import com.sajdatime.app.ui.theme.DarkSecondaryContainer
+import com.sajdatime.app.ui.theme.LightOnSecondaryContainer
+import com.sajdatime.app.ui.theme.LightSecondaryContainer
 import com.sajdatime.app.ui.theme.DarkSurfaceBright
 import com.sajdatime.app.ui.theme.DarkSurfaceContainerHigh
 import com.sajdatime.app.ui.theme.DarkSurfaceContainerHighest
@@ -84,6 +88,8 @@ class ColorContrastTest {
         Pair("light primary/containerHigh", LightPrimary, LightSurfaceContainerHigh, 4.5),
         Pair("light onSurface/containerLow", LightOnSurface, LightSurfaceContainerLow, 4.5),
         Pair("light inverseOnSurface/inverseSurface", LightInverseOnSurface, LightInverseSurface, 4.5),
+        // The navigation bar's selected pill.
+        Pair("light onSecondaryContainer/secondaryContainer", LightOnSecondaryContainer, LightSecondaryContainer, 4.5),
 
         // Dark
         Pair("dark onBackground/background", DarkOnBackground, DarkBackground, 4.5),
@@ -104,6 +110,7 @@ class ColorContrastTest {
         Pair("dark primary/containerHigh", DarkPrimary, DarkSurfaceContainerHigh, 4.5),
         Pair("dark onSurface/surfaceBright", DarkOnSurface, DarkSurfaceBright, 4.5),
         Pair("dark inverseOnSurface/inverseSurface", DarkInverseOnSurface, DarkInverseSurface, 4.5),
+        Pair("dark onSecondaryContainer/secondaryContainer", DarkOnSecondaryContainer, DarkSecondaryContainer, 4.5),
     )
 
     /** Icons, dividers and focus outlines only need 3:1 under WCAG 1.4.11. */

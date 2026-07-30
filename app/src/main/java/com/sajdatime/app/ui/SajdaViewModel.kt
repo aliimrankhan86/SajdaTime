@@ -4,23 +4,29 @@ import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sajdatime.app.core.CalcMethod
-import com.sajdatime.app.core.Coordinates
-import com.sajdatime.app.core.DayPrayerTimes
-import com.sajdatime.app.core.Madhab
-import com.sajdatime.app.core.NextPrayer
-import com.sajdatime.app.core.PrayerEngine
-import com.sajdatime.app.core.PrayerSlot
-import com.sajdatime.app.core.Sect
+import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.QiblaEngine
+import com.sajdatime.core.Sect
+import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
+import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.app.data.CompassRepository
 import com.sajdatime.app.data.LocationRepository
 import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.data.WatchSync
 import com.sajdatime.app.notify.DailyRescheduleWorker
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.OngoingBadge
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +55,12 @@ data class UiState(
     val problem: LocationProblem? = null,
     val resolvingLocation: Boolean = false,
     val exportedFile: Uri? = null,
+    /** Device heading in degrees from true north. Null when there is no compass. */
+    val compassHeading: Double? = null,
+    val compassAccuracy: CompassAccuracy = CompassAccuracy.UNAVAILABLE,
+    /** Qibla bearing in degrees from true north. Null until a location is known. */
+    val qiblaBearing: Double? = null,
+    val qiblaDistanceKm: Double? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -57,6 +69,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val locationRepository = LocationRepository(application)
     private val cityLookup = CityLookup()
     private val exporter = PrayerPdfExporter(application)
+    private val compassRepository = CompassRepository(application)
+
+    /** Sensor collection runs only while the Qibla screen is on-screen. */
+    private var compassJob: Job? = null
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -141,7 +157,25 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setOngoingBadge(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setOngoingBadge(enabled) }
 
+    fun setAlertStyle(style: AlertStyle) =
+        viewModelScope.launch { settingsRepository.setAlertStyle(style) }
+
+    fun setAlarmSound(uri: String) =
+        viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
+
     fun completeOnboarding() = viewModelScope.launch { settingsRepository.completeOnboarding() }
+
+    fun markDisclaimerSeen() = viewModelScope.launch { settingsRepository.markDisclaimerSeen() }
+
+    /**
+     * Last resort when neither GPS nor a city search produced a position: fall back to
+     * Makkah so the app still works, and flag it so the UI can say so plainly rather
+     * than presenting someone else's prayer times as their own.
+     */
+    fun useDefaultLocation() = viewModelScope.launch {
+        settingsRepository.useDefaultLocation()
+        _state.update { it.copy(problem = null, resolvingLocation = false) }
+    }
 
     // --- export ----------------------------------------------------------------------
 
@@ -162,6 +196,46 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun consumeExportedFile() = _state.update { it.copy(exportedFile = null) }
+
+    // --- qibla -----------------------------------------------------------------------
+
+    /**
+     * Starts or stops sensor collection as the Qibla screen comes and goes. The
+     * magnetometer is not free, so it is never left running behind other screens.
+     */
+    fun setQiblaVisible(visible: Boolean) {
+        compassJob?.cancel()
+        compassJob = null
+
+        val coordinates = _state.value.settings.coordinates
+        if (!visible || coordinates == null) {
+            _state.update { it.copy(compassHeading = null) }
+            return
+        }
+
+        if (!compassRepository.hasCompass()) {
+            _state.update {
+                it.copy(compassHeading = null, compassAccuracy = CompassAccuracy.UNAVAILABLE)
+            }
+            return
+        }
+
+        compassJob = viewModelScope.launch {
+            compassRepository.headings(coordinates).collect { reading ->
+                _state.update {
+                    it.copy(
+                        compassHeading = reading.trueHeading,
+                        compassAccuracy = reading.accuracy,
+                    )
+                }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compassJob?.cancel()
+    }
 
     // --- recalculation ---------------------------------------------------------------
 
@@ -185,12 +259,21 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             today to next
         }
 
-        _state.update { it.copy(today = computed.first, next = computed.second, now = now) }
+        _state.update {
+            it.copy(
+                today = computed.first,
+                next = computed.second,
+                now = now,
+                qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
+                qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
+            )
+        }
 
         withContext(Dispatchers.Default) {
             val context = getApplication<Application>()
             PrayerAlarmScheduler.reschedule(context, settings)
             OngoingBadge.refresh(context, settings)
+            WatchSync.publish(context, settings)
         }
     }
 }

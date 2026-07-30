@@ -1,12 +1,12 @@
-package com.sajdatime.app
+package com.sajdatime.core
 
-import com.sajdatime.app.core.CalcMethod
-import com.sajdatime.app.core.CalculationPrefs
-import com.sajdatime.app.core.Coordinates
-import com.sajdatime.app.core.Madhab
-import com.sajdatime.app.core.PrayerEngine
-import com.sajdatime.app.core.PrayerSlot
-import com.sajdatime.app.core.Sect
+import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate

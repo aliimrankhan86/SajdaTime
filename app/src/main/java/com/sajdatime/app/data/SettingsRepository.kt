@@ -8,17 +8,32 @@ import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.sajdatime.app.core.CalcMethod
-import com.sajdatime.app.core.CalculationPrefs
-import com.sajdatime.app.core.Coordinates
-import com.sajdatime.app.core.Madhab
-import com.sajdatime.app.core.PrayerSlot
-import com.sajdatime.app.core.Sect
+import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sajdatime")
+
+/**
+ * How a prayer time announces itself.
+ *
+ * The default is deliberately the quieter one: a notification that vibrates. Five full
+ * alarms a day, unasked for, is the kind of thing that gets an app uninstalled. Users who
+ * want an adhan or a louder tone opt into [ALARM] and choose their own sound.
+ */
+enum class AlertStyle {
+    /** Heads-up notification with vibration. Respects Do Not Disturb. */
+    NOTIFICATION,
+
+    /** Alarm-category alert with a user-chosen sound, and it may bypass Do Not Disturb. */
+    ALARM,
+}
 
 /**
  * All user state, stored locally on the device only. Nothing here is ever transmitted.
@@ -32,7 +47,14 @@ data class AppSettings(
     val cityName: String = "",
     /** Per-prayer notification switches. Absent slots default to on. */
     val notifyFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
-    val ongoingBadge: Boolean = false,
+    /** The glanceable badge is on out of the box; it is silent and costs nothing. */
+    val ongoingBadge: Boolean = true,
+    val alertStyle: AlertStyle = AlertStyle.NOTIFICATION,
+    /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
+    val alarmSoundUri: String = "",
+    val disclaimerSeen: Boolean = false,
+    /** True once the user has been told the app fell back to Makkah. */
+    val usingDefaultLocation: Boolean = false,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(sect = sect, madhab = madhab, method = method)
@@ -59,6 +81,7 @@ class SettingsRepository(private val context: Context) {
         it[Keys.LATITUDE] = coordinates.latitude
         it[Keys.LONGITUDE] = coordinates.longitude
         it[Keys.CITY] = cityName
+        it[Keys.DEFAULT_LOCATION] = false
     }
 
     suspend fun setNotify(slot: PrayerSlot, enabled: Boolean) = edit { prefs ->
@@ -69,7 +92,24 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setOngoingBadge(enabled: Boolean) = edit { it[Keys.ONGOING] = enabled }
 
+    suspend fun setAlertStyle(style: AlertStyle) = edit { it[Keys.ALERT_STYLE] = style.name }
+
+    suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
+
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
+
+    suspend fun markDisclaimerSeen() = edit { it[Keys.DISCLAIMER] = true }
+
+    /**
+     * Records that the app fell back to Makkah because no location could be established,
+     * so the UI can say so plainly instead of showing times for a place the user is not in.
+     */
+    suspend fun useDefaultLocation() = edit {
+        it[Keys.LATITUDE] = DEFAULT_LATITUDE
+        it[Keys.LONGITUDE] = DEFAULT_LONGITUDE
+        it[Keys.CITY] = DEFAULT_CITY
+        it[Keys.DEFAULT_LOCATION] = true
+    }
 
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
@@ -85,6 +125,17 @@ class SettingsRepository(private val context: Context) {
         val CITY = stringPreferencesKey("city")
         val NOTIFY = stringPreferencesKey("notify_slots")
         val ONGOING = booleanPreferencesKey("ongoing_badge")
+        val ALERT_STYLE = stringPreferencesKey("alert_style")
+        val ALARM_SOUND = stringPreferencesKey("alarm_sound")
+        val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
+        val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
+    }
+
+    private companion object {
+        /** The Kaaba. Used only when no real location can be established. */
+        const val DEFAULT_LATITUDE = 21.4224779
+        const val DEFAULT_LONGITUDE = 39.8251832
+        const val DEFAULT_CITY = "Makkah"
     }
 
     private fun Preferences.decodeNotifySet(): Set<PrayerSlot> {
@@ -106,7 +157,11 @@ class SettingsRepository(private val context: Context) {
             coordinates = if (lat != null && lng != null) Coordinates(lat, lng) else null,
             cityName = this[Keys.CITY] ?: "",
             notifyFor = decodeNotifySet(),
-            ongoingBadge = this[Keys.ONGOING] ?: false,
+            ongoingBadge = this[Keys.ONGOING] ?: true,
+            alertStyle = enumOr(this[Keys.ALERT_STYLE], AlertStyle.NOTIFICATION),
+            alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
+            disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
+            usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
         )
     }
 

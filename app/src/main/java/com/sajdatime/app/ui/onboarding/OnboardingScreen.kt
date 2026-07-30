@@ -54,8 +54,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
-import com.sajdatime.app.core.Madhab
-import com.sajdatime.app.core.Sect
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.Sect
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.SectionHeading
@@ -67,6 +67,7 @@ fun OnboardingScreen(
     state: UiState,
     onRequestLocationPermission: () -> Unit,
     onSearchCity: (String) -> Unit,
+    onUseDefaultLocation: () -> Unit,
     onSelectSect: (Sect) -> Unit,
     onSelectMadhab: (Madhab) -> Unit,
     onFinish: () -> Unit,
@@ -93,6 +94,7 @@ fun OnboardingScreen(
                     state = state,
                     onAllow = onRequestLocationPermission,
                     onSearchCity = onSearchCity,
+                    onUseDefaultLocation = onUseDefaultLocation,
                     onNext = { step = Step.SECT },
                 )
 
@@ -194,6 +196,7 @@ private fun PermissionStep(
     state: UiState,
     onAllow: () -> Unit,
     onSearchCity: (String) -> Unit,
+    onUseDefaultLocation: () -> Unit,
     onNext: () -> Unit,
 ) {
     var explaining by remember { mutableStateOf(false) }
@@ -310,6 +313,16 @@ private fun PermissionStep(
                     .height(48.dp),
             ) {
                 Text(stringResource(R.string.action_find_city))
+            }
+
+            // Nobody should be stuck at setup. If neither route works, Makkah keeps the
+            // app usable and the main screen says clearly that this is what happened.
+            Spacer(Modifier.height(20.dp))
+            TextButton(
+                onClick = onUseDefaultLocation,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.action_use_makkah))
             }
         }
 

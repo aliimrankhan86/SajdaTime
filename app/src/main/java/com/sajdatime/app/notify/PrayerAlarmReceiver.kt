@@ -3,7 +3,7 @@ package com.sajdatime.app.notify
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.sajdatime.app.core.PrayerSlot
+import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.data.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +30,13 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             try {
                 val settings = SettingsRepository(appContext).current()
                 if (slot in settings.notifyFor) {
-                    Notifications.postPrayerAlert(appContext, slot, at)
+                    Notifications.postPrayerAlert(
+                        context = appContext,
+                        slot = slot,
+                        at = at,
+                        style = settings.alertStyle,
+                        alarmSoundUri = settings.alarmSoundUri,
+                    )
                 }
                 // Chain the next horizon and refresh the badge while we are already awake.
                 PrayerAlarmScheduler.reschedule(appContext, settings)

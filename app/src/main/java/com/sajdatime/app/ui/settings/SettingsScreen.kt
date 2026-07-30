@@ -3,8 +3,7 @@ package com.sajdatime.app.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import androidx.activity.compose.BackHandler
+import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,27 +13,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,62 +41,53 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
-import com.sajdatime.app.core.CalcMethod
-import com.sajdatime.app.core.Madhab
-import com.sajdatime.app.core.PrayerEngine
-import com.sajdatime.app.core.PrayerSlot
-import com.sajdatime.app.core.Sect
+import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
+import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.onboarding.madhabLabel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     state: UiState,
-    onBack: () -> Unit,
     onSetSect: (Sect) -> Unit,
     onSetMadhab: (Madhab) -> Unit,
     onSetMethod: (CalcMethod) -> Unit,
     onSetNotify: (PrayerSlot, Boolean) -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
+    onSetAlertStyle: (AlertStyle) -> Unit,
+    onPickAlarmSound: () -> Unit,
     onRefreshLocation: () -> Unit,
+    onSearchCity: (String) -> Unit,
 ) {
     val context = LocalContext.current
     var methodPicker by remember { mutableStateOf(false) }
+    var locationSheet by remember { mutableStateOf(false) }
+    var disclaimer by remember { mutableStateOf(false) }
     val settings = state.settings
 
-    // System back returns to the prayer times rather than leaving the app.
-    BackHandler(onBack = onBack)
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.title_settings)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.action_back),
-                        )
-                    }
-                },
-                // Matches the page behind it; the default surface colour leaves a
-                // visible band between the bar and the content.
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                ),
-            )
-        },
-    ) { padding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 40.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.title_settings),
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 32.dp),
-        ) {
-            Group(stringResource(R.string.settings_group_school)) {
+                .padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
+                .semantics { heading() },
+        )
+
+        Group(stringResource(R.string.settings_group_school)) {
+            Column(Modifier.selectableGroup()) {
                 Sect.entries.forEach { sect ->
                     RadioRow(
                         label = stringResource(
@@ -115,11 +98,13 @@ fun SettingsScreen(
                     )
                 }
             }
+        }
 
-            // Madhab only changes the Asr rule, which the Jafari school fixes anyway,
-            // so it is hidden entirely for Shia users rather than shown disabled.
-            if (settings.sect == Sect.SUNNI) {
-                Group(stringResource(R.string.settings_group_madhab)) {
+        // Madhab only changes the Asr rule, which the Jafari school fixes anyway, so it
+        // is hidden entirely for Shia users rather than shown disabled.
+        if (settings.sect == Sect.SUNNI) {
+            Group(stringResource(R.string.settings_group_madhab)) {
+                Column(Modifier.selectableGroup()) {
                     Madhab.entries.forEach { madhab ->
                         RadioRow(
                             label = madhabLabel(madhab),
@@ -133,75 +118,129 @@ fun SettingsScreen(
                     }
                 }
             }
+        }
 
-            Group(stringResource(R.string.settings_group_method)) {
-                SettingRow(
-                    title = stringResource(R.string.settings_method),
-                    subtitle = if (settings.method == CalcMethod.AUTO) {
-                        stringResource(
-                            R.string.settings_method_auto,
-                            PrayerEngine.resolveMethod(settings.calculationPrefs).label,
-                        )
-                    } else {
-                        settings.method.label
+        Group(stringResource(R.string.settings_group_method)) {
+            SettingRow(
+                title = stringResource(R.string.settings_method),
+                subtitle = if (settings.method == CalcMethod.AUTO) {
+                    stringResource(
+                        R.string.settings_method_auto,
+                        PrayerEngine.resolveMethod(settings.calculationPrefs).label,
+                    )
+                } else {
+                    settings.method.label
+                },
+                onClick = { methodPicker = true },
+            )
+        }
+
+        Group(stringResource(R.string.settings_group_alerts)) {
+            if (!PrayerAlarmScheduler.canScheduleExact(context)) {
+                WarningRow(
+                    title = stringResource(R.string.settings_exact_alarms_title),
+                    body = stringResource(R.string.settings_exact_alarms_desc),
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            runCatching {
+                                context.startActivity(
+                                    Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                                        .setData(Uri.parse("package:${context.packageName}")),
+                                )
+                            }
+                        }
                     },
-                    onClick = { methodPicker = true },
                 )
             }
 
-            Group(stringResource(R.string.settings_group_notifications)) {
-                if (!PrayerAlarmScheduler.canScheduleExact(context)) {
-                    ExactAlarmWarning(
-                        onOpenSettings = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Column(Modifier.selectableGroup()) {
+                RadioRow(
+                    label = stringResource(R.string.alert_style_notification),
+                    supporting = stringResource(R.string.alert_style_notification_desc),
+                    selected = settings.alertStyle == AlertStyle.NOTIFICATION,
+                    onSelect = { onSetAlertStyle(AlertStyle.NOTIFICATION) },
+                )
+                RadioRow(
+                    label = stringResource(R.string.alert_style_alarm),
+                    supporting = stringResource(R.string.alert_style_alarm_desc),
+                    selected = settings.alertStyle == AlertStyle.ALARM,
+                    onSelect = { onSetAlertStyle(AlertStyle.ALARM) },
+                )
+            }
+
+            // Sound and Do Not Disturb only matter in alarm mode, so they appear only
+            // once it is chosen rather than sitting there greyed out.
+            if (settings.alertStyle == AlertStyle.ALARM) {
+                SettingRow(
+                    title = stringResource(R.string.settings_alarm_sound),
+                    subtitle = stringResource(R.string.settings_alarm_sound_desc),
+                    onClick = onPickAlarmSound,
+                )
+                if (!Notifications.hasDndAccess(context)) {
+                    WarningRow(
+                        title = stringResource(R.string.settings_dnd_title),
+                        body = stringResource(R.string.settings_dnd_desc),
+                        onClick = {
+                            runCatching {
                                 context.startActivity(
-                                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                        .setData(Uri.parse("package:${context.packageName}")),
+                                    Intent(SystemSettings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS),
                                 )
                             }
                         },
                     )
                 }
-                PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
-                    SwitchRow(
-                        title = slot.label,
-                        checked = slot in settings.notifyFor,
-                        onCheckedChange = { onSetNotify(slot, it) },
-                    )
-                }
-                HorizontalDivider(Modifier.padding(horizontal = 20.dp))
+            }
+        }
+
+        Group(stringResource(R.string.settings_group_notifications)) {
+            PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
                 SwitchRow(
-                    title = stringResource(R.string.settings_ongoing_badge),
-                    subtitle = stringResource(R.string.settings_ongoing_badge_desc),
-                    checked = settings.ongoingBadge,
-                    onCheckedChange = onSetOngoingBadge,
+                    title = slot.label,
+                    checked = slot in settings.notifyFor,
+                    onCheckedChange = { onSetNotify(slot, it) },
                 )
             }
+            HorizontalDivider(Modifier.padding(horizontal = 20.dp))
+            SwitchRow(
+                title = stringResource(R.string.settings_ongoing_badge),
+                subtitle = stringResource(R.string.settings_ongoing_badge_desc),
+                checked = settings.ongoingBadge,
+                onCheckedChange = onSetOngoingBadge,
+            )
+        }
 
-            Group(stringResource(R.string.settings_group_location)) {
-                SettingRow(
-                    title = stringResource(R.string.settings_update_location),
-                    subtitle = settings.cityName.ifBlank {
-                        stringResource(R.string.location_set_generic)
-                    },
-                    onClick = onRefreshLocation,
-                )
-            }
+        Group(stringResource(R.string.settings_group_location)) {
+            SettingRow(
+                title = stringResource(R.string.action_change_location),
+                subtitle = settings.cityName.ifBlank {
+                    stringResource(R.string.location_set_generic)
+                },
+                onClick = { locationSheet = true },
+            )
+        }
 
-            Group(stringResource(R.string.settings_group_about)) {
-                SettingRow(
-                    title = stringResource(R.string.about_version),
-                    subtitle = versionName(context),
-                )
-                SettingRow(
-                    title = stringResource(R.string.about_privacy),
-                    subtitle = stringResource(R.string.about_privacy_desc),
-                )
-                SettingRow(
-                    title = stringResource(R.string.about_charity),
-                    subtitle = stringResource(R.string.about_charity_desc),
-                )
-            }
+        Group(stringResource(R.string.settings_group_about)) {
+            SettingRow(
+                title = stringResource(R.string.about_version),
+                subtitle = versionName(context),
+            )
+            SettingRow(
+                title = stringResource(R.string.about_disclaimer),
+                subtitle = stringResource(R.string.about_disclaimer_short),
+                onClick = { disclaimer = true },
+            )
+            SettingRow(
+                title = stringResource(R.string.about_privacy),
+                subtitle = stringResource(R.string.about_privacy_desc),
+            )
+            SettingRow(
+                title = stringResource(R.string.about_charity),
+                subtitle = stringResource(R.string.about_charity_desc),
+            )
+            SettingRow(
+                title = stringResource(R.string.about_credits),
+                subtitle = stringResource(R.string.about_credits_desc),
+            )
         }
     }
 
@@ -216,6 +255,28 @@ fun SettingsScreen(
             },
         )
     }
+
+    if (locationSheet) {
+        LocationSheet(
+            state = state,
+            onDismiss = { locationSheet = false },
+            onUseGps = onRefreshLocation,
+            onSearchCity = onSearchCity,
+        )
+    }
+
+    if (disclaimer) {
+        AlertDialog(
+            onDismissRequest = { disclaimer = false },
+            confirmButton = {
+                TextButton(onClick = { disclaimer = false }) {
+                    Text(stringResource(R.string.action_got_it))
+                }
+            },
+            title = { Text(stringResource(R.string.disclaimer_title)) },
+            text = { Text(stringResource(R.string.disclaimer_body)) },
+        )
+    }
 }
 
 @Composable
@@ -225,7 +286,7 @@ private fun MethodPickerDialog(
     onDismiss: () -> Unit,
     onSelect: (CalcMethod) -> Unit,
 ) {
-    // Jafari/Tehran are Shia conventions; the rest are Sunni. Showing all of them to
+    // Jafari and Tehran are Shia conventions; the rest are Sunni. Showing all of them to
     // everyone invites a wrong pick, so the list follows the chosen school.
     val available = CalcMethod.entries.filter { method ->
         val shiaOnly = method == CalcMethod.JAFARI || method == CalcMethod.TEHRAN
@@ -256,35 +317,6 @@ private fun MethodPickerDialog(
     )
 }
 
-@Composable
-private fun ExactAlarmWarning(onOpenSettings: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(role = Role.Button, onClick = onOpenSettings)
-            .padding(horizontal = 20.dp, vertical = 14.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(R.string.settings_exact_alarms_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = stringResource(R.string.settings_exact_alarms_desc),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
 // --- small building blocks -------------------------------------------------------------
 
 @Composable
@@ -299,6 +331,32 @@ private fun Group(title: String, content: @Composable () -> Unit) {
             .semantics { heading() },
     )
     content()
+}
+
+@Composable
+private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 14.dp),
+    ) {
+        Icon(
+            Icons.Outlined.WarningAmber,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.tertiary,
+        )
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(text = title, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
 }
 
 @Composable

@@ -1,6 +1,6 @@
 # SajdaTime — Requirements and Architecture
 
-Version 1.0.0 · Android · Kotlin + Jetpack Compose
+Version 1.1.0 · Android and Wear OS · Kotlin + Jetpack Compose
 
 This document is the handoff record: what was built, why each decision was made, the exact
 business rules an iOS port must reproduce, and what deliberately was not built.
@@ -34,6 +34,8 @@ Three constraints shaped every technical decision:
 | Storage | DataStore Preferences | Async, no SharedPreferences main-thread traps. |
 | Scheduling | `AlarmManager` + `WorkManager` | Exact alerts plus a daily safety net. |
 | PDF | Android `PdfDocument` | Built into the platform. No library, no licence, no APK weight. |
+| Qibla | Own great-circle maths + `GeomagneticField` | The platform ships the World Magnetic Model already. No library needed. |
+| Watch | Wear Compose + ProtoLayout tiles | Standalone watch app sharing the same calculation module. |
 | Networking | `HttpURLConnection` + `org.json` | One optional GET request does not justify Retrofit/OkHttp/Moshi. |
 | Java 8+ APIs | Core library desugaring | Gives `java.time`, including the Hijri calendar, down to API 24. |
 
@@ -46,6 +48,20 @@ Three constraints shaped every technical decision:
   contrast guarantees and the deliberate green/gold identity.
 - **Dependency injection framework.** Three repositories constructed in one ViewModel.
 - **Navigation library.** Two screens and an onboarding flow. A boolean is enough.
+
+---
+
+## 2a. Module layout
+
+```
+:core   Prayer and Qibla calculation. No android.* imports. Shared by phone and watch.
+:app    The phone app.
+:wear   The Wear OS app and tile.
+```
+
+`:core` is an Android library only so that AGP's built-in Kotlin and core library
+desugaring apply. The code inside is plain Kotlin and lifts straight into a Kotlin
+Multiplatform or iOS target.
 
 ---
 
@@ -155,6 +171,35 @@ it. The alarm scheduler applies the same rule.
 
 Sunrise is displayed but is never returned as "the next prayer" and is never notified.
 
+### 3.9 Qibla
+
+The Qibla is the initial great-circle bearing from the user to the Kaaba
+(21.4224779 N, 39.8251832 E), measured clockwise from **true** north.
+
+Two things are easy to get wrong here, and both are handled:
+
+1. **Great circle, not flat map.** Treating latitude and longitude as flat x/y puts
+   London at about 127 degrees instead of the correct 119. The error grows with latitude
+   and distance.
+2. **True north, not magnetic north.** A phone's magnetometer reads magnetic north.
+   The difference (magnetic declination) exceeds 20 degrees in parts of the world, and
+   ignoring it points the user visibly off the Kaaba. Android's `GeomagneticField` is the
+   platform's own World Magnetic Model implementation and supplies the correction, so no
+   library or lookup table is needed.
+
+Bearings are verified against the Aladhan Qibla API across ten cities on five continents,
+agreeing to within a hundredth of a degree. See `QiblaEngineTest`.
+
+Heading comes from `TYPE_ROTATION_VECTOR`, the platform's own sensor fusion, which is far
+steadier than fusing the accelerometer and magnetometer by hand. That pair is kept only as
+a fallback for devices without a rotation vector. Readings pass through a circular
+low-pass filter, smoothed on the unit vector rather than on degrees so the needle does not
+swing wildly across the 359 to 0 boundary.
+
+The screen reports sensor accuracy and prompts for a figure-of-eight recalibration when it
+drops. When there is no compass at all, the app still states the bearing from true north
+so a user with a separate compass can act on it.
+
 ---
 
 ## 4. Notifications and reliability
@@ -180,10 +225,33 @@ A late Fajr notification is worse than a status bar icon, so the app never silen
 degrades to inexact alarms. Settings shows a prompt linking to the system screen when the
 permission is missing.
 
+### Alert style
+
+Two styles, and the quieter one is the default:
+
+| Style | Behaviour | Default |
+|---|---|---|
+| Notification | Heads-up notification with vibration. Respects Do Not Disturb. | Yes |
+| Alarm | Alarm-category alert with a sound the user picks, and it may sound through Do Not Disturb. | No |
+
+Five full alarms a day, unasked for, is the sort of thing that gets an app uninstalled, so
+alarm mode is opt-in. When the user chooses it, they pick their own tone through the system
+ringtone picker, which already lists every alarm, ringtone and audio file on the device.
+No adhan recording is bundled: it would raise licensing questions and inflate the download
+of a charity app for a sound many users already have.
+
+Sound is bound to the channel, not to the notification, and a channel's sound cannot be
+changed after creation. Choosing a new tone therefore creates a new channel id and deletes
+the old one, so the system Settings list does not fill with dead entries.
+
+Do Not Disturb bypass needs notification policy access, which the user grants in system
+settings. Settings prompts for it only once alarm mode is chosen.
+
 ### Channels
 
 - `prayer_times` — IMPORTANCE_HIGH, vibrates. One notification per prayer.
-- `next_prayer_badge` — IMPORTANCE_LOW, silent, ongoing. Optional, off by default.
+- `prayer_alarm_v<hash>` — IMPORTANCE_HIGH, user's sound, bypasses Do Not Disturb.
+- `next_prayer_badge` — IMPORTANCE_LOW, silent, ongoing. On by default, and free.
 
 The badge refreshes when something has already woken the app rather than ticking every
 minute; a live-updating countdown would require a foreground service and a permanent
@@ -235,6 +303,32 @@ change.
 
 ---
 
+## 5a. Wear OS
+
+The watch app is **standalone**. It calculates prayer times and the Qibla itself using
+`:core`, so it keeps working when the phone is out of range, switched off, or left at home.
+
+- **App**: two swipeable pages, the prayer list with a live countdown, and a Qibla compass.
+- **Tile**: next prayer, its time, and how long is left. Tiles are static snapshots, so
+  rather than update every second the tile asks to be refreshed a minute after the next
+  prayer begins. It is correct whenever the user looks at it and costs nothing in between.
+- **Settings sync**: the phone publishes sect, madhab, method and location over the Data
+  Layer. The transfer is one way and travels between two devices the same person owns.
+  Nothing reaches a server. If no watch is paired, nothing is ever published.
+- **Location**: the watch reads its own, either from onboard GPS or a fix the system hands
+  over from the phone. A synced location covers watches without their own.
+
+`minSdk` is 30 (Wear OS 3). Older watches run a different app model entirely and are not
+worth the maintenance for a solo project.
+
+**Trade-off worth knowing:** the Data Layer is part of Google Play Services, so
+`play-services-wearable` is now a dependency of the phone app too. That is the only way to
+move data between a phone and a Wear OS watch. It adds no tracking, but it does mean the
+phone build is no longer free of Google libraries. A no-GMS build flavour that simply drops
+watch sync is straightforward to add if that matters later.
+
+---
+
 ## 6. Privacy model
 
 | Data | Where it lives | Leaves the device? |
@@ -244,6 +338,7 @@ change.
 | Sect, madhab, method | DataStore, on device | Never |
 | Notification settings | DataStore, on device | Never |
 | Typed city name (fallback only) | Sent once to Aladhan | Yes, with prior on-screen disclosure |
+| Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 
 Cloud backup is **disabled** (`allowBackup="false"`). Android's backup service would
 otherwise copy the cached coordinates to Google's servers, contradicting the app's own
@@ -295,11 +390,19 @@ The `core/` package contains no Android imports. Everything in section 3 transfe
 
 ---
 
+## 8a. Disclaimer
+
+The app states plainly, once after setup and again in Settings, that it is a helper and
+not a religious authority: that the author is not a Mufti or Aalim, that it was built with
+the help of artificial intelligence, that it may be wrong, and that anything doubtful
+should be checked with a local mosque or a qualified person.
+
+---
+
 ## 9. Known limitations and next steps
 
 Honest list of what is not covered:
 
-- **Qibla compass** — not built. Out of scope for v1.
 - **High-latitude rule is not user-selectable.** `TWILIGHT_ANGLE` is a good default and
   matches Aladhan, but some UK mosques publish one-seventh-of-the-night times. If users
   report a mismatch with their local mosque, exposing this setting is the first thing to add.

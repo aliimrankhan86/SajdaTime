@@ -6,9 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.sajdatime.app.core.Coordinates
-import com.sajdatime.app.core.PrayerEngine
-import com.sajdatime.app.core.PrayerSlot
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.data.AppSettings
 import java.time.Instant
 import java.time.LocalDate

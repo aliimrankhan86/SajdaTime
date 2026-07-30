@@ -6,11 +6,11 @@ import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.FileProvider
-import com.sajdatime.app.core.CalculationPrefs
-import com.sajdatime.app.core.Coordinates
-import com.sajdatime.app.core.DayPrayerTimes
-import com.sajdatime.app.core.PrayerEngine
-import com.sajdatime.app.core.PrayerSlot
+import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.notify.TimeFormat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

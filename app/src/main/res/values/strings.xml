@@ -1,106 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  All user-facing text lives here so the app can be translated without touching code.
+  House style: plain words, short sentences, no em dashes, no semicolons, UK spelling.
+-->
 <resources>
     <string name="app_name">SajdaTime</string>
 
+    <!-- Navigation -->
+    <string name="nav_times">Times</string>
+    <string name="nav_qibla">Qibla</string>
+    <string name="nav_settings">Settings</string>
+
     <!-- Onboarding -->
     <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
-    <string name="welcome_tagline">Your private prayer companion — always free.</string>
+    <string name="welcome_tagline">Your private prayer companion. Free, always.</string>
     <string name="action_begin">Begin</string>
 
     <string name="permission_title">Where are you praying?</string>
-    <string name="permission_body">SajdaTime needs your approximate location to work out accurate prayer times. Tap the info icon to see exactly what this means.</string>
+    <string name="permission_body">SajdaTime needs a rough idea of where you are to work out your prayer times and the direction of the Qibla. Tap the info icon to see exactly what that means.</string>
     <string name="permission_why_title">Why we need your location</string>
-    <string name="permission_why_body">To show you accurate prayer times for where you are.\n\nWe only check your approximate location while the app is open. It never leaves your phone. No tracking, ever.</string>
+    <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. It stays on your phone. We never send it anywhere, and we never track you.</string>
     <string name="action_allow_location">Allow location</string>
     <string name="action_got_it">Got it</string>
+    <string name="action_understood">I understand</string>
     <string name="action_continue">Continue</string>
     <string name="location_set_generic">Your location</string>
     <string name="location_finding">Finding your location…</string>
-    <string name="location_no_fix">We could not get a location fix. Check that location is switched on, or enter your city below.</string>
+    <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
 
-    <string name="city_fallback_heading">Prefer not to share your location?</string>
-    <string name="city_fallback_body">Type your city instead. This sends only the city name you type to the free Aladhan service, once, to look up its coordinates. Every prayer time after that is calculated on your phone.</string>
+    <string name="city_fallback_heading">Rather not share your location?</string>
+    <string name="city_fallback_body">Type your city instead. Only the name you type is sent, once, to the free Aladhan service to look up its coordinates. After that, everything is worked out on your phone.</string>
     <string name="city_field_label">City</string>
     <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
     <string name="city_not_found">We could not find that place. Try adding the country.</string>
     <string name="action_find_city">Find city</string>
+    <string name="action_use_makkah">Skip for now and use Makkah</string>
 
     <string name="sect_title">Which school do you follow?</string>
-    <string name="sect_body">This sets the calculation your prayer times are based on. You can change it any time in Settings.</string>
+    <string name="sect_body">This sets how your prayer times are worked out. You can change it whenever you like.</string>
     <string name="sect_sunni">Sunni</string>
-    <string name="sect_sunni_desc">Muslim World League calculation by default</string>
+    <string name="sect_sunni_desc">Muslim World League times by default</string>
     <string name="sect_shia">Shia</string>
-    <string name="sect_shia_desc">Jafari (Ithna Ashari) calculation</string>
+    <string name="sect_shia_desc">Jafari (Ithna Ashari) times</string>
 
     <string name="madhab_title">Select your madhab</string>
-    <string name="madhab_body">Optional. This only affects the Asr time. Skip it and you will get the standard calculation.</string>
+    <string name="madhab_body">Optional. This only changes the Asr time. Skip it and you will get the standard timing.</string>
     <string name="madhab_hanafi">Hanafi</string>
     <string name="madhab_shafii">Shafi\'i</string>
     <string name="madhab_maliki">Maliki</string>
     <string name="madhab_hanbali">Hanbali</string>
-    <string name="madhab_hanafi_desc">Later Asr (shadow twice the object\'s length)</string>
-    <string name="madhab_standard_desc">Standard Asr (shadow equal to the object\'s length)</string>
+    <string name="madhab_hanafi_desc">Later Asr, when a shadow is twice the object\'s length</string>
+    <string name="madhab_standard_desc">Standard Asr, when a shadow equals the object\'s length</string>
     <string name="action_skip">Skip</string>
     <string name="action_back">Back</string>
 
     <string name="confirm_title">All set</string>
-    <string name="confirm_body">Looks good? You can change any of this in Settings.</string>
+    <string name="confirm_body">Look right? You can change any of this later in Settings.</string>
     <string name="label_location">Location</string>
     <string name="label_school">School</string>
     <string name="action_finish">Finish</string>
     <string name="state_selected">Selected</string>
 
+    <!-- Disclaimer -->
+    <string name="disclaimer_title">Please read this first</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.</string>
+
     <!-- Home -->
     <string name="home_next_prayer">NEXT PRAYER</string>
+    <string name="home_until">until it begins</string>
     <string name="home_today">Today</string>
     <string name="home_next_marker">Next</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
-    <string name="action_export_pdf">Export PDF</string>
-    <string name="export_sheet_title">Export prayer times</string>
-    <string name="export_today">Today</string>
-    <string name="export_week">Next 7 days</string>
-    <string name="export_month">This month</string>
+    <string name="home_default_location_title">Showing times for Makkah</string>
+    <string name="home_default_location_body">We could not work out where you are. Tap to set your location.</string>
+    <string name="action_change_location">Change location</string>
+
+    <!-- Location sheet -->
+    <string name="location_sheet_title">Your location</string>
+    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.</string>
+    <string name="action_use_my_location">Use my current location</string>
+    <string name="location_sheet_search_heading">Or type a city</string>
+
+    <!-- Export -->
+    <string name="action_save_timetable">Save timetable as PDF</string>
+    <string name="export_sheet_title">Save your timetable</string>
+    <string name="export_sheet_body">We will make a PDF of your prayer times for %1$s. You can then save it, print it, or send it to someone.</string>
+    <string name="export_today">Today only</string>
+    <string name="export_today_desc">One day, six times</string>
+    <string name="export_week">The next 7 days</string>
+    <string name="export_week_desc">Today and the six days after it</string>
+    <string name="export_month">This whole month</string>
+    <string name="export_month_desc">Every day from the 1st to the end of the month</string>
+
+    <!-- Qibla -->
+    <string name="qibla_title">Qibla</string>
+    <string name="qibla_subtitle">%1$d° from true north. The Kaaba is about %2$d km away.</string>
+    <string name="qibla_needs_location">Set your location to find the Qibla.</string>
+    <string name="qibla_facing">You are facing the Qibla</string>
+    <string name="qibla_heading_now">You are facing %1$d°</string>
+    <string name="qibla_turn_left">Turn left %1$d°</string>
+    <string name="qibla_turn_right">Turn right %1$d°</string>
+    <string name="qibla_no_compass">Face %1$d° from true north</string>
+    <string name="qibla_calibrate">The compass needs calibrating. Hold your phone and move it in a figure of eight a few times.</string>
+    <string name="qibla_sensor_missing">This phone has no compass, so we can give you the angle but cannot point the way.</string>
+    <string name="qibla_accuracy_medium">The reading may wander a little. Move away from metal, magnets and speakers for a steadier result.</string>
 
     <!-- Settings -->
     <string name="title_settings">Settings</string>
     <string name="settings_group_school">SCHOOL OF THOUGHT</string>
     <string name="settings_group_madhab">MADHAB</string>
     <string name="settings_group_method">CALCULATION</string>
-    <string name="settings_group_notifications">NOTIFICATIONS</string>
+    <string name="settings_group_alerts">HOW YOU ARE TOLD</string>
+    <string name="settings_group_notifications">WHICH PRAYERS</string>
     <string name="settings_group_location">LOCATION</string>
     <string name="settings_group_about">ABOUT</string>
     <string name="settings_method">Calculation method</string>
-    <!-- Method labels can themselves contain brackets, so this separator avoids nesting. -->
+    <!-- Method labels can contain brackets, so this separator avoids nesting them. -->
     <string name="settings_method_auto">Automatic · %1$s</string>
-    <string name="settings_ongoing_badge">Show next prayer in the shade</string>
-    <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and countdown</string>
-    <string name="settings_update_location">Update location</string>
+
+    <string name="alert_style_notification">Notification</string>
+    <string name="alert_style_notification_desc">A notification with a vibration. Quiet, and it respects Do Not Disturb.</string>
+    <string name="alert_style_alarm">Alarm</string>
+    <string name="alert_style_alarm_desc">Plays a sound you choose, and can be heard through Do Not Disturb.</string>
+    <string name="settings_alarm_sound">Alarm sound</string>
+    <string name="settings_alarm_sound_desc">Pick any tone or adhan already on your phone</string>
+    <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
+    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb. Tap to allow.</string>
+
+    <string name="settings_ongoing_badge">Keep the next prayer in the shade</string>
+    <string name="settings_ongoing_badge_desc">A silent notification showing what is next and how long you have</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
-    <string name="settings_exact_alarms_desc">Without this, prayer alerts may arrive a few minutes late. Tap to allow.</string>
+    <string name="settings_exact_alarms_desc">Without this, prayer alerts can arrive a few minutes late. Tap to allow.</string>
     <string name="action_close">Close</string>
 
     <string name="about_version">Version</string>
+    <string name="about_disclaimer">Disclaimer</string>
+    <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Your location never leaves this device. No accounts, no analytics, no ads.</string>
+    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no analytics, no ads.</string>
     <string name="about_charity">Free, forever</string>
-    <string name="about_charity_desc">Made with love, free for the Ummah. This app is a charity project, made for the sake of Allah.</string>
+    <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
+    <string name="about_credits">Made by</string>
+    <string name="about_credits_desc">Ali Imran Khan, as an ongoing charity for the Ummah</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Prayer times</string>
-    <string name="channel_prayers_desc">Alerts at the start of each prayer</string>
+    <string name="channel_prayers_desc">A notification at the start of each prayer</string>
+    <string name="channel_alarm">Prayer alarm</string>
+    <string name="channel_alarm_desc">A louder alert using the sound you chose</string>
     <string name="channel_ongoing">Next prayer badge</string>
-    <string name="channel_ongoing_desc">A silent, always-present reminder of the next prayer</string>
+    <string name="channel_ongoing_desc">A silent reminder of the next prayer, always in the shade</string>
     <string name="notif_prayer_title">Time for %1$s</string>
     <string name="notif_prayer_body">%1$s begins at %2$s</string>
     <string name="notif_next_title">%1$s at %2$s</string>
     <string name="notif_next_body">In %1$s</string>
 
     <!--
-      Hijri month names are listed explicitly rather than left to the platform. Month
-      name data for the Islamic chronology is missing or numeric on many Android
-      versions, which renders the date as "16 2 1448". Listing them also makes the
-      names translatable.
+      Hijri month names are listed here rather than left to the platform. Month name data
+      for the Islamic chronology is missing or numeric on many Android versions, which
+      renders the date as "16 2 1448". Listing them also makes them translatable.
     -->
     <string name="hijri_date_format">%1$d %2$s %3$d</string>
     <string-array name="hijri_months">

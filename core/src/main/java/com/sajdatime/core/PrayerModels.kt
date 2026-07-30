@@ -1,4 +1,4 @@
-package com.sajdatime.app.core
+package com.sajdatime.core
 
 import java.time.Instant
 import java.time.LocalDate

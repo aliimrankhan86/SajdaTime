@@ -67,7 +67,10 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.adhan)
+    implementation(project(":core"))
+    // Publishes settings to a paired Wear OS watch. Local device-to-device only.
+    implementation(libs.play.services.wearable)
+    implementation(libs.androidx.fragment)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

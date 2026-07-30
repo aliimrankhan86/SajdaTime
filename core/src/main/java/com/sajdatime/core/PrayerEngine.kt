@@ -1,4 +1,4 @@
-package com.sajdatime.app.core
+package com.sajdatime.core
 
 import com.batoulapps.adhan.CalculationMethod as AdhanMethod
 import com.batoulapps.adhan.CalculationParameters

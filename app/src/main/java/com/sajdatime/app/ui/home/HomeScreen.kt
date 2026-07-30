@@ -6,6 +6,7 @@ import android.os.Build
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,23 +27,19 @@ import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.WarningAmber
-import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,21 +52,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
-import com.sajdatime.app.core.PrayerSlot
+import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.rememberRemainingText
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
 import java.time.Instant
@@ -81,100 +79,91 @@ import java.time.temporal.ChronoField
 @Composable
 fun HomeScreen(
     state: UiState,
-    onOpenSettings: () -> Unit,
     onExport: (PrayerPdfExporter.Range) -> Unit,
+    onChangeLocation: () -> Unit,
+    onSearchCity: (String) -> Unit,
 ) {
     var exportSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
+    var locationSheet by remember { mutableStateOf(false) }
+    val exportSheetState = rememberModalBottomSheetState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = state.settings.cityName.ifBlank {
-                                stringResource(R.string.location_set_generic)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        Text(
-                            text = hijriToday(),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onOpenSettings, modifier = Modifier.size(48.dp)) {
-                        Icon(
-                            Icons.Outlined.Settings,
-                            contentDescription = stringResource(R.string.title_settings),
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                ),
-            )
-        },
-        floatingActionButton = {
-            if (state.today != null) {
-                ExtendedFloatingActionButton(
-                    onClick = { exportSheet = true },
-                    icon = {
-                        Icon(Icons.Outlined.PictureAsPdf, contentDescription = null)
-                    },
-                    text = { Text(stringResource(R.string.action_export_pdf)) },
-                )
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.background,
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp)
-                // Keep the last row clear of the floating action button.
-                .padding(bottom = 96.dp),
-        ) {
-            NextPrayerCard(state)
-            ExactAlarmBanner()
-            Spacer(Modifier.height(24.dp))
-            TodayTimeline(state)
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LocationHeader(state = state, onClick = { locationSheet = true })
+        Spacer(Modifier.height(12.dp))
+        NextPrayerCard(state)
+        DefaultLocationBanner(state, onFix = { locationSheet = true })
+        ExactAlarmBanner()
+        Spacer(Modifier.height(20.dp))
+        TodayTimeline(state)
+        Spacer(Modifier.height(20.dp))
+        ExportButton(enabled = state.today != null, onClick = { exportSheet = true })
     }
 
     if (exportSheet) {
-        ModalBottomSheet(
-            onDismissRequest = { exportSheet = false },
-            sheetState = sheetState,
-        ) {
-            Column(Modifier.padding(bottom = 32.dp)) {
+        ExportSheet(
+            sheetState = exportSheetState,
+            cityName = state.settings.cityName,
+            onDismiss = { exportSheet = false },
+            onPick = { range ->
+                onExport(range)
+                exportSheet = false
+            },
+        )
+    }
+
+    if (locationSheet) {
+        LocationSheet(
+            state = state,
+            onDismiss = { locationSheet = false },
+            onUseGps = onChangeLocation,
+            onSearchCity = onSearchCity,
+        )
+    }
+}
+
+/**
+ * The city is a button, not a label. Changing location is the most common thing a
+ * traveller needs, and burying it in Settings makes them hunt for it.
+ */
+@Composable
+private fun LocationHeader(state: UiState, onClick: () -> Unit) {
+    val city = state.settings.cityName.ifBlank {
+        stringResource(R.string.location_set_generic)
+    }
+    val changeLabel = stringResource(R.string.action_change_location)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(vertical = 10.dp)
+            .semantics { contentDescription = "$city. $changeLabel" },
+    ) {
+        Icon(
+            Icons.Outlined.LocationOn,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(18.dp),
+        )
+        Spacer(Modifier.width(6.dp))
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = city, style = MaterialTheme.typography.titleMedium)
+            val hijri = hijriToday()
+            if (hijri.isNotBlank()) {
                 Text(
-                    text = stringResource(R.string.export_sheet_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp, vertical = 8.dp)
-                        .semantics { heading() },
+                    text = hijri,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                PrayerPdfExporter.Range.entries.forEach { range ->
-                    ListItem(
-                        headlineContent = { Text(exportRangeLabel(range)) },
-                        colors = ListItemDefaults.colors(
-                            containerColor = Color.Transparent,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clickable(role = Role.Button) {
-                                onExport(range)
-                                exportSheet = false
-                            },
-                    )
-                }
             }
         }
     }
@@ -194,10 +183,14 @@ private fun NextPrayerCard(state: UiState) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(heroGradient(next?.slot)),
+            contentAlignment = Alignment.Center,
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 32.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
             ) {
                 if (next == null) {
                     Text(
@@ -213,23 +206,34 @@ private fun NextPrayerCard(state: UiState) {
                     text = stringResource(R.string.home_next_prayer),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(Modifier.height(6.dp))
-                Text(
-                    text = next.slot.label,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.semantics { heading() },
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = TimeFormat.clock(context, next.at),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                Spacer(Modifier.height(20.dp))
-                // A per-second live region would interrupt a screen reader constantly,
-                // so the digits are hidden and a readable summary is announced instead.
+                Spacer(Modifier.height(10.dp))
+
+                // Name and time share one optical line so the block reads as a single
+                // centred unit rather than three stacked fragments.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+                    Text(
+                        text = next.slot.label,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.semantics { heading() },
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        text = TimeFormat.clock(context, next.at),
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
+                    )
+                }
+
+                Spacer(Modifier.height(18.dp))
+
+                // A per-second live region would interrupt a screen reader constantly, so
+                // the digits are hidden and a readable summary is announced instead.
                 val spokenCountdown = stringResource(
                     R.string.home_countdown_a11y,
                     next.slot.label,
@@ -239,42 +243,151 @@ private fun NextPrayerCard(state: UiState) {
                     text = TimeFormat.countdownClock(state.now, next.at),
                     style = MaterialTheme.typography.displayLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.clearAndSetSemantics {
                         contentDescription = spokenCountdown
                     },
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.home_until),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
                 )
             }
         }
     }
 }
 
+@Composable
+private fun ExportButton(enabled: Boolean, onClick: () -> Unit) {
+    // A plain full-width button rather than a floating one: it never covers a prayer
+    // time, and the label can say what actually happens.
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+    ) {
+        Icon(Icons.Outlined.PictureAsPdf, contentDescription = null)
+        Spacer(Modifier.width(10.dp))
+        Text(stringResource(R.string.action_save_timetable))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExportSheet(
+    sheetState: SheetState,
+    cityName: String,
+    onDismiss: () -> Unit,
+    onPick: (PrayerPdfExporter.Range) -> Unit,
+) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
+        Column(Modifier.padding(bottom = 32.dp)) {
+            Text(
+                text = stringResource(R.string.export_sheet_title),
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .semantics { heading() },
+            )
+            Spacer(Modifier.height(6.dp))
+            Text(
+                text = stringResource(
+                    R.string.export_sheet_body,
+                    cityName.ifBlank { stringResource(R.string.location_set_generic) },
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 24.dp),
+            )
+            Spacer(Modifier.height(16.dp))
+
+            PrayerPdfExporter.Range.entries.forEach { range ->
+                ExportOption(range = range, onClick = { onPick(range) })
+                HorizontalDivider(
+                    Modifier.padding(horizontal = 24.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ExportOption(range: PrayerPdfExporter.Range, onClick: () -> Unit) {
+    val (titleRes, subtitleRes) = when (range) {
+        PrayerPdfExporter.Range.TODAY -> R.string.export_today to R.string.export_today_desc
+        PrayerPdfExporter.Range.NEXT_7_DAYS -> R.string.export_week to R.string.export_week_desc
+        PrayerPdfExporter.Range.THIS_MONTH -> R.string.export_month to R.string.export_month_desc
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 14.dp),
+    ) {
+        Text(text = stringResource(titleRes), style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = stringResource(subtitleRes),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/** Says plainly that the times on screen are not for where the user actually is. */
+@Composable
+private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
+    if (!state.settings.usingDefaultLocation) return
+    Spacer(Modifier.height(12.dp))
+    NoticeCard(
+        title = stringResource(R.string.home_default_location_title),
+        body = stringResource(R.string.home_default_location_body),
+        onClick = onFix,
+    )
+}
+
 /**
  * Shown only when the OS is withholding exact alarms. Prayer alerts still arrive, but
- * possibly a few minutes late — the user deserves to know that rather than quietly
- * receiving a late Fajr, so this states the consequence and links to the fix.
+ * possibly a few minutes late, and the user deserves to know that rather than quietly
+ * receiving a late Fajr.
  */
 @Composable
 private fun ExactAlarmBanner() {
     val context = LocalContext.current
     if (PrayerAlarmScheduler.canScheduleExact(context)) return
 
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(12.dp))
+    NoticeCard(
+        title = stringResource(R.string.settings_exact_alarms_title),
+        body = stringResource(R.string.settings_exact_alarms_desc),
+        onClick = {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                runCatching {
+                    context.startActivity(
+                        Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                            .setData(Uri.parse("package:${context.packageName}")),
+                    )
+                }
+            }
+        },
+    )
+}
+
+@Composable
+private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Button) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    runCatching {
-                        context.startActivity(
-                            Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                .setData(Uri.parse("package:${context.packageName}")),
-                        )
-                    }
-                }
-            },
+            .clickable(role = Role.Button, onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -287,12 +400,9 @@ private fun ExactAlarmBanner() {
             )
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
+                Text(text = title, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = stringResource(R.string.settings_exact_alarms_title),
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = stringResource(R.string.settings_exact_alarms_desc),
+                    text = body,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -311,6 +421,7 @@ private fun TodayTimeline(state: UiState) {
         text = stringResource(R.string.home_today),
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier
+            .fillMaxWidth()
             .padding(bottom = 8.dp)
             .semantics { heading() },
     )
@@ -408,22 +519,12 @@ private fun heroGradient(slot: PrayerSlot?): Brush {
     return Brush.verticalGradient(listOf(scheme.primaryContainer, end))
 }
 
-@Composable
-private fun exportRangeLabel(range: PrayerPdfExporter.Range): String = stringResource(
-    when (range) {
-        PrayerPdfExporter.Range.TODAY -> R.string.export_today
-        PrayerPdfExporter.Range.NEXT_7_DAYS -> R.string.export_week
-        PrayerPdfExporter.Range.THIS_MONTH -> R.string.export_month
-    },
-)
-
 /**
- * Hijri date for the top bar, e.g. "16 Safar 1448".
+ * Hijri date, e.g. "16 Safar 1448".
  *
  * Month names come from a string array rather than DateTimeFormatter: the Islamic
  * chronology has no month-name data on several Android versions, which renders the
- * month as a bare number. Returns an empty string if the chronology is unavailable
- * at all, in which case the top bar simply shows the city.
+ * month as a bare number.
  */
 @Composable
 private fun hijriToday(): String {

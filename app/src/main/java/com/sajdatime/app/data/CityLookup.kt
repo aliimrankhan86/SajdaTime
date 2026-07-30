@@ -1,6 +1,6 @@
 package com.sajdatime.app.data
 
-import com.sajdatime.app.core.Coordinates
+import com.sajdatime.core.Coordinates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject

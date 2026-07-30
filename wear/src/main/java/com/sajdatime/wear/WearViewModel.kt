@@ -1,0 +1,185 @@
+package com.sajdatime.wear
+
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.pm.PackageManager
+import android.hardware.GeomagneticField
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
+import android.location.Location
+import android.location.LocationManager
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.QiblaEngine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+
+data class WearUiState(
+    val settings: WearSettings = WearSettings(),
+    val today: DayPrayerTimes? = null,
+    val next: NextPrayer? = null,
+    val now: Instant = Instant.now(),
+    val qiblaBearing: Double? = null,
+    val heading: Double? = null,
+    val needsLocation: Boolean = false,
+)
+
+class WearViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val store = WearSettingsStore(application)
+    private val _state = MutableStateFlow(WearUiState())
+    val state: StateFlow<WearUiState> = _state.asStateFlow()
+
+    private var compassJob: Job? = null
+
+    init {
+        viewModelScope.launch {
+            store.settings.collect { settings ->
+                _state.update { it.copy(settings = settings) }
+                recalculate()
+            }
+        }
+        viewModelScope.launch {
+            while (true) {
+                val now = Instant.now()
+                _state.update { it.copy(now = now) }
+                val next = _state.value.next
+                if (next != null && !now.isBefore(next.at)) recalculate()
+                delay(1_000)
+            }
+        }
+        refreshLocation()
+    }
+
+    /**
+     * Watches have their own location, either onboard GPS or a fix handed over by the
+     * paired phone. Either way it arrives through the platform LocationManager, so the
+     * watch does not depend on the phone app being open.
+     */
+    @SuppressLint("MissingPermission")
+    fun refreshLocation() {
+        val context = getApplication<Application>()
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (!granted) {
+            // A synced location from the phone still works, so this is only a problem
+            // when the watch has neither.
+            _state.update { it.copy(needsLocation = it.settings.coordinates == null) }
+            return
+        }
+
+        val manager = ContextCompat.getSystemService(context, LocationManager::class.java)
+        val fix: Location? = listOf(
+            LocationManager.NETWORK_PROVIDER,
+            LocationManager.GPS_PROVIDER,
+            LocationManager.PASSIVE_PROVIDER,
+        ).mapNotNull { provider ->
+            runCatching { manager?.getLastKnownLocation(provider) }.getOrNull()
+        }.maxByOrNull { it.time }
+
+        if (fix != null) {
+            viewModelScope.launch {
+                store.setLocation(Coordinates(fix.latitude, fix.longitude), "")
+            }
+        }
+        _state.update { it.copy(needsLocation = fix == null && it.settings.coordinates == null) }
+    }
+
+    fun setQiblaVisible(visible: Boolean) {
+        compassJob?.cancel()
+        compassJob = null
+        if (!visible) {
+            _state.update { it.copy(heading = null) }
+            return
+        }
+
+        val coordinates = _state.value.settings.coordinates ?: return
+        val context = getApplication<Application>()
+        val manager = ContextCompat.getSystemService(context, SensorManager::class.java) ?: return
+        val rotationVector = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
+
+        val declination = runCatching {
+            GeomagneticField(
+                coordinates.latitude.toFloat(),
+                coordinates.longitude.toFloat(),
+                0f,
+                System.currentTimeMillis(),
+            ).declination.toDouble()
+        }.getOrDefault(0.0)
+
+        val rotation = FloatArray(9)
+        val orientation = FloatArray(3)
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent) {
+                SensorManager.getRotationMatrixFromVector(rotation, event.values)
+                SensorManager.getOrientation(rotation, orientation)
+                val azimuth = Math.toDegrees(orientation[0].toDouble())
+                _state.update {
+                    it.copy(heading = QiblaEngine.normalise(azimuth + declination))
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+        }
+
+        manager.registerListener(listener, rotationVector, SensorManager.SENSOR_DELAY_UI)
+        compassJob = viewModelScope.launch {
+            try {
+                while (true) delay(60_000)
+            } finally {
+                manager.unregisterListener(listener)
+            }
+        }
+    }
+
+    private suspend fun recalculate() {
+        val settings = _state.value.settings
+        val coordinates = settings.coordinates ?: run {
+            _state.update { it.copy(today = null, next = null, needsLocation = true) }
+            return
+        }
+
+        val zone = ZoneId.systemDefault()
+        val now = Instant.now()
+        val computed = withContext(Dispatchers.Default) {
+            PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs) to
+                PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
+        }
+
+        _state.update {
+            it.copy(
+                today = computed.first,
+                next = computed.second,
+                now = now,
+                needsLocation = false,
+                qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
+            )
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        compassJob?.cancel()
+    }
+}

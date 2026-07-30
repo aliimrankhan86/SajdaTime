@@ -1,7 +1,7 @@
 package com.sajdatime.app.notify
 
 import android.content.Context
-import com.sajdatime.app.core.PrayerEngine
+import com.sajdatime.core.PrayerEngine
 import com.sajdatime.app.data.AppSettings
 import java.time.Instant
 import java.time.ZoneId
