@@ -1,0 +1,22 @@
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/captures/
+.externalNativeBuild
+.cxx
+local.properties
+
+# Gradle build output
+build/
+app/build/
+
+# Kotlin
+.kotlin/
+
+# macOS iCloud Drive conflict copies. This project lives under ~/Documents, which
+# iCloud syncs; it periodically writes "<name> 2.class" duplicates into the build
+# directory and breaks dexing. See README for the fix.
+*\ [0-9].*

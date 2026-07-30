@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SajdaTime</string>
+
+    <!-- Onboarding -->
+    <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
+    <string name="welcome_tagline">Your private prayer companion — always free.</string>
+    <string name="action_begin">Begin</string>
+
+    <string name="permission_title">Where are you praying?</string>
+    <string name="permission_body">SajdaTime needs your approximate location to work out accurate prayer times. Tap the info icon to see exactly what this means.</string>
+    <string name="permission_why_title">Why we need your location</string>
+    <string name="permission_why_body">To show you accurate prayer times for where you are.\n\nWe only check your approximate location while the app is open. It never leaves your phone. No tracking, ever.</string>
+    <string name="action_allow_location">Allow location</string>
+    <string name="action_got_it">Got it</string>
+    <string name="action_continue">Continue</string>
+    <string name="location_set_generic">Your location</string>
+    <string name="location_finding">Finding your location…</string>
+    <string name="location_no_fix">We could not get a location fix. Check that location is switched on, or enter your city below.</string>
+
+    <string name="city_fallback_heading">Prefer not to share your location?</string>
+    <string name="city_fallback_body">Type your city instead. This sends only the city name you type to the free Aladhan service, once, to look up its coordinates. Every prayer time after that is calculated on your phone.</string>
+    <string name="city_field_label">City</string>
+    <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
+    <string name="city_not_found">We could not find that place. Try adding the country.</string>
+    <string name="action_find_city">Find city</string>
+
+    <string name="sect_title">Which school do you follow?</string>
+    <string name="sect_body">This sets the calculation your prayer times are based on. You can change it any time in Settings.</string>
+    <string name="sect_sunni">Sunni</string>
+    <string name="sect_sunni_desc">Muslim World League calculation by default</string>
+    <string name="sect_shia">Shia</string>
+    <string name="sect_shia_desc">Jafari (Ithna Ashari) calculation</string>
+
+    <string name="madhab_title">Select your madhab</string>
+    <string name="madhab_body">Optional. This only affects the Asr time. Skip it and you will get the standard calculation.</string>
+    <string name="madhab_hanafi">Hanafi</string>
+    <string name="madhab_shafii">Shafi\'i</string>
+    <string name="madhab_maliki">Maliki</string>
+    <string name="madhab_hanbali">Hanbali</string>
+    <string name="madhab_hanafi_desc">Later Asr (shadow twice the object\'s length)</string>
+    <string name="madhab_standard_desc">Standard Asr (shadow equal to the object\'s length)</string>
+    <string name="action_skip">Skip</string>
+    <string name="action_back">Back</string>
+
+    <string name="confirm_title">All set</string>
+    <string name="confirm_body">Looks good? You can change any of this in Settings.</string>
+    <string name="label_location">Location</string>
+    <string name="label_school">School</string>
+    <string name="action_finish">Finish</string>
+    <string name="state_selected">Selected</string>
+
+    <!-- Home -->
+    <string name="home_next_prayer">NEXT PRAYER</string>
+    <string name="home_today">Today</string>
+    <string name="home_next_marker">Next</string>
+    <string name="home_no_location">Set your location to see prayer times.</string>
+    <string name="home_countdown_a11y">%1$s in %2$s</string>
+    <string name="action_export_pdf">Export PDF</string>
+    <string name="export_sheet_title">Export prayer times</string>
+    <string name="export_today">Today</string>
+    <string name="export_week">Next 7 days</string>
+    <string name="export_month">This month</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+    <string name="settings_group_school">SCHOOL OF THOUGHT</string>
+    <string name="settings_group_madhab">MADHAB</string>
+    <string name="settings_group_method">CALCULATION</string>
+    <string name="settings_group_notifications">NOTIFICATIONS</string>
+    <string name="settings_group_location">LOCATION</string>
+    <string name="settings_group_about">ABOUT</string>
+    <string name="settings_method">Calculation method</string>
+    <!-- Method labels can themselves contain brackets, so this separator avoids nesting. -->
+    <string name="settings_method_auto">Automatic · %1$s</string>
+    <string name="settings_ongoing_badge">Show next prayer in the shade</string>
+    <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and countdown</string>
+    <string name="settings_update_location">Update location</string>
+    <string name="settings_exact_alarms_title">Allow exact alarms</string>
+    <string name="settings_exact_alarms_desc">Without this, prayer alerts may arrive a few minutes late. Tap to allow.</string>
+    <string name="action_close">Close</string>
+
+    <string name="about_version">Version</string>
+    <string name="about_privacy">Privacy</string>
+    <string name="about_privacy_desc">Your location never leaves this device. No accounts, no analytics, no ads.</string>
+    <string name="about_charity">Free, forever</string>
+    <string name="about_charity_desc">Made with love, free for the Ummah. This app is a charity project, made for the sake of Allah.</string>
+
+    <!-- Notifications -->
+    <string name="channel_prayers">Prayer times</string>
+    <string name="channel_prayers_desc">Alerts at the start of each prayer</string>
+    <string name="channel_ongoing">Next prayer badge</string>
+    <string name="channel_ongoing_desc">A silent, always-present reminder of the next prayer</string>
+    <string name="notif_prayer_title">Time for %1$s</string>
+    <string name="notif_prayer_body">%1$s begins at %2$s</string>
+    <string name="notif_next_title">%1$s at %2$s</string>
+    <string name="notif_next_body">In %1$s</string>
+
+    <!--
+      Hijri month names are listed explicitly rather than left to the platform. Month
+      name data for the Islamic chronology is missing or numeric on many Android
+      versions, which renders the date as "16 2 1448". Listing them also makes the
+      names translatable.
+    -->
+    <string name="hijri_date_format">%1$d %2$s %3$d</string>
+    <string-array name="hijri_months">
+        <item>Muharram</item>
+        <item>Safar</item>
+        <item>Rabi al-Awwal</item>
+        <item>Rabi al-Thani</item>
+        <item>Jumada al-Ula</item>
+        <item>Jumada al-Akhirah</item>
+        <item>Rajab</item>
+        <item>Shaban</item>
+        <item>Ramadan</item>
+        <item>Shawwal</item>
+        <item>Dhu al-Qadah</item>
+        <item>Dhu al-Hijjah</item>
+    </string-array>
+
+    <!-- Durations -->
+    <string name="duration_h_m">%1$dh %2$dm</string>
+    <string name="duration_m">%1$dm</string>
+    <string name="duration_s">%1$ds</string>
+</resources>
