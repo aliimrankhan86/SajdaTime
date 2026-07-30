@@ -20,13 +20,32 @@ Check the current rule in the Play Console when you sign up, because Google adju
 
 ---
 
-## Step 1 — Google Play developer account · **ONLY YOU**
+## Step 1 — Google Play developer account · **DONE, verification pending**
 
-1. Go to <https://play.google.com/console> and sign up.
-2. Pay the **one-off $25** registration fee.
-3. Complete identity verification (photo ID). This can take a few days.
-4. Choose **personal** or **organisation**. Personal is fine for a charity project, but it
-   triggers the 12-tester rule above. An organisation account needs a D-U-N-S number.
+Created as a **personal** account:
+
+| | |
+|---|---|
+| Developer name (public) | Ali Imran Khan |
+| Account ID | 6284685113064492750 |
+| Owner account | aliimrankhan86@gmail.com |
+| Developer email (public) | aikstudies@gmail.com |
+| Contact email (private) | aliimrankhan86@gmail.com |
+| Earning money | **No** — this is what keeps the street address off the public listing |
+
+Public on the Play listing: legal name, country ("United Kingdom"), developer email. The
+full address is only shown if you monetise, which this app does not.
+
+### Three verification tasks remain
+
+1. **Identity documents** — uploaded, Google is reviewing. Takes a few days.
+2. **Access to a real Android device** — install the **Play Console app** on a physical
+   Android phone and sign in as the owner account. **An emulator will not satisfy this** —
+   defeating emulators is the point of the check. If you do not own an Android phone you
+   must borrow one; publishing is impossible without it.
+3. **Contact phone number** — locked until the identity documents are approved.
+
+Track all three at <https://play.google.com/console> → Home.
 
 ---
 
@@ -109,28 +128,24 @@ found or has a wrong path in it.
 
 ---
 
-## Step 4 — Privacy policy · publish the page · **ONLY YOU** (one minute)
+## Step 4 — Privacy policy · **DONE**
 
-Play requires a **publicly reachable privacy policy URL**. A file in the repo is not enough;
-it has to be a live web page.
-
-The page is already written: [`docs/privacy.html`](privacy.html), with a small landing page
-at [`docs/index.html`](index.html) so the site root is not a 404. You just have to switch
-GitHub Pages on:
-
-1. Go to <https://github.com/aliimrankhan86/SajdaTime/settings/pages>
-2. Under **Build and deployment → Source**, choose **Deploy from a branch**
-3. Branch **main**, folder **/docs**, then **Save**
-4. Wait a minute or two, then check the URL loads
-
-Your privacy policy URL for the Play Console is then:
+GitHub Pages is switched on, serving `main` / `/docs`. Both pages are live and verified:
 
 ```
-https://aliimrankhan86.github.io/SajdaTime/privacy.html
+https://aliimrankhan86.github.io/SajdaTime/privacy.html   <- the Play Console privacy URL
+https://aliimrankhan86.github.io/SajdaTime/               <- landing page
 ```
 
 Note this publishes everything in `docs/` — including the handover and architecture
-documents. That is fine for this project (the repo is public already), but be aware of it.
+documents. That is fine here (the repo is public already), but be aware of it before putting
+anything private in `docs/`.
+
+To re-check it after editing the pages:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://aliimrankhan86.github.io/SajdaTime/privacy.html
+```
 
 ---
 
@@ -233,15 +248,18 @@ Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradl
 
 ## What is genuinely blocking, right now
 
-Three things, and all three need you personally:
+The developer account exists and GitHub Pages is live. Three things remain, all needing the
+owner personally:
 
-1. **The developer account** (Step 1) — $25 and photo-ID verification.
-2. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
-   Nobody else should ever generate or hold this.
-3. **Switching GitHub Pages on** (Step 4) — four clicks, needs your repo settings.
+1. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
+   Nobody else should ever generate or hold this. **Nothing else in the project is waiting
+   on anything but this.**
+2. **Android device verification** (Step 1, task 2) — the Play Console app on a real phone.
+   No emulator. Cannot publish without it.
+3. **Google's identity review** (Step 1, task 1) — out of everyone's hands, a few days.
 
-Then the 12-tester clock (Step 0) starts, and that is the long pole — start finding testers
-now rather than waiting for the rest.
+Then the 12-tester clock (Step 0) starts, and that is the long pole — line testers up now
+rather than waiting for the rest.
 
-Everything else is done and in the repo: the privacy policy page, the store screenshots, the
+Everything else is done and in the repo: the live privacy policy, the store screenshots, the
 icon, the feature graphic, all the listing text, and the Gradle signing wiring.

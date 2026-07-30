@@ -593,9 +593,13 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     1024 × 500 feature graphic, five phone screenshots, two Wear screenshots, and
     `LISTING.md` with every field of Console text (name, short and full description,
     category, data safety answers) already within Google's character limits. The privacy
-    policy page is `docs/privacy.html` with a landing page at `docs/index.html`. What
-    remains is the owner turning GitHub Pages on so the policy has a public URL —
-    `docs/RELEASING.md` Step 4.
+    policy is **live** at <https://aliimrankhan86.github.io/SajdaTime/privacy.html> (GitHub
+    Pages, serving `main` / `/docs`), with a landing page at the site root. The Play
+    developer account also **exists** — personal account, ID 6284685113064492750, developer
+    name "Ali Imran Khan", declared as not earning money so the street address stays off the
+    public listing. Still outstanding: Google's identity review, and **verifying access to a
+    real Android device via the Play Console app — an emulator will not do**. See
+    `docs/RELEASING.md`.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
