@@ -18,6 +18,11 @@ and leave it installed for two weeks.
 
 Check the current rule in the Play Console when you sign up, because Google adjusts it.
 
+**The owner's plan is to start recruiting testers only once account verification has
+cleared**, rather than in parallel. That is a deliberate decision — do not keep pressing for
+it earlier. Note only that the 14 days are *continuous* and start from the closed test going
+live, so the calendar cost lands after verification, not before.
+
 ---
 
 ## Step 1 — Google Play developer account · **DONE, verification pending**
