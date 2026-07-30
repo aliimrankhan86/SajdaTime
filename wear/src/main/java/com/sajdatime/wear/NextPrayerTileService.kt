@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
@@ -58,10 +57,8 @@ class NextPrayerTileService : TileService() {
             val remaining = Duration.between(now, next.at)
             Triple(
                 next.slot.label,
-                "${clock(next.at)}  ·  ${humanise(remaining)}",
-                // Refresh a minute after the prayer starts so the tile rolls on to the
-                // following one, with a floor so a passed time cannot cause a hot loop.
-                remaining.plusMinutes(1).coerceAtLeast(Duration.ofMinutes(1)),
+                "${TileFormat.clock(next.at)}  ·  ${TileFormat.humanise(remaining)}",
+                TileFormat.freshness(remaining),
             )
         }
 
@@ -161,17 +158,6 @@ class NextPrayerTileService : TileService() {
                     .build(),
             )
             .build()
-
-    private fun clock(instant: Instant): String =
-        DateTimeFormatter.ofPattern("HH:mm", Locale.getDefault())
-            .format(instant.atZone(ZoneId.systemDefault()))
-
-    private fun humanise(duration: Duration): String {
-        val safe = if (duration.isNegative) Duration.ZERO else duration
-        val hours = safe.toHours()
-        val minutes = safe.toMinutes() % 60
-        return if (hours > 0) "in ${hours}h ${minutes}m" else "in ${minutes}m"
-    }
 
     private companion object {
         const val RESOURCES_VERSION = "1"

@@ -4,6 +4,7 @@ import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.WearableListenerService
+import com.sajdatime.core.WatchSyncContract
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,41 +22,30 @@ class SettingsSyncService : WearableListenerService() {
         val store = WearSettingsStore(applicationContext)
 
         events.filter { it.type == DataEvent.TYPE_CHANGED }
-            .filter { it.dataItem.uri.path == PATH_SETTINGS }
+            .filter { it.dataItem.uri.path == WatchSyncContract.PATH_SETTINGS }
             .forEach { event ->
                 val map = DataMapItem.fromDataItem(event.dataItem).dataMap
                 CoroutineScope(Dispatchers.IO).launch {
                     store.applyFromPhone(
-                        sect = map.getString(KEY_SECT),
-                        madhab = map.getString(KEY_MADHAB),
-                        method = map.getString(KEY_METHOD),
+                        sect = map.getString(WatchSyncContract.KEY_SECT),
+                        madhab = map.getString(WatchSyncContract.KEY_MADHAB),
+                        method = map.getString(WatchSyncContract.KEY_METHOD),
                         // getDouble returns 0.0 for a missing key, which is a real
                         // coordinate off West Africa, so absence is checked explicitly.
-                        latitude = if (map.containsKey(KEY_LATITUDE)) {
-                            map.getDouble(KEY_LATITUDE)
+                        latitude = if (map.containsKey(WatchSyncContract.KEY_LATITUDE)) {
+                            map.getDouble(WatchSyncContract.KEY_LATITUDE)
                         } else {
                             null
                         },
-                        longitude = if (map.containsKey(KEY_LONGITUDE)) {
-                            map.getDouble(KEY_LONGITUDE)
+                        longitude = if (map.containsKey(WatchSyncContract.KEY_LONGITUDE)) {
+                            map.getDouble(WatchSyncContract.KEY_LONGITUDE)
                         } else {
                             null
                         },
-                        cityName = map.getString(KEY_CITY),
+                        cityName = map.getString(WatchSyncContract.KEY_CITY),
                     )
                 }
             }
         events.release()
-    }
-
-    companion object {
-        const val PATH_SETTINGS = "/sajdatime/settings"
-        const val KEY_SECT = "sect"
-        const val KEY_MADHAB = "madhab"
-        const val KEY_METHOD = "method"
-        const val KEY_LATITUDE = "latitude"
-        const val KEY_LONGITUDE = "longitude"
-        const val KEY_CITY = "city"
-        const val KEY_UPDATED_AT = "updated_at"
     }
 }

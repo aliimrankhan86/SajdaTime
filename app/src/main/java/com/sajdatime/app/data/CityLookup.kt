@@ -1,5 +1,8 @@
 package com.sajdatime.app.data
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import com.sajdatime.core.Coordinates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -8,42 +11,69 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import java.util.Locale
 
 /**
- * Manual city lookup, used only when the user declines location permission.
+ * Turns a typed place name into coordinates, for travellers and for anyone who declines
+ * location permission.
  *
- * This is the single feature in SajdaTime that touches the network, and it sends only
- * the city name the user typed — no device identifier, no coordinates, no history. The
- * UI states this plainly before the request is made. Once resolved, the coordinates are
- * stored locally and every subsequent calculation is offline.
+ * Two sources, in order:
+ *  1. The phone's own geocoder. Nothing leaves the app, and most phones have it.
+ *  2. Open-Meteo's free geocoding API, for phones with no geocoder backend.
  *
- * ponytail: HttpURLConnection + org.json, both in the platform. A charity app does not
- * need Retrofit/OkHttp/Moshi for one GET request.
+ * Only the place name is ever sent, and only when the first source comes up empty. No
+ * device identifier, no coordinates, no history. Once resolved the coordinates are stored
+ * locally and every prayer calculation from then on is offline.
+ *
+ * This previously read the coordinates out of Aladhan's timingsByAddress response. That
+ * endpoint now returns a fixed placeholder (8.8889, 7.7778) for every address, so every
+ * search silently resolved to a point in Nigeria while showing the user their own city
+ * name. Any replacement here must be spot-checked against real cities, not just "does it
+ * return something".
+ *
+ * ponytail: HttpURLConnection + org.json, both in the platform. One GET does not need a
+ * networking stack.
  */
-class CityLookup {
+class CityLookup(private val context: Context) {
 
     data class Result(val city: String, val coordinates: Coordinates)
 
-    /** Resolves a free-text place name to coordinates. Returns null if not found. */
     suspend fun search(query: String): Result? = withContext(Dispatchers.IO) {
-        if (query.isBlank()) return@withContext null
-        val encoded = URLEncoder.encode(query.trim(), "UTF-8")
-        val url = URL("https://api.aladhan.com/v1/timingsByAddress?address=$encoded")
+        val trimmed = query.trim()
+        if (trimmed.isBlank()) return@withContext null
 
-        val body = runCatching { url.readTextWithTimeout() }.getOrNull() ?: return@withContext null
+        fromPlatformGeocoder(trimmed) ?: fromOpenMeteo(trimmed)
+    }
 
-        runCatching {
-            val meta = JSONObject(body)
-                .getJSONObject("data")
-                .getJSONObject("meta")
-            val latitude = meta.getDouble("latitude")
-            val longitude = meta.getDouble("longitude")
-            Result(
-                city = query.trim(),
-                coordinates = Coordinates(latitude, longitude),
-            )
+    @Suppress("DEPRECATION")
+    private fun fromPlatformGeocoder(query: String): Result? {
+        if (!Geocoder.isPresent()) return null
+        return runCatching {
+            // The callback form arrived in API 33. The blocking call still works and this
+            // is already off the main thread, so one code path covers every version.
+            Geocoder(context, Locale.getDefault())
+                .getFromLocationName(query, 1)
+                ?.firstOrNull()
+                ?.let { Result(city = it.describeAddress(query), coordinates = Coordinates(it.latitude, it.longitude)) }
         }.getOrNull()
     }
+
+    private fun fromOpenMeteo(query: String): Result? {
+        val encoded = URLEncoder.encode(query, "UTF-8")
+        val url = URL(
+            "https://geocoding-api.open-meteo.com/v1/search" +
+                "?name=$encoded&count=1&language=en&format=json",
+        )
+
+        val body = runCatching { url.readTextWithTimeout() }.getOrNull() ?: return null
+        return parseOpenMeteo(body, query)
+    }
+
+    /** A readable label, falling back to what the user typed rather than showing blank. */
+    private fun Address.describeAddress(fallback: String): String = listOfNotNull(
+        locality ?: subAdminArea ?: adminArea,
+        countryName,
+    ).joinToString(", ").ifBlank { fallback }
 
     private fun URL.readTextWithTimeout(): String {
         val connection = openConnection() as HttpURLConnection
@@ -60,7 +90,29 @@ class CityLookup {
         }
     }
 
-    private companion object {
-        const val TIMEOUT_MS = 12_000
+    internal companion object {
+        private const val TIMEOUT_MS = 12_000
+
+        /**
+         * Kept separate from the request, and free of any Android type, so the parsing
+         * can be tested without a network or a device.
+         */
+        internal fun parseOpenMeteo(body: String, fallbackName: String): Result? = runCatching {
+            val results = JSONObject(body).optJSONArray("results") ?: return null
+            if (results.length() == 0) return null
+            val first = results.getJSONObject(0)
+            Result(
+                city = listOfNotNull(
+                    first.optString("name").takeIf { it.isNotBlank() },
+                    first.optString("country").takeIf { it.isNotBlank() },
+                ).joinToString(", ").ifBlank { fallbackName },
+                coordinates = Coordinates(
+                    // getDouble throws when absent, which is what we want: no coordinates
+                    // means no result, never a silent fallback to zero, zero.
+                    latitude = first.getDouble("latitude"),
+                    longitude = first.getDouble("longitude"),
+                ),
+            )
+        }.getOrNull()
     }
 }

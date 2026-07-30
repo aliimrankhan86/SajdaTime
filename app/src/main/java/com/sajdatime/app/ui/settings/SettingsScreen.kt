@@ -1,8 +1,9 @@
 package com.sajdatime.app.ui.settings
 
 import android.content.Intent
-import android.net.Uri
+import android.media.RingtoneManager
 import android.os.Build
+import androidx.core.net.toUri
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -145,7 +146,7 @@ fun SettingsScreen(
                             runCatching {
                                 context.startActivity(
                                     Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                        .setData(Uri.parse("package:${context.packageName}")),
+                                        .setData("package:${context.packageName}".toUri()),
                                 )
                             }
                         }
@@ -173,7 +174,10 @@ fun SettingsScreen(
             if (settings.alertStyle == AlertStyle.ALARM) {
                 SettingRow(
                     title = stringResource(R.string.settings_alarm_sound),
-                    subtitle = stringResource(R.string.settings_alarm_sound_desc),
+                    // Naming the chosen tone is the only confirmation the user gets that
+                    // the pick stuck. The generic hint stays until something is chosen.
+                    subtitle = rememberRingtoneTitle(settings.alarmSoundUri)
+                        ?: stringResource(R.string.settings_alarm_sound_desc),
                     onClick = onPickAlarmSound,
                 )
                 if (!Notifications.hasDndAccess(context)) {
@@ -448,3 +452,24 @@ private fun SwitchRow(
 private fun versionName(context: android.content.Context): String = runCatching {
     context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
 }.getOrDefault("")
+
+/**
+ * Resolves a saved ringtone URI back to the name the user saw when they picked it.
+ *
+ * Returns null when nothing is set, and also when the tone has since been deleted or
+ * lives on a card that is not mounted, so the caller falls back to the generic hint
+ * rather than showing a blank row.
+ */
+@Composable
+private fun rememberRingtoneTitle(uri: String): String? {
+    val context = LocalContext.current
+    return remember(uri) {
+        if (uri.isBlank()) {
+            null
+        } else {
+            runCatching {
+                RingtoneManager.getRingtone(context, uri.toUri())?.getTitle(context)
+            }.getOrNull()?.takeIf { it.isNotBlank() }
+        }
+    }
+}

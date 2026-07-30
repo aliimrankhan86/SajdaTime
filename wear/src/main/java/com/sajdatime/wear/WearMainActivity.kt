@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.wear.compose.material3.MaterialTheme
 
 class WearMainActivity : ComponentActivity() {
 
@@ -21,7 +20,7 @@ class WearMainActivity : ComponentActivity() {
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
-            MaterialTheme {
+            SajdaWearTheme {
                 WearApp(viewModel)
             }
         }

@@ -1,10 +1,10 @@
 package com.sajdatime.app.ui.home
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
+import androidx.core.net.toUri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,6 +42,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -119,6 +120,14 @@ fun HomeScreen(
     }
 
     if (locationSheet) {
+        // Close as soon as a location actually lands. Leaving the sheet up after a
+        // successful search hides the very times the user just changed.
+        val opened = remember { state.settings.coordinates to state.settings.cityName }
+        val current = state.settings.coordinates to state.settings.cityName
+        LaunchedEffect(current) {
+            if (current != opened) locationSheet = false
+        }
+
         LocationSheet(
             state = state,
             onDismiss = { locationSheet = false },
@@ -371,7 +380,7 @@ private fun ExactAlarmBanner() {
                 runCatching {
                     context.startActivity(
                         Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                            .setData(Uri.parse("package:${context.packageName}")),
+                            .setData("package:${context.packageName}".toUri()),
                     )
                 }
             }

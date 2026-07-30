@@ -329,6 +329,27 @@ watch sync is straightforward to add if that matters later.
 
 ---
 
+### 5b. City lookup — a caution for the iOS port
+
+Typed city names are resolved by the platform geocoder first (`android.location.Geocoder`),
+falling back to Open-Meteo's free geocoding API only when the phone has no geocoder backend.
+
+This deliberately does **not** use Aladhan's `timingsByAddress`. That endpoint used to
+return the geocoded coordinates in its `meta` block and was the original implementation.
+It now returns a fixed placeholder — `8.8889, 7.7778` — for *every* address, so each
+search silently resolved to a point in Nigeria while the interface displayed the city the
+user had typed. Nothing failed, nothing logged, and the times looked plausible.
+
+Two rules came out of that, and both should carry to any port:
+
+- **Never display the text the user typed as if it were the resolved place.** Show the
+  name that came back alongside the coordinates. Had the app done this, the fault would
+  have read as "Lahore → Lagos, Nigeria" on the first try instead of going unnoticed.
+- **A missing coordinate is a miss, not a default.** Parsing throws rather than falling
+  back to zero, zero.
+
+---
+
 ## 6. Privacy model
 
 | Data | Where it lives | Leaves the device? |
@@ -337,7 +358,7 @@ watch sync is straightforward to add if that matters later.
 | City name | DataStore, on device | Never |
 | Sect, madhab, method | DataStore, on device | Never |
 | Notification settings | DataStore, on device | Never |
-| Typed city name (fallback only) | Sent once to Aladhan | Yes, with prior on-screen disclosure |
+| Typed city name (fallback only) | Resolved on-device where possible, otherwise sent once to Open-Meteo | Only if the phone's own geocoder cannot answer, and with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 
 Cloud backup is **disabled** (`allowBackup="false"`). Android's backup service would
@@ -352,13 +373,17 @@ background location.
 
 ## 7. Testing
 
-23 unit tests, all offline and deterministic.
+All unit tests are offline and deterministic.
 
 | Suite | Covers |
 |---|---|
 | `PrayerEngineTest` | Reference timetables for Makkah, London and Tehran; the Jafari Maghrib rule; madhab differences; high-latitude behaviour; the Ramadan adjustment; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks. |
+| `QiblaEngineTest` | Bearings for ten cities on five continents, plus distance and normalisation. |
 | `DeterminismTest` | Repeated computation stability, minute-boundary alignment, madhab equivalence. |
 | `ColorContrastTest` | WCAG AA for every colour pair in both themes. |
+| `CityLookupParseTest` | Geocoding response parsing: coordinates come from the response, the displayed name is the resolved place rather than the typed text, and a missing coordinate is a miss rather than zero, zero. |
+| `TileFormatTest` | Watch tile countdown wording at the boundaries, and the refresh floor that stops a passed prayer re-rendering the tile in a loop. |
+| `WearSettingsTest` | Settings synced from the phone reach the engine intact; an unpaired watch still calculates; the phone-to-watch key contract. |
 
 Reference values were captured from the Aladhan API — an independent implementation of the
 same conventions — and pinned as golden values so the suite stays offline. To regenerate:
@@ -408,13 +433,34 @@ Honest list of what is not covered:
   report a mismatch with their local mosque, exposing this setting is the first thing to add.
 - **Per-prayer manual offsets** — some communities apply a few minutes' adjustment. Not
   built; the data model would take it easily.
-- **No adhan audio** — notifications use the system sound.
-- **City search requires internet** and is only reachable if location is declined.
+- **No bundled adhan audio.** Notification mode uses the system sound; alarm mode plays a
+  tone the user picks from what is already on their phone. Shipping audio would add
+  licensing questions and tens of megabytes for a file most users replace anyway.
+- **City search needs a network** unless the phone's own geocoder can answer offline.
+- **Times are shown in the phone's timezone, not the chosen city's.** This is right for
+  the traveller the feature is built for, whose phone follows them, but someone checking
+  a distant city from home sees those prayers on their own clock rather than the city's.
 - **No instrumented UI tests.** Logic and colour are covered by unit tests; the Compose
-  screens are verified manually.
+  screens on both phone and watch are verified manually on emulators.
 - **App is unsigned.** A release keystore must be generated before publishing; the release
   build currently produces `app-release-unsigned.apk`.
-- **Widgets, Wear OS, tablet-optimised layouts** — none.
+- **No home screen widget and no tablet-optimised layout.** The watch app and tile exist;
+  a phone widget does not.
+- **The watch has no settings of its own.** Sect, madhab and method arrive from the phone.
+  A watch that is never paired calculates with the defaults and cannot be changed on-wrist.
+
+---
+
+## 10. Regenerating this document
+
+The PDF beside this file is generated, never hand-made. After editing the markdown:
+
+```bash
+./tools/build-architecture-pdf.sh
+```
+
+The first release shipped a PDF a full version behind the markdown because it was produced
+by hand once and never again. Run the script rather than trusting the file on disk.
 
 ---
 

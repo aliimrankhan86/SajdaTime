@@ -29,7 +29,7 @@
     <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
 
     <string name="city_fallback_heading">Rather not share your location?</string>
-    <string name="city_fallback_body">Type your city instead. Only the name you type is sent, once, to the free Aladhan service to look up its coordinates. After that, everything is worked out on your phone.</string>
+    <string name="city_fallback_body">Type your city instead. Your phone looks it up on its own where it can. If it cannot, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
     <string name="city_field_label">City</string>
     <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
     <string name="city_not_found">We could not find that place. Try adding the country.</string>

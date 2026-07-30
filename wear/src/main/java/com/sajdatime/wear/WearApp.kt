@@ -31,6 +31,7 @@ import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.items
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
@@ -61,7 +62,7 @@ fun WearApp(viewModel: WearViewModel) {
     AppScaffold {
         HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {
-                PAGE_TIMES -> TimesPage(state)
+                PAGE_TIMES -> TimesPage(state, viewModel::useDefaultLocation)
                 else -> QiblaPage(state)
             }
         }
@@ -69,19 +70,24 @@ fun WearApp(viewModel: WearViewModel) {
 }
 
 @Composable
-private fun TimesPage(state: WearUiState) {
+private fun TimesPage(state: WearUiState, onUseDefaultLocation: () -> Unit) {
     val listState = rememberScalingLazyListState()
 
     ScreenScaffold(scrollState = listState) { contentPadding ->
-        if (state.needsLocation) {
+        if (state.locating) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(
-                    text = "Open SajdaTime on your phone to set your location",
+                    text = "Finding your location",
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(horizontal = 20.dp),
                 )
             }
+            return@ScreenScaffold
+        }
+
+        if (state.needsLocation) {
+            NoLocation(onUseDefaultLocation)
             return@ScreenScaffold
         }
 
@@ -95,10 +101,15 @@ private fun TimesPage(state: WearUiState) {
             modifier = Modifier.fillMaxSize(),
         ) {
             item {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    // Clears the watch face clock that AppScaffold draws along the top.
+                    // Without this the prayer name sits underneath it and is unreadable.
+                    modifier = Modifier.padding(top = 44.dp),
+                ) {
                     Text(
                         text = next?.slot?.label ?: "",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Text(
@@ -150,6 +161,45 @@ private fun TimesPage(state: WearUiState) {
     }
 }
 
+/**
+ * The dead end this replaces: a watch with no fix and no paired phone showed a prompt
+ * the user had no way to satisfy from the watch. Makkah is offered as an honest,
+ * clearly-labelled fallback rather than nothing at all.
+ */
+@Composable
+private fun NoLocation(onUseDefaultLocation: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "No location yet",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = "Open SajdaTime on your phone, or use Makkah for now.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+        Spacer(Modifier.height(10.dp))
+        Button(
+            onClick = onUseDefaultLocation,
+            label = {
+                Text(
+                    text = "Use Makkah",
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            },
+        )
+    }
+}
+
 @Composable
 private fun QiblaPage(state: WearUiState) {
     ScreenScaffold {
@@ -198,13 +248,16 @@ private fun QiblaPage(state: WearUiState) {
                         drawLine(tickColour, inner, outer, strokeWidth = 2f)
                     }
 
+                    // The needle floats between the rim and the middle rather than
+                    // starting at the centre, so it never lies across the readout.
                     rotate(degrees = qibla.toFloat(), pivot = centre) {
-                        val tip = Offset(centre.x, centre.y - radius * 0.78f)
+                        val tip = Offset(centre.x, centre.y - radius * 0.86f)
+                        val base = centre.y - radius * 0.40f
                         drawPath(
                             path = Path().apply {
                                 moveTo(tip.x, tip.y)
-                                lineTo(centre.x - radius * 0.08f, centre.y)
-                                lineTo(centre.x + radius * 0.08f, centre.y)
+                                lineTo(centre.x - radius * 0.09f, base)
+                                lineTo(centre.x + radius * 0.09f, base)
                                 close()
                             },
                             color = needleColour,

@@ -3,6 +3,7 @@ package com.sajdatime.app.data
 import android.content.Context
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.sajdatime.core.WatchSyncContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -19,22 +20,18 @@ import kotlinx.coroutines.withContext
  */
 object WatchSync {
 
-    private const val PATH_SETTINGS = "/sajdatime/settings"
-
     suspend fun publish(context: Context, settings: AppSettings) = withContext(Dispatchers.IO) {
         runCatching {
-            val request = PutDataMapRequest.create(PATH_SETTINGS).apply {
-                dataMap.putString("sect", settings.sect.name)
-                dataMap.putString("madhab", settings.madhab.name)
-                dataMap.putString("method", settings.method.name)
+            val request = PutDataMapRequest.create(WatchSyncContract.PATH_SETTINGS).apply {
+                dataMap.putString(WatchSyncContract.KEY_SECT, settings.sect.name)
+                dataMap.putString(WatchSyncContract.KEY_MADHAB, settings.madhab.name)
+                dataMap.putString(WatchSyncContract.KEY_METHOD, settings.method.name)
                 settings.coordinates?.let {
-                    dataMap.putDouble("latitude", it.latitude)
-                    dataMap.putDouble("longitude", it.longitude)
+                    dataMap.putDouble(WatchSyncContract.KEY_LATITUDE, it.latitude)
+                    dataMap.putDouble(WatchSyncContract.KEY_LONGITUDE, it.longitude)
                 }
-                dataMap.putString("city", settings.cityName)
-                // The Data Layer skips items whose contents are unchanged, so a
-                // timestamp is needed for a re-send to actually go out.
-                dataMap.putLong("updated_at", System.currentTimeMillis())
+                dataMap.putString(WatchSyncContract.KEY_CITY, settings.cityName)
+                dataMap.putLong(WatchSyncContract.KEY_UPDATED_AT, System.currentTimeMillis())
             }
 
             Wearable.getDataClient(context).putDataItem(

@@ -67,7 +67,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     private val settingsRepository = SettingsRepository(application)
     private val locationRepository = LocationRepository(application)
-    private val cityLookup = CityLookup()
+    private val cityLookup = CityLookup(application)
     private val exporter = PrayerPdfExporter(application)
     private val compassRepository = CompassRepository(application)
 

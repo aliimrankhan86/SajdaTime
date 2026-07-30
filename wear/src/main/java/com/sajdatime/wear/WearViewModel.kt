@@ -11,6 +11,7 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationManager
+import android.os.CancellationSignal
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,6 +41,8 @@ data class WearUiState(
     val qiblaBearing: Double? = null,
     val heading: Double? = null,
     val needsLocation: Boolean = false,
+    /** A fix has been asked for and has not arrived yet. */
+    val locating: Boolean = false,
 )
 
 class WearViewModel(application: Application) : AndroidViewModel(application) {
@@ -49,6 +52,9 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
     val state: StateFlow<WearUiState> = _state.asStateFlow()
 
     private var compassJob: Job? = null
+
+    /** In-flight single-shot location request, cancelled if another is asked for. */
+    private var currentFix: CancellationSignal? = null
 
     init {
         viewModelScope.launch {
@@ -85,25 +91,80 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         if (!granted) {
             // A synced location from the phone still works, so this is only a problem
             // when the watch has neither.
-            _state.update { it.copy(needsLocation = it.settings.coordinates == null) }
+            _state.update {
+                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
+            }
             return
         }
 
-        val manager = ContextCompat.getSystemService(context, LocationManager::class.java)
-        val fix: Location? = listOf(
-            LocationManager.NETWORK_PROVIDER,
-            LocationManager.GPS_PROVIDER,
-            LocationManager.PASSIVE_PROVIDER,
-        ).mapNotNull { provider ->
-            runCatching { manager?.getLastKnownLocation(provider) }.getOrNull()
-        }.maxByOrNull { it.time }
+        val manager = ContextCompat.getSystemService(context, LocationManager::class.java) ?: return
 
-        if (fix != null) {
-            viewModelScope.launch {
-                store.setLocation(Coordinates(fix.latitude, fix.longitude), "")
+        val cached: Location? = PROVIDERS
+            .mapNotNull { runCatching { manager.getLastKnownLocation(it) }.getOrNull() }
+            .maxByOrNull { it.time }
+
+        if (cached != null) {
+            adopt(cached)
+            return
+        }
+
+        // A watch that has never held a fix has no last known location at all, so asking
+        // for the cache alone leaves it stuck on the setup prompt forever. Ask the
+        // hardware for one fix. Nothing is streamed and no listener is left registered.
+        val provider = PROVIDERS.firstOrNull { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
+        if (provider == null) {
+            _state.update {
+                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
+            }
+            return
+        }
+
+        _state.update { it.copy(locating = it.settings.coordinates == null) }
+        currentFix?.cancel()
+        val signal = CancellationSignal()
+        currentFix = signal
+
+        runCatching {
+            manager.getCurrentLocation(
+                provider,
+                signal,
+                context.mainExecutor,
+            ) { location ->
+                currentFix = null
+                if (location != null) {
+                    adopt(location)
+                } else {
+                    _state.update {
+                        it.copy(locating = false, needsLocation = it.settings.coordinates == null)
+                    }
+                }
+            }
+        }.onFailure {
+            currentFix = null
+            _state.update {
+                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
             }
         }
-        _state.update { it.copy(needsLocation = fix == null && it.settings.coordinates == null) }
+    }
+
+    private fun adopt(fix: Location) {
+        _state.update { it.copy(locating = false, needsLocation = false) }
+        viewModelScope.launch {
+            store.setLocation(Coordinates(fix.latitude, fix.longitude), "")
+        }
+    }
+
+    /**
+     * Last resort, mirroring the phone: rather than leaving someone staring at a setup
+     * prompt they cannot satisfy, fall back to Makkah so the watch still shows something.
+     */
+    fun useDefaultLocation() {
+        currentFix?.cancel()
+        currentFix = null
+        _state.update { it.copy(locating = false, needsLocation = false) }
+        viewModelScope.launch {
+            store.setLocation(QiblaEngine.KAABA, "Makkah")
+        }
     }
 
     fun setQiblaVisible(visible: Boolean) {
@@ -181,5 +242,15 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
     override fun onCleared() {
         super.onCleared()
         compassJob?.cancel()
+        currentFix?.cancel()
+    }
+
+    private companion object {
+        /** Cheapest and most likely to have a fix first. */
+        val PROVIDERS = listOf(
+            LocationManager.NETWORK_PROVIDER,
+            LocationManager.GPS_PROVIDER,
+            LocationManager.PASSIVE_PROVIDER,
+        )
     }
 }
