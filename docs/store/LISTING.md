@@ -154,7 +154,26 @@ staying silent about it.
 | Which data type? | **Location → Approximate location** (Google's own definition names "the city a user is in") |
 | Collected? | **Yes** |
 | Shared? | **No** — Open-Meteo processes the query on our behalf and only because the user typed it, which is Google's "service provider" and "user-initiated action" carve-out. If you are ever unsure, answering Yes is the safe direction. |
-| Is this data processed ephemerally? | **Yes** — it is held in memory only, for the length of one request, and used for nothing else. This is the checkbox that keeps it off the public card. |
+| Is this data processed ephemerally? | **No — do not tick this.** See below. |
+
+### Why not to tick "processed ephemerally", even though it is tempting
+
+Ticking it hides the entry from the public privacy card, so it looks like the obvious answer.
+But Google's standard is that the data *"is only stored in memory and retained for no longer
+than necessary to service the specific request in real-time"* — and Open-Meteo's own
+[terms](https://open-meteo.com/en/terms) say:
+
+> "All log files will be deleted after a period of 90 days."
+
+So the request is logged for 90 days at the other end. Our handling is genuinely ephemeral;
+the round trip is not. Google has never resolved whose retention the standard refers to, and
+guessing in our own favour on an unresolved ambiguity is exactly the shape of thing that gets
+an app pulled later.
+
+**The cost of declaring it honestly is small.** The store card gains one line — "Approximate
+location · App functionality · Optional" — on an app whose whole pitch is privacy. That is a
+fair trade for a declaration nobody can challenge, and the privacy policy explains it in
+plain words. Over-declaring is never a violation. Under-declaring is.
 | Purpose | **App functionality** only. Not analytics, not advertising, not personalisation. |
 | Is it required, or can users choose? | **Users can choose** — the app works from device location, or from a typed city, or not at all |
 | Is all user data encrypted in transit? | **Yes** — HTTPS |

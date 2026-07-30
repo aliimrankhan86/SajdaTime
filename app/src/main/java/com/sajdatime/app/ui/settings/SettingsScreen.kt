@@ -233,9 +233,17 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.about_disclaimer_short),
                 onClick = { disclaimer = true },
             )
+            // Play requires a privacy policy reachable from inside the app, not only from
+            // the Console field. Opening the hosted policy satisfies that.
+            val privacyUrl = stringResource(R.string.privacy_policy_url)
             SettingRow(
                 title = stringResource(R.string.about_privacy),
                 subtitle = stringResource(R.string.about_privacy_desc),
+                onClick = {
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, privacyUrl.toUri()))
+                    }
+                },
             )
             SettingRow(
                 title = stringResource(R.string.about_charity),
@@ -244,6 +252,10 @@ fun SettingsScreen(
             SettingRow(
                 title = stringResource(R.string.about_credits),
                 subtitle = stringResource(R.string.about_credits_desc),
+            )
+            SettingRow(
+                title = stringResource(R.string.about_data),
+                subtitle = stringResource(R.string.about_data_desc),
             )
         }
     }

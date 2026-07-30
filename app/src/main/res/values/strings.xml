@@ -138,11 +138,16 @@
     <string name="about_disclaimer">Disclaimer</string>
     <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no analytics, no ads.</string>
+    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no analytics, no ads. Tap to read the full policy.</string>
+    <string name="privacy_policy_url" translatable="false">https://aliimrankhan86.github.io/SajdaTime/privacy.html</string>
     <string name="about_charity">Free, forever</string>
     <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
     <string name="about_credits">Made by</string>
     <string name="about_credits_desc">Ali Imran Khan, as an ongoing charity for the Ummah</string>
+    <!-- Open-Meteo publishes under CC BY 4.0, which requires attribution. This row is a
+         licence obligation, not a courtesy — do not remove it. -->
+    <string name="about_data">Data and libraries</string>
+    <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Prayer times</string>

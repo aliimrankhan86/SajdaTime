@@ -43,9 +43,51 @@ Realistic floor from a standing start: **about three weeks.**
 
 > **Ignore the paid "12 testers" services.** They dominate the search results for this topic
 > and have a direct financial interest in making the rule sound harsher than it is. Several
-> of their specific claims — that emulators are detected and rejected, that testers must open
-> the app repeatedly, that a rejection restarts the 14 days — appear **nowhere in Google's
-> documentation**, and two of them contradict each other on the same site.
+> of their specific claims appear **nowhere in Google's documentation**, and two of them
+> contradict each other on the same site.
+
+### What Google does not write down — and what gets people rejected
+
+Google deliberately does not publish the exit criteria. Asked directly, its support told one
+developer *"no further details could be provided"*. So the following comes from developers who
+were actually rejected, on Google's own community forum. It is **not policy** — the volunteer
+"Product Experts" who give it are unpaid developers, they contradict each other, and one
+repeatedly stated the number as 14 when it is 12. Weight it accordingly. But it is the only
+evidence there is of how the check behaves in practice, and it is consistent on these points:
+
+- **Testers must install from the Play Store.** The single most-cited cause of rejection is
+  handing testers an APK directly. *"Play has no way to determine they are actually testing
+  the app."* Never send anyone a `.apk` — always the opt-in link.
+- **Emulators do not count.** Widely reported, never officially stated.
+- **Merely staying opted in is not enough.** The rejection email's first line is *"Testers
+  were not engaged with your app during your closed test"* — so Google is looking at usage
+  data, not just the opt-in flag.
+- **Each tester should be a different person, Google account, device and household.** Testers
+  on one office or home network are reported to collapse into a single counted tester.
+- **Recruit roughly double.** One developer in June 2026 needed **30 testers to keep 12
+  active** through the fortnight.
+- **The Console counter is not trustworthy.** Repeated reports of it showing 0 with a dozen
+  confirmed testers, or lagging ~24 hours. There is **no way to see the consecutive-day
+  count**. Do not treat the dashboard as ground truth.
+- **Rejection is common and repeatable.** Three, four and five consecutive rejections are all
+  documented, including by developers who shipped multiple updates during the fortnight.
+- **The review can take far longer than the stated seven days.** Documented 2026 cases of four
+  and five weeks, with support saying it cannot escalate or give a date.
+- **Do not touch the store listing once you have submitted.** Changes are reported to restart
+  the review.
+
+### ⚠️ The specific risk for SajdaTime
+
+**This app is structurally the kind Google rejects on "insufficient user engagement".** It is
+designed so that you set it up once and then it notifies you — the better it works, the less
+anyone opens it. A privacy app whose author described it as running "silently in the
+background" was rejected on exactly this ground in February 2026 and made to serve another
+14 days.
+
+Do not let 12 people install it and forget it. Ask testers explicitly to **open the app daily**
+during the fortnight — check the times, swing the Qibla compass around, change the calculation
+method, export a PDF. And when the production-access form asks what you changed in response to
+feedback, **have a real answer**. That free-text box is the part you actually control.
 
 **The owner's plan is to start recruiting testers only once account verification has
 cleared**, rather than in parallel. That is a deliberate decision — do not keep pressing for
@@ -248,6 +290,36 @@ You must complete all of these before you can publish:
 5. **Government apps / financial features / health** — all no.
 6. **App access.** No login required; state that all functionality is available without
    restriction.
+
+---
+
+## What this app does NOT have to worry about
+
+Researched against Google's live policy pages in July 2026. Each of these is a thing solo
+developers routinely lose days to, and none of them applies here. **Do not let a future
+session "fix" any of them.**
+
+| Worry | Verdict |
+|---|---|
+| `SCHEDULE_EXACT_ALARM` needs a Play declaration | **No.** Only the *restricted* `USE_EXACT_ALARM` needs one, and that is limited to dedicated alarm/timer/calendar apps. Our permission is the user-granted, unrestricted one. **Do not "upgrade" to `USE_EXACT_ALARM`** — it would buy a non-revocable grant in exchange for a restricted-permission review and a new rejection vector. |
+| `USE_FULL_SCREEN_INTENT` | Not declared and not used. It *does* require a declaration. Alarm features often reach for it — ours must not. |
+| Coarse location needs a declaration | **No.** The Location Permissions form is for *background* location. Ours is coarse and foreground-only. |
+| The October 2026 "minimum scope" location policy | Applies to `ACCESS_FINE_LOCATION`. We are coarse-only — already the posture that policy is pushing everyone toward. |
+| targetSdk deadline (31 August 2026) | ✅ Compliant. New apps need API 36; we are at 36. Wear needs 35+; we are at 36. |
+| 16 KB page size (mandatory since Nov 2025) | ✅ Automatic. Pure Kotlin, no native code. |
+| Android developer verification (from 30 Sept 2026) | ✅ Nothing to do. Google auto-registers the package when you create the app in Console. |
+| A religion-specific Play policy | **There isn't one.** Religion appears in Play policy only as a *protected characteristic* — we are a beneficiary of that clause, not a target. No religious declaration, no special content-rating answers. Expect Everyone / PEGI 3. |
+| Being rejected for using AI to write the code | **No such policy exists.** Google's AI-Generated Content policy governs what an app *does at runtime* — chatbots, image generators — not how the source was authored. We ship no generative AI, so it does not apply. There is **no obligation to disclose AI assistance to Google**, and no policy hook for it. (The disclaimer in the app and the listing stays regardless — that is our own honesty commitment to users, not a Play requirement.) |
+| Rejection for a "saturated category" | **That is an Apple rule being mistaken for a Google one.** Play's Repetitive Content policy targets copying a specific app's content, or one developer shipping many near-identical apps. Neither applies. |
+| EU DSA trader/non-trader declaration | **Play has no such form.** That is Apple's requirement, February 2025, widely mis-attributed to Google. Google satisfies the same regulation upstream by publishing developer name, country and email. |
+| D-U-N-S number | Organisation accounts only. Not needed for a personal account. |
+
+**The one genuine 2022 precedent worth knowing:** Google removed a batch of prayer-times and
+Qibla apps that year. The trigger was a **surveillance SDK** harvesting phone numbers and
+locations, not religious content. It is why this category carries extra reviewer attention
+around data declarations — which is precisely why the data safety answers in
+`docs/store/LISTING.md` are worth getting exactly right. Our zero-SDK build is the strongest
+possible answer to that suspicion.
 
 ---
 
