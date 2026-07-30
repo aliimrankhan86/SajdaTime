@@ -21,3 +21,8 @@ app/build/
 # dexing three times. It now lives in ~/Developer. This stays as a second line of defence
 # in case anyone moves it back into a synced folder.
 *\ [0-9].*
+
+# Signing. Contains the upload key password - never commit.
+keystore.properties
+*.jks
+*.keystore

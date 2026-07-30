@@ -73,6 +73,10 @@ wear/   The Wear OS app and the next-prayer tile.
 
 - [docs/HANDOVER.md](docs/HANDOVER.md) - **start here.** Vision, stack, every feature and
   business rule, what is verified, what is not, what is left to do, and the build traps.
+- [docs/NEW-SESSION.md](docs/NEW-SESSION.md) - how to pick the project back up in a fresh
+  session, and what to say to get a useful one.
+- [docs/RELEASING.md](docs/RELEASING.md) - the Google Play checklist, including the two
+  steps only the owner can do.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - full requirements, design decisions,
   business rules, privacy model, and the iOS porting guide.
 - [docs/SajdaTime-Architecture.pdf](docs/SajdaTime-Architecture.pdf) - the above as a PDF.
