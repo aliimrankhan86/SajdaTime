@@ -15,8 +15,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <!--
-      Prayer alerts must land on the minute. If the user declines this, the scheduler
-      falls back to setAlarmClock, which is exact without a permission.
+      Prayer alerts must land on the minute. Denied by default from Android 13, and
+      setAlarmClock requires it too, so there is no exact path without it. When it is
+      not granted the scheduler falls back to setAndAllowWhileIdle, which fires within
+      a few minutes rather than on the minute. Settings shows a banner offering to
+      grant it.
     -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 

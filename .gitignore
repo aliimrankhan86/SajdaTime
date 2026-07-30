@@ -16,7 +16,8 @@ app/build/
 # Kotlin
 .kotlin/
 
-# macOS iCloud Drive conflict copies. This project lives under ~/Documents, which
-# iCloud syncs; it periodically writes "<name> 2.class" duplicates into the build
-# directory and breaks dexing. See README for the fix.
+# macOS iCloud Drive conflict copies. The project used to live under ~/Documents, which
+# iCloud syncs; it wrote "<name> 2.class" duplicates into the build directory and broke
+# dexing three times. It now lives in ~/Developer. This stays as a second line of defence
+# in case anyone moves it back into a synced folder.
 *\ [0-9].*
