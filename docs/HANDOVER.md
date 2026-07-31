@@ -1187,6 +1187,10 @@ never lost. 62 tests, up from 57 — five new ones in `PrayerEngineTest`, four o
 boundary cases and one that walks the whole day in five-minute steps asserting sunrise is
 never returned.
 
+Re-checked at **200% font scale** after the fact, because the first write-up honestly
+recorded the pill as untested at that size: both pills render in full, nothing clipped, the
+rows grow as they are meant to.
+
 **Not tested:** the watch has no such marker and was not changed. Notification and alarm
 copy do not mention the current prayer and were not touched.
 
