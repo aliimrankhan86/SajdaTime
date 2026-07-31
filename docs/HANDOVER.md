@@ -1104,7 +1104,7 @@ script after editing the markdown.**
 | `0e43fe5` | Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
 | `2a13b9d` | Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
 | `d9e31e3` | Brought the handover's own bookkeeping up to date |
-| *(this)* | **(current)** Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
+| `7d9cf89` | Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
 
 ---
 
