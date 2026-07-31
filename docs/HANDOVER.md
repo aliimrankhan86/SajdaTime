@@ -1325,11 +1325,20 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     djb2-xor hash computed on both sides rather than by reading them side by side. That file
     mirrors the Console; it never leads it.
 
+    **The closed testing track is set up** — `Closed testing - Alpha`, all **177 countries
+    targeted**, feedback email set to the store contact address. The countries list had been
+    completely empty, which is worth knowing about because it fails in the worst possible way:
+    every tester in the world hits *"app not available in your country"* on their own phone,
+    while the Console shows a healthy-looking track and an opted-in count of zero. Closed
+    tracks inherit production availability and production had never been set. Nothing warns
+    you.
+
     **The next actual steps:** the signing key — owner-only, `docs/RELEASING.md` Step 2, and
-    the one true blocker since both AABs on disk are unsigned — then Closed testing with 12
-    testers for 14 continuous days. The Wear OS screenshot slot only appears once the Wear form
-    factor is added, which happens at release time; the 454 × 454 files are already waiting in
-    `docs/store/upload/wear-os/`.
+    the one true blocker since both AABs on disk are unsigned — and, in parallel because it
+    needs nothing from the key, recruiting testers. The tester email list is the only part of
+    track setup left, and it needs addresses nobody but the owner has. The Wear OS screenshot
+    slot only appears once the Wear form factor is added, which happens at release time; the
+    454 × 454 files are already waiting in `docs/store/upload/wear-os/`.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background

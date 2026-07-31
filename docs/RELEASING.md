@@ -110,9 +110,50 @@ production-access form has three parts:
 Two of those are traps for this app in particular. *"Whether testers used all features"* is the
 engagement question from the risk note above, wearing a different hat — so ask testers to
 touch the Qibla compass, the madhab picker and the PDF export, not just let notifications
-arrive. And *"what you changed"* has no good answer if nothing was collected: set up somewhere
-for feedback to land **before** the test starts — one email address or a WhatsApp group is
-enough — because "no one reported anything" reads as "no one tested it".
+arrive. And *"what you changed"* has no good answer if nothing was collected: feedback needs
+somewhere to land **before** the test starts, because "no one reported anything" reads as
+"no one tested it".
+
+> **Already done:** the track's *Feedback URL or email address* field is set to
+> `aikstudies@gmail.com`, the same address already published on the store listing. Play shows
+> it to testers inside the Play Store entry for the test, so there is a route back that does
+> not depend on anyone remembering to ask. A dedicated form was considered and skipped — a
+> second inbox to check is a second inbox to forget, and twelve people do not need a database.
+
+### The message to send
+
+Short on purpose. Most of these people will not have been a "tester" before, and the fastest
+way to lose one is a wall of instructions. Send this, then send the link.
+
+> *Assalamu alaikum — I've built a free prayer times and Qibla app, no ads and no tracking,
+> and Google needs 12 people to try it for two weeks before it can go on the Play Store.*
+>
+> *It's a couple of taps: open the link on your Android phone, tap Join, then install it like
+> any normal app. Please keep it on your phone for the full two weeks — if you uninstall
+> early it doesn't count and I have to start again.*
+>
+> *If you get a minute, have a proper look around rather than just letting the notifications
+> come in — the compass, the settings, the timetable. And tell me anything that looks wrong,
+> especially prayer times that don't match your mosque. JazakAllah Kher.*
+
+Four things in that message are load-bearing, and every one of them maps to something Google
+asks about or checks:
+
+| Line | Why it is there |
+|---|---|
+| "keep it for the full two weeks" | The 14 days must be **consecutive**. An early uninstall does not just fail to count — it resets that tester |
+| "open the link on your Android phone" | Testers must install **from Play**. Never send anyone an APK; it is the single most-cited cause of rejection |
+| "have a proper look around" | Google's rejection email leads with *"Testers were not engaged with your app"*. This app is designed to be ignored once it is set up, which is exactly the profile that fails |
+| "tell me anything that looks wrong" | This is where the *"what did you change"* answer comes from. Without it, that box is empty |
+
+**Recruit around 25, not 12.** Twelve is the number who must still be opted in at the end, not
+the number you start with; one developer needed 30 to hold 12. Different people, different
+Google accounts, different households where you can manage it — testers on one home or office
+network are reported to collapse into a single counted tester.
+
+**Do not send the link until the release is live on the track.** The join link only exists once
+a build has been uploaded and rolled out, and a link sent early is a link that fails for
+everyone who tries it first.
 
 ### The Wear OS wrinkle
 
@@ -401,18 +442,34 @@ possible answer to that suspicion.
 
 ## Step 7 — Upload and roll out
 
-1. Play Console → **Create app** → name **SajdaTime**, free, app (not game).
+1. ✅ **DONE** — Play Console → **Create app**, name **SajdaTime**, free, app (not game).
    **"Free" is a one-way door.** Google: *"Once your app has been offered for free, the app
    can't be changed to paid."* That is exactly what this app wants, but know it is permanent.
    The `applicationId` is likewise permanent from the first upload.
-2. Fill in the store listing (Step 5) and all the forms (Step 6).
-3. **Testing → Closed testing** → **Countries/regions** → add **all** countries. Closed
-   tracks inherit production availability, and if production availability was never set your
-   testers hit "app not available in your country". This is the single most common reason a
-   closed test appears broken.
-4. Same track → **Releases → Create new release** → upload **`app-release.aab` only**.
-5. Add your 12 testers by email, share the opt-in link, and wait out the 14 days.
-6. Apply for production access, then **Production → Create release** and roll out.
+2. ✅ **DONE** — store listing (Step 5) and every form (Step 6), all green.
+3. ✅ **DONE** — **Testing → Closed testing → Countries/regions**: all **177** countries now
+   show *Targeted* on the `Closed testing - Alpha` track, confirmed on a reload.
+
+   > This was genuinely empty, and it is the trap it looks like. Closed tracks inherit
+   > production availability, and production availability had never been set, so **every**
+   > tester anywhere in the world would have hit *"app not available in your country"* — with
+   > the opted-in count sitting at zero and nothing on screen explaining why. It is the single
+   > most common reason a closed test appears broken, and it fails silently on the tester's
+   > phone rather than in the Console where anyone would see it.
+   >
+   > All countries is right for a closed track and costs nothing: only invited testers can
+   > install regardless. It also means a tester who travels does not drop out mid-fortnight.
+
+4. ✅ **DONE** — the track's **Feedback email** is set to `aikstudies@gmail.com`, so testers
+   have a route back that does not rely on remembering to ask them. See Step 0.
+5. ⬜ **Select testers** — the last piece of track setup, and the only one that needs
+   information nobody else has: the actual email addresses. **Testing → Closed testing →
+   Testers → Create email list.** Each tester needs the Google account they use on their
+   phone, not just any address. Recruitment copy is in Step 0.
+6. ⬜ Same track → **Releases → Create new release** → upload **`app-release.aab` only**
+   (needs the signing key, Step 2).
+7. ⬜ Share the opt-in link — **only once the release is live** — and wait out the 14 days.
+8. ⬜ Apply for production access, then **Production → Create release** and roll out.
 
 ### The watch bundle does NOT go in the same release
 
@@ -548,15 +605,17 @@ first of them:
 3. Run the closed test with at least 12 testers for at least 14 days
 4. Apply for production
 
-Which reduces to **two** real tasks:
+The closed testing track is otherwise set up: `Closed testing - Alpha` exists, all 177
+countries are targeted, and the feedback email is set. Which reduces to **two** real tasks:
 
-1. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
-   Nobody else should ever generate or hold this: not a contractor, not an assistant, not an
-   AI agent. **This is the only thing blocking a release build**, and it depends on nothing
-   and nobody else.
+1. **The signing key** (Step 2) — one `keytool` command, two password prompts, plus a
+   `keystore.properties` file. Nobody else should ever generate or hold this: not a
+   contractor, not an assistant, not an AI agent. **This is the only thing blocking a release
+   build**, and it depends on nothing and nobody else.
 2. **Twelve testers** (Step 0) — no longer blocked on anything either, now that verification
-   has cleared, and unlike the key it cannot be done in an afternoon. Recruit roughly double,
-   because the count is of testers who *stay* opted in.
+   has cleared, and unlike the key it cannot be done in an afternoon. Recruit roughly 25,
+   because the count is of testers who *stay* opted in for 14 consecutive days. The message to
+   send them is written out in Step 0.
 
 They are independent, so they should run in parallel. The key unblocks the upload; the testers
 are the 14-day clock, and that clock is the long pole. It cannot be shortened, only started
