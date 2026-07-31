@@ -1396,6 +1396,28 @@ script after editing the markdown.**
 | `7d9cf89` | Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
 | `eb24f54` | Recorded the Kaaba commit's own hash in this table |
 | `a5cf7fa` | Made the app format in its own language rather than the device's, after running it on Arabic and Bengali phones and finding a scrambled Hijri date, an unreadable Qibla sentence and two numbering systems on one screen |
+| `1defcdd` | Recorded the locale commit's own hash in this table |
+| `93611c5` | Added `./gradlew installRtl`, so any layout can be checked right-to-left before a translation exists to check it with |
+| `6f612ad` | Recomputed the day at midnight rather than only when a prayer passes — after midnight nothing passes for hours, so the "Today" list silently showed yesterday's times on the screen people use to break their fast |
+| `5f628db` | Recaptured the store screenshots natively at 1080 × 1920 instead of pillarboxing 20:9 captures, and moved the launcher icon and store art off the pre-revision green they had been left on |
+| `d9d1c9a` | Removed the price keyword from the short description **and** from the feature graphic, where the Console could not see it |
+
+### The author identity changes partway through, on purpose
+
+Commits up to and including `d9d1c9a` are authored as
+`Ali Khan <Ali.Khan@partner.bmwgroup.com>`. Everything after is
+`Ali Imran Khan <4550455+aliimrankhan86@users.noreply.github.com>`.
+
+Same person. A global `git config` on the owner's Mac was still set to a former employer's
+address, so it had been signing every commit in every personal repository — 26 of the 29
+here. It was corrected at the machine level, which fixes all future commits everywhere.
+
+**History was deliberately not rewritten**, and should not be: it would change every SHA,
+and this document, `RELEASING.md` and several commit messages all cite hashes by name. The
+old address is inert — it is a text label recorded at commit time, it authenticates nothing,
+and it was never registered on the GitHub account (commits carrying it show as an unlinked
+author, which is also why they earn no contribution credit). If reclaiming that credit ever
+matters more than the stable hashes, that is the trade being made.
 
 ---
 
