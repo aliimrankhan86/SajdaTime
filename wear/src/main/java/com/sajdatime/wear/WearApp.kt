@@ -6,6 +6,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
@@ -63,6 +65,43 @@ import kotlin.math.sin
 
 private const val PAGE_TIMES = 0
 private const val PAGE_QIBLA = 1
+
+/**
+ * Content padding for a [ScalingLazyColumn] on a round watch, used with `autoCentering = null`.
+ *
+ * ScalingLazyColumn's default auto-centring reserves roughly half a screen of trailing space
+ * so the final item can come to rest in the middle. At the bottom of a list that space has to
+ * come from somewhere, and where it comes from is the top: everything above the last item is
+ * hoisted into the narrow cap of the circle, which is also where AppScaffold paints the watch
+ * face clock. On the 227dp round at font scale 1.3 that put "Sunni · Shafi'i" directly
+ * underneath the time — grey on green, unreadable — and pressed the top of the button flat
+ * against the rim. It was wrong on the 192dp round too, just less legibly so.
+ *
+ * With auto-centring off the list simply stops when its last item reaches the bottom inset,
+ * so nothing is lifted anywhere. The insets then have to do the work auto-centring was doing:
+ * keep the first and last items off the rim.
+ *
+ * The bottom inset is a *share of the screen*, not a fixed dp, and that is the whole point. A
+ * round display loses width fastest near its edge — on a 227dp watch the usable chord is
+ * 199dp at 26% up from the bottom, 123dp at 8%, and 77dp at 3% — so the inset that keeps a
+ * wide item inside the glass has to be proportional to the diameter, not constant.
+ *
+ * 26% is a verified value, not a derived one: it is what was screenshotted clean on both
+ * 192dp and 227dp at font scale 1.0 and 1.3, with `tools/wear-round-check.py` confirming
+ * nothing lands behind the bezel. It is not claimed to be the minimum, and it should not be
+ * trimmed on arithmetic alone — pull it down and the last item drifts towards the rim, push
+ * it up and the list scrolls further, which is what put the button under the clock to begin
+ * with. Both directions fail, so re-run `tools/wear-verify.sh` before changing it.
+ *
+ * ponytail: a plain function over LocalConfiguration rather than Horologist's responsive
+ * padding helpers — two numbers do not justify the dependency, and the Wear Compose guidance
+ * is explicit that the Horologist layout libraries should not be used with Material3.
+ */
+@Composable
+private fun roundListPadding(fromScaffold: PaddingValues): PaddingValues = PaddingValues(
+    top = fromScaffold.calculateTopPadding(),
+    bottom = (LocalConfiguration.current.screenHeightDp * 0.26f).dp,
+)
 
 @Composable
 fun WearApp(viewModel: WearViewModel) {
@@ -109,12 +148,12 @@ private fun TimesPage(
     onUseDefaultLocation: () -> Unit,
     onChooseSchool: () -> Unit,
 ) {
-    // initialCenterItemIndex = 0, not the default 1. ScalingLazyColumn otherwise opens
-    // centred on the second item, which scrolled the countdown card up far enough that
-    // the watch face clock sat on top of the prayer name. The 44dp of top padding inside
-    // that card was never the problem — it was correct, and simply scrolled off. This is
-    // the first thing a user sees when they raise their wrist, so it has to be right on
-    // launch and not one flick later.
+    // initialCenterItemIndex = 0, not the default 1: ScalingLazyColumn otherwise opens
+    // centred on the second item, which scrolls the countdown card up under the watch face
+    // clock. With autoCentering off (see roundListPadding) the list already opens at the
+    // top and this is belt and braces, but it costs nothing and it is the setting that
+    // matches the padding. This is the first thing a user sees when they raise their
+    // wrist, so it has to be right on launch and not one flick later.
     val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     val context = LocalContext.current
 
@@ -141,7 +180,8 @@ private fun TimesPage(
 
         ScalingLazyColumn(
             state = listState,
-            contentPadding = contentPadding,
+            autoCentering = null,
+            contentPadding = roundListPadding(contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
         ) {
@@ -150,7 +190,15 @@ private fun TimesPage(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     // Clears the watch face clock that AppScaffold draws along the top.
                     // Without this the prayer name sits underneath it and is unreadable.
-                    modifier = Modifier.padding(top = 44.dp),
+                    //
+                    // 16dp, not the 44dp this used to be. The larger figure was paying for
+                    // auto-centring, which opened the list already scrolled and ate most of
+                    // it; with auto-centring off the list starts where it is put, and 44dp
+                    // on top of the scaffold's own inset pushed the first screen down far
+                    // enough to lose two prayer rows off the bottom of a 192dp watch. On a
+                    // screen this small, rows the user can see without scrolling are the
+                    // whole point.
+                    modifier = Modifier.padding(top = 16.dp),
                 ) {
                     Text(
                         text = next?.slot?.let { stringResource(it.labelRes) } ?: "",
@@ -202,9 +250,36 @@ private fun TimesPage(
                     }
                 }
 
-                // Always visible, directly under the times it produced. A watch that
-                // never received the phone's settings is otherwise indistinguishable
-                // from one that did, and the difference is over an hour of Asr.
+                item {
+                    Text(
+                        text = stringResource(R.string.wear_disclaimer),
+                        style = MaterialTheme.typography.bodyExtraSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                    )
+                }
+
+                // Always visible, at the end of the times it produced. A watch that never
+                // received the phone's settings is otherwise indistinguishable from one
+                // that did, and the difference is over an hour of Asr.
+                //
+                // Last, not second-to-last, and that ordering is load-bearing. At the
+                // bottom of the scroll the list is anchored from below: the final item
+                // rests on the bottom inset and everything else stacks upwards from it, so
+                // whichever item is second-to-last is the one that ends up against the top
+                // of the screen — under the clock AppScaffold paints there, in the narrow
+                // cap of the circle. With the button there, a 192dp watch at font scale 1.3
+                // printed the time straight through "Sunni · Hanafi".
+                //
+                // Padding cannot fix this from either side: above the button it changes
+                // nothing (the anchor is below it) and below the button it pushes the
+                // button further up. The only thing that moves the button down is putting
+                // something taller after it. The disclaimer is that something — three or
+                // four wrapped lines against the button's one — and it is the better
+                // casualty of the two: it is read on the way past rather than aimed at,
+                // and it is still shown in full, in the same list, immediately above.
+                // What must never end up illegible is the control the user has to hit.
                 item {
                     Button(
                         onClick = onChooseSchool,
@@ -216,16 +291,6 @@ private fun TimesPage(
                                 textAlign = TextAlign.Center,
                             )
                         },
-                    )
-                }
-
-                item {
-                    Text(
-                        text = stringResource(R.string.wear_disclaimer),
-                        style = MaterialTheme.typography.bodyExtraSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
                     )
                 }
             }
@@ -266,7 +331,8 @@ private fun SchoolPage(
     ScreenScaffold(scrollState = listState) { contentPadding ->
         ScalingLazyColumn(
             state = listState,
-            contentPadding = contentPadding,
+            autoCentering = null,
+            contentPadding = roundListPadding(contentPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxSize(),
         ) {

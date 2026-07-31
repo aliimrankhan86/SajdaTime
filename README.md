@@ -45,6 +45,13 @@ Run the checks:
 ./gradlew :core:testDebugUnitTest :app:testDebugUnitTest :wear:testDebugUnitTest :app:lintDebug :wear:lintDebug :core:lintDebug
 ```
 
+After any change to the watch UI, run it on both round sizes. Wear OS has two — 1.2" /
+192dp and 1.39" / 227dp — and they disagree about what fits:
+
+```bash
+./tools/wear-verify.sh
+```
+
 ### Keep this project out of iCloud
 
 The project lives in `~/Developer/SajdaTime` deliberately. It used to sit under

@@ -730,13 +730,55 @@ that ships an unreadable app.
 | Round display, 192dp | Verified on `sajdawear` — 384px at 320dpi, corner radius 192, i.e. a true circle. Both pages, nothing clipped, nothing unreachable |
 | Wear font scaling, 1.3× | Both pages: no overlap, no truncation. The times list grows and scrolls, which is what it is for |
 | `w1-times.png` chopping a glyph | Recaptured at a scroll position where the bottom edge falls between rows. This had been flagged in `RELEASING.md` and left open |
-| Round display, 227dp | **Still open.** `adb shell wm size 454x454` does not substitute for a real AVD: the rounded-corner overlay stays at the 384px radius, so the mask paints straight vertical cuts through the text. Those artefacts are the stale mask, not the app — and a capture that cannot be trusted must not be filed as evidence |
+| Round display, 227dp | **Closed.** See below |
+
+### Round display, 227dp — closed, and what it found
+
+The blocker was never the app; it was that the only Wear AVD here was small round, and the
+obvious shortcut is a trap. `adb shell wm size 454x454` resizes the panel but *not* the
+rounded-corner overlay, which was computed once for the real 384px display — so the stale
+mask paints **straight vertical cuts** through the text. A round screen cannot produce a
+straight vertical edge, so those captures are artefacts and must not be filed as evidence.
+
+The SDK has had the answer all along: a `wearos_large_round` device profile, 454px at
+320dpi, i.e. exactly 227dp, with `mRoundedCorners` reporting `radius=227, center=(227,227)`
+on all four corners — a true inscribed circle. `./tools/wear-verify.sh` creates that AVD if
+it is missing, boots both watches, and walks every screen at font scale 1.0 and 1.3.
+
+| Checked | Result |
+|---|---|
+| 227dp round, font 1.0 and 1.3 | Every screen clear. Nothing behind the bezel, nothing overlapping |
+| 192dp round, re-run against the same sweep | Clear at 1.0. At 1.3 the first line of the watch disclaimer passes under the clock at the very bottom of the scroll — body text, one flick from being readable, and not fixable by padding (see §15) |
+| Bezel clipping, all 28 captures | `tools/wear-round-check.py` — pure-stdlib PNG decode, no clipped content on either size at either font scale |
+
+**Two real defects, found only because the sizes were finally run side by side.**
+
+1. **The school button was printed underneath the watch face clock** at the bottom of the
+   times list — grey on green, unreadable — on *both* sizes, worst at 227dp/1.3×. Root
+   cause: `ScalingLazyColumn`'s default auto-centring reserves half a screen of trailing
+   space so the last item can rest in the middle, and that space is taken from the top,
+   hoisting whatever is second-to-last into the narrow cap of the circle where the clock
+   lives. Fixed by turning auto-centring off, padding the list explicitly as a share of
+   screen height, and making the button the *last* item so the taller disclaimer absorbs
+   the top slot instead.
+2. **The first screen had 44dp of clock clearance it no longer needed**, which was paying
+   for the auto-centred scroll. With auto-centring off it cost two prayer rows off the
+   bottom of a 192dp watch. Trimmed to 16dp.
+
+Neither was visible on the small round alone at default font. Both were invisible to the
+compiler, to lint, and to the unit tests.
 
 **Store screenshots are part of the diff.** All five phone captures and both watch captures
 were retaken and `tools/build-store-assets.sh` re-run. A theme change that leaves
 `docs/store/screenshots/` alone ships a listing that does not match the app.
 
 ### Useful device-testing recipes
+
+```bash
+# Both watch sizes, every screen, two font scales, plus the bezel check.
+# Creates the 227dp AVD if it does not exist. Run this after ANY watch UI change.
+./tools/wear-verify.sh
+```
 
 ```bash
 # Fire a real alarm: move the clock to just before a prayer time.
@@ -825,7 +867,13 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
    the other direction. Left deliberately; revisit only if someone actually complains.
 2. **No instrumented UI tests.** Logic and colour are unit-tested; every screen on both
    phone and watch is verified by hand only. A Compose UI test suite would make refactoring
-   much safer.
+   much safer. The one automated piece of layout checking that exists is
+   `tools/wear-round-check.py`, driven by `tools/wear-verify.sh` — it settles "nothing
+   behind the bezel" on both watch sizes but needs a booted emulator, so it is a release
+   check rather than part of `./gradlew test`. If this is ever taken further, Google's own
+   recommendation is Roborazzi with Robolectric, which runs Wear screenshot tests on the
+   JVM across the whole device matrix with no emulator at all. That would be the first
+   thing to add if the watch UI starts changing often.
 3. **The watch has no calculation-method setting of its own.** Sect and madhab can now be
    set on the wrist (see the note under item 7), but `CalcMethod` still only arrives from
    the phone. That matters far less: `AUTO` resolves a sane convention from the sect, and
@@ -934,7 +982,8 @@ different machine.
 | Android SDK | `/Users/aliimrankhan/Library/Android/sdk` (in `local.properties`, **gitignored**) |
 | JDK | Oracle Java SE 21 — `JAVA_HOME=$(/usr/libexec/java_home -v 21)` |
 | Phone emulator | AVD `sajda`, API 36 |
-| Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a` |
+| Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a`, `wearos_small_round` — 384px @ 320dpi = **192dp** |
+| Watch emulator, large | AVD `sajdawear_large`, same image, `wearos_large_round` — 454px @ 320dpi = **227dp**. Created on demand by `./tools/wear-verify.sh`. Both sizes must be run; the app was wrong on both in ways only visible with them side by side |
 | Repo files tracked | 80 |
 | Kotlin source | ~6,800 lines across the three modules |
 
@@ -1043,13 +1092,36 @@ script after editing the markdown.**
 8. **A visual change is not finished until `docs/store/screenshots/` is retaken.** Those
    images are a published listing. Recapture into `raw/` and re-run
    `tools/build-store-assets.sh`; the script reframes and copies, it does not re-shoot.
-9. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
-   shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-10. The owner is **not technical**. Explain in plain language, state what is verified versus
+9. **The emulator will let you fake a device size, and the fake will lie to you.**
+   `adb shell wm size 454x454` resizes the panel but not the rounded-corner overlay, which
+   was computed once for the real one. The stale mask then paints straight vertical cuts
+   through the text — and a round display cannot produce a straight vertical edge, so the
+   capture is an artefact rather than a finding either way. The lesson generalises past
+   Wear: when a shortcut reproduces a *shape the real hardware cannot make*, that is the
+   shortcut failing, and the answer is the real profile. `wearos_large_round` had been in
+   the SDK the whole time. Check `avdmanager list device` before inventing a workaround.
+10. **The wrong screen size is not a cosmetic risk.** Running the 227dp watch for the first
+    time immediately turned up a control printed underneath the system clock, unreadable,
+    at the resting position users land on after a flick — and once found, it was there on
+    the 192dp watch too. It had survived every build, every lint run, every unit test and
+    an entire release. Two sizes of the same round screen disagree about what fits, and
+    only one of them was ever being looked at.
+11. **On a round screen, `screencap` shows you pixels the wearer will never see.** The
+    capture is the framebuffer, taken before the corner overlay; the display is the circle
+    inscribed in it. That asymmetry is what `tools/wear-round-check.py` exploits, and it is
+    why "it looked fine in the screenshot" is not the same claim as "it fits on the watch".
+12. **An automated check is worth exactly what it measures, and no more.** The bezel check
+    settles "cut off by the screen edge" completely and says nothing at all about "overlaps
+    something else", because the clock and the app are both just lit pixels. The defect that
+    actually mattered was in the half it cannot see. Ship the check *and* look at the
+    pictures; be precise in the docs about which half each one covers.
+13. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+    shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
+14. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-11. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+15. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

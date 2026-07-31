@@ -378,22 +378,43 @@ Google publishes its own list of the most common Wear OS rejections. Against thi
 | Listing doesn't say **"Wear OS"** | ✅ The full description says "A Wear OS app and watch tile". Must be the exact phrase — "WearOS" and "Android Wear" both get rejected. **This applies to every localised listing too.** |
 | No Wear OS screenshot | ✅ Two, 384 × 384, 1:1, no device frame, no added text — all as required |
 | Basic functionality broken / screenshots inaccurate | ✅ `w1-times.png` was recaptured at a scroll position where the bottom edge falls between rows rather than through a glyph. The list still shows it continues below, which is how a ScalingLazyColumn is meant to look, but nothing is chopped. |
-| Not formatted for round displays | ⚠️ **Half done.** Verified on the 192dp round AVD (`sajdawear`, 384px at 320dpi, corner radius 192 = a true circle): both pages, nothing clipped, nothing unreachable. **227dp round is still unverified** — see the note below. |
-| Font scaling (WO-V1 / WO-V14) | ✅ Tested at `font_scale 1.3` on the 192dp round AVD. Both pages: no overlap, no truncation, nothing made unreachable. The times list grows and scrolls, which is what it is meant to do. |
+| Not formatted for round displays (WO-V16) | ✅ **Both sizes.** 192dp (`sajdawear`) and 227dp (`sajdawear_large`, 454px at 320dpi, corner radius 227 = a true circle) at font scale 1.0 and 1.3, every screen, checked by pixel rather than by eye — see below. |
+| Font scaling (WO-V1 / WO-V14) | ✅ `font_scale 1.3` on **both** round sizes. One real defect was found and fixed at 1.3 (the school button printed under the watch face clock); see the note below for the residual. |
 | Black background (WO-V13) | ✅ Confirmed in the screenshots |
 
-> **Why 227dp is still open, and why the obvious shortcut does not work.**
+> **How to re-run this, in one command.**
 >
-> Forcing the existing AVD to the larger size with `adb shell wm size 454x454` looks like
-> it should do the job. It does not. The rounded-corner overlay is computed once for the
-> device's real 384px panel, so after the resize the mask sits at the wrong radius and
-> paints **straight vertical cuts** through the middle of the text — "2:54 A|M" and so on.
-> Those artefacts are the stale mask, not the app, and a real round display cannot produce
-> a straight vertical edge. The layout underneath is fine, but the capture cannot be
-> trusted as evidence and must not be presented as such.
+> ```bash
+> ./tools/wear-verify.sh
+> ```
 >
-> Doing this properly needs a second AVD on a genuine 227dp round Wear profile. That is
-> the outstanding item.
+> It creates the 227dp AVD if it is missing, boots both watches, installs the debug
+> build, walks every screen at font scale 1.0 and 1.3, and runs `tools/wear-round-check.py`
+> over the captures. `screencap` grabs the framebuffer *before* the rounded-corner overlay,
+> so anything outside the inscribed circle in a capture is something the wearer never sees —
+> which makes WO-V16's "cut off by screen edges" a thing arithmetic can settle. 28 captures,
+> all clear.
+>
+> **What it cannot settle, and what that cost.** WO-V16 also says nothing may *overlap*.
+> The watch face clock is painted by the system on top of the app; both are lit pixels, and
+> no pixel check tells them apart. The school button sitting underneath the time was found
+> by looking at the screenshots, not by the checker. Look at the captures.
+>
+> **The shortcut that does not work — do not repeat it.** Forcing the small AVD to the
+> larger size with `adb shell wm size 454x454` looks like it should do the job. It does not.
+> The corner overlay is computed once for the panel the device was created with, so after
+> the resize the mask sits at the wrong radius and paints **straight vertical cuts** through
+> the text — "2:54 A|M" and so on. A round display cannot produce a straight vertical edge,
+> so those artefacts are the stale mask rather than the app, and the capture is not evidence
+> of anything. The answer is a second AVD on a genuine `wearos_large_round` profile, which
+> `wear-verify.sh` now creates.
+>
+> **Residual, stated plainly.** On the *192dp* watch at font scale 1.3, scrolled to the very
+> bottom of the times list, the first line of the watch disclaimer passes under the clock.
+> Nothing is unreachable — one flick up shows it in full — and it is body text rather than a
+> control. It is not fixable by padding: at the scroll extreme the list is anchored from
+> below, and at that size and font the content is simply taller than the glass. 227dp is
+> clear at both font scales.
 
 Two Wear hypotheses worth *not* worrying about: tiles and complications are **not** required
 for approval, and rotary-input support stopped being a requirement in February 2024.
