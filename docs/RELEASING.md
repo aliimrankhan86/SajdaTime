@@ -155,43 +155,49 @@ network are reported to collapse into a single counted tester.
 a build has been uploaded and rolled out, and a link sent early is a link that fails for
 everyone who tries it first.
 
-### If 12 testers cannot be found — the fallback, and it is a real one
+### If 12 testers cannot be found — there is no way round it
 
-Asked directly, and worth knowing **before** the recruiting starts, because the fear of this
-rule is worse than the rule.
+Asked directly. The short answer is that **the closed test is unavoidable**, and the longer
+answer is a correction, because the obvious escape route does not exist.
 
-**Nothing bad happens.** Google's documentation sets no deadline, no expiry and no penalty for
-never completing the requirement. The app sits where it is indefinitely. What gets disabled is
-narrow and specific:
+**Nothing bad happens if it never completes.** Google's documentation sets no deadline, no
+expiry and no penalty. The app sits where it is indefinitely, and the listing is not at risk.
 
-> "Certain features in Play Console, such as Production (Test and release > Production) and
-> Pre-registration (Test and release > Testing > Pre-registration), will be disabled until
-> developers meet these requirements."
+> ### ⚠️ Open testing is NOT a fallback. This document said it was, and that was wrong.
+>
+> The reasoning looked sound. Google's requirements page names exactly what gets disabled:
+>
+> > "Certain features in Play Console, such as Production (Test and release > Production) and
+> > Pre-registration (Test and release > Testing > Pre-registration), will be disabled until
+> > developers meet these requirements."
+>
+> Open testing is not in that list. Its own help page says *"users can find your test app on
+> Google Play"*, with no tester list and unlimited testers — which reads like public
+> distribution without the 12-tester rule.
+>
+> **The Console disagrees, and the Console is what actually decides.** The Open testing track
+> on this app carries a padlock and one sentence:
+>
+> > "Open testing is available when you have production access. To learn what you need to do
+> > before you can apply for production, visit the Help Centre."
+>
+> Confirmed on a forced reload, not a stale render. So open testing sits *behind* production
+> access, which sits behind the closed test. Google's own documentation and Google's own
+> product contradict each other here, and the product wins.
+>
+> **The lesson, since this is the second time it has been paid for:** when a question is about
+> what the Console will let you do, open the Console. A support page describes policy, not the
+> button state on this account. See §15 lesson 26 in `docs/HANDOVER.md` — recommending from a
+> list nobody read is the same mistake in a different costume.
 
-Internal and closed testing are not gated. **Neither is open testing** — and that is the
-fallback. Google's own page on open tracks:
+The other documented exemption is an **organisation account**, which is not subject to the
+rule at all. Noted so nobody has to re-discover it, not recommended: it needs a registered
+business and a D-U-N-S number, and the app would have to be transferred.
 
-> "users can find your test app on Google Play"
-
-For a new app an open test is discoverable in Play Store search, **anyone** can join with no
-tester list and no invitations, and the tester count is unlimited by default. So this app can
-be publicly installable worldwide without the 12-tester requirement ever being met. For an app
-whose entire purpose is reach, that is most of what production provides.
-
-Honest about the cost: an open test carries early-access positioning, gets less promotional
-surface than production, and cannot be featured. It is a worse shop window, not a locked door.
-Choosing it does not burn the production route — closed testing stays available, so the
-12-tester clock can be started later.
-
-The other documented exemption is an **organisation account**, which is not subject to this
-rule at all. It is noted for completeness and not recommended: it needs a registered business
-and a D-U-N-S number, and the app would have to be moved. That is a large amount of work to
-avoid asking twelve people a favour.
-
-**And twelve is easier than it sounds for this app in particular.** Testers do not need to be
-technical, or strangers, or know what a beta is — they need an Android phone and to want
-prayer times, which describes nearly everyone this would be sent to. One mosque WhatsApp group
-is twelve people.
+**So the only route is twelve real people, and that is more achievable than it sounds for this
+app in particular.** Testers do not need to be technical, or strangers, or know what a beta
+is — they need an Android phone and to want prayer times, which describes nearly everyone this
+would be sent to. One mosque WhatsApp group is twelve people.
 
 > **Avoid the free tester-swap communities**, where developers install each other's apps. They
 > are legitimate, unlike the paid services warned about above, and they are still the wrong
