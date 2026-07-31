@@ -18,10 +18,10 @@ SajdaTime: Prayer Times, Qibla
 ## Short description (max 80)
 
 ```
-Offline prayer times and Qibla compass for Sunni and Shia. No tracking.
+Offline prayer times (namaz) and Qibla compass for Sunni and Shia. No tracking.
 ```
 
-`71 / 80`
+`79 / 80`
 
 ### Do not put "Free" or "No ads" back
 
@@ -53,7 +53,7 @@ Rejected, and why:
 | `… No ads, no accounts, no tracking.` (73) | Safe, but leaves seven characters unused and says nothing a dozen other apps do not |
 | `… for Sunni and Shia. Private by design.` (77) | "Private by design" is marketing abstraction. `CLAUDE.md` requires this app to work for someone who has never changed a setting and may not read English well; "no ads, no tracking" is concrete and survives translation, "private by design" does not |
 | Adding *Adhan* for search volume | The app plays a **user-chosen** sound, not a bundled recitation. It would be a keyword that over-promises |
-| Adding *Namaz* / *Salah* for search volume | Keyword stuffing in an English sentence, and Play flags that separately |
+| Adding *Namaz* / *Salah* for search volume | ~~Keyword stuffing in an English sentence, and Play flags that separately~~ — **this was later reversed for `namaz` only.** See "Why *namaz* went in after all" below |
 
 `no accounts` was the item dropped from the trust triad — it is the least sharp of the
 three and is still in the full description.
@@ -83,8 +83,9 @@ they trust the developer's own sentence — the same argument that retired `Free
 still appears in the full description's second line, where the metadata policy is content
 for it to be.
 
-The freed characters were deliberately **not** spent. At `71 / 80` every word is doing work,
-and nine unused characters are not a debt to be paid off with a keyword.
+The freed characters were deliberately not spent *at the time*. They were spent later, on
+`(namaz)` — see the next section, which is the argument for why that is not the keyword
+stuffing this paragraph was guarding against.
 
 **Confirmed cleared.** After saving with `No ads` removed and reloading the page from the
 server, the notice is gone — checked by searching the rendered page for both "may not be
@@ -99,6 +100,35 @@ If the notice ever comes back after an edit, the method is the thing to reuse ra
 the answer: change one candidate phrase, save, reload, and re-read. It does not re-evaluate
 live, so a notice still on screen after an edit means nothing until the round trip.
 
+### Why *namaz* went in after all
+
+**Play has no keyword field.** It indexes the app name, the short description and the full
+description, and nothing else. So a word that is not in one of those three places is a word
+this app cannot be found by, and the short description is one of only three chances.
+
+`namaz` is the everyday word for the five daily prayers across South Asia, Turkey, Iran,
+Central Asia, Afghanistan and the Balkans — several hundred million Muslims, a large share of
+whom type it in Latin script into an English-language Play search. Before this edit, a search
+for "namaz time" matched nothing in this listing at all. That is not a marketing loss, it is
+a reachability one, and reach is the entire point of a *sadaqah jariyah* app.
+
+The earlier objection was keyword stuffing, and it was a fair objection to the thing it was
+aimed at — a bare list of synonyms bolted onto the end of a sentence. A parenthetical gloss
+immediately after the English term is a different construction: it reads as a translation
+aid, because that is what it is. `CLAUDE.md` requires this listing to work for a user who
+does not read English well, and for that reader the gloss is the *most* useful word in the
+line, not decoration around it.
+
+Only `namaz` went in. `salah` and `salat` did not, for two reasons: there is no room left at
+`79 / 80`, and both already appear in the full description's fourth line — *"Whether you call
+them namaz, salah or salat, these are the same five daily prayers"* — which Play indexes
+just as it indexes this one. Putting all three here would have bought nothing and cost the
+sentence its readability.
+
+**Checked, not assumed:** after saving, the page was reloaded from the server and searched
+again for "may not be promoted" and "price or promotion". Neither is present. A language word
+is not a promotion word, which was the open question and is now closed.
+
 ---
 
 ## Full description (max 4000)
@@ -109,15 +139,19 @@ That is all it does, and it does it without ads, without an account, and without
 
 Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
 
+Whether you call them namaz, salah or salat, these are the same five daily prayers.
+
 WHAT YOU GET
 
 • The five daily prayers plus sunrise, worked out for wherever you are
+• The Hijri date alongside the ordinary date, with the Islamic month names built in
 • A live countdown to the next prayer
 • A Qibla compass corrected to true north, not magnetic north
 • Notifications at each prayer time, even when the app is closed
-• An optional alarm mode with a sound you choose, loud enough to wake you for Fajr
+• An optional alarm mode using any tone or adhan already on your phone, loud enough for Fajr
 • An optional quiet badge in the notification shade showing the next prayer
 • A printable PDF timetable for today, the next seven days, or the whole month
+• During Ramadan it doubles as a sehri and iftar timetable: Fajr ends sehri, Maghrib opens your fast
 • A Wear OS app and watch tile that work on their own, with or without your phone
 • Light and dark themes, following your phone or set by hand, both checked for readability
 
@@ -136,7 +170,7 @@ Sunni and Shia conventions are both supported properly, not as an afterthought.
 
 YOUR PRIVACY IS NOT THE PRICE
 
-Most free prayer apps are funded by advertising, which means your data pay for them.
+Most free prayer apps are funded by advertising, which means you pay with your data.
 This one is not paid for at all.
 
 • No adverts, ever
@@ -163,7 +197,7 @@ as an ongoing charity for the Ummah.
 Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-`3,019 / 4000`
+`3,299 / 4000`
 
 ### This block is now a copy of the Console, not the other way round
 
@@ -179,21 +213,30 @@ this file was wrong about all four, so it has been overwritten with the live tex
 | "…of artificial intelligence and it may get things wrong." | "…of artificial intelligence, and it may get things wrong." |
 | "…my parents in your duas." | "…my parents in your duas. **JazakAllah Kher.**" |
 
-The character count in this file was also stale — it read `2,977` while the live text is
+The character count in this file was stale too — it claimed `2,977` when the live text was
 `3,019`. Treat a count written by hand as decoration.
 
 **Verify this file against the Console before trusting it**, rather than pasting from it and
-assuming. The check is cheap: hash the textarea in the browser and hash the fenced block
-here, then compare. A store listing that only exists correctly in a web form is one
-accidental Discard away from being lost.
+assuming. A store listing that only exists correctly in a web form is one accidental Discard
+away from being lost.
 
-**One phrasing worth a second look, not a blocker.** *"which means your data pay for them"*
-treats *data* as a plural noun. That is defensible, but it reads as a typo to most people,
-and `CLAUDE.md` requires this listing to work for someone who does not read English well.
-The version this file used to hold — *"which means paid for by your data"* — repeats
-"paid for" on purpose, which is what makes the point land: these apps are not free, you are
-simply paying with something other than money. Changing it is the owner's call; it is style,
-not correctness, and nothing else depends on it.
+**The check that is actually used**, because "read them side by side" does not work at three
+thousand characters and this file has now proved that twice. The browser is asked for the
+textarea's length *and* a djb2-xor hash of it; the text is then pulled out in fixed 800-character
+slices, reassembled here, and the same two numbers recomputed. If both match, the fenced block
+above is the Console text byte for byte and not a careful-looking approximation of it. The
+slice boundaries are asserted at exactly 800 too, so a dropped or doubled chunk fails loudly
+rather than quietly shifting the text. Last run: `len=3299 hash=492342197`, both sides.
+
+**The *"your data pay for them"* phrasing is resolved.** It read as a typo — *data* as a plural
+noun is defensible but not what most readers expect, and `CLAUDE.md` requires this listing to
+work for someone who does not read English well. It is now:
+
+> Most free prayer apps are funded by advertising, which means you pay with your data.
+
+Same length, and it fixes more than the grammar: the old sentence made the reader a bystander
+watching their data change hands, and this one puts them in it. The point was never that data
+is valuable — it is that these apps are not free and the reader is the one paying.
 
 ---
 
@@ -201,12 +244,43 @@ not correctness, and nothing else depends on it.
 
 | Field | Value |
 |---|---|
+| App or game | App |
 | App category | Lifestyle |
-| Tags | Prayer, Islam, Religion, Compass, Offline |
+| Tags | Clock, alarm & timer · Lifestyle · Maps & navigation |
 | Contains ads | **No** |
 | In-app purchases | **No** |
 | Content rating | Everyone / PEGI 3 (answer the questionnaire honestly, nothing applies) |
 | Target audience | 13+ (not directed at children) |
+
+### Three tags, not five, and none of the obvious ones
+
+> **This table used to read `Prayer, Islam, Religion, Compass, Offline`. Not one of those five
+> tags exists.** They were written from intuition instead of from the picker. The list is
+> closed — Play offers a fixed set, you choose from it, and you cannot type your own.
+
+The full set was enumerated from the dialog: **171 tags, and there is no religion tag and no
+religion category.** The nearest thing in the entire list is `Religious text`, which belongs
+to Books & reference and would describe a Qur'an app, not this one. Lifestyle is where prayer
+apps actually sit, so that part was right by luck rather than by checking.
+
+**Tags are not search keywords.** The dialog says so in its own words: they affect how the app
+is grouped, placed and compared against its peers, not what it matches when someone searches.
+That is why the reach work went into the short description — the field that *is* indexed — and
+why it would be a mistake to treat this table as a second attempt at the same job.
+
+Five slots are allowed and three are used, deliberately. Because a tag decides which apps this
+one is measured against, a loose tag does not add a little reach — it drags the app into a peer
+group it will compare badly in. The three chosen each describe something the app genuinely is:
+
+| Tag | Why |
+|---|---|
+| `Clock, alarm & timer` | Times, countdown, notifications and alarm mode — the largest part of what it does |
+| `Lifestyle` | Matches the category, which is where prayer apps live |
+| `Maps & navigation` | The Qibla compass, which is real navigation and true-north corrected |
+
+**One Console behaviour worth knowing:** the tag dialog's **Apply** button saves immediately to
+the server. There is no second confirmation, and the page's own Save button is not involved.
+Anything changed in that dialog is live the moment it closes.
 
 ---
 

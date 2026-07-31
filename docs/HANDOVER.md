@@ -1300,18 +1300,34 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     - **The promotability notice is blue, advisory, and re-evaluated on save.** It cost two
       rounds: `Free.` first, then `No ads`. It does not block publishing — it costs
       eligibility to be featured — so it is easy to scroll past, and for an app with no
-      marketing that would be the wrong thing to scroll past. The short description now
-      reads `Offline prayer times and Qibla compass for Sunni and Shia. No tracking.`
-      (71 / 80) and **the notice is confirmed cleared** on a fresh load. Both words were
-      removed from the feature graphic in the same commits, since the Console validates form
-      fields and cannot read a PNG. Full reasoning and the rejected alternatives are in
-      `docs/store/LISTING.md`.
+      marketing that would be the wrong thing to scroll past. Both words were removed from the
+      feature graphic in the same commits, since the Console validates form fields and cannot
+      read a PNG. Full reasoning and the rejected alternatives are in `docs/store/LISTING.md`.
+    - **Tags save on `Apply`, immediately, with no confirmation** and without the page's own
+      Save button being involved. Anything changed in that dialog is live the moment it
+      closes. The tag list is also a *closed* set of 171 with no religion tag and no religion
+      category — see §15 lesson 26.
+    - **Save greys out when the form matches the server**, which makes it the cheapest
+      possible check that an edit actually landed. It is also how a lost edit was caught: see
+      §15 lesson 25.
 
-    **The next actual steps:** Store settings (category Lifestyle, tags, contact email
-    `aikstudies@gmail.com`), then the signing key — owner-only, `docs/RELEASING.md` Step 2,
-    and the one true blocker since both AABs on disk are unsigned — then Closed testing with
-    12 testers for 14 continuous days. The Wear OS screenshot slot only appears once the
-    Wear form factor is added, which happens at release time.
+    **The store listing is saved and clean, verified from a server reload**, not from the page
+    as left. Name `SajdaTime: Prayer Times, Qibla` (30 / 30); short description `Offline prayer
+    times (namaz) and Qibla compass for Sunni and Shia. No tracking.` (79 / 80); full
+    description 3,299 / 4,000; no field errors; **no promotability notice**, confirmed with
+    `namaz` present, which establishes that a language word is not a promotion word. Store
+    settings are done too — App, category **Lifestyle**, tags **Clock, alarm & timer ·
+    Lifestyle · Maps & navigation**, contact email set.
+
+    `docs/store/LISTING.md` now holds the live text **byte for byte**, proved by length and a
+    djb2-xor hash computed on both sides rather than by reading them side by side. That file
+    mirrors the Console; it never leads it.
+
+    **The next actual steps:** the signing key — owner-only, `docs/RELEASING.md` Step 2, and
+    the one true blocker since both AABs on disk are unsigned — then Closed testing with 12
+    testers for 14 continuous days. The Wear OS screenshot slot only appears once the Wear form
+    factor is added, which happens at release time; the 454 × 454 files are already waiting in
+    `docs/store/upload/wear-os/`.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
@@ -1626,13 +1642,31 @@ matters more than the stable hashes, that is the trade being made.
     nothing. When a regression is suspected, spend the five minutes to build the version
     without it — a before-and-after is cheap and it is the only answer that is not a guess.
     The same applies in reverse: do not assume unchanged behaviour is correct behaviour.
-25. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+25. **An edit staged into a web form is not saved work, and it can vanish between one message
+    and the next.** A five-character correction was typed into the Console's full description
+    and the on-page counter moved, which proves the framework saw it — and then a reload
+    showed the old text at the old length anyway. Whatever discarded it, the edit had never
+    existed anywhere but that page's memory. The signal that settles it costs nothing: **the
+    Console greys out Save when the form matches the server.** A disabled Save plus the
+    pre-edit character count is proof the edit is gone; an enabled Save is proof something is
+    still pending. Check the count *and* the button state after every save rather than
+    trusting that a save happened, and treat anything staged but unsaved as work that will
+    have to be done again. The counter proves the form heard you. Only the server proves it
+    kept it.
+26. **Do not recommend values from a fixed list you have not read.** Play's five tag slots
+    were filled in with `Prayer, Islam, Religion, Compass, Offline` — confident, obvious, and
+    not one of them a tag that exists. Play offers a closed set of 171 and you cannot type
+    your own; there is **no religion tag and no religion category** anywhere in it. The cost
+    was the owner opening the dialog to find nothing he had been told to look for. Whenever a
+    field is a picker rather than a text box, enumerate the options first and recommend from
+    the actual list. Plausibility is not availability.
+27. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-26. The owner is **not technical**. Explain in plain language, state what is verified versus
+28. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-27. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+29. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 
