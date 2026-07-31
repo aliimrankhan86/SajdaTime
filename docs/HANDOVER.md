@@ -1274,6 +1274,17 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
       so seeing superseded art in the picker is not a caching bug.
     - **"Some languages have errors" is not about translation.** Only en-GB exists; it is a
       roll-up of that one language's own missing-field errors.
+    - **The asset library has no delete, and this was checked, not assumed.** Every asset row
+      offers exactly three actions — Crop, Preview, View details — confirmed by reading the
+      page's accessibility tree, not by looking for a button. So superseded uploads accumulate
+      permanently and cannot be tidied up by anyone. This matters more than it sounds:
+      re-uploading a corrected asset leaves the **older, wrong version sitting at the top of
+      the picker under an identical filename**, and the thumbnails are too small to tell
+      apart. Always use **Upload** to push a fresh file; never re-pick by name from the
+      library. Clutter itself is harmless — only *assigned* assets publish.
+    - **The picker greys out assets with a 🚫 badge when they do not fit the field it was
+      opened from** — 9:16 phone screenshots look "broken" in the feature-graphic picker and
+      are not. It is eligibility, not corruption.
     - **The promotability notice is blue, advisory, and re-evaluated on save.** It cost two
       rounds: `Free.` first, then `No ads`. It does not block publishing — it costs
       eligibility to be featured — so it is easy to scroll past, and for an app with no
