@@ -712,6 +712,18 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
 
+**The header date line, verified both ways round.** On `sajdastore` the header reads
+`Fri 31 Jul · 17 Safar 1448`, captured from a running build rather than reasoned about.
+The RTL build was then run through `./gradlew installRtl` and, because the Hijri part came
+out as `Safar 1448 17` rather than `17 Safar 1448`, **the change was stashed and the previous
+version rebuilt and captured for comparison**. The baseline renders `Safar 1448 17` too, so
+the reordering is pre-existing pseudolocale behaviour on English text in an RTL paragraph and
+not a regression. That comparison is the only thing that could have answered the question —
+the rendering looks exactly like the bug `AppLocale.kt` documents, and reasoning about it
+would have concluded the wrong thing in either direction. Note for whoever ships the first
+RTL translation: with real Arabic month names and Arabic-Indic digits this is a genuine RTL
+run and behaves differently, so re-check it then rather than trusting this note.
+
 **Phone — verified working:** full onboarding · permission rationale · reverse geocoding
 ("Greater Manchester") · home screen times · PDF export (file pulled off the device and
 rendered — clean 31-day table matching the screen) · settings · the Shia switch changing
@@ -1605,13 +1617,22 @@ matters more than the stable hashes, that is the trade being made.
     an unpublished rule list is narrowed by **elimination**, so write the elimination order
     down *before* running it; `docs/store/LISTING.md` had already named `No ads` as the next
     suspect, which turned a second surprise into a second step.
-24. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+24. **A screenshot that looks like a known bug is not evidence that you caused it.** The
+    header date line rendered as `Safar 1448 17` under `installRtl`, which is precisely the
+    reordering `AppLocale.kt` warns about, and the obvious conclusion was that adding a
+    second date to that line had broken it. Stashing the change and rebuilding the previous
+    version showed the baseline doing exactly the same thing. The fix that would have been
+    written for a bug that was not there would have been real code, added permanently, for
+    nothing. When a regression is suspected, spend the five minutes to build the version
+    without it — a before-and-after is cheap and it is the only answer that is not a guess.
+    The same applies in reverse: do not assume unchanged behaviour is correct behaviour.
+25. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-25. The owner is **not technical**. Explain in plain language, state what is verified versus
+26. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-26. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+27. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

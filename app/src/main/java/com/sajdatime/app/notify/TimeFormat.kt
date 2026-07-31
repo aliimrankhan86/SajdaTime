@@ -6,6 +6,7 @@ import com.sajdatime.app.R
 import com.sajdatime.core.AppLocale
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -33,6 +34,29 @@ object TimeFormat {
         val pattern = if (DateFormat.is24HourFormat(context.applicationContext)) "HH:mm" else "h:mm a"
         return DateTimeFormatter.ofPattern(pattern, AppLocale.of(context))
             .format(instant.atZone(zone))
+    }
+
+    /**
+     * Calendar date without the year, e.g. "Thu 31 Jul".
+     *
+     * The pattern is asked for rather than written out. Field order is not universal —
+     * en-GB wants "Thu 31 Jul" and en-US wants "Thu, Jul 31" — and a hardcoded pattern
+     * would be wrong for one of them the moment a translation ships. The skeleton
+     * "EEEdMMM" names the fields wanted and lets the platform order and punctuate them
+     * for the locale.
+     *
+     * The locale is [AppLocale], not the device's, for the reason set out in AppLocale.kt:
+     * formatting in a language the app is not written in is what turned a Hijri date into
+     * "١٤٤٨ Safar ١٧" on an Arabic phone.
+     *
+     * No year, deliberately. The line answers "what is today", and the reader's own
+     * calendar already says which year it is; the Hijri year beside it is the one they are
+     * actually unsure of.
+     */
+    fun date(context: Context, date: LocalDate): String {
+        val locale = AppLocale.of(context)
+        val pattern = DateFormat.getBestDateTimePattern(locale, "EEEdMMM")
+        return DateTimeFormatter.ofPattern(pattern, locale).format(date)
     }
 
     /**

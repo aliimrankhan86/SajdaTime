@@ -193,14 +193,11 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
                     modifier = Modifier.size(20.dp),
                 )
             }
-            val hijri = hijriToday(now)
-            if (hijri.isNotBlank()) {
-                Text(
-                    text = hijri,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            Text(
+                text = dateLine(now),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
@@ -582,6 +579,35 @@ private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
     PrayerSlot.ASR -> Icons.Filled.Brightness5
     PrayerSlot.MAGHRIB -> Icons.Filled.Brightness6
     PrayerSlot.ISHA -> Icons.Filled.NightsStay
+}
+
+/**
+ * The header's date line, e.g. "Thu 31 Jul · 16 Safar 1448".
+ *
+ * Both dates, and no setting to choose between them. This screen used to show the Hijri
+ * date alone, which is the one date the phone's own clock cannot give a Muslim user — but
+ * it left everyone who reads a Gregorian date with nothing on the screen to anchor to,
+ * since the only other reference was the word "Today". Showing both costs one line.
+ *
+ * A toggle was considered and rejected. `CLAUDE.md` requires this app to work for someone
+ * who has never opened Settings, and a preference only helps the people who go looking for
+ * it; the ones most likely to be confused by an unfamiliar calendar are exactly the ones
+ * who never will. Two dates on one line is not clutter that needs an escape hatch.
+ *
+ * Falls back to the ordinary date alone if the Hijri date cannot be produced, rather than
+ * showing nothing — which is what the old code did on the same failure.
+ */
+@Composable
+private fun dateLine(now: Instant): String {
+    val context = LocalContext.current
+    // Keyed on the calendar date for the same reason hijriToday is: this header sits
+    // beside a live countdown and recomposes about once a second, and building a
+    // DateTimeFormatter that often to render a string that changes at midnight is waste.
+    val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
+    val gregorian = remember(context, date) { TimeFormat.date(context, date) }
+    val hijri = hijriToday(now)
+    return if (hijri.isBlank()) gregorian
+    else stringResource(R.string.home_date_line, gregorian, hijri)
 }
 
 /**

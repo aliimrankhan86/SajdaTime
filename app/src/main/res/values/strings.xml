@@ -210,6 +210,12 @@
       renders the date as "16 2 1448". Listing them also makes them translatable.
     -->
     <string name="hijri_date_format">%1$d %2$s %3$d</string>
+    <!--
+      The header's date line: ordinary date, then Hijri. A separate string because the
+      separator is not universal punctuation — a translation may want a comma, a dash, or
+      to swap the order outright, and none of that should need a code change.
+    -->
+    <string name="home_date_line">%1$s · %2$s</string>
     <string-array name="hijri_months">
         <item>Muharram</item>
         <item>Safar</item>
