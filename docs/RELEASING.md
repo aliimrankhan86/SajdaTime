@@ -564,12 +564,67 @@ possible answer to that suspicion.
    own — `libandroidx.graphics.path.so` (Compose) and `libdatastore_shared_counter.so`
    (DataStore). There is no native code of ours, so there is nothing to symbolicate.
 
-7. ⬜ **Press "Submit 15 changes for review"** on **Publishing overview**. Everything is
-   staged and the button is live; nothing has been sent to Google yet. This is deliberately
-   left to the owner — see "Can an assistant fill the Play Console in for you?" below.
-   Managed publishing is **off**, so approval publishes straight to the closed track.
+7. ✅ **DONE, 31 Jul 2026** — the owner pressed **"Submit 15 changes for review"** on
+   **Publishing overview**. Managed publishing is **off**, so approval publishes straight to
+   the closed track with no second button to press.
+
+   > Play runs automated pre-checks before anything reaches a human — *"Running quick checks
+   > for commonly found issues… Up to 6 minutes remaining."* They passed with nothing
+   > flagged. **Submission activity** now records **Submission 1**, 15 changes, source *Play
+   > Console*, submitted **31 Jul 2026, 22:00**, status **In review**, covering `Closed
+   > testing - Alpha`, Store Listing, App Content and Store settings. The Publishing overview
+   > heading changed from *"Changes not yet submitted for review"* to *"Changes in review"*.
+   >
+   > The submission-details page is a receipt, not a form: there is nothing on it to press
+   > and nothing on it changes until Google decides. **Do not edit the store listing,
+   > screenshots or any App content answer while it is in review** — each edit becomes a new
+   > pending change and can put you back in the queue.
+   >
+   > Editing the *tester email list*, by contrast, is safe and creates no pending change:
+   > the list went from 13 to 15 addresses after submission and the Publishing overview
+   > still showed only *"Changes in review"*, with no new section to submit. Verified by
+   > scrolling the whole page, not by assuming.
+
 8. ⬜ Share the opt-in link — **only once the release is live** — and wait out the 14 days.
    `https://play.google.com/apps/testing/com.sajdatime.app`
+
+   > **Google sends testers nothing.** No invitation email, no notification. Adding an
+   > address to the list only grants access; the person has no way to know the app exists
+   > until the owner messages them. Until the release is live the link does not work at all
+   > and the Console says so: *"The link will be shown here when you publish your app."*,
+   > with **Copy link** greyed out. Send it to everyone on the same day so the fortnight
+   > starts together.
+
+   A message that can be sent as-is:
+
+   > Assalamu alaikum. I've built a free prayer times and Qibla app called SajdaTime — no
+   > ads, no accounts, no tracking, and it works without internet. I need a few people to
+   > test it before Google will let me release it publicly.
+   >
+   > Two things, and it's only a couple of minutes:
+   >
+   > 1. Open this on your Android phone: https://play.google.com/apps/testing/com.sajdatime.app
+   > 2. Press "Become a tester", then install the app.
+   >
+   > One favour — please **leave it installed for two weeks** and open it now and then.
+   > Google checks that. If you uninstall it early it sets me back.
+   >
+   > If the link says you're not a tester, tell me which Gmail address is on your phone and
+   > I'll add it.
+   >
+   > JazakAllah khair.
+
+   The three ways it fails on the tester's phone, all of which look like a broken app:
+
+   - **"You're not a tester."** They are signed into a different Google account than the one
+     on the list. The address must be the Google account actually signed into the Play Store
+     on their phone — not a work address, not one they never use. Ask, add, done.
+   - **Opted in, but the app will not install.** Normal. It can take a few hours, sometimes
+     up to a day, to propagate. Tell them to retry later rather than conclude it is broken.
+   - **They install it and remove it a week later.** The expensive one. The count is of
+     testers who *stay* opted in for 14 consecutive days, so a late uninstall can drop the
+     count below twelve and restart the clock. This is why the target is twenty-plus rather
+     than exactly twelve.
 9. ⬜ Apply for production access, then **Production → Create release** and roll out.
 10. ⬜ Second release for the watch, once Play unlocks the Wear OS form factor — see below.
 
@@ -697,7 +752,8 @@ Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradl
 The developer account is **fully verified** — identity, phone and device checks have all
 passed — GitHub Pages is live, and **the store listing and store settings are saved and clean
 in the Console**, checked on a reload from Google's servers rather than from the page as left.
-Every App content declaration is green. Nothing is waiting on Google.
+Every App content declaration is green. Everything the owner can do has been done; the app
+is now **in review with Google**.
 
 Play's dashboard states the remaining path in four steps, and shows the app sitting on the
 first of them:
@@ -710,25 +766,29 @@ first of them:
 The closed testing track is otherwise set up: `Closed testing - Alpha` exists, all 177
 countries are targeted, and the feedback email is set.
 
-**As of 31 Jul 2026 both of the tasks that used to sit here are done.** The signing key
-exists, the build produces genuinely signed bundles, the tester list holds 13 addresses and
-is attached to the track, and the release is uploaded, named, annotated and saved. Play's
-own pre-submission checks raise **one warning** and it is a false alarm (missing debug
-symbols for two of Google's own native libraries).
+**As of 31 Jul 2026 every task that used to sit here is done, and the app is in review.**
+The signing key exists, the build produces genuinely signed bundles, the tester list holds
+**15** addresses and is attached to the track, the release is uploaded, named and annotated,
+and the whole lot was submitted at 22:00 as **Submission 1** (15 changes). Play's automated
+pre-checks passed with nothing flagged. The one warning raised earlier is a false alarm
+(missing debug symbols for two of Google's own native libraries).
 
-What is left is exactly one button and then a wait:
+**Nothing is waiting on the owner. It is waiting on Google.**
 
-1. ⬜ **Press "Submit 15 changes for review"** — Publishing overview. The button is live and
-   blue; the lock and the *"complete the required steps in the app dashboard"* message are
-   gone. This sends the release, the 176 countries, the tester list, the store listing and
-   all ten App content declarations to Google in one submission. **Left deliberately to the
-   owner.** Play also runs automated pre-checks first and will hold the submission until
-   they pass, so pressing it early is safe.
+1. ⏳ **Google's review.** Publishing overview reads *"Your changes are now in review. We may
+   find additional issues when reviewing your app."* Google's own guidance is up to 7 days,
+   and a first submission from a new personal account tends to sit at the slower end. The
+   verdict arrives by email to the account the Console is registered to — **check spam**.
+   While it is in review, do not edit the listing, the screenshots or any App content answer.
 2. ⬜ **Twelve testers actually opting in** (Step 0) — the long pole, and the one thing that
    cannot be shortened. The opt-in link does not exist until the release is live, so this
    clock has not started. Recruit roughly 25: the count is of testers who *stay* opted in for
    14 consecutive days, and Google's rejection email leads with *"Testers were not engaged
    with your app"*, so they have to use it, not merely accept the invitation.
+
+   Building the list is the one useful thing that can be done *during* the review — it
+   creates no pending change and does not disturb the submission. See Step 8 for the
+   message to send and the three ways it fails on the tester's phone.
 
 Everything else is done and in the repo: the live privacy policy, the store screenshots, the
 icon, the feature graphic, all the listing text, and the Gradle signing wiring.

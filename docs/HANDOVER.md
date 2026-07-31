@@ -1367,11 +1367,13 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Blocker for release
 
-> **Read this first — 31 Jul 2026.** The signing key is **done**, the release is **uploaded
-> and staged**, and the only Play step left is the owner pressing **"Submit 15 changes for
-> review"**. The two paragraphs below are kept because their account and listing facts are
-> still true, but where the first one says the key is the only outstanding item, it is out of
-> date. See item 1 below and `docs/RELEASING.md`.
+> **Read this first — 31 Jul 2026.** The signing key is **done**, and the release has been
+> **submitted and is now in review with Google**: Submission 1, 15 changes, submitted 31 Jul
+> 2026 22:00, Publishing overview reading *"Changes in review"*. **Nothing in the Console
+> needs pressing.** The next event is Google's verdict by email, and after that the
+> 12-testers-for-14-days clock. The two paragraphs below are kept because their account and
+> listing facts are still true, but where the first one says the key is the only outstanding
+> item, it is out of date. See item 1 below and `docs/RELEASING.md`.
 >
 > **Play Store status at a glance.** Developer account created (personal, ID
 > 6284685113064492750, developer name "Ali Imran Khan"). Android-device check **passed**.
@@ -1405,9 +1407,10 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
    recoverable if lost. **An agent must still never generate, hold, or see it.**
    `keystore.properties`, `*.jks` and `*.keystore` remain gitignored.
 
-   The single remaining Play blocker is now one button — **"Submit 15 changes for review"**
-   on Publishing overview — which is deliberately the owner's to press, and after it the
-   12-testers-for-14-days clock. See `docs/RELEASING.md` "What is genuinely blocking".
+   The owner pressed **"Submit 15 changes for review"** on 31 Jul 2026. Play's automated
+   pre-checks passed with nothing flagged and the submission is now with Google's reviewers.
+   What remains is Google's verdict and then the 12-testers-for-14-days clock. See
+   `docs/RELEASING.md` "What is genuinely blocking".
 
 ### Not done, in rough priority order
 
@@ -1989,6 +1992,15 @@ matters more than the stable hashes, that is the trade being made.
     created cannot fail. Absence of an error is not evidence of an action. When a build step
     is conditional on a file, verify the *artefact* — see §10, "The first genuinely signed
     release build" — not the exit code.
+
+35. **Google never tells your testers anything. You do.** Adding an address to a closed-test
+    email list sends that person no email, no notification and no prompt of any kind. They
+    find out the app exists only because the developer messages them the opt-in link, and
+    the link itself does not exist until the release is live — the Console shows *"The link
+    will be shown here when you publish your app."* with **Copy link** greyed out. This is
+    the most common reason a closed test sits at `0 testers currently opted in` while the
+    developer believes invitations went out. A ready-to-send tester message, and the three
+    ways it goes wrong on the tester's phone, are in `docs/RELEASING.md` Step 8.
 
 ---
 
