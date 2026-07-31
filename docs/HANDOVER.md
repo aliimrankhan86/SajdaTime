@@ -724,6 +724,11 @@ would have concluded the wrong thing in either direction. Note for whoever ships
 RTL translation: with real Arabic month names and Arabic-Indic digits this is a genuine RTL
 run and behaves differently, so re-check it then rather than trusting this note.
 
+That re-check has since been done under a real RTL locale rather than the pseudolocale, and
+it moved two of the paragraphs below from reasoning to measurement — including one that was
+the wrong way round. Read "The pseudolocale hides the answer it is being asked for" later in
+this section **before** changing anything about how times or dates are laid out in RTL.
+
 **Phone — verified working:** full onboarding · permission rationale · reverse geocoding
 ("Greater Manchester") · home screen times · PDF export (file pulled off the device and
 rendered — clean 31-day table matching the screen) · settings · the Shia switch changing
@@ -989,6 +994,56 @@ the order and padding turned out to be an exact mirror. Three of this project's 
 `MP 1:16` on those screens is `PM` reversed — Android's ICU pseudolocale reverses Latin
 text it supplies itself. That is a useful tell: anything that comes out reversed came from
 the platform, not from `strings.xml`, so the meridiem will localise on its own.
+
+#### The pseudolocale hides the answer it is being asked for — point `rtl` at a real locale
+
+The paragraph above, and the one before it about Arabic month names, were **reasoning**. The
+pseudolocale cannot confirm either of them, because `ar-XB` reverses Latin characters
+outright, and character reversal is not something any real locale does. Everything mangled
+therefore looks equally mangled, and the interesting question — *which of these would still
+be wrong with a genuine RTL language?* — is exactly the one it cannot answer.
+
+It can be answered, cheaply and in about two minutes, by temporarily pointing the same build
+type at a **real** RTL locale that has no translation in the app. `ur` was used, because
+Urdu is right-to-left *and* keeps a Latin `AM`/`PM` in CLDR, so it exercises the worst case:
+
+```bash
+# app/src/rtl/res/values/strings.xml — temporarily, then put ar-XB back
+<string name="app_language_tag">ur</string>
+```
+
+What that showed on the phone emulator, and it is not what the notes above predicted:
+
+| Under real `ur` | Result |
+|---|---|
+| Prayer times | `AM 2:54`, `PM 1:16` — **not** reversed, and correctly placed |
+| Gregorian half of the header | `جمعہ، 31 جولائی` — localised on its own |
+| Hijri half of the header | `Safar 1448 17` — still wrong |
+| Warning-card sentence | `.minutes late. Tap to allow` — full stop still stranded |
+
+Three things follow, and the first is the one that matters.
+
+**`AM 2:54` is correct, not broken.** It looks wrong to an English eye and it is not. The
+logical string is `2:54 AM`; the paragraph is RTL; a reader starting at the right edge reads
+`2:54` first and `AM` second, which is the order it was written in. Unicode bidi put the
+first logical run at the right-hand end because that is where an RTL reader begins. Anyone
+who "fixes" this with a bidi isolate will be moving `AM` to the far side of the line *from*
+the correct position, and the English-looking result will be the wrong one. Do not do it.
+
+**The residual scrambling is precisely and only the strings the app supplies in English.**
+The Gregorian date localised without a code change, which is `getBestDateTimePattern` and
+`AppLocale` working as §5.11 says they do. The Hijri date did not, and now the reason is
+narrowed to one thing rather than assumed: its month names come from the app's own string
+array (`HomeScreen.kt`, and the comment there says so), so they stay English, stay a strong
+LTR run, and get reordered around the two numbers. That confirms the claim above — the Hijri
+date comes right when its month names arrive in the same language as the date — and it
+confirms it by measurement instead of by argument.
+
+**Leave the build type on `ar-XB`.** The `ur` pin is a diagnostic to reach for deliberately
+and revert, never something to commit. `ar-XB` is reserved and no real phone can be set to
+it, which is the property that stops the `rtl` build type from ever being mistaken for, or
+promoted into, a translation — read the comment at the top of that strings file. `ur` is a
+real language tag and would throw that safety away for no gain.
 
 **Not tested:** onboarding was not re-run under `rtl` (it is prose with no numbers, and its
 Bismillah is strong-RTL and already verified in §10); the PDF and the tile were not
@@ -1419,6 +1474,8 @@ Every one of these cost real time. Read before building.
 | **`org.json` in unit tests** | Every call throws "Stub!" | `testImplementation(libs.json)` puts a real implementation on the test classpath |
 | **Name clash** | `android.provider.Settings` vs `Icons.Outlined.Settings` | `import android.provider.Settings as SystemSettings` |
 | **`avdmanager`** | Cannot see system images through a symlinked `cmdline-tools` | Copy `cmdline-tools/latest` into `$ANDROID_HOME` as a real directory |
+| **Unscoped `installDebug`** | `INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000`, or the phone emulator silently running the watch build | Both modules share one `applicationId`, so the root task installs `:wear` **over** `:app`. Scope it: `:app:installDebug` / `:wear:installDebug`. To recover: `adb uninstall com.sajdatime.app`. To check which is installed: `adb shell cmd package resolve-activity --brief com.sajdatime.app`. See §15 lesson 28. |
+| **`sed -i.bak` inside `res/`** | `Resource and asset merger: The file name must end with .xml` | The backup file is itself a resource. Edit resources with a tool that does not drop siblings, or write the backup outside `res/`. |
 
 ### The architecture PDF is generated, never hand-made
 
@@ -1671,13 +1728,38 @@ matters more than the stable hashes, that is the trade being made.
     was the owner opening the dialog to find nothing he had been told to look for. Whenever a
     field is a picker rather than a text box, enumerate the options first and recommend from
     the actual list. Plausibility is not availability.
-27. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+27. **A pseudolocale cannot answer the question a pseudolocale is used to ask.** `ar-XB`
+    reverses Latin characters, which no real language does, so under it every English run
+    looks equally broken and there is no way to tell which ones would survive a genuine
+    translation. Two claims in §10 had been resting on that — the meridiem "will localise on
+    its own", the Hijri date "will reorder correctly in Arabic" — and both were argument, not
+    evidence. Pointing the same build type at a **real** RTL locale with no translation
+    (`ur`, chosen because it is RTL *and* keeps a Latin `AM`/`PM`) settled both in about two
+    minutes, and part of the answer was the opposite of what it looked like: `AM 2:54` is the
+    *correct* rendering, because an RTL reader starts at the right and therefore reads `2:54`
+    first. The English-looking "fix" would have been the bug. When a test harness deliberately
+    exaggerates, it is telling you where to look and not what you will find — go and get the
+    unexaggerated case before concluding anything, and revert the pin afterwards, because
+    `ar-XB` being un-settable is the property that stops the `rtl` build type from ever being
+    mistaken for a translation.
+28. **`./gradlew installDebug` at the root installs the watch app over the phone app.** Both
+    modules share one `applicationId` — which is required, it is how Play pairs a Wear app
+    with its phone app — so on any single device they are the same package and the last one
+    written wins. The watch module is written last, its `versionCode` is 1000 against the
+    phone's 2, and the next `installDebug` then dies with
+    `INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000`. The
+    phone emulator sits there running the watch build, which on a phone-shaped screen is not
+    obviously the wrong app. Always scope the task — `:app:installDebug`, `:wear:installDebug`
+    — and if a device is already in that state, `adb uninstall com.sajdatime.app` first.
+    `adb shell cmd package resolve-activity --brief com.sajdatime.app` names the launcher
+    activity and settles which of the two is actually installed in one line.
+29. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-28. The owner is **not technical**. Explain in plain language, state what is verified versus
+30. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-29. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+31. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

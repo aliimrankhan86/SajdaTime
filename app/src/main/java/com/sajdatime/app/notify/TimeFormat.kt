@@ -29,6 +29,12 @@ object TimeFormat {
      * the app into "13:10" for users who had always seen "1:10 pm". The application
      * context is deliberately left unpinned so this one question can still be put to the
      * device.
+     *
+     * Do **not** wrap the result in a bidi isolate to "fix" right-to-left. Under a real RTL
+     * locale this renders as `AM 2:54`, which looks wrong and is right: the paragraph reads
+     * from the right, so the run an RTL reader meets first is `2:54`, exactly as written.
+     * Isolating it would move the meridiem to the side it does not belong on. Measured under
+     * `ur`, not argued — docs/HANDOVER.md §10, "The pseudolocale hides the answer".
      */
     fun clock(context: Context, instant: Instant, zone: ZoneId = ZoneId.systemDefault()): String {
         val pattern = if (DateFormat.is24HourFormat(context.applicationContext)) "HH:mm" else "h:mm a"
