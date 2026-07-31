@@ -156,14 +156,13 @@ class SettingsRepository(private val context: Context) {
     }
 
     private fun Preferences.toAppSettings(): AppSettings {
-        val lat = this[Keys.LATITUDE]
-        val lng = this[Keys.LONGITUDE]
         return AppSettings(
             onboardingComplete = this[Keys.ONBOARDED] ?: false,
             sect = enumOr(this[Keys.SECT], Sect.SUNNI),
             madhab = enumOr(this[Keys.MADHAB], Madhab.SHAFII),
             method = enumOr(this[Keys.METHOD], CalcMethod.AUTO),
-            coordinates = if (lat != null && lng != null) Coordinates(lat, lng) else null,
+            // Range-checked rather than trusted: see Coordinates.orNull.
+            coordinates = Coordinates.orNull(this[Keys.LATITUDE], this[Keys.LONGITUDE]),
             cityName = this[Keys.CITY] ?: "",
             notifyFor = decodeNotifySet(),
             ongoingBadge = this[Keys.ONGOING] ?: true,

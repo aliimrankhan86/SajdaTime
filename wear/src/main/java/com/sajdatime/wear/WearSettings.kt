@@ -37,13 +37,13 @@ data class WearSettings(
 class WearSettingsStore(private val context: Context) {
 
     val settings: Flow<WearSettings> = context.dataStore.data.map { prefs ->
-        val lat = prefs[Keys.LATITUDE]
-        val lng = prefs[Keys.LONGITUDE]
         WearSettings(
             sect = enumOr(prefs[Keys.SECT], Sect.SUNNI),
             madhab = enumOr(prefs[Keys.MADHAB], Madhab.SHAFII),
             method = enumOr(prefs[Keys.METHOD], CalcMethod.AUTO),
-            coordinates = if (lat != null && lng != null) Coordinates(lat, lng) else null,
+            // Range-checked, not trusted. This store is written by SettingsSyncService,
+            // which has to be an exported component — see Coordinates.orNull.
+            coordinates = Coordinates.orNull(prefs[Keys.LATITUDE], prefs[Keys.LONGITUDE]),
             cityName = prefs[Keys.CITY] ?: "",
         )
     }

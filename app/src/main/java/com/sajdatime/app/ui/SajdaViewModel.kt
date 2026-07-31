@@ -108,9 +108,17 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             while (true) {
                 val now = Instant.now()
                 _state.update { it.copy(now = now) }
-                // Roll over to the next prayer (and next day) without a manual refresh.
-                val next = _state.value.next
-                if (next != null && !now.isBefore(next.at)) recalculate()
+                val snapshot = _state.value
+                // Roll over to the next prayer without a manual refresh.
+                val prayerPassed = snapshot.next?.let { !now.isBefore(it.at) } == true
+                // And roll over the day, which is *not* the same trigger. Between midnight
+                // and Fajr no prayer passes, so on the day-list alone this loop had nothing
+                // to fire on: an emulator left open and stepped to 01:00 was still showing
+                // the previous day's list, with Maghrib two minutes late. The header was
+                // already fixed for this (see hijriToday) and the times were not.
+                val dayChanged = snapshot.today
+                    ?.let { it.date != LocalDate.now(ZoneId.systemDefault()) } == true
+                if (prayerPassed || dayChanged) recalculate()
                 delay(1_000)
             }
         }

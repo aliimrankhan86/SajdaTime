@@ -52,7 +52,33 @@ enum class PrayerSlot {
 }
 
 /** Geographic position. Latitude/longitude in decimal degrees. */
-data class Coordinates(val latitude: Double, val longitude: Double)
+data class Coordinates(val latitude: Double, val longitude: Double) {
+    companion object {
+        /**
+         * The only way a stored or received pair should become a [Coordinates].
+         *
+         * Every reader of persisted settings goes through here, because not every writer
+         * is trusted. The watch's [SettingsSyncService][com.sajdatime.core.WatchSyncContract]
+         * listener has to be `exported` for Play Services to deliver Data Layer events at
+         * all, so any app on the same watch can also address it directly and hand over a
+         * payload. It can only write, never read — but writing a latitude of 999 into a
+         * prayer app means wrong times, and wrong times are the whole harm this app can do.
+         * Returning null instead degrades to "no location yet", which every screen already
+         * handles because a first run looks the same.
+         *
+         * It also covers the duller case of a settings file corrupted by a half-finished
+         * write, which needs no attacker at all.
+         *
+         * NaN fails every comparison including its own, so it falls out of the range check
+         * rather than needing a line of its own.
+         */
+        fun orNull(latitude: Double?, longitude: Double?): Coordinates? {
+            if (latitude == null || longitude == null) return null
+            if (latitude !in -90.0..90.0 || longitude !in -180.0..180.0) return null
+            return Coordinates(latitude, longitude)
+        }
+    }
+}
 
 /** The six daily time markers for one calendar day at one location. */
 data class DayPrayerTimes(

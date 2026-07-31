@@ -36,8 +36,15 @@
       allowBackup covers Android 11 and below. From Android 12 it stops cloud backup but
       not device-to-device transfer, so data_extraction_rules.xml shuts both off there.
     -->
+    <!--
+      Stated rather than left to the default. Cleartext is already off for targetSdk 28 and
+      above, but that is a default, and defaults are what a future library's merged manifest
+      quietly changes. The one request this app makes is HTTPS; saying so here means an
+      accidental http:// endpoint fails loudly instead of working.
+    -->
     <application
         android:allowBackup="false"
+        android:usesCleartextTraffic="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

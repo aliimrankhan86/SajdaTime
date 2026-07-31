@@ -69,8 +69,14 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
             while (true) {
                 val now = Instant.now()
                 _state.update { it.copy(now = now) }
-                val next = _state.value.next
-                if (next != null && !now.isBefore(next.at)) recalculate()
+                val snapshot = _state.value
+                val prayerPassed = snapshot.next?.let { !now.isBefore(it.at) } == true
+                // The day rolls over between midnight and Fajr, when no prayer passes and
+                // so nothing else here fires. Same bug as the phone, same fix — see
+                // SajdaViewModel.startClock for what it looked like on a running device.
+                val dayChanged = snapshot.today
+                    ?.let { it.date != LocalDate.now(ZoneId.systemDefault()) } == true
+                if (prayerPassed || dayChanged) recalculate()
                 delay(1_000)
             }
         }

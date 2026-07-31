@@ -145,7 +145,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (6 source files, 4 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
+**`:core`** (6 source files, 5 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
 
 | File | Contains |
 |---|---|
@@ -409,6 +409,12 @@ The alarm scheduler applies the same rule (`upcoming()` starts at `today.minusDa
 
 Sunrise is displayed but is **never** returned as "the next prayer" and is never notified.
 
+**The day list and the next prayer roll over on two different triggers, and both are
+needed.** The live clock recomputes when the next prayer passes *and* when the calendar
+date changes. They are not the same moment: between midnight and Fajr no prayer passes, so
+the prayer trigger alone left the "Today" list on the previous day's times for hours. See
+§10 for what that looked like on a running device.
+
 ### 5.9 Qibla
 Initial **great-circle bearing** to the Kaaba (21.4224779 N, 39.8251832 E), in degrees from
 **true** north. Magnetic declination comes from `android.hardware.GeomagneticField` (the
@@ -641,6 +647,14 @@ coordinates would still have been copied out when the user set up a new phone. B
 now also carry `android:dataExtractionRules="@xml/data_extraction_rules"`, which excludes
 every domain from `<cloud-backup>` and `<device-transfer>` alike.
 
+**The watch's Data Layer listener is the one door that has to stay open.**
+`SettingsSyncService` is `exported` because Play Services will not deliver events to it
+otherwise, so any app on the same watch can address it and hand over a settings payload.
+Write-only — there is no read path and no leak — but a bad payload means wrong prayer
+times. Enum fields were always safe; coordinates now go through `Coordinates.orNull`, which
+range-checks and degrades to "no location yet" rather than handing a latitude of 999 to the
+engine. See §10.
+
 Lint will complain that `dataExtractionRules` should be paired with `fullBackupContent`.
 Ignore it: it does not reason about `allowBackup="false"`, which already disables backup
 outright on every version `fullBackupContent` would apply to.
@@ -652,13 +666,14 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**53 unit tests, all offline and deterministic, 0 failures.**
+**57 unit tests, all offline and deterministic, 0 failures.**
 
 | Suite | Module | Tests | Covers |
 |---|---|---|---|
 | `PrayerEngineTest` | core | 17 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
 | `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
+| `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
 | `LocaleDisciplineTest` | core | 4 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11) |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
@@ -683,7 +698,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, 53 tests, 0 failures, lint informational-only, phone release
+Expected: BUILD SUCCESSFUL, 57 tests, 0 failures, lint informational-only, phone release
 APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties` is present).
 
 For Play, build bundles rather than APKs — `:app:bundleRelease :wear:bundleRelease`, which
@@ -944,6 +959,64 @@ Bismillah is strong-RTL and already verified in §10); the PDF and the tile were
 re-exported under it; `./tools/wear-verify.sh` was not re-run, because no shipped code
 changed — the diff is two build files and one resource that exists only in a build type
 that is never released. Verified instead that neither release bundle contains `ar-XB`.
+
+### Midnight rollover — a stale day list, found by stepping the clock
+
+Both apps drove their live clock off one trigger: recompute when the next prayer passes.
+That is correct for every hour of the day except the ones after midnight, when the next
+prayer is Fajr and nothing passes for hours. So an app left open across midnight kept
+showing the *previous* day's timetable until Fajr.
+
+Reproduced on the phone emulator with the app in memory, stepping the system clock rather
+than reasoning about it:
+
+| Clock | "Today" list showed | Should have been |
+|---|---|---|
+| 30 Jul, 23:50 | Sunrise 5:23, Asr 6:27, Maghrib 8:54 | correct for the 30th |
+| 31 Jul, 01:00 — *before the fix* | Sunrise 5:23, Asr 6:27, **Maghrib 8:54** | Sunrise 5:24, Asr 6:26, **Maghrib 8:52** |
+| 31 Jul, 01:00 — *after the fix* | Sunrise 5:24, Asr 6:26, Maghrib 8:52 | ✓ |
+
+**Maghrib was two minutes late**, which is the time a fasting person breaks their fast. The
+header was right the whole time, because `hijriToday` had already been fixed for exactly
+this and keys off the live clock — so the screen showed today's date above yesterday's
+times, and looked entirely plausible. The "Next" pill also vanished from the list, because
+the next prayer was no longer one of the rows being displayed; after the fix it is back on
+Fajr.
+
+Same defect and same fix on the watch, verified the same way: the list moved from Fajr
+2:53 am to 2:54 am across the boundary, where before it did not move at all.
+
+**Not covered by a test.** The trigger lives in a `ViewModel` loop with no test harness in
+this project (no Robolectric, no instrumented tests — §11). The evidence is the emulator
+run above. An instrumented test is the right home for it if Roborazzi ever lands.
+
+### Security review — what was looked at, and what was found
+
+A full pass over network, storage, logging, exported components and permissions. Findings
+were thin, which is itself the useful result:
+
+| Checked | Result |
+|---|---|
+| Network calls | Exactly one, `https://geocoding-api.open-meteo.com` in `CityLookup`, and only when the platform geocoder returns nothing. Sends the typed place name and nothing else — no identifier, no coordinates, no history. HTTPS, 12-second timeouts, connection closed in a `finally` |
+| Cleartext | Already blocked by the platform default at targetSdk 36; now declared explicitly with `usesCleartextTraffic="false"`, so a future merged manifest cannot quietly re-enable it |
+| Logging | **Zero** `Log.*`, `println`, `printStackTrace` or `System.out` in any shipped source file. Nothing to leak |
+| Exported components | Phone: the launcher activity only. Both receivers `exported="false"`, `FileProvider` `exported="false"` and scoped to `cache/exports/` — the generated PDFs and nothing else. Watch: the tile service, guarded by `BIND_TILE_PROVIDER`, and the Data Layer listener below |
+| `PendingIntent` flags | Every one is `FLAG_IMMUTABLE` |
+| Storage | Both DataStores are app-private by default. Cloud backup and device-to-device transfer both excluded explicitly (§8) |
+| Permissions | Five on the phone, two on the watch, each with a written reason in the manifest. No `ACCESS_FINE_LOCATION`, no background location, no `READ/WRITE_EXTERNAL_STORAGE` |
+| Third-party SDKs | None. No analytics, ads, billing, crash reporting or attribution library anywhere in `libs.versions.toml` |
+| Static `Context` fields | None |
+
+The one thing worth naming: **`SettingsSyncService` must be `exported`** and cannot be
+anything else, because Google Play Services delivers Data Layer events to it. Any app on
+the same watch can therefore address it directly and hand over a settings payload. It can
+only write, never read, so this is not a data-leak path — but a hostile or corrupt payload
+means wrong prayer times, which is the one real harm this app is capable of. Enum fields
+were already safe (`enumOr` falls back to a valid constant on any unrecognised string);
+coordinates were not, and a latitude of 999 would have gone straight to the engine. Both
+readers now go through `Coordinates.orNull`, which range-checks and degrades to "no
+location yet" — a state every screen already handles, because a first run looks the same.
+`CoordinatesTest` pins it, including NaN and infinity.
 
 ### Useful device-testing recipes
 
@@ -1370,13 +1443,23 @@ script after editing the markdown.**
     lands. The answer was to stop imitating a locale: a `rtl` build type has no locale
     folder, so there is nothing for either mechanism to misread. When a fixture keeps
     colliding with the tooling, it is usually pretending to be something it is not.
-19. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+19. **Two things that always happen together are not one trigger.** The live clock
+    recomputed when the next prayer passed, which covers every hour of the day except the
+    ones nobody was looking at: after midnight the next prayer is Fajr, nothing passes for
+    hours, and the "Today" list quietly stayed on yesterday — Maghrib two minutes late, on
+    the screen people use to break their fast. What made it survive is that it looked
+    right: the header had already been fixed for precisely this bug and keys off the live
+    clock, so the screen showed today's date above yesterday's times. A partial fix to a
+    bug class is more dangerous than none, because it removes the symptom that would have
+    led someone to the rest of it. When you fix a staleness bug, go and find every other
+    thing computed from the same stale input.
+20. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-20. The owner is **not technical**. Explain in plain language, state what is verified versus
+21. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-21. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+22. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 
