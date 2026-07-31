@@ -96,12 +96,10 @@ would be surprising; `tracking` is a privacy word, not a commercial one.
 ## Full description (max 4000)
 
 ```
-SajdaTime tells you when to pray and which way to face. That is all it does, and it does it
-without ads, without an account, and without sending your location anywhere.
+SajdaTime tells you when to pray and which way to face.
+That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
 
-Prayer times are calculated on your own phone, so the app keeps working on a plane, in a
-basement, or with no signal at all.
-
+Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
 
 WHAT YOU GET
 
@@ -114,7 +112,6 @@ WHAT YOU GET
 • A printable PDF timetable for today, the next seven days, or the whole month
 • A Wear OS app and watch tile that work on their own, with or without your phone
 • Light and dark themes, following your phone or set by hand, both checked for readability
-
 
 BUILT FOR YOUR SCHOOL OF THOUGHT
 
@@ -129,10 +126,9 @@ Sunni and Shia conventions are both supported properly, not as an afterthought.
   the sun never fully sets in summer
 • The Umm al-Qura Ramadan adjustment is applied automatically during Ramadan
 
-
 YOUR PRIVACY IS NOT THE PRICE
 
-Most free prayer apps are paid for by advertising, which means paid for by your data.
+Most free prayer apps are funded by advertising, which means your data pay for them.
 This one is not paid for at all.
 
 • No adverts, ever
@@ -142,30 +138,54 @@ This one is not paid for at all.
 • Your coordinates never leave your device — there is no server for them to go to
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
-If you would rather not share your location at all, you can type a city name instead and
-the app works exactly the same.
-
+If you would rather not share your location at all, you can type a city name instead, and the app works the same.
 
 HONEST ABOUT WHAT IT IS
 
 SajdaTime is a helper, not a religious authority. It was built with the help of artificial
-intelligence and it may get things wrong. If a time or a direction ever looks off, please
-check with your local mosque or someone qualified to advise you.
+intelligence, and it may get things wrong. If a time or a direction ever looks off, please check with your local mosque or someone qualified to advise you.
 
-Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source
-library, and are checked against independent reference timetables before each release.
-
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release.
 
 FREE, AND STAYING FREE
 
 There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely
 as an ongoing charity for the Ummah.
 
-Only one thing is ever asked in return: please remember me, my family, and my parents in
-your duas.
+Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-`2,977 / 4000`
+`3,019 / 4000`
+
+### This block is now a copy of the Console, not the other way round
+
+The two had **drifted**, and the Console was ahead. It was caught by hashing the live
+textarea and comparing it with this file, not by reading them side by side — at three
+thousand characters, eyes will not find a missing comma. Four real differences existed, and
+this file was wrong about all four, so it has been overwritten with the live text verbatim.
+
+| This file used to say | The Console actually says |
+|---|---|
+| "…are paid for by advertising, which means paid for by your data." | "…are funded by advertising, which means your data pay for them." |
+| "…a city name instead and the app works exactly the same." | "…a city name instead, and the app works the same." |
+| "…of artificial intelligence and it may get things wrong." | "…of artificial intelligence, and it may get things wrong." |
+| "…my parents in your duas." | "…my parents in your duas. **JazakAllah Kher.**" |
+
+The character count in this file was also stale — it read `2,977` while the live text is
+`3,019`. Treat a count written by hand as decoration.
+
+**Verify this file against the Console before trusting it**, rather than pasting from it and
+assuming. The check is cheap: hash the textarea in the browser and hash the fenced block
+here, then compare. A store listing that only exists correctly in a web form is one
+accidental Discard away from being lost.
+
+**One phrasing worth a second look, not a blocker.** *"which means your data pay for them"*
+treats *data* as a plural noun. That is defensible, but it reads as a typo to most people,
+and `CLAUDE.md` requires this listing to work for someone who does not read English well.
+The version this file used to hold — *"which means paid for by your data"* — repeats
+"paid for" on purpose, which is what makes the point land: these apps are not free, you are
+simply paying with something other than money. Changing it is the owner's call; it is style,
+not correctness, and nothing else depends on it.
 
 ---
 
