@@ -1210,7 +1210,7 @@ script after editing the markdown.**
 | `d9e31e3` | Brought the handover's own bookkeeping up to date |
 | `7d9cf89` | Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
 | `eb24f54` | Recorded the Kaaba commit's own hash in this table |
-| *(this)* | Made the app format in its own language rather than the device's, after running it on Arabic and Bengali phones and finding a scrambled Hijri date, an unreadable Qibla sentence and two numbering systems on one screen |
+| `a5cf7fa` | Made the app format in its own language rather than the device's, after running it on Arabic and Bengali phones and finding a scrambled Hijri date, an unreadable Qibla sentence and two numbering systems on one screen |
 
 ---
 
