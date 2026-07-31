@@ -54,6 +54,17 @@ android {
                 "proguard-rules.pro",
             )
         }
+
+        // `./gradlew installRtl` — a debug build that runs entirely right-to-left, for
+        // previewing what a translation into Arabic or Urdu will actually look like before
+        // one exists. See core/AppLocale.kt; docs/HANDOVER.md §10 has what it has caught.
+        create("rtl") {
+            initWith(getByName("debug"))
+            // :core has no rtl build type of its own and does not need one.
+            matchingFallbacks += "debug"
+            // The one difference from debug is src/rtl/res/values/strings.xml, which
+            // overrides core's app_language_tag. Read that file before changing this.
+        }
     }
 
     compileOptions {

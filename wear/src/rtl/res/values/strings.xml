@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The watch half of the phone's `rtl` build type. app/src/rtl/res/values/strings.xml carries
+  the full explanation, including the two neater-looking approaches that failed and must not
+  be tried again. Only in the `rtl` build type: never in debug, release or the AAB.
+
+  Worth having separately from the phone because the watch is where a mirrored row or a
+  longer string runs out of room first.
+-->
+<resources>
+    <string name="app_language_tag">ar-XB</string>
+</resources>

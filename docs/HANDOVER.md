@@ -168,6 +168,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
+| Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ar-XB` so `./gradlew installRtl` runs the whole app right-to-left. `:wear` has the same. Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it |
 
 **`:wear`** (8 source files, 2 test files)
 
@@ -901,7 +902,56 @@ text, so it should be untouched — that is reasoning, not evidence). No right-t
 *translation* has been tried, because none exists; what has been shown is that an
 English-only app on a right-to-left device now behaves, not that an Arabic build would.
 
+### Right-to-left, previewed before any translation exists — what `installRtl` found
+
+Pinning the app's formatting to its own language (§5.11) closed a real class of bug and cost
+one thing: the pseudolocales stopped reaching the app, so there was no longer any way to ask
+"will these screens survive right-to-left?" before a translation existed. The `rtl` build
+type gives that back — `./gradlew installRtl`, no device setting to change, no locale folder
+that could be mistaken for a translation.
+
+Run on both emulators. **Everything structural held**, which was not a foregone conclusion:
+
+| Checked | Result |
+|---|---|
+| Bottom navigation | mirrored — Settings right→left becomes Settings, Qibla, Times left→right |
+| Settings rows | icons move to the right, `AutoMirrored` chevrons flip to point left |
+| Theme chips (`FlowRow`) | mirrored exactly — order reversed, `start` padding moved to the right edge |
+| Prayer rows | time and name swap sides, nothing clipped or overlapped |
+| Qibla dial (`Canvas`) | **not mirrored** — needle, Kaaba mark, north triangle and tick marks all unchanged. This was the one that mattered: a mirrored Qibla compass would point people the wrong way |
+| Countdown, 52sp | one line |
+| Watch, 192dp | mirrored, nothing clipped |
+
+The residual scrambling that remains — the Hijri date reading `Safar 1448 17`, the Qibla
+subtitle ending `.away` on its own line — is the pseudolocale doing its job, not a defect.
+It is what a *Latin* word looks like inside a right-to-left paragraph. With Arabic month
+names and an Arabic sentence those runs are strong-RTL and reorder correctly; that was
+checked against the LTR build, which renders both correctly. It does mean the Hijri date is
+only right in Arabic once the month names are translated too — the date and its month name
+have to arrive in the same language.
+
+One false alarm worth recording, because it is the trap §15 warns about: the theme chips
+looked unmirrored until they were compared against the same screen in the LTR build, where
+the order and padding turned out to be an exact mirror. Three of this project's four
+"confirmed bugs" have now been errors in the test.
+
+`MP 1:16` on those screens is `PM` reversed — Android's ICU pseudolocale reverses Latin
+text it supplies itself. That is a useful tell: anything that comes out reversed came from
+the platform, not from `strings.xml`, so the meridiem will localise on its own.
+
+**Not tested:** onboarding was not re-run under `rtl` (it is prose with no numbers, and its
+Bismillah is strong-RTL and already verified in §10); the PDF and the tile were not
+re-exported under it; `./tools/wear-verify.sh` was not re-run, because no shipped code
+changed — the diff is two build files and one resource that exists only in a build type
+that is never released. Verified instead that neither release bundle contains `ar-XB`.
+
 ### Useful device-testing recipes
+
+```bash
+# Run the whole app right-to-left, without touching a device setting or shipping
+# a translation. Phone and watch both have the build type.
+./gradlew installRtl
+```
 
 ```bash
 # Both watch sizes, every screen, two font scales, plus the bezel check.
@@ -1064,12 +1114,12 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
       only English listed would show a picker with one entry.
     - An in-app language row, for phones below Android 13, which have no system picker.
 
-    **Cost of the locale pin, accepted knowingly:** pseudolocales (`en-XA`, `ar-XB`) — the
-    usual way to find text-expansion and RTL faults *before* translating — no longer reach
-    the app, because the pin overrides them. To exercise a layout in another language, add
-    the real `values-xx/` folder. The alternative was leaving the app scrambling its own
-    sentences on every non-English phone today, for the sake of a test that may never be
-    run.
+    **Previewing RTL before a translation exists:** `./gradlew installRtl`. The `rtl` build
+    type is `debug` plus one file, `app|wear/src/rtl/res/values/strings.xml`, which
+    overrides `app_language_tag` with `ar-XB`. The whole app then runs right-to-left with
+    Arabic date conventions on an otherwise untouched device — the same flip that happens
+    by itself the day `values-ar/` ships. It previews layout, not words: every string stays
+    English. §10 has what it found the first time it was run.
 
     ⚠️ **Do not machine-translate this app.** Prayer names, madhab names and the disclaimer
     are religious content, and Indonesian or Urdu speakers expect "Fajr", not a local
@@ -1307,13 +1357,26 @@ script after editing the markdown.**
     countdown reading `০২:১৮:১৯` directly above prayer times reading `2:50 AM`, on the same
     screen, from the same codebase, in the same locale. When two formatting paths exist,
     assume they disagree until a screenshot says otherwise.
-18. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+18. **A test fixture that pretends to be a translation gets treated as one.** Restoring the
+    RTL preview looked like a one-file job: a debug-only `values-ar-rXB/strings.xml`
+    declaring the language tag. Two platform mechanisms disagreed. `aapt2` pseudolocalises
+    the default strings at compile time and its generated value *beats* an explicit one, so
+    the tag arrived as the pseudolocalised text `‏‮en-GB‬‏` and parsed to no locale at all —
+    only visible by dumping the built APK's resource table, never from the source. And lint
+    reads any `values-ar*` folder as an Arabic translation and reported all 154 strings as
+    `MissingTranslation`; `tools:ignore` on that file does nothing, because lint raises the
+    error against the *default* file, not the translation. Every remaining fix disarmed the
+    one check that will actually matter the day a real, possibly incomplete `values-ar/`
+    lands. The answer was to stop imitating a locale: a `rtl` build type has no locale
+    folder, so there is nothing for either mechanism to misread. When a fixture keeps
+    colliding with the tooling, it is usually pretending to be something it is not.
+19. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-19. The owner is **not technical**. Explain in plain language, state what is verified versus
+20. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-20. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+21. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

@@ -75,6 +75,10 @@ session inherits it instead of relearning it.
 
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
+- **Before any layout change, check it right-to-left.** `./gradlew installRtl` runs the
+  whole app in RTL without a translation or a device setting. Roughly half the world's
+  Muslims read right-to-left, and the first Arabic or Urdu translation should not be the
+  moment anyone finds out whether the screens survive it.
 - **Run the phone and watch emulators together and compare them.** The worst bug in this
   project's history lived in the gap between two modules that were each individually correct.
 - **Verify against an independent reference, not your own reasoning.** Every real calculation

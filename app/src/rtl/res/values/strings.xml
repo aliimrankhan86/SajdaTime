@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Only in the `rtl` build type. Not in debug, not in release, not in the AAB, and it cannot
+  reach a user.
+
+  `./gradlew installRtl` gives a build that runs entirely right-to-left. AppLocale reads
+  app_language_tag and pins the whole configuration to it, so overriding the tag here turns
+  layout direction, digits and date formatting to Arabic conventions everywhere at once —
+  which is exactly what will happen on its own the day values-ar/ ships and an Arabic phone
+  resolves the tag to "ar". It previews that day. It is not a translation: every word stays
+  English, and the untranslated English is the point, since a Latin word inside an RTL line
+  is precisely what does not survive the trip.
+
+  ar-XB is a reserved pseudolocale that no real phone can be set to, so this can never be
+  mistaken for, or promoted into, an Arabic translation. CLAUDE.md requires a native speaker
+  for that, and nothing here is a step towards one.
+
+  Two neater-looking approaches were tried first and both failed, so do not "tidy" this back
+  into either:
+
+  - isPseudoLocalesEnabled = true on the debug build type. Generates en-XA and ar-XB, and
+    would also have padded every string ~30% longer to catch labels that only fit because
+    English is short. But aapt2 pseudolocalises the default strings at compile time and its
+    generated value beats an explicit one, so app_language_tag arrived as the pseudolocalised
+    text "&#8207;&#8238;en-GB&#8237;&#8207;", which parses to no locale at all. Confirmed by
+    dumping the built APK's resource table.
+  - A real values-ar-rXB/ resource folder in a debug source set. Works, and is the obvious
+    way to do it — but lint reads any values-ar* folder as an Arabic translation and reports
+    every string in the app as MissingTranslation. tools:ignore on that file does not help,
+    because lint raises the error against the default strings.xml, not the translation. The
+    only fixes left were disabling MissingTranslation or scoping it away, and both would
+    disarm the check that actually matters on the day a real, possibly incomplete values-ar/
+    lands. A build type has no locale folder, so lint has nothing to misread.
+-->
+<resources>
+    <string name="app_language_tag">ar-XB</string>
+</resources>

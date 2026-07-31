@@ -59,6 +59,13 @@ android {
                 "proguard-rules.pro",
             )
         }
+
+        // The phone's rtl build type, for the same reason. The watch has less room to lose,
+        // so it is the one more likely to break. See app/build.gradle.kts.
+        create("rtl") {
+            initWith(getByName("debug"))
+            matchingFallbacks += "debug"
+        }
     }
 
     compileOptions {

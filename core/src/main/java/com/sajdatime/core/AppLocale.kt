@@ -39,6 +39,11 @@ import java.util.Locale
  *
  * Deliberately *not* `Locale.getDefault()` anywhere in the app except where the platform
  * demands it. If you are reaching for it, you almost certainly want this instead.
+ *
+ * To see what a right-to-left translation will look like before one exists, run
+ * `./gradlew installRtl`. That build type overrides `app_language_tag` with the `ar-XB`
+ * pseudolocale, which is enough to flip the entire app, because everything below follows
+ * this one string.
  */
 object AppLocale {
 
