@@ -182,16 +182,36 @@ Use **Play App Signing** (the default and the safer option): Google holds the re
 key, and you hold an *upload* key. If you lose the upload key, Google can reset it. Without
 Play App Signing, losing your key is permanent and unrecoverable.
 
-Run this in Terminal, in the project folder:
+Run this in Terminal. It does not matter which folder you are in — the key is written to your
+home folder on purpose, well away from the project.
 
 ```bash
-keytool -genkeypair -v \
-  -keystore ~/sajdatime-upload-key.jks \
-  -keyalg RSA -keysize 2048 -validity 10000 \
-  -alias sajdatime
+export JAVA_HOME=$(/usr/libexec/java_home -v 21) && "$JAVA_HOME/bin/keytool" -genkeypair -v -keystore ~/sajdatime-upload-key.jks -keyalg RSA -keysize 2048 -validity 10000 -alias sajdatime -dname "CN=Ali Imran Khan, O=SajdaTime, C=GB"
 ```
 
-It will ask for a password and some details (name, organisation, city, country). Then:
+**It will ask you exactly two things, both the same answer:** `Enter keystore password:` and
+`Re-enter new password:`. Type a password you have never used elsewhere. Nothing appears on
+screen as you type — that is normal, not a frozen terminal. Then it prints two lines and
+finishes.
+
+Three details in that command are deliberate, and this exact form was run and checked with a
+throwaway key that was deleted afterwards:
+
+- **`-dname "..."` is what makes it two prompts instead of nine.** Without it, keytool
+  interrogates you for name, organisational unit, organisation, city, county and country one
+  at a time and then asks you to confirm — a sequence that is easy to abandon halfway, and
+  which produces a *worse* result if you answer "SajdaTime" to the question that actually
+  means the certificate's common name. None of these values are shown to users anywhere; they
+  only have to exist. Change the name in the quotes if you would rather it read differently.
+- **The password is *not* in the command.** It could be — keytool accepts `-storepass` — and
+  it deliberately is not, because anything typed on a command line is written to your shell
+  history in plain text and stays there.
+- **`JAVA_HOME` is pinned to 21** because plain `keytool` on this machine resolves to the one
+  inside **JDK 11**, while the project builds on 21. Either would in fact produce a keystore
+  the build can read, so this is belt-and-braces rather than a bug — but pinning it removes a
+  question nobody should have to answer at this stage.
+
+Then:
 
 - **Write the password down somewhere safe and permanent.** A password manager, not a note
   on your desktop.
