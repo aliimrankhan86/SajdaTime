@@ -330,6 +330,130 @@ class PrayerEngineTest {
         assertEquals(PrayerSlot.DHUHR, next.slot)
     }
 
+    // --- current prayer -------------------------------------------------------------
+    //
+    // The one the user can still pray. Every case below is a boundary, because the whole
+    // question is "which side of a line is now on" and the interesting failures all live
+    // within a second of one.
+
+    @Test
+    fun `current prayer is fajr between fajr and sunrise`() {
+        val zone = ZoneId.of("Europe/London")
+        val times = PrayerEngine.compute(london, LocalDate.of(2026, 6, 21), sunniPrefs)
+
+        assertEquals(
+            PrayerSlot.FAJR,
+            PrayerEngine.currentPrayer(london, sunniPrefs, times[PrayerSlot.FAJR], zone),
+        )
+        assertEquals(
+            PrayerSlot.FAJR,
+            PrayerEngine.currentPrayer(
+                london,
+                sunniPrefs,
+                times[PrayerSlot.SUNRISE].minusSeconds(1),
+                zone,
+            ),
+        )
+    }
+
+    /**
+     * The case the whole design turns on. Fajr's window shuts at sunrise, so from sunrise
+     * until Dhuhr there is no prayer to be in — and a naive "last prayer that started"
+     * would happily answer Fajr for the next six hours.
+     */
+    @Test
+    fun `there is no current prayer between sunrise and dhuhr`() {
+        val zone = ZoneId.of("Europe/London")
+        val times = PrayerEngine.compute(london, LocalDate.of(2026, 6, 21), sunniPrefs)
+
+        assertEquals(null, PrayerEngine.currentPrayer(london, sunniPrefs, times[PrayerSlot.SUNRISE], zone))
+
+        val midMorning = times[PrayerSlot.SUNRISE]
+            .plusSeconds(Duration.between(times[PrayerSlot.SUNRISE], times[PrayerSlot.DHUHR]).seconds / 2)
+        assertEquals(null, PrayerEngine.currentPrayer(london, sunniPrefs, midMorning, zone))
+
+        assertEquals(
+            null,
+            PrayerEngine.currentPrayer(
+                london,
+                sunniPrefs,
+                times[PrayerSlot.DHUHR].minusSeconds(1),
+                zone,
+            ),
+        )
+    }
+
+    @Test
+    fun `current prayer follows each window through the afternoon and evening`() {
+        val zone = ZoneId.of("Europe/London")
+        val times = PrayerEngine.compute(london, LocalDate.of(2026, 6, 21), sunniPrefs)
+
+        val expected = listOf(
+            PrayerSlot.DHUHR to PrayerSlot.ASR,
+            PrayerSlot.ASR to PrayerSlot.MAGHRIB,
+            PrayerSlot.MAGHRIB to PrayerSlot.ISHA,
+        )
+        for ((slot, endsAt) in expected) {
+            assertEquals(
+                "at the start of $slot",
+                slot,
+                PrayerEngine.currentPrayer(london, sunniPrefs, times[slot], zone),
+            )
+            assertEquals(
+                "one second before $endsAt",
+                slot,
+                PrayerEngine.currentPrayer(london, sunniPrefs, times[endsAt].minusSeconds(1), zone),
+            )
+        }
+    }
+
+    /**
+     * Isha has to survive the date change, or the marker would blink out at midnight for
+     * a prayer the user can still pray. This is why yesterday is scanned.
+     */
+    @Test
+    fun `current prayer is still isha after midnight`() {
+        val zone = ZoneId.of("Europe/London")
+        val date = LocalDate.of(2026, 6, 21)
+        val isha = PrayerEngine.compute(london, date, sunniPrefs)[PrayerSlot.ISHA]
+
+        assertEquals(
+            "just after isha",
+            PrayerSlot.ISHA,
+            PrayerEngine.currentPrayer(london, sunniPrefs, isha.plusSeconds(1), zone),
+        )
+
+        // Past midnight, on the following calendar day, but before that day's Fajr.
+        val afterMidnight = ZonedDateTime.of(2026, 6, 22, 0, 45, 0, 0, zone).toInstant()
+        val nextFajr = PrayerEngine.compute(london, date.plusDays(1), sunniPrefs)[PrayerSlot.FAJR]
+        assertTrue("test premise: 00:45 is before Fajr", afterMidnight < nextFajr)
+        assertEquals(
+            PrayerSlot.ISHA,
+            PrayerEngine.currentPrayer(london, sunniPrefs, afterMidnight, zone),
+        )
+    }
+
+    /** Sunrise is a marker, never an answer — the same guarantee [nextPrayer] gives. */
+    @Test
+    fun `current prayer never returns sunrise`() {
+        val zone = ZoneId.of("Europe/London")
+        val date = LocalDate.of(2026, 6, 21)
+        val times = PrayerEngine.compute(london, date, sunniPrefs)
+        val start = times[PrayerSlot.FAJR]
+        val end = times[PrayerSlot.ISHA]
+
+        // Walk the whole day in five-minute steps. Cheap, and it catches any window the
+        // hand-picked boundaries above happen to miss.
+        var t = start
+        while (t <= end) {
+            assertTrue(
+                "sunrise was reported as the current prayer at $t",
+                PrayerEngine.currentPrayer(london, sunniPrefs, t, zone) != PrayerSlot.SUNRISE,
+            )
+            t = t.plusSeconds(300)
+        }
+    }
+
     // --- auto method ----------------------------------------------------------------
 
     @Test

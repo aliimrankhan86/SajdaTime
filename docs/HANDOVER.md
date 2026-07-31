@@ -428,6 +428,36 @@ date changes. They are not the same moment: between midnight and Fajr no prayer 
 the prayer trigger alone left the "Today" list on the previous day's times for hours. See
 §10 for what that looked like on a running device.
 
+### 5.8a Current prayer — the one you can still pray
+`PrayerEngine.currentPrayer` answers "which prayer's time is in right now", which is a
+different question from §5.8's "what is next" and is shown by a separate **"Now"** marker.
+
+| Now is in | Current prayer |
+|---|---|
+| Fajr → sunrise | Fajr |
+| **sunrise → Dhuhr** | **none** — Fajr's window has shut and nothing has replaced it |
+| Dhuhr → Asr | Dhuhr |
+| Asr → Maghrib | Asr |
+| Maghrib → Isha | Maghrib |
+| Isha → next Fajr, *including past midnight* | Isha |
+
+The implementation is one rule — *the last slot at or before now* — and it is correct only
+because the list it scans **includes sunrise**. Sunrise is not a prayer, so when it is the
+last thing to have passed the answer is `null`, which is exactly right for mid-morning. Take
+sunrise out and the same code claims Fajr is still in until midday. There is no special case
+in the code and there must not be one added; the special case is the sunrise entry itself.
+
+Yesterday is scanned as well as today, for the same reason §5.8 scans tomorrow. After
+midnight the prayer that is in is the previous evening's Isha, and "before Fajr means Isha"
+is not a shortcut that survives high latitudes, where Isha itself can fall after midnight.
+
+Two deliberate omissions. Madhab differences in when a window *ends* are not modelled, and
+neither is the Jafari position that Dhuhr and Asr may be combined. Both would turn a
+one-word marker into a qualified statement, and the disclaimer already says the app is a
+helper rather than an authority. **A UI change here is a religious-content change** — the
+marker says "Now", never "you can pray this now", and that distinction is the whole reason
+the wording survives review.
+
 ### 5.9 Qibla
 Initial **great-circle bearing** to the Kaaba (21.4224779 N, 39.8251832 E), in degrees from
 **true** north. Magnetic declination comes from `android.hardware.GeomagneticField` (the
@@ -1130,6 +1160,35 @@ is not the same thing as proving the sync. Alarms firing, notification delivery 
 were not re-exercised this session; they were verified earlier and no code touching them
 changed. Lint's `DataExtractionRules` warning fires on both modules and is a false positive
 here: it asks for `fullBackupContent`, which only matters when `allowBackup="true"`.
+
+### The "Now" marker and the closable notice (31 Jul 2026), verified by stepping the clock
+
+Both asked for by the owner: show which prayer is *still* prayable, and stop the exact-alarm
+warning from meeting every user on every launch.
+
+The marker was checked at four times of day by moving the emulator clock, because the whole
+question is which side of a boundary "now" falls on and reading the code proves nothing:
+
+| Clock | On screen | Correct because |
+|---|---|---|
+| 03:32 | **Now** on Fajr, **Next** on Dhuhr | inside the Fajr window; sunrise is skipped for "next" |
+| 09:00 | **no Now anywhere**, Next on Dhuhr | Fajr's window shut at 05:23 and Dhuhr has not come in |
+| 19:18 | **Now** on Asr, **Next** on Maghrib | between Asr 17:28 and Maghrib 21:07 |
+| 00:30, next day | **Now** on Isha, **Next** on Fajr | last night's Isha is still in, and the marker does not blink out at midnight |
+
+The 09:00 case is the one worth keeping: it is the only one where the right answer is
+*nothing*, and it is the one a "last prayer that started" implementation gets wrong.
+
+Also verified: `secondaryContainer` "Now" pill against `primary` "Next" pill in **both**
+themes; **right-to-left** via `installRtl`, where the pill mirrors to the left of the time
+and the notice's close button mirrors to the left of the card; the notice staying closed
+across force-stops and reinstalls; and Settings still showing it afterwards, so the fix is
+never lost. 62 tests, up from 57 — five new ones in `PrayerEngineTest`, four of them
+boundary cases and one that walks the whole day in five-minute steps asserting sunrise is
+never returned.
+
+**Not tested:** the watch has no such marker and was not changed. Notification and alarm
+copy do not mention the current prayer and were not touched.
 
 ### Midnight rollover — a stale day list, found by stepping the clock
 

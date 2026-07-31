@@ -90,6 +90,16 @@ data class DayPrayerTimes(
     /** Prayer slots only (no sunrise), in chronological order. */
     val prayersOnly: List<Pair<PrayerSlot, Instant>>
         get() = PrayerSlot.entries.filter { it.isPrayer }.map { it to times.getValue(it) }
+
+    /**
+     * Every slot in chronological order, **sunrise included**.
+     *
+     * Sunrise earns its place here even though it is not a prayer: it is the moment Fajr's
+     * window shuts. Any question of the form "which prayer is in right now" has to see it,
+     * or it will answer "Fajr" all morning. [PrayerEngine.currentPrayer] relies on that.
+     */
+    val ordered: List<Pair<PrayerSlot, Instant>>
+        get() = PrayerSlot.entries.map { it to times.getValue(it) }
 }
 
 /** Everything the engine needs to produce times, independent of where it is stored. */

@@ -57,6 +57,16 @@ data class AppSettings(
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
     /**
+     * True once the user has closed the exact-alarm notice on the home screen.
+     *
+     * Dismissing hides it on **home only** — Settings keeps showing it for as long as the
+     * permission is missing, so the way back is always one screen away. This is why the
+     * flag is not reset when the permission is later granted and revoked again: the notice
+     * is still on the screen whose job is fixing it, and re-nagging on home is precisely
+     * what the user asked not to happen.
+     */
+    val exactAlarmNoticeDismissed: Boolean = false,
+    /**
      * Light, dark, or whatever the phone is set to. Following the system is the default,
      * and on a device that expresses no preference that resolves to light.
      */
@@ -119,6 +129,9 @@ class SettingsRepository(private val context: Context) {
         it[Keys.DEFAULT_LOCATION] = true
     }
 
+    /** Closes the exact-alarm notice on home for good. Settings still shows it. */
+    suspend fun dismissExactAlarmNotice() = edit { it[Keys.EXACT_ALARM_DISMISSED] = true }
+
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
     }
@@ -137,6 +150,7 @@ class SettingsRepository(private val context: Context) {
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
+        val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
         val THEME = stringPreferencesKey("theme_choice")
     }
 
@@ -170,6 +184,7 @@ class SettingsRepository(private val context: Context) {
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
+            exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
         )
     }

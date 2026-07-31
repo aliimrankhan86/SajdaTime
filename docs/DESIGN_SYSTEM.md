@@ -163,11 +163,12 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > Fajr. A single verified surface is testable; a moving one is not.
 
 **Today list** — one card, 24dp radius, 1dp `outlineVariant` border, rows divided by
-`outlineVariant` hairlines. Three row states:
+`outlineVariant` hairlines. Four row states:
 
 | State | Treatment |
 |---|---|
 | next | `primaryContainer` fill · 3dp `primary` bar down the leading edge · "Next" pill in `primary`/`onPrimary` |
+| current | `surfaceContainerHigh` fill · "Now" pill in `secondaryContainer`/`onSecondaryContainer` · **no** leading bar |
 | sunrise | `surfaceContainerLow` fill · `onSurfaceVariant` text · one type step smaller |
 | plain | transparent |
 
@@ -175,8 +176,24 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > nobody on a greyscale display or a colour-blind palette, and that question is the entire
 > reason the screen exists.
 >
+> **"Now" is deliberately the quieter of the two pills.** The screen answers two questions
+> — what is coming, and what can I still pray — and they are not equally urgent to a person
+> glancing at it. Filled versus tonal, bar versus no bar: the eye lands on "Next" first and
+> finds "Now" a beat later, which is the order people actually want them in. Two filled
+> pills a row apart were tried on paper and neither reads as the answer; the row stops
+> having a focal point at all.
+>
+> The two can never appear on the same row — one time is in the future and the other has
+> passed — so the treatments cannot stack and no tie-break is needed.
+>
+> `onSecondaryContainer`/`secondaryContainer` was chosen partly because `ColorContrastTest`
+> already asserts that pair in both themes. A new colour would have meant a new assertion;
+> an existing role meant the guarantee came for free.
+>
 > Sunrise is dimmed because **it is not a prayer**. It is on the list because people need
-> it; it should not compete with the five that are.
+> it; it should not compete with the five that are. It also does something invisible: it is
+> the moment Fajr's window shuts, and it is why there is no "Now" pill anywhere on the list
+> between sunrise and Dhuhr. See `PrayerEngine.currentPrayer`.
 
 **Qibla dial** — face in `surfaceVariant`, rim in `outlineVariant`, ticks every 15°, a
 `primary` arrow at the true bearing, and a fixed grey tick at the top meaning *you are
@@ -210,6 +227,22 @@ shapes and this one is a picture; the subtitle above the dial already says the w
 **Warning banner** — `tertiaryContainer` fill, `tertiary` icon and border,
 `onTertiaryContainer` text, 16dp radius. Used for "the system is withholding something you
 asked for": exact alarms, Do Not Disturb access, compass calibration.
+
+On **home** the exact-alarm banner carries a close button (`Outlined.Close`,
+`onTertiaryContainer`, 24dp glyph in a 44dp target) and stays closed once tapped. On
+**Settings** the same banner has no close button and never hides while the permission is
+missing.
+
+> A warning that cannot be put away is not a warning, it is furniture. Shown on every
+> launch it stops being read — and worse, people learn to skip that whole band of the
+> screen, which is where the Makkah notice lives too, and *that* one they need to act on.
+> Closable on home, permanent in Settings: it is said once, and the way to fix it is still
+> exactly where someone would go looking for it.
+>
+> The close button has its own `clickable` inside the card's `clickable`. The card opens
+> the system permission screen; the button closes the card. Two different outcomes must
+> never share one gesture. 44dp because a bare 24dp glyph is a target only someone with a
+> steady hand and good eyes can hit.
 
 > Amber, not red. Prayer alerts still arrive; they are just at the mercy of the scheduler.
 > An error colour would say the app is broken when it is not. And it is not grey any more,

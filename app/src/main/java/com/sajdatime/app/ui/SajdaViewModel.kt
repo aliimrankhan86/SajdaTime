@@ -64,6 +64,12 @@ data class UiState(
     val settings: AppSettings = AppSettings(),
     val today: DayPrayerTimes? = null,
     val next: NextPrayer? = null,
+    /**
+     * The prayer whose window is open right now, or null between sunrise and Dhuhr when
+     * none is. Separate from [next] on purpose: they are never the same prayer, and the
+     * question "what can I still pray" is not the question "what is coming".
+     */
+    val current: PrayerSlot? = null,
     val now: Instant = Instant.now(),
     val problem: LocationProblem? = null,
     val resolvingLocation: Boolean = false,
@@ -118,7 +124,17 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 // already fixed for this (see hijriToday) and the times were not.
                 val dayChanged = snapshot.today
                     ?.let { it.date != LocalDate.now(ZoneId.systemDefault()) } == true
-                if (prayerPassed || dayChanged) recalculate()
+                // Sunrise is a third trigger and it is invisible to the other two. It is
+                // not a prayer, so it never appears in `next` and nothing above fires on
+                // it — yet it is the exact moment Fajr stops being the prayer you can
+                // still pray. Without this the "Now" marker would sit on Fajr all morning
+                // and only move when Dhuhr came in, which is the bug the sunrise entry in
+                // DayPrayerTimes.ordered exists to prevent and would have been reintroduced
+                // here, one layer up, for free.
+                val sunrisePassed = snapshot.current == PrayerSlot.FAJR &&
+                    snapshot.today?.times?.get(PrayerSlot.SUNRISE)
+                        ?.let { !now.isBefore(it) } == true
+                if (prayerPassed || dayChanged || sunrisePassed) recalculate()
                 delay(1_000)
             }
         }
@@ -180,6 +196,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setAlertStyle(style: AlertStyle) =
         viewModelScope.launch { settingsRepository.setAlertStyle(style) }
+
+    fun dismissExactAlarmNotice() =
+        viewModelScope.launch { settingsRepository.dismissExactAlarmNotice() }
 
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
@@ -289,7 +308,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null) }
+            _state.update { it.copy(today = null, next = null, current = null) }
             return
         }
 
@@ -299,13 +318,15 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         val computed = withContext(Dispatchers.Default) {
             val today = PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs)
             val next: NextPrayer = PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
-            today to next
+            val current = PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
+            Triple(today, next, current)
         }
 
         _state.update {
             it.copy(
                 today = computed.first,
                 next = computed.second,
+                current = computed.third,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),

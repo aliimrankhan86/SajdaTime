@@ -127,6 +127,43 @@ object PrayerEngine {
         )
     }
 
+    /**
+     * The prayer whose time is in **now** — the one a user opening the app can still pray —
+     * or null when there is no such prayer.
+     *
+     * The rule is one line: take every slot at or before [now] and keep the last one. What
+     * makes it correct is that [DayPrayerTimes.ordered] includes **sunrise**, so the moment
+     * Fajr's window shuts is itself a candidate. Between sunrise and Dhuhr the last slot to
+     * have passed is sunrise, which is not a prayer, and the answer is correctly "none".
+     * Without sunrise in the list the same code would claim Fajr is still in until midday.
+     * That is the whole trick; there is no special case for it.
+     *
+     * Yesterday is scanned as well, for the same reason [nextPrayer] scans tomorrow. After
+     * midnight the prayer that is in is the previous evening's Isha, and at high latitudes
+     * Isha itself can fall after midnight, so "before Fajr means Isha" is not a shortcut
+     * that survives a Manchester June — the real times have to be looked at.
+     *
+     * Note what this deliberately does not model: madhab differences in when a window
+     * *ends*, and the Jafari position that Dhuhr and Asr may be combined. Both would make
+     * this answer longer and more equivocal, and the screen has room for one word. The app
+     * says which prayer has most recently come in; the disclaimer already tells the user it
+     * is a helper rather than an authority, and anyone needing the finer ruling has to ask
+     * someone qualified regardless.
+     */
+    fun currentPrayer(
+        coordinates: Coordinates,
+        prefs: CalculationPrefs,
+        now: Instant,
+        zone: ZoneId,
+    ): PrayerSlot? {
+        val today = now.atZone(zone).toLocalDate()
+        val started = (-1L..0L)
+            .flatMap { offset -> compute(coordinates, today.plusDays(offset), prefs).ordered }
+            .filter { (_, at) -> at <= now }
+        val (slot, _) = started.lastOrNull() ?: return null
+        return slot.takeIf { it.isPrayer }
+    }
+
     /** Times for [days] consecutive days starting at [start]. Used by the PDF export. */
     fun computeRange(
         coordinates: Coordinates,

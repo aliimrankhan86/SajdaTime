@@ -80,6 +80,19 @@
     <string name="home_until">until it begins</string>
     <string name="home_today">Today</string>
     <string name="home_next_marker">Next</string>
+    <!--
+      The prayer whose time is in now — the one you can still pray. One word, because it
+      sits in a pill beside a prayer name and a time on the narrowest phone we support, and
+      because "Now" survives translation into a short word almost everywhere.
+
+      Deliberately not "You can pray this now" or anything of that shape. That is a ruling,
+      and this app is not a religious authority; it reports which prayer has most recently
+      come in and leaves the ruling to the reader and their imam.
+    -->
+    <string name="home_now_marker">Now</string>
+    <!-- Screen-reader label for the row carrying that pill. -->
+    <string name="home_now_marker_a11y">Current prayer</string>
+    <string name="notice_dismiss">Dismiss</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->

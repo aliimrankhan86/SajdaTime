@@ -122,6 +122,7 @@ class MainActivity : ComponentActivity() {
                             onSearchCity = viewModel::searchCity,
                             onQiblaVisible = viewModel::setQiblaVisible,
                             onSetThemeChoice = viewModel::setThemeChoice,
+                            onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
                         )
 
                         // Shown once, immediately after setup. The app is a convenience,

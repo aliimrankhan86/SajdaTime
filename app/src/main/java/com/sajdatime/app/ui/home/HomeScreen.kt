@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -91,6 +92,7 @@ fun HomeScreen(
     onExport: (PrayerPdfExporter.Range) -> Unit,
     onChangeLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
+    onDismissExactAlarmNotice: () -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
@@ -108,7 +110,7 @@ fun HomeScreen(
         Spacer(Modifier.height(12.dp))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
-        ExactAlarmBanner()
+        ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(24.dp))
         TodayTimeline(state)
         Spacer(Modifier.height(24.dp))
@@ -402,11 +404,19 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
  * Shown only when the OS is withholding exact alarms. Prayer alerts still arrive, but
  * possibly a few minutes late, and the user deserves to know that rather than quietly
  * receiving a late Fajr.
+ *
+ * **Closable, and it stays closed.** Telling someone the same thing every time they open
+ * the app is nagging, not informing; they have read it, and a warning that cannot be put
+ * away teaches people to look past that whole part of the screen — including the Makkah
+ * notice sitting directly above it, which they *do* need to act on. Dismissing hides it
+ * here only. Settings shows the identical card for as long as the permission is missing,
+ * so the fix is always one tap away on the screen whose job is settings.
  */
 @Composable
-private fun ExactAlarmBanner() {
+private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
     if (PrayerAlarmScheduler.canScheduleExact(context)) return
+    if (state.settings.exactAlarmNoticeDismissed) return
 
     Spacer(Modifier.height(12.dp))
     NoticeCard(
@@ -422,6 +432,7 @@ private fun ExactAlarmBanner() {
                 }
             }
         },
+        onDismiss = onDismiss,
     )
 }
 
@@ -432,7 +443,7 @@ private fun ExactAlarmBanner() {
  * alarm notice went unnoticed.
  */
 @Composable
-private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
+private fun NoticeCard(title: String, body: String, onClick: () -> Unit, onDismiss: (() -> Unit)? = null) {
     val scheme = MaterialTheme.colorScheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -459,6 +470,23 @@ private fun NoticeCard(title: String, body: String, onClick: () -> Unit) {
                 text = body,
                 style = MaterialTheme.typography.bodyMedium,
                 color = scheme.onTertiaryContainer,
+            )
+        }
+        if (onDismiss != null) {
+            // Its own clickable inside a clickable row. The row opens the system screen
+            // that grants the permission; this closes the card. They must not be the same
+            // gesture, and 44dp is the smallest target that is honestly tappable — the
+            // 24dp glyph alone would be a trap for anyone with less than perfect aim.
+            Spacer(Modifier.width(8.dp))
+            Icon(
+                imageVector = Icons.Outlined.Close,
+                contentDescription = stringResource(R.string.notice_dismiss),
+                tint = scheme.onTertiaryContainer,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .clickable(role = Role.Button, onClick = onDismiss)
+                    .padding(10.dp)
+                    .size(24.dp),
             )
         }
     }
@@ -492,6 +520,7 @@ private fun TodayTimeline(state: UiState) {
                 slot = slot,
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
                 isNext = next != null && slot == next.slot && !next.isTomorrow,
+                isCurrent = slot == state.current,
             )
             if (index != slots.lastIndex) {
                 HorizontalDivider(color = scheme.outlineVariant)
@@ -503,23 +532,30 @@ private fun TodayTimeline(state: UiState) {
 /**
  * One row of the day.
  *
- * Three states, and each is carried by more than colour, because "which prayer is next"
- * is the only question this screen has to answer and a colour wash alone answers it for
- * nobody using a greyscale display or a colour-blind palette:
+ * Four states, and each is carried by more than colour, because this screen answers two
+ * questions — what is coming, and what can I still pray — and a colour wash alone answers
+ * neither for anyone on a greyscale display or a colour-blind palette:
  *
  *  - next    — highlighted surface, a 3dp accent bar down the leading edge, and a "Next"
  *              pill in words
+ *  - current — a quieter lift off the card and a "Now" pill, deliberately softer than
+ *              next: two loud rows next to each other and neither reads as the answer
  *  - sunrise — dimmed and set in smaller type, because it is not a prayer and it should
  *              not compete with the five that are
  *  - the rest — plain
+ *
+ * `isNext` and `isCurrent` can never both be true for the same row — one time is in the
+ * future and the other has passed — so the two treatments cannot stack and the `when`
+ * chains below need no tie-break.
  */
 @Composable
-private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
+private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent: Boolean) {
     val scheme = MaterialTheme.colorScheme
     val dimmed = !slot.isPrayer && !isNext
 
     val background = when {
         isNext -> scheme.primaryContainer
+        isCurrent -> scheme.surfaceContainerHigh
         dimmed -> scheme.surfaceContainerLow
         else -> Color.Transparent
     }
@@ -575,6 +611,24 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean) {
                     .clip(RoundedCornerShape(50))
                     .background(accent)
                     .padding(horizontal = 9.dp, vertical = 3.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+        }
+        if (isCurrent) {
+            // Tonal rather than filled, so it reads as a note beside the loud "Next" pill
+            // instead of arguing with it. onSecondaryContainer/secondaryContainer is an
+            // already-asserted pair in ColorContrastTest, in both themes.
+            val nowLabel = stringResource(R.string.home_now_marker_a11y)
+            Text(
+                text = stringResource(R.string.home_now_marker),
+                style = MaterialTheme.typography.labelMedium,
+                color = scheme.onSecondaryContainer,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(scheme.secondaryContainer)
+                    .padding(horizontal = 9.dp, vertical = 3.dp)
+                    // "Now" alone is meaningless read aloud in a list of times.
+                    .semantics { contentDescription = nowLabel },
             )
             Spacer(Modifier.width(10.dp))
         }

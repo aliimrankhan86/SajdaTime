@@ -69,6 +69,7 @@ fun MainScaffold(
     onSearchCity: (String) -> Unit,
     onQiblaVisible: (Boolean) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
+    onDismissExactAlarmNotice: () -> Unit,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -125,6 +126,7 @@ fun MainScaffold(
                         onExport = onExport,
                         onChangeLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
+                        onDismissExactAlarmNotice = onDismissExactAlarmNotice,
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)
