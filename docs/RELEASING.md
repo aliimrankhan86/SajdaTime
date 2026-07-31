@@ -264,7 +264,16 @@ account can create and publish apps.
 
 ---
 
-## Step 2 — Create your signing key · **ONLY YOU**
+## Step 2 — Create your signing key · **ONLY YOU** · **DONE, 31 Jul 2026**
+
+> **Done.** The owner ran the command below himself on 31 Jul 2026.
+> `~/sajdatime-upload-key.jks` exists, 2,654 bytes, permissions tightened to `600`. The
+> assistant confirmed only that the file exists and is the right size — it has never been
+> opened, and the password has never been in any transcript. Play App Signing is confirmed
+> **on** for this app ("Releases are signed by Google Play" appears on the release page), so
+> if this upload key is ever lost Google can reset it.
+>
+> The instructions are kept below because they are needed again if the key is ever replaced.
 
 This key proves the app is really from you. **If you lose it you can never update the app
 under the same listing.** No assistant should ever generate, hold, or see it.
@@ -284,6 +293,13 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21) && "$JAVA_HOME/bin/keytool" -ge
 `Re-enter new password:`. Type a password you have never used elsewhere. Nothing appears on
 screen as you type — that is normal, not a frozen terminal. Then it prints two lines and
 finishes.
+
+> If a third prompt ever appears — `Enter key password for <sajdatime> (RETURN if same as
+> keystore password):` — press Return on its own. It does not appear with the modern PKCS12
+> keystore format, which is the default from JDK 9 onwards and is what this command produces,
+> because PKCS12 requires the key and store passwords to match. It is listed here only so
+> that seeing it is not alarming: `keystore.properties` sets both passwords to the same value
+> either way, so pressing Return is always the right answer.
 
 Three details in that command are deliberate, and this exact form was run and checked with a
 throwaway key that was deleted afterwards:
@@ -312,7 +328,19 @@ Then:
 
 ---
 
-## Step 3 — Wire the key into the build
+## Step 3 — Wire the key into the build · **DONE, 31 Jul 2026**
+
+> **Done.** `keystore.properties` exists in the project root, `600`, all four keys present,
+> `storeFile` resolving to the real key. `git check-ignore` confirms it is ignored by
+> `.gitignore:26`, so it cannot be committed. The assistant read only the *key names* out of
+> it, with the values masked by `sed`; the password has never entered a transcript.
+>
+> Proven rather than assumed: `./gradlew clean test lint :app:bundleRelease
+> :wear:bundleRelease` then ran `:app:signReleaseBundle` and `:wear:signReleaseBundle` —
+> tasks which had silently not existed before — and both `.aab` files now contain
+> `META-INF/SAJDATIM.SF` and `META-INF/SAJDATIM.RSA`. Before the key existed, the same
+> command produced bundles with no signature block at all and said nothing about it. See
+> §10 of `docs/HANDOVER.md`.
 
 **The Gradle side is already done.** Both `app/build.gradle.kts` and `wear/build.gradle.kts`
 read a `keystore.properties` file from the project root and sign the release build with it.
@@ -512,14 +540,38 @@ possible answer to that suspicion.
 
 4. ✅ **DONE** — the track's **Feedback email** is set to `aikstudies@gmail.com`, so testers
    have a route back that does not rely on remembering to ask them. See Step 0.
-5. ⬜ **Select testers** — the last piece of track setup, and the only one that needs
-   information nobody else has: the actual email addresses. **Testing → Closed testing →
-   Testers → Create email list.** Each tester needs the Google account they use on their
-   phone, not just any address. Recruitment copy is in Step 0.
-6. ⬜ Same track → **Releases → Create new release** → upload **`app-release.aab` only**
-   (needs the signing key, Step 2).
-7. ⬜ Share the opt-in link — **only once the release is live** — and wait out the 14 days.
-8. ⬜ Apply for production access, then **Production → Create release** and roll out.
+5. ✅ **DONE** — **Select testers.** Email list `sajdatime - testers` exists with **13
+   testers** and is ticked against the `Closed testing - Alpha` track, confirmed on a reload
+   from Google's servers. The track checklist now reads *Select testers* ✓.
+
+   > This took three attempts, and the failure mode is worth knowing. The dialog has two
+   > fields that look like one: you type addresses into **"Add email addresses"**, but they
+   > only move into **"Email addresses added"** — the field that is actually required — when
+   > you press **Enter**. Until then the list looks full and **Save changes** stays greyed
+   > out with no explanation. Then, separately, saving the list does *not* attach it: the
+   > list appears in the table with its checkbox **unticked**, and the checklist still says
+   > *Select testers* incomplete. Two distinct steps, each of which looks finished before it
+   > is.
+
+6. ✅ **DONE** — **Releases → Create new release**, `app-release.aab` uploaded and accepted
+   as **version 2 (1.1.0)**, API 24+, target SDK 36, 4 ABIs, 1.64 MB install size. Release
+   name `1.1.0 - first closed test` (internal only, never shown to users); release notes
+   written for `en-GB`. Saved as a draft, then saved again from the *Preview and confirm*
+   step, and both fields re-read from the server after a full page reload.
+
+   One warning is raised and is safe to ignore: *"This App Bundle contains native code, and
+   you've not uploaded debug symbols."* The only two `.so` files in the bundle are Google's
+   own — `libandroidx.graphics.path.so` (Compose) and `libdatastore_shared_counter.so`
+   (DataStore). There is no native code of ours, so there is nothing to symbolicate.
+
+7. ⬜ **Press "Submit 15 changes for review"** on **Publishing overview**. Everything is
+   staged and the button is live; nothing has been sent to Google yet. This is deliberately
+   left to the owner — see "Can an assistant fill the Play Console in for you?" below.
+   Managed publishing is **off**, so approval publishes straight to the closed track.
+8. ⬜ Share the opt-in link — **only once the release is live** — and wait out the 14 days.
+   `https://play.google.com/apps/testing/com.sajdatime.app`
+9. ⬜ Apply for production access, then **Production → Create release** and roll out.
+10. ⬜ Second release for the watch, once Play unlocks the Wear OS form factor — see below.
 
 ### The watch bundle does NOT go in the same release
 
@@ -656,20 +708,34 @@ first of them:
 4. Apply for production
 
 The closed testing track is otherwise set up: `Closed testing - Alpha` exists, all 177
-countries are targeted, and the feedback email is set. Which reduces to **two** real tasks:
+countries are targeted, and the feedback email is set.
 
-1. **The signing key** (Step 2) — one `keytool` command, two password prompts, plus a
-   `keystore.properties` file. Nobody else should ever generate or hold this: not a
-   contractor, not an assistant, not an AI agent. **This is the only thing blocking a release
-   build**, and it depends on nothing and nobody else.
-2. **Twelve testers** (Step 0) — no longer blocked on anything either, now that verification
-   has cleared, and unlike the key it cannot be done in an afternoon. Recruit roughly 25,
-   because the count is of testers who *stay* opted in for 14 consecutive days. The message to
-   send them is written out in Step 0.
+**As of 31 Jul 2026 both of the tasks that used to sit here are done.** The signing key
+exists, the build produces genuinely signed bundles, the tester list holds 13 addresses and
+is attached to the track, and the release is uploaded, named, annotated and saved. Play's
+own pre-submission checks raise **one warning** and it is a false alarm (missing debug
+symbols for two of Google's own native libraries).
 
-They are independent, so they should run in parallel. The key unblocks the upload; the testers
-are the 14-day clock, and that clock is the long pole. It cannot be shortened, only started
-earlier.
+What is left is exactly one button and then a wait:
+
+1. ⬜ **Press "Submit 15 changes for review"** — Publishing overview. The button is live and
+   blue; the lock and the *"complete the required steps in the app dashboard"* message are
+   gone. This sends the release, the 176 countries, the tester list, the store listing and
+   all ten App content declarations to Google in one submission. **Left deliberately to the
+   owner.** Play also runs automated pre-checks first and will hold the submission until
+   they pass, so pressing it early is safe.
+2. ⬜ **Twelve testers actually opting in** (Step 0) — the long pole, and the one thing that
+   cannot be shortened. The opt-in link does not exist until the release is live, so this
+   clock has not started. Recruit roughly 25: the count is of testers who *stay* opted in for
+   14 consecutive days, and Google's rejection email leads with *"Testers were not engaged
+   with your app"*, so they have to use it, not merely accept the invitation.
 
 Everything else is done and in the repo: the live privacy policy, the store screenshots, the
 icon, the feature graphic, all the listing text, and the Gradle signing wiring.
+
+> **The watch is genuinely blocked until step 1 lands, and this is now confirmed rather than
+> inferred.** Play Console → Advanced settings → Form factors reads *"Once you've released
+> your app to any track, you can come back here to manage its availability"*. The Wear OS
+> form factor cannot be added, so the Wear OS screenshot slots do not exist yet either. The
+> 454×454 assets are ready at `docs/store/upload/wear-os/` and `wear-release.aab` is built
+> and signed; both simply have nowhere to go until the phone release exists.

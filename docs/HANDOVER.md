@@ -1252,6 +1252,47 @@ readers now go through `Coordinates.orNull`, which range-checks and degrades to 
 location yet" — a state every screen already handles, because a first run looks the same.
 `CoordinatesTest` pins it, including NaN and infinity.
 
+### The first genuinely signed release build (31 Jul 2026)
+
+Before the owner's upload key existed, `./gradlew ... :app:bundleRelease :wear:bundleRelease`
+exited **0** and produced two `.aab` files that looked entirely normal — right size, right
+version, sitting in the right folder. They were unsigned, and **nothing in the build output
+said so.** The signing config is created only when `keystore.properties` is present, so with
+no key the `signReleaseBundle` task does not fail: it does not exist, and a task that never
+runs prints nothing. An unsigned bundle is rejected on upload, not at build time, so this
+would have surfaced as a confusing Play Console error minutes after a clean green build.
+
+The check that actually distinguishes the two, and the one to use before any upload:
+
+```bash
+unzip -l app/build/outputs/bundle/release/app-release.aab | grep -E 'META-INF/.*\.(RSA|SF)'
+```
+
+Signed output names the key alias — `META-INF/SAJDATIM.SF` and `META-INF/SAJDATIM.RSA`.
+Unsigned output prints nothing at all, which is the entire tell.
+
+After the key was wired in, the full verification command was re-run from clean:
+
+| | |
+|---|---|
+| Result | `BUILD SUCCESSFUL in 57s`, 243 tasks |
+| Unit tests | **62**, 0 failures, 0 errors — 41 `:core`, 12 `:wear`, 9 `:app` |
+| Lint | **0 errors**, 11 warnings (4 `:app`, 2 `:wear`, 5 `:core`) — the previously audited set |
+| Signing | `:app:signReleaseBundle` and `:wear:signReleaseBundle` both ran; both bundles carry `SAJDATIM.RSA` |
+| Accepted by Play as | version **2 (1.1.0)**, API 24+, target SDK 36, 4 ABIs, **1.64 MB** install size |
+
+Play raises exactly one warning on the bundle — *"contains native code, and you've not
+uploaded debug symbols"* — and it is a false alarm worth not chasing. The app has no native
+code. The four ABIs come from two Google libraries that ship `.so` files of their own:
+
+```
+libandroidx.graphics.path.so     (Compose)
+libdatastore_shared_counter.so   (DataStore)
+```
+
+There is nothing of ours to symbolicate, and no crash reporting in the app to symbolicate it
+for.
+
 ### Useful device-testing recipes
 
 ```bash
@@ -1326,6 +1367,12 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Blocker for release
 
+> **Read this first — 31 Jul 2026.** The signing key is **done**, the release is **uploaded
+> and staged**, and the only Play step left is the owner pressing **"Submit 15 changes for
+> review"**. The two paragraphs below are kept because their account and listing facts are
+> still true, but where the first one says the key is the only outstanding item, it is out of
+> date. See item 1 below and `docs/RELEASING.md`.
+>
 > **Play Store status at a glance.** Developer account created (personal, ID
 > 6284685113064492750, developer name "Ali Imran Khan"). Android-device check **passed**.
 > Privacy policy **live** at <https://aliimrankhan86.github.io/SajdaTime/privacy.html>. All
@@ -1342,17 +1389,25 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 > financial features, health, advertising ID. Data safety declares **approximate location,
 > collected, not shared, App functionality only, users can choose, not processed
 > ephemerally** — see `docs/store/LISTING.md` for why each of those is the answer, and in
-> particular why "processed ephemerally" is a trap. Store listing text and graphics are
-> **not yet entered**; the assets are laid out one folder per Console box in
-> `docs/store/upload/`.
+> particular why "processed ephemerally" is a trap. Store listing text and graphics **are now
+> entered and saved** (31 Jul 2026): app name 29/30 characters, short description 78/80,
+> full description, icon 1/1, feature graphic 1/1, and 5 of 8 phone screenshots, with the
+> listing showing *Ready to send for review*. Tablet and Chromebook slots are deliberately
+> empty — they are optional, and untested layouts should not be advertised. The source
+> assets remain laid out one folder per Console box in `docs/store/upload/`.
 
-1. **The app is unsigned, and only the owner can change that.** The Gradle side *is* done:
-   both modules read a `keystore.properties` from the project root and sign the release with
-   it, falling back to unsigned output when the file is absent. That was verified with a
-   throwaway key — both `.aab` files came out carrying a real signature — after which the
-   throwaway key was destroyed. What is missing is the owner's real upload key. **An agent
-   must never generate, hold, or see it.** `keystore.properties`, `*.jks` and `*.keystore`
-   are gitignored. Full instructions: `docs/RELEASING.md` Step 2.
+1. ~~**The app is unsigned, and only the owner can change that.**~~ **Closed 31 Jul 2026.**
+   The owner created `~/sajdatime-upload-key.jks` himself and wrote `keystore.properties`;
+   an agent confirmed only that both files exist, with the property *values* masked, and has
+   never seen the key or the password. `./gradlew clean test lint :app:bundleRelease
+   :wear:bundleRelease` now runs `:app:signReleaseBundle` and `:wear:signReleaseBundle` and
+   both bundles carry `META-INF/SAJDATIM.RSA`. Play App Signing is on, so the upload key is
+   recoverable if lost. **An agent must still never generate, hold, or see it.**
+   `keystore.properties`, `*.jks` and `*.keystore` remain gitignored.
+
+   The single remaining Play blocker is now one button — **"Submit 15 changes for review"**
+   on Publishing overview — which is deliberately the owner's to press, and after it the
+   12-testers-for-14-days clock. See `docs/RELEASING.md` "What is genuinely blocking".
 
 ### Not done, in rough priority order
 
@@ -1916,6 +1971,24 @@ matters more than the stable hashes, that is the trade being made.
 32. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
+33. **Setting a field is not filling it. Read it back.** Setting the Play Console release
+    notes programmatically reported success, and the page's own counter agreed —
+    *"Release notes provided for 1 language"*. Reading the field back found it had silently
+    eaten the opening `<en-GB>` tag and collapsed one paragraph break into a space. The
+    counter was true and useless: it counted a language, not the text. Web forms built on a
+    framework keep their own copy of the value and re-derive the input from it, so a value
+    written straight into the DOM can be partly overwritten a moment later without any error
+    anywhere. Typing it as real keystrokes produced the exact string. This is the same shape
+    as lesson 25 — *the counter proves the form heard you, only the server proves it kept
+    it* — one level lower down: **the success message proves the call returned, only reading
+    the value back proves what it wrote.** After any programmatic form fill, re-read the
+    field and assert on its actual content, then reload from the server and assert again.
+34. **A missing build task is silent; a failing one is loud.** Both release bundles were
+    built, exited 0 and looked normal while being completely unsigned, because the signing
+    config is only created when `keystore.properties` exists and a task that is never
+    created cannot fail. Absence of an error is not evidence of an action. When a build step
+    is conditional on a file, verify the *artefact* — see §10, "The first genuinely signed
+    release build" — not the exit code.
 
 ---
 
