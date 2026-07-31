@@ -177,7 +177,27 @@ left turn sweeps anticlockwise and nobody is sent the long way round. Inside ±5
 clears, the face fills with `primaryContainer`, the rim switches to `primary`, and the
 wording changes to confirmation. Three independent signals again, only one of them colour.
 
-A legend names the two marks, because otherwise they are just shapes.
+**The Kaaba mark** sits at the far end of the arrow, at 0.72 of the dial radius, in
+`onSurface` with its band and door painted in whatever the dial face currently is. Same
+artwork on the phone and the watch — `core/res/drawable/ic_kaaba*.xml`, shared so one dial
+drawn twice cannot end up as two different buildings.
+
+> A bearing in degrees answers *which way* only for someone who thinks in bearings, and
+> the turn instruction under the dial answers it only for someone who reads the language
+> the app is in. Neither describes most of the people this is for. A picture of the
+> building needs neither.
+>
+> It stays upright at every bearing rather than rotating with the dial. Rotating it is the
+> obvious build — one more `rotate` block, no trigonometry — and it turns the Kaaba upside
+> down whenever the Qibla is behind you, at which point it stops being recognised and goes
+> back to being a shape.
+>
+> The band and door are painted over an opaque silhouette, not cut out of it. Cut-outs
+> were built first, reviewed clean, and were wrong: a hole shows what is *behind* the
+> mark, and what is behind the mark is the needle, so the doorway filled with green.
+
+A legend names the two abstract marks. The Kaaba is not in it, because a legend explains
+shapes and this one is a picture; the subtitle above the dial already says the word.
 
 **Warning banner** — `tertiaryContainer` fill, `tertiary` icon and border,
 `onTertiaryContainer` text, 16dp radius. Used for "the system is withholding something you

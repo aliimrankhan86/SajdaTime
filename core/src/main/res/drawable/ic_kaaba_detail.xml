@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Kaaba's band and door, drawn on top of ic_kaaba.xml in the dial's face colour so the
+  mark reads as a draped cube rather than a plain block. The two viewports are identical
+  and both are drawn into the same square, so the coordinates here are in the same frame
+  as the silhouette's and must move with it.
+
+  Face colour, not gold. Gold would be truer to the kiswah, and it was rejected: the dial
+  face is surfaceVariant normally and primaryContainer the moment you are facing the
+  Qibla, and each of those differs again between light and dark, so a gold band would be
+  four more colour pairs to hold above WCAG AA — and gold against the silhouette's own
+  colour is the weakest of the four in both themes. Painting the detail in the face colour
+  means the only pair that has to hold is the one already under test in ColorContrastTest,
+  and the band's contrast is then the same as the mark's own by construction.
+
+  The band sits at y 7.5, about a quarter of the way down the wall, which is roughly where
+  the hizam sits on the building. It is 1.2 units thick and no thicker: at 2 units the top
+  of the cube stopped reading as part of the cube and started reading as a separate lintel
+  sitting above it, which made the whole mark look like a shopfront.
+
+  The door is off-centre to the right and stops 1.5 units above the plinth rather than
+  meeting it. That gap is doing real work — the door of the Kaaba is raised about two
+  metres off the ground, and it is most of what separates this silhouette from a plain box
+  with a stripe across it.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M4.5,7.5h15v1.2h-15z M12.5,11.5h4.5v7h-4.5z" />
+</vector>

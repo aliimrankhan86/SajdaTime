@@ -32,11 +32,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -50,6 +55,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.core.QiblaEngine
+import com.sajdatime.core.R as CoreR
 import com.sajdatime.app.data.CompassAccuracy
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
@@ -147,6 +153,11 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     // aloud, drawn instead of said.
     val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qiblaTrueBearing) else 0.0
 
+    // Loaded here rather than inside the Canvas: painterResource is a composable and the
+    // draw lambda is not one.
+    val kaaba = painterResource(CoreR.drawable.ic_kaaba)
+    val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
+
     Box(
         modifier = Modifier
             // widthIn before fillMaxWidth, and the order is the whole point: fillMaxWidth
@@ -170,11 +181,10 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
             // Aligned fills the dial and switches its edge to the accent. That, the
             // vanishing arc and the changed wording are three independent signals of the
             // same fact, none of which is colour on its own.
-            drawCircle(
-                color = if (aligned) scheme.primaryContainer else scheme.surfaceVariant,
-                radius = radius,
-                center = centre,
-            )
+            // Named, because the Kaaba mark's band and door are painted in it too and the
+            // two have to stay the same colour or the mark grows a visible backing plate.
+            val face = if (aligned) scheme.primaryContainer else scheme.surfaceVariant
+            drawCircle(color = face, radius = radius, center = centre)
             drawCircle(
                 color = if (aligned) scheme.primary else scheme.outlineVariant,
                 radius = radius,
@@ -205,6 +215,20 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
                 end = Offset(centre.x, centre.y - radius * 0.78f),
                 strokeWidth = 5f,
             )
+
+            // Last, so it covers whatever it lands on. Two things it can land on: the
+            // north wedge, when the Qibla happens to be due north, and the facing tick,
+            // when you are already facing the Qibla. Both are moments when the mark
+            // underneath has nothing left to say and the Kaaba has.
+            drawKaaba(
+                centre = centre,
+                radius = radius,
+                bearingDegrees = dialRotation + qiblaTrueBearing.toFloat(),
+                silhouette = kaaba,
+                detail = kaabaDetail,
+                tint = scheme.onSurface,
+                face = face,
+            )
         }
         // Nothing is drawn over the centre. An icon and a heading readout there sat
         // directly on top of the needle and made both harder to read.
@@ -227,10 +251,7 @@ private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, sweep: Float, c
         sweepAngle = sweep,
         useCenter = false,
         topLeft = Offset(centre.x - radius + inset, centre.y - radius + inset),
-        size = androidx.compose.ui.geometry.Size(
-            (radius - inset) * 2f,
-            (radius - inset) * 2f,
-        ),
+        size = Size((radius - inset) * 2f, (radius - inset) * 2f),
         style = Stroke(width = thickness),
     )
 }
@@ -290,6 +311,69 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
         color = colour,
     )
     drawCircle(color = colour, radius = radius * 0.055f, center = centre)
+}
+
+/**
+ * How far out the Kaaba mark sits, and how big it is, both as a share of the dial radius.
+ *
+ * Shares rather than dp because the dial is not a fixed size: it shrinks in landscape and
+ * at a large font scale (see [dialMaxWidth]), and a mark measured in dp would grow into
+ * the tick ring as the dial got smaller.
+ *
+ * The two numbers are one decision. The mark stays upright while its position goes round,
+ * so the corner reaching furthest out is a different corner at every bearing: at 0.72 and
+ * 0.32 the worst of them lands at 0.892 of the radius. The tick ring starts at 0.915 here
+ * and at 0.897 on the 1.2" watch — so on the phone there is room, and on the small watch
+ * the margin is under a pixel. That is not a problem, because the mark is drawn last and
+ * would simply cover a tick, but it is the reason the mark was made *larger where it is*
+ * rather than pushed further out: distance is the term with no headroom left.
+ *
+ * The needle tip at 0.82 is *inside* the cube at every bearing, which is what makes the
+ * arrow end at the Kaaba rather than beside it or through it. So it is really three
+ * numbers, not two: change any and check the others. The watch draws the same mark with
+ * the same shares — see `WearApp.kt`.
+ */
+private const val KAABA_DISTANCE = 0.72f
+private const val KAABA_SIZE = 0.32f
+
+/**
+ * The Kaaba itself, at the far end of the needle.
+ *
+ * A bearing in degrees answers "which way is it" only for someone who already thinks in
+ * bearings, and the turn instruction underneath answers it only for someone who reads
+ * English. A picture of the building answers it for everyone else, which is most of the
+ * people this app was built for.
+ *
+ * It is drawn upright at every bearing rather than rotated with the dial, and that is the
+ * one thing here worth defending. Rotating it with the dial is the obvious implementation
+ * — it is what the needle does, one more `rotate` block and no trigonometry — but it puts
+ * the Kaaba upside down whenever the Qibla is behind you, and an upside-down building
+ * stops being recognised and goes back to being a shape. The whole value of the mark is
+ * that it is understood before it is read, so it stays the right way up and its position
+ * is computed instead.
+ */
+private fun DrawScope.drawKaaba(
+    centre: Offset,
+    radius: Float,
+    bearingDegrees: Float,
+    silhouette: Painter,
+    detail: Painter,
+    tint: Color,
+    face: Color,
+) {
+    // -90 because the dial's zero is straight up and trigonometry's is three o'clock.
+    val radians = Math.toRadians(bearingDegrees.toDouble() - 90.0)
+    val box = radius * KAABA_SIZE
+    translate(
+        left = centre.x + radius * KAABA_DISTANCE * cos(radians).toFloat() - box / 2f,
+        top = centre.y + radius * KAABA_DISTANCE * sin(radians).toFloat() - box / 2f,
+    ) {
+        // Solid first, detail over it, both opaque. The band and door were once holes in
+        // a single path, which was neater and wrong: a hole shows what is behind the mark,
+        // and what is behind the mark is the needle, so the doorway filled up with green.
+        with(silhouette) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(tint)) }
+        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(face)) }
+    }
 }
 
 /**

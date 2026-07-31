@@ -10,7 +10,8 @@ No accounts. No analytics. No ads. No tracking. Your location never leaves your 
 
 - Calculates the five daily prayers plus sunrise, entirely offline, from your approximate location
 - Supports Sunni (all four madhabs) and Shia (Jafari / Ithna Ashari) conventions
-- Qibla compass, corrected to true north, verified against a reference implementation
+- Qibla compass, corrected to true north, verified against a reference implementation, with
+  the Kaaba marked on the dial so the direction is clear without reading anything
 - Live countdown to the next prayer
 - Local notifications at each prayer time, working even when the app is closed
 - Optional alarm mode with a sound you choose, able to sound through Do Not Disturb

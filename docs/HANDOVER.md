@@ -145,7 +145,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (5 source files, 3 test files, and `res/values/strings.xml` — prayer and method names live here because the phone and the watch both show them)
+**`:core`** (5 source files, 3 test files, and `res/` — `values/strings.xml` for prayer and method names, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
 
 | File | Contains |
 |---|---|
@@ -246,9 +246,15 @@ at the permission step.
 
 ### Qibla screen
 Rotating compass dial, tick marks every 15° (long every 90°), north wedge, Qibla needle,
-fixed top reference dot. Bearing and distance in km. Guidance text ("Turn right 118°" /
-"Facing Qibla") as a **polite screen-reader live region**. Calibration prompt when sensor
-accuracy is low; a manual bearing readout when there is no compass at all.
+fixed top reference dot, and a **Kaaba mark** at the far end of the needle. Bearing and
+distance in km. Guidance text ("Turn right 118°" / "Facing Qibla") as a **polite
+screen-reader live region**. Calibration prompt when sensor accuracy is low; a manual
+bearing readout when there is no compass at all.
+
+The Kaaba mark is the only part of the screen that does not require reading. Degrees need
+a user who thinks in bearings; "Turn right 118°" needs a user who reads English, which is
+every user until the app is translated by native speakers. The picture needs neither. It
+is drawn on the watch too, from the same artwork — see §7.
 
 ### Settings
 Reorganised from a flat list of ~25 controls into **four groups of tappable rows**, each
@@ -538,6 +544,12 @@ draws dark.
   because colour alone marks it for nobody on a greyscale or colour-blind display.
 - The Qibla **aligned** state is marked three ways too (arc clears, dial fills, wording
   changes).
+- The **Kaaba mark** on the dial stays upright at every bearing and is opaque. Both look
+  like details and are not: rotating it with the dial turns it upside down when the Qibla
+  is behind you, and cutting the band and door out of it as holes lets the needle show
+  through the doorway. Both were built the obvious way first and both were wrong on the
+  emulator. The artwork lives in `core/src/main/res/drawable/` so the phone and the watch
+  cannot drift into drawing two different buildings.
 - Surfaces separate themselves by **shadow in light, hairline border in dark** — one
   helper, `Modifier.sajdaSurface`. A shadow on a dark surface is invisible; a border in
   light is a hard line the design does not want.
@@ -772,6 +784,36 @@ compiler, to lint, and to the unit tests.
 were retaken and `tools/build-store-assets.sh` re-run. A theme change that leaves
 `docs/store/screenshots/` alone ships a listing that does not match the app.
 
+### The Kaaba mark on the dial — what running it changed
+
+Added so the Qibla screen says *which way* without requiring the user to read anything.
+Every claim here is from a capture of the running app.
+
+| Checked | Result |
+|---|---|
+| Phone, light | Black cube, light band and raised door, needle ending inside it. This is the orientation the mark was designed for — in light theme the silhouette is genuinely the colour of the building |
+| Phone, dark | Inverted, as a tinted icon must be: light cube, dark band. Legible, reads as the same object |
+| Phone, aligned (`primaryContainer` face) | Band and door repaint in the green face colour and stay legible; the mark covers the facing tick, which by then has nothing left to say |
+| Watch, 192dp and 227dp, font 1.0 and 1.3 | Drawn clear of the tick ring and clear of the watch face clock on both sizes. All 24 captures pass `tools/wear-round-check.py` |
+| Watch, aligned | Same repaint as the phone, verified by driving the virtual magnetometer to the Qibla bearing |
+| Contrast | Four new pairs in `ColorContrastTest` at the 3:1 non-text threshold — `onSurface` on the dial face and on the aligned dial face, light and dark. They were never under test before, and the north wedge had been relying on them too |
+
+**Two things that reviewed clean and were wrong on the emulator.**
+
+1. **The band and door were holes in a single even-odd path.** Neater, one asset, and it
+   let the dial face show through by construction — except that what shows through a hole
+   is not the dial face, it is *whatever is behind the mark*, and what is behind the mark
+   is the needle. The doorway filled with green. Now an opaque silhouette with the detail
+   painted over it.
+2. **The watch needle was left at its old length and buried in the cube.** On the phone
+   that is right — the needle is long and its tip vanishing behind the Kaaba reads as an
+   arrow arriving. On the watch the needle already floats clear of the centre readout, so
+   burying the tip left a stubby trapezoid that stopped reading as an arrow at all. Pulled
+   back to 0.60 of the radius, where it stops just short and shows a whole triangle.
+
+The second one is the more useful lesson: the same change was correct on one screen and
+wrong on the other, and nothing but looking at both would have said so.
+
 ### Useful device-testing recipes
 
 ```bash
@@ -984,8 +1026,8 @@ different machine.
 | Phone emulator | AVD `sajda`, API 36 |
 | Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a`, `wearos_small_round` — 384px @ 320dpi = **192dp** |
 | Watch emulator, large | AVD `sajdawear_large`, same image, `wearos_large_round` — 454px @ 320dpi = **227dp**. Created on demand by `./tools/wear-verify.sh`. Both sizes must be run; the app was wrong on both in ways only visible with them side by side |
-| Repo files tracked | 112 |
-| Kotlin source | ~8,200 lines across the three modules |
+| Repo files tracked | 114 |
+| Kotlin source | ~8,350 lines across the three modules |
 
 ```bash
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -1060,7 +1102,9 @@ script after editing the markdown.**
 | `6e57e49` | Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
 | `6a16bd1` | Applied the light design system and added the Follow phone / Light / Dark setting |
 | `0e43fe5` | Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
-| *(this)* | **(current)** Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
+| `2a13b9d` | Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
+| `d9e31e3` | Brought the handover's own bookkeeping up to date |
+| *(this)* | **(current)** Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
 
 ---
 
@@ -1116,13 +1160,27 @@ script after editing the markdown.**
     something else", because the clock and the app are both just lit pixels. The defect that
     actually mattered was in the half it cannot see. Ship the check *and* look at the
     pictures; be precise in the docs about which half each one covers.
-13. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+13. **A hole is not a colour.** The Kaaba mark's band and door were first cut out of a
+    single even-odd path, on the reasoning that the dial face would show through and the
+    mark would therefore need no second colour to keep above AA. The reasoning was sound
+    and the result was wrong, because a hole does not show the background you were
+    thinking of — it shows whatever happens to be behind, and behind this mark is the
+    needle. The doorway filled with green. Any time transparency is standing in for a
+    specific colour, ask what else can get underneath it.
+14. **The same change can be right on one screen and wrong on the other.** Letting the
+    needle end inside the Kaaba mark is correct on the phone, where the needle is long and
+    its tip disappearing behind the building reads as an arrow arriving. On the watch the
+    needle already floats clear of the centre readout, so the identical treatment left a
+    stubby trapezoid that stopped reading as an arrow at all. Same code, same shape, same
+    constants, opposite verdicts — and the only thing that could have told you is having
+    both open at once. This is §5 again in a smaller key, and it will keep recurring.
+15. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-14. The owner is **not technical**. Explain in plain language, state what is verified versus
+16. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-15. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+17. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

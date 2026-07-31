@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Kaaba, as a mark on the Qibla dial: the silhouette. Its band and door are a separate
+  drawable, ic_kaaba_detail.xml, drawn on top of this one in the dial's own face colour.
+
+  Shared between the phone and the watch, because they draw the same dial twice and a
+  shape that drifts between them is exactly the kind of gap this project has been bitten
+  by before.
+
+  Two drawables rather than one path with the band and door cut out of it by the even-odd
+  rule. The cut-out version was written first and looked correct in review, and it was
+  wrong: a hole shows whatever is behind the mark, and what is behind the mark is the
+  needle. The Qibla needle ends inside the cube, so it appeared as a green streak through
+  the doorway and across the band, which read as a rendering fault rather than a building.
+  Opaque silhouette plus opaque detail cannot do that, whatever it is drawn over.
+
+  Deliberately a flat elevation and not a photograph or a perspective render. A photograph
+  would be someone else's copyright, would weigh more than the rest of the app's drawables
+  put together, and would be unreadable at the ~19dp this is drawn at on a 1.2" watch. The
+  silhouette, the band and the raised door are the three things that make it recognisable;
+  everything else is detail that disappears at that size anyway.
+
+  Geometry, in the 24x24 viewport: the wall is x 4.5..19.5 and y 3..20, so 15 wide by 17
+  tall — very slightly taller than it is wide, which is the proportion of the real face
+  that carries the door. It stands on the wider marble plinth, the shadharwan, at y 20.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M4.5,3h15v17h-15z M3,20h18v1.5h-18z" />
+</vector>

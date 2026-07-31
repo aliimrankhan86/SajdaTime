@@ -29,11 +29,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -54,6 +59,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
 import com.sajdatime.core.labelRes
 import com.sajdatime.core.QiblaEngine
+import com.sajdatime.core.R as CoreR
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -490,6 +496,12 @@ private fun QiblaPage(state: WearUiState) {
             val arcColour = MaterialTheme.colorScheme.primary
             val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qibla) else 0.0
 
+            // Read outside the Canvas because both are composable calls and the draw
+            // lambda is not one.
+            val kaaba = painterResource(CoreR.drawable.ic_kaaba)
+            val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
+            val kaabaColour = MaterialTheme.colorScheme.onSurface
+
             Canvas(
                 Modifier
                     .fillMaxSize()
@@ -531,8 +543,22 @@ private fun QiblaPage(state: WearUiState) {
 
                     // The needle floats between the rim and the middle rather than
                     // starting at the centre, so it never lies across the readout.
+                    //
+                    // The tip stops at 0.60 rather than the 0.86 it used to, which is just
+                    // short of the Kaaba mark rather than inside it. Buried, what was left
+                    // showing was a stubby trapezoid squeezed between the readout and the
+                    // cube, and it stopped reading as an arrow at all; stopping short
+                    // leaves a whole triangle that points at the mark.
+                    //
+                    // "Just short" moves with the bearing, and there is no single number
+                    // that is exact: the mark stays upright while the needle goes round,
+                    // so the needle arrives at its flat side at some angles and at a
+                    // corner at others, and the near edge sits at 0.60 of the radius in
+                    // the first case and about 0.55 in the second. 0.60 splits it — a
+                    // hair's gap at the flats, a hair's overlap at the corners, and
+                    // neither is visible at watch size.
                     rotate(degrees = qibla.toFloat(), pivot = centre) {
-                        val tip = Offset(centre.x, centre.y - radius * 0.86f)
+                        val tip = Offset(centre.x, centre.y - radius * 0.60f)
                         val base = centre.y - radius * 0.40f
                         drawPath(
                             path = Path().apply {
@@ -556,6 +582,19 @@ private fun QiblaPage(state: WearUiState) {
                         strokeWidth = 4f,
                     )
                 }
+
+                // Last, so it covers the facing tick on the one occasion they coincide:
+                // when you are already facing the Qibla, and the tick has nothing left
+                // to tell you.
+                drawKaaba(
+                    centre = centre,
+                    radius = radius,
+                    bearingDegrees = (qibla - (heading ?: 0.0)).toFloat(),
+                    silhouette = kaaba,
+                    detail = kaabaDetail,
+                    tint = kaabaColour,
+                    face = dialColour,
+                )
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -577,6 +616,51 @@ private fun QiblaPage(state: WearUiState) {
                 }
             }
         }
+    }
+}
+
+/**
+ * Where the Kaaba mark sits on the dial and how big it is, as shares of the dial radius.
+ *
+ * The same two numbers as the phone's `QiblaScreen.kt`, and they have to stay the same:
+ * this is one dial drawn twice, and the two watch sizes plus every phone size mean shares
+ * are the only form these can take. The 1.2" watch is the tightest case in the app: its
+ * tick ring starts at 0.897 of the radius and the mark's furthest corner reaches 0.892, a
+ * margin of well under a pixel. It costs nothing today — the mark is drawn last, so at
+ * worst it hides a tick — but it does mean the distance has no headroom, and this is the
+ * screen to check on if either number is ever changed.
+ */
+private const val KAABA_DISTANCE = 0.72f
+private const val KAABA_SIZE = 0.32f
+
+/**
+ * The Kaaba itself, at the far end of the needle. The phone draws the same mark from the
+ * same shared artwork; see `QiblaScreen.kt` for why it stays upright instead of rotating
+ * with the dial, and `ic_kaaba.xml` for why the band and door are painted over the
+ * silhouette rather than cut out of it.
+ *
+ * It earns its space here more than it does on the phone. The watch has no room for the
+ * turn instruction the phone prints under the dial, so before this the only thing on the
+ * screen naming a direction was a number of degrees.
+ */
+private fun DrawScope.drawKaaba(
+    centre: Offset,
+    radius: Float,
+    bearingDegrees: Float,
+    silhouette: Painter,
+    detail: Painter,
+    tint: Color,
+    face: Color,
+) {
+    // -90 because the dial's zero is straight up and trigonometry's is three o'clock.
+    val radians = Math.toRadians(bearingDegrees.toDouble() - 90.0)
+    val box = radius * KAABA_SIZE
+    translate(
+        left = centre.x + radius * KAABA_DISTANCE * cos(radians).toFloat() - box / 2f,
+        top = centre.y + radius * KAABA_DISTANCE * sin(radians).toFloat() - box / 2f,
+    ) {
+        with(silhouette) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(tint)) }
+        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(face)) }
     }
 }
 

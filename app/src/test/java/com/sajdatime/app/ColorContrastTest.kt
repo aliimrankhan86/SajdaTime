@@ -134,6 +134,15 @@ class ColorContrastTest {
         Pair("dark outline/background", DarkOutline, DarkBackground, 3.0),
         Pair("light accent/accentContainer", LightAccent, LightAccentContainer, 3.0),
         Pair("dark accent/accentContainer", DarkAccent, DarkAccentContainer, 3.0),
+        // The Kaaba mark and the north wedge are onSurface drawn straight onto the Qibla
+        // dial, and the dial face is not the surface — it is surfaceVariant, and it
+        // becomes primaryContainer the moment you are facing the Qibla. Four pairs, not
+        // one, because a mark that is legible until you point the right way is worse than
+        // one that was never legible at all.
+        Pair("light onSurface/dial face", LightOnSurface, LightSurfaceVariant, 3.0),
+        Pair("dark onSurface/dial face", DarkOnSurface, DarkSurfaceVariant, 3.0),
+        Pair("light onSurface/dial face aligned", LightOnSurface, LightPrimaryContainer, 3.0),
+        Pair("dark onSurface/dial face aligned", DarkOnSurface, DarkPrimaryContainer, 3.0),
     )
 
     @Test
