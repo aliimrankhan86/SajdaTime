@@ -361,6 +361,19 @@ a bug, and `DeterminismTest` asserts it.
 | Jafari | 16° | **4° below horizon** | 14° |
 | Tehran | 17.7° | **4.5° below horizon** | 14° |
 
+**Muslim World League also carries a +1 minute Dhuhr offset, and it is part of the method.**
+adhan ships MWL with `methodAdjustments = (dhuhr = 1)`, so the app's Dhuhr is one minute
+later than solar transit by definition. This is the single reason a careful user comparing
+to Aladhan will find Dhuhr "wrong by a minute" — Aladhan's MWL does not apply the offset,
+so it reports the transit itself. Both are defensible and adhan's is the safer direction,
+since it can only ever move the time later, never before the sun has passed the zenith.
+
+Do not "fix" it, and do not zero it out to make a reference comparison line up. Verified by
+running adhan-java directly: with the adjustment, Dhuhr is 13:16 for Manchester on 31 July
+2026; with `methodAdjustments` zeroed it is 13:15, which is exactly Aladhan's answer. An
+iOS port on adhan-swift inherits the same offset and needs no special handling; a port onto
+any *other* library must add it explicitly or every Dhuhr in the app will silently shift.
+
 ### 5.4 ⭐ The Jafari Maghrib rule — the single most important piece of logic
 For Sunni conventions Maghrib is sunset. For **Jafari and Tehran**, Maghrib is when the
 redness leaves the eastern sky — the sun 4° (4.5° Tehran) below the horizon, typically
@@ -1051,6 +1064,73 @@ re-exported under it; `./tools/wear-verify.sh` was not re-run, because no shippe
 changed — the diff is two build files and one resource that exists only in a build type
 that is never released. Verified instead that neither release bundle contains `ar-XB`.
 
+### Full pre-release audit (31 Jul 2026) — what was checked and what it found
+
+Run on both emulators together, against the shipped code, after the owner asked for a sweep
+rather than spot checks. Two things came out of it: one real defect, and one phantom.
+
+**Times, checked against Aladhan and against adhan-java itself.** Manchester, 31 July 2026,
+Sunni/Shafi'i/AUTO → MWL. All six times on screen matched adhan-java **exactly**. Against
+Aladhan: Fajr, Sunrise and Maghrib identical; Dhuhr +1 (the MWL method offset, §5.3); Asr −1
+and Isha +1 (nearest-minute rounding between two independent implementations). Every
+difference is accounted for and inside the ±2 min the suite already allows. The PDF was
+exported for the whole month, pulled off the device and rendered: 31 rows, correct weekdays,
+last row identical to the screen, and 1 July independently re-checked against Aladhan (5 of
+6 exact, Dhuhr +1 as expected) — so the whole range is right, not just today.
+Qibla re-derived from the great-circle formula: 118.45° / 5025 km against the app's
+118° / 5024 km.
+
+**The phantom.** The watch showed Asr 6:36 pm against the phone's 5:28 pm — a 68-minute gap,
+which is precisely Hanafi versus Shafi'i, and exactly the phone-versus-watch divergence this
+document warns is the worst bug class in the project. It was not a bug. Dumping the watch's
+DataStore showed `madhab = HANAFI` written into it by an earlier session's manual testing;
+both modules default to `SHAFII` and both persist by name. `pm clear` and a relaunch brought
+all six times into line with the phone. **Four of this project's five "confirmed bugs" have
+now been faults in the test rather than the code** — read the device's actual persisted state
+before believing a cross-module difference.
+
+**The real one — a false statement to the user, now fixed.** On a cold start the home card
+read *"Set your location to see prayer times."* while the user's coordinates were sitting in
+DataStore the whole time. The card keyed off `next == null`, which is true both before the
+first calculation lands and when there genuinely is no location; only the second deserves
+those words. It is now keyed to `!loading && coordinates == null`, which is the thing the
+sentence actually talks about. Seen once, on the slow API 36 emulator, and *not* reproducible
+in a controlled 40-sample re-run — recorded honestly as intermittent rather than dressed up
+as reliably reproduced. Verified after the fix across three cold starts with the empty text
+never appearing.
+
+Worth knowing for anyone hunting the same thing: post-onboarding, `coordinates == null` looks
+unreachable. Onboarding disables **Continue** until a location exists, and the decline path
+offers a typed city or *"Skip for now and use Makkah"*. The genuine no-location case is
+already covered by its own, better-worded banner — *"Showing times for Makkah / We could not
+work out where you are"* — which was exercised end to end and whose times match Aladhan for
+Makkah exactly (Fajr 02:33, Sunrise 03:54 in the device's London zone). So the branch that
+was fixed is defensive; the fix removes a lie without removing any message a user needs.
+
+**Everything else checked, clean:** onboarding both ways (granted, and denied → Makkah);
+approximate-location permission dialog confirms coarse-only; disclaimer with its dua
+paragraph intact; Times, Qibla, Settings; dark theme; theme choice surviving restart;
+location sheet re-acquiring; PDF export; **font scale 150% and 200%** — the hero card,
+countdown, warning card and all three nav labels reflow with nothing clipped or overlapped.
+**No crashes and no ANRs on either device.** The Wear emulator's own sensors HAL
+(`android.hardware.sensors-service.multihal`) died three times during the run; that is
+emulator infrastructure, not this app, and no SajdaTime process was involved.
+
+**Release bundles:** both build, both **unsigned** (no `keystore.properties`, as intended),
+`en-GB` ships, no `ar-XB` in either, `allowBackup=false` plus full `cloud-backup` **and**
+`device-transfer` exclusions in the merged release manifests. The app declares no foreground
+service of its own — `FOREGROUND_SERVICE` and `WAKE_LOCK` arrive from WorkManager's manifest
+and nothing ever calls `setForeground`, so the Android 14 "missing foregroundServiceType"
+crash cannot occur here.
+
+**Not tested:** no physical device of any kind. Data Layer settings sync between phone and
+watch is still unexercised — the two emulators are not paired, so the watch was verified
+standalone on its own defaults, which is what actually matters for a standalone watch app but
+is not the same thing as proving the sync. Alarms firing, notification delivery and the tile
+were not re-exercised this session; they were verified earlier and no code touching them
+changed. Lint's `DataExtractionRules` warning fires on both modules and is a false positive
+here: it asks for `fullBackupContent`, which only matters when `allowBackup="true"`.
+
 ### Midnight rollover — a stale day list, found by stepping the clock
 
 Both apps drove their live clock off one trigger: recompute when the next prayer passes.
@@ -1475,6 +1555,7 @@ Every one of these cost real time. Read before building.
 | **Name clash** | `android.provider.Settings` vs `Icons.Outlined.Settings` | `import android.provider.Settings as SystemSettings` |
 | **`avdmanager`** | Cannot see system images through a symlinked `cmdline-tools` | Copy `cmdline-tools/latest` into `$ANDROID_HOME` as a real directory |
 | **Unscoped `installDebug`** | `INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000`, or the phone emulator silently running the watch build | Both modules share one `applicationId`, so the root task installs `:wear` **over** `:app`. Scope it: `:app:installDebug` / `:wear:installDebug`. To recover: `adb uninstall com.sajdatime.app`. To check which is installed: `adb shell cmd package resolve-activity --brief com.sajdatime.app`. See §15 lesson 28. |
+| **Scoping the module is not enough with two emulators up** | Same `INSTALL_FAILED_VERSION_DOWNGRADE`, but now from `:app:installDebug`, which looks like it cannot possibly be the cause | Gradle installs to **every** connected device, so `:app:installDebug` also tries to put the phone APK on the watch emulator, where the watch build already sits at versionCode 1000. Scope the device too: `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug`. Bites exactly when you follow this project's own advice to run both emulators together. |
 | **`sed -i.bak` inside `res/`** | `Resource and asset merger: The file name must end with .xml` | The backup file is itself a resource. Edit resources with a tool that does not drop siblings, or write the backup outside `res/`. |
 
 ### The architecture PDF is generated, never hand-made
@@ -1753,13 +1834,23 @@ matters more than the stable hashes, that is the trade being made.
     — and if a device is already in that state, `adb uninstall com.sajdatime.app` first.
     `adb shell cmd package resolve-activity --brief com.sajdatime.app` names the launcher
     activity and settles which of the two is actually installed in one line.
-29. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+29. **Read the device's persisted state before believing a cross-module difference.** The
+    watch showed Asr 68 minutes off the phone — the exact Hanafi/Shafi'i gap, in exactly the
+    place this document says the project's worst bug once lived. Everything pointed at a real
+    defect. It was a `madhab = HANAFI` left in the watch's DataStore by an earlier session's
+    manual testing; `pm clear` and a relaunch matched the phone on all six times. An emulator
+    is not a clean room, it is a machine somebody has already been poking at, and its saved
+    state is an input to your test whether you meant it to be or not. Dump the store
+    (`run-as <pkg> cat .../datastore/*.preferences_pb | xxd`) before you write the bug up.
+    That is four of five "confirmed bugs" in this project now traced to the test, not the
+    code — and the one real defect this same session found was in a place nobody suspected.
+30. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-30. The owner is **not technical**. Explain in plain language, state what is verified versus
+31. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-31. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+32. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

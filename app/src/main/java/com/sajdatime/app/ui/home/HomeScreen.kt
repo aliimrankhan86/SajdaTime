@@ -223,12 +223,26 @@ private fun NextPrayerCard(state: UiState) {
         verticalArrangement = Arrangement.Center,
     ) {
         if (next == null) {
-            Text(
-                text = stringResource(R.string.home_no_location),
-                style = MaterialTheme.typography.titleMedium,
-                color = hero.prominent,
-                textAlign = TextAlign.Center,
-            )
+            // A null `next` means two different things and they need different words: the
+            // user has no location, or they have one and its times have not been worked
+            // out yet. Only the first is theirs to act on. Telling somebody who set their
+            // location months ago to "set your location" is simply false, and on a cold
+            // start on a slow device it is on screen long enough to read and believe —
+            // observed once on the API 36 emulator, where the card sat there for seconds
+            // while DataStore was still loading coordinates that were present all along.
+            //
+            // So the message is tied to the thing it actually talks about — a missing
+            // location — and not to the absence of a calculation. `loading` is still
+            // needed alongside it, because until the store emits, `settings` is the
+            // default `AppSettings()` and its coordinates are legitimately null.
+            if (!state.loading && state.settings.coordinates == null) {
+                Text(
+                    text = stringResource(R.string.home_no_location),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = hero.prominent,
+                    textAlign = TextAlign.Center,
+                )
+            }
             return@Column
         }
 
