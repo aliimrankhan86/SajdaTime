@@ -1290,9 +1290,10 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
       eligibility to be featured — so it is easy to scroll past, and for an app with no
       marketing that would be the wrong thing to scroll past. The short description now
       reads `Offline prayer times and Qibla compass for Sunni and Shia. No tracking.`
-      (71 / 80). Both words were removed from the feature graphic in the same commits, since
-      the Console validates form fields and cannot read a PNG. Full reasoning, the rejected
-      alternatives and the remaining elimination step are in `docs/store/LISTING.md`.
+      (71 / 80) and **the notice is confirmed cleared** on a fresh load. Both words were
+      removed from the feature graphic in the same commits, since the Console validates form
+      fields and cannot read a PNG. Full reasoning and the rejected alternatives are in
+      `docs/store/LISTING.md`.
 
     **The next actual steps:** Store settings (category Lifestyle, tags, contact email
     `aikstudies@gmail.com`), then the signing key — owner-only, `docs/RELEASING.md` Step 2,

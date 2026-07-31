@@ -86,10 +86,18 @@ for it to be.
 The freed characters were deliberately **not** spent. At `71 / 80` every word is doing work,
 and nine unused characters are not a debt to be paid off with a keyword.
 
-**If the notice still does not clear**, the last suspect is `No tracking.` — cut that
-sentence entirely and the line becomes `Offline prayer times and Qibla compass for Sunni and
-Shia.` (57 / 80), which contains nothing that could be read as price or promotion. That
-would be surprising; `tracking` is a privacy word, not a commercial one.
+**Confirmed cleared.** After saving with `No ads` removed and reloading the page from the
+server, the notice is gone — checked by searching the rendered page for both "may not be
+promoted" and "price or promotion" and finding neither, on a listing whose header now reads
+*Ready to send for review*. So the diagnosis was right: with `Free` and `No ads` both out,
+nothing in this sentence reads as price or promotion to Google's checker.
+
+That also settles, by elimination, that **`No tracking` is not a flagged phrase** — it
+survived the check untouched. Privacy words are fine; commercial ones are not.
+
+If the notice ever comes back after an edit, the method is the thing to reuse rather than
+the answer: change one candidate phrase, save, reload, and re-read. It does not re-evaluate
+live, so a notice still on screen after an edit means nothing until the round trip.
 
 ---
 
