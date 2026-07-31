@@ -89,9 +89,30 @@ during the fortnight — check the times, swing the Qibla compass around, change
 method, export a PDF. And when the production-access form asks what you changed in response to
 feedback, **have a real answer**. That free-text box is the part you actually control.
 
-**The owner's plan is to start recruiting testers only once account verification has
-cleared**, rather than in parallel. That is a deliberate decision — do not keep pressing for
-it earlier.
+**The owner's plan was to start recruiting testers only once account verification had
+cleared**, rather than in parallel. That was a deliberate decision and it should not have been
+pressed on earlier — but **verification has now cleared**, so the condition it was waiting for
+is gone. Recruiting is unblocked and is the only remaining task that does not depend on the
+signing key. It is also the long pole, so it is the one worth starting first.
+
+### The questions you will actually be asked
+
+Not a surprise to leave until the end — the answers are things you can only collect *during*
+the fortnight, and there is no going back for them afterwards. Google's own preview of the
+production-access form has three parts:
+
+| Part | What it asks |
+|---|---|
+| **About your closed test** | How easy you found it to recruit testers · tester engagement, including whether they used *all* the features and how that compared with expected real-world use · a summary of the feedback and **how you collected it** |
+| **About your app** | Who it is for, specifically · *"Describe how your app provides value to users"* · expected installs in the first year |
+| **Production readiness** | What you **changed** as a result of the closed test · how you decided it was ready |
+
+Two of those are traps for this app in particular. *"Whether testers used all features"* is the
+engagement question from the risk note above, wearing a different hat — so ask testers to
+touch the Qibla compass, the madhab picker and the PDF export, not just let notifications
+arrive. And *"what you changed"* has no good answer if nothing was collected: set up somewhere
+for feedback to land **before** the test starts — one email address or a WhatsApp group is
+enough — because "no one reported anything" reads as "no one tested it".
 
 ### The Wear OS wrinkle
 
@@ -132,9 +153,19 @@ full address is only shown if you monetise, which this app does not.
 | Access to a real Android device | ✅ **Done** — Play Console app on a physical phone |
 | Identity documents | ✅ **Done** — approved by Google |
 | Contact phone number | ✅ **Done** — verified once the identity review passed |
+| Android developer verification | ✅ **Done** — see below |
 
 **All account verification is complete.** Nothing on the Google side is outstanding. The
 account can create and publish apps.
+
+> **Android developer verification is the new one**, and it is the 2025–26 programme that
+> extends verification to apps installed *outside* Play. It is easy to miss because it is
+> announced on the account home page rather than in the app, and easy to worry about because
+> it sounds like a fresh hurdle. It is not: the Console states *"All of your apps have been
+> successfully registered to meet Android developer verification requirements."* Registration
+> happened automatically for an app already in the Console. It only needs attention if
+> SajdaTime is ever distributed off Play — an APK on the website, F-Droid, a direct download —
+> in which case that package name has to be registered explicitly.
 
 > The device check is worth remembering for any future account: it requires the **Play
 > Console app on a physical Android phone**, and an emulator does not satisfy it. Every
@@ -273,23 +304,48 @@ as it is wide. The script reframes them to 9:16 without cropping anything.
 
 ---
 
-## Step 6 — Play Console forms · **ONLY YOU** (answer honestly)
+## Step 6 — Play Console forms · **DONE** (all green)
 
-You must complete all of these before you can publish:
+Every one of these is complete in the Console. Kept here because they have to be re-checked
+after any change that touches data handling, and because two of them were answered wrongly
+first time.
 
-1. **Data safety.** The honest answers: no data is collected, no data is shared, no account
-   is required, nothing is sold. **One nuance to declare accurately** — if a user types a
-   city name instead of using location, that name is sent once to a free geocoding service
-   to look up coordinates. It is not stored, not linked to the person, and the app tells
-   them before it happens. Declare it as processed ephemerally rather than pretending
-   nothing leaves the device.
-2. **Content rating questionnaire.** Straightforward; the app has no objectionable content.
-   Expect a "Everyone / PEGI 3" style rating.
-3. **Target audience and content.** Not aimed at children.
-4. **Ads declaration.** **No**, the app contains no ads.
+1. **Data safety** — submitted. The answers to give, and why, are in `docs/store/LISTING.md`,
+   which is the authority on this form: **Yes**, collects **Approximate location**; not
+   shared; **not** ephemeral; purpose App functionality only.
+
+   > **The submitted answers were not re-read to write this.** The questionnaire is a
+   > five-step wizard whose step numbers are indicators rather than links, so the only way
+   > back to the answers is `Next` through all five — and stepping a completed declaration
+   > through its own wizard risks dropping it back into draft. It shows as actioned, which is
+   > the state that matters, and it is not worth re-opening a green form to admire it. If you
+   > ever do need to read the answers back, use **Export to CSV** at the top of the page
+   > rather than the wizard.
+
+   > ⚠️ **This step used to say two things that were wrong**, and both were the kind of wrong
+   > that gets an app pulled after it is already live.
+   >
+   > It said *"no data is collected"*. Google's definition is mechanical — *"'Collect' means
+   > transmitting data from your app off a user's device"* — and a typed city name leaves the
+   > device. That is collection, whatever our intentions, and answering No is a misdeclaration.
+   >
+   > It then said to *"declare it as processed ephemerally"*. **Do not tick that box.** The
+   > standard requires the data be retained no longer than needed to service the request, and
+   > Open-Meteo's own terms say *"All log files will be deleted after a period of 90 days."*
+   > Our handling is ephemeral; the round trip is not. Google has never resolved whose
+   > retention it means, and guessing in your own favour on an unresolved ambiguity is exactly
+   > what gets an app removed later.
+   >
+   > Declaring it honestly costs almost nothing: the public card gains one line, on an app
+   > whose whole pitch is privacy. **Over-declaring is never a violation. Under-declaring is.**
+
+2. **Content rating questionnaire** — submitted. No objectionable content.
+3. **Target audience and content** — **13+**, not aimed at children.
+4. **Ads declaration** — **No**.
 5. **Government apps / financial features / health** — all no.
-6. **App access.** No login required; state that all functionality is available without
-   restriction.
+6. **App access** — no login; all functionality available without restriction.
+7. **Advertising ID** — **No**. Re-check the merged manifest before ever changing this; a
+   Play Services library can pull `AD_ID` in transitively and the mismatch is a hard error.
 
 ---
 
@@ -460,15 +516,31 @@ Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradl
 ## What is genuinely blocking, right now
 
 The developer account is **fully verified** — identity, phone and device checks have all
-passed — and GitHub Pages is live. Nothing is waiting on Google. **One** thing remains
-before a bundle can be uploaded:
+passed — GitHub Pages is live, and **the store listing and store settings are saved and clean
+in the Console**, checked on a reload from Google's servers rather than from the page as left.
+Every App content declaration is green. Nothing is waiting on Google.
+
+Play's dashboard states the remaining path in four steps, and shows the app sitting on the
+first of them:
+
+1. Publish a closed testing release
+2. Have at least 12 testers opted in — **`0 testers currently opted in`**
+3. Run the closed test with at least 12 testers for at least 14 days
+4. Apply for production
+
+Which reduces to **two** real tasks:
 
 1. **The signing key** (Step 2) — one `keytool` command plus a `keystore.properties` file.
-   Nobody else should ever generate or hold this. **This is the only task blocking a
-   release build**, and it depends on nothing and nobody else.
+   Nobody else should ever generate or hold this: not a contractor, not an assistant, not an
+   AI agent. **This is the only thing blocking a release build**, and it depends on nothing
+   and nobody else.
+2. **Twelve testers** (Step 0) — no longer blocked on anything either, now that verification
+   has cleared, and unlike the key it cannot be done in an afternoon. Recruit roughly double,
+   because the count is of testers who *stay* opted in.
 
-After that: create the listing (Step 7), then the 12-tester clock (Step 0) starts, and that
-is the long pole — 14 continuous days that cannot be shortened.
+They are independent, so they should run in parallel. The key unblocks the upload; the testers
+are the 14-day clock, and that clock is the long pole. It cannot be shortened, only started
+earlier.
 
 Everything else is done and in the repo: the live privacy policy, the store screenshots, the
 icon, the feature graphic, all the listing text, and the Gradle signing wiring.

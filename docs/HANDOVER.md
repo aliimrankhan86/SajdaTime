@@ -1267,9 +1267,11 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     account: it requires the Play Console app on a *physical* phone and an emulator does not
     satisfy it — the one step in this whole project that cannot be done on an emulator.
 
-    **All account verification has now cleared** — identity documents approved and the
-    contact phone verified. Nothing on Google's side is outstanding. See
-    `docs/RELEASING.md` for the account facts and the full checklist.
+    **All account verification has now cleared** — identity documents approved, contact phone
+    verified, and **Android developer verification** (the 2025–26 programme covering apps
+    installed outside Play) registered automatically, which the Console confirms in as many
+    words. Nothing on Google's side is outstanding. See `docs/RELEASING.md` for the account
+    facts and the full checklist.
 
     **The app now exists in the Console** (app ID `4975578035662443727`). Every **App
     content** declaration is complete and green — privacy policy, app access, ads, content
