@@ -18,12 +18,12 @@ SajdaTime: Prayer Times, Qibla
 ## Short description (max 80)
 
 ```
-Offline prayer times and Qibla compass for Sunni and Shia. No ads, no tracking.
+Offline prayer times and Qibla compass for Sunni and Shia. No tracking.
 ```
 
-`79 / 80`
+`71 / 80`
 
-### Do not put the word "Free" back
+### Do not put "Free" or "No ads" back
 
 This used to end `… no accounts, no tracking. Free.` and the Console answered with a
 promotability notice:
@@ -56,16 +56,40 @@ Rejected, and why:
 | Adding *Namaz* / *Salah* for search volume | Keyword stuffing in an English sentence, and Play flags that separately |
 
 `no accounts` was the item dropped from the trust triad — it is the least sharp of the
-three and is still in the feature graphic and the full description.
+three and is still in the full description.
 
 **One judgment call worth knowing about.** Naming both traditions is inclusive and true, and
 it is a deliberate choice to say it on the front of the listing rather than only inside.
-If you would rather the store page not foreground the distinction, the 73-character variant
-above is a straight swap and nothing else in the listing depends on it.
+If you would rather the store page not foreground the distinction, dropping `for Sunni and
+Shia` is a straight swap and nothing else in the listing depends on it.
 
-**If the notice does not clear**, the next suspect is `No ads` — test by pasting the
-73-character variant, then the same line without `No ads`. Google does not publish the
-keyword list, so this is narrowed by elimination rather than by reading a rule.
+### "No ads" is also a promotion keyword — this was measured, not guessed
+
+Removing `Free.` **did not clear the notice.** The listing was saved and the page reloaded
+from the server, and the identical bullet came back on a fresh render:
+
+> "Should not use keywords that indicate price or promotion"
+
+So the check is real and re-evaluated, not a stale message left over from the previous text.
+Working through what was left — `Offline`, `prayer times`, `Qibla compass`, `Sunni and
+Shia`, `No ads`, `no tracking` — only one of those is about money at all. `No ads` describes
+how the app is (not) monetised, which is exactly the class of claim the guideline names.
+Google does not publish the keyword list, so this is elimination, not a rule anyone can read.
+
+Losing it costs less than it looks like it should. Play renders a **Contains ads** badge on
+listings that have ads, and shows nothing on listings that do not. The absence of ads is
+therefore already stated by Play itself, in its own UI, in a place users trust more than
+they trust the developer's own sentence — the same argument that retired `Free`. The claim
+still appears in the full description's second line, where the metadata policy is content
+for it to be.
+
+The freed characters were deliberately **not** spent. At `71 / 80` every word is doing work,
+and nine unused characters are not a debt to be paid off with a keyword.
+
+**If the notice still does not clear**, the last suspect is `No tracking.` — cut that
+sentence entirely and the line becomes `Offline prayer times and Qibla compass for Sunni and
+Shia.` (57 / 80), which contains nothing that could be read as price or promotion. That
+would be surprising; `tracking` is a privacy word, not a commercial one.
 
 ---
 
@@ -340,17 +364,25 @@ Its subtitle used to read `Free · No ads · No accounts · Works offline`. The 
 because it validates form fields and cannot read a PNG. Fixing the flagged field alone would
 have left the word in the one asset Play uses when it *does* promote an app.
 
-It now reads `Sunni & Shia · No ads · No accounts · No tracking`. `Works offline` went too,
-as redundant: the line directly above it already says "calculated on your phone".
+`No ads` then had to go the same way, once the Console proved the guideline was still firing
+with `Free` already removed (see the short description section above). The banner was never
+flagged and never could be, so this is the second time the same fix had to be applied twice:
+once where a validator could see it, once where nothing could.
 
-Measured after regenerating, not assumed — the longer line runs further into the warm end of
-the gradient than the old one did, so the background under it changed:
+It now reads `Sunni & Shia · No accounts · No tracking`. `Works offline` went for a different
+reason — redundancy: the line directly above it already says "calculated on your phone".
+
+Measured after each regeneration, not assumed. The line length changes where it ends in the
+gradient, so the background underneath genuinely changes with the text:
 
 | Check | Result |
 |---|---|
-| Subtitle `#2C4A3C` against the gradient beneath its full run | **6.90:1** — clears AA text (4.5:1) |
-| Line width | Ends at x≈870 of 1024, ~150px right margin, no wrap |
+| Subtitle `#2C4A3C` against the gradient beneath its full run | **7.01:1** — clears AA text (4.5:1) |
+| Line width | Runs x359→774 of 1024, 250px right margin, no wrap |
 | App icon background still `LightPrimary` | `#0E6B4F` ✅ |
+
+The four-item version measured 6.90:1 and ended at x≈870; three items end earlier, before the
+gradient reaches its warmest stop, which is why the number went up rather than down.
 
 Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
 

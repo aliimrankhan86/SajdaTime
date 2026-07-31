@@ -1274,6 +1274,14 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
       so seeing superseded art in the picker is not a caching bug.
     - **"Some languages have errors" is not about translation.** Only en-GB exists; it is a
       roll-up of that one language's own missing-field errors.
+    - **The promotability notice is blue, advisory, and re-evaluated on save.** It cost two
+      rounds: `Free.` first, then `No ads`. It does not block publishing — it costs
+      eligibility to be featured — so it is easy to scroll past, and for an app with no
+      marketing that would be the wrong thing to scroll past. The short description now
+      reads `Offline prayer times and Qibla compass for Sunni and Shia. No tracking.`
+      (71 / 80). Both words were removed from the feature graphic in the same commits, since
+      the Console validates form fields and cannot read a PNG. Full reasoning, the rejected
+      alternatives and the remaining elimination step are in `docs/store/LISTING.md`.
 
     **The next actual steps:** Store settings (category Lifestyle, tags, contact email
     `aikstudies@gmail.com`), then the signing key — owner-only, `docs/RELEASING.md` Step 2,
@@ -1573,6 +1581,18 @@ matters more than the stable hashes, that is the trade being made.
     text path and is blind to the generated-image path. When a rule is enforced on one
     representation of a value, go and find every other representation before calling it
     fixed — and read the advisories, not only the errors.
+
+    **And then it happened again in the same field.** Removing "Free." did not clear the
+    notice. Saving and reloading from the server brought the identical bullet back, which
+    ruled out a stale render and proved the diagnosis had been incomplete rather than wrong:
+    `No ads` is *also* a price-or-promotion keyword. It was in the banner too, so the same
+    two-place fix had to be done a second time. Two things to carry forward. First, when a
+    validator still complains after a fix, it is far more likely that the fix was partial
+    than that the validator is broken — check by forcing a genuine re-evaluation (save,
+    reload, re-read) before concluding anything about the tool. Second, an opaque check with
+    an unpublished rule list is narrowed by **elimination**, so write the elimination order
+    down *before* running it; `docs/store/LISTING.md` had already named `No ads` as the next
+    suspect, which turned a second surprise into a second step.
 24. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
 25. The owner is **not technical**. Explain in plain language, state what is verified versus

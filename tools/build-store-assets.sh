@@ -110,18 +110,24 @@ cat > "$work/feature.html" <<HTML
     <h1>SajdaTime</h1>
     <p>Prayer times and Qibla,<br>calculated on your phone</p>
     <!--
-      Do not put "Free" back in this line. It used to read "Free / No ads / No accounts /
-      Works offline", and Play flags price and promotion words as a reason not to feature
-      an app. The Console says so out loud for the short description field; it says nothing
-      about this banner, because it validates form fields and cannot read a PNG. The word
-      was removed from both in the same change, and the silent half is the one that would
-      have been left behind. Play prints "Free" next to the Install button anyway.
+      Do not put "Free" or "No ads" back in this line. It used to read "Free / No ads /
+      No accounts / Works offline", and Play flags price and promotion words as a reason not
+      to feature an app. The Console says so out loud for the short description field; it
+      says nothing about this banner, because it validates form fields and cannot read a PNG.
+      Both words were removed from the text and from here in the same change each time, and
+      the silent half is the one that would have been left behind.
 
-      "Works offline" also went: the line above it already says "calculated on your phone",
-      which is the same claim in plainer words. The slot went to the thing nothing else in
-      the listing was saying — that both traditions are supported properly.
+      Neither word was worth keeping anyway. Play prints "Free" next to the Install button
+      itself, and it renders a "Contains ads" badge on listings that have ads and nothing on
+      listings that do not — so both claims are already made by Play's own UI, where a user
+      trusts them more than they trust the developer's own banner.
+
+      "Works offline" went for a different reason: the line above it already says
+      "calculated on your phone", which is the same claim in plainer words. What is left is
+      three things nothing else in the listing was saying, and three reads better across
+      this gradient than four did.
     -->
-    <div class="sub">Sunni &amp; Shia &middot; No ads &middot; No accounts &middot; No tracking</div>
+    <div class="sub">Sunni &amp; Shia &middot; No accounts &middot; No tracking</div>
   </div>
 </div>
 HTML
