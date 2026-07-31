@@ -984,8 +984,8 @@ different machine.
 | Phone emulator | AVD `sajda`, API 36 |
 | Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a`, `wearos_small_round` — 384px @ 320dpi = **192dp** |
 | Watch emulator, large | AVD `sajdawear_large`, same image, `wearos_large_round` — 454px @ 320dpi = **227dp**. Created on demand by `./tools/wear-verify.sh`. Both sizes must be run; the app was wrong on both in ways only visible with them side by side |
-| Repo files tracked | 80 |
-| Kotlin source | ~6,800 lines across the three modules |
+| Repo files tracked | 112 |
+| Kotlin source | ~8,200 lines across the three modules |
 
 ```bash
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -1059,7 +1059,8 @@ script after editing the markdown.**
 | `f49dc5d` | Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
 | `6e57e49` | Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
 | `6a16bd1` | Applied the light design system and added the Follow phone / Light / Dark setting |
-| *(this)* | **(current)** Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
+| `0e43fe5` | Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
+| *(this)* | **(current)** Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
 
 ---
 

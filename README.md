@@ -82,6 +82,10 @@ app/    The phone app.
   ui/           Compose screens: onboarding, times, qibla, settings, theme.
 
 wear/   The Wear OS app and the next-prayer tile.
+
+tools/  Release helpers, all runnable from the repo root. wear-verify.sh checks the watch
+        on both round sizes; build-store-assets.sh regenerates the Play listing graphics;
+        build-architecture-pdf.sh regenerates the architecture PDF.
 ```
 
 ## Documentation
