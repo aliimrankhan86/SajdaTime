@@ -155,6 +155,50 @@ network are reported to collapse into a single counted tester.
 a build has been uploaded and rolled out, and a link sent early is a link that fails for
 everyone who tries it first.
 
+### If 12 testers cannot be found — the fallback, and it is a real one
+
+Asked directly, and worth knowing **before** the recruiting starts, because the fear of this
+rule is worse than the rule.
+
+**Nothing bad happens.** Google's documentation sets no deadline, no expiry and no penalty for
+never completing the requirement. The app sits where it is indefinitely. What gets disabled is
+narrow and specific:
+
+> "Certain features in Play Console, such as Production (Test and release > Production) and
+> Pre-registration (Test and release > Testing > Pre-registration), will be disabled until
+> developers meet these requirements."
+
+Internal and closed testing are not gated. **Neither is open testing** — and that is the
+fallback. Google's own page on open tracks:
+
+> "users can find your test app on Google Play"
+
+For a new app an open test is discoverable in Play Store search, **anyone** can join with no
+tester list and no invitations, and the tester count is unlimited by default. So this app can
+be publicly installable worldwide without the 12-tester requirement ever being met. For an app
+whose entire purpose is reach, that is most of what production provides.
+
+Honest about the cost: an open test carries early-access positioning, gets less promotional
+surface than production, and cannot be featured. It is a worse shop window, not a locked door.
+Choosing it does not burn the production route — closed testing stays available, so the
+12-tester clock can be started later.
+
+The other documented exemption is an **organisation account**, which is not subject to this
+rule at all. It is noted for completeness and not recommended: it needs a registered business
+and a D-U-N-S number, and the app would have to be moved. That is a large amount of work to
+avoid asking twelve people a favour.
+
+**And twelve is easier than it sounds for this app in particular.** Testers do not need to be
+technical, or strangers, or know what a beta is — they need an Android phone and to want
+prayer times, which describes nearly everyone this would be sent to. One mosque WhatsApp group
+is twelve people.
+
+> **Avoid the free tester-swap communities**, where developers install each other's apps. They
+> are legitimate, unlike the paid services warned about above, and they are still the wrong
+> tool here: they produce people who install once and never open it again, and *"Testers were
+> not engaged with your app"* is the precise rejection this app is already most at risk of.
+> They would make the problem worse while appearing to solve it.
+
 ### The Wear OS wrinkle
 
 Google has **never published** whether the 12-tester counter aggregates across the phone
