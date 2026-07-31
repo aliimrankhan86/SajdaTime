@@ -1259,10 +1259,27 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     contact phone verified. Nothing on Google's side is outstanding. See
     `docs/RELEASING.md` for the account facts and the full checklist.
 
-    **The next actual step:** Play Console → Create app → paste
-    the fields from `docs/store/LISTING.md`, upload the assets from `docs/store/`, complete
-    the data safety form (the LISTING.md notes explain the one nuance about the geocoding
-    lookup), then Closed testing with 12 testers for 14 continuous days.
+    **The app now exists in the Console** (app ID `4975578035662443727`). Every **App
+    content** declaration is complete and green — privacy policy, app access, ads, content
+    rating, target audience, news, COVID-19, data safety, government, financial, health and
+    Advertising ID. The **Default store listing is saved as a draft** with the name, both
+    descriptions, the icon, the feature graphic and all five phone screenshots assigned.
+
+    Two Console behaviours cost time and are worth knowing:
+
+    - **Ticking an asset in the library does not assign it.** You must click **Add** at the
+      bottom-right of the side panel. Until you do, the field stays empty and the page
+      refuses to save with "Upload an icon" — while the asset you ticked sits visibly on
+      screen. Old uploads also stay in the library forever; only *assigned* assets publish,
+      so seeing superseded art in the picker is not a caching bug.
+    - **"Some languages have errors" is not about translation.** Only en-GB exists; it is a
+      roll-up of that one language's own missing-field errors.
+
+    **The next actual steps:** Store settings (category Lifestyle, tags, contact email
+    `aikstudies@gmail.com`), then the signing key — owner-only, `docs/RELEASING.md` Step 2,
+    and the one true blocker since both AABs on disk are unsigned — then Closed testing with
+    12 testers for 14 continuous days. The Wear OS screenshot slot only appears once the
+    Wear form factor is added, which happens at release time.
 
 ### Deliberate non-goals — do not "fix" these
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
@@ -1498,7 +1515,7 @@ script after editing the markdown.**
     bug class is more dangerous than none, because it removes the symptom that would have
     led someone to the rest of it. When you fix a staleness bug, go and find every other
     thing computed from the same stale input.
-23. **Generated art inherits stale colours silently, because it still looks right.** The
+20. **Generated art inherits stale colours silently, because it still looks right.** The
     launcher icon sat on `#14624B` — the primary from before the light palette was revised
     for contrast — and `tools/build-store-assets.sh` copies its colours, so the store icon
     and the feature graphic were both a revision behind the app they advertise. Nothing
@@ -1508,7 +1525,7 @@ script after editing the markdown.**
     had *already recorded the same drift* on `DarkInversePrimary` in a comment, which is
     the tell that this class of miss repeats. When a value is duplicated outside the type
     system, the duplicate is where the next stale value will be.
-24. **A store rule that is "roughly X" is usually exactly Y, and the laxer version is the
+21. **A store rule that is "roughly X" is usually exactly Y, and the laxer version is the
     one you remember.** These notes said Play's screenshot rule was "the long side may not
     exceed twice the short side". The Console's own text says **16:9 or 9:16**, and nothing
     between. Under the remembered rule the 1080×2400 emulator captures merely needed
@@ -1516,20 +1533,31 @@ script after editing the markdown.**
     resolution is invalid with them. The pillarboxing that resulted was a workaround for a
     constraint that was never the constraint. Read the requirement text on the actual form
     before designing around it, not the version in your head.
-25. **An emulator answers sensor questions with zero, and zero looks like an answer.** The
+22. **An emulator answers sensor questions with zero, and zero looks like an answer.** The
     Qibla store screenshot read *"You are facing 0°"* for an entire release cycle. It is
     not a state any real user reaches — it is the absence of a magnetometer, rendered as a
     perfectly plausible number. Feeding `adb emu sensor set magnetic-field` a real heading
     both fixes the picture and turns it into a free end-to-end check: facing 60°, Qibla
     118°, app says "Turn right 58°". If a screen is driven by a sensor the emulator does
     not have, assume the value is fabricated until you set it yourself.
-26. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+23. **A validator that reads your text cannot read your picture, and the same mistake is
+    usually in both.** Play flagged the short description for containing "Free." — a price
+    keyword, which costs eligibility to be *featured* without blocking publication, so it
+    appears as a blue advisory rather than a red error and is easy to scroll past. The same
+    word was sitting in the feature graphic's subtitle, where the Console said nothing at
+    all, because it validates form fields and the banner is a PNG. Fixing only the flagged
+    field would have left the offending word in the one asset Play uses when it *does*
+    promote an app. This is lesson 20 in a different medium: the automated check covers the
+    text path and is blind to the generated-image path. When a rule is enforced on one
+    representation of a value, go and find every other representation before calling it
+    fixed — and read the advisories, not only the errors.
+24. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-21. The owner is **not technical**. Explain in plain language, state what is verified versus
+25. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-22. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+26. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

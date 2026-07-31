@@ -109,7 +109,19 @@ cat > "$work/feature.html" <<HTML
   <div>
     <h1>SajdaTime</h1>
     <p>Prayer times and Qibla,<br>calculated on your phone</p>
-    <div class="sub">Free &middot; No ads &middot; No accounts &middot; Works offline</div>
+    <!--
+      Do not put "Free" back in this line. It used to read "Free / No ads / No accounts /
+      Works offline", and Play flags price and promotion words as a reason not to feature
+      an app. The Console says so out loud for the short description field; it says nothing
+      about this banner, because it validates form fields and cannot read a PNG. The word
+      was removed from both in the same change, and the silent half is the one that would
+      have been left behind. Play prints "Free" next to the Install button anyway.
+
+      "Works offline" also went: the line above it already says "calculated on your phone",
+      which is the same claim in plainer words. The slot went to the thing nothing else in
+      the listing was saying — that both traditions are supported properly.
+    -->
+    <div class="sub">Sunni &amp; Shia &middot; No ads &middot; No accounts &middot; No tracking</div>
   </div>
 </div>
 HTML

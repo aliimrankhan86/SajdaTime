@@ -18,10 +18,54 @@ SajdaTime: Prayer Times, Qibla
 ## Short description (max 80)
 
 ```
-Offline prayer times and Qibla compass. No ads, no accounts, no tracking. Free.
+Offline prayer times and Qibla compass for Sunni and Shia. No ads, no tracking.
 ```
 
 `79 / 80`
+
+### Do not put the word "Free" back
+
+This used to end `… no accounts, no tracking. Free.` and the Console answered with a
+promotability notice:
+
+> "Your app may not be promoted on Google Play because your short description does not meet
+> the following guidelines: • Should not use keywords that indicate price or promotion"
+
+That is **advisory, not blocking** — the listing saves and publishes either way. What it
+costs is eligibility to be featured or included in Play's curated collections. For an app
+with no marketing, no budget and no reviews yet, organic discovery *is* the distribution
+model, so the notice is worth more than the word.
+
+It was also the weakest word in the sentence. Play prints **Free** next to the Install
+button by itself, and the full description gives it a whole section, so the short
+description was buying nothing with its last five characters.
+
+**What replaced it, and why that and not something else.** The freed space went to
+*"for Sunni and Shia"*, because it is the only claim in this listing a competitor cannot
+easily copy. Most prayer apps treat Shia conventions as an afterthought or omit them; this
+one implements the Jafari Maghrib rule and the correct Asr rule per madhab, and a Shia user
+previously had no way to learn that from the store page at all.
+
+Rejected, and why:
+
+| Candidate | Why not |
+|---|---|
+| `… No ads, no accounts, no tracking.` (73) | Safe, but leaves seven characters unused and says nothing a dozen other apps do not |
+| `… for Sunni and Shia. Private by design.` (77) | "Private by design" is marketing abstraction. `CLAUDE.md` requires this app to work for someone who has never changed a setting and may not read English well; "no ads, no tracking" is concrete and survives translation, "private by design" does not |
+| Adding *Adhan* for search volume | The app plays a **user-chosen** sound, not a bundled recitation. It would be a keyword that over-promises |
+| Adding *Namaz* / *Salah* for search volume | Keyword stuffing in an English sentence, and Play flags that separately |
+
+`no accounts` was the item dropped from the trust triad — it is the least sharp of the
+three and is still in the feature graphic and the full description.
+
+**One judgment call worth knowing about.** Naming both traditions is inclusive and true, and
+it is a deliberate choice to say it on the front of the listing rather than only inside.
+If you would rather the store page not foreground the distinction, the 73-character variant
+above is a straight swap and nothing else in the listing depends on it.
+
+**If the notice does not clear**, the next suspect is `No ads` — test by pasting the
+73-character variant, then the same line without `No ads`. Google does not publish the
+keyword list, so this is narrowed by elimination rather than by reading a rule.
 
 ---
 
@@ -288,6 +332,25 @@ so the store art cannot drift from the app by hand.
 The feature graphic is now the app's own hero gradient (`LightHeroStart/Middle/End`) with
 `LightOnHero` ink, rather than a flat green slab invented for the listing. Worst contrast
 pair on it is 4.99:1.
+
+### The feature graphic carries no price words either
+
+Its subtitle used to read `Free · No ads · No accounts · Works offline`. The Console flagged
+**only the short description** for the price keyword, and said nothing about the banner —
+because it validates form fields and cannot read a PNG. Fixing the flagged field alone would
+have left the word in the one asset Play uses when it *does* promote an app.
+
+It now reads `Sunni & Shia · No ads · No accounts · No tracking`. `Works offline` went too,
+as redundant: the line directly above it already says "calculated on your phone".
+
+Measured after regenerating, not assumed — the longer line runs further into the warm end of
+the gradient than the old one did, so the background under it changed:
+
+| Check | Result |
+|---|---|
+| Subtitle `#2C4A3C` against the gradient beneath its full run | **6.90:1** — clears AA text (4.5:1) |
+| Line width | Ends at x≈870 of 1024, ~150px right margin, no wrap |
+| App icon background still `LightPrimary` | `#0E6B4F` ✅ |
 
 Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
 
