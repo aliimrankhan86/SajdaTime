@@ -224,29 +224,79 @@ production.
 
 ---
 
-## Assets in this folder
+## Assets
 
-| File | Play field |
-|---|---|
-| `icon-512.png` | App icon (512 × 512) |
-| `feature-graphic-1024.png` | Feature graphic (1024 × 500) |
-| `screenshots/01-times-light.png` | Phone screenshot |
-| `screenshots/02-qibla-light.png` | Phone screenshot |
-| `screenshots/03-settings-light.png` | Phone screenshot |
-| `screenshots/04-times-dark.png` | Phone screenshot |
-| `screenshots/05-qibla-dark.png` | Phone screenshot |
-| `screenshots/w1-times.png` | Wear OS screenshot |
-| `screenshots/w2-qibla.png` | Wear OS screenshot |
+**One folder per Play Console upload box, under `upload/`.** Full instructions, including
+the capture recipe, are in [`upload/README.md`](upload/README.md).
 
-Phone screenshots are **1080 × 1920** (9:16); Wear screenshots are **384 × 384** (1:1). Both
-satisfy Play's rule that a screenshot's long side may not exceed twice its short side.
+| Folder | Play field | Files | Size |
+|---|---|---|---|
+| `upload/app-icon/` | App icon | `icon-512.png` | 512 × 512 |
+| `upload/feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
+| `upload/phone/` | Phone screenshots | 5, upload all in filename order | 1080 × 1920 |
+| `upload/wear-os/` | Wear OS screenshots | `w1-times`, `w2-qibla` | 454 × 454 |
+| `upload/tablet-7in/`, `tablet-10in/`, `chromebook/` | those boxes | **empty on purpose** | — |
 
-The emulator captures are natively 1080 × 2400, which is 2.22:1 and **would be rejected**.
-`screenshots/raw/` holds those originals; `tools/build-store-assets.sh` reframes them onto a
-9:16 canvas in the brand green, so nothing on screen is cropped away. Upload the reframed
-ones, not the raw ones.
+The three empty folders are a decision, not an omission: there is no tablet layout yet, and
+Play's asterisk on those boxes is satisfied by the phone screenshots (its own error text
+says *"at least 2 phone **or** tablet screenshots"*). Each folder carries a README saying so.
 
-Run `./tools/build-store-assets.sh` to regenerate everything in this folder. The captures
-themselves are taken by hand from a running emulator; the prayer times visible in them were
-checked against the Aladhan reference API at the time of capture and agreed to within a
-minute.
+### Aspect ratio is the trap
+
+Play accepts phone screenshots at **16:9 or 9:16 and nothing in between** — the Console's
+own wording. A modern phone is 20:9, so a native capture off a current device is
+automatically rejected.
+
+> **This was previously wrong.** These notes used to say the rule was "the long side may not
+> exceed twice the short side". That is a laxer rule than Play actually applies. The
+> captures came off a Pixel 7 AVD at 1080 × 2400 and were scaled down onto a 9:16 canvas and
+> pillarboxed in brand green. It complied, but it discarded a fifth of the frame and wrapped
+> a green surround around an app that never draws one.
+
+They are now captured **natively at 1080 × 1920** on a Pixel 2 profile AVD and copied
+through untouched — no scaling, no reframing, no invented pixels.
+
+### What the five phone screenshots show
+
+Chosen so no two show the same screen. The previous set spent two of its five slots on the
+same Times screen in light and dark, and two more on the same Qibla screen.
+
+| File | Screen | Why it earns a slot |
+|---|---|---|
+| `01-times-light.png` | Times, light | The core screen, with the hero gradient |
+| `02-qibla.png` | Qibla | The second core feature, with a live heading |
+| `03-times-dark.png` | Times, dark, scrolled | Dark theme, the full six times, and the PDF button |
+| `04-school-of-thought.png` | Madhab picker | Evidence for the "built for your school of thought" claim |
+| `05-settings.png` | Settings | Calculation method, theme, per-prayer reminders |
+
+At 9:16 the Times list does not fit on one screen. That is why `03` is scrolled rather than
+a duplicate of `01` — between them the carousel shows the hero, all six times and the PDF
+export, without showing the same thing twice.
+
+### Colours come from the design system
+
+`tools/build-store-assets.sh` draws the icon and feature graphic from
+`ui/theme/Color.kt` values, and the mihrab/minaret paths from `ic_launcher_foreground.xml`,
+so the store art cannot drift from the app by hand.
+
+> **It had already drifted.** The icon and both graphics sat on `#14624B`, the primary from
+> before the light palette was revised for contrast, so the launcher icon and every store
+> graphic were a revision behind the app. `Color.kt` records the same drift on
+> `DarkInversePrimary`. Corrected to `#0E6B4F` (`LightPrimary`); the sand mark stays
+> `#F0D69A`, which is 4.57:1 on that green and still clears WCAG AA for text.
+
+The feature graphic is now the app's own hero gradient (`LightHeroStart/Middle/End`) with
+`LightOnHero` ink, rather than a flat green slab invented for the listing. Worst contrast
+pair on it is 4.99:1.
+
+Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
+
+### What was verified, and what was not
+
+- Prayer times in the captures were cross-checked between the phone and watch builds and
+  agree exactly (Asr 5:28 pm, Maghrib 9:07 pm, Isha 11:28 pm for Greater Manchester).
+- The Qibla capture is a free end-to-end check of the compass maths: facing 60°, Qibla 118°,
+  and the app says "Turn right 58°".
+- **Not verified on real hardware.** Every capture is from an emulator. The watch Qibla page
+  in particular shows its bearing-from-north state because the Wear AVD has no
+  magnetometer — a real state, but not the best version of that screen.

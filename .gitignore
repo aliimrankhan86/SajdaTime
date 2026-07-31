@@ -35,3 +35,8 @@ design-extract-output/
 # which drops a __pycache__ next to them. Twice now it has turned up in git status.
 __pycache__/
 *.pyc
+
+# JVM crash dumps. The Gradle daemon can die under memory pressure — running two
+# emulators alongside a 4GB daemon did it once — and drops these in the repo root.
+hs_err_pid*.log
+replay_pid*.log

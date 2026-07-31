@@ -803,6 +803,30 @@ recorded with the arithmetic in `docs/DESIGN_SYSTEM.md`. **A design tool's ratio
 a claim, not a measurement** — check it, because every one of these errs in the direction
 that ships an unreadable app.
 
+### Store screenshots, retaken natively (v1.1.0)
+
+Retaken on a purpose-built `sajdastore` AVD — Pixel 2 profile, 1080 × 1920 at 420dpi, which
+is 9:16 natively so **nothing is scaled, reframed or padded**. The previous set was captured
+at 1080 × 2400 and shrunk onto a 9:16 canvas with green pillarboxing, which cost a fifth of
+the frame; see §15 lesson 24 for why the rule that drove it was misremembered.
+
+| Checked | Result |
+|---|---|
+| Phone captures are 9:16 with no post-processing | ✅ Five files, all exactly 1080 × 1920, copied through untouched |
+| Status bar not clipped | ✅ Fixed by moving off the Pixel 7 profile — its hole-punch cutout has a 136px top inset that does not fit a 1920-tall screen and cuts the clock in half |
+| Prayer times agree between phone and watch | ✅ Asr 5:28 pm, Maghrib 9:07 pm, Isha 11:28 pm on both, same location, same build. This is the §5 cross-module gap being checked rather than assumed |
+| Qibla maths, end to end | ✅ Sensors fed a real heading: facing 60°, Qibla 118°, app renders "Turn right 58°". 118 − 60 = 58 |
+| Amber exact-alarm banner absent from the Times shot | ✅ `SCHEDULE_EXACT_ALARM` granted before capture. The banner stays in the app; it is simply not what the screenshot exists to show |
+| Five distinct screens | ✅ The old set spent 2 of 5 slots on the same Times screen and 2 more on the same Qibla screen |
+| Icon and feature graphic on the current palette | ✅ `#14624B` → `#0E6B4F` (`LightPrimary`); sand `#F0D69A` is 4.57:1 on it, still AA for text. `./gradlew test lint` passes, `ColorContrastTest` included |
+| Wear captures | ✅ 454 × 454 off `sajdawear_large`, 1:1, above Play's 384px floor |
+
+**Not verified:** all of it is emulator output; none of it has been seen on real hardware.
+The watch Qibla page shows its bearing-from-north presentation rather than the live
+"facing" one, because the Wear AVD has no magnetometer and — unlike the phone — no sensor
+value fakes one convincingly. That is a real state the app has when a watch compass is
+unavailable, so the screenshot is honest; it is just not the best version of that screen.
+
 ### Wear OS checks closed by this session's audit
 
 | Checked | Result |
@@ -1100,6 +1124,17 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 > Nothing is waiting on Google. **The signing key is the only outstanding item, and it is
 > the owner's alone.** After that: create the listing, then the 12-testers-for-14-days
 > closed test, which is the long pole.
+>
+> **App created in the Console** (app ID 4975578035662443727, `com.sajdatime.app`, en-GB,
+> free). **All App content declarations are complete and green** — privacy policy, app
+> access, ads, content rating (IARC), target audience (13+, deliberately *not* under-13:
+> any under-13 bracket pulls the app into Families policy), data safety, news, government,
+> financial features, health, advertising ID. Data safety declares **approximate location,
+> collected, not shared, App functionality only, users can choose, not processed
+> ephemerally** — see `docs/store/LISTING.md` for why each of those is the answer, and in
+> particular why "processed ephemerally" is a trap. Store listing text and graphics are
+> **not yet entered**; the assets are laid out one folder per Console box in
+> `docs/store/upload/`.
 
 1. **The app is unsigned, and only the owner can change that.** The Gradle side *is* done:
    both modules read a `keystore.properties` from the project root and sign the release with
@@ -1238,6 +1273,16 @@ was drawn against the shipping feature set on purpose — no prayer tracker, no 
 on the Times screen, no per-row notification mute. They are absent from the mockups because
 they are absent from the app, not because they were forgotten. A future design pass should
 stay inside the feature set unless the feature itself has been agreed first.
+
+**Also: the tablet and Chromebook store screenshot slots stay empty.**
+`docs/store/upload/tablet-7in/`, `tablet-10in/` and `chromebook/` contain a README and
+nothing else, and that is the finished state, not a gap. Play marks those boxes with an
+asterisk, but the error text underneath reads *"Upload at least 2 phone **or** tablet
+screenshots"* — one requirement shared across all of them, already satisfied by the five
+phone screenshots. They are empty because there is no large-screen layout yet; filling them
+with phone captures would advertise a tablet experience that does not exist. The only cost
+is that Play will not surface the app in tablet and Chromebook recommendations, which is
+the correct outcome until the layout is real. Fill them when it is, and not before.
 
 ---
 
@@ -1453,7 +1498,32 @@ script after editing the markdown.**
     bug class is more dangerous than none, because it removes the symptom that would have
     led someone to the rest of it. When you fix a staleness bug, go and find every other
     thing computed from the same stale input.
-20. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+23. **Generated art inherits stale colours silently, because it still looks right.** The
+    launcher icon sat on `#14624B` — the primary from before the light palette was revised
+    for contrast — and `tools/build-store-assets.sh` copies its colours, so the store icon
+    and the feature graphic were both a revision behind the app they advertise. Nothing
+    failed. `ColorContrastTest` never saw it, because it asserts UI roles from `Color.kt`
+    and the icon is a drawable with a literal in it. Lint never saw it. The only way to see
+    it was to put the hex next to `LightPrimary` and notice they differ — and `Color.kt`
+    had *already recorded the same drift* on `DarkInversePrimary` in a comment, which is
+    the tell that this class of miss repeats. When a value is duplicated outside the type
+    system, the duplicate is where the next stale value will be.
+24. **A store rule that is "roughly X" is usually exactly Y, and the laxer version is the
+    one you remember.** These notes said Play's screenshot rule was "the long side may not
+    exceed twice the short side". The Console's own text says **16:9 or 9:16**, and nothing
+    between. Under the remembered rule the 1080×2400 emulator captures merely needed
+    padding; under the real one they are simply invalid, and every modern phone's native
+    resolution is invalid with them. The pillarboxing that resulted was a workaround for a
+    constraint that was never the constraint. Read the requirement text on the actual form
+    before designing around it, not the version in your head.
+25. **An emulator answers sensor questions with zero, and zero looks like an answer.** The
+    Qibla store screenshot read *"You are facing 0°"* for an entire release cycle. It is
+    not a state any real user reaches — it is the absence of a magnetometer, rendered as a
+    perfectly plausible number. Feeding `adb emu sensor set magnetic-field` a real heading
+    both fixes the picture and turns it into a free end-to-end check: facing 60°, Qibla
+    118°, app says "Turn right 58°". If a screen is driven by a sensor the emulator does
+    not have, assume the value is fabricated until you set it yourself.
+26. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
 21. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
