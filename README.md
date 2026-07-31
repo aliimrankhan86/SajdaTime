@@ -20,6 +20,9 @@ No accounts. No analytics. No ads. No tracking. Your location never leaves your 
 - A Wear OS app and tile that work on their own, with or without the phone nearby
 - Light and dark themes, following your phone by default or set by hand, both verified
   against WCAG 2.1 AA contrast
+- English only for now, and it stays readable on a phone set to any other language: the app
+  formats its clock times, dates and numbers in the language its words are in, rather than
+  the device's. See `docs/HANDOVER.md` §5.11 for why that is not the same thing.
 
 ## Build and run
 
@@ -74,7 +77,8 @@ find . -name '* [0-9].*' -not -path './.git/*' -delete && ./gradlew clean
 ```
 core/   Prayer and Qibla calculation, shared by the phone and the watch. The calculation
         itself has no Android imports and ports to iOS as is; only PrayerLabels.kt, which
-        maps the enums to translatable names, touches the Android framework.
+        maps the enums to translatable names, and AppLocale.kt, which decides what language
+        to format in, touch the Android framework.
 
 app/    The phone app.
   data/         Local settings (DataStore), location, compass, city lookup, watch sync.

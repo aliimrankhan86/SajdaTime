@@ -145,7 +145,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (5 source files, 3 test files, and `res/` — `values/strings.xml` for prayer and method names, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
+**`:core`** (6 source files, 4 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
 
 | File | Contains |
 |---|---|
@@ -154,6 +154,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | `PrayerEngine.kt` | **The heart of the app.** `compute`, `computeRange`, `nextPrayer`, `resolveMethod`. All the business rules in §5. |
 | `QiblaEngine.kt` | `KAABA`, `bearingToKaaba`, `trueToMagnetic`, `relativeTurn`, `isAligned`, `distanceToKaabaKm`, `normalise` |
 | `WatchSyncContract.kt` | The phone↔watch Data Layer path and keys, shared so the two modules cannot drift |
+| `AppLocale.kt` | The language the app's *words* are in, read back out of the resources, and `wrap(context)` which pins a whole configuration to it. Every clock, date and number in both apps formats through this rather than through the device locale — §5.11. |
 
 **`:app`** (24 source files, 2 test files)
 
@@ -443,6 +444,49 @@ Two rules came out of it, both enforced in code and covered by `CityLookupParseT
 2. **A missing coordinate is a miss, not a default.** Parsing throws rather than falling
    back to zero, zero.
 
+### 5.11 Language and locale — the app formats in its own language, not the device's
+
+The app ships in **English only**, deliberately (§11, and `CLAUDE.md`: prayer and madhab
+names are religious content and no language ships without a native speaker). That is a
+decision about *words*. Android takes it as a decision about words only, and carries on
+formatting *numbers, clock times, dates and layout direction* from the device locale — so
+a phone set to Arabic got English sentences with Arabic-Indic digits inside them, laid out
+right-to-left. What that actually looked like is in §10.
+
+The rule, enforced in `AppLocale.kt` and guarded by `LocaleDisciplineTest`:
+
+1. **`AppLocale.of(context)` is the app's language**, read out of
+   `core/values/strings.xml`'s `app_language_tag` (`en-GB` today). Every `DateTimeFormatter`
+   and `String.format` uses it. `Locale.getDefault()` appears nowhere in shipped code, and
+   the test fails the build if it reappears.
+2. **`AppLocale.wrap(context)` pins a whole configuration to it** — resource lookup, the
+   locale `Resources.getString(id, args)` formats `%d` with, and layout direction.
+   Applied in `MainActivity` and `WearMainActivity` (`attachBaseContext`, covering all UI),
+   in `Notifications.postPrayerAlert`/`postOngoingBadge`, in `PrayerPdfExporter`, and in
+   `NextPrayerTileService`. Step 1 alone is not enough: `stringResource` has no argument
+   for the locale, so the configuration is the only lever.
+3. **One exception, and it is load-bearing: 12/24-hour.** That is a device preference, not
+   a language property, so it is read from `context.applicationContext` — the one context
+   left unpinned. Asking a pinned context turned every time in the app into `13:10`,
+   because `is24HourFormat` falls back to the *locale's* convention when the user has never
+   touched the toggle, and `en-GB` is a 24-hour locale.
+4. **Every translation must override `app_language_tag`.** `LocaleDisciplineTest` fails the
+   build if a `values-xx/strings.xml` appears without it, or declares one that disagrees
+   with its folder.
+
+The pin is not an override of the user. It resolves to whatever language the resources
+resolved to, so the day `values-ar/` ships, an Arabic phone pins itself to Arabic and goes
+right-to-left with Arabic-Indic digits — correct, and with no code change.
+
+`android:supportsRtl="true"` therefore stays in both manifests even though nothing ships
+RTL today. Removing it would look like tidying and would break the first RTL translation.
+
+**Visible consequence, on purpose:** clock times now read `1:16 pm`, not `1:16 PM`, for
+everyone. `en-GB` is what the house style already says the words are, and it is what a UK
+phone was already producing before this change; the old screenshots showing `PM` were taken
+on an `en-US` emulator and never matched what a UK user saw. `docs/store/screenshots/` was
+retaken.
+
 ---
 
 ## 6. Notification and alarm architecture
@@ -559,6 +603,13 @@ draws dark.
   different contrast ratio at Isha than at Fajr and could not be asserted at all. Fixed
   gradient, testable, allowed. Moving gradient, not — do not reintroduce that one.
 
+- **Every user-facing string is a resource, and nothing is concatenated in code.** Two
+  places had drifted: onboarding built `"Sunni · Hanafi"` with a template literal while
+  Settings used `settings_value_pair` for the identical pair, and the location row's spoken
+  description was `"$city. $changeLabel"`. Both now go through resources. A separator and a
+  full stop are punctuation decisions, and a translator cannot change either one if it is
+  welded into Kotlin.
+
 ### Accessibility
 Contrast enforced by test · the Qibla dial is `clearAndSetSemantics {}` (decorative) with
 the spoken direction in a polite live region · `rememberRemainingText` uses `stringResource`
@@ -600,16 +651,17 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**47 unit tests, all offline and deterministic, 0 failures.**
+**53 unit tests, all offline and deterministic, 0 failures.**
 
 | Suite | Module | Tests | Covers |
 |---|---|---|---|
 | `PrayerEngineTest` | core | 17 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
 | `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
-| `ColorContrastTest` | app | 3 | WCAG AA for every pair in both themes |
+| `LocaleDisciplineTest` | core | 4 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11) |
+| `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
-| `TileFormatTest` | wear | 7 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
+| `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
 | `WearSettingsTest` | wear | 4 | Synced settings reach the engine intact; unpaired watch still calculates; the wire-key contract |
 
 Reference values were captured from the **Aladhan API** — an independent implementation of
@@ -630,7 +682,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, 47 tests, 0 failures, lint informational-only, phone release
+Expected: BUILD SUCCESSFUL, 53 tests, 0 failures, lint informational-only, phone release
 APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties` is present).
 
 For Play, build bundles rather than APKs — `:app:bundleRelease :wear:bundleRelease`, which
@@ -814,6 +866,41 @@ Every claim here is from a capture of the running app.
 The second one is the more useful lesson: the same change was correct on one screen and
 wrong on the other, and nothing but looking at both would have said so.
 
+### Locale — what running the app in another language found
+
+Nobody had ever launched the app on a phone set to anything but English, because the app is
+English-only and that felt like the end of the question. It is not: Android keeps *words*
+and *formatting* in two different places, and only the first of them was English. Run with
+`adb shell cmd locale set-app-locales com.sajdatime.app --locales ar-EG`, which sets the
+app's locale without disturbing the rest of the device.
+
+| Locale | Before | After |
+|---|---|---|
+| `ar-EG` — Hijri date | `١٤٤٨ Safar ١٧` — reads as the wrong date, not as a broken one | `17 Safar 1448` |
+| `ar-EG` — Qibla subtitle | `km ٤٨٢٢ from true north. The Kaaba is about ١١٨°` with the full stop alone on line 2 | `118° from true north. The Kaaba is about 4822 km away.` |
+| `ar-EG` — turn instruction | `١١٨° Turn right` | `Turn right 118°` |
+| `ar-EG` — prayer rows | `am 2:50` — meridiem on the wrong side of the number | `2:50 am` |
+| `ar-EG` — ongoing badge | `In ٢h ٥m` | `In 2h 5m` |
+| `bn-BD` — home card | countdown `০২:১৮:১৯` in Bengali digits, wrapped onto two lines, directly above prayer times reading `2:50 AM` in Latin ones | `02:07:31`, one line, matching the rows |
+| `ar-EG` — PDF export | (not previously checked) | exported and rendered: English headings, English day names, Latin digits throughout |
+| `ar-EG` — watch, 192dp | (not previously checked) | `2h 6m`, `1:16 pm`, `118°` — identical to English, `wear-round-check.py` PASS |
+| `ar-EG` — onboarding | — | the Bismillah still renders right-to-left with full diacritics. Strong-RTL text is unaffected by the paragraph pin, which was the one thing that would have made this unacceptable |
+| default `en-US` device | `1:16 PM` | `1:16 pm` — the deliberate `en-GB` change, §5.11 |
+
+Both guard tests were proved red before being accepted: a `values-ar/strings.xml` with no
+tag, then one declaring the wrong tag, then a single `Locale.getDefault()` reintroduced
+into `TimeFormat.kt`. Each failed the build, and the build went green again when reverted.
+
+Full regression after the change: `./gradlew clean test lint :app:bundleRelease
+:wear:bundleRelease` BUILD SUCCESSFUL, 53 tests, 0 failures; `./tools/wear-verify.sh`
+**24/24 PASS** across 192dp and 227dp at font scales 1.0 and 1.3.
+
+**What was not tested:** no physical phone or watch of any kind. The Data Layer sync
+between phone and watch was not re-exercised (it carries coordinates and settings, not
+text, so it should be untouched — that is reasoning, not evidence). No right-to-left
+*translation* has been tried, because none exists; what has been shown is that an
+English-only app on a right-to-left device now behaves, not that an Arabic build would.
+
 ### Useful device-testing recipes
 
 ```bash
@@ -958,10 +1045,18 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
     tile, the notifications and the PDF. They are resources in `:core` now, so the phone
     and the watch share one set. The PDF's own headings went with them.
 
+    Nothing is concatenated in code either — the two places that had drifted (onboarding's
+    `"Sunni · Hanafi"` and the location row's spoken description) now go through resources,
+    so a translator owns the separators and the punctuation as well as the words.
+
     **Adding a language is a file drop, no code change:** create
     `app/src/main/res/values-<lang>/strings.xml` and
-    `core/src/main/res/values-<lang>/strings.xml`. Android then picks it up from the
-    phone's language automatically — the user is never asked to choose, which is correct.
+    `core/src/main/res/values-<lang>/strings.xml`. Android picks it up from the phone's
+    language automatically — the user is never asked to choose, which is correct. The one
+    non-obvious requirement is that the `:core` file **must** declare `app_language_tag`
+    with its own BCP-47 tag, or the translation will be shown with English number and date
+    formatting (§5.11). `LocaleDisciplineTest` fails the build until it does, which is the
+    intended way to find out.
 
     Two things follow the *first* translation, and only then:
     - `android:localeConfig` on the manifest plus `res/xml/locales_config.xml`, which gives
@@ -969,12 +1064,21 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
       only English listed would show a picker with one entry.
     - An in-app language row, for phones below Android 13, which have no system picker.
 
+    **Cost of the locale pin, accepted knowingly:** pseudolocales (`en-XA`, `ar-XB`) — the
+    usual way to find text-expansion and RTL faults *before* translating — no longer reach
+    the app, because the pin overrides them. To exercise a layout in another language, add
+    the real `values-xx/` folder. The alternative was leaving the app scrambling its own
+    sentences on every non-English phone today, for the sake of a test that may never be
+    run.
+
     ⚠️ **Do not machine-translate this app.** Prayer names, madhab names and the disclaimer
     are religious content, and Indonesian or Urdu speakers expect "Fajr", not a local
     translation of "dawn". `core/src/main/res/values/strings.xml` carries a note to
     translators saying so. Each language needs a native speaker to review it before it
     ships. Arabic and Urdu are the obvious first two; both are RTL, and `supportsRtl="true"`
-    is already set but has never been exercised.
+    has now been exercised — see §5.11 and §10. What has been shown is that an English-only
+    app on a right-to-left *device* behaves correctly. An RTL *translation* is still
+    untried, because none exists.
 12. **No CI.** No GitHub Actions workflow; all verification is run locally.
 13. **Play Store listing assets are done.** `docs/store/` holds the 512 × 512 icon, the
     1024 × 500 feature graphic, five phone screenshots, two Wear screenshots, and
@@ -1026,8 +1130,8 @@ different machine.
 | Phone emulator | AVD `sajda`, API 36 |
 | Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a`, `wearos_small_round` — 384px @ 320dpi = **192dp** |
 | Watch emulator, large | AVD `sajdawear_large`, same image, `wearos_large_round` — 454px @ 320dpi = **227dp**. Created on demand by `./tools/wear-verify.sh`. Both sizes must be run; the app was wrong on both in ways only visible with them side by side |
-| Repo files tracked | 114 |
-| Kotlin source | ~8,350 lines across the three modules |
+| Repo files tracked | 116 |
+| Kotlin source | ~8,650 lines across the three modules |
 
 ```bash
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -1105,6 +1209,8 @@ script after editing the markdown.**
 | `2a13b9d` | Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
 | `d9e31e3` | Brought the handover's own bookkeeping up to date |
 | `7d9cf89` | Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
+| `eb24f54` | Recorded the Kaaba commit's own hash in this table |
+| *(this)* | Made the app format in its own language rather than the device's, after running it on Arabic and Bengali phones and finding a scrambled Hijri date, an unreadable Qibla sentence and two numbering systems on one screen |
 
 ---
 
@@ -1174,13 +1280,40 @@ script after editing the markdown.**
     stubby trapezoid that stopped reading as an arrow at all. Same code, same shape, same
     constants, opposite verdicts — and the only thing that could have told you is having
     both open at once. This is §5 again in a smaller key, and it will keep recurring.
-15. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
+15. **"We only ship one language" is a statement about words, and Android hears it as
+    one.** Text comes from `values-*`; numbers, clock times, dates and layout direction
+    come from `Locale.getDefault()`, which is the *device*. Nobody had ever launched this
+    app on a non-English phone, because being English-only felt like the end of the
+    question. It was the beginning of it: an Arabic phone rendered the Hijri date
+    `١٤٤٨ Safar ١٧` — the right numbers in the wrong order, reading as a different date
+    rather than as a broken one — and turned the Qibla sentence into
+    `km ٤٨٢٢ from true north. The Kaaba is about ١١٨°` with the full stop stranded on its
+    own line. Bidi was behaving perfectly; it had been told the paragraph was Arabic while
+    every word in it was English. If your app declares a language, make it format in that
+    language too, and go and look at it in a language you did not plan for.
+16. **The same platform question has two different answers depending on which context you
+    ask.** `Resources.getString(id, args)` formats `%d` from the *configuration* locale and
+    ignores which `values-` folder the string it just loaded came from, so passing the right
+    `Locale` to `DateTimeFormatter` fixed the clock and left every `%d` on the Qibla screen
+    exactly as broken as before. There is no argument for it — the configuration is the only
+    lever. And pinning that configuration immediately broke something else: `is24HourFormat`
+    falls back to the *locale's* convention when the user has never touched the toggle, so a
+    pin to `en-GB` silently turned every time in the app into `13:10`. Two rounds of "fixed
+    it" that were each only half a fix, and both halves were only ever visible on a running
+    device.
+17. **The two libraries that both format numbers do not agree.** `String.format` and
+    `Resources.getString` go through ICU, where Bengali's zero is `০`. The desugared
+    `java.time` carries its own CLDR data, where Bengali's zero is `0`. The result was a
+    countdown reading `০২:১৮:১৯` directly above prayer times reading `2:50 AM`, on the same
+    screen, from the same codebase, in the same locale. When two formatting paths exist,
+    assume they disagree until a screenshot says otherwise.
+18. Keep the ponytail discipline: stdlib and platform first, no speculative abstractions,
     shortest working diff. Mark deliberate simplifications with a `ponytail:` comment.
-16. The owner is **not technical**. Explain in plain language, state what is verified versus
+19. The owner is **not technical**. Explain in plain language, state what is verified versus
     assumed, and never present something as done when it is untested. He also has **no
     access to physical devices** — if you cannot test it on an emulator, say so plainly
     rather than suggesting he go and try it himself.
-17. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
+20. **When you commit, commit the understanding too** — see `CLAUDE.md` at the repo root.
     Code alone loses the reasoning, and the reasoning is what stops the next session
     undoing a decision it does not know was deliberate.
 

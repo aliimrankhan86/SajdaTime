@@ -18,6 +18,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.R
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.label
 import com.sajdatime.app.data.AlertStyle
@@ -139,12 +140,17 @@ object Notifications {
     }.getOrDefault(false)
 
     fun postPrayerAlert(
-        context: Context,
+        base: Context,
         slot: PrayerSlot,
         at: Instant,
         style: AlertStyle,
         alarmSoundUri: String,
     ) {
+        // Everything below builds text the user reads, so it is built from a context
+        // pinned to the app's own language rather than the device's. Wrapped here at the
+        // entry rather than at each getString, so a %d added to a notification string
+        // later cannot quietly reintroduce the bug. See AppLocale.kt.
+        val context = AppLocale.wrap(base)
         if (!canPost(context)) return
         ensureChannels(context)
 
@@ -187,7 +193,10 @@ object Notifications {
     }
 
     /** The optional silent badge showing what is next and how long until it starts. */
-    fun postOngoingBadge(context: Context, slot: PrayerSlot, at: Instant, now: Instant) {
+    fun postOngoingBadge(base: Context, slot: PrayerSlot, at: Instant, now: Instant) {
+        // Pinned to the app's language, as above. This one carries a countdown, so it is
+        // the notification that actually showed "In ٢h ١٤m" on an Arabic phone.
+        val context = AppLocale.wrap(base)
         if (!canPost(context)) return
         ensureChannels(context)
 

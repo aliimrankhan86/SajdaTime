@@ -2,6 +2,7 @@ package com.sajdatime.wear
 
 import android.content.Context
 import android.text.format.DateFormat
+import com.sajdatime.core.AppLocale
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -42,12 +43,24 @@ internal object TileFormat {
 
     /** Clock time, honouring the watch's own 12/24-hour setting rather than assuming 24. */
     fun clock(context: Context, instant: Instant, zone: ZoneId = ZoneId.systemDefault()): String =
-        clock(instant, zone, DateFormat.is24HourFormat(context))
+        // applicationContext for the 12/24 question only: it is the one context left
+        // unpinned, so it still answers for the watch rather than for en-GB. See
+        // TimeFormat.clock on the phone for what happens if it is asked of a pinned one.
+        clock(instant, zone, DateFormat.is24HourFormat(context.applicationContext), AppLocale.of(context))
 
-    /** The formatting itself, with the device preference passed in so it can be tested. */
-    fun clock(instant: Instant, zone: ZoneId, use24Hour: Boolean): String {
+    /**
+     * The formatting itself, with the device preference and the locale passed in so it can
+     * be tested. The locale is the app's own language, not the watch's — see AppLocale.kt.
+     * The default keeps the existing tests, which have no Context, working unchanged.
+     */
+    fun clock(
+        instant: Instant,
+        zone: ZoneId,
+        use24Hour: Boolean,
+        locale: Locale = Locale.UK,
+    ): String {
         val pattern = if (use24Hour) "HH:mm" else "h:mm a"
-        return DateTimeFormatter.ofPattern(pattern, Locale.getDefault()).format(instant.atZone(zone))
+        return DateTimeFormatter.ofPattern(pattern, locale).format(instant.atZone(zone))
     }
 
     /**

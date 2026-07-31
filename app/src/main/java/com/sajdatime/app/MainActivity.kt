@@ -2,6 +2,7 @@ package com.sajdatime.app
 
 import android.Manifest
 import android.content.ClipData
+import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.net.Uri
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sajdatime.core.AppLocale
 import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
@@ -31,6 +33,15 @@ import com.sajdatime.app.ui.onboarding.OnboardingScreen
 import com.sajdatime.app.ui.theme.SajdaTimeTheme
 
 class MainActivity : ComponentActivity() {
+
+    /**
+     * Every screen in the app renders through this Activity, so pinning its configuration
+     * to the app's own language covers the whole UI in one place. See AppLocale.kt for why
+     * that is necessary at all, and for what it deliberately does not do.
+     */
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(AppLocale.wrap(newBase))
+    }
 
     private val viewModel: SajdaViewModel by viewModels()
 

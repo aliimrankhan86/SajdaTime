@@ -1,5 +1,6 @@
 package com.sajdatime.wear
 
+import android.content.Context
 import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.dp
@@ -15,6 +16,7 @@ import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.label
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +27,6 @@ import kotlinx.coroutines.flow.first
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
-import java.util.Locale
 
 /**
  * The tile the user swipes to from the watch face: next prayer, its time, and how long
@@ -39,6 +40,14 @@ class NextPrayerTileService : TileService() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    /**
+     * Every string on the tile is built from this rather than from the service itself, so
+     * the countdown is formatted in the app's own language and not the watch's. Without it
+     * the tile read "in ٢h ١٤m" on an Arabic watch, in a layout sized for Latin digits.
+     * See AppLocale.kt.
+     */
+    private val localised: Context by lazy { AppLocale.wrap(this) }
+
     override fun onTileRequest(
         requestParams: RequestBuilders.TileRequest,
     ): ListenableFuture<TileBuilders.Tile> = scope.future {
@@ -48,8 +57,8 @@ class NextPrayerTileService : TileService() {
 
         val (headline, detail, refreshAfter) = if (coordinates == null) {
             Triple(
-                getString(R.string.tile_label),
-                getString(R.string.tile_needs_setup),
+                localised.getString(R.string.tile_label),
+                localised.getString(R.string.tile_needs_setup),
                 Duration.ofHours(1),
             )
         } else {
@@ -61,11 +70,11 @@ class NextPrayerTileService : TileService() {
             )
             val remaining = Duration.between(now, next.at)
             Triple(
-                next.slot.label(applicationContext),
-                getString(
+                next.slot.label(localised),
+                localised.getString(
                     R.string.wear_tile_detail,
-                    TileFormat.clock(applicationContext, next.at),
-                    TileFormat.humanise(applicationContext, remaining),
+                    TileFormat.clock(localised, next.at),
+                    TileFormat.humanise(localised, remaining),
                 ),
                 TileFormat.freshness(remaining),
             )
@@ -129,7 +138,13 @@ class NextPrayerTileService : TileService() {
                     .setHorizontalAlignment(HORIZONTAL_ALIGN_CENTER)
                     .addContent(
                         LayoutElementBuilders.Text.Builder()
-                            .setText(getString(R.string.tile_label).uppercase(Locale.getDefault()))
+                            // Uppercased in the app's own language: Locale.getDefault()
+                            // would apply Turkish casing rules to English words on a
+                            // Turkish watch. See AppLocale.kt.
+                            .setText(
+                                localised.getString(R.string.tile_label)
+                                    .uppercase(AppLocale.of(localised)),
+                            )
                             .setFontStyle(
                                 LayoutElementBuilders.FontStyle.Builder()
                                     .setSize(androidx.wear.protolayout.DimensionBuilders.sp(11f))

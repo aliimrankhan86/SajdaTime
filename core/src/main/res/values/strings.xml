@@ -12,6 +12,15 @@
 -->
 <resources>
 
+    <!--
+      Translators: nobody ever sees this one. It is the BCP-47 tag of the language this
+      file is written in, and the app reads it back to decide how to format clock times,
+      dates and numbers. Every translation must override it with its own tag, or it will
+      show its own words with English number formatting. LocaleDisciplineTest fails the build
+      if a translation forgets. See AppLocale.kt for why this exists at all.
+    -->
+    <string name="app_language_tag">en-GB</string>
+
     <string name="prayer_fajr">Fajr</string>
     <string name="prayer_sunrise">Sunrise</string>
     <string name="prayer_dhuhr">Dhuhr</string>

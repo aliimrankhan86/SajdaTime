@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
@@ -32,7 +33,12 @@ import java.util.Locale
  * library, no licence cost, no APK weight — and the output is a simple table, which is
  * exactly what PdfDocument is good at.
  */
-class PrayerPdfExporter(private val context: Context) {
+class PrayerPdfExporter(base: Context) {
+
+    // Pinned to the app's own language: the PDF is a document the user keeps and may
+    // print or send on, and its headings, day names and dates all have to be in one
+    // language. See AppLocale.kt.
+    private val context = AppLocale.wrap(base)
 
     enum class Range { TODAY, NEXT_7_DAYS, THIS_MONTH }
 
@@ -272,15 +278,18 @@ class PrayerPdfExporter(private val context: Context) {
 
     private val footer: String get() = context.getString(R.string.pdf_footer)
 
-    private val dayNameFormat = DateTimeFormatter.ofPattern("EEEE", Locale.getDefault())
+    // AppLocale, not the device locale: the headings and footer beside these come from
+    // string resources, so the day names have to be in the same language as the words
+    // they sit next to. See AppLocale.kt.
+    private val dayNameFormat = DateTimeFormatter.ofPattern("EEEE", AppLocale.of(context))
 
     /**
      * Abbreviated month, not the full name. The Date column is 91pt wide and the cell text
      * is 10pt, so "30 September 2026" ran within a few points of the Fajr column and a
      * longer month name in another language ran straight into it.
      */
-    private val dateFormat = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
-    private val monthYearFormat = DateTimeFormatter.ofPattern("MMMM yyyy", Locale.getDefault())
+    private val dateFormat = DateTimeFormatter.ofPattern("d MMM yyyy", AppLocale.of(context))
+    private val monthYearFormat = DateTimeFormatter.ofPattern("MMMM yyyy", AppLocale.of(context))
 
     private companion object {
         // A4 at 72 dpi.

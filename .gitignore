@@ -30,3 +30,8 @@ keystore.properties
 # Scratch output from the designlang CLI. Competitor design extractions are
 # working notes, not part of the app.
 design-extract-output/
+
+# Python bytecode. tools/*.py get imported by ad-hoc analysis scripts during verification,
+# which drops a __pycache__ next to them. Twice now it has turned up in git status.
+__pycache__/
+*.pyc

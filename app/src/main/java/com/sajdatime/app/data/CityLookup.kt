@@ -3,6 +3,7 @@ package com.sajdatime.app.data
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.Coordinates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,7 +12,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.util.Locale
 
 /**
  * Turns a typed place name into coordinates, for travellers and for anyone who declines
@@ -51,7 +51,9 @@ class CityLookup(private val context: Context) {
         return runCatching {
             // The callback form arrived in API 33. The blocking call still works and this
             // is already off the main thread, so one code path covers every version.
-            Geocoder(context, Locale.getDefault())
+            // AppLocale, matching the language= parameter the Open-Meteo fallback below
+            // sends, so both halves of this lookup name a place the same way.
+            Geocoder(context, AppLocale.of(context))
                 .getFromLocationName(query, 1)
                 ?.firstOrNull()
                 ?.let { Result(city = it.describeAddress(query), coordinates = Coordinates(it.latitude, it.longitude)) }
@@ -60,9 +62,13 @@ class CityLookup(private val context: Context) {
 
     private fun fromOpenMeteo(query: String): Result? {
         val encoded = URLEncoder.encode(query, "UTF-8")
+        // language= was hardcoded to "en" while the platform geocoder above used the
+        // device locale, so the same search returned "Cairo" or "القاهرة" depending only
+        // on which of the two happened to answer. Both follow AppLocale now.
+        val language = AppLocale.of(context).language
         val url = URL(
             "https://geocoding-api.open-meteo.com/v1/search" +
-                "?name=$encoded&count=1&language=en&format=json",
+                "?name=$encoded&count=1&language=$language&format=json",
         )
 
         val body = runCatching { url.readTextWithTimeout() }.getOrNull() ?: return null

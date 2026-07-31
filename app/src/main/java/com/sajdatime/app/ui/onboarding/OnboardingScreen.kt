@@ -457,7 +457,14 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                 SummaryRow(
                     stringResource(R.string.label_school),
                     when (state.settings.sect) {
-                        Sect.SUNNI -> "${stringResource(R.string.sect_sunni)} · ${madhabLabel(state.settings.madhab)}"
+                        // settings_value_pair, not string concatenation: Settings already
+                        // pairs these two the same way, and the separator belongs to the
+                        // translator rather than to this line.
+                        Sect.SUNNI -> stringResource(
+                            R.string.settings_value_pair,
+                            stringResource(R.string.sect_sunni),
+                            madhabLabel(state.settings.madhab),
+                        )
                         Sect.SHIA -> stringResource(R.string.sect_shia)
                     },
                 )

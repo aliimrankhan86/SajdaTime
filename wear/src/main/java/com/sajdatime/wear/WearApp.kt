@@ -54,6 +54,7 @@ import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
@@ -64,7 +65,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -669,8 +669,11 @@ private fun DrawScope.drawKaaba(
  * 24-hour, which showed "17:14" to users whose watch was set to show "5:14 PM".
  */
 private fun clock(context: Context, instant: Instant): String {
-    val pattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm a"
-    return DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
+    // 12/24-hour is a watch setting, so it is asked of applicationContext, the one
+    // context not pinned to the app's language. The locale is the app's own language,
+    // not the watch's. See AppLocale.kt.
+    val pattern = if (DateFormat.is24HourFormat(context.applicationContext)) "HH:mm" else "h:mm a"
+    return DateTimeFormatter.ofPattern(pattern, AppLocale.of(context))
         .format(instant.atZone(ZoneId.systemDefault()))
 }
 

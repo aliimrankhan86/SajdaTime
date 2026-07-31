@@ -31,7 +31,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 val settings = SettingsRepository(appContext).current()
                 if (slot in settings.notifyFor) {
                     Notifications.postPrayerAlert(
-                        context = appContext,
+                        base = appContext,
                         slot = slot,
                         at = at,
                         style = settings.alertStyle,

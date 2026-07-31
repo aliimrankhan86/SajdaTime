@@ -82,6 +82,8 @@
     <string name="home_next_marker">Next</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
+    <!-- Spoken for the location row: the place, then what tapping it does. -->
+    <string name="home_location_a11y">%1$s. %2$s</string>
     <string name="home_default_location_title">Showing times for Makkah</string>
     <string name="home_default_location_body">We could not work out where you are. Tap to set your location.</string>
     <string name="action_change_location">Change location</string>

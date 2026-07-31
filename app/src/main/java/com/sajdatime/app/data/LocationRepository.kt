@@ -10,12 +10,12 @@ import android.location.LocationManager
 import android.os.Build
 import android.os.CancellationSignal
 import androidx.core.content.ContextCompat
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.Coordinates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import java.util.Locale
 import kotlin.coroutines.resume
 
 /**
@@ -56,7 +56,14 @@ class LocationRepository(private val context: Context) {
         if (!Geocoder.isPresent()) return@withContext ""
         runCatching {
             @Suppress("DEPRECATION")
-            Geocoder(context, Locale.getDefault())
+            // AppLocale rather than the device locale, so the city name is in the same
+            // language as everything around it. On an Arabic phone the device locale gave
+            // "سلاو، المملكة المتحدة" as the only non-English text on an English screen,
+            // and the Open-Meteo fallback in CityLookup already asks for English, so the
+            // two halves of the same feature disagreed. Reversible: if translations land
+            // and someone would rather see their town in their own script regardless of
+            // app language, this is the line to change.
+            Geocoder(context, AppLocale.of(context))
                 .getFromLocation(coordinates.latitude, coordinates.longitude, 1)
                 ?.firstOrNull()
                 ?.let { it.locality ?: it.subAdminArea ?: it.adminArea ?: it.countryName }

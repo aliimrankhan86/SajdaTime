@@ -136,6 +136,14 @@ user may have picked for accessibility reasons.
 `PrayerTimeTextStyle` and the countdown use **tabular figures** (`tnum`) so digits do not
 jitter as they change width.
 
+> Tabular figures make the *Latin* digits an even width. They do not make every numbering
+> system the same width as Latin. On a phone set to Arabic or Bengali the 52sp countdown
+> was formatted with that language's digits, which are wider, and wrapped onto a second
+> line — inside a card sized for the narrower ones. The app now formats numbers in the
+> language its words are in (`docs/HANDOVER.md` §5.11), so this cannot happen today. It
+> becomes live again the moment a translation into a language with its own digits ships:
+> `displayLarge` on the next-prayer card is the first thing to re-measure.
+
 Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp.
 
 > They are **not** uppercased in code. `String.uppercase()` on a translated string is a

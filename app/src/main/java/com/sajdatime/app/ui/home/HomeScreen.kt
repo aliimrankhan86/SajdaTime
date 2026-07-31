@@ -154,7 +154,14 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
     val city = state.settings.cityName.ifBlank {
         stringResource(R.string.location_set_generic)
     }
-    val changeLabel = stringResource(R.string.action_change_location)
+    // Through a resource rather than "$city. $changeLabel": the full stop and the order of
+    // the two halves are punctuation decisions, and a translator cannot change either one
+    // if they are welded into the code.
+    val spokenLocation = stringResource(
+        R.string.home_location_a11y,
+        city,
+        stringResource(R.string.action_change_location),
+    )
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -163,7 +170,7 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
             .fillMaxWidth()
             .clickable(role = Role.Button, onClick = onClick)
             .padding(vertical = 10.dp)
-            .semantics { contentDescription = "$city. $changeLabel" },
+            .semantics { contentDescription = spokenLocation },
     ) {
         Icon(
             Icons.Outlined.LocationOn,
@@ -270,7 +277,7 @@ private fun NextPrayerCard(state: UiState) {
             rememberRemainingText(state.now, next.at),
         )
         Text(
-            text = TimeFormat.countdownClock(state.now, next.at),
+            text = TimeFormat.countdownClock(context, state.now, next.at),
             style = MaterialTheme.typography.displayLarge,
             color = hero.prominent,
             textAlign = TextAlign.Center,
