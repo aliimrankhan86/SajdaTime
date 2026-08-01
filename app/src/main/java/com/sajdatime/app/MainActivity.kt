@@ -15,15 +15,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
 import com.sajdatime.app.ui.ExportEvent
@@ -130,8 +134,18 @@ class MainActivity : ComponentActivity() {
                         if (!state.settings.disclaimerSeen) {
                             AlertDialog(
                                 onDismissRequest = { },
+                                // A filled, full-width button, not a text link. This is the
+                                // one control on the one screen every user must pass
+                                // through, and as a small tinted word in the corner it did
+                                // not read as pressable — a tester said so. 56dp clears the
+                                // 48dp minimum touch target with room for shaky hands.
                                 confirmButton = {
-                                    TextButton(onClick = { viewModel.markDisclaimerSeen() }) {
+                                    Button(
+                                        onClick = { viewModel.markDisclaimerSeen() },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .heightIn(min = 56.dp),
+                                    ) {
                                         Text(stringResource(R.string.action_understood))
                                     }
                                 },

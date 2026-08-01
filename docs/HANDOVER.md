@@ -1806,7 +1806,15 @@ not imply that a more precise location would change them.
   option was never that a smart default is wrong — it is that a **silent** one is. A visible
   prompt is not the same thing.
 
-- **T2 — the first-run flow advances on tap in some steps and needs a button in others.**
+- **T2 — DONE, 1 Aug 2026.** Every step that asks a question now ends in the same pair of
+  buttons, Back and Continue, through one shared `StepButtons` composable. Selecting a card
+  only selects it. Skip was deleted rather than relabelled, because one of the four madhabs is
+  always already selected, so Skip and Continue did the same thing while looking like a choice
+  between keeping and discarding an answer. The disclaimer's "I understand" became a filled,
+  full-width, 56dp button instead of a small tinted word in the corner. Verified by screenshot
+  on device in both LTR and RTL. Original analysis kept below.
+
+- **T2 (original) — the first-run flow advances on tap in some steps and needs a button in others.**
   Tester report: users do not know whether to tap or to press Next. Confirmed by reading
   `ui/onboarding/OnboardingScreen.kt`: `WELCOME` ends in a **Begin** button and `PERMISSION`
   in a **Continue** button, but `SECT` has **no button at all** — `ChoiceCard.onClick` calls
@@ -2508,6 +2516,36 @@ matters more than the stable hashes, that is the trade being made.
     proposed rewrite — new methods, a per-prayer offset feature — into one conditional card
     shown to users above a latitude. When a single user's evidence points at a global
     default, the next step is more locations, not more code.
+
+42. **Never leave the `installRtl` build on a device anyone else will pick up. Uninstall it
+    and put `installDebug` back the moment you are done.** The `rtl` build type sets
+    `app_language_tag` to **`ar-XB`**, a pseudolocale that does not merely flip the layout: it
+    **reverses Latin characters**. "Sat, Aug 1" renders as "1 guA ,taS" and "2:54 AM" as
+    "MA 2:54". That is the tool working exactly as designed, and it is unreadable on purpose.
+    This build was left installed on the owner's emulator after a verification pass. He opened
+    it, saw mirrored headings, reversed AM and PM, and English right-aligned, and reasonably
+    concluded the app was broken and that the work had been sloppy. Every one of those
+    "defects" was the harness. **Any screenshot from an RTL build must be labelled as one when
+    it is shown to anyone, and the device must be returned to the normal build afterwards.**
+    Leaving a deliberately-mangled build behind is not a neutral act: it destroys trust in
+    work that was actually fine, and it costs a review cycle to undo.
+
+    For the record, since it came up: **layout direction already follows the app's own
+    language, not the device's.** `app_language_tag` is `en-GB`, `AppLocale` pins the whole
+    configuration to it, so English is left-to-right and always will be. The day an Arabic or
+    Urdu translation ships and declares its own tag, that language flips to right-to-left on
+    its own with no code change, and `LocaleDisciplineTest` fails the build if a translation
+    is added without declaring one. There is nothing to fix here and nothing to switch on.
+
+43. **An affordance that is obvious to the person who wrote it is not an affordance.** The
+    sect step advanced the moment a card was tapped and showed no button at all, leaving the
+    bottom half of the screen empty. Whoever wrote it knew the cards were the control. Nobody
+    else did, and a tester said so in exactly those words: he could not tell whether to tap or
+    to press Next. Worse, the madhab step *did* show buttons, Back and Skip, while also
+    advancing on tap, so the screen actively promised a Next that did not exist. The fix was
+    not cleverness, it was sameness: one `StepButtons` composable, Back and Continue, on every
+    step that asks a question, and selecting only ever selects. **When a screen has empty space
+    where a button should be, that space is telling the user something. Believe it.**
 
 ---
 

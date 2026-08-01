@@ -100,21 +100,24 @@ fun OnboardingScreen(
                     onNext = { step = Step.SECT },
                 )
 
+                // Selecting only selects. Every step is left by pressing the button, never
+                // by tapping a card. These two used to advance the moment a card was
+                // touched, which threw the user forward before they had decided and left
+                // Sect with no button on screen at all — a tester reported not knowing
+                // whether to tap or to press Next, and he was right. See HANDOVER §15.
                 Step.SECT -> SectStep(
                     selected = state.settings.sect,
-                    onSelect = { sect ->
-                        onSelectSect(sect)
-                        step = if (sect == Sect.SUNNI) Step.MADHAB else Step.CONFIRM
+                    onSelect = onSelectSect,
+                    onNext = {
+                        step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.CONFIRM
                     },
+                    onBack = { step = Step.PERMISSION },
                 )
 
                 Step.MADHAB -> MadhabStep(
                     selected = state.settings.madhab,
-                    onSelect = {
-                        onSelectMadhab(it)
-                        step = Step.CONFIRM
-                    },
-                    onSkip = { step = Step.CONFIRM },
+                    onSelect = onSelectMadhab,
+                    onNext = { step = Step.CONFIRM },
                     onBack = { step = Step.SECT },
                 )
 
@@ -366,8 +369,44 @@ private fun LocatedRow(cityName: String) {
     }
 }
 
+/**
+ * Back on the left, Continue on the right, on every step that has a choice.
+ *
+ * One shape, used everywhere, because the tester complaint was not "this button is wrong"
+ * but "I cannot tell whether to tap or to press something". Two steps answered that
+ * differently from the other three, and one of them showed no button at all.
+ */
 @Composable
-private fun SectStep(selected: Sect, onSelect: (Sect) -> Unit) {
+private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
+    Spacer(Modifier.height(8.dp))
+    Row {
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = 56.dp),
+        ) {
+            Text(stringResource(R.string.action_back))
+        }
+        Spacer(Modifier.width(12.dp))
+        Button(
+            onClick = onNext,
+            modifier = Modifier
+                .weight(1f)
+                .heightIn(min = 56.dp),
+        ) {
+            Text(stringResource(R.string.action_continue))
+        }
+    }
+}
+
+@Composable
+private fun SectStep(
+    selected: Sect,
+    onSelect: (Sect) -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+) {
     StepScaffold(
         title = stringResource(R.string.sect_title),
         body = stringResource(R.string.sect_body),
@@ -385,6 +424,7 @@ private fun SectStep(selected: Sect, onSelect: (Sect) -> Unit) {
             selected = selected == Sect.SHIA,
             onClick = { onSelect(Sect.SHIA) },
         )
+        StepButtons(onBack = onBack, onNext = onNext)
     }
 }
 
@@ -392,7 +432,7 @@ private fun SectStep(selected: Sect, onSelect: (Sect) -> Unit) {
 private fun MadhabStep(
     selected: Madhab,
     onSelect: (Madhab) -> Unit,
-    onSkip: () -> Unit,
+    onNext: () -> Unit,
     onBack: () -> Unit,
 ) {
     StepScaffold(
@@ -411,26 +451,10 @@ private fun MadhabStep(
             )
             Spacer(Modifier.height(12.dp))
         }
-        Spacer(Modifier.height(8.dp))
-        Row {
-            OutlinedButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 52.dp),
-            ) {
-                Text(stringResource(R.string.action_back))
-            }
-            Spacer(Modifier.width(12.dp))
-            OutlinedButton(
-                onClick = onSkip,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 52.dp),
-            ) {
-                Text(stringResource(R.string.action_skip))
-            }
-        }
+        // Skip used to sit here next to Back. It was removed rather than relabelled: one of
+        // the four is always already selected, so Skip and Continue did the same thing while
+        // looking like a choice between keeping and discarding an answer.
+        StepButtons(onBack = onBack, onNext = onNext)
     }
 }
 
