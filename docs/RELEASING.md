@@ -46,6 +46,37 @@ Realistic floor from a standing start: **about three weeks.**
 > of their specific claims appear **nowhere in Google's documentation**, and two of them
 > contradict each other on the same site.
 
+### Who the testers are: Google will not tell you, and the field will not check you
+
+Two related surprises, both verified in the Console on 1 Aug 2026. Between them they account
+for most of the time lost chasing a closed test that appears not to work.
+
+**You get a number, never a name.** There is no per-tester view anywhere in Play Console: no
+list of who opted in, who installed, who uninstalled. Google treats that as the testers'
+private data. The Statistics page will eventually show installs and active devices, but
+aggregated and roughly a day behind — on 1 Aug, a day after going live, it read *"Data
+unavailable"*. **So the only way to know who is in is to ask them and keep your own list**:
+name, email, added, opted in, confirmed installed. Nothing in the Console reconstructs it,
+and nothing in the app can either — it has no analytics, no accounts and no server, and that
+is not going to change.
+
+**The email field validates nothing.** The Console accepts any string that looks like an
+address. It does not check that it is a Google account, and it cannot check that it is the
+account signed into the Play Store on that person's phone. Add the wrong one and it sits in
+your list of 17 looking correct while the tester sees *"not available"* — the whole failure
+is on their phone, and the Console shows you a healthy list either way. This is why the count
+of opted-in testers is always lower than the count of addresses, and why the gap tells you
+nothing about which addresses are wrong.
+
+So ask for it precisely, and in their words:
+
+> Open the Play Store app, tap your photo in the top right. What address does it show at the
+> top? That's the one I need.
+
+A hotmail, outlook, iCloud or work address only works if it has been registered as a Google
+account **and** is the one signed into that phone. It occasionally is. Asking for the Gmail
+is the version that does not generate confused replies.
+
 ### What Google does not write down — and what gets people rejected
 
 Google deliberately does not publish the exit criteria. Asked directly, its support told one
@@ -66,9 +97,13 @@ evidence there is of how the check behaves in practice, and it is consistent on 
   on one office or home network are reported to collapse into a single counted tester.
 - **Recruit roughly double.** One developer in June 2026 needed **30 testers to keep 12
   active** through the fortnight.
-- **The Console counter is not trustworthy.** Repeated reports of it showing 0 with a dozen
-  confirmed testers, or lagging ~24 hours. There is **no way to see the consecutive-day
-  count**. Do not treat the dashboard as ground truth.
+- **The Console counter is not trustworthy — but it does exist, in exactly one place.**
+  **Dashboard → Production → "Apply for access to production"**, as a line of italic text
+  under step 2: *"9 testers currently opted in"*. Nothing else in the Console shows it —
+  not the track page, not the Testers tab, not Statistics, not the release. There is still
+  **no way to see the consecutive-day count**, and there are repeated reports of the number
+  reading 0 with a dozen confirmed testers or lagging ~24 hours, so treat it as a lower
+  bound rather than ground truth.
 - **Rejection is common and repeatable.** Three, four and five consecutive rejections are all
   documented, including by developers who shipped multiple updates during the fortnight.
 - **The review can take far longer than the stated seven days.** Documented 2026 cases of four
@@ -585,8 +620,33 @@ possible answer to that suspicion.
    > still showed only *"Changes in review"*, with no new section to submit. Verified by
    > scrolling the whole page, not by assuming.
 
-8. ⬜ Share the opt-in link — **only once the release is live** — and wait out the 14 days.
-   `https://play.google.com/apps/testing/com.sajdatime.app`
+   > **Approved. Verified in the Console on 1 Aug 2026.** The review came back inside a day,
+   > not the seven that were budgeted for. `Closed testing - Alpha` now reads **Active**,
+   > release `1.1.0 - first closed test` shows a green tick and **"Available to selected
+   > testers · 1 version code · Released on 31 Jul 22:17"** across all 177 countries, and the
+   > Dashboard has struck through *Publish a closed testing release*. There was no second
+   > button to press and no notification in the Console — managed publishing being off means
+   > approval simply publishes, which is why the state can change without anything appearing
+   > to have happened.
+
+8. ⏳ **Share the opt-in link and wait out the 14 days.** The links are live as of 1 Aug 2026
+   — both read directly out of the Console's own DOM rather than assumed:
+
+   | Console label | URL |
+   |---|---|
+   | Join on the web — **send this one** | `https://play.google.com/apps/testing/com.sajdatime.app` |
+   | Join on Android | `https://play.google.com/store/apps/details?id=com.sajdatime.app` |
+
+   The first is the *"Become a tester"* page and is the one that works for someone who has
+   not opted in yet. The store link only resolves for people already opted in, so sending it
+   to a new tester produces a page that says the app does not exist.
+
+   **State on 1 Aug 2026: 17 addresses on the list, `9 testers currently opted in`.** Three
+   short. The 14 days are counted while **twelve or more** are opted in — Google's own
+   wording on the Dashboard is *"Run your closed test with at least 12 testers, for at least
+   14 days"* — so at nine the clock is not running and every day spent there is a day that
+   does not count. Chasing the eight who are on the list but have not opted in is worth more
+   than recruiting new people.
 
    > **Google sends testers nothing.** No invitation email, no notification. Adding an
    > address to the list only grants access; the person has no way to know the app exists
@@ -625,6 +685,45 @@ possible answer to that suspicion.
      testers who *stay* opted in for 14 consecutive days, so a late uninstall can drop the
      count below twelve and restart the clock. This is why the target is twenty-plus rather
      than exactly twelve.
+
+   **The two messages actually used (1 Aug 2026).** The long message above assumes the
+   recipient is already on the list. Recruiting someone new is a *two-step* conversation,
+   because the link cannot work until their address has been added — send it up front and
+   they will click it, be told they are not a tester, and quietly give up. So the first
+   message asks only for the address, and deliberately contains no link:
+
+   > Assalamu alaikum,
+   >
+   > I've made a free prayer times app called SajdaTime — prayer times, adhan notifications
+   > and Qibla compass. No adverts, no tracking, works without internet.
+   >
+   > It is for Android phones only. It won't work on an iPhone, sorry.
+   >
+   > Google won't let me publish it until 12 people have tested it. Can you help?
+   >
+   > If you have an Android phone, please send me your Gmail address — it has to be the
+   > Gmail signed in to the Play Store on your phone. Only Gmail works for this. A hotmail,
+   > outlook or work email will not.
+   >
+   > Once I've added you I'll reply with the link. Please keep the app on your phone for 15
+   > days — Google needs 12 people to keep it that long before I can release it publicly.
+   >
+   > Thank you. Jazakallahu khairan.
+
+   Then, once the address is on the list:
+
+   > You're added. Open this on your Android phone:
+   > https://play.google.com/apps/testing/com.sajdatime.app
+   > Tap "Become a tester", then install from the Google Play link on that page. Let me know
+   > when it's done.
+
+   Three deliberate choices in there. **"Android phones only"** is stated first because the
+   iPhone owners in any WhatsApp group will otherwise reply asking, and each one costs a
+   round trip. **"15 days"** rather than 14 is padding for a late opt-in — the rule is 14
+   consecutive days and there is no benefit in cutting it fine. **"Gmail only"** is a
+   simplification and is known to be slightly wrong (see "Who the testers are" in Step 0):
+   a non-Gmail Google account can work. It is phrased that way because the failure is
+   silent and the accurate version generates confused replies.
 9. ⬜ Apply for production access, then **Production → Create release** and roll out.
 10. ⬜ Second release for the watch, once Play unlocks the Wear OS form factor — see below.
 
@@ -743,59 +842,87 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
 ```
 
 Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradle.kts` and
-`wear/build.gradle.kts`.
+`wear/build.gradle.kts`. Version codes are unique **per app, not per track**: the phone is
+on `2`, the watch on `1000`, so the two sequences climb in separate bands and can never
+collide.
+
+### Shipping an improvement *during* the closed test
+
+This is the likely next thing to happen, so the mechanics are written down rather than
+rediscovered.
+
+1. Bump `versionCode`, build, and upload into the **same `Closed testing - Alpha` track** —
+   `Create new release`, not a new track. A new track would mean a new set of testers and a
+   new fortnight.
+2. It goes through review again. Subsequent reviews are generally quicker than the first,
+   but it is still a review, and the same rule applies: **do not edit the store listing or
+   any App content answer while one is open.**
+3. **This does not reset the 12-tester clock.** The counter tracks tester opt-in, not
+   releases. Researched and stated in Step 0; **not yet observed on this account** — the
+   first update shipped during a live fortnight is the thing that will confirm it, so record
+   what actually happens to the count when it does.
+4. Testers do not re-opt-in. They are already on the track and Play updates them like any
+   other app — expected behaviour, not yet watched happen here.
+5. Shipping fixes mid-test is *positively useful*: the production-access form asks what you
+   changed in response to feedback, and a real answer is worth more than a tidy one.
+
+Once production access exists, the same build goes to **Production → Create release**
+instead, and the closed track can keep running ahead of it as a beta if that is wanted.
 
 ---
 
 ## What is genuinely blocking, right now
 
-The developer account is **fully verified** — identity, phone and device checks have all
-passed — GitHub Pages is live, and **the store listing and store settings are saved and clean
-in the Console**, checked on a reload from Google's servers rather than from the page as left.
-Every App content declaration is green. Everything the owner can do has been done; the app
-is now **in review with Google**.
+**The app is approved and live on the closed testing track.** Google's review came back
+inside a day. The developer account is fully verified, GitHub Pages is live, the store
+listing and every App content declaration are saved and green, the bundles are genuinely
+signed, and `Closed testing - Alpha` is **Active** with `1.1.0 - first closed test`
+distributed to all 177 countries.
 
-Play's dashboard states the remaining path in four steps, and shows the app sitting on the
-first of them:
+Play's dashboard states the remaining path in four steps. As of **1 Aug 2026** it shows the
+app on the second:
 
-1. Publish a closed testing release
-2. Have at least 12 testers opted in — **`0 testers currently opted in`**
-3. Run the closed test with at least 12 testers for at least 14 days
-4. Apply for production
+| | Step | State |
+|---|---|---|
+| 1 | Publish a closed testing release | ✅ done — struck through on the Dashboard |
+| 2 | Have at least 12 testers opted in | ⏳ **`9 testers currently opted in`**, 17 on the list |
+| 3 | Run the closed test with 12 testers for at least 14 days | ⬜ **not started** |
+| 4 | Apply for production | ⬜ button greyed out until 2 and 3 pass |
 
-The closed testing track is otherwise set up: `Closed testing - Alpha` exists, all 177
-countries are targeted, and the feedback email is set.
+**The single most important thing on this page: the 14 days are counted while twelve or more
+are opted in.** At nine, the clock is not running. A day spent at nine is not day one of
+fourteen — it is a day that does not count at all. Everything below follows from that.
 
-**As of 31 Jul 2026 every task that used to sit here is done, and the app is in review.**
-The signing key exists, the build produces genuinely signed bundles, the tester list holds
-**15** addresses and is attached to the track, the release is uploaded, named and annotated,
-and the whole lot was submitted at 22:00 as **Submission 1** (15 changes). Play's automated
-pre-checks passed with nothing flagged. The one warning raised earlier is a false alarm
-(missing debug symbols for two of Google's own native libraries).
+1. ⏳ **Three more opt-ins.** Eight people are on the list but have not opted in, so chasing
+   them is worth more than recruiting new ones — they need a message, not an invitation
+   (§15 lesson 35: Google sends them nothing). The count lives in exactly one place,
+   **Dashboard → Production → "Apply for access to production"**, and nowhere else.
+2. ⬜ **Then fourteen consecutive days with twelve or more still opted in.** The long pole,
+   and the one thing that cannot be shortened. Aim well above twelve: the count is of
+   testers who *stay*, and Google's rejection email leads with *"Testers were not engaged
+   with your app"*, so they have to use it rather than merely accept. Ask them to open it,
+   swing the compass, change the madhab, export a PDF — see the risk note in Step 0, which
+   is specifically about this app.
+3. ⬜ **Apply for production access**, answer the three-part form (Step 0), wait roughly
+   another 7 days, then **Production → Create release**.
 
-**Nothing is waiting on the owner. It is waiting on Google.**
+Nothing else is waiting on anyone. Everything that can be prepared is in the repo: the live
+privacy policy, the store screenshots, the icon, the feature graphic, all the listing text,
+the Gradle signing wiring, and both signed bundles.
 
-1. ⏳ **Google's review.** Publishing overview reads *"Your changes are now in review. We may
-   find additional issues when reviewing your app."* Google's own guidance is up to 7 days,
-   and a first submission from a new personal account tends to sit at the slower end. The
-   verdict arrives by email to the account the Console is registered to — **check spam**.
-   While it is in review, do not edit the listing, the screenshots or any App content answer.
-2. ⬜ **Twelve testers actually opting in** (Step 0) — the long pole, and the one thing that
-   cannot be shortened. The opt-in link does not exist until the release is live, so this
-   clock has not started. Recruit roughly 25: the count is of testers who *stay* opted in for
-   14 consecutive days, and Google's rejection email leads with *"Testers were not engaged
-   with your app"*, so they have to use it, not merely accept the invitation.
-
-   Building the list is the one useful thing that can be done *during* the review — it
-   creates no pending change and does not disturb the submission. See Step 8 for the
-   message to send and the three ways it fails on the tester's phone.
-
-Everything else is done and in the repo: the live privacy policy, the store screenshots, the
-icon, the feature graphic, all the listing text, and the Gradle signing wiring.
-
-> **The watch is genuinely blocked until step 1 lands, and this is now confirmed rather than
-> inferred.** Play Console → Advanced settings → Form factors reads *"Once you've released
-> your app to any track, you can come back here to manage its availability"*. The Wear OS
-> form factor cannot be added, so the Wear OS screenshot slots do not exist yet either. The
-> 454×454 assets are ready at `docs/store/upload/wear-os/` and `wear-release.aab` is built
-> and signed; both simply have nowhere to go until the phone release exists.
+> **The watch is no longer blocked. Verified 1 Aug 2026.** This section previously recorded
+> that Advanced settings → Form factors was gated — *"Once you've released your app to any
+> track, you can come back here to manage its availability"*. Publishing the closed test
+> satisfied that gate. The page now lists **Android XR · Active** (a default, not something
+> we asked for — it is why the track summary reads "Phones, Tablets, Chrome OS, Android XR")
+> and offers **+ Add form factor**, enabled.
+>
+> **Deliberately not clicked.** Adding a form factor is a configuration change that creates
+> a pending change to submit, and it belongs to the owner, not to an agent poking at a
+> Console. So what is verified is only that the button is live; the Wear OS option itself,
+> the wizard behind it, and the 454×454 screenshot slots are **still unseen**. The assets are
+> ready at `docs/store/upload/wear-os/` and `wear-release.aab` is built and signed.
+>
+> **Do it after the phone reaches production, not now.** The watch triggers a separate human
+> review against the Wear quality guidelines, and there is nothing to gain from putting a
+> second review in flight while the fortnight is the only thing that matters.

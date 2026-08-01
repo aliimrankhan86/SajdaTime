@@ -1367,13 +1367,27 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ### Blocker for release
 
-> **Read this first — 31 Jul 2026.** The signing key is **done**, and the release has been
-> **submitted and is now in review with Google**: Submission 1, 15 changes, submitted 31 Jul
-> 2026 22:00, Publishing overview reading *"Changes in review"*. **Nothing in the Console
-> needs pressing.** The next event is Google's verdict by email, and after that the
-> 12-testers-for-14-days clock. The two paragraphs below are kept because their account and
-> listing facts are still true, but where the first one says the key is the only outstanding
-> item, it is out of date. See item 1 below and `docs/RELEASING.md`.
+> **Read this first — 1 Aug 2026.** **Google approved it, and the app is live on the closed
+> testing track.** The review came back inside a day. `Closed testing - Alpha` is **Active**
+> with `1.1.0 - first closed test`, *"Available to selected testers"*, released 31 Jul 22:17
+> across all 177 countries.
+>
+> **The whole project now rests on one number.** The Dashboard reads **`9 testers currently
+> opted in`** against 17 addresses on the list, and Google requires twelve, held for
+> fourteen *consecutive* days. **The fourteen days are counted while twelve or more are
+> opted in — so at nine the clock is not running at all.** Days spent at nine are not early
+> days of the fortnight; they are days that do not count.
+>
+> **Nothing in the Console needs pressing, and nothing in this repo is blocking.** The only
+> remaining work is human: getting three more people to open the opt-in link. The count
+> lives in exactly one place — **Dashboard → Production → "Apply for access to production"**
+> — and nowhere else in the Console. See `docs/RELEASING.md` Step 8 and "What is genuinely
+> blocking, right now".
+>
+> The two paragraphs below are kept because their account and listing facts remain true.
+> Where the first says the signing key is the only outstanding item, and that nothing is
+> waiting on Google, both are out of date — the key was created on 31 Jul and Google has
+> since reviewed and approved.
 >
 > **Play Store status at a glance.** Developer account created (personal, ID
 > 6284685113064492750, developer name "Ali Imran Khan"). Android-device check **passed**.
@@ -1407,10 +1421,16 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
    recoverable if lost. **An agent must still never generate, hold, or see it.**
    `keystore.properties`, `*.jks` and `*.keystore` remain gitignored.
 
-   The owner pressed **"Submit 15 changes for review"** on 31 Jul 2026. Play's automated
-   pre-checks passed with nothing flagged and the submission is now with Google's reviewers.
-   What remains is Google's verdict and then the 12-testers-for-14-days clock. See
-   `docs/RELEASING.md` "What is genuinely blocking".
+   The owner pressed **"Submit 15 changes for review"** on 31 Jul 2026; Play's automated
+   pre-checks passed with nothing flagged, and **Google approved it inside a day**. The app
+   went live on the closed track at 31 Jul 22:17. What remains is entirely outside the
+   repo: twelve testers opted in, held for fourteen consecutive days, then the
+   production-access application. See `docs/RELEASING.md` "What is genuinely blocking".
+
+   One consequence worth knowing, because it unblocks the watch: publishing to a track
+   satisfied the gate on **Advanced settings → Form factors**, which now offers
+   *+ Add form factor*. It was deliberately not clicked — see the note at the end of
+   `docs/RELEASING.md`.
 
 ### Not done, in rough priority order
 
@@ -2001,6 +2021,28 @@ matters more than the stable hashes, that is the trade being made.
     the most common reason a closed test sits at `0 testers currently opted in` while the
     developer believes invitations went out. A ready-to-send tester message, and the three
     ways it goes wrong on the tester's phone, are in `docs/RELEASING.md` Step 8.
+
+36. **Google gives you a number, never a name — and it hides the number in one place.**
+    There is no per-tester view anywhere in Play Console: who opted in, who installed, who
+    dropped out are all treated as the testers' private data. The only figure that exists is
+    a count, and it is printed as one italic line under step 2 of **Dashboard → Production →
+    "Apply for access to production"** — not on the track page, not on the Testers tab, not
+    in Statistics, which read *"Data unavailable"* a full day after going live. The Testers
+    tab shows how many *addresses* you have added, which is a different number and reliably
+    the larger one; mistaking one for the other is how a stalled test looks healthy. **So the
+    only way to know who is actually in is to ask them and keep your own list.** The app
+    cannot help either: no analytics, no accounts, no server, by design and permanently.
+
+37. **The tester email field validates nothing, and the failure lands on someone else's
+    phone.** The Console accepts any plausible-looking address. It does not check that it is
+    a Google account, and it cannot check that it is the account signed into the Play Store
+    on that person's device — so a wrong address sits in the list looking perfectly correct
+    while the tester sees *"not available"* and concludes the app is broken. Nothing appears
+    in the Console at all. This is the same shape as lesson 33 (*setting a field is not
+    filling it*) with the feedback loop removed entirely: there is no read-back to do,
+    because the only evidence of success is a human replying. Ask for the address by
+    describing where to find it — *Play Store → your photo, top right* — rather than by
+    asking for "your email".
 
 ---
 
