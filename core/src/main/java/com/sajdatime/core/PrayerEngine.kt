@@ -49,6 +49,13 @@ object PrayerEngine {
      *
      * ponytail: one sensible default, not a setting. Add a user-facing choice only if UK
      * users report a mismatch with their local mosque.
+     *
+     * That mismatch has now been reported (Slough, Aug 2026) — and this rule is NOT the
+     * cause, so do not start here. The rule only engages from roughly mid-May to late July,
+     * when 18 degrees becomes unreachable; on 1 August at 51.5N it changes nothing at all
+     * (Isha 23:17 with it and without it). The real gap is the *method*: the default MWL 17
+     * degrees lands 78 minutes after every local mosque, which use Moonsighting's shafaq
+     * rule. See docs/HANDOVER.md §10, "Isha in the UK", before touching this constant.
      */
     private val HIGH_LATITUDE_RULE = HighLatitudeRule.TWILIGHT_ANGLE
 

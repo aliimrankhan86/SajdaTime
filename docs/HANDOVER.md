@@ -374,6 +374,12 @@ running adhan-java directly: with the adjustment, Dhuhr is 13:16 for Manchester 
 iOS port on adhan-swift inherits the same offset and needs no special handling; a port onto
 any *other* library must add it explicitly or every Dhuhr in the app will silently shift.
 
+**These angles are a choice, not a fact, and at UK latitudes the choice dominates.** MWL's
+17° Isha is correctly implemented and matches Aladhan's MWL exactly — and is still 78 minutes
+later than the three Slough and Reading mosques measured in §10, "Isha in the UK", all of
+which use the *shafaq*-based Moonsighting convention. Do not treat a user's "Isha is wrong"
+as an arithmetic bug until their mosque's convention has been identified.
+
 ### 5.4 ⭐ The Jafari Maghrib rule — the single most important piece of logic
 For Sunni conventions Maghrib is sunset. For **Jafari and Tehran**, Maghrib is when the
 redness leaves the eastern sky — the sun 4° (4.5° Tehran) below the horizon, typically
@@ -1363,6 +1369,86 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
 
 ---
 
+### Isha in the UK — measured against three real mosques (1 Aug 2026)
+
+**Why this exists.** A tester asked why his local mosques disagree about Isha, and named
+three. Rather than reason about it, all three published timetables were read and compared
+against Aladhan. The finding is not what the question assumed: **the mosques barely disagree
+with each other. The app disagrees with all three of them.**
+
+**What the mosques actually publish.** Slough is 51.51°N, Reading 51.45°N.
+
+| Mosque | Date | Isha *begins* | Isha *jama'ah* |
+|---|---|---|---|
+| [JMIC Slough](https://www.jmicslough.org/) | 1 Aug 2026 | **21:58** | 22:15 |
+| [Reading Mosque](https://www.readingmosque.com/) | 31 Jul 2026 | **22:02** | 22:20 |
+| [Diamond Road, Slough](https://www.sloughislamictrust.org.uk/Diamond-Road-Mosque-Slough/) | 1 Aug 2026 | not published | 22:45 |
+
+The two that publish a begin time **agree to within four minutes**. The apparent 47-minute
+spread between JMIC and Diamond Road is not a disagreement about Isha at all — it is one
+mosque printing the start of the window and another printing the congregation.
+
+**Both begin-times were identified exactly.** Aladhan, same coordinates and dates:
+
+| | JMIC Slough (printed) | Moonsighting + Shafi'i | Reading (printed) | Moonsighting + Hanafi |
+|---|---|---|---|---|
+| Fajr | 03:39 | 03:38 | 03:39 | 03:38 |
+| Dhuhr | 13:14 | 13:09 | — | — |
+| Asr | **17:19** | **17:19** | **18:28** | **18:28** |
+| Maghrib | 20:53 | 20:51 | 20:57 | 20:54 |
+| Isha | 21:58 | 21:59 | 22:02 | 22:03 |
+
+Both mosques use **Moonsighting Committee Worldwide** — a *shafaq*-based convention built
+for high latitudes, not a fixed depression angle. They differ from each other only in Asr
+madhab (JMIC standard, Reading Hanafi), and each adds two to five minutes of *ihtiyat*
+(safety margin) to the published begin time. Asr matched to the exact minute in both cases,
+on a value that differs by 67 minutes between the two madhabs — so this is an identification,
+not a coincidence.
+
+**Where SajdaTime sits.** The default is `AUTO` → Muslim World League, Isha **17°**:
+
+| Convention for Slough, 1 Aug 2026 | Isha |
+|---|---|
+| Moonsighting Committee (what both mosques use) | **21:59** |
+| ISNA (15°) | 22:58 |
+| Muslim World League (17°) — **the app's default** | **23:17** |
+| Egyptian (17.5°) | 23:21 |
+| Karachi (18°) | 23:25 |
+
+**The app's default is 78 minutes later than every mosque in the tester's town**, and is the
+latest-but-two of the mainstream conventions. Nothing is arithmetically wrong — MWL at 17°
+is correctly implemented and matches Aladhan's MWL — but at 51.5°N the choice of convention
+matters far more than the arithmetic, and MWL is a poor fit for the UK.
+
+**The high-latitude rule is not the cause, and was ruled out rather than assumed.** On
+1 August, `TWILIGHT_ANGLE` and no rule at all produce identical times (Isha 23:17 either
+way), because at 51.5°N in August the sun still reaches 20° below the horizon. The rule only
+engages roughly **mid-May to late July**, when 18° is unreachable. Checked at the solstice
+for Slough, where the choice becomes enormous:
+
+| Rule, 21 Jun 2026, Slough | Fajr | Isha |
+|---|---|---|
+| `TWILIGHT_ANGLE` — what the app uses | 02:33 | 23:29 |
+| `MIDDLE_OF_THE_NIGHT` — adhan's default | 01:04 | **01:04** ← no Isha window at all |
+| `SEVENTH_OF_THE_NIGHT` | 03:42 | 22:27 |
+
+This re-confirms §5.5 from a second direction: `MIDDLE_OF_THE_NIGHT` is unusable here, and
+setting the rule explicitly was right. It also shows `SEVENTH_OF_THE_NIGHT` lands much
+closer to UK mosque practice in midsummer — worth knowing before anyone changes it.
+
+**What a UK user can do today, with no code change.** Settings → Calculation method →
+**Moonsighting Committee**, and Madhab → whichever their mosque follows. That reproduces
+both mosques' begin times to within a minute. `CalcMethod.MOON_SIGHTING` already exists and
+already ships; it is simply not discoverable, because onboarding asks for sect and madhab
+and never mentions method.
+
+**Not verified:** whether these mosques use Moonsighting year-round or switch convention in
+midsummer — a single date cannot show that, and it is exactly where high-latitude timetables
+tend to diverge. Two dates in December and June would settle it. Diamond Road's begin times
+are not published anywhere found, so only its jama'ah column could be read.
+
+---
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Blocker for release
@@ -1431,6 +1517,49 @@ Add the watch tile: long-press the watch face → **+** → scroll → "Next pra
    satisfied the gate on **Advanced settings → Form factors**, which now offers
    *+ Add form factor*. It was deliberately not clicked — see the note at the end of
    `docs/RELEASING.md`.
+
+### Tester feedback from the closed test — queued, deliberately not started
+
+> **Do not act on these until the closed test is over.** Recorded 1 Aug 2026, while the test
+> was still at 9 of 12 opted-in testers. Shipping a new build mid-test means another review
+> and another chance to disturb a run that has not yet started its fourteen days; the upside
+> of a fix does not outweigh that until production access is granted. Both items below are
+> analysed and evidenced, so the work can start immediately once the gate clears.
+
+- **T1 — Isha does not match UK mosques, and the fix already exists but is invisible.**
+  Full evidence in §10, "Isha in the UK — measured against three real mosques". The default
+  `AUTO` → Muslim World League puts Isha **78 minutes later** than all three of the tester's
+  local mosques, which use Moonsighting Committee. `CalcMethod.MOON_SIGHTING` already ships
+  and already fixes it, but **onboarding never asks for a calculation method** — it asks for
+  sect and madhab only (`Step.WELCOME, PERMISSION, SECT, MADHAB, CONFIRM`), so a user who
+  never opens Settings can never reach it.
+
+  Options considered, none yet chosen — **this is the owner's call, because it is a
+  religious question and not an engineering one**:
+
+  | Option | Effect | Cost |
+  |---|---|---|
+  | Leave the default; explain in Settings | App keeps a defensible mainstream convention | None; users stay mismatched |
+  | Per-prayer ± minute offset in Settings | Solves *every* variant — convention, *ihtiyat*, jama'ah — without the app adjudicating fiqh | Moderate; new setting, new persistence, watch sync |
+  | Add a method step to onboarding | Makes the existing fix reachable | Small; one more screen on a flow already too long |
+  | Change the default by latitude | Fixes it for everyone silently | **Rejected on sight** — the app would be picking a madhhab-adjacent position for the user, invisibly |
+
+  A per-prayer offset is the strongest candidate: it is what mature prayer apps ship, it
+  needs no religious ruling from us, and it also absorbs the *ihtiyat* margins the mosques
+  add. It does not remove the need to make the method discoverable.
+
+- **T2 — the first-run flow advances on tap in some steps and needs a button in others.**
+  Tester report: users do not know whether to tap or to press Next. Confirmed by reading
+  `ui/onboarding/OnboardingScreen.kt`: `WELCOME` ends in a **Begin** button and `PERMISSION`
+  in a **Continue** button, but `SECT` has **no button at all** — `ChoiceCard.onClick` calls
+  `onSelect`, which sets `step` and jumps straight forward. `MADHAB` does the same *while
+  also* showing **Back** and **Skip** buttons at the bottom, which is the worst case: the
+  screen visibly has buttons, so the user reasonably waits for a Next that does not exist,
+  then taps a card and is thrown forward before deciding. The fix is consistency, not
+  cleverness — every step gets an explicit forward button, selection only selects.
+
+  Note the interaction with T1: if a method step is added, it lands in this same flow, so
+  fixing the navigation first is the cheaper order.
 
 ### Not done, in rough priority order
 
@@ -2043,6 +2172,31 @@ matters more than the stable hashes, that is the trade being made.
     because the only evidence of success is a human replying. Ask for the address by
     describing where to find it — *Play Store → your photo, top right* — rather than by
     asking for "your email".
+
+38. **At high latitude the *convention* matters more than the arithmetic, and correct code
+    can still disagree with every mosque in town.** The engine reproduces Muslim World
+    League to the minute against Aladhan — and is still 78 minutes later than all three
+    mosques a tester actually attends, because they use Moonsighting Committee's
+    *shafaq*-based rule and the app defaults to MWL's fixed 17°. Nothing is broken. At 51.5°N
+    the spread between mainstream conventions reaches well over an hour, so "verified against
+    an independent reference" only ever proves the maths, never the choice. **A prayer app is
+    judged against the noticeboard at the end of the road, not against an API.** When a user
+    says the times are wrong, identify their mosque's convention before looking at the code:
+    reading three published timetables and matching them to a method took minutes and found
+    something no amount of re-reading `PrayerEngine.kt` could have. Method in §10, "Isha in
+    the UK".
+
+39. **"Begins" and "jama'ah" are different numbers, and mosques print them inconsistently.**
+    The three timetables compared showed all three styles: JMIC Slough labels both columns,
+    Reading labels them *Athan* and *Iqamah*, and Diamond Road prints a single unlabelled
+    column that is congregation times for every prayer **except Maghrib**, where it prints
+    the real one. So Diamond Road appears to disagree with JMIC about Isha by 47 minutes
+    while actually agreeing within four. The app can only ever show the start of the window,
+    and most users are comparing it to a board showing the congregation — **so the gap a user
+    reports is usually real, expected, and not a bug.** This is a wording problem before it is
+    a settings problem: say plainly that the app shows when a prayer *becomes due*, and that
+    mosques choose their own congregation time afterwards. Do not silently shift times to
+    close a gap that is supposed to be there.
 
 ---
 
