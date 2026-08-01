@@ -94,7 +94,15 @@
     <string name="home_now_marker_a11y">Current prayer</string>
     <string name="notice_dismiss">Dismiss</string>
     <string name="polar_notice_title">Approximate times</string>
-    <string name="polar_notice_body">This far from the equator the sun does not always rise or set, so there is no true Fajr or Isha to calculate. These times come from 60 degrees latitude instead. Mosques here handle it in different ways, so ask yours what it follows.</string>
+    <!--
+      Translators: %1$d is a latitude. It is 45 or 60 depending on the calculation method the
+      user has chosen, so it must stay a placeholder and must not be written out as a word.
+      Both figures come from a published ruling — see PrayerEngine.polarReferenceLatitude.
+      The degree sign follows the number directly, as on the Qibla screen; keep them together.
+      The last sentence is not padding: above the polar circles there is genuine scholarly
+      disagreement, and sending the user to their own mosque is the honest answer.
+    -->
+    <string name="polar_notice_body">This far from the equator the sun does not always rise or set, so there is no true Fajr or Isha to calculate. These times are worked out from latitude %1$d° instead. Mosques here handle it in different ways, so ask yours what it follows.</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->

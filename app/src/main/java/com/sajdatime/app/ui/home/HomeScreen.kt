@@ -415,8 +415,13 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
  */
 /**
  * Shown only above the polar circles, where the sun does not rise or set and there is no
- * true Fajr or Isha to calculate. The times on screen are projected from 60 degrees — see
- * PrayerEngine for why 60 and whose rule it is.
+ * true Fajr or Isha to calculate.
+ *
+ * The reference latitude is printed rather than hard-coded into the sentence because it is
+ * not a constant: it is 45 degrees under the Islamic Fiqh Council's ruling and 60 under
+ * Moonsighting Committee's, so it changes with the method the user picked. See
+ * PrayerEngine.polarReferenceLatitude for both sources. Printing the actual number is what
+ * lets someone check the app against their mosque instead of taking its word for it.
  *
  * Not dismissible, and deliberately so. Every other notice here describes something the
  * user can fix; this one describes where they live, and it will be just as true tomorrow.
@@ -424,11 +429,11 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
  */
 @Composable
 private fun PolarBanner(state: UiState) {
-    if (state.today?.approximated != true) return
+    val from = state.today?.approximatedFrom ?: return
     Spacer(Modifier.height(12.dp))
     NoticeCard(
         title = stringResource(R.string.polar_notice_title),
-        body = stringResource(R.string.polar_notice_body),
+        body = stringResource(R.string.polar_notice_body, from.toInt()),
     )
 }
 

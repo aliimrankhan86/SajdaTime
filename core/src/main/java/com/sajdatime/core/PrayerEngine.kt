@@ -13,6 +13,7 @@ import java.time.ZoneId
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 import kotlin.math.withSign
 
 /**
@@ -89,20 +90,121 @@ object PrayerEngine {
      * theoretical one, and it is why nothing here may return null.
      *
      * The classical answer is *aqrab al-bilad*: use the times of the nearest place where
-     * night and day are still distinguishable. Moonsighting Committee publish exactly this
-     * rule and use 60 degrees, so 60 is taken from them rather than invented here. Longitude
-     * and hemisphere are preserved, so solar noon stays true to where the user actually is.
+     * night and day are still distinguishable. Longitude and hemisphere are preserved, so
+     * solar noon stays true to where the user actually is. Which latitude counts as "nearest"
+     * is a fiqh question with two published answers, and [polarReferenceLatitude] picks
+     * between them by method rather than imposing one.
      *
-     * This is an approximation and the app says so on screen — see [DayPrayerTimes.approximated].
-     * Showing projected times silently would be the app taking a position on the user's
-     * behalf without telling them, which is the one thing it must not do.
+     * This is an approximation and the app says so on screen — see
+     * [DayPrayerTimes.approximatedFrom]. Showing projected times silently would be the app
+     * taking a position on the user's behalf without telling them, which is the one thing
+     * it must not do.
      */
-    private const val POLAR_FALLBACK_LATITUDE = 60.0
+    private const val FIQH_COUNCIL_REFERENCE_LATITUDE = 45.0
 
-    /** adhan yields null for all six fields together, but check each: never assume. */
-    private val AdhanPrayerTimes.isComplete: Boolean
-        get() = fajr != null && sunrise != null && dhuhr != null &&
-            asr != null && maghrib != null && isha != null
+    /** See [polarReferenceLatitude]. Moonsighting publish their own figure and it is not 45. */
+    private const val MOONSIGHTING_REFERENCE_LATITUDE = 60.0
+
+    /**
+     * The latitude to borrow times from when the sun will not rise or set where the user is.
+     *
+     * There is no single right answer here, so the app follows whichever body the user has
+     * already chosen rather than picking one for them. Both figures are verified against the
+     * publishing body's own words, not against another calculator — see docs/HANDOVER.md §10,
+     * "Aladhan was stale and I shipped it", for why that distinction is not pedantry.
+     *
+     * **45 degrees — Islamic Fiqh Council of the Muslim World League**, resolution 6 of the
+     * ninth session, Makkah, 12-19 Rajab 1406 (March 1986), endorsed by the European Council
+     * for Fatwa and Research. It sets three bands: below 48 degrees the signs are visible all
+     * year and must be used; between 48 and 66 Fajr and Isha are taken by analogy with the
+     * nearest place where they are clear; beyond 66 *all* times are estimated from 45 degrees.
+     * The band edges are not arbitrary and that is the strongest evidence they are reported
+     * correctly: 18 degrees of solar depression last occurs at midsummer at latitude
+     * 90 - 23.44 - 18 = 48.56, and 66.56 is the polar circle itself. At 45 degrees the sun
+     * still reaches 21.56 degrees below the horizon at midsummer, so a real Fajr and a real
+     * Isha exist there — the projection borrows measured twilight rather than an estimate of
+     * an estimate.
+     *
+     * **60 degrees — Moonsighting Committee**, in their own words: "at latitudes more than
+     * 60degrees, we slide down to 60degrees and calculate Fajr & Isha using the rule of Sab'u
+     * Lail in summer." They chose it knowing it breaches the eighteen-hour fasting limit of
+     * the fatwa they cite, on the empirical ground that Oslo copes. Verified rather than
+     * assumed: their page states the resulting Oslo extremes as 19h38m and 7h43m, and this
+     * engine at 60 degrees produces 19h39m and 7h41m. Within rounding, so adhan's Moonsighting
+     * model plus this projection really does reproduce what they publish.
+     *
+     * Rejected, with reasons, so they are not tried again:
+     * - *One constant for everybody.* Whichever number were chosen, it would impose one body's
+     *   ruling on users who had explicitly selected another. That is the failure this app
+     *   exists to avoid.
+     * - *Clamp to the highest latitude that still computes.* That boundary is an artefact of
+     *   the library, it moves daily, no scholar stands behind it, and Moonsighting measured
+     *   the result: fasts "of more than 23 hours in summer and less than 3 hours in winter".
+     * - *Use Makkah's times.* A real position, held by Dar al-Ifta al-Misriyyah and used by
+     *   some Norwegian mosques, but it discards the user's own solar noon, so Dhuhr would stop
+     *   matching the sun overhead. Worth revisiting only as an explicit user choice.
+     */
+    private fun polarReferenceLatitude(method: CalcMethod): Double =
+        if (method == CalcMethod.MOON_SIGHTING) {
+            MOONSIGHTING_REFERENCE_LATITUDE
+        } else {
+            FIQH_COUNCIL_REFERENCE_LATITUDE
+        }
+
+    /** No legitimate prayer is a whole day away from its own solar noon. See [isUsable]. */
+    private const val MAX_MILLIS_FROM_DHUHR = 24L * 60 * 60 * 1000
+
+    /**
+     * How far Dhuhr may sit from the midpoint of sunrise and sunset before the day is
+     * disbelieved. Chosen from measurement, not taste: swept over every 0.5 degrees of
+     * latitude, four longitudes and every day of 2026, the largest offset anywhere below
+     * 65 degrees is **three minutes**, which is the equation of time and the declination
+     * drifting across the day. Above 65 degrees the same sweep throws up 59, 87, 143, 212
+     * and 214 minutes. Thirty is therefore ten times the worst honest case and well clear
+     * of every dishonest one. See [isUsable].
+     */
+    private const val MAX_MILLIS_DHUHR_OFF_MIDPOINT = 30L * 60 * 1000
+
+    /**
+     * Whether adhan's answer can be believed, which is a stronger question than whether it
+     * returned anything.
+     *
+     * Null is the obvious failure and the one that used to crash the app. The subtler one is
+     * that above the polar circles adhan can return a *value* that is nonsense. Where the sun
+     * only grazes the horizon, the shadow ratio Asr is defined by is never reached, and rather
+     * than giving up adhan hands back whatever its root finder landed on. Measured across
+     * 262,070 day-computations: 2,239 faults, every latitude from 66 to 89.5 in **both**
+     * hemispheres, worst case a 27 January Asr returned as 13 March — forty-five days out.
+     * Those days were silently displayed, exported to PDF and used to schedule alarms.
+     *
+     * So the day has to be in order, and every slot has to sit within a day of its own Dhuhr.
+     * Dhuhr is the right anchor because it is the one time that does not depend on latitude at
+     * all: it comes from the date, the longitude and the sun's right ascension, and was
+     * measured identical at 0, 30, 50, 60 and 65 degrees.
+     *
+     * There is a third failure that order and range both survive, so it needs its own test.
+     * On the day polar day ends, sunrise and sunset happen minutes apart either side of
+     * midnight, and adhan can pair a sunrise from one night with a sunset from another.
+     * Measured at 78N on 24 August 2026: Maghrib 17:00, then 22:29 the following day. A
+     * sunset does not move five and a half hours overnight. The physics that catches it is
+     * that **solar noon is the midpoint of the day arc** — so if Dhuhr is not near the middle
+     * of sunrise and sunset, the two are not from the same day. See
+     * [MAX_MILLIS_DHUHR_OFF_MIDPOINT] for how the tolerance was measured.
+     *
+     * A day that fails any of the three is projected instead, and flagged. If that ever
+     * rejects a day that was really fine, the user sees an honest "approximate" banner rather
+     * than a confident wrong number, which is the safe direction to be wrong in.
+     */
+    private val AdhanPrayerTimes.isUsable: Boolean
+        get() {
+            val all = listOf(fajr, sunrise, dhuhr, asr, maghrib, isha)
+            if (all.any { it == null }) return false
+            val ms = all.map { it.time }
+            if (ms != ms.sorted()) return false
+            if (ms.any { abs(it - dhuhr.time) > MAX_MILLIS_FROM_DHUHR }) return false
+            val middayArc = (sunrise.time + maghrib.time) / 2
+            return abs(dhuhr.time - middayArc) <= MAX_MILLIS_DHUHR_OFF_MIDPOINT
+        }
 
     /** Resolves [CalcMethod.AUTO] into the convention appropriate for the user's sect. */
     fun resolveMethod(prefs: CalculationPrefs): CalcMethod =
@@ -124,15 +226,16 @@ object PrayerEngine {
         val dateComponents = DateComponents(date.year, date.monthValue, date.dayOfMonth)
         val params = parametersFor(method, prefs)
 
-        // Try where the user actually is first. Only if the sun refuses to rise or set
-        // there does the projection kick in, so everyone below the polar circles — which
-        // is very nearly everyone — is unaffected by this and gets their own astronomy.
+        // Try where the user actually is first. Only if the answer there is unusable does
+        // the projection kick in, so everyone below the polar circles — which is very nearly
+        // everyone — is unaffected by this and gets their own astronomy.
         val here = AdhanCoordinates(coordinates.latitude, coordinates.longitude)
-        val local = AdhanPrayerTimes(here, dateComponents, params).takeIf { it.isComplete }
+        val local = AdhanPrayerTimes(here, dateComponents, params).takeIf { it.isUsable }
+        val reference = polarReferenceLatitude(method)
         val adhanCoords = if (local != null) {
             here
         } else {
-            AdhanCoordinates(POLAR_FALLBACK_LATITUDE.withSign(coordinates.latitude), coordinates.longitude)
+            AdhanCoordinates(reference.withSign(coordinates.latitude), coordinates.longitude)
         }
         val base = local ?: AdhanPrayerTimes(adhanCoords, dateComponents, params)
 
@@ -147,7 +250,7 @@ object PrayerEngine {
 
         return DayPrayerTimes(
             date = date,
-            approximated = local == null,
+            approximatedFrom = reference.takeIf { local == null },
             times = mapOf(
                 PrayerSlot.FAJR to instantOf(base.fajr),
                 PrayerSlot.SUNRISE to instantOf(base.sunrise),

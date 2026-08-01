@@ -179,6 +179,147 @@ class PolarAndHemisphereTest {
     }
 
     /**
+     * The sweep that found the second polar bug, kept because reading could never have found
+     * it and neither could a spot check.
+     *
+     * Every 0.5 degrees of latitude from pole to pole, every day of a year, both madhabs.
+     * Before the [PrayerEngine] usability guard this failed on 2,239 days — every latitude
+     * from 66 to 89.5 in both hemispheres — because adhan does not only return null at
+     * extreme latitudes, it can return a confident wrong number. The worst was a 27 January
+     * Asr handed back as 13 March.
+     *
+     * Roughly a quarter of a million computations and about three seconds. Worth it: this is
+     * the only test in the project that would have caught that class of fault.
+     */
+    @Test
+    fun `no day anywhere on earth is out of order`() {
+        val faults = mutableListOf<String>()
+        var lat = -89.5
+        while (lat <= 89.5) {
+            var date = LocalDate.of(2026, 1, 1)
+            while (date.year == 2026) {
+                for (madhab in listOf(Madhab.SHAFII, Madhab.HANAFI)) {
+                    val day = PrayerEngine.compute(
+                        Coordinates(lat, 18.0),
+                        date,
+                        CalculationPrefs(madhab = madhab),
+                    )
+                    val instants = day.ordered.map { it.second }
+                    if (instants != instants.sorted() && faults.size < 5) {
+                        faults += "lat=$lat $date $madhab " +
+                            day.ordered.joinToString(" ") { "${it.first}=${it.second}" }
+                    }
+                }
+                date = date.plusDays(1)
+            }
+            lat += 0.5
+        }
+        assertTrue("times out of order: ${faults.joinToString(" | ")}", faults.isEmpty())
+    }
+
+    /**
+     * Solar noon is the midpoint of the day arc. Where that is not true, adhan has paired a
+     * sunrise from one night with a sunset from another, which is how the app came to show a
+     * Maghrib of 17:00 at 78N on 24 August and 22:29 the day after. A sunset does not move
+     * five and a half hours overnight.
+     *
+     * Measured before the fix: the largest honest offset anywhere below 65 degrees is three
+     * minutes, so this bound is deliberately loose at fifteen and still catches everything.
+     */
+    @Test
+    fun `dhuhr sits in the middle of the day arc unless the day is flagged`() {
+        var lat = -89.5
+        while (lat <= 89.5) {
+            var date = LocalDate.of(2026, 1, 1)
+            while (date.year == 2026) {
+                val day = PrayerEngine.compute(Coordinates(lat, 18.0), date, CalculationPrefs())
+                val sunrise = day[PrayerSlot.SUNRISE].toEpochMilli()
+                val maghrib = day[PrayerSlot.MAGHRIB].toEpochMilli()
+                val offMinutes =
+                    kotlin.math.abs(day[PrayerSlot.DHUHR].toEpochMilli() - (sunrise + maghrib) / 2) / 60_000
+                assertTrue(
+                    "lat=$lat $date Dhuhr is ${offMinutes}min from the middle of the day",
+                    offMinutes <= 30,
+                )
+                date = date.plusDays(1)
+            }
+            lat += 0.5
+        }
+    }
+
+    /** The two days that were wrong in the shipped build, pinned by name. */
+    @Test
+    fun `the days that were silently wrong are now flagged instead`() {
+        // 71.5N, 27 Jan 2026: adhan returned Asr as 13 March, forty-five days out.
+        val vorkuta = PrayerEngine.compute(
+            Coordinates(71.5, 18.0),
+            LocalDate.of(2026, 1, 27),
+            CalculationPrefs(),
+        )
+        assertTrue("the 27 January Asr fault must be caught", vorkuta.approximated)
+        assertTrue(
+            "Asr must land on its own day",
+            vorkuta[PrayerSlot.ASR].atZone(ZoneId.of("UTC")).toLocalDate() in
+                LocalDate.of(2026, 1, 26)..LocalDate.of(2026, 1, 28),
+        )
+
+        // 78N, 24 Aug 2026: sunrise and sunset paired from different nights.
+        val svalbard = PrayerEngine.compute(
+            Coordinates(78.0, 0.0),
+            LocalDate.of(2026, 8, 24),
+            CalculationPrefs(),
+        )
+        assertTrue("the 24 August pairing fault must be caught", svalbard.approximated)
+    }
+
+    /**
+     * The reference latitude is a fiqh choice, not a constant, so it has to follow the method
+     * the user picked rather than being imposed. 45 is the Islamic Fiqh Council's figure and
+     * 60 is Moonsighting Committee's own. See PrayerEngine.polarReferenceLatitude for both
+     * sources. If this ever fails, the strings and docs that quote those numbers are wrong too.
+     */
+    @Test
+    fun `the reference latitude follows the chosen method`() {
+        val tromso = Coordinates(69.65, 18.96)
+        val date = midsummer
+        for (method in CalcMethod.entries) {
+            val from = PrayerEngine.compute(tromso, date, CalculationPrefs(method = method))
+                .approximatedFrom
+            val expected = if (method == CalcMethod.MOON_SIGHTING) 60.0 else 45.0
+            assertEquals("$method reference latitude", expected, from)
+        }
+        // Southern hemisphere borrows from its own side of the equator, never across it.
+        val antarctic = PrayerEngine.compute(Coordinates(-78.0, 18.0), date, CalculationPrefs())
+        assertTrue("southern times must not be flagged as northern", antarctic.approximated)
+        assertTrue(
+            "a southern winter day must be short, not long",
+            antarctic[PrayerSlot.MAGHRIB].toEpochMilli() - antarctic[PrayerSlot.SUNRISE].toEpochMilli() <
+                12 * 3_600_000L,
+        )
+    }
+
+    /**
+     * Verification that the Moonsighting projection reproduces what Moonsighting themselves
+     * publish, rather than merely matching another calculator — the distinction that the
+     * Malaysia label got wrong. Their own page states the consequence of choosing 60 degrees:
+     * at Oslo the longest fasting day is 19h38m and the shortest 7h43m. This engine, at their
+     * reference latitude, must land on those figures.
+     */
+    @Test
+    fun `moonsighting at its own reference latitude reproduces its published Oslo extremes`() {
+        val oslo = Coordinates(60.0, 10.75)
+        val prefs = CalculationPrefs(method = CalcMethod.MOON_SIGHTING)
+        fun fastMinutes(date: LocalDate): Long {
+            val day = PrayerEngine.compute(oslo, date, prefs)
+            return (day[PrayerSlot.MAGHRIB].toEpochMilli() - day[PrayerSlot.FAJR].toEpochMilli()) / 60_000
+        }
+        val longest = fastMinutes(midsummer)
+        val shortest = fastMinutes(midwinter)
+        assertTrue("longest Oslo fast should be about 19h38m, was ${longest}min", longest in 1176..1180)
+        assertTrue("shortest Oslo fast should be about 7h43m, was ${shortest}min", shortest in 459..465)
+    }
+
+    /**
      * A canary, not a rule. adhan ignores [HighLatitudeRule] entirely when the method is
      * Moonsighting Committee — it substitutes its own seasonal model and, above 55 degrees,
      * its own one-seventh clamp. PrayerEngine sets the rule on every method regardless,

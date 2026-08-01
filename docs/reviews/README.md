@@ -31,6 +31,9 @@ The reason the raw text is kept rather than only the verdict:
 |---|---|
 | `2026-08-01-prompt.md` | The self-contained prompt sent out, with all measured data as it stood on 1 Aug 2026 |
 | `2026-08-01-second-opinions.md` | Two replies, verbatim: one from DeepSeek, one from ChatGPT/Codex |
+| `2026-08-01-prompt-round2.md` | The follow-up prompt |
+| `2026-08-01-round2-outcome.md` | What round 2 changed, claim by claim |
+| **`2026-08-01-polar-sources.md`** | **Not a review.** The primary sources on high-latitude prayer times, with what each body actually says and which claims failed checking. This is the *verified* file in this folder |
 
 ## Summary of the outcome
 
@@ -50,3 +53,21 @@ The reason the raw text is kept rather than only the verdict:
 
 Neither reviewer reached the finding that mattered most: both assumed the Fajr risk was in
 Britain, where the default runs cautiously early. It is in Indonesia, where it runs late.
+
+## Round 2, and what it led to
+
+| Claim | Verdict |
+|---|---|
+| Malaysia no longer uses 20° for Fajr | **Confirmed, and it was our error** — shipped label corrected the same day |
+| Dhuhr does not depend on latitude | **Confirmed** — identical at 0°, 30°, 50°, 60°, 65° |
+| `HijrahChronology` throws outside 1300–1600 AH | **Confirmed, but already handled** — both call sites guard with `runCatching` |
+| Qibla is meaningless at the Kaaba and the poles | **Confirmed** — cannot crash, logged, not fixed |
+| 60° is Moonsighting's rule wrongly applied to every method | **Confirmed** — and fixed: see `2026-08-01-polar-sources.md` and A9 |
+| MWL/ECFR use 45° | **Confirmed** — resolution 6, 9th session 1406 AH, corroborated against the astronomy of its own band edges |
+| …therefore the app should use 45° for everyone | **Rejected** — Moonsighting's own users must keep Moonsighting's own answer |
+| "Clamp to the highest latitude that still computes" | **Rejected** — and Moonsighting themselves refute it in print |
+| "Show nothing at all above the polar circles" | **Rejected** — logged as the weaker half of A10 |
+
+The round-2 reviewers found a real shipped error and a real design fault. Neither found the
+**worst** bug in this area — a non-null but nonsensical Asr, forty-five days out of place. That
+came from sweeping the whole input space, not from review. See lesson 50.

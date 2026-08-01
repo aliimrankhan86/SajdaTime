@@ -21,29 +21,68 @@ one screen: **the home screen, the watch face, the notification and the alarm sc
 died together**, in summer and in winter. Anyone living up there installed the app and it never
 opened. Those cities have mosques.
 
-**What it does now.** When the sun genuinely never rises or sets, the app uses the times for
-60° latitude instead — the nearest place where night and day still separate. That is not
-something we invented: it is the published rule of the Moonsighting Committee, and it is a
-recognised classical position (*aqrab al-bilad*, "the nearest locality"). Your longitude and
-your hemisphere are kept, so midday stays honest. And the screen **says so**, in a notice that
-cannot be dismissed, because showing someone an approximation without telling them is exactly
-what this app must not do.
+**What it does now.** When the sun genuinely never rises or sets, the app borrows the day from
+a lower latitude — the nearest place where night and day still separate. That is a recognised
+classical position (*aqrab al-bilad*, "the nearest locality"), not something we invented. Your
+longitude and hemisphere are kept, so midday stays honest, and the screen **says so** in a
+notice that cannot be dismissed.
 
-**How confident I am.** High, for the calculation: there is now an automatic test covering all
-fourteen calculation methods, seven far-north and far-south locations, and both solstices, and
-it also checks the app does *not* start approximating anywhere normal — Reykjavík and Luleå,
-the closest real towns to the line, keep their own times. The full build passes: 68 tests, no
-failures, no lint errors. **What I could not verify:** the wording of that notice as it appears
-on a real screen. The emulator would not hold a fake Arctic location long enough to photograph
-it. The code is the same notice component already proven on screen elsewhere, so I expect it is
-fine, but I have not seen it with my own eyes and I am not going to claim otherwise.
+**Which latitude it borrows from was got wrong the first time, and is now right.** The first
+version used 60° for everyone. 60° is the Moonsighting Committee's published figure — but it
+is *their* rule for *their* method, and the app was quietly applying it to Muslim World League,
+Egyptian, Karachi and every other option too. That is precisely the "deciding a religious
+question on your behalf" failure this app exists to avoid, and a reviewer was right to press it.
 
-**Should this be uploaded now, or wait?** Your call, and it is a real trade-off. Waiting means
-users above 65½° stay broken for another couple of weeks. Uploading means a new build during
-the fourteen-day run. My understanding is that updating the *closed testing* track does not
-reset the clock, because your testers stay opted in either way — **but I have not confirmed
-that with Google's own documentation, so please do not treat it as settled.** If you want, I
-can check that properly before you decide.
+Checked properly, there are two published answers and the app now follows whichever body you
+have already chosen:
+
+| If your method is | It borrows from | Whose rule that is |
+|---|---|---|
+| Moonsighting Committee | 60° | Moonsighting's own published rule |
+| Anything else | **45°** | Islamic Fiqh Council of the Muslim World League, 1406 AH (1986), endorsed by the European Council for Fatwa and Research |
+
+The screen prints the actual number, so you can check it against your mosque rather than take
+the app's word for it.
+
+**This matters, it is not a technicality.** At Tromsø on the longest day, borrowing from 60°
+gave a fasting day of **20 hours 25 minutes** — longer than the eighteen-hour limit of the
+fatwa Moonsighting themselves cite. From 45° it is 18 hours 9 minutes. In December the 60°
+version left only **51 minutes** between Dhuhr and Asr; from 45° it is a normal two hours.
+
+**And a second, separate bug was found underneath it — worse than the crash.** Widening the
+testing to every latitude and every day of the year (7.3 million checks, which took seconds)
+found that the library does not only fail by returning "no answer". Sometimes it returns a
+confident wrong answer. **At 71½° north on 27 January it gave the afternoon prayer as
+13 March — forty-five days out.** No crash, no warning; the wrong time was simply shown,
+written into the PDF and used to set an alarm. This was in the very first release and is in the
+build being tested now. It affected 2,239 days a year across the far north *and* far south.
+The app now checks that the answer is physically possible before believing it — the six times
+must be in order, and midday must actually fall in the middle of the day — and where it is not,
+it falls back to the borrowed times and says so.
+
+**How confident I am.** High, for the calculation. Tests now cover all fourteen methods, both
+hemispheres, both solstices, and a sweep of every latitude on Earth for every day of a year;
+they also check the app does *not* start approximating anywhere normal — Reykjavík and Luleå,
+the closest real towns to the line, keep their own times. Sunrise and sunset were cross-checked
+against Aladhan and agree **to the minute**. Full build passes: 74 tests, no failures, no lint
+errors.
+
+**What I could not verify:** the notice as it appears on a real screen. The emulator would not
+hold a fake Arctic location long enough to photograph it, and I am not going to claim otherwise.
+It is the same notice component already proven on screen elsewhere.
+
+**Should this be uploaded now, or wait?** I said last time I had not checked this properly.
+I have now. **Google's own documentation makes the requirement about your testers, not about
+your builds:** *"a minimum of 12 testers who have been opted-in for at least the last 14 days
+continuously"*, and it warns that testers who opt out and back in do not count — *"these 14
+days must be consecutive"*. There is **no statement anywhere in Google's documentation that
+publishing an update restarts the count.** The clock is attached to people staying opted in.
+
+So uploading a new build should not cost you the fortnight. What genuinely can cost it is a
+tester uninstalling. Two honest caveats: Google does not say this in so many words, so it is an
+absence of a rule rather than a stated permission; and every new build triggers a fresh review,
+which is a small risk of a different kind. Your call — but the far-north bugs are real, they
+have shipped, and they are now fixed and tested.
 
 **A second, smaller thing was fixed at the same time**, because it costs one line of text and
 helps more people than anything else in this document. See "The method nobody could find"
@@ -232,8 +271,9 @@ minutes in which someone believes they may still eat, and their own country's ti
 the fast has already begun. Being *late* on Fajr is the dangerous direction. Every earlier
 check had looked at Isha, so nobody had noticed.
 
-**The fix.** The entry is now called **"Kemenag / JAKIM / MUIS — Indonesia, Malaysia,
-Singapore"**. No new calculation, no new code. Just a name people recognise.
+**The fix.** The entry is now called **"Kemenag & MUIS — Indonesia, Singapore"**. No new
+calculation, no new code. Just a name people recognise. (Malaysia is deliberately absent —
+see the correction above; Malaysian users are already served correctly by the default.)
 
 **Checked properly, the second time:** for Singapore, against **MUIS's own printed 2024
 timetable** on 1 January, 21 March, 21 June and 23 September — Subuh matches to within a
@@ -259,8 +299,45 @@ Different from the order above, on purpose:
    navigation first means not doing it twice.
 3. **Then fix 2** — independent of both, can slot in anywhere.
 
+The far-north work is already done and in the repository — it is not waiting on anything.
+
 Then: one update to the closed track, one Google review, and **Wear OS after the phone
 reaches production** — not before, because it triggers a second review for no gain.
+
+---
+
+## The checklist for the day the fortnight ends
+
+In order. Nothing here needs a decision from you except where it says so.
+
+**Before touching the Console**
+
+1. Run the full gate: `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease`.
+2. Bump `versionCode` and `versionName` — see [`RELEASING.md`](RELEASING.md). The phone and
+   watch bundles share an application ID, so their version codes must not collide.
+3. Run both emulators and compare them. Run `./gradlew installRtl` for anything visual.
+4. Confirm the release is signed with **your** key. No agent has it and none ever will.
+
+**In the Console**
+
+5. Check the production-access checklist actually shows the fourteen days complete. If it
+   does not, nothing below matters yet.
+6. **Apply for production.** The form asks about the closed test, the app, and readiness.
+   Google say the review *"usually takes 7 days or less"*.
+7. While waiting, do **not** push another build unless something is broken.
+
+**Decisions that are yours, not an agent's**
+
+8. Fix 1 — whether to add the one-time note above ~45° latitude (`HANDOVER.md` §11, A2).
+9. Whether to decouple sect from calculation method (A1) and show the active method on the
+   home screen (A3).
+10. Whether the watch should carry the far-north notice too (A8) — it currently does not.
+11. Whether to build per-prayer provenance (A10) and the Moonsighting 60°-slide gap (A12).
+    These two share the same machinery and should be done together or not at all.
+
+**After production is granted**
+
+12. Then, and only then, the Wear OS release.
 
 ---
 

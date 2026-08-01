@@ -85,13 +85,21 @@ data class DayPrayerTimes(
     val date: LocalDate,
     val times: Map<PrayerSlot, Instant>,
     /**
-     * True when the sun neither rose nor set at the user's own latitude, so the times
-     * are projected from 60 degrees instead — see [PrayerEngine] for the rule and why it
-     * is that figure. Only ever true above the polar circles. The UI must say so when it
-     * is set: an approximation the user is not told about is worse than no times at all.
+     * The latitude these times were projected from, or null when they are the user's own
+     * astronomy. Set only when the sun refused to rise or set where the user actually is,
+     * which in practice means above the polar circles. It carries the *number* rather than
+     * a flag because the number is not constant — it depends on the calculation method, and
+     * the screen shows it so the user can check it against whatever their mosque follows.
+     * See [PrayerEngine.polarReferenceLatitude].
+     *
+     * The UI must say so when this is set: an approximation the user is not told about is
+     * worse than no times at all.
      */
-    val approximated: Boolean = false,
+    val approximatedFrom: Double? = null,
 ) {
+    /** True when these times came from somewhere other than where the user is standing. */
+    val approximated: Boolean get() = approximatedFrom != null
+
     operator fun get(slot: PrayerSlot): Instant = times.getValue(slot)
 
     /** Prayer slots only (no sunrise), in chronological order. */

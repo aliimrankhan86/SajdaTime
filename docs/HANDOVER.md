@@ -408,6 +408,67 @@ adhan's own default `MIDDLE_OF_THE_NIGHT` is **unusable at UK latitudes**: for L
 21 June it collapses Fajr and Isha onto the *same instant* (both 01:02), leaving no Isha
 window at all. `TWILIGHT_ANGLE` gives Fajr 02:31 and Isha 23:27, matching Aladhan exactly.
 
+### 5.5a Above the polar circles — the reference latitude, and why it is not one number
+
+`HighLatitudeRule` only helps while the sun still rises and sets. Beyond roughly 65.7°
+(summer) and 67.4° (winter) it does not, adhan gives up, and the engine borrows the day from
+a lower latitude — *aqrab al-bilad*, the nearest place where night and day are still
+distinguishable. Longitude and hemisphere are kept, so solar noon stays true to where the
+user is standing.
+
+**Which latitude to borrow from is a fiqh question with two published answers, so the engine
+follows whichever body the user already chose rather than picking for them.**
+
+| Method | Reference | Authority |
+|---|---|---|
+| Moonsighting Committee | **60°** | moonsighting.com, in their own words |
+| Everything else | **45°** | Islamic Fiqh Council of the Muslim World League |
+
+- **45° — Islamic Fiqh Council of the Muslim World League**, resolution 6 of the ninth
+  session, Makkah, 12–19 Rajab 1406 (March 1986), endorsed by the European Council for Fatwa
+  and Research. Three bands: below 48° the signs are visible all year and must be used;
+  between 48° and 66° Fajr and Isha are taken by analogy with the nearest place where they
+  are clear; **beyond 66° all times are estimated from 45°.**
+- **60° — Moonsighting Committee**: *"at latitudes more than 60degrees, we slide down to
+  60degrees and calculate Fajr & Isha using the rule of Sab'u Lail in summer."* They chose it
+  knowing it breaches the eighteen-hour fasting limit of the fatwa they cite, on the empirical
+  ground that Oslo copes.
+
+The band edges are the strongest evidence the resolution is reported correctly, because they
+are not round numbers chosen by a committee — they are astronomy. 18° of solar depression
+last occurs at midsummer at latitude 90 − 23.44 − 18 = **48.56°**, and 66.56° is the polar
+circle itself. Verified numerically; see §10.
+
+**The times are always flagged.** `DayPrayerTimes.approximatedFrom` carries the actual number
+and the home screen prints it, so a user can check the app against their mosque instead of
+taking its word. Showing a projection silently would be the app taking a position on someone's
+behalf without telling them.
+
+Rejected, with reasons, so they are not tried again:
+
+- *One constant for everybody.* Whichever number were chosen it would impose one body's ruling
+  on users who explicitly selected another — the exact failure this app exists to avoid.
+- *Clamp to the highest latitude that still computes.* An artefact of the library, it moves
+  daily, no scholar stands behind it, and Moonsighting measured the result: fasts *"of more
+  than 23 hours in summer and less than 3 hours in winter"*.
+- *Use Makkah's times.* A real position — Dar al-Iftā' al-Miṣriyyah, and some Norwegian
+  mosques — but it discards the user's own solar noon, so Dhuhr would stop matching the sun
+  overhead. Only ever as an explicit user choice.
+
+### 5.5b Trusting adhan's answer is not the same as receiving one
+
+`PrayerEngine.isUsable` is the guard, and it checks three things, not one:
+
+1. **No nulls.** The original crash.
+2. **In order.** adhan can return a confident wrong number rather than null. Measured: a
+   27 January Asr handed back as 13 March.
+3. **Dhuhr in the middle of the day arc.** Solar noon is the midpoint of sunrise and sunset.
+   Where it is not, adhan has paired a sunrise from one night with a sunset from another —
+   which is how 78°N came to show Maghrib at 17:00 on 24 August and 22:29 the next day.
+
+Any failure means project and flag. Being wrong in the direction of an honest "approximate"
+banner is safe; being wrong in the direction of a confident number is not.
+
 ### 5.6 Ramadan (Umm al-Qura only)
 Umm al-Qura stretches Isha from 90 to 120 minutes during Ramadan; adhan implements only 90,
 so the engine adds 30 minutes itself. Ramadan is detected as Hijri month 9 via
@@ -1923,6 +1984,113 @@ symmetric, so the trigger must be `abs(latitude)`:
 45° is where the spread crosses an hour, and −45° matches +45° exactly. That is the number to
 use, on absolute latitude, if a prompt is ever built.
 
+### A9 settled, and a second polar bug found underneath it (1 Aug 2026)
+
+A9 asked whether 60° was the right polar reference or Moonsighting's rule wrongly applied to
+everyone. Answering it properly meant reading what each body actually publishes rather than
+what another calculator does — lesson 45a — and the answer turned out to be **both numbers are
+right, for different users**. Along the way an exhaustive sweep found a second, unrelated
+polar defect that had shipped in every release.
+
+**1. The Fiqh Council's 45° is real, and the band edges prove it.**
+
+The resolution is reported consistently by IslamOnline, islamicfiqh.net, the `go-prayer`
+library and others: Islamic Fiqh Council of the Muslim World League, resolution 6, ninth
+session, Makkah, 12–19 Rajab 1406, endorsed by the ECFR. Bands of 45–48°, 48–66°, and beyond
+66° estimating **all** times from 45°.
+
+Secondary sources can repeat each other's mistakes, so the bands were checked against the sky
+instead. The sun's altitude at local solar midnight is `latitude + declination − 90`:
+
+| Latitude | Max solar depression, June solstice | 18° reachable? |
+|---|---|---|
+| 45° | 21.56° | yes, comfortably |
+| 48° | 18.56° | yes |
+| **48.56°** | **18.00°** | **exactly the limit** |
+| 55° | 11.56° | no |
+| 60° | 6.56° | no |
+| 66.56° | 0.00° | polar circle |
+
+48.56° is precisely where 18° twilight stops happening, and 66.56° is precisely the polar
+circle. **No one inventing or garbling a resolution lands on both of those.** The bands are
+astronomy, and the sources are reporting them faithfully.
+
+It also settles the substance: at 45° a real Fajr and a real Isha exist. At 60° neither does —
+18°, 17°, 15° and even 12° are all unreachable at midsummer, so projecting there means
+borrowing an estimate rather than a measurement.
+
+**2. Moonsighting's 60° is also real — verified against their own published consequence.**
+
+Their page states it verbatim, and states what it costs: at Oslo the longest fasting day
+becomes 19h38m and the shortest 7h43m. Running this engine at their reference latitude gives
+**19h39m and 7h41m**. Within rounding on both. So adhan's Moonsighting model plus this
+projection genuinely reproduces what Moonsighting publish, and a Moonsighting user should keep
+getting 60°.
+
+**3. What it costs a real user at Tromsø (69.65°N):**
+
+| | Fajr | Maghrib | Fasting day | Dhuhr → Asr |
+|---|---|---|---|---|
+| 21 Jun from 45° | 02:26 | 20:35 | 18h09m | 248 min |
+| 21 Jun from 60° | 01:47 | 22:12 | **20h25m** | 281 min |
+| 21 Dec from 45° | 05:32 | 16:05 | 10h33m | 125 min |
+| 21 Dec from 60° | 06:00 | 14:38 | 8h38m | **51 min** |
+
+A 20h25m fast is past the eighteen-hour limit of the very fatwa Moonsighting cite, and a
+51-minute Dhuhr window is short enough to miss. For everyone who did not choose Moonsighting,
+45° is both better sourced and kinder.
+
+**4. The second bug: adhan returns confident nonsense, not only nulls.**
+
+A sweep of every method, every madhab, every 0.5° of latitude from pole to pole and every day
+of 2026 — 7.3 million computations — turned up **2,239 days with times out of order**, at
+every latitude from 66° to 89.5° **in both hemispheres**. Blamed slot: Asr, 1,549 times.
+
+Worst case: **71.5°N, 27 January 2026 — Asr returned as 13 March, forty-five days out.** The
+sun barely clears the horizon there, the shadow ratio Asr is defined by is never reached, and
+rather than giving up adhan hands back whatever its root finder landed on. `isComplete` only
+checked for null, so these days were displayed, exported to PDF and used to schedule alarms.
+**This was in v1.0.0 and in the build now in closed testing.**
+
+A third failure survived both the null check and the ordering check: on the day polar day
+ends, sunrise and sunset happen minutes apart either side of midnight and adhan can pair a
+sunrise from one night with a sunset from another. At 78°N Maghrib came out as 17:00 on
+24 August and 22:29 the next day. A sunset does not move five and a half hours overnight.
+
+The physics that catches it is that **solar noon is the midpoint of the day arc**. Swept
+globally, the largest honest offset between Dhuhr and that midpoint anywhere below 65° is
+**three minutes**; above 65° the same sweep produced 59, 87, 143, 212 and 214. The threshold
+is 30 minutes — ten times the worst honest case, and nowhere near any dishonest one.
+
+After the fix: **0 faults in the same sweep.**
+
+**5. What was checked and found *not* to be a problem.**
+
+- *Does the projection ever override a sunset the user could watch?* No. Measured at Tromsø,
+  Rovaniemi, Luleå, Reykjavík and Longyearbyen: of 118 nulled days at Tromsø, **zero** had a
+  real sunrise and sunset. adhan's nulls occur exactly at apparent polar day or night. Derived
+  independently: no sunset above `89.167 − δ = 65.727°`, no sunrise above `90.833 − δ =
+  67.393°`; measured 65.8 and 67.4 at 0.1° resolution, and the 1.666° asymmetry between them
+  is exactly twice the 0.833° refraction and semi-diameter allowance. Nothing observable is
+  ever replaced.
+- *Is the engine's sunrise/sunset accurate?* An independent NOAA-based service
+  (api.sunrise-sunset.org) differs by 2–7 minutes, growing with latitude, which looked
+  alarming. **Aladhan — a separate implementation — agrees with this engine to the minute**
+  (Slough 21 Mar sunrise 06:03 / sunset 18:17 on both; Tromsø 04:39 / 17:05–06). adhan uses
+  the standard −0.8333° horizon, confirmed in bytecode. Two mature prayer-time engines against
+  one low-precision 1990 almanac algorithm: the outlier is the almanac. No change.
+- *Where exactly is the polar-day boundary?* Genuinely ambiguous to within a day at the
+  transition, because a 3-minute algorithmic difference flips it. That is not fixable, and it
+  is the reason the app's job there is to be **safe**, not precise.
+
+**6. A known divergence, deliberately not fixed.** Moonsighting say they slide to 60° above
+60°, but neither adhan nor the PHP library behind Aladhan implements that, so a Moonsighting
+user between 60° and 65.7° gets un-slid times. Measured gap: Helsinki 1 min, Anchorage 10,
+Trondheim 37, Reykjavík 49, **Luleå 91**. At Luleå in June the un-slid result is degenerate —
+Isha 00:14 and Fajr 00:52, 38 minutes of night. Recorded as A12; not changed, because it needs
+partial substitution (Fajr and Isha only, sunrise and sunset staying local) which is a design
+decision, not a constant.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -2178,30 +2346,37 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   projected times with nothing saying so. Small screen, no obvious room; needs a design
   decision rather than a quick insertion.
 
-- **A9 — ⚠️ Is 60° the right polar reference, or is it Moonsighting's rule applied to every
-  method?** The strongest objection from the round-2 review, and it is a good one. Moonsighting
-  Committee publish 60°, and that is where the figure came from — but they publish it *for
-  their own method*, alongside their seasonal model and one-seventh treatment. The formal MWL
-  resolution, later reaffirmed by the European Council for Fatwa and Research, is reported to
-  use **45°** instead. If that is right, the app currently applies Moonsighting's polar rule to
-  MWL, Egyptian, Karachi, Umm al-Qura and everything else — which is precisely the "silently
-  adopting a position" failure the app is supposed to avoid. **The ECFR/MWL 45° claim is not
-  verified here**; it needs the resolution text. Do that before changing anything. Note also
-  that 60° is *less* geographically distortive than 45° for a Tromsø user, so this is not a
-  simple "the reviewer is right, change the number".
+- **A9 — ✅ CLOSED (1 Aug 2026). The reference latitude now follows the method: 45° for
+  everything, 60° for Moonsighting.** Both figures verified against the publishing body's own
+  words, and the Fiqh Council's band edges independently confirmed against the sky — full
+  evidence in §10, "A9 settled, and a second polar bug found underneath it", and the rule in
+  §5.5a. The reviewer was right that 60° was Moonsighting's rule wrongly generalised; they
+  were wrong that it should simply become 45° for everyone, because Moonsighting's own users
+  should keep Moonsighting's own answer.
 
-  Explicitly rejected already: "clamp to the highest latitude that still computes". That
-  boundary is an artefact of the library's failure checks, moves from day to day, and has no
-  authority behind it — it optimises for the last floating-point value that did not return
-  null.
+  Explicitly rejected, and recorded in `PrayerEngine` so it is not tried again: one constant
+  for everybody; clamping to the highest latitude that still computes; and using Makkah's
+  times.
 
-- **A10 — Per-prayer provenance, and whether projected times should fire alarms.** Measured:
-  the 60° projection moves **Dhuhr by exactly zero** (solar transit does not depend on
+- **A10 — Per-prayer provenance, and whether projected times should fire alarms.** The
+  strongest remaining item, and the evidence for it got much stronger while closing A9.
+
+  Measured: the projection moves **Dhuhr by exactly zero** (solar transit does not depend on
   latitude), Fajr/Asr/Isha by up to ~40 minutes, and sunrise/Maghrib by up to 95. Asr is
-  genuinely computable in polar summer — the sun is up all day, so a shadow exists — and adhan
-  discards it only because a missing sunrise fails its whole constructor. A mixed day (true
-  Dhuhr, true Asr, estimated Fajr/Isha) would be more honest than a uniformly synthetic one,
-  and there is a real-world implementation of exactly that in Oulu, Finland.
+  genuinely computable in polar summer and this is now arithmetic rather than assertion: at
+  Tromsø on 21 June the noon altitude is 43.79°, so the noon shadow is 1.042 object-lengths
+  and Shāfi'ī Asr needs 2.042, i.e. an altitude of 26.1° — which the sun passes every
+  afternoon, because it ranges from 3.09° at midnight to 43.79° at noon. adhan discards it
+  only because a missing sunrise fails its whole constructor.
+
+  So on a polar-day date the honest answer is a **mixed** day: Dhuhr and Asr genuinely local
+  and correct, Fajr and Isha estimated, and sunrise and Maghrib genuinely non-existent rather
+  than estimated. The app currently replaces all six. There is a real-world implementation of
+  the mixed approach in Oulu, Finland.
+
+  Note what this is *not*: it is not about preserving an observable sunset, which was checked
+  and refuted — the projection only ever engages when the sun genuinely never rises or never
+  sets (§10). It is about not synthesising the two times that did not need synthesising.
 
   Separately: the home banner is not enough. A user may only ever meet the tile, the
   notification, the PDF or the **alarm**, and an alarm derived from a projection is a stronger
@@ -2216,6 +2391,28 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   of the Fajr prayer itself. So keep 18°, but during Ramadan say plainly that local and
   national timetables may begin Fajr earlier and should be confirmed. Do **not** silently add
   an imsak margin — that is another convention and another religious choice.
+
+- **A12 — Moonsighting's 60° slide is not applied between 60° and 65.7°.** Moonsighting say
+  they slide Fajr and Isha down to 60° above 60°. Neither adhan nor the PHP library behind
+  Aladhan implements it, so a Moonsighting user in that band gets un-slid times. Measured gap
+  on Fajr: Helsinki 1 min, Anchorage 10, Trondheim 37, Reykjavík 49, **Luleå 91**. At Luleå in
+  June the un-slid answer is degenerate — Isha 00:14 and Fajr 00:52, leaving 38 minutes of
+  night. Real populations: Reykjavík, Trondheim, Anchorage, Umeå, Luleå, Tampere.
+
+  Not fixed because it needs *partial* substitution — Fajr and Isha from 60°, sunrise/Dhuhr/
+  Asr/Maghrib staying local, since the sun does genuinely rise and set there. That is the same
+  machinery A10 needs, so the two should be done together or not at all. It is also worth
+  deciding first whether the app is trying to *be* moonsighting.com's timetable or to
+  implement adhan's faithful rendering of their published model; it currently does the latter,
+  which is defensible, just not identical.
+
+- **A13 — The polar notice has still never been seen on a device.** The banner, its wording
+  and now the reference-latitude number are all verified by unit test and by reading, never by
+  screenshot. The emulator would not hold an Arctic location (§10, device recipes): `emu geo
+  fix` sets GPS only while `LocationRepository.lastKnown()` prefers NETWORK, and the
+  `cmd location providers` mock reverted after the permission flow. Also unverified in RTL,
+  where `latitude 45°` puts a Latin numeral and a degree sign inside a right-to-left sentence.
+  Neither is likely to be wrong; neither has been looked at.
 
 ### Not done, in rough priority order
 
@@ -2971,6 +3168,58 @@ matters more than the stable hashes, that is the trade being made.
     **A second opinion is a source of hypotheses, not of conclusions. Check every claim
     against your own code and an independent reference, and write down which ones were
     wrong — otherwise the next session re-imports the same confident errors.**
+
+47. **A library returning a value is not the same as a library answering the question.**
+    The Arctic crash was found by checking for null. The bug *underneath* it was worse and
+    invisible to that check: at 71.5°N adhan returned a 27 January Asr of **13 March**. No
+    exception, no null, no warning — just a confident wrong number that was displayed,
+    exported to PDF and used to schedule an alarm. It shipped in v1.0.0 and in the closed test.
+
+    Null is the failure mode a library *tells* you about, so it is the one you fix first and
+    then stop looking. The dangerous ones are the failures it does not know it is having.
+    After handling null, ask separately: *is this answer physically possible?* Here that meant
+    two invariants the library never checks — the six times must be in order, and Dhuhr must
+    sit in the middle of sunrise and sunset, because solar noon is the midpoint of the day arc.
+    Both are one line. Both were missing.
+
+48. **Choose thresholds by sweeping, not by taste.** The midpoint check needed a tolerance.
+    Guessing would have produced a plausible round number and no way to defend it. Sweeping
+    every 0.5° of latitude, four longitudes and every day of a year gave the actual
+    distribution: below 65° the worst offset anywhere on Earth is **3 minutes**; above it, 59,
+    87, 143, 212, 214. The gap between those two populations is enormous, so 30 minutes is
+    obviously safe and obviously effective, and the comment can say *why* rather than
+    *what*. When a constant guards a boundary, the sweep that chose it is the documentation.
+
+49. **When two references disagree, find a third before believing either.** An independent
+    NOAA-based sunrise service put this engine 2–7 minutes out, growing with latitude, which
+    looked like a real defect in the most religiously sensitive direction — Maghrib slightly
+    *early*. Changing it would have moved the sunset time of every user in the world. Aladhan,
+    a third and completely separate implementation, agrees with this engine **to the minute**.
+    The outlier was the free service, which uses a low-precision 1990 almanac algorithm.
+
+    One disagreement is a question, not a finding. The cost of the extra check was one `curl`;
+    the cost of skipping it would have been a wrong Maghrib for everyone.
+
+50. **Exhaustive is cheap now, and it is the only thing that finds this class of bug.**
+    7.3 million day-computations — every method, every madhab, every 0.5° from pole to pole,
+    every day of a year — ran in seconds and found 2,239 broken days that four rounds of
+    careful reading, two external model reviews and a targeted polar test suite had all
+    missed. The targeted test only checked ordering *where the projection was already active*,
+    so it could never have seen a fault in the days the projection did not cover.
+
+    If a check can be run over the whole input space, run it over the whole input space. The
+    sweep is now a permanent test (`PolarAndHemisphereTest`) for exactly that reason.
+
+51. **Ask what a body publishes, not what it is reported to publish — but check the sky too.**
+    Lesson 45a said trace claims to the authority's own words. This went one better and
+    was worth it. The Fiqh Council's 45/48/66 bands were reported consistently by several
+    secondary sources, which proves only that they copy each other. What proved them was
+    arithmetic: 18° of twilight last occurs at midsummer at latitude 48.56°, and 66.56° is the
+    polar circle. Two band edges landing exactly on astronomy is not something a garbled
+    retelling produces.
+
+    Where a rule has a physical basis, that basis is a better witness than any number of
+    websites. Look for it.
 
 ---
 
