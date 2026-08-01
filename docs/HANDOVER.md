@@ -1400,10 +1400,96 @@ mosque printing the start of the window and another printing the congregation.
 
 Both mosques use **Moonsighting Committee Worldwide** — a *shafaq*-based convention built
 for high latitudes, not a fixed depression angle. They differ from each other only in Asr
-madhab (JMIC standard, Reading Hanafi), and each adds two to five minutes of *ihtiyat*
-(safety margin) to the published begin time. Asr matched to the exact minute in both cases,
-on a value that differs by 67 minutes between the two madhabs — so this is an identification,
-not a coincidence.
+madhab (JMIC standard, Reading Hanafi). Asr matched to the exact minute in both cases, on a
+value that differs by 67 minutes between the two madhabs — so this is an identification, not
+a coincidence.
+
+**Correction, made the same day by checking the app's own engine rather than Aladhan.** The
+paragraph above originally said each mosque adds two to five minutes of *ihtiyat* to the
+published time. That was wrong. Those offsets are **part of the Moonsighting method itself**:
+adhan-java's `MOON_SIGHTING_COMMITTEE` carries method adjustments of **+5 minutes on Dhuhr
+and +3 on Maghrib**, which Aladhan does not apply — exactly the same class of discrepancy
+already documented in §5.3 for MWL's +1 Dhuhr offset. Running `PrayerEngine` directly for
+Slough on 1 Aug 2026 with `MOON_SIGHTING`:
+
+| | JMIC Slough (printed) | **SajdaTime's own engine** | Aladhan |
+|---|---|---|---|
+| Fajr | 03:39 | 03:38 | 03:38 |
+| Dhuhr | 13:14 | **13:14** | 13:09 |
+| Asr | 17:19 | 17:18 | 17:19 |
+| Maghrib | 20:53 | **20:53** | 20:51 |
+| Isha | 21:58 | 21:59 | 21:59 |
+
+**The app on Moonsighting reproduces JMIC Slough to within one minute on all six times, and
+matches Dhuhr and Maghrib exactly** — better than Aladhan does, because adhan applies the
+method's own adjustments and Aladhan does not. So no per-prayer offset feature is needed to
+match this mosque. Selecting the method is enough.
+
+**The app's Moonsighting was then checked against Aladhan across the year**, because the
+engine forces `HighLatitudeRule.TWILIGHT_ANGLE` onto *every* method and that could plausibly
+have distorted a seasonal convention:
+
+| Slough | App Fajr / Aladhan | App Isha / Aladhan |
+|---|---|---|
+| 1 Aug 2026 | 03:38 / 03:38 | 21:59 / 21:59 |
+| **21 Jun 2026 (solstice)** | 02:45 / 02:45 | **22:44 / 22:43** |
+| 21 Dec 2026 | 06:24 / 06:24 | 17:34 / 17:34 |
+
+Fajr and Isha agree to the minute year-round **including at the solstice**, which is the one
+point where the forced high-latitude rule could have interfered. It does not. Recommending
+Moonsighting for high-latitude users is therefore safe, and this was verified rather than
+assumed.
+
+### Is Muslim World League actually a bad default? Measured worldwide, and mostly no
+
+**Why this exists.** The Slough finding above could easily be over-generalised into "MWL is
+wrong, replace it". That would be a mistake, and the app serves the whole Ummah rather than
+one town. So the default was tested against the regionally-dominant convention in fifteen
+major centres, on a winter and a summer date. **Isha difference, MWL minus local method:**
+
+| City | Local method | Jan | Jun |
+|---|---|---|---|
+| Jakarta | KEMENAG | +4 | +4 |
+| Karachi | Karachi | +4 | +6 |
+| Dhaka | Karachi | +5 | +5 |
+| Cairo | Egyptian | +3 | +3 |
+| Istanbul | Diyanet | 0 | 0 |
+| Kano | MWL | 0 | 0 |
+| Delhi | Karachi | +5 | +6 |
+| Riyadh | Umm al-Qura | +15 | +7 |
+| Kuala Lumpur | JAKIM | +4 | +4 |
+| Casablanca | Morocco | 0 | 0 |
+| Tashkent | MWL | 0 | 0 |
+| Chicago | ISNA | −11 | −18 |
+| **London** | Moonsighting | **−20** | **−47** |
+| **Berlin** | Moonsighting | **−24** | **−43** |
+
+**MWL is a good default for the great majority of the world's Muslims** — within about five
+minutes across South and South-East Asia, the Middle East and Africa, which is where most of
+them live. It fails specifically in the West, and it fails worst at high latitude.
+
+**Where the line falls.** Isha, MWL minus Moonsighting, at longitude 0:
+
+| Latitude | 21 Dec | 21 Mar | 21 Jun |
+|---|---|---|---|
+| 20° | −10 | −7 | +2 |
+| 30° | −8 | 0 | +12 |
+| 40° | 0 | +9 | +35 |
+| 45° | +5 | +16 | *(day-wrap)* |
+| **50°** | **+15** | **+26** | **+49** |
+| 55° | +30 | +40 | +31 |
+| 60° | +55 | +59 | +7 |
+
+Below about **40°N the two conventions agree within roughly ten minutes**. From 45°N the gap
+opens fast, and by 50°N — where Britain, the Netherlands, northern Germany and southern
+Canada sit — it is half an hour or more for most of the year. Two cells show absurd values
+(±1380 minutes) because Isha crosses midnight and the naive minute subtraction wraps; they
+are an artefact of the comparison script, not of either method.
+
+**The conclusion, which is narrower than the Slough finding alone suggested:** do not replace
+the default, do not add methods. `KEMENAG` and `JAKIM` are absent from `CalcMethod` and it
+does not matter — MWL is within four to nine minutes of both. **The only population that
+needs anything is users above roughly 45° of latitude**, and the fix they need already ships.
 
 **Where SajdaTime sits.** The default is `AUTO` → Muslim World League, Isha **17°**:
 
@@ -1504,11 +1590,29 @@ not imply that a more precise location would change them.
 > with `1.1.0 - first closed test`, *"Available to selected testers"*, released 31 Jul 22:17
 > across all 177 countries.
 >
-> **The whole project now rests on one number.** The Dashboard reads **`9 testers currently
-> opted in`** against 17 addresses on the list, and Google requires twelve, held for
-> fourteen *consecutive* days. **The fourteen days are counted while twelve or more are
-> opted in — so at nine the clock is not running at all.** Days spent at nine are not early
-> days of the fortnight; they are days that do not count.
+> **Updated later the same day: the twelve-tester bar is cleared, and the clock is running.**
+> The Dashboard's production-access checklist now reads:
+>
+> | Criterion | State |
+> |---|---|
+> | Publish a closed testing release | ✓ ticked, struck through |
+> | **Have at least 12 testers opted-in to your closed test** | **✓ ticked, struck through** |
+> | Run your closed test with at least 12 testers, for at least 14 days | ○ open — in progress |
+>
+> **Apply for production** is still greyed out. The email list holds **24 addresses**; twelve
+> or more of them have opted in. Do not read 24 as the opt-in figure — it is the *addresses
+> added* number and is reliably the larger one (§15 lesson 36).
+>
+> **The italic count line has disappeared.** While below twelve the Dashboard printed
+> *"N testers currently opted in"*; on passing twelve it replaces that line with a tick and
+> stops reporting the number at all. So there is now **no way to see whether the count is
+> holding at twelve or has slipped below it**, and no notification if it does. That is worth
+> knowing before assuming the fortnight is running cleanly.
+>
+> Earlier text, kept because the rule it states is still true: Google requires twelve, held
+> for fourteen *consecutive* days, and **the fourteen days are counted while twelve or more
+> are opted in** — so days spent below twelve are not early days of the fortnight, they are
+> days that do not count.
 >
 > **Nothing in the Console needs pressing, and nothing in this repo is blocking.** The only
 > remaining work is human: getting three more people to open the opt-in link. The count
@@ -1585,19 +1689,38 @@ not imply that a more precise location would change them.
   sect and madhab only (`Step.WELCOME, PERMISSION, SECT, MADHAB, CONFIRM`), so a user who
   never opens Settings can never reach it.
 
-  Options considered, none yet chosen — **this is the owner's call, because it is a
-  religious question and not an engineering one**:
+  **Scope, narrowed by measurement — read this before designing anything.** The worldwide
+  comparison in §10 shows **MWL is a good default for most of the Ummah** (within about five
+  minutes across South Asia, South-East Asia, the Middle East and Africa) and only fails
+  above roughly **45° of latitude**, where it reaches +26 minutes in March and +49 in June.
+  So this is **not** "the default is wrong". It is "the default has a latitude band where it
+  stops matching local practice". Do not widen it into a rewrite.
+
+  **Two things that follow, and both remove work:**
+
+  - **No new calculation methods are needed.** `KEMENAG` (Indonesia — the largest Muslim
+    population on earth) and `JAKIM` (Malaysia) are absent from `CalcMethod`, and MWL is
+    within four to nine minutes of both. Adding them would be motion, not progress.
+  - **No per-prayer offset feature is needed either** — which reverses what this section
+    said before the app's own engine was checked. On `MOON_SIGHTING` the engine reproduces
+    JMIC Slough to within a minute on all six times, matching Dhuhr and Maghrib *exactly*,
+    because adhan applies the method's own +5/+3 adjustments. The "*ihtiyat* the mosques add"
+    turned out to be the method, not the mosque. Selecting the method is sufficient.
+
+  Options, none yet chosen — **this is the owner's call, because it is a religious question
+  and not an engineering one**:
 
   | Option | Effect | Cost |
   |---|---|---|
-  | Leave the default; explain in Settings | App keeps a defensible mainstream convention | None; users stay mismatched |
-  | Per-prayer ± minute offset in Settings | Solves *every* variant — convention, *ihtiyat*, jama'ah — without the app adjudicating fiqh | Moderate; new setting, new persistence, watch sync |
-  | Add a method step to onboarding | Makes the existing fix reachable | Small; one more screen on a flow already too long |
-  | Change the default by latitude | Fixes it for everyone silently | **Rejected on sight** — the app would be picking a madhhab-adjacent position for the user, invisibly |
+  | Leave the default; explain it in Settings | Keeps a mainstream convention that is right for most of the world | None, but northern users stay mismatched |
+  | **One-time note when latitude > ~45°**, offering the method picker | Reaches exactly the affected users, changes no time silently, adds nothing for the ~80% who are already correct | Small: one conditional card |
+  | Add a method step to onboarding for everyone | Makes the existing fix reachable | Small, but lengthens a flow already too long, for users who do not need it |
+  | Auto-switch method by latitude | Fixes it for everyone silently | **Rejected** — the app would adopt a fiqh-adjacent position for the user, invisibly |
+  | Per-prayer ± minute offset | Absorbs any remaining variation | **No longer justified** — measurement showed nothing left for it to absorb |
 
-  A per-prayer offset is the strongest candidate: it is what mature prayer apps ship, it
-  needs no religious ruling from us, and it also absorbs the *ihtiyat* margins the mosques
-  add. It does not remove the need to make the method discoverable.
+  The latitude-triggered note is now the strongest candidate. The objection to the rejected
+  option was never that a smart default is wrong — it is that a **silent** one is. A visible
+  prompt is not the same thing.
 
 - **T2 — the first-run flow advances on tap in some steps and needs a button in others.**
   Tester report: users do not know whether to tap or to press Next. Confirmed by reading
@@ -2279,6 +2402,28 @@ matters more than the stable hashes, that is the trade being made.
     a settings problem: say plainly that the app shows when a prayer *becomes due*, and that
     mosques choose their own congregation time afterwards. Do not silently shift times to
     close a gap that is supposed to be there.
+
+40. **Google stops telling you the tester count at the exact moment it starts to matter.**
+    Below twelve, the Dashboard prints *"N testers currently opted in"* under the
+    production-access checklist. On reaching twelve it replaces that line with a tick and
+    **never shows the number again** — so for the whole fourteen-day run, the one period when
+    a drop below twelve would reset everything, there is no figure to watch and no
+    notification if it slips. The Testers tab still shows a number (24 here), but that is
+    *addresses added* and always the larger one — see lesson 36. Keep your own list of who
+    confirmed they installed, because the Console will not help and the failure is silent.
+    Verified by screenshot on 1 Aug 2026, when the count line vanished between two readings
+    the same day.
+
+41. **A finding from one town is a hypothesis, not a default.** The Slough measurement was
+    real, reproducible and completely correct — and it still nearly produced the wrong change,
+    because "MWL is 78 minutes out here" reads as "MWL is wrong". Testing the same default
+    against fifteen major centres showed it is within about five minutes across South Asia,
+    South-East Asia, the Middle East and Africa, which is where most of the world's Muslims
+    live, and only fails above roughly 45° of latitude. **The scope of a fix should be
+    measured, not inferred from the loudest report.** The check cost one script and turned a
+    proposed rewrite — new methods, a per-prayer offset feature — into one conditional card
+    shown to users above a latitude. When a single user's evidence points at a global
+    default, the next step is more locations, not more code.
 
 ---
 

@@ -97,13 +97,21 @@ evidence there is of how the check behaves in practice, and it is consistent on 
   on one office or home network are reported to collapse into a single counted tester.
 - **Recruit roughly double.** One developer in June 2026 needed **30 testers to keep 12
   active** through the fortnight.
-- **The Console counter is not trustworthy — but it does exist, in exactly one place.**
+- **The Console counter exists in exactly one place — and it vanishes the moment you pass.**
   **Dashboard → Production → "Apply for access to production"**, as a line of italic text
   under step 2: *"9 testers currently opted in"*. Nothing else in the Console shows it —
-  not the track page, not the Testers tab, not Statistics, not the release. There is still
+  not the track page, not the Testers tab, not Statistics, not the release. There is
   **no way to see the consecutive-day count**, and there are repeated reports of the number
   reading 0 with a dozen confirmed testers or lagging ~24 hours, so treat it as a lower
   bound rather than ground truth.
+
+  **On reaching twelve, that italic line is replaced by a tick and the number is never shown
+  again** — verified by screenshot on 1 Aug 2026, when it disappeared between two readings on
+  the same day. So throughout the fourteen-day run, which is the one stretch where dropping
+  below twelve actually costs you, there is no figure to watch and no warning if it slips.
+  The Testers tab still shows a number, but that is *addresses added* and always the larger
+  one. **Keep your own list of who confirmed they installed.** The Console will not tell you,
+  and the failure is silent.
 - **Rejection is common and repeatable.** Three, four and five consecutive rejections are all
   documented, including by developers who shipped multiple updates during the fortnight.
 - **The review can take far longer than the stated seven days.** Documented 2026 cases of four
@@ -641,12 +649,14 @@ possible answer to that suspicion.
    not opted in yet. The store link only resolves for people already opted in, so sending it
    to a new tester produces a page that says the app does not exist.
 
-   **State on 1 Aug 2026: 17 addresses on the list, `9 testers currently opted in`.** Three
-   short. The 14 days are counted while **twelve or more** are opted in — Google's own
-   wording on the Dashboard is *"Run your closed test with at least 12 testers, for at least
-   14 days"* — so at nine the clock is not running and every day spent there is a day that
-   does not count. Chasing the eight who are on the list but have not opted in is worth more
-   than recruiting new people.
+   **State on 1 Aug 2026, later the same day: cleared.** The list reached **24 addresses**
+   and the Dashboard now ticks *"Have at least 12 testers opted-in to your closed test"* and
+   strikes it through. **The fourteen days are now running.** The 14 days are counted while
+   **twelve or more** are opted in — Google's own wording is *"Run your closed test with at
+   least 12 testers, for at least 14 days"* — so the remaining risk is not recruitment, it is
+   **retention**: if the count slips below twelve the run is compromised, and as noted in
+   Step 0 the Console stops displaying the number once you pass, so nothing will warn you.
+   Do not read 24 as the opt-in figure; it is addresses added.
 
    > **Google sends testers nothing.** No invitation email, no notification. Adding an
    > address to the list only grants access; the person has no way to know the app exists
@@ -879,25 +889,26 @@ listing and every App content declaration are saved and green, the bundles are g
 signed, and `Closed testing - Alpha` is **Active** with `1.1.0 - first closed test`
 distributed to all 177 countries.
 
-Play's dashboard states the remaining path in four steps. As of **1 Aug 2026** it shows the
-app on the second:
+Play's dashboard states the remaining path in four steps. As of **1 Aug 2026** the app is on
+the third — the twelve-tester bar was cleared during the day:
 
 | | Step | State |
 |---|---|---|
 | 1 | Publish a closed testing release | ✅ done — struck through on the Dashboard |
-| 2 | Have at least 12 testers opted in | ⏳ **`9 testers currently opted in`**, 17 on the list |
-| 3 | Run the closed test with 12 testers for at least 14 days | ⬜ **not started** |
-| 4 | Apply for production | ⬜ button greyed out until 2 and 3 pass |
+| 2 | Have at least 12 testers opted in | ✅ **done — ticked and struck through**, 24 addresses on the list |
+| 3 | Run the closed test with 12 testers for at least 14 days | ⏳ **running** |
+| 4 | Apply for production | ⬜ button greyed out until 3 completes |
 
 **The single most important thing on this page: the 14 days are counted while twelve or more
-are opted in.** At nine, the clock is not running. A day spent at nine is not day one of
-fourteen — it is a day that does not count at all. Everything below follows from that.
+are opted in.** The clock is now running, so the risk has changed shape — it is no longer
+recruitment, it is **retention**, and it is invisible. On passing twelve the Console stopped
+printing the count (Step 0), so if people uninstall and the number slips there is no figure
+to check and no notification. Everything below follows from that.
 
-1. ⏳ **Three more opt-ins.** Eight people are on the list but have not opted in, so chasing
-   them is worth more than recruiting new ones — they need a message, not an invitation
-   (§15 lesson 35: Google sends them nothing). The count lives in exactly one place,
-   **Dashboard → Production → "Apply for access to production"**, and nowhere else.
-2. ⬜ **Then fourteen consecutive days with twelve or more still opted in.** The long pole,
+1. ✅ **Twelve or more opted in.** Cleared. Note that the Testers tab's 24 is *addresses
+   added*, not opt-ins — do not confuse the two (§15 lesson 36), and note that Google sends
+   the people on that list nothing at all (§15 lesson 35).
+2. ⏳ **Fourteen consecutive days with twelve or more still opted in.** The long pole,
    and the one thing that cannot be shortened. Aim well above twelve: the count is of
    testers who *stay*, and Google's rejection email leads with *"Testers were not engaged
    with your app"*, so they have to use it rather than merely accept. Ask them to open it,

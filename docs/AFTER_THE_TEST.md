@@ -12,13 +12,26 @@ happens next without reading two thousand lines.
 
 The app is **live on the closed testing track** and approved. It is not in the store.
 
-Google requires **12 testers opted in, held for 14 consecutive days**. The count sits at
-**9**. The fourteen days are counted only while twelve or more are opted in, so **the clock
-is not running yet** — days spent at nine are not early days of the fortnight, they are days
-that do not count.
+**The twelve-tester bar is cleared and the fourteen days are running.** Confirmed in the
+Console on 1 Aug 2026 — the production-access checklist now shows:
 
-Nothing in the code is blocking. The only work left before this stage ends is human: three
-more people opening the opt-in link. See [`RELEASING.md`](RELEASING.md) Step 8.
+| Criterion | State |
+|---|---|
+| Publish a closed testing release | ✓ done |
+| **Have at least 12 testers opted-in** | **✓ done** |
+| Run with at least 12 testers for at least 14 days | ○ in progress |
+
+**Apply for production** stays greyed out until the fortnight completes.
+
+**One thing to know, because it is a trap.** The email list holds **24 addresses** — that is
+not the opt-in figure, and it never was. Google used to print the real count as a line of
+italic text; the moment you pass twelve it replaces that line with a tick and **stops showing
+the number entirely**. So for the whole fourteen days — the only period when dropping below
+twelve would matter — there is no counter to watch and no warning if it slips. Nothing can be
+done about that from inside the Console; the only defence is keeping your own list of who
+confirmed they installed and left it installed.
+
+Nothing in the code is blocking. See [`RELEASING.md`](RELEASING.md) Step 8.
 
 **Why we are not shipping fixes now.** Every new build triggers another Google review and
 another chance to disturb a run that has not begun. None of the three fixes below is urgent
@@ -50,19 +63,43 @@ mosques to within a minute. The option ships already. It is simply unreachable f
 never opens Settings, because the first-run flow asks for sect and madhab and never mentions
 method.
 
-**⚠️ This one needs the owner's decision, and it is not an engineering question.** Four
-options, with what each costs:
+**But this affects far fewer people than it first looked, and that was checked before
+anything was planned.** The default was tested against the locally-dominant method in fifteen
+major cities. **It is within about five minutes across South Asia, South-East Asia, the
+Middle East and Africa** — which is where most of the world's Muslims live. It only fails in
+the West, and only badly above about **45° of latitude**:
+
+| Where | How far out the default is |
+|---|---|
+| Jakarta, Karachi, Dhaka, Delhi, Cairo, Kuala Lumpur | 3–6 minutes |
+| Istanbul, Casablanca, Kano, Tashkent | exact |
+| Riyadh | 7–15 minutes |
+| Chicago | 11–18 minutes |
+| **London, Berlin** | **20–47 minutes** |
+
+**So we are not changing the default and not adding any new methods.** Indonesia's and
+Malaysia's official methods are missing from the app and it does not matter — ours is within
+four to nine minutes of both. Adding them would be effort for nothing.
+
+**And no per-prayer adjustment setting is needed either** — which reverses what this file
+said earlier today. When I ran the app's own engine rather than trusting the reference API,
+SajdaTime on Moonsighting reproduces JMIC Slough **to within one minute on all six prayers,
+matching Dhuhr and Maghrib exactly**. The small offsets I had put down to mosques adding a
+safety margin turn out to be part of the method itself. There is nothing left for an
+adjustment feature to fix.
+
+**⚠️ What remains is one decision, and it is yours because it is religious, not technical:**
 
 | Option | What it does | Cost |
 |---|---|---|
-| Leave the default; explain it in Settings | Keeps a defensible mainstream convention | Free, but users stay mismatched |
-| **Per-prayer ± minutes adjustment** | Solves every variation — convention, safety margin, congregation time — without the app ruling on any of them | Moderate: new setting, saved, synced to the watch |
-| Add a method question to first-run | Makes the existing fix reachable | Small: one more screen |
-| Change the default automatically by latitude | Fixes it for everyone silently | **Rejected.** The app would adopt a religious position for the user without telling them |
+| Leave it; explain it in Settings | Keeps a convention that is right for most of the world | Free, but northern users stay mismatched |
+| **A one-time note for users above ~45° latitude**, offering the method choice | Reaches exactly the people affected, changes no time silently, adds nothing for everyone else | Small: one card that only appears when relevant |
+| Ask everyone the method during first-run | Makes the existing option reachable | Small, but lengthens the flow for people who do not need it |
+| Switch method automatically by latitude | Fixes it for everyone silently | **Rejected.** The app would adopt a religious position for you without saying so |
 
-The per-prayer adjustment is the strongest candidate, because it needs no ruling from us and
-also absorbs the two-to-five minutes of *ihtiyat* (safety margin) that mosques add. It does
-not remove the need to make the method findable.
+The one-time note is now the strongest. The objection to the rejected option was never that
+a smart default is wrong — it is that a **silent** one is. Showing you the choice is not the
+same as making it for you.
 
 ### 2. Automatic location shows the county, not the town
 
@@ -153,10 +190,13 @@ Then, because compiling is not working:
 
 ## The honest gaps
 
-- **One date proves one date.** Whether these mosques use Moonsighting all year, or switch
-  convention in midsummer, is unknown. Midsummer is exactly where high-latitude timetables
-  diverge. Two more checks — one in December, one in June — would settle it, and that should
-  happen **before** fix 1 changes anything, not after.
+- **One date proves one date — half of this is now closed.** What *is* verified: the app's
+  own Moonsighting output matches the reference to the minute in December, at the June
+  solstice and in August, so the method behaves correctly all year, including at the one
+  point where the app's high-latitude handling could have distorted it. What is **still
+  open**: whether these mosques stay on Moonsighting all year or switch convention in
+  midsummer. That needs their December and June timetables, not ours, and it should happen
+  **before** fix 1 changes anything.
 - **Diamond Road publishes no start times** anywhere found, so only its congregation column
   could be read. Its apparent 47-minute disagreement with JMIC is almost certainly this and
   nothing more.
