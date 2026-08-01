@@ -190,13 +190,17 @@ Then, because compiling is not working:
 
 ## The honest gaps
 
-- **One date proves one date — half of this is now closed.** What *is* verified: the app's
-  own Moonsighting output matches the reference to the minute in December, at the June
-  solstice and in August, so the method behaves correctly all year, including at the one
-  point where the app's high-latitude handling could have distorted it. What is **still
-  open**: whether these mosques stay on Moonsighting all year or switch convention in
-  midsummer. That needs their December and June timetables, not ours, and it should happen
-  **before** fix 1 changes anything.
+- **The seasonal question is now closed — this no longer gates fix 1.** The worry was that
+  UK mosques often change rule for the ten weeks around midsummer, when the normal Isha
+  calculation stops working at this latitude. If ours did, "set it to Moonsighting" would
+  have been right in August and wrong in June. Reading Mosque's own monthly timetable was
+  read for June and July: on **21 June, the solstice and the hardest date of the year, Fajr,
+  Asr and Isha all match to the exact minute**, and across five dates spanning ten weeks the
+  largest disagreement is one minute. They do not switch. Both sides are now verified — the
+  app reproduces the convention correctly all year, and the mosque genuinely uses it all
+  year. **Still inferred rather than measured:** the same check for JMIC Slough, whose
+  timetable is a PDF behind bot protection. It matched exactly on 1 August, and the mosque
+  26 km away holds the convention through the solstice.
 - **Diamond Road publishes no start times** anywhere found, so only its congregation column
   could be read. Its apparent 47-minute disagreement with JMIC is almost certainly this and
   nothing more.

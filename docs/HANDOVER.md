@@ -1528,10 +1528,46 @@ both mosques' begin times to within a minute. `CalcMethod.MOON_SIGHTING` already
 already ships; it is simply not discoverable, because onboarding asks for sect and madhab
 and never mentions method.
 
-**Not verified:** whether these mosques use Moonsighting year-round or switch convention in
-midsummer — a single date cannot show that, and it is exactly where high-latitude timetables
-tend to diverge. Two dates in December and June would settle it. Diamond Road's begin times
-are not published anywhere found, so only its jama'ah column could be read.
+### Do they switch convention in midsummer? No — closed, at the solstice itself
+
+**Why this mattered.** Everything above rested on one date, 31 July, which sits *outside* the
+window where an 18° Isha is unreachable at this latitude (roughly 21 May to 23 July at
+51.5°N). Many UK mosques adopt a different rule for those ten weeks. If Reading and JMIC did
+too, then "set it to Moonsighting" would be correct in August and wrong in June — which is
+the worst possible failure for a prayer app, because it would be wrong only in the season
+nobody double-checks.
+
+Reading Mosque publishes a month-navigable timetable (`/timetable/`, JS-rendered — the table
+is not in `innerText` until the month control is clicked, and the page's own July view loaded
+empty until stepped). Its **Athan** column against Aladhan Moonsighting + Hanafi:
+
+| Date | Fajr printed / calc | Asr printed / calc | Isha printed / calc |
+|---|---|---|---|
+| 1 Jun 2026 | 02:59 / 03:00 | 18:34 / **18:34** | 22:26 / 22:25 |
+| **21 Jun 2026 — solstice** | **02:47 / 02:47** | **18:43 / 18:43** | **22:45 / 22:45** |
+| 30 Jun 2026 | 02:53 / 02:53 | 18:44 / **18:44** | 22:43 / 22:42 |
+| 1 Jul 2026 | **02:54 / 02:54** | **18:44 / 18:44** | **22:42 / 22:42** |
+| 31 Jul 2026 | 03:39 / 03:38 | 18:28 / 18:28 | 22:02 / 22:03 |
+
+**At the solstice — the single hardest date of the year — Fajr, Asr and Isha all match to the
+exact minute.** Across five dates spanning ten weeks the largest disagreement is one minute.
+They do not switch. Moonsighting all year.
+
+For scale, MWL at the same solstice gives Fajr 02:34 and Isha **23:30** against the mosque's
+02:47 and 22:45 — **45 minutes late**, in the season when the mismatch is largest and least
+likely to be questioned.
+
+**This closes the seasonal question and unblocks T1.** The recommendation to offer
+Moonsighting at high latitude is now verified on both sides: the app reproduces the
+convention correctly year-round (above), and the mosques genuinely use it year-round (here).
+
+**Still not verified:** the same seasonal check for JMIC Slough. Its site publishes a monthly
+PDF rather than a navigable table, and the PDF is served behind bot protection — `WebFetch`
+returns 403, so it needs a browser session to read. JMIC matched Moonsighting exactly on
+1 August, and Reading — the same convention, same region, 26 km away — holds it through the
+solstice, so the expectation is that JMIC does too. That is an inference, not a measurement.
+Diamond Road's begin times are not published anywhere found, so only its jama'ah column could
+ever be read.
 
 ### Location precision — what it is actually worth, in minutes (1 Aug 2026)
 
