@@ -137,9 +137,17 @@ class MainActivity : ComponentActivity() {
                                 },
                                 title = { Text(stringResource(R.string.disclaimer_title)) },
                                 // Scrollable. AlertDialog does not scroll its body for
-                                // you, and this text is now five paragraphs — at a large
+                                // you, and this text is now seven paragraphs — at a large
                                 // system font size the last of them, the dua request, is
                                 // exactly what would fall off the bottom unread.
+                                //
+                                // Seven, not five, since the Isha and congregation-time
+                                // paragraphs were added. Only four fit on a 1080x1920
+                                // screen at default font, so the dua is three swipes down
+                                // and the scroll is the only thing keeping it reachable.
+                                // Verified by screenshot in RTL — see HANDOVER §10. Do not
+                                // lengthen this further without re-checking that the dua
+                                // still arrives, and do not remove the scroll.
                                 text = {
                                     Column(Modifier.verticalScroll(rememberScrollState())) {
                                         Text(stringResource(R.string.disclaimer_body))

@@ -1440,6 +1440,54 @@ point where the forced high-latitude rule could have interfered. It does not. Re
 Moonsighting for high-latitude users is therefore safe, and this was verified rather than
 assumed.
 
+### The disclaimer and method-picker wording, verified in RTL on device (1 Aug 2026)
+
+Owner's decision, recorded because it settles T1's open question: **the user gets the choice,
+and the disclaimer says so.** "If the user has to decide this then we should give it to them
+… it's a free, charity app. If the user wants to switch something in settings then that
+should be allowed."
+
+Two text changes, no new screens, no latitude logic, no auto-switching:
+
+1. **Two paragraphs added to `disclaimer_body`**, before the dua — that mosques disagree about
+   when a prayer begins, that Isha differs most and by over an hour in the north, that the app
+   will not settle it, and that the method is changeable in Settings. Plus that the app shows
+   when a prayer *becomes due* while the mosque board shows the congregation, and that the gap
+   between them is normal.
+2. **A help line at the top of `MethodPickerDialog`** — a list of institution names means
+   nothing to most users, and the wrong pick moves Isha by an hour here.
+
+**Verified by walking the RTL build on `emulator-5554`, not by reading the diff:**
+
+| Check | Result |
+|---|---|
+| Method picker help text renders, right-aligned | ✅ |
+| Method list still scrolls past the new text | ✅ — Moonsighting, ISNA, Kuwait, Qatar, Singapore, Diyanet all reachable after one swipe |
+| Disclaimer scrolls to the bottom | ✅ |
+| **Dua request still the final paragraph, still reachable** | ✅ |
+
+**Two traps this run exposed, both worth keeping:**
+
+- **`./gradlew installRtl` fails outright while both emulators are running:**
+  `INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000`. Phone
+  and watch share one `applicationId`, so the watch build (version code 1000 band) blocks the
+  phone build (2) on any device that has it. Fix: `ANDROID_SERIAL=emulator-5554`, and
+  `adb -s emulator-5554 uninstall com.sajdatime.app` first if a watch build got onto the phone
+  emulator. Identify which is which with `adb -s <id> shell getprop ro.build.characteristics`
+  — the watch reports `emulator,nosdcard,watch`.
+- **A `uiautomator dump` can be stale, and it reads as a confirmed bug.** A dump taken after
+  the disclaimer had closed showed home-screen nodes and no dua text, which looked exactly
+  like the dua being clipped away — a hard-rule violation. It was not; the dialog scrolls
+  fine. **Screenshot before concluding, and check the dump actually shows the screen you think
+  it does.**
+
+**Judgement call left open for the owner.** The disclaimer is now seven paragraphs and only
+four fit on a 1080×1920 screen at default font, so the dua is three swipes down. It was
+already below the fold before this change, and it is still last and still reachable — but the
+text is getting long, and the same explanation already appears in the method picker where the
+decision is actually made. If the disclaimer should be shortened again, the Isha paragraph is
+the one that is duplicated elsewhere.
+
 ### Is Muslim World League actually a bad default? Measured worldwide, and mostly no
 
 **Why this exists.** The Slough finding above could easily be over-generalised into "MWL is

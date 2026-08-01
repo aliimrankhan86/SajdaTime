@@ -395,6 +395,15 @@ private fun MethodPickerDialog(
     }
 
     ChooserDialog(title = stringResource(R.string.settings_method), onDismiss = onDismiss) {
+        // A list of institution names is meaningless to most users, and picking the wrong one
+        // moves Isha by over an hour at UK latitudes. This says what the choice is for and
+        // where to get the answer — the mosque — rather than leaving them to guess.
+        Text(
+            text = stringResource(R.string.settings_method_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(16.dp))
         Column(Modifier.selectableGroup()) {
             available.forEach { method ->
                 RadioRow(
