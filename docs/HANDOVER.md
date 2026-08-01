@@ -1447,6 +1447,52 @@ midsummer — a single date cannot show that, and it is exactly where high-latit
 tend to diverge. Two dates in December and June would settle it. Diamond Road's begin times
 are not published anywhere found, so only its jama'ah column could be read.
 
+### Location precision — what it is actually worth, in minutes (1 Aug 2026)
+
+**Why this exists.** The same tester reported that automatic location shows *"Berkshire"*
+rather than his town, and that the times therefore felt "not close enough". The second half
+of that does not follow, and it was measured rather than argued, because the obvious fix
+(more precise location) would have bought nothing.
+
+Aladhan, Moonsighting, 1 Aug 2026, moving away from Slough:
+
+| Position | Fajr | Maghrib | Isha |
+|---|---|---|---|
+| Slough, exact | 03:38 | 20:51 | 21:59 |
+| 3 km north | 03:38 | 20:51 | 21:59 |
+| 3 km west | 03:38 | 20:51 | 21:59 |
+| Reading — 26 km | 03:40 | 20:52 | 22:00 |
+| Newbury — 60 km, the far side of Berkshire | 03:41 | 20:53 | 22:01 |
+
+**A 3 km error costs nothing at all — the times are identical to the minute.** Being wrong
+by the entire width of the county costs two to three minutes. Coarse location is therefore
+not merely adequate, it is comfortably more precise than the app needs, which confirms the
+`ponytail:` note in `LocationRepository`. The arithmetic behind that: one degree of longitude
+is four minutes of solar time, and at 51.5°N one degree spans about 43 km, so a kilometre is
+worth roughly **five seconds**.
+
+**So the reported inaccuracy is not location, it is the calculation method** — see the Isha
+section above, where the default convention is 78 minutes out. Fixing location precision
+would have moved the times by zero and left the complaint exactly where it was. This is the
+whole reason it was measured first.
+
+**The label is still a real defect, for a different reason.** `LocationRepository.cityName`
+takes the first field that is non-null and stops:
+
+```kotlin
+?.let { it.locality ?: it.subAdminArea ?: it.adminArea ?: it.countryName }
+```
+
+Two consequences. It can never produce *"Slough, Berkshire, UK"* — only ever one field. And
+seeing *"Berkshire"* means `locality` came back **null**, so it fell through to the county;
+Slough is a unitary authority and geocoder coverage of those is uneven. `subLocality` and
+`featureName` are not in the chain at all, and either often survives when `locality` does not.
+
+**The harm is trust, not accuracy.** A user shown their county assumes the app does not know
+where they are and stops believing the times — which are, in fact, correct to the minute. So
+this is worth fixing, but it must not be sold as a fix for wrong times, and the app should
+not imply that a more precise location would change them.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -1560,6 +1606,37 @@ are not published anywhere found, so only its jama'ah column could be read.
 
   Note the interaction with T1: if a method step is added, it lands in this same flow, so
   fixing the navigation first is the cheaper order.
+
+- **T3 — automatic location shows the county, and the user stops trusting the times.**
+  Reported as *"it just shows Berkshire and gives me not close enough timing"*. The second
+  half is not true and it was measured before anything was planned — see §10, "Location
+  precision". **A 3 km error changes no prayer time at all; the whole width of Berkshire is
+  worth two to three minutes.** The times this tester saw were correct; the 78-minute error
+  he was feeling is T1. **Do not fix this expecting the times to move.**
+
+  What is genuinely wrong is the label. `LocationRepository.cityName` returns a single field
+  (`locality ?: subAdminArea ?: adminArea ?: countryName`), so it can never say *"Slough,
+  Berkshire, UK"*, and when `locality` is null — common for unitary authorities like Slough —
+  it silently degrades to the county with no indication that it has.
+
+  The work, smallest first:
+
+  1. **Add `subLocality` and `featureName` to the chain**, before falling back to the county.
+     One line, and it is the most likely reason the town went missing.
+  2. **Build a composite label** — town first, then a broader area, e.g. *"Slough, United
+     Kingdom"*. Comma-join whatever fields survive rather than showing one.
+  3. **One-line explanation under the location**, as the tester asked for. It must be
+     honest about what precision buys: something on the lines of *"Approximate location is
+     enough — prayer times change by under a minute within a few kilometres."* This closes
+     the complaint properly, because the user's real worry is that the app is lost.
+  4. **Make manual city entry obvious.** It already exists and already works — `CityLookup`
+     tries the platform geocoder then Open-Meteo, and Settings already wires `onSearchCity`
+     — but a user who distrusts the automatic label has no visible cue that they can simply
+     type their town. Surfacing the existing feature is worth more than any new one.
+
+  ponytail: nothing here needs a new dependency, a new permission, or `ACCESS_FINE_LOCATION`.
+  Fine location would be a privacy regression bought for zero minutes of accuracy, and it is
+  ruled out — see §8 and the hard rules in `CLAUDE.md`.
 
 ### Not done, in rough priority order
 
