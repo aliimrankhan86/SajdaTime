@@ -1566,6 +1566,11 @@ not imply that a more precise location would change them.
 
 ### Tester feedback from the closed test — queued, deliberately not started
 
+> **Short version for the owner: [`docs/AFTER_THE_TEST.md`](AFTER_THE_TEST.md).** Same three
+> items in plain language, in build order, with the exact user-facing wording already
+> decided and the one decision that needs the owner marked. This section is the technical
+> record behind it; that file is what to read first.
+
 > **Do not act on these until the closed test is over.** Recorded 1 Aug 2026, while the test
 > was still at 9 of 12 opted-in testers. Shipping a new build mid-test means another review
 > and another chance to disturb a run that has not yet started its fourteen days; the upside
