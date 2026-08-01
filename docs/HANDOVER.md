@@ -1313,6 +1313,46 @@ for.
 ./tools/wear-verify.sh
 ```
 
+**Putting the emulator somewhere else — harder than it looks, and it cost a session.**
+
+```bash
+# WRONG on its own. `emu geo fix` sets the GPS provider only, and
+# LocationRepository.lastKnown() reads NETWORK first, so the emulator's own
+# live network fix (Greater Manchester on a stock image) wins every time.
+adb -s emulator-5554 emu geo fix <lon> <lat>     # note: longitude FIRST
+
+# Better: override the network provider itself.
+adb -s emulator-5554 shell cmd location providers add-test-provider network
+adb -s emulator-5554 shell cmd location providers set-test-provider-enabled network true
+adb -s emulator-5554 shell cmd location providers set-test-provider-location network --location 69.65,18.96
+
+# ALWAYS remove it afterwards. Leaving a mock provider on the owner's emulator
+# is the same class of mistake as leaving the RTL build behind (lesson 42).
+adb -s emulator-5554 shell cmd location providers remove-test-provider network
+```
+
+Even then it is fragile. The mock survives long enough for one read, but the emulator keeps
+publishing real network fixes, and `lastKnown()` prefers the freshest — so after a permission
+dialog or an activity restart the app quietly reverts to the emulator's own position. If a
+screenshot at a specific latitude is genuinely required, **set the coordinates through the
+app's own city search instead**, or accept that the unit tests are the stronger evidence and
+say plainly that the screenshot was not taken. Do not claim a screen was seen when it was not.
+
+**An ANR immediately after `installDebug` is usually not your change.** Check before blaming
+the diff:
+
+```bash
+adb -s emulator-5554 shell "ls -t /data/anr/ | head -3"
+adb -s emulator-5554 shell "cat /data/anr/<file>" | head -30
+```
+
+On 1 Aug 2026 a fresh install produced *"SajdaTime isn't responding"* on the onboarding
+screen — a screen that computes no prayer times at all. The trace's `CriticalEventLog` showed
+`install_packages` followed by *"Blocked in monitor ActivityManagerService … for 17s"*: the
+emulator's own `system_server` had wedged and starved app startup. The subject was
+`failed to complete startup`, not anything of ours. A cold relaunch once the install settled
+was clean. **Read the trace's first event before concluding anything.**
+
 ```bash
 # Fire a real alarm: move the clock to just before a prayer time.
 # `date MMDDhhmmYYYY.ss` may be rejected; epoch seconds is more reliable.
