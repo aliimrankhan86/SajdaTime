@@ -1,10 +1,53 @@
 # What we do after the closed test
 
-**Plain-language plan, written 1 Aug 2026.** Nothing here is started, and nothing here
-should be started until Google grants production access. The reasoning, evidence and
-measurements behind every item are in [`HANDOVER.md`](HANDOVER.md) §10 and §11 (items T1,
-T2, T3) — this file is the short version, in order, for someone who wants to know what
-happens next without reading two thousand lines.
+**Plain-language plan, written 1 Aug 2026.** The reasoning, evidence and measurements behind
+every item are in [`HANDOVER.md`](HANDOVER.md) §10 and §11 — this file is the short version,
+in order, for someone who wants to know what happens next without reading two thousand lines.
+
+---
+
+## ⚠️ One thing was not left until later: the app crashed in the far north
+
+**Found on 1 Aug 2026, fixed the same day, and the reason it was found is worth saying.**
+
+You said: *don't just use Slough as an example, we are catering for a global audience.* Every
+test this project had ever run was at Slough's latitude. Widening it to the whole planet found
+a crash that had been in **every version shipped so far**.
+
+**What was wrong.** Past about 65½° north — Tromsø, Kiruna, Rovaniemi, Murmansk, Norilsk,
+Longyearbyen — the sun does not properly rise or set. The prayer-time library returns
+"no answer" for every single time, and the app was not expecting that, so it crashed. Not just
+one screen: **the home screen, the watch face, the notification and the alarm scheduler all
+died together**, in summer and in winter. Anyone living up there installed the app and it never
+opened. Those cities have mosques.
+
+**What it does now.** When the sun genuinely never rises or sets, the app uses the times for
+60° latitude instead — the nearest place where night and day still separate. That is not
+something we invented: it is the published rule of the Moonsighting Committee, and it is a
+recognised classical position (*aqrab al-bilad*, "the nearest locality"). Your longitude and
+your hemisphere are kept, so midday stays honest. And the screen **says so**, in a notice that
+cannot be dismissed, because showing someone an approximation without telling them is exactly
+what this app must not do.
+
+**How confident I am.** High, for the calculation: there is now an automatic test covering all
+fourteen calculation methods, seven far-north and far-south locations, and both solstices, and
+it also checks the app does *not* start approximating anywhere normal — Reykjavík and Luleå,
+the closest real towns to the line, keep their own times. The full build passes: 68 tests, no
+failures, no lint errors. **What I could not verify:** the wording of that notice as it appears
+on a real screen. The emulator would not hold a fake Arctic location long enough to photograph
+it. The code is the same notice component already proven on screen elsewhere, so I expect it is
+fine, but I have not seen it with my own eyes and I am not going to claim otherwise.
+
+**Should this be uploaded now, or wait?** Your call, and it is a real trade-off. Waiting means
+users above 65½° stay broken for another couple of weeks. Uploading means a new build during
+the fourteen-day run. My understanding is that updating the *closed testing* track does not
+reset the clock, because your testers stay opted in either way — **but I have not confirmed
+that with Google's own documentation, so please do not treat it as settled.** If you want, I
+can check that properly before you decide.
+
+**A second, smaller thing was fixed at the same time**, because it costs one line of text and
+helps more people than anything else in this document. See "The method nobody could find"
+below.
 
 ---
 
@@ -157,6 +200,40 @@ Next that does not exist, then tap a card and are thrown forward before they hav
 
 **The fix is consistency, not cleverness.** Selecting only selects. Every step gets an
 explicit forward button.
+
+---
+
+### The method nobody could find — fixed on 1 Aug, one line of text
+
+Not a tester report. It came out of checking the whole world instead of one town.
+
+**The problem.** Indonesia, Malaysia, Singapore and Brunei all use the same convention for
+Fajr and Isha — their religious authorities are Kemenag, JAKIM and MUIS. **The app has always
+calculated that convention perfectly.** It was in the list. It was just called *"Singapore"*.
+
+So around **270 million Muslims — the biggest group in the Ummah** — had no reason to ever
+select it, and stayed on the default.
+
+**Why that mattered, and it is not cosmetic.** On the default, Fajr in Jakarta comes out
+**eight minutes later** than the Indonesian national timetable. During Ramadan that is eight
+minutes in which someone believes they may still eat, and their own country's timetable says
+the fast has already begun. Being *late* on Fajr is the dangerous direction. Every earlier
+check had looked at Isha, so nobody had noticed.
+
+**The fix.** The entry is now called **"Kemenag / JAKIM / MUIS — Indonesia, Malaysia,
+Singapore"**. No new calculation, no new code. Just a name people recognise.
+
+**Checked properly:** against the independent Aladhan service at six cities in three countries
+— Jakarta, Medan, Surabaya, Kuala Lumpur, Kuching, Kota Bharu — on a June date and a Ramadan
+date. **Fifteen of sixteen times identical, one off by a single minute.** There is now a test
+that fails the build if a future library update quietly moves those times and makes the label
+untrue.
+
+**Worth knowing about the default generally.** Compared against each region's own official
+method, the app's default is 0–10 minutes *later* on Fajr almost everywhere in the world, and
+earlier essentially nowhere. It is still a sound default — for most of the Ummah it is within
+about five minutes and it only goes badly wrong above 45° latitude — but that consistent
+lateness is the argument for making the method easier to find, which is what fix 1 is about.
 
 ---
 

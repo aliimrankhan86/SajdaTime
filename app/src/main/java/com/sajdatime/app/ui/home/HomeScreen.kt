@@ -110,6 +110,7 @@ fun HomeScreen(
         Spacer(Modifier.height(12.dp))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
+        PolarBanner(state)
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(24.dp))
         TodayTimeline(state)
@@ -412,6 +413,25 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
  * here only. Settings shows the identical card for as long as the permission is missing,
  * so the fix is always one tap away on the screen whose job is settings.
  */
+/**
+ * Shown only above the polar circles, where the sun does not rise or set and there is no
+ * true Fajr or Isha to calculate. The times on screen are projected from 60 degrees — see
+ * PrayerEngine for why 60 and whose rule it is.
+ *
+ * Not dismissible, and deliberately so. Every other notice here describes something the
+ * user can fix; this one describes where they live, and it will be just as true tomorrow.
+ * Hiding it would leave approximated times looking like measured ones.
+ */
+@Composable
+private fun PolarBanner(state: UiState) {
+    if (state.today?.approximated != true) return
+    Spacer(Modifier.height(12.dp))
+    NoticeCard(
+        title = stringResource(R.string.polar_notice_title),
+        body = stringResource(R.string.polar_notice_body),
+    )
+}
+
 @Composable
 private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
@@ -443,7 +463,15 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
  * alarm notice went unnoticed.
  */
 @Composable
-private fun NoticeCard(title: String, body: String, onClick: () -> Unit, onDismiss: (() -> Unit)? = null) {
+private fun NoticeCard(
+    title: String,
+    body: String,
+    // Null when the card only informs. Not every notice has somewhere to go: the polar
+    // one states a fact about where the user lives, and a card that looks tappable but
+    // does nothing teaches people that tapping cards here is pointless.
+    onClick: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+) {
     val scheme = MaterialTheme.colorScheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -451,7 +479,7 @@ private fun NoticeCard(title: String, body: String, onClick: () -> Unit, onDismi
             .fillMaxWidth()
             .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
             .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button, onClick = onClick)
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             .padding(16.dp),
     ) {
         Icon(

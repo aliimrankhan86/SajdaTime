@@ -38,7 +38,17 @@
     <string name="method_north_america">ISNA, North America</string>
     <string name="method_kuwait">Kuwait</string>
     <string name="method_qatar">Qatar</string>
-    <string name="method_singapore">Singapore</string>
+    <!--
+      This entry is adhan's SINGAPORE preset, but its angles (Fajr 20, Isha 18) are also
+      exactly those of Kemenag in Indonesia, JAKIM in Malaysia and MUIS in Singapore, and
+      Brunei follows the same. Verified against Aladhan at six cities in three countries:
+      15 of 16 values identical, one off by a minute — see docs/HANDOVER.md §10. Labelled
+      "Singapore" it was invisible to the largest bloc of Muslims on earth, roughly 270
+      million people, who had no reason to look at it. The label carries the countries
+      because that is what a user recognises; the enum name stays SINGAPORE because it is
+      what is written into saved settings.
+    -->
+    <string name="method_singapore">Kemenag / JAKIM / MUIS — Indonesia, Malaysia, Singapore</string>
     <string name="method_turkey">Diyanet, Turkey</string>
     <string name="method_jafari">Jafari (Ithna Ashari)</string>
     <string name="method_tehran">Institute of Geophysics, Tehran</string>

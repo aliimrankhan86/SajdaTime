@@ -13,6 +13,7 @@ import java.time.ZoneId
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
+import kotlin.math.withSign
 
 /**
  * Offline prayer time calculation. Wraps adhan-java (MIT) and adds the Shia/Jafari
@@ -56,11 +57,52 @@ object PrayerEngine {
      * (Isha 23:17 with it and without it). The real gap is the *method*: the default MWL 17
      * degrees lands 78 minutes after every local mosque, which use Moonsighting's shafaq
      * rule. See docs/HANDOVER.md §10, "Isha in the UK", before touching this constant.
+     *
+     * One correction, measured from adhan's own bytecode and confirmed on the numbers:
+     * this rule does nothing whatsoever when the method is Moonsighting Committee. adhan
+     * computes the night portions and then discards them, substituting its own seasonal
+     * model, plus a one-seventh clamp above 55 degrees. All three rules give byte-identical
+     * Moonsighting output at every latitude tested. Setting the rule here is therefore
+     * harmless rather than meaningful, and PolarAndHemisphereTest guards that assumption in
+     * case a library upgrade changes it. It bites only on the plain angle methods, and
+     * there the choice is real: at 51.5N on 21 June, MIDDLE_OF_THE_NIGHT collapses Fajr and
+     * Isha onto 01:04, SEVENTH_OF_THE_NIGHT gives 03:42/22:27, and TWILIGHT_ANGLE gives
+     * 02:32/23:29. Those are three different religious approximations, not three roundings.
      */
     private val HIGH_LATITUDE_RULE = HighLatitudeRule.TWILIGHT_ANGLE
 
     /** Umm al-Qura lengthens the Isha interval from 90 to 120 minutes during Ramadan. */
     private const val UMM_AL_QURA_RAMADAN_EXTRA_MINUTES = 30L
+
+    /**
+     * Beyond the polar circles the sun can fail to set at all in summer, or to rise at all
+     * in winter, and adhan then returns null for **every** field — not only Fajr and Isha
+     * but Dhuhr and Asr as well, because it derives them all from a sunrise and sunset that
+     * do not exist. Measured boundary: null from 66 degrees on 21 June and from 68 degrees
+     * on 21 December; 65.5 degrees still computes. See docs/HANDOVER.md §10.
+     *
+     * Until this was measured those nulls reached [instantOf], whose parameter is not
+     * nullable, and threw NullPointerException. That took out the home screen, the watch
+     * tile, the ongoing notification and the alarm scheduler together, in both solstices,
+     * for everyone living above roughly 65.5 degrees — Tromso, Kiruna, Rovaniemi, Murmansk,
+     * Norilsk, Longyearbyen. Those places have mosques. This was a real crash, not a
+     * theoretical one, and it is why nothing here may return null.
+     *
+     * The classical answer is *aqrab al-bilad*: use the times of the nearest place where
+     * night and day are still distinguishable. Moonsighting Committee publish exactly this
+     * rule and use 60 degrees, so 60 is taken from them rather than invented here. Longitude
+     * and hemisphere are preserved, so solar noon stays true to where the user actually is.
+     *
+     * This is an approximation and the app says so on screen — see [DayPrayerTimes.approximated].
+     * Showing projected times silently would be the app taking a position on the user's
+     * behalf without telling them, which is the one thing it must not do.
+     */
+    private const val POLAR_FALLBACK_LATITUDE = 60.0
+
+    /** adhan yields null for all six fields together, but check each: never assume. */
+    private val AdhanPrayerTimes.isComplete: Boolean
+        get() = fajr != null && sunrise != null && dhuhr != null &&
+            asr != null && maghrib != null && isha != null
 
     /** Resolves [CalcMethod.AUTO] into the convention appropriate for the user's sect. */
     fun resolveMethod(prefs: CalculationPrefs): CalcMethod =
@@ -79,10 +121,20 @@ object PrayerEngine {
         prefs: CalculationPrefs,
     ): DayPrayerTimes {
         val method = resolveMethod(prefs)
-        val adhanCoords = AdhanCoordinates(coordinates.latitude, coordinates.longitude)
         val dateComponents = DateComponents(date.year, date.monthValue, date.dayOfMonth)
+        val params = parametersFor(method, prefs)
 
-        val base = AdhanPrayerTimes(adhanCoords, dateComponents, parametersFor(method, prefs))
+        // Try where the user actually is first. Only if the sun refuses to rise or set
+        // there does the projection kick in, so everyone below the polar circles — which
+        // is very nearly everyone — is unaffected by this and gets their own astronomy.
+        val here = AdhanCoordinates(coordinates.latitude, coordinates.longitude)
+        val local = AdhanPrayerTimes(here, dateComponents, params).takeIf { it.isComplete }
+        val adhanCoords = if (local != null) {
+            here
+        } else {
+            AdhanCoordinates(POLAR_FALLBACK_LATITUDE.withSign(coordinates.latitude), coordinates.longitude)
+        }
+        val base = local ?: AdhanPrayerTimes(adhanCoords, dateComponents, params)
 
         // Shia conventions push Maghrib past sunset; Sunni ones use sunset itself.
         val maghrib = maghribAngleFor[method]?.let { angle ->
@@ -95,6 +147,7 @@ object PrayerEngine {
 
         return DayPrayerTimes(
             date = date,
+            approximated = local == null,
             times = mapOf(
                 PrayerSlot.FAJR to instantOf(base.fajr),
                 PrayerSlot.SUNRISE to instantOf(base.sunrise),

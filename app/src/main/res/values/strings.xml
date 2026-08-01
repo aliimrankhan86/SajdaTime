@@ -93,6 +93,8 @@
     <!-- Screen-reader label for the row carrying that pill. -->
     <string name="home_now_marker_a11y">Current prayer</string>
     <string name="notice_dismiss">Dismiss</string>
+    <string name="polar_notice_title">Approximate times</string>
+    <string name="polar_notice_body">This far from the equator the sun does not always rise or set, so there is no true Fajr or Isha to calculate. These times come from 60 degrees latitude instead. Mosques here handle it in different ways, so ask yours what it follows.</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->

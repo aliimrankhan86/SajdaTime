@@ -1663,6 +1663,166 @@ where they are and stops believing the times — which are, in fact, correct to 
 this is worth fixing, but it must not be sold as a fix for wrong times, and the app should
 not imply that a more precise location would change them.
 
+### The app crashed above the Arctic Circle — found by testing the world, not Slough (1 Aug 2026)
+
+The owner's instruction was the whole reason this was found: *"Please don't just use Slough as
+an example … we are trying to cater for the masses."* Every measurement to that point had been
+taken at 51.5°N. Widening the sweep to the rest of the planet found a crash that had been in
+every release so far.
+
+**What happens.** Beyond the polar circles the sun can fail to set at all in summer, or to
+rise at all in winter. adhan then returns `null` for **every** field — not only Fajr and Isha
+but Dhuhr, Asr, sunrise and Maghrib, because it derives them all from a sunrise and sunset
+that do not exist. `PrayerEngine.instantOf` takes a non-null `Date`, so this threw
+`NullPointerException: fajr must not be null`.
+
+**Measured boundary**, MWL, sweeping latitude in 0.5° steps:
+
+| Date | Last latitude that computes | First latitude that returns null |
+|---|---|---|
+| 21 June | 65.5°N | 66.0°N |
+| 21 December | 67.0°N | 68.0°N |
+
+**The blast radius was the whole app, not one screen.** Every caller of the engine was
+affected together: `SajdaViewModel` (phone), `WearViewModel`, `NextPrayerTileService`,
+`OngoingBadge`, `PrayerPdfExporter` and — worst — `PrayerAlarmScheduler`, which runs in the
+background. Both solstices, so summer *and* winter.
+
+**This was not hypothetical.** Tromsø (69.65°N) has the Alnor Centre. Kiruna, Rovaniemi,
+Luleå, Murmansk, Norilsk and Longyearbyen all have Muslim communities; Norilsk has thousands
+of Central Asian workers. Every one of them installed this app and it died on open.
+
+**What a mature reference does instead.** Aladhan does not crash. For Tromsø on 21 June it
+returns `Fajr = Sunrise = Maghrib = Isha = 00:46` — degenerate and useless, but it renders.
+Degrading beats crashing, so anything is better than what we shipped.
+
+**The fix, and why this rule and not another.** `PrayerEngine` now tries the user's real
+coordinates first and only falls back if any field comes back null. The fallback is
+*aqrab al-bilad* — the times of the nearest place where night and day are still
+distinguishable — projected to **60°**, keeping longitude and hemisphere so solar noon stays
+true. 60 is not invented: it is the figure Moonsighting Committee publish for exactly this
+case. `DayPrayerTimes.approximated` is set and the home screen shows a non-dismissible notice,
+because a projection the user is not told about is the app taking a position silently.
+
+Rejected: returning null times (ripples nullability through every screen, the PDF, the watch
+and the scheduler, to produce a blank screen at the end of it); Aladhan's degenerate collapse
+(renders, but six identical times are worse than honest approximations); *aqrab al-ayyam*,
+nearest-day (defensible, but needs a search over dates where a latitude clamp needs none).
+
+Guarded by `PolarAndHemisphereTest`, which asserts across all 14 calculation methods, both
+solstices, seven polar locations including two southern ones, that times exist, are in
+chronological order, are flagged approximate, and that `nextPrayer`/`currentPrayer` survive at
+four times of day. It also asserts the projection stays **off** at Reykjavík (64.15°N) and
+Luleå (65.58°N), the closest inhabited places to the boundary.
+
+### MWL's Fajr errs in the unsafe direction almost everywhere (1 Aug 2026)
+
+Both second opinions said the investigation had been Isha-only and that Fajr matters more,
+because a fast begins at Fajr. That was right, and measuring it moved the conclusion.
+
+MWL Fajr minus the region's own official method, from Aladhan, on a Ramadan date (20 Feb 2027)
+and a June date. Positive means **MWL is later**:
+
+| City | Local authority | Ramadan | June |
+|---|---|---:|---:|
+| Jakarta | Kemenag | +8 | +8 |
+| Kuala Lumpur | JAKIM | +8 | +9 |
+| Singapore | MUIS | +8 | +9 |
+| Cairo | Egyptian | +7 | +10 |
+| Casablanca | Morocco | +4 | +7 |
+| Riyadh | Umm al-Qura | +3 | +3 |
+| Istanbul | Diyanet | 0 | 0 |
+| Karachi / Dhaka / Delhi | Karachi | 0 | 0 |
+| Tehran | Tehran | −1 | −2 |
+
+**MWL is never earlier than local practice anywhere measured except Tehran.** For a fasting
+person that is the wrong way to err: a user on the default in Jakarta is still eating eight
+minutes after their national timetable says the fast has begun. Nobody had noticed because
+every previous check had been on Isha.
+
+Note the direction reverses with latitude. At Slough, MWL Fajr is 15–42 minutes **earlier**
+than the mosques' Moonsighting all year — cautious, not dangerous. **So the fasting risk is
+not in Britain, it is in Indonesia.** Neither second opinion reached that; it took the numbers.
+
+### The largest bloc of Muslims on earth could not find their own method (1 Aug 2026)
+
+adhan's `SINGAPORE` preset is Fajr 20° / Isha 18°. Those are also, exactly, the angles used by
+**Kemenag** (Indonesia), **JAKIM** (Malaysia) and **MUIS** (Singapore); Brunei follows the
+same. Verified against Aladhan at six cities in three countries — Jakarta, Medan, Surabaya,
+Kuala Lumpur, Kuching, Kota Bharu — on a June and a Ramadan date: **15 of 16 values identical,
+one off by a single minute.**
+
+Labelled simply *"Singapore"*, that option was invisible to roughly **270 million** Muslims who
+had no reason to look at it. The maths was already correct and already shipping; only the label
+was wrong. Now `Kemenag / JAKIM / MUIS — Indonesia, Malaysia, Singapore`.
+
+The enum stays `CalcMethod.SINGAPORE` because that name is written into saved settings; only
+`method_singapore` changed. Pinned by `PolarAndHemisphereTest`, so an adhan upgrade that moves
+these angles fails the build rather than quietly making the label a lie.
+
+### What the two second opinions got right and wrong (1 Aug 2026)
+
+Neither was accepted on trust. Every checkable claim was tested against adhan's bytecode, the
+running engine, or Aladhan.
+
+**Right, and acted on:**
+
+- *adhan ignores `HighLatitudeRule` entirely for Moonsighting.* Confirmed twice. In the
+  bytecode, `nightPortions()` is computed and then discarded for that method in favour of
+  `seasonAdjustedMorningTwilight`/`seasonAdjustedEveningTwilight`; on the numbers, all three
+  rules give identical output at 51.51°, 54°, 56° and 58°. `PrayerEngine`'s comment claimed
+  otherwise and has been corrected. Now guarded by a canary test.
+- *Above 55° Moonsighting also forces a one-seventh clamp.* Confirmed — and visible as a
+  discontinuity: Fajr on 21 June is 02:28 at 54° but jumps to **03:21** at 56°.
+- *`TWILIGHT_ANGLE` is itself a religious approximation, not a rounding.* Confirmed from
+  `nightPortions()`: MIDDLE = 0.5 of the night, SEVENTH = 0.1428, TWILIGHT = angle/60, so MWL
+  Isha caps at 17/60 = **28%**. At 51.5°N on 21 June the three give 01:04/01:04 (collapsed),
+  03:42/22:27, and 02:32/23:29. Three different answers, one silently chosen for the user.
+- *Fajr had never been measured.* Correct, and it changed the conclusion — see above.
+- *Rejecting Kemenag/JAKIM on an Isha-only comparison was unsound.* Correct. On Isha they are
+  within 4 minutes of MWL, which is why they were dismissed; on **Fajr** they are 8–9 minutes
+  apart, and that is the one that matters for fasting.
+- *The `latitude >= 55` Moonsighting clamp uses a raw latitude, not `abs()`.* Confirmed in
+  bytecode. Consequence measured: at +56° on 21 June Fajr sits 55 minutes before sunrise, but
+  at −56° on 21 December it sits **2 hours** before. A real asymmetry — see §11.
+
+**Wrong, or overstated:**
+
+- *"Umm al-Qura is 30 minutes early during Ramadan."* **False for this app.** True of the
+  library, but `PrayerEngine.ishaFor` has always added the 30 minutes, using
+  `HijrahChronology`, which *is* the Umm al-Qura calendar — so the method and the calendar
+  agree by construction. The reviewer inferred from adhan's source without checking ours.
+- *"DST transitions may be off by an hour."* **Not a defect.** Verified across all four 2026
+  transitions in both hemispheres: London 28→29 Mar Dhuhr 12:08→13:08, 24→25 Oct 12:48→11:47;
+  Melbourne 4→5 Apr 13:24→12:24, 3→4 Oct 12:10→13:10. `java.time` handles it; the engine
+  returns `Instant` and formatting is the caller's job, which is the right split.
+- *"The Southern Hemisphere seasonal model is northern-centric."* **False.** adhan's
+  `daysSinceSolstice` branches on `latitude >= 0` and measures from the June solstice in the
+  south, and `seasonAdjusted*Twilight` uses `Math.abs(latitude)`. Only the 55° clamp is wrong.
+- *"London Unified is 12°/12°."* One reviewer asserted this, the other corrected it to Khalid
+  Shaukat's observation-guided seasonal model. **Not verified here either way** — flagged in
+  §11 rather than acted on, because a claim about a named authority needs their own document.
+- *"MWL is a bad default."* Neither said this outright, but both leaned that way. It is still
+  wrong: MWL is within ~5 minutes of local practice for most of the Ummah and only fails above
+  ~45°. See the earlier worldwide table. The defect is discoverability, not the default.
+
+**Measured method spread by latitude**, worst case over a full year across MWL, Egyptian,
+Karachi, ISNA and Moonsighting. This is the evidence for any latitude threshold, and it is
+symmetric, so the trigger must be `abs(latitude)`:
+
+| Latitude | Max Fajr spread | Max Isha spread |
+|---:|---:|---:|
+| 0° | 20 min | 13 min |
+| 20° | 24 min | 16 min |
+| 30° | 28 min | 21 min |
+| 40° | 40 min | 46 min |
+| **45° / −45°** | **57 min** | **74 min** |
+| 50° | 66 min | 88 min |
+| 55° | 102 min | 95 min |
+
+45° is where the spread crosses an hour, and −45° matches +45° exactly. That is the number to
+use, on absolute latitude, if a prompt is ever built.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -1857,6 +2017,66 @@ not imply that a more precise location would change them.
   ponytail: nothing here needs a new dependency, a new permission, or `ACCESS_FINE_LOCATION`.
   Fine location would be a privacy regression bought for zero minutes of accuracy, and it is
   ruled out — see §8 and the hard rules in `CLAUDE.md`.
+
+### Open decisions from the worldwide review (1 Aug 2026) — owner's call, not an agent's
+
+These come out of the global sweep and the two second opinions. Each is a *product* decision
+about how much the app should say on the user's behalf, and none should be taken unilaterally.
+The measurements behind them are in §10 and are not in doubt; what to do about them is.
+
+- **A1 — Decouple sect from calculation method.** Both reviewers called this the app's clearest
+  breach of its own principle, and they are right on the logic: `resolveMethod` maps
+  Sunni → MWL, but MWL is one organisation's 18°/17° convention, not a Sunni position. Turkey,
+  Egypt, Indonesia and Malaysia are all overwhelmingly Sunni and none of them use it. The
+  madhab question is different and must stay — it genuinely sets the Asr shadow ratio.
+  *Against changing it:* something has to be the default, every option is somebody's
+  convention, and an extra onboarding question costs every user to help some. *Middle option:*
+  keep MWL as the default but stop deriving it from sect, and say on screen which method is
+  in use. Not started.
+
+- **A2 — A one-time notice above 45° absolute latitude.** Measured, and 45 is the right number:
+  the worst-case spread between mainstream methods crosses an hour there, and −45° mirrors +45°
+  exactly, so the trigger must use `abs(latitude)`. A notice informs without choosing, which
+  is the distinction that makes it acceptable where auto-switching is not. Still needs a
+  decision on whether it appears at all. Not started.
+
+- **A3 — Show the active method on the home screen.** Cheapest of the lot and suggested by
+  both reviewers: a small "Calculation: MWL" line, tappable through to the picker. It makes the
+  choice visible to users who never open Settings and never read the disclaimer, which is most
+  of them. Not started.
+
+- **A4 — Whether `HighLatitudeRule` should be a user setting.** It is inert for Moonsighting
+  (§10) but decisive for the plain angle methods, where the three options are three different
+  religious approximations. Wifaqul Ulama's own published deliberation declined to name a
+  single agreed rule for Britain, so there is genuine plurality here and the app currently
+  picks one silently. *Against:* it is the most jargon-heavy setting imaginable and would
+  bewilder the majority to serve a minority. Not started.
+
+- **A5 — adhan's 55° Moonsighting clamp is not hemisphere-symmetric.** Confirmed in bytecode
+  and on the numbers: at +56° on 21 June Fajr sits 55 minutes before sunrise; at −56° on
+  21 December it sits two hours before. Compensating is a handful of lines. *Against:* almost
+  nobody lives below 55°S — Ushuaia at 54.8° is already above the line — so this is a
+  correctness itch more than a user problem. Deliberately left, and written down so the next
+  session does not rediscover it as a mystery.
+
+- **A6 — Whether to add Morocco (19°/17°) and a proper Wifaqul Ulama profile.** Morocco is
+  ~37 million Muslims and 4–7 minutes off MWL on Fajr; Wifaqul is a genuinely distinct UK
+  authority (18° Fajr, 15° Isha above 48°, plus hardship handling) that one reviewer measured
+  as differing from London Unified by up to 98 minutes on Fajr in midsummer. **That Wifaqul
+  comparison is the reviewer's, not ours, and has not been independently checked** — do not
+  quote it as verified. Likewise the claim that London Unified is *not* a fixed 12°/12°
+  timetable but Khalid Shaukat's seasonal model: plausible, unverified here, and it needs the
+  authority's own document before anything is built on it.
+
+- **A7 — The Moonsighting option must not be sold as "the UK method".** It is what the two
+  Slough mosques and London Unified use, and that is all we have measured. Two mosques in one
+  county are not a country. If the label ever gains a subtitle it should name who uses it, not
+  where.
+
+- **A8 — The watch does not show the polar approximation notice.** The phone does. The engine
+  fix is shared so the watch no longer crashes, but a Wear user above the Arctic Circle sees
+  projected times with nothing saying so. Small screen, no obvious room; needs a design
+  decision rather than a quick insertion.
 
 ### Not done, in rough priority order
 
@@ -2546,6 +2766,57 @@ matters more than the stable hashes, that is the trade being made.
     not cleverness, it was sameness: one `StepButtons` composable, Back and Continue, on every
     step that asks a question, and selecting only ever selects. **When a screen has empty space
     where a button should be, that space is telling the user something. Believe it.**
+
+44. **Test the whole world, or you are only testing yourself.** Every measurement in this
+    project had been taken at Slough, because that is where the person reporting problems
+    lives. The owner had to say it outright — *"don't just use Slough as an example … we are
+    trying to cater for the masses"* — before the sweep was widened. Within an hour that found
+    a **NullPointerException above 65.5°N that crashed the home screen, the watch tile, the
+    ongoing notification and the alarm scheduler**, in summer and in winter, in every release
+    shipped so far. It had been there from the first commit. No amount of testing at 51°N
+    would ever have found it, because the bug does not exist at 51°N.
+
+    The lesson is not "test more". It is that **a test suite inherits the blind spots of
+    whoever wrote it**, and the cheapest correction is to sweep the parameter rather than
+    sample it. Latitude from −90 to +90. Both solstices. Both hemispheres. All fourteen
+    methods. That sweep is six unit tests and runs in under a second.
+
+    A corollary about *reference points*: Aladhan does not crash at Tromsø, it degrades into
+    six identical useless times. **Checking what a mature implementation does in the same
+    situation is worth more than deciding for yourself what "correct" means.** We were not
+    merely different from the reference, we were strictly worse, and that is a fact you only
+    learn by going and looking.
+
+45. **A wrong label is a real defect, not cosmetics.** The app already computed Indonesian,
+    Malaysian and Singaporean prayer times perfectly — adhan's `SINGAPORE` preset is Fajr 20°
+    / Isha 18°, which is exactly Kemenag, JAKIM and MUIS. Verified at six cities in three
+    countries: 15 of 16 values identical to Aladhan. But it was labelled *"Singapore"*, so
+    roughly **270 million Muslims** — the largest bloc in the Ummah — had no reason to ever
+    select it, and sat on a default that put their Fajr eight minutes late.
+
+    Nothing was wrong with the mathematics. Nothing needed building. **When a feature exists
+    and nobody uses it, look at what it is called before you look at what it does.**
+
+46. **Take a second opinion seriously enough to check it.** Two other models reviewed this
+    design. Both were useful and neither was right to accept whole. They correctly caught that
+    adhan ignores `HighLatitudeRule` for Moonsighting, that `TWILIGHT_ANGLE` is itself a
+    religious choice, that a 55° clamp uses a raw rather than absolute latitude, and — most
+    valuably — that the whole investigation had ignored Fajr, which is the prayer that governs
+    fasting. All confirmed, all acted on.
+
+    They were also confidently wrong in ways that would have caused damage. One said Umm
+    al-Qura was 30 minutes out during Ramadan; it has never been, because `PrayerEngine`
+    already adjusts it. One said DST might be an hour out; all four 2026 transitions in both
+    hemispheres are exact. One said the Southern Hemisphere seasonal model was northern-
+    centric; adhan's `daysSinceSolstice` branches on the sign of the latitude. Each of those
+    was an inference from a library or a general pattern rather than from **this** codebase.
+
+    And the most interesting finding was one that **neither** of them reached: they both
+    assumed the Fajr risk was in Britain, where MWL is *earlier* than local practice and
+    therefore cautious. Measuring showed the danger is in Indonesia, where MWL is *later*.
+    **A second opinion is a source of hypotheses, not of conclusions. Check every claim
+    against your own code and an independent reference, and write down which ones were
+    wrong — otherwise the next session re-imports the same confident errors.**
 
 ---
 

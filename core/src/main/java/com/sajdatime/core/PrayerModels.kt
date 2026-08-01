@@ -84,6 +84,13 @@ data class Coordinates(val latitude: Double, val longitude: Double) {
 data class DayPrayerTimes(
     val date: LocalDate,
     val times: Map<PrayerSlot, Instant>,
+    /**
+     * True when the sun neither rose nor set at the user's own latitude, so the times
+     * are projected from 60 degrees instead — see [PrayerEngine] for the rule and why it
+     * is that figure. Only ever true above the polar circles. The UI must say so when it
+     * is set: an approximation the user is not told about is worse than no times at all.
+     */
+    val approximated: Boolean = false,
 ) {
     operator fun get(slot: PrayerSlot): Instant = times.getValue(slot)
 
