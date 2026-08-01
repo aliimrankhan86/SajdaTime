@@ -2,7 +2,6 @@ package com.sajdatime.app.ui.settings
 
 import android.content.Intent
 import android.media.RingtoneManager
-import android.os.Build
 import androidx.core.net.toUri
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
-import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.NotificationsActive
@@ -39,6 +37,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -78,7 +77,7 @@ import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 
 /** Which chooser is currently open, if any. Only one can be at a time. */
-private enum class Chooser { SCHOOL, METHOD, ALERTS, PRAYERS, LOCATION, DISCLAIMER }
+private enum class Chooser { SCHOOL, METHOD, ALERTS, LOCATION, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -86,9 +85,9 @@ fun SettingsScreen(
     onSetSect: (Sect) -> Unit,
     onSetMadhab: (Madhab) -> Unit,
     onSetMethod: (CalcMethod) -> Unit,
-    onSetNotify: (PrayerSlot, Boolean) -> Unit,
+    onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
-    onSetAlertStyle: (AlertStyle) -> Unit,
+    onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
@@ -119,19 +118,10 @@ fun SettingsScreen(
             WarningRow(
                 title = stringResource(R.string.settings_exact_alarms_title),
                 body = stringResource(R.string.settings_exact_alarms_desc),
-                onClick = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        runCatching {
-                            context.startActivity(
-                                Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                                    .setData("package:${context.packageName}".toUri()),
-                            )
-                        }
-                    }
-                },
+                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
             )
         }
-        if (settings.alertStyle == AlertStyle.ALARM && !Notifications.hasDndAccess(context)) {
+        if (settings.usesAlarm && !Notifications.hasDndAccess(context)) {
             WarningRow(
                 title = stringResource(R.string.settings_dnd_title),
                 body = stringResource(R.string.settings_dnd_desc),
@@ -180,17 +170,15 @@ fun SettingsScreen(
         }
 
         Group(stringResource(R.string.settings_group_reminders)) {
+            // One row, not two. "Which prayers" and "How you are told" were separate
+            // choosers answering halves of the same question, and between them they could
+            // not express "wake me for Fajr, a quiet notification for the rest" — which is
+            // what a tester asked for. Off is now simply having no style.
             SettingRow(
                 icon = Icons.Outlined.NotificationsActive,
                 title = stringResource(R.string.settings_alerts),
-                subtitle = alertSummary(settings.alertStyle),
+                subtitle = alertSummary(settings.alertFor),
                 onClick = { open = Chooser.ALERTS },
-            )
-            SettingRow(
-                icon = Icons.Outlined.Checklist,
-                title = stringResource(R.string.settings_which_prayers),
-                subtitle = prayerCountSummary(settings.notifyFor.size),
-                onClick = { open = Chooser.PRAYERS },
             )
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
@@ -262,16 +250,12 @@ fun SettingsScreen(
         )
 
         Chooser.ALERTS -> AlertsDialog(
-            style = settings.alertStyle,
+            alertFor = settings.alertFor,
             alarmSoundUri = settings.alarmSoundUri,
-            onSelectStyle = onSetAlertStyle,
+            respectsSilent = settings.alarmRespectsSilent,
+            onSetAlert = onSetAlert,
+            onSetRespectsSilent = onSetAlarmRespectsSilent,
             onPickAlarmSound = onPickAlarmSound,
-            onDismiss = { open = null },
-        )
-
-        Chooser.PRAYERS -> PrayersDialog(
-            enabled = settings.notifyFor,
-            onSetNotify = onSetNotify,
             onDismiss = { open = null },
         )
 
@@ -314,19 +298,23 @@ private fun schoolSummary(sect: Sect, madhab: Madhab): String = when (sect) {
     Sect.SHIA -> stringResource(R.string.sect_shia)
 }
 
+/** "All five · Notification", "2 of 5 · Mixed", or just "None". */
 @Composable
-private fun alertSummary(style: AlertStyle): String = stringResource(
-    when (style) {
-        AlertStyle.NOTIFICATION -> R.string.alert_style_notification
-        AlertStyle.ALARM -> R.string.alert_style_alarm
-    },
-)
-
-@Composable
-private fun prayerCountSummary(count: Int): String = when (count) {
-    0 -> stringResource(R.string.settings_which_prayers_none)
-    5 -> stringResource(R.string.settings_which_prayers_all)
-    else -> stringResource(R.string.settings_which_prayers_some, count)
+private fun alertSummary(alertFor: Map<PrayerSlot, AlertStyle>): String {
+    if (alertFor.isEmpty()) return stringResource(R.string.settings_which_prayers_none)
+    val count = when (alertFor.size) {
+        5 -> stringResource(R.string.settings_which_prayers_all)
+        else -> stringResource(R.string.settings_which_prayers_some, alertFor.size)
+    }
+    val styles = alertFor.values.toSet()
+    val style = stringResource(
+        when {
+            styles.size > 1 -> R.string.alert_style_mixed
+            styles.single() == AlertStyle.ALARM -> R.string.alert_style_alarm
+            else -> R.string.alert_style_notification
+        },
+    )
+    return stringResource(R.string.settings_value_pair, count, style)
 }
 
 // --- choosers ----------------------------------------------------------------------------
@@ -416,34 +404,41 @@ private fun MethodPickerDialog(
     }
 }
 
-/** Alert style, and the sound that goes with it once alarm mode is chosen. */
+/**
+ * Every prayer, and how each one announces itself. Off, a quiet notification, or a full
+ * alarm — chosen per prayer, because "wake me for Fajr, do not shout at me for Dhuhr" is
+ * the request this screen exists to answer.
+ *
+ * The alarm sound and the silent-mode switch appear only once at least one prayer is set
+ * to Alarm, rather than sitting greyed out for the majority who never leave the default.
+ */
 @Composable
 private fun AlertsDialog(
-    style: AlertStyle,
+    alertFor: Map<PrayerSlot, AlertStyle>,
     alarmSoundUri: String,
-    onSelectStyle: (AlertStyle) -> Unit,
+    respectsSilent: Boolean,
+    onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
+    onSetRespectsSilent: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_alerts), onDismiss = onDismiss) {
-        Column(Modifier.selectableGroup()) {
-            RadioRow(
-                label = stringResource(R.string.alert_style_notification),
-                supporting = stringResource(R.string.alert_style_notification_desc),
-                selected = style == AlertStyle.NOTIFICATION,
-                onSelect = { onSelectStyle(AlertStyle.NOTIFICATION) },
-            )
-            RadioRow(
-                label = stringResource(R.string.alert_style_alarm),
-                supporting = stringResource(R.string.alert_style_alarm_desc),
-                selected = style == AlertStyle.ALARM,
-                onSelect = { onSelectStyle(AlertStyle.ALARM) },
+        Text(
+            text = stringResource(R.string.settings_alerts_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+
+        PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
+            AlertChoiceRow(
+                label = stringResource(slot.labelRes),
+                selected = alertFor[slot],
+                onSelect = { onSetAlert(slot, it) },
             )
         }
 
-        // Only meaningful once alarm mode is on, so it appears then rather than sitting
-        // greyed out.
-        if (style == AlertStyle.ALARM) {
+        if (alertFor.containsValue(AlertStyle.ALARM)) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SettingRow(
                 title = stringResource(R.string.settings_alarm_sound),
@@ -454,23 +449,52 @@ private fun AlertsDialog(
                 onClick = onPickAlarmSound,
                 horizontalPadding = 0.dp,
             )
+            SwitchRow(
+                title = stringResource(R.string.settings_alarm_respect_silent),
+                subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
+                checked = respectsSilent,
+                onCheckedChange = onSetRespectsSilent,
+                horizontalPadding = 0.dp,
+            )
         }
     }
 }
 
+/**
+ * One prayer, three mutually exclusive answers.
+ *
+ * Chips in a FlowRow rather than a Row of radio buttons: three labelled radios do not fit
+ * across a phone beside a prayer name at a raised system font size, and the one that would
+ * be clipped is "Alarm" — the whole reason anyone opens this.
+ */
 @Composable
-private fun PrayersDialog(
-    enabled: Set<PrayerSlot>,
-    onSetNotify: (PrayerSlot, Boolean) -> Unit,
-    onDismiss: () -> Unit,
+private fun AlertChoiceRow(
+    label: String,
+    selected: AlertStyle?,
+    onSelect: (AlertStyle?) -> Unit,
 ) {
-    ChooserDialog(title = stringResource(R.string.settings_which_prayers), onDismiss = onDismiss) {
-        PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
-            SwitchRow(
-                title = stringResource(slot.labelRes),
-                checked = slot in enabled,
-                onCheckedChange = { onSetNotify(slot, it) },
-                horizontalPadding = 0.dp,
+    Column(Modifier.padding(vertical = 10.dp)) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+        Spacer(Modifier.height(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.selectableGroup(),
+        ) {
+            ChoiceChip(
+                label = stringResource(R.string.alert_style_off),
+                selected = selected == null,
+                onClick = { onSelect(null) },
+            )
+            ChoiceChip(
+                label = stringResource(R.string.alert_style_notification),
+                selected = selected == AlertStyle.NOTIFICATION,
+                onClick = { onSelect(AlertStyle.NOTIFICATION) },
+            )
+            ChoiceChip(
+                label = stringResource(R.string.alert_style_alarm),
+                selected = selected == AlertStyle.ALARM,
+                onClick = { onSelect(AlertStyle.ALARM) },
             )
         }
     }
@@ -585,31 +609,46 @@ private fun ThemeRow(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit) {
                 .selectableGroup(),
         ) {
             ThemeChoice.entries.forEach { choice ->
-                val selected = current == choice
-                Text(
-                    text = stringResource(labels.getValue(choice)),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (selected) scheme.onSecondaryContainer else scheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(if (selected) scheme.secondaryContainer else Color.Transparent)
-                        .border(
-                            width = 1.dp,
-                            color = if (selected) scheme.primary else scheme.outline,
-                            shape = RoundedCornerShape(50),
-                        )
-                        // selectable, not clickable: a screen reader should say "selected"
-                        // on the active chip, and three chips are one choice, not three.
-                        .selectable(
-                            selected = selected,
-                            role = Role.RadioButton,
-                            onClick = { onSelect(choice) },
-                        )
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                ChoiceChip(
+                    label = stringResource(labels.getValue(choice)),
+                    selected = current == choice,
+                    onClick = { onSelect(choice) },
                 )
             }
         }
     }
+}
+
+/**
+ * One option in a small horizontal set. Used by the theme picker and by the per-prayer
+ * alert picker, which is the only reason it is not still inlined in the theme row.
+ *
+ * `selectable`, not `clickable`: a screen reader should announce "selected" on the active
+ * chip, and a set of chips is one choice rather than three independent buttons.
+ */
+@Composable
+private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    Text(
+        text = label,
+        style = MaterialTheme.typography.bodyMedium,
+        color = if (selected) scheme.onSecondaryContainer else scheme.onSurfaceVariant,
+        modifier = Modifier
+            // Grows the touch target to the 48dp minimum without growing the chip itself.
+            // A chip this size draws at about 40dp, which reads fine and misses the
+            // accessibility floor — the two are separate measurements and only one of
+            // them is visible.
+            .minimumInteractiveComponentSize()
+            .clip(RoundedCornerShape(50))
+            .background(if (selected) scheme.secondaryContainer else Color.Transparent)
+            .border(
+                width = 1.dp,
+                color = if (selected) scheme.primary else scheme.outline,
+                shape = RoundedCornerShape(50),
+            )
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+    )
 }
 
 /** Same amber treatment as the banners on Times, so a warning looks like a warning. */

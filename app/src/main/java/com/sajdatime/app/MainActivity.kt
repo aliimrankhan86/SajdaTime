@@ -116,9 +116,9 @@ class MainActivity : ComponentActivity() {
                             onSetSect = viewModel::setSect,
                             onSetMadhab = viewModel::setMadhab,
                             onSetMethod = viewModel::setMethod,
-                            onSetNotify = viewModel::setNotify,
+                            onSetAlert = viewModel::setAlert,
                             onSetOngoingBadge = viewModel::setOngoingBadge,
-                            onSetAlertStyle = viewModel::setAlertStyle,
+                            onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                             onPickAlarmSound = {
                                 openAlarmSoundPicker(state.settings.alarmSoundUri)
                             },

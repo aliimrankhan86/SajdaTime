@@ -188,14 +188,15 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setMethod(method: CalcMethod) = viewModelScope.launch { settingsRepository.setMethod(method) }
 
-    fun setNotify(slot: PrayerSlot, enabled: Boolean) =
-        viewModelScope.launch { settingsRepository.setNotify(slot, enabled) }
+    /** [style] of null silences that prayer. */
+    fun setAlert(slot: PrayerSlot, style: AlertStyle?) =
+        viewModelScope.launch { settingsRepository.setAlert(slot, style) }
 
     fun setOngoingBadge(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setOngoingBadge(enabled) }
 
-    fun setAlertStyle(style: AlertStyle) =
-        viewModelScope.launch { settingsRepository.setAlertStyle(style) }
+    fun setAlarmRespectsSilent(respects: Boolean) =
+        viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
 
     fun dismissExactAlarmNotice() =
         viewModelScope.launch { settingsRepository.dismissExactAlarmNotice() }

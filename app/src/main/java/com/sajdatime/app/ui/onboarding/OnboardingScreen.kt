@@ -18,11 +18,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -32,7 +35,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +44,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,7 +52,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -60,6 +68,8 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.Sect
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.ui.components.ProgressRow
 import com.sajdatime.app.ui.components.SectionHeading
 
 private enum class Step { WELCOME, PERMISSION, SECT, MADHAB, CONFIRM }
@@ -136,6 +146,13 @@ private fun StepScaffold(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            // imePadding *outside* verticalScroll, so the keyboard shrinks the scrolling
+            // viewport rather than being drawn over the end of it. The other order
+            // compiles, looks identical in a preview, and leaves the last control
+            // permanently under the keyboard. enableEdgeToEdge means adjustResize in the
+            // manifest no longer moves the window on its own, so without this the city
+            // field on the location step is typed into blind. See HANDOVER §15.
+            .imePadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 32.dp),
     ) {
@@ -207,9 +224,22 @@ private fun PermissionStep(
 ) {
     var explaining by rememberSaveable { mutableStateOf(false) }
     var city by rememberSaveable { mutableStateOf("") }
-    val denied = state.problem == LocationProblem.PERMISSION_DENIED ||
-        state.problem == LocationProblem.NO_FIX
+    var searchingCity by rememberSaveable { mutableStateOf(false) }
     val located = state.settings.coordinates != null
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    // The search has finished when the view model stops resolving. Keyed on that flag
+    // alone, so the effect can only act on the true -> false edge and never on the gap
+    // between the tap and the coroutine starting.
+    LaunchedEffect(state.resolvingLocation) {
+        if (searchingCity && !state.resolvingLocation) searchingCity = false
+    }
+
+    val findCity = {
+        keyboard?.hide()
+        searchingCity = true
+        onSearchCity(city)
+    }
 
     if (explaining) {
         AlertDialog(
@@ -254,20 +284,9 @@ private fun PermissionStep(
 
         // Without this the buttons simply grey out while a fix is awaited, which reads as
         // a frozen screen. Location can legitimately take several seconds indoors.
-        if (state.resolvingLocation) {
+        if (state.resolvingLocation && !searchingCity) {
             Spacer(Modifier.height(20.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                CircularProgressIndicator(
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.size(20.dp),
-                )
-                Spacer(Modifier.width(14.dp))
-                Text(
-                    text = stringResource(R.string.location_finding),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
+            ProgressRow(stringResource(R.string.location_finding))
         }
 
         if (located && !state.resolvingLocation) {
@@ -284,9 +303,22 @@ private fun PermissionStep(
             )
         }
 
-        if (denied) {
+        // Offered until a location exists, and gated on nothing else.
+        //
+        // This used to appear only while `problem` was PERMISSION_DENIED or NO_FIX, which
+        // made the whole block — field, button, error message and the Makkah escape —
+        // disappear the instant "Find city" was pressed, because searching sets
+        // `problem` to null and a failure sets it to CITY_NOT_FOUND. Neither is in that
+        // pair. A user who declined location and mistyped a city was left on a screen
+        // with a disabled Continue and no way forward at all, and the "we could not find
+        // that place" message they needed was inside the block that had just vanished.
+        // Reproduced on device before the fix, and again after. See HANDOVER §10.
+        //
+        // Showing it up front also answers T3's fourth point: manual entry was always
+        // there and nobody could find it.
+        if (!located) {
             Spacer(Modifier.height(28.dp))
-            SectionHeading(stringResource(R.string.city_fallback_heading))
+            SectionHeading(stringResource(R.string.location_sheet_search_heading))
             Spacer(Modifier.height(8.dp))
             Text(
                 text = stringResource(R.string.city_fallback_body),
@@ -294,31 +326,43 @@ private fun PermissionStep(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
+            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND
             OutlinedTextField(
                 value = city,
                 onValueChange = { city = it },
                 label = { Text(stringResource(R.string.city_field_label)) },
                 supportingText = {
-                    val error = state.problem == LocationProblem.CITY_NOT_FOUND
                     Text(
                         text = stringResource(
-                            if (error) R.string.city_not_found else R.string.city_field_helper,
+                            if (notFound) R.string.city_not_found else R.string.city_field_helper,
                         ),
                     )
                 },
-                isError = state.problem == LocationProblem.CITY_NOT_FOUND,
+                isError = notFound,
                 singleLine = true,
+                // The keyboard's own search key is the first thing a user reaches for,
+                // and without this it only closed the keyboard.
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { if (city.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(8.dp))
             OutlinedButton(
-                onClick = { onSearchCity(city) },
+                onClick = findCity,
                 enabled = city.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.action_find_city))
+            }
+
+            // Said next to the field it belongs to, and in its own words. The one spinner
+            // this screen had said "Finding your location…" beside the GPS button, which
+            // is the wrong sentence in the wrong place for a typed-in city.
+            if (searchingCity && state.resolvingLocation) {
+                Spacer(Modifier.height(12.dp))
+                ProgressRow(stringResource(R.string.location_looking_up))
             }
 
             // Nobody should be stuck at setup. If neither route works, Makkah keeps the
@@ -460,6 +504,15 @@ private fun MadhabStep(
 
 @Composable
 private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
+    val context = LocalContext.current
+    // Recomposed when the step is re-entered after the system screen returns, so the
+    // offer disappears once the permission has actually been granted rather than
+    // continuing to ask for something the user has already done.
+    var exactAllowed by remember { mutableStateOf(PrayerAlarmScheduler.canScheduleExact(context)) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        exactAllowed = PrayerAlarmScheduler.canScheduleExact(context)
+    }
+
     StepScaffold(
         title = stringResource(R.string.confirm_title),
         body = stringResource(R.string.confirm_body),
@@ -494,6 +547,36 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                 )
             }
         }
+
+        // Asked once, here, because a prayer alert that arrives late is not a prayer
+        // alert. From Android 13 "Alarms & reminders" is *denied by default*, and without
+        // it the app can only fall back to an alarm the system is documented as being
+        // free to move — Google publishes no upper bound on how late that can be. The
+        // banners on Times and Settings were the only mention of this, and a banner about
+        // a setting is not the same as being asked.
+        //
+        // Deliberately not a blocker: Finish is right underneath, unconditional, and the
+        // app works without it. See HANDOVER §10.
+        if (!exactAllowed) {
+            Spacer(Modifier.height(24.dp))
+            SectionHeading(stringResource(R.string.confirm_exact_alarm_title))
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.confirm_exact_alarm_body),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(12.dp))
+            OutlinedButton(
+                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                Text(stringResource(R.string.settings_exact_alarms_title))
+            }
+        }
+
         Spacer(Modifier.height(32.dp))
         Button(
             onClick = onFinish,

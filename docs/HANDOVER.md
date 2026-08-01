@@ -117,6 +117,25 @@ Do not remove, soften, or bury this. It is a stated requirement, not decoration.
   Verifying *against* Aladhan during development is correct and encouraged (§15 item 3).
   Calling it from the shipped app is not. These are not the same thing.
 
+- **`USE_EXACT_ALARM`.** Checked properly on 1 Aug 2026 and rejected, so that the next
+  session does not rediscover it as an obvious win — because on the technical merits it is
+  one. It is the *only* documented way to keep an app floored at the WORKING_SET standby
+  bucket, and at targetSdk 36 `SCHEDULE_EXACT_ALARM` no longer provides that floor, so
+  without it a rarely-opened app can drift to Restricted and its documented allowance of
+  **one alarm per day**.
+
+  It is refused on policy, not on engineering. Play names exactly two qualifying categories,
+  *"an alarm or timer app"* and *"a calendar app that shows event notifications"*, and the
+  penalty for a category claim Google disagrees with is being *"disallowed from publishing"*
+  that release. A prayer app with recurring user-set alerts is arguable. Arguable is not a
+  category, and the cost of losing the argument is a blocked release on a project that has
+  already spent a fortnight collecting twelve testers. Sourcing:
+  `docs/reviews/2026-08-01-android-alarm-facts.md` §3.
+
+- **`USE_FULL_SCREEN_INTENT`.** Same shape of reason. Its auto-grant list at targetSdk 34+ is
+  *narrower* still — "setting an alarm" or "receiving phone or video calls", with no calendar
+  bullet — and a prayer notification does not need to seize the whole screen.
+
 ---
 
 ## 3. Module layout
@@ -196,10 +215,12 @@ data class AppSettings(
     val method: CalcMethod = CalcMethod.AUTO,
     val coordinates: Coordinates? = null,
     val cityName: String = "",
-    val notifyFor: Set<PrayerSlot> = <all five prayers>,  // absent slots default to on
+    // How each prayer announces itself. A prayer absent from the map is silent — there is
+    // no separate on/off switch, because "off" is simply having no style.
+    val alertFor: Map<PrayerSlot, AlertStyle> = <all five -> NOTIFICATION>,
     val ongoingBadge: Boolean = true,      // silent, costs nothing, so on by default
-    val alertStyle: AlertStyle = AlertStyle.NOTIFICATION,   // ALARM is opt-in
     val alarmSoundUri: String = "",        // empty = device default alarm
+    val alarmRespectsSilent: Boolean = true,   // alarm falls back to a quiet notification
     val disclaimerSeen: Boolean = false,
     val usingDefaultLocation: Boolean = false,  // true once Makkah was used as fallback
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,  // SYSTEM resolves to light
@@ -208,6 +229,16 @@ data class AppSettings(
 
 `PrayerSlot`: `FAJR, SUNRISE, DHUHR, ASR, MAGHRIB, ISHA` — `isPrayer` is false for
 `SUNRISE`, which is why it is displayed but never notified and never "next".
+
+**`alertFor` replaced two keys, and the migration is tested.** It supersedes
+`notify_slots` (which prayers) and `alert_style` (one global how). Both old keys are still
+*read*, never written, by `AlertCodec.migrate` — see `AlertCodecTest`. The distinction that
+matters: the old `notify_slots` stored "no prayers" as an **empty string** and "never
+touched" as an **absent key**, so conflating the two would give the one user who had
+deliberately silenced everything five unexpected alerts the morning after an update. Stored
+form is `"FAJR:ALARM,DHUHR:NOTIFICATION,…"`, sorted by the enum's own order so an unchanged
+setting is not rewritten. Unknown slots and unknown styles are dropped entry by entry rather
+than throwing, because preferences outlive the code that wrote them.
 
 Enums are read back defensively (`enumValues<T>().firstOrNull { it.name == name } ?: fallback`)
 so a renamed or removed constant in a future version degrades to the default instead of
@@ -236,8 +267,17 @@ raster assets anywhere in the app itself. The Play Store icon and feature graphi
 Welcome/bismillah → coarse-location permission with an **(i) info icon** explaining why it
 is needed → Sunni/Shia cards → madhab (shown **only for Sunni**, and **skippable**; Shia
 skips straight to confirm because Jafari fixes the Asr rule anyway) → confirmation →
-finish. Then the one-time disclaimer dialog. A "Skip for now and use Makkah" escape exists
-at the permission step.
+finish. Then the one-time disclaimer dialog.
+
+The **PERMISSION** step always offers both routes at once: "Allow location", and below it
+"Or type a city" with a field, a Find city button and a "Skip for now and use Makkah"
+escape. All three are shown until a location exists and are gated on nothing else — see
+lesson 52 for the first-run dead end that the previous, cleverer condition produced.
+
+The **CONFIRM** step ends with a one-time offer to grant "Alarms & reminders" when it is
+missing, because that permission is denied by default from Android 13 and a banner about a
+setting is not the same as being asked. Finish sits underneath it, unconditional: it is an
+offer, never a gate.
 
 ### Times screen (home)
 - Tappable location header showing city + **Hijri date**
@@ -271,7 +311,7 @@ nobody found them.
 |---|---|
 | **PRAYER TIMES** | Location (pin icon, city as subtitle) · School of thought ("Sunni · Hanafi") · Calculation method |
 | **APPEARANCE** | Theme — three chips, Follow phone / Light / Dark. Chips rather than a chooser because the result is visible the instant it is tapped, and a dialog would sit on top of the change it just made |
-| **REMINDERS** | How you are told (Notification / Alarm, with the sound picker and DND warning inside) · Which prayers ("All five" / "3 of 5") · Next-prayer badge switch, inline |
+| **REMINDERS** | Prayer alerts — Off / Notification / Alarm **per prayer**, with the sound picker, the silent-mode switch and the DND warning inside · Next-prayer badge switch, inline |
 | **ABOUT** | Version · Disclaimer · Privacy (opens the hosted policy) · Free, forever · Made by · Data and libraries |
 
 Any row that opens something carries a chevron, so "this is tappable" is never a guess.
@@ -285,8 +325,14 @@ twice for the same thing is asking too often.
 ### Notifications
 - **Default: notification + vibration + silent badge.** Alarm is **off** by default — this
   was an explicit user instruction.
+- **The style is chosen per prayer, not once for the app.** Off, Notification or Alarm, for
+  each of the five, in one chooser. A tester asked to be woken for Fajr and left alone for
+  the rest, and a single global radio could not say that. See §5.12.
 - **Alarm mode is opt-in** and requires the user to pick their own tone. No adhan audio is
   bundled (licensing + APK size).
+- **An alarm stays quiet while the phone is silenced**, unless the user turns that off. The
+  notification still arrives, on time, in the shade and as a heads-up — only the sound is
+  dropped. See §5.13.
 - **What actually carries an alarm through Do Not Disturb is `USAGE_ALARM` on the channel
   plus `CATEGORY_ALARM` on the notification**, not `setBypassDnd(true)`. That call is a
   no-op without notification policy access, which this app does not ask for: read the
@@ -294,10 +340,10 @@ twice for the same thing is asking too often.
   the user ever grants the access. Verified on an API 36 emulator under
   `ZEN_MODE_IMPORTANT_INTERRUPTIONS`: the prayer alarm posted with `mIntercept=false` while
   the silent next-prayer badge was intercepted, which is the behaviour wanted for both.
-- **The alarm survives Doze.** `setAlarmClock` in alarm mode, `setExactAndAllowWhileIdle`
-  otherwise; both carry `FLAG_WAKE_FROM_IDLE`. Verified under forced deep idle: `dumpsys
-  alarm` named SajdaTime as `Next wake from idle`, `whenElapsed` was not deferred, and
-  crossing the trigger time posted "Time for Asr" and rolled the badge on to Maghrib.
+- **The alarm survives Doze.** `setAlarmClock` for **every** prayer alert now, whatever
+  style it will eventually make — see §6. Verified under forced deep idle: `dumpsys alarm`
+  named SajdaTime as `Next wake from idle`, `whenElapsed` was not deferred, and crossing the
+  trigger time posted "Time for Asr" and rolled the badge on to Maghrib.
 - Optional silent ongoing "next prayer" badge in the shade.
 
 ### PDF export
@@ -604,33 +650,113 @@ phone was already producing before this change; the old screenshots showing `PM`
 on an `en-US` emulator and never matched what a UK user saw. `docs/store/screenshots/` was
 retaken.
 
+### 5.12 Alerts are chosen per prayer
+
+`alertFor: Map<PrayerSlot, AlertStyle>`. Off, Notification or Alarm, for each of the five.
+Absence from the map is off; there is no separate on/off flag.
+
+This replaced two settings — "Which prayers" and "How you are told" — that between them
+answered halves of one question and could not express the request that produced them: *an
+alarm loud enough to wake me for Fajr, and a quiet notification for the four I am already
+awake for.* Collapsing them removed a settings row rather than adding one.
+
+Defaults are unchanged and stay deliberately quiet: **all five, Notification.** Nothing is
+ever loud until asked. The alarm sound row and the silent-mode switch appear only once at
+least one prayer is set to Alarm, rather than sitting greyed out for the majority who never
+leave the default.
+
+Rejected: keeping the global style and adding a per-prayer override set. It preserves the
+same two-settings confusion and needs a rule for what happens when the two disagree.
+
+### 5.13 An alarm stays quiet while the phone is silenced
+
+`alarmRespectsSilent`, **on by default**. When it is on and `AudioManager.getRingerMode()`
+is `RINGER_MODE_SILENT` or `RINGER_MODE_VIBRATE`, an Alarm-style alert is posted on the
+quiet channel instead. It still arrives on time, in the shade and as a heads-up — only the
+sound is dropped.
+
+**This is a fix, not a preference, and here is why it was needed.** Android deliberately does
+*not* mute the alarm stream with the ringer: the streams it mutes are RING, NOTIFICATION,
+SYSTEM and SYSTEM_ENFORCED, and turning STREAM_ALARM into one of them is an opt-in device
+resource (`config_audio_ringer_mode_affects_alarm_stream`) that defaults to false. That is
+right for a clock someone set for one morning and wrong for a recurring alert five times a
+day from an app they installed yesterday. A tester reported the alarm sounding through a
+silenced phone, and he was right to.
+
+**Vibrate counts as silenced.** Someone who has taken the ringer down to vibrate has asked
+for no sound just as plainly as someone on full silent, and the quiet channel still vibrates.
+
+**Why the default is on, when a real alarm clock's would be off.** Making noise from a phone
+that has visibly been silenced is a top reason a charity app gets uninstalled, and the user
+who genuinely wants Fajr regardless can turn the switch off — where the wording says exactly
+what that costs. The switch exists precisely because this is a judgement call and not a fact.
+
+**Deliberately not consulting Do Not Disturb.** DND allows alarms by default, it has its own
+separate opt-in on the Settings screen, and `getRingerMode()` is the question the user
+actually answered with the volume keys. Note also that `getRingerMode()` returns the
+*external* mode, which can diverge from the internal one after a ringer change made while DND
+is active — it is the right API to ask about the ringer and the wrong one to ask about DND.
+
 ---
 
 ## 6. Notification and alarm architecture
 
-### Reliability — four independent reschedule triggers
+### Reliability — five independent reschedule triggers
 No single failure silently stops notifications:
 1. every time the app is opened
 2. every time an alarm fires (chains the next window)
 3. a WorkManager job (12-hour period)
 4. `BOOT_COMPLETED` / `TIMEZONE_CHANGED` / `TIME_SET` / `MY_PACKAGE_REPLACED`
+5. `android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED` — Android 12+
 
 Alarms are laid down `HORIZON_DAYS = 2` ahead, so a missed daily job is survivable.
 
-### Exact alarms — a trap that caused a real crash
+**Why (5) matters in both directions.** Granting "Alarms & reminders" is the moment the
+whole schedule can be upgraded from a one-hour delivery window to an exact one, and without
+this receiver that upgrade waited until the user next opened the app — which for this app
+may be days, because the notification *is* the product. Revoking it cancels every future
+exact alarm the app has already set, so the schedule has to be re-laid in whatever weaker
+form is still permitted. Verified: running only `appops set … SCHEDULE_EXACT_ALARM allow`,
+without touching the app, flipped every pending alarm from `window=+1h0m0s0ms` to
+`window=0` in `dumpsys alarm`.
+
+### Exact alarms — the ladder, and why every alert now uses `setAlarmClock`
+
 `SCHEDULE_EXACT_ALARM` is **denied by default from Android 13**, and **`setAlarmClock`
 requires it too** (an early assumption that it did not caused a `SecurityException` crash
-on first launch). Strategy now:
+on first launch). Three rungs, each tried only if the one above it failed:
 
 ```kotlin
-if (canScheduleExact(manager)) manager.setExactAndAllowWhileIdle(...)
-else                          manager.setAndAllowWhileIdle(...)
-// plus a runCatching fallback to setAndAllowWhileIdle if the exact call throws anyway,
-// because some OEM builds revoke the capability between the check and the call
+1. setAlarmClock                — needs SCHEDULE_EXACT_ALARM, no exemption clause
+2. setExactAndAllowWhileIdle    — still exact; a battery-exempt app may call it without
+                                  the permission, which rung 1 cannot use
+3. setAndAllowWhileIdle         — inexact, never throws, always available
 ```
 
-Settings shows a banner offering to grant it. Without it, alerts fire within a few minutes
-rather than on the minute.
+`runCatching` at each rung rather than a permission check alone, because some OEM builds and
+work profiles revoke the capability between the check and the call.
+
+**Notification style used to get rung 2 and now gets rung 1.** The old comment here said the
+quieter alarm was chosen so the app "does not claim a status bar icon it has not earned".
+That is overruled, on evidence: `setAlarmClock` is the only API Google describes as never
+moved (*"the system never adjusts their delivery time"*), while `setExactAndAllowWhileIdle`
+carries the opposite promise in the same reference and a rate limit Google's own pages state
+three incompatible ways. The status bar alarm icon is a cosmetic cost; an alert that arrives
+after the prayer has begun is a functional failure. The icon is also **true** — an alarm
+really is scheduled. Full sourcing: `docs/reviews/2026-08-01-android-alarm-facts.md`.
+
+**Measured, not assumed.** Without the permission, `dumpsys alarm` showed
+`window=+1h0m0s0ms` — a **one-hour** delivery window, not "a few minutes". The user-facing
+wording was corrected to match, and onboarding's last step now asks for the permission
+outright instead of leaving it to a banner.
+
+**What this does not fix, and must not be claimed to.** App Standby buckets. Google
+documents no exemption from them for `setAlarmClock`, and a Restricted-bucket app is held to
+*"One alarm per day, either an exact alarm or an inexact alarm"*. Worse, `SCHEDULE_EXACT_ALARM`
+only floors an app at WORKING_SET when it **targets API 33 or below**; this app targets 36,
+so it has no floor. Only `USE_EXACT_ALARM` gives one, and that permission is Play-gated to
+alarm-clock and calendar apps — see §11 for why it was checked and rejected rather than
+claimed.
 
 ### Channels — sound is immutable, so channels are versioned
 Android binds sound and importance to the **channel**, not the notification. A channel's
@@ -776,17 +902,19 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**57 unit tests, all offline and deterministic, 0 failures.**
+**83 unit tests, all offline and deterministic, 0 failures.**
 
 | Suite | Module | Tests | Covers |
 |---|---|---|---|
-| `PrayerEngineTest` | core | 17 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
+| `PrayerEngineTest` | core | 22 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
+| `PolarAndHemisphereTest` | core | 13 | Every 0.5° pole to pole × every day of 2026 × both madhabs is in order; Dhuhr sits mid-day-arc; the days that were silently wrong are flagged; the reference latitude follows the method; Moonsighting reproduces its own published Oslo extremes; the Shia Maghrib path survives every latitude |
 | `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
 | `LocaleDisciplineTest` | core | 4 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11) |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
+| `AlertCodecTest` | app | 8 | Per-prayer alert round-trip and stable ordering; rubbish dropped entry by entry rather than thrown; Sunrise refused; and the upgrade from the two keys it replaced — including the empty-string-versus-absent-key distinction that decides whether a user who silenced everything gets five alerts back (§3, persisted data model) |
 | `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
 | `WearSettingsTest` | wear | 4 | Synced settings reach the engine intact; unpaired watch still calculates; the wire-key contract |
 
@@ -2131,6 +2259,119 @@ Isha 00:14 and Fajr 00:52, 38 minutes of night. Recorded as A12; not changed, be
 partial substitution (Fajr and Isha only, sunrise and sunset staying local) which is a design
 decision, not a constant.
 
+### The second round of tester feedback, and a first-run trap underneath it (1 Aug 2026)
+
+Five complaints arrived from the closed test. Four were about alerts; one was *"user typing
+city name but its not selecting it"*, with a screenshot. Every one of them was reproduced on
+a device before anything was changed, and reproducing the last one found something nobody had
+reported.
+
+#### 1. The first-run dead end — the worst defect in this file since the polar Asr
+
+**A user who declined location and mistyped a city could not proceed, at all.**
+
+`OnboardingScreen.PermissionStep` showed the city block only while `problem` was
+`PERMISSION_DENIED` or `NO_FIX`. Searching sets `problem` to null, and a failed search sets
+it to `CITY_NOT_FOUND`. **Neither is in that pair.** So pressing "Find city" made the
+heading, the field, what had been typed, the button, the error message *and the "use Makkah"
+escape hatch* all disappear in the same frame — leaving a screen with "Allow location", which
+the user had already refused, and a **disabled** Continue.
+
+Reproduced on an API 36 emulator: typed `zzqqxxnowhere`, pressed Find city, and the screen
+went to two controls, one of them dead. There is no way forward from there except granting
+location or reinstalling. **It shipped in v1.0.0 and it is in the build in closed testing
+now.** The `city_not_found` message the user needed was inside the block that had just
+vanished, which is why nobody could have diagnosed it from the app.
+
+Fixed by deleting the condition rather than extending it: the city entry is shown whenever
+there is no location yet, full stop. No transient state, so no state to get wrong. It also
+closes T3's fourth point for free — manual entry was always there and nobody could find it.
+
+#### 2. What the tester actually saw: a search that worked and said nothing
+
+The reported bug was in the Settings location sheet, and the search was **not** broken. Typed
+"slough", pressed Find city, and Settings behind the sheet did change to "Slough, United
+Kingdom". The sheet simply stayed open with the typed text still in it and no confirmation of
+any kind. The only feedback was a spinner next to the *GPS* button reading "Finding your
+location…" — the wrong sentence, in the wrong place, for a typed-in city.
+
+Three separate faults, all confirmed by `uiautomator dump`:
+
+| Fault | Evidence | Fix |
+|---|---|---|
+| Sheet opened half-height; "Find city" off-screen entirely | field bounds `[63,1909][1017,1920]` on a 1080×1920 screen, button not in the tree until the sheet was dragged up | `skipPartiallyExpanded = true` |
+| No confirmation, sheet never closed | location changed, sheet unchanged | close on success; the header behind it *is* the confirmation |
+| Wrong progress text, wrong place | "Finding your location…" beside the GPS button | shared `ProgressRow`, new string, under the field it belongs to |
+
+Onboarding additionally had no `imePadding` and no IME action at all — the keyboard's own
+search key only closed the keyboard. Both added; the sheet already had them.
+
+**The obvious diagnosis was wrong and would have cost a day.** The screenshot showed a button
+under a keyboard, so insets looked like the cause. They were not: material3 1.4.0 already
+applies `imePadding()` inside the sheet's own dialog window unconditionally, so a nested one
+is a no-op and `contentWindowInsets = WindowInsets(0)` cannot switch it off. The real cause
+was the sheet's half-height default, visible **before any keyboard was involved**. Sourcing
+in `docs/reviews/2026-08-01-android-alarm-facts.md` §5; lesson 55.
+
+#### 3. Late notifications — measured at a one-hour window, not "a few minutes"
+
+`dumpsys alarm`, with "Alarms & reminders" not granted, which is the **default** state from
+Android 13:
+
+```
+type=RTC_WAKEUP origWhen=2026-08-01 23:48:00.000 window=+1h0m0s0ms flags=0x20
+```
+
+After `appops set com.sajdatime.app SCHEDULE_EXACT_ALARM allow`, **without reopening the
+app** — so this also verifies the new permission-state receiver:
+
+```
+type=RTC_WAKEUP origWhen=2026-08-01 23:48:00.000 window=0 exactAllowReason=permission flags=0x3
+Next alarm clock information:
+  user:0 pendingSend:false time:1785624480000 = 2026-08-01 23:48:00.000
+```
+
+`flags=0x3` and the populated "Next alarm clock information" are `setAlarmClock`. After a
+clean onboarding with the permission granted, all six upcoming alarms read `window=0`.
+
+Two changes followed. Notification style moved from `setExactAndAllowWhileIdle` to
+`setAlarmClock` (§6 for the reasoning and the rejected alternative), and onboarding's last
+step now asks for the permission outright — a banner about a setting is not the same as being
+asked. The banner's wording changed too: "a few minutes late" was a promise the platform does
+not make, and one hour is what was measured.
+
+#### 4. The alarm sounding through a silenced phone — confirmed, and both directions tested
+
+Fired the alert at each ringer mode and read back which channel the system used:
+
+| Ringer | `alarmRespectsSilent` | Channel used |
+|---|---|---|
+| NORMAL | on | `prayer_alarm_v0` — sounds |
+| VIBRATE | on | `prayer_times` — quiet |
+| SILENT | on | `prayer_times` — quiet |
+| SILENT | **off** | `prayer_alarm_v0` — sounds anyway |
+
+The notification is posted in every one of those cases; only the channel differs. Both the
+silent badge (`id=1000`, `next_prayer_badge`) and the prayer alert (`id=2000`) were present in
+`dumpsys notification` at the same time, which answers the tester's *"notification badge and
+alarm could be done together"* — they always could, and now the screen says so.
+
+#### 5. The rest of the gate
+
+Per-prayer alerts driven through the UI end to end: set Fajr to Alarm, watched the summary
+become "All five · Mixed", and read the stored value back out of DataStore as
+`FAJR:ALARM,DHUHR:NOTIFICATION,ASR:NOTIFICATION,MAGHRIB:NOTIFICATION,ISHA:NOTIFICATION`.
+Checked in RTL via `:app:assembleRtl` — the three chips mirror correctly, Off on the right.
+At `font_scale 1.5` the `FlowRow` wraps "Alarm" onto a second line inside the dialog rather
+than clipping it, which is the reason it is a `FlowRow` and not a `Row`. The keyboard's search
+key was verified to run the search (`input keyevent 66`), and the sheet was re-checked at
+`wm size 1080x1100` — roughly the space left above a large keyboard — where "Find city" is one
+scroll away rather than unreachable.
+
+**Not tested:** a real device, a real Samsung keyboard (the emulator has a hardware keyboard,
+so `wm size` was used as a proxy), and App Standby bucket behaviour, which cannot be forced
+honestly on an emulator and which §6 explicitly does not claim to have fixed.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -2227,11 +2468,16 @@ decision, not a constant.
 > decided and the one decision that needs the owner marked. This section is the technical
 > record behind it; that file is what to read first.
 
-> **Do not act on these until the closed test is over.** Recorded 1 Aug 2026, while the test
-> was still at 9 of 12 opted-in testers. Shipping a new build mid-test means another review
-> and another chance to disturb a run that has not yet started its fourteen days; the upside
-> of a fix does not outweigh that until production access is granted. Both items below are
-> analysed and evidenced, so the work can start immediately once the gate clears.
+> **Superseded, 1 Aug 2026 (later the same day).** This section used to open with *"do not
+> act on these until the closed test is over"*. That advice conflated two different things
+> and is withdrawn: **writing and committing a fix costs the closed test nothing — only
+> uploading a build reaches Google at all.** Everything below marked DONE was built, verified
+> on a device and committed while the test was running; none of it has been uploaded. The
+> upload decision still belongs at the end of the fortnight, and the surrounding evidence is
+> in §10 and in `docs/AFTER_THE_TEST.md`. Google's own closed-testing page says *"Continue to
+> use closed testing while you fix user-reported issues and bugs"*, and is silent on whether
+> a new release disturbs the fourteen days — silence is not permission, which is why the
+> upload waits and the code does not.
 
 - **T1 — Isha does not match UK mosques, and the fix already exists but is invisible.**
   Full evidence in §10, "Isha in the UK — measured against three real mosques". The default
@@ -2325,6 +2571,38 @@ decision, not a constant.
   ponytail: nothing here needs a new dependency, a new permission, or `ACCESS_FINE_LOCATION`.
   Fine location would be a privacy regression bought for zero minutes of accuracy, and it is
   ruled out — see §8 and the hard rules in `CLAUDE.md`.
+
+  **Point 4 is DONE, 1 Aug 2026**, as a side effect of fixing T4: the typed-city entry is now
+  shown on the location step from the start, rather than only after a location attempt has
+  failed. Points 1 to 3 remain.
+
+### The second round of tester feedback (1 Aug 2026) — all four DONE
+
+Reproduced on a device first, fixed, and verified on a device again. Evidence in §10, "The
+second round of tester feedback, and a first-run trap underneath it". Rules in §5.12, §5.13
+and §6. Platform sourcing in `docs/reviews/2026-08-01-android-alarm-facts.md`.
+
+- **T4 — DONE.** *"User typing city name but its not selecting it."* The search worked; the
+  sheet gave no sign of it. Now closes on success, opens fully expanded so "Find city" is
+  visible without a drag, says "Looking up that place…" beside the field it belongs to, and
+  responds to the keyboard's own search key. **Reproducing it also found a first-run dead
+  end that no tester reported** and that is live in the current closed test — see §10.
+- **T5 — DONE.** *"Give notification as soon as its time for namaaz (avoid delays)."* Two
+  causes, both measured. Every prayer alert now uses `setAlarmClock`, and onboarding asks
+  for "Alarms & reminders" instead of leaving it to a banner. Without that permission the
+  measured delivery window was **one hour**.
+- **T6 — DONE.** *"If phone is silent then alarm shouldn't ring but Notification still pops
+  up on time."* `alarmRespectsSilent`, on by default, verified in all four combinations.
+- **T7 — DONE.** *"Alarm setting to be configured by the user"* and *"notification badge and
+  alarm could be done together"*. Off / Notification / Alarm, per prayer, in one chooser that
+  replaced two.
+
+**Left undone on purpose:** App Standby buckets. At targetSdk 36 `SCHEDULE_EXACT_ALARM` no
+longer floors the app at WORKING_SET, and a Restricted-bucket app is documented as getting
+*one alarm per day*. The only documented fix is `USE_EXACT_ALARM`, which Play gates to
+alarm-clock and calendar apps; claiming that category for a prayer app is arguable, and being
+wrong blocks the release at review. Checked, rejected, and recorded rather than attempted —
+revisit only with a specific reason, and write the outcome into the reviews file.
 
 ### Open decisions from the worldwide review (1 Aug 2026) — owner's call, not an agent's
 
@@ -3262,6 +3540,67 @@ matters more than the stable hashes, that is the trade being made.
 
     Where a rule has a physical basis, that basis is a better witness than any number of
     websites. Look for it.
+
+52. **A UI condition that gates a whole section on transient state will eventually hide the
+    thing the user needs most.** The city entry in onboarding appeared only while `problem`
+    was `PERMISSION_DENIED` or `NO_FIX`. Searching cleared `problem`; failing set it to
+    `CITY_NOT_FOUND`. Neither value was in the pair, so the act of using the feature deleted
+    the feature — along with its own error message and the escape hatch beside it, leaving a
+    first-run screen with nothing enabled on it.
+
+    The fix was not a better condition. It was **deleting the condition**: show it whenever
+    there is no location. State you do not have cannot be wrong. When a section's visibility
+    depends on a value that the section's own actions change, that is the bug, not the value.
+
+53. **"It did nothing" usually means "it did it silently".** The tester said the city search
+    was not selecting his city. It was selecting it perfectly, every time. The sheet stayed
+    open with his text still in it and the only moving part was a spinner next to a button he
+    had not pressed. An action that succeeds and shows nothing is indistinguishable from one
+    that failed, and users report what they can see.
+
+    Before debugging the mechanism, check whether the mechanism already works and the
+    *report* of it is missing. It is faster, and it is the more common fault.
+
+54. **Read what the API promises, not what it is called.** `setExactAndAllowWhileIdle` has
+    "exact" in the name and this paragraph in its own reference: *"the OS will allow itself
+    more flexibility for scheduling these alarms than regular exact alarms… it may take even
+    more liberties."* `setAlarmClock` is the only one Google says is never moved. Measured
+    consequence with the permission ungranted: `window=+1h0m0s0ms` — a **one-hour** delivery
+    window, while the app's own banner told users the delay was "a few minutes".
+
+    Two habits from this. Read the reference paragraph for the API you chose, not the guide
+    page for the family it belongs to. And when the app makes a promise to the user about
+    timing, check that the platform makes that promise to you first.
+
+55. **The obvious cause of a screenshot is often not the cause.** A button under a keyboard
+    means an insets bug — except it did not. Material3 1.4.0 already applies `imePadding()`
+    inside the sheet's own window unconditionally, so the fix everyone reaches for is a no-op
+    and `contentWindowInsets = WindowInsets(0)` cannot even switch the behaviour off. The
+    real cause was the sheet's half-height default: the field opened pinned to the bottom
+    edge with the button off-screen entirely, **before any keyboard was involved**.
+
+    Found by opening the sheet and dumping the view tree, not by reading about insets. When a
+    screenshot has an obvious culprit, reproduce the screenshot first and see what is true
+    with the culprit removed.
+
+56. **Ask two agents, and tell the second one to attack the first.** Four research briefs
+    were written from primary sources and then handed to four refuters whose only instruction
+    was to disprove them. The refuters overturned the load-bearing claim in two of the four —
+    including a bytecode scan that returned a false negative because it searched for
+    `WindowInsetsPaddingKt.imePadding` when on Android the symbol lives in
+    `WindowInsetsPadding_androidKt`. Both briefs read as confident and well-cited.
+
+    A citation is not a verification. "I fetched the URL and the sentence is there" is, and
+    it is worth paying a second agent for.
+
+57. **"Do not touch it until the window closes" was two decisions wearing one coat.** This
+    file previously told the next session not to act on tester feedback during the closed
+    test. The real constraint is only on *uploading* — writing, testing and committing a fix
+    reaches Google not at all. Conflating them cost nothing this time because the same session
+    noticed; it could easily have cost a fortnight of idle waiting.
+
+    When writing a "do not do X yet" instruction, name the actual irreversible step. X is
+    almost always narrower than it first appears.
 
 ---
 

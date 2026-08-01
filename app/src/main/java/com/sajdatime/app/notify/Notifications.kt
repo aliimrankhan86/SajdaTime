@@ -139,12 +139,38 @@ object Notifications {
             ?.isNotificationPolicyAccessGranted == true
     }.getOrDefault(false)
 
+    /**
+     * True when the user has silenced this phone with the ringer control.
+     *
+     * This is asked because the alarm stream deliberately ignores it. On stock Android the
+     * streams the ringer mutes are RING, NOTIFICATION, SYSTEM and SYSTEM_ENFORCED —
+     * STREAM_ALARM is not among them, and turning it into one is an opt-in device resource
+     * (`config_audio_ringer_mode_affects_alarm_stream`) that defaults to false. That is
+     * correct for a clock someone set for one morning and wrong for a recurring prayer
+     * alert, which is why a tester reported the alarm sounding through a silenced phone.
+     *
+     * Vibrate counts as silenced. Someone who has turned the ringer down to vibrate has
+     * asked for no sound just as plainly as someone on full silent, and the quieter
+     * channel this routes to still vibrates.
+     *
+     * Deliberately not consulting Do Not Disturb: DND allows alarms by default, has its
+     * own separate opt-in on the Settings screen, and reading the ringer mode is the
+     * question the user actually answered with the volume keys.
+     */
+    private fun phoneIsSilenced(context: Context): Boolean = runCatching {
+        when (context.getSystemService(AudioManager::class.java)?.ringerMode) {
+            AudioManager.RINGER_MODE_SILENT, AudioManager.RINGER_MODE_VIBRATE -> true
+            else -> false
+        }
+    }.getOrDefault(false)
+
     fun postPrayerAlert(
         base: Context,
         slot: PrayerSlot,
         at: Instant,
         style: AlertStyle,
         alarmSoundUri: String,
+        respectSilent: Boolean,
     ) {
         // Everything below builds text the user reads, so it is built from a context
         // pinned to the app's own language rather than the device's. Wrapped here at the
@@ -154,7 +180,13 @@ object Notifications {
         if (!canPost(context)) return
         ensureChannels(context)
 
-        val channelId = when (style) {
+        // The alert still arrives, on time, in the shade and as a heads-up — only the
+        // sound is dropped. Nothing about the ringer suppresses a notification's visual
+        // treatment, so "quiet, but still there" is exactly what the user asked for.
+        val silenced = style == AlertStyle.ALARM && respectSilent && phoneIsSilenced(context)
+        val effectiveStyle = if (silenced) AlertStyle.NOTIFICATION else style
+
+        val channelId = when (effectiveStyle) {
             AlertStyle.NOTIFICATION -> CHANNEL_PRAYERS
             AlertStyle.ALARM -> ensureAlarmChannel(context, alarmSoundUri)
         }
@@ -173,7 +205,7 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context))
 
-        when (style) {
+        when (effectiveStyle) {
             AlertStyle.NOTIFICATION ->
                 builder.setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setVibrate(PRAYER_VIBRATION)

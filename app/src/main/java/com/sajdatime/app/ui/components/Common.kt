@@ -1,6 +1,5 @@
 package com.sajdatime.app.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
@@ -27,6 +28,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -53,6 +56,25 @@ fun SectionHeading(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier,
     )
+}
+
+/**
+ * Spinner and a line of text, used wherever the app is waiting on something the user
+ * asked for. Shared so that "we are working on it" looks the same in onboarding as it
+ * does in the location sheet — and so that neither of them can quietly say the wrong
+ * sentence, which is how a city lookup came to announce "Finding your location…".
+ */
+@Composable
+fun ProgressRow(text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(12.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
 
 /**
@@ -87,15 +109,47 @@ fun LocationSheet(
     onUseGps: () -> Unit,
     onSearchCity: (String) -> Unit,
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    // skipPartiallyExpanded, because the half-height default opened with the city field
+    // pinned to the very bottom edge and "Find city" entirely off-screen — the user had
+    // to know to drag the sheet upwards before the button they wanted even existed.
+    // Confirmed on a 1080x1920 emulator: the field's own bounds were [.,1909]-[.,1920].
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var query by rememberSaveable { mutableStateOf("") }
+    var searching by remember { mutableStateOf(false) }
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    // A successful search changed the location and gave no sign of it: the sheet stayed
+    // open, the field still held what was typed, and the only feedback was a spinner
+    // beside a button the user had not pressed. The tester read that as "it is not
+    // selecting it" and he was right to. Closing the sheet reveals the new city in the
+    // header behind it, which is the confirmation.
+    //
+    // Keyed on resolvingLocation alone so it fires only on the true -> false edge, never
+    // in the gap between the tap and the view model's coroutine starting.
+    LaunchedEffect(state.resolvingLocation) {
+        if (searching && !state.resolvingLocation) {
+            searching = false
+            if (state.problem == null) onDismiss()
+        }
+    }
+
+    val findCity = {
+        keyboard?.hide()
+        searching = true
+        onSearchCity(query)
+    }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(
             Modifier
                 .fillMaxWidth()
-                // Without these the on-screen keyboard covers the city field and its
-                // button, so the user types blind and cannot reach "Find city".
+                // Currently redundant, and kept on purpose. Material3 1.4.0 already
+                // applies Modifier.fillMaxSize().imePadding() itself, inside the sheet's
+                // own dialog window, so this one consumes an inset that is already gone.
+                // It is retained because that call is deleted in 1.5.0-alpha19 and later
+                // (b/289824811), where IME avoidance moves to contentWindowInsets — this
+                // line is correct in both worlds and costs nothing in either. Verified by
+                // reading the shipped bytecode, not by assuming. See HANDOVER §10.
                 .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
@@ -126,20 +180,9 @@ fun LocationSheet(
                 Text(stringResource(R.string.action_use_my_location))
             }
 
-            if (state.resolvingLocation) {
+            if (state.resolvingLocation && !searching) {
                 Spacer(Modifier.height(16.dp))
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                ) {
-                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(R.string.location_finding),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
+                ProgressRow(stringResource(R.string.location_finding))
             }
 
             Spacer(Modifier.height(24.dp))
@@ -169,17 +212,13 @@ fun LocationSheet(
                 },
                 isError = notFound,
                 singleLine = true,
-                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
-                    imeAction = ImeAction.Search,
-                ),
-                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
-                    onSearch = { if (query.isNotBlank()) onSearchCity(query) },
-                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { if (query.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
             OutlinedButton(
-                onClick = { onSearchCity(query) },
+                onClick = findCity,
                 enabled = query.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -188,6 +227,10 @@ fun LocationSheet(
                 Icon(Icons.Outlined.Search, contentDescription = null)
                 Spacer(Modifier.width(10.dp))
                 Text(stringResource(R.string.action_find_city))
+            }
+            if (searching) {
+                Spacer(Modifier.height(12.dp))
+                ProgressRow(stringResource(R.string.location_looking_up))
             }
         }
     }

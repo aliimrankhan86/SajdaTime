@@ -98,6 +98,97 @@ below.
 
 ---
 
+## ⚠️ Your tester sent five more notes, and one of them uncovered something worse
+
+**Reported and fixed on 1 Aug 2026.** Four were about alerts. The fifth was *"user typing
+city name but its not selecting it"*, with a screenshot. Chasing that one down found a fault
+nobody had reported.
+
+### The one nobody reported: a new user could get stuck on the very first screen
+
+If someone declines the location permission and then mistypes their city — "Manchestr", or a
+place the lookup does not know — **everything on that screen disappears.** The box they typed
+into, the Find city button, the message telling them it was not found, and even the "skip and
+use Makkah" way out. What is left is a button they already said no to, and a Continue button
+that is greyed out. There is no way forward at all except reinstalling the app.
+
+This has been in every version, including the one your testers have right now. It was not
+found by reading the code — it was found by sitting on the first-run screen and typing
+nonsense into the box on purpose.
+
+**Fixed** by showing the "or type a city" box from the start, instead of only after something
+has gone wrong. That also quietly closes a complaint from the earlier round: this tester could
+not find the manual city entry, because until now it only appeared once the app had failed.
+
+### What he actually saw with "slough"
+
+The search was working. Every time. It found Slough, saved it, and the Settings screen behind
+the panel changed to say so — **but the panel stayed open with his typing still in it, and
+said nothing.** From where he sat, nothing had happened. He was right to report it.
+
+Three things were wrong and all three are fixed:
+
+- The panel opened at half height, so the **Find city button was off the bottom of the
+  screen** before the keyboard was even involved. It now opens full height.
+- Nothing confirmed success. It now closes when it finds your city, so you see the new place
+  name straight away.
+- The little "Finding your location…" message appeared next to the wrong button. It now says
+  "Looking up that place…" and sits under the box you typed in.
+
+The search key on your keyboard now works too, so you do not have to reach for the button.
+
+### "Notifications arrive late" — this one had a number
+
+Android will not let an app set an alert for an exact minute unless the user allows it, and
+from Android 13 that permission is **switched off by default**. Nobody had been asked for it
+— there was only a small banner most people scroll past.
+
+Measured on a test phone with the permission off: Android was giving itself a **one-hour
+window** to deliver each prayer alert. The app's own banner said "a few minutes late". That
+was wrong, and it now says the phone "may hold prayer alerts back and deliver them late",
+because Android publishes no limit at all.
+
+Two fixes. Setup now asks for the permission on the last screen, in plain English, with
+Finish still right underneath so nobody is trapped. And every prayer alert now uses the one
+kind of alarm Android promises never to move — previously only the loud "alarm" mode did, and
+ordinary notifications used a weaker one that the system is explicitly allowed to delay.
+
+The one visible cost: a small alarm-clock icon in your status bar. It is honest — an alarm
+genuinely is set — and a prayer alert arriving after the prayer has started is worse.
+
+### "If the phone is silent the alarm should not ring"
+
+He is right, and it was doing the opposite on purpose — Android deliberately lets alarms
+sound through a silenced phone, because that is what you want from a wake-up alarm you set
+last night. It is not what you want from something that goes off five times a day.
+
+Now, if your phone is on silent or vibrate, the alarm **stays quiet and the notification still
+arrives on time**. There is a switch for anyone who wants the old behaviour, because someone
+relying on this to wake for Fajr may well want it to ring regardless. The switch says exactly
+what each choice means.
+
+### "Let the user configure the alarm"
+
+The old settings had two separate rows — *which prayers* and *how you are told* — and between
+them they could not say the obvious thing: **a loud alarm for Fajr, a quiet notification for
+the rest.** They are now one row. Each prayer gets Off, Notification or Alarm.
+
+Nothing changes for anyone who never opens Settings: all five prayers, quiet notification,
+exactly as before.
+
+### What is still not fixed, and I am not going to pretend otherwise
+
+Android puts apps you rarely open into a restricted category, and an app in the worst of
+those is allowed **one alarm a day**. This app is exactly the kind that gets put there,
+because the notification *is* the point — you do not need to open it.
+
+There is one official way out, a permission reserved for alarm-clock and calendar apps. A
+prayer app arguably qualifies. **Arguably is not good enough**: if Google disagrees at review,
+the release is blocked, and we have already waited a fortnight. So it was checked, written
+down, and left alone.
+
+---
+
 ## First, what we are waiting for
 
 The app is **live on the closed testing track** and approved. It is not in the store.
@@ -307,7 +398,13 @@ Different from the order above, on purpose:
    navigation first means not doing it twice.
 3. **Then fix 2** — independent of both, can slot in anywhere.
 
-The far-north work is already done and in the repository — it is not waiting on anything.
+The far-north work is already done and in the repository — it is not waiting on anything, and
+neither are the five fixes from the second round of tester feedback above.
+
+**A correction to something this file used to imply.** It read as though no work should happen
+until the fortnight was over. That was muddled. Nothing reaches Google until a build is
+*uploaded* — writing the code, testing it and saving it to the repository costs the closed
+test nothing at all. So the fixes are done and waiting; only the upload is on hold.
 
 Then: one update to the closed track, one Google review, and **Wear OS after the phone
 reaches production** — not before, because it triggers a second review for no gain.

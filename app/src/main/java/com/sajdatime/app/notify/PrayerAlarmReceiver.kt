@@ -29,13 +29,14 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val settings = SettingsRepository(appContext).current()
-                if (slot in settings.notifyFor) {
+                settings.alertFor[slot]?.let { style ->
                     Notifications.postPrayerAlert(
                         base = appContext,
                         slot = slot,
                         at = at,
-                        style = settings.alertStyle,
+                        style = style,
                         alarmSoundUri = settings.alarmSoundUri,
+                        respectSilent = settings.alarmRespectsSilent,
                     )
                 }
                 // Chain the next horizon and refresh the badge while we are already awake.

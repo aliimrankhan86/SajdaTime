@@ -33,7 +33,8 @@ The reason the raw text is kept rather than only the verdict:
 | `2026-08-01-second-opinions.md` | Two replies, verbatim: one from DeepSeek, one from ChatGPT/Codex |
 | `2026-08-01-prompt-round2.md` | The follow-up prompt |
 | `2026-08-01-round2-outcome.md` | What round 2 changed, claim by claim |
-| **`2026-08-01-polar-sources.md`** | **Not a review.** The primary sources on high-latitude prayer times, with what each body actually says and which claims failed checking. This is the *verified* file in this folder |
+| **`2026-08-01-polar-sources.md`** | **Not a review.** The primary sources on high-latitude prayer times, with what each body actually says and which claims failed checking. **Verified.** |
+| **`2026-08-01-android-alarm-facts.md`** | **Not a review either.** What Android and Play actually document about alarm lateness, silent mode, exact-alarm permissions and sheet keyboards. Written from primary sources, then handed to a second pass whose only job was to refute it. **Verified**, including the two claims that did not survive |
 
 ## Summary of the outcome
 

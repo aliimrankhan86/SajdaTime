@@ -205,40 +205,69 @@ so a user with a separate compass can act on it.
 ## 4. Notifications and reliability
 
 Prayer alerts are the feature most likely to fail silently, so the schedule is rebuilt from
-four independent triggers:
+five independent triggers:
 
 1. every time the app is opened
 2. every time an alarm fires (chains the next window)
 3. a `WorkManager` job every 12 hours
 4. device boot, time-zone change, clock change, and app update
+5. the exact-alarm permission being granted or revoked (Android 12+)
 
 Alarms are laid down two days ahead, so a single missed trigger cannot break the chain.
 
 ### Exact alarm strategy
 
-| Condition | Mechanism | Trade-off |
+> **Corrected 1 Aug 2026.** This table used to say `setAlarmClock` was "permission-free" and
+> was what the app fell back to when the permission was refused. **Both halves were wrong**,
+> and it is the same misconception that caused a real `SecurityException` crash earlier in
+> this project's history. `setAlarmClock` requires `SCHEDULE_EXACT_ALARM` like every other
+> exact API — more strictly, in fact: its reference note is the only one of the three without
+> an "unless the app is exempt from battery restrictions" clause.
+
+Three rungs, each attempted only if the one above it failed, and every alert takes the
+highest rung available regardless of which style it will eventually make:
+
+| Rung | Mechanism | Guarantee |
 |---|---|---|
-| `canScheduleExactAlarms()` is true | `setExactAndAllowWhileIdle` | Exact, Doze-proof, no status bar icon. |
-| Permission refused (Android 12+) | `setAlarmClock` | Still exact and permission-free, but shows an alarm icon. |
+| 1 | `setAlarmClock` | The only API Google documents as never moved: *"the system never adjusts their delivery time."* Needs `SCHEDULE_EXACT_ALARM`. Shows a status bar alarm icon. |
+| 2 | `setExactAndAllowWhileIdle` | Exact but rate-limited, and the OS *"may take even more liberties"* when idle. Reachable without the permission if the user has exempted the app from battery optimisation. |
+| 3 | `setAndAllowWhileIdle` | Inexact. Measured delivery window: **one hour**. Never throws. |
 
-A late Fajr notification is worse than a status bar icon, so the app never silently
-degrades to inexact alarms. Settings shows a prompt linking to the system screen when the
-permission is missing.
+`runCatching` at each rung rather than a permission check alone: some OEM builds and work
+profiles revoke the capability between the check and the call.
 
-### Alert style
+A late Fajr notification is worse than a status bar icon, which is why rung 1 is used even
+for quiet notifications. Onboarding asks for the permission on its last step, and both the
+home and Settings banners link to the system screen while it is missing.
 
-Two styles, and the quieter one is the default:
+**Not solved by any of this:** App Standby buckets, which are documented to hold a
+Restricted-bucket app to one alarm per day and from which `setAlarmClock` has no documented
+exemption. An iOS port has no equivalent of this problem; an Android reimplementation does.
+
+### Alert style — chosen per prayer
+
+Three answers, for each of the five prayers independently. A prayer with no style is silent;
+there is no separate on/off flag.
 
 | Style | Behaviour | Default |
 |---|---|---|
-| Notification | Heads-up notification with vibration. Respects Do Not Disturb. | Yes |
+| Off | No alert. | — |
+| Notification | Heads-up notification with vibration. Respects Do Not Disturb. | **All five** |
 | Alarm | Alarm-category alert with a sound the user picks, and it may sound through Do Not Disturb. | No |
+
+Per prayer rather than once for the app, because the request that drove it — *a loud alarm
+for Fajr, a quiet notification for the rest* — cannot be expressed by a single global choice.
 
 Five full alarms a day, unasked for, is the sort of thing that gets an app uninstalled, so
 alarm mode is opt-in. When the user chooses it, they pick their own tone through the system
 ringtone picker, which already lists every alarm, ringtone and audio file on the device.
 No adhan recording is bundled: it would raise licensing questions and inflate the download
 of a charity app for a sound many users already have.
+
+**An alarm stays quiet while the phone is silenced**, unless the user turns that off. Android
+deliberately does not mute the alarm stream with the ringer, which is right for a one-off
+wake-up alarm and wrong for a recurring alert; the notification still arrives on time and
+only the sound is dropped. Vibrate counts as silenced.
 
 Sound is bound to the channel, not to the notification, and a channel's sound cannot be
 changed after creation. Choosing a new tone therefore creates a new channel id and deletes

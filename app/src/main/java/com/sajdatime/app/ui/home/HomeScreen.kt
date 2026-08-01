@@ -1,11 +1,7 @@
 package com.sajdatime.app.ui.home
 
-import android.content.Intent
-import android.os.Build
-import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.core.net.toUri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -447,16 +443,7 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     NoticeCard(
         title = stringResource(R.string.settings_exact_alarms_title),
         body = stringResource(R.string.settings_exact_alarms_desc),
-        onClick = {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                runCatching {
-                    context.startActivity(
-                        Intent(SystemSettings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                            .setData("package:${context.packageName}".toUri()),
-                    )
-                }
-            }
-        },
+        onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
         onDismiss = onDismiss,
     )
 }

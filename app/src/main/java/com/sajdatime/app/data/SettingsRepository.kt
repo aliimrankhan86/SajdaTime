@@ -27,6 +27,10 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
  * The default is deliberately the quieter one: a notification that vibrates. Five full
  * alarms a day, unasked for, is the kind of thing that gets an app uninstalled. Users who
  * want an adhan or a louder tone opt into [ALARM] and choose their own sound.
+ *
+ * This is chosen **per prayer**, not once for the whole app. A tester asked for exactly
+ * that — an alarm loud enough to wake him for Fajr, and a quiet notification for the four
+ * he is already awake for — and a single global radio button could not express it.
  */
 enum class AlertStyle {
     /** Heads-up notification with vibration. Respects Do Not Disturb. */
@@ -46,13 +50,33 @@ data class AppSettings(
     val method: CalcMethod = CalcMethod.AUTO,
     val coordinates: Coordinates? = null,
     val cityName: String = "",
-    /** Per-prayer notification switches. Absent slots default to on. */
-    val notifyFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
+    /**
+     * How each prayer announces itself. A prayer absent from this map is silent — there
+     * is no separate on/off, because "off" is simply having no style.
+     *
+     * All five start as a quiet notification. Nothing here is ever loud until asked.
+     */
+    val alertFor: Map<PrayerSlot, AlertStyle> = PrayerSlot.entries
+        .filter { it.isPrayer }
+        .associateWith { AlertStyle.NOTIFICATION },
     /** The glanceable badge is on out of the box; it is silent and costs nothing. */
     val ongoingBadge: Boolean = true,
-    val alertStyle: AlertStyle = AlertStyle.NOTIFICATION,
     /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
     val alarmSoundUri: String = "",
+    /**
+     * Whether an alarm-style alert falls back to a silent notification while the phone
+     * itself is silenced.
+     *
+     * On by default, and that is a real decision rather than a shrug. An alarm plays on
+     * the alarm stream, which Android deliberately does *not* mute with the ringer — that
+     * is right for a clock the user set for one morning, and wrong for a recurring alert
+     * five times a day from an app they installed yesterday. Making noise from a phone
+     * someone has visibly silenced is how a charity app earns an uninstall.
+     *
+     * The user who genuinely wants to be woken for Fajr regardless turns this off, and
+     * the switch says plainly what that means. Requested by a tester.
+     */
+    val alarmRespectsSilent: Boolean = true,
     val disclaimerSeen: Boolean = false,
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
@@ -74,6 +98,70 @@ data class AppSettings(
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(sect = sect, madhab = madhab, method = method)
+
+    /** The prayers that announce themselves at all, in any style. */
+    val notifyFor: Set<PrayerSlot> get() = alertFor.keys
+
+    /** True when at least one prayer is set to the loud style. */
+    val usesAlarm: Boolean get() = alertFor.containsValue(AlertStyle.ALARM)
+}
+
+/**
+ * How [AppSettings.alertFor] is written to and read from a preference string, kept free of
+ * DataStore and of Android so it can be tested without either.
+ *
+ * It is worth testing on its own because the failure is silent in both directions. A
+ * decode that drops entries turns a prayer off without telling anyone, and a migration
+ * that misreads the two keys this replaced would hand somebody who had deliberately
+ * silenced four prayers four unexpected alerts a day after an update.
+ */
+internal object AlertCodec {
+
+    /** "FAJR:ALARM,DHUHR:NOTIFICATION", in the enum's own order. */
+    fun encode(alerts: Map<PrayerSlot, AlertStyle>): String =
+        // Sorted rather than left to map iteration order: DataStore compares the written
+        // value against the stored one, so a stable string means no pointless writes.
+        alerts.entries
+            .sortedBy { it.key.ordinal }
+            .joinToString(",") { "${it.key.name}:${it.value.name}" }
+
+    /**
+     * An empty string means every prayer is silent — which is exactly why the caller must
+     * distinguish an absent key from an empty one, and why this function is never asked
+     * to invent a default.
+     *
+     * Every part is validated rather than trusted: an unknown slot or style is dropped, so
+     * a preferences file written by a future version, or one holding a since-renamed enum
+     * constant, loses a single entry instead of throwing on a background thread at Fajr.
+     */
+    fun decode(raw: String): Map<PrayerSlot, AlertStyle> {
+        if (raw.isBlank()) return emptyMap()
+        return raw.split(",").mapNotNull { entry ->
+            val parts = entry.split(":").takeIf { it.size == 2 } ?: return@mapNotNull null
+            val slot = prayerNamed(parts[0]) ?: return@mapNotNull null
+            val style = AlertStyle.entries.firstOrNull { it.name == parts[1] } ?: return@mapNotNull null
+            slot to style
+        }.toMap()
+    }
+
+    /**
+     * An install from before per-prayer styles: fold the two keys this replaced —
+     * "which prayers" and one global "how" — into the new shape.
+     *
+     * [notifyRaw] absent means the old default, which was all five on.
+     */
+    fun migrate(notifyRaw: String?, styleName: String?): Map<PrayerSlot, AlertStyle> {
+        val style = AlertStyle.entries.firstOrNull { it.name == styleName } ?: AlertStyle.NOTIFICATION
+        val slots = when {
+            notifyRaw == null -> PrayerSlot.entries.filter { it.isPrayer }
+            notifyRaw.isBlank() -> emptyList()
+            else -> notifyRaw.split(",").mapNotNull(::prayerNamed)
+        }
+        return slots.associateWith { style }
+    }
+
+    private fun prayerNamed(name: String): PrayerSlot? =
+        PrayerSlot.entries.firstOrNull { it.name == name && it.isPrayer }
 }
 
 class SettingsRepository(private val context: Context) {
@@ -100,17 +188,19 @@ class SettingsRepository(private val context: Context) {
         it[Keys.DEFAULT_LOCATION] = false
     }
 
-    suspend fun setNotify(slot: PrayerSlot, enabled: Boolean) = edit { prefs ->
-        val current = prefs.decodeNotifySet()
-        val updated = if (enabled) current + slot else current - slot
-        prefs[Keys.NOTIFY] = updated.joinToString(",") { it.name }
+    /** [style] of null silences that prayer. */
+    suspend fun setAlert(slot: PrayerSlot, style: AlertStyle?) = edit { prefs ->
+        val current = prefs.decodeAlerts()
+        val updated = if (style == null) current - slot else current + (slot to style)
+        prefs[Keys.ALERTS] = AlertCodec.encode(updated)
     }
 
     suspend fun setOngoingBadge(enabled: Boolean) = edit { it[Keys.ONGOING] = enabled }
 
-    suspend fun setAlertStyle(style: AlertStyle) = edit { it[Keys.ALERT_STYLE] = style.name }
-
     suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
+
+    suspend fun setAlarmRespectsSilent(respects: Boolean) =
+        edit { it[Keys.ALARM_RESPECTS_SILENT] = respects }
 
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
@@ -144,10 +234,17 @@ class SettingsRepository(private val context: Context) {
         val LATITUDE = doublePreferencesKey("latitude")
         val LONGITUDE = doublePreferencesKey("longitude")
         val CITY = stringPreferencesKey("city")
-        val NOTIFY = stringPreferencesKey("notify_slots")
+        val ALERTS = stringPreferencesKey("alert_for")
         val ONGOING = booleanPreferencesKey("ongoing_badge")
-        val ALERT_STYLE = stringPreferencesKey("alert_style")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
+        val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
+
+        // Read but never written: the two keys ALERTS replaced. Kept so that an existing
+        // install's choices survive the upgrade instead of silently reverting to the
+        // defaults — which for someone who had turned four prayers off would mean four
+        // unexpected alerts a day.
+        val NOTIFY = stringPreferencesKey("notify_slots")
+        val ALERT_STYLE = stringPreferencesKey("alert_style")
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
         val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
@@ -161,13 +258,10 @@ class SettingsRepository(private val context: Context) {
         const val DEFAULT_CITY = "Makkah"
     }
 
-    private fun Preferences.decodeNotifySet(): Set<PrayerSlot> {
-        val raw = this[Keys.NOTIFY] ?: return PrayerSlot.entries.filter { it.isPrayer }.toSet()
-        if (raw.isBlank()) return emptySet()
-        return raw.split(",").mapNotNull { name ->
-            PrayerSlot.entries.firstOrNull { it.name == name && it.isPrayer }
-        }.toSet()
-    }
+    private fun Preferences.decodeAlerts(): Map<PrayerSlot, AlertStyle> =
+        this[Keys.ALERTS]
+            ?.let(AlertCodec::decode)
+            ?: AlertCodec.migrate(this[Keys.NOTIFY], this[Keys.ALERT_STYLE])
 
     private fun Preferences.toAppSettings(): AppSettings {
         return AppSettings(
@@ -178,10 +272,10 @@ class SettingsRepository(private val context: Context) {
             // Range-checked rather than trusted: see Coordinates.orNull.
             coordinates = Coordinates.orNull(this[Keys.LATITUDE], this[Keys.LONGITUDE]),
             cityName = this[Keys.CITY] ?: "",
-            notifyFor = decodeNotifySet(),
+            alertFor = decodeAlerts(),
             ongoingBadge = this[Keys.ONGOING] ?: true,
-            alertStyle = enumOr(this[Keys.ALERT_STYLE], AlertStyle.NOTIFICATION),
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
+            alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
