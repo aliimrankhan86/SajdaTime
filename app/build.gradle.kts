@@ -65,6 +65,31 @@ android {
             // The one difference from debug is src/rtl/res/values/strings.xml, which
             // overrides core's app_language_tag. Read that file before changing this.
         }
+
+        // `./gradlew installSideload` — for putting a test build on a phone that already
+        // has the Play version installed, which is the owner's phone and every tester's.
+        //
+        // It exists because the two cannot coexist without it. Same applicationId and a
+        // different signature means Android refuses the install, and the only way through
+        // is uninstalling the Play copy — which `docs/RELEASING.md` records as the thing
+        // that actually costs the fortnight: Google's own rejection wording is "testers
+        // opted in, tested for less than 14 days, and then opted out", and an early
+        // uninstall resets that tester rather than merely failing to count.
+        //
+        // The suffix is the whole mechanism, so this lands as a separate app with its own
+        // icon, its own settings and its own notifications, touching nothing.
+        //
+        // Known limitation, and the reason `debug` was left alone: a suffixed package
+        // cannot talk to the watch. The Wear Data Layer matches on package name, so
+        // phone-to-watch sync is dead in this build type. Use plain `installDebug` on the
+        // emulators for anything involving the watch — that pairing is exactly where this
+        // project's worst bug once lived, so do not test it here.
+        create("sideload") {
+            initWith(getByName("debug"))
+            matchingFallbacks += "debug"
+            applicationIdSuffix = ".sideload"
+            versionNameSuffix = "-sideload"
+        }
     }
 
     compileOptions {

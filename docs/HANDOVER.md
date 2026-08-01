@@ -2372,6 +2372,92 @@ scroll away rather than unreachable.
 so `wm size` was used as a proxy), and App Standby bucket behaviour, which cannot be forced
 honestly on an emulator and which §6 explicitly does not claim to have fixed.
 
+*The first of those three was closed the next day — see below. The emulator had been telling
+the truth about the fix and hiding two things about the world it runs in.*
+
+### The shipped app measured on real hardware, beside the fix (2 Aug 2026)
+
+The owner attached his own phone: a Xiaomi Redmi Note 13 Pro 5G (`2312DRA50G`, codename
+garnet) running **HyperOS 3 on Android 16, API 36** — the first physical device this project
+has ever been tested on, and by luck the most hostile OEM for background alarms.
+
+The Play closed-test build was already installed on it (`installerPackageName=com.android.vending`,
+versionCode 2, installed 31 Jul). It was never touched. `docs/RELEASING.md` records that an
+early uninstall *resets* a tester rather than merely failing to count them, and the same
+`applicationId` with a different signature cannot install over it — so a `sideload` build type
+exists purely to sit beside it (`applicationIdSuffix = ".sideload"`, `app_name` overridden to
+"SajdaTime (test)"). Both packages coexisted for the whole session.
+
+#### What the shipped app is actually doing on a user's phone
+
+Read straight out of the device's own alarm table, not inferred:
+
+```
+com.sajdatime.app   RTC_WAKEUP  origWhen=2026-08-02 02:51:00  window=+1h0m0s0ms  flags=0x20
+```
+
+All ten scheduled prayer alarms carried a **one-hour window**, `maxWhenElapsed` a full hour
+past `whenElapsed`. Fajr, scheduled for 02:51, was permitted to arrive at 03:51. `flags=0x20`
+is `FLAG_ALLOW_WHILE_IDLE_COMPAT` — the *inexact* variant. The tester's "notifications arrive
+late" was not a slow phone or a one-off; it is the shipped behaviour, and the delay is bounded
+only by an hour.
+
+The cause, also read off the device: `SCHEDULE_EXACT_ALARM` appears under `requested
+permissions` but is **absent from the granted list**. Since Android 14 it is not granted at
+install for apps targeting 33+. Every install on Android 14/15/16 lands without it, and every
+alert silently degrades. Nothing in the app noticed or said so.
+
+#### The fix, on the same phone, at the same moment
+
+| | Shipped v1.1.0 | This branch |
+|---|---|---|
+| Fajr 02:51 | `window=+1h0m0s0ms` | `window=0` |
+| flags | `0x20` (allow-while-idle **compat**) | `0x3` (`STANDALONE\|WAKE_FROM_IDLE`) |
+| exactness | — | `exactAllowReason=permission` |
+| slack | `maxWhenElapsed = +1h` | `maxWhenElapsed == whenElapsed` |
+
+`flags=0x3` is the signature of `setAlarmClock`. Zero slack, on the hardware, side by side
+with the bug. §6's ladder does what it claims.
+
+#### Three things the emulator could not have shown
+
+1. **The app had fallen to App Standby bucket 40 — RARE** (`am get-standby-bucket`, stable
+   across three reads), while the freshly-installed test build sat at 10 (ACTIVE). This is
+   the concrete demonstration of the asymmetry recorded in §10 and §6: `USE_EXACT_ALARM`
+   floors an app at WORKING_SET, `SCHEDULE_EXACT_ALARM` only does so *at targetSdk ≤ 33*, and
+   this app targets 36. It therefore has no floor, and a real user's phone duly dropped it two
+   buckets. §6 is right not to claim buckets are fixed.
+
+2. **`setAlarmClock` takes over the phone's system "next alarm" slot.**
+   `Next alarm clock information: user:0 time:… = 2026-08-02 02:51:00`. The lock screen and
+   status bar report Fajr as the next alarm in place of whatever the user set in their own
+   clock app. Their alarm still fires; the readout is what changes. The comment in
+   `PrayerAlarmScheduler` called this "a cosmetic cost" — it is a little more than that, and
+   the comment has been corrected to say so. The decision stands on this project's own
+   tiebreaker: a missed Fajr beats a confusing readout.
+
+3. **HyperOS applies a power policy that AOSP does not have.** While the phone sat idle, every
+   alarm on it — SajdaTime's, Photos', Maps', Messaging's, Fitness' — carried
+   `power_pending = requester + 3 days`, making `whenElapsed` three days out. Once the device
+   woke, `power_pending` went to `--` on all 258 alarms and every time returned to normal.
+   Uniform across apps, so not something SajdaTime provokes. **Whether it actually delays
+   delivery or is a placeholder released on wake is not yet established** — two dumps cannot
+   tell those apart, and it is being measured rather than assumed. See §11.
+
+#### A method that produced nothing, recorded so it is not repeated
+
+Several attempts were made to trigger an alert with
+`am broadcast -n …/PrayerAlarmReceiver -a …PRAYER_ALARM`. Every one reported
+`Broadcast completed: result=0` and did nothing: no process start, no notification, no log
+line. The receiver is `android:exported="false"`, so a broadcast from the adb shell — a
+different uid — is dropped silently rather than refused loudly. Adding
+`FLAG_INCLUDE_STOPPED_PACKAGES` did not help, because that was never the problem.
+
+This nearly produced a reported bug that did not exist. The "missing" notification was the
+test, not the code. `-f 0x20` and `Broadcast completed: result=0` both look like success and
+neither is. If a future session needs to fire an alert without the UI, drive the UI or wait
+for a real alarm; do not broadcast at a non-exported receiver and read silence as a defect.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -2735,6 +2821,21 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   is A8, and it is a design question rather than a verification gap.
 
 ### Not done, in rough priority order
+
+0. **⏳ HyperOS `power_pending` — measured overnight, answer not yet in.** On the owner's
+   Redmi Note 13 Pro, an idle `dumpsys alarm` showed a Xiaomi-only policy `power_pending` set
+   to `requester + 3 days` on **every alarm on the device**, including Google's own; once the
+   phone woke it cleared to `--` on all 258 and every time returned to normal. Two dumps
+   cannot distinguish "delays delivery" from "placeholder released on wake", and the
+   difference matters enormously: if it is real, Fajr is the worst-affected prayer on the
+   most popular Android brand in much of the Muslim world.
+
+   Being settled by the cleanest test available — an A/B on one phone, since both builds hold
+   a Fajr alarm at exactly 02:51:00, the shipped one with `window=+1h` and this branch's with
+   `window=0`. Sampling the pending table and the notification list every 30s while the phone
+   is left asleep and untouched. **Do not report a conclusion from the two dumps alone.**
+   If the fixed build fires at 02:51 the policy is bookkeeping and this closes; if both drift,
+   the OEM defeats `setAlarmClock` and §6 needs a paragraph saying so honestly.
 
 1. **One light frame at cold start when the theme is overridden.**
    `android:windowBackground` is a resource, resolved by the system from the *system's*
@@ -3601,6 +3702,39 @@ matters more than the stable hashes, that is the trade being made.
 
     When writing a "do not do X yet" instruction, name the actual irreversible step. X is
     almost always narrower than it first appears.
+
+58. **A tool that reports success is not a tool that did something.** `am broadcast` at a
+    non-exported receiver prints `Broadcast completed: result=0` and delivers nothing at all —
+    no process start, no notification, no log line, no error. Several rounds of "the alert
+    isn't posting" were spent on the app before the receiver's `android:exported="false"` was
+    read. The silence was the test failing, not the code.
+
+    The tell was there the whole time: the app's *process never started*. When a component
+    that should have run leaves no trace anywhere — not even a crash — suspect that it was
+    never invoked before suspecting that it ran and misbehaved. And before reporting a defect
+    from an absence, prove the trigger actually fires.
+
+59. **The emulator was honest about the fix and silent about the world.** Everything §6 claims
+    about `setAlarmClock` reproduced exactly on real hardware. What the emulator could not show
+    was the *context*: a real user's install had drifted to App Standby bucket RARE, arrived
+    without `SCHEDULE_EXACT_ALARM` because Android 14 stopped granting it, and ran under an
+    OEM power policy that parks every alarm on the device three days out while it sleeps.
+
+    None of those are bugs in this app and none are reproducible on an emulator. They are the
+    conditions the app has to survive. Test the fix wherever is convenient; test the
+    *assumptions* on hardware someone actually owns.
+
+60. **Read your own rejected-option comments before overruling them.** Having measured the
+    status-bar side effect of `setAlarmClock`, the obvious move was to use the quieter alarm
+    for notification style. That exact alternative had been considered and rejected the day
+    before, with the reason written down three lines above the code — and the reason still
+    held.
+
+    What the new measurement legitimately changed was one word: the rejection called the cost
+    "cosmetic", and it is slightly more than that. So the comment was corrected and the
+    behaviour was left alone. A recorded rationale is not an obstacle to be argued past; it is
+    the previous session telling you it already thought about this. Update the record when new
+    evidence refines it, and change the behaviour only when the evidence actually overturns it.
 
 ---
 

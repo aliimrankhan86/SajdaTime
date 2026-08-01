@@ -92,10 +92,24 @@ object PrayerAlarmScheduler {
      *
      * The rejected alternative was to keep the quieter alarm for notification style so it
      * "does not claim a status bar icon it has not earned". That was the previous comment
-     * here and it is now overruled: the icon is a cosmetic cost, a prayer alert that
-     * arrives after the prayer has started is a functional failure, and the whole point
-     * of the notification is that it marks the beginning of the window. The icon is also
-     * true — an alarm really is scheduled.
+     * here and it is now overruled: a prayer alert that arrives after the prayer has
+     * started is a functional failure, the whole point of the notification is that it
+     * marks the beginning of the window, and the icon is true — an alarm really is
+     * scheduled.
+     *
+     * That rejection called the icon "a cosmetic cost", which measurement on a real device
+     * has since shown to be understated, so the honest version is recorded here rather
+     * than the comfortable one. `setAlarmClock` publishes an `AlarmClockInfo`, and
+     * `AlarmManager.getNextAlarmClock` returns the soonest one *across every app*. With
+     * Fajr at 02:51 the phone's lock screen and status bar report 02:51 as "next alarm",
+     * in place of the 07:00 the user set in their own clock app. Their alarm still fires —
+     * nothing is broken — but someone glancing at the lock screen to check it is set will
+     * see a time they did not choose. Verified on a Redmi Note 13 Pro, HyperOS 3 / API 36:
+     * *"Next alarm clock information: user:0 time:… = 2026-08-02 02:51:00"*.
+     *
+     * Kept anyway, on this project's own tiebreaker: dependable beats elegant. Reversing it
+     * costs a missed Fajr; keeping it costs a confusing readout. If it is ever revisited,
+     * revisit it with that asymmetry in view and not because the icon looks untidy.
      *
      * The ladder, and why it is a ladder rather than one call and a catch:
      *

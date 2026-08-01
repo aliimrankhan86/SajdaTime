@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Overrides the launcher name for the sideload build only, so that a phone carrying both
+  this and the Play version does not show two identical icons called "SajdaTime". The
+  owner is not technical and should never have to guess which one an agent just installed.
+-->
+<resources>
+    <string name="app_name">SajdaTime (test)</string>
+</resources>
