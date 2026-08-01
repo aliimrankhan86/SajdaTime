@@ -218,6 +218,43 @@ class PolarAndHemisphereTest {
     }
 
     /**
+     * The sweep above uses the default method, which is not enough for Jafari and Tehran:
+     * their Maghrib comes from a **second** adhan call, made with the maghrib angle in the
+     * Isha slot, and `isUsable` never sees it. So the two Shia conventions get their own pass.
+     *
+     * Note for anyone tempted to tighten [isUsable] using the finished Maghrib rather than
+     * adhan's raw sunset: do not. Jafari Maghrib sits 4 degrees past sunset and Tehran 4.5, so
+     * the midpoint of sunrise-to-Maghrib is legitimately much later than Dhuhr — measured at
+     * 52 minutes at 68S in July, where the whole day is only 148 minutes long. That is the
+     * rule working, not a fault, and the guard is deliberately applied before it.
+     */
+    @Test
+    fun `the shia maghrib rule survives every latitude`() {
+        for (method in listOf(CalcMethod.JAFARI, CalcMethod.TEHRAN)) {
+            var lat = -89.0
+            while (lat <= 89.0) {
+                var date = LocalDate.of(2026, 1, 1)
+                while (date.year == 2026) {
+                    val day = PrayerEngine.compute(
+                        Coordinates(lat, 18.0),
+                        date,
+                        CalculationPrefs(method = method),
+                    )
+                    val instants = day.ordered.map { it.second }
+                    assertEquals(
+                        "$method lat=$lat $date out of order: " +
+                            day.ordered.joinToString(" ") { "${it.first}=${it.second}" },
+                        instants.sorted(),
+                        instants,
+                    )
+                    date = date.plusDays(1)
+                }
+                lat += 1.0
+            }
+        }
+    }
+
+    /**
      * Solar noon is the midpoint of the day arc. Where that is not true, adhan has paired a
      * sunrise from one night with a sunset from another, which is how the app came to show a
      * Maghrib of 17:00 at 78N on 24 August and 22:29 the day after. A sunset does not move
