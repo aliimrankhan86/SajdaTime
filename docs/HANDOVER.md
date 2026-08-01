@@ -2083,7 +2083,47 @@ After the fix: **0 faults in the same sweep.**
   transition, because a 3-minute algorithmic difference flips it. That is not fixable, and it
   is the reason the app's job there is to be **safe**, not precise.
 
-**6. A known divergence, deliberately not fixed.** Moonsighting say they slide to 60° above
+**6. The notice, finally seen on a real screen (1 Aug 2026) — and how to do it again.**
+
+Two previous sessions failed to photograph the polar banner because they fought the emulator's
+location stack. That was the wrong tool. **The app has a city search, and it works.**
+
+Recipe, which takes about two minutes:
+
+1. Install and open the app, grant coarse location so onboarding's **Continue** enables (it
+   stays disabled until a location exists — the emulator will offer somewhere in England).
+2. Finish onboarding, then tap the location chip at the top of the home screen → **Or type a
+   city**.
+3. Type a city that is in polar day or night **today**. This is the part earlier attempts got
+   wrong: on 1 August, Tromsø has already come out of polar day, so it shows ordinary times.
+   **Longyearbyen (78.22°N) is in polar day until late August** and works. In December almost
+   any Arctic town will do.
+
+Verified this way:
+
+| Setting | What the screen said |
+|---|---|
+| Default (Muslim World League) | *"…worked out from **latitude 45°** instead."* |
+| Settings → Moonsighting Committee | *"…worked out from **latitude 60°** instead."* |
+
+So the method-dependent reference latitude is confirmed end to end — engine, model, string
+and screen — not merely in a unit test. The card is not dismissible (no ✕, unlike the
+exact-alarm card directly beneath it), which is the intended difference.
+
+**RTL, via `./gradlew installRtl`:** the card mirrors correctly and, importantly, the number
+survives — it renders as `latitude 60°`, with the numeral and the degree sign together and in
+that order, inside the right-to-left paragraph. The usual force-RTL artefacts on the
+surrounding *English* text are present and expected (the full stop moves to the left, "Aug"
+reverses); they are an artefact of laying English out RTL, not a defect, and are already
+described in "Right-to-left, previewed before any translation exists".
+
+**Build trap found on the way.** `./gradlew installRtl` and `:app:installDebug` both fail with
+`INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000` when the
+**watch** emulator is also connected — the watch carries the same applicationId at a much
+higher version code, and `ANDROID_SERIAL` is not honoured by `installRtl`. Fix: build with
+`:app:assembleRtl` and install with `adb -s emulator-5554 install -r -d <apk>`.
+
+**7. A known divergence, deliberately not fixed.** Moonsighting say they slide to 60° above
 60°, but neither adhan nor the PHP library behind Aladhan implements that, so a Moonsighting
 user between 60° and 65.7° gets un-slid times. Measured gap: Helsinki 1 min, Anchorage 10,
 Trondheim 37, Reykjavík 49, **Luleå 91**. At Luleå in June the un-slid result is degenerate —
@@ -2406,13 +2446,15 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   implement adhan's faithful rendering of their published model; it currently does the latter,
   which is defensible, just not identical.
 
-- **A13 — The polar notice has still never been seen on a device.** The banner, its wording
-  and now the reference-latitude number are all verified by unit test and by reading, never by
-  screenshot. The emulator would not hold an Arctic location (§10, device recipes): `emu geo
-  fix` sets GPS only while `LocationRepository.lastKnown()` prefers NETWORK, and the
-  `cmd location providers` mock reverted after the permission flow. Also unverified in RTL,
-  where `latitude 45°` puts a Latin numeral and a degree sign inside a right-to-left sentence.
-  Neither is likely to be wrong; neither has been looked at.
+- **A13 — ✅ CLOSED (1 Aug 2026). The polar notice has now been seen on a device, in both
+  directions.** Two sessions had failed at this by fighting the emulator's location providers.
+  The answer was to stop: **the app's own city search sets the location directly**, and
+  Longyearbyen is in polar day through August. Verified 45° on the default method, 60° after
+  switching to Moonsighting, and correct mirroring in RTL. Recipe and the `installRtl`
+  version-code trap are in §10.
+
+  Still unseen: the same state on the **watch**, which does not show the notice at all — that
+  is A8, and it is a design question rather than a verification gap.
 
 ### Not done, in rough priority order
 

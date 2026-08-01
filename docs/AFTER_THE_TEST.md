@@ -67,9 +67,17 @@ the closest real towns to the line, keep their own times. Sunrise and sunset wer
 against Aladhan and agree **to the minute**. Full build passes: 74 tests, no failures, no lint
 errors.
 
-**What I could not verify:** the notice as it appears on a real screen. The emulator would not
-hold a fake Arctic location long enough to photograph it, and I am not going to claim otherwise.
-It is the same notice component already proven on screen elsewhere.
+**And I have now seen it on a screen**, which I could not manage in two earlier attempts. The
+mistake before was trying to fake an Arctic GPS position. The app has a city search built in,
+so I simply typed **Longyearbyen** — which is still in permanent daylight in August — and the
+notice appeared. On the default method it reads *"worked out from latitude 45° instead"*; after
+switching to Moonsighting in Settings it changes to *"latitude 60°"*, exactly as intended. It
+also survives being run entirely right-to-left, which is how it will look once someone
+translates the app into Arabic or Urdu.
+
+**What is still not verified:** the same situation on the **watch**, which does not show this
+notice at all. That is a design question — the screen is tiny — rather than something that is
+broken, and it is written down.
 
 **Should this be uploaded now, or wait?** I said last time I had not checked this properly.
 I have now. **Google's own documentation makes the requirement about your testers, not about
