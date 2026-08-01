@@ -120,9 +120,10 @@ the West, and only badly above about **45° of latitude**:
 | Chicago | 11–18 minutes |
 | **London, Berlin** | **20–47 minutes** |
 
-**So we are not changing the default and not adding any new methods.** Indonesia's and
-Malaysia's official methods are missing from the app and it does not matter — ours is within
-four to nine minutes of both. Adding them would be effort for nothing.
+**So we are not changing the default and not adding any new methods.** That table was written
+before the label was fixed; Indonesia's method was in the app all along, just under the wrong
+name — see "The method nobody could find" below. Malaysia's 18° is the same angle the default
+already uses.
 
 **And no per-prayer adjustment setting is needed either** — which reverses what this file
 said earlier today. When I ran the app's own engine rather than trusting the reference API,
@@ -207,12 +208,23 @@ explicit forward button.
 
 Not a tester report. It came out of checking the whole world instead of one town.
 
-**The problem.** Indonesia, Malaysia, Singapore and Brunei all use the same convention for
-Fajr and Isha — their religious authorities are Kemenag, JAKIM and MUIS. **The app has always
-calculated that convention perfectly.** It was in the list. It was just called *"Singapore"*.
+**The problem.** Indonesia and Singapore use the same convention for Fajr and Isha — their
+religious authorities are Kemenag and MUIS. **The app has always calculated that convention
+perfectly.** It was in the list. It was just called *"Singapore"*.
 
-So around **270 million Muslims — the biggest group in the Ummah** — had no reason to ever
-select it, and stayed on the default.
+So around **240 million Muslims** had no reason to ever select it, and stayed on the default.
+
+> **I got part of this wrong this morning and it went out.** The first version of the label
+> also said Malaysia. I had checked it against a well-known prayer-times website, which agreed
+> exactly — but that website is out of date: Malaysia changed its official Fajr from 20° to 18°
+> back in **November 2019**, and the website never updated. A reviewer caught it. I have since
+> checked Singapore against **MUIS's own printed 2024 timetable** rather than a website, and it
+> holds up on all four dates I tested. Malaysia has been removed from the label. Malaysian
+> users are correctly served by the default, which already uses 18°.
+>
+> The lesson is written down: checking against another calculator only proves the *sums* match.
+> It proves nothing about what a country actually does today. That needs the country's own
+> published timetable.
 
 **Why that mattered, and it is not cosmetic.** On the default, Fajr in Jakarta comes out
 **eight minutes later** than the Indonesian national timetable. During Ramadan that is eight
@@ -223,11 +235,12 @@ check had looked at Isha, so nobody had noticed.
 **The fix.** The entry is now called **"Kemenag / JAKIM / MUIS — Indonesia, Malaysia,
 Singapore"**. No new calculation, no new code. Just a name people recognise.
 
-**Checked properly:** against the independent Aladhan service at six cities in three countries
-— Jakarta, Medan, Surabaya, Kuala Lumpur, Kuching, Kota Bharu — on a June date and a Ramadan
-date. **Fifteen of sixteen times identical, one off by a single minute.** There is now a test
-that fails the build if a future library update quietly moves those times and makes the label
-untrue.
+**Checked properly, the second time:** for Singapore, against **MUIS's own printed 2024
+timetable** on 1 January, 21 March, 21 June and 23 September — Subuh matches to within a
+minute on all four, and Isha matches exactly. For Indonesia, against Kemenag's method at
+Jakarta, Medan and Surabaya, plus Kemenag's own public statement that it still uses 20°.
+There is now a test that fails the build if a library update moves those times and makes the
+label untrue, and a second test pinning Malaysia to the default instead.
 
 **Worth knowing about the default generally.** Compared against each region's own official
 method, the app's default is 0–10 minutes *later* on Fajr almost everywhere in the world, and

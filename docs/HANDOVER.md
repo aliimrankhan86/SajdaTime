@@ -1766,7 +1766,7 @@ and a June date. Positive means **MWL is later**:
 | City | Local authority | Ramadan | June |
 |---|---|---:|---:|
 | Jakarta | Kemenag | +8 | +8 |
-| Kuala Lumpur | JAKIM | +8 | +9 |
+| ~~Kuala Lumpur~~ | ~~JAKIM~~ | ~~+8~~ | ~~+9~~ |
 | Singapore | MUIS | +8 | +9 |
 | Cairo | Egyptian | +7 | +10 |
 | Casablanca | Morocco | +4 | +7 |
@@ -1784,17 +1784,77 @@ Note the direction reverses with latitude. At Slough, MWL Fajr is 15–42 minute
 than the mosques' Moonsighting all year — cautious, not dangerous. **So the fasting risk is
 not in Britain, it is in Indonesia.** Neither second opinion reached that; it took the numbers.
 
+**⚠️ The Kuala Lumpur row above is struck through because it is wrong.** It was measured
+against Aladhan's JAKIM method, which is stale. See "Aladhan was stale and I shipped it"
+below. Malaysia's national Fajr criterion has been 18° since November 2019, which *is* MWL's
+angle, so the correct figure for Kuala Lumpur is **0**, not +8/+9. Every other row stands.
+
+### Aladhan was stale and I shipped it (1 Aug 2026, same day)
+
+The worst mistake of this session, caught by a second-opinion review a few hours after the
+commit went out.
+
+**What happened.** adhan's `SINGAPORE` preset is Fajr 20° / Isha 18°. Checking it against
+Aladhan showed those angles matching Aladhan's Kemenag (Indonesia), JAKIM (Malaysia) and MUIS
+(Singapore) methods to the minute across six cities. On that basis the option was relabelled
+`Kemenag / JAKIM / MUIS — Indonesia, Malaysia, Singapore` and committed.
+
+**What was actually true.** Malaysia moved its national Fajr criterion from 20° to 18° at the
+MKI Coordination Committee meeting of **20–21 November 2019**, following a year of research by
+JAKIM with Universiti Malaya, UniSZA and UiTM. Subuh became roughly **eight minutes later**.
+Confirmed from Malaysian government and state-mufti sources.
+
+**Aladhan's JAKIM method still reports Fajr 20°.** It has been wrong for nearly seven years.
+Verified directly from its own `/v1/methods` endpoint:
+`id=17 Jabatan Kemajuan Islam Malaysia (JAKIM) params={'Fajr': 20, 'Isha': 18}`.
+
+So the check confirmed the arithmetic perfectly and confirmed nothing about Malaysia. The
+label was a lie about a real country's practice, and it shipped.
+
+**What Singapore actually does — checked properly this time.** Not against an aggregator, but
+against **MUIS's own published "Prayer Times for Singapore Year 2024"**, text-extracted from
+their PDF:
+
+| Date | MUIS printed Subuh | Computed at 20° | Computed at 18° |
+|---|---|---|---|
+| 1 Jan 2024 | 5:44 | **05:43** | 05:52 |
+| 21 Mar 2024 | 5:52 | **05:52** | 06:00 |
+| 21 Jun 2024 | 5:37 | **05:36** | 05:45 |
+| 23 Sep 2024 | 5:37 | **05:37** | 05:45 |
+
+Isyak matches 18° exactly on all four. **Singapore is genuinely 20°/18°.** Indonesia is
+genuinely 20° — Kemenag has publicly reaffirmed it and NU calculates at 20°, though note that
+Muhammadiyah, one of Indonesia's largest organisations, adopted 18° after its own review, so
+even "Indonesia" is not one number.
+
+**Corrected label:** `Kemenag & MUIS — Indonesia, Singapore`. Malaysia removed. The affected
+population is ~240 million, not the ~270 million claimed in the first commit.
+
+**And the direction of the original finding reverses for Malaysia.** MWL is *not* eight
+minutes late there; at 18° it is the national criterion. A Malaysian on the default is
+correct. `PolarAndHemisphereTest` now pins that relationship so the label cannot drift back.
+
+**The rule this produces:** Aladhan is an excellent cross-check for *arithmetic* — does my
+implementation of an 18° Fajr agree with another implementation of an 18° Fajr. It is not a
+source of truth for *what a country currently observes*. Those are different questions, and
+this session conflated them. A claim about a national authority needs that authority's own
+current publication, and nothing less.
+
 ### The largest bloc of Muslims on earth could not find their own method (1 Aug 2026)
 
 adhan's `SINGAPORE` preset is Fajr 20° / Isha 18°. Those are also, exactly, the angles used by
-**Kemenag** (Indonesia), **JAKIM** (Malaysia) and **MUIS** (Singapore); Brunei follows the
-same. Verified against Aladhan at six cities in three countries — Jakarta, Medan, Surabaya,
-Kuala Lumpur, Kuching, Kota Bharu — on a June and a Ramadan date: **15 of 16 values identical,
-one off by a single minute.**
+**Kemenag** (Indonesia) and **MUIS** (Singapore) — verified for Singapore against MUIS's own
+2024 timetable on four dates, and for Indonesia against Aladhan's Kemenag method plus Kemenag's
+own public reaffirmation of 20°.
 
-Labelled simply *"Singapore"*, that option was invisible to roughly **270 million** Muslims who
+> **This paragraph originally also claimed Malaysia and Brunei, on the strength of Aladhan's
+> JAKIM method. That was wrong and it shipped.** Malaysia moved to 18° in November 2019 and
+> Aladhan has not caught up. See "Aladhan was stale and I shipped it" immediately above; the
+> corrected figure is ~240 million people, not ~270 million.
+
+Labelled simply *"Singapore"*, that option was invisible to roughly **240 million** Muslims who
 had no reason to look at it. The maths was already correct and already shipping; only the label
-was wrong. Now `Kemenag / JAKIM / MUIS — Indonesia, Malaysia, Singapore`.
+was wrong. Now `Kemenag & MUIS — Indonesia, Singapore`.
 
 The enum stays `CalcMethod.SINGAPORE` because that name is written into saved settings; only
 `method_singapore` changed. Pinned by `PolarAndHemisphereTest`, so an adhan upgrade that moves
@@ -2117,6 +2177,45 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   fix is shared so the watch no longer crashes, but a Wear user above the Arctic Circle sees
   projected times with nothing saying so. Small screen, no obvious room; needs a design
   decision rather than a quick insertion.
+
+- **A9 — ⚠️ Is 60° the right polar reference, or is it Moonsighting's rule applied to every
+  method?** The strongest objection from the round-2 review, and it is a good one. Moonsighting
+  Committee publish 60°, and that is where the figure came from — but they publish it *for
+  their own method*, alongside their seasonal model and one-seventh treatment. The formal MWL
+  resolution, later reaffirmed by the European Council for Fatwa and Research, is reported to
+  use **45°** instead. If that is right, the app currently applies Moonsighting's polar rule to
+  MWL, Egyptian, Karachi, Umm al-Qura and everything else — which is precisely the "silently
+  adopting a position" failure the app is supposed to avoid. **The ECFR/MWL 45° claim is not
+  verified here**; it needs the resolution text. Do that before changing anything. Note also
+  that 60° is *less* geographically distortive than 45° for a Tromsø user, so this is not a
+  simple "the reviewer is right, change the number".
+
+  Explicitly rejected already: "clamp to the highest latitude that still computes". That
+  boundary is an artefact of the library's failure checks, moves from day to day, and has no
+  authority behind it — it optimises for the last floating-point value that did not return
+  null.
+
+- **A10 — Per-prayer provenance, and whether projected times should fire alarms.** Measured:
+  the 60° projection moves **Dhuhr by exactly zero** (solar transit does not depend on
+  latitude), Fajr/Asr/Isha by up to ~40 minutes, and sunrise/Maghrib by up to 95. Asr is
+  genuinely computable in polar summer — the sun is up all day, so a shadow exists — and adhan
+  discards it only because a missing sunrise fails its whole constructor. A mixed day (true
+  Dhuhr, true Asr, estimated Fajr/Isha) would be more honest than a uniformly synthetic one,
+  and there is a real-world implementation of exactly that in Oulu, Finland.
+
+  Separately: the home banner is not enough. A user may only ever meet the tile, the
+  notification, the PDF or the **alarm**, and an alarm derived from a projection is a stronger
+  claim than a number on a screen. Options are a per-prayer "estimated" marker carried
+  everywhere, a one-time confirmation before projected alarms are first scheduled, or showing
+  estimates while suppressing their alarms.
+
+- **A11 — Ramadan wording for Fajr, rather than changing the default angle.** One reviewer
+  argued the worldwide default should err early (19.5°–20°) on precautionary grounds. The
+  better argument is that there is no globally cautious angle, because one timestamp carries
+  two opposite risks: late is dangerous for ending suhur, early is dangerous for the validity
+  of the Fajr prayer itself. So keep 18°, but during Ramadan say plainly that local and
+  national timetables may begin Fajr earlier and should be confirmed. Do **not** silently add
+  an imsak margin — that is another convention and another religious choice.
 
 ### Not done, in rough priority order
 
@@ -2827,15 +2926,30 @@ matters more than the stable hashes, that is the trade being made.
     merely different from the reference, we were strictly worse, and that is a fact you only
     learn by going and looking.
 
-45. **A wrong label is a real defect, not cosmetics.** The app already computed Indonesian,
-    Malaysian and Singaporean prayer times perfectly — adhan's `SINGAPORE` preset is Fajr 20°
-    / Isha 18°, which is exactly Kemenag, JAKIM and MUIS. Verified at six cities in three
-    countries: 15 of 16 values identical to Aladhan. But it was labelled *"Singapore"*, so
-    roughly **270 million Muslims** — the largest bloc in the Ummah — had no reason to ever
-    select it, and sat on a default that put their Fajr eight minutes late.
+45. **A wrong label is a real defect, not cosmetics.** The app already computed Indonesian and
+    Singaporean prayer times perfectly — adhan's `SINGAPORE` preset is Fajr 20° / Isha 18°,
+    which is exactly Kemenag and MUIS. But it was labelled *"Singapore"*, so roughly **240
+    million Muslims** had no reason to ever select it, and sat on a default that put their
+    Fajr eight minutes late.
 
     Nothing was wrong with the mathematics. Nothing needed building. **When a feature exists
     and nobody uses it, look at what it is called before you look at what it does.**
+
+45a. **Verifying against a mirror is not verifying.** The same label, in the same commit, also
+    claimed Malaysia — because Aladhan's JAKIM method agreed to the minute. It agreed because
+    Aladhan still publishes Fajr 20° for JAKIM, which Malaysia abandoned in **November 2019**.
+    The check was internally flawless and told me nothing.
+
+    The failure was conflating two different questions. *"Does my 20° Fajr match another
+    implementation's 20° Fajr"* is arithmetic, and Aladhan answers it well. *"Is 20° what
+    Malaysia currently observes"* is a fact about the world, and no calculator can answer it —
+    only the authority's own current publication can. When Singapore was checked properly,
+    against MUIS's own 2024 PDF, it held up. Malaysia did not.
+
+    **Any claim naming a country or an authority must be traced to that authority's own
+    current publication.** A second implementation agreeing with you is not evidence; it may
+    simply be stale in the same direction, and aggregators are stale far more often than their
+    confident APIs suggest. This one had been wrong for nearly seven years.
 
 46. **Take a second opinion seriously enough to check it.** Two other models reviewed this
     design. Both were useful and neither was right to accept whole. They correctly caught that

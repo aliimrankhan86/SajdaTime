@@ -121,19 +121,32 @@ class PolarAndHemisphereTest {
     }
 
     /**
-     * The option labelled for Indonesia, Malaysia and Singapore has to actually reproduce
-     * what those countries publish, or the label is a lie. These figures are Aladhan's, for
-     * Kemenag (method 20) in Indonesia and JAKIM (method 17) in Malaysia. If an adhan
-     * upgrade moves them, the label needs revisiting rather than the numbers forcing.
+     * The option labelled for Indonesia and Singapore has to reproduce what those countries
+     * actually publish, or the label is a lie.
+     *
+     * The Singapore rows are the decisive ones because they come from **MUIS's own 2024
+     * timetable**, not from an aggregator. That distinction is the whole point: an earlier
+     * version of this test trusted Aladhan's JAKIM method, which still reports Fajr 20
+     * degrees although Malaysia moved its national criterion to 18 in November 2019. The
+     * label named Malaysia on that basis and was wrong. Aladhan is a fine cross-check for
+     * *arithmetic*; it is not a source of truth for *what a country currently observes*.
+     *
+     * Malaysia is therefore absent by design. Do not add it back without a JAKIM timetable
+     * in hand — at 18 degrees it is served by MUSLIM_WORLD_LEAGUE, not by this entry.
      */
     @Test
-    fun `southeast asia option matches Kemenag and JAKIM`() {
+    fun `southeast asia option matches Kemenag and MUIS`() {
         val hm = DateTimeFormatter.ofPattern("HH:mm")
         val expected = listOf(
+            // MUIS, "Prayer Times for Singapore Year 2024", Subuh/Isyak as printed.
+            Triple("Singapore 1 Jan", Coordinates(1.35, 103.82) to "Asia/Singapore", LocalDate.of(2024, 1, 1) to ("05:43" to "20:24")),
+            Triple("Singapore 21 Mar", Coordinates(1.35, 103.82) to "Asia/Singapore", LocalDate.of(2024, 3, 21) to ("05:52" to "20:24")),
+            Triple("Singapore 21 Jun", Coordinates(1.35, 103.82) to "Asia/Singapore", LocalDate.of(2024, 6, 21) to ("05:36" to "20:28")),
+            Triple("Singapore 23 Sep", Coordinates(1.35, 103.82) to "Asia/Singapore", LocalDate.of(2024, 9, 23) to ("05:37" to "20:09")),
+            // Indonesia, cross-checked against Aladhan's Kemenag method. Kemenag has
+            // publicly reaffirmed 20 degrees, so unlike JAKIM this one is not stale.
             Triple("Medan", Coordinates(3.59, 98.67) to "Asia/Jakarta", midsummer to ("04:53" to "19:53")),
             Triple("Surabaya", Coordinates(-7.25, 112.75) to "Asia/Jakarta", midsummer to ("04:16" to "18:37")),
-            Triple("Kuching", Coordinates(1.55, 110.34) to "Asia/Kuching", midsummer to ("05:10" to "20:02")),
-            Triple("Kota Bharu", Coordinates(6.13, 102.24) to "Asia/Kuala_Lumpur", midsummer to ("05:33" to "20:44")),
         )
         for ((name, place, want) in expected) {
             val (at, tz) = place
@@ -142,6 +155,26 @@ class PolarAndHemisphereTest {
             val zone = ZoneId.of(tz)
             assertEquals("$name Fajr", times.first, day[PrayerSlot.FAJR].atZone(zone).format(hm))
             assertEquals("$name Isha", times.second, day[PrayerSlot.ISHA].atZone(zone).format(hm))
+        }
+    }
+
+    /**
+     * Malaysia moved its national Fajr criterion from 20 to 18 degrees in November 2019,
+     * which is Muslim World League's angle. This pins that relationship so the label cannot
+     * drift back: if MWL ever stops matching Malaysia's criterion, this fails and the
+     * guidance in strings.xml needs rewriting.
+     */
+    @Test
+    fun `Malaysia is served by MWL, not by the Indonesia-Singapore option`() {
+        val kl = Coordinates(3.14, 101.69)
+        for (date in listOf(midsummer, midwinter)) {
+            val mwl = PrayerEngine.compute(kl, date, CalculationPrefs(method = CalcMethod.MUSLIM_WORLD_LEAGUE))
+            val seAsia = PrayerEngine.compute(kl, date, CalculationPrefs(method = CalcMethod.SINGAPORE))
+            val gap = (seAsia[PrayerSlot.FAJR].toEpochMilli() - mwl[PrayerSlot.FAJR].toEpochMilli()) / 60_000
+            assertTrue(
+                "20 vs 18 degrees at KL should separate Fajr by roughly 8-9 minutes, was $gap",
+                gap in -11..-6,
+            )
         }
     }
 

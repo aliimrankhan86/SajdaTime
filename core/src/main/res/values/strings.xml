@@ -39,16 +39,20 @@
     <string name="method_kuwait">Kuwait</string>
     <string name="method_qatar">Qatar</string>
     <!--
-      This entry is adhan's SINGAPORE preset, but its angles (Fajr 20, Isha 18) are also
-      exactly those of Kemenag in Indonesia, JAKIM in Malaysia and MUIS in Singapore, and
-      Brunei follows the same. Verified against Aladhan at six cities in three countries:
-      15 of 16 values identical, one off by a minute — see docs/HANDOVER.md §10. Labelled
-      "Singapore" it was invisible to the largest bloc of Muslims on earth, roughly 270
-      million people, who had no reason to look at it. The label carries the countries
-      because that is what a user recognises; the enum name stays SINGAPORE because it is
-      what is written into saved settings.
+      adhan's SINGAPORE preset: Fajr 20, Isha 18. Those angles are also Kemenag's in
+      Indonesia and MUIS's in Singapore, so the label names both — "Singapore" alone was
+      invisible to ~240 million Indonesians who had no reason to look at it.
+      Verified against MUIS's OWN 2024 timetable (not an aggregator) on four dates: Subuh
+      matches 20 degrees to within a minute and is 8-9 minutes from 18.
+
+      Malaysia is deliberately NOT named here, and this must not be "corrected" back.
+      JAKIM used 20 degrees until the MKI Coordination Committee of 20-21 Nov 2019 moved
+      the national criterion to 18, making Subuh about 8 minutes later. Malaysia is
+      therefore served by Muslim World League, not by this entry. Aladhan's JAKIM method
+      still publishes 20 and is stale; an earlier version of this label trusted it and was
+      wrong. See docs/HANDOVER.md §10, "Aladhan was stale and I shipped it".
     -->
-    <string name="method_singapore">Kemenag / JAKIM / MUIS — Indonesia, Malaysia, Singapore</string>
+    <string name="method_singapore">Kemenag &amp; MUIS — Indonesia, Singapore</string>
     <string name="method_turkey">Diyanet, Turkey</string>
     <string name="method_jafari">Jafari (Ithna Ashari)</string>
     <string name="method_tehran">Institute of Geophysics, Tehran</string>
