@@ -201,6 +201,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissExactAlarmNotice() =
         viewModelScope.launch { settingsRepository.dismissExactAlarmNotice() }
 
+    fun dismissMethodNotice() =
+        viewModelScope.launch { settingsRepository.dismissMethodNotice() }
+
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
 

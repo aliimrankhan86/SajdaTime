@@ -91,6 +91,15 @@ data class AppSettings(
      */
     val exactAlarmNoticeDismissed: Boolean = false,
     /**
+     * True once the user has closed the calculation-method notice on the home screen.
+     *
+     * Same contract as [exactAlarmNoticeDismissed]: dismissing hides it on home only, and
+     * Settings still shows the method row it points at. Choosing any method also stops it
+     * appearing, so a user who reads the notice and acts on it is never asked twice — see
+     * `HomeScreen.MethodBanner`.
+     */
+    val methodNoticeDismissed: Boolean = false,
+    /**
      * Light, dark, or whatever the phone is set to. Following the system is the default,
      * and on a device that expresses no preference that resolves to light.
      */
@@ -222,6 +231,9 @@ class SettingsRepository(private val context: Context) {
     /** Closes the exact-alarm notice on home for good. Settings still shows it. */
     suspend fun dismissExactAlarmNotice() = edit { it[Keys.EXACT_ALARM_DISMISSED] = true }
 
+    /** Closes the calculation-method notice on home for good. Settings still shows the row. */
+    suspend fun dismissMethodNotice() = edit { it[Keys.METHOD_NOTICE_DISMISSED] = true }
+
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
     }
@@ -248,6 +260,7 @@ class SettingsRepository(private val context: Context) {
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
         val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
+        val METHOD_NOTICE_DISMISSED = booleanPreferencesKey("method_notice_dismissed")
         val THEME = stringPreferencesKey("theme_choice")
     }
 
@@ -279,6 +292,7 @@ class SettingsRepository(private val context: Context) {
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
+            methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
         )
     }

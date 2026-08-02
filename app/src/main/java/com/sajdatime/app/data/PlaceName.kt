@@ -34,9 +34,17 @@ internal fun placeLabel(
 ): String {
     val place = locality.orNull()
         ?: subLocality.orNull()
-        ?: featureName.orNull()?.takeIf { it.looksLikeAPlace() }
         ?: subAdminArea.orNull()
         ?: adminArea.orNull()
+        // Last resort only, and it earned that position by failing. Placed third at first,
+        // ahead of the county, on the reasoning that it is "more specific". Running it
+        // produced "Townhouse Hotel, United Kingdom" — the geocoder had returned a POI,
+        // which is worse than the county this whole change exists to remove, and on an app
+        // that promises to ask only for an approximate position, naming a *building* reads
+        // as though it knows exactly where the user is standing. It stays only for the case
+        // where every administrative field is null — mid-ocean, open desert — where a name
+        // beats no name at all.
+        ?: featureName.orNull()?.takeIf { it.looksLikeAPlace() }
     val country = countryName.orNull()
 
     return when {

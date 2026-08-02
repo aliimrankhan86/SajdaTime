@@ -127,6 +127,7 @@ class MainActivity : ComponentActivity() {
                             onQiblaVisible = viewModel::setQiblaVisible,
                             onSetThemeChoice = viewModel::setThemeChoice,
                             onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
+                            onDismissMethodNotice = viewModel::dismissMethodNotice,
                         )
 
                         // Shown once, immediately after setup. The app is a convenience,

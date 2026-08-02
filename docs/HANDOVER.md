@@ -2946,6 +2946,38 @@ same as seeing it.
   option was never that a smart default is wrong — it is that a **silent** one is. A visible
   prompt is not the same thing.
 
+  **DONE, 2 Aug 2026 — the latitude-triggered note, built exactly as scoped.**
+  `HomeScreen.MethodBanner`, using the existing `NoticeCard` and the same dismiss contract as
+  the exact-alarm banner. It appears only when **all three** hold:
+
+  | Condition | Why |
+  |---|---|
+  | `abs(latitude) ≥ 45` | Below it the default is within minutes of local practice nearly everywhere; showing this to everyone hands ~80% of users a question they have no reason to answer. `abs`, because the Southern Hemisphere is not an afterthought |
+  | `method == AUTO` | A user who has already chosen — even if they chose MWL deliberately — has answered this. Asking again second-guesses them |
+  | not dismissed | Persisted as `method_notice_dismissed`, home only; Settings keeps the row |
+
+  **It names no method and changes no time.** The wording asks *"Does this match your
+  mosque?"* and offers the picker. Auto-switching by latitude stays rejected for the reason
+  above. This is also consistent with the disclaimer, which already tells users to ask their
+  mosque and pick the method in Settings — the banner is the actionable version of a
+  sentence that was previously buried in a wall of text shown once.
+
+  Verified on the emulator, all five paths: shown at 51°N on `AUTO`; **absent at Makkah**
+  (21°N); absent after choosing any method (and Dhuhr moved 1:16 → 1:20 pm, so the choice
+  took effect); tap switches to the Settings tab; Dismiss hides it and survives a full app
+  restart, while the exact-alarm banner beside it still shows — which is what proves the
+  dismiss is specific rather than hiding everything.
+
+  **A regression in the T3 fix was found by this same run, and it is the more useful
+  finding.** `PlaceName` had `featureName` third in the chain, ahead of the county, on the
+  reasoning that it is "more specific". The emulator's geocoder answered a UK fix with a
+  POI and the home screen read **"Townhouse Hotel, United Kingdom"** — worse than the county
+  the change existed to remove, and on an app whose new location copy promises to ask only
+  for an *approximate* position, naming a building is its own contradiction. `featureName`
+  is now last, consulted only when every administrative field is null. Nine tests, one named
+  for the regression. It compiled, it read correctly, it passed eight tests, and it was
+  wrong; only running it said so.
+
 - **T2 — DONE, 1 Aug 2026.** Every step that asks a question now ends in the same pair of
   buttons, Back and Continue, through one shared `StepButtons` composable. Selecting a card
   only selects it. Skip was deleted rather than relabelled, because one of the four madhabs is
@@ -4243,6 +4275,22 @@ matters more than the stable hashes, that is the trade being made.
     permission. A comment recording why a cautious choice was made is exactly the thing that
     should be re-read whenever new evidence lands, not treated as settled because it is
     well-argued. Grep your own hedges after every measurement.
+
+70. **"More specific" is not the same as "better", and a passing test suite will not tell
+    you the difference.** The town-not-county fix put `featureName` third in the chain,
+    ahead of the county, because it is the most specific field the geocoder offers. Eight
+    tests passed, including one asserting a house number is rejected. Then it ran, and the
+    home screen said **"Townhouse Hotel, United Kingdom"**.
+
+    Every test had been written against the failure I had already imagined — a numeric house
+    number — and none against the one that actually happens, a named point of interest,
+    because I did not think of it until a real geocoder produced it. The tests were not
+    weak; they were a faithful record of my imagination. Worse, the wrong answer contradicted
+    a *different* promise made in the same commit, that the app only ever asks for an
+    approximate position; a fix can breach a guarantee that lives two files away.
+
+    The generalisation: when ordering fallbacks, ask what the field contains when it is
+    *wrong*, not what it contains when it is right. And run the thing.
 
 ---
 

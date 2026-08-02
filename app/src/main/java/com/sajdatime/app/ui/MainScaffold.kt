@@ -70,6 +70,7 @@ fun MainScaffold(
     onQiblaVisible: (Boolean) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
+    onDismissMethodNotice: () -> Unit,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -127,6 +128,11 @@ fun MainScaffold(
                         onChangeLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
                         onDismissExactAlarmNotice = onDismissExactAlarmNotice,
+                        onDismissMethodNotice = onDismissMethodNotice,
+                        // The method notice is the only card that has to move the user to
+                        // another tab, so it sets `destination` directly rather than
+                        // adding a navigation callback the other two would never use.
+                        onOpenMethodSetting = { destination = Destination.SETTINGS },
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)

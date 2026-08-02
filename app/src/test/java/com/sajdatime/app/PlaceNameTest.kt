@@ -69,7 +69,27 @@ class PlaceNameTest {
     }
 
     @Test
-    fun `a named feature is shown when it is the only place-like field`() {
+    fun `a point of interest never outranks a real administrative area`() {
+        // Regression, found by running it rather than reading it. featureName sat third in
+        // the chain, ahead of the county, and the emulator's geocoder answered a UK fix
+        // with a hotel: the home screen read "Townhouse Hotel, United Kingdom". A POI is
+        // worse than the county the change exists to remove, and on an app that asks only
+        // for an approximate position, naming a building is its own kind of wrong.
+        assertEquals(
+            "Berkshire, United Kingdom",
+            label(
+                featureName = "Townhouse Hotel",
+                subAdminArea = "Berkshire",
+                adminArea = "England",
+                countryName = "United Kingdom",
+            ),
+        )
+    }
+
+    @Test
+    fun `a named feature is shown when there is no administrative area at all`() {
+        // Mid-ocean or open desert: a name beats no name. This is the only case featureName
+        // is still consulted for.
         assertEquals("Snowdonia, United Kingdom", label(featureName = "Snowdonia", countryName = "United Kingdom"))
     }
 

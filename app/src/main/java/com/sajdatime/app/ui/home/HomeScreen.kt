@@ -65,6 +65,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
@@ -81,6 +82,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.chrono.HijrahDate
 import java.time.temporal.ChronoField
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,6 +92,8 @@ fun HomeScreen(
     onChangeLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
+    onDismissMethodNotice: () -> Unit,
+    onOpenMethodSetting: () -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
@@ -108,6 +112,7 @@ fun HomeScreen(
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
+        MethodBanner(state, onOpen = onOpenMethodSetting, onDismiss = onDismissMethodNotice)
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(24.dp))
         TodayTimeline(state)
@@ -441,6 +446,46 @@ private fun PolarBanner(state: UiState) {
     )
 }
 
+/**
+ * Offers the calculation-method setting to the users it actually matters to.
+ *
+ * The complaint behind it: three mosques in the tester's town put Isha **78 minutes**
+ * earlier than the app did. The app was not miscalculating — `MOON_SIGHTING` already ships
+ * and already matches them to the minute — but onboarding never asks for a method, so a
+ * user who does not open Settings can never reach the fix.
+ *
+ * **Only above [METHOD_NOTICE_LATITUDE].** The worldwide sweep in HANDOVER §10 found the
+ * default (Muslim World League) is within about five minutes across South Asia,
+ * South-East Asia, the Middle East and Africa, and only diverges nearer the poles, where it
+ * reaches +26 minutes in March and +49 in June. Showing this to everyone would hand ~80% of
+ * users a question they have no reason to answer. `abs` because latitude bands are
+ * symmetric and the Southern Hemisphere is not an afterthought.
+ *
+ * **Only while the method is still [CalcMethod.AUTO].** A user who has already chosen —
+ * even if they chose MWL deliberately — has answered this question, and asking again would
+ * second-guess them.
+ *
+ * It names no method and changes no time. Auto-switching by latitude was considered and
+ * rejected: the objection was never that a smart default is wrong, it is that a *silent*
+ * one has the app taking a fiqh-adjacent position for the user. A visible prompt is not the
+ * same thing. See HANDOVER §11, T1.
+ */
+@Composable
+private fun MethodBanner(state: UiState, onOpen: () -> Unit, onDismiss: () -> Unit) {
+    if (state.settings.methodNoticeDismissed) return
+    if (state.settings.method != CalcMethod.AUTO) return
+    val latitude = state.settings.coordinates?.latitude ?: return
+    if (abs(latitude) < METHOD_NOTICE_LATITUDE) return
+
+    Spacer(Modifier.height(12.dp))
+    NoticeCard(
+        title = stringResource(R.string.method_notice_title),
+        body = stringResource(R.string.method_notice_body),
+        onClick = onOpen,
+        onDismiss = onDismiss,
+    )
+}
+
 @Composable
 private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
@@ -734,3 +779,14 @@ private fun hijriToday(now: Instant): String {
     val name = months.getOrNull(month - 1) ?: return ""
     return stringResource(R.string.hijri_date_format, day, name, year)
 }
+
+/**
+ * Where the calculation-method notice starts appearing, in degrees of latitude, either side
+ * of the equator.
+ *
+ * 45 is not a round number chosen for tidiness — it is where the measured divergence starts.
+ * Below it the default is within a few minutes of local practice essentially everywhere;
+ * above it the gap grows quickly (+26 minutes by March, +49 by June). See HANDOVER §10,
+ * "Is Muslim World League actually a bad default?".
+ */
+private const val METHOD_NOTICE_LATITUDE = 45.0
