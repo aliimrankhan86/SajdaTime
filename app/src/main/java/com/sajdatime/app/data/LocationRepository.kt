@@ -66,7 +66,10 @@ class LocationRepository(private val context: Context) {
             Geocoder(context, AppLocale.of(context))
                 .getFromLocation(coordinates.latitude, coordinates.longitude, 1)
                 ?.firstOrNull()
-                ?.let { it.locality ?: it.subAdminArea ?: it.adminArea ?: it.countryName }
+                // Shared with CityLookup so a place found automatically and the same place
+                // found by searching are named identically. See PlaceName.kt for why the
+                // old chain showed a tester his county.
+                ?.placeLabel()
                 .orEmpty()
         }.getOrDefault("")
     }

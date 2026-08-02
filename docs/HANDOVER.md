@@ -2712,6 +2712,92 @@ This is groundwork for a translation that does not exist yet, and it is delibera
 *only* groundwork done: no `values-ar/`, no machine translation, nothing that looks like a
 step towards shipping a language without a native speaker. See CLAUDE.md.
 
+### The daytime half of the alarm story, and the town-not-county fix (2 Aug 2026)
+
+**The clearest single piece of evidence this project has produced.** The Xiaomi came back
+with both builds still installed and both holding the *same nine prayer times*. One
+`dumpsys alarm`, one instant, no reinstall, nothing rescheduled:
+
+| Target | Build | `window` | `flags` | `exactAllowReason` | Fires no later than |
+|---|---|---|---|---|---|
+| 13:10 Dhuhr | shipped | `+1h0m0s0ms` | `0x20` | — | +1 hour |
+| 13:10 Dhuhr | fixed | `0` | `0x3` | `permission` | exactly |
+| 17:17 Asr | shipped | `+1h0m0s0ms` | `0x20` | — | +1 hour |
+| 17:17 Asr | fixed | `0` | `0x3` | `permission` | exactly |
+
+…and so on for all nine. Every fixed alarm exact; every shipped alarm an hour of slack.
+The fixed entries also carry a `showIntent=…startActivity`, which is the `setAlarmClock`
+signature — the shipped ones have none, because `setAndAllowWhileIdle` has nothing to show.
+
+**`power_pending` had cleared to `--` on both.** So this is *not* the HyperOS deferral: it
+is the plain one-hour window Android applies to any inexact alarm, present in ordinary
+daytime use with the phone awake and charging. The two findings stack rather than compete —
+overnight the OEM parks the alarm for days, and in the daytime Android alone still costs up
+to an hour. Between them there is no part of the day when the shipped build is on time.
+
+**A caught error of my own.** The first dump showed the shipped build's alarms still parked
+three days out; the second, seconds later, showed them released. Same alarm object. The
+deferral clears when the phone becomes active, exactly as the overnight run predicted — but
+had I read only the first dump I would have reported a permanent three-day park, and had I
+read only the second I would have missed the parking entirely.
+
+**Another prayer app on the same phone answers the question the fix could not.** Muslim Pro
+declares `USE_EXACT_ALARM`, has `SCHEDULE_EXACT_ALARM: granted=false`, and its alarms read
+`window=0 exactAllowReason=policy_permission flags=0x5` — exact, with **no permission the
+user can decline**, because that permission is auto-granted at install and cannot be
+revoked. It is the whole problem sidestepped rather than mitigated. It is deliberately
+**not** adopted here; see §11 and lesson 68.
+
+**T3 — the town, not the county — is fixed, and it is the fix this document already
+specified.** The precision section above ends by naming the cause exactly: `subLocality`
+and `featureName` "are not in the chain at all, and either often survives when `locality`
+does not". `data/PlaceName.kt` is now the single chain used by *both* halves of the feature:
+
+```
+locality → subLocality → featureName (only if it contains a letter) → subAdminArea → adminArea
+```
+
+Three things worth knowing about it:
+
+- **The two halves used to disagree with each other.** A searched city read "Slough, United
+  Kingdom"; the same place found automatically read "Slough". Same screen, two formats. They
+  share one function now and cannot drift apart again.
+- **`featureName` is guarded.** It is only *usually* a place name; on a precise fix it is as
+  likely to be a house number, and "37, United Kingdom" is worse than the county the whole
+  change exists to remove. Anything without a letter in it is rejected.
+- **Eight JVM tests, on plain strings rather than `android.location.Address`,** because that
+  class is a stub outside an emulator and every assertion would otherwise have needed
+  Robolectric to say anything at all. The test named for the bug reproduces the exact shape
+  a coarse fix returns.
+
+**The precision explainer is measured, not asserted.** `location_sheet_body` now tells the
+user why the name may be approximate and that it barely moves the times. The figure was
+computed with the app's own `PrayerEngine` over ±10 miles at UK latitude, on today,
+midsummer and midwinter: **every prayer moves by at most two minutes**, longitude
+dominating as expected. That agrees with the independent Aladhan figures in the precision
+section above (≈5 seconds per kilometre), so two methods now say the same thing. It is
+shown only when the user opens the location sheet — the app never volunteers it, and it is
+not a second disclaimer. The sheet already has `.verticalScroll`, so the longer body cannot
+clip or push the search field off-screen.
+
+**The onboarding and settings copy has been strengthened, and the old reasoning retired.**
+Both strings said only "may hold prayer alerts back and deliver them late", with a comment
+explaining that no number was given because Android documents no upper bound. That was
+right while we were *reasoning* and wrong once we had *measured*. Denial now reproduces as
+a one-hour window on two makes and, overnight on HyperOS, as an alarm that never arrives.
+"Late" undersold that badly enough to talk a user out of a permission that silently costs
+them Fajr, so both strings now name the measured floor and the overnight case, and name
+Fajr specifically because it is the prayer that fails.
+
+**What this did *not* establish.** The 13:10 firing itself had not yet been observed when
+this was written — the table is the *scheduling* state, which is what the fix changes. The
+RTL preview could not be installed on the Xiaomi at all (`INSTALL_FAILED_USER_RESTRICTED`,
+the HyperOS "Install via USB" gate), so RTL on hardware remains a Samsung-only result. And
+the new location sheet was not screenshotted on a device: the phone emulator wedged
+mid-walk, having already ANR'd `system_server` the day before. Its scroll behaviour was
+confirmed by reading the composable instead, which covers the actual risk but is not the
+same as seeing it.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -2914,7 +3000,29 @@ step towards shipping a language without a native speaker. See CLAUDE.md.
 
   **Point 4 is DONE, 1 Aug 2026**, as a side effect of fixing T4: the typed-city entry is now
   shown on the location step from the start, rather than only after a location attempt has
-  failed. Points 1 to 3 remain.
+  failed.
+
+  **Points 1 to 3 are DONE, 2 Aug 2026.** All three landed together in `data/PlaceName.kt`,
+  because points 1 and 2 are the same function and doing them separately would have left the
+  two halves of the feature disagreeing for a commit. Evidence in §10, "The daytime half of
+  the alarm story, and the town-not-county fix". Three notes for whoever reads this next:
+
+  - The chain is `locality → subLocality → featureName → subAdminArea → adminArea`, and
+    **`featureName` is guarded** — it is rejected unless it contains a letter, because on a
+    precise fix it is often a house number and "37, United Kingdom" is worse than the county.
+  - **`CityLookup` shares the same function now.** It had its own copy of the old chain, so
+    the searched and the automatic name formatted differently on the same screen. That was
+    not in the tester's report and was found only by fixing both at once.
+  - The point-3 wording was **measured before it was written**, with the app's own engine:
+    ±10 miles at UK latitude moves every prayer by at most two minutes, in midsummer,
+    midwinter and today. It lives in `location_sheet_body`, shown only when the user opens
+    the location sheet — never volunteered, and not a second disclaimer.
+
+  What was *not* done: the new sheet has not been seen on a real device. The phone emulator
+  wedged mid-walk (it had ANR'd `system_server` the day before) and the RTL preview would
+  not install on the Xiaomi at all. The overflow risk was closed by reading the composable —
+  the sheet already has `.verticalScroll` — which covers the real hazard but is not a
+  screenshot. Take one on the next device session.
 
 ### The second round of tester feedback (1 Aug 2026) — all four DONE
 
@@ -2943,6 +3051,50 @@ longer floors the app at WORKING_SET, and a Restricted-bucket app is documented 
 alarm-clock and calendar apps; claiming that category for a prayer app is arguable, and being
 wrong blocks the release at review. Checked, rejected, and recorded rather than attempted —
 revisit only with a specific reason, and write the outcome into the reviews file.
+
+### A14 — `USE_EXACT_ALARM` would delete the permission problem, and is deliberately not taken (2 Aug 2026)
+
+**Owner's call, and the recommendation is to wait.** Muslim Pro, on the owner's own Xiaomi,
+gets exact prayer alarms with **no permission prompt at all**. Verified from the device:
+
+```
+android.permission.SCHEDULE_EXACT_ALARM: granted=false
+android.permission.USE_EXACT_ALARM:      granted=true
+  → window=0 exactAllowReason=policy_permission flags=0x5
+```
+
+`USE_EXACT_ALARM` has protection level `normal`: granted at install, invisible to the user,
+and not revocable without uninstalling. SajdaTime declares only `SCHEDULE_EXACT_ALARM`,
+which since Android 14 is denied at install and must be found and granted by the user. So
+the root cause of T5 is not merely mitigable — it is **avoidable**. Everything the fix does
+(the onboarding prompt, the dismissible banner, the settings row, the whole ladder in §6)
+exists to work around a permission this app might simply not need.
+
+**Why it is not being taken now.** Google's policy (Play Console Help, *Permissions and APIs
+that Access Sensitive Information* → *Exact Alarm Permission*) admits exactly two use cases:
+
+> The app is an alarm or timer app.
+> The app is a calendar app that shows event notifications.
+
+and states that apps requesting it *"are subject to review, and those that do not meet the
+acceptable use case criteria will be disallowed from publishing on Google Play."* A Play
+Console declaration is required. Requires `targetSdk` 33+ — we are on 36, so that is not the
+obstacle.
+
+Genuinely arguable both ways, which is the point:
+
+| For | Against |
+|---|---|
+| The app has a real Alarm mode: alarm-stream audio, own sound, per prayer, used as a Fajr wake-up | The store listing describes a prayer times and Qibla app, which a reviewer may not read as "alarm app" |
+| Muslim Pro ships it in this exact category and is live | *Another app passing review is evidence it can pass, not proof that we would* |
+| Removes the single largest cause of late alerts for every user who declines | The penalty is "disallowed from publishing", not a warning |
+
+**Recommendation: ship to production on `SCHEDULE_EXACT_ALARM`, then revisit.** The fix is
+committed, measured exact on two makes, and the onboarding prompt has been walked end to
+end. For a first-time personal developer mid-closed-test, a wrong call here costs the
+launch; the thing it would buy is worth an hour. Once the app is live and stable, a
+rejection costs a version instead, and the declaration can be made properly. Do not let a
+future session read this as an oversight and "fix" it quietly — see §15 lesson 68.
 
 ### Open decisions from the worldwide review (1 Aug 2026) — owner's call, not an agent's
 
@@ -4053,6 +4205,44 @@ matters more than the stable hashes, that is the trade being made.
 
     Before assuming a documented check is being performed, confirm it is *possible* on the
     hardware people actually have.
+
+67. **Two consecutive reads of the same table disagreed, and both were true.** The first
+    `dumpsys alarm` after the Xiaomi was plugged back in showed the shipped build's alarms
+    parked three days out; the second, taken seconds later, showed them released and holding
+    a one-hour window. Same alarm object, same phone. HyperOS had let them go the moment the
+    device became active.
+
+    Either read alone supports a confident, wrong headline: "permanently parked for three
+    days", or "no OEM deferral at all, just Android's hour". A state that changes *because
+    you started observing it* is normal on a phone — plugging in, unlocking and running
+    `adb` are all inputs. Sample twice before writing the sentence.
+
+68. **The competitor on the user's own phone can answer a question your own app cannot.**
+    Muslim Pro sits on the owner's Xiaomi getting exact alarms with no permission prompt at
+    all, because it declares `USE_EXACT_ALARM` rather than `SCHEDULE_EXACT_ALARM`. One
+    `dumpsys` on a device we already had told us the entire permission problem is
+    *avoidable*, not merely mitigable — something no amount of reading our own code would
+    have shown.
+
+    The discipline is what came next: it was **not** adopted. Google's policy admits only
+    "an alarm or timer app" and "a calendar app that shows event notifications", and apps
+    that request it are "subject to review, and those that do not meet the acceptable use
+    case criteria will be disallowed from publishing". *Another app shipping it is evidence
+    that it can pass review, not proof that we would.* For a first-time personal developer
+    mid-closed-test, a rejection costs the launch; an hour's alarm slip costs an hour. The
+    upgrade is real and it is written down (§11) — it is just not worth taking before
+    production. Finding a better road is not the same as being right to take it today.
+
+69. **Copy written honestly under uncertainty becomes dishonest once you measure.** Both
+    exact-alarm strings deliberately avoided a number, with a code comment explaining that
+    Android documents no upper bound so "a few minutes" would be a promise we could not
+    keep. That reasoning was sound — and it silently expired the moment denial was measured
+    at a one-hour window on two makes and a never-fired alarm overnight.
+
+    "May deliver them late" was now the *understatement* that talks a user out of the
+    permission. A comment recording why a cautious choice was made is exactly the thing that
+    should be re-read whenever new evidence lands, not treated as settled because it is
+    well-argued. Grep your own hedges after every measurement.
 
 ---
 

@@ -112,7 +112,13 @@
 
     <!-- Location sheet -->
     <string name="location_sheet_title">Your location</string>
-    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.</string>
+    <!-- The second paragraph exists because a tester was shown his county instead of his
+         town and reasonably assumed his prayer times were wrong too. The "about a minute"
+         figure is measured, not estimated: PrayerEngine over a 10-mile radius at UK
+         latitude moves every prayer by at most 2 minutes, in midsummer, midwinter and
+         between. See HANDOVER §10. Shown only when the user opens this sheet — the app
+         does not volunteer it, and it is not a second disclaimer. -->
+    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little — ten miles is about a minute. If the name looks wrong to you, type your city below.</string>
     <string name="action_use_my_location">Use my current location</string>
     <string name="location_sheet_search_heading">Or type a city</string>
 
@@ -200,12 +206,19 @@
     <string name="settings_ongoing_badge">Keep the next prayer in the shade</string>
     <string name="settings_ongoing_badge_desc">A silent notification showing what is next and how long you have</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
-    <!-- "Late" without a number, deliberately: Android documents no upper bound on how
-         far it may move a non-exact alarm, so "a few minutes" was a promise we could not
-         keep. See HANDOVER section 10. -->
-    <string name="settings_exact_alarms_desc">Without this, your phone may hold prayer alerts back and deliver them late. Tap to allow.</string>
+    <!-- These two said only "and deliver them late", with no number, because Android
+         documents no upper bound and "a few minutes" was a promise we could not keep.
+         That was right while we were reasoning; it is wrong now that we have measured.
+         Denying the permission was reproduced on two makes: a one-hour window on both a
+         Galaxy S23 Ultra and a Redmi Note 13 Pro in daytime use, and on the Redmi
+         overnight the alarm was parked roughly three days out by HyperOS and never fired
+         at all. "Late" undersold that badly enough to talk a user out of a permission
+         that silently costs them Fajr, so both strings now name the measured floor and
+         the overnight case. Fajr is named because it is the one that matters and the one
+         that fails. Evidence in HANDOVER section 10. -->
+    <string name="settings_exact_alarms_desc">Without this your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. Tap to allow.</string>
     <string name="confirm_exact_alarm_title">One last thing</string>
-    <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it, your phone may hold prayer alerts back and deliver them late. You can also do this later from Settings.</string>
+    <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>
     <string name="action_close">Close</string>
 
     <string name="about_version">Version</string>

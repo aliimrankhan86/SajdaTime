@@ -76,10 +76,7 @@ class CityLookup(private val context: Context) {
     }
 
     /** A readable label, falling back to what the user typed rather than showing blank. */
-    private fun Address.describeAddress(fallback: String): String = listOfNotNull(
-        locality ?: subAdminArea ?: adminArea,
-        countryName,
-    ).joinToString(", ").ifBlank { fallback }
+    private fun Address.describeAddress(fallback: String): String = placeLabel(fallback)
 
     private fun URL.readTextWithTimeout(): String {
         val connection = openConnection() as HttpURLConnection
