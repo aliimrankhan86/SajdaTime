@@ -6,7 +6,24 @@
 
   Worth having separately from the phone because the watch is where a mirrored row or a
   longer string runs out of room first.
+
+  This said `ar-XB` until 2 Aug 2026, five days after the phone moved to `ur` for a reason
+  that applied to the watch just as much: `ar-XB` reverses Latin characters outright, so
+  "PM" renders "MP" and "Fajr" renders "rjaF", and every screen looks mangled whether or not
+  anything is wrong. The watch is where that hurt most — the one thing this preview is
+  really for on a 192dp round screen is *does the text still fit and stay clear of the watch
+  face clock*, and a reversed string answers nothing while looking alarming.
+
+  Kept in step with the phone on purpose. Two build types of the same name previewing two
+  different locales is how a check passes on one device and is never really run on the other,
+  and this project already has that bug once: see HANDOVER §15 lesson 84.
+
+  One deliberate difference from the phone: this build type carries **no** applicationIdSuffix,
+  so it installs *over* the real watch app rather than beside it. The phone needs a suffix
+  because installing over the Play copy resets a closed tester; the watch app is not on Play
+  yet (§11 P5), and a suffix would break the Data Layer sync, which is the one thing on the
+  watch most worth being able to test. Revisit when the Wear app ships.
 -->
 <resources>
-    <string name="app_language_tag">ar-XB</string>
+    <string name="app_language_tag">ur</string>
 </resources>

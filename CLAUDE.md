@@ -55,6 +55,13 @@ session inherits it instead of relearning it.
   and never nagged.
 - **Never machine-translate the app.** Prayer and madhab names are religious content; each
   language needs a native speaker before it ships.
+- **The app follows the phone's language, and goes right-to-left only when it has the
+  words to.** `AppLocale` reads the app's language out of the resources, so the day a
+  reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL
+  layout with no code change. Until that day the app stays English and left-to-right on
+  *every* phone, whatever the phone is set to — because English laid out right-to-left is
+  genuinely wrong, not merely unusual, and the owner has ruled it out. Two tests in
+  `LocaleDisciplineTest` fail the build if either half slips. See `docs/HANDOVER.md` §5.16.
 - **Never call the Aladhan API — or any network — from the shipped app to calculate times.**
   Verifying against it during development is correct and encouraged. Calling it at runtime is
   not, and the reasons are in `docs/HANDOVER.md` §2. The owner was asked directly and said no.
@@ -75,10 +82,16 @@ session inherits it instead of relearning it.
 
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
-- **Before any layout change, check it right-to-left.** `./gradlew installRtl` runs the
-  whole app in RTL without a translation or a device setting. Roughly half the world's
-  Muslims read right-to-left, and the first Arabic or Urdu translation should not be the
-  moment anyone finds out whether the screens survive it.
+- **Before any layout change, check it right-to-left — and read the result as a *layout*
+  check.** `./gradlew installRtl` runs the whole app in RTL without a translation or a
+  device setting. Roughly half the world's Muslims read right-to-left, and the first Arabic
+  or Urdu translation should not be the moment anyone finds out whether the screens survive
+  it. But it shows **English words in a right-to-left paragraph**, which always looks
+  broken, because it is: stranded full stops, meridiems on the wrong side. Judge the
+  mirroring — margins, chevrons, nav order, clipping — and ignore the prose. **Do not put
+  its screenshots in front of the owner as findings.** He has reported it as broken three
+  times, correctly each time, and every one of those rounds spent trust that a real RTL
+  report will need. Report what the check *concluded*, not what it looked like.
 - **Run the phone and watch emulators together and compare them.** The worst bug in this
   project's history lived in the gap between two modules that were each individually correct.
 - **Verify against an independent reference, not your own reasoning.** Every real calculation

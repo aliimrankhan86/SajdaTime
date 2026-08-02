@@ -77,22 +77,10 @@ class NoTranslationsYetTest {
         )
     }
 
-    @Test
-    fun `the right-to-left preview locale is confined to the rtl build type`() {
-        val root = File("..").canonicalFile
-        val offenders = listOf("app", "wear", "core")
-            .map { File(root, "$it/src") }
-            .filter { it.isDirectory }
-            .flatMap { it.walkTopDown().filter { f -> f.name == "strings.xml" } }
-            .filter { it.readText().contains("<string name=\"app_language_tag\">ur</string>") }
-            .map { it.path }
-            .filterNot { it.contains("/src/rtl/") }
-
-        assertEquals(
-            "app_language_tag is pinned to the right-to-left preview locale outside the " +
-                "rtl build type. That tag decides the language of the shipped app.",
-            emptyList<String>(),
-            offenders,
-        )
-    }
+    // The third test that used to live here — "the right-to-left preview locale is confined to
+    // the rtl build type" — has moved to LocaleDisciplineTest, next to AppLocale, which is what
+    // it is really about. It was replaced rather than copied: it matched the single literal tag
+    // `ur` and so would have passed for `ar`, `fa` or `he`. Two tests there now cover it —
+    // `the shipped app is left to right`, and `no shipping source set points the app at a
+    // language it is not written in`, which catches any untranslated tag, right-to-left or not.
 }

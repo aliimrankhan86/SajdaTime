@@ -70,6 +70,93 @@ class LocaleDisciplineTest {
         assertTrue("Language tag does not match its folder: $mismatched", mismatched.isEmpty())
     }
 
+    /**
+     * **The shipped app is left-to-right, and stays that way until it is written in a
+     * right-to-left language.**
+     *
+     * The owner's instruction, 2 August 2026, after reviewing the RTL preview build for the
+     * third time: *"I dont [want] RTL to be default because the text is not looking great in
+     * RTL."* He is right, and the reason is not cosmetic. English words laid out
+     * right-to-left are genuinely wrong — the closing full stop moves to the far end, a
+     * leading number changes places with the sentence it belongs to — because the Unicode
+     * algorithm is being told the paragraph is Arabic when every word in it is English.
+     *
+     * Nothing about that changes on the day `values-ar/` ships. On that day the words *are*
+     * Arabic, the paragraph direction is correct, and the app should and will go
+     * right-to-left on its own with no code change, because [AppLocale] reads the direction
+     * out of the language the words are in. This test does not stand in the way of that; it
+     * stands in the way of arriving there *early*, with the layout flipped and the words
+     * still English, which is the only version the owner has ever been shown and the only
+     * version that looks broken.
+     *
+     * ponytail: an explicit set rather than a lookup. The JDK's own
+     * `ComponentOrientation.getOrientation` knows seven RTL languages and misses Pashto,
+     * Sindhi, Uyghur, Kurdish and Divehi; ICU is not on a plain JVM test classpath. This list
+     * does not have to be exhaustive — it has to cover the languages this app could plausibly
+     * be translated into, and the failure it guards is a deliberate edit, not a typo.
+     */
+    @Test
+    fun `the shipped app is left to right`() {
+        val declared = defaultStrings().tagOrNull()!!
+        val language = Locale.forLanguageTag(declared).language
+
+        assertTrue(
+            "app_language_tag is '$declared', which is a right-to-left language. That flips " +
+                "the whole app — layout, digits and date order — so it must only ever be set " +
+                "to a language the app is actually translated into. If a native-speaker " +
+                "translation has genuinely shipped, this test is the one to change, in the " +
+                "same commit, naming the reviewer. To preview right-to-left without shipping " +
+                "it, run ./gradlew installRtl.",
+            language !in rightToLeftLanguages,
+        )
+    }
+
+    /**
+     * A tag may only name a language the app has words in.
+     *
+     * Setting it to a language with no `values-<lang>/` behind it is the exact failure the
+     * test above describes: the words keep falling back to English while the formatting, the
+     * digits and the layout direction all switch. It is also indistinguishable from a
+     * half-finished translation, which is the state CLAUDE.md forbids shipping.
+     *
+     * The default `values/` file is exempt because it *defines* the base language rather than
+     * selecting one, and `src/rtl/` is exempt because that build type exists to produce
+     * precisely this mismatch on purpose — it carries `applicationIdSuffix ".rtl"` and its own
+     * `app_name`, so it installs beside the real app and can never be mistaken for it.
+     *
+     * This replaces the narrower check that used to live in `NoTranslationsYetTest`, which
+     * only knew the single literal tag `ur` and would have passed for `ar`, `fa` or `he`.
+     */
+    @Test
+    fun `no shipping source set points the app at a language it is not written in`() {
+        val translated = translatedStringFiles()
+            .map { it.parentFile!!.name.removePrefix("values-").substringBefore("-r").lowercase() }
+            .toSet()
+
+        val offenders = repoRoot.walkTopDown()
+            .onEnter { it.name != "build" && it.name != ".git" }
+            .filter { it.name == "strings.xml" && it.parentFile!!.name == "values" }
+            .filterNot { it.path.contains("${File.separator}src${File.separator}rtl${File.separator}") }
+            .filterNot { it.canonicalFile == defaultStrings().canonicalFile }
+            .mapNotNull { file ->
+                val tag = file.tagOrNull() ?: return@mapNotNull null
+                val language = Locale.forLanguageTag(tag).language
+                if (language in translated) {
+                    null
+                } else {
+                    "${file.relativeTo(repoRoot).path} selects '$tag' but there is no values-$language/"
+                }
+            }
+            .toList()
+
+        assertTrue(
+            "A shipping source set points app_language_tag at a language the app has no " +
+                "words in. The words would stay English while the digits, dates and layout " +
+                "direction all changed. Offenders: $offenders",
+            offenders.isEmpty(),
+        )
+    }
+
     @Test
     fun `no shipped code formats from the device locale`() {
         val mainSources = "${File.separator}src${File.separator}main${File.separator}"
@@ -97,6 +184,22 @@ class LocaleDisciplineTest {
             offenders.isEmpty(),
         )
     }
+
+    /** See `the shipped app is left to right` for why this is a list and not a lookup. */
+    private val rightToLeftLanguages = setOf(
+        "ar", // Arabic
+        "fa", // Persian
+        "ur", // Urdu
+        "ps", // Pashto
+        "sd", // Sindhi
+        "ug", // Uyghur
+        "ku", "ckb", // Kurdish (Sorani)
+        "dv", // Divehi
+        "he", "iw", // Hebrew, and its withdrawn ISO code, which Locale still normalises to
+        "yi", "ji", // Yiddish, likewise
+        "syr", // Syriac
+        "nqo", // N'Ko
+    )
 
     private fun defaultStrings() = File(repoRoot, "core/src/main/res/values/strings.xml")
 

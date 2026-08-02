@@ -195,7 +195,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
-| Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ar-XB` so `./gradlew installRtl` runs the whole app right-to-left. `:wear` has the same. Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it |
+| Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` so `./gradlew installRtl` runs the whole app right-to-left. `:wear` has the same, and must stay on the same tag — it was left on `ar-XB` for five days after the phone moved, which is the second half of §15 lesson 84. Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it |
 
 **`:wear`** (8 source files, 2 test files)
 
@@ -666,6 +666,10 @@ right-to-left with Arabic-Indic digits — correct, and with no code change.
 `android:supportsRtl="true"` therefore stays in both manifests even though nothing ships
 RTL today. Removing it would look like tidying and would break the first RTL translation.
 
+**§5.16 is the policy this mechanism implements**, including the owner's decision that the
+app must not go right-to-left before it has right-to-left words, the two tests that enforce
+it, and the device evidence that the pin actually holds on an Arabic phone.
+
 **Visible consequence, on purpose:** clock times now read `1:16 pm`, not `1:16 PM`, for
 everyone. `en-GB` is what the house style already says the words are, and it is what a UK
 phone was already producing before this change; the old screenshots showing `PM` were taken
@@ -823,6 +827,65 @@ with `./tools/wear-verify.sh` open in front of you.
 link from Play, and the same words. The policy page is already the one Google links to, so the
 disclaimer lives there under an `#disclaimer` anchor and `docs/index.html` points at it.
 ponytail: one published copy, one link.
+
+### 5.16 The app follows the phone's language, and goes RTL only when it has the words (2 Aug 2026)
+
+§5.11 is the mechanism. This is the policy, the owner's decision behind it, and the evidence.
+
+**The owner's instruction, verbatim:** *"Remember to adapt to the language of the phone for
+better user experience. I dont RTL to be default because the text is not looking great in
+RTL."*
+
+Those two sentences sound like they pull against each other and do not. They resolve into one
+rule with two halves, and the app already implemented both — this section exists because
+"already true" is not the same as "guarded", and because the second half had been asserted for
+months without once being run on a phone that was actually set to Arabic.
+
+**Half one — follow the phone.** `AppLocale.of()` reads the app's language out of the
+resources, so language selection *is* Android's own resource resolution. The day a
+native-speaker-reviewed `values-ar/` lands, an Arabic phone resolves `app_language_tag` to
+`ar`, the whole configuration pins to Arabic, and the app switches to Arabic words,
+Arabic-Indic digits and a right-to-left layout **with no code change and nothing to remember**.
+That is the adaptation the owner is asking for, and it is already wired.
+
+**Half two — until then, English and left-to-right, on every phone.** Not a compromise: the
+correct behaviour. An English sentence laid out right-to-left is *wrong*, not merely unusual —
+the Unicode algorithm is told the paragraph is Arabic when every word in it is English, so the
+closing full stop moves to the far end and a leading number swaps places with the sentence it
+belongs to. Flipping the layout before the words follow would degrade the app for the very
+users it was meant to serve.
+
+**What the guards are, and what each one catches** (both in `LocaleDisciplineTest`, next to
+`AppLocale`, replacing a narrower check that used to sit in `NoTranslationsYetTest` and only
+knew the single literal tag `ur`):
+
+| Test | Fails when |
+|---|---|
+| `the shipped app is left to right` | the default `app_language_tag` names an RTL language — `ar`, `fa`, `ur`, `ps`, `sd`, `ug`, `ku`/`ckb`, `dv`, `he`, `yi`, `syr`, `nqo` |
+| `no shipping source set points the app at a language it is not written in` | any tag outside `values/` and outside `src/rtl/` names a language with no `values-<lang>/` behind it — right-to-left or not |
+
+Both were proved by making the edit and watching the build go red, then restoring it and
+watching it go green, with no `--rerun-tasks`. The `src/rtl/` build type is exempt because
+producing exactly this mismatch is its entire job; it carries `applicationIdSuffix ".rtl"` and
+its own `app_name`, so it installs beside the real app and can never be mistaken for it.
+
+**⚠️ The list of RTL languages is hand-maintained, and that is deliberate.** The JDK's
+`ComponentOrientation` knows seven and misses Pashto, Sindhi, Uyghur, Kurdish and Divehi; ICU
+is not on a plain JVM test classpath. It does not need to be exhaustive — it needs to cover the
+languages this app could plausibly be translated into, and the edit it guards is deliberate,
+not a typo.
+
+**What "adapt to the phone" does *not* mean here, and why.** Place names were considered and
+left alone. They are the one string in the app that comes from outside it, so they *could* be
+fetched in the device's language — an Urdu phone showing "لاہور، پاکستان" instead of "Lahore,
+Pakistan". Rejected: it would put Arabic script inside an otherwise-English left-to-right
+screen, which is the mixed-direction rendering the owner has just ruled out, and both halves of
+the lookup (platform geocoder and Open-Meteo `language=`) were deliberately brought onto
+`AppLocale` in the first place so they could not disagree with each other. Revisit it when
+there is a translation to make it coherent, not before. See `CityLookup.kt`.
+
+Evidence for the whole of this section — nine surfaces on a phone and a watch both set to
+`ar-EG` — is in §10, "The app on a phone that is actually set to Arabic".
 
 ---
 
@@ -1040,7 +1103,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**127 unit tests, all offline and deterministic, 0 failures.** (core 73, app 42, wear 12.)
+**128 unit tests, all offline and deterministic, 0 failures.** (core 75, app 41, wear 12.)
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
 > row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
@@ -1053,14 +1116,14 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
-| `LocaleDisciplineTest` | core | 4 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11) |
+| `LocaleDisciplineTest` | core | 6 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11); **the shipped tag is a left-to-right language**; **no shipping source set selects a language the app has no `values-<lang>/` for** (§5.16). The last two replaced a narrower check in `NoTranslationsYetTest` that only knew the literal tag `ur` |
 | `AdjustmentTest` | core | 11 | Per-prayer corrections move a prayer by exactly that many minutes on every path, including those that bypass adhan; out-of-range values clamped on the way out rather than trusted; zero dropped rather than stored; no corrections is byte-identical to before; the worst legal pair still cannot invert a day; the Hijri shift moves Ramadan, and the Umm al-Qura Isha rule moves with it |
 | `BidiTest` | core | 8 | Right-to-left ordering asserted against `java.text.Bidi`, the real Unicode algorithm — the Hijri date, a Latin city inside an Arabic sentence and the reverse; and a test that pins the *wrong* fix (isolating the whole date rather than the month) so it cannot be "simplified" back in |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
 | `PlaceNameTest` | app | 9 | The town wins over the county; a point of interest never outranks a real administrative area; a house number is never shown as a place; blank fields skipped; the reported bug — a coarse fix with no locality falling through to the county — pinned |
 | `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
-| `NoTranslationsYetTest` | app | 3 | Fails the build if a language-qualified `values-*` folder ever appears (CLAUDE.md: never machine-translate). Proven by adding `values-ar/`, watching it go red, removing it, watching it go green |
+| `NoTranslationsYetTest` | app | 2 | Fails the build if a language-qualified `values-*` folder ever appears (CLAUDE.md: never machine-translate). Proven by adding `values-ar/`, watching it go red, removing it, watching it go green |
 | `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
 | `AlertCodecTest` | app | 8 | Per-prayer alert round-trip and stable ordering; rubbish dropped entry by entry rather than thrown; Sunrise refused; and the upgrade from the two keys it replaced — including the empty-string-versus-absent-key distinction that decides whether a user who silenced everything gets five alerts back (§3, persisted data model) |
 | `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
@@ -1084,7 +1147,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, **127 tests**, 0 failures, lint informational-only (0 errors),
+Expected: BUILD SUCCESSFUL, **128 tests**, 0 failures, lint informational-only (0 errors),
 phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
 is present).
 
@@ -3335,6 +3398,68 @@ IT IS" block was rewritten and the full description recounted at **3,704 / 4000*
 **Not verified.** None of this has been seen on the Xiaomi — HyperOS still refuses the sideload
 — or on a physical watch, because there is not one. Both emulator round sizes were exercised.
 
+### The app on a phone that is actually set to Arabic (2 Aug 2026)
+
+**The claim in §5.11 had never been tested on an RTL device — only reasoned about, and only
+previewed through the `rtl` build type, which is the app pinning *itself* to Urdu rather than a
+phone being set to Arabic.** Those are different code paths and only one of them is what a user
+has. This closes that gap.
+
+Both emulators were rebooted into `ar-EG` for real, not pseudolocalised:
+
+```
+config: mcc310-mnc260-ar-rEG,en-rUS-ldrtl-…-v36     (phone, 1080×1920)
+config: mcc310-mnc260-ar-rEG,en-rUS-ldrtl-sw192dp-…round-watch-…-v34   (watch, 192dp)
+```
+
+`ldrtl` is the system telling every app on the device to lay out right-to-left. The plain
+`debug` build was installed — **not** `installRtl`, which would have proved nothing here.
+
+| Surface | Result |
+|---|---|
+| Disclaimer dialog, first run | English, left-to-right, full stops where they belong |
+| Home — countdown, banners, `Sun 2 Aug · 19 Safar 1448` | LTR; date in the right order; Latin digits |
+| Home, **rotated to landscape** | still LTR — the config change does not undo the pin |
+| Home, **dark mode toggled** | still LTR — likewise |
+| Timetable, with the `Now` pill | LTR, pill on the correct side |
+| Qibla — `0° from true north. The Kaaba is about 0 km away.` | intact; this is the exact sentence §5.11 records as having scrambled |
+| Settings | LTR, chevrons pointing right |
+| **Notification, in the shade** | right-*aligned* by SystemUI, and correct: the text still reads `Fajr at 2:34 am` / `In 8h 10m`, unscrambled |
+| **PDF export, pulled off the device** | LTR, correct column order, no tofu where the bidi isolates are |
+| Watch — home list | LTR, names left, times right |
+| Watch — disclaimer at the scroll extreme | three lines, clear of the watch face clock |
+
+**The two config-change rows are the ones that were actually at risk.** `attachBaseContext`
+wrapping is the classic thing Android undoes on a configuration change, because `ResourcesManager`
+rewrites the base context's resources underneath it. It holds here. That was worth finding out by
+rotating the phone rather than by reading `AppLocale.kt` again.
+
+**The notification is the one surface the pin cannot reach**, because SystemUI renders the shade
+in the *device's* direction, not the app's. It comes out fine anyway: our English block sits at
+the right-hand edge alongside the phone's own Arabic notifications, and reads left-to-right
+inside itself. Nothing to fix, but it is the surface to re-check if notification wording ever
+starts with a digit.
+
+The only Arabic anywhere on either screen is the system's own chrome — the status bar clock
+`٦:٢٣`, the watch face `١٨:٣٤`, the shade. That contrast **is** the evidence: the platform is
+plainly in Arabic, and the app is plainly not.
+
+**And in the artefact that actually ships**, checked on the same build as the gate above:
+
+```
+app-release.aab   base/resources.pb → 39 × "en-GB", 0 × "ur", 0 × "ar-XB", no res/values-<rtl>/
+wear-release.aab  base/resources.pb → 23 × "en-GB", 0 × "ur", 0 × "ar-XB", no res/values-<rtl>/
+```
+
+**Separately, the `rtl` preview build was re-run on the watch after moving it off `ar-XB`**, and
+the change is the point of the exercise: `PM 9:03` and `AM 2:55` where `ar-XB` gave `MP` and
+`MA`, prayer names legible rather than reversed, and the watch disclaimer still **three lines
+and clear of the clock** under RTL — which `tools/wear-verify.sh` cannot tell you, because it
+only runs left-to-right. The one remaining artefact is the full stop of `.Follow your mosque`
+sitting at the visual left. That is an English sentence in a right-to-left paragraph behaving
+exactly as Unicode says it should, and it goes away when the words are translated. It is not a
+bug, and per `CLAUDE.md` it is not something to put in front of the owner as one.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Parked, 2 Aug 2026 — the whole of it, on one screen
@@ -3359,6 +3484,7 @@ exist yet. Start here, then read the detail in the sections that follow.
 |---|---|---|
 | A14 | `USE_EXACT_ALARM` | **Not before production.** Re-verified against Google's policy page, not assumed. Revisit once live, when a rejection costs a version rather than the launch |
 | A8 | Should the watch carry the far-north notice? | Genuinely open. The watch marks approximated times but does not explain them |
+| A17 | **Which language to translate first, and who reviews it** | The owner asked the app to adapt to the phone's language. Everything mechanical for that is built and guarded (§5.16): drop in a reviewed `values-<lang>/` and the app switches language, digits, date order and layout direction on its own. **The blocker is a person, not code.** `CLAUDE.md` forbids machine translation — prayer and madhab names are religious content — so this cannot be started, only commissioned. Likely first candidates on user numbers: Urdu, Arabic, Bengali, Turkish, Indonesian |
 
 **Waiting on evidence that does not exist yet**
 
@@ -5152,6 +5278,48 @@ matters more than the stable hashes, that is the trade being made.
     project's own rule — *run the phone and watch emulators together and compare them* —
     exists because of a bug that lived in the gap between two modules, and this is the same
     gap: work done on the phone, shipped to the watch, verified on the phone.
+
+84. **Fixing a bug class in one module does not fix it in the sibling that has the same bug.**
+    `NoTranslationsYetTest` read the filesystem, Gradle could not see that, the task went
+    `UP-TO-DATE`, and the guard reported success without running. That was found, understood,
+    written up as lesson 42, and fixed in `app/build.gradle.kts`. `LocaleDisciplineTest` in
+    `:core` does the same thing — it walks **every** module's main sources for
+    `Locale.getDefault()` and every module's res folders for an undeclared translation — and
+    nobody looked. Measured, not assumed: planting `Locale.getDefault()` in a file under
+    `app/src/main/` and running `./gradlew :core:testDebugUnitTest` printed `UP-TO-DATE` and
+    `BUILD SUCCESSFUL`; the same command with `--rerun-tasks` failed on the identical working
+    tree. **When you write up a bug class, grep for every other instance of it in the same
+    commit.** A lesson filed and not applied is a lesson that will be learned twice.
+
+    The same session found a second instance of the same shape: the `rtl` build type moved
+    from `ar-XB` to `ur` on the phone, for a reason that applied identically to the watch, and
+    `wear/src/rtl/res/values/strings.xml` was left on `ar-XB` — so `:wear:installRtl` was still
+    reversing Latin characters while `:app:installRtl` was not. The watch is where the preview
+    matters most, because 192dp round is where text runs out of room. Both are now `ur`.
+
+85. **`sed -i.bak` inside an Android `res/` folder breaks the build, and it breaks it in a way
+    that looks like your change failing.** The backup lands as `strings.xml.bak` next to the
+    original and the resource merger refuses it: *"The file name must end with .xml"*. The
+    experiment that was supposed to prove a new guard turned red in 576 ms with a failure that
+    had nothing to do with the guard, and the first reading of that was "the guard works".
+    It did not run. Keep scratch copies outside `res/`, and be suspicious of a test failure
+    that arrives faster than the tests do.
+
+86. **A preview that its only reviewer cannot read costs more than it finds.** `installRtl`
+    has now been reported as broken three times by the owner, and every time he was looking at
+    the tool working correctly — English words in a right-to-left paragraph, which always looks
+    wrong. Each round cost an explanation and some of the trust that a genuine RTL report will
+    need. The tool is worth keeping, and it has found two real bugs. What had to change is how
+    its output is *reported*: judge the mirroring, report the conclusion, and never hand the
+    owner a screenshot of English laid out backwards. That is now a rule in `CLAUDE.md`.
+
+87. **"Already true" and "guarded" are different states, and only one survives the next
+    session.** The app not going right-to-left on an Arabic phone had been the design since
+    `AppLocale` was written, was documented in §5.11, and had never once been run on a phone
+    set to Arabic — only on the `rtl` build type, which is the app pinning *itself*, a
+    different code path. It turned out to be correct on all eleven surfaces. The value was not
+    in the outcome; it was in converting a claim into evidence and a convention into two tests.
+    Verify the things that have been true for so long that nobody checks them any more.
 
 
 ---

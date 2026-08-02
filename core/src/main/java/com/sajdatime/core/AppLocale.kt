@@ -40,10 +40,21 @@ import java.util.Locale
  * Deliberately *not* `Locale.getDefault()` anywhere in the app except where the platform
  * demands it. If you are reaching for it, you almost certainly want this instead.
  *
+ * **This is also how the app "adapts to the language of the phone", which is what the owner
+ * asked for on 2 Aug 2026 — and it is why the app does *not* go right-to-left today, which
+ * is what he asked for in the same breath.** Both follow from one rule: the app's language
+ * is whichever language its resources resolved to. A phone set to Arabic gets English and
+ * left-to-right, because English is all the app has words in; the day a reviewed
+ * `values-ar/` ships, that same phone gets Arabic, Arabic-Indic digits and an RTL layout,
+ * and nothing here changes. `LocaleDisciplineTest` fails the build if either half slips.
+ * Verified on an `ar-EG` phone and watch rather than argued — HANDOVER §5.16 and §10.
+ *
  * To see what a right-to-left translation will look like before one exists, run
- * `./gradlew installRtl`. That build type overrides `app_language_tag` with the `ar-XB`
- * pseudolocale, which is enough to flip the entire app, because everything below follows
- * this one string.
+ * `./gradlew installRtl`. That build type overrides `app_language_tag` with `ur` — a real
+ * right-to-left locale, on both phone and watch — which is enough to flip the entire app,
+ * because everything below follows this one string. Read what it shows you as a check on
+ * *layout*, not on prose: the words are still English, and English in a right-to-left
+ * paragraph always looks wrong.
  */
 object AppLocale {
 
