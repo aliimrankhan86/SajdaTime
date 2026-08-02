@@ -44,6 +44,33 @@
     <string name="wear_disclaimer">A helper, not a religious authority. Times are calculated. Follow your mosque.</string>
 
     <!--
+      Shown only when the day's times were projected from another latitude, which above the
+      polar circles is every day for months. %1$d is that latitude — it is not a constant,
+      it follows the calculation method, which is why the number is printed rather than
+      described. See PrayerEngine.polarReferenceLatitude.
+
+      This exists because the watch was the one surface that said nothing. DayPrayerTimes'
+      own contract is "the UI must say so when this is set: an approximation the user is not
+      told about is worse than no times at all", and the phone honours it with a banner, the
+      PDF with a footnote, the alert with a header, and the tile by printing "About 5:14" —
+      while the watch *app* printed six times that looked measured. Three surfaces telling
+      the truth and one not is worse than none doing it, because the quiet one is the one
+      on the wrist.
+
+      Deliberately not the phone's paragraph. There is no room, and the phone is where the
+      full explanation belongs; this says enough to stop the times being trusted as exact
+      and points at the person who can settle it.
+
+      It sits ABOVE the times, not down beside the disclaimer. That was tried first and
+      screenshotted: after the times it is off the screen entirely at the scroll extreme,
+      and on the way there it passes under the watch face clock AppScaffold paints in the
+      cap of the circle — so the one line saying "do not trust these to the minute" was the
+      one line the user had to hunt for. It costs two prayer rows off the first screen, and
+      only for the users who ever see it.
+    -->
+    <string name="wear_polar_notice">Approximate. Here the sun does not rise or set today, so these come from %1$d°. Ask your mosque.</string>
+
+    <!--
       School of thought, on the wrist.
 
       The watch is standalone, so it cannot assume the phone app exists or that its

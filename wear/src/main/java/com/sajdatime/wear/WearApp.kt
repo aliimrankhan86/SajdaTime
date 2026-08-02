@@ -225,6 +225,33 @@ private fun TimesPage(
             }
 
             if (today != null) {
+                // Above the polar circles every time below was projected from another
+                // latitude, and until this was added the watch was the only surface that did
+                // not say so — the phone shows a banner, the PDF a footnote, the alert a
+                // header, and the tile prints "About 5:14", while this list printed six times
+                // that looked measured. DayPrayerTimes' own contract requires the UI to say
+                // so, and three surfaces telling the truth while the one on the wrist stays
+                // quiet is the worst arrangement of the four.
+                //
+                // Here, above the times, rather than down beside the disclaimer — which is
+                // where it was first put, and screenshotting it is what settled the question.
+                // Placed after the times it is off-screen at the scroll extreme and passes
+                // under the watch face clock on the way there, so the one line that says
+                // "do not trust these to the minute" was the one line you had to hunt for.
+                // It costs two prayer rows off the first screen, but only for the users it
+                // appears to, and for them it is the most important line on the watch.
+                today.approximatedFrom?.let { from ->
+                    item {
+                        Text(
+                            text = stringResource(R.string.wear_polar_notice, from.roundToInt()),
+                            style = MaterialTheme.typography.bodyExtraSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+                        )
+                    }
+                }
+
                 items(PrayerSlot.entries.filter { it.isPrayer }) { slot ->
                     val at = today.times[slot] ?: return@items
                     val isNext = slot == next?.slot && next.isTomorrow == false

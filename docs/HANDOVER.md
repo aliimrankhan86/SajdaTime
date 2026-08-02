@@ -1103,7 +1103,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**128 unit tests, all offline and deterministic, 0 failures.** (core 75, app 41, wear 12.)
+**129 unit tests, all offline and deterministic, 0 failures.** (core 76, app 41, wear 12.)
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
 > row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
@@ -1112,7 +1112,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | Suite | Module | Tests | Covers |
 |---|---|---|---|
 | `PrayerEngineTest` | core | 22 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
-| `PolarAndHemisphereTest` | core | 13 | Every 0.5° pole to pole × every day of 2026 × both madhabs is in order; Dhuhr sits mid-day-arc; the days that were silently wrong are flagged; the reference latitude follows the method; Moonsighting reproduces its own published Oslo extremes; the Shia Maghrib path survives every latitude |
+| `PolarAndHemisphereTest` | core | 14 | Every 0.5° pole to pole × every day of 2026 × both madhabs is in order; Dhuhr sits mid-day-arc; the days that were silently wrong are flagged; the reference latitude follows the method; Moonsighting reproduces its own published Oslo extremes; the Shia Maghrib path survives every latitude; **and twelve rows of Moonsighting's own published timetable for Lulea, Trondheim and Helsinki are pinned as golden values, so re-implementing the 60-degree slide turns the build red** (A12, §10) |
 | `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
@@ -1147,7 +1147,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, **128 tests**, 0 failures, lint informational-only (0 errors),
+Expected: BUILD SUCCESSFUL, **129 tests**, 0 failures, lint informational-only (0 errors),
 phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
 is present).
 
@@ -3460,6 +3460,131 @@ sitting at the visual left. That is an English sentence in a right-to-left parag
 exactly as Unicode says it should, and it goes away when the words are translated. It is not a
 bug, and per `CLAUDE.md` it is not something to put in front of the owner as one.
 
+### A12 settled: Moonsighting publish the un-slid numbers, and this engine already matches them (2 Aug 2026)
+
+**Blocked on evidence for a week, and the block was a tooling problem, not a research one.**
+Their JSON endpoint 500s and their HTML page builds its table in JavaScript, so `curl` came back
+with nothing and the item was parked. A browser runs JavaScript. Their generator at
+`moonsighting.com/pray.php` takes latitude, longitude, timezone, year and madhab, and renders a
+full year in the page.
+
+Their Lulea (65.58°N) solstice row, Hanafi, Europe/Stockholm:
+
+```
+Jun 21 Sun   Fajr 00:52   Sunrise 01:00   Dhuhr 12:38   Asr 18:55   Maghrib 00:10   Isha 00:14
+```
+
+**Isha four minutes after Maghrib, a night of about forty minutes, in order.** That is the
+un-slid local calculation. It is *not* 60 degrees' much longer night borrowed upward, which is
+what a literal reading of their own prose describes and what was built and reverted on 2 Aug
+after it produced Isha 86 minutes *before* Maghrib.
+
+Twelve rows compared, three places spanning the band, against this engine:
+
+| Place | Rows | Worst divergence |
+|---|---|---|
+| Lulea 65.58°N | 20, 21, 22 Jun; 15 Jul; 2 Aug; 21 Dec | 1 min |
+| Trondheim 63.43°N | 21 Jun; 15 Jul; 21 Dec | 1 min |
+| Helsinki 60.17°N | 21 Jun; 15 Jul; 21 Dec | 1 min |
+
+One minute, everywhere, and that is rounding — they round, this engine truncates. Several rows
+match exactly. **So the reverted slide was not a missing feature; it was a misreading, and
+implementing it would have moved Lulea up to 91 minutes away from what the committee itself
+publishes.**
+
+All twelve rows are now golden values in `PolarAndHemisphereTest`, with the reasoning in the
+KDoc above them, **so that the next session cannot re-implement the slide without turning the
+build red.** Proved by shifting one value five minutes and watching it fail.
+
+A12 moves from *blocked on evidence* to *closed*. The lesson is in §15 lesson 88.
+
+### A8 settled: the watch says the times are approximate, and where that line had to go (2 Aug 2026)
+
+The parked item read "the watch marks approximated times but does not explain them". **It was
+worse than that: the watch *app* did not mark them at all.** `grep` for `approximatedFrom` in
+`:wear` returned one hit, in `NextPrayerTileService`. The tile prints "About 5:14"; the app
+printed six times that looked measured.
+
+That is not a judgement call, it is a broken contract — `DayPrayerTimes`' own KDoc says *"the UI
+must say so when this is set: an approximation the user is not told about is worse than no times
+at all"*, and the phone, the PDF, the alert and the tile all honour it. Only the wrist was quiet,
+which is the worst one to be quiet.
+
+`wear_polar_notice` now carries it: *"Approximate. Here the sun does not rise or set today, so
+these come from 45°. Ask your mosque."* Deliberately not the phone's paragraph — no room, and the
+phone is where the full explanation belongs.
+
+**Placement was the real decision, and screenshotting is what settled it.** It went below the
+times first, beside the disclaimer. On a 192dp round that put it *off the screen entirely* at the
+scroll extreme, and on the way there it passed under the watch face clock — so the one line
+saying "do not trust these to the minute" was the one line you had to hunt for. It now sits
+directly under the countdown, above the first prayer row. It costs two rows off the first screen,
+and only for the people it appears to.
+
+Verified by forcing the coordinates to Longyearbyen in a local build and capturing all four
+combinations, plus RTL:
+
+| Screen | Result |
+|---|---|
+| 192dp, font 1.0 | 4 lines, fully visible, clear of the clock |
+| 192dp, font 1.3 | 5 lines, last line below the fold — scrollable, nothing overlapped |
+| 227dp, font 1.0 | 3 lines, and Fajr and Dhuhr still visible under it |
+| 227dp, font 1.3 | 4 lines, fully visible |
+| 192dp, `installRtl` | mirrors correctly, `45°` not `°45`, four lines |
+
+**Honest about the method:** the *trigger* was forced (a hardcoded coordinate in a throwaway
+build) because neither `adb emu geo fix` nor a test location provider would move the watch
+emulator's position. The condition itself — `approximatedFrom != null` at 78.22°N — is covered by
+`PolarAndHemisphereTest`. What was verified on the device is the layout, which is the part no
+test can see.
+
+### The alarm on a projected day, watched firing, with a control (2 Aug 2026)
+
+§11 has carried "the alarm has never been watched *firing* quietly on a projected day" since the
+downgrade shipped. It has now been watched, on the phone emulator, through the ordinary user
+path: location set to Longyearbyen by typing it into the city search, Isha set to **Alarm**,
+exact-alarm permission granted, clock advanced to 21:17:34.
+
+`dumpsys alarm` first, to prove what was scheduled:
+
+```
+type=RTC_WAKEUP origWhen=2026-08-02 21:18:00.000 window=0 exactAllowReason=permission flags=0x3
+showIntent=PendingIntent{… startActivity …}          ← the setAlarmClock signature
+```
+
+Then at 21:18:14, `dumpsys notification`:
+
+```
+id=2005 importance=4 Notification(channel=prayer_times … sound=null … category=reminder)
+  android.title = Time for Isha
+  android.text  = Isha begins at 9:18 pm
+```
+
+**`prayer_times`, not the alarm channel. `category=reminder`. No sound.** It vibrated, which is
+what the app promises a notification does.
+
+**And the control, which is the half that makes it evidence rather than a coincidence.** Same
+phone, same install, same Isha-set-to-Alarm, one thing changed — the location moved to Slough,
+where nothing is projected — and the clock advanced to that day's Isha at 23:16:
+
+```
+id=2005 Notification(channel=prayer_alarm_v0 … category=alarm)
+effectiveNotificationChannel: mSound=content://settings/system/alarm_alert, usage=USAGE_ALARM
+```
+
+| Location | Projected? | Channel | Category | Sound |
+|---|---|---|---|---|
+| Longyearbyen 78.22°N | yes | `prayer_times` | `reminder` | none, vibrate only |
+| Slough 51.51°N | no | `prayer_alarm_v0` | `alarm` | device alarm sound, `USAGE_ALARM` |
+
+So the alarm path works *and* the downgrade works, and neither reading rests on the other. Without
+the control, "it was quiet" would equally have been consistent with the alarm being broken
+everywhere — which is exactly the shape of the three confidently-reported bugs in this project's
+history that turned out to be errors in the test.
+
+**Not covered:** this was the emulator, not the Xiaomi, and it was a clock jump rather than a real
+overnight wait. HyperOS parking (§10) is the thing a clock jump cannot reproduce.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Parked, 2 Aug 2026 — the whole of it, on one screen
@@ -3483,14 +3608,14 @@ exist yet. Start here, then read the detail in the sections that follow.
 | | What | State |
 |---|---|---|
 | A14 | `USE_EXACT_ALARM` | **Not before production.** Re-verified against Google's policy page, not assumed. Revisit once live, when a rejection costs a version rather than the launch |
-| A8 | Should the watch carry the far-north notice? | Genuinely open. The watch marks approximated times but does not explain them |
+| A8 | ~~Should the watch carry the far-north notice?~~ | **CLOSED 2 Aug.** Not a judgement call in the end — the watch app was not marking approximated times at all, which breaks `DayPrayerTimes`' own contract. It now carries one line above the times. §10 |
 | A17 | **Which language to translate first, and who reviews it** | The owner asked the app to adapt to the phone's language. Everything mechanical for that is built and guarded (§5.16): drop in a reviewed `values-<lang>/` and the app switches language, digits, date order and layout direction on its own. **The blocker is a person, not code.** `CLAUDE.md` forbids machine translation — prayer and madhab names are religious content — so this cannot be started, only commissioned. Likely first candidates on user numbers: Urdu, Arabic, Bengali, Turkish, Indonesian |
 
 **Waiting on evidence that does not exist yet**
 
 | | What | What is missing |
 |---|---|---|
-| A12 | The Moonsighting 60° slide | One real published Moonsighting Committee timetable for 60–66°N in June. Built once and thrown away rather than ship a rule nobody could check — §10 |
+| ~~A12~~ | ~~The Moonsighting 60° slide~~ | **CLOSED 2 Aug.** The timetable was obtainable after all — their page builds its table in JavaScript, so a browser could read what `curl` could not. They publish the un-slid numbers and this engine already matches them to within a minute across 60–66°N. Twelve of their rows are now golden values. §10 |
 | — | Whether the default method is right for Britain | Three mosques in two towns is enough to prove the current default is wrong for one user, not enough to prove which is right for the country |
 
 **Known and deliberately not fixed** — the numbered list under *Not done* below, plus
@@ -3499,8 +3624,11 @@ decisions, not oversights.
 
 **Untested, and it should stay written down until it is not**
 
-- The alarm has never been watched *firing* quietly on a projected day. Needs an overnight run
-  at a polar location.
+- ~~The alarm has never been watched *firing* quietly on a projected day.~~ **Watched, 2 Aug,
+  with a control** — quiet on the `prayer_times` channel at Longyearbyen, loud on
+  `prayer_alarm_v0` at Slough, one setting unchanged between them (§10). Still emulator-only,
+  and still a clock jump rather than a real overnight wait, which is the one thing that cannot
+  reproduce HyperOS parking.
 - The phone↔watch Data Layer sync has never been observed working end to end (item 7 below).
 - Nothing since 2 Aug has run on the Xiaomi — HyperOS refuses the sideload — and there is no
   physical watch at all.
@@ -5320,6 +5448,35 @@ matters more than the stable hashes, that is the trade being made.
     different code path. It turned out to be correct on all eleven surfaces. The value was not
     in the outcome; it was in converting a claim into evidence and a convention into two tests.
     Verify the things that have been true for so long that nobody checks them any more.
+
+88. **"Blocked on evidence" is sometimes "blocked on the wrong tool", and a week of a correctness
+    question sat behind that.** A12 — whether Moonsighting really slide Fajr and Isha down to 60
+    degrees — was parked because moonsighting.com would not serve a timetable: the JSON endpoint
+    500s and the HTML page builds its table in JavaScript, so `curl` came back empty and the
+    conclusion recorded was "this is blocked on evidence that does not exist yet". The evidence
+    existed. It was one browser away. Their generator takes latitude, longitude, timezone and
+    madhab and renders a full year in the page, and reading it settled the question in ten
+    minutes: they publish the un-slid numbers, and this engine already matched them to within a
+    minute. **Before parking something as unobtainable, write down which tool failed and what a
+    different one would do.** "curl got nothing" and "the data is not published" are very
+    different findings, and only one of them justifies stopping.
+
+89. **The half that makes it evidence is the control, and it is the half that gets skipped
+    because the first result already looks like the answer.** Watching the alarm arrive quietly
+    on a projected day proves nothing on its own — a broken alarm feature produces exactly the
+    same observation. One more run at an ordinary latitude, changing nothing else, showed
+    `prayer_alarm_v0` and `USAGE_ALARM`, and only the pair of them says "the downgrade fired".
+    This project has already reported three bugs that turned out to be errors in the test; every
+    one of them would have been caught by asking *what else would produce this reading?*
+
+90. **A feature can be complete on three surfaces and absent on the fourth, and the absence is
+    invisible because nothing fails.** "Mark approximated times" was closed weeks ago, and it was
+    true of the phone, the PDF, the alert and the tile — but not the watch *app*, which is the
+    surface a watch owner actually looks at. Nothing errored, no test covered it, and the parked
+    item describing it understated the problem ("marks them but does not explain them") because
+    it was written from the tile's behaviour. **When you close a cross-cutting item, grep for the
+    field it depends on and count the call sites.** One `grep` for `approximatedFrom` would have
+    found this the day it shipped.
 
 
 ---

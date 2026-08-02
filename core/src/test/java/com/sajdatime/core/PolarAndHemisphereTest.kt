@@ -10,7 +10,9 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -355,6 +357,90 @@ class PolarAndHemisphereTest {
         assertTrue("longest Oslo fast should be about 19h38m, was ${longest}min", longest in 1176..1180)
         assertTrue("shortest Oslo fast should be about 7h43m, was ${shortest}min", shortest in 459..465)
     }
+
+    /**
+     * **A12, settled 2 Aug 2026 — and settled in favour of changing nothing.**
+     *
+     * Moonsighting's prose says that above 60 degrees they "slide down to 60degrees and
+     * calculate Fajr & Isha using the rule of Sab'u Lail in summer". Read literally that means
+     * borrowing 60 degrees' much longer night, and an implementation of exactly that was built
+     * on 2 Aug and thrown away the same day: swept over 60.5–66N it produced 1,043 non-monotonic
+     * days out of 13,140, including **Isha 86 minutes before Maghrib** at Lulea on the solstice.
+     * It was reverted as a regression, and the item was parked as *blocked on evidence* — nobody
+     * could get moonsighting.com to serve a timetable, because their JSON endpoint 500s and the
+     * HTML page builds its table in JavaScript.
+     *
+     * A browser renders JavaScript. Their generator at `moonsighting.com/pray.php` produced a
+     * full 2026 timetable for any latitude, longitude and zone, and the answer is unambiguous:
+     * **they publish the un-slid, local numbers, and this engine already reproduces them.**
+     *
+     * Their Lulea solstice row is `Fajr 00:52, Maghrib 00:10, Isha 00:14` — Isha four minutes
+     * *after* Maghrib, a night of about forty minutes, kept in order. That is what a literal
+     * slide destroys, and it is what the un-slid calculation already gives. So the prose is
+     * describing something narrower than it sounds, the revert was right, and the case for
+     * re-implementing it is closed rather than merely deferred.
+     *
+     * The values below are theirs, transcribed from that page, and pinned here as golden values
+     * for the same reason the Aladhan figures are: **so that nobody re-implements the slide.**
+     * Anyone who does will turn this red by up to 91 minutes.
+     *
+     * One minute of tolerance, because they round and this engine truncates.
+     */
+    @Test
+    fun `moonsighting matches its own published timetable across the 60 to 66 degree band`() {
+        // lat, lon, zone, date, then Fajr Sunrise Dhuhr Asr(Hanafi) Maghrib Isha as published.
+        val published = listOf(
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-06-20", "00:52 01:00 12:38 18:55 00:09 00:14"),
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-06-21", "00:52 01:00 12:38 18:55 00:10 00:14"),
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-06-22", "00:53 01:00 12:38 18:56 00:09 00:14"),
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-07-15", "01:48 02:17 12:42 18:46 22:59 23:24"),
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-08-02", "02:38 03:26 12:43 18:20 21:51 22:36"),
+            Published("Lulea", 65.5848, 22.1567, "Europe/Stockholm", "2026-12-21", "08:06 09:55 11:34 11:42 13:07 14:49"),
+            Published("Trondheim", 63.4305, 10.3951, "Europe/Oslo", "2026-06-21", "02:33 03:02 13:25 19:33 23:41 00:07"),
+            Published("Trondheim", 63.4305, 10.3951, "Europe/Oslo", "2026-07-15", "03:03 03:43 13:29 19:25 23:08 23:44"),
+            Published("Trondheim", 63.4305, 10.3951, "Europe/Oslo", "2026-12-21", "08:13 10:01 12:21 12:54 14:35 16:16"),
+            Published("Helsinki", 60.1699, 24.9384, "Europe/Helsinki", "2026-06-21", "03:11 03:54 13:27 19:24 22:53 23:33"),
+            Published("Helsinki", 60.1699, 24.9384, "Europe/Helsinki", "2026-07-15", "03:32 04:22 13:31 19:17 22:32 23:20"),
+            Published("Helsinki", 60.1699, 24.9384, "Europe/Helsinki", "2026-12-21", "07:37 09:24 12:23 13:27 15:16 16:56"),
+        )
+
+        for (row in published) {
+            val zone = ZoneId.of(row.zone)
+            val date = LocalDate.parse(row.date)
+            val day = PrayerEngine.compute(
+                Coordinates(row.latitude, row.longitude),
+                date,
+                CalculationPrefs(method = CalcMethod.MOON_SIGHTING, madhab = Madhab.HANAFI),
+            )
+            val expected = row.times.split(" ")
+            for ((index, slot) in PrayerSlot.entries.withIndex()) {
+                val ours = day[slot].atZone(zone)
+                // Maghrib and Isha can fall after midnight this far north, and their table
+                // prints them on the day the fast started. Compare the wall clock only.
+                val theirs = LocalTime.parse(expected[index])
+                val drift = Duration.between(theirs, ours.toLocalTime()).toMinutes()
+                val minutes = if (drift > 720) drift - 1440 else if (drift < -720) drift + 1440 else drift
+                assertTrue(
+                    "${row.place} ${row.date} $slot: Moonsighting publish ${expected[index]}, " +
+                        "this engine gives ${DateTimeFormatter.ofPattern("HH:mm").format(ours)} " +
+                        "(${minutes}min out). Anything beyond a minute means the calculation has " +
+                        "moved away from what the committee itself publishes — most likely because " +
+                        "somebody implemented the 60-degree slide. Read the KDoc above before " +
+                        "changing this.",
+                    kotlin.math.abs(minutes) <= 1,
+                )
+            }
+        }
+    }
+
+    private data class Published(
+        val place: String,
+        val latitude: Double,
+        val longitude: Double,
+        val zone: String,
+        val date: String,
+        val times: String,
+    )
 
     /**
      * A canary, not a rule. adhan ignores [HighLatitudeRule] entirely when the method is
