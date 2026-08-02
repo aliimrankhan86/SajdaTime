@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
@@ -156,9 +157,13 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
     // Through a resource rather than "$city. $changeLabel": the full stop and the order of
     // the two halves are punctuation decisions, and a translator cannot change either one
     // if they are welded into the code.
+    //
+    // The city is isolated because it is the one half of this sentence the translator does
+    // not own — it comes from the geocoder and stays Latin even in an Arabic build. See
+    // core/Bidi.kt.
     val spokenLocation = stringResource(
         R.string.home_location_a11y,
-        city,
+        city.bidiIsolated(),
         stringResource(R.string.action_change_location),
     )
 
@@ -343,7 +348,10 @@ private fun ExportSheet(
             Text(
                 text = stringResource(
                     R.string.export_sheet_body,
-                    cityName.ifBlank { stringResource(R.string.location_set_generic) },
+                    // isBlank is checked before isolating, so the fallback still fires.
+                    cityName.bidiIsolated().ifBlank {
+                        stringResource(R.string.location_set_generic)
+                    },
                 ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

@@ -34,4 +34,9 @@
 -->
 <resources>
     <string name="app_language_tag">ar-XB</string>
+    <!-- The build type carries applicationIdSuffix ".rtl" so this sits beside the Play
+         build rather than replacing it. Two SajdaTime icons on one launcher are otherwise
+         indistinguishable, and installing the RTL preview over the real app is the mistake
+         the suffix exists to prevent. -->
+    <string name="app_name">SajdaTime (RTL)</string>
 </resources>

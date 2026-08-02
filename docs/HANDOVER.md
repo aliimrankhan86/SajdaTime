@@ -2543,6 +2543,175 @@ that hardware, the pre-fix build's prayer notifications were not degraded. They 
   it is recorded here because a suppressed alert is not a *silent* one, and nobody heard this
   fire.
 
+### A second OEM: the Galaxy S23 Ultra (2 Aug 2026)
+
+The owner attached a **Samsung Galaxy S23 Ultra (SM-S918B), One UI on Android 16 / API 36**,
+which is the other half of the market the Redmi represents. Two gates had to come down first
+and both are worth knowing: **Auto Blocker** greys out USB debugging entirely
+(*Settings → Security and privacy → Auto Blocker*), and the "Allow USB debugging?" prompt
+must then be accepted or the device sits at `unauthorized` forever. Unlike HyperOS, One UI
+then permits everything: `input tap`, `pm grant`, `settings put global`. Every UI check below
+was impossible on the Redmi and routine here.
+
+#### The bug is not Xiaomi's fault, and that is the important part
+
+The Play build on this phone looked *healthy* — all ten alarms `window=0`, `flags=0x3`. That
+is not the fix working; it is a coincidence. This phone happens to have
+`SCHEDULE_EXACT_ALARM` allowed **and** all five prayers set to Alarm style, and the shipped
+code already used `setAlarmClock` for that one combination. The phone was never showing the
+defect.
+
+So the permission was revoked on the test build to recreate a fresh user, on the same phone,
+minutes apart:
+
+| Galaxy S23 Ultra, test build | `flags` | `window` |
+|---|---|---|
+| Exact-alarm permission **denied** (what a new user gets) | `0x20` | **`+1h0m0s0ms`** |
+| Exact-alarm permission **granted** | `0x3` | `0` |
+
+**The one-hour window reproduces exactly on Samsung.** The shipped defect is not an OEM
+quirk — it is what Android 14+ does to any app that targets 33+ and has not been granted the
+permission, which is every fresh install on a modern phone.
+
+What *is* OEM-specific is the punishment. Samsung's policy line reads
+`app_standby=-2m54s device_idle=-8m10s battery_saver=-- gms_manager=--` — every constraint
+negative, nothing binding, no `power_pending` equivalent anywhere. On One UI "up to an hour
+late" is literally true. On HyperOS the same weak alarm is moved three days. **Same bug, and
+the severity is decided by the badge on the phone.**
+
+One thing did repeat: Samsung's `nextUserAlarmTime` was `11:02:00` — SajdaTime's alarm, not
+the user's. The system next-alarm takeover recorded above is not a Xiaomi behaviour either.
+
+#### The onboarding permission step, driven through the real UI at last
+
+Never tested before this, on any device, because the Redmi blocked input. Walked end to end:
+
+1. **Allow exact alarms** on the last onboarding step opens
+   `com.android.settings/.Settings$AlarmsAndRemindersAppActivity` for the app — the right
+   screen, not a generic settings page.
+2. Granting it makes the whole "One last thing" block disappear from the summary.
+3. All nine scheduled alarms immediately became `window=0 exactAllowReason=permission
+   flags=0x3`.
+
+The banner-to-settings-to-granted path is now verified rather than assumed.
+
+#### T6, watched firing on a silenced phone
+
+The complaint was "the alarm should stay quiet when the phone is silent". Set up as the
+tester would have it — Dhuhr on **Alarm** style, sound "Cowbell", *Stay quiet when your phone
+is silent* **on**, ringer mode **SILENT**, alarm stream unmuted — and left to fire:
+
+```
+11:01:43 pend=2 note=6  playing=0
+11:02:04 pend=0 note=10 playing=0        ← alarm gone from the queue, alert posted
+```
+
+```
+08-02 11:02:00.801  StatusBarNotification(pkg=com.sajdatime.app.sideload id=2002
+  Notification(channel=prayer_times ... vibrate=null sound=null defaults=0 ...))
+```
+
+Posted **801 ms** after the target. Note the channel: `prayer_times`, not the alarm channel —
+the alert was **downgraded from Alarm to Notification style at fire time**, which is exactly
+what §5.13 specifies. `importance=4` so it still surfaces; `sound=null vibrate=null` so it
+makes no noise; and `playing=0` across every 20-second sample, meaning no audio stream ever
+started. On time, and silent. That is the whole of T6, measured.
+
+#### Everything else walked on this phone
+
+- **City search (T4)** — typed "Lahore", resolved to "Lahore, Pakistan" with a tick and a
+  Continue button. Fixed, on hardware.
+- **Per-prayer alerts (T7)** — Off/Notification/Alarm independently per prayer; alarm sound
+  opens the system picker (a chooser first, on a phone with Zedge installed) and the chosen
+  tone round-trips back as "Cowbell".
+- **Disclaimer** — intact, dua request in the final paragraph.
+- **Qibla** — Cairo: 136° and 1287 km. Lahore: 260° and 3599 km. Both correct.
+- **PDF** — a full month for Cairo, 31 rows, six columns, offline footer.
+- **Font scale 1.5×** — Times and Settings both hold; wrapping, no clipping.
+- **Light theme, landscape, rotation** — all clean.
+- **No crashes** in `logcat -b crash` across the whole walk.
+
+#### Two defects that were not defects
+
+Recorded because both looked real enough to report and both would have been wrong:
+
+- **"The alarm sound picker is missing."** The Prayer alerts dialog scrolls, and the picker
+  plus the silent switch live below the fold. The screenshot was cut off, not the UI.
+- **"The Qibla screen is clipped in landscape."** `You are facing 24°` was sliced by the
+  navigation bar — and scrolled into view perfectly. Content taller than a landscape
+  viewport is not clipping.
+
+#### What this phone confirmed about the timezone item
+
+With Cairo selected, the app and the exported PDF both show Dhuhr as **11:02**, which is UK
+time; Cairo's own Dhuhr is 13:02. §11 item 4 already records this for the screen. The PDF is
+worse than the screen: it is titled "Prayer times for Cairo, Egypt", carries no timezone
+label, and is a document someone prints and pins up, where there is no live countdown to give
+the game away. Item 4 should be read as covering the export too.
+
+### RTL run on real hardware for the first time, and the real bug underneath it (2 Aug 2026)
+
+`./gradlew installRtl` had only ever run on an emulator, and the reason turned out to be
+structural rather than anything to do with RTL: the `rtl` build type shared the release
+`applicationId`, so a debug-signed `com.sajdatime.app` could not install beside a Play copy.
+Every phone worth testing on — the owner's two, and every tester's — is exactly that phone,
+and the only way through was uninstalling the Play build, which `docs/RELEASING.md` records
+as the thing that resets a closed tester. **`rtl` now carries `applicationIdSuffix = ".rtl"`
+and its own `app_name`**, for the same reason `sideload` does, and RTL is now runnable
+anywhere.
+
+On the S23 Ultra the mirroring is correct: prayer names right and times left, bottom
+navigation reversed to Settings | Qibla | Times, banner icons and dismiss controls swapped,
+forward chevrons pointing left. Nothing clipped, nothing overlapping.
+
+#### The owner looked at that screen and said it was wrong. He was half right, and the half he was right about mattered.
+
+What he was looking at was the **preview build doing its job**: English words laid out
+right-to-left, with the full stop of ".A helper, not a religious authority. Tap to read"
+stranded at the wrong end. That is not a defect and it cannot reach a user — `AppLocale`
+pins layout direction to the language the app's own words are in, so the shipped English app
+is left-to-right, and every screenshot in this session's walk shows it that way. `ar-XB` is a
+reserved pseudolocale that no real phone can be set to.
+
+But the instinct behind the complaint was right, and it found something real that had been
+sitting there the whole time: **there was no bidi isolation anywhere in the codebase.**
+`grep` for `BidiFormatter`, `unicodeWrap`, `LayoutDirection` returned nothing.
+
+That does not matter while the app ships only in English. It matters enormously on the day
+`values-ar/` or `values-ur/` lands, because of one asymmetry: **every string in `values/` is
+written by us or by a translator, so it is in the same language as the sentence around it —
+except the city name.** City names come from the Open-Meteo geocoder and are usually Latin
+*even for a user reading the app in Arabic*. Someone in Lahore sees "Lahore, Pakistan".
+
+A Latin run inside a right-to-left sentence is precisely the case the Unicode bidirectional
+algorithm resolves from the characters on either side of it, and those characters are the
+translator's. It is the same fault `AppLocale` already documents for digits, where
+"17 Safar 1448" rendered as "١٤٤٨ Safar ١٧" and read as a different date.
+
+`core/Bidi.kt` fixes it with two characters — FSI (U+2068) and PDI (U+2069) — applied at the
+three places a city name lands inside a sentence: the home screen's spoken location label,
+the export sheet body, and the PDF title. Deliberately **not** `BidiFormatter`, which needs a
+`Context`, cannot run in a JVM unit test, and would tell the algorithm a direction that FSI
+detects for itself.
+
+Verified rather than reasoned about, because both halves could have gone wrong:
+
+- `BidiTest` runs the actual UBA over an Arabic sentence via `java.text.Bidi` and asserts the
+  city stays one unbroken run — not merely that two characters were appended, which would
+  pass with the wrong pair.
+- **In English it must be invisible, and it is.** The export sheet on the emulator still
+  reads "…for Slough, United Kingdom." exactly as before.
+- **The PDF was the real risk**: `Canvas.drawText` could have drawn the isolates as tofu
+  boxes in a printed document. Exported and rendered — the title reads
+  "Prayer times for Slough, United Kingdom, August 2026", clean. Minikin skips them.
+- Blank is returned untouched, because `HomeScreen` and the exporter both do
+  `cityName.ifBlank { generic }` and wrapping `""` in two invisible characters would make it
+  non-blank and silently kill the fallback. That is a test case, not a hope.
+
+This is groundwork for a translation that does not exist yet, and it is deliberately the
+*only* groundwork done: no `values-ar/`, no machine translation, nothing that looks like a
+step towards shipping a language without a native speaker. See CLAUDE.md.
+
 ---
 
 ## 11. ⚠️ Still pending — the honest list
@@ -3851,6 +4020,39 @@ matters more than the stable hashes, that is the trade being made.
 
     When a safety measure and a measurement appear to conflict, the answer is usually a
     different instrument, not a compromise on the safety measure.
+
+64. **A healthy-looking device can be the least informative one.** The Play build on the
+    Galaxy S23 Ultra showed `window=0` on every alarm and looked like proof the fix was
+    unnecessary. It was proof of nothing: that phone happened to have the permission granted
+    *and* every prayer on Alarm style, which is the one combination the old code already
+    handled correctly. The defect was invisible there for the same reason it is invisible to
+    a developer who granted the permission months ago and forgot.
+
+    Revoking the permission to recreate a fresh install turned a useless observation into a
+    decisive one, and it reproduced the one-hour window on Samsung immediately — which is
+    what proved the bug was Android's, not Xiaomi's. When a device disagrees with a
+    measurement you trust, find what is different about that device before concluding the
+    measurement was wrong.
+
+65. **"That looks wrong" from a non-technical owner is data, even when the thing he is
+    looking at is working as designed.** He was shown the `ar-XB` preview build — English
+    words laid out right-to-left, punctuation stranded — and said make it better. Strictly he
+    was looking at a developer tool behaving correctly, and the shipped English app has never
+    been anything but left-to-right.
+
+    Dismissing it there would have missed the actual finding, which was one `grep` away:
+    there was no bidi isolation anywhere in the codebase, and city names arrive from a
+    geocoder in Latin script even for an Arabic reader. The complaint pointed at the right
+    screen for the wrong reason. Answer the reason *and* check the screen.
+
+66. **The build type that cannot be installed is the check that never runs.** `installRtl`
+    had existed for a while, was documented in CLAUDE.md as a required step before any layout
+    change, and had never once run on a physical phone — not because RTL is hard, but because
+    it shared the release `applicationId` and would have required uninstalling the Play build
+    from the only phones available. A one-line `applicationIdSuffix` fixed it.
+
+    Before assuming a documented check is being performed, confirm it is *possible* on the
+    hardware people actually have.
 
 ---
 

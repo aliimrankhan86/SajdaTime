@@ -15,6 +15,7 @@ import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.label
 import com.sajdatime.app.R
 import com.sajdatime.app.notify.TimeFormat
@@ -200,7 +201,11 @@ class PrayerPdfExporter(base: Context) {
     // --- naming ----------------------------------------------------------------------
 
     private fun title(cityName: String, range: Range, start: LocalDate): String {
-        val place = cityName.ifBlank { context.getString(R.string.pdf_place_unknown) }
+        // Isolated because this is the line a user prints and pins to a wall, so a city
+        // name reordered by the sentence around it survives longer here than on a screen
+        // they can refresh. See core/Bidi.kt. The isolate characters are zero-width and
+        // Canvas.drawText does not draw them.
+        val place = cityName.bidiIsolated().ifBlank { context.getString(R.string.pdf_place_unknown) }
         val period = when (range) {
             Range.TODAY -> start.format(dateFormat)
             Range.NEXT_7_DAYS ->

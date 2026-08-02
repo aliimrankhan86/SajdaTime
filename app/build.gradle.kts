@@ -62,8 +62,20 @@ android {
             initWith(getByName("debug"))
             // :core has no rtl build type of its own and does not need one.
             matchingFallbacks += "debug"
-            // The one difference from debug is src/rtl/res/values/strings.xml, which
-            // overrides core's app_language_tag. Read that file before changing this.
+            // src/rtl/res/values/strings.xml overrides core's app_language_tag, and also
+            // app_name so this is tellable apart on the launcher. Read that file first.
+            //
+            // The suffix is here for the same reason `sideload` has one, and it was added
+            // the first time anyone tried to run this on a real phone: a debug-signed
+            // `com.sajdatime.app` cannot install alongside the Play build, so without a
+            // suffix the only way to preview RTL on a phone that has SajdaTime from Play
+            // is to uninstall it — which `docs/RELEASING.md` records as the thing that
+            // resets a closed tester and costs the fortnight. Every tester's phone, and
+            // the owner's two, are exactly that phone. Before this, `./gradlew installRtl`
+            // was runnable only on an emulator, which is why RTL had never once been seen
+            // on real hardware.
+            applicationIdSuffix = ".rtl"
+            versionNameSuffix = "-rtl"
         }
 
         // `./gradlew installSideload` — for putting a test build on a phone that already
