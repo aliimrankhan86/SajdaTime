@@ -139,7 +139,12 @@ as one number.
 
 ### Verified by test, not by eye
 
-- 103 unit tests across `app`, `core` and `wear`, 0 failures.
+- **127 unit tests** across `app` (42), `core` (73) and `wear` (12), 0 failures. 0 lint errors.
+  Both bundles built and signed with the owner's key (`META-INF/SAJDATIM.RSA`).
+- `DisclaimerContentTest` now guards the disclaimer itself — that it still makes all four of
+  its points, that the dua request is still the last paragraph and appears once, and that the
+  watch, the privacy page, the front page and the Play listing have not drifted from it.
+  Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red.
 - Bidi ordering asserted against `java.text.Bidi`, the real Unicode algorithm — including a
   test that pins the *wrong* fix so it cannot be "simplified" back in.
 - `NoTranslationsYetTest` fails the build if a machine translation ever appears. Proven by
@@ -160,7 +165,12 @@ as one number.
 - ~~The notification and the watch tile carry no marking when times are approximated.~~
   **Both mark it now** (2 Aug). Whether a projected time should fire an alarm at all is still
   open — that is A10, and it is a religious question.
-- Wear OS has not been re-verified since today's changes (none of them touch `:wear`).
+- ~~Wear OS has not been re-verified since today's changes (none of them touch `:wear`).~~
+  **Re-verified 2 Aug** after the disclaimer reword, which does touch `:wear`:
+  `./tools/wear-verify.sh`, 24 captures across both round sizes and both font scales, 24/24
+  pass. It caught a regression the phone-side verification could not have: the reworded string
+  wrapped to a fourth line and the watch face clock printed through it. Fixed and re-measured.
+  Still **emulator only** — there is no physical watch.
 
 ---
 
@@ -245,6 +255,7 @@ than a confident wrong one, and it is the same answer for every other source of 
 | | Decision | Recommendation |
 |---|---|---|
 | **A14** | Switch to `USE_EXACT_ALARM`, which removes the permission prompt entirely — Muslim Pro does exactly this on the owner's own phone | **Not before production — re-verified against the policy page on 2 Aug, not assumed.** Google names exactly two qualifying categories, quoted: *"The app is an alarm or timer app"* and *"The app is a calendar app that shows event notifications."* A prayer-times app is neither, and the stated consequence for apps outside them is that they *"will be disallowed from publishing on Google Play."* Google's own remedy for anything else is the permission the app already uses: *"you should evaluate if using `SCHEDULE_EXACT_ALARM` as an alternative is an option."* Muslim Pro passing review is evidence it can pass, not proof we would. Revisit once live, when a rejection costs a version rather than the launch |
+| **A15** | What the disclaimer has to say, given the owner does not want to be held accountable | **DECIDED and BUILT, 2 Aug, in the owner's own words.** The wording now establishes four things rather than the previous two: that the times are a calculation run on the user's own phone and not a timetable from any authority; how that calculation can fail; that **a disagreement with the mosque is settled in the mosque's favour** (this replaced *"It is your choice to make"*); and that the app is free and given as it is, with no warranty. Published in four places that must be changed together — the in-app dialog, the watch, `docs/privacy.html#disclaimer` and the Play listing. Rule and copy table in HANDOVER §5.15 |
 | **A10** | Should a projected time fire an alarm at all? | **DECIDED and BUILT, 2 Aug.** No — it posts quietly and marked, with a switch to turn ringing back on, offered only to users whose location actually produces such days. The switch is not optional garnish: without it a Tromsø user's Fajr alarm silently stops working for two months a year. Rule in HANDOVER §5.14, device evidence in §10 |
 | **A1** | Stop deriving calculation method from sect | **Deferred.** Still right on the logic, but the symptom is now covered by the latitude banner and by "Match your mosque"; what is left costs every user an onboarding question to settle an internal tidiness point |
 | **A11** | Ramadan wording for Fajr | **Deferred by the owner** — suhoor and imsak are a fasting question, and the app is deliberately staying on salah for now. Revisit before the app's first live Ramadan |

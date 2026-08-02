@@ -219,6 +219,15 @@ another chance to disturb a run that has not begun. None of the three fixes belo
 enough to risk that. They are written up in full so the work can start the day the gate
 clears, not so it can start early.
 
+> **This was reversed on 2 Aug 2026, and only for one build.** The live version turns out to
+> skip Dhuhr's alert entirely — a defect that costs a user a prayer notification every single
+> day, which is itself a reason to uninstall, and uninstalling is the one thing that actually
+> resets a tester's fourteen days. Google's rule counts **tester opt-in days** and says nothing
+> about uploads, so a new build does not restart the clock. The repo is therefore at
+> `versionCode` 3 waiting to go up mid-window, and the reasoning is set out in full in
+> [`PRODUCTION_READINESS.md`](PRODUCTION_READINESS.md) §3 and §7. The paragraph above still
+> holds for everything that is merely an improvement.
+
 ---
 
 ## The three fixes, in the order users feel them
@@ -463,13 +472,39 @@ later session proposes reopening one, the reasoning is in `HANDOVER.md` §11.
     else *"will be disallowed from publishing on Google Play"*. Muslim Pro getting away with
     it proves it can pass, not that we would. Once the app is live, a rejection costs a
     version instead of the launch, and it can be tried properly then.
-13. **Still genuinely open:** whether the watch should carry the far-north notice too (A8), and
+13. **The disclaimer now says four things instead of two (A15) — your instruction, 2 Aug.**
+    You said the app should tell people the times come from a calculation, that they should
+    follow their mosque if there is a contradiction, and that you do not want to be held
+    accountable. It now says all three, plus one more that was missing and matters:
+
+    - **Where the times come from.** The app never actually said this before. Someone could
+      reasonably have assumed the times were supplied by a mosque or a scholar. They are not —
+      your phone works them out from the position of the sun. Now it says so.
+    - **How it can go wrong.** Not just "it may get things wrong", which is the line every app
+      carries and nobody reads, but the actual ways: a fault in the software, a wrong location,
+      a wrong clock, or me being wrong.
+    - **Follow your mosque.** It used to end that paragraph with *"It is your choice to make"*,
+      which is true but unhelpful — it hands someone a decision without helping them make it.
+      It now says plainly that where the app and the mosque disagree, the mosque wins. That is
+      not the app taking sides in fiqh; deferring to a real scholar over a piece of software is
+      the humble answer, and it is the safest one for you.
+    - **No warranty.** That it is free, given as it is, with no promise of accuracy. Said once,
+      in plain English, in the same voice as the rest of the screen — not in legal small print,
+      which would be read even less than the rest.
+
+    The same wording is now in four places, so someone who never installs the app can still
+    read it: the first-run screen, the watch, the privacy page on the website (under its own
+    "Disclaimer" heading, which the front page links to), and the Play Store description. The
+    dua request stays where it always was — the first-run screen only, asked once, never
+    repeated.
+
+14. **Still genuinely open:** whether the watch should carry the far-north notice too (A8), and
     the Moonsighting 60°-slide gap (A12) — which is not a decision at all, but a wait: it
     needs one real published timetable for 60–66°N in June before anything can be built.
 
 **After production is granted**
 
-14. Then, and only then, the Wear OS release.
+15. Then, and only then, the Wear OS release.
 
 ---
 

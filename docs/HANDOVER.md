@@ -61,6 +61,13 @@ dialog, and permanently in Settings → About → Disclaimer** — that:
 
 Do not remove, soften, or bury this. It is a stated requirement, not decoration.
 
+**§5.15 is the other half of this rule** and was added later, on the owner's instruction: it
+sets out the four things the wording has to establish — that the times are a calculation and
+not a timetable from any authority, how that calculation can fail, that **a disagreement with
+the mosque is settled in the mosque's favour**, and that the app carries no warranty. It also
+lists the four places the disclaimer is published and the requirement to change them together.
+Read it before editing a word of `disclaimer_body`.
+
 ---
 
 ## 2. Tech stack
@@ -758,6 +765,67 @@ and `AlertStyleDowngradeTest` sweeps all sixteen flag combinations to keep it th
 
 ---
 
+### 5.15 What the disclaimer has to say, and the four places it says it (2 Aug 2026)
+
+§1 records *that* there is a disclaimer and that it must not be removed, softened or buried.
+This is the harder half: **what it has to contain**, and where the copies are.
+
+**The four points.** A reader who takes away three of these four has been misled, so all four
+have to survive any rewording:
+
+| # | Point | Why it is not optional |
+|---|---|---|
+| 1 | **These times are a calculation, run on the reader's own phone from the position of the sun. They are not supplied by a mosque, a scholar or any authority.** | Until 2 Aug 2026 the app never said this outright. A user was free to assume the times came from somewhere authoritative — a stronger claim than the app has ever been entitled to make, and one it was silently benefiting from. |
+| 2 | **The calculation can be wrong, and here is how:** a fault in the software, a wrong location, a wrong clock, or the author's own mistake. | "May get things wrong" is the line every app carries and nobody reads. Naming the failure modes turns a formality into a warning. |
+| 3 | **Where the app and the mosque disagree, follow the mosque.** | The owner's explicit instruction, 2 Aug 2026. It replaced *"It is your choice to make"*, which asserted the reader's agency without helping them use it. This is **not** the app taking a fiqh position — deferring to local scholars over a piece of software is the humble answer, not a partisan one. |
+| 4 | **Free, and given as it is, with no warranty and no promise of accuracy.** | Also the owner's explicit instruction, in his words: *"I dont want to be held accountable."* Stated plainly and once, in the register of the rest of the screen. Legal boilerplate would be read even less than point 2. |
+
+**The four copies, and which is canonical.**
+
+| Where | What it carries | File |
+|---|---|---|
+| **In-app dialog** — once after setup, and any time from Settings → About → Disclaimer | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
+| **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
+| **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
+
+Changing the canonical string means changing the other three **in the same commit**. The dua
+request appears in the in-app dialog only (§1) — the web page deliberately omits it, because a
+second copy is a second ask.
+
+**`DisclaimerContentTest` enforces this**, and it is the reason the table above is not merely
+advice. It reads all four files off disk and checks each still carries its points, that the dua
+request is still last and still appears once, and that the watch string is inside its length
+budget. Two things about it are deliberate:
+
+- It matches **phrases, not sentences**, so the wording stays free to improve. It cannot judge
+  whether a rewrite still *means* the same thing — only that nothing was silently dropped.
+- `app/build.gradle.kts` declares the other three files as **task inputs**. Without that the
+  test task stays `UP-TO-DATE` after exactly the edit the guard exists to catch, and reports
+  success without running — the same trap `NoTranslationsYetTest` fell into and the same fix.
+  Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
+  restoring it turns it green.
+
+**Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
+does not have room for, and every watch owner also has the phone app, where all four are shown
+once, unavoidably, at setup. Points 1 and 3 are the two that change what someone *does*.
+
+**The watch string has a hard three-line budget**, and that is why it reads more bluntly than
+the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top
+of the block is what rises into the cap of the circle where `AppScaffold` paints the watch
+face clock. Three lines stops clear of it; four is printed straight through by the time. The
+first attempt at this wording was four lines and did exactly that — caught by screenshotting
+the bottom of the scroll, and by nothing else. Character count is a poor proxy because the
+wrap is by word: **88 chars fitted three lines, 85 needed four, 78 fitted**. Reword it only
+with `./tools/wear-verify.sh` open in front of you.
+
+**Rejected: a separate Terms page.** It would be a second URL to keep true, a second thing to
+link from Play, and the same words. The policy page is already the one Google links to, so the
+disclaimer lives there under an `#disclaimer` anchor and `docs/index.html` points at it.
+ponytail: one published copy, one link.
+
+---
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -972,7 +1040,11 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**83 unit tests, all offline and deterministic, 0 failures.**
+**127 unit tests, all offline and deterministic, 0 failures.** (core 73, app 42, wear 12.)
+
+> This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
+> row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
+> in a second, and a count nobody can trust is worse than no count.
 
 | Suite | Module | Tests | Covers |
 |---|---|---|---|
@@ -982,8 +1054,14 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
 | `LocaleDisciplineTest` | core | 4 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11) |
+| `AdjustmentTest` | core | 11 | Per-prayer corrections move a prayer by exactly that many minutes on every path, including those that bypass adhan; out-of-range values clamped on the way out rather than trusted; zero dropped rather than stored; no corrections is byte-identical to before; the worst legal pair still cannot invert a day; the Hijri shift moves Ramadan, and the Umm al-Qura Isha rule moves with it |
+| `BidiTest` | core | 8 | Right-to-left ordering asserted against `java.text.Bidi`, the real Unicode algorithm — the Hijri date, a Latin city inside an Arabic sentence and the reverse; and a test that pins the *wrong* fix (isolating the whole date rather than the month) so it cannot be "simplified" back in |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
+| `PlaceNameTest` | app | 9 | The town wins over the county; a point of interest never outranks a real administrative area; a house number is never shown as a place; blank fields skipped; the reported bug — a coarse fix with no locality falling through to the county — pinned |
+| `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
+| `NoTranslationsYetTest` | app | 3 | Fails the build if a language-qualified `values-*` folder ever appears (CLAUDE.md: never machine-translate). Proven by adding `values-ar/`, watching it go red, removing it, watching it go green |
+| `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
 | `AlertCodecTest` | app | 8 | Per-prayer alert round-trip and stable ordering; rubbish dropped entry by entry rather than thrown; Sunrise refused; and the upgrade from the two keys it replaced — including the empty-string-versus-absent-key distinction that decides whether a user who silenced everything gets five alerts back (§3, persisted data model) |
 | `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
 | `WearSettingsTest` | wear | 4 | Synced settings reach the engine intact; unpaired watch still calculates; the wire-key contract |
@@ -1006,8 +1084,9 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, 57 tests, 0 failures, lint informational-only, phone release
-APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties` is present).
+Expected: BUILD SUCCESSFUL, **127 tests**, 0 failures, lint informational-only (0 errors),
+phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
+is present).
 
 For Play, build bundles rather than APKs — `:app:bundleRelease :wear:bundleRelease`, which
 give ~4.3 MB and ~3.5 MB `.aab` files.
@@ -3214,6 +3293,48 @@ adb -s emulator-5554 install -r app/build/outputs/apk/rtl/app-rtl.apk
 needs an overnight run at a polar location and was not done. None of this has run on the
 Xiaomi, which still refuses the sideload.
 
+### The disclaimer reworded, and the watch regression it caused (2 Aug 2026)
+
+The wording change is §5.15. This is what was run, and what it caught.
+
+**On the phone — read on screen, not in the resource file.** Cleared install, full onboarding,
+disclaimer captured at the top of the scroll and again at the bottom.
+
+| Configuration | Result |
+|---|---|
+| Pixel emulator, LTR, font scale 1.0 | All four points present. Paragraphs 1–3 visible without scrolling; the dua request arrives in full at the bottom; **"I understand" stays fixed and reachable at every scroll position** |
+| Same, font scale **1.5** | Still reaches the dua, still reaches the button. This is the case the code comment warns about, and it is why the body is inside a `verticalScroll` — `AlertDialog` will not scroll it for you |
+| **RTL build** (`app-rtl.apk`, font scale 1.0) | Mirrors correctly: title right-aligned, paragraphs right-aligned, no clipping, dua arrives, button reachable. Trailing full stops render at the left edge, which is correct bidi behaviour for English text in an RTL layout, not a defect |
+
+**On the watch — and this is where it went wrong.** The first reworded `wear_disclaimer` was
+114 characters, wrapped to **four** lines, and at the bottom of the scroll the watch face clock
+printed straight through its first line, in grey on grey. Caught by looking at the screenshot.
+Nothing else would have caught it: the string compiled, the tests passed, lint was clean, and
+the phone was already verified.
+
+Then the fix went wrong too, which is the useful part. Shortening it to **85** characters still
+produced four lines — the wrap is by word, so a shorter sentence whose words pack badly is
+*taller*, not shorter. Only at **78** characters did it come back to three.
+
+| Round | Font scale | Lines | Bottom of scroll |
+|---|---|---|---|
+| 192dp | 1.0 | 3 | Clear of the clock |
+| 192dp | 1.3 | 4 | First line under the clock — **the pre-existing residual** recorded in `RELEASING.md`, unchanged in kind; the shipped string is shorter than the one that residual was measured with, so it cannot be worse |
+| 227dp | 1.0 | 3 | Clear |
+| 227dp | 1.3 | 4 | Clear |
+
+`./tools/wear-verify.sh` — 24 captures across both round sizes and both font scales, **24/24
+pass** the bezel check. The bezel check cannot see text drawn over text; the four rows above
+came from opening the captures.
+
+**Elsewhere.** `docs/privacy.html` gained an anchored `#disclaimer` section and `docs/index.html`
+now links to it rather than carrying a second full copy; the Play listing's "HONEST ABOUT WHAT
+IT IS" block was rewritten and the full description recounted at **3,704 / 4000** (the figure in
+`RELEASING.md` had drifted and said 2,897).
+
+**Not verified.** None of this has been seen on the Xiaomi — HyperOS still refuses the sideload
+— or on a physical watch, because there is not one. Both emulator round sizes were exercised.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Blocker for release
@@ -4963,6 +5084,25 @@ matters more than the stable hashes, that is the trade being made.
     in `app/build/outputs/apk/rtl/`; install it to one device with `adb -s`. Read which task
     failed before believing the variant is broken — this is the same shape as the "missing"
     banner that had only scrolled off screen (lesson 51).
+
+82. **Character count does not predict where text wraps, and on the watch the wrap is what
+    matters.** Shortening `wear_disclaimer` from 88 characters to 85 made it *taller* — four
+    lines instead of three — because the wrap is by word, and the words in the new sentence
+    happened to pack badly. 78 characters fitted again. The line that overflowed was then
+    lifted into the cap of the circle and printed through by the watch face clock, which is
+    the exact failure `roundListPadding` was written to prevent, arriving from a direction it
+    could not defend against: not a layout change, a *copy* change. Two consequences. Any edit
+    to a watch string is a layout change and needs `./tools/wear-verify.sh`, not a proofread.
+    And when the budget is really "three lines", write **three lines** in the comment, because
+    the next person will otherwise reason about characters, as this one did, and be wrong.
+
+83. **The regression was mine, and reading would never have found it.** The wording was
+    correct, the tests passed, lint was clean, and the phone screens were verified in two
+    directions and two font scales. The watch was checked last, as an afterthought, on the
+    assumption that a one-line string in a scrolling list cannot break a layout. It can. The
+    project's own rule — *run the phone and watch emulators together and compare them* —
+    exists because of a bug that lived in the gap between two modules, and this is the same
+    gap: work done on the phone, shipped to the watch, verified on the phone.
 
 
 ---

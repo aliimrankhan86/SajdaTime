@@ -486,6 +486,13 @@ not a religious authority: that the author is not a Mufti or Aalim, that it was 
 the help of artificial intelligence, that it may be wrong, and that anything doubtful
 should be checked with a local mosque or a qualified person.
 
+It also has to establish four specific things — that the times are calculated on the device
+rather than supplied by any authority, how that calculation can fail, that a disagreement
+with the mosque is settled in the mosque's favour, and that the app carries no warranty —
+and it is published in four places that must be changed together. The full rule, the table
+of copies and the rejected alternatives are in `docs/HANDOVER.md` §5.15. A port to another
+platform inherits all of it.
+
 ---
 
 ## 9. Known limitations and next steps

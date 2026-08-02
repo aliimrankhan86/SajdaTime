@@ -147,6 +147,23 @@ tasks.withType<Test>().configureEach {
             include("app/src/**/values-*/**", "wear/src/**/values-*/**", "core/src/**/values-*/**")
         },
     ).withPropertyName("localeResourceFolders").withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // Same trap, second guard. DisclaimerContentTest reads the *other* module's strings and
+    // the two published web pages and the Play listing off disk, to catch the four copies of
+    // the disclaimer drifting apart (docs/HANDOVER.md §5.15). None of those is on :app's
+    // compile or resource path, so without this the task stays UP-TO-DATE after exactly the
+    // edit the guard exists to catch — someone softening the wording in docs/privacy.html and
+    // running the tests to a green board that never re-ran.
+    inputs.files(
+        rootProject.fileTree(rootProject.projectDir) {
+            include(
+                "wear/src/main/res/values/strings.xml",
+                "docs/privacy.html",
+                "docs/index.html",
+                "docs/store/LISTING.md",
+            )
+        },
+    ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {

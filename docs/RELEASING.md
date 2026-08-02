@@ -469,7 +469,7 @@ field — app name, short description, full description, category, data safety a
 | Phone screenshots | 2–8, ≥1080px short side | ✅ 5 in `docs/store/screenshots/` (1080 × 1920) |
 | Wear OS screenshots | ≥1, square | ✅ 2 in `docs/store/screenshots/` (384 × 384) |
 | Short description | max 80 characters | ✅ in `LISTING.md` (79) |
-| Full description | max 4000 characters | ✅ in `LISTING.md` (2,897) |
+| Full description | max 4000 characters | ✅ in `LISTING.md` (3,704) |
 | App category | Lifestyle | You pick it in the console |
 
 Regenerate the icon and feature graphic any time with:
@@ -834,6 +834,15 @@ Google publishes its own list of the most common Wear OS rejections. Against thi
 > control. It is not fixable by padding: at the scroll extreme the list is anchored from
 > below, and at that size and font the content is simply taller than the glass. 227dp is
 > clear at both font scales.
+>
+> **Re-verified 2 Aug 2026** after `wear_disclaimer` was reworded, on all 24 captures across
+> both round sizes and both font scales: 24/24 pass the bezel check, and the four scroll-extreme
+> captures read 192dp@1.0 clear, 192dp@1.3 residual as above, 227dp@1.0 clear, 227dp@1.3 clear.
+> **The reword had to be measured, not proofread**, and the first attempt at it failed: a
+> *shorter* string wrapped to four lines instead of three and put the residual on 192dp@1.0 as
+> well, where there had been none. Wrapping is by word, so character count does not predict it —
+> 88 chars fitted three lines, 85 needed four, 78 fitted. Any edit to a watch string is a
+> layout change. Run this script.
 
 Two Wear hypotheses worth *not* worrying about: tiles and complications are **not** required
 for approval, and rotary-input support stopped being a requirement in February 2024.

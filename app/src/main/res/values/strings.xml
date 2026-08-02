@@ -71,8 +71,33 @@
       twice for the same thing is asking too often. This dialog is also reachable any time
       from Settings, so it stays available without ever being repeated unprompted.
       Do not remove the last paragraph.
+
+      Paragraphs 2 and 3 are the ones that carry the weight, and each sentence in them is
+      there on purpose. Between them they have to establish four separate things, because
+      a reader who takes only three of the four away has been misled:
+
+        1. Where the times come from — a calculation run on the reader's own phone from
+           the position of the sun, not a timetable handed down by any mosque, scholar or
+           authority. Until this was said outright the app never actually said it, and a
+           user who assumed the times were sourced from somewhere authoritative was
+           reading a stronger claim than the app was ever entitled to make.
+        2. That the calculation can be wrong, and the specific ways it can: a fault in the
+           software, a wrong location, a wrong clock, or the author's own mistake. "May
+           get things wrong" on its own is the sort of line every app carries and nobody
+           reads. Naming the failures makes it a real warning.
+        3. What to do about a disagreement — follow the mosque. This replaced "It is your
+           choice to make", which stated the reader's agency without helping them use it.
+           This is not the app adopting a fiqh position: deferring to local scholars over
+           a piece of software is the humble answer, not a partisan one, and it is the
+           owner's explicit instruction.
+        4. That the app is given free and as it is, with no warranty. Plainly and once,
+           in the register of the rest of the screen rather than in legal boilerplate,
+           which nobody reads either.
+
+      Keep all four if this is ever reworded. Dropping any one of them is a change of
+      substance dressed as an edit, and the fourth is the owner's own request.
     -->
-    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. It is your choice to make.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
     <string name="home_next_prayer">NEXT PRAYER</string>

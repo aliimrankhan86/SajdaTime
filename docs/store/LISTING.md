@@ -184,10 +184,9 @@ If you would rather not share your location at all, you can type a city name ins
 
 HONEST ABOUT WHAT IT IS
 
-SajdaTime is a helper, not a religious authority. It was built with the help of artificial
-intelligence, and it may get things wrong. If a time or a direction ever looks off, please check with your local mosque or someone qualified to advise you.
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
 
-Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release.
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
 
 FREE, AND STAYING FREE
 
@@ -197,7 +196,7 @@ as an ongoing charity for the Ummah.
 Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-`3,299 / 4000`
+`3,704 / 4000`
 
 ### This block is now a copy of the Console, not the other way round
 

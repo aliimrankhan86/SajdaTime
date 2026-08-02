@@ -19,8 +19,29 @@
       The watch had no disclaimer at all, so a user who only ever glanced at their wrist
       never saw one. Shortened to fit the screen, saying the same thing as the phone.
       Do not remove it.
+
+      Two of the phone disclaimer's four points survive the shortening: these are a
+      calculation, and the mosque wins a disagreement. The other two — how the calculation
+      can fail, and that the app carries no warranty — are on the phone, which every watch
+      owner also has. See docs/HANDOVER.md §5.15.
+
+      ⚠️ THREE LINES. That is a hard budget, not a style note, and it is why this reads more
+      bluntly than the phone's version.
+
+      This is the second-to-last item in the times list, and the list anchors from the
+      bottom (see roundListPadding in WearApp.kt), so the top of this block is what rises
+      into the narrow cap of the circle — where AppScaffold paints the watch face clock.
+      At three lines it stops just clear of it. At four the first line is printed straight
+      through by the time, in grey on grey, and the one screen element that must never be
+      buried is the one that gets buried.
+
+      Measured on the 192dp round, font scale 1.0, at the bottom of the scroll. Character
+      count is a poor guide because the wrap is by word: 88 chars fitted three lines, 85
+      needed four, 78 fitted. If you reword this, screenshot the bottom of the scroll —
+      `./tools/wear-verify.sh` captures exactly that, on both round sizes and both font
+      scales. Do not merge a reworded version you have only read.
     -->
-    <string name="wear_disclaimer">A helper, not a religious authority. Check with your local mosque if a time looks wrong.</string>
+    <string name="wear_disclaimer">A helper, not a religious authority. Times are calculated. Follow your mosque.</string>
 
     <!--
       School of thought, on the wrist.
