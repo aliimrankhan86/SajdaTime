@@ -36,10 +36,29 @@ type=RTC_WAKEUP origWhen=2026-08-02 17:17:00.000 window=+1h0m0s0ms flags=0x20
 hour**. The fixed build, installed beside it on the same phone and holding the same nine
 prayer times, reads `window=0 flags=0x3` — exact.
 
-So every tester currently in the fortnight is testing an app whose prayer alerts can be up to
-an hour late, and — on Xiaomi/HyperOS overnight — may not arrive at all. That was measured:
-an identical 02:51 Fajr alarm fired at **02:51:00.037** on the fixed build and **never fired**
-on the shipped build, which was still queued at 04:23 with HyperOS holding it three days out.
+**Then today's Dhuhr was watched on both, and the live build did not merely run late.** At
+13:13, three minutes after the prayer fell:
+
+```
+requester=-3m6s606ms  …  power_pending=+2d23h56m53s394ms
+whenElapsed=+2d23h56m53s394ms   maxWhenElapsed=+2d23h56m53s394ms
+```
+
+Every other policy is in the past, so nothing else is holding it. HyperOS's `power_pending`
+alone overwrote both bounds and moved today's Dhuhr to **5 August**. The fixed build, same
+phone, same target, posted "Time for Dhuhr" at **13:10:00.600**.
+
+This also corrects an inference made this morning. At 11:21 `power_pending` read `--` on both
+builds, and that was written up as "in daytime the damage is only the one-hour window". The
+observation was right and the conclusion was wrong: `power_pending` **re-engaged during the
+afternoon**, on a phone that was plugged in, unlocked and in active use, before the alarm was
+due. So the one-hour window is the **floor**, not the expected damage, and the multi-day
+parking is not an overnight-only phenomenon.
+
+**The plain statement of the defect, then, is not "alerts can be late". It is that a tester on
+a Xiaomi phone can have a prayer silently skipped altogether, at any time of day.** The same
+was already measured overnight: an identical 02:51 Fajr fired at 02:51:00.037 on the fixed
+build and never fired on the shipped one.
 
 This matters for the decision because of §3.
 
@@ -129,7 +148,7 @@ as one number.
 
 | # | Risk | Severity | State |
 |---|---|---|---|
-| 1 | Testers are on the build with the alarm defect | **High** | Fix built and verified, not uploaded. §7 |
+| 1 | Testers are on a build that can **silently skip a prayer entirely** on Xiaomi phones, at any time of day | **High** | Fix built and verified, not uploaded. §7. Measured twice: Fajr overnight, Dhuhr in the afternoon |
 | 2 | Opt-in count may have slipped below 12 without notice | **High** | Play stops displaying the number once 12 is passed, and gives no alert if it drops. Unobservable |
 | 3 | Store screenshots no longer match the app | Medium | Deliberate. Must be retaken **at upload**, not before — `RELEASING.md` |
 | 4 | Moonsighting users between 60° and 66° get Fajr up to 91 min out | Medium | Real, bounded, affects a small population. Fix attempted and reverted — see §6 |

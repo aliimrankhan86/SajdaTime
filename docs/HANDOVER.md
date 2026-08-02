@@ -2876,11 +2876,30 @@ with both builds still installed and both holding the *same nine prayer times*. 
 The fixed entries also carry a `showIntent=…startActivity`, which is the `setAlarmClock`
 signature — the shipped ones have none, because `setAndAllowWhileIdle` has nothing to show.
 
-**`power_pending` had cleared to `--` on both.** So this is *not* the HyperOS deferral: it
-is the plain one-hour window Android applies to any inexact alarm, present in ordinary
-daytime use with the phone awake and charging. The two findings stack rather than compete —
-overnight the OEM parks the alarm for days, and in the daytime Android alone still costs up
-to an hour. Between them there is no part of the day when the shipped build is on time.
+**`power_pending` had cleared to `--` on both** at the time of that reading, so this looked
+like the plain one-hour window Android applies to any inexact alarm, present in ordinary
+daytime use with the phone awake and charging.
+
+> **⚠️ That inference was wrong, and the same day's 13:10 Dhuhr disproved it.** The
+> observation was accurate; what was concluded from it was not. `power_pending` is not a
+> state that clears once on waking and stays clear — it **re-engaged during the afternoon**,
+> on a phone that was plugged in, unlocked and in active use, and it re-engaged *before the
+> alarm was due*. Read at 13:13:06, three minutes after Dhuhr fell:
+>
+> ```
+> requester=-3m6s606ms  …  power_pending=+2d23h56m53s394ms
+> whenElapsed=+2d23h56m53s394ms   maxWhenElapsed=+2d23h56m53s394ms
+> ```
+>
+> Every other policy sits in the past, so nothing else is holding it. `power_pending` alone
+> overwrote **both** bounds and moved today's Dhuhr to **5 August**. The live build did not
+> deliver the prayer late — **it will not deliver it at all**. The fixed build, on the same
+> phone, holding the same target, posted "Time for Dhuhr" at **13:10:00.600**.
+>
+> Corrected picture: **the one-hour window is the floor, not the expected damage**, and the
+> three-day parking is not an overnight-only phenomenon. There is no time of day at which the
+> shipped build can be relied upon. Evidence:
+> `docs/reviews/2026-08-02-dhuhr-daytime-ab.md`.
 
 **A caught error of my own.** The first dump showed the shipped build's alarms still parked
 three days out; the second, seconds later, showed them released. Same alarm object. The
