@@ -95,12 +95,16 @@ tools/  Release helpers, all runnable from the repo root. wear-verify.sh checks 
 
 ## Documentation
 
-- [CLAUDE.md](CLAUDE.md) - the standing rules for any AI working on this project, loaded
-  automatically by Claude Code. The hard requirements, the commit rule, and how to work here.
+- [CLAUDE.md](CLAUDE.md) - the standing rules for any AI working on this project. Some tools
+  load it automatically; name it explicitly if yours does not. The hard requirements, the
+  commit rule, and how to work here.
 - [docs/HANDOVER.md](docs/HANDOVER.md) - **start here.** Vision, stack, every feature and
-  business rule, what is verified, what is not, what is left to do, and the build traps.
+  business rule, what is verified, what is not, what is left to do, and the build traps. It is
+  the only document kept current; everything else defers to it.
 - [docs/NEW-SESSION.md](docs/NEW-SESSION.md) - how to pick the project back up in a fresh
-  session, and what to say to get a useful one.
+  session with **any** assistant, what to paste, which decisions are settled and must not be
+  quietly undone, and the traps this project has already paid for. Deliberately holds nothing
+  that changes, so it cannot go stale the way it once did.
 - [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) - every colour token, spacing step and
   component pattern, and why each one is the way it is.
 - [docs/RELEASING.md](docs/RELEASING.md) - the Google Play checklist, including the three
