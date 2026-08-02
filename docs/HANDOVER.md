@@ -3337,6 +3337,49 @@ IT IS" block was rewritten and the full description recounted at **3,704 / 4000*
 
 ## 11. ⚠️ Still pending — the honest list
 
+### Parked, 2 Aug 2026 — the whole of it, on one screen
+
+The code work asked for is finished and pushed. Nothing below is half-done; each item is
+either waiting on the calendar, waiting on the owner, or waiting on evidence that does not
+exist yet. Start here, then read the detail in the sections that follow.
+
+**Waiting on the calendar or on Google — nothing to build**
+
+| | What | When |
+|---|---|---|
+| P1 | **Upload `versionCode` 3 to the closed track.** Built, signed, waiting. It carries the Dhuhr fix, which silently loses one prayer alert a day in the live build | Now. Owner action in the Play Console |
+| P2 | **Retake `docs/store/screenshots/`** — in the order build → capture → upload, as part of P1, not before it | With P1 |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1 |
+| P4 | **Apply for production** when the fourteen days complete | ~14 Aug 2026 |
+| P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |
+
+**Waiting on the owner — a decision, not a task**
+
+| | What | State |
+|---|---|---|
+| A14 | `USE_EXACT_ALARM` | **Not before production.** Re-verified against Google's policy page, not assumed. Revisit once live, when a rejection costs a version rather than the launch |
+| A8 | Should the watch carry the far-north notice? | Genuinely open. The watch marks approximated times but does not explain them |
+
+**Waiting on evidence that does not exist yet**
+
+| | What | What is missing |
+|---|---|---|
+| A12 | The Moonsighting 60° slide | One real published Moonsighting Committee timetable for 60–66°N in June. Built once and thrown away rather than ship a rule nobody could check — §10 |
+| — | Whether the default method is right for Britain | Three mosques in two towns is enough to prove the current default is wrong for one user, not enough to prove which is right for the country |
+
+**Known and deliberately not fixed** — the numbered list under *Not done* below, plus
+*Deliberate non-goals*. Read both before "improving" anything: several entries there are
+decisions, not oversights.
+
+**Untested, and it should stay written down until it is not**
+
+- The alarm has never been watched *firing* quietly on a projected day. Needs an overnight run
+  at a polar location.
+- The phone↔watch Data Layer sync has never been observed working end to end (item 7 below).
+- Nothing since 2 Aug has run on the Xiaomi — HyperOS refuses the sideload — and there is no
+  physical watch at all.
+- One ANR seen once, under uiautomator load, never reproduced.
+
 ### Blocker for release
 
 > **Read this first — 1 Aug 2026.** **Google approved it, and the app is live on the closed
@@ -3971,11 +4014,17 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
    checking a distant city from home. Decide whether to show the city's local time, or
    label the timezone explicitly.
 5. **High-latitude rule is not user-selectable.** `TWILIGHT_ANGLE` is a good default and
-   matches Aladhan, but some UK mosques publish one-seventh-of-the-night times. If users
-   report a mismatch with their local mosque, **exposing this setting is the first thing to
-   add.**
-6. **No per-prayer manual offsets.** Some communities apply a few minutes' adjustment. The
-   data model would take it easily.
+   matches Aladhan, but some UK mosques publish one-seventh-of-the-night times. ~~If users
+   report a mismatch with their local mosque, exposing this setting is the first thing to
+   add.~~ **Deliberately deferred, 2 Aug 2026 — this is A4.** It would be the most
+   jargon-heavy setting the app could ship, and "Match your mosque" (item 6) now reaches the
+   same outcome without asking anyone to hold an opinion about a twilight rule. Still the
+   right thing to add if a mismatch survives a manual correction.
+6. ~~**No per-prayer manual offsets.** Some communities apply a few minutes' adjustment. The
+   data model would take it easily.~~ **Built, 2 Aug 2026 — "Match your mosque".** Per-prayer
+   minute corrections plus a −2..+2 day Hijri shift, applied on every path including the ones
+   that bypass adhan, clamped on read rather than trusted, and covered by `AdjustmentTest`
+   (11 tests). §5 and the settings table in §4.
 7. **The phone↔watch Data Layer sync has never been observed working.** Both sides are
    implemented against the shared `WatchSyncContract` and unit-tested, but the two emulators
    were never actually paired, so a real phone→watch settings push is **unverified**. The
