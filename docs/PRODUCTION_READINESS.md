@@ -181,7 +181,7 @@ as one number.
 | 1 | Testers are on a build that can **silently skip a prayer entirely** on Xiaomi phones, at any time of day | **High** | Fix built and verified, not uploaded. §7. Measured twice: Fajr overnight, Dhuhr in the afternoon |
 | 2 | Opt-in count may have slipped below 12 without notice | **High** | Play stops displaying the number once 12 is passed, and gives no alert if it drops. Unobservable |
 | 3 | Store screenshots no longer match the app | Medium | Deliberate. Must be retaken **at upload**, not before — `RELEASING.md` |
-| 4 | Moonsighting users between 60° and 66° get Fajr up to 91 min out | Medium | Real, bounded, affects a small population. Fix attempted and reverted — see §6 |
+| 4 | ~~Moonsighting users between 60° and 66° get Fajr up to 91 min out~~ | **Closed** | **Not a risk — the opposite.** Their own published timetable for Luleå, Trondheim and Helsinki matches this engine to within a minute; the 91 minutes measured the damage the reverted *fix* would have done. Twelve of their rows are now golden values. HANDOVER §10 |
 | 5 | Users who decline the exact-alarm permission still get late alerts | Medium | Mitigated: onboarding prompt, dismissible home banner, settings row, and copy that now names the real cost |
 | 6 | ~~Cold start unmeasured on hardware~~ | **Closed** | Measured 2 Aug: ~224 ms cold on the Redmi. HANDOVER §10 |
 | 7 | The emulator ANR is real after all | Low | Never seen on hardware; profile is consistent with emulator cold start |
@@ -220,8 +220,14 @@ rescue the reverted implementation: Luleå in late June satisfies the condition,
 fires there and the inversion is real. It does mean the contradiction was partly in the
 reading. See HANDOVER §15 lesson 78.
 
-**Still blocked on evidence, not effort**: one Moonsighting timetable for a place between 60°
-and 66° in June would settle it.
+> **⚠️ SUPERSEDED 2 Aug 2026 — settled, and settled in favour of changing nothing.** This
+> paragraph used to read *"still blocked on evidence, not effort: one Moonsighting timetable for
+> a place between 60° and 66° in June would settle it."* That timetable was obtainable all
+> along — their page builds its table in JavaScript, so `curl` saw nothing and a browser saw
+> everything. **They publish the un-slid numbers and this engine already reproduces them**
+> across Luleå, Trondheim and Helsinki, summer and winter, to within one minute of rounding.
+> There is no slide to implement. Twelve of their rows are pinned in `PolarAndHemisphereTest`
+> so it cannot be re-implemented silently. HANDOVER §10, "A12 settled".
 
 **But the user-facing problem it represents is now addressable without settling it.** The
 "Match your mosque" corrections added on 2 August let a user at any latitude match their own

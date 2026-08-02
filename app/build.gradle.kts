@@ -148,19 +148,38 @@ tasks.withType<Test>().configureEach {
         },
     ).withPropertyName("localeResourceFolders").withPathSensitivity(PathSensitivity.RELATIVE)
 
-    // Same trap, second guard. DisclaimerContentTest reads the *other* module's strings and
-    // the two published web pages and the Play listing off disk, to catch the four copies of
-    // the disclaimer drifting apart (docs/HANDOVER.md §5.15). None of those is on :app's
-    // compile or resource path, so without this the task stays UP-TO-DATE after exactly the
-    // edit the guard exists to catch — someone softening the wording in docs/privacy.html and
-    // running the tests to a green board that never re-ran.
+    // Same trap, second guard. DisclaimerContentTest reads every copy of the disclaimer off
+    // disk — including this module's own strings.xml — to catch the copies drifting apart
+    // (docs/HANDOVER.md §5.15). None of them is on :app's compile or resource path, so without
+    // this the task stays UP-TO-DATE after exactly the edit the guard exists to catch.
+    //
+    // ⚠️ The first entry is the one that was missing, and it is the canonical copy — the words
+    // the user actually reads. It was assumed covered by the `values-*` glob above. It is not:
+    // Ant's `values-*` requires the literal hyphen, so it matches `values-night/` and never
+    // `values/`. Nor does anything else invalidate the task, because `unitTests.isReturnDefaultValues`
+    // means merged resources are off the unit-test classpath and changing a string's *value*
+    // does not change R.jar.
+    //
+    // Measured on 2 Aug 2026, after the guard had been reported as working: deleting
+    // "no warranty" from disclaimer_body and running `./gradlew :app:testDebugUnitTest` printed
+    // UP-TO-DATE and BUILD SUCCESSFUL. `./gradlew clean :app:testDebugUnitTest` printed
+    // FROM-CACHE and BUILD SUCCESSFUL — the build cache keys off these same declared inputs, so
+    // `clean` does not rescue it either, and neither did CLAUDE.md's own release-gate command.
+    // Only `--rerun-tasks` went red. The original "proven to fail" demonstration softened
+    // docs/privacy.html, which *was* declared, so it never exercised this copy.
+    //
+    // That is three instances of this one bug class in this project (docs/HANDOVER.md §15
+    // lesson 84 and its own footnote). If you add a guard that reads a file off disk, declare
+    // that exact file here, and prove it by breaking the file the guard is really about.
     inputs.files(
         rootProject.fileTree(rootProject.projectDir) {
             include(
+                "app/src/main/res/values/strings.xml",
                 "wear/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",
                 "docs/store/LISTING.md",
+                "README.md",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

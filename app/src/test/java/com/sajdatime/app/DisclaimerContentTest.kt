@@ -139,5 +139,19 @@ class DisclaimerContentTest {
         assertContains(listing, "not a religious authority", "docs/store/LISTING.md")
         assertContains(listing, "follow your mosque", "docs/store/LISTING.md (point 3)")
         assertContains(listing, "no warranty", "docs/store/LISTING.md (point 4)")
+
+        // The README is the first thing a visitor to the public GitHub repo reads, and it was
+        // carrying a sixth copy that nobody had counted — missing "follow your mosque" and the
+        // no-warranty sentence, which are two of the four points. Found by audit on 2 Aug 2026,
+        // not by this test, because this test did not know the file existed.
+        val readme = read("README.md")
+        assertContains(readme, "not a religious authority", "README.md")
+        assertContains(readme, "follow your mosque", "README.md (point 3)")
+        assertContains(readme, "no warranty", "README.md (point 4)")
+        assertTrue(
+            "README.md now repeats the dua request. It belongs on the first-run screen and " +
+                "nowhere else — CLAUDE.md.",
+            !readme.contains("duas", ignoreCase = true),
+        )
     }
 }

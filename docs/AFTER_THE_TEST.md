@@ -64,7 +64,7 @@ it falls back to the borrowed times and says so.
 hemispheres, both solstices, and a sweep of every latitude on Earth for every day of a year;
 they also check the app does *not* start approximating anywhere normal — Reykjavík and Luleå,
 the closest real towns to the line, keep their own times. Sunrise and sunset were cross-checked
-against Aladhan and agree **to the minute**. Full build passes: 74 tests, no failures, no lint
+against Aladhan and agree **to the minute**. Full build passes: 129 tests, no failures, no lint
 errors.
 
 **And I have now seen it on a screen**, which I could not manage in two earlier attempts. The
@@ -498,9 +498,19 @@ later session proposes reopening one, the reasoning is in `HANDOVER.md` §11.
     dua request stays where it always was — the first-run screen only, asked once, never
     repeated.
 
-14. **Still genuinely open:** whether the watch should carry the far-north notice too (A8), and
-    the Moonsighting 60°-slide gap (A12) — which is not a decision at all, but a wait: it
-    needs one real published timetable for 60–66°N in June before anything can be built.
+14. **Both of these are now closed** (2 August), and neither needed a decision from you in the
+    end.
+
+    - *The watch and the far-north notice.* It turned out the watch was not saying anything at
+      all about approximate times, which was simply a gap rather than a design question. It now
+      carries one line under the countdown: *"Approximate. Here the sun does not rise or set
+      today, so these come from 45°. Ask your mosque."*
+    - *The Moonsighting question.* This had been waiting for a published timetable that nobody
+      could get hold of. It turned out their website does publish one — it just builds the page
+      in a way the earlier tool could not read. **Their times match SajdaTime to the minute**,
+      so the app has been right all along, and the "fix" that was built and thrown away would
+      have made it worse by up to an hour and a half. Their figures are now locked into the
+      tests so nobody rebuilds it by mistake.
 
 **After production is granted**
 

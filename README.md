@@ -133,8 +133,16 @@ and never reaches a server.
 Prayer times are calculated with [adhan-java](https://github.com/batoulapps/adhan-java) (MIT)
 by Batoul Apps. The Qibla is calculated by this app directly.
 
-**Disclaimer:** SajdaTime is a helper, not a religious authority. It was built with the help
-of artificial intelligence and may get things wrong. If a time or direction looks off, check
-with your local mosque or someone qualified to advise you.
+**Disclaimer:** SajdaTime is a helper, not a religious authority. These times are not supplied
+by a mosque, a scholar, or any authority — your own phone works them out from the position of
+the sun, using calculation methods that scholars have published. It was built with the help of
+artificial intelligence and may get things wrong. **Where SajdaTime and your mosque disagree,
+follow your mosque.** If a time or direction looks off, or you are unsure, ask them or someone
+else qualified to advise you. The app is free and given as it is, **with no warranty and no
+promise of accuracy**.
+
+The full disclaimer is shown in the app on first run and published at
+[docs/privacy.html#disclaimer](https://aliimrankhan86.github.io/SajdaTime/privacy.html#disclaimer).
+All copies must make the same four points and change together — see `docs/HANDOVER.md` §5.15.
 
 Made by Ali Imran Khan, as an ongoing charity for the Ummah. Free, for the sake of Allah.

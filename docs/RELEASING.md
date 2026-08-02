@@ -427,7 +427,7 @@ unzip -l app/build/outputs/bundle/release/app-release.aab | grep META-INF
 You should see a `.RSA` and a `.SF` file. If you see neither, `keystore.properties` was not
 found or has a wrong path in it.
 
-> Phone is `versionCode = 2`, watch is `versionCode = 1000`. They share an `applicationId`,
+> Phone is `versionCode = 3` (bumped 2 Aug 2026), watch is `versionCode = 1000`. They share an `applicationId`,
 > so Play requires every version code to be unique across **both** modules — the number is
 > scoped to the app, not to the release track. Each module now has its own band, so bump
 > either freely and they can never collide. Every update must *increase* the number; Play

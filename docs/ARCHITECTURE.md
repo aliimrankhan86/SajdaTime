@@ -441,6 +441,20 @@ All unit tests are offline and deterministic.
 | `CityLookupParseTest` | Geocoding response parsing: coordinates come from the response, the displayed name is the resolved place rather than the typed text, and a missing coordinate is a miss rather than zero, zero. |
 | `TileFormatTest` | Watch tile countdown wording at the boundaries, and the refresh floor that stops a passed prayer re-rendering the tile in a loop. |
 | `WearSettingsTest` | Settings synced from the phone reach the engine intact; an unpaired watch still calculates; the phone-to-watch key contract. |
+| `PolarAndHemisphereTest` | Every 0.5° pole to pole × every day of 2026 × both madhabs is chronologically ordered; polar latitudes produce times rather than a crash; the reference latitude follows the method; **twelve rows of Moonsighting's own published timetable for Luleå, Trondheim and Helsinki are pinned as golden values** so the reverted 60° slide cannot be re-implemented silently. |
+| `AdjustmentTest` | "Match your mosque": per-prayer corrections move a prayer by exactly that many minutes on every path, out-of-range values are clamped, and the worst legal pair still cannot invert a day. |
+| `CoordinatesTest` | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed. |
+| `LocaleDisciplineTest` | The app formats in its own language, not the device's; every translation declares its tag; **the shipped app is left-to-right and may not select a language it has no words in.** |
+| `NoTranslationsYetTest` | Fails the build if any language-qualified `values-<lang>/` folder appears anywhere — the machine-translation ban in `CLAUDE.md`. |
+| `DisclaimerContentTest` | The religious disclaimer still makes all four of its points, the dua request is still last and appears once, and the published copies have not drifted apart. |
+| `BidiTest` | Right-to-left ordering asserted against `java.text.Bidi`, including a test that pins the *wrong* fix so it cannot be "simplified" back in. |
+| `PlaceNameTest` | The town wins over the county; a point of interest never outranks an administrative area; a house number is never shown as a place. |
+| `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless — and a Notification is never upgraded to an Alarm. |
+| `AlertCodecTest` | Per-prayer alert round-trip, rubbish dropped entry by entry, and the upgrade from the two keys it replaced. |
+
+**17 suites, 129 tests** at the time of writing. `docs/HANDOVER.md` §9 carries the
+authoritative per-suite counts and the command that produces them; this table went three days
+stale listing only seven, which is why the count is stated here rather than left implicit.
 
 Reference values were captured from the Aladhan API — an independent implementation of the
 same conventions — and pinned as golden values so the suite stays offline. To regenerate:
@@ -500,10 +514,16 @@ platform inherits all of it.
 Honest list of what is not covered:
 
 - **High-latitude rule is not user-selectable.** `TWILIGHT_ANGLE` is a good default and
-  matches Aladhan, but some UK mosques publish one-seventh-of-the-night times. If users
-  report a mismatch with their local mosque, exposing this setting is the first thing to add.
-- **Per-prayer manual offsets** — some communities apply a few minutes' adjustment. Not
-  built; the data model would take it easily.
+  matches Aladhan, but some UK mosques publish one-seventh-of-the-night times. ⚠️ This entry
+  used to end "exposing this setting is the first thing to add". **That was struck from
+  `docs/HANDOVER.md` on 2 Aug 2026 as simply false, and it is struck here for the same
+  reason:** it is item A4 and it is *deliberately deferred*, because "Match your mosque"
+  (below) closes the same gap without asking a user to understand twilight models. Do not
+  build it on the strength of this bullet.
+- **Per-prayer manual offsets — BUILT, 2 Aug 2026, as "Match your mosque".** Each prayer can
+  be nudged by whole minutes and the Hijri date shifted by ±2 days; both sync to the watch.
+  See `core/AdjustmentCodec.kt`, `SettingsRepository.setAdjustment`, and `AdjustmentTest`
+  (11 tests). This bullet said "Not built" for three days after it shipped.
 - **No bundled adhan audio.** Notification mode uses the system sound; alarm mode plays a
   tone the user picks from what is already on their phone. Shipping audio would add
   licensing questions and tens of megabytes for a file most users replace anyway.
@@ -513,12 +533,18 @@ Honest list of what is not covered:
   a distant city from home sees those prayers on their own clock rather than the city's.
 - **No instrumented UI tests.** Logic and colour are covered by unit tests; the Compose
   screens on both phone and watch are verified manually on emulators.
-- **App is unsigned.** A release keystore must be generated before publishing; the release
-  build currently produces `app-release-unsigned.apk`.
+- ~~**App is unsigned.**~~ **Signed since 31 July 2026.** Both `:app` and `:wear` release
+  bundles are signed from `keystore.properties`, which is gitignored and holds the owner's own
+  upload key. ⚠️ **No agent may generate, hold, request or view that key** — see `CLAUDE.md`
+  and `docs/RELEASING.md`. This bullet previously read "a release keystore must be generated
+  before publishing", which invited exactly the hard-rule violation the project forbids.
 - **No home screen widget and no tablet-optimised layout.** The watch app and tile exist;
   a phone widget does not.
-- **The watch has no settings of its own.** Sect, madhab and method arrive from the phone.
-  A watch that is never paired calculates with the defaults and cannot be changed on-wrist.
+- **The watch has *some* settings of its own.** Sect and madhab can be changed on the wrist —
+  there is a school picker at the bottom of the times list, precisely so an unpaired watch is
+  not stuck on Sunni/Shafi'i with Asr over an hour out. **Calculation method is still
+  phone-only.** A watch that is never paired calculates with its own defaults and says which
+  school produced the times.
 
 ---
 

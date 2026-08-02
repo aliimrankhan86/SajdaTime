@@ -823,6 +823,30 @@ the bottom of the scroll, and by nothing else. Character count is a poor proxy b
 wrap is by word: **88 chars fitted three lines, 85 needed four, 78 fitted**. Reword it only
 with `./tools/wear-verify.sh` open in front of you.
 
+**⚠️ There are SIX copies, not four, and the count in this section was wrong for three days.**
+Found by audit on 2 Aug 2026. The full set, all guarded by `DisclaimerContentTest`:
+
+| # | Copy | Notes |
+|---|---|---|
+| 1 | `R.string.disclaimer_body` | **Canonical.** First-run dialog. The only copy carrying the dua request |
+| 2 | `R.string.wear_disclaimer` | Shortened to two of the four points; hard three-line budget |
+| 3 | `docs/privacy.html#disclaimer` | The URL Google Play links to |
+| 4 | `docs/store/LISTING.md` | Mirrors the Play description byte for byte |
+| 5 | `docs/index.html` | Short form; links to copy 3 |
+| 6 | `README.md` | **The first thing a visitor to the public repo reads.** It was missing "follow your mosque" and the no-warranty sentence entirely until 2 Aug — two of the four points, on the most public surface, and no test knew the file existed |
+
+**And the guard was not running on copy 1.** `app/build.gradle.kts` declared the *other* copies
+as task inputs and assumed the canonical one was covered by the `values-*` glob above it. It is
+not: Ant's `values-*` needs the literal hyphen, so it matches `values-night/` and never
+`values/`. Measured — deleting "no warranty" from `disclaimer_body` and running
+`./gradlew :app:testDebugUnitTest` printed UP-TO-DATE and BUILD SUCCESSFUL, and
+`./gradlew clean :app:testDebugUnitTest` printed FROM-CACHE and BUILD SUCCESSFUL, because the
+build cache keys off the same declared inputs. **CLAUDE.md's own release-gate command was green
+on a softened disclaimer.** The original "proven to fail" demonstration softened
+`docs/privacy.html`, which *was* declared, so it never exercised the copy that matters. Fixed by
+declaring the file; re-proved by breaking copy 1 and watching both commands go red. This is the
+third instance of the bug class in §15 lesson 84.
+
 **Rejected: a separate Terms page.** It would be a second URL to keep true, a second thing to
 link from Play, and the same words. The policy page is already the one Google links to, so the
 disclaimer lives there under an `#disclaimer` anchor and `docs/index.html` points at it.
@@ -884,7 +908,7 @@ the lookup (platform geocoder and Open-Meteo `language=`) were deliberately brou
 `AppLocale` in the first place so they could not disagree with each other. Revisit it when
 there is a translation to make it coherent, not before. See `CityLookup.kt`.
 
-Evidence for the whole of this section — nine surfaces on a phone and a watch both set to
+Evidence for the whole of this section — eleven surfaces on a phone and a watch both set to
 `ar-EG` — is in §10, "The app on a phone that is actually set to Arabic".
 
 ---
@@ -4065,10 +4089,13 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   county are not a country. If the label ever gains a subtitle it should name who uses it, not
   where.
 
-- **A8 — The watch does not show the polar approximation notice.** The phone does. The engine
-  fix is shared so the watch no longer crashes, but a Wear user above the Arctic Circle sees
-  projected times with nothing saying so. Small screen, no obvious room; needs a design
-  decision rather than a quick insertion.
+- **A8 — ✅ CLOSED (2 Aug 2026). The watch now says the times are approximate.** This entry
+  read "needs a design decision rather than a quick insertion" and that framing was wrong: it
+  was not a design question, it was a broken contract. `DayPrayerTimes`' own KDoc requires the
+  UI to say when times are projected, and the watch *app* was not marking them at all — only
+  the tile was. `wear_polar_notice` now sits directly under the countdown, above the first
+  prayer row. Placement was the only real decision and screenshotting settled it; full evidence
+  in §10, "A8 settled".
 
 - **A9 — ✅ CLOSED (1 Aug 2026). The reference latitude now follows the method: 45° for
   everything, 60° for Moonsighting.** Both figures verified against the publishing body's own
@@ -4167,12 +4194,26 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   be picked up before the first Ramadan the app is live for — not because it is wrong, but
   because that is when a silent omission starts costing something.
 
-- **A12 — Moonsighting's 60° slide is not applied between 60° and 65.7°.** Moonsighting say
-  they slide Fajr and Isha down to 60° above 60°. Neither adhan nor the PHP library behind
-  Aladhan implements it, so a Moonsighting user in that band gets un-slid times. Measured gap
-  on Fajr: Helsinki 1 min, Anchorage 10, Trondheim 37, Reykjavík 49, **Luleå 91**. At Luleå in
-  June the un-slid answer is degenerate — Isha 00:14 and Fajr 00:52, leaving 38 minutes of
-  night. Real populations: Reykjavík, Trondheim, Anchorage, Umeå, Luleå, Tampere.
+- **A12 — ✅ CLOSED (2 Aug 2026). Moonsighting publish the un-slid numbers, and this engine
+  already matches them.** Everything below this paragraph is kept because it is the reasoning
+  that led here, but **its conclusion is superseded and must not be acted on.**
+
+  > The decisive correction: this entry called Luleå's un-slid June answer *"degenerate — Isha
+  > 00:14 and Fajr 00:52, leaving 38 minutes of night"*. **Those are, to the minute,
+  > Moonsighting's own published times for Luleå on 21 June 2026.** Their generator at
+  > `moonsighting.com/pray.php` renders a full year in the page — it was unreadable to `curl`
+  > only because the table is built in JavaScript. Twelve of their rows across Luleå (65.58°N),
+  > Trondheim (63.43°N) and Helsinki (60.17°N), summer and winter, match this engine to within
+  > one minute of rounding. So there is no slide to implement, the revert was right, and
+  > building it would have moved Luleå up to 91 minutes *away* from the committee's own answer.
+  > All twelve rows are now golden values in `PolarAndHemisphereTest`. Evidence in §10,
+  > "A12 settled".
+
+  *Superseded reasoning, kept for the record:* Moonsighting say they slide Fajr and Isha down to
+  60° above 60°. Neither adhan nor the PHP library behind Aladhan implements it, so a
+  Moonsighting user in that band gets un-slid times. Measured gap on Fajr: Helsinki 1 min,
+  Anchorage 10, Trondheim 37, Reykjavík 49, **Luleå 91** — figures which turned out to measure
+  the damage the *fix* would do, not the damage of leaving it alone.
 
   Not fixed because it needs *partial* substitution — Fajr and Isha from 60°, sunrise/Dhuhr/
   Asr/Maghrib staying local, since the sun does genuinely rise and set there. That is the same
@@ -4328,7 +4369,8 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
 
     **Previewing RTL before a translation exists:** `./gradlew installRtl`. The `rtl` build
     type is `debug` plus one file, `app|wear/src/rtl/res/values/strings.xml`, which
-    overrides `app_language_tag` with `ar-XB`. The whole app then runs right-to-left with
+    overrides `app_language_tag` with **`ur`** (it was `ar-XB` until 2 Aug 2026 — see §15
+    lesson 84; do not restore it). The whole app then runs right-to-left with
     Arabic date conventions on an otherwise untouched device — the same flip that happens
     by itself the day `values-ar/` ships. It previews layout, not words: every string stays
     English. §10 has what it found the first time it was run.
@@ -4426,7 +4468,9 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
     you.
 
     **The next actual steps:** the signing key — owner-only, `docs/RELEASING.md` Step 2, and
-    the one true blocker since both AABs on disk are unsigned — and, in parallel because it
+the one true blocker since both AABs on disk are unsigned ⚠️ **— both halves of that were
+    superseded on 31 Jul 2026: the key exists, both bundles are signed, and the app is live on
+    the closed track. Read the block at the top of §11, not this paragraph** — and, in parallel because it
     needs nothing from the key, recruiting testers. The tester email list is the only part of
     track setup left, and it needs addresses nobody but the owner has. The Wear OS screenshot
     slot only appears once the Wear form factor is added, which happens at release time; the
@@ -4529,6 +4573,13 @@ script after editing the markdown.**
 ---
 
 ## 14. Git history
+
+> ⚠️ **This table is a selective highlight reel and it stops at `d9d1c9a` (31 Jul 2026).**
+> Roughly fifty commits since then are not listed, including the whole closed-test, polar-crash,
+> Dhuhr-fix, disclaimer, locale-discipline and Moonsighting arc. It was written as a summary and
+> then read as a record, which is the wrong way round. **For the real history run
+> `git log --oneline`; every commit message in this project is written to be read.** Kept
+> because the early entries explain decisions that predate the detailed sections above.
 
 | Commit | What |
 |---|---|
@@ -5448,6 +5499,26 @@ matters more than the stable hashes, that is the trade being made.
     different code path. It turned out to be correct on all eleven surfaces. The value was not
     in the outcome; it was in converting a claim into evidence and a convention into two tests.
     Verify the things that have been true for so long that nobody checks them any more.
+
+91. **A guard can be declared, documented, demonstrated — and still not run on the file it is
+    really about.** `DisclaimerContentTest` was added with a Gradle `inputs.files` declaration,
+    a HANDOVER section explaining the UP-TO-DATE trap it was avoiding, and a published "proven
+    to fail" demonstration. All three were true and the guard was still silent on the canonical
+    disclaimer, because the glob was `values-*` (which needs the literal hyphen and so never
+    matches `values/`) and the demonstration had broken `docs/privacy.html` — one of the copies
+    that *was* declared. The build cache keys off the same declared inputs, so `clean` did not
+    rescue it either: CLAUDE.md's own release-gate command reported green on a disclaimer with
+    "no warranty" deleted. **Prove a guard by breaking the exact file it exists to protect, not
+    a sibling.** Third instance of lesson 84's bug class, and the one that landed on a hard rule.
+
+92. **The audit that finds your documentation lying is worth more than the documentation.**
+    Five independent auditors over this repository, each finding adversarially refuted, turned
+    up: a hard-rule guard that never ran, four false statements in `ARCHITECTURE.md` §9 (one of
+    which invited an agent to generate the signing key CLAUDE.md forbids), `§11` detail entries
+    still describing A8 and A12 as open under a summary table that said CLOSED, a `README.md`
+    disclaimer missing two of its four points, and a test-count in the owner-facing document
+    that was 55 tests stale. **None of it would have failed a build.** Every one of them was
+    something a fresh session would have read and acted on. Run this before parking, not after.
 
 88. **"Blocked on evidence" is sometimes "blocked on the wrong tool", and a week of a correctness
     question sat behind that.** A12 — whether Moonsighting really slide Fajr and Isha down to 60
