@@ -56,7 +56,43 @@ policy is also in the past, i.e. none of them is holding it. **`power_pending` a
 holding it, and it has overwritten both `whenElapsed` and `maxWhenElapsed` to +2 days 23 h
 56 m** — 5 August.
 
-Today's Dhuhr on the live build is therefore not late. **It will never be announced.**
+Today's Dhuhr on the live build is therefore not late.
+
+## What happened next, which corrects the paragraph above
+
+The first version of this file stopped there and said the alarm "will fire on 5 August". That
+was wrong, and watching it to the end matters more than the snapshot did.
+
+At **13:22:39** the app process started, ran **`DailyRescheduleWorker`** — one of the five
+reschedule triggers that exist to make alerts *more* reliable — rewrote the alarm set, and was
+killed by `lowmemorykiller` a second later. The parked 13:10 alarm was **cancelled in the
+rewrite**. It is not queued for 5 August. It is simply gone:
+
+```
+alarms matching origWhen 1785672600000 for com.sajdatime.app : 0
+next alarms held: 17:17 Asr, 20:49 Maghrib, 23:16 Isha  (all window=+1h flags=0x20)
+```
+
+And the notification record settles what the user actually received. Every notification the
+live build has posted today, by channel:
+
+```
+channel=next_prayer_badge      (the silent ongoing badge, importance=2, SILENT)
+```
+
+**No `prayer_times` notification. No Dhuhr alert. At any point.** The badge simply moved on to
+showing the next prayer. The fixed build, on the same phone, posted `channel=prayer_times`,
+`android.title="Time for Dhuhr"` at `when=1785672600600`.
+
+**So the failure is worse than a deferral, and the mechanism is the interesting part.** OEM
+parking alone would have produced a very late alert. Parking *plus the app's own daily
+reschedule* produces **no alert at all**: the worker tidies away the stale alarm on its next
+run, having never delivered it. A reliability feature and an OEM power policy, each defensible
+alone, combine into silent loss.
+
+That interaction only appears if you keep watching after the prayer time passes. A snapshot at
+13:13 says "deferred three days"; a snapshot at 13:25 says "nothing scheduled, all normal".
+Neither says "the user missed Dhuhr".
 
 ## Why this corrects the earlier reading from the same morning
 

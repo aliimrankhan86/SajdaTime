@@ -2892,9 +2892,20 @@ daytime use with the phone awake and charging.
 > ```
 >
 > Every other policy sits in the past, so nothing else is holding it. `power_pending` alone
-> overwrote **both** bounds and moved today's Dhuhr to **5 August**. The live build did not
-> deliver the prayer late — **it will not deliver it at all**. The fixed build, on the same
-> phone, holding the same target, posted "Time for Dhuhr" at **13:10:00.600**.
+> overwrote **both** bounds and pushed today's Dhuhr out by nearly three days.
+>
+> **And it never fired then either, which is the part that took watching to the end.** At
+> 13:22:39 the app ran `DailyRescheduleWorker` — one of the five reschedule triggers that
+> exist to make alerts *more* reliable — rewrote its alarm set, and **cancelled the parked
+> alarm in the rewrite**. Afterwards: no 13:10 alarm remains, and the only notification the
+> live build posted all day is the silent ongoing badge. **No `prayer_times` alert at any
+> point.** The fixed build posted "Time for Dhuhr" at **13:10:00.600**.
+>
+> The failure is therefore **silent loss, not deferral**, and neither half causes it alone:
+> OEM parking would have given a very late alert, and the app's own reliability worker then
+> tidied the stale alarm away without ever delivering it. A snapshot at 13:13 reads "deferred
+> three days"; a snapshot at 13:25 reads "nothing scheduled, all normal". Neither says "the
+> user missed Dhuhr" — only watching across both does.
 >
 > Corrected picture: **the one-hour window is the floor, not the expected damage**, and the
 > three-day parking is not an overnight-only phenomenon. There is no time of day at which the
@@ -4578,6 +4589,24 @@ matters more than the stable hashes, that is the trade being made.
     generated output, another module's sources — needs those inputs declared, and needs its
     red state demonstrated at least once. Write the guard, then break the thing on purpose
     and watch it catch it. A guard never seen to fail is not known to work.
+
+74. **Stopping the measurement when the event was due can invert the conclusion.** Today's
+    Dhuhr was watched on two builds. At 13:13 the shipped build's alarm was still queued with
+    HyperOS holding it three days out, and that was written up — correctly as an observation —
+    as "it will fire on 5 August". Kept running, the truth was different and worse: at 13:22
+    the app's own `DailyRescheduleWorker` rewrote the alarm set and **cancelled the parked
+    alarm**, so the alert was never delivered at all and nothing remained to show it had been
+    due.
+
+    Two snapshots, two wrong stories. 13:13 says "deferred three days". 13:25 says "nothing
+    scheduled, everything normal" — the most misleading reading of the three, and the one a
+    casual check would land on. Only the interval between them says "the user missed Dhuhr".
+
+    The general shape: when measuring whether something *happens*, the window has to extend
+    past the deadline far enough to see the cleanup, because cleanup erases the evidence. And
+    note what caused it — a **reliability feature** (five reschedule triggers, added to make
+    alerts more dependable) combined with an OEM power policy to produce silent loss. Neither
+    is a bug alone.
 
 ---
 

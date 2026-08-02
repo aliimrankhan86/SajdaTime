@@ -45,8 +45,18 @@ whenElapsed=+2d23h56m53s394ms   maxWhenElapsed=+2d23h56m53s394ms
 ```
 
 Every other policy is in the past, so nothing else is holding it. HyperOS's `power_pending`
-alone overwrote both bounds and moved today's Dhuhr to **5 August**. The fixed build, same
-phone, same target, posted "Time for Dhuhr" at **13:10:00.600**.
+alone overwrote both bounds and pushed today's Dhuhr out by nearly three days.
+
+**It did not fire then either.** At 13:22:39 the app ran `DailyRescheduleWorker` — one of the
+five reschedule triggers that exist to make alerts *more* reliable — rewrote its alarm set and
+**cancelled the parked alarm in the process**. Checked afterwards: no alarm for 13:10 remains,
+and the only notification the live build has posted all day is the silent ongoing badge. **No
+`prayer_times` alert. No Dhuhr notification. At any point.** The fixed build, same phone, same
+target, posted "Time for Dhuhr" at **13:10:00.600**.
+
+So the failure mode is not deferral, it is **silent loss**, and the mechanism is worth stating
+because neither half causes it alone: OEM parking would have produced a very late alert; the
+app's own reliability worker then tidied the stale alarm away without ever delivering it.
 
 This also corrects an inference made this morning. At 11:21 `power_pending` read `--` on both
 builds, and that was written up as "in daytime the damage is only the one-hour window". The
