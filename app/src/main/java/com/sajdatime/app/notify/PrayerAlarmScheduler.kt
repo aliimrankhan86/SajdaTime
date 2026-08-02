@@ -121,6 +121,16 @@ object PrayerAlarmScheduler {
      *     Going straight from 1 to 3, as this did, threw that away.
      *  3. `setAndAllowWhileIdle` — inexact, never throws, always available.
      *
+     * Rung 3 is worth less than "inexact" makes it sound, and the gap was measured rather
+     * than guessed. On HyperOS (Xiaomi/Redmi/POCO) an alarm scheduled this way does not drift
+     * inside its hour: the OEM's `power_pending` policy overwrites `whenElapsed` outright and
+     * parks it about three days out, where it stays until the user next picks the phone up.
+     * Both builds were run on one Redmi Note 13 Pro holding the same 02:51:00 Fajr alarm,
+     * same standby bucket, same charger, Doze inactive. Rung 1 fired at 02:51:00.037. Rung 3
+     * never fired at all. Rung 3 stays because it never throws and a deferred alarm beats a
+     * SecurityException — but do not read it as "within the hour" and do not promote it.
+     * Evidence in HANDOVER §10, "The overnight A/B at Fajr".
+     *
      * What this does **not** fix, and must not be claimed to: App Standby buckets. Google
      * documents no exemption from them for `setAlarmClock`, and a Restricted-bucket app is
      * held to *"One alarm per day, either an exact alarm or an inexact alarm"*. At

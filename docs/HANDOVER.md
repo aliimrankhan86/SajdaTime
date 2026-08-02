@@ -750,6 +750,17 @@ really is scheduled. Full sourcing: `docs/reviews/2026-08-01-android-alarm-facts
 wording was corrected to match, and onboarding's last step now asks for the permission
 outright instead of leaving it to a banner.
 
+**Rung 3 is worth less than "inexact" suggests, on the hardware that matters most.** On a
+Xiaomi (HyperOS 3 / API 36), a `setAndAllowWhileIdle` alarm does not merely drift within its
+hour — the OEM's `power_pending` policy **overwrites `whenElapsed` outright**, pushing it
+roughly three days out, and it stays there until the user picks the phone up. Measured
+overnight, both builds on one phone, same prayer, same minute, same standby bucket: rung 1
+fired at 02:51:00.037, rung 3 never fired at all (§10). Rung 3 is kept because it never
+throws and something is better than a `SecurityException` — but it should be understood as a
+last resort that on some devices means "whenever the phone next wakes", not "within the
+hour". This is the single strongest reason the ladder starts at `setAlarmClock` for **both**
+alert styles.
+
 **What this does not fix, and must not be claimed to.** App Standby buckets. Google
 documents no exemption from them for `setAlarmClock`, and a Restricted-bucket app is held to
 *"One alarm per day, either an exact alarm or an inexact alarm"*. Worse, `SCHEDULE_EXACT_ALARM`
@@ -2440,9 +2451,9 @@ with the bug. §6's ladder does what it claims.
    alarm on it — SajdaTime's, Photos', Maps', Messaging's, Fitness' — carried
    `power_pending = requester + 3 days`, making `whenElapsed` three days out. Once the device
    woke, `power_pending` went to `--` on all 258 alarms and every time returned to normal.
-   Uniform across apps, so not something SajdaTime provokes. **Whether it actually delays
-   delivery or is a placeholder released on wake is not yet established** — two dumps cannot
-   tell those apart, and it is being measured rather than assumed. See §11.
+   Uniform across apps, so not something SajdaTime provokes. Two dumps could not tell
+   "delays delivery" apart from "placeholder released on wake", so it was measured overnight
+   rather than assumed. **It delays delivery.** See the next subsection.
 
 #### A method that produced nothing, recorded so it is not repeated
 
@@ -2457,6 +2468,80 @@ This nearly produced a reported bug that did not exist. The "missing" notificati
 test, not the code. `-f 0x20` and `Broadcast completed: result=0` both look like success and
 neither is. If a future session needs to fire an alert without the UI, drive the UI or wait
 for a real alarm; do not broadcast at a non-exported receiver and read silence as a defect.
+
+### The overnight A/B at Fajr — HyperOS does defer, and `setAlarmClock` defeats it (2 Aug 2026)
+
+The question left open above was settled by the cleanest experiment the situation allowed:
+**both builds on one phone, both holding a Fajr alarm at exactly 02:51:00**, differing only
+in which `AlarmManager` API placed it. The phone was left plugged in, screen off, untouched
+from 00:28 to 04:22. The pending table, the notification list, the Doze state and the
+wakefulness were sampled every 30 seconds, and a full `logcat` ran alongside as an
+independent witness.
+
+**The result was not close.**
+
+| | Shipped v1.1.0 (`setAndAllowWhileIdle`) | This branch (`setAlarmClock`) |
+|---|---|---|
+| Fired at | **never** | **02:51:00.037** |
+| Still pending at 04:23 | yes | no — it fired and rechained |
+| `power_pending` | `+2d22h29m7s356ms` | `--` |
+| `whenElapsed` | rewritten to **+2 days 22 hours** | `+8h45m` (the next prayer, unmoved) |
+| `logcat` "sending alarm" | 0 occurrences | 1, at 02:51:00.037 |
+
+The shipped build's Fajr alarm did not arrive an hour late. **It did not arrive at all**, and
+at the time of writing the system intends to deliver it on 5 August. Its `whenElapsed` and
+`maxWhenElapsed` were both overwritten with the `power_pending` value — this is not a window
+being widened, it is the delivery time being replaced.
+
+```
+com.sajdatime.app           origWhen=2026-08-02 02:51  window=+1h  flags=0x20
+  policyWhenElapsed: requester=-1h30m52s  app_standby=-3h3m33s  device_idle=--
+                     battery_saver=-3h3m33s  ssru=-3h3m33s  power_pending=+2d22h29m7s
+  whenElapsed=+2d22h29m7s  maxWhenElapsed=+2d22h29m7s      ← moved, not widened
+
+com.sajdatime.app.sideload  origWhen=2026-08-02 13:10  window=0   flags=0x3
+  policyWhenElapsed: requester=+8h45m44s  app_standby=-1h33m15s  device_idle=--
+                     battery_saver=--  ssru=-1h33m15s  power_pending=--
+  whenElapsed=+8h45m44s  maxWhenElapsed=+8h45m44s          ← untouched
+```
+
+**The confound was eliminated, which is the part that makes this worth trusting.** Both
+packages were in **App Standby bucket 40 (RARE)** — read at the same moment, identical. Doze
+was not involved (`mState=ACTIVE`, `device_idle=--` on both). Battery saver was off. Both
+were on the same charger, in the same minute, for the same prayer. Every plausible
+alternative explanation is negative in the policy line above; the **only** binding constraint
+on the shipped alarm is `power_pending`, and the only difference between the two builds is
+which API scheduled them.
+
+Xiaomi's own log says the same thing in its own words. `AlarmManager` printed
+**`not align this alarm: Alarm{… com.sajdatime.app.sideload}, reason=6`** eighteen times
+during the window and never once for the shipped package — its alignment engine explicitly
+excluding the exact alarm-clock alarms from the batching it applies to everything else.
+
+#### What this means for a real user, and why the tester's wording understated it
+
+`power_pending` clears to `--` the moment the phone wakes (observed on all 258 alarms). So on
+a Xiaomi the shipped app does not produce a *late* notification on a timer — it produces
+**nothing at all until the user picks the phone up**, at which point the backlog is released
+and the alert appears. That is exactly what "notifications arrive late" feels like from the
+outside, and it is why the complaint was worth taking literally rather than explaining away:
+the user reporting it was describing a real mechanism they had no way to name.
+
+Xiaomi, Redmi and POCO are one brand family, and it is a dominant one in Pakistan, India,
+Indonesia, Bangladesh, Nigeria and the Gulf — much of the audience this app exists for. On
+that hardware, the pre-fix build's prayer notifications were not degraded. They were absent.
+
+#### What this does *not* establish
+
+- Only Fajr was observed firing. The other four prayers of 2 Aug were still pending when the
+  watch ended; they are expected to behave the same but were not watched.
+- One night, one device, one OEM. Samsung's One UI has its own background policy and has not
+  been tested; the owner has an S23 Ultra and it is the obvious next check.
+- The measurement was taken with Do Not Disturb set to `ZEN_MODE_ALARMS` from 02:09 so the
+  02:51 alerts would not wake the household. DND suppresses presentation, not posting, and
+  the primary signal was the alarm leaving the pending table, which DND cannot affect — but
+  it is recorded here because a suppressed alert is not a *silent* one, and nobody heard this
+  fire.
 
 ---
 
@@ -2822,20 +2907,16 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
 
 ### Not done, in rough priority order
 
-0. **⏳ HyperOS `power_pending` — measured overnight, answer not yet in.** On the owner's
-   Redmi Note 13 Pro, an idle `dumpsys alarm` showed a Xiaomi-only policy `power_pending` set
-   to `requester + 3 days` on **every alarm on the device**, including Google's own; once the
-   phone woke it cleared to `--` on all 258 and every time returned to normal. Two dumps
-   cannot distinguish "delays delivery" from "placeholder released on wake", and the
-   difference matters enormously: if it is real, Fajr is the worst-affected prayer on the
-   most popular Android brand in much of the Muslim world.
+0. **✅ HyperOS `power_pending` — settled 2 Aug 2026. It defers delivery, and the fix beats
+   it.** Measured overnight on the owner's Redmi Note 13 Pro with both builds holding the
+   same 02:51:00 Fajr alarm: the fixed build fired at **02:51:00.037**; the shipped build
+   **never fired**, and was still pending at 04:23 with `power_pending` holding it out to
+   5 August. Both packages were in bucket 40 (RARE), Doze inactive, battery saver off — the
+   only variable was `setAlarmClock` versus `setAndAllowWhileIdle`. Full evidence, including
+   the policy lines and Xiaomi's own `not align this alarm … reason=6` log, is in §10.
 
-   Being settled by the cleanest test available — an A/B on one phone, since both builds hold
-   a Fajr alarm at exactly 02:51:00, the shipped one with `window=+1h` and this branch's with
-   `window=0`. Sampling the pending table and the notification list every 30s while the phone
-   is left asleep and untouched. **Do not report a conclusion from the two dumps alone.**
-   If the fixed build fires at 02:51 the policy is bookkeeping and this closes; if both drift,
-   the OEM defeats `setAlarmClock` and §6 needs a paragraph saying so honestly.
+   Nothing to do; recorded so the next session does not re-open it. What is *not* settled is
+   Samsung — One UI has its own background policy and has not been tested.
 
 1. **One light frame at cold start when the theme is overridden.**
    `android:windowBackground` is a resource, resolved by the system from the *system's*
@@ -3735,6 +3816,41 @@ matters more than the stable hashes, that is the trade being made.
     behaviour was left alone. A recorded rationale is not an obstacle to be argued past; it is
     the previous session telling you it already thought about this. Update the record when new
     evidence refines it, and change the behaviour only when the evidence actually overturns it.
+
+61. **Design the experiment so the confound cannot survive it.** The overnight Fajr test could
+    have been run the easy way — fixed build on the phone, see if it fires — and it would have
+    proved nothing, because the fixed build was also newer, also freshly installed, and had
+    started life two standby buckets higher. Running **both builds on one phone, at one
+    prayer, in one minute** meant the OEM policy, the Doze state, the charger, the bucket and
+    the clock were all held constant by construction rather than by argument. When the result
+    came in, the policy line showed every alternative explanation already negative
+    (`app_standby=-3h3m`, `device_idle=--`, `battery_saver=--`) and exactly one constraint
+    binding. There was nothing left to argue about.
+
+    The cheap version of this test would have produced a confident answer of unknown value.
+    An hour spent making a second variable impossible was worth more than a day spent
+    defending a single-arm result.
+
+62. **A measured "it is late" can turn out to be "it never arrives".** The tester said
+    notifications were late. The first dump agreed and quantified it: a one-hour window. That
+    was a real finding and it was correctly reported — but it was still the *smaller* half of
+    the truth. Left overnight, the shipped build's Fajr did not slip by an hour; it was moved
+    three days and would have surfaced only when the phone was next unlocked.
+
+    A snapshot of a queue tells you what the system *intends*. Only waiting tells you what it
+    *does*. Where the difference matters — and for a prayer alert it is the whole product —
+    pay the wall-clock cost and watch it happen.
+
+63. **Protecting the user's sleep and protecting the measurement were the same problem, and
+    both had to be solved before either.** Silencing the 02:51 alerts by muting the phone
+    would have muted the owner's own alarm; DND "alarms only" silenced the app and left his
+    alarm working. Silencing by suspending the package would have destroyed the very thing
+    being measured. The way out was to pick a signal the mitigation could not touch — the
+    alarm leaving the pending table, which DND cannot affect — and add `logcat` as a second
+    witness rather than trusting that.
+
+    When a safety measure and a measurement appear to conflict, the answer is usually a
+    different instrument, not a compromise on the safety measure.
 
 ---
 
