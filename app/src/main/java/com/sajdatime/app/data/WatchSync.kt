@@ -3,6 +3,7 @@ package com.sajdatime.app.data
 import android.content.Context
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.sajdatime.core.AdjustmentCodec
 import com.sajdatime.core.WatchSyncContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -31,6 +32,11 @@ object WatchSync {
                     dataMap.putDouble(WatchSyncContract.KEY_LONGITUDE, it.longitude)
                 }
                 dataMap.putString(WatchSyncContract.KEY_CITY, settings.cityName)
+                dataMap.putString(
+                    WatchSyncContract.KEY_ADJUSTMENTS,
+                    AdjustmentCodec.encode(settings.adjustments),
+                )
+                dataMap.putInt(WatchSyncContract.KEY_HIJRI_OFFSET, settings.hijriOffsetDays)
                 dataMap.putLong(WatchSyncContract.KEY_UPDATED_AT, System.currentTimeMillis())
             }
 

@@ -69,10 +69,22 @@ class NextPrayerTileService : TileService() {
                 zone = ZoneId.systemDefault(),
             )
             val remaining = Duration.between(now, next.at)
+            // The tile is the surface most likely to be the only one a watch user ever
+            // reads, so a projected time has to say so here too. The phone's home screen
+            // and the PDF have carried this marking for a while; the tile and the phone's
+            // notifications were the two places it was missing, which were precisely the
+            // two that reach the user without the app being open.
+            val approximate = runCatching {
+                PrayerEngine.compute(
+                    coordinates,
+                    next.at.atZone(ZoneId.systemDefault()).toLocalDate(),
+                    settings.calculationPrefs,
+                ).approximatedFrom != null
+            }.getOrDefault(false)
             Triple(
                 next.slot.label(localised),
                 localised.getString(
-                    R.string.wear_tile_detail,
+                    if (approximate) R.string.wear_tile_detail_approx else R.string.wear_tile_detail,
                     TileFormat.clock(localised, next.at),
                     TileFormat.humanise(localised, remaining),
                 ),

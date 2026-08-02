@@ -2977,6 +2977,102 @@ same as seeing it.
 
 ---
 
+### "Match your mosque": corrections, the Hijri shift, and what they actually settle (2 Aug 2026)
+
+**The owner's question was the right one, and sharper than the feature it produced:** if
+mosques disagree because of a ruling — moon sighting, or a high-latitude convention — should
+the user be able to select it rather than have the app choose?
+
+The answer separates into four gaps that were being treated as one. Two the app already
+covered, two it did not:
+
+| What the user sees | Cause | Before |
+|---|---|---|
+| Fajr/Isha off 10–40 min | twilight angle, i.e. the calculation method | covered — method picker, help text, latitude banner |
+| Asr off 45–90 min | Hanafi vs the other three | covered — madhab picker |
+| Every prayer off 2–10 min | mosque precaution minutes, or a printed local table no formula reproduces | **nothing** |
+| Ramadan/Eid off a day | local sighting vs calculation | **nothing** — the date is computed |
+
+**The naming trap, recorded because it will catch the next reader too.** "Moonsighting
+Committee" in the method picker is their *twilight rule* for Fajr and Isha. It is not their
+moon sighting announcements for Ramadan and Eid. Same organisation, same word, unrelated
+mechanisms. A user whose Eid is a day out will pick that method expecting it to fix the date,
+and it will not.
+
+**What was built.** Per-prayer corrections of ±30 minutes, and a Hijri shift of ±2 days, in
+one dialog called "Match your mosque" — one dialog because from the user's side it answers one
+question, and splitting it would make someone decide whether their disagreement was about
+minutes or days before they had any way to know.
+
+Three decisions worth not re-litigating:
+
+- **Offsets are applied to the finished times, not through adhan's own
+  `CalculationParameters.adjustments`.** See §15 lesson 76. Three of six outputs bypass that
+  field, so half the prayers would have silently ignored the correction.
+- **The engine holds the day in order after applying them.** See §15 lesson 75. The ±30 bound
+  does not prevent an inversion: at 59.9°N on 1 January, Dhuhr and Asr sit twenty-six minutes
+  apart.
+- **±30 and not wider.** A larger gap is a method mismatch wearing an offset's clothes. The
+  Slough case in this section's siblings is the proof: MWL landed 78 minutes from every local
+  mosque, and the correct fix there was the method, not a nudge. The dialog's own copy says
+  to try the method first.
+
+**Both settings sync to the watch** (`WatchSyncContract.KEY_ADJUSTMENTS`, `KEY_HIJRI_OFFSET`),
+because a user who corrects Maghrib on the phone and then reads a different Maghrib on their
+wrist has been given two answers to a religious question by one app. `AdjustmentCodec` lives
+in `core` for the same reason — one parser, two callers.
+
+**What this settles that calculation could not.** A12 (Moonsighting above 60°) remains
+unresolved as a *calculation* question, and §15 lesson 78 records the guard clause that
+earlier reading missed. But the user-facing problem it represents is now addressable: a
+Luleå user whose mosque publishes different times can match them exactly, without the app
+having to adjudicate between scholarly bodies or guess at undocumented edge behaviour. That
+is a better answer than a confident wrong one, and it is the same answer for every other
+cause of divergence.
+
+**Verified on the emulator, LTR and RTL.** Fajr 2:55 → 3:00 with +5; Dhuhr 1:16 → 1:13 with
+-3; the other four unmoved; the Hijri date 19 → 20 Safar with +1; the summary row reading
+"2 prayers adjusted, Date +1 day"; the corrections carried through into the exported PDF
+(3:00 and 1:13 on the 2 August row). RTL mirrors correctly — label right, stepper mirrored,
+per-prayer accessibility labels present on every button ("Increase Fajr", "Decrease Asr").
+
+### Cold start on real hardware, and risk 6 closed (2 Aug 2026)
+
+The only figure the audit had was **13.3 s**, from a debug build on a struggling emulator, and
+it was correctly labelled as not evidence. Measured on the Redmi Note 13 Pro, `am start -W`,
+force-stopped between runs, `LaunchState: COLD` on every one:
+
+```
+com.sajdatime.app (Play build, versionCode 2)   631 ms, 244 ms, 224 ms
+com.sajdatime.app.sideload (current main)      1018 ms, 846 ms, 775 ms
+```
+
+So the shipped app cold-starts in about **a quarter of a second** on real hardware, and the
+first run's 631 ms is the usual page-cache warm-up. The emulator figure was off by a factor
+of roughly fifty. The sideload build is slower because it is a different variant with a lower
+`minSdk` and without the release build's optimisation; it is not the comparison that matters
+and is recorded only so the numbers are not mistaken for each other later.
+
+Risk 6 in `PRODUCTION_READINESS.md` is closed. The emulator ANR remains what it was — seen
+once, never on hardware, profile consistent with un-JITted cold-start drawing under
+uiautomator load.
+
+### The two surfaces that never marked an approximated time (2 Aug 2026)
+
+The home screen and the PDF have carried the "these times are approximate" marking for a
+while. The notification and the Wear tile did not — which meant the only two surfaces
+presenting a projected time without qualification were **the two that reach the user when the
+app is closed**, which above the polar circles is most of the day.
+
+Both now mark it. The phone uses `setSubText`, which Android draws small and grey in the
+notification header beside the app name: the alert's own words stay "Time for Fajr", because
+a notification is read in one glance on a lock screen and burying the prayer behind a caveat
+helps nobody. The tile uses a separate string, "About 05:12 · in 2h" rather than a tilde, so
+a screen reader says the word instead of skipping the symbol.
+
+Whether a projected time should fire an alarm at all is still **A10**, and still a religious
+question rather than an engineering one. Marking it is not the same as answering it.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Blocker for release
@@ -4607,6 +4703,50 @@ matters more than the stable hashes, that is the trade being made.
     note what caused it — a **reliability feature** (five reschedule triggers, added to make
     alerts more dependable) combined with an OEM power policy to produce silent loss. Neither
     is a bug alone.
+
+75. **A bound is not an invariant, and the difference is measurable.** The per-prayer
+    corrections are capped at plus or minus thirty minutes, and it was assumed — reasonably,
+    and wrongly — that a cap that small could not put a day out of order. A sweep across
+    eight latitudes and every seventh day of the year found the counter-example on the first
+    high-latitude row: at 59.9 degrees on 1 January, Dhuhr and Asr are **twenty-six minutes
+    apart**, so the legal pair (+30, -30) crosses them. Midwinter squeezes the middle of the
+    day to almost nothing and no fixed cap survives it — any bound small enough to be safe at
+    60 degrees is too small to be useful at 51. The fix is a monotonic clamp in the engine,
+    not a smaller number. The general shape: when a limit is supposed to guarantee an
+    ordering, sweep for the crossing rather than reasoning about the typical case, because
+    the typical case is not where limits fail.
+
+76. **The library's own feature can be the wrong place to put it.** adhan ships
+    `CalculationParameters.adjustments`, which is exactly this feature, and using it would
+    have been the ladder-correct move. It would also have been a bug: three of this engine's
+    six outputs never pass through those parameters — the Shia Maghrib comes from a second
+    `PrayerTimes` built with probe parameters, the Umm al-Qura Ramadan Isha is arithmetic
+    done in `PrayerEngine`, and a projected polar day is computed at a borrowed latitude.
+    Half the prayers would have silently ignored the user's correction. Applying the offsets
+    to the finished map instead covers every path by construction, and the test that proves
+    it asserts the *property* (whichever path produced this time, the correction reached it)
+    rather than the implementation. Before reaching for a library's built-in, check how many
+    of your own code paths actually go through it.
+
+77. **Android strips whitespace from an unquoted string resource, and the failure is
+    invisible in review.** `<string name="list_separator">, </string>` compiles to `","`.
+    The summary line rendered as "2 prayers adjusted,Date +1 day" on the device and looked
+    perfectly correct in the XML, in the Kotlin, and in the diff. Only reading it on a screen
+    caught it. Quote the value — `", "` — whenever leading or trailing space is load-bearing.
+    Same family as the project's standing rule that compiling is not running.
+
+78. **The rule that looked contradictory had a missing condition, and the condition was one
+    sentence away.** The Moonsighting high-latitude slide was implemented, measured, found to
+    produce Isha before Maghrib, and reverted, on the reading "above 60 degrees, slide to 60".
+    Their own page carries the qualifier that reading dropped: the slide is conditional on
+    the day being longer than **18 hours or shorter than 6**, it applies to **Fajr and Isha
+    only**, and it is a **summer** rule ("in winter, we use research by Moonsighting.com for
+    Subh-Sadiq and Shafaq"). That does not make the earlier implementation correct — Luleå in
+    late June satisfies the condition and the inversion is real — but it does mean the
+    contradiction was in the reading, not only in the source. When a published rule appears
+    to contradict itself, re-read the whole passage for a guard clause before concluding the
+    body is doing something undocumented.
+
 
 ---
 

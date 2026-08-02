@@ -203,7 +203,7 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
                 )
             }
             Text(
-                text = dateLine(now),
+                text = dateLine(now, state.settings.hijriOffsetDays),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -739,14 +739,14 @@ private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
  * showing nothing — which is what the old code did on the same failure.
  */
 @Composable
-private fun dateLine(now: Instant): String {
+private fun dateLine(now: Instant, hijriOffsetDays: Int): String {
     val context = LocalContext.current
     // Keyed on the calendar date for the same reason hijriToday is: this header sits
     // beside a live countdown and recomposes about once a second, and building a
     // DateTimeFormatter that often to render a string that changes at midnight is waste.
     val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
     val gregorian = remember(context, date) { TimeFormat.date(context, date) }
-    val hijri = hijriToday(now)
+    val hijri = hijriToday(now, hijriOffsetDays)
     return if (hijri.isBlank()) gregorian
     else stringResource(R.string.home_date_line, gregorian, hijri)
 }
@@ -759,14 +759,18 @@ private fun dateLine(now: Instant): String {
  * month as a bare number.
  */
 @Composable
-private fun hijriToday(now: Instant): String {
+private fun hijriToday(now: Instant, offsetDays: Int): String {
     val months = stringArrayResource(R.array.hijri_months)
     // Keyed on the calendar date, not computed once. Left open overnight the header
     // otherwise kept yesterday's Hijri date until the app was killed.
     val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
-    val parts = remember(months, date) {
+    val parts = remember(months, date, offsetDays) {
         runCatching {
-            val today = HijrahDate.from(date)
+            // The user's own sighting correction. java.time's HijrahChronology is the
+            // Umm al-Qura calendar, which is calculated and announced from Makkah; a
+            // mosque that sighted the moon locally can legitimately be a day either side
+            // of it, and this is the only place in the app that lets them say so.
+            val today = HijrahDate.from(date.plusDays(offsetDays.toLong()))
             Triple(
                 today.get(ChronoField.DAY_OF_MONTH),
                 today.get(ChronoField.MONTH_OF_YEAR),

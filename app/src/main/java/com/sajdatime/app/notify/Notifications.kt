@@ -171,6 +171,7 @@ object Notifications {
         style: AlertStyle,
         alarmSoundUri: String,
         respectSilent: Boolean,
+        approximate: Boolean = false,
     ) {
         // Everything below builds text the user reads, so it is built from a context
         // pinned to the app's own language rather than the device's. Wrapped here at the
@@ -204,6 +205,7 @@ object Notifications {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context))
+            .markIfApproximate(context, approximate)
 
         when (effectiveStyle) {
             AlertStyle.NOTIFICATION ->
@@ -225,7 +227,13 @@ object Notifications {
     }
 
     /** The optional silent badge showing what is next and how long until it starts. */
-    fun postOngoingBadge(base: Context, slot: PrayerSlot, at: Instant, now: Instant) {
+    fun postOngoingBadge(
+        base: Context,
+        slot: PrayerSlot,
+        at: Instant,
+        now: Instant,
+        approximate: Boolean = false,
+    ) {
         // Pinned to the app's language, as above. This one carries a countdown, so it is
         // the notification that actually showed "In ٢h ١٤m" on an Arabic phone.
         val context = AppLocale.wrap(base)
@@ -245,6 +253,7 @@ object Notifications {
             .setOngoing(true)
             .setShowWhen(false)
             .setContentIntent(openAppIntent(context))
+            .markIfApproximate(context, approximate)
             .build()
 
         post(context, ID_ONGOING, notification)
@@ -281,3 +290,23 @@ object Notifications {
         )
     }
 }
+
+/**
+ * Says so when the time being announced was projected from another latitude rather than
+ * measured where the user is.
+ *
+ * It goes in `setSubText`, which Android draws small and grey in the notification's header
+ * line, beside the app name. That placement is the point: the alert's own words must stay
+ * "Time for Fajr" and nothing else, because a notification is read in one glance on a lock
+ * screen and burying the prayer behind a caveat helps nobody. The caveat rides alongside.
+ *
+ * The home screen and the PDF have carried this marking for a while and these two surfaces
+ * did not, which meant the *only* two places a projected time was presented without any
+ * qualification were the two that reach the user when the app is closed. Above the polar
+ * circles that is most of the day.
+ */
+private fun NotificationCompat.Builder.markIfApproximate(
+    context: Context,
+    approximate: Boolean,
+): NotificationCompat.Builder =
+    if (approximate) setSubText(context.getString(R.string.notif_approximate)) else this

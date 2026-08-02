@@ -6,8 +6,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.sajdatime.core.AdjustmentCodec
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
@@ -59,6 +61,14 @@ data class AppSettings(
     val alertFor: Map<PrayerSlot, AlertStyle> = PrayerSlot.entries
         .filter { it.isPrayer }
         .associateWith { AlertStyle.NOTIFICATION },
+    /**
+     * Per-prayer correction in minutes, for matching the local mosque. Empty for everyone
+     * who has never opened the row, which is the intended common case — this is a
+     * reconciliation tool, not a setting anybody should have to think about.
+     */
+    val adjustments: Map<PrayerSlot, Int> = emptyMap(),
+    /** Days to shift the Hijri date by, for mosques that follow local sighting. */
+    val hijriOffsetDays: Int = 0,
     /** The glanceable badge is on out of the box; it is silent and costs nothing. */
     val ongoingBadge: Boolean = true,
     /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
@@ -106,7 +116,13 @@ data class AppSettings(
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,
 ) {
     val calculationPrefs: CalculationPrefs
-        get() = CalculationPrefs(sect = sect, madhab = madhab, method = method)
+        get() = CalculationPrefs(
+            sect = sect,
+            madhab = madhab,
+            method = method,
+            adjustments = adjustments,
+            hijriOffsetDays = hijriOffsetDays,
+        )
 
     /** The prayers that announce themselves at all, in any style. */
     val notifyFor: Set<PrayerSlot> get() = alertFor.keys
@@ -173,6 +189,7 @@ internal object AlertCodec {
         PrayerSlot.entries.firstOrNull { it.name == name && it.isPrayer }
 }
 
+
 class SettingsRepository(private val context: Context) {
 
     val settings: Flow<AppSettings> = context.dataStore.data.map { it.toAppSettings() }
@@ -202,6 +219,27 @@ class SettingsRepository(private val context: Context) {
         val current = prefs.decodeAlerts()
         val updated = if (style == null) current - slot else current + (slot to style)
         prefs[Keys.ALERTS] = AlertCodec.encode(updated)
+    }
+
+    /** A [minutes] of 0 clears the correction rather than storing a no-op. */
+    suspend fun setAdjustment(slot: PrayerSlot, minutes: Int) = edit { prefs ->
+        val clamped = minutes.coerceIn(
+            -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
+            CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
+        )
+        val current = AdjustmentCodec.decode(prefs[Keys.ADJUSTMENTS])
+        val updated = if (clamped == 0) current - slot else current + (slot to clamped)
+        prefs[Keys.ADJUSTMENTS] = AdjustmentCodec.encode(updated)
+    }
+
+    /** Drops every correction at once, so a user who has lost track can start again. */
+    suspend fun clearAdjustments() = edit { it[Keys.ADJUSTMENTS] = "" }
+
+    suspend fun setHijriOffsetDays(days: Int) = edit {
+        it[Keys.HIJRI_OFFSET] = days.coerceIn(
+            -CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+            CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+        )
     }
 
     suspend fun setOngoingBadge(enabled: Boolean) = edit { it[Keys.ONGOING] = enabled }
@@ -247,6 +285,8 @@ class SettingsRepository(private val context: Context) {
         val LONGITUDE = doublePreferencesKey("longitude")
         val CITY = stringPreferencesKey("city")
         val ALERTS = stringPreferencesKey("alert_for")
+        val ADJUSTMENTS = stringPreferencesKey("prayer_adjustments")
+        val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
         val ONGOING = booleanPreferencesKey("ongoing_badge")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
         val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
@@ -286,6 +326,8 @@ class SettingsRepository(private val context: Context) {
             coordinates = Coordinates.orNull(this[Keys.LATITUDE], this[Keys.LONGITUDE]),
             cityName = this[Keys.CITY] ?: "",
             alertFor = decodeAlerts(),
+            adjustments = AdjustmentCodec.decode(this[Keys.ADJUSTMENTS]),
+            hijriOffsetDays = this[Keys.HIJRI_OFFSET] ?: 0,
             ongoingBadge = this[Keys.ONGOING] ?: true,
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,

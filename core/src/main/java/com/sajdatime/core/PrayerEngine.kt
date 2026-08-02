@@ -257,9 +257,54 @@ object PrayerEngine {
                 PrayerSlot.DHUHR to instantOf(base.dhuhr),
                 PrayerSlot.ASR to instantOf(base.asr),
                 PrayerSlot.MAGHRIB to instantOf(maghrib),
-                PrayerSlot.ISHA to instantOf(ishaFor(method, base, date)),
-            ),
+                PrayerSlot.ISHA to instantOf(ishaFor(method, base, date, prefs)),
+            ).adjustedBy(prefs),
         )
+    }
+
+    /**
+     * Applies the user's per-prayer corrections to the finished times.
+     *
+     * Deliberately last, and deliberately not adhan's own `CalculationParameters.adjustments`,
+     * which would have been the obvious move. Three of this engine's outputs never pass
+     * through that field: the Shia Maghrib comes from a second `PrayerTimes` built with its
+     * own probe parameters, the Umm al-Qura Ramadan Isha is arithmetic done here, and a
+     * projected polar day is computed at a borrowed latitude. Handing the offsets to adhan
+     * would have silently corrected three prayers out of six and left the user hunting for
+     * why Maghrib ignored them. Applying them here covers every path by construction.
+     *
+     * It also keeps [isUsable] honest: that check decides whether a day is real astronomy or
+     * a projection, and it must judge what the sky did, not what the user typed.
+     */
+    private fun Map<PrayerSlot, Instant>.adjustedBy(
+        prefs: CalculationPrefs,
+    ): Map<PrayerSlot, Instant> {
+        if (prefs.adjustments.isEmpty()) return this
+        val moved = mapValues { (slot, at) ->
+            at.plusSeconds(60L * prefs.adjustmentMinutes(slot))
+        }
+
+        // Then held in order, and this is not defensive tidying — the bound alone does not
+        // make it safe, which was assumed and turned out to be false.
+        //
+        // Measured: at 59.9 degrees on 1 January, Dhuhr and Asr are twenty-six minutes
+        // apart. A user allowed to push one prayer thirty minutes later and the next thirty
+        // earlier can therefore cross them, and the sweep in AdjustmentTest found exactly
+        // that — Dhuhr 12:35, Asr 12:31. An inverted day is not a cosmetic problem: the
+        // whole app keys off "which prayer is next", and a timetable that runs backwards is
+        // unusable in the specific way a wrong-by-a-few-minutes one is not.
+        //
+        // Tightening the bound instead was considered and rejected. The gap keeps shrinking
+        // with latitude, so any fixed bound small enough to be safe at 60 degrees is too
+        // small to be useful at 51 — and still fails further north. Clamping to the
+        // neighbour costs the user nothing in every case where their correction is legal,
+        // and in the one case where it is not it gives them as much of it as the sky allows.
+        var floor: Instant? = null
+        return PrayerSlot.entries.associateWith { slot ->
+            val at = maxOf(moved.getValue(slot), floor ?: Instant.MIN)
+            floor = at
+            at
+        }
     }
 
     /**
@@ -369,15 +414,25 @@ object PrayerEngine {
         method: CalcMethod,
         base: AdhanPrayerTimes,
         date: LocalDate,
+        prefs: CalculationPrefs,
     ): java.util.Date {
-        if (method != CalcMethod.UMM_AL_QURA || !isRamadan(date)) return base.isha
+        if (method != CalcMethod.UMM_AL_QURA || !isRamadan(date, prefs.hijriOffset)) return base.isha
         return java.util.Date(
             base.isha.time + UMM_AL_QURA_RAMADAN_EXTRA_MINUTES * 60_000L,
         )
     }
 
-    private fun isRamadan(date: LocalDate): Boolean = runCatching {
-        HijrahDate.from(date).get(ChronoField.MONTH_OF_YEAR) == 9
+    /**
+     * The offset is applied here and not only on the home screen's date line, which is the
+     * whole reason this takes a parameter. A user who shifts the calendar because their
+     * mosque sighted the moon a day earlier has moved when Ramadan starts *for them*, and
+     * Umm al-Qura's Isha rule keys off exactly that. Shifting the printed date but not the
+     * rule that depends on it would show "1 Ramadan" beside an Isha still calculated as
+     * though it were Sha'ban.
+     */
+    private fun isRamadan(date: LocalDate, offsetDays: Int): Boolean = runCatching {
+        HijrahDate.from(date.plusDays(offsetDays.toLong()))
+            .get(ChronoField.MONTH_OF_YEAR) == 9
     }.getOrDefault(false)
 
     /**

@@ -117,6 +117,9 @@ class MainActivity : ComponentActivity() {
                             onSetMadhab = viewModel::setMadhab,
                             onSetMethod = viewModel::setMethod,
                             onSetAlert = viewModel::setAlert,
+                            onSetAdjustment = viewModel::setAdjustment,
+                            onSetHijriOffset = viewModel::setHijriOffsetDays,
+                            onResetAdjustments = viewModel::resetAdjustments,
                             onSetOngoingBadge = viewModel::setOngoingBadge,
                             onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                             onPickAlarmSound = {

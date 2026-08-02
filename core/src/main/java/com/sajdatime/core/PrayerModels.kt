@@ -122,7 +122,50 @@ data class CalculationPrefs(
     val sect: Sect = Sect.SUNNI,
     val madhab: Madhab = Madhab.SHAFII,
     val method: CalcMethod = CalcMethod.AUTO,
-)
+    /**
+     * Per-prayer correction in whole minutes, for matching the mosque the user actually
+     * prays at. A slot absent from the map is unadjusted, which is every slot by default.
+     *
+     * This exists because the app cannot calculate its way out of the problem. A timetable
+     * on a mosque wall is not always the output of any calculation method: committees add
+     * precaution minutes, round to the printed five, or follow a local table handed down for
+     * decades. The method and madhab pickers explain the two *large* divergences; this
+     * closes whatever is left, and it does so without the user needing to know which of the
+     * three causes they are looking at.
+     *
+     * Bounded at [MAX_ADJUSTMENT_MINUTES] on purpose. A residual gap fits inside half an
+     * hour; a gap larger than that is a method mismatch wearing an offset's clothes, and the
+     * right fix is the method picker — see the Isha-in-the-UK note in docs/HANDOVER.md §10,
+     * where the default method landed 78 minutes from every local mosque and no amount of
+     * nudging would have been the correct answer.
+     */
+    val adjustments: Map<PrayerSlot, Int> = emptyMap(),
+    /**
+     * Days to shift the Hijri date by, for users whose mosque follows local moon sighting
+     * rather than calculation.
+     *
+     * This is the *other* thing people mean by "moonsighting", and conflating it with
+     * [CalcMethod.MOON_SIGHTING] is easy: that is a twilight rule for Fajr and Isha, this is
+     * which day it is. Only this one moves Ramadan and Eid.
+     *
+     * Bounded at [MAX_HIJRI_OFFSET_DAYS]. Every published sighting disagreement is one day,
+     * occasionally two; anything wider is not a sighting difference.
+     */
+    val hijriOffsetDays: Int = 0,
+) {
+    /** The correction for [slot] in minutes, clamped, so a bad stored value cannot escape. */
+    fun adjustmentMinutes(slot: PrayerSlot): Int =
+        (adjustments[slot] ?: 0).coerceIn(-MAX_ADJUSTMENT_MINUTES, MAX_ADJUSTMENT_MINUTES)
+
+    /** [hijriOffsetDays], clamped, for the same reason. */
+    val hijriOffset: Int
+        get() = hijriOffsetDays.coerceIn(-MAX_HIJRI_OFFSET_DAYS, MAX_HIJRI_OFFSET_DAYS)
+
+    companion object {
+        const val MAX_ADJUSTMENT_MINUTES = 30
+        const val MAX_HIJRI_OFFSET_DAYS = 2
+    }
+}
 
 /** The next upcoming prayer, and how long until it starts. */
 data class NextPrayer(

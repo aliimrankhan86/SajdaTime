@@ -56,4 +56,8 @@
     <string name="wear_in_m">in %1$dm</string>
     <!-- Time and countdown on one tile line, e.g. "05:14  ·  in 2h 10m". -->
     <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <!-- Same line, for a time projected from another latitude above the polar circles.
+         "About" rather than a tilde: a screen reader says the word and skips the symbol,
+         and this is the only warning a watch-only user will ever get. -->
+    <string name="wear_tile_detail_approx">About %1$s  ·  %2$s</string>
 </resources>

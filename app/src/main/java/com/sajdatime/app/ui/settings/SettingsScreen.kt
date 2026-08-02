@@ -26,8 +26,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.MoreTime
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
@@ -41,6 +44,7 @@ import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,7 +58,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -62,12 +68,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
+import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.data.AlertStyle
+import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
@@ -77,7 +86,7 @@ import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 
 /** Which chooser is currently open, if any. Only one can be at a time. */
-private enum class Chooser { SCHOOL, METHOD, ALERTS, LOCATION, DISCLAIMER }
+private enum class Chooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -86,6 +95,9 @@ fun SettingsScreen(
     onSetMadhab: (Madhab) -> Unit,
     onSetMethod: (CalcMethod) -> Unit,
     onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
+    onSetAdjustment: (PrayerSlot, Int) -> Unit,
+    onSetHijriOffset: (Int) -> Unit,
+    onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
@@ -163,6 +175,16 @@ fun SettingsScreen(
                 },
                 onClick = { open = Chooser.METHOD },
             )
+            // Last in this group on purpose. The method and school rows above explain the
+            // two divergences that have a reason; this one is the catch-all for whatever is
+            // left, and offering it first would invite someone to nudge a number when the
+            // honest fix was to pick the convention their mosque actually follows.
+            SettingRow(
+                icon = Icons.Outlined.MoreTime,
+                title = stringResource(R.string.settings_adjustments),
+                subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
+                onClick = { open = Chooser.ADJUSTMENTS },
+            )
         }
 
         Group(stringResource(R.string.settings_group_appearance)) {
@@ -230,6 +252,15 @@ fun SettingsScreen(
 
     when (open) {
         null -> Unit
+
+        Chooser.ADJUSTMENTS -> AdjustmentsDialog(
+            adjustments = settings.adjustments,
+            hijriOffsetDays = settings.hijriOffsetDays,
+            onSetAdjustment = onSetAdjustment,
+            onSetHijriOffset = onSetHijriOffset,
+            onReset = onResetAdjustments,
+            onDismiss = { open = null },
+        )
 
         Chooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
@@ -839,4 +870,161 @@ private fun rememberRingtoneTitle(uri: String): String? {
             }.getOrNull()?.takeIf { it.isNotBlank() }
         }
     }
+}
+
+/**
+ * "Match your mosque": the per-prayer corrections and the Hijri date shift, in one place.
+ *
+ * They are one dialog rather than two rows because from where the user is standing they
+ * answer one question — *my mosque says something different* — and splitting them would
+ * make someone decide, before they had any information, whether their disagreement was
+ * about minutes or about days.
+ *
+ * Steppers rather than a text field or a slider. A field invites "12:45" into a box that
+ * wants "5" and needs validation, an error state and a keyboard; a slider cannot be landed
+ * on an exact minute with a thumb. Two buttons and a number can only ever produce a legal
+ * value, need no keyboard at all, and are the easiest thing on this screen to hit — which
+ * matters, because the person reaching for this feature is often reading a printed
+ * timetable in one hand.
+ */
+@Composable
+private fun AdjustmentsDialog(
+    adjustments: Map<PrayerSlot, Int>,
+    hijriOffsetDays: Int,
+    onSetAdjustment: (PrayerSlot, Int) -> Unit,
+    onSetHijriOffset: (Int) -> Unit,
+    onReset: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    ChooserDialog(title = stringResource(R.string.settings_adjustments), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_adjustments_help),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+
+        PrayerSlot.entries.forEach { slot ->
+            val minutes = adjustments[slot] ?: 0
+            StepperRow(
+                label = slot.label(context),
+                value = minuteLabel(minutes),
+                canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
+                canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
+                onDecrease = { onSetAdjustment(slot, minutes - 1) },
+                onIncrease = { onSetAdjustment(slot, minutes + 1) },
+            )
+        }
+
+        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+        SectionLabel(stringResource(R.string.settings_hijri_offset))
+        Text(
+            text = stringResource(R.string.settings_hijri_offset_help),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp),
+        )
+        StepperRow(
+            label = stringResource(R.string.settings_hijri_offset_label),
+            value = dayLabel(hijriOffsetDays),
+            canDecrease = hijriOffsetDays > -CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+            canIncrease = hijriOffsetDays < CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+            onDecrease = { onSetHijriOffset(hijriOffsetDays - 1) },
+            onIncrease = { onSetHijriOffset(hijriOffsetDays + 1) },
+        )
+
+        if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
+            TextButton(
+                onClick = {
+                    onReset()
+                    onSetHijriOffset(0)
+                },
+            ) {
+                Text(stringResource(R.string.settings_adjustments_reset))
+            }
+        }
+    }
+}
+
+/**
+ * One label with a minus, a value and a plus.
+ *
+ * The value carries the whole row's accessibility label because a screen reader landing on
+ * a bare "+5 min" between two icon buttons has no way to know which prayer it belongs to.
+ */
+@Composable
+private fun StepperRow(
+    label: String,
+    value: String,
+    canDecrease: Boolean,
+    canIncrease: Boolean,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
+        FilledTonalIconButton(onClick = onDecrease, enabled = canDecrease) {
+            Icon(
+                Icons.Outlined.Remove,
+                contentDescription = stringResource(R.string.action_decrease, label),
+            )
+        }
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            // Wide enough for "-30 min" so the plus button does not shuffle sideways as
+            // the number grows a digit or loses its sign.
+            modifier = Modifier.width(64.dp),
+        )
+        FilledTonalIconButton(onClick = onIncrease, enabled = canIncrease) {
+            Icon(
+                Icons.Outlined.Add,
+                contentDescription = stringResource(R.string.action_increase, label),
+            )
+        }
+    }
+}
+
+/** "+5 min", "-3 min", or a dash for no change. */
+@Composable
+private fun minuteLabel(minutes: Int): String = when {
+    minutes == 0 -> stringResource(R.string.adjustment_none)
+    else -> stringResource(R.string.adjustment_minutes, minutes)
+}
+
+/** "+1 day", "-2 days", or a dash. Plural-aware, because Arabic and Urdu are not English. */
+@Composable
+private fun dayLabel(days: Int): String = when {
+    days == 0 -> stringResource(R.string.adjustment_none)
+    else -> pluralStringResource(R.plurals.adjustment_days, abs(days), days)
+}
+
+/** The settings-row summary: what is set, without opening the dialog. */
+@Composable
+private fun adjustmentSummary(adjustments: Map<PrayerSlot, Int>, hijriOffsetDays: Int): String {
+    val parts = buildList {
+        val count = adjustments.count { it.value != 0 }
+        if (count > 0) add(pluralStringResource(R.plurals.adjustment_summary_times, count, count))
+        if (hijriOffsetDays != 0) {
+            add(
+                stringResource(
+                    R.string.adjustment_summary_hijri,
+                    pluralStringResource(R.plurals.adjustment_days, abs(hijriOffsetDays), hijriOffsetDays),
+                ),
+            )
+        }
+    }
+    return if (parts.isEmpty()) stringResource(R.string.settings_adjustments_none)
+    else parts.joinToString(stringResource(R.string.list_separator))
 }

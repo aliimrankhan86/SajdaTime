@@ -43,6 +43,10 @@ class SettingsSyncService : WearableListenerService() {
                             null
                         },
                         cityName = map.getString(WatchSyncContract.KEY_CITY),
+                        adjustments = map.getString(WatchSyncContract.KEY_ADJUSTMENTS),
+                        // getInt also returns 0 for a missing key, but here 0 *is* the
+                        // correct meaning of absence — no shift — so it needs no guard.
+                        hijriOffsetDays = map.getInt(WatchSyncContract.KEY_HIJRI_OFFSET),
                     )
                 }
             }

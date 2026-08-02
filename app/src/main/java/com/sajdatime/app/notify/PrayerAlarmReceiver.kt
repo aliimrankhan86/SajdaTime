@@ -3,6 +3,9 @@ package com.sajdatime.app.notify
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.sajdatime.app.data.AppSettings
+import com.sajdatime.core.PrayerEngine
+import java.time.ZoneId
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.data.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +40,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         style = style,
                         alarmSoundUri = settings.alarmSoundUri,
                         respectSilent = settings.alarmRespectsSilent,
+                        approximate = settings.isApproximateOn(at),
                     )
                 }
                 // Chain the next horizon and refresh the badge while we are already awake.
@@ -47,4 +51,24 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             }
         }
     }
+}
+
+/**
+ * Whether the day containing [at] had to be projected from another latitude.
+ *
+ * Recomputed here rather than carried through the alarm's intent extras. The alarm may have
+ * been laid down days ago, and the answer can change between then and now: the user can move,
+ * change method, or simply cross the date on which the sun stops setting where they live. An
+ * extra sub-second computation on a receiver that is already awake is cheaper than an alert
+ * that describes yesterday's astronomy.
+ */
+private fun AppSettings.isApproximateOn(at: Instant): Boolean {
+    val coordinates = coordinates ?: return false
+    return runCatching {
+        PrayerEngine.compute(
+            coordinates,
+            at.atZone(ZoneId.systemDefault()).toLocalDate(),
+            calculationPrefs,
+        ).approximatedFrom != null
+    }.getOrDefault(false)
 }

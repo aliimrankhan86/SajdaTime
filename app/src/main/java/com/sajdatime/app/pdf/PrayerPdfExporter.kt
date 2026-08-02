@@ -2,12 +2,15 @@ package com.sajdatime.app.pdf
 
 import android.content.ContentValues
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.Typeface
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.sajdatime.core.AppLocale
 import com.sajdatime.core.CalculationPrefs
@@ -135,10 +138,7 @@ class PrayerPdfExporter(base: Context) {
 
                 var y = MARGIN + 28f
                 if (pageNumber == 1) {
-                    canvas.drawText(title(cityName, range, start), MARGIN, y, titlePaint)
-                    y += 20f
-                    canvas.drawText(subtitle(), MARGIN, y, subtitlePaint)
-                    y += 14f
+                    y = drawBrandHeader(canvas, cityName, range, start)
                     // Only when a day in this range was actually projected. Above the polar
                     // circles the home screen shows a banner; the PDF is the copy that leaves
                     // the app and gets pinned to a wall, and it had no such marking at all.
@@ -211,22 +211,98 @@ class PrayerPdfExporter(base: Context) {
 
     // --- naming ----------------------------------------------------------------------
 
-    private fun title(cityName: String, range: Range, start: LocalDate): String {
-        // Isolated because this is the line a user prints and pins to a wall, so a city
-        // name reordered by the sentence around it survives longer here than on a screen
-        // they can refresh. See core/Bidi.kt. The isolate characters are zero-width and
+    /**
+     * The masthead: mark, wordmark, then the place and period as their own block.
+     *
+     * The place used to be buried mid-sentence in a single bold line ("Prayer times for
+     * Slough, United Kingdom, August 2026"), which is the hardest possible thing to find at
+     * a glance on a sheet pinned to a kitchen wall — the one place this file's output
+     * actually gets read. It now gets a line of its own at the largest size on the page,
+     * with the qualifier underneath rather than inside it.
+     *
+     * "Approximate area" is not modesty, it is the truth and it is load-bearing: the app
+     * only ever asks for coarse location, so the name really is a district rather than an
+     * address. docs/privacy.html says so publicly, the location sheet says so on screen, and
+     * a document the user may hand to someone else is the last place that promise should
+     * quietly stop being repeated.
+     *
+     * Returns the y to carry on drawing from.
+     */
+    private fun drawBrandHeader(
+        canvas: Canvas,
+        cityName: String,
+        range: Range,
+        start: LocalDate,
+    ): Float {
+        val top = MARGIN
+        drawLogo(canvas, MARGIN, top, LOGO_SIZE)
+
+        val textLeft = MARGIN + LOGO_SIZE + 12f
+        canvas.drawText(context.getString(R.string.app_name), textLeft, top + 19f, wordmarkPaint)
+        canvas.drawText(context.getString(R.string.pdf_tagline), textLeft, top + 33f, taglinePaint)
+
+        var y = top + LOGO_SIZE + 20f
+        canvas.drawLine(MARGIN, y - 12f, MARGIN + tableWidth, y - 12f, rulePaint)
+
+        // Isolated because this is the line a user prints and pins to a wall, so a place
+        // name reordered by the text around it survives longer here than on a screen they
+        // can refresh. See core/Bidi.kt. The isolate characters are zero-width and
         // Canvas.drawText does not draw them.
         val place = cityName.bidiIsolated().ifBlank { context.getString(R.string.pdf_place_unknown) }
+        canvas.drawText(place, MARGIN, y, placePaint)
+        y += 13f
+
         val period = when (range) {
             Range.TODAY -> start.format(dateFormat)
             Range.NEXT_7_DAYS ->
                 context.getString(R.string.pdf_period_onwards, start.format(dateFormat))
             Range.THIS_MONTH -> start.format(monthYearFormat)
         }
-        return context.getString(R.string.pdf_title, place, period)
+        canvas.drawText(
+            context.getString(R.string.pdf_header_meta, context.getString(R.string.pdf_area_label), period),
+            MARGIN,
+            y,
+            subtitlePaint,
+        )
+        y += 8f
+        canvas.drawLine(MARGIN, y, MARGIN + tableWidth, y, hairlinePaint)
+        return y + 14f
     }
 
-    private fun subtitle(): String = context.getString(R.string.pdf_subtitle)
+    /**
+     * The launcher mark, drawn as its two adaptive-icon layers rather than as
+     * `R.mipmap.ic_launcher`.
+     *
+     * ponytail: the rounded square is one `drawRoundRect` in the icon's own background
+     * colour, so there is no bitmap, no mask and no density bucket to pick. Asking for the
+     * AdaptiveIconDrawable instead would work, but it would draw its background as a full
+     * square and leave the corners to a mask this Canvas does not have.
+     *
+     * The foreground is inflated by [LOGO_FOREGROUND_SCALE] about its own centre because an
+     * adaptive icon's artwork is drawn at 108 units while only the middle 72 are ever shown
+     * — dropping it into the box unscaled renders a correct but conspicuously shrunken mark.
+     */
+    private fun drawLogo(canvas: Canvas, left: Float, top: Float, size: Float) {
+        canvas.drawRoundRect(
+            RectF(left, top, left + size, top + size),
+            size * 0.22f,
+            size * 0.22f,
+            logoBackPaint,
+        )
+        val foreground = ContextCompat.getDrawable(context, R.drawable.ic_launcher_foreground)
+            ?: return
+        val bleed = size * (LOGO_FOREGROUND_SCALE - 1f) / 2f
+        foreground.setBounds(
+            (left - bleed).toInt(),
+            (top - bleed).toInt(),
+            (left + size + bleed).toInt(),
+            (top + size + bleed).toInt(),
+        )
+        canvas.save()
+        canvas.clipRect(left, top, left + size, top + size)
+        foreground.draw(canvas)
+        canvas.restore()
+    }
 
     /**
      * The approximation notice, or null when every day in the range is the user's own
@@ -295,10 +371,29 @@ class PrayerPdfExporter(base: Context) {
 
     private val tableWidth = COLUMNS.sumOf { it.width.toDouble() }.toFloat()
 
-    private val titlePaint = Paint().apply {
+    // The wordmark is the app's own name at the top of a document that leaves the app, so
+    // it is set larger and looser than anything else on the page and never competes with
+    // the place name below it for the same weight.
+    private val wordmarkPaint = Paint().apply {
+        isAntiAlias = true
+        textSize = 19f
+        letterSpacing = 0.01f
+        color = LOGO_GREEN
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    }
+    private val taglinePaint = Paint().apply {
+        isAntiAlias = true
+        textSize = 8.5f
+        color = 0xFF6B6B6B.toInt()
+    }
+    private val placePaint = Paint().apply {
         isAntiAlias = true
         textSize = 15f
         typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    }
+    private val logoBackPaint = Paint().apply {
+        isAntiAlias = true
+        color = LOGO_GREEN
     }
     private val subtitlePaint = Paint().apply {
         isAntiAlias = true
@@ -348,5 +443,12 @@ class PrayerPdfExporter(base: Context) {
         const val ROW_HEIGHT = 19f
         const val CELL_PADDING = 3f
         const val FOOTER_SPACE = 16f
+        const val LOGO_SIZE = 40f
+
+        /** 108/72: an adaptive icon draws at 108 units and only the middle 72 are shown. */
+        const val LOGO_FOREGROUND_SCALE = 1.5f
+
+        /** LightPrimary, the same #0E6B4F as ic_launcher_background.xml. Keep them together. */
+        const val LOGO_GREEN = 0xFF0E6B4F.toInt()
     }
 }

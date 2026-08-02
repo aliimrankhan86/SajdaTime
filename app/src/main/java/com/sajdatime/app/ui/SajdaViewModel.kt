@@ -192,6 +192,14 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setAlert(slot: PrayerSlot, style: AlertStyle?) =
         viewModelScope.launch { settingsRepository.setAlert(slot, style) }
 
+    fun setAdjustment(slot: PrayerSlot, minutes: Int) =
+        viewModelScope.launch { settingsRepository.setAdjustment(slot, minutes) }
+
+    fun setHijriOffsetDays(days: Int) =
+        viewModelScope.launch { settingsRepository.setHijriOffsetDays(days) }
+
+    fun resetAdjustments() = viewModelScope.launch { settingsRepository.clearAdjustments() }
+
     fun setOngoingBadge(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setOngoingBadge(enabled) }
 

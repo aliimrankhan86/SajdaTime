@@ -104,6 +104,13 @@ increasing a documented one.
 
 **Recommendation: upload the fix.** See §7 for the order.
 
+**Re-checked against the source on 2 August, because the whole plan hangs on it.** The Play
+Console help page was re-read end to end looking specifically for anything about builds,
+releases or version codes during the window. There is nothing. The page describes recruiting
+testers, engaging with them, gathering feedback and acting on it; the only thing it names as
+breaking continuity is a tester opting out. The claim that uploading resets the clock does not
+appear in Google's documentation at all.
+
 ---
 
 ## 4. What is verified, and on what
@@ -143,13 +150,16 @@ as one number.
 - **None of today's UI work has been seen on a physical phone.** The RTL build will not
   install on the Xiaomi at all (`INSTALL_FAILED_USER_RESTRICTED`, the HyperOS "Install via
   USB" gate) and the Xiaomi was held for an alarm measurement.
-- **Cold start has never been measured on real hardware for the release build.** The only
-  figure is 13.3 s for a debug build on a struggling emulator, which is not evidence.
+- ~~Cold start has never been measured on real hardware.~~ **Measured 2 Aug on the Redmi
+  Note 13 Pro: 631 ms, 244 ms, 224 ms, all `LaunchState: COLD`.** The 13.3 s emulator figure
+  was wrong by a factor of about fifty. See HANDOVER §10.
 - **One ANR was seen once**, during automated emulator onboarding: main thread in
   `Canvas.drawPath`, every frame interpreted, i.e. consistent with un-JITted cold-start
   drawing under uiautomator load rather than a block in app code. Did not reproduce on a clean
   launch and has never occurred on either physical phone. Unconfirmed either way.
-- The notification and the watch tile still carry **no** marking when times are approximated.
+- ~~The notification and the watch tile carry no marking when times are approximated.~~
+  **Both mark it now** (2 Aug). Whether a projected time should fire an alarm at all is still
+  open — that is A10, and it is a religious question.
 - Wear OS has not been re-verified since today's changes (none of them touch `:wear`).
 
 ---
@@ -163,7 +173,7 @@ as one number.
 | 3 | Store screenshots no longer match the app | Medium | Deliberate. Must be retaken **at upload**, not before — `RELEASING.md` |
 | 4 | Moonsighting users between 60° and 66° get Fajr up to 91 min out | Medium | Real, bounded, affects a small population. Fix attempted and reverted — see §6 |
 | 5 | Users who decline the exact-alarm permission still get late alerts | Medium | Mitigated: onboarding prompt, dismissible home banner, settings row, and copy that now names the real cost |
-| 6 | Cold start unmeasured on hardware | Low–Medium | No baseline exists. Cheap to close |
+| 6 | ~~Cold start unmeasured on hardware~~ | **Closed** | Measured 2 Aug: ~224 ms cold on the Redmi. HANDOVER §10 |
 | 7 | The emulator ANR is real after all | Low | Never seen on hardware; profile is consistent with emulator cold start |
 
 **Nothing here is a launch blocker.** #1 and #2 are the two that deserve action this week.
@@ -191,8 +201,22 @@ It was reverted, for three reasons in order of weight:
    prose does not state. Guessing what, inside prayer-time code, days before a production
    submission, is the exact move this project's rules exist to prevent.
 
-**This is now blocked on evidence, not effort**: one Moonsighting timetable for a place
-between 60° and 66° in June would settle it.
+**Re-read on 2 August, and the earlier reading was missing a guard clause.** Moonsighting's
+own page states the rule conditionally, not absolutely: *"Any location where the duration of
+fasting exceeds 18 hours or is less than 6 hours should refer itself to the times valid for
+the closest 'balanced' location"*, and the slide applies to *"Fajr & Isha … in summer"* only —
+*"In winter, we use research by Moonsighting.com for Subh-Sadiq and Shafaq."* That does not
+rescue the reverted implementation: Luleå in late June satisfies the condition, so the slide
+fires there and the inversion is real. It does mean the contradiction was partly in the
+reading. See HANDOVER §15 lesson 78.
+
+**Still blocked on evidence, not effort**: one Moonsighting timetable for a place between 60°
+and 66° in June would settle it.
+
+**But the user-facing problem it represents is now addressable without settling it.** The
+"Match your mosque" corrections added on 2 August let a user at any latitude match their own
+mosque's printed times exactly, whatever the cause of the divergence. That is a better answer
+than a confident wrong one, and it is the same answer for every other source of disagreement.
 
 ---
 
@@ -216,7 +240,7 @@ between 60° and 66° in June would settle it.
 
 | | Decision | Recommendation |
 |---|---|---|
-| **A14** | Switch to `USE_EXACT_ALARM`, which removes the permission prompt entirely — Muslim Pro does exactly this on the owner's own phone | **Not before production.** Google admits only "an alarm or timer app" or "a calendar app"; apps that miss it are *disallowed from publishing*. Another app passing review is evidence it can pass, not proof we would. Revisit once live, when a rejection costs a version rather than the launch |
+| **A14** | Switch to `USE_EXACT_ALARM`, which removes the permission prompt entirely — Muslim Pro does exactly this on the owner's own phone | **Not before production — re-verified against the policy page on 2 Aug, not assumed.** Google names exactly two qualifying categories, quoted: *"The app is an alarm or timer app"* and *"The app is a calendar app that shows event notifications."* A prayer-times app is neither, and the stated consequence for apps outside them is that they *"will be disallowed from publishing on Google Play."* Google's own remedy for anything else is the permission the app already uses: *"you should evaluate if using `SCHEDULE_EXACT_ALARM` as an alternative is an option."* Muslim Pro passing review is evidence it can pass, not proof we would. Revisit once live, when a rejection costs a version rather than the launch |
 | **A1** | Stop deriving calculation method from sect | Open |
 | **A10** | Should a projected time fire an alarm at all? | Open — a genuine religious question, not an engineering one |
 | **A11** | Ramadan wording for Fajr | Open |

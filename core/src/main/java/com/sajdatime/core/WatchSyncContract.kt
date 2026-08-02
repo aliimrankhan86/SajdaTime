@@ -19,6 +19,18 @@ object WatchSyncContract {
     const val KEY_CITY = "city"
 
     /**
+     * The per-prayer corrections, as one [AdjustmentCodec] string.
+     *
+     * Synced, and that is the point. A user who nudges Maghrib to match their mosque and
+     * then sees the watch on their wrist disagree with the phone in their pocket has been
+     * given two answers to a religious question by one app.
+     */
+    const val KEY_ADJUSTMENTS = "adjustments"
+
+    /** Days the Hijri date is shifted by. Same reasoning as [KEY_ADJUSTMENTS]. */
+    const val KEY_HIJRI_OFFSET = "hijri_offset"
+
+    /**
      * The Data Layer drops an update whose payload is byte-identical to the last one, so
      * a re-send needs something that always changes.
      */

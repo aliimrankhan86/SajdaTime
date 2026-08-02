@@ -28,6 +28,13 @@ object OngoingBadge {
             now = now,
             zone = ZoneId.systemDefault(),
         )
-        Notifications.postOngoingBadge(context, next.slot, next.at, now)
+        // Recomputed rather than carried on NextPrayer: the badge shows tomorrow's Fajr
+        // once Isha has passed, and tomorrow can be a projected day when today was not.
+        val approximate = PrayerEngine.compute(
+            coordinates,
+            next.at.atZone(ZoneId.systemDefault()).toLocalDate(),
+            settings.calculationPrefs,
+        ).approximatedFrom != null
+        Notifications.postOngoingBadge(context, next.slot, next.at, now, approximate)
     }
 }
