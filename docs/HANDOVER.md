@@ -2968,6 +2968,29 @@ same as seeing it.
   restart, while the exact-alarm banner beside it still shows — which is what proves the
   dismiss is specific rather than hiding everything.
 
+  **Checked right-to-left, dark, and at 1.5× text, because it is a layout change** (CLAUDE.md
+  hard rule). All three at once in the `rtl` build: the card mirrors correctly — dismiss on
+  the left, warning icon on the right — text is right-aligned, it wraps rather than clipping,
+  and the page scrolls when the card grows past the viewport. The `?Does this match your
+  mosque` and `.follows` artefacts are the documented `ar-XB` behaviour with English words,
+  not a defect (see "Locale — what running the app in another language found").
+
+  **The RTL run also gave the bidi isolation its first genuinely mixed-script test.** Under
+  `ar-XB` the geocoder returns the country in Arabic, so the header read
+  **"Greater Manchester, المملكة المتحدة"** — Latin town, Arabic country, in one line. The
+  city stayed a single unbroken run with the comma correctly between the two halves, which
+  is exactly the case `core/Bidi.kt` exists for and which the English build can never
+  exercise. Yesterday's work was committed on the strength of a JVM test and a rendered PDF;
+  this is the first time it has been *seen* doing its job.
+
+  **A false alarm worth recording.** Mid-check the banner appeared to have vanished from the
+  RTL build, and the persisted state said it should be showing. It was simply scrolled off
+  the top: uiautomator only reports nodes inside the visible bounds, and each `txt` helper
+  call re-dumps, so the scroll position had drifted between calls. Confirmed present at
+  bounds `[220,1038][896,1198]` from a single dump taken after scrolling to the top. The
+  tooling was wrong, not the app — the same shape of error as the "missing" alarm sound
+  picker and the "clipped" landscape Qibla screen (§15 lesson 51).
+
   **A regression in the T3 fix was found by this same run, and it is the more useful
   finding.** `PlaceName` had `featureName` third in the chain, ahead of the county, on the
   reasoning that it is "more specific". The emulator's geocoder answered a UK fix with a
