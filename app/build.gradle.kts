@@ -1,3 +1,4 @@
+import org.gradle.api.tasks.PathSensitivity
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -122,6 +123,25 @@ android {
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
+}
+
+// NoTranslationsYetTest reads the res folders off disk to enforce "no machine translation"
+// (CLAUDE.md). Gradle cannot infer that, so the test task counted as UP-TO-DATE and was
+// skipped in exactly the situation the guard exists for: someone has just added a
+// values-<lang>/ folder and changed nothing else. That is not a theory — adding
+// values-ar/ and running the tests reported zero failures until --rerun-tasks was passed,
+// which is a guard that reports success while not running.
+//
+// Declaring the folders as inputs makes adding, removing or editing one invalidate the
+// task. Directory *names* are what matter here, hence the broad include and the relative
+// path sensitivity: a new empty values-ar/ has no file contents to notice, but its
+// strings.xml does, and a translation folder with no strings in it is not the failure mode.
+tasks.withType<Test>().configureEach {
+    inputs.files(
+        rootProject.fileTree(rootProject.projectDir) {
+            include("app/src/**/values-*/**", "wear/src/**/values-*/**", "core/src/**/values-*/**")
+        },
+    ).withPropertyName("localeResourceFolders").withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 dependencies {

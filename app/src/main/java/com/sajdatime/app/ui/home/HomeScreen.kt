@@ -776,7 +776,16 @@ private fun hijriToday(now: Instant): String {
     } ?: return ""
 
     val (day, month, year) = parts
-    val name = months.getOrNull(month - 1) ?: return ""
+    // The month name is isolated and the day and year are not, and that asymmetry is the
+    // whole fix — see BidiTest, "the Hijri date reads in the right order". The month is the
+    // only strong left-to-right run in "19 Safar 1448"; without a fence the two numbers
+    // resolve around it and a right-to-left reader gets 19, 1448, Safar, with the year
+    // where the month should be. Wrapping the *whole* date instead, which is the obvious
+    // move, is worse: it becomes one foreign block and reads 1448 Safar 19.
+    //
+    // Measured with java.text.Bidi, not reasoned, and it reproduced the header exactly.
+    // Invisible in English, where the paragraph is already left-to-right.
+    val name = months.getOrNull(month - 1)?.bidiIsolated() ?: return ""
     return stringResource(R.string.hijri_date_format, day, name, year)
 }
 

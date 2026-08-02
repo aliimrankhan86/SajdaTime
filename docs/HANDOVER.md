@@ -1288,11 +1288,26 @@ LTR run, and get reordered around the two numbers. That confirms the claim above
 date comes right when its month names arrive in the same language as the date — and it
 confirms it by measurement instead of by argument.
 
-**Leave the build type on `ar-XB`.** The `ur` pin is a diagnostic to reach for deliberately
-and revert, never something to commit. `ar-XB` is reserved and no real phone can be set to
-it, which is the property that stops the `rtl` build type from ever being mistaken for, or
-promoted into, a translation — read the comment at the top of that strings file. `ur` is a
-real language tag and would throw that safety away for no gain.
+**~~Leave the build type on `ar-XB`.~~ OVERTURNED 2 Aug 2026 — the build type is now `ur`.**
+The original text read: *"The `ur` pin is a diagnostic to reach for deliberately and revert,
+never something to commit. `ar-XB` is reserved and no real phone can be set to it, which is
+the property that stops the `rtl` build type from ever being mistaken for, or promoted into,
+a translation. `ur` is a real language tag and would throw that safety away for no gain."*
+
+Two of its three claims were sound. The third — *"for no gain"* — was wrong, and the section
+directly above it says why without noticing: a preview that mangles every screen equally
+cannot answer which screens are actually wrong. The owner reviewed the `ar-XB` build twice
+and both times reported the app as broken. It was not, and telling him so twice was worse
+than useless: it spends the trust that makes future RTL reports worth reading. **A review
+tool that its only human reviewer cannot read has failed at its one job**, and the gain from
+fixing that is the entire reason the build type exists.
+
+The safety claim was also weaker than it sounded. `ar-XB` never stopped anyone adding
+`values-ar/` to the *main* source set, which is the move CLAUDE.md actually forbids — it only
+made the preview itself unpromotable, which no one was trying to promote. That is now
+guarded deliberately by `NoTranslationsYetTest`, which fails the build if any
+`values-<lang>/` folder appears in any module. See "Reading the preview, and the real bug it
+was hiding" below.
 
 **Not tested:** onboarding was not re-run under `rtl` (it is prose with no numbers, and its
 Bismillah is strong-RTL and already verified in §10); the PDF and the tile were not
@@ -2711,6 +2726,77 @@ Verified rather than reasoned about, because both halves could have gone wrong:
 This is groundwork for a translation that does not exist yet, and it is deliberately the
 *only* groundwork done: no `values-ar/`, no machine translation, nothing that looks like a
 step towards shipping a language without a native speaker. See CLAUDE.md.
+
+### Reading the preview, and the real bug it was hiding (2 Aug 2026)
+
+**The owner reported the RTL build as broken for the second time** — "AM becomes MA, MP
+becomes PM" — and said to stop explaining it and fix it. He was right to, and the right
+answer turned out to be *both* things: the reversal was the tool, and underneath it there
+was a genuine ordering bug that the tool had been hiding for as long as it existed.
+
+**The tool.** `ar-XB` reverses Latin characters outright. `PM` → `MP`, `Sun` → `nuS`. No
+real locale does that, so every screen looked mangled whether or not anything was wrong. The
+build type now pins `ur` instead. Same screen, one line of build config apart:
+
+| | `ar-XB` (before) | `ur` (now) |
+|---|---|---|
+| Meridiem | `MP 1:16` | `PM 1:16` |
+| Gregorian date | `2 guA ,nuS` | `اتوار 2 اگست` |
+| Hijri date | `Safar 1448 19` | `Safar 1448 19` ← unchanged, and that is the finding |
+
+`ur` rather than `ar` on purpose: Urdu is right-to-left, keeps a Latin `AM`/`PM` in CLDR and
+uses Latin digits, so the hardest case is still exercised while prayer times stay legible to
+the person reviewing them. `ar` switches to Arabic-Indic digits and would have made every
+time on the screen unreadable to this project's only reviewer — testing less while looking
+more thorough.
+
+**The bug the reversal was hiding.** Under `ar-XB` the Hijri date was mangled like everything
+else, so it never stood out. Under `ur` it is the *only* thing still wrong, and it is wrong
+in a way that survives into a real translation. The header rendered `Safar 1448 19`. Read
+right-to-left, as the reader of an RTL paragraph does, that is **19, then 1448, then Safar** —
+the year sitting where the month belongs. Measured with `java.text.Bidi` rather than argued,
+and the measurement reproduced the header exactly:
+
+| | visual | what an RTL reader takes in |
+|---|---|---|
+| Before | `Safar 1448 19` | `19 1448 Safar` ✗ |
+| Month name isolated | `1448 Safar 19` | `19 Safar 1448` ✓ |
+| **Whole date isolated** | `19 Safar 1448` | `1448 Safar 19` ✗ |
+
+**The obvious fix is the wrong one, and that is the part worth remembering.** Wrapping the
+whole date — which looks right, and produces a visual string that reads correctly to an
+English eye — makes it a single foreign block that gets placed as a unit, and it comes out
+backwards. Only the month name may be fenced, because it is the only strong left-to-right
+run in the line and the two numbers must stay free to resolve around it. Both cases are now
+permanent tests in `BidiTest`, including the wrong one, so nobody "simplifies" the fix into it.
+
+Verified after: the `ur` build shows `1448 Safar 19`, which reads `19 Safar 1448`. The
+English build shows `Sun 2 Aug · 19 Safar 1448` with no tofu boxes — the isolates are
+zero-width and Minikin skips them, the same property already relied on in the PDF.
+
+**What replaced `ar-XB`'s safety, and why it is stronger.** Its one real advantage was being
+a reserved tag no phone can be set to. That is now covered three ways, all of which guard
+more than it did: the build type carries `applicationIdSuffix ".rtl"`, `app_name` is
+"SajdaTime (RTL)", and `NoTranslationsYetTest` fails the build if a `values-<lang>/` folder
+appears in *any* module — which is the move CLAUDE.md actually forbids and which `ar-XB`
+never prevented. Verified by adding `values-ar/` and watching the build go red, then removing
+it and watching it go green. Also verified that the release bundle carries `en-GB` and
+neither preview tag.
+
+**The guard was broken when first written, and the way it failed is the interesting part.**
+It reads the filesystem, which Gradle cannot see, so the test task was `UP-TO-DATE` and
+*skipped* — the first run with `values-ar/` present reported zero failures. A guard that
+reports success while not running is worse than no guard at all, and it would have been
+skipped in precisely the situation it exists for: someone adds a translation folder and
+changes nothing else. Fixed by declaring the locale folders as task inputs in
+`app/build.gradle.kts`, and confirmed by re-running the same experiment with a plain
+`./gradlew test` and no force flag.
+
+**Not fixed, and correctly so:** `PM 1:16` and the stranded `?` in `?Does this match your
+mosque`. Both are English strings inside an RTL paragraph, both read correctly right-to-left,
+and both disappear when the words are translated. The `TimeFormat.clock` KDoc already warns
+against "fixing" the meridiem with an isolate, and that warning stands — doing it would move
+`PM` to the side it does not belong on.
 
 ### The daytime half of the alarm story, and the town-not-county fix (2 Aug 2026)
 
@@ -4314,6 +4400,37 @@ matters more than the stable hashes, that is the trade being made.
 
     The generalisation: when ordering fallbacks, ask what the field contains when it is
     *wrong*, not what it contains when it is right. And run the thing.
+
+71. **A diagnostic that corrupts everything equally cannot tell you what is broken — and it
+    will hide one real bug for as long as it exists.** The `rtl` build type pinned `ar-XB`,
+    a pseudolocale that reverses Latin characters. Every screen looked mangled, so nothing
+    stood out. Swapping it for a real RTL locale (`ur`) cleaned up nine artefacts and left
+    exactly one still wrong — the Hijri date, misordered in a way that survives into a
+    genuine translation. That bug had been on screen the whole time, indistinguishable from
+    the noise.
+
+    The tell was the owner reporting the same thing twice. The first time it was answered
+    with "the preview is behaving correctly", which was true and useless. Noise in a
+    diagnostic is not neutral: it costs the reviewer's attention, it costs their trust in
+    every later report, and it camouflages the signal you built the diagnostic to find.
+
+72. **The obvious version of a bidi fix is often the exactly-wrong one.** Fencing the whole
+    Hijri date reads correctly to an English eye and is backwards to the reader it is for;
+    fencing only the month name is right. The difference cannot be seen by reading the code
+    or the string — it only appears once the Unicode algorithm has actually laid it out.
+    Both variants are now tests, the wrong one included, because "simplify this to wrap the
+    whole thing" is a change someone will otherwise make on sight.
+
+73. **A guard that cannot observe its own trigger will report success without running.**
+    `NoTranslationsYetTest` reads resource folders off disk. Gradle has no way to know that,
+    so the task was `UP-TO-DATE` and skipped, and adding `values-ar/` produced *zero
+    failures* on the first run. It only failed under `--rerun-tasks`, which nobody passes.
+
+    That is the worst failure mode a check can have, and it is invisible: the suite is green
+    either way. Any test that reaches outside its declared inputs — filesystem, environment,
+    generated output, another module's sources — needs those inputs declared, and needs its
+    red state demonstrated at least once. Write the guard, then break the thing on purpose
+    and watch it catch it. A guard never seen to fail is not known to work.
 
 ---
 

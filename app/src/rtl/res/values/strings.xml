@@ -11,9 +11,34 @@
   English, and the untranslated English is the point, since a Latin word inside an RTL line
   is precisely what does not survive the trip.
 
-  ar-XB is a reserved pseudolocale that no real phone can be set to, so this can never be
-  mistaken for, or promoted into, an Arabic translation. CLAUDE.md requires a native speaker
-  for that, and nothing here is a step towards one.
+  It is `ur`, and it used to be the reserved pseudolocale `ar-XB`. That was changed on
+  2 Aug 2026, deliberately overturning the decision recorded in HANDOVER §10 ("The
+  pseudolocale hides the answer it is being asked for"), which said to stay on ar-XB.
+
+  Why the reversal. ar-XB reverses Latin characters outright — "PM" renders "MP", "Sun"
+  renders "nuS". No real locale does that, so every screen looks mangled whether or not
+  anything is wrong, and the one question this build exists to answer — *which of these
+  would still be wrong in a genuine RTL language?* — is the one it cannot answer. The owner
+  reviewed it twice and both times reported the app as broken when it was not. A preview
+  its only human reviewer cannot read has failed at its single job, and worse, it spends
+  trust: it teaches him that RTL reports are noise.
+
+  `ur` instead of `ar` on purpose. Urdu is right-to-left, keeps Latin AM/PM in CLDR, and
+  uses Latin digits, so prayer times stay legible while the hardest case — a Latin run
+  inside an RTL line — is still exercised. `ar` would switch to Arabic-Indic digits and
+  make every time unreadable to this project's reviewer, testing less and hiding more.
+
+  Nothing here is a translation. There is no values-ur/, so every string still resolves
+  from values/ in English; only layout direction and date/number formatting change.
+
+  What replaces ar-XB's safety. Its one advantage was that no real phone can be set to it,
+  so the build type could never be mistaken for a translation. That is now guarded properly
+  instead of incidentally, and in three places that are all stronger than a scary-looking
+  tag: the build type carries applicationIdSuffix ".rtl" so it installs beside the real app
+  rather than over it; app_name says "SajdaTime (RTL)"; and NoTranslationsYetTest fails the
+  build if any values-<lang>/ folder appears anywhere in the project. That last one guards
+  the actual hard rule in CLAUDE.md — never machine-translate the app — which ar-XB never
+  did: nothing about a pseudolocale ever stopped someone adding values-ar/ to main.
 
   Two neater-looking approaches were tried first and both failed, so do not "tidy" this back
   into either:
@@ -33,7 +58,7 @@
     lands. A build type has no locale folder, so lint has nothing to misread.
 -->
 <resources>
-    <string name="app_language_tag">ar-XB</string>
+    <string name="app_language_tag">ur</string>
     <!-- The build type carries applicationIdSuffix ".rtl" so this sits beside the Play
          build rather than replacing it. Two SajdaTime icons on one launcher are otherwise
          indistinguishable, and installing the RTL preview over the real app is the mistake
