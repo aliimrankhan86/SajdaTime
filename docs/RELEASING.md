@@ -484,6 +484,26 @@ minute. Upload the ones directly in `screenshots/`, not the ones in `screenshots
 raw emulator captures are 1080 × 2400, which Play rejects for being more than twice as tall
 as it is wide. The script reframes them to 9:16 without cropping anything.
 
+> ### ⚠️ The current screenshots are stale for the *next* release, deliberately
+>
+> **Do not retake them yet, and do not upload the new build without retaking them.** Two
+> changes made on 2 Aug 2026 alter the home screen, and `01-times-light.png` shows both:
+>
+> | What changed | Effect on that screenshot |
+> |---|---|
+> | T1 method banner | It is Greater Manchester at 53.5°N on the default method, so a fresh install now shows an amber "Does this match your mosque?" card that is not in the picture |
+> | T3 composite place name | The header now reads "Greater Manchester, United Kingdom", not "Greater Manchester" |
+>
+> They are left alone on purpose. A store screenshot has to match the build a user actually
+> downloads, and none of this is uploaded — 1.1.0 is live and the closed test is still
+> running. Retaking now would make the listing wrong for the app that is live today in order
+> to be right for one that does not exist yet, and Play treats inaccurate screenshots as a
+> policy problem in its own right (see the Wear rejection table below).
+>
+> So this is a **release-time step, not a now step**: retake as part of the same change that
+> uploads the new AAB, in the order build → capture → upload, and check the banner is either
+> present in every phone screenshot or absent from all of them rather than mixed.
+
 ---
 
 ## Step 6 — Play Console forms · **DONE** (all green)

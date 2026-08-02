@@ -2727,6 +2727,67 @@ This is groundwork for a translation that does not exist yet, and it is delibera
 *only* groundwork done: no `values-ar/`, no machine translation, nothing that looks like a
 step towards shipping a language without a native speaker. See CLAUDE.md.
 
+### The Moonsighting slide, built and thrown away (2 Aug 2026)
+
+**The clearest "measure it before you believe it" result in the project so far**, and the
+finding is that a fix which looked obviously correct was a regression.
+
+A12 says Moonsighting Committee slide Fajr and Isha down to 60° above 60° latitude, and that
+the app does not. Both halves confirmed. Their page, verbatim:
+
+> "Therefore, at latitudes more than 60degrees, we slide down to 60degrees and calculate
+> **Fajr & Isha** using the rule of Sab'u Lail in summer."
+
+*Fajr & Isha* — named explicitly, so the other four stay local. And the damage from not
+doing it, measured with this engine on 21 June 2026 against the same longitude at 60°:
+
+| Place | Fajr error | Isha error |
+|---|---|---|
+| Helsinki 60.2°N | −1 min | +2 min |
+| Anchorage 61.2°N | −10 min | +10 min |
+| Trondheim 63.4°N | −37 min | +37 min |
+| Umeå 63.8°N | −44 min | +43 min |
+| Reykjavík 64.2°N | −49 min | +49 min |
+| **Luleå 65.6°N** | **−91 min** | **+91 min** |
+
+Luleå's un-slid answer is degenerate rather than merely inaccurate: Isha 22:14, Fajr 22:52,
+**38 minutes of night**. Every row has a real Muslim population. So the case for fixing it
+was strong, the primary source was clear, and the implementation was fifteen lines.
+
+**Then it was swept, and it broke.** 60.5°–66°N, every day of 2026, three longitudes:
+**1,043 of 13,140 day-computations came out non-monotonic**. Luleå, 21 June, with the slide
+applied:
+
+```
+Fajr 00:23   Sunrise 23:00   Dhuhr 10:38   Asr 15:30   Maghrib 22:09   Isha 20:43
+```
+
+**Isha 86 minutes before Maghrib.** Structural, not a slip: Isha moves ~1.5 hours south while
+Maghrib stays at a very late local sunset, and they cross. Near the solstice at 63° the same
+crossing appears as a *one-minute* inversion — which is the dangerous version, because it
+would have shipped looking fine.
+
+**Reverted.** Three reasons, in order of weight:
+
+1. **A wrong-but-ordered day beats an incoherent one.** The current behaviour is up to 91
+   minutes out at Luleå. The "fix" produced timetables where Isha precedes Maghrib, which no
+   user could pray by and no mosque would recognise. That is a regression, not a correction.
+2. **It could not be verified against the publishing body's own output.** Every real
+   calculation bug in this project was caught by comparing to an independent reference, and
+   three confidently-reported bugs turned out to be errors in the test rather than the code.
+   moonsighting.com would not serve a timetable to `curl` — the JSON endpoint 500s and the
+   HTML page builds its table in JavaScript — so there was nothing to check against.
+3. **The prose is under-specified, and now demonstrably so.** A literal reading contradicts
+   itself, which means Moonsighting are doing something the sentence does not say. Guessing
+   what, inside prayer-time code, days before a production submission, is exactly the move
+   this file exists to prevent.
+
+**What would unblock it:** Moonsighting's own published timetable for one place between 60°
+and 66° in June, showing how they order Maghrib and Isha on a day where a literal slide
+crosses them. A browser session, an email to them, or a printed timetable from a mosque in
+that band would each settle it. This is now blocked on *evidence*, not on effort — which is
+a different and much more actionable state than "needs the same machinery as A10".
+
 ### Reading the preview, and the real bug it was hiding (2 Aug 2026)
 
 **The owner reported the RTL build as broken for the second time** — "AM becomes MA, MP
@@ -3335,6 +3396,33 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   everywhere, a one-time confirmation before projected alarms are first scheduled, or showing
   estimates while suppressing their alarms.
 
+  **The PDF half is DONE, 2 Aug 2026.** `approximatedFrom` was reaching exactly one place in
+  the app — `HomeScreen` — so the exported timetable printed projected times with no marking
+  at all. That is the worst of the four surfaces, and not by a little: a PDF is the copy that
+  *leaves* the app. It gets printed, pinned to a wall and handed to other people, with no
+  banner above it, no countdown beside it and no way to ask it a question. A projected time on
+  paper claims more certainty than the same number on a screen.
+
+  It now prints, only when a day in the range was actually projected:
+
+  > Some of these times are approximate. This far north the sun does not always rise or set,
+  > so those days are worked out from latitude 45° instead. Ask your mosque what it follows.
+
+  Verified by exporting a real month at Longyearbyen and rendering the PDF: the note appears
+  under the subtitle, wraps to two lines, and the table is untouched. Most users see no
+  change at all, because most days are nobody's projection.
+
+  **A wording bug was caught by looking at the rendered output rather than the code.** The
+  first draft said "so *Fajr and Isha* are worked out from latitude 45°", which is how the
+  polar problem is always described and is wrong here: when a day is projected the engine
+  replaces **all six** slots, sunrise and Maghrib included. The rendered table showed sunrise
+  4:43 am on days the sun does not rise. Under-describing an approximation is the same class
+  of error as not mentioning it.
+
+  **Still open:** the notification and the watch tile carry no marking, and the alarm
+  question — whether a projected time should fire an alarm at all — is untouched and remains
+  a decision rather than a task.
+
 - **A11 — Ramadan wording for Fajr, rather than changing the default angle.** One reviewer
   argued the worldwide default should err early (19.5°–20°) on precautionary grounds. The
   better argument is that there is no globally cautious angle, because one timestamp carries
@@ -3356,6 +3444,46 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   deciding first whether the app is trying to *be* moonsighting.com's timetable or to
   implement adhan's faithful rendering of their published model; it currently does the latter,
   which is defensible, just not identical.
+
+  > **⛔ Attempted and reverted, 2 Aug 2026 — and the reason upgrades this item from "more
+  > work" to "not yet specified".** The partial substitution above was built exactly as
+  > described: for `MOON_SIGHTING` above 60°, take Fajr and Isha from a 60° probe at the same
+  > longitude and leave the other four local. It compiles, it is about fifteen lines, and it
+  > **produces invalid days**.
+  >
+  > Swept over 60.5°–66°N, every day of 2026, three longitudes: **1,043 of 13,140
+  > day-computations came out non-monotonic.** Not marginally — Luleå on 21 June:
+  >
+  > ```
+  > Fajr 00:23   Sunrise 23:00   Dhuhr 10:38   Asr 15:30   Maghrib 22:09   Isha 20:43
+  > ```
+  >
+  > **Isha lands 86 minutes before Maghrib.** The cause is structural rather than a coding
+  > slip: Isha slides ~1.5 hours south while Maghrib stays at a local sunset that is very
+  > late, so the two cross. Near the solstice at 63° the same crossing shows up as a
+  > one-minute inversion, which is worse — it would have shipped unnoticed.
+  >
+  > **What that means.** The published sentence — *"at latitudes more than 60degrees, we slide
+  > down to 60degrees and calculate Fajr & Isha"* — cannot be a literal coordinate
+  > substitution, because a literal reading contradicts itself. Moonsighting must be doing
+  > something further that the prose does not state: most likely combining the 60° twilight
+  > values with a locally-anchored Sab'u Lail bound, as their own text describes for the
+  > 55°–60° band. Deriving that from the words alone is guesswork, and guesswork is not
+  > allowed in this file.
+  >
+  > **The blocker is therefore evidence, not effort.** What is needed is
+  > **moonsighting.com's own published timetable for one place in the 60°–66° band in June**
+  > — Trondheim, Umeå or Luleå — to see how they order Maghrib and Isha on the days where a
+  > literal slide breaks. Their site would not serve a timetable to `curl` (the JSON endpoint
+  > 500s and the HTML page builds its table in JavaScript), so this needs a browser, or an
+  > email to them, or a printed timetable from a mosque in that band.
+  >
+  > Until that exists, the current behaviour stays. It is wrong by up to 91 minutes at Luleå,
+  > which is bad — and it is *ordered*, which the fix was not. **A wrong-but-coherent day
+  > beats an incoherent one**, and shipping the second to fix the first would have been a
+  > clear regression dressed as a correction.
+  >
+  > Full evidence: §10, "The Moonsighting slide, built and thrown away".
 
 - **A13 — ✅ CLOSED (1 Aug 2026). The polar notice has now been seen on a device, in both
   directions.** Two sessions had failed at this by fighting the emulator's location providers.

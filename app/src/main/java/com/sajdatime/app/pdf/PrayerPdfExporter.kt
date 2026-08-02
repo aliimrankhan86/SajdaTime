@@ -138,7 +138,18 @@ class PrayerPdfExporter(base: Context) {
                     canvas.drawText(title(cityName, range, start), MARGIN, y, titlePaint)
                     y += 20f
                     canvas.drawText(subtitle(), MARGIN, y, subtitlePaint)
-                    y += 26f
+                    y += 14f
+                    // Only when a day in this range was actually projected. Above the polar
+                    // circles the home screen shows a banner; the PDF is the copy that leaves
+                    // the app and gets pinned to a wall, and it had no such marking at all.
+                    approximateNote(rows)?.let { note ->
+                        wrapped(note, PAGE_WIDTH - 2 * MARGIN, subtitlePaint).forEach { line ->
+                            canvas.drawText(line, MARGIN, y, subtitlePaint)
+                            y += 11f
+                        }
+                        y += 4f
+                    }
+                    y += 12f
                 } else {
                     y += 6f
                 }
@@ -216,6 +227,39 @@ class PrayerPdfExporter(base: Context) {
     }
 
     private fun subtitle(): String = context.getString(R.string.pdf_subtitle)
+
+    /**
+     * The approximation notice, or null when every day in the range is the user's own
+     * astronomy — which is very nearly every user, so most PDFs are unchanged.
+     *
+     * The latitude is read from the days themselves rather than recomputed, because it is
+     * not a constant: it is 45 degrees under the Islamic Fiqh Council's ruling and 60 under
+     * Moonsighting's, so it depends on the method the user picked. Printing the actual number
+     * is what lets someone check this against their mosque instead of taking its word.
+     */
+    private fun approximateNote(rows: List<DayPrayerTimes>): String? {
+        val from = rows.firstNotNullOfOrNull { it.approximatedFrom } ?: return null
+        return context.getString(R.string.pdf_approximate_note, from.toInt())
+    }
+
+    /**
+     * Greedy word wrap against the actual measured text width.
+     *
+     * ponytail: `Paint.measureText` and a fold, not a StaticLayout. StaticLayout wants a
+     * width in pixels and a whole layout pass to draw one paragraph of small print onto a
+     * Canvas that is already being drawn line by line, and this file draws every other row
+     * by baseline arithmetic already.
+     */
+    private fun wrapped(text: String, maxWidth: Float, paint: Paint): List<String> =
+        text.split(" ").fold(mutableListOf<String>()) { lines, word ->
+            val candidate = if (lines.isEmpty()) word else "${lines.last()} $word"
+            if (lines.isNotEmpty() && paint.measureText(candidate) <= maxWidth) {
+                lines[lines.lastIndex] = candidate
+            } else {
+                lines.add(word)
+            }
+            lines
+        }
 
     // PrayerTimes_July2026.pdf / PrayerTimes_30Jul2026.pdf. Locale.US is deliberate and is
     // the one place in the app that ignores the user's language: this string is a file name
