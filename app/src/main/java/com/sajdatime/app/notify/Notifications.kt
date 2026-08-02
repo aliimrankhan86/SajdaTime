@@ -172,6 +172,7 @@ object Notifications {
         alarmSoundUri: String,
         respectSilent: Boolean,
         approximate: Boolean = false,
+        alarmOnApproximate: Boolean = false,
     ) {
         // Everything below builds text the user reads, so it is built from a context
         // pinned to the app's own language rather than the device's. Wrapped here at the
@@ -181,11 +182,13 @@ object Notifications {
         if (!canPost(context)) return
         ensureChannels(context)
 
-        // The alert still arrives, on time, in the shade and as a heads-up — only the
-        // sound is dropped. Nothing about the ringer suppresses a notification's visual
-        // treatment, so "quiet, but still there" is exactly what the user asked for.
-        val silenced = style == AlertStyle.ALARM && respectSilent && phoneIsSilenced(context)
-        val effectiveStyle = if (silenced) AlertStyle.NOTIFICATION else style
+        val effectiveStyle = effectiveAlertStyle(
+            style = style,
+            respectSilent = respectSilent,
+            approximate = approximate,
+            alarmOnApproximate = alarmOnApproximate,
+            phoneIsSilenced = { phoneIsSilenced(context) },
+        )
 
         val channelId = when (effectiveStyle) {
             AlertStyle.NOTIFICATION -> CHANNEL_PRAYERS
@@ -289,6 +292,43 @@ object Notifications {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
     }
+}
+
+/**
+ * Which of the two alert channels this alert actually lands on.
+ *
+ * Two independent reasons drop an alarm to a notification, and **neither suppresses the
+ * alert** — it still arrives, on time, in the shade and as a heads-up, still marked. Only
+ * the sound is dropped. Nothing about the ringer or the channel suppresses a notification's
+ * visual treatment, so "quiet, but still there" is what both cases produce.
+ *
+ *  1. **The phone is silenced and the user asked that to be respected.** The alarm stream
+ *     deliberately ignores the ringer, which is right for a clock someone set for one
+ *     morning and wrong for a recurring alert five times a day. See [phoneIsSilenced].
+ *  2. **The time was projected from another latitude.** Above the polar circles there is no
+ *     true Fajr or Isha to calculate, so the app borrows the times from a lower latitude
+ *     under a published ruling. A notification states such a time and marks it approximate;
+ *     an alarm asserts it hard enough to wake someone at two in the morning, on a number
+ *     the app itself is telling them not to be certain of. The user can override this —
+ *     see [com.sajdatime.app.data.AppSettings.alarmOnApproximateDays], and read the note
+ *     there before removing the override, because the cost of not having one is a polar
+ *     user losing their Fajr alarm for two months a year.
+ *
+ * Pure, and split out of [Notifications.postPrayerAlert] only so it can be tested: posting
+ * needs a live NotificationManager and this does not. [phoneIsSilenced] is a lambda rather
+ * than a Boolean so the AudioManager read stays skipped in the cases that never reach it,
+ * which is the overwhelming majority of alerts.
+ */
+internal fun effectiveAlertStyle(
+    style: AlertStyle,
+    respectSilent: Boolean,
+    approximate: Boolean,
+    alarmOnApproximate: Boolean,
+    phoneIsSilenced: () -> Boolean,
+): AlertStyle {
+    if (style != AlertStyle.ALARM) return style
+    if (approximate && !alarmOnApproximate) return AlertStyle.NOTIFICATION
+    return if (respectSilent && phoneIsSilenced()) AlertStyle.NOTIFICATION else style
 }
 
 /**

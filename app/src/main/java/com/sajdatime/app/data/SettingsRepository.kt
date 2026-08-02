@@ -87,6 +87,27 @@ data class AppSettings(
      * the switch says plainly what that means. Requested by a tester.
      */
     val alarmRespectsSilent: Boolean = true,
+    /**
+     * Whether a prayer whose time had to be projected from another latitude may still ring
+     * as a full alarm. **Off by default** — those days drop to a notification.
+     *
+     * Above the polar circles the sun does not always rise or set, so there is no true Fajr
+     * or Isha to calculate and the app borrows the times from a lower latitude. That is a
+     * published ruling, not a guess, but it is still a borrowed answer, and mosques in the
+     * same town follow different ones. A notification states the time and marks it
+     * approximate; an alarm asserts it hard enough to wake someone at two in the morning.
+     *
+     * **The switch exists because the default has a real cost, and it is not hypothetical.**
+     * At Tromso every day from late May to late July is projected, so a user who set a Fajr
+     * alarm would find it silently stop working for two months of the year. Leaving them no
+     * way back would be the app settling a religious question on their behalf — the same
+     * objection that got auto-switching the calculation method rejected (HANDOVER §11, A2).
+     * Turning this on says "wake me anyway", and it is the user's to say.
+     *
+     * Shown only to users whose own location actually produces such days — see
+     * `SettingsScreen.hasApproximateDays`. Everyone below the polar circles never sees it.
+     */
+    val alarmOnApproximateDays: Boolean = false,
     val disclaimerSeen: Boolean = false,
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
@@ -249,6 +270,9 @@ class SettingsRepository(private val context: Context) {
     suspend fun setAlarmRespectsSilent(respects: Boolean) =
         edit { it[Keys.ALARM_RESPECTS_SILENT] = respects }
 
+    suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
+        edit { it[Keys.ALARM_ON_APPROXIMATE] = allowed }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -290,6 +314,7 @@ class SettingsRepository(private val context: Context) {
         val ONGOING = booleanPreferencesKey("ongoing_badge")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
         val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
+        val ALARM_ON_APPROXIMATE = booleanPreferencesKey("alarm_on_approximate_days")
 
         // Read but never written: the two keys ALERTS replaced. Kept so that an existing
         // install's choices survive the upgrade instead of silently reverting to the
@@ -331,6 +356,7 @@ class SettingsRepository(private val context: Context) {
             ongoingBadge = this[Keys.ONGOING] ?: true,
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
+            alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,

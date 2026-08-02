@@ -35,7 +35,10 @@ android {
         // https://developer.android.com/training/wearables/packaging. Bump freely; the two
         // sequences can never collide. Version codes can never be reused or decreased.
         versionCode = 1000
-        versionName = "1.1.0"
+        // Kept in step with the phone's versionName so one release never shows two version
+        // numbers to the same user. The *code* stays in its own 1000+ lane on purpose —
+        // see the note by versionCode above.
+        versionName = "1.1.1"
     }
 
     signingConfigs {

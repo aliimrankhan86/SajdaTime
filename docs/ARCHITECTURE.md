@@ -1,6 +1,6 @@
 # SajdaTime — Requirements and Architecture
 
-Version 1.1.0 · Android and Wear OS · Kotlin + Jetpack Compose
+Version 1.1.1 · Android and Wear OS · Kotlin + Jetpack Compose
 
 This document is the handoff record: what was built, why each decision was made, the exact
 business rules an iOS port must reproduce, and what deliberately was not built.

@@ -7,12 +7,13 @@ business rule, what is verified, what is not, and what is left to do.
 - **Repo:** `git@github.com:aliimrankhan86/SajdaTime.git`
 - **Local path:** `/Users/aliimrankhan/Developer/SajdaTime`
 - **Branch:** `main`
-- **Version:** 1.1.0 (`versionCode` 2 on phone, **1000** on the watch — they share an
+- **Version:** 1.1.1 (`versionCode` 3 on phone, **1000** on the watch — they share an
   `applicationId`, so codes must be unique across both modules; each has its own band so
   the two sequences can never collide. The watch also ships on a **separate Play release
   track**, not in the phone's release — see `docs/RELEASING.md` Step 7.)
-- **Status:** feature-complete, tested, and prepared for Play. **Not shippable yet — the
-  release is unsigned because only the owner may hold the key.** See §11.
+- **Status:** **live on the Play closed testing track** since 31 Jul 2026, signed by the
+  owner's own key. `versionCode` 2 (1.1.0) is what testers are running; `versionCode` 3
+  (1.1.1) is built and waiting to be uploaded and carries the Dhuhr fix. See §11.
 - **Companion docs:** `docs/ARCHITECTURE.md` (the technical spec, including the exact
   business rules an iOS port must reproduce) and `README.md` (the short public-facing one).
 
@@ -218,14 +219,24 @@ data class AppSettings(
     // How each prayer announces itself. A prayer absent from the map is silent — there is
     // no separate on/off switch, because "off" is simply having no style.
     val alertFor: Map<PrayerSlot, AlertStyle> = <all five -> NOTIFICATION>,
+    // "Match your mosque" — see §5.14's neighbours and the AdjustmentCodec.
+    val adjustments: Map<PrayerSlot, Int> = emptyMap(),   // per prayer, clamped to +/-30 min
+    val hijriOffsetDays: Int = 0,                          // clamped to +/-2 days
     val ongoingBadge: Boolean = true,      // silent, costs nothing, so on by default
     val alarmSoundUri: String = "",        // empty = device default alarm
-    val alarmRespectsSilent: Boolean = true,   // alarm falls back to a quiet notification
+    val alarmRespectsSilent: Boolean = true,      // alarm -> quiet notification when silenced
+    val alarmOnApproximateDays: Boolean = false,  // §5.14 — projected days do not ring
     val disclaimerSeen: Boolean = false,
     val usingDefaultLocation: Boolean = false,  // true once Makkah was used as fallback
+    val exactAlarmNoticeDismissed: Boolean = false,  // home only; Settings keeps the row
+    val methodNoticeDismissed: Boolean = false,      // same contract as the line above
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,  // SYSTEM resolves to light
 )
 ```
+
+This block has drifted from the code before. If you are changing `AppSettings`, change it
+here in the same edit — a stale data model is the one piece of this document a reader is
+most likely to trust without checking.
 
 `PrayerSlot`: `FAJR, SUNRISE, DHUHR, ASR, MAGHRIB, ISHA` — `isPrayer` is false for
 `SUNRISE`, which is why it is displayed but never notified and never "next".
@@ -309,9 +320,9 @@ nobody found them.
 
 | Group | Rows |
 |---|---|
-| **PRAYER TIMES** | Location (pin icon, city as subtitle) · School of thought ("Sunni · Hanafi") · Calculation method |
+| **PRAYER TIMES** | Location (pin icon, city as subtitle) · School of thought ("Sunni · Hanafi") · Calculation method · Match your mosque (per-prayer minutes and the Hijri date; **last in the group on purpose** — the two rows above it explain the divergences that have a reason, and this one is the catch-all for what is left) |
 | **APPEARANCE** | Theme — three chips, Follow phone / Light / Dark. Chips rather than a chooser because the result is visible the instant it is tapped, and a dialog would sit on top of the change it just made |
-| **REMINDERS** | Prayer alerts — Off / Notification / Alarm **per prayer**, with the sound picker, the silent-mode switch and the DND warning inside · Next-prayer badge switch, inline |
+| **REMINDERS** | Prayer alerts — Off / Notification / Alarm **per prayer**, with the sound picker, the silent-mode switch, the DND warning and (only above the polar circles) "Ring on approximate days" inside · Next-prayer badge switch, inline |
 | **ABOUT** | Version · Disclaimer · Privacy (opens the hosted policy) · Free, forever · Made by · Data and libraries |
 
 Any row that opens something carries a chevron, so "this is tappable" is never a guess.
@@ -333,6 +344,10 @@ twice for the same thing is asking too often.
 - **An alarm stays quiet while the phone is silenced**, unless the user turns that off. The
   notification still arrives, on time, in the shade and as a heads-up — only the sound is
   dropped. See §5.13.
+- **An alarm also stays quiet on a day whose times had to be projected from another latitude**,
+  unless the user turns *that* off. Same treatment: it arrives on time, in the shade, and
+  additionally carries the "Approximate time" marking. The switch appears only for users whose
+  own location produces such days, so almost nobody ever sees it. See §5.14.
 - **What actually carries an alarm through Do Not Disturb is `USAGE_ALARM` on the channel
   plus `CATEGORY_ALARM` on the notification**, not `setBypassDnd(true)`. That call is a
   no-op without notification policy access, which this app does not ask for: read the
@@ -696,6 +711,50 @@ separate opt-in on the Settings screen, and `getRingerMode()` is the question th
 actually answered with the volume keys. Note also that `getRingerMode()` returns the
 *external* mode, which can diverge from the internal one after a ringer change made while DND
 is active — it is the right API to ask about the ringer and the wrong one to ask about DND.
+
+### 5.14 An alarm does not ring for a time the app had to borrow (A10, decided 2 Aug 2026)
+
+`alarmOnApproximateDays`, **off by default**. When a day's times had to be projected from
+another latitude — `DayPrayerTimes.approximatedFrom != null`, which in practice means above
+the polar circles — an Alarm-style alert is posted on the quiet channel instead. As in 5.13,
+the alert still arrives, on time, in the shade, as a heads-up, and still carrying the
+"Approximate time" marking. Only the sound is dropped.
+
+**The reasoning.** Above the polar circles the sun does not always rise or set, so there is
+no true Fajr or Isha to calculate and the app borrows both from a lower latitude under a
+published ruling (§5.5a). That is a defensible answer, not a guess — but it is a *borrowed*
+answer, and mosques in the same town follow different ones. A notification states such a time
+and marks it approximate. An alarm asserts it hard enough to wake someone at two in the
+morning, on a number the app is simultaneously telling them to check with their mosque.
+
+**The switch is not decoration, and this is the part that must not be removed.** At Tromsø
+every day from late May to late July is projected. Without an override, a user who had set a
+Fajr alarm would find it silently stop working for two months of the year — and the only way
+to discover that is to not be woken by it. That is the app settling a religious question on
+the user's behalf, which is exactly the objection that got auto-switching the calculation
+method rejected (§11, A2). *Off by default* is a judgement about which way to be wrong.
+*No switch at all* would be a different thing entirely.
+
+**Who sees the switch.** Only users whose own location produces such days.
+`SettingsScreen.hasApproximateDays` sweeps a full 366 days through the engine and asks it
+directly, rather than testing a latitude against a threshold. A threshold would have to be
+method-dependent — the reference latitude is 45 under the Islamic Fiqh Council and 60 under
+Moonsighting Committee — and it would be one `abs()` away from being wrong in the Southern
+Hemisphere. The sweep is a few milliseconds behind a `remember`, computed only while the
+dialog is open. ponytail: no constant to keep in step, no physical claim to pin with a test.
+
+**Deliberately not synced to the watch.** Unlike `adjustments` and `hijriOffsetDays`, which
+change the *times* and therefore have to reach both modules, this one changes only how an
+alert sounds — and the watch module schedules no alarms and posts no prayer alerts at all
+(no `AlarmManager`, no `AlertStyle`, nothing calling `postPrayerAlert`). Adding it to
+`WatchSyncContract` would ship a key nothing reads. If the watch ever gains its own alerts,
+this is the setting to carry across, and this paragraph is why it was not there already.
+
+**The order of the two downgrades matters and is deliberate.** `effectiveAlertStyle` checks
+the projected case *before* the ringer, so the AudioManager read is skipped whenever the
+cheaper answer already settles it — this runs on a receiver that has just been woken from
+Doze. Neither path can ever turn a Notification *into* an Alarm; both are downgrades only,
+and `AlertStyleDowngradeTest` sweeps all sixteen flag combinations to keep it that way.
 
 ---
 
@@ -3070,8 +3129,90 @@ a notification is read in one glance on a lock screen and burying the prayer beh
 helps nobody. The tile uses a separate string, "About 05:12 · in 2h" rather than a tilde, so
 a screen reader says the word instead of skipping the symbol.
 
-Whether a projected time should fire an alarm at all is still **A10**, and still a religious
-question rather than an engineering one. Marking it is not the same as answering it.
+Whether a projected time should fire an alarm at all was **A10**, and it has since been
+decided and built — quiet by default, with an override, offered only to the users it can
+apply to. The rule is §5.14 and the evidence is below.
+
+### A projected time no longer rings, and the switch that keeps that honest (2 Aug 2026)
+
+Marking a time as approximate and then shouting it at 2 am are not consistent with each
+other, and that inconsistency is what A10 was really about. The decision taken: an Alarm on a
+projected day posts on the quiet channel — still on time, still in the shade, still marked —
+and `alarmOnApproximateDays` turns ringing back on for anyone who wants it.
+
+**The switch was not in the original recommendation, and reading the code is what added it.**
+`approximatedFrom` is a whole-day property, and above the polar circles *every* day in the
+polar season is projected. At Tromsø that is late May to late July. So a downgrade with no
+override would not be a small caveat on a rare day — it would silently disable a user's Fajr
+alarm for two months a year, discoverable only by not being woken by it. Recorded because the
+recommendation looked complete before that was checked, and was not.
+
+**Where the switch is offered, and the measurement that fixed the first attempt.**
+`hasApproximateDays` sweeps 366 days through the engine rather than testing latitude against
+a threshold. Both alternatives were tried on paper and dropped: a threshold has to be
+method-dependent (45 under the Islamic Fiqh Council, 60 under Moonsighting), and a
+two-solstice probe assumes the worst day of the year is a solstice — *nearly* true, and not
+worth asserting when the exact answer costs a few milliseconds behind a `remember`.
+
+The boundary was then measured, and one case in the test was written into the wrong bucket:
+
+| Place | Latitude | Offered the switch? |
+|---|---|---|
+| Makkah, Karachi, Jakarta, London, Cape Town | 21°N to 51°N, 6°S to 34°S | No |
+| **Ushuaia** | **54.8°S** | **No** — see below |
+| Tromsø | 69.7°N | Yes |
+| Longyearbyen | 78.2°N | Yes |
+| McMurdo Station | 77.9°S | Yes |
+
+**Ushuaia is the useful row.** It is the southernmost city on earth and reads as an extreme
+case, so it was written on the "shown" side — and the test failed. At 54.8°S it is *below*
+the Antarctic Circle, the sun rises and sets there every day of the year, and it needs this
+switch no more than London does. It is kept in the test on the hidden side precisely because
+it is the case that looks like it belongs on the other one. The southern polar case is now
+McMurdo, which is genuinely inside the circle.
+
+Pinned by `AlertStyleDowngradeTest`: the two downgrade reasons, the override, the interaction
+between them, all sixteen flag combinations proving a Notification is never *upgraded* to an
+Alarm, that the ringer is not read when the cheaper check already settles it, and that the
+sweep finds the polar season starting from any month of the year.
+
+**Verified on the emulator at a real polar location, all five paths.** The app was cleared and
+walked from first run with the city typed as *Longyearbyen* (78.22°N), on 2 August 2026 — a
+date still inside Svalbard's polar day, so every time on the screen is projected:
+
+| Path | Result |
+|---|---|
+| Longyearbyen, no alarm set | Polar notice shows its base text only. The alarm sentence is correctly withheld from a user it does not describe |
+| Longyearbyen, Fajr set to Alarm | **"Ring on approximate days" appears** in the alerts dialog, below "Stay quiet when your phone is silent", switched **off** |
+| Same, back on home | Polar notice **gains** the second paragraph: *"On these days your alarms arrive as quiet notifications instead of ringing…"* |
+| Switch turned **on** | The alarm paragraph **disappears** from the notice, base text intact. The notice describes the behaviour in force, not the behaviour in general |
+| Location changed to Slough (51.5°N), Fajr still Alarm | **The row is gone.** "Stay quiet when your phone is silent" is still there, which is what proves the disappearance is the latitude test and not the whole block collapsing |
+
+The disclaimer was read on screen in the same walk: the new "Match your mosque" sentence is
+in the mosque-disagreement paragraph where it belongs, and the dua request is still the last
+thing on the page. The About screen reads **1.1.1**.
+
+**Checked right-to-left, because it is a layout change** (CLAUDE.md hard rule). The whole
+walk was repeated in the `rtl` build, again at Longyearbyen. The new switch mirrors like its
+neighbour — control on the left, label and body right-aligned, chips reversed to
+Alarm | Notification | Off — and wraps to six lines without clipping. The polar notice card
+now carries two paragraphs and still mirrors correctly, warning icon on the right, scrolling
+rather than overflowing. The trailing-full-stop artefacts (`.follows`, `.turn this on`) are
+the documented `ar-XB` behaviour with English words, not a defect.
+
+**A note for whoever runs this next.** `./gradlew installRtl` fails outright while the Xiaomi
+and the watch emulator are attached: it installs to *every* connected device, so it collects
+`INSTALL_FAILED_USER_RESTRICTED` from HyperOS and `INSTALL_FAILED_UPDATE_INCOMPATIBLE` from
+the watch, and reports a red build for a variant that built perfectly. Install the APK it
+already produced directly instead:
+
+```bash
+adb -s emulator-5554 install -r app/build/outputs/apk/rtl/app-rtl.apk
+```
+
+**Not verified.** The alarm has not been watched *firing* quietly on a projected day — that
+needs an overnight run at a polar location and was not done. None of this has run on the
+Xiaomi, which still refuses the sideload.
 
 ## 11. ⚠️ Still pending — the honest list
 
@@ -3440,6 +3581,14 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   keep MWL as the default but stop deriving it from sect, and say on screen which method is
   in use. Not started.
 
+  **DEFERRED, 2 Aug 2026, and deliberately so.** The logic is still right and nothing here is
+  withdrawn. What changed is that the user-facing symptom it was raised to fix — a northern
+  user stuck on a method their mosque does not use — is now addressed by the latitude-
+  triggered `MethodBanner` (A2, shipped) and by "Match your mosque" (§5.14 sits beside it).
+  What remains is an internal tidiness argument, and it costs every user an extra onboarding
+  question to settle. Revisit if a tester reports being confused by the derivation itself,
+  which no tester has.
+
 - **A2 — A one-time notice above 45° absolute latitude.** Measured, and 45 is the right number:
   the worst-case spread between mainstream methods crosses an hour there, and −45° mirrors +45°
   exactly, so the trigger must use `abs(latitude)`. A notice informs without choosing, which
@@ -3451,12 +3600,24 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   choice visible to users who never open Settings and never read the disclaimer, which is most
   of them. Not started.
 
+  **DEFERRED, 2 Aug 2026 — largely superseded.** The `MethodBanner` already puts the question
+  in front of the users the method actually matters to, and does it with a sentence rather
+  than an abbreviation. A permanent "Calculation: MWL" line would add jargon to the home
+  screen of every user worldwide to serve the same case less well. If it comes back, it
+  should come back as a full method *name* on the Times screen, not a code.
+
 - **A4 — Whether `HighLatitudeRule` should be a user setting.** It is inert for Moonsighting
   (§10) but decisive for the plain angle methods, where the three options are three different
   religious approximations. Wifaqul Ulama's own published deliberation declined to name a
   single agreed rule for Britain, so there is genuine plurality here and the app currently
   picks one silently. *Against:* it is the most jargon-heavy setting imaginable and would
   bewilder the majority to serve a minority. Not started.
+
+  **DEFERRED, 2 Aug 2026.** Unchanged on the merits — this is a real plurality the app resolves
+  silently. But it is the single most jargon-heavy setting the app could ship, and "Match your
+  mosque" now lets an affected user reach the same *outcome* by matching a printed timetable
+  without having to hold an opinion about the rule. Absorbing a difference is not the same as
+  understanding it; it is, however, what the user actually wanted.
 
 - **A5 — adhan's 55° Moonsighting clamp is not hemisphere-symmetric.** Confirmed in bytecode
   and on the numbers: at +56° on 21 June Fajr sits 55 minutes before sunrise; at −56° on
@@ -3473,6 +3634,13 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   quote it as verified. Likewise the claim that London Unified is *not* a fixed 12°/12°
   timetable but Khalid Shaukat's seasonal model: plausible, unverified here, and it needs the
   authority's own document before anything is built on it.
+
+  **DEFERRED, 2 Aug 2026, on the evidence rather than the priority.** Morocco is a genuine gap
+  and a large one. Wifaqul is not addable at all until someone reads their own published
+  document — the 98-minute figure is a reviewer's, unchecked here, and the claim that London
+  Unified is a seasonal model rather than a fixed 12°/12° timetable is likewise unverified.
+  Adding a method profile from a second-hand number is exactly the mistake this project has
+  spent two days not making. Morocco can go in whenever someone wants it; Wifaqul cannot.
 
 - **A7 — The Moonsighting option must not be sold as "the UK method".** It is what the two
   Slough mosques and London Unified use, and that is all we have measured. Two mosques in one
@@ -3545,9 +3713,26 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   4:43 am on days the sun does not rise. Under-describing an approximation is the same class
   of error as not mentioning it.
 
-  **Still open:** the notification and the watch tile carry no marking, and the alarm
-  question — whether a projected time should fire an alarm at all — is untouched and remains
-  a decision rather than a task.
+  **The notification and watch-tile half is DONE, 2 Aug 2026** — see §10, "The two surfaces
+  that never marked an approximated time".
+
+  **The alarm question is DECIDED and BUILT, 2 Aug 2026 (owner's call, taken).** A projected
+  time posts on the quiet channel by default and does not ring; the user can turn ringing
+  back on, and only users who actually have such days are offered the switch. The full rule,
+  the reasoning, and the part that must not be removed are in **§5.14**.
+
+  Two of the three options listed above were therefore rejected, and the reasons belong here
+  so they are not re-proposed as fresh ideas:
+
+  | Option | Verdict |
+  |---|---|
+  | Suppress projected alarms outright, no override | **Rejected.** At Tromsø that silently disables a Fajr alarm for two months a year, discoverable only by not being woken. Being wrong in the safe direction is a default; removing the user's say is a different thing |
+  | A one-time confirmation before projected alarms are first scheduled | **Rejected.** It asks the question months before it applies, at the moment the user is doing something else, and answers it for a season they cannot picture. The polar notice already asks it on the day it is true |
+  | Per-prayer "estimated" marker carried everywhere | **Superseded, and no longer needed for this.** Every surface now marks the day. Per-*prayer* provenance remains a genuine open item, but only for the mixed-day work below — not for the alarm |
+
+  **What is still open under A10** is the original mixed-day question: on a polar-day date,
+  Dhuhr and Asr are genuinely local and correct while Fajr and Isha are estimated, and the
+  engine currently replaces all six. Unchanged by today's work, and still worth doing.
 
 - **A11 — Ramadan wording for Fajr, rather than changing the default angle.** One reviewer
   argued the worldwide default should err early (19.5°–20°) on precautionary grounds. The
@@ -3556,6 +3741,13 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   of the Fajr prayer itself. So keep 18°, but during Ramadan say plainly that local and
   national timetables may begin Fajr earlier and should be confirmed. Do **not** silently add
   an imsak margin — that is another convention and another religious choice.
+
+  **DEFERRED by the owner, 2 Aug 2026, and the reason is scope rather than doubt.** His words:
+  *"we are right now targetting users for the purpose of salah / namaaz hence trying to keep
+  ourselves safe for now."* Suhoor and imsak are a fasting question sitting next to a prayer
+  app, and the app does not currently claim that ground. The analysis above stands and should
+  be picked up before the first Ramadan the app is live for — not because it is wrong, but
+  because that is when a silent omission starts costing something.
 
 - **A12 — Moonsighting's 60° slide is not applied between 60° and 65.7°.** Moonsighting say
   they slide Fajr and Isha down to 60° above 60°. Neither adhan nor the PHP library behind
@@ -4746,6 +4938,31 @@ matters more than the stable hashes, that is the trade being made.
     contradiction was in the reading, not only in the source. When a published rule appears
     to contradict itself, re-read the whole passage for a guard clause before concluding the
     body is doing something undocumented.
+
+79. **A safe-looking default can disable a feature for a season, and the scope is in the data
+    model rather than the diff.** "A projected time should not ring" reads like a caveat on a
+    rare day. `approximatedFrom` is a property of the *whole day*, and above the polar circles
+    every day in the polar season is projected — so at Tromsø the same one-line rule silently
+    removes a user's Fajr alarm from late May to late July, discoverable only by not being
+    woken by it. The rule was right and shipped; what was missing was the override beside it.
+    Before defaulting a behaviour off, ask how long it stays off for the worst-affected user.
+    If the answer is "two months", it needs a switch, however sound the default.
+
+80. **A place that reads as extreme is not evidence about latitude.** Ushuaia was written into
+    the "shows the polar switch" side of a test because it is the southernmost city on earth,
+    and the test failed. At 54.8°S it is below the Antarctic Circle, the sun rises and sets
+    every day of the year, and it needs the switch no more than London does — the genuine
+    southern case is McMurdo at 77.9°S. It is kept on the hidden side of that test precisely
+    because it is the row that looks like it belongs on the other one. Reputation is not a
+    coordinate; put the number in the test and let it answer.
+
+81. **`installRtl` reports a red build for a variant that compiled perfectly, and the cause is
+    the other devices.** It installs to *every* attached device, so with the Xiaomi and the
+    watch emulator plugged in it collects `INSTALL_FAILED_USER_RESTRICTED` from HyperOS and
+    `INSTALL_FAILED_UPDATE_INCOMPATIBLE` from the watch, and fails. The APK is already sitting
+    in `app/build/outputs/apk/rtl/`; install it to one device with `adb -s`. Read which task
+    failed before believing the variant is broken — this is the same shape as the "missing"
+    banner that had only scrolled off screen (lesson 51).
 
 
 ---

@@ -225,9 +225,13 @@ than a confident wrong one, and it is the same answer for every other source of 
 1. **Check the opt-in count is still ≥ 12.** It is the only thing that can silently cost the
    fortnight, and Play will not tell you. Ask the testers directly if there is no other way.
 2. **Upload the fixed build to the closed track** (§3 — the requirement tracks opt-in, not
-   builds; and the defect it fixes is itself a reason to uninstall). Bump `versionCode` to 3.
+   builds; and the defect it fixes is itself a reason to uninstall). ~~Bump `versionCode`
+   to 3.~~ **Done, 2 Aug 2026: the repo is now `versionCode` 3 / `versionName` 1.1.1**, on
+   both modules' `versionName` so one release never shows a user two version numbers. The
+   watch's `versionCode` stays in its own 1000+ lane.
    Retake the store screenshots **as part of that same change**, in the order build → capture
-   → upload.
+   → upload. Screenshots are still outstanding and belong at upload time, not before — see
+   `docs/RELEASING.md`.
 3. **Tell the testers a fix has landed and to update.** This is the one action that addresses
    the community concern in §3 directly.
 4. **When the 14 days complete, apply for production.** Expect a further review, days rather
@@ -241,9 +245,12 @@ than a confident wrong one, and it is the same answer for every other source of 
 | | Decision | Recommendation |
 |---|---|---|
 | **A14** | Switch to `USE_EXACT_ALARM`, which removes the permission prompt entirely — Muslim Pro does exactly this on the owner's own phone | **Not before production — re-verified against the policy page on 2 Aug, not assumed.** Google names exactly two qualifying categories, quoted: *"The app is an alarm or timer app"* and *"The app is a calendar app that shows event notifications."* A prayer-times app is neither, and the stated consequence for apps outside them is that they *"will be disallowed from publishing on Google Play."* Google's own remedy for anything else is the permission the app already uses: *"you should evaluate if using `SCHEDULE_EXACT_ALARM` as an alternative is an option."* Muslim Pro passing review is evidence it can pass, not proof we would. Revisit once live, when a rejection costs a version rather than the launch |
-| **A1** | Stop deriving calculation method from sect | Open |
-| **A10** | Should a projected time fire an alarm at all? | Open — a genuine religious question, not an engineering one |
-| **A11** | Ramadan wording for Fajr | Open |
+| **A10** | Should a projected time fire an alarm at all? | **DECIDED and BUILT, 2 Aug.** No — it posts quietly and marked, with a switch to turn ringing back on, offered only to users whose location actually produces such days. The switch is not optional garnish: without it a Tromsø user's Fajr alarm silently stops working for two months a year. Rule in HANDOVER §5.14, device evidence in §10 |
+| **A1** | Stop deriving calculation method from sect | **Deferred.** Still right on the logic, but the symptom is now covered by the latitude banner and by "Match your mosque"; what is left costs every user an onboarding question to settle an internal tidiness point |
+| **A11** | Ramadan wording for Fajr | **Deferred by the owner** — suhoor and imsak are a fasting question, and the app is deliberately staying on salah for now. Revisit before the app's first live Ramadan |
+| **A3** | Show the active method on the home screen | **Deferred — largely superseded** by the latitude banner, which asks the question in a sentence rather than an abbreviation |
+| **A4** | `HighLatitudeRule` as a user setting | **Deferred.** The most jargon-heavy setting the app could ship, and "Match your mosque" now reaches the same outcome without requiring an opinion about the rule |
+| **A6** | Add Morocco and a Wifaqul Ulama profile | **Deferred on evidence.** Morocco is addable whenever wanted; Wifaqul is not, until someone reads the authority's own published document rather than a reviewer's summary |
 
 ---
 

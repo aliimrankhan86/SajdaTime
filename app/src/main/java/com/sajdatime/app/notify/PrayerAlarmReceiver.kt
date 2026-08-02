@@ -41,6 +41,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         alarmSoundUri = settings.alarmSoundUri,
                         respectSilent = settings.alarmRespectsSilent,
                         approximate = settings.isApproximateOn(at),
+                        alarmOnApproximate = settings.alarmOnApproximateDays,
                     )
                 }
                 // Chain the next horizon and refresh the badge while we are already awake.

@@ -28,8 +28,13 @@ android {
         applicationId = "com.sajdatime.app"
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.1.0"
+        // 3 is the build that goes to the closed track carrying the Dhuhr fix. Google's
+        // production-access rule counts tester opt-in days and says nothing about uploads
+        // (PRODUCTION_READINESS §3), and the defect this replaces can silently skip a
+        // prayer — which is itself a reason to uninstall, and uninstalling *is* what
+        // resets the fortnight.
+        versionCode = 3
+        versionName = "1.1.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

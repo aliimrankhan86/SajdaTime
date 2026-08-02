@@ -440,9 +440,16 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
 private fun PolarBanner(state: UiState) {
     val from = state.today?.approximatedFrom ?: return
     Spacer(Modifier.height(12.dp))
+    // The alarm sentence is added only when it is both true and about to matter: the user
+    // has set at least one alarm, and has not already turned the override on. Without it the
+    // only way to learn that today's alarms will not ring is to not be woken by one. With it
+    // shown to everyone, most polar users would read a paragraph about a feature they never
+    // enabled. See AppSettings.alarmOnApproximateDays.
+    val quietened = state.settings.usesAlarm && !state.settings.alarmOnApproximateDays
     NoticeCard(
         title = stringResource(R.string.polar_notice_title),
-        body = stringResource(R.string.polar_notice_body, from.toInt()),
+        body = stringResource(R.string.polar_notice_body, from.toInt()) +
+            if (quietened) "\n\n" + stringResource(R.string.polar_notice_alarm) else "",
     )
 }
 

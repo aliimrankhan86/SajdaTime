@@ -122,6 +122,7 @@ class MainActivity : ComponentActivity() {
                             onResetAdjustments = viewModel::resetAdjustments,
                             onSetOngoingBadge = viewModel::setOngoingBadge,
                             onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
+                            onSetAlarmOnApproximateDays = viewModel::setAlarmOnApproximateDays,
                             onPickAlarmSound = {
                                 openAlarmSoundPicker(state.settings.alarmSoundUri)
                             },

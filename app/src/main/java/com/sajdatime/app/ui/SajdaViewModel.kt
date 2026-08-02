@@ -206,6 +206,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setAlarmRespectsSilent(respects: Boolean) =
         viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
 
+    fun setAlarmOnApproximateDays(allowed: Boolean) =
+        viewModelScope.launch { settingsRepository.setAlarmOnApproximateDays(allowed) }
+
     fun dismissExactAlarmNotice() =
         viewModelScope.launch { settingsRepository.dismissExactAlarmNotice() }
 

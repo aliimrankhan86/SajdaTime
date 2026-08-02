@@ -72,7 +72,7 @@
       from Settings, so it stays available without ever being repeated unprompted.
       Do not remove the last paragraph.
     -->
-    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. It is your choice to make.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nI am not a Mufti, Aalim, or an expert in fiqh. This app was built with the help of artificial intelligence, and it may get things wrong.\n\nIf a time or a direction looks off, or if you are unsure, please check with your local mosque or someone qualified to advise you.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. It is your choice to make.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
     <string name="home_next_prayer">NEXT PRAYER</string>
@@ -114,6 +114,14 @@
       disagreement, and sending the user to their own mosque is the honest answer.
     -->
     <string name="polar_notice_body">This far from the equator the sun does not always rise or set, so there is no true Fajr or Isha to calculate. These times are worked out from latitude %1$d° instead. Mosques here handle it in different ways, so ask yours what it follows.</string>
+    <!--
+      Appended to polar_notice_body, and only for a user who has actually set an alarm and
+      has not already overridden the default. It explains a change they would otherwise
+      discover by not being woken, which is the worst way to discover anything in this app.
+      Withheld from users with no alarms because for them it describes nothing.
+      See HomeScreen.PolarBanner and AppSettings.alarmOnApproximateDays.
+    -->
+    <string name="polar_notice_alarm">On these days your alarms arrive as quiet notifications instead of ringing, because the app cannot vouch for the exact minute. Turn on “Ring on approximate days” in Settings if you would rather be woken anyway.</string>
     <string name="home_no_location">Set your location to see prayer times.</string>
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
@@ -341,4 +349,12 @@
          above the polar circles. Kept out of the alert's own words on purpose: see
          Notifications.markIfApproximate. -->
     <string name="notif_approximate">Approximate time</string>
+    <!--
+      Shown only to users whose own location produces days the app has to approximate — in
+      practice, above the polar circles. "Approximate" is deliberately the same word as
+      notif_approximate and polar_notice_title, so all three read as one idea rather than
+      three unrelated features.
+    -->
+    <string name="settings_alarm_on_approximate">Ring on approximate days</string>
+    <string name="settings_alarm_on_approximate_desc">When the sun does not rise or set, times are worked out from a lower latitude. Alarms stay quiet on those days unless you turn this on.</string>
 </resources>

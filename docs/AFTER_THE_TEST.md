@@ -431,18 +431,45 @@ In order. Nothing here needs a decision from you except where it says so.
    Google say the review *"usually takes 7 days or less"*.
 7. While waiting, do **not** push another build unless something is broken.
 
-**Decisions that are yours, not an agent's**
+**Decisions that were yours — settled on 2 Aug 2026**
 
-8. Fix 1 — whether to add the one-time note above ~45° latitude (`HANDOVER.md` §11, A2).
-9. Whether to decouple sect from calculation method (A1) and show the active method on the
-   home screen (A3).
-10. Whether the watch should carry the far-north notice too (A8) — it currently does not.
-11. Whether to build per-prayer provenance (A10) and the Moonsighting 60°-slide gap (A12).
-    These two share the same machinery and should be done together or not at all.
+You said *"lets go with your recommendation"*, so these are now decided and written down. If a
+later session proposes reopening one, the reasoning is in `HANDOVER.md` §11.
+
+8. ~~The one-time note above ~45° latitude (A2).~~ **Built and shipped.**
+9. **Alarms on far-north days (A10) — decided and built.** On days the app has to work the
+   times out from a lower latitude, an alarm now arrives as a quiet notification instead of
+   ringing. It still comes on time and still says the time is approximate; it just does not
+   wake anyone for a minute the app cannot vouch for.
+
+   **There is a switch, and the switch matters more than the rule.** In a place like Tromsø
+   *every* day from late May to late July is worked out that way, so without a way to turn
+   ringing back on, someone's Fajr alarm would quietly stop working for two months a year —
+   and they would only find out by not waking up. So: quiet by default, one switch to turn it
+   back on, and the switch is only shown to people whose own town actually has such days.
+   Nobody in Britain, Pakistan, Indonesia or anywhere near the equator ever sees it.
+10. **Sect and calculation method (A1), the method on the home screen (A3), the high-latitude
+    rule as a setting (A4), Morocco and Wifaqul Ulama (A6) — all deferred, on purpose.** The
+    problem each was raised to solve is now handled by the far-north note and by "Match your
+    mosque". What is left of them would add settings and questions for everyone in order to
+    tidy something most users will never notice. Morocco can be added any time someone wants
+    it; Wifaqul cannot, because we would be copying a number from a review rather than from
+    the authority's own document, and this project does not do that.
+11. **Ramadan wording for Fajr (A11) — deferred, in your words**: we are aiming at salah for
+    now, and suhoor is a fasting question. Worth picking up before the first Ramadan the app
+    is live for.
+12. **The exact-alarm permission (A14) — not before production.** Google names exactly two
+    kinds of app that may use it, an alarm/timer app and a calendar app, and says everything
+    else *"will be disallowed from publishing on Google Play"*. Muslim Pro getting away with
+    it proves it can pass, not that we would. Once the app is live, a rejection costs a
+    version instead of the launch, and it can be tried properly then.
+13. **Still genuinely open:** whether the watch should carry the far-north notice too (A8), and
+    the Moonsighting 60°-slide gap (A12) — which is not a decision at all, but a wait: it
+    needs one real published timetable for 60–66°N in June before anything can be built.
 
 **After production is granted**
 
-12. Then, and only then, the Wear OS release.
+14. Then, and only then, the Wear OS release.
 
 ---
 

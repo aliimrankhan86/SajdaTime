@@ -76,6 +76,7 @@ import com.sajdatime.core.Sect
 import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
@@ -84,6 +85,7 @@ import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
+import java.time.LocalDate
 
 /** Which chooser is currently open, if any. Only one can be at a time. */
 private enum class Chooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, DISCLAIMER }
@@ -100,6 +102,7 @@ fun SettingsScreen(
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
+    onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
@@ -284,8 +287,11 @@ fun SettingsScreen(
             alertFor = settings.alertFor,
             alarmSoundUri = settings.alarmSoundUri,
             respectsSilent = settings.alarmRespectsSilent,
+            alarmOnApproximate = settings.alarmOnApproximateDays,
+            hasApproximateDays = rememberHasApproximateDays(settings),
             onSetAlert = onSetAlert,
             onSetRespectsSilent = onSetAlarmRespectsSilent,
+            onSetAlarmOnApproximate = onSetAlarmOnApproximateDays,
             onPickAlarmSound = onPickAlarmSound,
             onDismiss = { open = null },
         )
@@ -448,8 +454,11 @@ private fun AlertsDialog(
     alertFor: Map<PrayerSlot, AlertStyle>,
     alarmSoundUri: String,
     respectsSilent: Boolean,
+    alarmOnApproximate: Boolean,
+    hasApproximateDays: Boolean,
     onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
     onSetRespectsSilent: (Boolean) -> Unit,
+    onSetAlarmOnApproximate: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -487,9 +496,57 @@ private fun AlertsDialog(
                 onCheckedChange = onSetRespectsSilent,
                 horizontalPadding = 0.dp,
             )
+            // Only for the few thousand people on earth this can ever apply to. Everyone
+            // below the polar circles has no approximated days, so the switch would be a
+            // question about astronomy they will never meet — and this app is used by
+            // people who have never opened a settings screen. See rememberHasApproximateDays.
+            if (hasApproximateDays) {
+                SwitchRow(
+                    title = stringResource(R.string.settings_alarm_on_approximate),
+                    subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
+                    checked = alarmOnApproximate,
+                    onCheckedChange = onSetAlarmOnApproximate,
+                    horizontalPadding = 0.dp,
+                )
+            }
         }
     }
 }
+
+/**
+ * Whether this location has any day in the coming year that must be projected from another
+ * latitude — which is the only condition under which the alarm-on-approximate-days switch
+ * means anything.
+ *
+ * A full 365-day sweep rather than a latitude threshold or a solstice probe. Both of those
+ * were considered: a threshold would have to be method-dependent, because the reference
+ * latitude is (45 under the Islamic Fiqh Council, 60 under Moonsighting Committee), and a
+ * two-solstice probe assumes the worst day of the year is a solstice, which is *nearly*
+ * true but not something worth asserting when the exact answer is this cheap. The engine is
+ * pure arithmetic, the sweep is a few milliseconds, it runs behind `remember` keyed on the
+ * only two inputs that can change it, and it is computed only when the dialog is open.
+ *
+ * ponytail: no threshold constant, no test pinning a physical claim, no way to be subtly
+ * wrong at one latitude in one hemisphere. Ask the engine the actual question.
+ */
+@Composable
+private fun rememberHasApproximateDays(settings: AppSettings): Boolean {
+    val coordinates = settings.coordinates
+    val prefs = settings.calculationPrefs
+    return remember(coordinates, prefs) { settings.hasApproximateDays(LocalDate.now()) }
+}
+
+/** The year-long sweep behind [rememberHasApproximateDays], separated so it can be tested. */
+internal fun AppSettings.hasApproximateDays(from: LocalDate): Boolean {
+    val coordinates = coordinates ?: return false
+    return runCatching {
+        PrayerEngine.computeRange(coordinates, from, DAYS_IN_YEAR, calculationPrefs)
+            .any { it.approximated }
+    }.getOrDefault(false)
+}
+
+/** 366, not 365: a leap year must not be the one that hides a day. */
+private const val DAYS_IN_YEAR = 366
 
 /**
  * One prayer, three mutually exclusive answers.
