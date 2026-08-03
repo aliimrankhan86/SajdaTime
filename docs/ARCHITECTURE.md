@@ -240,9 +240,14 @@ A late Fajr notification is worse than a status bar icon, which is why rung 1 is
 for quiet notifications. Onboarding asks for the permission on its last step, and both the
 home and Settings banners link to the system screen while it is missing.
 
-**Not solved by any of this:** App Standby buckets, which are documented to hold a
-Restricted-bucket app to one alarm per day and from which `setAlarmClock` has no documented
-exemption. An iOS port has no equivalent of this problem; an Android reimplementation does.
+**Not solved by any of this — except it turned out to be.** App Standby buckets are
+documented to hold a Restricted-bucket app to one alarm per day, and Google's public pages
+give `setAlarmClock` no exemption. The AOSP implementation does:
+`AlarmManagerService.isExemptFromAppStandby` short-circuits on `a.alarmClock != null`, so
+rung 1 never reaches the bucket branch. Confirmed on a device at bucket 45 (RESTRICTED) with
+the charger exemption off. What buckets still throttle is the app's *jobs* — the daily
+reschedule worker has no such exemption. An iOS port has no equivalent of either problem; an
+Android reimplementation has both. HANDOVER §6.
 
 ### Alert style — chosen per prayer
 

@@ -131,11 +131,25 @@ object PrayerAlarmScheduler {
      * SecurityException — but do not read it as "within the hour" and do not promote it.
      * Evidence in HANDOVER §10, "The overnight A/B at Fajr".
      *
-     * What this does **not** fix, and must not be claimed to: App Standby buckets. Google
-     * documents no exemption from them for `setAlarmClock`, and a Restricted-bucket app is
-     * held to *"One alarm per day, either an exact alarm or an inexact alarm"*. At
-     * targetSdk 34+ SCHEDULE_EXACT_ALARM no longer floors the app at WORKING_SET either —
-     * only USE_EXACT_ALARM does, and this app is not eligible for it. See HANDOVER §10.
+     * App Standby buckets used to be listed here as the thing rung 1 does *not* fix, because
+     * Google's public tables hold a Restricted-bucket app to one alarm per day and document
+     * no exemption for `setAlarmClock`. The implementation says otherwise, and it is worth
+     * knowing which one to trust: `AlarmManagerService.isExemptFromAppStandby` returns true
+     * on `a.alarmClock != null`, so rung 1 never reaches the bucket branch at all. Confirmed
+     * on a device at bucket 45 (RESTRICTED), off charger, `App Standby Parole: false` —
+     * every alarm read `app_standby` in the past and `whenElapsed == maxWhenElapsed`.
+     *
+     * The same check explains rung 3's other weakness: an app without the exact-alarm route
+     * has `FLAG_ALLOW_WHILE_IDLE` swapped for `FLAG_ALLOW_WHILE_IDLE_COMPAT` (the `flags=0x20`
+     * seen in every Xiaomi dump of the old build), and the exemption does not test `_COMPAT`.
+     * So rung 3 *was* bucket-throttled and rung 1 is not — one more reason the ladder starts
+     * where it does.
+     *
+     * Still true, and still the reason USE_EXACT_ALARM keeps coming up: at targetSdk 34+
+     * SCHEDULE_EXACT_ALARM no longer floors the app at WORKING_SET, so it will keep drifting
+     * to RESTRICTED. That now costs the app's *jobs* — DailyRescheduleWorker gets no
+     * alarmClock exemption — rather than its alarms. See HANDOVER §6 and
+     * docs/reviews/2026-08-03-standby-bucket-exemption.md.
      */
     private fun schedule(
         context: Context,

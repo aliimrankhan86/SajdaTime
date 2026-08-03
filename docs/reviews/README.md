@@ -34,7 +34,10 @@ The reason the raw text is kept rather than only the verdict:
 | `2026-08-01-prompt-round2.md` | The follow-up prompt |
 | `2026-08-01-round2-outcome.md` | What round 2 changed, claim by claim |
 | **`2026-08-01-polar-sources.md`** | **Not a review.** The primary sources on high-latitude prayer times, with what each body actually says and which claims failed checking. **Verified.** |
-| **`2026-08-01-android-alarm-facts.md`** | **Not a review either.** What Android and Play actually document about alarm lateness, silent mode, exact-alarm permissions and sheet keyboards. Written from primary sources, then handed to a second pass whose only job was to refute it. **Verified**, including the two claims that did not survive |
+| **`2026-08-01-android-alarm-facts.md`** | **Not a review either.** What Android and Play actually document about alarm lateness, silent mode, exact-alarm permissions and sheet keyboards. Written from primary sources, then handed to a second pass whose only job was to refute it. **Verified**, including the two claims that did not survive. One finding in it has since been *superseded* — see the next row |
+| `2026-08-02-hyperos-fajr-ab.md` | **Raw evidence.** The overnight Fajr A/B on the owner's Xiaomi: the shipped build's alarm never fired, the fixed build's fired at 02:51:00.037 |
+| `2026-08-02-dhuhr-daytime-ab.md` | **Raw evidence.** The same comparison in daylight, which found the silent-loss path the overnight run could not |
+| **`2026-08-03-standby-bucket-exemption.md`** | **Raw evidence.** App Standby buckets do not hold `setAlarmClock` — AOSP source plus a measurement at bucket 45 RESTRICTED, off charger. Supersedes the alarm-facts file's "no documented exemption", and retires a control both A/Bs believed they had |
 
 ## Summary of the outcome
 

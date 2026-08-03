@@ -62,6 +62,28 @@ could find.
 
 ### App Standby buckets — the limit `setAlarmClock` does not escape
 
+> **⚠️ SUPERSEDED 3 Aug 2026. `setAlarmClock` does escape it.** Everything below is still an
+> accurate reading of Google's *published pages*, and the section's own caution — "verified
+> *by absence*, which means 'not documented as rate-limited', not 'documented as exempt'" —
+> was the right call to make from those pages alone. The absence was then checked against
+> the implementation, which is where the answer had been all along:
+>
+> ```java
+> // AlarmManagerService.java, AOSP main
+> static boolean isExemptFromAppStandby(Alarm a) {
+>     return a.alarmClock != null || UserHandle.isCore(a.creatorUid)
+>             || (a.flags & (FLAG_ALLOW_WHILE_IDLE_UNRESTRICTED | FLAG_ALLOW_WHILE_IDLE)) != 0;
+> }
+> ```
+>
+> `a.alarmClock != null` is set by `setAlarmClock()` alone, and the bucket branch —
+> including the Restricted 1/day case tabled below — is never reached for such an alarm.
+> Measured to agree at bucket 45 RESTRICTED with `App Standby Parole: false`. The section's
+> conclusion for **this app** therefore inverts: the shipped ladder is exempt, while the old
+> `setAndAllowWhileIdle` call was not, because its flag is downgraded to
+> `FLAG_ALLOW_WHILE_IDLE_COMPAT`, which the exemption does not test.
+> Full working: `2026-08-03-standby-bucket-exemption.md`.
+
 Verbatim from [power-details](https://developer.android.com/topic/performance/power/power-details):
 
 | Bucket | Alarms |

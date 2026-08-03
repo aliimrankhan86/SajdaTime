@@ -132,6 +132,11 @@ Read it before editing a word of `disclaimer_body`.
   without it a rarely-opened app can drift to Restricted and its documented allowance of
   **one alarm per day**.
 
+  **That last clause weakened on 3 Aug 2026** and the rejection is now easier, not harder:
+  AOSP exempts `setAlarmClock` alarms from bucket throttling outright, so drifting to
+  Restricted no longer costs a prayer alert (§6). The floor still matters for the app's
+  *jobs*, which is a smaller prize than a missed Fajr was.
+
   It is refused on policy, not on engineering. Play names exactly two qualifying categories,
   *"an alarm or timer app"* and *"a calendar app that shows event notifications"*, and the
   penalty for a category claim Google disagrees with is being *"disallowed from publishing"*
@@ -975,13 +980,47 @@ last resort that on some devices means "whenever the phone next wakes", not "wit
 hour". This is the single strongest reason the ladder starts at `setAlarmClock` for **both**
 alert styles.
 
-**What this does not fix, and must not be claimed to.** App Standby buckets. Google
-documents no exemption from them for `setAlarmClock`, and a Restricted-bucket app is held to
-*"One alarm per day, either an exact alarm or an inexact alarm"*. Worse, `SCHEDULE_EXACT_ALARM`
-only floors an app at WORKING_SET when it **targets API 33 or below**; this app targets 36,
-so it has no floor. Only `USE_EXACT_ALARM` gives one, and that permission is Play-gated to
-alarm-clock and calendar apps — see §11 for why it was checked and rejected rather than
-claimed.
+**App Standby buckets — this *was* the open constraint, and it is now closed for the alarm
+itself (3 Aug 2026).** This paragraph used to read "what this does not fix, and must not be
+claimed to", on the honest ground that Google's public
+[power-details](https://developer.android.com/topic/performance/power/power-details) table
+holds a Restricted-bucket app to *"One alarm per day, either an exact alarm or an inexact
+alarm"* and **documents no exemption for `setAlarmClock`**. That caution was right at the
+time and is worth keeping visible, because verified-by-absence is exactly the kind of gap
+that gets read as a guarantee. It has since been settled from AOSP source and on a device:
+
+```java
+// AlarmManagerService.java, AOSP main — fetched 3 Aug 2026
+static boolean isExemptFromAppStandby(Alarm a) {
+    return a.alarmClock != null || UserHandle.isCore(a.creatorUid)
+            || (a.flags & (FLAG_ALLOW_WHILE_IDLE_UNRESTRICTED | FLAG_ALLOW_WHILE_IDLE)) != 0;
+}
+```
+
+`a.alarmClock != null` is what `setAlarmClock()` sets and nothing else does, and
+`adjustDeliveryTimeBasedOnBucketLocked` returns on that check before the bucket branch — the
+1/day RESTRICTED case is unreachable for an alarm-clock alarm. Measured to match, at
+API 36 in bucket **45 (RESTRICTED)**, off charger, with `App Standby Parole: false`: every
+prayer alarm read `app_standby=-2m25s` (in the past, not binding) and
+`whenElapsed == maxWhenElapsed == requester`. Evidence:
+`docs/reviews/2026-08-03-standby-bucket-exemption.md`.
+
+The mirror image is the sharper half. An app reaching `setAndAllowWhileIdle` without the
+exact-alarm route has `FLAG_ALLOW_WHILE_IDLE` **stripped and replaced** with
+`FLAG_ALLOW_WHILE_IDLE_COMPAT` — the `flags=0x20` the shipped v1.1.0 build carried in every
+Xiaomi dump — and `isExemptFromAppStandby` does not test `_COMPAT`. So the old API was
+bucket-throttled and the new one is not. Source-derived, not measured: the old build could
+not be rebuilt to sit beside this one.
+
+**Three things this still does not license.** (1) HyperOS is not AOSP — Xiaomi demonstrably
+patches this service, so the exemption is verified for stock Android and *assumed* on
+HyperOS. (2) `SCHEDULE_EXACT_ALARM` still only floors an app at WORKING_SET when it targets
+API 33 or below; this app targets 36, so it has no floor and will keep drifting to RARE and
+RESTRICTED. That no longer costs the alarm, but it is the same fact §11 rejects
+`USE_EXACT_ALARM` over, and the rejection stands on policy either way. (3) **Jobs are not
+alarms.** `DailyRescheduleWorker` is a WorkManager job with no `alarmClock` exemption; it
+read `WITHIN_QUOTA` in the same state, but that is one snapshot, not a day under sustained
+restriction.
 
 ### Channels — sound is immutable, so channels are versioned
 Android binds sound and importance to the **channel**, not the notification. A channel's
@@ -2753,6 +2792,15 @@ alternative explanation is negative in the policy line above; the **only** bindi
 on the shipped alarm is `power_pending`, and the only difference between the two builds is
 which API scheduled them.
 
+> **One of those controls was inert, and it is worth knowing which (added 3 Aug 2026).**
+> Reading the bucket on both packages did establish they started level, and the conclusion
+> above is unaffected. But `AlarmManagerService` sets `mAppStandbyParole = bm.isCharging()`,
+> and parole short-circuits the bucket adjustment for **every alarm on the device**. Both
+> runs were on a charger, so App Standby was not merely equal, it was switched off. This
+> experiment was about OEM parking and was silent on buckets *by construction*. That gap is
+> now closed separately — see §6 and
+> `docs/reviews/2026-08-03-standby-bucket-exemption.md`.
+
 Xiaomi's own log says the same thing in its own words. `AlarmManager` printed
 **`not align this alarm: Alarm{… com.sajdatime.app.sideload}, reason=6`** eighteen times
 during the window and never once for the shipped package — its alignment engine explicitly
@@ -3956,12 +4004,20 @@ and §6. Platform sourcing in `docs/reviews/2026-08-01-android-alarm-facts.md`.
   alarm could be done together"*. Off / Notification / Alarm, per prayer, in one chooser that
   replaced two.
 
-**Left undone on purpose:** App Standby buckets. At targetSdk 36 `SCHEDULE_EXACT_ALARM` no
-longer floors the app at WORKING_SET, and a Restricted-bucket app is documented as getting
-*one alarm per day*. The only documented fix is `USE_EXACT_ALARM`, which Play gates to
-alarm-clock and calendar apps; claiming that category for a prayer app is arguable, and being
-wrong blocks the release at review. Checked, rejected, and recorded rather than attempted —
-revisit only with a specific reason, and write the outcome into the reviews file.
+**Left undone on purpose — and mostly resolved a day later:** App Standby buckets. At
+targetSdk 36 `SCHEDULE_EXACT_ALARM` no longer floors the app at WORKING_SET, and a
+Restricted-bucket app is *documented* as getting one alarm per day. The only documented fix
+is `USE_EXACT_ALARM`, which Play gates to alarm-clock and calendar apps; claiming that
+category for a prayer app is arguable, and being wrong blocks the release at review.
+Checked, rejected, and recorded rather than attempted.
+
+**On 3 Aug 2026 the alarm half turned out not to need it.** AOSP exempts
+`setAlarmClock` alarms from bucket throttling outright (`a.alarmClock != null` in
+`isExemptFromAppStandby`), measured to match at bucket 45 RESTRICTED off charger. The app
+still has no bucket *floor* and will still drift to RESTRICTED — that part was accurate —
+but the drift no longer costs a prayer alert. `USE_EXACT_ALARM` stays rejected, now for one
+reason instead of two: it is Play-gated, and the engineering argument for it has lost its
+strongest limb. §6 and `docs/reviews/2026-08-03-standby-bucket-exemption.md`.
 
 ### A14 — `USE_EXACT_ALARM` would delete the permission problem, and is deliberately not taken (2 Aug 2026)
 
@@ -4284,6 +4340,21 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
 
    Nothing to do; recorded so the next session does not re-open it. What is *not* settled is
    Samsung — One UI has its own background policy and has not been tested.
+
+   **✅ And the other half — App Standby buckets — settled 3 Aug 2026. `setAlarmClock` is
+   exempt.** This is the constraint §6 had been careful *not* to claim was fixed. AOSP's
+   `isExemptFromAppStandby` returns true on `a.alarmClock != null`, so the bucket branch
+   never runs for these alarms; measured to agree at bucket **45 (RESTRICTED)**, off charger,
+   `App Standby Parole: false`, with every prayer alarm reading `app_standby` in the past and
+   `whenElapsed == maxWhenElapsed`. The same read showed the *old* API was the bucket-bound
+   one, via the `FLAG_ALLOW_WHILE_IDLE_COMPAT` downgrade. §6 and
+   `docs/reviews/2026-08-03-standby-bucket-exemption.md`.
+
+   Two gaps it does not cover, both written down rather than guessed at: HyperOS patches this
+   service (that is what `power_pending` *is*), so the exemption is stock-Android-verified and
+   HyperOS-assumed; and `DailyRescheduleWorker` is a job, not an alarm, so it gets no such
+   exemption — it read `WITHIN_QUOTA` in the same state, which is a snapshot rather than a day
+   under sustained restriction.
 
 1. **One light frame at cold start when the theme is overridden.**
    `android:windowBackground` is a resource, resolved by the system from the *system's*
@@ -5548,6 +5619,27 @@ matters more than the stable hashes, that is the trade being made.
     it was written from the tile's behaviour. **When you close a cross-cutting item, grep for the
     field it depends on and count the call sites.** One `grep` for `approximatedFrom` would have
     found this the day it shipped.
+
+93. **A control can be equal and inert at the same time, and "we held it constant" reads like
+    "we ruled it out" long after anyone remembers the difference.** Both August alarm A/Bs
+    recorded that the two builds sat in the same App Standby bucket, and treated that as the
+    confound eliminated. It was not: `mAppStandbyParole = bm.isCharging()`, and both runs were
+    on a charger, so buckets were switched off device-wide for the entire experiment. The
+    conclusions survived — `power_pending` really was the only binding policy — but the
+    experiments were *silent* on the one constraint §6 was simultaneously warning had not been
+    fixed. **When you record a variable as controlled, write down whether it could have varied.**
+    A variable pinned by the apparatus is not evidence about that variable, and a charger is
+    apparatus.
+
+94. **"Documented as X" and "not documented" are different findings, and the second one decays
+    into the first.** §6 said Google "documents no exemption from buckets for `setAlarmClock`" —
+    scrupulously accurate, explicitly flagged in the reviews file as *verified by absence*. Read
+    a fortnight later it had quietly become "buckets throttle our alarms", which shaped a
+    permission decision and an open-item list. The actual answer was one `grep` away in AOSP:
+    `isExemptFromAppStandby` returns true for `a.alarmClock != null`, and has done for years.
+    **When a finding rests on absence, put the source you would read next to it.** Google's
+    public tables are a summary of `AlarmManagerService`, not a substitute for it, and the file
+    is a single `curl` from `android.googlesource.com`.
 
 
 ---

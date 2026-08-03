@@ -40,3 +40,10 @@ __pycache__/
 # emulators alongside a 4GB daemon did it once — and drops these in the repo root.
 hs_err_pid*.log
 replay_pid*.log
+
+# Knowledge graph built by the `graphify` CLI over this repo. 6MB of generated artefacts
+# (a 1.9MB graph.json and a 1.6MB self-contained graph.html), regenerable in one command,
+# and the cache files inside it hold absolute paths from whichever machine built them.
+# Nothing in it is a source of truth — anything worth keeping gets written into
+# docs/HANDOVER.md by hand, which is where the next session will actually look.
+graphify-out/
