@@ -300,6 +300,31 @@ account can create and publish apps.
 > happened automatically for an app already in the Console. It only needs attention if
 > SajdaTime is ever distributed off Play — an APK on the website, F-Droid, a direct download —
 > in which case that package name has to be registered explicitly.
+>
+> **The stakes, recorded 6 Aug 2026, because "nothing to do" is not the same as "nothing at
+> risk".** Google sends blanket reminder emails about this, and the next one will look
+> alarming to anyone who only has the verdict above and not the numbers behind it:
+>
+> - **Deadline: 30 September 2026.** Play Console help is blunt — *"Effective September 30,
+>   2026, all Play packages must be registered"*, and packages that are not are **removed
+>   from Play globally**. That is the real consequence, and it is worse than the framing in
+>   most coverage, which describes it as an install block in the launch countries.
+> - **Enforcement starts in Brazil, Indonesia, Singapore and Thailand**, across seven stores
+>   (Play, HONOR, OPPO, Galaxy Store, Palm Store, V-Appstore and Xiaomi's GetApps). Global
+>   in 2027.
+> - **Identity verification is not a second step.** Google: *"Your existing verified identity
+>   … meets this requirement."* Ours cleared in July 2026.
+> - **A new app created in the Console registers its package name on creation.** That is why
+>   `com.sajdatime.app` needed no action and why a future app will not either.
+>
+> **ADB is explicitly exempt, and that matters more here than it sounds.** Google:
+> *"Developers and power users can still use Android Debug Bridge (ADB) to build, test, and
+> install modified or unverified apps on their own devices, which remains the standard method
+> for development work."* This whole project's device testing is `adb install` onto the
+> owner's Xiaomi, and `app/build.gradle.kts` creates two package names that exist only for
+> that — `…app.rtl` and `…app.sideload`. **Neither should ever be registered.** They are
+> debug variants that are never distributed, and registering them would put two junk package
+> names on the account permanently for no benefit.
 
 > The device check is worth remembering for any future account: it requires the **Play
 > Console app on a physical Android phone**, and an emulator does not satisfy it. Every
@@ -565,7 +590,7 @@ session "fix" any of them.**
 | The October 2026 "minimum scope" location policy | Applies to `ACCESS_FINE_LOCATION`. We are coarse-only — already the posture that policy is pushing everyone toward. |
 | targetSdk deadline (31 August 2026) | ✅ Compliant. New apps need API 36; we are at 36. Wear needs 35+; we are at 36. |
 | 16 KB page size (mandatory since Nov 2025) | ✅ Automatic. Pure Kotlin, no native code. |
-| Android developer verification (from 30 Sept 2026) | ✅ Nothing to do. Google auto-registers the package when you create the app in Console. |
+| Android developer verification (from 30 Sept 2026) | ✅ Nothing to do — but know the stakes. Google auto-registers the package when you create the app in Console, and the Console confirms ours is registered. An *un*registered package is removed from Play **globally** on 30 Sept 2026, not merely blocked in the launch countries, so re-read the box in Step 1 before dismissing any reminder email as noise. ADB installs are exempt by name, so the `.rtl` and `.sideload` debug variants need nothing and must not be registered. |
 | A religion-specific Play policy | **There isn't one.** Religion appears in Play policy only as a *protected characteristic* — we are a beneficiary of that clause, not a target. No religious declaration, no special content-rating answers. Expect Everyone / PEGI 3. |
 | Being rejected for using AI to write the code | **No such policy exists.** Google's AI-Generated Content policy governs what an app *does at runtime* — chatbots, image generators — not how the source was authored. We ship no generative AI, so it does not apply. There is **no obligation to disclose AI assistance to Google**, and no policy hook for it. (The disclaimer in the app and the listing stays regardless — that is our own honesty commitment to users, not a Play requirement.) |
 | Rejection for a "saturated category" | **That is an Apple rule being mistaken for a Google one.** Play's Repetitive Content policy targets copying a specific app's content, or one developer shipping many near-identical apps. Neither applies. |
