@@ -11,19 +11,31 @@ in order, for someone who wants to know what happens next without reading two th
 **The app is finished and tested. Nothing is half-built.** Everything below is now waiting on
 you, not on code, and most of it happens in one sitting at the Play Console.
 
-**Do these together, in this order, when you have half an hour:**
+**Right now: you have applied for production and Google is reviewing. So the honest answer
+is to do nothing and wait.** That is not me being cautious — there is a specific reason.
 
-1. **Check whether "Apply for production" has unlocked.** Your closed test went live on
-   **31 July**, so the fourteen days were up on **14 August** — that has passed. Whether the
-   button is actually available depends on twelve testers having stayed opted in the whole
-   time, which only the Console can tell you. Worth looking first, because it changes
-   whether the rest is a routine update or the real launch.
-2. **Upload the new version.** It carries the Dhuhr fix, which is quietly costing one prayer
-   alert a day in the version your testers have now.
-3. **Upload the new screenshots** from `docs/store/upload/`, one folder per box. Do it in the
-   *same* sitting as the upload above, so the pictures never show a version nobody has yet.
-4. **Tell your testers to update.** This is the only thing that answers "why has nothing
+> ⚠️ **Do not touch the store listing while a review is open.** That is written into
+> `RELEASING.md` as a rule, and it means **do not upload the new screenshots yet**, even
+> though they are sitting ready. I told you the opposite yesterday — to upload them in the
+> same sitting as the build — and that advice was written before you applied. It is wrong
+> now. They will keep.
+
+**When the decision comes back, then do these together, in this order:**
+
+1. **Build the new version fresh and upload it.** It is `versionCode` 4, `1.2.0` — I bumped
+   it today, and the reason matters: the number had not moved since 2 August, but two weeks
+   of work had landed on it. The old "1.1.1" was just the Dhuhr fix; what you have now also
+   has the calculation-method question at setup, the town name instead of the county, the
+   whole compass redesign, and the buzzing fix. **Do not upload any file you have saved from
+   before** — several old builds are labelled version 3 and they are not this app. Play
+   accepts whatever you hand it, and a wrong upload cannot be taken back without spending
+   another version number.
+2. **Upload the new screenshots** from `docs/store/upload/`, one folder per box.
+3. **Tell your testers to update.** This is the only thing that answers "why has nothing
    changed on my phone".
+
+If production is granted, that build goes to **Production → Create release** rather than the
+closed track, and the closed test can keep running ahead of it as a beta if you want it to.
 
 **Whenever you get to it, no rush:**
 

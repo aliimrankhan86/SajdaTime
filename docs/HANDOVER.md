@@ -12,8 +12,11 @@ business rule, what is verified, what is not, and what is left to do.
   the two sequences can never collide. The watch also ships on a **separate Play release
   track**, not in the phone's release — see `docs/RELEASING.md` Step 7.)
 - **Status:** **live on the Play closed testing track** since 31 Jul 2026, signed by the
-  owner's own key. `versionCode` 2 (1.1.0) is what testers are running; `versionCode` 3
-  (1.1.1) is built and waiting to be uploaded and carries the Dhuhr fix. See §11.
+  owner's own key, and **production access was applied for on 16 Aug 2026** once the
+  fourteen days completed. `versionCode` 2 (1.1.0) is what testers are running.
+  **`versionCode` 4 (1.2.0) is the next upload** and has never been sent to Play — it
+  carries the Dhuhr fix plus everything from 15–16 Aug. `versionCode` 3 was cut on 2 Aug,
+  never uploaded, and superseded; **do not upload any artifact labelled 3.** See §11.
 - **Companion docs:** `docs/ARCHITECTURE.md` (the technical spec, including the exact
   business rules an iOS port must reproduce), `docs/RELEASING.md` (the owner's release
   procedure and the Play rules that cost a fortnight), `docs/NEW-SESSION.md` (how to start
@@ -4285,13 +4288,19 @@ something to do here, the honest answer is that there is nothing in this list fo
 and ask the owner what he wants next rather than inventing work from the "Not done" list
 further down, which is mostly deliberate non-goals.
 
-> ⚠️ **The one item that has quietly become actionable.** P4 was written as "~14 Aug 2026"
-> when it was in the future. The closed test went live **31 Jul 2026**, so the fourteen days
-> elapsed on **14 Aug** — it is now past that. Whether Google has actually unlocked
-> **Apply for production** depends on twelve testers having stayed opted in for the whole
-> window, which is a fact only the Play Console holds and no one here has checked. So: it is
-> worth the owner opening the Console and looking, and it is *not* something this document
-> can claim either way.
+> ✅ **Production access has been applied for — 16 Aug 2026.** The fourteen days completed
+> (test live 31 Jul, day fourteen 14 Aug) and the owner submitted the application with the
+> information Google asked for. **A review is therefore open.**
+>
+> ⚠️ **While that review is open, do not touch the store listing.** `docs/RELEASING.md`
+> states the rule plainly: *do not edit the store listing or any App content answer while
+> one is open.* This corrects advice written in this file on 16 Aug, which told the owner to
+> upload the new screenshots in the same sitting as the build — that was written before the
+> application went in and is wrong now. **The screenshots are ready and must simply wait.**
+>
+> **When the decision comes back**, `RELEASING.md` has the mechanics: once production access
+> exists, the build goes to **Production → Create release**, and the closed track can keep
+> running ahead of it as a beta if that is wanted.
 
 The detail for each item is in the sections that follow.
 
@@ -4299,10 +4308,10 @@ The detail for each item is in the sections that follow.
 
 | | What | When |
 |---|---|---|
-| P1 | **Upload `versionCode` 3 to the closed track.** Built, signed, waiting. It carries the Dhuhr fix, which silently loses one prayer alert a day in the live build | Now. Owner action in the Play Console |
+| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ **Build it fresh from `main`. Never upload a saved `.aab`** — several artifacts exist labelled `versionCode` 3 and they are not the same app; Play takes whichever file it is handed, and a wrong one cannot be corrected without burning another code | Owner action in the Play Console, **after the production review closes** |
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **the capturing is DONE, 16 Aug 2026.** All seven raw captures retaken and `tools/build-store-assets.sh` re-run, so `docs/store/upload/` is current and correct-sized. They were badly stale: the Qibla shot still showed the pre-15 Aug dial (needle *on* the Kaaba, the deleted north wedge, no cardinal letters, no gold, old subtitle order), Times predated the mosque-difference line, Settings said "Greater Manchester" from before the town rule, and the madhab step's button still read *Skip* rather than *Continue*. **What remains is purely the upload**, which is a Play Console action and therefore the owner's — see §10 for what each file now shows | Upload with P1 |
-| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1 |
-| P4 | **Apply for production** when the fourteen days complete. **The window has now passed** — the test went live 31 Jul, so day fourteen was 14 Aug. Whether the button is actually unlocked depends on twelve testers staying opted in throughout, which only the Console can answer | **Check now** |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1, so after the review |
+| P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug) and the owner submitted the application with the information requested. **A review is now open**, which is why P1, P2's upload and P3 all wait | ⏳ Awaiting Google |
 | P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |
 
 **Waiting on the owner — a decision, not a task**

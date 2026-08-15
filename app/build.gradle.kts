@@ -28,13 +28,21 @@ android {
         applicationId = "com.sajdatime.app"
         minSdk = 24
         targetSdk = 36
-        // 3 is the build that goes to the closed track carrying the Dhuhr fix. Google's
-        // production-access rule counts tester opt-in days and says nothing about uploads
-        // (PRODUCTION_READINESS §3), and the defect this replaces can silently skip a
-        // prayer — which is itself a reason to uninstall, and uninstalling *is* what
-        // resets the fortnight.
-        versionCode = 3
-        versionName = "1.1.1"
+        // 4 / 1.2.0, bumped 16 Aug 2026 for the production rollout.
+        //
+        // 3 was cut on 2 Aug as a patch carrying the Dhuhr fix, and was never uploaded.
+        // A fortnight of work then landed on top of that same number without it moving:
+        // the calculation-method step in onboarding (§5.17), the town-not-county place
+        // label (§5.18), the redesigned compass, and the arrival hysteresis that stopped a
+        // resting phone buzzing at itself (§5.9). "1.1.1, the Dhuhr fix" stopped describing
+        // this build some time ago, and a minor bump is what that content is.
+        //
+        // The trap this closes: an .aab labelled versionCode 3 exists from any of those
+        // builds, and they are not the same app. **Never upload a saved artifact — build
+        // fresh from main.** Play accepts whichever file you hand it, so a stale one ships
+        // silently and cannot be corrected without burning another version code.
+        versionCode = 4
+        versionName = "1.2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
