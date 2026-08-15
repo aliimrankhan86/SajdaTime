@@ -4268,11 +4268,32 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 
 ## 11. ⚠️ Still pending — the honest list
 
-### Parked, 2 Aug 2026 — the whole of it, on one screen
+### Parked, 16 Aug 2026 — the whole of it, on one screen
 
-The code work asked for is finished and pushed. Nothing below is half-done; each item is
-either waiting on the calendar, waiting on the owner, or waiting on evidence that does not
-exist yet. Start here, then read the detail in the sections that follow.
+**Read this first, then the tables.** The code work is finished, verified on real hardware,
+committed and pushed. **Nothing is half-built.** Every remaining item is one of three
+things, and it is worth knowing which before picking any of them up:
+
+| | Kind | What that means |
+|---|---|---|
+| P1, P3, P4, P5, and P2's upload | **Owner actions in the Play Console** | An AI cannot do these and should not try. They need his account, and P1 needs the signing key, which `docs/RELEASING.md` puts off-limits to everyone but him |
+| A18 | **Owner action on his own devices** | Assigned 16 Aug; he said he would pair a watch himself |
+| A14, A17, the Britain default | **Waiting on a decision, a person, or evidence** | Not buildable today. A17 needs a human translator, not a model |
+
+**So there is no engineering work outstanding.** If you are a new session looking for
+something to do here, the honest answer is that there is nothing in this list for you — go
+and ask the owner what he wants next rather than inventing work from the "Not done" list
+further down, which is mostly deliberate non-goals.
+
+> ⚠️ **The one item that has quietly become actionable.** P4 was written as "~14 Aug 2026"
+> when it was in the future. The closed test went live **31 Jul 2026**, so the fourteen days
+> elapsed on **14 Aug** — it is now past that. Whether Google has actually unlocked
+> **Apply for production** depends on twelve testers having stayed opted in for the whole
+> window, which is a fact only the Play Console holds and no one here has checked. So: it is
+> worth the owner opening the Console and looking, and it is *not* something this document
+> can claim either way.
+
+The detail for each item is in the sections that follow.
 
 **Waiting on the calendar or on Google — nothing to build**
 
@@ -4281,7 +4302,7 @@ exist yet. Start here, then read the detail in the sections that follow.
 | P1 | **Upload `versionCode` 3 to the closed track.** Built, signed, waiting. It carries the Dhuhr fix, which silently loses one prayer alert a day in the live build | Now. Owner action in the Play Console |
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **the capturing is DONE, 16 Aug 2026.** All seven raw captures retaken and `tools/build-store-assets.sh` re-run, so `docs/store/upload/` is current and correct-sized. They were badly stale: the Qibla shot still showed the pre-15 Aug dial (needle *on* the Kaaba, the deleted north wedge, no cardinal letters, no gold, old subtitle order), Times predated the mosque-difference line, Settings said "Greater Manchester" from before the town rule, and the madhab step's button still read *Skip* rather than *Continue*. **What remains is purely the upload**, which is a Play Console action and therefore the owner's — see §10 for what each file now shows | Upload with P1 |
 | P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1 |
-| P4 | **Apply for production** when the fourteen days complete | ~14 Aug 2026 |
+| P4 | **Apply for production** when the fourteen days complete. **The window has now passed** — the test went live 31 Jul, so day fourteen was 14 Aug. Whether the button is actually unlocked depends on twelve testers staying opted in throughout, which only the Console can answer | **Check now** |
 | P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |
 
 **Waiting on the owner — a decision, not a task**

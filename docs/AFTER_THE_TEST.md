@@ -6,6 +6,43 @@ in order, for someone who wants to know what happens next without reading two th
 
 ---
 
+## 📌 Where things stand, 16 Aug 2026 — the parking note
+
+**The app is finished and tested. Nothing is half-built.** Everything below is now waiting on
+you, not on code, and most of it happens in one sitting at the Play Console.
+
+**Do these together, in this order, when you have half an hour:**
+
+1. **Check whether "Apply for production" has unlocked.** Your closed test went live on
+   **31 July**, so the fourteen days were up on **14 August** — that has passed. Whether the
+   button is actually available depends on twelve testers having stayed opted in the whole
+   time, which only the Console can tell you. Worth looking first, because it changes
+   whether the rest is a routine update or the real launch.
+2. **Upload the new version.** It carries the Dhuhr fix, which is quietly costing one prayer
+   alert a day in the version your testers have now.
+3. **Upload the new screenshots** from `docs/store/upload/`, one folder per box. Do it in the
+   *same* sitting as the upload above, so the pictures never show a version nobody has yet.
+4. **Tell your testers to update.** This is the only thing that answers "why has nothing
+   changed on my phone".
+
+**Whenever you get to it, no rush:**
+
+- **Pair a watch and compare Asr.** The one-minute check is written out further down, under
+  *"The one-minute check, for when you have paired a watch"*. Just tell me "same" or
+  "different".
+
+**Not yours, and not urgent — for the record:**
+
+- **Translation.** Everything mechanical is built and waiting; the blocker is finding a
+  native speaker to review each language. Prayer and madhab names are religious content, so
+  they are never machine-translated. Nothing happens here until you decide to commission it.
+- **The Wear OS store listing** comes after the phone app is live on production, not before.
+
+**What I would not touch.** There is a list further down of things deliberately *not* built —
+no widget, no tablet layout, no bundled adhan audio. Those are decisions, not gaps.
+
+---
+
 ## 15 Aug 2026 — "The times still do not match my mosque", and what I did about it
 
 You brought a four-part plan written with another AI. Here is what happened to each part, in
