@@ -4260,6 +4260,7 @@ exist yet. Start here, then read the detail in the sections that follow.
 |---|---|---|
 | A14 | `USE_EXACT_ALARM` | **Not before production.** Re-verified against Google's policy page, not assumed. Revisit once live, when a rejection costs a version rather than the launch |
 | A8 | ~~Should the watch carry the far-north notice?~~ | **CLOSED 2 Aug.** Not a judgement call in the end — the watch app was not marking approximated times at all, which breaks `DayPrayerTimes`' own contract. It now carries one line above the times. §10 |
+| A18 | **Pair a watch and prove the settings sync** | **Assigned to the owner, 16 Aug 2026 — he said he will do it himself.** It needs "Wear OS by Google" on the S23 Ultra signed into his account, which is not an AI's to touch. **When he says it is done, the check is one line and takes a minute:** set the phone to **Hanafi**, open the watch, and compare **Asr**. Equal → sync works, and §11 item 7 can finally be struck. Different → the phone's settings are not reaching the watch, and the watch is calculating on its own Shafi'i default; the school button at the foot of the watch's times list will show which school it actually used. Asr is the right time to compare because it is the one the madhab moves, by 26 minutes at minimum and usually about an hour — a gap far too large to mistake for rounding. That is the exact symptom that exposed this in the first place (item 7). Also worth capturing while paired: change a per-prayer adjustment on the phone and confirm it reaches the watch, since `KEY_ADJUSTMENTS` is synced precisely so the two cannot give one user two answers |
 | A17 | **Which language to translate first, and who reviews it** | The owner asked the app to adapt to the phone's language. Everything mechanical for that is built and guarded (§5.16): drop in a reviewed `values-<lang>/` and the app switches language, digits, date order and layout direction on its own. **The blocker is a person, not code.** `CLAUDE.md` forbids machine translation — prayer and madhab names are religious content — so this cannot be started, only commissioned. Likely first candidates on user numbers: Urdu, Arabic, Bengali, Turkish, Indonesian |
 
 **Waiting on evidence that does not exist yet**
@@ -4291,8 +4292,10 @@ decisions, not oversights.
 - The phone↔watch Data Layer sync has never been observed working end to end (item 7 below).
   It was looked at again on 16 Aug and is **blocked, not merely undone**: the S23 Ultra
   carries only Samsung's preinstalled `watchmanagerstub`, so pairing a Wear emulator to it
-  needs "Wear OS by Google" installed and signed into the owner's Google account. That is
-  the owner's to do. Do not burn another session trying to route around it.
+  needs "Wear OS by Google" installed and signed into the owner's Google account.
+  **The owner said on 16 Aug 2026 that he will do the pairing himself, so this is assigned,
+  not open.** Do not burn a session trying to route around it, and do not ask him for it
+  again — ask instead whether he has done it yet, and if so, run the check in A18 below.
 - Nothing since 2 Aug has run on the Xiaomi — HyperOS refuses the sideload — and there is no
   physical watch at all.
 - One ANR seen once, under uiautomator load, never reproduced.

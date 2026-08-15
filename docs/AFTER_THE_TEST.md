@@ -204,7 +204,34 @@ the thing it is for.
 **What I could not do.** The watch still cannot be tested against a real phone. Pairing one
 needs the "Wear OS by Google" app installed on your handset and signed in with your Google
 account, and I will not sign into your account. That is the one job on this list that has to
-be yours.
+be yours — and you have said you will do it, so it is written down as yours rather than left
+looking undone.
+
+### The one-minute check, for when you have paired a watch
+
+You do not need to test the watch thoroughly. **One comparison answers it**, and it is the
+same one that caught the worst bug this project has ever had.
+
+1. On the **phone**, make sure the school is set to **Hanafi** (Settings → School of thought).
+2. Open SajdaTime on the **watch**.
+3. Compare **Asr** on the two.
+
+**Same time → the sync works**, and I can finally cross this off. **Different → the phone's
+settings are not reaching the watch.** Nothing is broken on your end if that happens; it is
+exactly the thing we have never been able to test, and it is what I need to know.
+
+Why Asr and not one of the others: Asr is the only prayer the Hanafi/Shafi'i choice moves,
+and it moves it by at least 26 minutes and usually about an hour. Every other time would look
+identical whether the sync worked or not, so they tell you nothing. If the two disagree, look
+at the button at the bottom of the watch's list of times — it names the school the watch
+actually used, which tells us straight away whether the setting arrived.
+
+**A second thing worth trying while you are paired**, if you have the patience: change one
+prayer by a few minutes on the phone under *Match your mosque*, then look at the watch. That
+correction is meant to travel too — the whole point being that the app must never give you
+one answer in your pocket and a different one on your wrist.
+
+Just tell me "same" or "different" and I will take it from there.
 
 **I put your phone back as I found it**: text size, dark mode, and your real location. The
 Play Store copy of the app was never touched — I install a separate test copy alongside it,
