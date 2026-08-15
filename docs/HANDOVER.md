@@ -680,6 +680,22 @@ watch, one rule. Rejected: the previous form (needle to the Kaaba, "you" as a ri
 because a compass needle is read as "me" by anyone who has held a compass, and the two
 marks coinciding made "am I facing it?" unanswerable at a glance — the owner's report.
 
+**The ring carries N, E, S and W, and the glyphs stay upright (15 Aug 2026).** Positions
+rotate with the dial so each letter sits over the right quarter; the letters themselves are
+drawn the right way up rather than inside the `rotate` block, because this screen is read
+while the user is turning and a rotating "W" is an upside-down "M" half the time. North is
+`primary` and bold. It replaced a filled wedge that marked north only, and only to someone
+who already knew what the wedge meant. Four radial numbers are one budget and move together:
+ticks 0.91..0.99, letters 0.83, Kaaba mark 0.66 at size 0.30, needle tip 0.74.
+
+**Alignment is an event, not a caption (15 Aug 2026).** On arriving: one haptic pulse, the
+message turns `primary` and grows, a tick appears, the dial fills and its rim thickens from
+2 to 6, the turn arc vanishes, and the raw heading readout is hidden. Five signals, only one
+of which is colour, so it still lands for a user who cannot separate green from grey. The
+pulse fires on the transition and not per frame, and not on first composition. The wording
+is **"You are now facing the Kaaba"** on the phone and "Facing the Kaaba" on the watch: the
+building rather than the abstraction, at the owner's request.
+
 Verified against the Aladhan Qibla API across ten cities on five continents, test tolerance
 0.5°:
 London 118.987, Manchester 118.455, New York 58.482, Jakarta 295.152, Sydney 277.500,
@@ -3994,6 +4010,49 @@ button whole and clear of the bar.
 | City search | Typed "Slough" → **"Slough, United Kingdom"**. Forward geocoding names the town on hardware too, and the two halves of the feature agree |
 | Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **142 tests, 0 failures** |
 
+### The dial became a compass, and arriving became an event (15 Aug 2026)
+
+The owner asked for the compass to look and work better on both phone and watch, and for it
+to say something like "you are now facing the Kaaba". Four things were wrong, and only the
+last was cosmetic.
+
+**It had no cardinal letters.** North was a small filled wedge. That is honest and useless:
+it tells you where north is only once you already know the wedge means north, and it says
+nothing about the other three quarters. N, E, S and W now sit on the rotating ring, with N
+in the app's green and bolder than the rest. **The glyphs stay upright while their positions
+rotate** — a bezel that turns its letters with it puts "W" upside down when you face south,
+and this is a screen meant to be read *while turning*.
+
+That needed a band of its own, so four numbers moved together: the ticks went out to
+0.91..0.99, the letters sit at 0.83, the Kaaba mark came in from 0.72/0.32 to **0.66/0.30**,
+and the needle tip from 0.82 to 0.74 so it still lands inside the cube on arrival. The watch
+took the same mark geometry even though it draws no letters, because this is one dial drawn
+twice. It also ended a squeeze that had been noted and tolerated for a fortnight: at the old
+shares the mark's furthest corner reached 0.892 on the 1.2" watch against a tick ring
+starting at 0.897, under a pixel of margin. It is 0.822 now.
+
+**Arriving was a caption change.** Facing the Kaaba swapped one line for another at the same
+size, weight and colour, which is the least a screen can do for the thing the user opened it
+for. It now buzzes once, turns green, grows to `headlineSmall`, gains a tick, and the raw
+heading readout disappears — that number helps while you are turning and competes with the
+answer once you are not. The buzz is keyed on the *edge* (`LaunchedEffect(aligned)`), so
+holding still does not vibrate sixty times a second, and it stays quiet on first composition
+because a phone that buzzes as you open a screen has told you nothing. The watch gets the
+same buzz and two words in the middle of the dial.
+
+**It led with jargon.** "153° from true north. The Kaaba is about 1858 km away." puts the
+least usable fact first. Now: "The Kaaba is about 1858 km from here, at 153° from north."
+`qibla_facing` became **"You are now facing the Kaaba"** and the watch's became "Facing the
+Kaaba" — the building, not the abstraction, and the word the owner asked for.
+
+**Verified in both states on both emulators**, including the aligned one, which needed a
+recipe worth keeping (§13): the app prefers `TYPE_ROTATION_VECTOR`, which the emulator
+synthesises, and `emu sensor set orientation` does not move it at all. Driving
+`magnetic-field` does, but **the emulator's device is upright, so the horizontal plane is
+X-Z, not X-Y** — an hour went into sweeping X-Y and getting a ±31° wobble before that
+landed. Sweeping `(30 sin a, -48.4, 30 cos a)` gives a clean, near-linear
+`heading ≈ a + 181`, which is how the phone was put on 118° and the watch on 153°.
+
 ### The Kaaba mark was a shopfront, and a contrast test could never have caught it (15 Aug 2026)
 
 The owner asked for better Kaaba artwork, visible in both themes. **Visibility was never the
@@ -5056,6 +5115,8 @@ Every one of these cost real time. Read before building.
 | **`sed -i.bak` inside `res/`** | `Resource and asset merger: The file name must end with .xml` | The backup file is itself a resource. Edit resources with a tool that does not drop siblings, or write the backup outside `res/`. |
 | **"BUILD SUCCESSFUL in 2h 48m" for a build that took five seconds** | Every Gradle invocation reports a near-identical multi-hour duration regardless of what it did — a no-op install and a full `clean test lint bundleRelease` both report ~2h50m | Gradle's own figure is wrong on this machine (it tracks something closer to daemon uptime). **Do not use it to reason about anything**, and do not conclude the machine is slow or contended — a session on 15 Aug 2026 lost time doing exactly that. Wrap the command instead: `date "+start %T" && ./gradlew … && date "+end %T"`, which showed 18:22:06 → 18:22:11 against a reported 2h48m. |
 | **A green gate that never ran the tests** | `BUILD SUCCESSFUL, 142 tests, 0 failures`, but the test XML under `*/test-results/` is hours old | Gradle cached `test` because its inputs had not changed, which is correct behaviour and invisible in the summary — the *previous* run's counts are what you are reading. If it matters that the tests really executed against the code in front of you, force it (`./gradlew test --rerun-tasks`) and confirm with `stat -f "%Sm" …/TEST-*.xml` that the files are new. A cached pass is only as good as the run it was cached from. |
+| **The emulator compass will not move** | `adb emu sensor set orientation 118:0:0` returns OK and the heading does not change. Driving `magnetic-field` in X and Y wobbles it by about 31° and no more | The app reads `TYPE_ROTATION_VECTOR`, which the emulator synthesises rather than deriving from the orientation sensor, so `orientation` is inert. `magnetic-field` does feed it, but **the emulated device is upright, so its horizontal plane is X-Z**: putting the field in X-Y only tilts it. Sweep `(30·sin a, -48.4, 30·cos a)` and read the on-screen heading, which comes out near-linear at `heading ≈ a + 181`. Then solve for the heading you want. Used on 15 Aug 2026 to park the phone on 118° and the watch on 153° and photograph the aligned state. |
+| **`:app:installDebug` fails with `Update version code 3 is older than current 1000` even when scoped to the phone emulator** | `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug` still reports a downgrade | The *watch* build is sitting on the phone emulator from an earlier unscoped install — both modules share one `applicationId`, so this is the residue of the trap two rows up rather than a new one. Check with `adb -s emulator-5554 shell cmd package resolve-activity --brief com.sajdatime.app`: if it answers `WearMainActivity`, uninstall (`adb -s emulator-5554 uninstall com.sajdatime.app`) and install again. Uninstalling wipes onboarding, so expect to walk the setup flow afterwards. |
 | **Emulator after a locale change** | System UI, Bluetooth and the app itself ANR ("failed to complete startup") for many minutes after `setprop persist.sys.locale` + zygote restart or `adb reboot`; `uiautomator dump` returns nothing | Not the app. Kill the AVD and cold-boot it (`emulator -avd sajda -no-snapshot-load`), and stop the Gradle daemons while it settles. Seen 15 Aug 2026 after switching to `ar-EG` and back. |
 
 ### The architecture PDF is generated, never hand-made
@@ -6096,7 +6157,18 @@ matters more than the stable hashes, that is the trade being made.
     because it was written down as settled, it stayed settled for a fortnight. Re-derive the
     constraint before trusting the note that says a thing was already ruled out.
 
-99. **Logical screen height does not follow from physical size, so a layout budget must be
+99. **When the thing the user came for finally happens, the screen has to behave like it
+    happened.** Facing the Kaaba used to swap one line of text for another at the same size,
+    weight and colour. Everything was correct, nothing was wrong, and the single moment the
+    whole screen exists to deliver went by unmarked. It now buzzes, grows, turns green, gains
+    a tick, fills the dial and drops the number that was only useful while you were still
+    turning. Correctness is not the same as communication, and "the state changed" is not the
+    same as "the user noticed". Ask of any success state: if this fired while the user was
+    mid-turn and half-looking, would they know?
+
+    The corollary that keeps it honest: five signals, and only one of them is colour.
+
+100. **Logical screen height does not follow from physical size, so a layout budget must be
     measured on the *short* device.** The one-screen home layout was budgeted on the
     1080x2400 emulator — 914dp tall — and fitted with room to spare. The owner's Galaxy S23
     Ultra, a physically much larger phone, is **823dp**, because its density is 3.75 rather

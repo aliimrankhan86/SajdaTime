@@ -216,7 +216,7 @@
          latitude moves every prayer by at most 2 minutes, in midsummer, midwinter and
          between. See HANDOVER §10. Shown only when the user opens this sheet — the app
          does not volunteer it, and it is not a second disclaimer. -->
-    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little — ten miles is about a minute. If the name looks wrong to you, type your city below.</string>
+    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little: ten miles is about a minute. If the name looks wrong to you, type your city below.</string>
     <string name="action_use_my_location">Use my current location</string>
     <string name="location_sheet_search_heading">Or type a city</string>
 
@@ -262,10 +262,10 @@
 
     <!-- Qibla -->
     <string name="qibla_title">Qibla</string>
-    <string name="qibla_subtitle">%1$d° from true north. The Kaaba is about %2$d km away.</string>
+    <string name="qibla_subtitle">The Kaaba is about %2$d km from here, at %1$d° from north.</string>
     <string name="qibla_needs_location">Set your location to find the Qibla.</string>
-    <string name="qibla_facing">You are facing the Qibla</string>
-    <string name="qibla_heading_now">You are facing %1$d°</string>
+    <string name="qibla_facing">You are now facing the Kaaba</string>
+    <string name="qibla_heading_now">Facing %1$d°</string>
     <!-- The dial's legend. The needle is *you* — it points the way the phone points and
          stays put while the dial and the Kaaba turn round it. Turn until it touches the
          Kaaba. -->

@@ -36,7 +36,9 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -613,6 +615,16 @@ private fun QiblaPage(state: WearUiState) {
                 )
             }
 
+            // A wrist has no room for the phone's sentence, so arriving is carried by a
+            // buzz and two short words in the middle of the dial. The buzz fires on the
+            // edge, not every frame: keyed on `aligned`, so holding still does not vibrate.
+            val haptics = LocalHapticFeedback.current
+            var wasAligned by rememberSaveable { mutableStateOf(aligned) }
+            LaunchedEffect(aligned) {
+                if (aligned && !wasAligned) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                wasAligned = aligned
+            }
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (aligned) {
@@ -620,7 +632,12 @@ private fun QiblaPage(state: WearUiState) {
                     } else {
                         stringResource(R.string.wear_qibla_bearing, qibla.roundToInt())
                     },
-                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                    style = if (aligned) {
+                        MaterialTheme.typography.titleSmall
+                    } else {
+                        MaterialTheme.typography.titleMedium
+                    },
                     color = needleColour,
                 )
                 if (heading == null) {
@@ -640,14 +657,17 @@ private fun QiblaPage(state: WearUiState) {
  *
  * The same two numbers as the phone's `QiblaScreen.kt`, and they have to stay the same:
  * this is one dial drawn twice, and the two watch sizes plus every phone size mean shares
- * are the only form these can take. The 1.2" watch is the tightest case in the app: its
- * tick ring starts at 0.897 of the radius and the mark's furthest corner reaches 0.892, a
- * margin of well under a pixel. It costs nothing today — the mark is drawn last, so at
- * worst it hides a tick — but it does mean the distance has no headroom, and this is the
- * screen to check on if either number is ever changed.
+ * are the only form these can take.
+ *
+ * Pulled in from 0.72/0.32 on 15 Aug 2026 when the phone gained cardinal letters. The watch
+ * has no room for letters and does not draw them, but the mark must not drift between the
+ * two screens, so it moved here too. It also ended a long-standing squeeze: at the old
+ * numbers the mark's furthest corner reached 0.892 on the 1.2" watch against a tick ring
+ * starting at 0.897, a margin of well under a pixel. At 0.66 and 0.30 the corner reaches
+ * 0.822 and there is real space again.
  */
-private const val KAABA_DISTANCE = 0.72f
-private const val KAABA_SIZE = 0.32f
+private const val KAABA_DISTANCE = 0.66f
+private const val KAABA_SIZE = 0.30f
 
 /**
  * The Kaaba itself, on the ring at the Qibla bearing. The phone draws the same mark from

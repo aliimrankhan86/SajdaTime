@@ -111,6 +111,50 @@ never had, or asked for, your PIN.
 
 ---
 
+## 15 Aug 2026 — the compass, and telling you when you have arrived
+
+You asked for the compass to look better and to say something when you are facing the Kaaba.
+Here is what changed, in plain terms.
+
+**It now has N, E, S and W on it.** Before, north was a small filled triangle, which only
+helps if you already know that is what it means, and it told you nothing about the other
+three directions. Now the four letters sit around the ring like a compass you have actually
+held. They turn as you turn, but the letters themselves stay the right way up, because a "W"
+that is upside down when you face south is no use to anybody.
+
+**Arriving is now an event.** Before, facing the Kaaba just swapped one line of text for
+another, in the same size and colour. You could easily miss it. Now, the moment you line up:
+the phone buzzes once, the whole dial fills green, the ring around it thickens, the green
+arc showing how far you have to turn disappears, a tick appears, and it says in large green
+letters **"You are now facing the Kaaba"**. The degrees reading vanishes at that point too,
+because it was only helping while you were still turning. On the watch it buzzes and says
+"Facing the Kaaba".
+
+Five separate signals, and only one of them is colour. That is on purpose, so it still works
+for someone who cannot easily tell green from grey.
+
+**It stopped leading with the technical bit.** The line under the title used to read "153°
+from true north. The Kaaba is about 1858 km away." The number most people cannot use came
+first. It now reads "The Kaaba is about 1858 km from here, at 153° from north."
+
+**I also went through the wording everywhere.** The disclaimer I left almost exactly as it
+is. It reads as something a person wrote, it says the four things it has to say, and the dua
+request at the end is yours. I checked it rather than rewrote it. Elsewhere I fixed two
+small things: one long dash inside a sentence, and one in a method name, both replaced with
+ordinary punctuation.
+
+**One correction I made to my own work.** I first changed "so we can give you the angle" to
+"so the app can give you the angle", then put it back. The app says "we" everywhere else
+("We could not get a fix", "We never send it anywhere"), and changing one line would have
+made the voice inconsistent for no gain.
+
+**Checked on both simulators, in both the turning state and the arrived state**, with the
+compass driven to the exact bearing so I could see the arrival rather than assume it. Full
+build clean: 142 tests, no failures. Your real phone was unplugged by then, so the buzz
+itself has not been felt on hardware, only the code path that fires it.
+
+---
+
 ## ⚠️ One thing was not left until later: the app crashed in the far north
 
 **Found on 1 Aug 2026, fixed the same day, and the reason it was found is worth saying.**

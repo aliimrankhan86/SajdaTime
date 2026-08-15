@@ -52,7 +52,7 @@
       still publishes 20 and is stale; an earlier version of this label trusted it and was
       wrong. See docs/HANDOVER.md §10, "Aladhan was stale and I shipped it".
     -->
-    <string name="method_singapore">Kemenag &amp; MUIS — Indonesia, Singapore</string>
+    <string name="method_singapore">Kemenag &amp; MUIS, Indonesia and Singapore</string>
     <string name="method_turkey">Diyanet, Turkey</string>
     <string name="method_jafari">Jafari (Ithna Ashari)</string>
     <string name="method_tehran">Institute of Geophysics, Tehran</string>

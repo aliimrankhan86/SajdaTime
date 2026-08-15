@@ -21,12 +21,17 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -47,7 +52,14 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -172,6 +184,7 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     val kaaba = painterResource(CoreR.drawable.ic_kaaba)
     val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
     val gold = kiswahGold()
+    val measurer = rememberTextMeasurer()
 
     Box(
         modifier = Modifier
@@ -193,26 +206,31 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
             val radius = size.minDimension / 2f
             val centre = Offset(size.width / 2f, size.height / 2f)
 
-            // Aligned fills the dial and switches its edge to the accent. That, the
-            // vanishing arc and the changed wording are three independent signals of the
-            // same fact, none of which is colour on its own.
+            // Aligned fills the dial and switches its edge to the accent, and the edge
+            // thickens from 2 to 6. That, the vanishing arc and the changed wording are
+            // independent signals of the same fact, none of which is colour on its own —
+            // a user who cannot separate green from grey still sees a ring get heavier.
             val face = if (aligned) scheme.primaryContainer else scheme.surfaceVariant
             drawCircle(color = face, radius = radius, center = centre)
             drawCircle(
                 color = if (aligned) scheme.primary else scheme.outlineVariant,
                 radius = radius,
                 center = centre,
-                style = Stroke(width = 2f),
+                style = Stroke(width = if (aligned) 6f else 2f),
             )
 
             if (heading != null && !aligned) {
                 drawTurnArc(centre, radius, turn.toFloat(), scheme.primary)
             }
 
-            rotate(degrees = dialRotation, pivot = centre) {
-                drawTicks(centre, radius, scheme.outline)
-                drawCardinalMarker(centre, radius, scheme.onSurface)
-            }
+            drawTicks(centre, radius, dialRotation, scheme.outline)
+
+            // The four letters, upright at every heading rather than rotating with the
+            // ring. A compass whose "W" is upside down when you face south is a compass
+            // people have to tilt their head at, and the whole point of the screen is to
+            // be read while turning. North is the app's green and heavier than the other
+            // three: it is the one bearing that anchors the rest.
+            drawCardinals(centre, radius, dialRotation, measurer, scheme.onSurfaceVariant, scheme.primary)
 
             // The needle: fixed at the top with a compass ("you"), at the bearing without
             // one. Screen space, not dial space, which is the whole point.
@@ -220,9 +238,9 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
                 drawNeedle(centre, radius, scheme.primary)
             }
 
-            // Last, so it covers whatever it lands on: the north wedge when the Qibla is
-            // due north, and the needle's tip when you are facing the Qibla — the moment
-            // the two marks are meant to meet.
+            // Last, so it covers whatever it lands on: a cardinal letter when the Qibla is
+            // near due north, and the needle's tip when you are facing the Qibla — the
+            // moment the two marks are meant to meet.
             drawKaaba(
                 centre = centre,
                 radius = radius,
@@ -259,19 +277,27 @@ private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, sweep: Float, c
     )
 }
 
-private fun DrawScope.drawTicks(centre: Offset, radius: Float, colour: Color) {
-    // A tick every 15 degrees, longer every 90, so the dial reads at a glance.
+/**
+ * The tick ring, kept out at the rim so the cardinal letters have a band of their own.
+ *
+ * Takes the rotation itself rather than sitting inside a `rotate` block, because
+ * [drawCardinals] cannot use one — the letters have to stay upright — and having the two
+ * halves of the same ring computed the same way is what stops them drifting apart.
+ */
+private fun DrawScope.drawTicks(centre: Offset, radius: Float, rotation: Float, colour: Color) {
+    // A tick every 15 degrees, longer and heavier every 90 so the quarters read at a
+    // glance. They span 0.91..0.99 of the radius: outside the letters, inside the rim.
     for (degrees in 0 until 360 step 15) {
         val major = degrees % 90 == 0
-        val length = if (major) radius * 0.12f else radius * 0.06f
-        val radians = Math.toRadians(degrees.toDouble() - 90.0)
+        val length = if (major) radius * 0.09f else radius * 0.05f
+        val radians = Math.toRadians(degrees + rotation.toDouble() - 90.0)
         val outer = Offset(
-            centre.x + (radius - 10f) * cos(radians).toFloat(),
-            centre.y + (radius - 10f) * sin(radians).toFloat(),
+            centre.x + radius * 0.99f * cos(radians).toFloat(),
+            centre.y + radius * 0.99f * sin(radians).toFloat(),
         )
         val inner = Offset(
-            centre.x + (radius - 10f - length) * cos(radians).toFloat(),
-            centre.y + (radius - 10f - length) * sin(radians).toFloat(),
+            centre.x + (radius * 0.99f - length) * cos(radians).toFloat(),
+            centre.y + (radius * 0.99f - length) * sin(radians).toFloat(),
         )
         drawLine(
             color = colour,
@@ -282,30 +308,67 @@ private fun DrawScope.drawTicks(centre: Offset, radius: Float, colour: Color) {
     }
 }
 
-/** A small filled wedge marking north on the rotating dial. */
-private fun DrawScope.drawCardinalMarker(centre: Offset, radius: Float, colour: Color) {
-    val tip = Offset(centre.x, centre.y - radius * 0.74f)
-    val left = Offset(centre.x - radius * 0.05f, centre.y - radius * 0.64f)
-    val right = Offset(centre.x + radius * 0.05f, centre.y - radius * 0.64f)
-    drawPath(
-        path = Path().apply {
-            moveTo(tip.x, tip.y)
-            lineTo(left.x, left.y)
-            lineTo(right.x, right.y)
-            close()
-        },
-        color = colour,
-    )
+/**
+ * N, E, S and W, placed on the rotating ring but drawn the right way up.
+ *
+ * This replaced a small filled wedge that marked north and nothing else. The wedge was
+ * honest and useless: it told you where north was only if you already knew it was the
+ * north marker, and it said nothing at all about the other three quarters. Letters are
+ * what every compass anyone has held already uses.
+ *
+ * **Positions rotate, glyphs do not.** Each letter's position is computed at its own
+ * bearing minus the heading, so it sits over the right part of the ring, but it is drawn
+ * upright rather than inside a `rotate` block. Rotating the glyphs too is what a physical
+ * bezel does, and on a screen it means reading "M" for W while facing south.
+ *
+ * Sits at 0.83 of the radius, between the Kaaba mark (out to 0.81) and the ticks (in to
+ * 0.91). Those three numbers are one budget: move any and check the others, and see
+ * [KAABA_DISTANCE] for the fourth term, the needle tip.
+ *
+ * ponytail: `Char` per point rather than a localised string array. These four glyphs are
+ * the standard compass abbreviations, not prose, and the day a translated build ships they
+ * are what `values-<lang>/` would carry — at which point this takes a `List<String>`.
+ */
+private fun DrawScope.drawCardinals(
+    centre: Offset,
+    radius: Float,
+    rotation: Float,
+    measurer: TextMeasurer,
+    colour: Color,
+    northColour: Color,
+) {
+    val points = listOf("N" to 0, "E" to 90, "S" to 180, "W" to 270)
+    for ((label, bearing) in points) {
+        val north = bearing == 0
+        val radians = Math.toRadians(bearing + rotation.toDouble() - 90.0)
+        val laid = measurer.measure(
+            text = label,
+            style = TextStyle(
+                color = if (north) northColour else colour,
+                fontSize = (radius * 0.115f).toSp(),
+                fontWeight = if (north) FontWeight.Bold else FontWeight.Medium,
+            ),
+        )
+        // Centre the glyph on the point rather than hanging it off the top-left corner,
+        // which is where drawText would otherwise put it.
+        drawText(
+            textLayoutResult = laid,
+            topLeft = Offset(
+                centre.x + radius * 0.83f * cos(radians).toFloat() - laid.size.width / 2f,
+                centre.y + radius * 0.83f * sin(radians).toFloat() - laid.size.height / 2f,
+            ),
+        )
+    }
 }
 
 /**
  * The needle: a long tapered arrow from the centre outward. With a compass it is fixed at
  * the top and means "the way you are pointing"; without one it is turned to the Qibla
- * bearing. Its tip at 0.82 sits inside the Kaaba mark's box when the two coincide — see
- * [KAABA_DISTANCE] — so on alignment the arrow visibly ends at the Kaaba.
+ * bearing. Its tip at 0.74 sits inside the Kaaba mark's box when the two coincide, see
+ * [KAABA_DISTANCE], so on alignment the arrow visibly ends at the Kaaba.
  */
 private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
-    val tip = Offset(centre.x, centre.y - radius * 0.82f)
+    val tip = Offset(centre.x, centre.y - radius * 0.74f)
     val baseLeft = Offset(centre.x - radius * 0.075f, centre.y)
     val baseRight = Offset(centre.x + radius * 0.075f, centre.y)
 
@@ -329,20 +392,23 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * the tick ring as the dial got smaller.
  *
  * The two numbers are one decision. The mark stays upright while its position goes round,
- * so the corner reaching furthest out is a different corner at every bearing: at 0.72 and
- * 0.32 the worst of them lands at 0.892 of the radius. The tick ring starts at 0.915 here
- * and at 0.897 on the 1.2" watch — so on the phone there is room, and on the small watch
- * the margin is under a pixel. That is not a problem, because the mark is drawn last and
- * would simply cover a tick, but it is the reason the mark was made *larger where it is*
- * rather than pushed further out: distance is the term with no headroom left.
+ * so the corner reaching furthest out is a different corner at every bearing: at 0.66 and
+ * 0.30 the worst of them lands at 0.822 of the radius.
  *
- * The needle tip at 0.82 is *inside* the cube when the two coincide, which is what makes
+ * **Pulled in from 0.72/0.32 on 15 Aug 2026 to make room for the cardinal letters.** N, E,
+ * S and W now sit at 0.83 and the ticks were moved out to 0.91..0.99, so the dial reads
+ * outside-in as rim, ticks, letters, then the Kaaba. Before that the mark ran out to 0.892
+ * and the ring began at 0.915, which left no band for a letter at all.
+ *
+ * The needle tip, now 0.74, is *inside* the cube when the two coincide, which is what makes
  * the arrow end at the Kaaba on alignment rather than beside it or through it. So it is
- * really three numbers, not two: change any and check the others. The watch draws the
- * same mark with the same shares — see `WearApp.kt`.
+ * four numbers, not two — mark distance, mark size, needle tip, letter ring — and they move
+ * together: change any and check the others. The watch draws the same mark at the same
+ * shares but keeps its own needle length, because it has a readout in the middle that the
+ * phone does not; see `WearApp.kt`.
  */
-private const val KAABA_DISTANCE = 0.72f
-private const val KAABA_SIZE = 0.32f
+private const val KAABA_DISTANCE = 0.66f
+private const val KAABA_SIZE = 0.30f
 
 /**
  * The Kaaba itself, on the ring at the Qibla bearing: "it is over there".
@@ -392,14 +458,23 @@ private fun DrawScope.drawKaaba(
 /**
  * The spoken and written instruction. This, not the dial, is what a screen reader user
  * relies on, so it is a polite live region rather than a per-frame announcement.
+ *
+ * **Arriving is now an event, not a change of caption.** Until 15 Aug 2026 facing the
+ * Kaaba swapped one line of the same size and weight for another, which is the least a
+ * screen can do to mark the thing the user opened it for. It now also buzzes once and
+ * turns green, and the buzz fires on the *edge* rather than every frame: `LaunchedEffect`
+ * keyed on `aligned` runs when the value flips, so a user holding still is not vibrated
+ * sixty times a second. It stays quiet on first composition when already aligned, because
+ * a phone that buzzes the instant you open a screen has told you nothing.
  */
 @Composable
 private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
     val heading = state.compassHeading
+    val aligned = heading != null && QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0)
 
     val message = when {
         heading == null -> stringResource(R.string.qibla_no_compass, qiblaTrueBearing.roundToInt())
-        QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0) -> stringResource(R.string.qibla_facing)
+        aligned -> stringResource(R.string.qibla_facing)
         else -> {
             val turn = QiblaEngine.relativeTurn(heading, qiblaTrueBearing)
             if (turn > 0) {
@@ -410,23 +485,51 @@ private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
         }
     }
 
+    val haptics = LocalHapticFeedback.current
+    var wasAligned by rememberSaveable { mutableStateOf(aligned) }
+    LaunchedEffect(aligned) {
+        if (aligned && !wasAligned) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        wasAligned = aligned
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        Text(
-            text = message,
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .semantics {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (aligned) {
+                Icon(
+                    imageVector = Icons.Outlined.CheckCircle,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(26.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(
+                text = message,
+                // Bigger and green on arrival. Weight and size carry the moment for anyone
+                // who cannot see the colour change.
+                style = if (aligned) {
+                    MaterialTheme.typography.headlineSmall
+                } else {
+                    MaterialTheme.typography.titleLarge
+                },
+                color = if (aligned) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                textAlign = TextAlign.Center,
+                modifier = Modifier.semantics {
                     liveRegion = LiveRegionMode.Polite
                     contentDescription = message
                 },
-        )
-        if (heading != null) {
+            )
+        }
+        // The raw heading is hidden once you have arrived. It is a debugging number that
+        // helps while you are still turning and competes with the answer once you are not.
+        if (heading != null && !aligned) {
             Spacer(Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.qibla_heading_now, heading.roundToInt()),
