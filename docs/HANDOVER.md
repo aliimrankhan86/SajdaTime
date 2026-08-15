@@ -672,6 +672,32 @@ across the 359°→0° wrap.
 tighter than a phone magnetometer can honestly claim, so the needle would flicker in and
 out of "Facing Qibla".
 
+**Arrival has two angles, not one — and a quiet window (16 Aug 2026).** `QiblaEngine`
+`staysAligned(wasAligned, current, target)` is now the only thing the UI asks. You arrive
+within `ALIGN_GRAB_DEGREES` (5°) and you keep having arrived until you are
+`ALIGN_RELEASE_DEGREES` (8°) away. On top of that both screens refuse to buzz twice inside
+`ARRIVAL_QUIET_MILLIS` (5 s), and neither buzzes for the first heading of a session at all.
+
+This is not tidiness. A single threshold drives both a sentence and a vibration, and on the
+owner's S23 Ultra lying **untouched on a desk** it fired 26 times in 76 seconds, plus 6 more
+in 14 seconds during which every sample of the caption read "You are now facing the Kaaba" —
+the dropouts were shorter than the screen could be sampled, so the phone drummed in the hand
+under a sentence that looked settled. The same test after the fix recorded **zero buzzes in
+three minutes**. Measurements and method are in §10.
+
+Three rules, because each fixes a different failure, and removing any one brings its own
+back:
+- *hysteresis* — the wobble of a phone at rest sitting on the boundary;
+- *the quiet window* — a compass genuinely re-converging after the screen opens, which
+  swings wider than any sane release angle (4 buzzes in 26 s with hysteresis alone);
+- *"not the first reading"* — opening the screen while already facing the Kaaba, which is
+  not an arrival and must not be announced as one.
+
+Pinned by `QiblaEngineTest`, including a test that fails if the two angles are ever made
+equal. Rejected: smoothing the heading harder in `CompassRepository` instead — the filter
+runs on every sensor sample, and slowing it enough to hide this would make the needle lag
+the hand for every user, to fix a boundary only some users stand on.
+
 **On the dial, the needle is the user and the Kaaba is the target (15 Aug 2026).** With a
 compass the needle is fixed at the top of the dial (the way the phone points) and the Kaaba
 mark rides the rotating ring at the Qibla bearing; alignment is the needle touching the
@@ -692,9 +718,15 @@ ticks 0.91..0.99, letters 0.83, Kaaba mark 0.66 at size 0.30, needle tip 0.74.
 message turns `primary` and grows, a tick appears, the dial fills and its rim thickens from
 2 to 6, the turn arc vanishes, and the raw heading readout is hidden. Five signals, only one
 of which is colour, so it still lands for a user who cannot separate green from grey. The
-pulse fires on the transition and not per frame, and not on first composition. The wording
-is **"You are now facing the Kaaba"** on the phone and "Facing the Kaaba" on the watch: the
-building rather than the abstraction, at the owner's request.
+wording is **"You are now facing the Kaaba"** on the phone and "Facing the Kaaba" on the
+watch: the building rather than the abstraction, at the owner's request.
+
+`aligned` is worked out **once**, in `QiblaScreen` (and once in `QiblaPage` on the watch),
+and handed to the dial and the sentence. It cannot be recomputed locally any more: with
+hysteresis the answer depends on the previous answer, so two copies can disagree and the
+screen would announce an arrival under a dial still showing a turn. The haptic is fired in
+that same effect for the same reason — when the two were one cycle apart, the gap was a bug
+(see §10, 16 Aug 2026).
 
 Verified against the Aladhan Qibla API across ten cities on five continents, test tolerance
 0.5°:
@@ -1407,7 +1439,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, **142 tests**, 0 failures, lint informational-only (0 errors),
+Expected: BUILD SUCCESSFUL, **145 tests**, 0 failures, lint informational-only (0 errors),
 phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
 is present).
 
@@ -1421,6 +1453,94 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ## 10. What has been verified on a device, and how
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
+
+### 16 Aug 2026 — a session on the owner's S23 Ultra, and what only hardware could say
+
+The phone was attached (`R5CW13508HX`, SM-S918B, Android 16, 384×823 dp, font scale 0.9,
+dark mode). Installed with `installSideload`, so the Play build beside it was never touched.
+Everything below was measured on that handset unless it says otherwise. Font scale and theme
+were put back afterwards, and the app's location was returned to "use my current location".
+
+**Two long-standing gaps in §11 are now closed.**
+
+*An exact alarm was watched firing, for the first time on this phone.* Prayer times move
+with location, so the location was set to Dhaka, which put Fajr 90 seconds away rather than
+waiting until dawn. `dumpsys alarm` showed the alarm queued as
+`RTC_WAKEUP … origWhen=2026-08-16 01:14:00.000 window=0 exactAllowReason=permission`, with
+`app_standby=-20s` — i.e. Standby was applying no delay, which is the same conclusion the
+Redmi reached and is recorded in §6. Notification titles were then sampled every 10 s: at
+01:13:57 only the silent "Fajr at 01:14" badge existed; by 01:14:08 the alert **"Time for
+Fajr"** had been posted and the badge had already rolled forward to "Dhuhr at 09:04". The
+posted timestamp was 1786832040037, i.e. **01:14:00.037 — 37 ms after the scheduled
+instant.** The location was restored afterwards.
+
+*The haptic is real.* It had only ever been read in source. `dumpsys vibrator_manager` keeps
+a per-package history, and `QiblaScreen` holds the app's **only** `performHapticFeedback`
+call, so every entry attributed to the package is this one line. The pulses are recorded as
+`finished`, 122–129 ms, `constant=0` (LONG_PRESS). Nobody has felt it; the vibrator service
+says it played.
+
+**And the same instrument found a defect that no emulator could produce**, because injected
+sensor values do not wobble. See §5.9 for the rule; this is the evidence.
+
+| | buzzes | over | phone |
+|---|---|---|---|
+| Before | 26 | 76 s | untouched on a desk |
+| Before | 6 | 14 s | untouched, caption reading "facing" in *every* sample |
+| Hysteresis only | 4 | first 26 s, then silent | untouched |
+| Hysteresis + quiet window | **0** | 3 min | untouched |
+
+The second row is the one that matters: the sentence looked completely stable while the
+phone buzzed every two to three seconds, because each dropout was shorter than the ~2 s it
+takes to sample the screen. A caption that looks right is not evidence that the state
+behind it is.
+
+A separate bug fell out of fixing the first. Moving `aligned` up to the parent left one
+effect cycle between the heading landing and the flag catching up, and in that gap the
+sentence recorded "not arrived yet" and then read the flag turning true as an arrival — so
+the phone buzzed **every time the Qibla screen was opened while already facing the Kaaba**,
+at 00:29:18.393, 0.4 s after the tap. Deciding the flag and firing the buzz in the same
+effect removes the gap. This is why §5.9 insists they stay together.
+
+**The fix was then checked in the other direction, which mattered more than the first.**
+Silencing a genuine arrival would have been a worse bug than the one being fixed, and the
+physical phone cannot be turned remotely — so the heading was swept on the phone emulator
+(`adb emu sensor set magnetic-field`, recipe in §13). Turning onto the Qibla buzzed exactly
+once; wobbling inside the band buzzed not at all; leaving and returning buzzed again, three
+times for three arrivals. Both directions hold.
+
+**What else was confirmed on the handset, rather than assumed:**
+
+- *Times are right where the owner actually is.* The engine was run for the phone's own
+  stored coordinates and matched the screen to the minute on all six rows. Independently,
+  Aladhan was queried for **public Alanya town-centre coordinates** — deliberately not his
+  position, which is not ours to send anywhere — and agreed 5 of 6 exactly with Dhuhr +1,
+  which is the documented MWL offset of §5.3. The next-prayer card reading 04:36 against the
+  list's 04:35 is not a discrepancy: it is tomorrow's Fajr, one minute later in mid-August.
+- *Qibla, checked against the formula rather than itself.* App: 153°, 1858 km. Great-circle:
+  153.2°, 1859 km.
+- *The compass drawing agrees with its own words.* On a settled frame the Kaaba mark was
+  measured from the pixels at 9.0° left of the needle against a caption reading "Turn left
+  9°", at 0.65 R against the specified 0.66. Mid-movement the mark lags by a few degrees,
+  which is the 120 ms `animateFloatAsState` on the dial and not an error.
+- *Both themes.* Dark: white Kaaba, gold band and door, clearly readable. Light: dark Kaaba,
+  same gold. The aligned dial fills, the rim thickens, and the needle tip lands **inside**
+  the cube, which is the detail that makes arrival read at a glance.
+- *Font scale 1.5.* Qibla still fits one screen — the dial shrinks, the legend wraps. Home
+  no longer fits, which is expected and correct: it scrolls, and the "Different from your
+  mosque?" door is reachable.
+- *First run, on real hardware and a real geocoder.* Location permission, "Alanya, Türkiye"
+  from a live GPS fix (§5.18's town rule, on a non-UK address), school and method steps, the
+  exact-alarm prompt — which correctly **disappeared the moment the permission was granted**
+  — the disclaimer scrolled to its end with the dua request intact, and through to home.
+- *"Automatic" resolves by school, not by country.* In Türkiye it offered Muslim World
+  League, not Diyanet. That is §5.1 working as written, and the onboarding text says so.
+
+**Still not verified, and not fudged:** nobody has felt the buzz — the vibrator log is not a
+fingertip. Phone-to-watch sync is still untested and could not be attempted here: this
+handset has only Samsung's preinstalled `watchmanagerstub`, so pairing a Wear emulator to it
+would mean installing "Wear OS by Google" and signing into the owner's Google account, which
+is his to do and not mine.
 
 **The header date line, verified both ways round.** On `sajdastore` the header reads
 `Fri 31 Jul · 17 Safar 1448`, captured from a running build rather than reasoned about.
@@ -4008,7 +4128,7 @@ button whole and clear of the bar.
 | Font scale 1.5 | Overflows, as intended — the column is `verticalScroll` so nothing is lost; scrolling reaches the full Isha row and the door. Restored to 0.9 afterwards |
 | Location sheet | Seen on real hardware for the first time (it was listed as unverified in §11): full body, both buttons, the measured "ten miles is about a minute" line, nothing clipped |
 | City search | Typed "Slough" → **"Slough, United Kingdom"**. Forward geocoding names the town on hardware too, and the two halves of the feature agree |
-| Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **142 tests, 0 failures** |
+| Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **145 tests, 0 failures** |
 
 ### The dial became a compass, and arriving became an event (15 Aug 2026)
 
@@ -4144,7 +4264,19 @@ decisions, not oversights.
   `prayer_alarm_v0` at Slough, one setting unchanged between them (§10). Still emulator-only,
   and still a clock jump rather than a real overnight wait, which is the one thing that cannot
   reproduce HyperOS parking.
+- ~~No alarm has been watched firing on the S23 Ultra.~~ **Watched, 16 Aug** — posted
+  **37 ms** after the scheduled instant, with the queued alarm and the posted notification
+  both captured. Method and numbers in §10. This is a real handset on Android 16, not an
+  emulator, though still not a real overnight wait.
+- ~~The arrival haptic has never been confirmed on hardware.~~ **Confirmed, 16 Aug**, from
+  `dumpsys vibrator_manager`: `finished`, 122–129 ms, LONG_PRESS, attributed to the app —
+  which holds exactly one `performHapticFeedback` call. **Nobody has felt it.** A vibrator
+  log is not a fingertip, and that distinction should survive into the next session.
 - The phone↔watch Data Layer sync has never been observed working end to end (item 7 below).
+  It was looked at again on 16 Aug and is **blocked, not merely undone**: the S23 Ultra
+  carries only Samsung's preinstalled `watchmanagerstub`, so pairing a Wear emulator to it
+  needs "Wear OS by Google" installed and signed into the owner's Google account. That is
+  the owner's to do. Do not burn another session trying to route around it.
 - Nothing since 2 Aug has run on the Xiaomi — HyperOS refuses the sideload — and there is no
   physical watch at all.
 - One ANR seen once, under uiautomator load, never reproduced.
@@ -5118,6 +5250,10 @@ Every one of these cost real time. Read before building.
 | **The emulator compass will not move** | `adb emu sensor set orientation 118:0:0` returns OK and the heading does not change. Driving `magnetic-field` in X and Y wobbles it by about 31° and no more | The app reads `TYPE_ROTATION_VECTOR`, which the emulator synthesises rather than deriving from the orientation sensor, so `orientation` is inert. `magnetic-field` does feed it, but **the emulated device is upright, so its horizontal plane is X-Z**: putting the field in X-Y only tilts it. Sweep `(30·sin a, -48.4, 30·cos a)` and read the on-screen heading, which comes out near-linear at `heading ≈ a + 181`. Then solve for the heading you want. Used on 15 Aug 2026 to park the phone on 118° and the watch on 153° and photograph the aligned state. |
 | **`:app:installDebug` fails with `Update version code 3 is older than current 1000` even when scoped to the phone emulator** | `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug` still reports a downgrade | The *watch* build is sitting on the phone emulator from an earlier unscoped install — both modules share one `applicationId`, so this is the residue of the trap two rows up rather than a new one. Check with `adb -s emulator-5554 shell cmd package resolve-activity --brief com.sajdatime.app`: if it answers `WearMainActivity`, uninstall (`adb -s emulator-5554 uninstall com.sajdatime.app`) and install again. Uninstalling wipes onboarding, so expect to walk the setup flow afterwards. |
 | **Emulator after a locale change** | System UI, Bluetooth and the app itself ANR ("failed to complete startup") for many minutes after `setprop persist.sys.locale` + zygote restart or `adb reboot`; `uiautomator dump` returns nothing | Not the app. Kill the AVD and cold-boot it (`emulator -avd sajda -no-snapshot-load`), and stop the Gradle daemons while it settles. Seen 15 Aug 2026 after switching to `ar-EG` and back. |
+| **`--tests` is rejected on `:core:test`** | `Problem configuring task :core:test from command line. > Unknown command-line option '--tests'` | `test` is an aggregate lifecycle task with no filter of its own. Filter the real one: `./gradlew :core:testDebugUnitTest --tests "*QiblaEngineTest*"`. Add `-i` to see `println` output from a test. |
+| **The emulator compass freezes mid-experiment** | Injected `magnetic-field` values are accepted (`emu sensor get` reads them back) but the heading on screen stops changing, so a sensor sweep silently reports the same value every step | The screen went to sleep, and the compass flow is lifecycle-scoped — it unsubscribes, and the last heading stays painted. Nothing is wrong with the app; the reading on screen is simply stale. `adb -s <emu> shell svc power stayon true` before any sensor sweep, and treat an unchanging heading as suspect rather than as data. |
+| **Counting vibrations by counting lines under-reports them** | `dumpsys vibrator_manager \| grep -c <package>` stays flat while the device is plainly buzzing | The aggregated history is capped, so new entries push old ones out and the total stops rising. **Compare timestamps, not counts** — `grep <package>` and read the newest entry. A count that has stopped moving is the tell that the buffer is full, not that the vibrations stopped. Cost a wrong conclusion on 16 Aug 2026 before the timestamps were read. |
+| **The watch app will not launch from `monkey`** | `monkey -p com.sajdatime.app -c android.intent.category.LAUNCHER 1` returns without error and the watch stays on whatever it was showing | Launch the activity explicitly: `adb -s emulator-5556 shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity`. Note the class is **`WearMainActivity`**, not `MainActivity` — which is also the string that tells you which module is installed under the shared `applicationId` (see the rows above). |
 
 ### The architecture PDF is generated, never hand-made
 
@@ -6177,6 +6313,45 @@ matters more than the stable hashes, that is the trade being made.
     dp height and is worth nothing without one; and when a fit is tight, keep the container
     scrollable so that the device you did not test degrades to *reachable* rather than
     *lost*.
+
+101. **A caption that looks steady is not evidence that the state behind it is steady.** The
+    Qibla screen was sampled every two seconds and read "You are now facing the Kaaba" in
+    *every* sample, which looked like a settled compass. The vibrator log for the same
+    fourteen seconds showed six pulses. The alignment was dropping out and recovering faster
+    than the screen could be sampled, so the sentence never appeared to change while the
+    phone buzzed in the hand every two to three seconds. **Sample the state, not the
+    rendering of it** — and prefer a log the system keeps for you, because it records events
+    a poll can only miss. This defect was invisible on the emulator by construction:
+    injected sensor values do not wobble, so no amount of emulator testing could have
+    produced it.
+
+102. **A threshold that drives a vibration needs hysteresis; an edge is not enough.** Firing
+    on the *edge* of a boolean stops per-frame repetition and does nothing whatever about a
+    reading resting on the boundary — and a compass at rest always rests somewhere. Two
+    angles, one to arrive and a wider one to leave, plus a refusal to repeat inside a few
+    seconds. Then check the *positive* case as hard as the negative one: silencing a genuine
+    arrival would have been the worse bug, and the only reason it was caught in time is that
+    the sweep was run deliberately after the fix. A fix verified only in the direction of the
+    complaint is half a fix.
+
+103. **Moving a value up a level puts a cycle of daylight between it and everything that
+    read it.** Hoisting `aligned` into the parent so the dial and the sentence could not
+    disagree was correct, and it introduced a second bug immediately: the child now saw a
+    real heading with the parent's flag still false, wrote down "not arrived", and read the
+    flag catching up as an arrival — so the phone buzzed every single time the screen was
+    opened while already facing the Kaaba. **State and the effect that reacts to it belong
+    in the same place.** If a derived flag and its side effect live in different composables,
+    the gap between them is a state the user can land in.
+
+104. **You cannot rotate a phone over adb, so find the feature that moves the world
+    instead.** Verifying alignment needed a heading different from the one the handset had,
+    and the phone sat on a desk in another country. Changing the *city* moves the Qibla
+    bearing, which is the same relationship seen from the other end, and it is a shipping
+    feature rather than a test hook — so it needed no special build. Where that ran out (the
+    arrival *transition*, which no location change can produce because the screen is rebuilt
+    on the way back), the emulator took over with injected sensors. Two instruments, each
+    used for the half it can actually reach, beats waiting for the owner to pick the phone
+    up.
 
 
 ---

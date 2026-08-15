@@ -1,6 +1,7 @@
 package com.sajdatime.wear
 
 import android.content.Context
+import android.os.SystemClock
 import android.text.format.DateFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -511,7 +513,32 @@ private fun QiblaPage(state: WearUiState) {
             }
 
             val heading = state.heading
-            val aligned = heading != null && QiblaEngine.isAligned(heading, qibla, 5.0)
+            // Hysteresis, same rule and same reasons as the phone: a bare threshold buzzed
+            // the owner's phone 26 times in 76 seconds while it lay still on a desk. A wrist
+            // is the worse place to get that wrong, because a watch is always against skin.
+            // The buzz is fired here, in the same effect that decides `aligned`, because a
+            // cycle of daylight between the two is exactly what made the phone buzz on
+            // every open. See QiblaEngine.staysAligned and QiblaScreen.
+            val haptics = LocalHapticFeedback.current
+            var aligned by rememberSaveable { mutableStateOf(false) }
+            // False until the first heading is read: raising the watch while already facing
+            // the Kaaba records that, rather than announcing an arrival that never happened.
+            var haveRead by rememberSaveable { mutableStateOf(false) }
+            // And no second buzz within five seconds of the last, so a compass settling
+            // after the screen wakes cannot drum on the wrist. Measured on the phone: with
+            // hysteresis alone it still buzzed 4 times in the 26 seconds after opening.
+            var lastBuzzAt by rememberSaveable { mutableLongStateOf(0L) }
+            LaunchedEffect(heading, qibla) {
+                if (heading == null) return@LaunchedEffect
+                val now = QiblaEngine.staysAligned(aligned, heading, qibla)
+                val since = SystemClock.elapsedRealtime() - lastBuzzAt
+                if (now && !aligned && haveRead && since > ARRIVAL_QUIET_MILLIS) {
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    lastBuzzAt = SystemClock.elapsedRealtime()
+                }
+                aligned = now
+                haveRead = true
+            }
             // Green, aligned or not — the same rule as the phone. A colour that changes
             // underneath the needle invites the reading that the direction has changed.
             val needleColour = MaterialTheme.colorScheme.primary
@@ -615,16 +642,8 @@ private fun QiblaPage(state: WearUiState) {
                 )
             }
 
-            // A wrist has no room for the phone's sentence, so arriving is carried by a
-            // buzz and two short words in the middle of the dial. The buzz fires on the
-            // edge, not every frame: keyed on `aligned`, so holding still does not vibrate.
-            val haptics = LocalHapticFeedback.current
-            var wasAligned by rememberSaveable { mutableStateOf(aligned) }
-            LaunchedEffect(aligned) {
-                if (aligned && !wasAligned) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                wasAligned = aligned
-            }
-
+            // A wrist has no room for the phone's sentence, so arriving is carried by the
+            // buzz fired above and two short words in the middle of the dial.
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (aligned) {
@@ -666,6 +685,9 @@ private fun QiblaPage(state: WearUiState) {
  * starting at 0.897, a margin of well under a pixel. At 0.66 and 0.30 the corner reaches
  * 0.822 and there is real space again.
  */
+/** Shortest gap between arrival buzzes. Mirrors ARRIVAL_QUIET_MILLIS in QiblaScreen. */
+private const val ARRIVAL_QUIET_MILLIS = 5_000L
+
 private const val KAABA_DISTANCE = 0.66f
 private const val KAABA_SIZE = 0.30f
 

@@ -155,6 +155,66 @@ itself has not been felt on hardware, only the code path that fires it.
 
 ---
 
+## 16 Aug 2026 — your phone found the buzz was going off every three seconds
+
+You plugged the S23 Ultra back in and asked me to test it. The short version: **the compass
+had a real fault that neither simulator could ever have shown me, and it is fixed.**
+
+**What was wrong.** Your phone was lying still on the desk, facing the Kaaba, and nobody was
+touching it. In 76 seconds it buzzed **26 times**. Worse, for one stretch it buzzed 6 times
+in 14 seconds while the screen calmly read "You are now facing the Kaaba" the whole time —
+so it looked completely settled and was drumming away in your hand.
+
+**Why it happened.** A real compass never sits perfectly still; it drifts a degree or two
+even when the phone does not. The app had one line drawn at 5 degrees: inside it you have
+arrived, outside it you have not. When the reading wobbles right on that line, it crosses
+back and forth, and the app read every crossing as "you have just arrived" and buzzed again.
+The wobble was too quick to see on screen, which is exactly why this survived being tested
+on the simulators — a simulated compass is perfectly steady, so it never wobbles at all.
+
+**What I changed.** Three things, each fixing a different way it went wrong:
+
+1. **Two lines instead of one.** You arrive at 5 degrees, but you do not stop having arrived
+   until you have turned 8 degrees away. The gap in between is the wobble, absorbed silently.
+2. **No two buzzes within five seconds.** When you first open the screen the compass genuinely
+   takes a moment to settle, and that settling swings wider than any sensible allowance.
+3. **Opening the screen while already facing the Kaaba no longer buzzes.** It was doing that
+   every single time. Opening a screen is not arriving anywhere.
+
+**The result, measured the same way as before**: three minutes, phone untouched, **not a
+single buzz** — and the message stayed put the whole time.
+
+**Then I checked the opposite thing, which mattered more.** Making it silent is easy; making
+it silent by accident would have been a worse bug than the one I started with, and you would
+have found it in a car park somewhere. Since I cannot turn your phone from here, I drove a
+simulator's compass around instead: turning onto the Qibla buzzes once, wobbling about while
+facing it buzzes not at all, and turning away and coming back buzzes again. It still does
+the thing it is for.
+
+**Two things I could finally prove on your phone that I never could before.**
+
+- **An alarm was watched going off.** Prayer times move with where you are, so I briefly set
+  the location to Dhaka, which put Fajr 90 seconds away instead of waiting until dawn. The
+  alert arrived **37 thousandths of a second** after the minute it was due. I set your
+  location back afterwards.
+- **The buzz genuinely reaches the motor.** Android keeps a log of every vibration and which
+  app asked for it, and yours are in there. **I still have not felt it** — I am reading a
+  log, not holding the phone — and I would rather say that plainly than claim more.
+
+**What I could not do.** The watch still cannot be tested against a real phone. Pairing one
+needs the "Wear OS by Google" app installed on your handset and signed in with your Google
+account, and I will not sign into your account. That is the one job on this list that has to
+be yours.
+
+**I put your phone back as I found it**: text size, dark mode, and your real location. The
+Play Store copy of the app was never touched — I install a separate test copy alongside it,
+exactly so your closed test is never disturbed.
+
+Full build clean: **145 tests, no failures** (three new ones, which fail if anyone ever
+quietly collapses those two lines back into one).
+
+---
+
 ## ⚠️ One thing was not left until later: the app crashed in the far north
 
 **Found on 1 Aug 2026, fixed the same day, and the reason it was found is worth saying.**

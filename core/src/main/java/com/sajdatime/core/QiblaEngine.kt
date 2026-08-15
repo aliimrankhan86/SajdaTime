@@ -63,6 +63,46 @@ object QiblaEngine {
     fun isAligned(current: Double, target: Double, toleranceDegrees: Double = 3.0): Boolean =
         abs(relativeTurn(current, target)) <= toleranceDegrees
 
+    /** It takes this much to arrive. */
+    const val ALIGN_GRAB_DEGREES = 5.0
+
+    /** And this much to be told you have left, which is deliberately wider. See [staysAligned]. */
+    const val ALIGN_RELEASE_DEGREES = 8.0
+
+    /**
+     * Arrival, with hysteresis: harder to leave than to enter.
+     *
+     * A bare threshold is fine for a caption and wrong for a vibration. Arriving is an
+     * event — it buzzes the phone and swaps the whole dial — so it must fire when the user
+     * turns to face the Kaaba and at no other time. With one threshold, a heading resting
+     * anywhere near it re-triggers on every wobble.
+     *
+     * That is not hypothetical. On the owner's S23 Ultra on 16 Aug 2026, sitting untouched
+     * on a desk while the battery finished charging, the fused heading wandered between
+     * 144 and 167 degrees against a Qibla of 153. Alignment flipped at least six times in
+     * 55 seconds and the vibrator log shows it buzzing each time, for a phone nobody had
+     * moved. The compass is otherwise steady — 42 consecutive samples aligned, and 24
+     * consecutive at "turn right 6" on a later run — so this is a boundary problem, not a
+     * noisy sensor.
+     *
+     * Hence two thresholds: arrive within [ALIGN_GRAB_DEGREES], and keep saying so until
+     * the user is [ALIGN_RELEASE_DEGREES] away. The gap is the wobble the screen absorbs
+     * in silence. It is deliberately narrow — it swallows the jitter that sits on the
+     * boundary, not a genuine 12-degree excursion, because a user who really has turned
+     * away should be told so.
+     *
+     * Rejected: smoothing the heading harder instead. The filter in CompassRepository
+     * already runs at every sensor sample; slowing it enough to hide this would make the
+     * needle visibly lag the hand, which costs every user something to fix a boundary that
+     * only some users sit on.
+     */
+    fun staysAligned(wasAligned: Boolean, current: Double, target: Double): Boolean =
+        isAligned(
+            current,
+            target,
+            if (wasAligned) ALIGN_RELEASE_DEGREES else ALIGN_GRAB_DEGREES,
+        )
+
     /**
      * Great-circle distance to the Kaaba in kilometres. Shown alongside the compass so
      * the reading has a sanity check the user can recognise.

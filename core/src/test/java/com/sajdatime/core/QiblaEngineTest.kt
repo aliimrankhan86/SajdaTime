@@ -109,6 +109,46 @@ class QiblaEngineTest {
         assertEquals(13240.0, QiblaEngine.distanceToKaabaKm(Coordinates(-33.8688, 151.2093)), 60.0)
     }
 
+    /**
+     * The hysteresis is the whole point, so it is pinned rather than left to be tidied
+     * into a single tolerance by a later reader who sees two constants and assumes one is
+     * redundant. Collapsing them buzzed the owner's phone 26 times in 76 seconds while it
+     * lay untouched on a desk — see [QiblaEngine.staysAligned].
+     */
+    @Test
+    fun `arriving takes five degrees but leaving takes eight`() {
+        // Coming in: 6 degrees off is not yet arrival, 5 is.
+        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 159.0, target = 153.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 158.0, target = 153.0))
+
+        // Already there: the same 6 degrees does not throw you out again. This is the exact
+        // band the S23 Ultra was wobbling across.
+        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 159.0, target = 153.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 161.0, target = 153.0))
+
+        // But a real turn away still registers.
+        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 162.0, target = 153.0))
+        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 167.0, target = 153.0))
+    }
+
+    @Test
+    fun `the release angle is wider than the grab angle`() {
+        // If these ever meet, the hysteresis is gone and the buzzing is back.
+        assertTrue(QiblaEngine.ALIGN_RELEASE_DEGREES > QiblaEngine.ALIGN_GRAB_DEGREES)
+    }
+
+    @Test
+    fun `hysteresis works across the 360 degree seam`() {
+        // The wobble does not care that the Qibla happens to sit near north.
+        // 357 -> 2 is a 5 degree turn: inside the grab angle either way.
+        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 357.0, target = 2.0))
+        // 355 -> 2 is 7 degrees: too far to arrive, near enough to stay.
+        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 355.0, target = 2.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 355.0, target = 2.0))
+        // 353 -> 2 is 9 degrees, past the release angle, so it is a genuine turn away.
+        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 353.0, target = 2.0))
+    }
+
     @Test
     fun `normalise always returns zero to 360`() {
         listOf(-720.0, -181.0, -0.5, 0.0, 359.9, 360.0, 720.5).forEach { input ->

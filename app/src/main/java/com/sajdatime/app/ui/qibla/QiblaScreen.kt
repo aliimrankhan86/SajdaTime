@@ -26,9 +26,11 @@ import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import android.os.SystemClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -116,10 +118,48 @@ fun QiblaScreen(state: UiState) {
             textAlign = TextAlign.Center,
         )
 
+        // Worked out once, here, and handed to both halves. The dial and the sentence are
+        // two renderings of the same fact, and with hysteresis "aligned" now depends on
+        // what it was a moment ago — so two independent copies could disagree, and the
+        // screen would say you had arrived under a dial that said you had not.
+        //
+        // The buzz is decided in this same effect, deliberately. It used to live down in
+        // GuidanceText, and when `aligned` moved up here that put one effect cycle between
+        // the heading landing and the flag catching up. In that gap GuidanceText saw a real
+        // heading with `aligned` still false, wrote down "not arrived yet", and then read
+        // the flag turning true as an arrival — so the phone buzzed every single time the
+        // screen was opened while already facing the Kaaba. Measured on the S23 Ultra:
+        // 00:29:18.393, 0.4 s after the tab was tapped. Deciding both together removes the
+        // gap that the bug lived in.
+        val heading = state.compassHeading
+        val haptics = LocalHapticFeedback.current
+        var aligned by rememberSaveable { mutableStateOf(false) }
+        // False until the first heading of the session has been read. Opening the screen
+        // already facing the Kaaba is not an arrival, and must not be announced as one.
+        var haveRead by rememberSaveable { mutableStateOf(false) }
+        // And never twice in quick succession. Hysteresis stops the endless buzzing of a
+        // phone at rest, but a compass that has just been switched on genuinely swings
+        // while it settles, and those swings are wider than any sensible release angle:
+        // with hysteresis alone the S23 Ultra still buzzed 4 times in the 26 seconds after
+        // the screen opened, then fell silent for the rest of the run. One arrival is worth
+        // announcing; four in half a minute is a fault the user feels in their hand.
+        var lastBuzzAt by rememberSaveable { mutableLongStateOf(0L) }
+        LaunchedEffect(heading, qibla) {
+            if (heading == null) return@LaunchedEffect
+            val now = QiblaEngine.staysAligned(aligned, heading, qibla)
+            val since = SystemClock.elapsedRealtime() - lastBuzzAt
+            if (now && !aligned && haveRead && since > ARRIVAL_QUIET_MILLIS) {
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                lastBuzzAt = SystemClock.elapsedRealtime()
+            }
+            aligned = now
+            haveRead = true
+        }
+
         Spacer(Modifier.height(24.dp))
-        CompassDial(state = state, qiblaTrueBearing = qibla)
+        CompassDial(state = state, qiblaTrueBearing = qibla, aligned = aligned)
         Spacer(Modifier.height(24.dp))
-        GuidanceText(state = state, qiblaTrueBearing = qibla)
+        GuidanceText(state = state, qiblaTrueBearing = qibla, aligned = aligned)
         if (state.compassHeading != null) {
             Spacer(Modifier.height(14.dp))
             DialLegend()
@@ -143,7 +183,7 @@ private fun dialMaxWidth(): Dp =
     minOf(320.dp, (LocalConfiguration.current.screenHeightDp * 0.36f).dp)
 
 @Composable
-private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
+private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boolean) {
     val heading = state.compassHeading
     val scheme = MaterialTheme.colorScheme
 
@@ -156,8 +196,6 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
         animationSpec = tween(durationMillis = 120),
         label = "dial",
     )
-
-    val aligned = heading != null && QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0)
 
     // The arc is the turn still owed, measured from the needle at the top round to the
     // Kaaba. Signed, so a left turn sweeps anticlockwise and the user is never told to walk
@@ -407,6 +445,14 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * shares but keeps its own needle length, because it has a readout in the middle that the
  * phone does not; see `WearApp.kt`.
  */
+/**
+ * The shortest gap between two arrival buzzes. Long enough to swallow a compass settling
+ * after the screen opens, short enough that a user who really does turn away and back is
+ * told again. Shared with the watch by copy rather than by a common constant, because the
+ * modules share only `core` and this is a feel value, not a rule.
+ */
+private const val ARRIVAL_QUIET_MILLIS = 5_000L
+
 private const val KAABA_DISTANCE = 0.66f
 private const val KAABA_SIZE = 0.30f
 
@@ -461,16 +507,22 @@ private fun DrawScope.drawKaaba(
  *
  * **Arriving is now an event, not a change of caption.** Until 15 Aug 2026 facing the
  * Kaaba swapped one line of the same size and weight for another, which is the least a
- * screen can do to mark the thing the user opened it for. It now also buzzes once and
- * turns green, and the buzz fires on the *edge* rather than every frame: `LaunchedEffect`
- * keyed on `aligned` runs when the value flips, so a user holding still is not vibrated
- * sixty times a second. It stays quiet on first composition when already aligned, because
- * a phone that buzzes the instant you open a screen has told you nothing.
+ * screen can do to mark the thing the user opened it for. It now also turns green and
+ * buzzes — though the buzz itself is fired by [QiblaScreen], where `aligned` is decided,
+ * because the two have to be worked out in the same breath. The comment there says why.
+ *
+ * **An edge alone is not enough on real hardware**, which the emulator could never have
+ * shown, because injected sensor values do not wobble. Measured on the owner's S23 Ultra
+ * on 16 Aug 2026, lying untouched on a desk: 26 buzzes in 76 seconds, and a further 6 in
+ * the 14 seconds from 00:17:52, during which *every* sample of this very caption read "You
+ * are now facing the Kaaba". The dropouts were shorter than the screen could be sampled,
+ * so the sentence looked settled while the phone went off in the user's hand every three
+ * seconds. [QiblaEngine.staysAligned] is what fixed it, and the same four-minute test
+ * afterwards recorded no buzz at all.
  */
 @Composable
-private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
+private fun GuidanceText(state: UiState, qiblaTrueBearing: Double, aligned: Boolean) {
     val heading = state.compassHeading
-    val aligned = heading != null && QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0)
 
     val message = when {
         heading == null -> stringResource(R.string.qibla_no_compass, qiblaTrueBearing.roundToInt())
@@ -483,13 +535,6 @@ private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
                 stringResource(R.string.qibla_turn_left, (-turn).roundToInt())
             }
         }
-    }
-
-    val haptics = LocalHapticFeedback.current
-    var wasAligned by rememberSaveable { mutableStateOf(aligned) }
-    LaunchedEffect(aligned) {
-        if (aligned && !wasAligned) haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-        wasAligned = aligned
     }
 
     Column(
