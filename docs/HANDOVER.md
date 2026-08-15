@@ -196,7 +196,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | State | `ui/SajdaViewModel.kt` — the single ViewModel; `UiState`; 1-second clock; compass lifecycle |
 | Data | `data/SettingsRepository.kt` (DataStore + `AppSettings` + `AlertStyle`), `data/LocationRepository.kt`, `data/CityLookup.kt`, `data/CompassRepository.kt`, `data/WatchSync.kt` |
 | Notify | `notify/Notifications.kt` (channels), `notify/PrayerAlarmScheduler.kt`, `notify/PrayerAlarmReceiver.kt`, `notify/SystemEventReceiver.kt`, `notify/DailyRescheduleWorker.kt`, `notify/OngoingBadge.kt`, `notify/TimeFormat.kt` |
-| Screens | `ui/home/HomeScreen.kt`, `ui/qibla/QiblaScreen.kt`, `ui/settings/SettingsScreen.kt`, `ui/onboarding/OnboardingScreen.kt`, `ui/components/Common.kt` (`LocationSheet`, `SectionHeading`, `rememberRemainingText`) |
+| Screens | `ui/home/HomeScreen.kt`, `ui/qibla/QiblaScreen.kt`, `ui/settings/SettingsScreen.kt`, `ui/onboarding/OnboardingScreen.kt`, `ui/components/Common.kt` (`LocationSheet`, `SectionHeading`, `rememberRemainingText`), `ui/components/MethodChoices.kt` (`MethodChoiceList` — the one list of calculation methods with a plain line under each, shared by the Settings picker and the first-run step so they cannot drift; `RadioRow`) |
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
@@ -285,12 +285,23 @@ raster assets anywhere in the app itself. The Play Store icon and feature graphi
 ## 4. Features — the complete list
 
 ### Onboarding (first run only)
-`Step` enum: `WELCOME → PERMISSION → SECT → MADHAB → CONFIRM`.
+`Step` enum: `WELCOME → PERMISSION → SECT → MADHAB → METHOD → CONFIRM`.
 
 Welcome/bismillah → coarse-location permission with an **(i) info icon** explaining why it
-is needed → Sunni/Shia cards → madhab (shown **only for Sunni**, and **skippable**; Shia
-skips straight to confirm because Jafari fixes the Asr rule anyway) → confirmation →
-finish. Then the one-time disclaimer dialog.
+is needed → Sunni/Shia cards → madhab (shown **only for Sunni**; Shia skips it because
+Jafari fixes the Asr rule anyway) → **calculation method** (everyone; the same list Settings
+shows, one plain line under each, "Automatic" preselected so the unsure user pays one tap)
+→ confirmation, which now names the method beside the location and school → finish. Then
+the one-time disclaimer dialog.
+
+**The METHOD step was added on 15 Aug 2026 and it is the visible answer to the auto-mapping
+that was rejected.** Until then setup asked for sect and madhab and never mentioned the
+method, so a user who did not open Settings could not reach it. The far-north banner (below)
+covers users above 45°; measured with the app's own engine, the *complaint-sized* gap — ten
+to twenty minutes on Isha — sits below that line, across North America and the Gulf, and
+Fajr is eight minutes late in Indonesia. See §10, "The gap the banner never reached", and
+§5.17. Going Back from this step and switching school discards a method the new school was
+never offered (`CalcMethod.offeredTo`, §5.17).
 
 The **PERMISSION** step always offers both routes at once: "Allow location", and below it
 "Or type a city" with a field, a Find city button and a "Skip for now and use Makkah"
@@ -306,8 +317,14 @@ offer, never a gate.
 - Tappable location header showing city + **Hijri date**
 - Centred hero card: "NEXT PRAYER", name and time on one line, large live countdown, "until it begins"
 - Today's full timeline — Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha — with the next one highlighted
+- **"Different from your mosque?"** — a quiet text link under the timeline, for everyone,
+  never dismissed. Opens a short explainer (the board shows the congregation; Fajr and Isha
+  follow the twilight method; Asr follows the school; a few minutes are left over; where a
+  difference remains, follow your mosque) with one button per cause that opens the matching
+  Settings chooser directly. It names no method and changes no time. §5.17
 - Full-width "Save timetable as PDF" button
-- Banners: Makkah-fallback notice, exact-alarm-permission notice
+- Banners: Makkah-fallback notice, far-north method notice (tap opens the method picker
+  directly, not merely the Settings tab), exact-alarm-permission notice
 
 ### Qibla screen
 Rotating compass dial, tick marks every 15° (long every 90°), north wedge, Qibla needle,
@@ -916,6 +933,64 @@ there is a translation to make it coherent, not before. See `CityLookup.kt`.
 Evidence for the whole of this section — eleven surfaces on a phone and a watch both set to
 `ar-EG` — is in §10, "The app on a phone that is actually set to Arabic".
 
+### 5.17 The method is asked, visibly, of everyone — and never chosen for them (15 Aug 2026)
+
+The owner brought a problem, with a proposed solution written by another AI: users still
+say the times are "not right" against their mosque, by fifteen to thirty minutes on Isha or
+Asr, and think the app is broken. The proposal asked for four things. Two were already built,
+one was already rejected with reasons, and one was right. What follows is the rule that came
+out of it; the evidence and the item-by-item verdicts are in §10, "The gap the banner never
+reached", and §11.
+
+**The rule.** The app never chooses a calculation method for the user, silently or on a
+proxy — not by madhab, not by latitude, not by country, and not from a "do you prefer early
+or late Isha" question. It does three things instead, all visible:
+
+1. **It asks once at setup**, of everyone, with "Automatic" preselected and a plain line
+   under every option saying who publishes it and, where that is known, who uses it. The
+   unsure user pays one tap. `Step.METHOD`; the list is `MethodChoiceList`.
+2. **It keeps a permanent, quiet door on the Times screen** — *"Different from your
+   mosque?"* — for everyone, because a user who thinks the app is wrong is looking at the
+   times, not at Settings, and the disclaimer that explains this is read once. Behind it, one
+   short explainer with one button per cause, each opening the matching chooser directly.
+3. **It keeps the far-north banner** (`MethodBanner`, `abs(latitude) ≥ 45`, method still
+   `AUTO`, dismissible) for the users where the default is an *hour* out, and its tap now
+   opens the picker rather than the Settings tab.
+
+**Why not auto-map.** The proposal wanted Sunni + Hanafi → University of Karachi in South
+Asia, everyone else → Muslim World League, and an "Early Isha" answer swapped to ISNA behind
+the scenes. Measured with this engine: Karachi's Fajr equals MWL's at every South Asian city
+tried and its Isha is four to six minutes later, so the mapping buys almost nothing; and the
+madhab is a rule about the *Asr shadow*, not the twilight, so binding a method to it is a
+category error that would leave a Hanafi in Cairo on the wrong convention. The ISNA swap is a
+silent method change wearing a preference question — the same move A2 rejected — and it
+labels ISNA's fixed 15° as "the red twilight", which is a claim about a named authority that
+nothing here supports. A description that helps someone *recognise* their mosque's answer is
+allowed; a rule that *decides* it is not.
+
+**Why not a ±60-minute slider.** "Match your mosque" already exists at ±30 with steppers,
+and the reasons for both bounds are recorded (§5 data model, §15 lessons 75 and 76): a gap
+past half an hour is a method mismatch wearing an offset's clothes — Slough's was 78 minutes
+and the fix was the method — and a slider cannot be landed on an exact minute. Wider offsets
+would also let a user push "Isha begins" onto their *congregation* time, at which point the
+notification and the Now marker state something false. Matching jama'ah is a different
+feature (a second time per prayer), not a bigger offset; it is not built and is recorded in
+§11 as a non-goal for now.
+
+**Which school a method belongs to is one definition.** `CalcMethod.offeredTo(sect)` decides
+what the list shows and what both sect setters keep: switching school discards a method the
+new school was never offered and falls back to Automatic. The phone did that on the way to
+Shia only, and the watch never did — the watch would keep a synced Sunni method through an
+on-wrist switch to Shia and silently lose the Jafari Maghrib. Both directions, both modules,
+one function now; `MethodOfferingTest` pins which side each method sits on.
+
+**Descriptions are religious content and hedged on purpose.** The sourcing rules sit above
+the strings in `core/values/strings.xml`. Short form: no angles; name who publishes it; name
+where it is used only where that is the publisher's own country or has been verified against
+real timetables; keep "some" and "many"; never sell a method as *the* method for a country
+that has several. Aladhan marks its Dubai and Diyanet entries *experimental*, so those two
+descriptions claim nothing about officialness.
+
 ---
 
 ## 6. Notification and alarm architecture
@@ -1166,7 +1241,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**129 unit tests, all offline and deterministic, 0 failures.** (core 76, app 41, wear 12.)
+**133 unit tests, all offline and deterministic, 0 failures.** (core 80, app 41, wear 12.)
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
 > row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
@@ -1180,6 +1255,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
 | `LocaleDisciplineTest` | core | 6 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11); **the shipped tag is a left-to-right language**; **no shipping source set selects a language the app has no `values-<lang>/` for** (§5.16). The last two replaced a narrower check in `NoTranslationsYetTest` that only knew the literal tag `ur` |
+| `MethodOfferingTest` | core | 4 | `CalcMethod.offeredTo` — AUTO to both schools, Jafari and Tehran to Shia only, every other method to Sunni only, and every method to exactly one school. It is the one definition behind the picker's filter and both sect setters' "discard a method the new school was never offered", so a new method cannot be added without deciding which side it sits on (§5.17) |
 | `AdjustmentTest` | core | 11 | Per-prayer corrections move a prayer by exactly that many minutes on every path, including those that bypass adhan; out-of-range values clamped on the way out rather than trusted; zero dropped rather than stored; no corrections is byte-identical to before; the worst legal pair still cannot invert a day; the Hijri shift moves Ramadan, and the Umm al-Qura Isha rule moves with it |
 | `BidiTest` | core | 8 | Right-to-left ordering asserted against `java.text.Bidi`, the real Unicode algorithm — the Hijri date, a Latin city inside an Arabic sentence and the reverse; and a test that pins the *wrong* fix (isolating the whole date rather than the month) so it cannot be "simplified" back in |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
@@ -1210,7 +1286,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, **129 tests**, 0 failures, lint informational-only (0 errors),
+Expected: BUILD SUCCESSFUL, **133 tests**, 0 failures, lint informational-only (0 errors),
 phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
 is present).
 
@@ -3657,6 +3733,113 @@ history that turned out to be errors in the test.
 **Not covered:** this was the emulator, not the Xiaomi, and it was a clock jump rather than a real
 overnight wait. HyperOS parking (§10) is the thing a clock jump cannot reproduce.
 
+### The gap the banner never reached, and what the other AI's proposal got right (15 Aug 2026)
+
+**Why this exists.** The owner reported that users still find the times "not right" against
+their mosque — fifteen to thirty minutes on Isha or Asr — and brought a four-part proposal
+drafted with another AI (auto-map the method from madhab and region, an "early or late Isha"
+question that swaps to ISNA behind the scenes, a ±60-minute per-prayer slider, plain-language
+labels, and a "trust banner" in Settings). It assumed the app calls the AlAdhan API at
+runtime, which it does not (§2). Each part was checked against this codebase and measured
+with this engine before anything was built. The rule that came out is §5.17.
+
+**1. A 15–30 minute Asr gap cannot be the madhab.** Hanafi minus standard Asr, this engine,
+longitude 0, on 15 Jan / 20 Mar / 21 Jun / 21 Dec:
+
+| Latitude | Hanafi − standard Asr, minutes |
+|---|---|
+| 0° | +58, +73, +56, +56 |
+| 20° | +47, +58, +77, +46 |
+| 40° | +39, +51, +74, +38 |
+| 55° | +29, +49, +76, +26 |
+
+Never under 26 minutes anywhere on earth. A gap of fifteen to thirty on Asr is therefore the
+mosque board printing the *congregation*, or the mosque's own precaution minutes — lesson 39,
+a wording problem before a settings problem. That is why the explainer's first paragraph is
+about the congregation and not about any setting.
+
+**2. The default is 10–20 minutes out exactly where the far-north banner does not reach.**
+`METHOD_NOTICE_LATITUDE` is 45° because that is where the spread between methods crosses an
+hour (the table under "What the two second opinions got right and wrong"). Measured now with
+this engine — MWL (the `AUTO` default) minus each region's own method, on the same five dates,
+positive meaning the default is **later**:
+
+| City | Local method | Fajr | Isha |
+|---|---|---|---|
+| New York 40.7°N | ISNA | −17, −16, −26, −16, −16 | **+11, +11, +17, +11, +11** |
+| Chicago 41.9°N | ISNA | −17, −17, −29, −17, −17 | **+11, +11, +19, +11, +11** |
+| Toronto 43.7°N | ISNA | −17, −17, −32, −17, −17 | **+12, +12, +21, +11, +12** |
+| Los Angeles 34.1°N | ISNA | −15, −15, −21, −14, −15 | +10, +10, +14, +10, +10 |
+| Houston 29.8°N | ISNA | −14, −14, −19, −14, −15 | +10, +9, +12, +10, +9 |
+| Riyadh 24.7°N | Umm al-Qura | +2, +2, +3, +2, +3 | **−15, −18, −6, −19, −13** |
+| Jeddah 21.5°N | Umm al-Qura | +2, +3, +2, +2, +2 | **−17, −20, −9, −21, −15** |
+| Doha 25.3°N | Qatar | 0 | **−14, −18, −6, −19, −13** |
+| Kuwait 29.4°N | Kuwait | 0 | −3, −2, −3, −3, −3 |
+| Dubai 25.2°N | Dubai | +1 | −6, −5, −7, −6, −6 |
+| Cairo 30.0°N | Egyptian | **+7, +7, +10, +7, +7** | −2, −2, −3, −2, −3 |
+| Istanbul 41.0°N | Diyanet | 0 | 0 |
+| Karachi / Lahore / Dhaka / Delhi | Karachi | 0 | −4 to −6 |
+| Jakarta 6.2°S | Kemenag | **+9, +8, +8, +8, +10** | −4, −5, −4, −4, −5 |
+| Singapore 1.3°N | MUIS | **+9, +8, +9, +8, +9** | −4, −4, −5, −4, −4 |
+| Slough 51.5°N | Moonsighting | −21, −20, −13, −21, −23 | +20, +29, +45, +29, +19 |
+
+Every one of those cities is under 45° except Slough, so none of them ever saw *"Does this
+match your mosque?"*. **North America on the default reads Isha 10–21 minutes late and Fajr
+14–32 minutes early; the Gulf reads Isha 6–21 minutes early; Egypt, Indonesia and Singapore
+read Fajr 7–10 minutes late, which is the fasting direction.** That is the complaint the owner
+is describing, and the users making it were never offered the method. The rest of the world
+is within about six minutes of its own convention, as the 1 Aug worldwide table said — the
+threshold was measured for the worst case and missed the common one (lesson 95).
+
+**3. The proposal's auto-mapping buys almost nothing and decides a religious question.**
+Sunni + Hanafi → University of Karachi in South Asia: Karachi's Fajr equals MWL's at every
+South Asian city above and its Isha is four to six minutes later, so a South Asian Hanafi on
+the default is already within the "Match your mosque" range. And a Hanafi in Cairo, Chicago
+or Bradford has nothing to do with the University of Karachi's twilight angle — the madhab
+sets the Asr shadow, not the twilight, and binding one to the other would leave most Hanafis
+worldwide on a convention their mosque does not use. "Early Isha (red twilight) → swap to
+ISNA behind the scenes" is a silent method change behind a preference question, which is the
+option A2 rejected; and it labels ISNA's fixed 15° as *the red twilight* — a claim about a
+named authority with no document behind it (lesson 45a). Rejected, with the measured reasons.
+
+**4. What was right in the proposal, and built.** Plain-language descriptions under each
+method (Item 3 of the proposal), and a permanent explanation of *why* times differ (Item 4)
+— but on the Times screen where the doubt happens, not only in Settings, and with the app's
+own register: *"Neither is wrong"* and *"follow your mosque"* rather than a statement about
+which variances are "valid". Item 2 (±60 slider) was already built at ±30 with steppers on 2
+Aug and the bounds stand — §5.17 says why. Item 1 was replaced by asking, once, at setup.
+
+**Verified on the phone emulator (API 36), from a cleared install, LTR:**
+
+| Checked | Result |
+|---|---|
+| Sunni path | Welcome → location → Sunni → madhab → **Calculation method** with Automatic preselected and a line under all twelve → picked ISNA → confirm card shows *Location / School / Calculation method: ISNA, North America* → Finish → disclaimer → home |
+| Shia path | Sunni card swapped for Shia → straight to the method step showing Automatic, Jafari, Tehran only |
+| Back and switch | Picked Tehran, Back, chose Sunni, Continue, Continue → method step on **Automatic**; DataStore read `SUNNI` and `AUTO` — the Shia method was discarded, not kept |
+| Home door | *"Different from your mosque?"* under the timeline; opens the explainer; **Calculation method** opened Settings with the picker already showing, and each option carries its line; picking MWL closed it and the row read *Muslim World League* |
+| Other two actions | **Match your mosque** opened the Adjustments dialog; **School of thought** opened the School dialog, each from a fresh visit to Times |
+| Far-north banner | Method set back to Automatic at 51.5°N → *"Does this match your mosque?"* appeared; tapping it opened the **picker directly**, not merely the Settings tab |
+| Rotation | Picker open, rotate → still open; close, rotate back → does **not** reopen (the request is consumed once) |
+| Font scale 1.5 | Method step scrolls to Back / Continue; confirm reads *Automatic · Muslim World League*; explainer scrolls to *Match your mosque* and the closing sentence, Close reachable throughout |
+| RTL (`:app:assembleRtl`, `com.sajdatime.app.rtl`) | Method step: radios on the right, text right-aligned, nothing clipped. Explainer: title and paragraphs right-aligned, Close on the left, buttons full width; *Match your mosque* landed in the Adjustments dialog. Stranded full stops are the documented English-in-RTL artefact. **Uninstalled afterwards** (lesson 42) |
+| Watch (`sajdawear`, API 34) | Debug build installs and launches; on-wrist school switch to Shia writes `sect=SHIA` with no stale method key and the button reads *Shia*; process alive, `logcat -b crash` empty. The watch AVD's GPS was still pinned to Longyearbyen by an earlier session (78.22°N), so its times were projected — correct for that location, and not something this change touched |
+| Gate | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **133 tests, 0 failures**, lint 0 errors with the previously audited warning set |
+
+**One thing that looked like a defect and was not reproduced.** In one run, tapping the door
+immediately after returning to Times did not open the explainer and a later dump showed the
+Qibla tab; two identical retries opened it every time and the same sequence (door → action →
+close → Times → door) then behaved. This has the shape of lesson 51 — a tap landing during
+the tab crossfade, or a stale `uiautomator` dump — and is recorded rather than dressed up as
+either a bug or a non-event.
+
+**Not verified.** No physical phone or watch; the emulator's timezone had been left on
+`Europe/Istanbul` by an earlier session and was set to `Europe/London` first, which is why
+the first home screenshot showed Dhuhr at 3:07 pm (item 4 in §11, phone timezone, not a
+regression). `docs/store/screenshots/` was **not** retaken — the home screen gained one line
+of text, and P2 in §11 already schedules the retake as part of the next upload, so it should
+be done then and not before. The explainer was also opened in **dark** theme (Settings →
+Dark → Times → door): plain-role dialog, outlined buttons and green Close, nothing to fix.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Parked, 2 Aug 2026 — the whole of it, on one screen
@@ -3670,7 +3853,7 @@ exist yet. Start here, then read the detail in the sections that follow.
 | | What | When |
 |---|---|---|
 | P1 | **Upload `versionCode` 3 to the closed track.** Built, signed, waiting. It carries the Dhuhr fix, which silently loses one prayer alert a day in the live build | Now. Owner action in the Play Console |
-| P2 | **Retake `docs/store/screenshots/`** — in the order build → capture → upload, as part of P1, not before it | With P1 |
+| P2 | **Retake `docs/store/screenshots/`** — in the order build → capture → upload, as part of P1, not before it. **Now also owed by 15 Aug's change:** the Times screen gained the *"Different from your mosque?"* line under the timetable, and the first-run flow gained a Calculation method step, so the Times capture is stale by one line | With P1 |
 | P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1 |
 | P4 | **Apply for production** when the fourteen days complete | ~14 Aug 2026 |
 | P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |
@@ -3849,6 +4032,16 @@ decisions, not oversights.
   The latitude-triggered note is now the strongest candidate. The objection to the rejected
   option was never that a smart default is wrong — it is that a **silent** one is. A visible
   prompt is not the same thing.
+
+  > **Superseded on the third row, 15 Aug 2026.** The onboarding step was *also* built, and
+  > the "for users who do not need it" objection turned out to be wrong on measurement: the
+  > default is 10–21 minutes out on Isha across North America and the Gulf and 7–10 minutes
+  > late on Fajr in Egypt, Indonesia and Singapore — all under 45°, so none of them are
+  > reached by the note. §10, "The gap the banner never reached", and §5.17. The fifth row's
+  > verdict also aged: the per-prayer offset *was* justified for the reasons in "Match your
+  > mosque" (§10, 2 Aug), just not as a fix for Slough. The rejection of auto-switching
+  > stands, and now covers auto-mapping by madhab or region and preference questions that
+  > swap the method behind the scenes.
 
   **DONE, 2 Aug 2026 — the latitude-triggered note, built exactly as scoped.**
   `HomeScreen.MethodBanner`, using the existing `NoticeCard` and the same dismiss contract as
@@ -4103,6 +4296,22 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   than an abbreviation. A permanent "Calculation: MWL" line would add jargon to the home
   screen of every user worldwide to serve the same case less well. If it comes back, it
   should come back as a full method *name* on the Times screen, not a code.
+
+  **CLOSED another way, 15 Aug 2026.** The case A3 was for — users who never open Settings
+  and never read the disclaimer — is now met by two things that are not a code on the home
+  screen: the method is asked at setup, of everyone, and the Times screen carries the
+  permanent *"Different from your mosque?"* door, which is the user's own question rather than
+  a label they would have to decode. §5.17. A "Calculation: …" line remains unbuilt and is
+  not planned.
+
+- **A18 — Matching the mosque's *congregation* time is a different feature, not a wider
+  offset (15 Aug 2026).** The proposal that prompted §5.17 asked for a ±60-minute per-prayer
+  slider. Some of what people want from that is to be told at *jama'ah* time. "Match your
+  mosque" moves *when the prayer begins*, and past about thirty minutes that is no longer
+  what it is doing — Isha jama'ah at Diamond Road, Slough is 47 minutes after the begin time
+  the app shows, and pushing "Isha begins" onto it would make the notification and the Now
+  marker say something false. If this is ever wanted it is a second time per prayer, an
+  "also remind me at" — a separate setting with its own wording. Not built; not a defect.
 
 - **A4 — Whether `HighLatitudeRule` should be a user setting.** It is inert for Moonsighting
   (§10) but decisive for the plain angle methods, where the three options are three different
@@ -5640,6 +5849,31 @@ matters more than the stable hashes, that is the trade being made.
     **When a finding rests on absence, put the source you would read next to it.** Google's
     public tables are a summary of `AlarmManagerService`, not a substitute for it, and the file
     is a single `curl` from `android.googlesource.com`.
+
+95. **A threshold measured for the worst case can miss the common case, and it looks like
+    the problem is solved.** The far-north banner triggers at 45° because that is where the
+    spread between methods crosses an *hour*. Correct, measured, and it left every North
+    American and Gulf user — 10 to 20 minutes out on Isha on the default — with no prompt at
+    all, because they never came near the threshold and never came near "hour". The complaint
+    that arrived was fifteen to thirty minutes, which is precisely the band the threshold was
+    designed to ignore. **When a threshold is chosen from a worst-case sweep, sweep the
+    complaint-sized case too, and ask who is on the other side of the line.** The fix was not
+    to lower the number; it was to give everyone a visible way in and keep the number for the
+    users it was measured for.
+
+96. **A proposal from another AI is a list of hypotheses with the evidence removed — check
+    each one against the code, the measurements and the recorded decisions before building
+    any of it.** The 15 Aug proposal assumed a network API the app never calls, asked for a
+    feature that shipped a fortnight earlier at a bound this file already justifies, asked
+    for the auto-switch this file already rejects (twice, in a costume — by madhab, and by
+    an "early Isha" question), and stated a fact about a named authority (ISNA = "red
+    twilight") that nothing supports. It was also right about two things, and one of them —
+    users need the *why* at the moment of doubt, not in a disclaimer read once — was the most
+    useful observation of the day. Neither the wrong three nor the right two were visible
+    from the prose. They were visible from measuring: Hanafi−standard Asr is never under 26
+    minutes anywhere, Karachi−MWL Fajr is zero across South Asia, and MWL−ISNA Isha is +11 in
+    Chicago. Lesson 46 with the roles reversed — the same discipline applies when the second
+    opinion arrives *as* the brief.
 
 
 ---

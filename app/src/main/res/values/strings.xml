@@ -54,6 +54,15 @@
     <string name="madhab_hanbali">Hanbali</string>
     <string name="madhab_hanafi_desc">Later Asr, when a shadow is twice the object\'s length</string>
     <string name="madhab_standard_desc">Standard Asr, when a shadow equals the object\'s length</string>
+    <!--
+      The first-run method step. The title is the same words as the Settings row on purpose,
+      so a user who meets it here recognises it there. The body says what the choice moves
+      (Fajr and Isha), by how much (minutes; over an hour in the far north — both measured,
+      HANDOVER §10), and that "not sure" is a fine answer. It does not name a method or a
+      country: the list underneath does that, one line each, and the mosque is the authority.
+    -->
+    <string name="method_step_title">Calculation method</string>
+    <string name="method_step_body">Mosques measure the dawn and evening twilight differently, so Fajr and Isha can differ by some minutes from one method to another, and by over an hour in the far north. If your mosque\'s times differ from the app, choosing its method here is usually the fix. Not sure? Keep the first option. You can change this any time in Settings.</string>
     <string name="action_back">Back</string>
 
     <string name="confirm_title">All set</string>
@@ -129,6 +138,26 @@
          the rejected auto-switch option). Asking is not the same as deciding. -->
     <string name="method_notice_title">Does this match your mosque?</string>
     <string name="method_notice_body">This far from the equator, mosques differ most over when Fajr and Isha begin, sometimes by an hour or more. If these times do not match yours, tap to pick the method your mosque follows.</string>
+    <!--
+      The permanent, quiet door under the timetable, for everyone. The notice above reaches
+      only users above 45° of latitude, where the gap between methods is an hour; the gap a
+      person actually notices and reports is 10 to 20 minutes, and measured with the app's
+      own engine that gap sits below the line: North America (ISNA) and the Gulf (Umm al-Qura,
+      Qatar) on the default, plus every mosque board anywhere that prints the congregation
+      rather than the beginning. See HANDOVER §10, "The gap the banner never reached".
+
+      The dialog is not a second disclaimer. It says what the app shows, names the three
+      things that move a time, gives one button per cause, and ends where the disclaimer
+      ends: follow the mosque. It does not say which times are "valid" — that is a ruling.
+      Translators: "becomes due" is deliberate and matches the disclaimer; keep them aligned.
+    -->
+    <string name="mosque_diff_link">Different from your mosque?</string>
+    <string name="mosque_diff_title">Different from your mosque?</string>
+    <string name="mosque_diff_congregation">This app shows when each prayer becomes due. Your mosque usually holds the congregation a little later, so its board and these times will often differ by some minutes. Neither is wrong.</string>
+    <string name="mosque_diff_twilight">Fajr and Isha depend on how the twilight is measured, and mosques measure it differently. If yours differs by more than a few minutes, choose the method it follows.</string>
+    <string name="mosque_diff_asr">Asr depends on the school of thought. Hanafi mosques begin Asr later than others, by up to an hour or more.</string>
+    <string name="mosque_diff_minutes">If a few minutes still separate you, nudge each prayer to match your mosque\'s printed times.</string>
+    <string name="mosque_diff_follow">Where a difference remains, follow your mosque.</string>
     <string name="polar_notice_title">Approximate times</string>
     <!--
       Translators: %1$d is a latitude. It is 45 or 60 depending on the calculation method the

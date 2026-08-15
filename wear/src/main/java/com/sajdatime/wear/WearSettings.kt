@@ -101,7 +101,17 @@ class WearSettingsStore(private val context: Context) {
     }
 
     suspend fun setSect(sect: Sect) {
-        context.dataStore.edit { it[Keys.SECT] = sect.name }
+        context.dataStore.edit {
+            it[Keys.SECT] = sect.name
+            // The phone's setter has done this since the first release and the watch's never
+            // did: a method synced from the phone (say Karachi) stayed put when the wearer
+            // switched to Shia on the wrist, and the Jafari Maghrib was silently lost.
+            // Same rule as the phone, from the same definition. See HANDOVER §15 lesson 84
+            // for why a fix in one module has to be looked for in the sibling.
+            if (!enumOr(it[Keys.METHOD], CalcMethod.AUTO).offeredTo(sect)) {
+                it[Keys.METHOD] = CalcMethod.AUTO.name
+            }
+        }
     }
 
     suspend fun setMadhab(madhab: Madhab) {

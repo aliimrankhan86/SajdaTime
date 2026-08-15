@@ -29,14 +29,17 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -75,6 +78,7 @@ import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.rememberRemainingText
+import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
 import com.sajdatime.app.ui.theme.heroStyle
 import com.sajdatime.app.ui.theme.sajdaSurface
@@ -93,10 +97,12 @@ fun HomeScreen(
     onSearchCity: (String) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
-    onOpenMethodSetting: () -> Unit,
+    /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
+    onOpenSetting: (SettingsChooser) -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
+    var explaining by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
 
     Column(
@@ -112,12 +118,27 @@ fun HomeScreen(
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
-        MethodBanner(state, onOpen = onOpenMethodSetting, onDismiss = onDismissMethodNotice)
+        MethodBanner(
+            state,
+            onOpen = { onOpenSetting(SettingsChooser.METHOD) },
+            onDismiss = onDismissMethodNotice,
+        )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(24.dp))
         TodayTimeline(state)
-        Spacer(Modifier.height(24.dp))
+        MosqueDifferenceLink(enabled = state.today != null, onClick = { explaining = true })
+        Spacer(Modifier.height(12.dp))
         ExportButton(enabled = state.today != null, onClick = { exportSheet = true })
+    }
+
+    if (explaining) {
+        MosqueDifferenceDialog(
+            onDismiss = { explaining = false },
+            onOpen = { chooser ->
+                explaining = false
+                onOpenSetting(chooser)
+            },
+        )
     }
 
     if (exportSheet) {
@@ -312,6 +333,95 @@ private fun NextPrayerCard(state: UiState) {
             color = hero.secondary,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+/**
+ * The one door every user gets, at the moment they need it.
+ *
+ * The far-north notice above only appears above 45 degrees, and that threshold was chosen
+ * for where the spread between methods crosses an hour. Measured with this app's own
+ * engine, the *complaint-sized* gap — ten to twenty minutes on Isha — sits below that line:
+ * the default is 10-21 minutes late against ISNA across North America and 6-21 minutes early
+ * against Umm al-Qura and Qatar in the Gulf, and none of those users ever sees the notice.
+ * The rest of the world is within a few minutes of its local convention, but is still
+ * comparing the app to a mosque board that shows the *congregation*, which is a gap of
+ * exactly this size and is supposed to be there.
+ *
+ * So the question is asked of everyone, quietly, right under the times being doubted —
+ * because a user who thinks the app is broken is looking at the times, not at Settings.
+ * A text link and not a card: it must not compete with the notices, and it never goes away,
+ * so it must not nag. It names no method and changes no time; the dialog behind it does the
+ * explaining and hands over to the chooser that answers.
+ */
+@Composable
+private fun MosqueDifferenceLink(enabled: Boolean, onClick: () -> Unit) {
+    TextButton(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
+        Text(stringResource(R.string.mosque_diff_link))
+    }
+}
+
+/**
+ * Why the app and the mosque board disagree, in the user's own order of surprise, with the
+ * fix for each cause one tap away. The paragraphs are the four causes the project has
+ * measured (HANDOVER §10 and §11, "Match your mosque"): the board shows the congregation;
+ * Fajr and Isha follow the twilight method; Asr follows the madhab; and a few minutes of
+ * mosque precaution are left over. It ends the way the disclaimer does — follow the mosque —
+ * because that sentence is the app's whole position and it should be the last thing read.
+ *
+ * Deliberately not a second disclaimer and not a religious statement about which times are
+ * "valid". "Neither is wrong" is as far as it goes.
+ */
+@Composable
+private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChooser) -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
+        },
+        title = { Text(stringResource(R.string.mosque_diff_title)) },
+        // Scrollable, like every long dialog here: AlertDialog will not scroll its body for
+        // you, and at a raised font size the last paragraph is what falls off the bottom.
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation))
+                ExplainerParagraph(stringResource(R.string.mosque_diff_twilight))
+                ExplainerAction(stringResource(R.string.settings_method)) {
+                    onOpen(SettingsChooser.METHOD)
+                }
+                ExplainerParagraph(stringResource(R.string.mosque_diff_asr))
+                ExplainerAction(stringResource(R.string.settings_school)) {
+                    onOpen(SettingsChooser.SCHOOL)
+                }
+                ExplainerParagraph(stringResource(R.string.mosque_diff_minutes))
+                ExplainerAction(stringResource(R.string.settings_adjustments)) {
+                    onOpen(SettingsChooser.ADJUSTMENTS)
+                }
+                ExplainerParagraph(stringResource(R.string.mosque_diff_follow))
+            }
+        },
+    )
+}
+
+@Composable
+private fun ExplainerParagraph(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        modifier = Modifier.padding(top = 12.dp),
+    )
+}
+
+@Composable
+private fun ExplainerAction(label: String, onClick: () -> Unit) {
+    OutlinedButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .heightIn(min = 48.dp),
+    ) {
+        Text(label)
     }
 }
 

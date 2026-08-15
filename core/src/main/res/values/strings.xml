@@ -57,4 +57,39 @@
     <string name="method_jafari">Jafari (Ithna Ashari)</string>
     <string name="method_tehran">Institute of Geophysics, Tehran</string>
 
+    <!--
+      One plain sentence or two under each method, shown wherever the list is offered (the
+      Settings picker and the first-run step). A list of institution names means nothing to
+      most people, and the wrong pick moves Isha by an hour in the north.
+
+      Rules for these, because they are religious content and were got wrong once before
+      (see the Malaysia note above):
+        - No angles, no degrees. The person this list is for does not think in solar
+          depression, and the ones who do can read docs/ARCHITECTURE.md.
+        - Say WHO publishes the method. Say WHERE it is used only where that is either the
+          publishing body's own country or has been verified against real timetables
+          (Indonesia and Singapore against MUIS's own PDF and Kemenag's statement; Britain
+          against two mosques' published tables, docs/HANDOVER.md §10 "Isha in the UK").
+          "Common in" and "some mosques" are deliberate hedges, not filler. Do not upgrade
+          them to "the method for" without the authority's own document.
+        - Never sell one as "the method for your country" when a country has several
+          (Britain, the United States and Indonesia all do). The user is told to ask their
+          mosque, and these lines exist to help them recognise the answer.
+      Translators: keep the hedges. "Some" and "many" are load-bearing.
+    -->
+    <string name="method_auto_desc">Not sure? Keep this. Muslim World League times, or Jafari for Shia. Close to local practice in much of the world. The far north differs most.</string>
+    <string name="method_muslim_world_league_desc">A general convention used in many countries. The standard here.</string>
+    <string name="method_egyptian_desc">Egypt\'s official method.</string>
+    <string name="method_karachi_desc">Common across Pakistan and South Asia.</string>
+    <string name="method_umm_al_qura_desc">The official method in Saudi Arabia. Isha is set at a fixed time after Maghrib.</string>
+    <string name="method_dubai_desc">A convention used in the Gulf.</string>
+    <string name="method_moon_sighting_desc">A seasonal rule made for places far from the equator. Followed by some mosques in Britain.</string>
+    <string name="method_north_america_desc">The Islamic Society of North America. Used by many mosques in the United States and Canada.</string>
+    <string name="method_kuwait_desc">The convention used in Kuwait.</string>
+    <string name="method_qatar_desc">The convention used in Qatar.</string>
+    <string name="method_singapore_desc">The official bodies of Indonesia and Singapore.</string>
+    <string name="method_turkey_desc">Turkey\'s Presidency of Religious Affairs.</string>
+    <string name="method_jafari_desc">The usual Shia convention. Maghrib is a little after sunset, once the redness has left the sky.</string>
+    <string name="method_tehran_desc">The University of Tehran, whose calendar Iran\'s official times follow.</string>
+
 </resources>

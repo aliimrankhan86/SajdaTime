@@ -36,6 +36,19 @@ enum class CalcMethod {
     TURKEY,
     JAFARI,
     TEHRAN,
+    ;
+
+    /**
+     * Whether this method is one a user of [sect] should be offered at all. Jafari and
+     * Tehran are Shia conventions (a Maghrib after sunset, §5.4); the rest are Sunni;
+     * [AUTO] resolves per sect and so belongs to both. One definition, used by the list
+     * the user picks from and by the sect setter that has to discard a method the new
+     * school was never offered — so the two cannot disagree about which is which.
+     */
+    fun offeredTo(sect: Sect): Boolean {
+        val shiaOnly = this == JAFARI || this == TEHRAN
+        return this == AUTO || if (sect == Sect.SHIA) shiaOnly else !shiaOnly
+    }
 }
 
 enum class PrayerSlot {

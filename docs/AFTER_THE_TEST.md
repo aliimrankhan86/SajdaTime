@@ -6,6 +6,60 @@ in order, for someone who wants to know what happens next without reading two th
 
 ---
 
+## 15 Aug 2026 — "The times still do not match my mosque", and what I did about it
+
+You brought a four-part plan written with another AI. Here is what happened to each part, in
+plain terms. The measurements are all in `HANDOVER.md` §10, "The gap the banner never
+reached", and the rule that came out of it is §5.17.
+
+**First, the honest correction to that plan's starting point.** It assumed the app fetches
+times from the AlAdhan website. It does not, and it never will — the sums are done on the
+phone, so it works with no signal and never sends anyone's location anywhere. That was your
+decision and it stands. Everything below fits inside it.
+
+**What I measured before building anything.** Using the app's own engine, not a website:
+
+- **A gap of 15–30 minutes on Asr is not the Hanafi/Shafi'i setting.** That difference is
+  never smaller than 26 minutes anywhere on earth and is usually about an hour. So an Asr
+  gap of that size is the mosque board showing the *congregation* time, or the mosque adding
+  a few minutes of caution. Nothing is wrong. The app now says so, where the user is looking.
+- **The 15–30 minute Isha gap is real, and it lives exactly where the app was not asking.**
+  On the default, in New York, Chicago, Toronto and Los Angeles the app's Isha is 10–21
+  minutes *later* than the ISNA times most mosques there use, and Fajr 14–32 minutes
+  *earlier*. In Riyadh, Jeddah and Doha, Isha is 6–21 minutes *earlier* than the official
+  times. In Cairo, Jakarta and Singapore, Fajr is 7–10 minutes *late*, which matters for
+  fasting. All of those places are nearer the equator than the line where the "Does this match
+  your mosque?" card appears, so those users were never offered the choice. Most of the rest of
+  the world is within a few minutes of its own convention.
+
+**What the plan asked for, and what I did:**
+
+| The plan said | Verdict |
+|---|---|
+| Pick the method for the user automatically from their madhab and region | **No.** Madhab is about Asr, not about twilight; tying one to the other would put a Hanafi in Cairo or Chicago on the wrong convention. And the "South Asian Hanafi → Karachi" mapping moves Isha by four to six minutes and Fajr by nothing. Instead, **the app now asks everyone once, at setup**, with "Not sure — keep this" preselected, and a plain line under every option saying who publishes it and where it is used |
+| Ask "early or late Isha?" and quietly switch to ISNA behind the scenes | **No.** That is the app choosing a religious ruling for the user behind a preference question — the same thing you and I ruled out earlier — and it calls ISNA "the red twilight", which no authority says. The plain-language descriptions do the honest version of this job |
+| A ±60-minute slider per prayer | **Already built on 2 Aug** ("Match your mosque"), at ±30 with plus/minus buttons. Thirty is on purpose: a bigger gap is the wrong method, not a mosque's caution. Sixty would also let someone drag "Isha begins" onto their congregation time and then the app would be stating something false. Reminding at congregation time is a different feature, written down as such |
+| Hide the technical words; describe each method in plain English | **Yes, done.** No angles anywhere. Each method now carries one plain line — "Egypt's official method", "Used by many mosques in the United States and Canada", "The official bodies of Indonesia and Singapore", and so on. Every line was hedged where I could not verify it against the authority itself, and I have written the rules for those lines next to them so nobody "improves" them into claims |
+| A reassuring "why times differ" card in Settings | **Yes, but on the Times screen.** A user who thinks the app is wrong is looking at the times, not at Settings, and the disclaimer that explains this is read once. There is now a quiet permanent line under the timetable — *"Different from your mosque?"* — that opens a short explanation: the board shows the congregation; Fajr and Isha follow the twilight method; Asr follows the school; a few minutes are left over; where a difference remains, follow your mosque. Each cause has a button that opens the exact setting. The far-north card also now opens the method list directly instead of just the Settings tab |
+
+**Two small things found on the way.** Switching school on the watch used to keep a Sunni
+method behind a Shia choice and silently lose the Shia Maghrib; and on the phone the same
+thing could happen in the other direction. Both fixed from one definition, with a test.
+
+**What I verified.** Fresh install walked end to end for a Sunni and a Shia user; the new
+step; the summary; the door and all three of its buttons; the far-north card; rotation;
+large text; dark theme; right-to-left (as a *layout* check — it mirrors correctly); the watch
+still installs and the school switch works. Full build: 133 tests, no failures, no lint
+errors, both release bundles built. **Not** verified: any physical phone or watch, and the
+store screenshots have not been retaken — the Times screen has one new line, so that is owed
+with the next upload (P2).
+
+**Where the complaint came from is still not known.** I have no city or mosque for the users
+who reported 15–30 minutes. If you can find that out — even one mosque's published timetable
+— it can be checked against the app in ten minutes, the way Slough was.
+
+---
+
 ## ⚠️ One thing was not left until later: the app crashed in the far north
 
 **Found on 1 Aug 2026, fixed the same day, and the reason it was found is worth saying.**

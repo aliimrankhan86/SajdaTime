@@ -79,6 +79,19 @@ This section is the specification an iOS port must match exactly.
 A user who never opens advanced settings still gets a correct convention. An explicitly
 chosen method always overrides AUTO.
 
+**Which methods a school is offered** is one definition, `CalcMethod.offeredTo(sect)`:
+Jafari and Tehran are offered to Shia only (they carry the post-sunset Maghrib of §3.4),
+every other named method to Sunni only, and AUTO to both. Two things depend on it and a port
+must keep them together: the list the user picks from is filtered by it, and **changing
+school discards a stored method the new school was never offered, falling back to AUTO** —
+in both directions, on both the phone and the watch. Otherwise a Sunni convention survives a
+switch to Shia and the Jafari Maghrib is silently lost, or the reverse.
+
+The app never chooses a method for the user by any proxy — not madhab, latitude, country or
+a preference question. It asks once at setup, keeps a permanent "Different from your mosque?"
+explainer on the Times screen, and shows a dismissible prompt above 45° of latitude while
+the method is still AUTO. Reasoning and measurements: `HANDOVER.md` §5.17 and §10.
+
 ### 3.2 Asr (madhab)
 
 Asr depends only on the shadow ratio:

@@ -40,6 +40,7 @@ import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
+import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.settings.SettingsScreen
 import com.sajdatime.app.ui.theme.ThemeChoice
 
@@ -81,6 +82,15 @@ fun MainScaffold(
     // the Qibla compass and turning the phone sideways to line it up lost the screen
     // they were using, which is precisely when they were using it.
     var destination by rememberSaveable { mutableStateOf(Destination.TIMES) }
+
+    // A chooser the Times screen asked Settings to open. Held here, not in either screen,
+    // because it has to outlive the tab switch that delivers it. Settings nulls it once
+    // opened, so it cannot reopen on rotation or on the next visit to the tab.
+    var settingsRequest by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
+    val openSetting: (SettingsChooser) -> Unit = {
+        settingsRequest = it
+        destination = Destination.SETTINGS
+    }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
     DisposableEffect(destination) {
@@ -133,16 +143,15 @@ fun MainScaffold(
                         onSearchCity = onSearchCity,
                         onDismissExactAlarmNotice = onDismissExactAlarmNotice,
                         onDismissMethodNotice = onDismissMethodNotice,
-                        // The method notice is the only card that has to move the user to
-                        // another tab, so it sets `destination` directly rather than
-                        // adding a navigation callback the other two would never use.
-                        onOpenMethodSetting = { destination = Destination.SETTINGS },
+                        onOpenSetting = openSetting,
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)
 
                     Destination.SETTINGS -> SettingsScreen(
                         state = state,
+                        request = settingsRequest,
+                        onRequestHandled = { settingsRequest = null },
                         onSetSect = onSetSect,
                         onSetMadhab = onSetMadhab,
                         onSetMethod = onSetMethod,

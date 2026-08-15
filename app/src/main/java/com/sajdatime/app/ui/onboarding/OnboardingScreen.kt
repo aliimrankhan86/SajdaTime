@@ -64,15 +64,19 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Madhab
+import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.Sect
+import com.sajdatime.core.labelRes
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.ui.components.MethodChoiceList
 import com.sajdatime.app.ui.components.ProgressRow
 import com.sajdatime.app.ui.components.SectionHeading
 
-private enum class Step { WELCOME, PERMISSION, SECT, MADHAB, CONFIRM }
+private enum class Step { WELCOME, PERMISSION, SECT, MADHAB, METHOD, CONFIRM }
 
 @Composable
 fun OnboardingScreen(
@@ -82,6 +86,7 @@ fun OnboardingScreen(
     onUseDefaultLocation: () -> Unit,
     onSelectSect: (Sect) -> Unit,
     onSelectMadhab: (Madhab) -> Unit,
+    onSelectMethod: (CalcMethod) -> Unit,
     onFinish: () -> Unit,
 ) {
     var step by rememberSaveable { mutableStateOf(Step.WELCOME) }
@@ -119,7 +124,7 @@ fun OnboardingScreen(
                     selected = state.settings.sect,
                     onSelect = onSelectSect,
                     onNext = {
-                        step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.CONFIRM
+                        step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.METHOD
                     },
                     onBack = { step = Step.PERMISSION },
                 )
@@ -127,8 +132,25 @@ fun OnboardingScreen(
                 Step.MADHAB -> MadhabStep(
                     selected = state.settings.madhab,
                     onSelect = onSelectMadhab,
-                    onNext = { step = Step.CONFIRM },
+                    onNext = { step = Step.METHOD },
                     onBack = { step = Step.SECT },
+                )
+
+                // Asked of everyone, once, with "not sure" preselected. Until 15 Aug 2026
+                // the method was never mentioned at setup, so a user who did not open
+                // Settings could not reach it — and measured with the app's own engine the
+                // default is 10-20 minutes from local practice across North America and
+                // the Gulf, and 8 minutes late on Fajr in Indonesia, none of which the
+                // far-north banner covers. One tap costs the unsure user nothing; the
+                // concept is now something they have seen once. See HANDOVER §10.
+                Step.METHOD -> MethodStep(
+                    sect = state.settings.sect,
+                    selected = state.settings.method,
+                    onSelect = onSelectMethod,
+                    onNext = { step = Step.CONFIRM },
+                    onBack = {
+                        step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.SECT
+                    },
                 )
 
                 Step.CONFIRM -> ConfirmStep(state = state, onFinish = onFinish)
@@ -503,6 +525,24 @@ private fun MadhabStep(
 }
 
 @Composable
+private fun MethodStep(
+    sect: Sect,
+    selected: CalcMethod,
+    onSelect: (CalcMethod) -> Unit,
+    onNext: () -> Unit,
+    onBack: () -> Unit,
+) {
+    StepScaffold(
+        title = stringResource(R.string.method_step_title),
+        body = stringResource(R.string.method_step_body),
+    ) {
+        // The same list Settings shows, so what was chosen here is what is found there.
+        MethodChoiceList(sect = sect, current = selected, onSelect = onSelect)
+        StepButtons(onBack = onBack, onNext = onNext)
+    }
+}
+
+@Composable
 private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
     val context = LocalContext.current
     // Recomposed when the step is re-entered after the system screen returns, so the
@@ -543,6 +583,20 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                             madhabLabel(state.settings.madhab),
                         )
                         Sect.SHIA -> stringResource(R.string.sect_shia)
+                    },
+                )
+                Spacer(Modifier.height(12.dp))
+                SummaryRow(
+                    stringResource(R.string.settings_method),
+                    // Same wording as the Settings row, so "Automatic · Muslim World League"
+                    // reads identically in both places.
+                    if (state.settings.method == CalcMethod.AUTO) {
+                        stringResource(
+                            R.string.settings_method_auto,
+                            stringResource(PrayerEngine.resolveMethod(state.settings.calculationPrefs).labelRes),
+                        )
+                    } else {
+                        stringResource(state.settings.method.labelRes)
                     },
                 )
             }

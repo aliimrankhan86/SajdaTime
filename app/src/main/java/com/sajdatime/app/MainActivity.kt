@@ -103,6 +103,7 @@ class MainActivity : ComponentActivity() {
                         onUseDefaultLocation = viewModel::useDefaultLocation,
                         onSelectSect = viewModel::setSect,
                         onSelectMadhab = viewModel::setMadhab,
+                        onSelectMethod = viewModel::setMethod,
                         onFinish = {
                             requestNotificationsIfNeeded()
                             viewModel.completeOnboarding()

@@ -41,12 +41,12 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,17 +82,33 @@ import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
+import com.sajdatime.app.ui.components.MethodChoiceList
+import com.sajdatime.app.ui.components.RadioRow
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.LocalDate
 
-/** Which chooser is currently open, if any. Only one can be at a time. */
-private enum class Chooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, DISCLAIMER }
+/**
+ * Which chooser is currently open, if any. Only one can be at a time.
+ *
+ * Not private, because the Times screen can ask for one by name — the "Different from your
+ * mosque?" explainer and the far-north method notice both hand the user straight to the
+ * chooser that answers them, rather than to the top of Settings with the row left to find.
+ * See [SettingsScreen]'s `request` parameter.
+ */
+enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
     state: UiState,
+    /**
+     * A chooser another screen asked to have opened, consumed once. Held by the scaffold
+     * rather than here so it survives the tab switch that delivers it; cleared through
+     * [onRequestHandled] so rotating the phone afterwards does not reopen it.
+     */
+    request: SettingsChooser?,
+    onRequestHandled: () -> Unit,
     onSetSect: (Sect) -> Unit,
     onSetMadhab: (Madhab) -> Unit,
     onSetMethod: (CalcMethod) -> Unit,
@@ -109,8 +125,17 @@ fun SettingsScreen(
     onSetThemeChoice: (ThemeChoice) -> Unit,
 ) {
     val context = LocalContext.current
-    var open by rememberSaveable { mutableStateOf<Chooser?>(null) }
+    var open by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
     val settings = state.settings
+
+    // Keyed on the request, so a second identical request after the first was closed still
+    // opens it (the scaffold nulls it in between, which is what makes the key change).
+    LaunchedEffect(request) {
+        if (request != null) {
+            open = request
+            onRequestHandled()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -157,13 +182,13 @@ fun SettingsScreen(
                 subtitle = settings.cityName.ifBlank {
                     stringResource(R.string.location_set_generic)
                 },
-                onClick = { open = Chooser.LOCATION },
+                onClick = { open = SettingsChooser.LOCATION },
             )
             SettingRow(
                 icon = Icons.Outlined.Schedule,
                 title = stringResource(R.string.settings_school),
                 subtitle = schoolSummary(settings.sect, settings.madhab),
-                onClick = { open = Chooser.SCHOOL },
+                onClick = { open = SettingsChooser.SCHOOL },
             )
             SettingRow(
                 icon = Icons.Outlined.Tune,
@@ -176,7 +201,7 @@ fun SettingsScreen(
                 } else {
                     stringResource(settings.method.labelRes)
                 },
-                onClick = { open = Chooser.METHOD },
+                onClick = { open = SettingsChooser.METHOD },
             )
             // Last in this group on purpose. The method and school rows above explain the
             // two divergences that have a reason; this one is the catch-all for whatever is
@@ -186,7 +211,7 @@ fun SettingsScreen(
                 icon = Icons.Outlined.MoreTime,
                 title = stringResource(R.string.settings_adjustments),
                 subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
-                onClick = { open = Chooser.ADJUSTMENTS },
+                onClick = { open = SettingsChooser.ADJUSTMENTS },
             )
         }
 
@@ -203,7 +228,7 @@ fun SettingsScreen(
                 icon = Icons.Outlined.NotificationsActive,
                 title = stringResource(R.string.settings_alerts),
                 subtitle = alertSummary(settings.alertFor),
-                onClick = { open = Chooser.ALERTS },
+                onClick = { open = SettingsChooser.ALERTS },
             )
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
@@ -224,7 +249,7 @@ fun SettingsScreen(
             SettingRow(
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
-                onClick = { open = Chooser.DISCLAIMER },
+                onClick = { open = SettingsChooser.DISCLAIMER },
             )
             // Play requires a privacy policy reachable from inside the app, not only from
             // the Console field. Opening the hosted policy satisfies that.
@@ -256,7 +281,7 @@ fun SettingsScreen(
     when (open) {
         null -> Unit
 
-        Chooser.ADJUSTMENTS -> AdjustmentsDialog(
+        SettingsChooser.ADJUSTMENTS -> AdjustmentsDialog(
             adjustments = settings.adjustments,
             hijriOffsetDays = settings.hijriOffsetDays,
             onSetAdjustment = onSetAdjustment,
@@ -265,7 +290,7 @@ fun SettingsScreen(
             onDismiss = { open = null },
         )
 
-        Chooser.SCHOOL -> SchoolDialog(
+        SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
             madhab = settings.madhab,
             onSelectSect = onSetSect,
@@ -273,7 +298,7 @@ fun SettingsScreen(
             onDismiss = { open = null },
         )
 
-        Chooser.METHOD -> MethodPickerDialog(
+        SettingsChooser.METHOD -> MethodPickerDialog(
             current = settings.method,
             sect = settings.sect,
             onDismiss = { open = null },
@@ -283,7 +308,7 @@ fun SettingsScreen(
             },
         )
 
-        Chooser.ALERTS -> AlertsDialog(
+        SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
             alarmSoundUri = settings.alarmSoundUri,
             respectsSilent = settings.alarmRespectsSilent,
@@ -296,14 +321,14 @@ fun SettingsScreen(
             onDismiss = { open = null },
         )
 
-        Chooser.LOCATION -> LocationSheet(
+        SettingsChooser.LOCATION -> LocationSheet(
             state = state,
             onDismiss = { open = null },
             onUseGps = onRefreshLocation,
             onSearchCity = onSearchCity,
         )
 
-        Chooser.DISCLAIMER -> AlertDialog(
+        SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
             confirmButton = {
                 TextButton(onClick = { open = null }) {
@@ -412,32 +437,18 @@ private fun MethodPickerDialog(
     onDismiss: () -> Unit,
     onSelect: (CalcMethod) -> Unit,
 ) {
-    // Jafari and Tehran are Shia conventions; the rest are Sunni. Showing all of them to
-    // everyone invites a wrong pick, so the list follows the chosen school.
-    val available = CalcMethod.entries.filter { method ->
-        val shiaOnly = method == CalcMethod.JAFARI || method == CalcMethod.TEHRAN
-        method == CalcMethod.AUTO || if (sect == Sect.SHIA) shiaOnly else !shiaOnly
-    }
-
     ChooserDialog(title = stringResource(R.string.settings_method), onDismiss = onDismiss) {
         // A list of institution names is meaningless to most users, and picking the wrong one
         // moves Isha by over an hour at UK latitudes. This says what the choice is for and
-        // where to get the answer — the mosque — rather than leaving them to guess.
+        // where to get the answer — the mosque — rather than leaving them to guess. The list
+        // itself is shared with the first-run step, so each entry also says who it is for.
         Text(
             text = stringResource(R.string.settings_method_help),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Spacer(Modifier.height(16.dp))
-        Column(Modifier.selectableGroup()) {
-            available.forEach { method ->
-                RadioRow(
-                    label = stringResource(method.labelRes),
-                    selected = current == method,
-                    onSelect = { onSelect(method) },
-                )
-            }
-        }
+        MethodChoiceList(sect = sect, current = current, onSelect = onSelect)
     }
 }
 
@@ -827,36 +838,6 @@ private fun SettingRow(
                 tint = MaterialTheme.colorScheme.outline,
                 modifier = Modifier.size(14.dp),
             )
-        }
-    }
-}
-
-@Composable
-private fun RadioRow(
-    label: String,
-    supporting: String? = null,
-    selected: Boolean,
-    onSelect: () -> Unit,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(role = Role.RadioButton, onClick = onSelect)
-            .heightIn(min = 56.dp)
-            .padding(vertical = 8.dp),
-    ) {
-        RadioButton(selected = selected, onClick = null)
-        Spacer(Modifier.width(8.dp))
-        Column(Modifier.weight(1f)) {
-            Text(text = label, style = MaterialTheme.typography.bodyLarge)
-            supporting?.let {
-                Text(
-                    text = it,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
         }
     }
 }

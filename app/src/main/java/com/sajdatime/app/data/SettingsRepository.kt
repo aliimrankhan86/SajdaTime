@@ -219,9 +219,14 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setSect(sect: Sect) = edit {
         it[Keys.SECT] = sect.name
-        // A Shia user has no madhab choice, so reset the method to AUTO (-> Jafari)
-        // instead of silently keeping a Sunni convention they picked earlier.
-        if (sect == Sect.SHIA) it[Keys.METHOD] = CalcMethod.AUTO.name
+        // A method the new school was never offered goes back to AUTO rather than being
+        // silently kept: a Sunni convention on a Shia user loses the Jafari Maghrib, and a
+        // Shia one on a Sunni user gains it. This used to reset only on the way to Shia;
+        // the other direction became reachable in one gesture once first-run setup gained a
+        // method step with a Back button, so both directions are covered now, from the
+        // same definition of "offered" the list itself uses.
+        val method = enumOr(it[Keys.METHOD], CalcMethod.AUTO)
+        if (!method.offeredTo(sect)) it[Keys.METHOD] = CalcMethod.AUTO.name
     }
 
     suspend fun setMadhab(madhab: Madhab) = edit { it[Keys.MADHAB] = madhab.name }
