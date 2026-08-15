@@ -11,8 +11,14 @@ in order, for someone who wants to know what happens next without reading two th
 **The app is finished and tested. Nothing is half-built.** Everything below is now waiting on
 you, not on code, and most of it happens in one sitting at the Play Console.
 
-**Right now: you have applied for production and Google is reviewing. So the honest answer
-is to do nothing and wait.** That is not me being cautious — there is a specific reason.
+**As of 16 August: you have applied for production and Google is reviewing. So the honest
+answer is to do nothing and wait.** That is not me being cautious — there is a specific
+reason.
+
+> 💬 **If you are opening a new session in a few days, tell it one thing first: whether
+> production access came through.** The answer only exists in your Play Console, so no AI
+> can look it up, and everything else waits on it. "Production came through" or "still
+> waiting" is enough — it will know what to do from there.
 
 > ⚠️ **Do not touch the store listing while a review is open.** That is written into
 > `RELEASING.md` as a rule, and it means **do not upload the new screenshots yet**, even

@@ -4301,6 +4301,22 @@ further down, which is mostly deliberate non-goals.
 > **When the decision comes back**, `RELEASING.md` has the mechanics: once production access
 > exists, the build goes to **Production → Create release**, and the closed track can keep
 > running ahead of it as a beta if that is wanted.
+>
+> 🕐 **If you are reading this more than a day or two after 16 Aug 2026, the two paragraphs
+> above have probably expired — ASK, do not assume.** A Play review takes hours to days, so
+> by the time you read this it has very likely concluded, and the answer is not in this
+> repository: it lives in the owner's Play Console, which no assistant can see. **Your first
+> question to him should be "did production access come through?"** because everything else
+> hangs off it:
+>
+> | If he says | Then |
+> |---|---|
+> | **Granted** | The listing is free to edit again. Build fresh from `main`, upload `versionCode` 4 (1.2.0) to **Production → Create release**, then the screenshots from `docs/store/upload/`, then tell the testers. Update this block to say so |
+> | **Rejected** | Read the reason before doing anything. `docs/RELEASING.md` Step 0 and `PRODUCTION_READINESS.md` carry what Google asked for and what was answered |
+> | **Still waiting** | Nothing to do. Do not touch the store listing |
+>
+> Whatever he answers, **rewrite this block to match** rather than leaving a future session
+> to make the same guess. This file's §1 status line needs the same treatment.
 
 The detail for each item is in the sections that follow.
 
