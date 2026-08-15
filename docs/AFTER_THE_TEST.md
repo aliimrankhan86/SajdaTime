@@ -237,6 +237,27 @@ Just tell me "same" or "different" and I will take it from there.
 Play Store copy of the app was never touched — I install a separate test copy alongside it,
 exactly so your closed test is never disturbed.
 
+### I also redid the Play Store screenshots
+
+They were showing an app that no longer exists. The compass picture was **two versions out
+of date** — it still had the needle sitting on top of the Kaaba, which is the very thing you
+told me looked wrong and which I fixed. The Times picture was from before the "Different
+from your mosque?" line existed, and the Settings one said "Greater Manchester" instead of
+naming the town.
+
+All seven are retaken and ready. They live in `docs/store/upload/`, one folder per box in
+the Play Console, so there is no guessing which file goes where:
+
+| Folder | Where it goes in Play |
+|---|---|
+| `phone/` | Phone screenshots — all 5, in filename order |
+| `wear-os/` | Wear OS screenshots — both |
+| `app-icon/`, `feature-graphic/` | Unchanged, but they are there if Play asks |
+
+**Uploading them is yours**, because it happens in the Play Console under your account —
+do it in the same sitting as the app update, not before it, so the pictures never describe
+a version your testers do not have yet.
+
 Full build clean: **145 tests, no failures** (three new ones, which fail if anyone ever
 quietly collapses those two lines back into one).
 

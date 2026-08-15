@@ -1544,6 +1544,36 @@ times for three arrivals. Both directions hold.
 - *"Automatic" resolves by school, not by country.* In Türkiye it offered Muslim World
   League, not Diyanet. That is §5.1 working as written, and the onboarding text says so.
 
+### The store screenshots, retaken because they were advertising a design that no longer exists (16 Aug 2026)
+
+`CLAUDE.md` says a visual change is not finished until `docs/store/screenshots/` is retaken,
+and two commits of compass work had gone by without it. Opening the old files showed worse
+than staleness — the Qibla capture was **two design revisions behind**, still showing the
+needle resting on the Kaaba (the exact "they look attached" complaint that started the
+redesign), the north wedge that has since been deleted, no cardinal letters, no gold on the
+Kaaba, and the old subtitle order. Times predated the mosque-difference line; Settings read
+"Greater Manchester", from before §5.18 made the label a town; the madhab step's primary
+button still said *Skip*.
+
+All seven retaken on the AVDs the recipe names (`sajdastore` 1080×1920 for the phone,
+`sajdawear_large` 454×454 for the watch), then `tools/build-store-assets.sh` re-run. Sizes
+re-checked afterwards: five at 1080×1920, two at 454×454, icon 512², feature 1024×500.
+
+Three things the recipe did not say, now added to `docs/store/upload/README.md`:
+
+- **Grant `allow_dnd`**, or Settings leads with an amber "Allow sound during Do Not Disturb"
+  banner. Exactly the same reasoning the README already gave for the exact-alarm grant: the
+  banner is honest and belongs in the app, it is simply not the subject of the screenshot.
+- **Set the AVD's timezone to match the location.** It inherits the host's, so a Manchester
+  fix rendered in +03 shows every prayer two hours out — wrong, and plausible enough that
+  nobody would catch it in a store listing.
+- **Set the clock to mid-afternoon.** Captured at whatever time the session happens to run,
+  the hero card shows a 1 am Isha; at 15:00 it shows a live countdown with a Now/Next pair,
+  which is what the screen looks like in use.
+
+The compass capture doubles as a free end-to-end test, as the README says it should:
+Qibla 118°, heading driven to 60°, and the app printed **"Turn right 58°"**. 118 − 60 = 58.
+
 **Still not verified, and not fudged:** nobody has felt the buzz — the vibrator log is not a
 fingertip. Phone-to-watch sync is still untested and could not be attempted here: this
 handset has only Samsung's preinstalled `watchmanagerstub`, so pairing a Wear emulator to it
@@ -4249,7 +4279,7 @@ exist yet. Start here, then read the detail in the sections that follow.
 | | What | When |
 |---|---|---|
 | P1 | **Upload `versionCode` 3 to the closed track.** Built, signed, waiting. It carries the Dhuhr fix, which silently loses one prayer alert a day in the live build | Now. Owner action in the Play Console |
-| P2 | **Retake `docs/store/screenshots/`** — in the order build → capture → upload, as part of P1, not before it. **Now also owed by 15 Aug's change:** the Times screen gained the *"Different from your mosque?"* line under the timetable, and the first-run flow gained a Calculation method step, so the Times capture is stale by one line | With P1 |
+| P2 | ~~**Retake `docs/store/screenshots/`**~~ — **the capturing is DONE, 16 Aug 2026.** All seven raw captures retaken and `tools/build-store-assets.sh` re-run, so `docs/store/upload/` is current and correct-sized. They were badly stale: the Qibla shot still showed the pre-15 Aug dial (needle *on* the Kaaba, the deleted north wedge, no cardinal letters, no gold, old subtitle order), Times predated the mosque-difference line, Settings said "Greater Manchester" from before the town rule, and the madhab step's button still read *Skip* rather than *Continue*. **What remains is purely the upload**, which is a Play Console action and therefore the owner's — see §10 for what each file now shows | Upload with P1 |
 | P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1 |
 | P4 | **Apply for production** when the fourteen days complete | ~14 Aug 2026 |
 | P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |

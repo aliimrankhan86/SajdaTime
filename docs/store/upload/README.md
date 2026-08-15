@@ -72,6 +72,11 @@ adb emu geo fix -2.2426 53.4808          # Greater Manchester
 adb shell pm grant com.sajdatime.app android.permission.ACCESS_COARSE_LOCATION
 adb shell cmd appops set com.sajdatime.app SCHEDULE_EXACT_ALARM allow
 
+# Same reasoning as the exact-alarm grant, and missed on the first pass: without this,
+# Settings leads with an amber "Allow sound during Do Not Disturb" banner. It is honest
+# and belongs in the app; it is not what the screenshot is there to show.
+adb shell cmd notification allow_dnd com.sajdatime.app
+
 # A clean, consistent status bar. This is system chrome only — no app pixel is touched.
 adb shell settings put global sysui_demo_allowed 1
 adb shell am broadcast -a com.android.systemui.demo -e command enter
@@ -84,6 +89,21 @@ Two things that are not obvious:
 
 - **`geo fix` expires.** The app will sit on "Finding your location…" if you send it once
   and wait. Send it repeatedly until the city name resolves.
+- **Set the emulator's clock and timezone, or the times are wrong for the place.** The AVD
+  inherits the host's zone, so a Manchester fix rendered in +03 puts every prayer two hours
+  out — plausible-looking and false, which is the worst kind of store screenshot. And a
+  capture taken at whatever time you happen to be working shows a 1 am Isha, where a
+  mid-afternoon clock shows a live countdown and a Now/Next pair, which is what the screen
+  actually looks like in use. Both are one command each, on a throwaway AVD:
+
+  ```bash
+  adb root
+  adb shell setprop persist.sys.timezone Europe/London
+  adb shell settings put global auto_time 0
+  adb shell date 081515002026.00     # MMDDhhmmYYYY.ss — 15 Aug 2026, 15:00
+  ```
+
+  Re-launch the app afterwards so it picks the zone up.
 - **Grant `SCHEDULE_EXACT_ALARM` before capturing**, or the Times screen carries the amber
   "the system is withholding this" banner. The banner is honest and should stay in the app;
   it just is not what the screenshot is there to show.
