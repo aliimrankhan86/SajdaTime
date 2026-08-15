@@ -6,6 +6,12 @@
 <resources>
     <string name="app_name">SajdaTime</string>
 
+    <!-- Empty here and in every build a user can install. Only src/rtl/ fills it, and
+         MainActivity.PreviewBuildFrame shows it as a band across the top of every screen
+         so the developer-only right-to-left preview can never be mistaken for the app.
+         Not for translation: no translated build ever shows it. -->
+    <string name="preview_build_notice" translatable="false"></string>
+
     <!-- Navigation -->
     <string name="nav_times">Times</string>
     <string name="nav_qibla">Qibla</string>
@@ -91,9 +97,16 @@
            user who assumed the times were sourced from somewhere authoritative was
            reading a stronger claim than the app was ever entitled to make.
         2. That the calculation can be wrong, and the specific ways it can: a fault in the
-           software, a wrong location, a wrong clock, or the author's own mistake. "May
-           get things wrong" on its own is the sort of line every app carries and nobody
-           reads. Naming the failures makes it a real warning.
+           software, a wrong location, a wrong clock, a delayed alert, or the author's own
+           mistake. "May get things wrong" on its own is the sort of line every app carries
+           and nobody reads. Naming the failures makes it a real warning. The alert clause
+           was added 15 Aug 2026 after checking every sentence against the code: alerts
+           use setAlarmClock where the phone allows exact alarms and the throttled
+           setExactAndAllowWhileIdle where it does not (PrayerAlarmScheduler.kt), so a
+           delayed alert is a real failure mode and the one thing the app promises that
+           the disclaimer had not named. "Islamic authorities and scholars" replaced
+           "scholars" in the same pass: the conventions come from ISNA, Umm al-Qura,
+           Diyanet, Kemenag and the like as much as from individuals.
         3. What to do about a disagreement — follow the mosque. This replaced "It is your
            choice to make", which stated the reader's agency without helping them use it.
            This is not the app adopting a fiqh position: deferring to local scholars over
@@ -106,7 +119,7 @@
       Keep all four if this is ever reworded. Dropping any one of them is a change of
       substance dressed as an edit, and the fourth is the owner's own request.
     -->
-    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
     <string name="home_next_prayer">NEXT PRAYER</string>
@@ -126,8 +139,14 @@
     <!-- Screen-reader label for the row carrying that pill. -->
     <string name="home_now_marker_a11y">Current prayer</string>
     <string name="notice_dismiss">Dismiss</string>
-    <!-- Shown only above ~45° of latitude, and only while the method is still AUTO. The
-         measured basis: the default (Muslim World League) puts Isha 78 minutes later than
+    <!-- The far-north form of the "Different from your mosque?" door under the timetable
+         (HomeScreen.MosqueDifferenceDoor). Shown only above ~45° of latitude, only while the
+         method is still AUTO, and only until dismissed; everywhere else the door is a plain
+         button carrying mosque_diff_link. It used to be a separate card above the times,
+         which pushed Maghrib, Isha and every button below the fold on a 20:9 phone; since
+         15 Aug 2026 it is the same door, made loud, and it opens the same explainer.
+
+         The measured basis: the default (Muslim World League) puts Isha 78 minutes later than
          all three of the tester's Slough mosques, which follow Moonsighting Committee, but
          MWL is within about five minutes across South Asia, South-East Asia, the Middle
          East and Africa. So this is not "the default is wrong" — it is "the default has a
@@ -135,16 +154,21 @@
 
          It names no method and changes no time. Picking one for the user would be the app
          adopting a fiqh-adjacent position on their behalf, which is refused (HANDOVER §11,
-         the rejected auto-switch option). Asking is not the same as deciding. -->
+         the rejected auto-switch option). Asking is not the same as deciding. Two lines of
+         body at most, about 66 characters at the default font: measured on the 420dpi
+         emulator, a third line is exactly what the navigation bar clips. "Here" means at
+         this latitude; the dialog behind it says why (twilight) and offers the chooser. -->
     <string name="method_notice_title">Does this match your mosque?</string>
-    <string name="method_notice_body">This far from the equator, mosques differ most over when Fajr and Isha begin, sometimes by an hour or more. If these times do not match yours, tap to pick the method your mosque follows.</string>
+    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here. Tap to see why.</string>
     <!--
-      The permanent, quiet door under the timetable, for everyone. The notice above reaches
-      only users above 45° of latitude, where the gap between methods is an hour; the gap a
-      person actually notices and reports is 10 to 20 minutes, and measured with the app's
-      own engine that gap sits below the line: North America (ISNA) and the Gulf (Umm al-Qura,
-      Qatar) on the default, plus every mosque board anywhere that prints the congregation
-      rather than the beginning. See HANDOVER §10, "The gap the banner never reached".
+      The plain, permanent form of the door under the timetable — what everyone below 45°
+      sees, and what everyone sees once the loud form above is dismissed or a method is
+      chosen. The loud form reaches only users above 45° of latitude, where the gap between
+      methods is an hour; the gap a person actually notices and reports is 10 to 20 minutes,
+      and measured with the app's own engine that gap sits below the line: North America
+      (ISNA) and the Gulf (Umm al-Qura, Qatar) on the default, plus every mosque board
+      anywhere that prints the congregation rather than the beginning. See HANDOVER §10,
+      "The gap the banner never reached".
 
       The dialog is not a second disclaimer. It says what the app shows, names the three
       things that move a time, gives one button per cause, and ends where the disclaimer
@@ -198,6 +222,8 @@
 
     <!-- Export -->
     <string name="action_save_timetable">Save timetable as PDF</string>
+    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <string name="action_save_pdf">Save as PDF</string>
     <string name="export_sheet_title">Save your timetable</string>
     <string name="export_sheet_body">We will make a PDF of your prayer times for %1$s. You can then save it, print it, or send it to someone.</string>
     <string name="export_today">Today only</string>
@@ -240,6 +266,10 @@
     <string name="qibla_needs_location">Set your location to find the Qibla.</string>
     <string name="qibla_facing">You are facing the Qibla</string>
     <string name="qibla_heading_now">You are facing %1$d°</string>
+    <!-- The dial's legend. The needle is *you* — it points the way the phone points and
+         stays put while the dial and the Kaaba turn round it. Turn until it touches the
+         Kaaba. -->
+    <string name="qibla_legend_kaaba">The Kaaba</string>
     <string name="qibla_legend_facing">Where you are facing</string>
     <string name="qibla_turn_left">Turn left %1$d°</string>
     <string name="qibla_turn_right">Turn right %1$d°</string>

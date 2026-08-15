@@ -3,7 +3,6 @@ package com.sajdatime.app.ui.qibla
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -136,9 +134,10 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     val heading = state.compassHeading
     val scheme = MaterialTheme.colorScheme
 
-    // The dial rotates opposite to the device so north stays physically north. When there
-    // is no compass the dial is held still and only the Qibla arrow is drawn, pointing at
-    // the true bearing from north.
+    // The dial rotates opposite to the device so north stays physically north, and the
+    // Kaaba mark rides on it at the Qibla bearing — so the mark is always "where the Kaaba
+    // is" in the room. When there is no compass the dial is held still with north at the
+    // top, and the needle swings round to the bearing instead (see below).
     val dialRotation by animateFloatAsState(
         targetValue = if (heading != null) -heading.toFloat() else 0f,
         animationSpec = tween(durationMillis = 120),
@@ -147,11 +146,25 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
 
     val aligned = heading != null && QiblaEngine.isAligned(heading, qiblaTrueBearing, 5.0)
 
-    // The arc is the turn still owed, measured from the fixed "facing" tick at the top
-    // round to the Qibla arrow. Signed, so a left turn sweeps anticlockwise and the user
-    // is never told to walk the long way round. It is the same number GuidanceText speaks
-    // aloud, drawn instead of said.
+    // The arc is the turn still owed, measured from the needle at the top round to the
+    // Kaaba. Signed, so a left turn sweeps anticlockwise and the user is never told to walk
+    // the long way round. It is the same number GuidanceText speaks aloud, drawn instead
+    // of said.
     val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qiblaTrueBearing) else 0.0
+
+    // **The needle is you, not the Qibla.** It points the way the phone points — straight
+    // up the screen — and stays there while the dial and the Kaaba turn round it. Turn
+    // until the needle touches the Kaaba.
+    //
+    // It used to be the other way round: the needle swung to the Qibla bearing with the
+    // Kaaba mark sitting on its tip, and "you" was a short grey tick at the rim. Read cold,
+    // that dial showed a compass needle already pointing at the Kaaba, so the two marks
+    // looked like one thing and the question "am I facing it?" had no visible answer — the
+    // owner's report on 15 Aug 2026 was that the needle and the Kaaba were "attached". A
+    // compass needle is read as "me" by everyone who has held a compass, so that is what it
+    // is now. Without a compass there is no "me", and the needle does the only useful thing
+    // left: it points at the Kaaba, which on a north-up dial is the bearing from north.
+    val needleRotation = if (heading != null) 0f else qiblaTrueBearing.toFloat()
 
     // Loaded here rather than inside the Canvas: painterResource is a composable and the
     // draw lambda is not one.
@@ -199,27 +212,17 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
             rotate(degrees = dialRotation, pivot = centre) {
                 drawTicks(centre, radius, scheme.outline)
                 drawCardinalMarker(centre, radius, scheme.onSurface)
-
-                // Qibla needle, drawn in dial space so it tracks true north correctly.
-                rotate(degrees = qiblaTrueBearing.toFloat(), pivot = centre) {
-                    drawNeedle(centre, radius, scheme.primary)
-                }
             }
 
-            // Fixed reference mark at the top: "you are pointing here". A tick rather
-            // than a dot, because it is the origin the arc is measured from and a dot
-            // does not read as an origin.
-            drawLine(
-                color = scheme.outline,
-                start = Offset(centre.x, centre.y - radius),
-                end = Offset(centre.x, centre.y - radius * 0.78f),
-                strokeWidth = 5f,
-            )
+            // The needle: fixed at the top with a compass ("you"), at the bearing without
+            // one. Screen space, not dial space, which is the whole point.
+            rotate(degrees = needleRotation, pivot = centre) {
+                drawNeedle(centre, radius, scheme.primary)
+            }
 
-            // Last, so it covers whatever it lands on. Two things it can land on: the
-            // north wedge, when the Qibla happens to be due north, and the facing tick,
-            // when you are already facing the Qibla. Both are moments when the mark
-            // underneath has nothing left to say and the Kaaba has.
+            // Last, so it covers whatever it lands on: the north wedge when the Qibla is
+            // due north, and the needle's tip when you are facing the Qibla — the moment
+            // the two marks are meant to meet.
             drawKaaba(
                 centre = centre,
                 radius = radius,
@@ -295,7 +298,12 @@ private fun DrawScope.drawCardinalMarker(centre: Offset, radius: Float, colour: 
     )
 }
 
-/** The Qibla pointer: a long tapered arrow from the centre outward. */
+/**
+ * The needle: a long tapered arrow from the centre outward. With a compass it is fixed at
+ * the top and means "the way you are pointing"; without one it is turned to the Qibla
+ * bearing. Its tip at 0.82 sits inside the Kaaba mark's box when the two coincide — see
+ * [KAABA_DISTANCE] — so on alignment the arrow visibly ends at the Kaaba.
+ */
 private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
     val tip = Offset(centre.x, centre.y - radius * 0.82f)
     val baseLeft = Offset(centre.x - radius * 0.075f, centre.y)
@@ -328,16 +336,16 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * would simply cover a tick, but it is the reason the mark was made *larger where it is*
  * rather than pushed further out: distance is the term with no headroom left.
  *
- * The needle tip at 0.82 is *inside* the cube at every bearing, which is what makes the
- * arrow end at the Kaaba rather than beside it or through it. So it is really three
- * numbers, not two: change any and check the others. The watch draws the same mark with
- * the same shares — see `WearApp.kt`.
+ * The needle tip at 0.82 is *inside* the cube when the two coincide, which is what makes
+ * the arrow end at the Kaaba on alignment rather than beside it or through it. So it is
+ * really three numbers, not two: change any and check the others. The watch draws the
+ * same mark with the same shares — see `WearApp.kt`.
  */
 private const val KAABA_DISTANCE = 0.72f
 private const val KAABA_SIZE = 0.32f
 
 /**
- * The Kaaba itself, at the far end of the needle.
+ * The Kaaba itself, on the ring at the Qibla bearing: "it is over there".
  *
  * A bearing in degrees answers "which way is it" only for someone who already thinks in
  * bearings, and the turn instruction underneath answers it only for someone who reads
@@ -425,23 +433,22 @@ private fun GuidanceText(state: UiState, qiblaTrueBearing: Double) {
 }
 
 /**
- * Two swatches naming the two marks on the dial. Without it the green arrow and the grey
- * tick are just shapes, and "which one am I?" is the first thing anyone asks. Hidden when
- * there is no compass, because then there is no "facing" mark to explain.
+ * The two marks on the dial, drawn small and named. Without it the arrow and the cube are
+ * just shapes, and "which one am I?" is the first thing anyone asks. The keys are the marks
+ * themselves in miniature — a needle and a Kaaba — rather than colour swatches, so the
+ * legend still works for someone who cannot tell green from grey. Hidden when there is no
+ * compass, because then there is no "you" on the dial to explain.
  */
 @Composable
 private fun DialLegend() {
     val scheme = MaterialTheme.colorScheme
+    val kaaba = painterResource(CoreR.drawable.ic_kaaba)
+    val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
 
     @Composable
-    fun Swatch(colour: Color, label: String) {
+    fun Key(label: String, mark: @Composable () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                Modifier
-                    .size(width = 14.dp, height = 6.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(colour),
-            )
+            Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { mark() }
             Spacer(Modifier.width(8.dp))
             Text(
                 text = label,
@@ -456,8 +463,29 @@ private fun DialLegend() {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.clearAndSetSemantics { },
     ) {
-        Swatch(scheme.primary, stringResource(R.string.qibla_title))
-        Swatch(scheme.outline, stringResource(R.string.qibla_legend_facing))
+        Key(stringResource(R.string.qibla_legend_kaaba)) {
+            // Both layers, as on the dial: the band and door are painted in the page
+            // colour over the silhouette rather than cut out of it.
+            Box(Modifier.size(16.dp)) {
+                Icon(painter = kaaba, contentDescription = null, tint = scheme.onSurface, modifier = Modifier.size(16.dp))
+                Icon(painter = kaabaDetail, contentDescription = null, tint = scheme.surface, modifier = Modifier.size(16.dp))
+            }
+        }
+        Key(stringResource(R.string.qibla_legend_facing)) {
+            // A stubbier arrow than the dial's: the real needle's proportions are a hair's
+            // width at 18dp.
+            Canvas(Modifier.size(width = 12.dp, height = 18.dp)) {
+                drawPath(
+                    path = Path().apply {
+                        moveTo(size.width / 2f, 0f)
+                        lineTo(0f, size.height)
+                        lineTo(size.width, size.height)
+                        close()
+                    },
+                    color = scheme.primary,
+                )
+            }
+        }
     }
 }
 

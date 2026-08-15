@@ -30,7 +30,6 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -110,25 +109,43 @@ fun HomeScreen(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
-            .padding(bottom = 24.dp),
+            // 8dp, not 24: this sits below the last element, where the navigation bar is
+            // already providing the separation, and on a short screen it was 24dp of the
+            // 37dp that pushed the mosque door under the bar.
+            .padding(bottom = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // Order and heights are budgeted so that on a phone at the default font size the
+        // whole of this — header, next prayer, all six times, the mosque door — sits above
+        // the navigation bar without scrolling. That is why the export action lives on the
+        // "Today" line rather than in a 56dp button of its own, and why the far-north
+        // notice is the door under the times rather than a card above them (which alone was
+        // 185dp and pushed Maghrib and Isha off the screen). The rare banners in between —
+        // no location, polar, exact alarms — are allowed to push things down; they are
+        // transient and they matter more than the fit.
+        //
+        // **The budget was set on an emulator and the emulator was the roomy case.** It was
+        // measured on 1080x2400 at 420dpi, which is 914dp tall, and passed. The owner's
+        // Galaxy S23 Ultra is 1440x3088 at density 3.75 — **823dp**, 91dp less — and there
+        // the door was sliced in half by the navigation bar (measured 15 Aug 2026: the
+        // content overran the viewport by exactly 137px, 37dp). Logical height does not
+        // follow from a screen sounding large; a taller, denser panel can give the app less
+        // room than a modest one. If this list grows again, measure on the *short* device,
+        // and note that the column stays `verticalScroll` on purpose so that a screen
+        // shorter still, or a large font setting, loses nothing — it only has to be reached.
         LocationHeader(state = state, now = state.now, onClick = { locationSheet = true })
         Spacer(Modifier.height(12.dp))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
-        MethodBanner(
-            state,
-            onOpen = { onOpenSetting(SettingsChooser.METHOD) },
-            onDismiss = onDismissMethodNotice,
-        )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
-        Spacer(Modifier.height(24.dp))
-        TodayTimeline(state)
-        MosqueDifferenceLink(enabled = state.today != null, onClick = { explaining = true })
         Spacer(Modifier.height(12.dp))
-        ExportButton(enabled = state.today != null, onClick = { exportSheet = true })
+        TodayTimeline(state, onExport = { exportSheet = true })
+        MosqueDifferenceDoor(
+            state = state,
+            onOpen = { explaining = true },
+            onDismissNotice = onDismissMethodNotice,
+        )
     }
 
     if (explaining) {
@@ -248,7 +265,9 @@ private fun NextPrayerCard(state: UiState) {
         modifier = Modifier
             .fillMaxWidth()
             .sajdaSurface(RoundedCornerShape(24.dp), hero.brush)
-            .padding(horizontal = 20.dp, vertical = 24.dp),
+            // 16dp, not 24: part of the height budget in HomeScreen, and the card is the
+            // tallest single block on the screen so it is where height is cheapest to find.
+            .padding(horizontal = 20.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -337,27 +356,62 @@ private fun NextPrayerCard(state: UiState) {
 }
 
 /**
- * The one door every user gets, at the moment they need it.
+ * The one door every user gets, at the moment they need it — right under the times being
+ * doubted, because a user who thinks the app is broken is looking at the times, not at
+ * Settings. It names no method and changes no time; the dialog behind it does the
+ * explaining and hands over to the chooser that answers.
  *
- * The far-north notice above only appears above 45 degrees, and that threshold was chosen
- * for where the spread between methods crosses an hour. Measured with this app's own
- * engine, the *complaint-sized* gap — ten to twenty minutes on Isha — sits below that line:
- * the default is 10-21 minutes late against ISNA across North America and 6-21 minutes early
- * against Umm al-Qura and Qatar in the Gulf, and none of those users ever sees the notice.
- * The rest of the world is within a few minutes of its local convention, but is still
+ * Two forms, one door:
+ *
+ *  - **Plain**, for everyone: an outlined button. A button and not a text link, since
+ *    15 Aug 2026 — the owner asked for the calls to action to be findable, and a tinted
+ *    word under a card did not read as one. Outlined and not filled, so it never competes
+ *    with the next-prayer card, and it never goes away, so it must not nag.
+ *  - **Loud**, above 45° of latitude while the method is still AUTO and until dismissed:
+ *    the amber notice card. That threshold is where the spread between methods crosses an
+ *    hour (78 minutes on Isha in Slough against the mosques' Moonsighting convention).
+ *    Until 15 Aug 2026 this was a separate card *above* the times; on a 20:9 phone it was
+ *    185dp tall and pushed Maghrib, Isha and every button below the fold, which the owner
+ *    reported. It is the same door made loud, and it opens the same explainer — whose
+ *    first button is the method chooser — rather than dropping a first-time user straight
+ *    into a list of fourteen conventions.
+ *
+ * Why the plain form is asked of everyone: measured with this app's own engine, the
+ * *complaint-sized* gap — ten to twenty minutes on Isha — sits below the 45° line. The
+ * default is 10-21 minutes late against ISNA across North America and 6-21 minutes early
+ * against Umm al-Qura and Qatar in the Gulf, and none of those users ever sees the loud
+ * form. The rest of the world is within a few minutes of its local convention, but is still
  * comparing the app to a mosque board that shows the *congregation*, which is a gap of
  * exactly this size and is supposed to be there.
  *
- * So the question is asked of everyone, quietly, right under the times being doubted —
- * because a user who thinks the app is broken is looking at the times, not at Settings.
- * A text link and not a card: it must not compete with the notices, and it never goes away,
- * so it must not nag. It names no method and changes no time; the dialog behind it does the
- * explaining and hands over to the chooser that answers.
+ * Deliberately not an auto-switch: naming or picking a method for the user would be the app
+ * taking a fiqh-adjacent position on their behalf (HANDOVER §11, T1). Asking is not deciding.
  */
 @Composable
-private fun MosqueDifferenceLink(enabled: Boolean, onClick: () -> Unit) {
-    TextButton(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.mosque_diff_link))
+private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNotice: () -> Unit) {
+    if (state.today == null) return
+    val latitude = state.settings.coordinates?.latitude
+    val loud = !state.settings.methodNoticeDismissed &&
+        state.settings.method == CalcMethod.AUTO &&
+        latitude != null && abs(latitude) >= METHOD_NOTICE_LATITUDE
+
+    Spacer(Modifier.height(12.dp))
+    if (loud) {
+        NoticeCard(
+            title = stringResource(R.string.method_notice_title),
+            body = stringResource(R.string.method_notice_body),
+            onClick = onOpen,
+            onDismiss = onDismissNotice,
+        )
+    } else {
+        OutlinedButton(
+            onClick = onOpen,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
+        ) {
+            Text(stringResource(R.string.mosque_diff_link))
+        }
     }
 }
 
@@ -422,23 +476,6 @@ private fun ExplainerAction(label: String, onClick: () -> Unit) {
             .heightIn(min = 48.dp),
     ) {
         Text(label)
-    }
-}
-
-@Composable
-private fun ExportButton(enabled: Boolean, onClick: () -> Unit) {
-    // A plain full-width button rather than a floating one: it never covers a prayer
-    // time, and the label can say what actually happens.
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 56.dp),
-    ) {
-        Icon(Icons.Outlined.PictureAsPdf, contentDescription = null)
-        Spacer(Modifier.width(10.dp))
-        Text(stringResource(R.string.action_save_timetable))
     }
 }
 
@@ -563,46 +600,6 @@ private fun PolarBanner(state: UiState) {
     )
 }
 
-/**
- * Offers the calculation-method setting to the users it actually matters to.
- *
- * The complaint behind it: three mosques in the tester's town put Isha **78 minutes**
- * earlier than the app did. The app was not miscalculating — `MOON_SIGHTING` already ships
- * and already matches them to the minute — but onboarding never asks for a method, so a
- * user who does not open Settings can never reach the fix.
- *
- * **Only above [METHOD_NOTICE_LATITUDE].** The worldwide sweep in HANDOVER §10 found the
- * default (Muslim World League) is within about five minutes across South Asia,
- * South-East Asia, the Middle East and Africa, and only diverges nearer the poles, where it
- * reaches +26 minutes in March and +49 in June. Showing this to everyone would hand ~80% of
- * users a question they have no reason to answer. `abs` because latitude bands are
- * symmetric and the Southern Hemisphere is not an afterthought.
- *
- * **Only while the method is still [CalcMethod.AUTO].** A user who has already chosen —
- * even if they chose MWL deliberately — has answered this question, and asking again would
- * second-guess them.
- *
- * It names no method and changes no time. Auto-switching by latitude was considered and
- * rejected: the objection was never that a smart default is wrong, it is that a *silent*
- * one has the app taking a fiqh-adjacent position for the user. A visible prompt is not the
- * same thing. See HANDOVER §11, T1.
- */
-@Composable
-private fun MethodBanner(state: UiState, onOpen: () -> Unit, onDismiss: () -> Unit) {
-    if (state.settings.methodNoticeDismissed) return
-    if (state.settings.method != CalcMethod.AUTO) return
-    val latitude = state.settings.coordinates?.latitude ?: return
-    if (abs(latitude) < METHOD_NOTICE_LATITUDE) return
-
-    Spacer(Modifier.height(12.dp))
-    NoticeCard(
-        title = stringResource(R.string.method_notice_title),
-        body = stringResource(R.string.method_notice_body),
-        onClick = onOpen,
-        onDismiss = onDismiss,
-    )
-}
-
 @Composable
 private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
@@ -683,19 +680,32 @@ private fun NoticeCard(
 }
 
 @Composable
-private fun TodayTimeline(state: UiState) {
+private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     val today = state.today ?: return
     val context = LocalContext.current
     val next = state.next
 
-    Text(
-        text = stringResource(R.string.home_today),
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .semantics { heading() },
-    )
+    // The heading and the export action share one line. The export used to be a 56dp filled
+    // button under everything, and on a 20:9 phone it was the thing that fell below the
+    // fold; beside the list it exports it costs no height at all and reads as what it is —
+    // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Text(
+            text = stringResource(R.string.home_today),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .weight(1f)
+                .semantics { heading() },
+        )
+        TextButton(onClick = onExport) {
+            Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(stringResource(R.string.action_save_pdf))
+        }
+    }
 
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }
@@ -770,8 +780,11 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
                 if (isNext) drawRect(accent, size = Size(barWidth, size.height))
             }
             // Vertical padding plus a floor, not a fixed height: at a large system font
-            // size the row has to grow rather than crop the prayer name.
-            .heightIn(min = 56.dp)
+            // size the row has to grow rather than crop the prayer name. 50, not 56, since
+            // 15 Aug 2026: six dp a row over six rows is what lets the mosque door under
+            // the list clear the navigation bar (see the budget note in HomeScreen). Still
+            // above the 48dp touch-target minimum, though these rows are not tappable.
+            .heightIn(min = 50.dp)
             .padding(horizontal = 18.dp, vertical = 12.dp),
     ) {
         Icon(
@@ -911,12 +924,15 @@ private fun hijriToday(now: Instant, offsetDays: Int): String {
 }
 
 /**
- * Where the calculation-method notice starts appearing, in degrees of latitude, either side
- * of the equator.
+ * Where the mosque door switches to its loud, amber form, in degrees of latitude either
+ * side of the equator (`abs`, because latitude bands are symmetric and the Southern
+ * Hemisphere is not an afterthought).
  *
  * 45 is not a round number chosen for tidiness — it is where the measured divergence starts.
- * Below it the default is within a few minutes of local practice essentially everywhere;
- * above it the gap grows quickly (+26 minutes by March, +49 by June). See HANDOVER §10,
- * "Is Muslim World League actually a bad default?".
+ * Below it the default (Muslim World League) is within a few minutes of local practice
+ * essentially everywhere; above it the gap grows quickly (+26 minutes by March, +49 by June,
+ * 78 on Isha in Slough against Moonsighting). Showing the loud form to everyone would hand
+ * ~80% of users a question they have no reason to answer. See HANDOVER §10, "Is Muslim
+ * World League actually a bad default?".
  */
 private const val METHOD_NOTICE_LATITUDE = 45.0

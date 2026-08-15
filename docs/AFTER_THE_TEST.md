@@ -60,6 +60,57 @@ who reported 15–30 minutes. If you can find that out — even one mosque's pub
 
 ---
 
+## 15 Aug 2026 (later the same day) — your own phone found two bugs the emulators never could
+
+You plugged in your Galaxy S23 Ultra. It was worth doing: within twenty minutes it showed
+two things wrong that a whole day of testing on simulated phones had said were fine. The app
+was installed *beside* your Play Store copy, not over it, so your testers were never at risk.
+
+**1. The place name showed a province, not your town.** Earlier that day I fixed the
+"Berkshire instead of Slough" problem and wrote down that it was a British quirk — I had
+checked eight other countries and they were all fine. Your phone, in Türkiye, showed
+**"Alanya/Antalya"**. Antalya is a province; it is the Turkish version of the exact problem
+you asked me to remove. So the fix was right but my explanation of it was too confident, and
+Turkey writes its addresses in a way that slipped through. It now reads **"Alanya, Türkiye"**,
+and the real address from your phone is saved as a permanent test so it cannot come back.
+
+The lesson, written into the notes for whoever works on this next: eight countries agreeing
+is a sample, not a proof, and I had quietly written it up as a proof.
+
+**2. The "Different from your mosque?" button was cut in half by the navigation bar.** You
+asked for everything important to fit on one screen. It did — on the simulated phone I
+measured, which turns out to give an app *more* room than your real one, even though your
+real one is the bigger phone. Yours is about a tenth shorter in the units that matter, and
+that tenth was exactly the button. I measured the overflow (37 units), found that much space
+in padding that was doing nothing, and it now sits whole and clear above the bar. Checked in
+both light and dark.
+
+**What else I checked on your phone.** The full setup walk; that Android's own permission box
+says *approximate* location, which is the privacy promise in the platform's words rather than
+mine; that the alerts are scheduled as exact ones on your Samsung; that the disclaimer scrolls
+all the way to the dua request; that the Qibla dial now shows the needle and the Kaaba as two
+separate things, with the maths checked and not just the picture; that everything still works
+at large text; and the location panel and city search, which had never once been seen on a
+real phone before today.
+
+**What I could not check.** I cannot physically turn your phone round, so I could not watch
+the Qibla dial reach the "you are facing it" state on that handset — that part is confirmed
+on the simulator and by arithmetic. I did not wait by the phone to watch an alarm actually
+ring on it; I only read that it was correctly scheduled. And your watch was not paired with
+it, so phone-to-watch syncing is still the one thing this project has never seen work.
+
+**One known limitation showed itself.** I searched Slough from your phone in Türkiye and got
+Slough's prayer times displayed in Turkish clock time. That is the app behaving as designed
+— it uses your phone's clock — but it reads as nonsense if you are checking a city abroad. It
+was already on the list as something to decide about; now it has actually been seen rather
+than merely predicted.
+
+**I changed two settings on your phone to test with, and put both back**: the text size
+(briefly to large, back to your 0.9) and the app's theme. Nothing else was touched, and I
+never had, or asked for, your PIN.
+
+---
+
 ## ⚠️ One thing was not left until later: the app crashed in the far north
 
 **Found on 1 Aug 2026, fixed the same day, and the reason it was found is worth saying.**

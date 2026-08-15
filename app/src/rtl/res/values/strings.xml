@@ -64,4 +64,12 @@
          indistinguishable, and installing the RTL preview over the real app is the mistake
          the suffix exists to prevent. -->
     <string name="app_name">SajdaTime (RTL)</string>
+    <!-- A band across the top of every screen, drawn by MainActivity.PreviewBuildFrame.
+         Added 15 Aug 2026 after the fourth time the owner saw this build running on an
+         emulator and reported the app as broken. He was right each time — English laid
+         out right-to-left is broken — and nothing on the screen said it was a test. The
+         shipping app follows the phone's language and stays left-to-right until it has
+         words in a right-to-left one (AppLocale.kt, LocaleDisciplineTest); this build
+         is the one place that rule is deliberately suspended, and it now says so. -->
+    <string name="preview_build_notice" translatable="false">LAYOUT TEST BUILD. English forced right-to-left on purpose. No user ever sees this.</string>
 </resources>

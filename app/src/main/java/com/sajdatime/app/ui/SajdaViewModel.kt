@@ -98,9 +98,18 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
+            var first = true
             settingsRepository.settings.collect { settings ->
                 _state.update { it.copy(settings = settings, loading = false) }
                 recalculate()
+                // MainActivity.onResume refreshes the location on every foreground visit —
+                // except the first. On a cold start onCreate, onStart and onResume run in
+                // one main-thread pass, so this collector has not delivered yet and onResume
+                // sees `coordinates == null` and skips. Found on 15 Aug 2026 while verifying
+                // the place label: a cold-opened app kept the stored city and only refreshed
+                // after being backgrounded once. So the first load does the refresh itself.
+                if (first && settings.coordinates != null) refreshLocation()
+                first = false
             }
         }
         startClock()

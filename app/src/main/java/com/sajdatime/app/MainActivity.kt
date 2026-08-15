@@ -14,15 +14,25 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -93,87 +103,89 @@ class MainActivity : ComponentActivity() {
                     if (state.exportEvent != null) viewModel.consumeExportEvent()
                 }
 
-                when {
-                    state.loading -> Unit
+                PreviewBuildFrame {
+                    when {
+                        state.loading -> Unit
 
-                    !state.settings.onboardingComplete -> OnboardingScreen(
-                        state = state,
-                        onRequestLocationPermission = ::requestLocation,
-                        onSearchCity = viewModel::searchCity,
-                        onUseDefaultLocation = viewModel::useDefaultLocation,
-                        onSelectSect = viewModel::setSect,
-                        onSelectMadhab = viewModel::setMadhab,
-                        onSelectMethod = viewModel::setMethod,
-                        onFinish = {
-                            requestNotificationsIfNeeded()
-                            viewModel.completeOnboarding()
-                        },
-                    )
-
-                    else -> {
-                        MainScaffold(
+                        !state.settings.onboardingComplete -> OnboardingScreen(
                             state = state,
-                            onExport = viewModel::exportPdf,
-                            onSetSect = viewModel::setSect,
-                            onSetMadhab = viewModel::setMadhab,
-                            onSetMethod = viewModel::setMethod,
-                            onSetAlert = viewModel::setAlert,
-                            onSetAdjustment = viewModel::setAdjustment,
-                            onSetHijriOffset = viewModel::setHijriOffsetDays,
-                            onResetAdjustments = viewModel::resetAdjustments,
-                            onSetOngoingBadge = viewModel::setOngoingBadge,
-                            onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
-                            onSetAlarmOnApproximateDays = viewModel::setAlarmOnApproximateDays,
-                            onPickAlarmSound = {
-                                openAlarmSoundPicker(state.settings.alarmSoundUri)
-                            },
-                            onRefreshLocation = ::requestLocation,
+                            onRequestLocationPermission = ::requestLocation,
                             onSearchCity = viewModel::searchCity,
-                            onQiblaVisible = viewModel::setQiblaVisible,
-                            onSetThemeChoice = viewModel::setThemeChoice,
-                            onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
-                            onDismissMethodNotice = viewModel::dismissMethodNotice,
+                            onUseDefaultLocation = viewModel::useDefaultLocation,
+                            onSelectSect = viewModel::setSect,
+                            onSelectMadhab = viewModel::setMadhab,
+                            onSelectMethod = viewModel::setMethod,
+                            onFinish = {
+                                requestNotificationsIfNeeded()
+                                viewModel.completeOnboarding()
+                            },
                         )
 
-                        // Shown once, immediately after setup. The app is a convenience,
-                        // not a religious authority, and saying so should not be buried.
-                        if (!state.settings.disclaimerSeen) {
-                            AlertDialog(
-                                onDismissRequest = { },
-                                // A filled, full-width button, not a text link. This is the
-                                // one control on the one screen every user must pass
-                                // through, and as a small tinted word in the corner it did
-                                // not read as pressable — a tester said so. 56dp clears the
-                                // 48dp minimum touch target with room for shaky hands.
-                                confirmButton = {
-                                    Button(
-                                        onClick = { viewModel.markDisclaimerSeen() },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .heightIn(min = 56.dp),
-                                    ) {
-                                        Text(stringResource(R.string.action_understood))
-                                    }
+                        else -> {
+                            MainScaffold(
+                                state = state,
+                                onExport = viewModel::exportPdf,
+                                onSetSect = viewModel::setSect,
+                                onSetMadhab = viewModel::setMadhab,
+                                onSetMethod = viewModel::setMethod,
+                                onSetAlert = viewModel::setAlert,
+                                onSetAdjustment = viewModel::setAdjustment,
+                                onSetHijriOffset = viewModel::setHijriOffsetDays,
+                                onResetAdjustments = viewModel::resetAdjustments,
+                                onSetOngoingBadge = viewModel::setOngoingBadge,
+                                onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
+                                onSetAlarmOnApproximateDays = viewModel::setAlarmOnApproximateDays,
+                                onPickAlarmSound = {
+                                    openAlarmSoundPicker(state.settings.alarmSoundUri)
                                 },
-                                title = { Text(stringResource(R.string.disclaimer_title)) },
-                                // Scrollable. AlertDialog does not scroll its body for
-                                // you, and this text is now seven paragraphs — at a large
-                                // system font size the last of them, the dua request, is
-                                // exactly what would fall off the bottom unread.
-                                //
-                                // Seven, not five, since the Isha and congregation-time
-                                // paragraphs were added. Only four fit on a 1080x1920
-                                // screen at default font, so the dua is three swipes down
-                                // and the scroll is the only thing keeping it reachable.
-                                // Verified by screenshot in RTL — see HANDOVER §10. Do not
-                                // lengthen this further without re-checking that the dua
-                                // still arrives, and do not remove the scroll.
-                                text = {
-                                    Column(Modifier.verticalScroll(rememberScrollState())) {
-                                        Text(stringResource(R.string.disclaimer_body))
-                                    }
-                                },
+                                onRefreshLocation = ::requestLocation,
+                                onSearchCity = viewModel::searchCity,
+                                onQiblaVisible = viewModel::setQiblaVisible,
+                                onSetThemeChoice = viewModel::setThemeChoice,
+                                onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
+                                onDismissMethodNotice = viewModel::dismissMethodNotice,
                             )
+
+                            // Shown once, immediately after setup. The app is a convenience,
+                            // not a religious authority, and saying so should not be buried.
+                            if (!state.settings.disclaimerSeen) {
+                                AlertDialog(
+                                    onDismissRequest = { },
+                                    // A filled, full-width button, not a text link. This is the
+                                    // one control on the one screen every user must pass
+                                    // through, and as a small tinted word in the corner it did
+                                    // not read as pressable — a tester said so. 56dp clears the
+                                    // 48dp minimum touch target with room for shaky hands.
+                                    confirmButton = {
+                                        Button(
+                                            onClick = { viewModel.markDisclaimerSeen() },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .heightIn(min = 56.dp),
+                                        ) {
+                                            Text(stringResource(R.string.action_understood))
+                                        }
+                                    },
+                                    title = { Text(stringResource(R.string.disclaimer_title)) },
+                                    // Scrollable. AlertDialog does not scroll its body for
+                                    // you, and this text is now seven paragraphs — at a large
+                                    // system font size the last of them, the dua request, is
+                                    // exactly what would fall off the bottom unread.
+                                    //
+                                    // Seven, not five, since the Isha and congregation-time
+                                    // paragraphs were added. Only four fit on a 1080x1920
+                                    // screen at default font, so the dua is three swipes down
+                                    // and the scroll is the only thing keeping it reachable.
+                                    // Verified by screenshot in RTL — see HANDOVER §10. Do not
+                                    // lengthen this further without re-checking that the dua
+                                    // still arrives, and do not remove the scroll.
+                                    text = {
+                                        Column(Modifier.verticalScroll(rememberScrollState())) {
+                                            Text(stringResource(R.string.disclaimer_body))
+                                        }
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -234,3 +246,47 @@ private inline fun <reified T : Parcelable> Intent.getParcelableExtraCompat(name
     } else {
         getParcelableExtra(name)
     }
+
+/**
+ * Wraps the whole UI in a build-type banner — or, in every build a user can install, in
+ * nothing at all.
+ *
+ * `preview_build_notice` is empty in `main` and overridden only in `src/rtl/`, the
+ * developer-only build that forces the app right-to-left with its English words left in
+ * place (see that file). Every time the owner has seen that build on an emulator he has,
+ * correctly, reported the app as broken — four times by 15 Aug 2026 — because English laid
+ * out right-to-left *is* broken and nothing on the screen said "this is a layout test".
+ * Now something does, on every screen, in a colour nothing else in the app uses for a
+ * band. The check is a resource, not `BuildConfig`, for the same reason `app_language_tag`
+ * is: it is one string, it needs no build feature, and the shipping build pays a single
+ * `isBlank()` for it.
+ *
+ * The status-bar inset is taken by the banner and consumed before the content, so the
+ * scaffold underneath does not add it a second time. That branch is only compiled into a
+ * layout when the notice is non-blank; the shipping build lays out exactly as before.
+ */
+@Composable
+private fun PreviewBuildFrame(content: @Composable () -> Unit) {
+    val notice = stringResource(R.string.preview_build_notice)
+    if (notice.isBlank()) {
+        content()
+        return
+    }
+    Column(Modifier.fillMaxSize()) {
+        Text(
+            text = notice,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onErrorContainer,
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.errorContainer)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+        )
+        Box(
+            Modifier
+                .weight(1f)
+                .consumeWindowInsets(WindowInsets.statusBars),
+        ) { content() }
+    }
+}

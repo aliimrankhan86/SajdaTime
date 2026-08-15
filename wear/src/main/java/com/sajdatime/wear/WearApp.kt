@@ -510,10 +510,15 @@ private fun QiblaPage(state: WearUiState) {
 
             val heading = state.heading
             val aligned = heading != null && QiblaEngine.isAligned(heading, qibla, 5.0)
-            // Green, aligned or not — the same rule as the phone. The arrow's job is
-            // "the Qibla is that way", and a colour that changes underneath it invites
-            // the reading that the direction itself has changed.
+            // Green, aligned or not — the same rule as the phone. A colour that changes
+            // underneath the needle invites the reading that the direction has changed.
             val needleColour = MaterialTheme.colorScheme.primary
+            // The needle is *you*: fixed at the top, the way the watch points, while the
+            // dial and the Kaaba turn round it. Turn until it touches the Kaaba. Without a
+            // compass there is no "you", so it points at the Kaaba instead — the bearing
+            // from north on a north-up dial. Same rule as the phone; the reasoning and the
+            // owner's report that led to it are in QiblaScreen.kt.
+            val needleRotation = if (heading != null) 0f else qibla.toFloat()
             val dialColour = if (aligned) {
                 MaterialTheme.colorScheme.primaryContainer
             } else {
@@ -567,52 +572,36 @@ private fun QiblaPage(state: WearUiState) {
                         )
                         drawLine(tickColour, inner, outer, strokeWidth = 2f)
                     }
-
-                    // The needle floats between the rim and the middle rather than
-                    // starting at the centre, so it never lies across the readout.
-                    //
-                    // The tip stops at 0.60 rather than the 0.86 it used to, which is just
-                    // short of the Kaaba mark rather than inside it. Buried, what was left
-                    // showing was a stubby trapezoid squeezed between the readout and the
-                    // cube, and it stopped reading as an arrow at all; stopping short
-                    // leaves a whole triangle that points at the mark.
-                    //
-                    // "Just short" moves with the bearing, and there is no single number
-                    // that is exact: the mark stays upright while the needle goes round,
-                    // so the needle arrives at its flat side at some angles and at a
-                    // corner at others, and the near edge sits at 0.60 of the radius in
-                    // the first case and about 0.55 in the second. 0.60 splits it — a
-                    // hair's gap at the flats, a hair's overlap at the corners, and
-                    // neither is visible at watch size.
-                    rotate(degrees = qibla.toFloat(), pivot = centre) {
-                        val tip = Offset(centre.x, centre.y - radius * 0.60f)
-                        val base = centre.y - radius * 0.40f
-                        drawPath(
-                            path = Path().apply {
-                                moveTo(tip.x, tip.y)
-                                lineTo(centre.x - radius * 0.09f, base)
-                                lineTo(centre.x + radius * 0.09f, base)
-                                close()
-                            },
-                            color = needleColour,
-                        )
-                    }
                 }
 
-                // Fixed "you are pointing here" tick, the origin the arc is measured
-                // from. Drawn outside the rotate block so it stays at the top.
-                if (heading != null) {
-                    drawLine(
-                        color = tickColour,
-                        start = Offset(centre.x, centre.y - radius),
-                        end = Offset(centre.x, centre.y - radius * 0.74f),
-                        strokeWidth = 4f,
+                // The needle floats between the rim and the middle rather than starting
+                // at the centre, so it never lies across the readout. Screen space, not
+                // dial space: it is fixed at the top with a compass and turned to the
+                // bearing without one.
+                //
+                // The tip stops at 0.60 rather than the 0.86 it used to, which is just
+                // short of the Kaaba mark rather than inside it. Buried, what was left
+                // showing was a stubby trapezoid squeezed between the readout and the
+                // cube, and it stopped reading as an arrow at all; stopping short leaves a
+                // whole triangle that points at the mark when the two meet. 0.60 splits
+                // the mark's flat side (near edge at 0.60) and its corner (about 0.55) —
+                // a hair's gap or a hair's overlap, neither visible at watch size.
+                rotate(degrees = needleRotation, pivot = centre) {
+                    val tip = Offset(centre.x, centre.y - radius * 0.60f)
+                    val base = centre.y - radius * 0.40f
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(tip.x, tip.y)
+                            lineTo(centre.x - radius * 0.09f, base)
+                            lineTo(centre.x + radius * 0.09f, base)
+                            close()
+                        },
+                        color = needleColour,
                     )
                 }
 
-                // Last, so it covers the facing tick on the one occasion they coincide:
-                // when you are already facing the Qibla, and the tick has nothing left
-                // to tell you.
+                // Last, so it covers whatever it lands on — the needle's tip, when you are
+                // facing the Qibla and the two marks are meant to meet.
                 drawKaaba(
                     centre = centre,
                     radius = radius,
@@ -661,8 +650,8 @@ private const val KAABA_DISTANCE = 0.72f
 private const val KAABA_SIZE = 0.32f
 
 /**
- * The Kaaba itself, at the far end of the needle. The phone draws the same mark from the
- * same shared artwork; see `QiblaScreen.kt` for why it stays upright instead of rotating
+ * The Kaaba itself, on the ring at the Qibla bearing. The phone draws the same mark from
+ * the same shared artwork; see `QiblaScreen.kt` for why it stays upright instead of rotating
  * with the dial, and `ic_kaaba.xml` for why the band and door are painted over the
  * silhouette rather than cut out of it.
  *

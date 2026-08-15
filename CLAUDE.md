@@ -104,9 +104,28 @@ session inherits it instead of relearning it.
   WCAG AA. A visual change is not finished until `docs/store/screenshots/` is retaken.
 - **Ponytail discipline:** stdlib and platform first, no speculative abstractions, shortest
   working diff. Mark deliberate simplifications with a `ponytail:` comment.
-- **The owner is not technical and has no physical test devices.** Explain in plain language,
-  distinguish verified from assumed, never call something done when it is untested, and never
-  ask him to go and test it on a device himself.
+- **The owner is not technical.** Explain in plain language, distinguish verified from
+  assumed, never call something done when it is untested, and never ask him to go and test
+  it on a device himself and report back.
+- **He does have real devices, and they find things the emulators cannot.** A Redmi Note 13
+  Pro (HyperOS) and a Galaxy S23 Ultra (One UI), which he will plug in if asked. Every
+  alarm-reliability fact this project knows came off the Redmi, and the S23 Ultra found both
+  a geocoder bug and a layout bug on 15 Aug 2026 that twenty emulator probes had missed. So
+  **ask for the phone when the change touches layout, location, alarms or permissions.**
+  What to ask for, in this order, because he will not know the terms: *Settings → About
+  phone → Software information → tap Build number seven times*, then *Settings → Developer
+  options → USB debugging on*, then pick **File Transfer / Android Auto** on the USB
+  notification, then **Allow** on the "Allow USB debugging?" box. Also ask him to turn on
+  *Developer options → Stay awake*, or the screen locks mid-test and you cannot unlock it.
+  You can tell debugging is still off without asking: the phone shows on the USB bus as
+  `idProduct 0x6860` (file transfer only) and becomes `0x6864` when adb is available.
+- **Install on his phone with `./gradlew installSideload`, never `installDebug`.** The Play
+  build is on that handset. A debug-signed `com.sajdatime.app` cannot sit beside it, so a
+  plain debug install means uninstalling the Play copy, which resets his closed testers and
+  costs a fortnight (`docs/RELEASING.md`). `installSideload` uses the `.sideload` suffix and
+  installs alongside. Prefix with `ANDROID_SERIAL=<serial>` so Gradle does not target an
+  emulator instead. **Never enter his PIN or any credential**, and put back anything you
+  change on his phone — font scale, theme, locale.
 
 ---
 

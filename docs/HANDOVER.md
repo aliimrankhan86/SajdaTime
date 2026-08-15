@@ -15,7 +15,23 @@ business rule, what is verified, what is not, and what is left to do.
   owner's own key. `versionCode` 2 (1.1.0) is what testers are running; `versionCode` 3
   (1.1.1) is built and waiting to be uploaded and carries the Dhuhr fix. See §11.
 - **Companion docs:** `docs/ARCHITECTURE.md` (the technical spec, including the exact
-  business rules an iOS port must reproduce) and `README.md` (the short public-facing one).
+  business rules an iOS port must reproduce), `docs/RELEASING.md` (the owner's release
+  procedure and the Play rules that cost a fortnight), `docs/NEW-SESSION.md` (how to start
+  a session, tool-agnostic, nothing volatile), `docs/AFTER_THE_TEST.md` (plain language for
+  the owner: what changed and what happens next) and `README.md` (the short public one).
+- **How this file is kept current:** on 15 Aug 2026 the day-by-day narratives in §10, the
+  resolved items in §11 and the duplicated lessons in §15 were condensed to what is still
+  true. The long form is in git history before commit `e9a7853`. Keep it that way: when a
+  section stops being true, rewrite it — do not append a correction under it.
+- **The owner has real phones, and they keep finding what emulators cannot.** A Redmi Note 13
+  Pro (HyperOS) and a Galaxy S23 Ultra (One UI); he will plug either in if asked. Every
+  alarm-reliability fact here came off the Redmi, and on 15 Aug 2026 the S23 Ultra found a
+  geocoder bug and a layout bug that a day of emulator work had passed. **Ask for a phone
+  whenever the change touches layout, location, alarms or permissions**, and install with
+  `ANDROID_SERIAL=<serial> ./gradlew :app:installSideload` — never `installDebug`, which
+  cannot coexist with the Play build and would cost a fortnight of closed testing to undo.
+  `CLAUDE.md` has the exact words to walk a non-technical owner through enabling USB
+  debugging.
 
 > ⚠️ **The project used to live in `~/Documents`, which is iCloud-synced.** iCloud wrote
 > conflict copies (`SomeClass 2.class`) into `app/build` and broke dexing three separate
@@ -44,9 +60,9 @@ Three constraints shaped the whole architecture:
 
 The user is not technical and asked for the app to be "fit for the masses". Wording is
 plain and calm throughout — UK spelling, no jargon, no em dashes or semicolons in UI
-strings. All 193 user-facing strings are resources, ready for translation, and nothing is
-hardcoded in a composable: 146 in `app`, 27 in `wear`, and 20 in `core` (the prayer and
-calculation-method names, which live there because both the phone and the watch show them).
+strings. Every user-facing string is a resource, ready for translation, and nothing is
+hardcoded in a composable. The prayer and calculation-method names and their one-line
+descriptions live in `core` because both the phone and the watch show them.
 
 ### The religious disclaimer (non-negotiable)
 
@@ -177,7 +193,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (6 source files, 5 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
+**`:core`** (8 source files, 9 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
 
 | File | Contains |
 |---|---|
@@ -187,20 +203,22 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | `QiblaEngine.kt` | `KAABA`, `bearingToKaaba`, `trueToMagnetic`, `relativeTurn`, `isAligned`, `distanceToKaabaKm`, `normalise` |
 | `WatchSyncContract.kt` | The phone↔watch Data Layer path and keys, shared so the two modules cannot drift |
 | `AppLocale.kt` | The language the app's *words* are in, read back out of the resources, and `wrap(context)` which pins a whole configuration to it. Every clock, date and number in both apps formats through this rather than through the device locale — §5.11. |
+| `Bidi.kt` | `String.bidiIsolated()` — FSI/PDI isolation for text the app did not write (city names), so a Latin name inside a future RTL sentence cannot be reordered. Invisible in English. |
+| `AdjustmentCodec.kt` | Encodes "Match your mosque" per-prayer minutes for DataStore and the watch wire; clamps to ±30. |
 
-**`:app`** (24 source files, 2 test files)
+**`:app`** (26 source files, 7 test files)
 
 | Area | Files |
 |---|---|
-| Entry | `MainActivity.kt` (ringtone picker, disclaimer dialog, PDF share), `ui/MainScaffold.kt` (bottom nav: Times / Qibla / Settings) |
+| Entry | `MainActivity.kt` (ringtone picker, disclaimer dialog, PDF share, and `PreviewBuildFrame` — the red band the `rtl` build type shows on every screen; empty resource, so a no-op in every shipping build), `ui/MainScaffold.kt` (bottom nav: Times / Qibla / Settings; holds the `SettingsChooser` request that lets Times open a Settings chooser directly) |
 | State | `ui/SajdaViewModel.kt` — the single ViewModel; `UiState`; 1-second clock; compass lifecycle |
-| Data | `data/SettingsRepository.kt` (DataStore + `AppSettings` + `AlertStyle`), `data/LocationRepository.kt`, `data/CityLookup.kt`, `data/CompassRepository.kt`, `data/WatchSync.kt` |
+| Data | `data/SettingsRepository.kt` (DataStore + `AppSettings` + `AlertStyle`), `data/LocationRepository.kt`, `data/CityLookup.kt`, `data/PlaceName.kt` (the one place a geocoder result becomes the label the user sees — town before district before county, and the UK postal town dug out of the address line; §5.18), `data/CompassRepository.kt`, `data/WatchSync.kt` |
 | Notify | `notify/Notifications.kt` (channels), `notify/PrayerAlarmScheduler.kt`, `notify/PrayerAlarmReceiver.kt`, `notify/SystemEventReceiver.kt`, `notify/DailyRescheduleWorker.kt`, `notify/OngoingBadge.kt`, `notify/TimeFormat.kt` |
 | Screens | `ui/home/HomeScreen.kt`, `ui/qibla/QiblaScreen.kt`, `ui/settings/SettingsScreen.kt`, `ui/onboarding/OnboardingScreen.kt`, `ui/components/Common.kt` (`LocationSheet`, `SectionHeading`, `rememberRemainingText`), `ui/components/MethodChoices.kt` (`MethodChoiceList` — the one list of calculation methods with a plain line under each, shared by the Settings picker and the first-run step so they cannot drift; `RadioRow`) |
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
-| Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` so `./gradlew installRtl` runs the whole app right-to-left. `:wear` has the same, and must stay on the same tag — it was left on `ar-XB` for five days after the phone moved, which is the second half of §15 lesson 84. Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it |
+| Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` (so `./gradlew installRtl` runs the whole app right-to-left), `app_name` set to "SajdaTime (RTL)", `applicationIdSuffix ".rtl"` so it installs beside the real app, and since 15 Aug 2026 `preview_build_notice` filled so a red "LAYOUT TEST BUILD" band sits on every screen. `:wear` has the same tag and must stay on it (§15 lesson 84). Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it. **Uninstall it when you are done** (`adb uninstall com.sajdatime.app.rtl`) — every time it has been left on an emulator the owner has seen it and, correctly, reported the app as broken |
 
 **`:wear`** (8 source files, 2 test files)
 
@@ -314,29 +332,57 @@ setting is not the same as being asked. Finish sits underneath it, unconditional
 offer, never a gate.
 
 ### Times screen (home)
-- Tappable location header showing city + **Hijri date**
+Budgeted, since 15 Aug 2026, so that on a 20:9 phone at the default font size the whole of
+it sits above the navigation bar without scrolling (measured on the 1080×2400 / 420dpi
+emulator: 914dp tall, 818dp above the bar; the budget is written into `HomeScreen`). In
+order:
+
+- Tappable location header showing the town + **Hijri date** ("Slough, United Kingdom",
+  never the county — §5.18)
 - Centred hero card: "NEXT PRAYER", name and time on one line, large live countdown, "until it begins"
-- Today's full timeline — Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha — with the next one highlighted
-- **"Different from your mosque?"** — a quiet text link under the timeline, for everyone,
-  never dismissed. Opens a short explainer (the board shows the congregation; Fajr and Isha
-  follow the twilight method; Asr follows the school; a few minutes are left over; where a
-  difference remains, follow your mosque) with one button per cause that opens the matching
-  Settings chooser directly. It names no method and changes no time. §5.17
-- Full-width "Save timetable as PDF" button
-- Banners: Makkah-fallback notice, far-north method notice (tap opens the method picker
-  directly, not merely the Settings tab), exact-alarm-permission notice
+- Rare banners, allowed to push things down: Makkah-fallback notice, polar "approximate
+  times" notice, exact-alarm-permission notice
+- "Today" heading with **"Save as PDF"** on the same line (a text button with the PDF icon;
+  it used to be a 56dp filled button under everything and was the thing that fell off the
+  screen)
+- Today's full timeline — Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha, 52dp rows — with the
+  next one highlighted and a "Now" pill on the current one
+- **The mosque door** — one element with two forms, for everyone, under the times because a
+  user who doubts the times is looking at them: plain, an outlined button *"Different from
+  your mosque?"*; loud, above 45° of latitude while the method is still Automatic and until
+  dismissed, the amber card *"Does this match your mosque?"*. Both open the same short
+  explainer (the board shows the congregation; Fajr and Isha follow the twilight method; Asr
+  follows the school; a few minutes are left over; where a difference remains, follow your
+  mosque) with one button per cause that opens the matching Settings chooser directly. It
+  names no method and changes no time. §5.17. Until 15 Aug 2026 the loud form was a
+  separate card *above* the times, 185dp tall, and pushed Maghrib and Isha below the fold.
 
 ### Qibla screen
-Rotating compass dial, tick marks every 15° (long every 90°), north wedge, Qibla needle,
-fixed top reference dot, and a **Kaaba mark** at the far end of the needle. Bearing and
-distance in km. Guidance text ("Turn right 118°" / "Facing Qibla") as a **polite
-screen-reader live region**. Calibration prompt when sensor accuracy is low; a manual
-bearing readout when there is no compass at all.
+A compass dial that rotates so north stays north, tick marks every 15° (long every 90°), a
+north wedge, and two marks — §5.9 has the rule:
+
+- **The needle is you.** Fixed, pointing up the phone, in the accent colour. It is the way
+  the phone points and the origin of the turn arc.
+- **The Kaaba rides the ring** at the Qibla bearing, upright at every angle, so it is always
+  "where the Kaaba is" in the room. Turn until the needle touches it: the dial fills, the
+  edge turns accent, and the text says "You are facing the Qibla".
+- A **turn arc** sweeps the shorter way from the needle round to the Kaaba; the same number
+  the guidance text says ("Turn right 118°"), drawn.
+- A **legend** under the guidance, showing the two marks in miniature and naming them
+  ("The Kaaba" / "Where you are facing"); hidden when there is no compass.
+
+Without a compass the dial holds still with north at the top and the needle swings to the
+bearing instead, since there is no "you" to point. Bearing and distance in km in the
+subtitle. Guidance text as a **polite screen-reader live region**. Calibration prompt when
+sensor accuracy is low; a manual bearing readout when there is no compass at all.
+
+Until 15 Aug 2026 it was the other way round — the needle swung to the Qibla with the Kaaba
+on its tip and "you" was a grey tick at the rim — and the owner reported the needle and the
+Kaaba as "attached", which they were. The watch draws the same dial with the same rule.
 
 The Kaaba mark is the only part of the screen that does not require reading. Degrees need
 a user who thinks in bearings; "Turn right 118°" needs a user who reads English, which is
-every user until the app is translated by native speakers. The picture needs neither. It
-is drawn on the watch too, from the same artwork — see §7.
+every user until the app is translated by native speakers. The picture needs neither.
 
 ### Settings
 Reorganised from a flat list of ~25 controls into **four groups of tappable rows**, each
@@ -626,6 +672,14 @@ across the 359°→0° wrap.
 tighter than a phone magnetometer can honestly claim, so the needle would flicker in and
 out of "Facing Qibla".
 
+**On the dial, the needle is the user and the Kaaba is the target (15 Aug 2026).** With a
+compass the needle is fixed at the top of the dial (the way the phone points) and the Kaaba
+mark rides the rotating ring at the Qibla bearing; alignment is the needle touching the
+Kaaba. Without a compass the needle turns to the bearing on a north-up dial. Both phone and
+watch, one rule. Rejected: the previous form (needle to the Kaaba, "you" as a rim tick),
+because a compass needle is read as "me" by anyone who has held a compass, and the two
+marks coinciding made "am I facing it?" unanswerable at a glance — the owner's report.
+
 Verified against the Aladhan Qibla API across ten cities on five continents, test tolerance
 0.5°:
 London 118.987, Manchester 118.455, New York 58.482, Jakarta 295.152, Sydney 277.500,
@@ -912,8 +966,13 @@ knew the single literal tag `ur`):
 
 Both were proved by making the edit and watching the build go red, then restoring it and
 watching it go green, with no `--rerun-tasks`. The `src/rtl/` build type is exempt because
-producing exactly this mismatch is its entire job; it carries `applicationIdSuffix ".rtl"` and
-its own `app_name`, so it installs beside the real app and can never be mistaken for it.
+producing exactly this mismatch is its entire job; it carries `applicationIdSuffix ".rtl"`,
+its own `app_name`, and since 15 Aug 2026 a red "LAYOUT TEST BUILD. English forced
+right-to-left on purpose. No user ever sees this." band on every screen
+(`preview_build_notice`, `MainActivity.PreviewBuildFrame`). The band exists because the
+owner watches the emulator, saw that build four times, and each time reported the app as
+broken — rightly, since nothing on the screen said it was a test. Re-verified the same day on
+an `ar-EG` phone: the shipped build stays English, left-to-right, Latin digits.
 
 **⚠️ The list of RTL languages is hand-maintained, and that is deliberate.** The JDK's
 `ComponentOrientation` knows seven and misses Pashto, Sindhi, Uyghur, Kurdish and Divehi; ICU
@@ -953,9 +1012,12 @@ or late Isha" question. It does three things instead, all visible:
    mosque?"* — for everyone, because a user who thinks the app is wrong is looking at the
    times, not at Settings, and the disclaimer that explains this is read once. Behind it, one
    short explainer with one button per cause, each opening the matching chooser directly.
-3. **It keeps the far-north banner** (`MethodBanner`, `abs(latitude) ≥ 45`, method still
-   `AUTO`, dismissible) for the users where the default is an *hour* out, and its tap now
-   opens the picker rather than the Settings tab.
+3. **Above 45° of latitude, while the method is still `AUTO` and until dismissed, that door
+   is loud** — the amber card *"Does this match your mosque?"* — because there the default
+   is an *hour* out. It is the same door and opens the same explainer, whose first button
+   is the method chooser. Until 15 Aug 2026 it was a separate `MethodBanner` above the
+   times that opened the picker directly; folded into the door the same day so the whole
+   Times screen fits on a phone without scrolling (§4).
 
 **Why not auto-map.** The proposal wanted Sunni + Hanafi → University of Karachi in South
 Asia, everyone else → Muslim World League, and an "Early Isha" answer swapped to ISNA behind
@@ -990,6 +1052,49 @@ where it is used only where that is the publisher's own country or has been veri
 real timetables; keep "some" and "many"; never sell a method as *the* method for a country
 that has several. Aladhan marks its Dubai and Diyanet entries *experimental*, so those two
 descriptions claim nothing about officialness.
+
+### 5.18 The place label is the town, never the county (15 Aug 2026)
+
+The label under which the times are shown ("Slough, United Kingdom") comes from
+`PlaceName.placeLabel`, shared by "find my location" and "search a city" so the same place
+is named the same way from both. The order is **town, then postal town parsed from the
+address line, then district, then county, then region, then a named feature only if nothing
+administrative exists** — and then the country, unless it is all there is.
+
+**Why the address line is parsed.** Measured on 15 Aug 2026 (a probe logging every field of
+five results at twenty coordinates): for reverse geocoding **in the United Kingdom, Google's
+geocoder never fills `Address.locality`** — not for the exact centre of Slough, nor Reading,
+Birmingham or Whitechapel. UK addresses carry a *postal town* that Android's `Address` has no
+field for, so it survives only in the formatted line ("5 William St, Slough SL1 1GZ, UK")
+while `subAdminArea` holds the ceremonial county. The old chain therefore showed the county
+to every user in Britain who was not standing in a named district — the "Berkshire" the
+tester and the owner both reported. Forward geocoding by name does return `locality`, so
+search was never affected.
+
+**This is not a British special case — that claim was made here and then disproved the same
+day.** The emulator probe found `locality` present in Karachi, Lahore, Toronto, Cairo,
+Jakarta, Riyadh, Kuala Lumpur and Lagos, which was written up as "the parse changes nothing
+outside the UK". Installing on the owner's Galaxy S23 Ultra in **Alanya, Türkiye** returned
+`locality=null, subLocality=Türkler, subAdminArea=Alanya, adminArea=Antalya,
+line="Türkler, Fatih 6. Cadde 23/2, 07410 Alanya/Antalya, Türkiye"`. Two consequences: the
+parse is a general path and must be treated as such, and **Turkey packs district and province
+into one part with a slash**, so the parse keeps only what precedes it — otherwise the home
+screen reads "Alanya/Antalya", and Antalya is a province the size of the Berkshire this
+feature exists to remove. `PlaceNameTest` holds that row verbatim. Eight countries agreeing
+was a sample, not a proof.
+
+**Guards, because a wrong town is worse than a county:** the line must have at least three
+comma-separated parts (a two-part "Townhouse Hotel, United Kingdom" cannot be told from a
+town); the part before the country is taken with every digit-bearing word removed (the
+postcode, whole or partial); it is refused if it equals the street or the feature name, or
+if it is all capitals ("ON", "CA" — a province or state, not a town). `PlaceNameTest` holds
+the real probe rows. The theory the previous fix rested on — that a coarse fix landing
+outside a town polygon dropped `locality` — was wrong: it is null in the UK regardless.
+
+**Also fixed the same day:** a cold start never refreshed the location, because
+`onCreate`/`onStart`/`onResume` run in one main-thread pass and the DataStore collector has
+not delivered when `onResume` checks for coordinates. `SajdaViewModel` now refreshes on the
+first settings emission; a warm resume still refreshes as before.
 
 ---
 
@@ -1241,7 +1346,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**133 unit tests, all offline and deterministic, 0 failures.** (core 80, app 41, wear 12.)
+**141 unit tests, all offline and deterministic, 0 failures.** (core 80, app 49, wear 12.)
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
 > row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
@@ -1260,7 +1365,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 | `BidiTest` | core | 8 | Right-to-left ordering asserted against `java.text.Bidi`, the real Unicode algorithm — the Hijri date, a Latin city inside an Arabic sentence and the reverse; and a test that pins the *wrong* fix (isolating the whole date rather than the month) so it cannot be "simplified" back in |
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
-| `PlaceNameTest` | app | 9 | The town wins over the county; a point of interest never outranks a real administrative area; a house number is never shown as a place; blank fields skipped; the reported bug — a coarse fix with no locality falling through to the county — pinned |
+| `PlaceNameTest` | app | 18 | The town wins over the county; the postal town is parsed from the address line when `locality` is missing, using rows copied from real 15 Aug 2026 probes — the UK emulator sweep (Slough centre, the rugby-club coarse fix, Bradford/Manningham, London, Birmingham, partial and missing postcodes, an Arabic-comma line) and the owner's S23 Ultra in Türkiye (`07410 Alanya/Antalya` must yield "Alanya", not the province); a point of interest, the street, a house number and a state/province abbreviation never become the town; the district is still used when there is no town; blank fields skipped; the country is not repeated (§5.18) |
 | `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
 | `NoTranslationsYetTest` | app | 2 | Fails the build if a language-qualified `values-*` folder ever appears (CLAUDE.md: never machine-translate). Proven by adding `values-ar/`, watching it go red, removing it, watching it go green |
 | `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
@@ -1286,7 +1391,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
   :app:assembleRelease :wear:assembleRelease
 ```
 
-Expected: BUILD SUCCESSFUL, **133 tests**, 0 failures, lint informational-only (0 errors),
+Expected: BUILD SUCCESSFUL, **142 tests**, 0 failures, lint informational-only (0 errors),
 phone release APK ~1.9 MB and watch ~2.6 MB (both **unsigned**, unless a `keystore.properties`
 is present).
 
@@ -3274,27 +3379,27 @@ user can decline**, because that permission is auto-granted at install and canno
 revoked. It is the whole problem sidestepped rather than mitigated. It is deliberately
 **not** adopted here; see §11 and lesson 68.
 
-**T3 — the town, not the county — is fixed, and it is the fix this document already
-specified.** The precision section above ends by naming the cause exactly: `subLocality`
-and `featureName` "are not in the chain at all, and either often survives when `locality`
-does not". `data/PlaceName.kt` is now the single chain used by *both* halves of the feature:
-
-```
-locality → subLocality → featureName (only if it contains a letter) → subAdminArea → adminArea
-```
-
-Three things worth knowing about it:
+**T3 — the town, not the county — was attempted here, and this attempt did not work.** The
+fix shipped that day reordered the `Address` fields into a single chain shared by both
+halves of the feature (`locality → subLocality → featureName → subAdminArea → adminArea`),
+on the reasoning that a coarse fix lands outside the town polygon and so drops `locality`.
+The owner reported "Berkshire" again a fortnight later. **The real cause, measured on
+15 Aug 2026, is that Google never fills `locality` for UK reverse geocoding at all**, so no
+reordering could have reached the town — see §5.18 for what the code does now. Two parts of
+that day's work do survive and are still true:
 
 - **The two halves used to disagree with each other.** A searched city read "Slough, United
   Kingdom"; the same place found automatically read "Slough". Same screen, two formats. They
   share one function now and cannot drift apart again.
 - **`featureName` is guarded.** It is only *usually* a place name; on a precise fix it is as
   likely to be a house number, and "37, United Kingdom" is worse than the county the whole
-  change exists to remove. Anything without a letter in it is rejected.
-- **Eight JVM tests, on plain strings rather than `android.location.Address`,** because that
-  class is a stub outside an emulator and every assertion would otherwise have needed
-  Robolectric to say anything at all. The test named for the bug reproduces the exact shape
-  a coarse fix returns.
+  change exists to remove. Anything without a letter in it is rejected. It now sits last in
+  the chain rather than third — see §15 lesson 70 for the "Townhouse Hotel" that moved it.
+
+The tests are on plain strings rather than `android.location.Address`, because that class is
+a stub outside an emulator and every assertion would otherwise have needed Robolectric to say
+anything at all. There were eight that day; there are seventeen now, and the new ones are
+copied from a real probe rather than imagined.
 
 **The precision explainer is measured, not asserted.** `location_sheet_body` now tells the
 user why the name may be approximate and that it barely moves the times. The figure was
@@ -3840,6 +3945,68 @@ of text, and P2 in §11 already schedules the retake as part of the next upload,
 be done then and not before. The explainer was also opened in **dark** theme (Settings →
 Dark → Times → door): plain-role dialog, outlined buttons and green Close, nothing to fix.
 
+### On the owner's own Galaxy S23 Ultra, in Türkiye — two bugs the emulator could not show (15 Aug 2026)
+
+The owner connected his personal S23 Ultra (SM-S918B, **Android 16 / One UI**, 1440x3088 at
+density 3.75, font scale 0.9, Wi-Fi on with the radio in airplane mode). Installed as
+`com.sajdatime.app.sideload` **beside** the Play build, which stayed untouched at 1.1.0 —
+uninstalling it would reset the closed testers and cost a fortnight (`RELEASING.md`).
+
+**Bug 1 — `locality` is not a British problem, and the parse produced a province.** §5.18 had
+just been written claiming the missing `locality` was specific to UK reverse geocoding,
+because eight non-UK probe coordinates all filled it. A temporary log of every `Address`
+field, run once on the phone, disproved that in a line:
+
+```
+locality=null | subLocality=Türkler | featureName=23/2 | subAdminArea=Alanya
+adminArea=Antalya | thoroughfare=Fatih 6. Cadde | country=Türkiye
+lines=Türkler, Fatih 6. Cadde 23/2, 07410 Alanya/Antalya, Türkiye
+```
+
+Turkey formats the part before the country as `<postcode> <District>/<Province>`, so the
+address-line parse returned the whole pair and the home screen read **"Alanya/Antalya,
+Türkiye"** — Antalya being a province the size of the Berkshire this feature exists to
+remove. Fixed by keeping only what precedes the slash; the row is in `PlaceNameTest`
+verbatim. Verified after: **"Alanya, Türkiye"**. Eight countries agreeing was a sample, not
+a proof, and it had already been written up as one.
+
+**Bug 2 — the one-screen height budget was set on the roomier device.** The budget was
+measured on the 1080x2400 / 420dpi emulator, which is **914dp** tall, and passed. The S23
+Ultra is **823dp** — 91dp less, despite being the physically larger phone — and there the
+*"Different from your mosque?"* button was sliced in half by the navigation bar. Measured
+rather than eyeballed: scrolling to the bottom moved the content by exactly **137px = 37dp**,
+which is the overflow. Reclaimed 44dp from padding that carried no meaning — the column's
+24dp bottom pad (below the last element, where the nav bar already separates) → 8, the
+next-prayer card's 20dp vertical → 16, and the prayer rows 52dp → 50 (still over the 48dp
+touch minimum, and they are not tappable). Re-measured after: no scroll travel left, the
+button whole and clear of the bar.
+
+| Checked on the phone | Result |
+|---|---|
+| Onboarding, full walk | Welcome → location → Sunni → Hanafi → method (Diyanet, Turkey present in the list) → confirm → exact alarms → notifications → disclaimer → home |
+| Permission wording | Android's own dialog says **"approximate location"** — the coarse-only promise confirmed by the platform, not just by our docs |
+| Exact alarms | Granted; `dumpsys alarm` reads `window=0 exactAllowReason=permission flags=0x3` with the `setAlarmClock` `showIntent`. First One UI / Android 16 reading of this |
+| Disclaimer | Scrolls; the dua request in the final paragraph arrives in full with the button pinned |
+| Home fit, dark and light | Header, next-prayer card, all six times and the door above the navigation bar with **no scrolling**, both themes |
+| Qibla | Heading 17°, Qibla 153°. Needle fixed at the top, Kaaba on the ring, arc spanning the 136° owed. Geometry checked rather than eyeballed: the mark was predicted at (644, 856) and measured at (645, 870) |
+| Font scale 1.5 | Overflows, as intended — the column is `verticalScroll` so nothing is lost; scrolling reaches the full Isha row and the door. Restored to 0.9 afterwards |
+| Location sheet | Seen on real hardware for the first time (it was listed as unverified in §11): full body, both buttons, the measured "ten miles is about a minute" line, nothing clipped |
+| City search | Typed "Slough" → **"Slough, United Kingdom"**. Forward geocoding names the town on hardware too, and the two halves of the feature agree |
+| Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **142 tests, 0 failures** |
+
+**§11 item 4 reproduced on hardware, and it is worse than it reads.** Searching Slough from
+a phone in Türkiye showed Fajr 05:24, Dhuhr 15:08, Maghrib 22:25 — Slough's *times*, in the
+phone's *timezone* (UTC+3). Those are not wrong by the rule the app follows, and they are
+unreadable as prayer times to anyone who does not know that rule. Recorded here because item
+4 has until now been an argued limitation rather than a seen one; it is a seen one.
+
+**Not verified on the phone.** The compass was read at one heading only — the phone could not
+be physically rotated from here, so the *aligned* state (needle meeting the Kaaba, dial
+filling) is confirmed on the emulator and by arithmetic, not by turning this handset. No
+alarm was watched firing on it; only the scheduling was read. The watch was **not** paired
+with it — that remains item 7 in §11. Nothing was tested on One UI's own battery-optimisation
+screens, so Samsung's background policy is still the open OEM question §11 records.
+
 ## 11. ⚠️ Still pending — the honest list
 
 ### Parked, 2 Aug 2026 — the whole of it, on one screen
@@ -4159,9 +4326,10 @@ decisions, not oversights.
   two halves of the feature disagreeing for a commit. Evidence in §10, "The daytime half of
   the alarm story, and the town-not-county fix". Three notes for whoever reads this next:
 
-  - The chain is `locality → subLocality → featureName → subAdminArea → adminArea`, and
-    **`featureName` is guarded** — it is rejected unless it contains a letter, because on a
-    precise fix it is often a house number and "37, United Kingdom" is worse than the county.
+  - The chain is described in **§5.18**, which is the current one; the version written here
+    on 2 Aug did not fix the county and was replaced on 15 Aug. **`featureName` is guarded**
+    either way — it is rejected unless it contains a letter, because on a precise fix it is
+    often a house number and "37, United Kingdom" is worse than the county.
   - **`CityLookup` shares the same function now.** It had its own copy of the old chain, so
     the searched and the automatic name formatted differently on the same screen. That was
     not in the tester's report and was found only by fixing both at once.
@@ -4170,11 +4338,10 @@ decisions, not oversights.
     midwinter and today. It lives in `location_sheet_body`, shown only when the user opens
     the location sheet — never volunteered, and not a second disclaimer.
 
-  What was *not* done: the new sheet has not been seen on a real device. The phone emulator
-  wedged mid-walk (it had ANR'd `system_server` the day before) and the RTL preview would
-  not install on the Xiaomi at all. The overflow risk was closed by reading the composable —
-  the sheet already has `.verticalScroll` — which covers the real hazard but is not a
-  screenshot. Take one on the next device session.
+  ~~What was *not* done: the new sheet has not been seen on a real device.~~ **Closed
+  15 Aug 2026** on the owner's Galaxy S23 Ultra: full body, both buttons and the measured
+  "ten miles is about a minute" line, nothing clipped, and a city search from it returned
+  "Slough, United Kingdom". §10.
 
 ### The second round of tester feedback (1 Aug 2026) — all four DONE
 
@@ -4790,8 +4957,6 @@ different machine.
 | Phone emulator | AVD `sajda`, API 36 |
 | Watch emulator | AVD `sajdawear`, Wear OS API 34, `arm64-v8a`, `wearos_small_round` — 384px @ 320dpi = **192dp** |
 | Watch emulator, large | AVD `sajdawear_large`, same image, `wearos_large_round` — 454px @ 320dpi = **227dp**. Created on demand by `./tools/wear-verify.sh`. Both sizes must be run; the app was wrong on both in ways only visible with them side by side |
-| Repo files tracked | 116 |
-| Kotlin source | ~8,650 lines across the three modules |
 
 ```bash
 export ANDROID_HOME=$HOME/Library/Android/sdk
@@ -4799,8 +4964,25 @@ export PATH="$ANDROID_HOME/platform-tools:$PATH"
 
 $ANDROID_HOME/emulator/emulator -avd sajda     -no-snapshot-load -no-audio &
 $ANDROID_HOME/emulator/emulator -avd sajdawear -no-snapshot-load -no-audio &
-adb devices     # phone tends to be 5556, watch 5554 — confirm, do not assume
+adb devices     # which serial is which changes with launch order — confirm, do not assume
 ```
+
+Location on the phone emulator: `adb emu geo fix` only reaches an app that is actively
+listening for GPS, and `getLastKnownLocation` keeps handing back the boot-time fix. Use the
+mock provider instead (needs `adb root` on this image):
+
+```bash
+adb -s emulator-5554 root
+adb -s emulator-5554 shell cmd location providers add-test-provider gps
+adb -s emulator-5554 shell cmd location providers set-test-provider-enabled gps true
+adb -s emulator-5554 shell cmd location providers set-test-provider-location gps --location 51.5105,-0.5950 --accuracy 10
+```
+
+Coarse-permission apps still get one fudged fix per ~20 minutes from the platform, so do
+not try to sweep many coordinates through the app's own location path — geocode a list
+directly if that is the question (§15 lesson 97). Heading on the phone emulator: set the
+magnetometer flat and rotated, e.g. `adb emu sensor set magnetic-field -8.73:-4.64:-47.7`
+for 118°, and give the AOSP rotation-vector fusion ten seconds to converge.
 
 `local.properties` is not committed; a fresh clone needs its own with `sdk.dir=...`.
 
@@ -4838,6 +5020,9 @@ Every one of these cost real time. Read before building.
 | **Unscoped `installDebug`** | `INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 2 is older than current 1000`, or the phone emulator silently running the watch build | Both modules share one `applicationId`, so the root task installs `:wear` **over** `:app`. Scope it: `:app:installDebug` / `:wear:installDebug`. To recover: `adb uninstall com.sajdatime.app`. To check which is installed: `adb shell cmd package resolve-activity --brief com.sajdatime.app`. See §15 lesson 28. |
 | **Scoping the module is not enough with two emulators up** | Same `INSTALL_FAILED_VERSION_DOWNGRADE`, but now from `:app:installDebug`, which looks like it cannot possibly be the cause | Gradle installs to **every** connected device, so `:app:installDebug` also tries to put the phone APK on the watch emulator, where the watch build already sits at versionCode 1000. Scope the device too: `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug`. Bites exactly when you follow this project's own advice to run both emulators together. |
 | **`sed -i.bak` inside `res/`** | `Resource and asset merger: The file name must end with .xml` | The backup file is itself a resource. Edit resources with a tool that does not drop siblings, or write the backup outside `res/`. |
+| **"BUILD SUCCESSFUL in 2h 48m" for a build that took five seconds** | Every Gradle invocation reports a near-identical multi-hour duration regardless of what it did — a no-op install and a full `clean test lint bundleRelease` both report ~2h50m | Gradle's own figure is wrong on this machine (it tracks something closer to daemon uptime). **Do not use it to reason about anything**, and do not conclude the machine is slow or contended — a session on 15 Aug 2026 lost time doing exactly that. Wrap the command instead: `date "+start %T" && ./gradlew … && date "+end %T"`, which showed 18:22:06 → 18:22:11 against a reported 2h48m. |
+| **A green gate that never ran the tests** | `BUILD SUCCESSFUL, 142 tests, 0 failures`, but the test XML under `*/test-results/` is hours old | Gradle cached `test` because its inputs had not changed, which is correct behaviour and invisible in the summary — the *previous* run's counts are what you are reading. If it matters that the tests really executed against the code in front of you, force it (`./gradlew test --rerun-tasks`) and confirm with `stat -f "%Sm" …/TEST-*.xml` that the files are new. A cached pass is only as good as the run it was cached from. |
+| **Emulator after a locale change** | System UI, Bluetooth and the app itself ANR ("failed to complete startup") for many minutes after `setprop persist.sys.locale` + zygote restart or `adb reboot`; `uiautomator dump` returns nothing | Not the app. Kill the AVD and cold-boot it (`emulator -avd sajda -no-snapshot-load`), and stop the Gradle daemons while it settles. Seen 15 Aug 2026 after switching to `ar-EG` and back. |
 
 ### The architecture PDF is generated, never hand-made
 
@@ -4854,38 +5039,12 @@ script after editing the markdown.**
 
 ## 14. Git history
 
-> ⚠️ **This table is a selective highlight reel and it stops at `d9d1c9a` (31 Jul 2026).**
-> Roughly fifty commits since then are not listed, including the whole closed-test, polar-crash,
-> Dhuhr-fix, disclaimer, locale-discipline and Moonsighting arc. It was written as a summary and
-> then read as a record, which is the wrong way round. **For the real history run
-> `git log --oneline`; every commit message in this project is written to be read.** Kept
-> because the early entries explain decisions that predate the detailed sections above.
-
-| Commit | What |
-|---|---|
-| `41fc109` | Initial commit |
-| `ac12c85` | v1.0.0: offline prayer times, notifications, PDF export |
-| `f5bb071` | Qibla compass, Wear OS app, alarm mode, shared `:core` module |
-| `30cb5eb` | Fixed the silently-wrong city search; first real run of the watch app; alarm mode verified on device |
-| `6e91cdc` | Corrected two Play Store errors found by research; added 8 localised listings |
-| `1792d0a` | Closed two compliance gaps found in research; recorded the non-risks |
-| `e693fa1` | Fixed 13 defects found in a full ship-readiness audit |
-| `6a6dbcd` | Made the app translatable, reorganised Settings, asked for duas once |
-| `985adc8` | Fixed nine defects found by running the app rather than reading it — including the watch calculating Asr with the wrong madhab |
-| `f49dc5d` | Recorded the Aladhan runtime decision, the session's lessons, and the commit rule |
-| `6e57e49` | Applied the dark design system to both apps; added the watch-accuracy paragraph to the disclaimer |
-| `6a16bd1` | Applied the light design system and added the Follow phone / Light / Dark setting |
-| `0e43fe5` | Audit: fixed a stale inverse colour and a stale architecture palette, closed two Wear checks |
-| `2a13b9d` | Ran the 227dp watch for the first time; fixed the school button printed under the watch face clock, and added `tools/wear-verify.sh` so both round sizes are checked from now on |
-| `d9e31e3` | Brought the handover's own bookkeeping up to date |
-| `7d9cf89` | Put the Kaaba on the Qibla dial, on both the phone and the watch, so the screen answers "which way" without being read |
-| `eb24f54` | Recorded the Kaaba commit's own hash in this table |
-| `a5cf7fa` | Made the app format in its own language rather than the device's, after running it on Arabic and Bengali phones and finding a scrambled Hijri date, an unreadable Qibla sentence and two numbering systems on one screen |
-| `1defcdd` | Recorded the locale commit's own hash in this table |
-| `93611c5` | Added `./gradlew installRtl`, so any layout can be checked right-to-left before a translation exists to check it with |
-| `6f612ad` | Recomputed the day at midnight rather than only when a prayer passes — after midnight nothing passes for hours, so the "Today" list silently showed yesterday's times on the screen people use to break their fast |
-| `5f628db` | Recaptured the store screenshots natively at 1080 × 1920 instead of pillarboxing 20:9 captures, and moved the launcher icon and store art off the pre-revision green they had been left on |
-| `d9d1c9a` | Removed the price keyword from the short description **and** from the feature graphic, where the Console could not see it |
+Run `git log --oneline`. Every commit message in this project is written to be read — it
+says what was wrong, how it was found, why this fix, what was verified and what was not
+(CLAUDE.md, "the commit rule"). A highlight table used to sit here; it stopped at
+31 Jul 2026, was read as a record when it was only a summary, and was removed on
+15 Aug 2026 rather than left to mislead again. The early decisions it explained are all
+recorded in the sections above.
 
 ### The author identity changes partway through, on purpose
 
@@ -5874,6 +6033,28 @@ matters more than the stable hashes, that is the trade being made.
     minutes anywhere, Karachi−MWL Fajr is zero across South Asia, and MWL−ISNA Isha is +11 in
     Chicago. Lesson 46 with the roles reversed — the same discipline applies when the second
     opinion arrives *as* the brief.
+
+97. **A sample that agrees with you is not a proof, and the write-up is where the sample
+    quietly becomes one.** The geocoder probe covered twenty coordinates and found
+    `locality` filled in Karachi, Lahore, Toronto, Cairo, Jakarta, Riyadh, Kuala Lumpur and
+    Lagos, and missing only in the UK. That is exactly what was measured. What got written
+    into `PlaceName.kt` and §5.18 was *"so this only ever changes what the UK sees"* — a
+    claim about every country on earth, resting on eight. The first real device the code ran
+    on was in Türkiye, where `locality` is null and the address line packs the province in
+    beside the town, and it put a province on the home screen. Watch for the sentence that
+    turns "these cases behaved" into "this case is special": it is usually one clause long,
+    it always sounds like a summary, and it converts a finding into a guarantee nobody
+    measured. Say which cases were checked, and let the reader see the edge.
+
+98. **Logical screen height does not follow from physical size, so a layout budget must be
+    measured on the *short* device.** The one-screen home layout was budgeted on the
+    1080x2400 emulator — 914dp tall — and fitted with room to spare. The owner's Galaxy S23
+    Ultra, a physically much larger phone, is **823dp**, because its density is 3.75 rather
+    than 2.625. The 91dp difference was precisely the mosque-difference button, which
+    arrived sliced in half by the navigation bar. "It fits" is a statement about a specific
+    dp height and is worth nothing without one; and when a fit is tight, keep the container
+    scrollable so that the device you did not test degrades to *reachable* rather than
+    *lost*.
 
 
 ---
