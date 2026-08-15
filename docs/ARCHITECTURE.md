@@ -213,6 +213,17 @@ The screen reports sensor accuracy and prompts for a figure-of-eight recalibrati
 drops. When there is no compass at all, the app still states the bearing from true north
 so a user with a separate compass can act on it.
 
+**Arriving is a state with hysteresis, not a comparison.** Facing the Kaaba is announced
+with a vibration, so it must fire when the user arrives and at no other time. A single
+threshold cannot do that: a real compass at rest still drifts a degree or two, and a
+reading resting on the threshold crosses it repeatedly. `QiblaEngine.staysAligned` therefore
+takes the previous answer as an input — you arrive within 5 degrees and keep having arrived
+until you are 8 away — and the screens additionally refuse to repeat the pulse inside five
+seconds, and never fire it for the first heading of a session. This is measured behaviour,
+not caution: with a plain 5-degree test the app buzzed 26 times in 76 seconds on a phone
+lying still on a desk. `docs/HANDOVER.md` §5.9 carries the numbers, and `QiblaEngineTest`
+fails if the two angles are ever made equal.
+
 ---
 
 ## 4. Notifications and reliability
@@ -453,7 +464,7 @@ All unit tests are offline and deterministic.
 | Suite | Covers |
 |---|---|
 | `PrayerEngineTest` | Reference timetables for Makkah, London and Tehran; the Jafari Maghrib rule; madhab differences; high-latitude behaviour; the Ramadan adjustment; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks. |
-| `QiblaEngineTest` | Bearings for ten cities on five continents, plus distance and normalisation. |
+| `QiblaEngineTest` | Bearings for ten cities on five continents, plus distance and normalisation — and the arrival hysteresis, including a test that fails if its two angles are ever collapsed into one. |
 | `DeterminismTest` | Repeated computation stability, minute-boundary alignment, madhab equivalence. |
 | `ColorContrastTest` | WCAG AA for every colour pair in both themes. |
 | `CityLookupParseTest` | Geocoding response parsing: coordinates come from the response, the displayed name is the resolved place rather than the typed text, and a missing coordinate is a miss rather than zero, zero. |
@@ -470,9 +481,10 @@ All unit tests are offline and deterministic.
 | `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless — and a Notification is never upgraded to an Alarm. |
 | `AlertCodecTest` | Per-prayer alert round-trip, rubbish dropped entry by entry, and the upgrade from the two keys it replaced. |
 
-**17 suites, 129 tests** at the time of writing. `docs/HANDOVER.md` §9 carries the
+**18 suites, 145 tests** as of 16 Aug 2026. `docs/HANDOVER.md` §9 carries the
 authoritative per-suite counts and the command that produces them; this table went three days
 stale listing only seven, which is why the count is stated here rather than left implicit.
+If you are reading this and the number disagrees with a run, trust the run — and fix the line.
 
 Reference values were captured from the Aladhan API — an independent implementation of the
 same conventions — and pinned as golden values so the suite stays offline. To regenerate:

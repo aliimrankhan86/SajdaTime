@@ -200,7 +200,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | `PrayerModels.kt` | `Sect`, `Madhab`, `CalcMethod` (14 methods), `PrayerSlot` (with `isPrayer`), `Coordinates`, `DayPrayerTimes` (with `prayersOnly`), `CalculationPrefs`, `NextPrayer`. **No display names** — see `PrayerLabels.kt`. This file has no `android.*` import and lifts straight into an iOS or KMP target. |
 | `PrayerLabels.kt` | Display names for `PrayerSlot` and `CalcMethod`, as `labelRes` (for Compose) and `label(context)` (for notifications, the tile and the PDF). The one Android-touching file in `:core`; an iOS port supplies its own. |
 | `PrayerEngine.kt` | **The heart of the app.** `compute`, `computeRange`, `nextPrayer`, `resolveMethod`. All the business rules in §5. |
-| `QiblaEngine.kt` | `KAABA`, `bearingToKaaba`, `trueToMagnetic`, `relativeTurn`, `isAligned`, `distanceToKaabaKm`, `normalise` |
+| `QiblaEngine.kt` | `KAABA`, `bearingToKaaba`, `trueToMagnetic`, `relativeTurn`, `isAligned`, **`staysAligned`** (the one the screens call — hysteresis, §5.9), `ALIGN_GRAB_DEGREES`, `ALIGN_RELEASE_DEGREES`, `distanceToKaabaKm`, `normalise` |
 | `WatchSyncContract.kt` | The phone↔watch Data Layer path and keys, shared so the two modules cannot drift |
 | `AppLocale.kt` | The language the app's *words* are in, read back out of the resources, and `wrap(context)` which pins a whole configuration to it. Every clock, date and number in both apps formats through this rather than through the device locale — §5.11. |
 | `Bidi.kt` | `String.bidiIsolated()` — FSI/PDI isolation for text the app did not write (city names), so a Latin name inside a future RTL sentence cannot be reordered. Invisible in English. |
@@ -358,14 +358,19 @@ order:
   separate card *above* the times, 185dp tall, and pushed Maghrib and Isha below the fold.
 
 ### Qibla screen
-A compass dial that rotates so north stays north, tick marks every 15° (long every 90°), a
-north wedge, and two marks — §5.9 has the rule:
+A compass dial that rotates so north stays north, tick marks every 15° (long every 90°),
+**N / E / S / W around the ring** (positions turn with the dial, glyphs stay upright; north
+in `primary` and bold — this replaced a filled north-only wedge on 15 Aug 2026), and two
+marks — §5.9 has the rule:
 
 - **The needle is you.** Fixed, pointing up the phone, in the accent colour. It is the way
   the phone points and the origin of the turn arc.
 - **The Kaaba rides the ring** at the Qibla bearing, upright at every angle, so it is always
   "where the Kaaba is" in the room. Turn until the needle touches it: the dial fills, the
-  edge turns accent, and the text says "You are facing the Qibla".
+  edge turns accent and thickens, a tick appears, the phone buzzes once, the heading readout
+  is hidden, and the text says **"You are now facing the Kaaba"** ("Facing the Kaaba" on the
+  watch). Arrival has hysteresis and will not buzz twice in five seconds — §5.9, and it is
+  not optional: without it the phone buzzes at itself on a desk.
 - A **turn arc** sweeps the shorter way from the needle round to the Kaaba; the same number
   the guidance text says ("Turn right 118°"), drawn.
 - A **legend** under the guidance, showing the two marks in miniature and naming them
@@ -668,9 +673,10 @@ platform's World Magnetic Model). Heading from `TYPE_ROTATION_VECTOR` with circu
 low-pass smoothing (factor 0.18) on the unit vector — smoothing the raw angle would break
 across the 359°→0° wrap.
 
-`isAligned` defaults to a 3° tolerance, but **every UI call site passes 5°** — 3° is
-tighter than a phone magnetometer can honestly claim, so the needle would flicker in and
-out of "Facing Qibla".
+`isAligned(current, target, tolerance)` defaults to a 3° tolerance and is now an internal
+building block: **no screen calls it directly any more** (16 Aug 2026). 3° is tighter than a
+phone magnetometer can honestly claim, and even 5° turned out to be unusable on its own —
+see the next paragraph. Both screens ask `staysAligned` instead.
 
 **Arrival has two angles, not one — and a quiet window (16 Aug 2026).** `QiblaEngine`
 `staysAligned(wasAligned, current, target)` is now the only thing the UI asks. You arrive
@@ -1394,7 +1400,9 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 
 ## 9. Testing
 
-**141 unit tests, all offline and deterministic, 0 failures.** (core 80, app 49, wear 12.)
+**145 unit tests, all offline and deterministic, 0 failures.** (core 83, app 50, wear 12.)
+Counted from the XML on 16 Aug 2026, not carried forward by hand — the recipe is in the note
+below, and it takes a second.
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
 > row. `python3 -c "…"` over `*/build/test-results/test*/*.xml` will give you the real numbers
@@ -1404,7 +1412,7 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 |---|---|---|---|
 | `PrayerEngineTest` | core | 22 | Reference timetables for Makkah, London, Tehran; Jafari Maghrib; madhab differences; high latitude; Ramadan; next-prayer roll-over and midnight spillover; chronological ordering across 3 cities × 4 methods × 52 weeks |
 | `PolarAndHemisphereTest` | core | 14 | Every 0.5° pole to pole × every day of 2026 × both madhabs is in order; Dhuhr sits mid-day-arc; the days that were silently wrong are flagged; the reference latitude follows the method; Moonsighting reproduces its own published Oslo extremes; the Shia Maghrib path survives every latitude; **and twelve rows of Moonsighting's own published timetable for Lulea, Trondheim and Helsinki are pinned as golden values, so re-implementing the 60-degree slide turns the build red** (A12, §10) |
-| `QiblaEngineTest` | core | 8 | Ten cities on five continents, distance, normalisation |
+| `QiblaEngineTest` | core | 11 | Ten cities on five continents, distance, normalisation — plus the arrival hysteresis of §5.9: arrive at 5°, leave at 8°, the seam at 360°, and a test that fails if the two angles are ever made equal |
 | `DeterminismTest` | core | 3 | Repeat-call stability, minute alignment, madhab equivalence |
 | `CoordinatesTest` | core | 4 | `Coordinates.orNull` rejects off-globe values, NaN, infinity and half-pairs — the gate on everything the watch's exported Data Layer listener is handed (§8) |
 | `LocaleDisciplineTest` | core | 6 | `app_language_tag` parses and round-trips; every translation declares one; it matches its folder; no shipped code calls `Locale.getDefault()` (§5.11); **the shipped tag is a left-to-right language**; **no shipping source set selects a language the app has no `values-<lang>/` for** (§5.16). The last two replaced a narrower check in `NoTranslationsYetTest` that only knew the literal tag `ur` |
@@ -4128,7 +4136,7 @@ button whole and clear of the bar.
 | Font scale 1.5 | Overflows, as intended — the column is `verticalScroll` so nothing is lost; scrolling reaches the full Isha row and the door. Restored to 0.9 afterwards |
 | Location sheet | Seen on real hardware for the first time (it was listed as unverified in §11): full body, both buttons, the measured "ten miles is about a minute" line, nothing clipped |
 | City search | Typed "Slough" → **"Slough, United Kingdom"**. Forward geocoding names the town on hardware too, and the two halves of the feature agree |
-| Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **145 tests, 0 failures** |
+| Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **142 tests, 0 failures** |
 
 ### The dial became a compass, and arriving became an event (15 Aug 2026)
 
@@ -4156,9 +4164,17 @@ size, weight and colour, which is the least a screen can do for the thing the us
 for. It now buzzes once, turns green, grows to `headlineSmall`, gains a tick, and the raw
 heading readout disappears — that number helps while you are turning and competes with the
 answer once you are not. The buzz is keyed on the *edge* (`LaunchedEffect(aligned)`), so
-holding still does not vibrate sixty times a second, and it stays quiet on first composition
-because a phone that buzzes as you open a screen has told you nothing. The watch gets the
-same buzz and two words in the middle of the dial.
+holding still does not vibrate sixty times a second. The watch gets the same buzz and two
+words in the middle of the dial.
+
+> **Both of that paragraph's claims about the buzz were wrong, and the phone said so the
+> next day.** It was written here on 15 Aug as "holding still does not vibrate" and "it
+> stays quiet on first composition". On hardware it vibrated 26 times in 76 seconds while
+> holding still, and it buzzed on *every* open. An edge is not enough when the reading rests
+> on the threshold, and the "first composition" guard never fired because the first heading
+> is always null. Fixed 16 Aug — see §5.9 and the 16 Aug entry in this section. Left standing
+> rather than quietly deleted, because "reviewed, reasoned about, wrong on the first real
+> device" is the most useful shape of story this document holds.
 
 **It led with jargon.** "153° from true north. The Kaaba is about 1858 km away." puts the
 least usable fact first. Now: "The Kaaba is about 1858 km from here, at 153° from north."
@@ -5246,7 +5262,7 @@ Every one of these cost real time. Read before building.
 | **Scoping the module is not enough with two emulators up** | Same `INSTALL_FAILED_VERSION_DOWNGRADE`, but now from `:app:installDebug`, which looks like it cannot possibly be the cause | Gradle installs to **every** connected device, so `:app:installDebug` also tries to put the phone APK on the watch emulator, where the watch build already sits at versionCode 1000. Scope the device too: `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug`. Bites exactly when you follow this project's own advice to run both emulators together. |
 | **`sed -i.bak` inside `res/`** | `Resource and asset merger: The file name must end with .xml` | The backup file is itself a resource. Edit resources with a tool that does not drop siblings, or write the backup outside `res/`. |
 | **"BUILD SUCCESSFUL in 2h 48m" for a build that took five seconds** | Every Gradle invocation reports a near-identical multi-hour duration regardless of what it did — a no-op install and a full `clean test lint bundleRelease` both report ~2h50m | Gradle's own figure is wrong on this machine (it tracks something closer to daemon uptime). **Do not use it to reason about anything**, and do not conclude the machine is slow or contended — a session on 15 Aug 2026 lost time doing exactly that. Wrap the command instead: `date "+start %T" && ./gradlew … && date "+end %T"`, which showed 18:22:06 → 18:22:11 against a reported 2h48m. |
-| **A green gate that never ran the tests** | `BUILD SUCCESSFUL, 142 tests, 0 failures`, but the test XML under `*/test-results/` is hours old | Gradle cached `test` because its inputs had not changed, which is correct behaviour and invisible in the summary — the *previous* run's counts are what you are reading. If it matters that the tests really executed against the code in front of you, force it (`./gradlew test --rerun-tasks`) and confirm with `stat -f "%Sm" …/TEST-*.xml` that the files are new. A cached pass is only as good as the run it was cached from. |
+| **A green gate that never ran the tests** | A summary line reporting the full suite passing (on 15 Aug 2026, when this was found, `BUILD SUCCESSFUL, 142 tests, 0 failures` — the count of the day, not a number to check against), but the test XML under `*/test-results/` is hours old | Gradle cached `test` because its inputs had not changed, which is correct behaviour and invisible in the summary — the *previous* run's counts are what you are reading. If it matters that the tests really executed against the code in front of you, force it (`./gradlew test --rerun-tasks`) and confirm with `stat -f "%Sm" …/TEST-*.xml` that the files are new. A cached pass is only as good as the run it was cached from. |
 | **The emulator compass will not move** | `adb emu sensor set orientation 118:0:0` returns OK and the heading does not change. Driving `magnetic-field` in X and Y wobbles it by about 31° and no more | The app reads `TYPE_ROTATION_VECTOR`, which the emulator synthesises rather than deriving from the orientation sensor, so `orientation` is inert. `magnetic-field` does feed it, but **the emulated device is upright, so its horizontal plane is X-Z**: putting the field in X-Y only tilts it. Sweep `(30·sin a, -48.4, 30·cos a)` and read the on-screen heading, which comes out near-linear at `heading ≈ a + 181`. Then solve for the heading you want. Used on 15 Aug 2026 to park the phone on 118° and the watch on 153° and photograph the aligned state. |
 | **`:app:installDebug` fails with `Update version code 3 is older than current 1000` even when scoped to the phone emulator** | `ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug` still reports a downgrade | The *watch* build is sitting on the phone emulator from an earlier unscoped install — both modules share one `applicationId`, so this is the residue of the trap two rows up rather than a new one. Check with `adb -s emulator-5554 shell cmd package resolve-activity --brief com.sajdatime.app`: if it answers `WearMainActivity`, uninstall (`adb -s emulator-5554 uninstall com.sajdatime.app`) and install again. Uninstalling wipes onboarding, so expect to walk the setup flow afterwards. |
 | **Emulator after a locale change** | System UI, Bluetooth and the app itself ANR ("failed to complete startup") for many minutes after `setprop persist.sys.locale` + zygote restart or `adb reboot`; `uiautomator dump` returns nothing | Not the app. Kill the AVD and cold-boot it (`emulator -avd sajda -no-snapshot-load`), and stop the Gradle daemons while it settles. Seen 15 Aug 2026 after switching to `ar-EG` and back. |
