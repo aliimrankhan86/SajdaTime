@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Kaaba, as a mark on the Qibla dial: the silhouette. Its band and door are a separate
-  drawable, ic_kaaba_detail.xml, drawn on top of this one in the dial's own face colour.
+  The Kaaba, as a mark on the Qibla dial: the silhouette. Its hizam (the band) and its door
+  are a separate drawable, ic_kaaba_detail.xml, drawn on top of this one in gold.
 
   Shared between the phone and the watch, because they draw the same dial twice and a
   shape that drifts between them is exactly the kind of gap this project has been bitten
@@ -20,9 +20,18 @@
   silhouette, the band and the raised door are the three things that make it recognisable;
   everything else is detail that disappears at that size anyway.
 
-  Geometry, in the 24x24 viewport: the wall is x 4.5..19.5 and y 3..20, so 15 wide by 17
-  tall — very slightly taller than it is wide, which is the proportion of the real face
-  that carries the door. It stands on the wider marble plinth, the shadharwan, at y 20.
+  **Geometry, redrawn 15 Aug 2026 from the building's own measurements** rather than from
+  round numbers, after the owner reported the mark looking wrong. In the 24x24 viewport the
+  wall is x 5..19 and y 3.5..20 — 14 wide by 16.5 tall, a ratio of 0.85 against the real
+  front face's 11.03m by 13.1m, which is 0.84. It stands on the wider marble plinth, the
+  shadharwan, which oversails it by 1.5 units either side.
+
+  The previous version was 15 by 17 starting at y 3, with the band at y 7.5. Nothing about
+  it was far wrong on paper and it read, at size, as a **shopfront**: the band sat high
+  enough to leave a thin strip of cube above it, and because the band was painted in the
+  page colour rather than gold, that strip separated visually and became an awning over a
+  shop sign. Lowering the band and colouring it fixed the same complaint twice over. See
+  ic_kaaba_detail.xml, and HANDOVER §10 for the screenshots.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
@@ -31,5 +40,5 @@
     android:viewportHeight="24">
     <path
         android:fillColor="#FF000000"
-        android:pathData="M4.5,3h15v17h-15z M3,20h18v1.5h-18z" />
+        android:pathData="M5,3.5h14v16.5h-14z M3.5,20h17v1.4h-17z" />
 </vector>

@@ -609,7 +609,7 @@ private fun QiblaPage(state: WearUiState) {
                     silhouette = kaaba,
                     detail = kaabaDetail,
                     tint = kaabaColour,
-                    face = dialColour,
+                    gold = Kiswah,
                 )
             }
 
@@ -653,7 +653,8 @@ private const val KAABA_SIZE = 0.32f
  * The Kaaba itself, on the ring at the Qibla bearing. The phone draws the same mark from
  * the same shared artwork; see `QiblaScreen.kt` for why it stays upright instead of rotating
  * with the dial, and `ic_kaaba.xml` for why the band and door are painted over the
- * silhouette rather than cut out of it.
+ * silhouette rather than cut out of it. The gold is [Kiswah] — the phone's dark-theme
+ * value, because the watch has no light theme.
  *
  * It earns its space here more than it does on the phone. The watch has no room for the
  * turn instruction the phone prints under the dial, so before this the only thing on the
@@ -666,7 +667,7 @@ private fun DrawScope.drawKaaba(
     silhouette: Painter,
     detail: Painter,
     tint: Color,
-    face: Color,
+    gold: Color,
 ) {
     // -90 because the dial's zero is straight up and trigonometry's is three o'clock.
     val radians = Math.toRadians(bearingDegrees.toDouble() - 90.0)
@@ -676,7 +677,7 @@ private fun DrawScope.drawKaaba(
         top = centre.y + radius * KAABA_DISTANCE * sin(radians).toFloat() - box / 2f,
     ) {
         with(silhouette) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(tint)) }
-        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(face)) }
+        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(gold)) }
     }
 }
 

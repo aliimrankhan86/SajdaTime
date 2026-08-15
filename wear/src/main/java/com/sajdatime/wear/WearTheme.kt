@@ -27,6 +27,18 @@ private val Background = Color(0xFF000000)
 private val OnSurface = Color(0xFFE7EAE8)
 private val OnSurfaceVariant = Color(0xFFA9B2AE)
 
+/**
+ * The gold of the Kaaba's hizam and door on the Qibla dial. The phone's `DarkKiswah` —
+ * this module cannot import it, so the value is duplicated here like every other colour in
+ * this file, and must be changed in both places.
+ *
+ * Deliberately not [Accent]. That amber means "the system is withholding something", and
+ * the watch draws both on the same screen family. It is also the *dark* gold rather than
+ * the phone's bright one, because the watch only has a dark theme: the silhouette is
+ * `onSurface`, which here is near-white, and a bright gold on a white cube is 1.7:1.
+ */
+internal val Kiswah = Color(0xFF8A5807)
+
 private val SajdaWearColors = ColorScheme(
     primary = Primary,
     onPrimary = OnPrimary,

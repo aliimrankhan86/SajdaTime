@@ -33,6 +33,8 @@ import com.sajdatime.app.ui.theme.DarkSecondary
 import com.sajdatime.app.ui.theme.DarkSurface
 import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
+import com.sajdatime.app.ui.theme.LightKiswah
+import com.sajdatime.app.ui.theme.DarkKiswah
 import com.sajdatime.app.ui.theme.LightHeroEnd
 import com.sajdatime.app.ui.theme.LightHeroMiddle
 import com.sajdatime.app.ui.theme.LightHeroStart
@@ -143,6 +145,16 @@ class ColorContrastTest {
         Pair("dark onSurface/dial face", DarkOnSurface, DarkSurfaceVariant, 3.0),
         Pair("light onSurface/dial face aligned", LightOnSurface, LightPrimaryContainer, 3.0),
         Pair("dark onSurface/dial face aligned", DarkOnSurface, DarkPrimaryContainer, 3.0),
+        // The Kaaba's hizam and door, in gold on the silhouette. **Two pairs, not four**,
+        // and the difference is the whole reason gold was rejected once and is used now:
+        // these shapes sit wholly inside the wall, so they are never drawn on the dial and
+        // the dial's two faces are irrelevant to them. The background here is the mark's
+        // own colour, which is onSurface — and onSurface flips from near-black to
+        // near-white between the themes, which is why the two golds are not the same gold.
+        // 4.5 rather than the 3.0 the rest of this list uses: the door is a 2.6-unit shape
+        // at ~19dp on a watch, which is nearer fine detail than a divider.
+        Pair("light kiswah/kaaba silhouette", LightKiswah, LightOnSurface, 4.5),
+        Pair("dark kiswah/kaaba silhouette", DarkKiswah, DarkOnSurface, 4.5),
     )
 
     @Test

@@ -57,6 +57,7 @@ import com.sajdatime.core.R as CoreR
 import com.sajdatime.app.data.CompassAccuracy
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.kiswahGold
 import com.sajdatime.app.ui.theme.sajdaSurface
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -167,9 +168,10 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
     val needleRotation = if (heading != null) 0f else qiblaTrueBearing.toFloat()
 
     // Loaded here rather than inside the Canvas: painterResource is a composable and the
-    // draw lambda is not one.
+    // draw lambda is not one. Same for the gold — kiswahGold reads a CompositionLocal.
     val kaaba = painterResource(CoreR.drawable.ic_kaaba)
     val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
+    val gold = kiswahGold()
 
     Box(
         modifier = Modifier
@@ -194,8 +196,6 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
             // Aligned fills the dial and switches its edge to the accent. That, the
             // vanishing arc and the changed wording are three independent signals of the
             // same fact, none of which is colour on its own.
-            // Named, because the Kaaba mark's band and door are painted in it too and the
-            // two have to stay the same colour or the mark grows a visible backing plate.
             val face = if (aligned) scheme.primaryContainer else scheme.surfaceVariant
             drawCircle(color = face, radius = radius, center = centre)
             drawCircle(
@@ -230,7 +230,7 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double) {
                 silhouette = kaaba,
                 detail = kaabaDetail,
                 tint = scheme.onSurface,
-                face = face,
+                gold = gold,
             )
         }
         // Nothing is drawn over the centre. An icon and a heading readout there sat
@@ -367,7 +367,7 @@ private fun DrawScope.drawKaaba(
     silhouette: Painter,
     detail: Painter,
     tint: Color,
-    face: Color,
+    gold: Color,
 ) {
     // -90 because the dial's zero is straight up and trigonometry's is three o'clock.
     val radians = Math.toRadians(bearingDegrees.toDouble() - 90.0)
@@ -379,8 +379,13 @@ private fun DrawScope.drawKaaba(
         // Solid first, detail over it, both opaque. The band and door were once holes in
         // a single path, which was neater and wrong: a hole shows what is behind the mark,
         // and what is behind the mark is the needle, so the doorway filled up with green.
+        //
+        // The detail is gold and no longer the dial's face colour. Painted in the face it
+        // was not a band but a slot cut through the cube, and the mark read as a shopfront
+        // — see ic_kaaba_detail.xml. Because both shapes sit wholly inside the silhouette,
+        // gold only ever has to hold against `tint`, never against the dial.
         with(silhouette) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(tint)) }
-        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(face)) }
+        with(detail) { draw(size = Size(box, box), colorFilter = ColorFilter.tint(gold)) }
     }
 }
 
@@ -464,11 +469,12 @@ private fun DialLegend() {
         modifier = Modifier.clearAndSetSemantics { },
     ) {
         Key(stringResource(R.string.qibla_legend_kaaba)) {
-            // Both layers, as on the dial: the band and door are painted in the page
-            // colour over the silhouette rather than cut out of it.
+            // Both layers, as on the dial: silhouette, then the hizam and door in gold on
+            // top of it. The legend has to match the dial exactly — a key drawn in
+            // different colours from the thing it explains is worse than no key.
             Box(Modifier.size(16.dp)) {
                 Icon(painter = kaaba, contentDescription = null, tint = scheme.onSurface, modifier = Modifier.size(16.dp))
-                Icon(painter = kaabaDetail, contentDescription = null, tint = scheme.surface, modifier = Modifier.size(16.dp))
+                Icon(painter = kaabaDetail, contentDescription = null, tint = kiswahGold(), modifier = Modifier.size(16.dp))
             }
         }
         Key(stringResource(R.string.qibla_legend_facing)) {

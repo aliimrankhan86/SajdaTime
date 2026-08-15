@@ -64,6 +64,23 @@ val LightOutlineVariant = Color(0xFFC9CFC9)
 val LightError = Color(0xFFB3261E)
 val LightOnError = Color(0xFFFFFFFF)
 
+/**
+ * The gold of the Kaaba's hizam and door on the Qibla dial — see `ic_kaaba_detail.xml`.
+ *
+ * **Depictive, not semantic.** Every other hue in this file carries meaning; this one is
+ * simply what the object is, in the same way the silhouette is a cube and not a circle. It
+ * is deliberately *not* the amber accent: that amber means "the system is withholding
+ * something", and a mark on the Qibla dial must not borrow a warning's colour. The two
+ * happen to sit on the same hue family, which is why they are written out separately here
+ * rather than aliased — changing the warning amber must not silently redress the Kaaba.
+ *
+ * Drawn only ever *on the silhouette*, which is `onSurface`, so that is the one pair it has
+ * to hold. Bright here because the light theme's cube is near-black (8.4:1); the dark
+ * theme's cube is near-white, so its gold has to go the other way. Both are asserted in
+ * `ColorContrastTest`.
+ */
+val LightKiswah = Color(0xFFE8B14A)
+
 // Tonal surfaces. Material 3 draws dialogs, bottom sheets, menus and elevated cards from
 // these roles — leaving them unset makes those components fall back to Material's default
 // purple-tinted baseline, which is jarring next to the green identity.
@@ -135,6 +152,19 @@ val DarkOutline = Color(0xFF8B948F)
 val DarkOutlineVariant = Color(0xFF2A312E)
 val DarkError = Color(0xFFF2B8B5)
 val DarkOnError = Color(0xFF601410)
+
+/**
+ * The dark theme's half of [LightKiswah] — a deep bronze rather than a bright gold, and it
+ * has to be, because the two themes tint the cube itself in opposite directions.
+ *
+ * `onSurface` is near-black in light and near-white in dark, so the silhouette this is drawn
+ * on flips from black to white. A single gold cannot serve both: #E8B14A on the dark theme's
+ * near-white cube is 1.7:1 and effectively invisible. This is the same hue taken far enough
+ * down to clear AA against a white cube (5.0:1) while still reading as gold rather than
+ * brown. The watch carries its own copy of this value — see `WearTheme.kt`, and keep them
+ * in step.
+ */
+val DarkKiswah = Color(0xFF8A5807)
 
 val DarkSurfaceContainerLowest = Color(0xFF0B0D0C)
 val DarkSurfaceContainerLow = Color(0xFF141817)

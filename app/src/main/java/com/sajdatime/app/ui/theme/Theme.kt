@@ -177,6 +177,18 @@ fun Modifier.sajdaSurface(shape: Shape, brush: Brush): Modifier {
 }
 
 /**
+ * The gold for the Kaaba's hizam and door on the Qibla dial.
+ *
+ * A function rather than a colour-scheme role because Material 3 has no slot for it and
+ * inventing one would imply it is semantic; it is depictive. Read through [LocalDarkTheme]
+ * and not `isSystemInDarkTheme()`, for the same reason `heroStyle` is: the user can override
+ * the system, and a mark that picks its gold from the phone's setting rather than the app's
+ * would be invisible on exactly the screen the override exists to fix.
+ */
+@Composable
+fun kiswahGold(): Color = if (LocalDarkTheme.current) DarkKiswah else LightKiswah
+
+/**
  * The next-prayer card's fill, and the three text colours that sit on it.
  *
  * Light keeps the design's mint-to-sand gradient; dark is a flat `primaryContainer`. All

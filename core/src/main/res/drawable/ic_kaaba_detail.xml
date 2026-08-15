@@ -1,27 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Kaaba's band and door, drawn on top of ic_kaaba.xml in the dial's face colour so the
-  mark reads as a draped cube rather than a plain block. The two viewports are identical
-  and both are drawn into the same square, so the coordinates here are in the same frame
-  as the silhouette's and must move with it.
+  The Kaaba's hizam — the embroidered band round the kiswah — and its door, drawn on top of
+  ic_kaaba.xml. The two viewports are identical and both are drawn into the same square, so
+  the coordinates here are in the same frame as the silhouette's and must move with it.
 
-  Face colour, not gold. Gold would be truer to the kiswah, and it was rejected: the dial
-  face is surfaceVariant normally and primaryContainer the moment you are facing the
-  Qibla, and each of those differs again between light and dark, so a gold band would be
-  four more colour pairs to hold above WCAG AA — and gold against the silhouette's own
-  colour is the weakest of the four in both themes. Painting the detail in the face colour
-  means the only pair that has to hold is the one already under test in ColorContrastTest,
-  and the band's contrast is then the same as the mark's own by construction.
+  **Gold, since 15 Aug 2026, and the earlier decision not to use gold rested on an error.**
+  This file used to be painted in the dial's face colour, and argued for it: gold "would be
+  four more colour pairs to hold above WCAG AA", because the dial face is surfaceVariant
+  normally and primaryContainer when you are facing the Qibla, each differing again between
+  light and dark. That is true of anything drawn *on the dial* — and neither of these shapes
+  is. Both sit entirely inside the wall (x 5..19 against a wall of exactly x 5..19), so the
+  only pair that has ever needed to hold is this colour against the **silhouette's** colour:
+  one pair per theme, not four. The old reasoning measured the wrong background.
 
-  The band sits at y 7.5, about a quarter of the way down the wall, which is roughly where
-  the hizam sits on the building. It is 1.2 units thick and no thicker: at 2 units the top
-  of the cube stopped reading as part of the cube and started reading as a separate lintel
-  sitting above it, which made the whole mark look like a shopfront.
+  What the old choice cost is what the owner reported: painted in the page colour, the band
+  is not a band, it is a *slot cut through the cube*, and a full-width slot near the top
+  turns the strip above it into an awning. The mark read as a shopfront in both themes. It
+  was never a contrast failure — both themes were already about 14:1 — which is why a
+  contrast test could never have caught it and a screenshot did.
 
-  The door is off-centre to the right and stops 1.5 units above the plinth rather than
-  meeting it. That gap is doing real work — the door of the Kaaba is raised about two
-  metres off the ground, and it is most of what separates this silhouette from a plain box
-  with a stripe across it.
+  Gold is also simply what is there. The hizam and the door are gold thread and gilded
+  bronze on black cloth, and it is the one detail everyone recognises.
+
+  Geometry, from the building: the hizam sits about two thirds of the way up (real: 9m of
+  13.1m) and is roughly a metre deep, so y 9..10.2 here, leaving 5.5 units of cube above it
+  rather than the old 4.5 — enough that the top can no longer read as a separate lintel. The
+  door is 2.6 by 4.2, off-centre to the right as it is on the building, and it **stops 2.8
+  units above the plinth**: the real door is raised about two metres off the ground, and that
+  gap is most of what separates this from a box with a stripe across it.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
@@ -30,5 +36,5 @@
     android:viewportHeight="24">
     <path
         android:fillColor="#FF000000"
-        android:pathData="M4.5,7.5h15v1.2h-15z M12.5,11.5h4.5v7h-4.5z" />
+        android:pathData="M5,9h14v1.2h-14z M12.8,13h2.6v4.2h-2.6z" />
 </vector>

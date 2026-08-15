@@ -3994,6 +3994,40 @@ button whole and clear of the bar.
 | City search | Typed "Slough" → **"Slough, United Kingdom"**. Forward geocoding names the town on hardware too, and the two halves of the feature agree |
 | Gate | `clean test lint :app:bundleRelease :wear:bundleRelease` — BUILD SUCCESSFUL, **142 tests, 0 failures** |
 
+### The Kaaba mark was a shopfront, and a contrast test could never have caught it (15 Aug 2026)
+
+The owner asked for better Kaaba artwork, visible in both themes. **Visibility was never the
+problem** — measured, the mark was already about 14:1 in both. The problem was that the
+hizam and the door were painted in the *dial's face colour*, so they were not a band and a
+door, they were **slots cut through the cube**, and a full-width slot near the top turned the
+strip above it into an awning. In light theme it read as a shopfront. That is an aesthetic
+failure with a perfect contrast score, which is exactly the class of bug `ColorContrastTest`
+cannot see and a screenshot can.
+
+**Gold had been considered and rejected, on a mistake worth naming.** `ic_kaaba_detail.xml`
+argued gold "would be four more colour pairs to hold above WCAG AA", because the dial face is
+`surfaceVariant` normally and `primaryContainer` when aligned, each differing again between
+light and dark. True of anything drawn *on the dial* — and neither shape is: both sit wholly
+inside the wall (`x 5..19` against a wall of exactly `x 5..19`). The only pair that ever had
+to hold is gold against the **silhouette**, one per theme. The rejection measured the wrong
+background.
+
+Two golds, because the silhouette is `onSurface` and that flips between themes: `#E8B14A` on
+the light theme's near-black cube (8.4:1) and `#8A5807` on the dark theme's near-white one
+(5.0:1). The bright gold on a white cube is 1.7:1, which is the trap if these are retuned.
+Asserted at 4.5 rather than the 3.0 the other non-text pairs use — the door is a 2.6-unit
+shape at ~19dp on a watch, nearer fine detail than a divider. It is `kiswahGold()` in
+`Theme.kt` rather than a Material role, and explicitly **not** the warning amber: same hue
+family, different meaning, so restyling one must not redress the other.
+
+The geometry was redrawn from the building rather than from round numbers — wall 14×16.5 for
+a real 11.03m×13.1m, hizam two thirds up, door 2.6×4.2 off-centre right and stopping 2.8
+units above the plinth because the real door is raised about two metres. Verified on the S23
+Ultra in both themes and on the watch: light is a black cube with a gold band and raised
+door; dark is a white cube with a deep antique-gold band; the legend keys match the dial
+exactly, which matters because a key drawn in different colours from the thing it explains is
+worse than no key.
+
 **§11 item 4 reproduced on hardware, and it is worse than it reads.** Searching Slough from
 a phone in Türkiye showed Fajr 05:24, Dhuhr 15:08, Maghrib 22:25 — Slough's *times*, in the
 phone's *timezone* (UTC+3). Those are not wrong by the rule the app follows, and they are
@@ -6046,7 +6080,23 @@ matters more than the stable hashes, that is the trade being made.
     it always sounds like a summary, and it converts a finding into a guarantee nobody
     measured. Say which cases were checked, and let the reader see the edge.
 
-98. **Logical screen height does not follow from physical size, so a layout budget must be
+98. **A passing contrast test says a thing is legible, not that it is right — and "paint the
+    detail in the background colour" is how a shape quietly becomes a hole.** The Kaaba mark
+    scored about 14:1 in both themes and looked like a shopfront, because its band and door
+    were painted in the dial's face colour. At that point they are not decoration on the
+    cube, they are gaps through it, and a full-width gap near the top reads as an awning over
+    a sign. No automated check in this project could have seen that; the owner saw it in a
+    second. Where an icon depicts a real object, its own colours are part of the depiction —
+    a gold band is not decoration to be economised away.
+
+    The second half of the lesson is worse: gold had been considered and rejected in a
+    written comment, on the grounds that it would need to clear AA against the dial's two
+    faces in both themes. The band and door never touch the dial — they sit wholly inside the
+    silhouette. **A confidently-reasoned rejection had measured the wrong background**, and
+    because it was written down as settled, it stayed settled for a fortnight. Re-derive the
+    constraint before trusting the note that says a thing was already ruled out.
+
+99. **Logical screen height does not follow from physical size, so a layout budget must be
     measured on the *short* device.** The one-screen home layout was budgeted on the
     1080x2400 emulator — 914dp tall — and fitted with room to spare. The owner's Galaxy S23
     Ultra, a physically much larger phone, is **823dp**, because its density is 3.75 rather

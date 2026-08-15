@@ -34,6 +34,7 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 | warning | `tertiary` | `#E8B14A` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#2A2113` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#F3E4C5` | Text in that banner |
+| kiswah | *(none — `kiswahGold()`)* | `#8A5807` | The Kaaba's hizam and door on the Qibla dial |
 
 ### Light
 
@@ -56,6 +57,7 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 | warning | `tertiary` | `#9A6208` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#FBF1DC` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#5A4408` | Text in that banner |
+| kiswah | *(none — `kiswahGold()`)* | `#E8B14A` | The Kaaba's hizam and door on the Qibla dial |
 
 ### The light hero gradient
 
@@ -78,6 +80,35 @@ and the navigation pill all rendered in Material's default **lilac** because
 `surfaceContainer*`, the inverse roles and `secondaryContainer` were left unset. It then
 happened a fourth time on the watch, which was using Wear's default scheme. If anything
 looks purple, an unset role is the cause.
+
+### One colour is depictive rather than semantic, and it is the only one
+
+Every other hue here carries meaning: green is the identity, amber is a warning, and
+nothing is decorative. **`kiswah` is the exception, and it is deliberate.** It is the gold
+of the Kaaba's hizam and its door on the Qibla dial — not a role, not a state, just what
+the object is, in the same way the silhouette is a cube and not a circle. It has no
+Material slot; it is read through `kiswahGold()` in `Theme.kt`, which reads `LocalDarkTheme`
+for the same reason `sajdaSurface` does.
+
+**It is not the warning amber, and must not be aliased to it.** The two sit on the same hue
+family, which is exactly why they are written out as separate values — restyling the
+warning colour must never silently redress the Kaaba, and a mark on the Qibla dial must not
+borrow the colour that means "the system is withholding something".
+
+**The two themes need opposite golds.** The mark's silhouette is `onSurface`, which is
+near-black in light and near-white in dark, so the gold drawn *on* it has to flip too:
+`#E8B14A` on the light theme's black cube (8.4:1) and the much deeper `#8A5807` on the dark
+theme's white cube (5.0:1). The bright gold on a white cube is 1.7:1 and effectively
+invisible, which is the trap to avoid if these are ever retuned.
+
+**Only one pair per theme has to hold, and getting that wrong is what delayed this.** The
+band and door sit wholly inside the wall, so they are never drawn against the dial face. An
+earlier version rejected gold on the grounds that it would need to clear AA against
+`surfaceVariant` *and* `primaryContainer` in *both* themes — four pairs — and painted the
+detail in the dial's face colour instead. That reasoning measured the wrong background, and
+what it shipped was not a band but a slot cut through the cube, which made the mark read as
+a shopfront. Contrast was never the problem: both themes were already about 14:1. See
+`ic_kaaba_detail.xml`.
 
 ### Light and dark separate surfaces differently
 
