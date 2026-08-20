@@ -4288,35 +4288,49 @@ something to do here, the honest answer is that there is nothing in this list fo
 and ask the owner what he wants next rather than inventing work from the "Not done" list
 further down, which is mostly deliberate non-goals.
 
-> ✅ **Production access has been applied for — 16 Aug 2026.** The fourteen days completed
-> (test live 31 Jul, day fourteen 14 Aug) and the owner submitted the application with the
-> information Google asked for. **A review is therefore open.**
+> ✅ **Production access GRANTED — confirmed by email from Google, 20 Aug 2026.** Applied for
+> 16 Aug, granted within the review window.
 >
-> ⚠️ **While that review is open, do not touch the store listing.** `docs/RELEASING.md`
-> states the rule plainly: *do not edit the store listing or any App content answer while
-> one is open.* This corrects advice written in this file on 16 Aug, which told the owner to
-> upload the new screenshots in the same sitting as the build — that was written before the
-> application went in and is wrong now. **The screenshots are ready and must simply wait.**
+> ✅ **Everything an assistant can stage is staged, 20 Aug 2026 — one owner click remains.**
+> Built `versionCode` 4 (1.2.0) fresh from `main` (`clean test lint bundleRelease` for both
+> modules, all green, both `.aab`s verified signed by `SAJDATIM.RSA`/`.SF`), then in Play
+> Console:
 >
-> **When the decision comes back**, `RELEASING.md` has the mechanics: once production access
-> exists, the build goes to **Production → Create release**, and the closed track can keep
-> running ahead of it as a beta if that is wanted.
+> 1. **Production track countries/regions** — was empty (the same trap the closed track hit
+>    once already, this time on the track that actually matters). Set to all countries,
+>    matching the closed track. Saved, not yet submitted.
+> 2. **Production → Create release** — `app-release.aab` uploaded (1.66 MB install size, one
+>    harmless warning about native-code debug symbols, same as every prior release — the only
+>    `.so` files are AndroidX's own). Release notes written for en-GB. Saved as a draft.
+> 3. **Store listing screenshots** — the 5 stale ones (pre-15-Aug Qibla dial, "Skip" button,
+>    "Greater Manchester" without country) were live on the listing; replaced with the 16 Aug
+>    retakes from `docs/store/upload/phone/`, reordered to match filename order. **This save
+>    was not gated behind "submit for review" — Play applied it immediately**, unlike the
+>    release and country changes below. So the corrected screenshots are already visible to
+>    anyone who reaches the listing (closed testers today; the wider public once production
+>    goes live), even though nothing else has been submitted.
 >
-> 🕐 **If you are reading this more than a day or two after 16 Aug 2026, the two paragraphs
-> above have probably expired — ASK, do not assume.** A Play review takes hours to days, so
-> by the time you read this it has very likely concluded, and the answer is not in this
-> repository: it lives in the owner's Play Console, which no assistant can see. **Your first
-> question to him should be "did production access come through?"** because everything else
-> hangs off it:
+> **What is NOT done, deliberately: nothing has been submitted for review, and no rollout has
+> started.** `Publishing overview` shows *"Submit 3 changes for review"* — the release
+> (`Start full rollout`) and the two countries/regions changes — sitting staged. That button
+> was left unpressed on purpose: this account has managed publishing **off**, so per
+> `docs/RELEASING.md` Step 7's own history, once changes are submitted and Google approves,
+> **they publish immediately with no second confirmation** — the review, not the submit
+> click, is the last gate. That is a one-way door for a track that has never served the
+> public, so it was left for the owner to press himself.
 >
-> | If he says | Then |
-> |---|---|
-> | **Granted** | The listing is free to edit again. Build fresh from `main`, upload `versionCode` 4 (1.2.0) to **Production → Create release**, then the screenshots from `docs/store/upload/`, then tell the testers. Update this block to say so |
-> | **Rejected** | Read the reason before doing anything. `docs/RELEASING.md` Step 0 and `PRODUCTION_READINESS.md` carry what Google asked for and what was answered |
-> | **Still waiting** | Nothing to do. Do not touch the store listing |
+> ⚠️ **Correction to earlier advice in this block: there is no staged-rollout percentage for
+> a track's first-ever release.** The idea of rolling out at 20% first was the plan going in,
+> but the Play Console UI never offered a percentage field anywhere in the release-creation
+> flow — the queued change is literally named *"Start full rollout"* by Google, not
+> adjustable. Staged percentages become available on the *next* update, once this track has
+> a live release to roll out gradually against. So the only choice on this release is timing,
+> not size — confirmed from the live UI, not assumed.
 >
-> Whatever he answers, **rewrite this block to match** rather than leaving a future session
-> to make the same guess. This file's §1 status line needs the same treatment.
+> **To finish: open Publishing overview and press "Submit 3 changes for review."** Nothing
+> else is needed first. Then, once it goes live: tell the closed-test testers to update (P3),
+> and start the Wear OS release (P5) — `docs/RELEASING.md` Step 7 has those mechanics
+> (Advanced settings → Form factors → Add form factor → Wear OS).
 
 The detail for each item is in the sections that follow.
 
@@ -4324,11 +4338,11 @@ The detail for each item is in the sections that follow.
 
 | | What | When |
 |---|---|---|
-| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ **Build it fresh from `main`. Never upload a saved `.aab`** — several artifacts exist labelled `versionCode` 3 and they are not the same app; Play takes whichever file it is handed, and a wrong one cannot be corrected without burning another code | Owner action in the Play Console, **after the production review closes** |
-| P2 | ~~**Retake `docs/store/screenshots/`**~~ — **the capturing is DONE, 16 Aug 2026.** All seven raw captures retaken and `tools/build-store-assets.sh` re-run, so `docs/store/upload/` is current and correct-sized. They were badly stale: the Qibla shot still showed the pre-15 Aug dial (needle *on* the Kaaba, the deleted north wedge, no cardinal letters, no gold, old subtitle order), Times predated the mosque-difference line, Settings said "Greater Manchester" from before the town rule, and the madhab step's button still read *Skip* rather than *Continue*. **What remains is purely the upload**, which is a Play Console action and therefore the owner's — see §10 for what each file now shows | Upload with P1 |
-| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | With P1, so after the review |
-| P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug) and the owner submitted the application with the information requested. **A review is now open**, which is why P1, P2's upload and P3 all wait | ⏳ Awaiting Google |
-| P5 | **Wear OS release** — separate track, and only after the phone app is live | After P4 |
+| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **Built and uploaded as a draft release, 20 Aug 2026 — awaiting the owner's "Submit for review" click** |
+| P2 | ~~**Retake `docs/store/screenshots/`**~~ — **DONE, 16 Aug 2026** (capture) **and 20 Aug 2026** (upload). All five stale phone screenshots replaced on the live store listing — pre-15-Aug Qibla dial, "Skip" button, "Greater Manchester" without country, all gone; see §10 for what each file now shows | ✅ **Uploaded and already live on the listing — Play did not gate this behind review** |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ After the release is submitted and live |
+| P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026, GRANTED 20 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug), the owner submitted the application 16 Aug, and Google's confirmation email arrived 20 Aug. Production access exists | ✅ **Granted** |
+| P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ After P1 |
 
 **Waiting on the owner — a decision, not a task**
 

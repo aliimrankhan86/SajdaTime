@@ -943,15 +943,20 @@ listing and every App content declaration are saved and green, the bundles are g
 signed, and `Closed testing - Alpha` is **Active** with `1.1.0 - first closed test`
 distributed to all 177 countries.
 
-Play's dashboard states the remaining path in four steps. As of **1 Aug 2026** the app is on
-the third — the twelve-tester bar was cleared during the day:
+Play's dashboard stated the path in four steps, and **all four are now done**:
 
 | | Step | State |
 |---|---|---|
 | 1 | Publish a closed testing release | ✅ done — struck through on the Dashboard |
-| 2 | Have at least 12 testers opted in | ✅ **done — ticked and struck through**, 24 addresses on the list |
-| 3 | Run the closed test with 12 testers for at least 14 days | ⏳ **running** |
-| 4 | Apply for production | ⬜ button greyed out until 3 completes |
+| 2 | Have at least 12 testers opted in | ✅ done, 1 Aug 2026 — 24 addresses on the list |
+| 3 | Run the closed test with 12 testers for at least 14 days | ✅ done — completed 14 Aug 2026 |
+| 4 | Apply for production | ✅ **granted — confirmed by email from Google, 20 Aug 2026** |
+
+**What is left is Step 9 below: Production → Create release.** Build `versionCode` 4
+(1.2.0) fresh from `main`, upload it and the screenshots from `docs/store/upload/`, then
+tell the closed-test testers to update. See `docs/HANDOVER.md` §11 for the up-to-date
+detail — this section is kept for the history of how access was obtained, not as the
+current status.
 
 **The single most important thing on this page: the 14 days are counted while twelve or more
 are opted in.** The clock is now running, so the risk has changed shape — it is no longer
