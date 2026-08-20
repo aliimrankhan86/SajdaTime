@@ -4310,15 +4310,6 @@ further down, which is mostly deliberate non-goals.
 >    anyone who reaches the listing (closed testers today; the wider public once production
 >    goes live), even though nothing else has been submitted.
 >
-> **What is NOT done, deliberately: nothing has been submitted for review, and no rollout has
-> started.** `Publishing overview` shows *"Submit 3 changes for review"* — the release
-> (`Start full rollout`) and the two countries/regions changes — sitting staged. That button
-> was left unpressed on purpose: this account has managed publishing **off**, so per
-> `docs/RELEASING.md` Step 7's own history, once changes are submitted and Google approves,
-> **they publish immediately with no second confirmation** — the review, not the submit
-> click, is the last gate. That is a one-way door for a track that has never served the
-> public, so it was left for the owner to press himself.
->
 > ⚠️ **Correction to earlier advice in this block: there is no staged-rollout percentage for
 > a track's first-ever release.** The idea of rolling out at 20% first was the plan going in,
 > but the Play Console UI never offered a percentage field anywhere in the release-creation
@@ -4327,10 +4318,21 @@ further down, which is mostly deliberate non-goals.
 > a live release to roll out gradually against. So the only choice on this release is timing,
 > not size — confirmed from the live UI, not assumed.
 >
-> **To finish: open Publishing overview and press "Submit 3 changes for review."** Nothing
-> else is needed first. Then, once it goes live: tell the closed-test testers to update (P3),
-> and start the Wear OS release (P5) — `docs/RELEASING.md` Step 7 has those mechanics
-> (Advanced settings → Form factors → Add form factor → Wear OS).
+> ✅ **Submitted for review by the owner, 20 Aug 2026, 1:39pm.** He pressed "Submit 3 changes
+> for review" himself — that press was deliberately left for him rather than done by an
+> assistant, because managed publishing is off on this account, so once Google approves this
+> **publishes immediately with no second confirmation screen**. Confirmed from
+> `Publishing overview → Submission activity`: **Submission 2, Production, status "In
+> review."** Nothing to do now but wait for Google's decision — historically (Submission 1)
+> that came back inside a day, but budget could be longer.
+>
+> **When the decision comes back, ask the owner rather than assuming — the answer is in his
+> Play Console, not this repository.** If **live**: tell the closed-test testers to update
+> (P3), and the Wear OS release (P5) can start — `docs/RELEASING.md` Step 7 has those
+> mechanics (Advanced settings → Form factors → Add form factor → Wear OS). If **rejected**:
+> read the reason before doing anything; `docs/RELEASING.md` Step 0 has what Google asked
+> for originally. Rewrite this block to match whatever he says, the same way this paragraph
+> replaced the one before it.
 
 The detail for each item is in the sections that follow.
 
@@ -4338,9 +4340,9 @@ The detail for each item is in the sections that follow.
 
 | | What | When |
 |---|---|---|
-| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **Built and uploaded as a draft release, 20 Aug 2026 — awaiting the owner's "Submit for review" click** |
+| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **Built, uploaded and submitted for review by the owner, 20 Aug 2026, 1:39pm — Submission 2, status "In review"** |
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **DONE, 16 Aug 2026** (capture) **and 20 Aug 2026** (upload). All five stale phone screenshots replaced on the live store listing — pre-15-Aug Qibla dial, "Skip" button, "Greater Manchester" without country, all gone; see §10 for what each file now shows | ✅ **Uploaded and already live on the listing — Play did not gate this behind review** |
-| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ After the release is submitted and live |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ After Google's decision, once live |
 | P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026, GRANTED 20 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug), the owner submitted the application 16 Aug, and Google's confirmation email arrived 20 Aug. Production access exists | ✅ **Granted** |
 | P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ After P1 |
 

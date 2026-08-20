@@ -952,9 +952,11 @@ Play's dashboard stated the path in four steps, and **all four are now done**:
 | 3 | Run the closed test with 12 testers for at least 14 days | ✅ done — completed 14 Aug 2026 |
 | 4 | Apply for production | ✅ **granted — confirmed by email from Google, 20 Aug 2026** |
 
-**What is left is Step 9 below: Production → Create release.** Build `versionCode` 4
-(1.2.0) fresh from `main`, upload it and the screenshots from `docs/store/upload/`, then
-tell the closed-test testers to update. See `docs/HANDOVER.md` §11 for the up-to-date
+**Step 9 is done too.** `versionCode` 4 (1.2.0) was built fresh from `main`, uploaded to
+Production, and the store listing screenshots replaced. The owner submitted it for review
+himself on 20 Aug 2026, 1:39pm — Submission 2, status "In review" in
+`Publishing overview → Submission activity`. What's left is Google's decision, then
+telling the closed-test testers to update. See `docs/HANDOVER.md` §11 for the up-to-date
 detail — this section is kept for the history of how access was obtained, not as the
 current status.
 
