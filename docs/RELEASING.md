@@ -1012,10 +1012,22 @@ run was 20 Aug and nothing has changed since, so it will pass. "It should pass" 
 that precedes most of the lessons in §15.
 
 ```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew clean test lint :wear:bundleRelease
+./tools/ship-wear.sh
 ```
 
-The file lands at `wear/build/outputs/bundle/release/wear-release.aab`.
+That is the whole mechanical half in one command: it pushes, cleans, runs the tests and the
+lint, builds both bundles, checks each one actually carries `META-INF/SAJDATIM.RSA` rather than
+trusting that it does, prints the watch `versionCode`, and then prints the two things it
+**cannot** do as a checklist. It is deliberately noisy about that last part, because a script
+that prints "done" having only done the easy half is how a release ships without its
+verification.
+
+The bundle lands at `wear/build/outputs/bundle/release/wear-release.aab`. If you would rather
+run it by hand, the build step alone is:
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew clean test lint :wear:bundleRelease
+```
 
 ### A18 is not optional, and it guards the worst failure this release could have
 
