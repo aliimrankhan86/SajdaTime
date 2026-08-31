@@ -47,3 +47,8 @@ replay_pid*.log
 # Nothing in it is a source of truth — anything worth keeping gets written into
 # docs/HANDOVER.md by hand, which is where the next session will actually look.
 graphify-out/
+
+# Per-machine Claude Code settings (.claude/settings.local.json). Local tool permissions
+# for whoever is sitting at this checkout, not a property of the project, and committing
+# one machine's answers would silently apply them to the next session on another machine.
+.claude/
