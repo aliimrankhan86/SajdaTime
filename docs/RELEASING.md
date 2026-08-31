@@ -821,8 +821,9 @@ The order is:
    [Wear OS app quality guidelines](https://developer.android.com/docs/quality-guidelines/wear-app-quality),
    on top of the normal app review. Outcome shows as Pending / Approved / Not approved.
 
-**Version codes are unique per app, not per track.** Phone is `2`; the watch is `1000` and
-climbs in its own band, so the two sequences can never collide. See `wear/build.gradle.kts`.
+**Version codes are unique per app, not per track.** The phone is on `4` (live on production
+since 20 Aug 2026) and the watch on `1001`, each climbing in its own band, so the two sequences
+can never collide. See `wear/build.gradle.kts`.
 
 ### What the Wear review actually checks
 
@@ -830,8 +831,8 @@ Google publishes its own list of the most common Wear OS rejections. Against thi
 
 | Rejection cause | Where we stand |
 |---|---|
-| Listing doesn't say **"Wear OS"** | ✅ The full description says "A Wear OS app and watch tile". Must be the exact phrase — "WearOS" and "Android Wear" both get rejected. **This applies to every localised listing too.** |
-| No Wear OS screenshot | ✅ Two, 384 × 384, 1:1, no device frame, no added text — all as required |
+| Listing doesn't say **"Wear OS"** | ✅ The full description says "A Wear OS app and watch tile", **confirmed on the live public listing 31 Aug 2026**, not merely in the source file. Must be the exact phrase — "WearOS" and "Android Wear" both get rejected. **This applies to every localised listing too.** |
+| No Wear OS screenshot | ✅ Two, **454 × 454**, 1:1, fully opaque, no device frame, no added text. Google's rule is a **384 × 384 minimum**, not a fixed size; an earlier version of this row said the files were 384 × 384, which was simply wrong about them. Measured 31 Aug 2026, see Step 9 |
 | Basic functionality broken / screenshots inaccurate | ✅ `w1-times.png` was recaptured at a scroll position where the bottom edge falls between rows rather than through a glyph. The list still shows it continues below, which is how a ScalingLazyColumn is meant to look, but nothing is chopped. |
 | Not formatted for round displays (WO-V16) | ✅ **Both sizes.** 192dp (`sajdawear`) and 227dp (`sajdawear_large`, 454px at 320dpi, corner radius 227 = a true circle) at font scale 1.0 and 1.3, every screen, checked by pixel rather than by eye — see below. |
 | Font scaling (WO-V1 / WO-V14) | ✅ `font_scale 1.3` on **both** round sizes. One real defect was found and fixed at 1.3 (the school button printed under the watch face clock); see the note below for the residual. |
@@ -985,6 +986,59 @@ the Console, so the two cannot disagree.
 
 ---
 
+## Step 9 — The Wear OS release: pre-flight audit, 31 Aug 2026
+
+The mechanics have not changed and are in Step 7, under *"The watch bundle does NOT go in the
+same release"*. **This step is the readiness audit run before handing the job over**, so the
+Console session is short and nothing is discovered halfway through it.
+
+### What was checked, and against what
+
+| Check | Result | How |
+|---|---|---|
+| The live listing contains the exact phrase **"Wear OS"** | ✅ Present: *"A Wear OS app and watch tile that work on their own, with or without your phone"* | Read off the **live public listing**, not `docs/store/LISTING.md`. This is the single most common cause of Wear rejection, and a source file agreeing with itself proves nothing about what Google is actually serving |
+| Screenshot count | ✅ Two. Google requires **at least one** | `docs/store/upload/wear-os/` |
+| Size and aspect ratio | ✅ 454 × 454, 1:1. Google's wording is *"a 1:1 aspect ratio and with a minimum size of 384 x 384 pixels"*, so **384 is a floor, not a target** | Measured, not eyeballed |
+| No transparency or masking | ✅ Alpha is 255 at every pixel of both files, zero non-opaque pixels | Measured. A round-watch capture saved as RGBA is exactly where a transparent corner would hide, and Google's rule is *"Don't include transparent backgrounds or masking"* |
+| Black background (WO-V13) | ✅ All four corners of both files are `(0, 0, 0, 255)` | Same measurement |
+| No device frame, no added text | ✅ Raw `screencap` output, never composited | Provenance: `tools/wear-verify.sh` |
+| `wear-release.aab` is current | ✅ Built 20 Aug 08:02, and **no file under `wear/src` or `core/src` is newer than it**, so it carries `versionCode` 1001 / `1.2.0` | `find -newer` against the bundle, which is the check the stale-artifact note asks for |
+
+### Build it fresh anyway
+
+The bundle above is provably current, and it should still be rebuilt, for a reason that has
+nothing to do with the bundle: **the rebuild re-runs the tests and the lint.** The last green
+run was 20 Aug and nothing has changed since, so it will pass. "It should pass" is the sentence
+that precedes most of the lessons in §15.
+
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew clean test lint :wear:bundleRelease
+```
+
+The file lands at `wear/build/outputs/bundle/release/wear-release.aab`.
+
+### A18 is not optional, and it guards the worst failure this release could have
+
+**The phone-to-watch settings sync has never been observed working end to end.** If it does not
+work, the watch calculates on its own Shafi'i default while the phone is set to Hanafi, and the
+two disagree about **Asr by roughly an hour**. That is not a minor defect. A prayer app that
+contradicts itself on the same wrist is worse than no watch app at all, and it is the exact
+symptom that exposed this problem the first time (§11 item 7).
+
+The check takes a minute once a watch is paired: set the phone to **Hanafi**, open the watch,
+compare **Asr**. Equal means the sync works. An hour apart means it does not, and the school
+button at the foot of the watch's times list will say which school it actually used. **Do this
+before uploading, not after.**
+
+### What to expect from the review
+
+Unlike the phone release on 20 Aug, this one really does involve waiting for a decision. Adding
+the form factor triggers a **separate human review** against the Wear OS app quality
+guidelines, on top of the normal app review, and the outcome shows as Pending / Approved / Not
+approved. Lesson 105 still applies to the approval half: do not wait on an email.
+
+---
+
 ## Can an assistant fill the Play Console in for you?
 
 Partly, and it is worth knowing where the line is before you start.
@@ -1014,7 +1068,7 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
 
 Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradle.kts` and
 `wear/build.gradle.kts`. Version codes are unique **per app, not per track**: the phone is
-on `2`, the watch on `1000`, so the two sequences climb in separate bands and can never
+on `4`, the watch on `1001`, so the two sequences climb in separate bands and can never
 collide.
 
 ### Shipping an improvement *during* the closed test
