@@ -5,6 +5,32 @@ This file is loaded automatically. It is deliberately short. **The full handover
 
 ---
 
+## ⚠️ First thing, every session — before you ask him anything
+
+**Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11 and read the `PICK UP HERE` block at the top
+of it.** It is dated, it names the single next action, and it carries the checks that confirm
+the state instead of asking you to believe it. It is rewritten as part of any commit that moves
+the project, so it will not be the stale sentence this file is forbidden from carrying.
+
+**Then confirm what is actually live, before acting on anyone's claim that something is done.**
+Fetch the public listing, signed out of every Google account:
+
+```
+https://play.google.com/store/apps/details?id=com.sajdatime.app
+```
+
+The **"Updated on"** date moves when a release publishes and for nothing else, so it separates
+*live* from *everyone involved feels ready* in two seconds, with no credentials and no Console
+session. Play sends **no email** when a review passes, so an inbox proves nothing in either
+direction. Both of those are lessons this project paid for: `docs/HANDOVER.md` §15, 105 and 107.
+
+**The owner should not have to tell you any of this, and has asked not to have to.** He does
+not want to paste a briefing at the start of a session. This file is loaded automatically so
+that he never has to. Keep it that way: when the pick-up point moves, move it in
+`docs/HANDOVER.md` §11 rather than adding status here.
+
+---
+
 ## What this project is
 
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS,
@@ -107,6 +133,15 @@ session inherits it instead of relearning it.
 - **The owner is not technical.** Explain in plain language, distinguish verified from
   assumed, never call something done when it is untested, and never ask him to go and test
   it on a device himself and report back.
+- **Anything he has to do himself in a web UI, walk him through it one screen at a time.**
+  Handing over a numbered list does not work, and it has been tried often enough to stop
+  trying: on 31 Aug 2026 the six Play Console steps for the Wear release were given three
+  times and read each time as a description of something already finished rather than as
+  instructions to follow. Ask him to open the page and send a screenshot, tell him what to
+  click **on that screen**, ask for the next one. He sends screenshots readily and this is the
+  format that fits him. **Stop before any submit, publish, purchase or consent button and hand
+  it to him** — the 20 Aug production submission was deliberately left for him to press, and
+  agreeing to Google's policies is his signature, not an assistant's.
 - **He does have real devices, and they find things the emulators cannot.** A Redmi Note 13
   Pro (HyperOS) and a Galaxy S23 Ultra (One UI), which he will plug in if asked. Every
   alarm-reliability fact this project knows came off the Redmi, and the S23 Ultra found both
