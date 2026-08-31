@@ -4271,9 +4271,71 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 
 ## 11. ⚠️ Still pending — the honest list
 
+### 🔴 PICK UP HERE — 31 Aug 2026, 21:45 UTC
+
+**One action is outstanding in the whole project, and it is a Play Console session only the
+owner can run.** Everything that can be prepared is prepared, and there is no engineering work
+left. Read this block, confirm it against the table below rather than believing it, then help
+him through the Console.
+
+#### Confirm the state, do not take it from this file
+
+| Claim | Confirm with | What you should see today |
+|---|---|---|
+| **Phone app is LIVE, nothing pending** | Fetch <https://play.google.com/store/apps/details?id=com.sajdatime.app> while signed out of every Google account | It renders, with an Install button, *"Updated on Aug 20, 2026"*, and release notes matching 1.2.0. A closed-testing listing 404s to a non-tester, so a page that renders at all is a production page |
+| **Watch app is BUILT but NOT SUBMITTED** | The same page's *Updated on* date | **Still 20 Aug means the Wear release has not gone up.** That date moves when, and only when, a release actually publishes. It is the cheapest true signal in this project |
+| Repo is pushed | `git status` | Possibly two commits behind origin. `./tools/ship-wear.sh` pushes them |
+
+#### Ready, and verified rather than assumed
+
+- `wear-release.aab`, `versionCode` 1001 / `1.2.0`, built fresh from `main` on 31 Aug 21:34,
+  signed (`META-INF/SAJDATIM.RSA` present in the artefact), and carrying `arm64-v8a` and
+  `x86_64`, so the **15 Sept 2026 Wear 64-bit deadline is met** (§Step 9 and the corrected
+  note in `RELEASING.md`).
+- **A18 PASSED, 31 Aug.** The owner paired a watch, set the phone to Hanafi and compared Asr:
+  they agreed. The phone-to-watch sync works. `KEY_ADJUSTMENTS` specifically was not exercised.
+- Wear screenshots audited against Google's published rules: 454 × 454, 1:1, alpha 255 at every
+  pixel, black corners, no device frames. `RELEASING.md` Step 9 has the measurements.
+- The exact phrase **"Wear OS"** is in the description on the **live** listing, which is the
+  most common Wear rejection and was checked against the live page, not the source file.
+
+#### The only remaining action
+
+Play Console, the owner's account, in this order:
+
+1. Test and release → Advanced settings → Form factors → **Add form factor → Wear OS**
+2. Upload `docs/store/upload/wear-os/w1-times.png` and `w2-qibla.png`
+3. Manage → **Use a dedicated release track for Wear OS**
+4. Upload `wear/build/outputs/bundle/release/wear-release.aab`, form-factor selector set to
+   **Wear OS**, not phones
+5. Agree to the Wear OS review policy — **legal consent, and his alone**
+6. Submit
+
+Then a genuine human review against the Wear quality guidelines, showing as Pending / Approved
+/ Not approved under `Publishing overview → Submission activity`. **Nothing will email him when
+it passes** (§15 lesson 105), so check the Console or the store page.
+
+#### How to help, learned the hard way on 31 Aug
+
+The owner is not technical, and **handing over the numbered list above in one message did not
+work.** It was given three times and read each time as a description of something already done
+rather than as instructions to follow. What was agreed instead, and what should be done next
+session:
+
+> **Walk it screen by screen.** Ask him to open the Console and send a screenshot. Tell him
+> what to click on that screen, one thing at a time. Ask for the next screenshot. He sends
+> screenshots readily and this is the format that actually fits him.
+
+Start him at
+<https://play.google.com/console/u/0/developers/6284685113064492750/app/4975578035662443727/app-dashboard>
+and **ask for a screenshot rather than restating the steps.**
+
+**Stop at step 6 and hand him the button.** The 20 Aug submission was deliberately left for him
+to press and this one should be too.
+
 ### Parked, 16 Aug 2026 — the whole of it, on one screen
 
-**Read this first, then the tables.** The code work is finished, verified on real hardware,
+**Read the block above first, then this, then the tables.** The code work is finished, verified on real hardware,
 committed and pushed. **Nothing is half-built.** Every remaining item is one of three
 things, and it is worth knowing which before picking any of them up:
 
@@ -6537,6 +6599,26 @@ matters more than the stable hashes, that is the trade being made.
     only in 1.2.0. **That is positive evidence of which build is on users' phones**, obtainable
     without a Console login, and it is worth taking after every upload rather than trusting that
     the right file was picked.
+
+107. **"It has been reviewed and we are happy to proceed" has three different meanings on this
+    project, and they were conflated repeatedly on 31 Aug 2026.** The testers being happy,
+    Google's review passing, and the owner giving his own go-ahead are three separate events,
+    and one sentence can mean any of them. Each time it arrived it was taken as the second and
+    meant the first or the third, and the effect was several rounds of preparing for a
+    submission that had not been made and could not have been, because nothing had been
+    uploaded.
+
+    The conflation is easy and it is not the owner's fault: **Play never announces anything.**
+    It sends no email when a review passes (lesson 105), so there is no moment that
+    unambiguously marks "Google has decided", and the vocabulary fills the gap with whatever
+    approval happened most recently.
+
+    **The fix is not to ask better questions, it is to look at the artefact.** The public store
+    page's *"Updated on"* date moves when a release publishes and does not move for anything
+    else, so it distinguishes "submitted and live" from "everyone involved feels ready" in two
+    seconds, with no credentials and no Console session. The general form, which is the same
+    lesson as verifying against Aladhan rather than against your own reasoning: **when a status
+    arrives as a claim, go and look at the thing itself before acting on it.**
 
 
 ---
