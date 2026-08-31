@@ -4445,7 +4445,7 @@ decisions, not oversights.
 > **Nothing in the Console needs pressing, and nothing in this repo is blocking.** The only
 > remaining work is human: getting three more people to open the opt-in link. The count
 > lives in exactly one place — **Dashboard → Production → "Apply for access to production"**
-> — and nowhere else in the Console. See `docs/RELEASING.md` Step 8 and "What is genuinely
+> — and nowhere else in the Console. See `docs/RELEASING.md` Step 0 and "What is genuinely
 > blocking, right now".
 >
 > The two paragraphs below are kept because their account and listing facts remain true.
@@ -5687,7 +5687,9 @@ matters more than the stable hashes, that is the trade being made.
     will be shown here when you publish your app."* with **Copy link** greyed out. This is
     the most common reason a closed test sits at `0 testers currently opted in` while the
     developer believes invitations went out. A ready-to-send tester message, and the three
-    ways it goes wrong on the tester's phone, are in `docs/RELEASING.md` Step 8.
+    ways it goes wrong on the tester's phone, are in `docs/RELEASING.md` Step 0. The separate
+    message for the day production goes live, and why an absent Update button usually means the
+    tester is already updated, are in Step 8.
 
 36. **Google gives you a number, never a name — and it hides the number in one place.**
     There is no per-tester view anywhere in Play Console: who opted in, who installed, who

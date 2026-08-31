@@ -889,6 +889,102 @@ for approval, and rotary-input support stopped being a requirement in February 2
 
 ---
 
+## Step 8 — Telling the testers, once production is live
+
+**This is the step nothing in the Console prompts you to take, which is why it was missed.**
+The app went live on 20 Aug 2026 and the closed testers were told nothing for eleven days.
+They are not customers. They are the twenty-four people whose opt-ins bought production
+access, and silence leaves them assuming the project stalled.
+
+### First, the thing that is almost certainly not a problem
+
+When a tester says *"the Play Store is not showing an update"*, the usual answer is that
+**they already have the new version.** Auto-update is on by default, so within days of a
+production release most testers are quietly moved onto it. Play then shows **Open** rather
+than **Update**, and a tester hunting for an Update button is hunting for something that
+cannot exist.
+
+**The app settles this itself, which is part of why the version is on screen.** Settings →
+About → **Version** reads the installed `versionName` straight from `PackageManager`
+(`SettingsScreen.kt`, `versionName(context)`). **Ask for that number instead of asking whether
+they updated.** It is the one question a non-technical tester can answer correctly, and it
+does not depend on them understanding what a version is.
+
+### The track is not the cause, and this was checked rather than reasoned
+
+It is tempting to assume an opted-in tester is pinned to the closed track and therefore stuck
+on the old build. **They are not.** Google's own wording, from *Set up an open, closed, or
+internal test*:
+
+> "All users are eligible to receive the Production track. If an app bundle with a higher
+> version code is published to the Production track than to a test track where a user opted
+> in, the user receives the production release."
+
+Production is `versionCode` 4 and the closed track is on 2, so every tester is entitled to
+1.2.0 and Play will deliver it. **Nothing has to be halted, promoted or reconfigured**, and the
+closed track can be left running as a beta lane for the next release. Internal testing is the
+one exception to that rule and behaves differently, but this project has never used it.
+
+Two ordinary Play Store behaviours do delay delivery, and both look like a fault when they are
+not: the Updates list refreshes on Play's own schedule rather than on demand, and many phones
+are set to auto-update on Wi-Fi only. **The app's own store page always shows the true state
+and the Updates list does not**, so send the store link rather than directing anyone into a
+menu.
+
+### The message to send when production goes live
+
+Recruitment is a different message and lives in Step 0. This is the one for the day the app
+goes public. Written for people who are not technical, short enough for WhatsApp, and it asks
+for a version number rather than asking a yes/no question nobody can answer reliably:
+
+> Assalamu alaikum,
+>
+> SajdaTime is now live on Google Play for everyone. Thank you for testing it. It would not
+> have got there without you.
+>
+> You may already have the latest version without realising, because phones update apps
+> automatically. To check: open SajdaTime, go to **Settings**, scroll down to **About**, and
+> look at **Version**.
+>
+> If it says **1.2.0**, you are up to date and there is nothing to do.
+>
+> If it says **1.1.0**, open this on your phone and tap Update:
+> https://play.google.com/store/apps/details?id=com.sajdatime.app
+>
+> If you do not see an Update button there, swipe the page down to refresh it, and check again
+> later. Some phones only update apps when connected to Wi-Fi.
+>
+> What is new:
+> • Fixed a bug that could stop the Dhuhr alarm going off
+> • A new step that checks your calculation method matches your mosque
+> • Redesigned Qibla compass, much clearer at a glance
+> • Shows your town name on the times screen
+> • Fixed the compass vibrating on its own
+>
+> Now that it is public, please do share it with family and friends. It is free, no ads, no
+> tracking, and it always will be.
+>
+> JazakAllahu khairan,
+> Ali
+
+**Deliberately not in it: the dua request.** `CLAUDE.md` puts that in the app's disclaimer and
+*nowhere else*, asked once and never repeated. Broadcasting it to twenty-four people would
+break the rule, and the rule exists precisely because that kind of ask is worth less every
+time it is repeated.
+
+**Say plainly that the testing link is no longer the route.** Once the app is public,
+<https://play.google.com/store/apps/details?id=com.sajdatime.app> works for anyone, and the
+old `/apps/testing/` link only confuses people who are now ordinary users.
+
+### Update the version numbers in this message before reusing it
+
+The two version numbers above are the only part that goes stale, and a message telling someone
+to look for a number that is no longer current is worse than no message. On the next release,
+change them and change the "What is new" bullets to match the release notes actually filed in
+the Console, so the two cannot disagree.
+
+---
+
 ## Can an assistant fill the Play Console in for you?
 
 Partly, and it is worth knowing where the line is before you start.
