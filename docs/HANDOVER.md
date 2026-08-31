@@ -4348,10 +4348,35 @@ further down, which is mostly deliberate non-goals.
 > coarsest bucket and is consistent with anything from ten to ninety-nine, so it is not evidence
 > of reach in either direction.
 >
-> **The two items this was blocking are now open, and both are the owner's.** Tell the
-> closed-test testers to update (P3, and nothing has been sent to them since 20 Aug, so they are
-> still on 1.1.0), and start the Wear OS release (P5), for which `docs/RELEASING.md` Step 7 has
-> the mechanics: Advanced settings → Form factors → Add form factor → Wear OS.
+> ✅ **The testers were told, and they came back happy. 31 Aug 2026.** The message now written
+> down in `docs/RELEASING.md` Step 8 was sent, and the reply was that they have tested it and
+> are happy with the latest fixes. **P3 is closed.**
+>
+> **What that reply establishes.** The update reached them, so last week's question of why no
+> Update button appeared is answered: they are on 1.2.0, not 1.1.0. Google's track-precedence
+> rule (Step 8) predicted exactly that, and it has now been observed instead of merely read.
+>
+> **What it does not establish, and must not be promoted into §10 as if it did.** Nobody
+> reported a version number, so "they are on 1.2.0" is inferred from satisfaction with fixes
+> that exist only in that build, not read off a screen. Nobody reported watching the Dhuhr
+> alarm fire, which is the one change in this release that cannot be confirmed by looking at
+> the app. **"Happy with the fixes" is a report, not a measurement**, and the standing gap
+> below is untouched by it: no alarm has been watched firing through a real overnight wait on
+> a real handset. If a tester's word were sufficient evidence, none of the Xiaomi and S23
+> Ultra work in §10 would ever have been needed.
+>
+> ⚠️ **There is no further gate, and this is the misconception to kill on sight.** Tester
+> approval was a requirement for *production access*, which Google granted on 20 Aug 2026.
+> The release published the same day and the app has been public since. **Nothing is waiting
+> to be submitted, approved, promoted or rolled out**, and a tester saying they are happy does
+> not send anything anywhere. The next thing that reaches a user is a *new* `versionCode`,
+> built fresh from `main` and uploaded as a new release, which is a fresh trip through
+> `docs/RELEASING.md` "Before every future update" and not a continuation of this one.
+>
+> **So the only launch item left is the Wear OS release (P5)**, for which
+> `docs/RELEASING.md` Step 7 has the mechanics: Advanced settings → Form factors → Add form
+> factor → Wear OS. It is an owner action and it triggers a separate human review against the
+> Wear quality guidelines.
 
 The detail for each item is in the sections that follow.
 
@@ -4361,9 +4386,9 @@ The detail for each item is in the sections that follow.
 |---|---|---|
 | P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **LIVE.** Approved and published 20 Aug 2026, confirmed from the public store page 31 Aug 2026 |
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **DONE, 16 Aug 2026** (capture) **and 20 Aug 2026** (upload). All five stale phone screenshots replaced on the live store listing — pre-15-Aug Qibla dial, "Skip" button, "Greater Manchester" without country, all gone; see §10 for what each file now shows | ✅ **Uploaded and already live on the listing — Play did not gate this behind review** |
-| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ **Unblocked since 20 Aug, and now overdue.** The app has been live for eleven days and the testers have not been told |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ✅ **Done, 31 Aug 2026.** Told, and they replied that they have tested 1.2.0 and are happy with the fixes. That reply doubles as the evidence that the production update reached them |
 | P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026, GRANTED 20 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug), the owner submitted the application 16 Aug, and Google's confirmation email arrived 20 Aug. Production access exists | ✅ **Granted** |
-| P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ **Unblocked.** P1 is live |
+| P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ **Unblocked, and now the only launch item left.** P1 is live and P3 is closed |
 
 **Waiting on the owner — a decision, not a task**
 
