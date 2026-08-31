@@ -4319,20 +4319,39 @@ further down, which is mostly deliberate non-goals.
 > not size — confirmed from the live UI, not assumed.
 >
 > ✅ **Submitted for review by the owner, 20 Aug 2026, 1:39pm.** He pressed "Submit 3 changes
-> for review" himself — that press was deliberately left for him rather than done by an
-> assistant, because managed publishing is off on this account, so once Google approves this
-> **publishes immediately with no second confirmation screen**. Confirmed from
-> `Publishing overview → Submission activity`: **Submission 2, Production, status "In
-> review."** Nothing to do now but wait for Google's decision — historically (Submission 1)
-> that came back inside a day, but budget could be longer.
+> for review" himself. That press was deliberately left for him rather than done by an
+> assistant, because managed publishing is off on this account, so once Google approved it the
+> release **published immediately with no second confirmation screen.** That is exactly what
+> happened.
 >
-> **When the decision comes back, ask the owner rather than assuming — the answer is in his
-> Play Console, not this repository.** If **live**: tell the closed-test testers to update
-> (P3), and the Wear OS release (P5) can start — `docs/RELEASING.md` Step 7 has those
-> mechanics (Advanced settings → Form factors → Add form factor → Wear OS). If **rejected**:
-> read the reason before doing anything; `docs/RELEASING.md` Step 0 has what Google asked
-> for originally. Rewrite this block to match whatever he says, the same way this paragraph
-> replaced the one before it.
+> ✅ **LIVE ON PRODUCTION. Approved and published 20 Aug 2026, independently confirmed
+> 31 Aug 2026.** `versionCode` 4 / `1.2.0` is the public release.
+>
+> **No approval email was ever sent, and none was coming.** Eleven days were spent waiting on
+> an inbox that was never going to produce anything, which is §15 lesson 105. The evidence that
+> settles it is the public store page, fetched with no Google account attached, which is the one
+> check that does not depend on anyone's Console session:
+>
+> <https://play.google.com/store/apps/details?id=com.sajdatime.app>
+>
+> | What the page shows | Why it settles the question |
+> |---|---|
+> | It loads at all, to a signed-out fetch | A closed-testing listing returns *"the requested URL was not found on this server"* to anyone who is not a tester. A page that renders for nobody in particular is a production page |
+> | "Updated on Aug 20, 2026" | Publication was same-day. The review took hours, not the eleven days the silence implied |
+> | "10+ Downloads", and a plain **Install** button | Install counts and an unqualified Install button are production furniture. No "Early access", no "Beta" and no testing banner appears anywhere on the page |
+> | "What's new" lists the Dhuhr fix, the method step, the redesigned compass, the town label and the buzz fix | Those are the 15 to 16 Aug changes, which is `1.2.0` and nothing else. So the artefact that went live is the one built fresh from `main`, not one of the stale `versionCode` 3 bundles that `app/build.gradle.kts` warns about. **The stale-artifact trap did not fire** |
+> | Contact shows `aikstudies@gmail.com` and the GitHub Pages site | The listing Google is serving is the one written in `docs/store/LISTING.md` |
+>
+> **What this does not establish, and must not be written down as if it did.** The rollout
+> percentage, the live country count and the crash-free rate are Console figures and were not
+> read. Nobody has confirmed an install by anyone outside the tester list. "10+" is Play's
+> coarsest bucket and is consistent with anything from ten to ninety-nine, so it is not evidence
+> of reach in either direction.
+>
+> **The two items this was blocking are now open, and both are the owner's.** Tell the
+> closed-test testers to update (P3, and nothing has been sent to them since 20 Aug, so they are
+> still on 1.1.0), and start the Wear OS release (P5), for which `docs/RELEASING.md` Step 7 has
+> the mechanics: Advanced settings → Form factors → Add form factor → Wear OS.
 
 The detail for each item is in the sections that follow.
 
@@ -4340,11 +4359,11 @@ The detail for each item is in the sections that follow.
 
 | | What | When |
 |---|---|---|
-| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **Built, uploaded and submitted for review by the owner, 20 Aug 2026, 1:39pm — Submission 2, status "In review"** |
+| P1 | **Upload `versionCode` 4 (1.2.0).** Bumped 16 Aug for the production rollout — it carries the Dhuhr fix *plus* the whole of 15–16 Aug: the method step, the town label, the redesigned compass, the buzz fix. ⚠️ Built fresh from `main`, never a saved artifact — several `.aab` files exist labelled `versionCode` 3 and they are not the same app | ✅ **LIVE.** Approved and published 20 Aug 2026, confirmed from the public store page 31 Aug 2026 |
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **DONE, 16 Aug 2026** (capture) **and 20 Aug 2026** (upload). All five stale phone screenshots replaced on the live store listing — pre-15-Aug Qibla dial, "Skip" button, "Greater Manchester" without country, all gone; see §10 for what each file now shows | ✅ **Uploaded and already live on the listing — Play did not gate this behind review** |
-| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ After Google's decision, once live |
+| P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ⬜ **Unblocked since 20 Aug, and now overdue.** The app has been live for eleven days and the testers have not been told |
 | P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026, GRANTED 20 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug), the owner submitted the application 16 Aug, and Google's confirmation email arrived 20 Aug. Production access exists | ✅ **Granted** |
-| P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ After P1 |
+| P5 | **Wear OS release** — separate track, and only after the phone app is live | ⬜ **Unblocked.** P1 is live |
 
 **Waiting on the owner — a decision, not a task**
 
@@ -6463,6 +6482,30 @@ matters more than the stable hashes, that is the trade being made.
     on the way back), the emulator took over with injected sensors. Two instruments, each
     used for the half it can actually reach, beats waiting for the owner to pick the phone
     up.
+
+105. **Google does not email you when a review passes, so an empty inbox is not a pending
+    decision.** The production release was submitted on 20 Aug 2026, approved the same day, and
+    published immediately because managed publishing is off. No email was sent and none was ever
+    going to be: Play emails on rejections, on policy issues, and on account milestones such as
+    production access being granted, but not on a routine approval. Eleven days of silence were
+    reasonably read as "still in review", and nothing was wrong at any point during them.
+    **The status change appears in `Publishing overview → Submission activity`, and the fact of
+    being live is visible from outside the Console entirely.** Fetch the public store URL while
+    signed out of every Google account: a closed-testing listing returns *"the requested URL was
+    not found on this server"* to a non-tester, so a page that renders at all, carrying a
+    download count and a plain Install button, is a production page. That check takes seconds,
+    needs no credentials, and does not depend on whoever last looked at the Console, which makes
+    it the right instrument for exactly the question an inbox cannot answer.
+
+106. **Read the "What's new" text on the live listing to prove which artefact shipped.** The
+    stale-artifact trap recorded in `app/build.gradle.kts` is real: several `.aab` files exist
+    labelled `versionCode` 3 and they are not the same app, and Play ships whichever file it was
+    handed. A store page does not always display the version number, but it always displays the
+    release notes, and those are written per release. The live page lists the Dhuhr fix, the
+    method step, the redesigned compass, the town label and the buzz fix, which together exist
+    only in 1.2.0. **That is positive evidence of which build is on users' phones**, obtainable
+    without a Console login, and it is worth taking after every upload rather than trusting that
+    the right file was picked.
 
 
 ---

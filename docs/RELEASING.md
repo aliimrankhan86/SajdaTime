@@ -325,6 +325,17 @@ account can create and publish apps.
 > that — `…app.rtl` and `…app.sideload`. **Neither should ever be registered.** They are
 > debug variants that are never distributed, and registering them would put two junk package
 > names on the account permanently for no benefit.
+>
+> **Read back in the Console by the owner, 31 Aug 2026, and this is the read-back that
+> matters.** *Play Console → Android developer verification → Package names* shows **1 package
+> name**: `com.sajdatime.app`, status **Registered**, **3 keys**, last updated **31 Jul 2026**.
+> Three keys is expected rather than a mistake: Play App Signing holds both the app signing key
+> and the upload key, and this page lists the keys associated with the package, not one key per
+> app. The date is the day the app was created in the Console, which is what "registered
+> automatically on creation" looks like from the outside. **So every reminder email on this
+> subject can be dismissed**, including the "[Final reminder]" of 31 Aug 2026, unless and until
+> SajdaTime is distributed off Play, at which point that package and the key that signs it have
+> to be registered explicitly on this same page using **Register package name**.
 
 > The device check is worth remembering for any future account: it requires the **Play
 > Console app on a physical Android phone**, and an emulator does not satisfy it. Every
@@ -590,7 +601,7 @@ session "fix" any of them.**
 | The October 2026 "minimum scope" location policy | Applies to `ACCESS_FINE_LOCATION`. We are coarse-only — already the posture that policy is pushing everyone toward. |
 | targetSdk deadline (31 August 2026) | ✅ Compliant. New apps need API 36; we are at 36. Wear needs 35+; we are at 36. |
 | 16 KB page size (mandatory since Nov 2025) | ✅ Automatic. Pure Kotlin, no native code. |
-| Android developer verification (from 30 Sept 2026) | ✅ Nothing to do — but know the stakes. Google auto-registers the package when you create the app in Console, and the Console confirms ours is registered. An *un*registered package is removed from Play **globally** on 30 Sept 2026, not merely blocked in the launch countries, so re-read the box in Step 1 before dismissing any reminder email as noise. ADB installs are exempt by name, so the `.rtl` and `.sideload` debug variants need nothing and must not be registered. |
+| Android developer verification (from 30 Sept 2026) | ✅ **Done, and read back in the Console on 31 Aug 2026: `com.sajdatime.app`, Registered, 3 keys, last updated 31 Jul 2026.** Nothing to do, but know the stakes. Google auto-registers the package when you create the app in Console, and the Console confirms ours is registered. An *un*registered package is removed from Play **globally** on 30 Sept 2026, not merely blocked in the launch countries, so re-read the box in Step 1 before dismissing any reminder email as noise. ADB installs are exempt by name, so the `.rtl` and `.sideload` debug variants need nothing and must not be registered. |
 | A religion-specific Play policy | **There isn't one.** Religion appears in Play policy only as a *protected characteristic* — we are a beneficiary of that clause, not a target. No religious declaration, no special content-rating answers. Expect Everyone / PEGI 3. |
 | Being rejected for using AI to write the code | **No such policy exists.** Google's AI-Generated Content policy governs what an app *does at runtime* — chatbots, image generators — not how the source was authored. We ship no generative AI, so it does not apply. There is **no obligation to disclose AI assistance to Google**, and no policy hook for it. (The disclaimer in the app and the listing stays regardless — that is our own honesty commitment to users, not a Play requirement.) |
 | Rejection for a "saturated category" | **That is an Apple rule being mistaken for a Google one.** Play's Repetitive Content policy targets copying a specific app's content, or one developer shipping many near-identical apps. Neither applies. |
@@ -937,6 +948,11 @@ instead, and the closed track can keep running ahead of it as a beta if that is 
 
 ## What is genuinely blocking, right now
 
+> **Nothing is blocking. The app is LIVE on Google Play production, confirmed 31 Aug 2026.**
+> Everything below this box is the history of how production access was obtained, kept because
+> the mechanics are worth having written down, not because it describes today. The current
+> status lives in `docs/HANDOVER.md` §11.
+
 **The app is approved and live on the closed testing track.** Google's review came back
 inside a day. The developer account is fully verified, GitHub Pages is live, the store
 listing and every App content declaration are saved and green, the bundles are genuinely
@@ -952,13 +968,18 @@ Play's dashboard stated the path in four steps, and **all four are now done**:
 | 3 | Run the closed test with 12 testers for at least 14 days | ✅ done — completed 14 Aug 2026 |
 | 4 | Apply for production | ✅ **granted — confirmed by email from Google, 20 Aug 2026** |
 
-**Step 9 is done too.** `versionCode` 4 (1.2.0) was built fresh from `main`, uploaded to
-Production, and the store listing screenshots replaced. The owner submitted it for review
-himself on 20 Aug 2026, 1:39pm — Submission 2, status "In review" in
-`Publishing overview → Submission activity`. What's left is Google's decision, then
-telling the closed-test testers to update. See `docs/HANDOVER.md` §11 for the up-to-date
-detail — this section is kept for the history of how access was obtained, not as the
-current status.
+**Step 9 is done, and the app is live.** `versionCode` 4 (1.2.0) was built fresh from `main`,
+uploaded to Production, and the store listing screenshots replaced. The owner submitted it for
+review himself on 20 Aug 2026, 1:39pm. Google approved it the same day and, because managed
+publishing is off, it published immediately with no second confirmation screen.
+**Confirmed independently on 31 Aug 2026** from the public store page,
+<https://play.google.com/store/apps/details?id=com.sajdatime.app>, which loads to a signed-out
+request and shows "Updated on Aug 20, 2026", "10+ Downloads", a plain Install button, no testing
+banner of any kind, and release notes that match 1.2.0 and nothing else. **Google sent no
+approval email, and none was coming**, which is worth knowing before waiting for one again:
+`docs/HANDOVER.md` §15 lesson 105. What is left is telling the closed-test testers to update,
+and the Wear OS track. See `docs/HANDOVER.md` §11 for the up-to-date detail. This section is
+kept for the history of how access was obtained, not as the current status.
 
 **The single most important thing on this page: the 14 days are counted while twelve or more
 are opted in.** The clock is now running, so the risk has changed shape — it is no longer
