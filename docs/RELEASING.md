@@ -884,9 +884,23 @@ Google publishes its own list of the most common Wear OS rejections. Against thi
 Two Wear hypotheses worth *not* worrying about: tiles and complications are **not** required
 for approval, and rotary-input support stopped being a requirement in February 2024.
 
-> **Deadline: 15 September 2026 — 64-bit support becomes mandatory for Wear OS apps.** This
-> app is pure Kotlin with no native libraries, so it should be unaffected, but confirm before
-> that date.
+> **Deadline: 15 September 2026 — 64-bit support becomes mandatory for Wear OS apps.**
+> ✅ **CONFIRMED MET, 31 Aug 2026, by reading the artefact rather than reasoning about it.**
+> The claim this entry used to make — *"pure Kotlin with no native libraries, so it should be
+> unaffected"* — was wrong on its premise. `wear-release.aab` does ship native libraries: two
+> of them, `libandroidx.graphics.path.so` and `libdatastore_shared_counter.so`, both AndroidX's
+> own. They are present for **four** ABIs including `arm64-v8a` and `x86_64`, so the
+> requirement is satisfied, but it is satisfied because AndroidX ships 64-bit builds and not
+> because there is nothing to check. `app-release.aab` carries the same eight files.
+>
+> ```bash
+> unzip -l wear/build/outputs/bundle/release/wear-release.aab | grep '\.so$'
+> ```
+>
+> **The lesson is the premise, not the answer.** "We have no native code" was believed because
+> nothing in `wear/src` compiles any, which is true and irrelevant: a dependency's `.so` files
+> land in your bundle and are yours to satisfy deadlines with. Re-run the command above rather
+> than re-reasoning from the source tree, especially if a dependency is ever added or bumped.
 
 ---
 
