@@ -4298,7 +4298,7 @@ be pushed. The project is waiting on Google, and on one physical check only the 
 | Phone app | **Live**, `versionCode` 4 / 1.2.0, 177 countries, full rollout | Public store page, and `Test and release → Production` |
 | Phone store listing | **Correct and live as of 1 Sept.** Description carries the full disclaimer; the five screenshots are the current app | Pixel diff and text diff against the public page, not the Console preview |
 | Feature graphic, app icon, app name, short description | **Correct**, diffed to zero difference against `docs/store/upload/` | 1 Sept check |
-| Wear OS release | **SUBMITTED, IN REVIEW.** `versionCode` 1001 / 1.2.0, four ABIs, target SDK 36, full rollout, 177 countries inherited from the phone app | `Publishing overview → Changes in review`, four items |
+| Wear OS release | **IN REVIEW with a human reviewer, from 1 Sept 11:35 UTC.** `versionCode` 1001 / 1.2.0, four ABIs, target SDK 36, full rollout, 177 countries inherited from the phone app. Google's pre-review quick checks passed, and the page now reads *"Your changes are now in review"* | `Publishing overview → Changes in review`, four items |
 | Play policy status | **No issues.** All App content declarations complete | `Monitor and improve → Policy status`, `Policy and programmes → App content` |
 | Android developer verification | **Registered**, 3 keys, since 31 July. The 30 Sept 2026 deadline is already met, so do not raise it as a task | `Android developer verification → Package names` |
 | Repository | **Clean and pushed.** `main` and `origin/main` in step | `git status`, `git rev-list --left-right --count origin/main...main` |
@@ -4379,6 +4379,13 @@ Read these before touching the Play Console or believing a status.
    those eleven days, because it renders the draft. Only the public page counts.
 3. **No email ever arrives when a review passes.** Eleven days were spent waiting on an inbox.
    The *Updated on* date and the page content are the only signals.
+4. **The "minutes remaining" bar is not the review.** After you submit, `Publishing overview`
+   shows *"Running quick checks for commonly found issues"* with a countdown of a few minutes.
+   That is Google's automated pre-screen, and the wording under it says so: *"Changes will be
+   sent for review as soon as the checks complete successfully."* When it finishes, the banner
+   changes to **"Your changes are now in review"**, and only then is a human looking. Read the
+   banner text, not the timer. The owner reasonably read the countdown as the review itself on
+   1 Sept, and a review takes hours to days, not minutes.
 
 #### What an assistant can and cannot do here, verified 1 Sept 2026
 
