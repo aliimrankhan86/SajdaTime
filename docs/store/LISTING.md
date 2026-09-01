@@ -225,7 +225,9 @@ textarea's length *and* a djb2-xor hash of it; the text is then pulled out in fi
 slices, reassembled here, and the same two numbers recomputed. If both match, the fenced block
 above is the Console text byte for byte and not a careful-looking approximation of it. The
 slice boundaries are asserted at exactly 800 too, so a dropped or doubled chunk fails loudly
-rather than quietly shifting the text. Last run: `len=3299 hash=492342197`, both sides.
+rather than quietly shifting the text. Last run: **`len=3704 hash=441829862`, both sides, 1 Sept 2026** — computed in the browser against the Console textarea and on disk against this file.
+
+> **1 Sept 2026: the drift had reversed, and this section's own claim above was stale.** The Console was on `len=3299` and *this file* was right, not the other way round. The 3,299-character version was missing both halves of the strengthened religious disclaimer written on 2 Aug in `91ae9c6` — the sentence saying the times come from a calculation and not from any mosque or scholar, the instruction to follow your mosque where the two disagree, and the no-warranty sentence. `91ae9c6` names four copies that must move together (in-app dialog, watch, `docs/privacy.html`, Play listing) and only three of them moved. The Console text was corrected to match this file, by replacing those two paragraphs in place so the remaining 3,299 characters stayed byte-identical, and both sides were re-measured. **So the rule is not "the Console is always ahead" — it is that neither side is authoritative until they are hashed against each other.**
 
 **The *"your data pay for them"* phrasing is resolved.** It read as a typo — *data* as a plural
 noun is defensible but not what most readers expect, and `CLAUDE.md` requires this listing to
@@ -438,9 +440,14 @@ same Times screen in light and dark, and two more on the same Qibla screen.
 | `04-school-of-thought.png` | Madhab picker | Evidence for the "built for your school of thought" claim |
 | `05-settings.png` | Settings | Calculation method, theme, per-prayer reminders |
 
-At 9:16 the Times list does not fit on one screen. That is why `03` is scrolled rather than
-a duplicate of `01` — between them the carousel shows the hero, all six times and the PDF
-export, without showing the same thing twice.
+> **This was wrong, and is corrected here rather than quietly dropped.** It used to say the Times
+list does not fit on one screen at 9:16 and that `03` is therefore scrolled. It is not scrolled:
+`01` and `03` are the same view, same scroll position, in the two themes, and both already show
+all six times and the PDF button. So the carousel does spend two of its five slots on one screen,
+which is exactly the fault the paragraph above says the previous set had. It is not worth a
+retake on its own — the screenshots need an emulator, and the dark theme is a real thing to show
+— but if the set is ever recaptured, `03` should be genuinely different: scrolled, or the PDF
+export sheet, or the Ramadan sehri/iftar framing.
 
 ### Colours come from the design system
 

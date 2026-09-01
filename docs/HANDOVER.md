@@ -4271,6 +4271,87 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 
 ## 11. ⚠️ Still pending — the honest list
 
+### 🟢 1 Sept 2026, 12:15 UTC — ROOT CAUSE FOUND. The screenshots were never stale in the Console
+
+**The finding below this one was right that the public listing is serving the old screenshots, and
+wrong about why.** A Console session was opened and the answer is mundane: the corrected screenshots
+were uploaded on 20 Aug and **saved, but never submitted for review**. They have been sitting in
+`Publishing overview → Changes not yet submitted for review` ever since, which is why the store
+listing row shows *Live* **and** *Draft changes* at the same time.
+
+**Corrects the 20 Aug entry further down this file.** That entry states, in bold, that a screenshot
+save "was not gated behind submit for review — Play applied it immediately". **That is wrong.** The
+Console's own footer on the store listing page reads *"If you save, changes will be saved in
+Publishing overview, ready for you to send for review"*, and saving today produced exactly that. A
+store listing change goes through review like any other. Nothing about the 20 Aug save was special,
+and the eleven days of "the corrected screenshots are already visible" in this file were never true.
+
+**What was measured, not assumed, this session:**
+
+| Check | Method | Result |
+|---|---|---|
+| Console's draft phone screenshots vs `docs/store/upload/phone/` | Downloaded the five Console assets at full size, diffed with PIL | **0.0 mean difference on all five**, and in the right order. Nothing to re-upload |
+| Public listing's phone screenshots vs the same local set | Signed-out fetch of the store page, five images pulled from the raw HTML, same diff | 14 to 27 mean per channel on the closest match. Still the old set, as the entry below found |
+| Feature graphic (live vs `upload/feature-graphic/`) | Same diff. **This was the one asset never checked before** | **0.0. Identical** |
+| App icon (live vs `upload/app-icon/`) | Same diff | 0.0. Identical |
+| Short description and app name | Compared to `LISTING.md` | Match, 79/80 and 30/30 |
+| Local screenshots vs the shipped app | The five files were captured 16 Aug (`031c82b`); the last commit touching phone UI is 15 Aug (`77a3879`) | The local set **is** current for 1.2.0. No retake needed, which matters because this session had no `adb`, emulator or Gradle |
+
+#### The full description was wrong too, and in a way that touches a hard rule
+
+Diffing the live description line-for-line against `docs/store/LISTING.md` found **two paragraphs
+missing**, both of them the strengthened religious disclaimer written on 2 Aug in `91ae9c6`. That
+commit says in its own message that the disclaimer now lives in four places which "must move
+together": the in-app dialog, the watch, `docs/privacy.html`, and the Play listing. Three moved. The
+Play listing did not. So for a month the store page has carried the older, weaker wording, which:
+
+- did **not** say the times are not supplied by any mosque, scholar or authority;
+- did **not** say *"Where SajdaTime and your mosque disagree, follow your mosque"*;
+- did **not** carry the no-warranty, no-promise-of-accuracy sentence.
+
+Those are precisely the three things the owner asked for in `91ae9c6` and the reason `CLAUDE.md`
+carries "the religious disclaimer must never be removed, softened, or buried" as a hard rule. It was
+not removed on purpose — the listing simply never received the update — but the effect on a reader is
+the same.
+
+**The Console text is now `LISTING.md`'s text, verified rather than eyeballed.** The two paragraphs
+were replaced in place, leaving the other 3,299 characters byte-identical, and both sides were then
+measured with the same length-and-hash method §LISTING.md describes: **`len=3704
+djb2xor=441829862`**, computed independently in the browser and from the file on disk. The Console's
+own counter reads `3704 / 4000`.
+
+#### State at hand-off
+
+**Submitted by the owner, 1 Sept 2026, 12:20 UTC.** He pressed *Submit 2 changes for review*
+himself, as with the 20 Aug production submission. `Publishing overview` now shows *Changes in
+review* carrying *Change full description* and *Change Phone screenshots*, with Google's
+pre-review quick checks running. Managed publishing is **off**, so approval publishes immediately
+with no second confirmation.
+
+**Nothing will email him when it passes** (§15 lesson 105). The check is the public store page, and
+it must be the pixel diff, not the Console preview — the preview was already trusted once, on
+20 Aug, and was not the thing that was wrong:
+
+```bash
+# five screenshot ids out of the raw HTML, downloaded, diffed against the local set.
+# 0.0 on all five = published. Anything in the 14-27 range = still the old set.
+curl -sL "https://play.google.com/store/apps/details?id=com.sajdatime.app&hl=en_GB&gl=GB" -o live.html
+grep -o 'https://play-lh.googleusercontent.com/[A-Za-z0-9_-]*' live.html | sort -u
+# then fetch each with =w2000 and compare to docs/store/upload/phone/ with PIL
+```
+
+Two things to confirm on that page, not one: the five screenshots, **and** that the description now
+contains *"they are not supplied by any mosque, scholar or authority"*, which is the single cheapest
+string to grep for to prove the disclaimer fix landed.
+
+**One judgment call left for the owner, not acted on.** The full description lists *"A Wear OS app
+and watch tile that work on their own"*. The Wear release is built and cleared but **not submitted**,
+so the listing promises a watch app a new user cannot install today. Removing the line would be
+worse, because the exact phrase "Wear OS" in the live description is the most common Wear rejection
+cause and is checked for at submission. The clean fix is to ship the Wear release (P5 below), not to
+edit the sentence.
+
+
 ### 🔴 PICK UP HERE — 31 Aug 2026, 21:45 UTC
 
 **One action is outstanding in the whole project, and it is a Play Console session only the
