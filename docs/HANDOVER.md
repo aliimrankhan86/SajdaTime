@@ -4278,6 +4278,48 @@ owner can run.** Everything that can be prepared is prepared, and there is no en
 left. Read this block, confirm it against the table below rather than believing it, then help
 him through the Console.
 
+#### 🟥 NEW, 1 Sept 2026 — the live screenshots are the stale set, and this file was wrong
+
+**Checked because the owner asked "are the description and screenshots accurate, check
+everything, don't assume."** They were not. This was found, not assumed either — the live
+listing's five screenshot files were downloaded from
+`https://play.google.com/store/apps/details?id=com.sajdatime.app`, converted from WebP, and
+diffed pixel-for-pixel against `docs/store/upload/phone/`, the set this file has claimed was
+live since the 20 Aug entry below.
+
+| | Live listing shows | Should show (`docs/store/upload/phone/`) |
+|---|---|---|
+| Times screen | **"Greater Manchester"**, no country | "Manchester, United Kingdom" |
+| Madhab step | **Back / Skip** buttons | Back / **Continue** |
+| Settings | No "Match your mosque" row at all | "Match your mosque" row present |
+| Qibla | Old dial style, no N/E/S/W letters | Redesigned dial, cardinal letters |
+| Reminders (Settings) | "How you are told" / "Which prayers" as two rows | "Prayer alerts — All five · Mixed" as one row |
+
+That is, pixel for pixel, **the exact stale set this file's own 20 Aug entry (below) describes
+as replaced**: *"the 5 stale ones (pre-15-Aug Qibla dial, 'Skip' button, 'Greater Manchester'
+without country)"*. The upload evidently did not take, or was reverted, or was saved as a
+draft rather than published — which of those is unknown, because nothing in the Console
+distinguishes them from outside a session, the same shape as lesson 36. **What is not in
+doubt is the pixel diff**: mean per-channel difference against the correct file ranged from
+8 to 199 out of 255 across the five, with the times-screen and madhab-step pairs the worst
+offenders. The description text and the app icon were checked the same way — description
+diffed line-for-line against `docs/store/LISTING.md`, icon diffed to **zero** difference —
+and both are correct. **Only the five phone screenshots are wrong.** The feature graphic was
+not checked.
+
+**Why this is worse than a stale-doc problem.** The listing is currently advertising a
+"Skip" button on the madhab step that no longer exists, and is silently omitting the "Match
+your mosque" feature that the very same listing's "What's new" section names as new. A
+prospective user reads two contradicting descriptions of the same app on one page.
+
+**The fix is a Console session, not a code change.** `Grow → Store presence → Main store
+listing → Phone screenshots`, remove the five current images, upload
+`docs/store/upload/phone/01-times-light.png` through `05-settings.png` **in that filename
+order**. If the 20 Aug entry's claim is right that this applies without a review gate, it
+should be visible on the public listing within minutes; confirm with the same pixel-diff
+method rather than trusting the Console's own preview, since the preview is exactly what
+was trusted on 20 Aug.
+
 #### Confirm the state, do not take it from this file
 
 | Claim | Confirm with | What you should see today |
