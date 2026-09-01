@@ -4278,7 +4278,59 @@ owner can run.** Everything that can be prepared is prepared, and there is no en
 left. Read this block, confirm it against the table below rather than believing it, then help
 him through the Console.
 
-#### 🟥 NEW, 1 Sept 2026 — the live screenshots are the stale set, and this file was wrong
+#### 🔴 SESSION HANDOFF, 1 Sept 2026, 11:00 UTC — read this block before anything below it
+
+**The owner asked for this block specifically, after a session went sideways.** Two things
+went wrong in one sitting and the owner's trust in what he was being told took a real hit.
+Both are now fixed and both are recorded honestly, not smoothed over, because the smoothing
+is what caused the second one.
+
+**1. Wrong terminal command given, and it was already documented as wrong.** The owner was
+told to run `./gradlew installDebug` on the `sajda` phone emulator. It failed:
+`INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 4 is older than current 1001` — 1001
+is the *watch's* `versionCode`, so the phone emulator already had the Wear build sitting on
+it. This exact trap was already written down two sections below, in the build-traps table:
+`:app` and `:wear` share one `applicationId`, so an unscoped `installDebug` runs in both
+modules and installs whichever ran last. **The advice should have been `:app:installDebug`
+from the start**, and checking the traps table before dictating a command would have caught
+it. Fixed and expanded into a proper runbook, *"Getting the app onto an emulator when the
+assistant has no device access"*, immediately below this section.
+
+**2. "I am deleting the pictures" was ambiguous, and it went to the wrong target.** The owner
+meant to clear the screenshot slots in Play Console before uploading the corrected set (the
+task from the entry below this one). What actually happened is the five files were deleted
+from disk, in `docs/store/upload/phone/`, which does nothing to the Console and would have
+destroyed the very files needed for the upload. **They were not lost** — tracked in git, not
+yet committed as deleted, recovered in one command (`git checkout -- docs/store/upload/phone/`)
+and verified present and byte-identical to the originals afterward (`shasum`,
+`b869b4df57c216e98d48fdaf5efa586d823bec8d` for `01-times-light.png`). But the ambiguity
+should have been caught and clarified *before* he acted on it, not after.
+
+**State, confirmed rather than assumed, at hand-off:**
+
+| | State | Confirmed by |
+|---|---|---|
+| Phone app on Play Store | Live, unaffected by any of this | Unchanged since earlier verification |
+| Local screenshot files | **Present, correct, restored** | `ls` shows 5 files; `shasum` matches |
+| Play Console screenshots | **Still the stale set — nothing uploaded yet.** The entry below this one (pixel-diff finding) is still fully open | Not re-checked this session; assume stale until the live page is re-diffed |
+| Emulator `sajda` | Booted, `adb` reachable, `emulator-5554` shows `device` | Owner-pasted terminal output |
+| App on the emulator | **Unknown.** Last confirmed output was the failed unscoped install. The corrected `:app:installDebug` command (with the uninstall-first recovery if still needed) was given but its output was never pasted back before this hand-off | Not confirmed either way — do not assume it worked |
+| Watch release | Built, signed, cleared (A18 passed) — **on hold by the owner's own choice**, unrelated to tonight's mistakes | §11 P5 row, unchanged |
+| Repo | Clean, one commit ahead of `origin/main` (`fd32e53`) at hand-off | `git status` |
+
+**What the next session should do, in order:**
+1. Push (`git push`), if the owner is willing — or note it is still pending if not.
+2. Re-run the pixel-diff check against the live store page before assuming the Console
+   screenshots are still stale or already fixed. Do not carry the finding below forward
+   without re-checking it — it may already have moved.
+3. If the emulator install is still open, use the runbook immediately below this block:
+   `:app:installDebug`, scoped, and paste-react-repeat rather than handing over the whole
+   sequence at once.
+4. **Read the ambiguity the way it actually landed, not the way it was meant.** When the
+   owner describes an action in his own words, confirm the target before he acts, especially
+   for anything irreversible-sounding like "delete."
+
+#### 🟥 1 Sept 2026 — the live screenshots are the stale set, and this file was wrong
 
 **Checked because the owner asked "are the description and screenshots accurate, check
 everything, don't assume."** They were not. This was found, not assumed either — the live
