@@ -7,10 +7,18 @@ This file is loaded automatically. It is deliberately short. **The full handover
 
 ## ⚠️ First thing, every session — before you ask him anything
 
-**Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11 and read the `PICK UP HERE` block at the top
-of it.** It is dated, it names the single next action, and it carries the checks that confirm
-the state instead of asking you to believe it. It is rewritten as part of any commit that moves
-the project, so it will not be the stale sentence this file is forbidden from carrying.
+**Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11 and read the `STATE OF PLAY` block at the top
+of it.** It is dated. It says what is true right now, what is left and whose job each item is,
+how to check every claim without a Play Console session, the traps that have actually cost this
+project time, and what an assistant can and cannot do with the tooling here. Everything below
+its `HISTORY BELOW THIS LINE` marker is the dated record of how the project got here: read it
+for reasoning, never as a task list. The STATE OF PLAY block is rewritten as part of any commit
+that moves the project, so it will not be the stale sentence this file is forbidden from
+carrying.
+
+**Do not invent work from the older blocks, or from any "Not done" list further down §11.** Most
+of it is closed, and the rest is a deliberate non-goal. If the state block leaves you with
+nothing to do, that is the correct answer: ask the owner what he wants next.
 
 **Then confirm what is actually live, before acting on anyone's claim that something is done.**
 Fetch the public listing, signed out of every Google account:

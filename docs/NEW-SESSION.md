@@ -24,10 +24,11 @@ Open the project folder in your assistant and paste this:
 
 ```
 Read CLAUDE.md and then docs/HANDOVER.md before changing anything. Start with the
-block at the top of HANDOVER §11 — that is the current state of play. Then run
-`git log --oneline -10` and the verification command in §9, and tell me what you
-understand the state to be and what you think the next step is, before you touch
-any code.
+STATE OF PLAY block at the top of HANDOVER §11 — that is the current state, and
+everything below its HISTORY marker is a record of how it got there rather than a
+task list. Then run `git log --oneline -10` and the verification command in §9, and
+tell me what you understand the state to be and what you think the next step is,
+before you touch any code.
 ```
 
 You do not need to attach any files. The handover lives inside the repository, so the
@@ -180,3 +181,56 @@ how the watch app once passed every check while being completely unusable.
 ---
 
 *Made with love, free for the Ummah.*
+
+
+---
+
+## What is actually live, and how to see it without any account
+
+This is the one check worth knowing before anything else, because this project has twice
+believed a listing was live when it was not. It needs no credentials and no Play Console
+session:
+
+```bash
+curl -sL -A "Mozilla/5.0" \
+  "https://play.google.com/store/apps/details?id=com.sajdatime.app&hl=en_GB&gl=GB" -o live.html
+```
+
+- **The page rendering at all** means it is a production listing. A closed test 404s to anyone
+  who is not a tester.
+- **The "Updated on" date** moves when a release publishes, and for nothing else.
+- **The text and the images on that page** are the truth about the listing. The Play Console's
+  own preview renders the *draft*, so it can show something the public cannot see.
+
+Three facts that follow, each of which has cost this project real time:
+
+1. **Saving a store listing change does not submit it.** It sits in `Publishing overview` until
+   someone presses *Submit for review*. A listing showing *Live* and *Draft changes* together is
+   the symptom of something saved and forgotten.
+2. **Play sends no email when a review passes.** An empty inbox proves nothing in either
+   direction.
+3. **Compare images by measurement, not by eye.** Fetch a live screenshot at `=w2000` and diff
+   it against `docs/store/upload/` with PIL. Identical is `0.0`. A screenshot from a previous
+   build of the same screen scores in the teens or twenties and looks perfectly fine in a
+   preview.
+
+---
+
+## What an assistant can and cannot do here
+
+Which of these applies depends on how the assistant is connected, so check rather than assume.
+The boundaries themselves do not change.
+
+- **A shell that only reaches the mounted project folder** can read, search and edit files, run
+  `git`, run Python, and use the network. It **cannot** run `adb`, the emulator, or Gradle,
+  because those live outside the mount. So it cannot build, install, or screenshot the running
+  app, and it must not claim to have.
+- **Deleting files in the project folder may be blocked**, including stale `.git/*.lock` files
+  left behind by an interrupted commit. Ask the owner to run one `rm` command rather than
+  engineering around it.
+- **The Play Console can be driven directly in the owner's own Chrome** when a browser tool is
+  available, and that is much better for him than a numbered list of steps. Uploading an `.aab`
+  that way may be blocked, in which case the app bundle is the one file he has to attach
+  himself.
+- **Consent, submit and publish buttons are his**, always. Prepare everything up to the button
+  and hand it over. Agreeing to Google's policies is his signature, not an assistant's.

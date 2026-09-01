@@ -4271,6 +4271,140 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 
 ## 11. ⚠️ Still pending — the honest list
 
+> **This section opens with the current state of play, then the dated record of how the project
+> got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
+> not instructions.**
+
+### 📍 STATE OF PLAY — 1 Sept 2026, 13:00 UTC
+
+**Written for any assistant, on any tool, arriving with no memory of this project.** Read this
+block, then confirm it with the commands in "How to check, rather than believe" below, then ask
+the owner what he wants next. Do not start work from the older blocks in this section: they
+describe problems that are now closed.
+
+#### In one paragraph
+
+SajdaTime is live on Google Play for phones, on version 1.2.0 (`versionCode` 4), in 177
+countries. On 1 Sept the store listing was corrected and published: the full description now
+carries the strengthened religious disclaimer, and the five phone screenshots finally match the
+shipped app. On the same day the Wear OS release was submitted and is **in review**. There is
+**no engineering work outstanding**, no half-finished change, and nothing in the repo waiting to
+be pushed. The project is waiting on Google, and on one physical check only the owner can do.
+
+#### What is true right now
+
+| | State | Confirmed by |
+|---|---|---|
+| Phone app | **Live**, `versionCode` 4 / 1.2.0, 177 countries, full rollout | Public store page, and `Test and release → Production` |
+| Phone store listing | **Correct and live as of 1 Sept.** Description carries the full disclaimer; the five screenshots are the current app | Pixel diff and text diff against the public page, not the Console preview |
+| Feature graphic, app icon, app name, short description | **Correct**, diffed to zero difference against `docs/store/upload/` | 1 Sept check |
+| Wear OS release | **SUBMITTED, IN REVIEW.** `versionCode` 1001 / 1.2.0, four ABIs, target SDK 36, full rollout, 177 countries inherited from the phone app | `Publishing overview → Changes in review`, four items |
+| Play policy status | **No issues.** All App content declarations complete | `Monitor and improve → Policy status`, `Policy and programmes → App content` |
+| Android developer verification | **Registered**, 3 keys, since 31 July. The 30 Sept 2026 deadline is already met, so do not raise it as a task | `Android developer verification → Package names` |
+| Repository | **Clean and pushed.** `main` and `origin/main` in step | `git status`, `git rev-list --left-right --count origin/main...main` |
+| Translations | **English only, deliberately.** Machine translation is forbidden; each language needs a native speaker | `CLAUDE.md` hard rules, §5.16 |
+
+#### What is left, and who it belongs to
+
+There are exactly three open items, and none of them is code.
+
+1. **Google's Wear OS review.** Waiting. Nothing to do but check. **Play sends no email when a
+   review passes** (§15 lesson 105), so an empty inbox proves nothing. The check is the public
+   store page, described below.
+2. **The watch Qibla has never been seen working on real hardware. Owner action, two minutes.**
+   Prayer times on the watch were verified against the phone on his own paired watch on 31 Aug
+   (A18). The compass was not. Every Wear Qibla check to date has run on the Wear AVD, which has
+   no magnetometer and therefore renders the bearing-from-north state rather than the live
+   "facing" one. **The check:** stand still, open Qibla on the watch and on the phone, compare.
+   They should agree. If they do not, the Wear release can be pulled from `Publishing overview`
+   before it publishes. He was told this before submitting and chose to submit anyway, which is
+   a reasonable call, not an oversight.
+3. **A standing health check runs hourly outside this repo** (a scheduled task on the owner's
+   Claude account, not a cron job on his machine). It watches the public store page for the Wear
+   release going live, for the app being removed or suspended, for the disclaimer phrase
+   disappearing from the description, for any of the five old screenshots returning, for new low
+   ratings, and for the privacy policy URL going down. It stays silent unless something changes,
+   and it drops to once a morning after the Wear release lands. **If the owner says he is being
+   notified about the app, that is where it comes from.**
+
+Everything else in this section, and the "Not done" lists further down, are either closed or
+deliberate non-goals. **There is no engineering work waiting for a new session here.** If you
+are looking for something to do, ask him rather than inventing it from an old list.
+
+#### How to check, rather than believe
+
+Every claim above is checkable without a Play Console session and without any credentials. Do
+this before acting on anything in this file.
+
+```bash
+# 1. The repo. Clean, and in step with origin?
+cd ~/Developer/SajdaTime && git status --porcelain && git log --oneline -5
+git rev-list --left-right --count origin/main...main     # "0  0" means in step
+
+# 2. What is actually live. Signed out of every Google account, no credentials needed.
+curl -sL -A "Mozilla/5.0" \
+  "https://play.google.com/store/apps/details?id=com.sajdatime.app&hl=en_GB&gl=GB" -o live.html
+
+# The page renders at all  ->  it is a production listing (a closed test 404s to a non-tester)
+grep -c "Install" live.html
+
+# The corrected disclaimer is live  ->  expect a number greater than 0
+grep -c "not supplied by any mosque, scholar or authority" live.html
+
+# The corrected screenshots are live  ->  expect these five IDs, and none of the old ones
+grep -o 'https://play-lh.googleusercontent.com/[A-Za-z0-9_-]*' live.html | sort -u
+#   correct set begins: HannRxHh  yPYr6RhG  MyGwDS8Y  UojMmMLL  PwdWhWpd
+#   the old stale set began: -2Kei_dj  140ka3qY  cRSY7Knq  gMDcKXHZ  hWZ_VQ90
+
+# Has the Wear release published? The listing starts declaring Wear OS support, and the two
+# round 454x454 watch screenshots appear beside the five 1080x1920 phone ones.
+```
+
+To compare an image properly rather than by eye, fetch it at `=w2000` and diff it against the
+file in `docs/store/upload/` with PIL. **Mean per-channel difference of 0.0 is the standard**,
+because a visually similar screenshot from a previous build scores 14 to 27, which looks fine
+in a preview and is wrong. That is precisely how the stale-screenshot problem hid for eleven
+days.
+
+#### The three traps that have actually cost this project time
+
+Read these before touching the Play Console or believing a status.
+
+1. **"Saved" is not "submitted".** A store listing change saves into `Publishing overview` and
+   sits there until someone presses **Submit for review**. On 20 Aug the corrected screenshots
+   were uploaded, saved, and never submitted, and this file recorded them as live for eleven
+   days. The store listing row reading *Live* **and** *Draft changes* at the same time is the
+   symptom. **Anything not in `Changes in review` or already published is not going anywhere.**
+2. **The Console's own preview is not evidence.** It showed the correct screenshots throughout
+   those eleven days, because it renders the draft. Only the public page counts.
+3. **No email ever arrives when a review passes.** Eleven days were spent waiting on an inbox.
+   The *Updated on* date and the page content are the only signals.
+
+#### What an assistant can and cannot do here, verified 1 Sept 2026
+
+| | |
+|---|---|
+| A chat-bridge shell reaching the mounted project folder | **Can** read, search and edit files, run `git`, run Python, and reach the network. **Cannot** run `adb`, the emulator, or Gradle: they live outside the mount. So it cannot build, install, or take a screenshot of the running app |
+| Deleting files in the project folder | Blocked by default, including stale `.git/*.lock` files. Ask the owner to run one `rm` command rather than trying to work around it |
+| The Play Console | **Can be driven directly in the owner's own Chrome** via a browser tool, which is how the 1 Sept listing fix and the whole Wear submission were done. This is far better for him than dictating steps. **Uploading an `.aab` this way is blocked**, so the app bundle is the one file he has to attach himself |
+| Consent, submit and publish buttons | **His, always.** Opting in to the Wear review policy and pressing *Submit for review* are his signature. Prepare everything up to that button and hand it over |
+
+#### If he asks for the next release
+
+There is no reason to cut one right now. If a change does land, `docs/RELEASING.md` is the
+procedure, the signing key is his alone and must never be requested, and both `versionCode`s
+move together: the phone is at 4, the watch at 1001.
+
+---
+
+### ⬛ HISTORY BELOW THIS LINE
+
+Everything that follows is the dated record of how the project reached the state above. It is
+kept because the reasoning is expensive to rebuild and because several of these blocks record
+mistakes that would otherwise be repeated. **It is evidence, not a task list.** Where an older
+block contradicts the STATE OF PLAY above, the block above is right.
+
+
 ### 🟢 1 Sept 2026, 12:40 UTC — the listing fix IS LIVE, and the Wear release is SUBMITTED
 
 Read this first. Both of the blocks below it are now history rather than open items.
@@ -4446,7 +4580,7 @@ cause and is checked for at submission. The clean fix is to ship the Wear releas
 edit the sentence.
 
 
-### 🔴 PICK UP HERE — 31 Aug 2026, 21:45 UTC
+### ⬛ HISTORY — the former PICK UP HERE, 31 Aug 2026, 21:45 UTC (superseded 1 Sept, see STATE OF PLAY above)
 
 **One action is outstanding in the whole project, and it is a Play Console session only the
 owner can run.** Everything that can be prepared is prepared, and there is no engineering work
