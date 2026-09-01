@@ -4320,6 +4320,32 @@ measured with the same length-and-hash method §LISTING.md describes: **`len=370
 djb2xor=441829862`**, computed independently in the browser and from the file on disk. The Console's
 own counter reads `3704 / 4000`.
 
+#### Everything else in the Console was swept, 1 Sept 2026, and is clear
+
+Asked for directly: *"make sure everything is gone and there is nothing pending."* Checked, one
+page at a time, and recorded here so the next session does not repeat the sweep:
+
+| Area | State |
+|---|---|
+| `Publishing overview` | *Changes in review*, the two store listing items only. Google's pre-review quick checks passed. Nothing else queued, nothing left unsubmitted |
+| `Production` track | Active, latest release **4 (1.2.0)**, 177 countries/regions, rollout complete. Matches `app/build.gradle.kts`. No draft release sitting anywhere |
+| `Monitor and improve → Policy status` | **No policy issues found** |
+| `Policy and programmes → App content` | **All declarations complete.** "You've caught up with everything" — nothing under *Need attention* |
+| Form factors on the production track | Phones, Tablets, Chrome OS, Android XR. **No Wear OS**, consistent with the Wear release never having been added (P5) |
+| Repo | Clean, `main` and `origin/main` both at `da591af`. The owner pushed it himself |
+
+**One thing found that was not on anyone's list, and it is a hard deadline.** A Console
+notification dated 6 Aug, still unread, says every app must be registered for **Android developer
+verification by 30 September 2026** or be *"removed from Google Play globally"*. That is a
+distribution-ending requirement, not an advisory.
+
+**It is already satisfied, verified rather than assumed.** `Android developer verification →
+Package names` lists `com.sajdatime.app` as **Registered**, 3 keys, last updated 31 Jul 2026, and the
+*Identity* tab carries the legal name and address from the developer account. **No action is needed
+before 30 Sept.** It is written down here because the notification will keep looking alarming, and
+because the answer to "do we need to do something about this?" should cost the next session one
+sentence rather than another Console session.
+
 #### State at hand-off
 
 **Submitted by the owner, 1 Sept 2026, 12:20 UTC.** He pressed *Submit 2 changes for review*
