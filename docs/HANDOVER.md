@@ -4271,6 +4271,74 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 
 ## 11. ⚠️ Still pending — the honest list
 
+### 🟢 1 Sept 2026, 12:40 UTC — the listing fix IS LIVE, and the Wear release is SUBMITTED
+
+Read this first. Both of the blocks below it are now history rather than open items.
+
+#### The store listing fix published, confirmed on the public page
+
+Approved and published the same afternoon it was submitted. **Verified by measurement, not by the
+Console's own preview**, which is the trap this project has already paid for twice:
+
+| Check | Result |
+|---|---|
+| Description contains *"not supplied by any mosque, scholar or authority"* | **Present.** The strengthened disclaimer from `91ae9c6` is finally on the store page, a month late |
+| The five stale screenshot asset IDs | **All gone from the page** |
+| The five IDs now serving | `HannRxHh…`, `yPYr6RhG…`, `MyGwDS8Y…`, `UojMmMLL…`, `PwdWhWpd…` — the exact assets diffed at **0.0** against `docs/store/upload/phone/` earlier the same day |
+
+So a new user now sees the current app: "Manchester, United Kingdom", the Continue button, the
+redesigned Qibla dial, and the "Match your mosque" row.
+
+#### The Wear OS release went in the same session
+
+The owner asked for it once the phone side was clean, and it was staged and submitted in one sitting.
+**Four changes are in review**, listed in `Publishing overview → Changes in review`:
+
+1. `Production (Wear OS)` — **1001 (1.2.0), Start full rollout**
+2. `Store listings` — Change Wear OS screenshots
+3. `Advanced settings` — Form factor Wear OS by Google set to opted-in
+4. `Advanced settings` — Start using a dedicated release track for Wear OS
+
+Verified while doing it, rather than assumed:
+
+- The uploaded bundle reports **1001 (1.2.0), API 30+, target SDK 36, four ABIs**, so the
+  **15 Sept 2026 Wear 64-bit deadline is met** by the artefact Google actually received.
+- Wear screenshots accepted at **454 × 454, 1:1**. Note the carousel order came out **Qibla first,
+  Times second**, not the `w1`/`w2` filename order. Cosmetic, and the Console's move control did not
+  reorder them.
+- **The Wear track inherited 177 countries/regions from the phone app.** The empty-countries trap
+  that bit both the closed and production tracks did not fire here, because the Wear track's
+  availability is bound to the phone app's rather than set separately.
+- Release notes written for en-GB, one language, the first-Wear-release wording.
+- Only warning on the release is the usual native-debug-symbols note, identical to every prior
+  release. The `.so` files are AndroidX's own.
+- **AI asset declaration: "Don't label assets."** Asked of the owner rather than decided, and it is
+  accurate: the screenshots are device captures and the icon and feature graphic are drawn by
+  `tools/build-store-assets.sh` from `Color.kt`. Generative AI made none of the images. The AI help
+  in this project is in the code and the prose, which this declaration does not cover.
+
+**The owner pressed both consent buttons himself**, as with 20 Aug: *Opt in and go to overview*,
+which is the agreement to be reviewed against the Wear OS quality guidelines, and *Submit changes
+for review*.
+
+#### The one real gap, stated plainly because it is not covered anywhere else
+
+**The watch Qibla has never been seen working on real hardware.** A18 proved the *times* half on his
+own paired watch on 31 Aug. Every Qibla check on the watch has run on the Wear AVD, which has no
+magnetometer, so it renders the bearing-from-north state rather than the live "facing" one (§10). He
+was told this before submitting and accepted it. **The check, when he next has the watch on:** stand
+still, open Qibla on the watch and on the phone, and compare. They should agree. If they do not, the
+release can be pulled from `Publishing overview` before it publishes, and that is cheaper than a
+correction after.
+
+#### What to do when the Wear review lands
+
+Nothing will email him (§15 lesson 105). Managed publishing is **off**, so approval publishes with no
+second confirmation. The store page is the check, and the signal is different from the phone one:
+the listing gains Wear OS support, and `Test and release → Production → Wear OS only` moves from
+**Inactive** to active with 1001 (1.2.0) available rather than *"Unavailable on Google Play"*.
+
+
 ### 🟢 1 Sept 2026, 12:15 UTC — ROOT CAUSE FOUND. The screenshots were never stale in the Console
 
 **The finding below this one was right that the public listing is serving the old screenshots, and
@@ -4651,7 +4719,7 @@ The detail for each item is in the sections that follow.
 | P2 | ~~**Retake `docs/store/screenshots/`**~~ — **DONE, 16 Aug 2026** (capture) **and 20 Aug 2026** (upload). All five stale phone screenshots replaced on the live store listing — pre-15-Aug Qibla dial, "Skip" button, "Greater Manchester" without country, all gone; see §10 for what each file now shows | ✅ **Uploaded and already live on the listing — Play did not gate this behind review** |
 | P3 | **Tell the testers to update.** The only action that addresses the "why has nothing changed" risk | ✅ **Done, 31 Aug 2026.** Told, and they replied that they have tested 1.2.0 and are happy with the fixes. That reply doubles as the evidence that the production update reached them |
 | P4 | ~~**Apply for production**~~ — **DONE, 16 Aug 2026, GRANTED 20 Aug 2026.** The fourteen days completed (live 31 Jul, day fourteen 14 Aug), the owner submitted the application 16 Aug, and Google's confirmation email arrived 20 Aug. Production access exists | ✅ **Granted** |
-| P5 | **Wear OS release** — separate track, and only after the phone app is live | 🟢 **CLEAR TO UPLOAD, 31 Aug 2026.** A18 passed, so the reason for the pause below is gone. `./tools/ship-wear.sh` ran green, and `wear-release.aab` (`versionCode` 1001) is built, signed and carries `arm64-v8a` and `x86_64`, so the 15 Sept 64-bit deadline is met. What remains is the Console session, which is the owner's. Superseded text follows. ⏸ ~~**PARKED BY THE OWNER, 31 Aug 2026, and this is a decision rather than a backlog item.**~~ The build half is done: `./tools/ship-wear.sh` ran green and `wear-release.aab` (`versionCode` 1001) is built and signed. It is **deliberately not uploaded**, because A18 is unverified and he chose to come back to it. **Do not upload the watch bundle until A18 passes** — an unsynced watch shows Asr about an hour from the phone, and that is the one defect worth holding a release for. A future session finding this "ready to ship" should not ship it |
+| P5 | **Wear OS release** — separate track, and only after the phone app is live | ✅ **SUBMITTED FOR REVIEW, 1 Sept 2026.** Form factor added, screenshots uploaded, dedicated Wear track created, `wear-release.aab` (1001 / 1.2.0) uploaded, opted in and submitted by the owner. Four changes are in review. See the dated block at the top of this section for what was verified and for the one open gap, the watch Qibla on real hardware. Superseded text follows. ~~🟢 **CLEAR TO UPLOAD, 31 Aug 2026.**~~ A18 passed, so the reason for the pause below is gone. `./tools/ship-wear.sh` ran green, and `wear-release.aab` (`versionCode` 1001) is built, signed and carries `arm64-v8a` and `x86_64`, so the 15 Sept 64-bit deadline is met. What remains is the Console session, which is the owner's. Superseded text follows. ⏸ ~~**PARKED BY THE OWNER, 31 Aug 2026, and this is a decision rather than a backlog item.**~~ The build half is done: `./tools/ship-wear.sh` ran green and `wear-release.aab` (`versionCode` 1001) is built and signed. It is **deliberately not uploaded**, because A18 is unverified and he chose to come back to it. **Do not upload the watch bundle until A18 passes** — an unsynced watch shows Asr about an hour from the phone, and that is the one defect worth holding a release for. A future session finding this "ready to ship" should not ship it |
 
 **Waiting on the owner — a decision, not a task**
 
