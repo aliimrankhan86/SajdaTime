@@ -5518,6 +5518,57 @@ Every one of these cost real time. Read before building.
 | **Counting vibrations by counting lines under-reports them** | `dumpsys vibrator_manager \| grep -c <package>` stays flat while the device is plainly buzzing | The aggregated history is capped, so new entries push old ones out and the total stops rising. **Compare timestamps, not counts** — `grep <package>` and read the newest entry. A count that has stopped moving is the tell that the buffer is full, not that the vibrations stopped. Cost a wrong conclusion on 16 Aug 2026 before the timestamps were read. |
 | **The watch app will not launch from `monkey`** | `monkey -p com.sajdatime.app -c android.intent.category.LAUNCHER 1` returns without error and the watch stays on whatever it was showing | Launch the activity explicitly: `adb -s emulator-5556 shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity`. Note the class is **`WearMainActivity`**, not `MainActivity` — which is also the string that tells you which module is installed under the shared `applicationId` (see the rows above). |
 
+### Getting the app onto an emulator when the assistant has no device access
+
+**An assistant working through a chat/Console bridge (Cowork, or similar) cannot run `adb`,
+the emulator binary, or Gradle itself.** Verified, not assumed, on 1 Sept 2026: the bridge's
+shell only sees the mounted project folder, and the Android SDK, `adb`, and the emulator all
+live outside it on the real machine. Do not spend a session trying `device_bash` for these —
+it will not reach them. **The pattern that works is dictation:** give the owner one command
+block, ask for the exact output pasted back, react to that output, repeat. This is the same
+shape as the Play Console walkthrough below and should be treated the same way — never a
+numbered list handed over all at once (§11, "How to help, learned the hard way on 31 Aug").
+
+The full sequence, in order, each step waiting for pasted output before the next:
+
+```bash
+# 1. JVM — Gradle needs 17+; this machine's default `java` is 11
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+
+# 2. adb daemon — frequently not running, and installDebug fails opaquely if it is not
+export ANDROID_HOME=~/Library/Android/sdk
+$ANDROID_HOME/platform-tools/adb kill-server
+$ANDROID_HOME/platform-tools/adb start-server
+$ANDROID_HOME/platform-tools/adb devices          # expect "emulator-5554  device"
+
+# 3. Boot the AVD, if it is not already up (this opens a real window — separate step)
+$ANDROID_HOME/emulator/emulator -avd sajda -no-snapshot-load -no-audio &
+
+# 4. Install — SCOPED to the module, never bare `installDebug`
+cd ~/Developer/SajdaTime
+./gradlew :app:installDebug
+```
+
+**Step 4 is scoped on purpose and this cost a session to rediscover.** `:app` and `:wear`
+share one `applicationId`, so a bare `./gradlew installDebug` runs the task in *both* modules
+and Gradle installs whichever ran last onto every connected device — commonly the watch
+build landing on the phone emulator. That is exactly the trap two rows below in the table,
+`INSTALL_FAILED_VERSION_DOWNGRADE: Update version code 4 is older than current 1001` — 1001
+is the *watch's* `versionCode`, so the phone AVD already had the Wear build sitting on it.
+
+**If step 4 still reports a downgrade**, something is already installed under
+`com.sajdatime.app`. Check which, then remove it:
+
+```bash
+$ANDROID_HOME/platform-tools/adb shell cmd package resolve-activity --brief com.sajdatime.app
+# answers WearMainActivity -> the watch build is on there, not MainActivity
+$ANDROID_HOME/platform-tools/adb uninstall com.sajdatime.app
+./gradlew :app:installDebug
+```
+
+Uninstalling wipes onboarding, so the app will ask its setup questions again on first
+launch — expected, not a bug.
+
 ### The architecture PDF is generated, never hand-made
 
 ```bash

@@ -142,6 +142,14 @@ session inherits it instead of relearning it.
   format that fits him. **Stop before any submit, publish, purchase or consent button and hand
   it to him** — the 20 Aug production submission was deliberately left for him to press, and
   agreeing to Google's policies is his signature, not an assistant's.
+- **The same dictation pattern applies to the emulator and `adb`, not only the Play Console.**
+  Verified 1 Sept 2026: a chat/Console bridge session cannot run `adb`, the emulator, or
+  Gradle — its shell only reaches the mounted project folder, nothing else on the machine.
+  Give one command block, ask him to paste back exactly what it printed, react to that,
+  repeat. Do not hand over a multi-step sequence and assume it ran. The full sequence,
+  including the module-scoping trap that cost a session, is in
+  [`docs/HANDOVER.md`](docs/HANDOVER.md), "Getting the app onto an emulator when the
+  assistant has no device access", just above the build-traps table.
 - **He does have real devices, and they find things the emulators cannot.** A Redmi Note 13
   Pro (HyperOS) and a Galaxy S23 Ultra (One UI), which he will plug in if asked. Every
   alarm-reliability fact this project knows came off the Redmi, and the S23 Ultra found both
