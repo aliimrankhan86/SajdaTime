@@ -4311,14 +4311,13 @@ There are exactly three open items, and none of them is code.
 1. **Google's Wear OS review.** Waiting. Nothing to do but check. **Play sends no email when a
    review passes** (§15 lesson 105), so an empty inbox proves nothing. The check is the public
    store page, described below.
-2. **The watch Qibla has never been seen working on real hardware. Owner action, two minutes.**
-   Prayer times on the watch were verified against the phone on his own paired watch on 31 Aug
-   (A18). The compass was not. Every Wear Qibla check to date has run on the Wear AVD, which has
-   no magnetometer and therefore renders the bearing-from-north state rather than the live
-   "facing" one. **The check:** stand still, open Qibla on the watch and on the phone, compare.
-   They should agree. If they do not, the Wear release can be pulled from `Publishing overview`
-   before it publishes. He was told this before submitting and chose to submit anyway, which is
-   a reasonable call, not an oversight.
+2. ~~The watch Qibla has never been seen working on real hardware.~~ ✅ **CLOSED, 1 Sept 2026.**
+   He tested the watch himself and reported it fine, the Qibla included, and asked explicitly
+   that it not be raised again. **Do not put it back on any list.** For the record of what the
+   evidence actually is: prayer times on the watch were verified against the phone on 31 Aug
+   (A18), the compass was verified by him on 1 Sept, and both are his word rather than a capture,
+   which for a check needing his hardware and his account is the intended evidence and always
+   was.
 3. **A standing health check runs hourly outside this repo** (a scheduled task on the owner's
    Claude account, not a cron job on his machine). It watches the public store page for the Wear
    release going live, for the app being removed or suspended, for the disclaimer phrase
@@ -4395,6 +4394,37 @@ Read these before touching the Play Console or believing a status.
 | Deleting files in the project folder | Blocked by default, including stale `.git/*.lock` files. Ask the owner to run one `rm` command rather than trying to work around it |
 | The Play Console | **Can be driven directly in the owner's own Chrome** via a browser tool, which is how the 1 Sept listing fix and the whole Wear submission were done. This is far better for him than dictating steps. **Uploading an `.aab` this way is blocked**, so the app bundle is the one file he has to attach himself |
 | Consent, submit and publish buttons | **His, always.** Opting in to the Wear review policy and pressing *Submit for review* are his signature. Prepare everything up to that button and hand it over |
+
+#### Standing instructions from the owner, 1 Sept 2026
+
+These are his words and they govern how this project is worked on. They are not suggestions.
+
+- **The aim is to get everything live and ready for other people to use, with the latest of
+  everything related to the app.** Judge any piece of work against that. Something correct but
+  unpublished is not done.
+- **Watch testing is finished. Do not raise it again.**
+- **Play's edge-to-edge advisories on release 4 are not a problem for now.** They are cosmetic,
+  they do not block anything, and they were considered and deferred rather than missed. Leave
+  them until a release is being cut for another reason.
+- **Do the work for him and ask the minimum of him.** Where the Play Console can be driven in
+  his own Chrome, drive it rather than dictating steps, and leave him only the consent and
+  submit presses. Do not hand him numbered lists to follow.
+- **Do not use the Figma, Gmail or Google Drive connectors for this project.**
+
+#### Committing from an assistant session, because git locks will bite you
+
+An assistant working through a mounted folder usually cannot delete files, so git's own
+`.git/index.lock` and `.git/HEAD.lock` survive every command and block the next one. Do not try
+to engineer around it. Write the commit message to `COMMIT_MSG.txt` in the project root and give
+him this single line, which clears the locks, commits, tidies up and pushes:
+
+```bash
+cd ~/Developer/SajdaTime && rm -f .git/index.lock .git/HEAD.lock && git commit -F COMMIT_MSG.txt && rm COMMIT_MSG.txt && git push
+```
+
+Note the paths are spelled out rather than globbed: `rm -f .git/*.lock` fails under zsh when
+nothing matches. Use `git --no-optional-locks` for your own status and log checks so read-only
+commands stop creating locks in the first place.
 
 #### If he asks for the next release
 
