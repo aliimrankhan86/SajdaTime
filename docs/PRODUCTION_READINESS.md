@@ -170,7 +170,10 @@ as one number.
   `./tools/wear-verify.sh`, 24 captures across both round sizes and both font scales, 24/24
   pass. It caught a regression the phone-side verification could not have: the reworded string
   wrapped to a fourth line and the watch face clock printed through it. Fixed and re-measured.
-  Still **emulator only** — there is no physical watch.
+  ~~Still **emulator only** — there is no physical watch.~~ **Superseded 31 Aug / 1 Sept 2026.**
+  The owner does have a watch. His paired watch and his phone were shown to agree on Asr on
+  31 Aug, and he checked the watch himself, Qibla included, on 1 Sept and reported it fine.
+  **Watch testing is closed — do not raise it.**
 
 ---
 

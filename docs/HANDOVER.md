@@ -4406,8 +4406,23 @@ trade-off to put to him first.
   risk of missing the 15 Sept 64-bit deadline. **It stays silent unless one of those fires.**
   **If he says he is being notified about the app, that is where it comes from.**
 
-  **The repo's own docs were swept on 2 Sept for anything that contradicted this block**, and
-  four stale claims were corrected in place rather than merely noted. `tools/ship-wear.sh` was
+  **Watch testing is closed, and on 2 Sept every document that still implied otherwise was
+  annotated.** This mattered more than it looks: six separate places still carried sentences
+  like *"the phone-to-watch sync has never been observed working"*, *"the watch Qibla has never
+  been seen working on real hardware"* and *"there is no physical watch"*, and a new session
+  grepping the repo would have found them and put a watch check in front of the owner — the one
+  thing he has asked never to happen again. Each is now struck through or banner-marked with the
+  date it closed, and the fact was added to `CLAUDE.md`'s hard rules, which loads automatically,
+  so it is known before any doc is read. The places were: `docs/RELEASING.md` ("A18 is not
+  optional"), `docs/AFTER_THE_TEST.md` (twice — the to-do list and the one-minute check),
+  `docs/PRODUCTION_READINESS.md` ("emulator only"), and `docs/HANDOVER.md` itself (the "one real
+  gap" block, old item 7, and the A18 assignment table). **The evidence they were waiting for
+  exists:** his own paired watch and phone agreed on Asr on 31 Aug with the phone set to Hanafi,
+  which is exactly the comparison those documents specify, and he checked the rest of the watch
+  including the Qibla on 1 Sept.
+
+  **The repo's own docs were swept on 2 Sept for anything else that contradicted this block**,
+  and four further stale claims were corrected in place rather than merely noted. `tools/ship-wear.sh` was
   the dangerous one: its step 4 still opened with *"pair a watch and check the sync, it has
   never been proved to work"* and then walked through the six-item Console setup. A session
   running it would have asked him to re-test the watch, which he has forbidden, and to redo a
@@ -4756,7 +4771,13 @@ Verified while doing it, rather than assumed:
 which is the agreement to be reviewed against the Wear OS quality guidelines, and *Submit changes
 for review*.
 
-#### The one real gap, stated plainly because it is not covered anywhere else
+#### The one real gap as it stood on 1 Sept — ✅ CLOSED later the same day
+
+> **CLOSED, 1 Sept 2026, and it must not be reopened.** Hours after this was written the owner
+> checked the watch himself, the Qibla included, reported it fine, and asked explicitly that
+> watch testing not be raised again. The paragraph below is kept as the record of what was
+> honestly unknown at submission time. **Do not act on it, and do not put its check in front of
+> him.**
 
 **The watch Qibla has never been seen working on real hardware.** A18 proved the *times* half on his
 own paired watch on 31 Aug. Every Qibla check on the watch has run on the Wear AVD, which has no
@@ -5046,7 +5067,7 @@ things, and it is worth knowing which before picking any of them up:
 | | Kind | What that means |
 |---|---|---|
 | P1, P3, P4, P5, and P2's upload | **Owner actions in the Play Console** | An AI cannot do these and should not try. They need his account, and P1 needs the signing key, which `docs/RELEASING.md` puts off-limits to everyone but him |
-| A18 | **Owner action on his own devices** | Assigned 16 Aug; he said he would pair a watch himself |
+| A18 | ~~**Owner action on his own devices**~~ ✅ **DONE, 31 Aug 2026** | Assigned 16 Aug; he paired a watch himself and reported the phone and watch agreeing on Asr. Closed — do not reassign it |
 | A14, A17, the Britain default | **Waiting on a decision, a person, or evidence** | Not buildable today. A17 needs a human translator, not a model |
 
 **So there is no engineering work outstanding.** If you are a new session looking for
@@ -5917,9 +5938,17 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
    minute corrections plus a −2..+2 day Hijri shift, applied on every path including the ones
    that bypass adhan, clamped on read rather than trusted, and covered by `AdjustmentTest`
    (11 tests). §5 and the settings table in §4.
-7. **The phone↔watch Data Layer sync has never been observed working.** Both sides are
+7. ~~**The phone↔watch Data Layer sync has never been observed working.**~~ ✅ **CLOSED,
+   31 Aug 2026 (A18).** The owner ran the comparison on his own paired watch: phone set to
+   Hanafi, and the two agreed on Asr. The sync works on real hardware. He checked the rest of
+   the watch, Qibla included, on 1 Sept and asked that watch testing not be raised again.
+   **This item is history — do not act on it.** The original text follows because the bug it
+   describes is the worst this project has had and the reasoning is worth keeping.
+
+   Both sides are
    implemented against the shared `WatchSyncContract` and unit-tested, but the two emulators
-   were never actually paired, so a real phone→watch settings push is **unverified**. The
+   were never actually paired, so a real phone→watch settings push was **unverified at the
+   time this was written**. The
    phone emulator has no Wear companion app installed, which is why: `dumpsys` on the watch
    reports `0 connected out of 1`. Pairing needs a Play-services phone image plus the Wear
    OS companion app, and is the one setup step that would let this finally be tested.

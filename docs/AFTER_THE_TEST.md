@@ -43,11 +43,11 @@ reason.
 If production is granted, that build goes to **Production → Create release** rather than the
 closed track, and the closed test can keep running ahead of it as a beta if you want it to.
 
-**Whenever you get to it, no rush:**
+**Nothing is asked of you here any more:**
 
-- **Pair a watch and compare Asr.** The one-minute check is written out further down, under
-  *"The one-minute check, for when you have paired a watch"*. Just tell me "same" or
-  "different".
+- ~~**Pair a watch and compare Asr.**~~ ✅ **DONE, 31 Aug 2026 — you reported "same".** The
+  sync works on real hardware, and on 1 Sept you checked the rest of the watch including the
+  Qibla and reported it fine. **Watch testing is closed and will not be asked again.**
 
 **Not yours, and not urgent — for the record:**
 
@@ -262,7 +262,13 @@ account, and I will not sign into your account. That is the one job on this list
 be yours — and you have said you will do it, so it is written down as yours rather than left
 looking undone.
 
-### The one-minute check, for when you have paired a watch
+### ✅ The one-minute check — DONE, 31 Aug 2026. Nothing here is asked of you
+
+> **You have already done this and it passed.** On 31 Aug your paired watch and your phone
+> agreed on Asr with the phone set to Hanafi, which is exactly what this check is for, and on
+> 1 Sept you checked the rest of the watch including the Qibla and reported it fine. **No
+> further watch testing is wanted or expected.** This section stays only so the method survives
+> for a future change that touches the phone-to-watch sync.
 
 You do not need to test the watch thoroughly. **One comparison answers it**, and it is the
 same one that caught the worst bug this project has ever had.

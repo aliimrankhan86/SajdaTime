@@ -1048,11 +1048,18 @@ run it by hand, the build step alone is:
 export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew clean test lint :wear:bundleRelease
 ```
 
-### A18 is not optional, and it guards the worst failure this release could have
+### A18 — ✅ DONE, 31 Aug 2026. Kept as the procedure, not as an outstanding check
 
-**The phone-to-watch settings sync has never been observed working end to end.** If it does not
-work, the watch calculates on its own Shafi'i default while the phone is set to Hanafi, and the
-two disagree about **Asr by roughly an hour**. That is not a minor defect. A prayer app that
+> **CLOSED. Do not ask the owner to do this.** A18 was carried out on 31 Aug 2026 on his own
+> paired watch: the phone was set to Hanafi and the two agreed on Asr, so the sync works. He
+> then checked the whole watch himself on 1 Sept, the Qibla included, reported it fine, and
+> asked that watch testing not be raised again. Everything below is retained because it is the
+> right check to run *if a future change touches the sync*, and because the reasoning explains
+> why this one comparison matters more than a thorough test. **It is not work waiting to be
+> done.** Current state is always `docs/HANDOVER.md` §11 STATE OF PLAY.
+
+The reason it mattered: if the sync does not work, the watch calculates on its own Shafi'i
+default while the phone is set to Hanafi, and the two disagree about **Asr by roughly an hour**. That is not a minor defect. A prayer app that
 contradicts itself on the same wrist is worse than no watch app at all, and it is the exact
 symptom that exposed this problem the first time (§11 item 7).
 

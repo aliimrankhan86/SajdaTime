@@ -84,6 +84,16 @@ session inherits it instead of relearning it.
 
 ## Hard rules — these are not preferences
 
+- **Watch testing is finished. Never ask him to test the watch.** He tested it himself on
+  1 September 2026, the Qibla included, reported it fine, and asked explicitly that it not be
+  raised again. The times half was proved separately on 31 Aug, when his own paired watch and
+  his phone were shown to agree on Asr (handover A18). Older documents in `docs/` still contain
+  sentences like *"the phone-to-watch sync has never been observed working"* and *"the watch
+  Qibla has never been seen on real hardware"*; every one of them is dated, superseded, and
+  annotated as such. **They are history. Do not act on them, and do not put a watch check in
+  front of him on their authority.** Raising it again spends trust that a real defect report
+  will need.
+
 - **The religious disclaimer must never be removed, softened, or buried**, and the dua
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
   and never nagged.
