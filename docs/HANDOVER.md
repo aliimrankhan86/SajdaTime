@@ -4406,6 +4406,18 @@ trade-off to put to him first.
   risk of missing the 15 Sept 64-bit deadline. **It stays silent unless one of those fires.**
   **If he says he is being notified about the app, that is where it comes from.**
 
+  **The repo's own docs were swept on 2 Sept for anything that contradicted this block**, and
+  four stale claims were corrected in place rather than merely noted. `tools/ship-wear.sh` was
+  the dangerous one: its step 4 still opened with *"pair a watch and check the sync, it has
+  never been proved to work"* and then walked through the six-item Console setup. A session
+  running it would have asked him to re-test the watch, which he has forbidden, and to redo a
+  submission already in review. It now says the setup is done, says not to raise watch testing,
+  and describes only what a *future* Wear release needs. `docs/RELEASING.md` had three unticked
+  boxes for work long finished (production access, the production rollout, the Wear release) and
+  a quote block still saying the form factor was "deliberately not clicked"; all four are now
+  dated and marked closed. **If you find another doc that disagrees with this block, the block
+  is right — fix the doc rather than the block.**
+
   Its prompt was rewritten on 2 Sept to carry the verified baseline above, the corrected
   submission time, and an explicit list of settled matters it must never raise: watch testing,
   the edge-to-edge advisories, developer verification, whether the app is public, and building

@@ -790,8 +790,13 @@ possible answer to that suspicion.
    simplification and is known to be slightly wrong (see "Who the testers are" in Step 0):
    a non-Gmail Google account can work. It is phrased that way because the failure is
    silent and the accurate version generates confused replies.
-9. ⬜ Apply for production access, then **Production → Create release** and roll out.
-10. ⬜ Second release for the watch, once Play unlocks the Wear OS form factor — see below.
+9. ✅ **DONE, 20 Aug 2026** — production access applied for and granted, **Production →
+   Create release** run, release `4 (1.2.0)` rolled out in full to 177 countries. Confirmed
+   still live 2 Sept 2026.
+10. ✅ **DONE, 1 Sept 2026** — the Wear OS form factor was added, a dedicated Wear track
+   created, the Wear screenshots uploaded and `1001 (1.2.0)` submitted. **In review with
+   Google as of 2 Sept.** The procedure below is kept because it is the procedure, not
+   because it is outstanding.
 
 ### The watch bundle does NOT go in the same release
 
@@ -1166,14 +1171,20 @@ to check and no notification. Everything below follows from that.
 1. ✅ **Twelve or more opted in.** Cleared. Note that the Testers tab's 24 is *addresses
    added*, not opt-ins — do not confuse the two (§15 lesson 36), and note that Google sends
    the people on that list nothing at all (§15 lesson 35).
-2. ⏳ **Fourteen consecutive days with twelve or more still opted in.** The long pole,
+2. ✅ **DONE, Aug 2026.** **Fourteen consecutive days with twelve or more still opted in.** The long pole,
    and the one thing that cannot be shortened. Aim well above twelve: the count is of
    testers who *stay*, and Google's rejection email leads with *"Testers were not engaged
    with your app"*, so they have to use it rather than merely accept. Ask them to open it,
    swing the compass, change the madhab, export a PDF — see the risk note in Step 0, which
    is specifically about this app.
-3. ⬜ **Apply for production access**, answer the three-part form (Step 0), wait roughly
-   another 7 days, then **Production → Create release**.
+3. ✅ **DONE, 20 Aug 2026.** **Apply for production access**, answer the three-part form
+   (Step 0), wait roughly another 7 days, then **Production → Create release**. Access was
+   granted and release `4` published; the app has been publicly installable since.
+
+> **This whole numbered list is closed and is kept as the record of how production access was
+> won. It is not a task list.** The 12-testers-for-14-days rule gates *applying* for production
+> access on a new personal developer account, and that application succeeded on 20 Aug 2026. Do
+> not re-raise it. Current state is always `docs/HANDOVER.md` §11 STATE OF PLAY.
 
 Nothing else is waiting on anyone. Everything that can be prepared is in the repo: the live
 privacy policy, the store screenshots, the icon, the feature graphic, all the listing text,
@@ -1185,6 +1196,11 @@ the Gradle signing wiring, and both signed bundles.
 > satisfied that gate. The page now lists **Android XR · Active** (a default, not something
 > we asked for — it is why the track summary reads "Phones, Tablets, Chrome OS, Android XR")
 > and offers **+ Add form factor**, enabled.
+>
+> **SUPERSEDED, 1 Sept 2026.** Everything from here to the end of this quote was written when
+> the form factor had not been added. It has been: the owner added Wear OS, created the
+> dedicated track, uploaded the 454×454 screenshots and submitted `1001 (1.2.0)`, which has been
+> in review since. Read the rest as the record of the decision to wait, not as work to do.
 >
 > **Deliberately not clicked.** Adding a form factor is a configuration change that creates
 > a pending change to submit, and it belongs to the owner, not to an agent poking at a
