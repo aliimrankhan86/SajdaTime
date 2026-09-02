@@ -4275,7 +4275,240 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY — 1 Sept 2026, 13:00 UTC
+### 📍 STATE OF PLAY — 2 Sept 2026
+
+**Written for any assistant, on any tool, arriving with no memory of this project.** Every claim
+in this block was re-verified from scratch on 2 Sept against the live store page, the Play
+Console itself, and a clean build — not carried forward from the previous block. Where the two
+disagree, this one is right and the discrepancy is called out by name. The source for each fact
+is cited inline: the command that produced it, the Console field it was read from, or the file
+and line.
+
+#### Remaining human-only actions
+
+Only one thing is open, and no script, API or assistant can move it.
+
+1. **Wait for Google's Wear OS review.** Submission 4 went in on 1 Sept 2026 at 12:24 on the
+   Console clock and reads *In review* (`Publishing overview → Submission activity`, row 4).
+   Review is a human decision at Google's pace, hours to days. There is nothing to press, fix
+   or resubmit, and **Play sends no email when a review passes** (§15 lesson 105), so an empty
+   inbox means nothing. To check it in ten seconds with no login: fetch
+   `https://play.google.com/store/apps/details?id=com.sajdatime.app` and look at **Updated on**.
+   It reads *20 Aug 2026* today. **When it moves, the Wear release has published** — that date
+   moves for a release publishing and for nothing else. A store-listing change does not move it,
+   which is why it still says 20 Aug even though the listing was corrected and published on
+   1 Sept.
+
+That is the entire list. There is no engineering work outstanding, nothing half-finished, and
+nothing waiting to be pushed. **If this leaves you with nothing to do, that is the correct
+answer — ask the owner what he wants next rather than inventing work from the history below.**
+
+#### In one paragraph
+
+SajdaTime is **live on Google Play production for phones**, publicly visible and installable by
+anyone — not a test track. Version 1.2.0 (`versionCode` 4), full roll-out, 177 of 177 countries,
+live since 20 Aug 2026. The store listing is correct and published: the description carries the
+full religious disclaimer and the five phone screenshots are pixel-identical to the repo
+originals. The Wear OS release (`versionCode` 1001, same 1.2.0) was submitted on 1 Sept and is
+in review. Play reports no policy issues and no outstanding declarations. The project is waiting
+on Google and on nothing else.
+
+#### What is true right now, and how each line was checked
+
+| | State | Evidence, 2 Sept 2026 |
+|---|---|---|
+| Phone app | **Live in production.** `versionCode` 4 / 1.2.0, full roll-out, 177 of 177 countries, released 24 Aug 10:31 | `Test and release → Production` (form factor *Phones, Tablets, Chrome OS, Android XR*): "Active · Latest release: 4 (1.2.0) · 177 countries/regions · 21 installs"; the release reads "Available on Google Play · 1 version code". No staged-rollout control is shown, which is what a completed full roll-out looks like |
+| Publicly installable by anyone | **Yes.** Not gated to testers | `curl` of the public listing signed out of every account returns HTTP 200 and 1,161,231 bytes with an Install button. A closed test 404s a non-tester. Console app row reads App status **Production** |
+| Phone store listing | **Correct and published.** Description carries the full disclaimer and the dua paragraph; the five screenshots are the shipped app | Description extracted from the live page and read in full. All five screenshots fetched at `=w2000` and diffed against `docs/store/upload/phone/*.png` with Pillow: **mean per-channel difference 0.0000 on every one** |
+| Wear OS release | **In review**, submitted 1 Sept 12:24 (Console clock). `versionCode` 1001 / 1.2.0, full roll-out, 177 countries, 81 supported devices | `Test and release → Production` with the form-factor selector on *Wear OS only*: "Active · Release 1001 (1.2.0) in review · 177 countries/regions". `Publishing overview` banner: "Your changes are now in review" |
+| Nothing sitting unsubmitted | **Confirmed.** `Publishing overview` has a *Changes in review* section and **no** *ready to send for review* section | The 20 Aug trap (saved but never submitted) is not repeating. Managed publishing is **off** |
+| Play policy status | **No issues** | `Monitor and improve → Policy status`: "No policy issues found" |
+| App content declarations | **All complete** | `Policy and programmes → App content → Need attention` is empty: "You've caught up with everything" |
+| Android developer verification | **Registered.** The 30 Sept 2026 deadline is already met — do not raise it as a task | Console home banner: "All of your apps have been successfully registered to meet Android developer verification requirements" |
+| Privacy policy URL | **Up** | `curl -I https://aliimrankhan86.github.io/SajdaTime/privacy.html` → HTTP 200 |
+| Repository | **Clean and pushed** | `git status --porcelain` empty; `git rev-list --left-right --count origin/main...main` → `0 0`; HEAD `981091a` |
+| Build | **Green.** 145 tests, 0 failures; 0 lint issues; both release bundles build and sign | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` exit 0. Per module: core 83, app 50, wear 12 tests. `lint-results-debug.xml` reports 0 issues in all three |
+| Translations | **English only, deliberately.** Machine translation is forbidden | `CLAUDE.md` hard rules, §5.16 |
+
+#### Two things the previous block got wrong, corrected here
+
+1. **The Wear submission time.** The 1 Sept block said "in review from 1 Sept 11:35 UTC". The
+   Console's own ledger disagrees: `Publishing overview → Submission activity` records
+   **submission 4 at 1 Sept 2026, 12:24**, and 11:57 belongs to **submission 3**, the store
+   listing fix, which is separately marked *Published*. 11:17 is when the `1001` bundle was
+   uploaded, which is a third event again. The Console displays times without a zone label and
+   the machine runs on BST, so treat these as UK local, not UTC. Use the ledger, not a
+   remembered number.
+2. **"Google's pre-review quick checks passed."** Nothing in the Console reports quick-check
+   outcomes after the fact. What is actually observable is the banner text, and it currently
+   reads *"Your changes are now in review"*. That is the evidence; the quick-check claim was an
+   inference presented as a reading.
+
+#### The Play publishing pipeline: there isn't one, and that is on purpose
+
+Checked exhaustively on 2 Sept so no future session repeats the hunt:
+
+- **No fastlane** — no `Fastfile`, `Appfile` or `fastlane/` anywhere in the repo; the `fastlane`
+  binary is not installed.
+- **No Gradle Play Publisher** — `com.github.triplet.play` appears in no build script, and the
+  root `build.gradle.kts` declares only the Android and Compose plugins.
+- **No CI** — there is no `.github/` directory at all.
+- **No service-account credentials** — nothing matching a Play API service account under
+  `~/Developer`, `~/.config` or `~/.gradle`; `gcloud` is not installed.
+- **Therefore the Google Play Developer API is not configured**, and no track, release or
+  rollout state can be read or written programmatically. Everything recorded above was read
+  from the Console UI in the owner's own Chrome.
+
+**This is a deliberate non-goal, not a gap to close.** Wiring up the Developer API would mean
+minting a Google Cloud service account and storing a long-lived JSON key beside a project whose
+whole premise is that it holds no credentials it does not need. The app ships a few times a
+year, the `.aab` has to be attached by hand anyway (browser automation cannot upload it), and
+the consent and submit presses are the owner's signature either way. The automation would save
+one upload and add a permanent secret. If a future session is ever asked to add it, that is the
+trade-off to put to him first.
+
+#### Loose ends that are not problems
+
+- **The closed-testing Alpha track is still active on `versionCode` 2 / 1.1.0** (last updated
+  31 Jul 2026, 24 testers on the *sajdatime - testers* email list). It is stale but harmless:
+  Play serves each user the highest version code they are eligible for, so a tester on that
+  track gets production `4` regardless. Leave it unless he asks.
+- **The 12-testers-for-14-continuous-days rule is moot.** It gates *applying* for production
+  access on a new personal developer account. That access was granted, and a production release
+  has been live since 20 Aug. The tester list stands at 24. Nothing about it is outstanding.
+- **Two edge-to-edge advisories on release 4** (`Production → Release dashboard`, "2 actions
+  recommended"). Cosmetic, non-blocking, and **explicitly deferred by the owner**. Do not raise
+  them until a release is being cut for another reason.
+- **A standing health check runs hourly outside this repo** — a scheduled task on the owner's
+  Claude account, not a cron job on his machine. It watches the public store page for the Wear
+  release going live, for the app being removed or suspended, for the disclaimer phrase
+  disappearing, for old screenshots returning, for new low ratings, and for the privacy policy
+  URL going down. It is silent unless something changes. **If he says he is being notified about
+  the app, that is where it comes from.**
+
+#### How to check all of this yourself, without a Play Console session
+
+```bash
+# 1. The repo. Clean, and in step with origin?
+cd ~/Developer/SajdaTime && git --no-optional-locks status --porcelain
+git --no-optional-locks rev-list --left-right --count origin/main...main   # "0  0" means in step
+
+# 2. The build. This is the project's definition of finished.
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+./gradlew clean test lint :app:bundleRelease :wear:bundleRelease
+
+# 3. What is actually live. Signed out of everything, no credentials needed.
+curl -sL -A "Mozilla/5.0" \
+  "https://play.google.com/store/apps/details?id=com.sajdatime.app&hl=en_GB&gl=GB" -o live.html
+
+grep -o "Updated on[^<]*<[^>]*>[^<]*" live.html   # 20 Aug 2026 -> Wear not yet published
+grep -c "Install" live.html                        # renders at all -> production, not a closed test
+grep -c "not supplied by any mosque, scholar or authority" live.html   # >0 -> disclaimer is live
+
+# The five correct screenshot IDs begin: HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd
+# The old stale set began:               -2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90
+grep -o 'https://play-lh.googleusercontent.com/[A-Za-z0-9_-]*' live.html | sort -u
+```
+
+To compare an image properly rather than by eye, fetch it at `=w2000` and diff it against the
+file in `docs/store/upload/` with Pillow. **Mean per-channel difference of 0.0 is the standard**,
+because a visually similar screenshot from a previous build scores 14 to 27, looks fine in a
+preview, and is wrong. That is exactly how the stale-screenshot problem hid for eleven days.
+All five scored 0.0000 on 2 Sept.
+
+#### The four traps that have actually cost this project time
+
+Read these before touching the Play Console or believing a status.
+
+1. **"Saved" is not "submitted".** A store listing change saves into `Publishing overview` and
+   sits there until someone presses **Submit for review**. On 20 Aug the corrected screenshots
+   were uploaded, saved, and never submitted, and this file recorded them as live for eleven
+   days. The store listing row reading *Live* **and** *Draft changes* at the same time is the
+   symptom. **Anything not in `Changes in review` or already published is not going anywhere.**
+2. **The Console's own preview is not evidence.** It showed the correct screenshots throughout
+   those eleven days, because it renders the draft. Only the public page counts.
+3. **No email ever arrives when a review passes.** Eleven days were spent waiting on an inbox.
+   The *Updated on* date and the page content are the only signals.
+4. **The "minutes remaining" bar is not the review.** After you submit, `Publishing overview`
+   shows *"Running quick checks for commonly found issues"* with a countdown of a few minutes.
+   That is Google's automated pre-screen, and the wording under it says so. When it finishes the
+   banner changes to **"Your changes are now in review"**, and only then is a human looking.
+   Read the banner text, not the timer. The owner reasonably read the countdown as the review
+   itself on 1 Sept, and a review takes hours to days, not minutes.
+
+#### What an assistant can and cannot do here
+
+Re-tested 2 Sept from a full Claude Code session with local shell access, which is a **wider**
+set of powers than the chat-bridge session the 1 Sept block described. Both rows are kept
+because either kind of session may pick this up.
+
+| Session type | What it can do |
+|---|---|
+| **Claude Code with local shell** (this one, 2 Sept) | **Can** read and edit files, run `git`, and run the full Gradle build including `test`, `lint` and both signed `bundleRelease` tasks — verified, exit 0. `adb`, the emulators and Python are all reachable. Can drive the Play Console read-only in the owner's own Chrome |
+| **Chat-bridge shell on the mounted folder** (1 Sept) | **Can** read, search and edit files, run `git` and Python, and reach the network. **Cannot** run `adb`, the emulator or Gradle — they live outside the mount — so it cannot build, install, or screenshot the running app. Deleting files is blocked, including stale `.git/*.lock` files |
+| The Play Console | **Can be driven in the owner's own Chrome** via the browser tool, which is how the 1 Sept listing fix and the whole Wear submission were done, and how every Console fact above was read on 2 Sept. **Uploading an `.aab` this way is blocked**, so the bundle is the one file he must attach himself |
+| Consent, submit and publish buttons | **His, always.** Agreeing to Google's policies and pressing *Submit for review* are his signature. Prepare everything up to that button and hand it over |
+| The release signing key | **Never** generate, request, display or transmit it. It is his alone (`docs/RELEASING.md`). Running a build that signs with it is fine and is how the bundles above were produced |
+
+#### Standing instructions from the owner, 1 Sept 2026, still current
+
+These are his words and they govern how this project is worked on. They are not suggestions.
+
+- **The aim is to get everything live and ready for other people to use, with the latest of
+  everything related to the app.** Judge any piece of work against that. Something correct but
+  unpublished is not done.
+- **Watch testing is finished. Do not raise it again.** He tested the watch himself on 1 Sept,
+  the Qibla included, and asked explicitly that it not be put back on any list. For the record
+  of what the evidence is: the watch and phone were shown to agree on Asr on 31 Aug (A18), and
+  the compass is his own report — which, for a check needing his hardware and his account, is
+  the intended evidence and always was.
+- **Play's edge-to-edge advisories on release 4 are not a problem for now.** Cosmetic,
+  non-blocking, considered and deferred rather than missed.
+- **Do the work for him and ask the minimum of him.** Where the Play Console can be driven in
+  his own Chrome, drive it rather than dictating steps, and leave him only the consent and
+  submit presses. Do not hand him numbered lists to follow.
+- **Do not use the Figma, Gmail or Google Drive connectors for this project.**
+
+#### Committing from an assistant session, because git locks will bite you
+
+An assistant working through a mounted folder usually cannot delete files, so git's own
+`.git/index.lock` and `.git/HEAD.lock` survive every command and block the next one. Do not try
+to engineer around it. Write the commit message to `COMMIT_MSG.txt` in the project root and give
+him this single line, which clears the locks, commits, tidies up and pushes:
+
+```bash
+cd ~/Developer/SajdaTime && rm -f .git/index.lock .git/HEAD.lock && git commit -F COMMIT_MSG.txt && rm COMMIT_MSG.txt && git push
+```
+
+Note the paths are spelled out rather than globbed: `rm -f .git/*.lock` fails under zsh when
+nothing matches. Use `git --no-optional-locks` for your own status and log checks so read-only
+commands stop creating locks in the first place. A session with a local shell (like 2 Sept's)
+can just commit normally.
+
+#### If he asks for the next release
+
+There is no reason to cut one right now. If a change does land, `docs/RELEASING.md` is the
+procedure, the signing key is his alone and must never be requested, and the two `versionCode`
+lanes move independently: the phone is at 4, the watch at 1001. **Never upload a saved
+artifact — build fresh from `main`** (`app/build.gradle.kts:40`, and `tools/ship-wear.sh` does
+the whole mechanical half in one command). The repo carries **no git tags**, so there is no tag
+to bump and nothing to look one up in; releases are identified by `versionCode` alone.
+
+---
+
+### ⬛ HISTORY BELOW THIS LINE
+
+Everything that follows is the dated record of how the project reached the state above. It is
+kept because the reasoning is expensive to rebuild and because several of these blocks record
+mistakes that would otherwise be repeated. **It is evidence, not a task list.** Where an older
+block contradicts the STATE OF PLAY above, the block above is right.
+
+
+### ⬛ HISTORY — the former STATE OF PLAY, 1 Sept 2026, 13:00 UTC (superseded 2 Sept, see the block at the top of this section)
+
+> Kept for its reasoning and for the traps it records. Two of its claims were wrong and are
+> corrected in the 2 Sept block above: the Wear submission time, and the "quick checks passed"
+> reading. Everything else in it held up under re-verification.
 
 **Written for any assistant, on any tool, arriving with no memory of this project.** Read this
 block, then confirm it with the commands in "How to check, rather than believe" below, then ask
@@ -4434,17 +4667,10 @@ move together: the phone is at 4, the watch at 1001.
 
 ---
 
-### ⬛ HISTORY BELOW THIS LINE
+### ⬛ HISTORY — 1 Sept 2026, 12:40 UTC — the listing fix IS LIVE, and the Wear release is SUBMITTED
 
-Everything that follows is the dated record of how the project reached the state above. It is
-kept because the reasoning is expensive to rebuild and because several of these blocks record
-mistakes that would otherwise be repeated. **It is evidence, not a task list.** Where an older
-block contradicts the STATE OF PLAY above, the block above is right.
-
-
-### 🟢 1 Sept 2026, 12:40 UTC — the listing fix IS LIVE, and the Wear release is SUBMITTED
-
-Read this first. Both of the blocks below it are now history rather than open items.
+*This block once said "Read this first". It no longer applies: the current state of play is the
+block at the top of §11, dated 2 Sept. Kept below for the evidence it records.*
 
 #### The store listing fix published, confirmed on the public page
 
@@ -7110,6 +7336,41 @@ matters more than the stable hashes, that is the trade being made.
     seconds, with no credentials and no Console session. The general form, which is the same
     lesson as verifying against Aladhan rather than against your own reasoning: **when a status
     arrives as a claim, go and look at the thing itself before acting on it.**
+
+108. **The Play Console keeps a submission ledger, and it settles arguments that a remembered
+    timestamp cannot.** `Publishing overview → Submission activity` lists every submission ever
+    made, numbered, with the exact time, the set of things it contained, and its status. On
+    2 Sept 2026 it showed four rows, and two of them were the same day: submission 3 at 11:57
+    carrying the store listing fix (*Published*), and submission 4 at 12:24 carrying the Wear
+    release (*In review*). The previous session's note had recorded a single event at
+    "11:35 UTC", which is neither of them — it was close enough to sound right and wrong enough
+    to make two distinct submissions look like one.
+
+    Three separate timestamps exist for what feels like one action: when the `.aab` was
+    uploaded, when the change was submitted, and when the track record last moved. They differ
+    by up to an hour and it is easy to write down whichever was on screen. **Read the ledger,
+    quote its row number, and do not convert its clock** — the Console shows times without a
+    zone label, and this machine runs on BST, so an unlabelled "12:24" is not UTC.
+
+    The ledger also answers the question the *Updated on* date cannot: it distinguishes "there
+    is nothing waiting to be submitted" from "I did not look". A `Publishing overview` with a
+    *Changes in review* section and **no** *ready to send for review* section is positive
+    evidence that the 20 Aug trap (lesson in §11: saved but never submitted) is not repeating.
+
+109. **There is no Play publishing automation on this project, and looking for it costs an hour
+    every time.** No fastlane, no Gradle Play Publisher, no CI, no service-account key, and
+    therefore no Google Play Developer API access — so no track, release or rollout state can
+    be read or written programmatically, and every Console fact has to be read from the UI in
+    the owner's own Chrome. Verified exhaustively on 2 Sept 2026 and written into §11 so the
+    search does not have to be repeated.
+
+    It is a deliberate non-goal rather than a gap. Wiring up the Developer API means minting a
+    Google Cloud service account and storing a long-lived JSON key beside a project whose whole
+    premise is that it holds no credentials it does not need; the app ships a few times a year;
+    the `.aab` has to be attached by hand regardless, because browser automation cannot upload
+    it; and the consent and submit presses are the owner's signature either way. The automation
+    would save one upload and add a permanent secret. **Do not add it without putting that
+    trade-off to him first.**
 
 
 ---
