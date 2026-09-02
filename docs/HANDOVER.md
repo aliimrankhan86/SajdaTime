@@ -4379,12 +4379,38 @@ trade-off to put to him first.
 - **Two edge-to-edge advisories on release 4** (`Production → Release dashboard`, "2 actions
   recommended"). Cosmetic, non-blocking, and **explicitly deferred by the owner**. Do not raise
   them until a release is being cut for another reason.
-- **A standing health check runs hourly outside this repo** — a scheduled task on the owner's
-  Claude account, not a cron job on his machine. It watches the public store page for the Wear
-  release going live, for the app being removed or suspended, for the disclaimer phrase
-  disappearing, for old screenshots returning, for new low ratings, and for the privacy policy
-  URL going down. It is silent unless something changes. **If he says he is being notified about
-  the app, that is where it comes from.**
+- **A standing health check runs once a day outside this repo.** It is a **cloud routine on the
+  owner's Claude account**, not a cron job on his machine and not in this repository, so nothing
+  here can start or stop it. Details, read off the routine itself on 2 Sept:
+
+  | | |
+  |---|---|
+  | Name | `SajdaTime app health check` |
+  | Routine ID | `trig_0129FQnWihf8XG6rKLCB4oFr` |
+  | Schedule | `0 12 * * *` — **daily at 12:00 UTC**, which is 1pm UK in summer |
+  | Model | `claude-opus-5` |
+  | Notification | push on, email off |
+  | Managed at | https://claude.ai/code/routines |
+
+  An earlier version of this block said it runs **hourly** and would "drop to once a morning
+  after the Wear release lands". Both were wrong: it has been daily since it was created on
+  1 Sept, and it is told to stay daily afterwards. Corrected here after reading the routine's
+  own `cron_expression` rather than the note about it.
+
+  It fetches the public store page and checks seven things: that the page still loads with an
+  Install button; whether the Wear release has gone live, judged by the **"Updated on" date
+  moving past 20 Aug 2026**; that the disclaimer phrase is still in the description and no old
+  screenshot ID has returned; that the live version is still 1.2.0 / `versionCode` 4; new or low
+  ratings, with anything reporting wrong prayer times or a wrong Qibla passed on verbatim and at
+  once; that the privacy policy URL returns 200; and, from 10 Sept, whether the Wear review is at
+  risk of missing the 15 Sept 64-bit deadline. **It stays silent unless one of those fires.**
+  **If he says he is being notified about the app, that is where it comes from.**
+
+  Its prompt was rewritten on 2 Sept to carry the verified baseline above, the corrected
+  submission time, and an explicit list of settled matters it must never raise: watch testing,
+  the edge-to-edge advisories, developer verification, whether the app is public, and building
+  publishing automation. **If a fact in this section changes, change the routine too** — it
+  cannot read this file, because it runs in the cloud with no checkout of this repository.
 
 #### How to check all of this yourself, without a Play Console session
 
