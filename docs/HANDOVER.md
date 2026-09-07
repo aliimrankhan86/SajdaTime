@@ -4314,7 +4314,8 @@ no outstanding declarations, and no changes in review. **The project is not wait
 | **Wear OS app** | **Live in production.** `versionCode` 1001 / 1.2.0, 177 countries. **Published 5 Sept 2026 at 14:04** | `Test and release → Production` with the form-factor selector on *Wear OS only*: "Track summary (Wear OS) · Active · Latest release: 1001 (1.2.0) · 177 countries/regions", and the release itself reads **"Available on Google Play · 1 version code · Released on 5 Sept 14:04"** |
 | The Wear review | **Passed.** Submission 4 now reads *Published*, not *In review* | `Publishing overview → Submission activity`, row 4: "4 · Sept 01, 2026, 12:24 pm · Production (Wear OS), Store Listing, Advanced distribution · **Published**". All four submissions in the ledger read *Published* |
 | Publicly installable by anyone | **Yes.** Not gated to testers | `curl` of the public listing signed out of every account returns HTTP 200 and 1,171,076 bytes with an Install button. A closed test 404s a non-tester. Console app row reads App status **Production** |
-| Store listing | **Correct and published.** Description carries the full disclaimer and the dua paragraph; the five screenshots are the shipped ones | All five known-good Google image IDs are present on the live page (`HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd`) and **none** of the stale set (`-2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90`). Google mints a new ID per uploaded image, so matching IDs mean the same bytes the 2 Sept Pillow diff scored at 0.0000. Disclaimer phrase present twice |
+| Store listing | **Correct and published.** Description carries the full disclaimer and the dua paragraph; the five phone screenshots are the shipped ones | All five known-good Google image IDs are present on the live page (`HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd`) and **none** of the stale set (`-2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90`). Google mints a new ID per uploaded image, so matching IDs mean the same bytes the 2 Sept Pillow diff scored at 0.0000. Disclaimer phrase present twice |
+| **The watch screenshots are now on the public page** | **Two round 454×454 images**, `69mKXUJL6sRk…` and `6xAB1Mc0_8_y…`, sitting in the media block right after the five 1920×1080 phone ones. **They were absent on 2 Sept.** This is the best public, credential-free proof the Wear release is live — better than any date | Found by the daily health check on its 7 Sept run, then confirmed here. The page's own media payload tags each image with its dimensions, so `[454,454]` next to a `play-lh` URL is unambiguous. **Do not use the phrase "Wear OS" in the description as evidence** — the owner wrote that himself and it has always been there |
 | Nothing sitting unsubmitted | **Confirmed.** `Publishing overview` is empty — no *Changes in review* section and no *ready to send for review* section | The 20 Aug trap (saved but never submitted) is not repeating. Managed publishing is **off**. "Last published on 5 September 2026" |
 | Play policy status | **No issues** | Account level *and* app level both render "No issues found" (`Monitor and improve → Policy and programmes → Policy status`) |
 | App content declarations | **All complete** | `Policy and programmes → App content → Need attention` is empty: "You've caught up with everything" |
@@ -4427,18 +4428,34 @@ trade-off to put to him first.
   risk of missing the 15 Sept 64-bit deadline. **It stays silent unless one of those fires.**
   **If he says he is being notified about the app, that is where it comes from.**
 
-  > ⚠️ **7 Sept 2026: two of those seven checks are now stale and the routine needs editing.**
-  > Its Wear trigger is "*Updated on* has moved past 20 Aug 2026", and that has now happened —
-  > the page reads 1 Sept. Left alone the routine will report the Wear release as newly live
-  > **every single day, forever**, which is precisely how a useful alarm becomes one he stops
-  > reading. Its 15 Sept 64-bit deadline check is moot for the same reason: the release it was
-  > guarding published on 5 Sept. **New baseline for the routine: *Updated on* = 1 Sept 2026,
-  > phone `versionCode` 4 and Wear `versionCode` 1001 both live, and alert only if that date
-  > moves again** (which would mean a release nobody in this repo made). It also needs the
-  > settled-matters list extended with "the Wear release is live — do not report it as pending
-  > or as news". **This cannot be done from here**: the routine runs in the cloud on his Claude
-  > account at https://claude.ai/code/routines, with no checkout of this repository, so it
-  > cannot read this file. It has to be edited there.
+  > ✅ **REWRITTEN 7 Sept 2026, and the description above is the OLD version.** Two of those
+  > seven checks had gone stale the moment the Wear release published, and the routine was
+  > edited at https://claude.ai/code/routines to fix it. What it does now:
+  >
+  > - **It watches for regressions, not for a launch.** Its own words: *a smoke alarm on a
+  >   finished building*. The Wear trigger was "*Updated on* has moved past 20 Aug 2026", which
+  >   became permanently true on 5 Sept — left alone it would have reported the same stale news
+  >   **every day forever**, which is exactly how a useful alarm becomes one he stops reading.
+  >   The new form is a **baseline to compare against, not a threshold to cross**: *Updated on*
+  >   should read **1 Sept 2026**, and it speaks up if that ever changes.
+  > - **The 15 Sept 64-bit deadline check is gone.** The release it was guarding published on
+  >   5 Sept, ten days early.
+  > - **The seven live screenshots are now its integrity check** — five phone at 1920×1080 and
+  >   **two round watch ones at 454×454** (`69mKXUJL6sRk`, `6xAB1Mc0_8_y`). If either watch
+  >   image vanishes, the Wear release may have been pulled.
+  > - **Ratings and reviews are now its most valuable check**, because they are the only place
+  >   something genuinely new can still appear. There are none at all yet, so the first one is
+  >   news; anything reporting wrong times or a wrong Qibla goes to him verbatim and at once.
+  > - **Settled-matters list extended** with the Wear release being live, the 64-bit deadline
+  >   being met, and a much firmer statement that **watch testing is closed permanently**.
+  > - Prompt-level instruction added not to use the Gmail, Drive or Figma connectors. They are
+  >   still attached to the routine; they were left attached rather than cleared, because the
+  >   push notification this routine exists to send appears to come through the connector set
+  >   and breaking that to remove three unused entries is a bad trade. Revisit only if he asks.
+  >
+  > Schedule, model and notification settings are unchanged: `0 12 * * *`, `claude-opus-5`,
+  > push on and email off. **It still cannot read this file** — it runs in the cloud with no
+  > checkout — so if a fact here changes, it has to be edited there as a separate act.
 
   **Watch testing is closed, and on 2 Sept every document that still implied otherwise was
   annotated.** This mattered more than it looks: six separate places still carried sentences
@@ -4494,9 +4511,15 @@ grep -o "Updated on[^<]*<[^>]*>[^<]*" live.html   # "1 Sept 2026" -> phone AND w
 grep -c "Install" live.html                        # renders at all -> production, not a closed test
 grep -c "not supplied by any mosque, scholar or authority" live.html   # >0 -> disclaimer is live
 
-# The five correct screenshot IDs begin: HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd
-# The old stale set began:               -2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90
+# The five correct PHONE screenshot IDs begin: HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd
+# The two WATCH screenshot IDs begin:          69mKXUJL 6xAB1Mc0
+# The old stale set began:                     -2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90
 grep -o 'https://play-lh.googleusercontent.com/[A-Za-z0-9_-]*' live.html | sort -u
+
+# 4. Best public proof the WATCH app is live, with no login: its two round screenshots.
+# The media payload tags every image with its pixel dimensions, so 454x454 is unambiguous.
+# Expect 2. Zero means the Wear release is gone.
+grep -o '\[null,[0-9]*,\[454,454\],\[null,null,"https://play-lh[^"]*"' live.html | wc -l
 ```
 
 To compare an image properly rather than by eye, fetch it at `=w2000` and diff it against the
@@ -4551,6 +4574,15 @@ These are his words and they govern how this project is worked on. They are not 
   of what the evidence is: the watch and phone were shown to agree on Asr on 31 Aug (A18), and
   the compass is his own report — which, for a check needing his hardware and his account, is
   the intended evidence and always was.
+
+  > **Reconfirmed by him unprompted on 7 Sept 2026**, in the same breath as asking for the
+  > watchdog to be brought up to date: *"watch testing is done and record it."* That is the
+  > third time he has said it. It is now stated in four places that a session actually reads
+  > before acting — `CLAUDE.md`'s hard rules (loaded automatically), this block, the daily
+  > cloud routine's settled-matters list, and `tools/ship-wear.sh` — specifically so that no
+  > future session has to be told a fourth time. **Treat a request to check the watch as a
+  > bug in the request.** The watch app is live on Play; if something is genuinely wrong with
+  > it, that will arrive as a user review, which the routine is watching for.
 - **Play's edge-to-edge advisories on release 4 are not a problem for now.** Cosmetic,
   non-blocking, considered and deferred rather than missed.
 - **Do the work for him and ask the minimum of him.** Where the Play Console can be driven in
@@ -7488,6 +7520,19 @@ matters more than the stable hashes, that is the trade being made.
     and anyone reading it as one will be four days out and will look for a release event on the
     wrong day. The authoritative line is on `Test and release → Production` with the form-factor
     selector on *Wear OS only*, which spells out "Released on 5 Sept 14:04". Found 7 Sept 2026.
+
+    **The better public signal is the screenshots.** A live Wear release puts its two round
+    454×454 images on the public listing, and they were simply not there on 2 Sept. The page's
+    media payload tags every image with its dimensions, so one grep settles it with no login:
+
+    ```bash
+    grep -o '\[null,[0-9]*,\[454,454\],\[null,null,"https://play-lh[^"]*"' live.html | wc -l
+    ```
+
+    Two means the watch app is live; zero means it is not. **Do not use the words "Wear OS"
+    appearing in the description as evidence** — the owner wrote that sentence himself and it
+    has been there since long before any Wear release existed. The daily health check found
+    this before anyone here did, which is the argument for keeping it.
 
 111. **A watchdog whose trigger is "X has changed" fires forever once X changes.** The daily
     health check was told to alert when *Updated on* moved past 20 Aug 2026. It moved on 5 Sept,

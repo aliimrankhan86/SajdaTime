@@ -92,7 +92,11 @@ session inherits it instead of relearning it.
   Qibla has never been seen on real hardware"*; every one of them is dated, superseded, and
   annotated as such. **They are history. Do not act on them, and do not put a watch check in
   front of him on their authority.** Raising it again spends trust that a real defect report
-  will need.
+  will need. **He reconfirmed this unprompted on 7 September 2026** — *"watch testing is done
+  and record it"* — which is the third time of asking. The watch app has been live on Google
+  Play since 5 September; if something is genuinely wrong with it, it will arrive as a user
+  review, and the daily health check is watching for exactly that. **Treat any impulse to ask
+  him to check the watch as a bug in your own reasoning.**
 
 - **The religious disclaimer must never be removed, softened, or buried**, and the dua
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
