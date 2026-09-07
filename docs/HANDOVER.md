@@ -4326,6 +4326,50 @@ no outstanding declarations, and no changes in review. **The project is not wait
 | Ratings and reviews | **None yet.** 26 lifetime installs, 22 current; no star rating shown, so nobody has rated it | Public listing carries no `Rated` label and no review count; Console app row reads "Installed audience 22" |
 | Translations | **English only, deliberately.** Machine translation is forbidden | `CLAUDE.md` hard rules, §5.16 |
 
+#### "Is it ready for everyone yet?" — the answer, and why it keeps being asked
+
+**He has now asked this in several different wordings across several sessions, and the answer
+has been yes every time.** It keeps coming back because the documents kept answering the wrong
+question. Written out properly here so it can be answered in one reply and closed.
+
+**Yes. Anybody with a Play Store can find and install it, and could before either of us asked.**
+No invitation, no tester list, no region gate. Verified 7 Sept 2026 three independent ways:
+
+1. **It appears in Play's public search.** Searching `SajdaTime` returns it as the first and
+   only result. **This is the single most convincing proof, and the one to reach for first,
+   because a closed test never appears in search at all** — that is what "closed" means. A
+   search hit is therefore not merely consistent with being public, it is only possible if it
+   is.
+2. **The listing renders for a client with no Google account whatsoever.** `curl` signed out of
+   everything returns HTTP 200, 1.17 MB, with an Install button. A closed-test listing serves a
+   non-tester a not-found page instead.
+3. **The Console says so.** App status *Production*, 177 of 177 countries, full roll-out, no
+   staged-rollout control shown.
+
+```bash
+# Public? One command, no credentials. Expect a match.
+curl -sL -A "Mozilla/5.0" \
+  "https://play.google.com/store/search?q=SajdaTime&c=apps&hl=en_GB&gl=GB" \
+  | grep -c "com.sajdatime.app"
+```
+
+**The thing he is actually noticing is discovery, not availability, and they are not the same
+problem.** Searching `SajdaTime` finds it instantly. Searching **`prayer times`**, **`qibla`**,
+**`prayer times qibla`** or **`namaz times`** does **not** — checked on 7 Sept, roughly 25 apps
+come back for each and this one is on none of those first pages. That is neither a fault nor a
+setting. Play ranks on installs, ratings and retention; this app has 26 lifetime installs and
+**zero ratings**, against category leaders with millions of each. Nothing in the repository can
+change it and no Console switch exists for it.
+
+So the honest sentence, and the one to give him, is: **it is finished and open to the world,
+but the world has not heard of it.** Only the first half was ever an engineering problem, and
+it is done. **Do not turn the second half into invented work** — see the non-goal on rating
+prompts in §11 before proposing anything that nudges users.
+
+The stale closed-testing Alpha track with its 24 testers is very likely what seeds the doubt.
+It gates nothing: Play serves every user the highest version code they are eligible for, so
+those 24 people receive production `4` exactly like the public does.
+
 #### What changed since 2 Sept, and what the 2 Sept block got wrong
 
 1. **The Wear release went live on 5 Sept 2026 at 14:04**, and with it the last open item on this
@@ -6179,6 +6223,18 @@ the one true blocker since both AABs on disk are unsigned ⚠️ **— both halv
 Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
 location, cloud backup, a server of any kind.
 
+**Also: no in-app prompt asking the user to rate, review or share the app. Added 7 Sept 2026.**
+This will look tempting, because the app is live with zero ratings and ratings are what would
+lift it in Play's search rankings — the standard growth advice is a "enjoying the app? leave a
+review" dialog, and a future session trying to be helpful will reach for it. **It is forbidden,
+and it is forbidden for a reason that is already written down elsewhere in this file:** the app
+asks the user for something exactly once, in the final paragraph of the disclaimer, where it
+requests a dua. §5.15 states plainly that the request belongs there *and nowhere else*, and the
+user is asked once and never nagged. A rating prompt is a second ask, and a self-interested one
+in an app built as sadaqah jariyah. **The ranking is not worth the principle**, and the owner
+has not asked for it. If growth is ever discussed, the honest advice is that sharing the link
+directly does more than any dialog would — see the discoverability block in §11.
+
 **Also: features the dark design system deliberately leaves out.** The design it came from
 was drawn against the shipping feature set on purpose — no prayer tracker, no day stepper
 on the Times screen, no per-row notification mute. They are absent from the mockups because
@@ -7552,6 +7608,30 @@ matters more than the stable hashes, that is the trade being made.
     `OldTargetApi` — which **appear on their own as time passes and new library versions ship**,
     with nobody touching the code. A verification claim phrased as an absolute zero will quietly
     rot; phrase it as "0 errors" and state the warning count separately. Found 7 Sept 2026.
+
+113. **"Live" and "findable" are different questions, and answering the first when he asked the
+    second is why this one keeps coming back.** The owner has asked several times, in several
+    wordings, whether the app is ready for everyone to download. It has been since 20 August,
+    and the documents said so — but "yes, it is public" never landed, because what he was
+    actually noticing was that nobody seems to find it. Both halves have to be said in the same
+    breath or the question returns:
+
+    - **Available:** yes, to anyone, with no invitation. **The killer proof is Play search** —
+      `SajdaTime` returns it as the first result, and *a closed test cannot appear in search at
+      all*, so a search hit is not merely consistent with being public, it is only possible if
+      it is. Better than any Console screenshot, because he can do it himself on his own phone
+      in thirty seconds, and so can anyone he asks.
+    - **Discoverable:** no, not yet, and there is no switch. `prayer times`, `qibla` and
+      `namaz times` return roughly 25 apps each and none of them is this one. Play ranks on
+      installs, ratings and retention; 26 installs and zero ratings against category leaders
+      with millions of both is exactly where a new app starts.
+
+    **Give him a way to check rather than an assurance.** "Ask someone who has never been a
+    tester to search SajdaTime in their Play Store" is worth more than any amount of citing the
+    Console, because it is his own evidence rather than a claim from an assistant. And **do not
+    convert the discovery gap into engineering work** — the obvious lever, an in-app rating
+    prompt, is now an explicit non-goal in §11 because it breaks the ask-once rule. Found
+    7 Sept 2026.
 
 
 ---

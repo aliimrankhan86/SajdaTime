@@ -32,6 +32,20 @@ The **"Updated on"** date moves when a release publishes and for nothing else, s
 session. Play sends **no email** when a review passes, so an inbox proves nothing in either
 direction. Both of those are lessons this project paid for: `docs/HANDOVER.md` §15, 105 and 107.
 
+**When he asks whether the app is ready for everyone — and he will, because he has asked
+several times — the answer is yes, and the proof is Play search, not the Console.** A closed
+test cannot appear in search at all, so a hit is only possible if the app is public:
+
+```bash
+curl -sL -A "Mozilla/5.0" "https://play.google.com/store/search?q=SajdaTime&c=apps&hl=en_GB&gl=GB" | grep -c "com.sajdatime.app"
+```
+
+**Say the second half in the same breath or the question returns:** it is *available* to
+everyone but not yet *discoverable* — searching "prayer times" or "qibla" does not surface it,
+because Play ranks on installs and ratings and this app has few of one and none of the other.
+That is not a fault, not a setting, and **not work to invent**. §15 lesson 113, and the §11
+non-goal on rating prompts.
+
 **The owner should not have to tell you any of this, and has asked not to have to.** He does
 not want to paste a briefing at the start of a session. This file is loaded automatically so
 that he never has to. Keep it that way: when the pick-up point moves, move it in
@@ -100,7 +114,8 @@ session inherits it instead of relearning it.
 
 - **The religious disclaimer must never be removed, softened, or buried**, and the dua
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
-  and never nagged.
+  and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
+  however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
 - **Never machine-translate the app.** Prayer and madhab names are religious content; each
   language needs a native speaker before it ships.
 - **The app follows the phone's language, and goes right-to-left only when it has the

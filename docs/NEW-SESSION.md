@@ -91,6 +91,16 @@ deliberately, and several were built and then thrown away. All have their eviden
 | **Location never leaves the device.** Coarse, foreground only. Cloud backup and device-to-device transfer both off. `docs/privacy.html` is a published promise | §2, `CLAUDE.md` |
 | **The release signing key is the owner's alone.** No assistant may generate, hold, request or view it | `CLAUDE.md`, `docs/RELEASING.md` |
 | **The high-latitude rule is deliberately not a user setting** (item A4). "Match your mosque" closes the same gap without asking anyone to understand twilight models | §11 |
+| **No in-app prompt to rate, review or share.** The user is asked for one thing, once, in the disclaimer. A ratings dialog is a second ask and a self-interested one in an app built as sadaqah | §11 non-goals, `CLAUDE.md` |
+| **Watch testing is closed.** Do not ask him to check the watch, pair one, or verify anything on it. He has said so three times | `CLAUDE.md`, §11 |
+
+**One question he asks repeatedly, with the answer that closes it:** *"is it ready for everyone
+to download?"* Yes, and it has been since the first production release. **Prove it with Play
+search, not the Console** — a closed test cannot appear in search at all, so a hit is only
+possible if the app is public, and he can run the check himself on his own phone. Then say the
+other half immediately, or the question comes back: it is **available** to everyone but not yet
+**discoverable**, because Play ranks on installs and ratings. That is normal for a new app, and
+it is not work to invent. §15 lesson 113.
 
 ---
 
