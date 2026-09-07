@@ -4275,10 +4275,10 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY — 2 Sept 2026
+### 📍 STATE OF PLAY — 7 Sept 2026
 
 **Written for any assistant, on any tool, arriving with no memory of this project.** Every claim
-in this block was re-verified from scratch on 2 Sept against the live store page, the Play
+in this block was re-verified from scratch on 7 Sept against the live store page, the Play
 Console itself, and a clean build — not carried forward from the previous block. Where the two
 disagree, this one is right and the discrepancy is called out by name. The source for each fact
 is cited inline: the command that produced it, the Console field it was read from, or the file
@@ -4286,51 +4286,72 @@ and line.
 
 #### Remaining human-only actions
 
-Only one thing is open, and no script, API or assistant can move it.
+**None. The list is empty for the first time since this project started.**
 
-1. **Wait for Google's Wear OS review.** Submission 4 went in on 1 Sept 2026 at 12:24 on the
-   Console clock and reads *In review* (`Publishing overview → Submission activity`, row 4).
-   Review is a human decision at Google's pace, hours to days. There is nothing to press, fix
-   or resubmit, and **Play sends no email when a review passes** (§15 lesson 105), so an empty
-   inbox means nothing. To check it in ten seconds with no login: fetch
-   `https://play.google.com/store/apps/details?id=com.sajdatime.app` and look at **Updated on**.
-   It reads *20 Aug 2026* today. **When it moves, the Wear release has published** — that date
-   moves for a release publishing and for nothing else. A store-listing change does not move it,
-   which is why it still says 20 Aug even though the listing was corrected and published on
-   1 Sept.
+The Wear OS review — the single item the 2 Sept block was waiting on — **passed, and the Wear
+release published on 5 Sept 2026 at 14:04**. Both form factors are now live in production on
+Google Play, nothing is in review, and nothing is sitting unsubmitted.
 
-That is the entire list. There is no engineering work outstanding, nothing half-finished, and
-nothing waiting to be pushed. **If this leaves you with nothing to do, that is the correct
-answer — ask the owner what he wants next rather than inventing work from the history below.**
+There is no engineering work outstanding, nothing half-finished, and nothing waiting to be
+pushed. **If this leaves you with nothing to do, that is the correct answer — ask the owner what
+he wants next rather than inventing work from the history below.**
 
 #### In one paragraph
 
-SajdaTime is **live on Google Play production for phones**, publicly visible and installable by
-anyone — not a test track. Version 1.2.0 (`versionCode` 4), full roll-out, 177 of 177 countries,
-live since 20 Aug 2026. The store listing is correct and published: the description carries the
-full religious disclaimer and the five phone screenshots are pixel-identical to the repo
-originals. The Wear OS release (`versionCode` 1001, same 1.2.0) was submitted on 1 Sept and is
-in review. Play reports no policy issues and no outstanding declarations. The project is waiting
-on Google and on nothing else.
+SajdaTime is **fully live on Google Play production, phone and watch**, publicly visible and
+installable by anyone — not a test track. The phone build is version 1.2.0 (`versionCode` 4),
+full roll-out, 177 of 177 countries, live since 20 Aug 2026. The Wear OS build (`versionCode`
+1001, same 1.2.0, 177 countries) went live on 5 Sept 2026 and reads *Available on Google Play*.
+The store listing is correct and published: the description carries the full religious
+disclaimer and the five phone screenshots are the shipped ones. Play reports no policy issues,
+no outstanding declarations, and no changes in review. **The project is not waiting on anybody.**
 
 #### What is true right now, and how each line was checked
 
-| | State | Evidence, 2 Sept 2026 |
+| | State | Evidence, 7 Sept 2026 |
 |---|---|---|
-| Phone app | **Live in production.** `versionCode` 4 / 1.2.0, full roll-out, 177 of 177 countries, released 24 Aug 10:31 | `Test and release → Production` (form factor *Phones, Tablets, Chrome OS, Android XR*): "Active · Latest release: 4 (1.2.0) · 177 countries/regions · 21 installs"; the release reads "Available on Google Play · 1 version code". No staged-rollout control is shown, which is what a completed full roll-out looks like |
-| Publicly installable by anyone | **Yes.** Not gated to testers | `curl` of the public listing signed out of every account returns HTTP 200 and 1,161,231 bytes with an Install button. A closed test 404s a non-tester. Console app row reads App status **Production** |
-| Phone store listing | **Correct and published.** Description carries the full disclaimer and the dua paragraph; the five screenshots are the shipped app | Description extracted from the live page and read in full. All five screenshots fetched at `=w2000` and diffed against `docs/store/upload/phone/*.png` with Pillow: **mean per-channel difference 0.0000 on every one** |
-| Wear OS release | **In review**, submitted 1 Sept 12:24 (Console clock). `versionCode` 1001 / 1.2.0, full roll-out, 177 countries, 81 supported devices | `Test and release → Production` with the form-factor selector on *Wear OS only*: "Active · Release 1001 (1.2.0) in review · 177 countries/regions". `Publishing overview` banner: "Your changes are now in review" |
-| Nothing sitting unsubmitted | **Confirmed.** `Publishing overview` has a *Changes in review* section and **no** *ready to send for review* section | The 20 Aug trap (saved but never submitted) is not repeating. Managed publishing is **off** |
-| Play policy status | **No issues** | `Monitor and improve → Policy status`: "No policy issues found" |
+| Phone app | **Live in production.** `versionCode` 4 / 1.2.0, full roll-out, 177 of 177 countries | `Test and release → Production` (form factor *Phones, Tablets, Chrome OS, Android XR*): "Active · Latest release: 4 (1.2.0) · 177 countries/regions · 22 installs". No staged-rollout control is shown, which is what a completed full roll-out looks like |
+| **Wear OS app** | **Live in production.** `versionCode` 1001 / 1.2.0, 177 countries. **Published 5 Sept 2026 at 14:04** | `Test and release → Production` with the form-factor selector on *Wear OS only*: "Track summary (Wear OS) · Active · Latest release: 1001 (1.2.0) · 177 countries/regions", and the release itself reads **"Available on Google Play · 1 version code · Released on 5 Sept 14:04"** |
+| The Wear review | **Passed.** Submission 4 now reads *Published*, not *In review* | `Publishing overview → Submission activity`, row 4: "4 · Sept 01, 2026, 12:24 pm · Production (Wear OS), Store Listing, Advanced distribution · **Published**". All four submissions in the ledger read *Published* |
+| Publicly installable by anyone | **Yes.** Not gated to testers | `curl` of the public listing signed out of every account returns HTTP 200 and 1,171,076 bytes with an Install button. A closed test 404s a non-tester. Console app row reads App status **Production** |
+| Store listing | **Correct and published.** Description carries the full disclaimer and the dua paragraph; the five screenshots are the shipped ones | All five known-good Google image IDs are present on the live page (`HannRxHh yPYr6RhG MyGwDS8Y UojMmMLL PwdWhWpd`) and **none** of the stale set (`-2Kei_dj 140ka3qY cRSY7Knq gMDcKXHZ hWZ_VQ90`). Google mints a new ID per uploaded image, so matching IDs mean the same bytes the 2 Sept Pillow diff scored at 0.0000. Disclaimer phrase present twice |
+| Nothing sitting unsubmitted | **Confirmed.** `Publishing overview` is empty — no *Changes in review* section and no *ready to send for review* section | The 20 Aug trap (saved but never submitted) is not repeating. Managed publishing is **off**. "Last published on 5 September 2026" |
+| Play policy status | **No issues** | Account level *and* app level both render "No issues found" (`Monitor and improve → Policy and programmes → Policy status`) |
 | App content declarations | **All complete** | `Policy and programmes → App content → Need attention` is empty: "You've caught up with everything" |
 | Android developer verification | **Registered.** The 30 Sept 2026 deadline is already met — do not raise it as a task | Console home banner: "All of your apps have been successfully registered to meet Android developer verification requirements" |
 | Privacy policy URL | **Up** | `curl -I https://aliimrankhan86.github.io/SajdaTime/privacy.html` → HTTP 200 |
-| Repository | **Clean and pushed** | `git status --porcelain` empty; `git rev-list --left-right --count origin/main...main` → `0 0`; HEAD `981091a` |
-| Build | **Green.** 145 tests, 0 failures; 0 lint issues; both release bundles build and sign | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` exit 0. Per module: core 83, app 50, wear 12 tests. `lint-results-debug.xml` reports 0 issues in all three |
+| Repository | **Clean and pushed** | `git status --porcelain` empty; `git rev-list --left-right --count origin/main...main` → `0 0`; HEAD `1bc4a31` before this commit |
+| Build | **Green.** 145 tests, 0 failures; lint reports **0 errors and 15 warnings**; both release bundles build and sign | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` exit 0. `app-release.aab` 4.6 MB, `wear-release.aab` 3.6 MB |
+| Ratings and reviews | **None yet.** 26 lifetime installs, 22 current; no star rating shown, so nobody has rated it | Public listing carries no `Rated` label and no review count; Console app row reads "Installed audience 22" |
 | Translations | **English only, deliberately.** Machine translation is forbidden | `CLAUDE.md` hard rules, §5.16 |
 
-#### Two things the previous block got wrong, corrected here
+#### What changed since 2 Sept, and what the 2 Sept block got wrong
+
+1. **The Wear release went live on 5 Sept 2026 at 14:04**, and with it the last open item on this
+   project closed. Nobody was told: **Play sent no email**, exactly as §15 lesson 105 says it
+   never does. The only two signals were the ones this block already named — the public page's
+   *Updated on* moving off 20 Aug, and `Submission activity` row 4 flipping from *In review* to
+   *Published*. Both had fired by the time anyone looked on 7 Sept.
+2. **The *Updated on* date is stamped with the release's own date, not the publication date.**
+   The public listing now reads **1 Sept 2026** — the day the Wear release was created and
+   submitted — even though it actually published on 5 Sept. The Console's app row agrees, also
+   reading *Last updated 1 Sept 2026*. So the 2 Sept rule ("when it moves, the Wear release has
+   published") held and is still the right ten-second check, but **do not read the date it moves
+   *to* as the day it went live** — go to `Test and release → Production → Wear OS only` for
+   that, which states "Released on 5 Sept 14:04" outright.
+3. **"0 lint issues in all three modules" was wrong**, and probably was on 2 Sept too. `lint`
+   reports **0 errors and 15 warnings** (app 5, wear 2, core 8) — the build passes because
+   warnings do not fail it, not because the reports are empty. Ten of the fifteen are
+   version-nag rules (`NewerVersionAvailable`, `GradleDependency`,
+   `AndroidGradlePluginVersion`, `OldTargetApi`), which appear on their own as time passes and
+   new library versions ship, so this count will drift upward without anyone touching the code.
+   None is a defect. The mistake was counting `<issue` with `grep -c`, which matches the
+   `<issues>` root element and returns a misleading number on a file with no findings; count
+   `^    <issue$` instead. **Do not "fix" these warnings as busywork** — chasing dependency
+   bumps on a shipped, working app is churn, and the owner has not asked for it.
+
+The 2 Sept block also corrected two errors of its own predecessor, kept here because the
+reasoning still applies:
 
 1. **The Wear submission time.** The 1 Sept block said "in review from 1 Sept 11:35 UTC". The
    Console's own ledger disagrees: `Publishing overview → Submission activity` records
@@ -4406,6 +4427,19 @@ trade-off to put to him first.
   risk of missing the 15 Sept 64-bit deadline. **It stays silent unless one of those fires.**
   **If he says he is being notified about the app, that is where it comes from.**
 
+  > ⚠️ **7 Sept 2026: two of those seven checks are now stale and the routine needs editing.**
+  > Its Wear trigger is "*Updated on* has moved past 20 Aug 2026", and that has now happened —
+  > the page reads 1 Sept. Left alone the routine will report the Wear release as newly live
+  > **every single day, forever**, which is precisely how a useful alarm becomes one he stops
+  > reading. Its 15 Sept 64-bit deadline check is moot for the same reason: the release it was
+  > guarding published on 5 Sept. **New baseline for the routine: *Updated on* = 1 Sept 2026,
+  > phone `versionCode` 4 and Wear `versionCode` 1001 both live, and alert only if that date
+  > moves again** (which would mean a release nobody in this repo made). It also needs the
+  > settled-matters list extended with "the Wear release is live — do not report it as pending
+  > or as news". **This cannot be done from here**: the routine runs in the cloud on his Claude
+  > account at https://claude.ai/code/routines, with no checkout of this repository, so it
+  > cannot read this file. It has to be edited there.
+
   **Watch testing is closed, and on 2 Sept every document that still implied otherwise was
   annotated.** This mattered more than it looks: six separate places still carried sentences
   like *"the phone-to-watch sync has never been observed working"*, *"the watch Qibla has never
@@ -4454,7 +4488,9 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 curl -sL -A "Mozilla/5.0" \
   "https://play.google.com/store/apps/details?id=com.sajdatime.app&hl=en_GB&gl=GB" -o live.html
 
-grep -o "Updated on[^<]*<[^>]*>[^<]*" live.html   # 20 Aug 2026 -> Wear not yet published
+grep -o "Updated on[^<]*<[^>]*>[^<]*" live.html   # "1 Sept 2026" -> phone AND watch are live.
+                                                   # If this ever moves again, someone published
+                                                   # a release that this repo does not know about.
 grep -c "Install" live.html                        # renders at all -> production, not a closed test
 grep -c "not supplied by any mosque, scholar or authority" live.html   # >0 -> disclaimer is live
 
@@ -5005,10 +5041,15 @@ was trusted on 20 Aug.
 
 #### Confirm the state, do not take it from this file
 
+> ⚠️ **CLOSED, 5 Sept 2026 — this table's expected values are historical.** The watch was
+> submitted on 1 Sept and **published on 5 Sept at 14:04**, and the live *Updated on* date now
+> reads **1 Sept 2026**, not 20 Aug. The method below is still right; the "what you should see"
+> column is not. Use the STATE OF PLAY block at the top of §11.
+
 | Claim | Confirm with | What you should see today |
 |---|---|---|
 | **Phone app is LIVE, nothing pending** | Fetch <https://play.google.com/store/apps/details?id=com.sajdatime.app> while signed out of every Google account | It renders, with an Install button, *"Updated on Aug 20, 2026"*, and release notes matching 1.2.0. A closed-testing listing 404s to a non-tester, so a page that renders at all is a production page |
-| **Watch app is BUILT but NOT SUBMITTED** | The same page's *Updated on* date | **Still 20 Aug means the Wear release has not gone up.** That date moves when, and only when, a release actually publishes. It is the cheapest true signal in this project |
+| ~~**Watch app is BUILT but NOT SUBMITTED**~~ *(closed — it is live)* | The same page's *Updated on* date | ~~**Still 20 Aug means the Wear release has not gone up.**~~ That date moves when, and only when, a release actually publishes, which is still the cheapest true signal in this project — but it moved on 5 Sept, so 20 Aug is no longer the expected reading |
 | Repo is pushed | `git status` | Possibly two commits behind origin. `./tools/ship-wear.sh` pushes them |
 
 #### Ready, and verified rather than assumed
@@ -7438,6 +7479,34 @@ matters more than the stable hashes, that is the trade being made.
     it; and the consent and submit presses are the owner's signature either way. The automation
     would save one upload and add a permanent secret. **Do not add it without putting that
     trade-off to him first.**
+
+110. **Play's "Updated on" date is the release's own date, not the day it published.** The Wear
+    release was created and submitted on 1 Sept 2026 and actually went live on 5 Sept at 14:04,
+    and the public listing stamps it **1 Sept**. The Console's app-list row says the same thing.
+    So the ten-second signed-out check still works — the date moving off 20 Aug is exactly what
+    proved the release had published — but **the date it moves *to* is not the go-live date**,
+    and anyone reading it as one will be four days out and will look for a release event on the
+    wrong day. The authoritative line is on `Test and release → Production` with the form-factor
+    selector on *Wear OS only*, which spells out "Released on 5 Sept 14:04". Found 7 Sept 2026.
+
+111. **A watchdog whose trigger is "X has changed" fires forever once X changes.** The daily
+    health check was told to alert when *Updated on* moved past 20 Aug 2026. It moved on 5 Sept,
+    which is the alert working — but the condition stays true every day afterwards, so without
+    re-baselining it reports the same stale news daily until he stops reading it. **Any alarm
+    written against a one-way state transition needs its baseline moved in the same breath as
+    the transition being acknowledged.** The routine lives on his Claude account at
+    https://claude.ai/code/routines with no checkout of this repo, so a session that fixes the
+    documentation has *not* fixed the alarm; the two have to be done separately and neither can
+    read the other. Found 7 Sept 2026.
+
+112. **`grep -c "<issue"` on a lint report is a lie, because it matches the `<issues>` root
+    element.** §11 carried "0 lint issues in all three modules" on that basis. The real count is
+    **0 errors and 15 warnings**, and `lint` passes because warnings do not fail the build.
+    Count `^    <issue$` instead. The deeper point is that most of those fifteen are version-nag
+    rules — `NewerVersionAvailable`, `GradleDependency`, `AndroidGradlePluginVersion`,
+    `OldTargetApi` — which **appear on their own as time passes and new library versions ship**,
+    with nobody touching the code. A verification claim phrased as an absolute zero will quietly
+    rot; phrase it as "0 errors" and state the warning count separately. Found 7 Sept 2026.
 
 
 ---

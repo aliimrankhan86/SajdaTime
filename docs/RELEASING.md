@@ -793,10 +793,13 @@ possible answer to that suspicion.
 9. ✅ **DONE, 20 Aug 2026** — production access applied for and granted, **Production →
    Create release** run, release `4 (1.2.0)` rolled out in full to 177 countries. Confirmed
    still live 2 Sept 2026.
-10. ✅ **DONE, 1 Sept 2026** — the Wear OS form factor was added, a dedicated Wear track
-   created, the Wear screenshots uploaded and `1001 (1.2.0)` submitted. **In review with
-   Google as of 2 Sept.** The procedure below is kept because it is the procedure, not
-   because it is outstanding.
+10. ✅ **DONE AND LIVE.** The Wear OS form factor was added, a dedicated Wear track created,
+   the Wear screenshots uploaded and `1001 (1.2.0)` submitted on 1 Sept 2026. **Google's
+   review passed and the Wear release published on 5 Sept 2026 at 14:04** — verified 7 Sept
+   from `Test and release → Production → Wear OS only` ("Available on Google Play · Released
+   on 5 Sept 14:04") and from `Submission activity` row 4, now reading *Published*. The
+   procedure below is kept because it is the procedure for a *future* Wear release, not
+   because anything is outstanding.
 
 ### The watch bundle does NOT go in the same release
 
@@ -1204,10 +1207,11 @@ the Gradle signing wiring, and both signed bundles.
 > we asked for — it is why the track summary reads "Phones, Tablets, Chrome OS, Android XR")
 > and offers **+ Add form factor**, enabled.
 >
-> **SUPERSEDED, 1 Sept 2026.** Everything from here to the end of this quote was written when
-> the form factor had not been added. It has been: the owner added Wear OS, created the
-> dedicated track, uploaded the 454×454 screenshots and submitted `1001 (1.2.0)`, which has been
-> in review since. Read the rest as the record of the decision to wait, not as work to do.
+> **SUPERSEDED, 1 Sept 2026; closed 5 Sept 2026.** Everything from here to the end of this quote
+> was written when the form factor had not been added. It has been: the owner added Wear OS,
+> created the dedicated track, uploaded the 454×454 screenshots and submitted `1001 (1.2.0)`,
+> **which passed review and published on 5 Sept 2026 at 14:04**. Read the rest as the record of
+> the decision to wait, not as work to do.
 >
 > **Deliberately not clicked.** Adding a form factor is a configuration change that creates
 > a pending change to submit, and it belongs to the owner, not to an agent poking at a
