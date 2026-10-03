@@ -4358,6 +4358,34 @@ before consent. There is **no separate terms and conditions document**; the in-a
 usage counts. Not a lawyer's review: the wording follows the ICO pages read on 3 Oct and is the assistant's reading. Gate after the
 change: `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Not re-run on a device (text only).
 
+### 4 Oct 2026 — usage counts are now ON BY DEFAULT after a notice (owner decision, against the assistant's advice)
+
+**Decision.** The owner wants the numbers to choose future features and rejected opt in after being told, three times and in plain
+words, that the assistant thought on by default risked breaching PECR reg 6, special category rules (faith) and the ICO Children's code.
+He understood the legal question is open and asked the assistant to "figure it out and do it". Recorded so nobody reads it as an oversight.
+**Rejected:** a silent default (no notice) and a pre-ticked Yes: neither is defensible. **Chosen:** notice, then count, with an equal
+weight one tap "Turn this off", and a Settings switch.
+
+**How it works.** `notice_*` strings; the setup step (after Welcome) and the one-time screen for existing users show the notice;
+"OK, keep it on" saves yes, "Turn this off" saves no; nothing is counted until one of them is tapped; the screen is not dismissible
+by BACK or an outside tap. Turning the switch back ON from Settings still shows the full `consent_*` dialog and asks. Only strings,
+the `notice` flag on `UsageCountsConsentBody/Dialog`, and two call sites changed; the SDK, manifest and event set are untouched, so the
+76 minute capture still stands. `UsageCountsTest` gained a notice test (broken on purpose and seen to fail, lesson 119).
+
+**Verified on the emulator (Redmi unplugged):** notice shown in setup and on upgrade; zero events before an answer; after OK events
+flow (`first_open`, `session_start`, `screen_view`) and `app-measurement.com` and `firebaseinstallations.googleapis.com` appear only then
+(two earlier `firebaseinstallations` hits predate the app's install and are the emulator's own Google services); after Turn this off:
+no events, no uploads, only `www.google.com` through the proxy; BACK does not dismiss the upgrade notice; Settings ON shows the consent
+dialog. **Not checked:** font scale 1.3 and 2.0 on the new notice (same layout as the old dialog, which passed), the Redmi or S23 on the
+new build, and the Settings switch's checked state read from the UI (the events prove it).
+
+**Legal position: UNSETTLED.** See `docs/DPIA_ANALYTICS.md` section 7 and `docs/ANALYTICS_DEFAULT_ON_BRIEF.md`. If an adviser or the ICO says opt in is required,
+revert the setup step to ask rather than inform (the `consent_*` strings were kept for this), update `privacy.html` "Our basis", rerun
+`ANALYTICS_DEVICE_CHECK.md`. About an hour. Also open: Play Data safety "Optional" answer for an on-by-default feature (LISTING.md).
+Docs aligned in the same commit: `privacy.html`, `CLAUDE.md`, `README.md`, `LISTING.md`, `ANALYTICS_READING.md`, the DPIA.
+Gate: `clean test lint :app:bundleRelease :wear:bundleRelease` passed; `app-release.aab` 5,728,670 bytes, sha256
+`18a466b2e3efe06d5dfdb5b58d4ae1df6661fd275e193b5012db303e1125f4f0`, **unsigned**; manifest free of `AD_ID`/`ADSERVICES`.
+
 **Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
 send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
 Play services missing; a signed bundle; Play Console, Data safety and the privacy page text.

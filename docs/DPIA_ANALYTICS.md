@@ -1,6 +1,6 @@
 # Data protection impact assessment: optional usage counts
 
-**Status: DRAFT written 3 Oct 2026 by the assistant. The owner must read it and approve it before
+**Status: DRAFT written 3 Oct 2026 by the assistant. REVISED 4 Oct 2026: the owner chose usage counts ON BY DEFAULT after a notice, see section 7 before relying on anything else here. The owner must read it and approve it before
 release 1.3.0.** The ICO says a DPIA is required when an online service that children are likely to
 access is changed significantly (Children's code, standards 2 and 7). SajdaTime says it is suitable
 for all ages, and Google Play's audience includes 13 to 17, so this applies even though the app is
@@ -80,3 +80,33 @@ in the Session 1 list (`docs/ANALYTICS_PLAN.md` section 5) are applied and match
 policy; the controller identity and contact route are settled; and the owner has read this.
 
 Update 4 Oct 2026: the opted out capture condition is met (see section 5); the first launch note is disclosed. The owner asked on 4 Oct 2026 for the wording to be made as compliant as possible; this is the assistant's reading of ICO guidance, not legal advice. Approved by the owner, Ali Imran Khan, who said in conversation on 3 Oct 2026 that he has read this assessment and wants release to go ahead on these conditions. Recorded by the assistant, not signed.
+
+
+## 7. Revision 4 Oct 2026: on by default, at the owner's instruction
+
+**What changed.** Counting is no longer opt in. A notice (setup, or once for people who installed earlier) says counts are on and
+offers an equal-weight "Turn this off". Nothing is counted until one of the two buttons is tapped. A Settings switch turns it off or on
+at any time. Everything about *what* is sent is unchanged and the first-launch note (section 2) still applies.
+
+**Why.** The owner wants the numbers to decide future features and does not accept a small, self-selected sample. The assistant advised
+against it three times (PECR reg 6 consent, faith as special category data, the Children's code asking for high-privacy defaults) and
+offered to ask the ICO first. The owner decided to proceed. Recorded here so the reasoning is not lost.
+
+**Legal position: NOT settled, and the assistant cannot settle it.** The design relies on (a) the PECR statistical purposes exception as
+amended in 2025, which the ICO describes as narrow, needs a processor rather than a joint controller, and does not cover keeping
+individual level data (we keep event level data for 14 months, against a random ID); and (b) legitimate interests with a one tap
+objection. Neither is confirmed for a free prayer app whose use can reveal religion and which children use. EU users are under
+ePrivacy consent rules with no equivalent exception. The Children's code expects high-privacy defaults, which this is not. Expect
+that an adviser or the ICO may say this needs prior opt in. **The brief for that question is `docs/ANALYTICS_DEFAULT_ON_BRIEF.md`;
+the owner has been asked to send it to the ICO helpline.**
+
+**What reduces the risk.** Notice before any counting; one tap to turn off, equal weight to OK; a permanent switch; nothing about sect,
+madhab, method, settings or location; Google signals and data sharing off; retention 14 months with reset on new activity off;
+no deletion promise because the ID is random (stated in the policy). The 76 minute capture shows nothing leaves before the notice is
+answered or after Turn this off.
+
+**If the adviser says opt in is required:** set the notice back to the consent wording (`consent_*` strings already exist and the
+Settings path still uses them), make the setup step ask rather than inform, rewrite `privacy.html` section "Our basis", and re-run the
+checks in `docs/ANALYTICS_DEVICE_CHECK.md`. This is about an hour of work and is why the consent wording was kept.
+
+**Residual risk:** Medium until the legal question is answered. Accepted by the owner, 4 Oct 2026, in conversation.

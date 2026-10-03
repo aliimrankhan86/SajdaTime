@@ -94,14 +94,16 @@ fun MainScaffold(
     // opened, so it cannot reopen on rotation or on the next visit to the tab.
     var settingsRequest by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
 
-    // People who installed before usage counts existed never saw the setup question, so ask
-    // them once. Yes or No is saved either way and it never returns. Not dismissible, so a
-    // stray tap outside is not recorded as an answer. Nothing is sent until they say yes.
+    // People who installed before usage counts existed never saw the setup notice, so show it
+    // to them once. OK or Turn off is saved either way and it never returns. Not dismissible,
+    // so a stray tap outside is not recorded as an answer, and nothing is counted until they
+    // have seen it and tapped one of the two buttons.
     if (!state.loading && state.settings.onboardingComplete && !state.settings.analyticsAnswered) {
         UsageCountsConsentDialog(
             onYes = { onSetAnalytics(true) },
             onNo = { onSetAnalytics(false) },
             onDismiss = {},
+            notice = true,
         )
     }
     val openSetting: (SettingsChooser) -> Unit = {
