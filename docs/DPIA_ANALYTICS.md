@@ -74,7 +74,7 @@ Likely users include 13 to 17 year olds. How each relevant standard is met:
 ## 6. Outcome
 
 Proceed, provided: the opted out capture shows nothing is sent before consent; the console settings
-in `docs/ANALYTICS_PLAN.md` section 4.7 and the Session 1 list are applied and match the published
+in the Session 1 list (`docs/ANALYTICS_PLAN.md` section 5) are applied and match the published
 policy; the controller identity and contact route are settled; and the owner has read this.
 
 Approved by the owner: ______________________   Date: ______________
