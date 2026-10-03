@@ -238,10 +238,10 @@ private fun StepScaffold(
 @Composable
 private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
     StepScaffold(
-        title = stringResource(R.string.notice_title),
+        title = stringResource(R.string.consent_title),
         body = "",
     ) {
-        UsageCountsConsentBody(onYes = onYes, onNo = onNo, notice = true)
+        UsageCountsConsentBody(onYes = onYes, onNo = onNo)
     }
 }
 

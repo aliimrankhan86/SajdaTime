@@ -183,9 +183,9 @@ This one is not paid for at all.
 
 • No adverts, ever
 • No accounts, no sign-in, no email address
-• Usage counts to improve the app, on unless you turn them off (you are told first). No crash reporting
+• Optional usage counts, off unless you switch them on. No crash reporting
 • Approximate location only, read while the app is open, never in the background
-• Your coordinates never leave your device, and are never part of the usage counts
+• Your coordinates never leave your device, and are never part of the optional usage counts
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
 If you would rather not share your location at all, you can type a city name instead, and the app works the same.
@@ -378,12 +378,12 @@ declaration must match the app and `docs/privacy.html` exactly.
 - **Shared: No.** Google says an analytics provider that processes data "solely on your behalf"
   is a service provider, which is collection, not sharing. That holds only while the console
   data sharing settings and Google signals stay off (privacy.html says they are).
-- **Optional: decide on the day.** Counts are on by default (owner decision 4 Oct 2026), so users can opt OUT, not opt in. Google's page allowed "optional" where all users can opt in or out, and the wording is not certain for on-by-default. If the form does not accept Optional = Yes, answer No (collected, not optional) and keep the policy as written. Do not guess: read the help text on the day.
+- **Optional: Yes.** Google's help says Optional includes the ability to opt in or opt out for all users; counts are opt in, so this is correct (checked 4 Oct 2026).
 - **Ephemeral: No.** Not in memory only.
 - **Encrypted in transit: Yes.**
 - **Users can request deletion: No.** The ID is random and cannot be matched to a person, and
   resetting it destroys the only handle. privacy.html says so plainly. Do not tick "deletable on request".
-- The SDK also notes the time of first launch on the device before any choice and sends it with the rest if counts are left on. That is the same "App interactions" category and the same Collected / Optional answers; privacy.html says it in "Before you choose". Do not describe the app as recording nothing before consent.
+- The SDK also notes the time of first launch on the device before any choice and sends it only after a Yes. That is the same "App interactions" category and the same Collected / Optional answers; privacy.html says it in "Before you choose". Do not describe the app as recording nothing before consent.
 - "App info and performance" is **not** on Google's list for Analytics, so it is not ticked.
 
 Never claim nothing at all touches the network — the privacy policy already says it does, and

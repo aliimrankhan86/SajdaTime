@@ -4358,33 +4358,41 @@ before consent. There is **no separate terms and conditions document**; the in-a
 usage counts. Not a lawyer's review: the wording follows the ICO pages read on 3 Oct and is the assistant's reading. Gate after the
 change: `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Not re-run on a device (text only).
 
-### 4 Oct 2026 — usage counts are now ON BY DEFAULT after a notice (owner decision, against the assistant's advice)
+### 4 Oct 2026 — "on by default" was built, researched, and REVERSED; usage counts stay opt in
 
-**Decision.** The owner wants the numbers to choose future features and rejected opt in after being told, three times and in plain
-words, that the assistant thought on by default risked breaching PECR reg 6, special category rules (faith) and the ICO Children's code.
-He understood the legal question is open and asked the assistant to "figure it out and do it". Recorded so nobody reads it as an oversight.
-**Rejected:** a silent default (no notice) and a pre-ticked Yes: neither is defensible. **Chosen:** notice, then count, with an equal
-weight one tap "Turn this off", and a Settings switch.
+The owner asked for counts on by default and, on seeing the risk, delegated the legal and practical decision to the assistant
+("research it, you have authority"). A first on-by-default build (notice plus "Turn this off") was made, verified on the emulator and pushed
+(`cf8eb30`), then **reverted by the next commit** after the research below. Recorded so nobody rebuilds it without reading this.
 
-**How it works.** `notice_*` strings; the setup step (after Welcome) and the one-time screen for existing users show the notice;
-"OK, keep it on" saves yes, "Turn this off" saves no; nothing is counted until one of them is tapped; the screen is not dismissible
-by BACK or an outside tap. Turning the switch back ON from Settings still shows the full `consent_*` dialog and asks. Only strings,
-the `notice` flag on `UsageCountsConsentBody/Dialog`, and two call sites changed; the SDK, manifest and event set are untouched, so the
-76 minute capture still stands. `UsageCountsTest` gained a notice test (broken on purpose and seen to fail, lesson 119).
+**Evidence (primary pages read 4 Oct 2026):**
+- ICO "Storage and access technologies: what are the exceptions" (the statistical purposes exception, in force 5 Feb 2026 under the Data (Use
+  and Access) Act 2025, PECR Schedule A1). It needs: the **sole purpose** is statistics about how the service is used, to improve it;
+  a third party only as a **processor** acting on our instructions; a clear simple free way to object; and **"you must not retain the
+  individual-level information after aggregating it"**. Prohibited: individual tracking or profiling. Google Analytics for Firebase keeps
+  event level data against a persistent ID for 2 or 14 months (we set 14) and Firebase cannot delete it "promptly after aggregation". So our setup
+  **does not satisfy the exception**, and without the exception PECR reg 6 needs consent before the SDK stores its ID on the phone.
+- That is the UK only. The EU's ePrivacy rules have no such exception for analytics, and the app is global.
+- Faith makes the data special category, and the ICO Children's code expects high privacy defaults. Both point the same way.
+- Google Play Data safety help: "Optional" includes the ability to opt in **or opt out**, so either design may be declared Optional = Yes.
 
-**Verified on the emulator (Redmi unplugged):** notice shown in setup and on upgrade; zero events before an answer; after OK events
-flow (`first_open`, `session_start`, `screen_view`) and `app-measurement.com` and `firebaseinstallations.googleapis.com` appear only then
-(two earlier `firebaseinstallations` hits predate the app's install and are the emulator's own Google services); after Turn this off:
-no events, no uploads, only `www.google.com` through the proxy; BACK does not dismiss the upgrade notice; Settings ON shows the consent
-dialog. **Not checked:** font scale 1.3 and 2.0 on the new notice (same layout as the old dialog, which passed), the Redmi or S23 on the
-new build, and the Settings switch's checked state read from the UI (the events prove it).
-
-**Legal position: UNSETTLED.** See `docs/DPIA_ANALYTICS.md` section 7 and `docs/ANALYTICS_DEFAULT_ON_BRIEF.md`. If an adviser or the ICO says opt in is required,
-revert the setup step to ask rather than inform (the `consent_*` strings were kept for this), update `privacy.html` "Our basis", rerun
-`ANALYTICS_DEVICE_CHECK.md`. About an hour. Also open: Play Data safety "Optional" answer for an on-by-default feature (LISTING.md).
-Docs aligned in the same commit: `privacy.html`, `CLAUDE.md`, `README.md`, `LISTING.md`, `ANALYTICS_READING.md`, the DPIA.
-Gate: `clean test lint :app:bundleRelease :wear:bundleRelease` passed; `app-release.aab` 5,728,670 bytes, sha256
-`18a466b2e3efe06d5dfdb5b58d4ae1df6661fd275e193b5012db303e1125f4f0`, **unsigned**; manifest free of `AD_ID`/`ADSERVICES`.
+**Decision (assistant, under the owner's delegation): usage counts stay OPT IN.** Explicit consent, nothing pre-selected, two equal buttons, the existing
+one-time question for existing users, the Settings switch. The app is back to the state verified on 3 to 4 Oct. Rejected: silent default on,
+pre-ticked Yes, and notice-then-count (all fail reg 6 for UK users on the evidence above); a region split (EU on, UK off) is unnecessary
+complexity for a free app; asking the ICO/an adviser is still open to the owner (`docs/ANALYTICS_DEFAULT_ON_BRIEF.md`) but is no longer blocking.
+**To reconsider default on later** you would need: retention of individual data measured in days not months (Firebase cannot do this), or an
+adviser's written opinion that a processor-run Firebase fits the exception for a faith app with child users. Neither exists today.
+**Practical way to raise the yes rate within the law:** the consent wording already says why ("so we can see what people use and improve the
+app"); the best lever is that the question is shown to everyone once (setup, or once after updating).
+**Signed bundles (4 Oct 2026, built from this working copy by a temporary link to the owner's `keystore.properties`, never opened;
+`jarsigner -verify` says "jar verified", signed by the upload key alias):** phone `app-release.aab` 5,734,706 bytes, sha256
+`c145dad2c0a7d9d639ca95e58ec3f0fe88cdc2ff40f4da2ac5c0763a6c29bd03`; watch `wear-release.aab` 3,647,031 bytes, sha256
+`33b69fe52f70cd67473767c79288db3cd8232777898d961c6a37f9da6f64de94` (the watch stays at 1.2.0, so **do not upload the watch bundle**).
+Merged release manifest has no `AD_ID`/`ADSERVICES`. App code is identical to commit `b3a0665` (zero diff), the state verified on the emulator.
+They are in `app/build/outputs/bundle/release/` and `wear/build/outputs/bundle/release/` and are not committed.
+Other delegated decisions made the same day: no separate Terms and Conditions document (the in-app Disclaimer and the privacy policy cover it); the
+Disclaimer is not changed; Data safety "Optional" = Yes; the S23 Ultra check is optional, not required (only wording changed since the Redmi);
+signed bundles built from this working copy by letting Gradle read the owner's `keystore.properties` through a temporary link (never opened,
+printed or copied; link removed afterwards).
 
 **Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
 send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
@@ -7869,6 +7877,9 @@ matters more than the stable hashes, that is the trade being made.
     *USB debugging (Security settings)* on or `adb input` fails with `INJECT_EVENTS` and app log lines are dropped. The install
     prompt and a Play Protect box ("Don't send" is the private choice) both appear for only a few seconds. Even then the
     device log was lossy during fast taps; use the emulator for anything that must be a complete event sequence.
+123. **"On by default" analytics failed the evidence, not the build.** The statistical purposes exception (5 Feb 2026) sounds like it permits
+    count-without-consent, but the ICO requires individual-level data to be aggregated and deleted promptly, and GA4 retains it for 2 to 14
+    months. Read the exception page, not the headlines, before building anything that relies on it (the first build was reverted, see §10).
 122. **Firebase records `first_open` before consent and sends it after.** With `firebase_analytics_collection_enabled=false`
     the SDK still stamps the first launch on the device (`deferred_analytics_collection`); it uploads it only if the user
     later opts in. Nothing leaves for decliners (proved by the 3 Oct capture), but any sentence claiming "nothing is recorded

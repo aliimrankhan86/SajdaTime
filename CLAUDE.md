@@ -58,11 +58,10 @@ that he never has to. Keep it that way: when the pick-up point moves, move it in
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS,
 built as an ongoing charity (*sadaqah jariyah*) for the Ummah. It is not a product, there is
 no business model, and there never will be one. Every decision follows from that: no ads, no
-accounts, no server of our own, and no revenue. The one thing the app can send is **usage counts to Google Analytics, on after a plain notice
-unless the user turns them off**. The owner approved counts on 3 Oct 2026 (opt in) and chose
-**on by default on 4 Oct 2026**, against the assistant's advice, so he can see how the app is used and
-plan the next phases (`docs/ANALYTICS_PLAN.md`, `docs/HANDOVER.md` §10). That is a narrow exception,
-not a licence: see the usage counts rule below.
+accounts, no server of our own, and no revenue. The one thing the app can send is **optional,
+opt in usage counts to Google Analytics, off by default**, approved by the owner on 3 Oct 2026 so
+he can see how the app is used and plan the next phases (`docs/ANALYTICS_PLAN.md`, owner sign off
+in its section 11). That is a narrow exception, not a licence: see the usage counts rule below.
 
 It has to work **for the masses** — including a phone with no signal, an old device, a user
 who has never changed a setting, and a user who cannot read English. When a trade-off appears
@@ -141,12 +140,11 @@ session inherits it instead of relearning it.
   nothing for that.) Cloud backup and device-to-device transfer are both off.
   `docs/privacy.html` is a published promise, so any change that touches data handling has to be
   reflected there in the same commit.
-- **Usage counts are on after a notice, closed, and never about belief.** Nothing is counted until the
-  user has seen the notice (first run, or once after updating) and tapped OK or Turn this off; turning
-  it off is one equal-weight tap and a switch in Settings. The notice states the facts in full
-  (`UsageCounts.kt`, the `notice_*` and `consent_*` strings, and `docs/privacy.html` must agree). **The
-  legal basis for on-by-default is unverified** (see `docs/DPIA_ANALYTICS.md` and
-  `docs/ANALYTICS_DEFAULT_ON_BRIEF.md`); do not describe it to the owner as settled. Only the fixed events in `UsageCounts.kt` may be sent: no new
+- **Usage counts are opt in, closed, and never about belief.** Off until the user says yes, with a
+  consent text that states the facts in full (`UsageCounts.kt`, the `consent_*` strings, and
+  `docs/privacy.html` must agree). **The owner asked for on-by-default on 4 Oct 2026; it was built, then reversed
+  the same day on the evidence in `docs/HANDOVER.md` §10 (ICO statistical purposes exception needs individual
+  data deleted after aggregation, which Firebase cannot do). Do not rebuild it without that evidence changing.** Only the fixed events in `UsageCounts.kt` may be sent: no new
   event, parameter or user property without the owner's agreement and a privacy policy change
   first. **Never send the user's sect, madhab, calculation method, alert or prayer settings, city
   or coordinates, and never anything whose *shape* reveals them** (the madhab step is shown to

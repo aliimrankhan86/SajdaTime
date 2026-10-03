@@ -258,19 +258,6 @@ class UsageCountsTest {
             .find(strings)!!.groupValues[1]
         listOf("Google Analytics", "random ID", "outside the UK", "faith", "GPS", "your prayer settings", "switch it off")
             .forEach { assertTrue("consent_body no longer says \"$it\"", body.contains(it)) }
-        // The on-by-default notice (owner decision 4 Oct 2026) must carry the same facts and the
-        // same two never-sent promises, and must say nothing is counted before a button is tapped.
-        val notice = Regex("""<string name="notice_body">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
-            .find(strings)!!.groupValues[1]
-        listOf(
-            "Google Analytics", "random ID", "outside the UK", "faith", "GPS", "your prayer settings",
-            "turn it off", "Settings", "when you first opened the app", "Nothing is counted until",
-        ).forEach { assertTrue("notice_body no longer says \"$it\"", notice.contains(it)) }
-        Regex("""<string name="(notice_[a-z_]+)">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
-            .findAll(strings).forEach {
-                assertFalse("The word tracking is not used in this app's copy", it.groupValues[2].contains("track", ignoreCase = true))
-                assertFalse("The dua request belongs in the disclaimer and nowhere else", it.groupValues[2].contains("dua", ignoreCase = true))
-            }
         consent.forEach {
             assertFalse("The word tracking is not used in this app's copy", it.contains("track", ignoreCase = true))
             assertFalse("The dua request belongs in the disclaimer and nowhere else", it.contains("dua", ignoreCase = true))

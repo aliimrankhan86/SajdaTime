@@ -2,7 +2,7 @@
 
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS.
 
-No accounts. No ads. Your location never leaves your phone. Usage counts, on unless you turn them off (you are told first, and it is one tap), help the developer see how the app is used (never your location, school of thought or settings).
+No accounts. No ads. Your location never leaves your phone. Optional usage counts, off unless you switch them on, help the developer see how the app is used (never your location, school of thought or settings).
 
 ---
 

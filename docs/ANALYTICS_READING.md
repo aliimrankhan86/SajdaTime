@@ -39,7 +39,7 @@ Never quote a Firebase number as "how many users I have". Say "of the people who
 
 ## Rules of thumb
 
-- **Sample bias.** Counts are on by default, so most users should be included, but anyone who turned them off is missing and may not be typical. Compare *ratios*,
+- **Sample bias.** Expect only a minority to opt in, and not a typical minority. Compare *ratios*,
   never raw counts, and never compare Firebase to Play Console counts.
 - **Small numbers lie.** With a few dozen opted in users, one person moves a percentage a lot. Wait
   for weeks of data before acting, and treat anything under about 50 users as a hint.
