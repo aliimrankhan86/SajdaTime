@@ -502,3 +502,47 @@ pressing Publish (section 5).
   behaviour; consent text wording for exact alarms; extra inventory lines (`privacy.html`
   48 to 49, manifest 39 to 44, HANDOVER §10); release notes drafted; day one checklist.
   Still open: every UNVERIFIED row in section 2.
+
+## 14. Resume instructions: when the owner says "do everything"
+
+**What this means.** The owner is not technical and has asked for the assistant to run the whole
+job. "Do everything" authorises sections 6 to 8 of this plan, from Phase 0 to Phase 8, in
+order, without asking for approval at each step. It does **not** authorise: touching the signing
+key, pressing submit or publish, agreeing to Google's terms, entering credentials, or any event
+or data beyond what section 4.3 approves. The sign off in section 11 stands. Do not ask again.
+
+**Before anything else (Phase 0 additions).**
+1. Confirm this plan is on the branch the session has checked out. If the planning branch
+   `claude/app-analytics-strategy-e826p5` never reached GitHub (the planning session could not
+   push, GitHub access was missing), tell the owner in one plain sentence and ask him to
+   reconnect GitHub at https://claude.ai/connect-github. The plan's decisions are also recorded in
+   section 11, so the work can be rebuilt from this file if it exists, or from the owner's
+   decisions if it does not.
+2. Check the session has a shell with Gradle, `adb` and emulators, and whether Chrome can be
+   driven (section 5).
+3. Confirm the app is live: fetch the public Play listing and read "Updated on" (1.2.0).
+4. Read `CLAUDE.md` and HANDOVER §11 STATE OF PLAY. Do not invent other work.
+
+**How to talk to the owner.** Plain language. One screen at a time. Lead with what to click.
+Separate what is verified from what is assumed. Never ask him to test the watch. Never ask him to
+run commands himself unless the session has no shell.
+
+**What the owner will be asked to do, and nothing more.**
+- Sign in to the Firebase console and Play Console with the Google account used for Play Console.
+- Accept Google's terms where required (his signature).
+- Send a screenshot of each console screen if Chrome cannot be driven.
+- A five minute DebugView check during Phase 4 (open Analytics > DebugView, send a screenshot).
+- Press Publish at the end of Session 2.
+- Optionally plug in the Redmi for a two minute layout check.
+
+**Decisions already made, so they are not reopened.** Firebase Analytics, opt in, phone only. One
+screen view per main tab. Two setup events (`setup_step`, `permission_result`) with the sect
+safety rules in 4.3 item 7. Consent step straight after Welcome, plus a Settings row that opens
+the same dialog. No pop up for existing users. No deletion on request promise. Drop "No
+tracking" from the store listing and use "No accounts". Firebase under the Play Console account.
+Phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001). Friendly wording, but the consent surfaces
+state the material facts in full.
+
+**The single most likely failure.** Treating "do everything" as permission to skip the stop rule
+(4.1) or the opted out capture. If Firebase sends anything to Google before the user opts in and
+the fallback cannot fix it, **do not ship**, and tell the owner plainly why.
