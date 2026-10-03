@@ -80,6 +80,8 @@ backend (cost and security burden, no benefit).
 | Do they stay | Day 1, 7, 28 retention | Needs enough opted in users |
 | Where from | Country, usually city | Derived from the connection, not GPS |
 | Which part of the app is used | Screen views per main tab (v4) | Counts opted in users only. Says nothing about features inside a screen |
+| Where setup loses people | Setup step reached, permission granted or denied (v4.1) | Counts people who opted in at the consent step, so it cannot see anyone who left before it |
+| Whether a future feature is wanted | **Not answerable by this data** | Usage shows what people do with what exists. Demand for something that does not exist yet needs another source (reviews, direct questions). Do not pretend otherwise when planning phase two |
 | Device, Android version, app version | Standard reports | |
 | True installs | **Play Console** | The only unsampled headcount |
 
@@ -132,6 +134,22 @@ The owner is told plainly. No compromise on "off means off".
    produce per-tab data by itself (UNVERIFIED for Compose, confirm on the day). If the
    navigation structure makes this more than a few lines, stop and tell the owner rather than
    building an event layer.
+7. **Setup counts (approved, v4.1).** Exactly two event names, fixed, sent only while opted in:
+   - `setup_step` with one parameter `step`, a fixed word per onboarding step after consent
+     (for example `permission`, `sect`, `madhab`, `method`, `confirm`). The step names are
+     structural, not the user's answer. The user's chosen sect, madhab and method are **never**
+     sent.
+   - `permission_result` with `permission` (`notifications`, `exact_alarm` or `location`) and
+     `granted` (`true` or `false`). A yes or no only. No coordinates, no place name.
+   - Where each fires is decided in Phase 3. The notification prompt fires from
+     `MainActivity` `onFinish`, and the exact alarm and location outcomes come from their own
+     flows, so find each real result callback rather than logging the request. A logged request
+     is not an outcome.
+   - These two event names are the entire event layer. No wrapper class, no extra parameters.
+     Adding any other event, parameter or user property needs the owner's yes and a privacy
+     policy update first.
+   - Custom parameters need registering in the Firebase console before they show in reports
+     (UNVERIFIED, from memory). Add this to Session 1 if the console asks.
 
 ### 4.4 Build variants
 `debug` shares the release package name. `rtl` and `sideload` use `initWith(debug)`, which does
@@ -144,7 +162,9 @@ The owner is told plainly. No compromise on "off means off".
 - Nothing Firebase related goes into `:wear`.
 
 ### 4.5 Consent UX
-- **New installs:** a new onboarding step after `PERMISSION`. Rewire both directions
+- **New installs:** a new onboarding step placed **straight after `WELCOME` and before `PERMISSION`** (approved
+  setup counts, section 11 item 9, need consent to exist before the steps they measure; the
+  welcome screen itself cannot be counted). Rewire both directions
   (`OnboardingScreen.kt`, enum at line 79, wiring about lines 108 to 156). Two equal choices,
   nothing pre selected, Google named, policy linked.
 - **Everyone:** a Settings switch in About beside Privacy. Off by default. It is also the
@@ -245,7 +265,8 @@ Line numbers are from the 3 Oct tree and may drift.
 ### 7.3 Drafts (final only after Phase 1)
 **Onboarding step.** Title: *Help us see how SajdaTime is used?* Body: *If you say yes,
 SajdaTime sends usage counts to Google Analytics: how many people use it, how often, for how
-long, which main screen you open, and your approximate area, which Google works out from your
+long, which main screen you open, which setup steps you reach, whether you allow notifications,
+alarms and location (a yes or no, never the location itself), and your approximate area, which Google works out from your
 internet connection. They
 are tied to a random ID, not your name. It never sends your GPS position, the place you type or
 your prayer settings. It is off unless you choose yes, and you can switch it off in Settings
@@ -349,7 +370,8 @@ make improvements and plan the next phases.*
    analytics first as its own small release (1.3.0) so a baseline exists before anything else
    changes. The data will answer "how many, how often, how long, from where, which main tab",
    not "why".
-9. **PROPOSED, needs a yes from the owner:** a small fixed set of setup events, so "what is not
+9. **APPROVED (owner, 3 Oct 2026: "I want to understand how users are interacting with the app
+   and if it is useful, and use it to decide future features"):** a small fixed set of setup events, so "what is not
    making sense" has a real signal. Onboarding step reached (step name only) and permission
    outcomes (notifications, exact alarms and location each granted or denied, as a yes or no,
    never the location itself). Setup friction is the likeliest place users get lost in this app,
