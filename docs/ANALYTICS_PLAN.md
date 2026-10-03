@@ -227,6 +227,13 @@ Line numbers are from the 3 Oct tree and may drift.
   Analytics." Do not state it as our own guarantee.
 - Name Google, say data may be processed in the US (UNVERIFIED location, check on the day), link the policy.
 - Never promise deletion on request.
+- **Tone (owner request, 3 Oct 2026): friendly and low key, never understated.** Avoid the word
+  "tracking" everywhere. Use "usage counts" and "help us improve". In marketing surfaces (store
+  short description, feature graphic, website tagline) keep it brief and do not headline it. In
+  the consent screen, the Settings row description and `privacy.html`, state the material facts
+  in full: Google receives it, it is tied to a random ID, what is and is not sent. Reason: UK
+  consent rules require clear information, Play Data safety must match behaviour, and a vague
+  consent is both unlawful and the thing most likely to cost the app its trust.
 - The option is for adults. The app is not directed at children.
 - **Permanent rule: never send sect, madhab, calculation method, alert or prayer settings, a
   typed city or coordinates**, as an event, a parameter or a user property. Knowing that someone
@@ -333,6 +340,23 @@ make improvements and plan the next phases.*
    records. The policy explains this plainly.
 6. **Added by the assistant (v4), reversible:** one screen view per main tab, and the permanent
    "never send sect, madhab, method or settings" rule in 7.2.
+
+7. **Approved (owner, 3 Oct 2026):** drop "No tracking" from the Play short description and the
+   feature graphic, replace with "No accounts" (to be tested in the Console, see 7.3). Keep the
+   mention of usage counts brief and friendly in marketing surfaces (tone rule in 7.2).
+8. **Phase two scope: undefined by the owner.** Stated purpose only: understand how people use
+   the app, what makes sense to them and what does not, to make better decisions. Decision: ship
+   analytics first as its own small release (1.3.0) so a baseline exists before anything else
+   changes. The data will answer "how many, how often, how long, from where, which main tab",
+   not "why".
+9. **PROPOSED, needs a yes from the owner:** a small fixed set of setup events, so "what is not
+   making sense" has a real signal. Onboarding step reached (step name only) and permission
+   outcomes (notifications, exact alarms and location each granted or denied, as a yes or no,
+   never the location itself). Setup friction is the likeliest place users get lost in this app,
+   and screen views cannot show it. If approved, the consent step moves to straight after Welcome
+   so the later steps can be counted, and the consent text gains one line about setup steps.
+   Never sect, madhab, method or settings (rule 7.2). About 5 event calls in total, no event
+   framework. If not approved, nothing changes.
 
 Still needed from the owner, later and only as guided sessions: the Firebase console session,
 the Play Console session and pressing Publish (section 5).
