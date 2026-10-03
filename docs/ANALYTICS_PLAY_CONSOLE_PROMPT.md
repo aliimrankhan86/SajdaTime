@@ -61,12 +61,20 @@ PART 3. STORE LISTING (Grow > Store presence > Main store listing, English (Unit
     (Keep the "—" in the old line only as a way to find it; the new line has no dash.) Save.
  c) Do not change graphics or screenshots.
 
-PART 4. REPORT (stop here, do not send anything for review)
+PART 4. RELEASE (Test and release > Production > Create new release)
+Create the release for phones. Upload ONLY this file: <PATH OF app-release.aab, FILLED IN BY ME>.
+Release name: leave the suggested one. Release notes, English (United Kingdom), exactly:
+New: an optional setting to share usage counts, so we can see how SajdaTime is used and improve it. If you installed before, you will be asked once. Nothing is shared unless you say yes. Your prayer times and your location are not affected.
+Save the release as a draft and open its summary. It must say version code 5 (1.3.0) and no errors.
+If it shows any error or warning, copy it to me. Do NOT click Send for review.
+
+PART 5. REPORT (stop here, do not send anything for review)
 Open Publishing overview and tell me the list of changes waiting to be sent for review. Then report
 in one message:
 - Data safety: each question and the answer you saved, and the preview text of the public card.
 - Advertising ID: the answer found, and whether you changed it.
 - Listing: the short description as saved, the two bullet lines as saved, and any notices.
+- Release: the version code and name shown in the summary, the notes saved, and any error or warning.
 - Publishing overview: the exact list of changes ready to send.
 - Anything that did not match this brief, or that you had to decide.
 ```
