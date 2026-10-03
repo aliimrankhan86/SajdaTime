@@ -380,7 +380,7 @@ numbers are from the 3 Oct tree and may drift.
   the policy first. Record in HANDOVER §11.
 
 ### 7.3 Drafts (final only after Phase 1)
-**Consent dialog and onboarding step.** Title: *Help us see how SajdaTime is used?* Body: *If you
+**Consent dialog and onboarding step.** Title: *Help improve SajdaTime?* (changed 3 Oct 2026 to state the purpose) Body: *If you
 say yes, SajdaTime sends usage counts to Google Analytics. They cover how many people use the
 app, how often and for how long, which main screen you open, which setup steps you reach,
 whether you allow notifications and location, and whether exact alarms are allowed (a yes or no, never the location itself),

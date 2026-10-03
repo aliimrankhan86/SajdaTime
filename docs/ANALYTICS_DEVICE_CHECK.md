@@ -98,3 +98,13 @@ Play Store one. Start it with packet capture: `emulator -avd <name> -tcpdump /tm
 - Section 2: PASS or FAIL, duration, emulator image, hosts searched, and what the opted-in run showed.
 - Section 3: the two `.aab` paths, sizes, the sha256, the manifest grep result, which store images changed.
 - Anything that did not match this file, anything you had to decide, and what you did not test.
+
+## Added 3 Oct 2026 (commit 8a39b2b): the one time question for existing users
+
+Run after the capture. Report PASS or FAIL for each.
+1. Upgrade: keep data from the previous build (setup complete, no answer saved), install the new build
+   over it with installSideload. The question appears once. Tapping outside or Back does not dismiss it
+   and saves no answer. After tapping either button it never returns, even after force stop and relaunch.
+2. Fresh install: the question appears once in setup only and never again afterwards.
+3. After No nothing is sent. After Yes only the fixed events are sent.
+4. Both buttons fully visible and equal size at font scale 1.3 and 2.0. Restore the font scale after.
