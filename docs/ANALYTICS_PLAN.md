@@ -517,7 +517,7 @@ makes sense to them and what does not, and use that to decide future features.* 
 
 14. **Done (3 Oct 2026):** Firebase project and Analytics settings (plan section 5 Session 1) were applied
     by Claude in Chrome and confirmed after reload, including `Reset user data on new activity` OFF.
-    **Pending, the owner's signature: accept the Google Analytics Data Processing Terms.**
+    **Done (owner, 3 Oct 2026): he accepted the Google Analytics Data Processing Terms himself.**
 
 Still needed from the owner: the two guided sessions, the five minute DebugView check and
 pressing Publish (section 5).
