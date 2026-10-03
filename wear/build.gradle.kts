@@ -35,9 +35,13 @@ android {
         // https://developer.android.com/training/wearables/packaging. Bump freely; the two
         // sequences can never collide. Version codes can never be reused or decreased.
         versionCode = 1001
-        // Kept in step with the phone's versionName so one release never shows two version
-        // numbers to the same user. The *code* stays in its own 1000+ lane on purpose —
-        // see the note by versionCode above.
+        // Normally kept in step with the phone's versionName so one release never shows two
+        // version numbers to the same user. **Deliberate exception for phone 1.3.0 (3 Oct
+        // 2026):** that release adds optional usage counts to the phone app only and changes
+        // nothing on the watch, so the watch stays at 1.2.0 / 1001. No second upload and no
+        // Wear review. If the owner would rather match the numbers, bump this to "1.3.0" and
+        // versionCode 1002 and upload both. See docs/ANALYTICS_PLAN.md section 4.7. The
+        // *code* stays in its own 1000+ lane on purpose — see the note by versionCode above.
         versionName = "1.2.0"
     }
 

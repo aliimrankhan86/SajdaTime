@@ -41,8 +41,8 @@ android {
         // builds, and they are not the same app. **Never upload a saved artifact — build
         // fresh from main.** Play accepts whichever file you hand it, so a stale one ships
         // silently and cannot be corrected without burning another version code.
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
