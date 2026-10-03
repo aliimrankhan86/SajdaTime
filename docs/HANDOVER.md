@@ -4274,6 +4274,64 @@ alarm was watched firing on it; only the scheduling was read. The watch was **no
 with it — that remains item 7 in §11. Nothing was tested on One UI's own battery-optimisation
 screens, so Samsung's background policy is still the open OEM question §11 records.
 
+### 3–4 Oct 2026 — Usage counts verification (owner's Redmi Note 13 Pro, `sajda` emulator, release build)
+
+Run from `docs/ANALYTICS_DEVICE_CHECK.md` on the owner's Mac, branch `claude/app-analytics-strategy-e826p5`. Everything
+used a local `.sideload` build with `analytics_allowed` switched to `true`; **that edit was never committed** (reverted
+and `git status` checked clean of it). `./gradlew clean test lint` passed before and after (the sideload-flag test
+fails while the edit is in place, as designed). The Redmi (HyperOS, Android 16) ran the build as `com.sajdatime.app.sideload`.
+
+**Phone (Redmi), driven by the owner tapping while the assistant read the device log** (HyperOS refuses `adb input` even
+with USB debugging on; see lesson in §15):
+- *Declined path:* "No thanks", setup, Times/Qibla/Settings: no `Logging event`, no upload for the app. PASS. Caveat: that
+  phone's log buffer is lossy and its Play-services log lines carry no package name, so this is good evidence, not proof;
+  the proof is the emulator capture below.
+- *Opt in from Settings:* full consent dialog appeared, "Yes" chosen. `screen_view` with `times`, `qibla`, `settings`
+  uploaded, one each. PASS.
+- *Off:* switching off, then changing tabs: no events and no upload. PASS.
+- *On, force-stop, relaunch:* switch still on, events flow again. PASS (on, off, on, relaunch).
+- *Setup path:* the phone log dropped lines during the fast setup (only `confirm`, `finish`, `permission_result`
+  exact_alarm/notifications survived), so the full sequence was NOT taken from the phone. See the emulator below.
+- Layout, phone: Settings About group with the "Share usage counts" row reads cleanly (dark theme). Consent step and dialog
+  fine on the emulator at the same 1080x2400. The dialog scrolls as a whole, so the two buttons sit below the fold until
+  the owner scrolls; both are reachable and equal. "No thanks" on the consent step sits tight to the bottom edge. Not a fault.
+
+**Emulator `sajda` (Google APIs, API 36), setup events**, full log, via proxy-capture below. Event names and parameters for
+both sects: `setup_step` step=permission, sect, method, confirm, finish; `permission_result` location=true (emulator),
+exact_alarm=false, notifications=true. **Shia and Sunni runs were identical** (`diff` empty); the Sunni run went through the
+madhab screen and no `madhab` event exists. PASS.
+
+**The opted-out capture (the stop rule): PASS, 76 min 48 s** (22:51:42 to 00:08:30, 3–4 Oct), fresh install, "No thanks",
+setup done, app opened, backgrounded and tab-switched every ~5 min for the whole period, `TIME_SET` broadcast each cycle.
+- App log: `App measurement disabled via the manifest`; **zero** `Logging event`, `Uploading data` or `Successful upload` lines.
+- Hosts: every connection through the logging proxy, with TLS SNI read from the ClientHello. Only `www.google.com` (connectivity)
+  appeared. No `app-measurement.com`, `region1.app-measurement.com`, `firebaseinstallations.googleapis.com`, `firebase*`,
+  `crashlytics`, `google-analytics`. `firebaseinstallations.googleapis.com` first appeared only after opt in.
+- **Positive control (same proxy, same session):** after opting in, the proxy logged `app-measurement.com`,
+  `region1.app-measurement.com` and `firebaseinstallations.googleapis.com`, and the app log showed `screen_view` uploads.
+
+**The first capture attempt was invalid and is not evidence.** `emulator -tcpdump` recorded only the boot burst (21:26) and a
+few packets at 22:14, and showed nothing at all while the app was uploading successfully at 22:44. A capture that cannot see the
+opted-in uploads proves nothing about the opted-out run, so it was thrown away and redone with a local logging proxy
+(`emulator -http-proxy http://127.0.0.1:8899`, a ~60-line Python CONNECT proxy that logs SNI). See §15.
+
+**Finding to decide on (not a stop):** the SDK records `first_open` on the device at first launch, before consent, tagged
+`deferred_analytics_collection`, and uploads it **only if the user later opts in** (seen on the Redmi: `first_open` stamped
+21:44:50, uploaded 21:55:24 after opt in, alongside `session_start` and `screen_view`). Decliners send nothing (the capture). The
+policy and DPIA should say that the time of first launch can be included if you opt in later. Not edited here.
+
+**Release build (unsigned here):** the worktree has no `keystore.properties` (it lives in the owner's main checkout and was
+deliberately not copied), so these two bundles are **unsigned**. A signed pair must be built from the main checkout.
+`app-release.aab` 5,726,823 bytes, sha256 `00c9158d55a84da9f1dee2b52be8a8a7e4a65aca5915113217f4dcfef6e97dcb`;
+`wear-release.aab` 3,638,937 bytes. Merged release manifest: **no** `AD_ID` or `ADSERVICES` (grep empty); it has
+`INTERNET`, `ACCESS_NETWORK_STATE`, `WAKE_LOCK`, the install-referrer permission and the three Firebase meta-data flags.
+`tools/build-store-assets.sh`: only `feature-graphic-1024.png` changed ("Sunni & Shia · No accounts"); the text sits cleanly
+on the gradient. `05-settings.png` does not show the new row, so it was left alone.
+
+**Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
+send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
+Play services missing; a signed bundle; Play Console, Data safety and the privacy page text.
+
 ## 11. ⚠️ Still pending — the honest list
 
 > **This section opens with the current state of play, then the dated record of how the project
@@ -4322,8 +4380,13 @@ anything.** It reverses the old "no analytics" rule in one narrow way and nothin
    Publish**. Phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001).
 6. After publishing: the owner reads the numbers using `docs/ANALYTICS_READING.md`.
 
-**Not tested as of this entry:** anything at runtime. Unit tests and the merged manifest were checked;
-nothing has been run on an emulator or a phone.
+**Update 4 Oct 2026: steps 2 and 3 are DONE and PASSED** (see the "Usage counts verification" entry in §10): 76 min 48 s
+opted-out capture clean with a working positive control, phone opt in/out/relaunch, Sunni and Shia event names identical, release
+manifest free of `AD_ID`/`ADSERVICES`. **What remains:** (a) decide whether `privacy.html` and the DPIA should add one sentence that
+the time of first launch can be sent if you opt in later (the `first_open` finding in §10); (b) build the **signed** bundles from
+the owner's main checkout (this verification built unsigned ones); (c) Data safety and Play Console, owner presses Publish.
+
+**Not tested as of the 3 Oct entry:** anything at runtime. (Superseded by the update just above.)
 
 ### 📍 STATE OF PLAY — 7 Sept 2026 (still the record of what is live)
 
@@ -7737,6 +7800,21 @@ matters more than the stable hashes, that is the trade being made.
     run printed BUILD SUCCESSFUL three times, because the new config files were not yet test inputs
     (lesson 84 again, found 3 Oct 2026). It looked like a pass. Declare the file in the
     `inputs.files` block, then break it, and only trust the run that goes red.
+
+120. **A network capture is only evidence once it has seen the thing it claims is absent.** On 3 Oct 2026 `emulator
+    -tcpdump` ran for 76 minutes and showed no Analytics hosts, and would have been reported as a pass; it had in fact stopped
+    recording after the boot burst and did not see an opted-in upload that succeeded in the log. Always run the positive
+    control (opt in, watch the hosts appear) in the same capture. What worked: a ~60-line local CONNECT proxy that logs
+    the TLS SNI, with `emulator -http-proxy http://127.0.0.1:8899`. A pcap is not needed.
+121. **HyperOS (Redmi) needs three things before `adb` is useful**, none obvious: *Install via USB* on, the per-app
+    entry under "Denied installation via USB" switched **off** (a timed-out install prompt adds the app there itself), and
+    *USB debugging (Security settings)* on or `adb input` fails with `INJECT_EVENTS` and app log lines are dropped. The install
+    prompt and a Play Protect box ("Don't send" is the private choice) both appear for only a few seconds. Even then the
+    device log was lossy during fast taps; use the emulator for anything that must be a complete event sequence.
+122. **Firebase records `first_open` before consent and sends it after.** With `firebase_analytics_collection_enabled=false`
+    the SDK still stamps the first launch on the device (`deferred_analytics_collection`); it uploads it only if the user
+    later opts in. Nothing leaves for decliners (proved by the 3 Oct capture), but any sentence claiming "nothing is recorded
+    until you say yes" would be wrong.
 
 ---
 
