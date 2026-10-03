@@ -2,8 +2,9 @@
 
 **Run this only after the device check (`docs/ANALYTICS_DEVICE_CHECK.md`) has reported PASS for the
 "nothing is sent before consent" proof, the branch has been merged to `main` with the owner's OK
-(so `docs/privacy.html` is live), and the signed bundle exists.** The browser agent never uploads
-the bundle and never sends anything for review: those two are the owner's. Written 3 Oct 2026.
+(so `docs/privacy.html` is live), and the signed bundle exists.** The browser agent may create the release,
+upload the bundle and paste the release notes (owner said yes on 3 Oct 2026), but never sends
+anything for review: that button is the owner's. Written 3 Oct 2026.
 Source of every answer below: `docs/store/LISTING.md` ("Optional usage counts") and `docs/ANALYTICS_PLAN.md`.
 
 ```
@@ -14,7 +15,8 @@ what is listed. Change nothing else.
 HARD RULES
 - Do NOT click "Send for review", "Publish", "Submit", "Roll out" or any final submit or publish
   button. I do that myself.
-- Do NOT upload any bundle (.aab). I do that myself.
+- You MAY create the Production release and upload ONLY the file I name as the 1.3.0 .aab (versionCode 5).
+  If the file picker cannot be driven, stop and tell me; I will choose the file myself.
 - Do NOT accept policies or agreements for me. Stop at any that appear and tell me.
 - Do NOT touch pricing, countries, app access, content rating, target audience or anything not
   listed. If a screen is not as described, STOP and describe it.
@@ -69,11 +71,11 @@ in one message:
 - Anything that did not match this brief, or that you had to decide.
 ```
 
-## What the owner does after that (about 5 minutes, one screen at a time)
+## The release steps (agent does 1 to 3 if it can; the owner does 4)
 1. Test and release > Production > Create new release (phone / "Phones, Tablets…" form factor only).
 2. Upload the signed `app-release.aab` (versionCode 5, 1.3.0).
 3. Release notes (en-GB): *New: an optional setting to share usage counts, so we can see how SajdaTime
-   is used and improve it. It is off unless you turn it on. Your prayer times and your location are
+   is used and improve it. If you installed before, you will be asked once. Nothing is shared unless you say yes. Your prayer times and your location are
    not affected.*
 4. Check the release summary says versionCode 5 and no errors, then **Send for review** (one submission
    with the Data safety and listing changes). **That is the owner's button.**
