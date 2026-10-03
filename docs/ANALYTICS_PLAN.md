@@ -1,175 +1,187 @@
-# Phase two: optional usage counts (plan, v4, APPROVED IN PRINCIPLE)
+# Phase two: optional usage counts (plan v5, approved by the owner, not yet built)
 
-**Status: v4. Owner sign off recorded 3 Oct 2026 (section 11). No app code has been changed.**
-The build is waiting on the session at the owner's computer (section 6, Phase 0 onwards).
-Written 3 Oct 2026. Revised three times: v2 after an adversarial review, v3 after a fact check
-and a rewrite around "the assistant does the work, the owner does the minimum", v4 to record the
-sign off and add tab level screen views, because the owner's goal is to see what is doing well
-and what is not.
-When approved and built, fold the decisions into `docs/HANDOVER.md` (§2, §5, §8, §11, §15) and
-`CLAUDE.md`, then delete or archive this file.
+**Status: v5. Owner sign off recorded 3 Oct 2026 (section 11). No app code has been changed.**
+The build waits for a session on the owner's computer (section 6).
+Written and revised 3 Oct 2026 (history in section 13). When built, fold the decisions into
+`docs/HANDOVER.md` (§2, §5, §8, §11, §15) and `CLAUDE.md`, then delete or archive this file.
 
 ## 0. How to read this plan
 
-Every factual claim carries one of three labels. **If a claim has no label, treat it as the
-author's judgement, not a fact.**
+Every factual claim carries a label. **A claim with no label is the author's judgement.**
 
-- **CONFIRMED**: seen in an official Google or Firebase page (via search result text) or in
-  this repo, with the source named.
-- **PARTLY**: supported only by third party sources, or by the iOS page where Android is
-  assumed to behave the same. To be proved on the day.
-- **UNVERIFIED**: could not be checked. Has a test or a console screen that settles it.
+- **CONFIRMED**: seen in an official Google or Firebase page (via search result text) or in this
+  repo, with the source named.
+- **PARTLY**: third party sources only, or the iOS page where Android is assumed the same.
+- **UNVERIFIED**: could not be checked. A test or a console screen settles it.
 
-**What could not be done in the planning session, and why it matters:** Google's own pages
-(firebase.google.com, support.google.com, dl.google.com, maven.google.com metadata) are blocked
-from this environment, so nothing was read from them directly. There is also **no Android SDK
-here**, so nothing could be compiled, linted or run. The plan therefore contains no claim that
-any code works. All building and testing happens on the owner's computer (section 5).
+**Limits of the planning session:** Google's own pages (firebase.google.com,
+support.google.com, dl.google.com, Maven metadata) were blocked, so nothing was read from them
+directly. There is **no Android SDK** in that environment, so nothing was compiled, linted or
+run. The plan makes no claim that any code works. Two independent reviews (one by a stronger
+model) were run on earlier versions, and their findings are in section 13.
 
-## 1. Decision being asked for
+## 1. Decision
 
-Add **optional, opt in usage counts** to the **phone app only**, using Firebase Analytics, so
-the owner can see how many people use SajdaTime, how often, for how long, and from which
-countries. Nothing else.
+Add **optional, opt in usage counts** to the **phone app only**, using Firebase Analytics, so the
+owner can see how people use SajdaTime, what makes sense to them, and where they get stuck, in
+order to make better decisions about future work.
 
-This **reverses a written project rule** ("no analytics", `CLAUDE.md` lines 60 to 61,
-`HANDOVER.md` §11 non-goals at about line 6222, and several published statements). It needs the
-owner's explicit sign off before any code (section 11).
+This **reverses a written project rule** ("no analytics", `CLAUDE.md` lines 60 to 61 and 134,
+`HANDOVER.md` §11 non-goals about line 6222, and several published statements). Approved by
+the owner (section 11).
 
-| Already decided (owner, 3 Oct 2026) | |
+| Decided | |
 |---|---|
-| Tool | Firebase Analytics (free) |
+| Tool | Firebase Analytics, free |
 | Consent | Opt in, off by default |
 | Scope | Phone only. Watch untouched |
-| Events | **v4 change:** automatic metrics plus **one screen view per main tab** (Times, Qibla, Settings, and any other top level tab that exists on the day). Nothing else. Reason: the owner wants to see what is doing well, and automatic metrics alone cannot show which part of the app is used. The owner asked for the goal and delegated the method, so this is the assistant's recommendation. Say "drop it" to revert to automatic only |
-| Never sent | Sect, madhab, calculation method, prayer or alert settings, city, coordinates. These reveal religious belief and are treated as special category data under UK GDPR (legal classification UNVERIFIED, so we are conservative). A permanent rule, see 7.2 |
+| Collected | Automatic metrics, plus one screen view per main tab, plus two fixed setup events (4.3) |
+| Never sent | Sect, madhab, calculation method, alert or prayer settings, typed city, coordinates. As an event, a parameter, a user property, or by the **shape** of what is sent (B1 in section 13) |
 
-**Rejected, with reasons:** Aptabase (tracks nothing automatically, so every metric needs event
-code); self hosted Umami, Plausible or Matomo (needs a server, breaks "no server"); on by
-default (weakest privacy position, and the UK "statistical purposes" exemption is narrow, legal
-status UNVERIFIED); Crashlytics (out of scope, Play vitals already covers crashes); custom
-backend (cost and security burden, no benefit).
+**Rejected:** Aptabase (tracks nothing automatically, needs event code for every metric); self
+hosted Umami, Plausible, Matomo (needs a server); on by default (weakest privacy position, and
+the UK "statistical purposes" exemption is narrow, UNVERIFIED); Crashlytics (out of scope, Play
+vitals covers crashes); custom backend (cost and security burden).
 
-## 2. Fact check: what is and is not established
+## 2. Fact check
 
 | Claim | Status | Source or test |
 |---|---|---|
-| `setAnalyticsCollectionEnabled` persists across launches and overrides the manifest default | CONFIRMED (iOS page text; the Android page was seen only as a summary saying the same) | Firebase "Configure Analytics data collection". Prove on Android with the on, off, on, relaunch test |
-| A manifest `..._collection_enabled=false` is the documented way to wait for consent | CONFIRMED | Same page |
-| The "deactivated" key overrides any runtime call, so it must **not** be used for opt in | CONFIRMED on iOS, PARTLY on Android | Same page. We do not use it either way |
-| Google Analytics does not log or store IP addresses, but derives city, region and country from the IP | CONFIRMED | Google "Privacy controls in Google Analytics" (support.google.com/firebase/answer/9019185) |
-| New GA4 properties keep event data 2 months by default, 14 months selectable free | PARTLY | Third party guides plus Google retention page text. Settle on the console screen on the day |
+| `setAnalyticsCollectionEnabled` persists across launches and overrides the manifest default | CONFIRMED (iOS page text; Android seen only as a summary) | Firebase "Configure Analytics data collection". Prove on Android with the on, off, on, relaunch test |
+| Manifest `..._collection_enabled=false` is the documented way to wait for consent | CONFIRMED | Same page |
+| The "deactivated" key overrides any runtime call, so never use it | CONFIRMED on iOS, PARTLY on Android | Same page |
+| Google Analytics does not log or store IP addresses but derives city, region and country from them | CONFIRMED | Google "Privacy controls in Google Analytics" (support.google.com/firebase/answer/9019185) |
+| New GA4 properties keep event data 2 months by default, 14 selectable free | PARTLY | Third party guides plus Google retention text. Settle on the console screen |
 | Manual `FirebaseApp.initializeApp` after startup is possible | CONFIRMED | Firebase blog "Take control of your Firebase init" |
-| Manual init is **safe for Analytics** | **UNVERIFIED, doubtful** | Sources say Analytics wants the app ID and early init to measure correctly, and users report Analytics disabled without it. Late init may miss `first_open` and the first `session_start` |
-| With collection disabled, Firebase sends nothing at all before consent | **UNVERIFIED** | Docs imply it. Settled only by the opted out capture test (section 8) |
-| Analytics falls back to the Android ID when the advertising ID is off | UNVERIFIED (one forum claim) | Only changes policy wording, because *Device or other IDs* is declared regardless |
-| Latest versions: BoM 34.19.0, firebase-analytics 23.2.0, google-services plugin 4.4.4 | UNVERIFIED (search result summaries, Google Maven blocked here) | Gradle resolves the real latest on the day. Do not hard code these numbers from this plan |
-| google-services plugin works with this repo's AGP 9.3.1 and built in Kotlin | UNVERIFIED | Build every variant on the day |
-| Merged manifest gains `ACCESS_NETWORK_STATE`, `WAKE_LOCK`, probably the install referrer permission and `<queries>` | UNVERIFIED | Diff the merged manifest on the day |
-| Play Data safety accepts a CSV import | UNVERIFIED (from memory) | Look for "Import from CSV" on the form on the day. If absent the form is filled by hand with the answers in section 7 |
-| Existing installs: about 22 as of 7 Sept (HANDOVER) | CONFIRMED but stale | Re-read Play Console before quoting |
-| Reports lag about a day; hidden rows at small audiences | UNVERIFIED | Observe |
+| Manual init is **safe for Analytics** | **UNVERIFIED, doubtful** | Late init may miss `first_open` and the first `session_start` |
+| With collection disabled, Firebase sends nothing before consent | **UNVERIFIED** | Settled only by the opted out capture test (8) |
+| Firebase can be configured from plain string resources (`google_app_id` and friends) with no plugin or JSON | **UNVERIFIED** | Spike in Phase 1. If it works it removes the plugin, the AGP 9.3.1 risk and the extra app registrations. Otherwise use the plugin |
+| Analytics falls back to the Android ID when the advertising ID is off | UNVERIFIED (one forum claim) | Only changes policy wording |
+| Versions BoM 34.19.0, firebase-analytics 23.2.0, google-services 4.4.4 | UNVERIFIED (search summaries) | Gradle resolves the real latest. Do not hard code these |
+| google-services plugin works with AGP 9.3.1 and built in Kotlin | UNVERIFIED | Only matters if the resource route fails |
+| Merged manifest gains `ACCESS_NETWORK_STATE`, `WAKE_LOCK`, probably install referrer permission and `<queries>` | UNVERIFIED | Diff the merged manifest |
+| Play Data safety accepts a CSV import | UNVERIFIED (memory) | Look on the day, otherwise fill by hand from section 7.3 |
+| Uploads from Play services devices may not appear under the app's own process in a traffic capture | PARTLY (reviewer) | Capture whole device traffic (8) |
+| Existing installs about 22 as of 7 Sept (HANDOVER) | CONFIRMED but stale | Re-read Play Console before quoting |
+| Reports lag about a day; rows hidden at small audiences | UNVERIFIED | Observe |
+| Instance ID is personal data; consent needed for storing or reading it on the device (PECR) | PARTLY, **legal position UNVERIFIED** | Check the ICO guidance in Phase 1 |
+| Religious belief is special category data, so using a prayer app may itself be sensitive | PARTLY, **legal position UNVERIFIED** | Check ICO guidance on Article 9 in Phase 1. We are conservative regardless |
 
 ## 3. What the owner will be able to see
 
 | Question | Where | Notes |
 |---|---|---|
-| How many users | Daily, weekly, monthly active users (Firebase) | **A sample.** Only opted in users |
-| How often | Sessions per user, returning users | Same sample |
-| How long | Average engagement time | Foreground time only |
+| How many users | Active users, daily/weekly/monthly (Firebase) | **A sample.** Opted in users only |
+| How often / how long | Sessions per user, engagement time | Foreground time only |
 | Do they stay | Day 1, 7, 28 retention | Needs enough opted in users |
 | Where from | Country, usually city | Derived from the connection, not GPS |
-| Which part of the app is used | Screen views per main tab (v4) | Counts opted in users only. Says nothing about features inside a screen |
-| Where setup loses people | Setup step reached, permission granted or denied (v4.1) | Counts people who opted in at the consent step, so it cannot see anyone who left before it |
-| Whether a future feature is wanted | **Not answerable by this data** | Usage shows what people do with what exists. Demand for something that does not exist yet needs another source (reviews, direct questions). Do not pretend otherwise when planning phase two |
-| Device, Android version, app version | Standard reports | |
+| Which part is used | Screen views per main tab | Says nothing about features inside a screen |
+| Where setup loses people | Setup step reached, permission results | **Blind spot:** anyone who leaves before the consent step, or says no, is invisible by design |
+| Device, Android, app version | Standard reports | |
 | True installs | **Play Console** | The only unsampled headcount |
+| Whether a future feature is wanted | **Not answerable by this data** | Usage shows what people do with what exists. Demand for something new needs another source (reviews, asking users) |
 
-Caveats to repeat every time: (1) opt in rates are low, so use Firebase for ratios and Play
-Console for the headcount (author's judgement); (2) notification, lock screen and watch use
-never opens the app, so retention is a better signal than time in app; (3) small audiences give
-sparse reports (UNVERIFIED threshold); (4) a Settings switch alone would, in the author's
-judgement, give close to no data.
+Caveats to repeat: opt in rates are low (author's judgement), so use Firebase for ratios and
+Play Console for the headcount; notification, lock screen and watch use never opens the app;
+small audiences give sparse reports (UNVERIFIED).
 
 ## 4. Design
 
-### 4.1 Approach (decided: A)
-**A. Standard setup.** `google-services` plugin and `google-services.json`; Firebase
-initialises at startup but is told not to collect (`firebase_analytics_collection_enabled`
-false); `setAnalyticsCollectionEnabled(true)` after the user opts in. This is the documented
-path and is the only one that keeps Analytics' own session logic intact.
+### 4.1 Approach
+**A. Standard setup.** Firebase initialises at startup but is told not to collect
+(`firebase_analytics_collection_enabled` false). `setAnalyticsCollectionEnabled(true)` after the
+user opts in. The Phase 1 spike decides how it is configured: **A1** plain string resources, no
+plugin (preferred if it works), or **A2** the `google-services` plugin and JSON.
 
-**B. Manual init after consent** was the v2 favourite. The fact check demoted it (section 2).
-It is only a **fallback**, used if and only if the opted out capture test shows traffic under A.
-If B is needed, it must first prove that it records `first_open` and sessions, or we stop and
-report to the owner rather than ship incomplete data.
+**B. Manual init after consent** is a **fallback only**, used if the opted out capture shows
+traffic under A. It must first prove it records `first_open` and sessions.
 
-**Stop rule:** if A leaks traffic before consent and B cannot record sessions, we do not ship.
-The owner is told plainly. No compromise on "off means off".
+**Stop rule:** if A leaks traffic before consent and B cannot record sessions, do not ship. Tell
+the owner plainly. No compromise on "off means off".
 
 ### 4.2 Manifest (app only)
 - `firebase_analytics_collection_enabled` = false.
-- `google_analytics_adid_collection_enabled` = false (key name PARTLY confirmed, check on the day).
-- Remove `com.google.android.gms.permission.AD_ID` with `tools:node="remove"`. Needs
-  `xmlns:tools` added to the phone manifest, which lacks it.
-- No Consent Mode default keys. They add a second switch that could disagree with the first.
-  Whether `setConsent` is also needed is UNVERIFIED, so the test must show events arriving
-  after opt in.
-- Never use the "deactivated" key.
-- Fix the `INTERNET` comment (`AndroidManifest.xml` line 11).
+- `google_analytics_adid_collection_enabled` = false (key name PARTLY confirmed).
+- Remove `com.google.android.gms.permission.AD_ID` with `tools:node="remove"` (needs
+  `xmlns:tools`, which the phone manifest lacks).
+- No Consent Mode default keys (a second switch that could disagree). Whether `setConsent` is
+  also needed is UNVERIFIED, so the test must show events arriving after opt in.
+- Never use the "deactivated" key. Fix the `INTERNET` comment (`AndroidManifest.xml` line 11).
 - Every merged permission addition goes into `privacy.html`.
 
 ### 4.3 Code (smallest diff, copies `ongoingBadge` and `disclaimerSeen`)
 1. `AppSettings.analyticsEnabled: Boolean = false`. No "prompt seen" flag.
-2. Key, setter, mapping in `SettingsRepository.kt`. No migration (absent reads false).
-3. `SajdaViewModel` wrapper, threaded through `MainActivity`, `MainScaffold`, `SettingsScreen`.
-4. About 10 to 15 lines in the data layer: when settings load and the flag is true, enable
-   collection. On a true to false change, disable and call `resetAnalyticsData()`. Otherwise
-   **do not touch Firebase at all** (calling disable on every launch could itself initialise
-   the SDK, a reviewer's concern, UNVERIFIED but cheap to avoid).
-5. No `Application` subclass. Fix the "never transmitted" KDoc (`SettingsRepository.kt` about line 44).
-6. **Tab screen views (v4):** one `screen_view` log per main tab, sent only while opted in, with
-   the screen name set to a fixed word (for example `times`, `qibla`, `settings`). No
-   parameters, no user properties. The app is a single activity, so Analytics will not
-   produce per-tab data by itself (UNVERIFIED for Compose, confirm on the day). If the
-   navigation structure makes this more than a few lines, stop and tell the owner rather than
-   building an event layer.
-7. **Setup counts (approved, v4.1).** Exactly two event names, fixed, sent only while opted in:
-   - `setup_step` with one parameter `step`, a fixed word per onboarding step after consent
-     (for example `permission`, `sect`, `madhab`, `method`, `confirm`). The step names are
-     structural, not the user's answer. The user's chosen sect, madhab and method are **never**
-     sent.
-   - `permission_result` with `permission` (`notifications`, `exact_alarm` or `location`) and
-     `granted` (`true` or `false`). A yes or no only. No coordinates, no place name.
-   - Where each fires is decided in Phase 3. The notification prompt fires from
-     `MainActivity` `onFinish`, and the exact alarm and location outcomes come from their own
-     flows, so find each real result callback rather than logging the request. A logged request
-     is not an outcome.
-   - These two event names are the entire event layer. No wrapper class, no extra parameters.
-     Adding any other event, parameter or user property needs the owner's yes and a privacy
+2. Key, setter, mapping in `SettingsRepository.kt`. No migration.
+3. `SajdaViewModel` wrapper threaded through `MainActivity`, `MainScaffold`, `SettingsScreen`.
+4. About 10 to 15 lines in the data layer. **The enable call must complete before the first
+   event is logged.** Enabling happens in the same step as the user pressing "Yes", not later
+   "when settings load", so the first `setup_step` is not lost or sent while disabled. On true to
+   false: disable and call `resetAnalyticsData()`. For users who never opted in: **do not touch
+   Firebase at all**, and every logging site goes through one guard that returns early when the
+   flag is false, so `FirebaseAnalytics.getInstance` is never called.
+5. No `Application` subclass. Fix the "never transmitted" KDoc (`SettingsRepository.kt` about 44).
+6. **Tab screen views:** one `screen_view` per main tab, only while opted in, `screen_name` from a
+   fixed set (`times`, `qibla`, `settings`, plus any other top level tab on the day). No other
+   parameters. The app is single activity, so per tab data will not appear on its own
+   (UNVERIFIED for Compose). If the navigation makes this more than a few lines, stop and tell
+   the owner.
+7. **Setup counts.** Exactly two event names, fixed, only while opted in:
+   - `setup_step` with one parameter `step`, drawn **only from steps every user passes through**:
+     `permission`, `sect`, `method`, `confirm`, `finish`. **Never `madhab`.** The madhab step is
+     shown only to Sunni users (`OnboardingScreen.kt` lines 127 and 152), so logging it, or
+     logging anything that appears for one sect only, would reveal sect. A unit test asserts the
+     set of step names that can be sent does not depend on sect.
+   - `permission_result` with `permission` (`notifications`, `location`, `exact_alarm`) and
+     `granted` (`true` or `false`). Yes or no only. Real behaviour, from the code:
+     - **notifications:** log from the existing `notificationPermission` callback
+       (`MainActivity.kt` line 66, currently a no-op). Below Android 13 the prompt never fires,
+       so log nothing.
+     - **location:** log from the `locationPermission` callback (`MainActivity.kt` line 62) by
+       reading its result map, **only on the onboarding path**, once. That launcher also serves
+       other screens. After two refusals Android answers "denied" with no dialog, which is
+       counted as denied.
+     - **exact_alarm:** there is **no result callback** (`requestExactAlarmPermission` just opens
+       a settings screen, `PrayerAlarmScheduler.kt` line 204). Log the state once at `finish`
+       using `canScheduleExact`, and name it as a **state, not a decision**, because on many
+       Android versions it is granted by default and "false" mixes refusal with never asked. Say
+       so in the docs.
+   - These two events are the whole event layer. No wrapper class, no timestamps, no sequence
+     numbers, no other parameters or user properties. Adding any needs the owner's yes and a
      policy update first.
-   - Custom parameters need registering in the Firebase console before they show in reports
-     (UNVERIFIED, from memory). Add this to Session 1 if the console asks.
+   - Residual, accepted: Google stamps events with time, so a Sunni user's gap between `sect`
+     and `method` is longer. Not linkable to a person without exporting user level data, so
+     **do not enable the BigQuery export**.
+   - Custom parameters may need registering in the Firebase console before they show in
+     reports (UNVERIFIED, memory). Add to Session 1 if the console asks.
 
 ### 4.4 Build variants
 `debug` shares the release package name. `rtl` and `sideload` use `initWith(debug)`, which does
-**not** inherit the `debug` source set (reviewer finding, matches the repo). So:
-- Create `app/src/debug`, and use the existing `app/src/rtl` and `app/src/sideload`, each
-  setting `R.bool.analytics_allowed` to false. `main` sets true.
-- When false, analytics never starts and the Settings switch is hidden.
-- A test asserts the three overrides exist.
-- The plugin needs `google-services.json` clients for `.rtl` and `.sideload` as well.
-- Nothing Firebase related goes into `:wear`.
+not inherit the `debug` source set (matches the repo).
+- Create `app/src/debug` and use `app/src/rtl` and `app/src/sideload`, each setting
+  `R.bool.analytics_allowed` to false. `main` sets true.
+- **When false, the UI is still shown** (consent step, Settings switch) so layout, RTL and the
+  Redmi check can see it. **Only the SDK calls are gated** and do nothing. A test asserts the
+  three overrides exist and that release resolves true.
+- The analytics path itself (events, DebugView, capture) is tested on an **emulator** with the
+  flag temporarily on in a local, uncommitted build. It cannot be tested on the owner's phone
+  through `installSideload`, because the flag is off there by design. Say this to the owner
+  rather than let him think the phone check covered it.
+- Nothing Firebase goes into `:wear`. Under A2 the JSON also needs clients for `.rtl` and
+  `.sideload`.
 
 ### 4.5 Consent UX
-- **New installs:** a new onboarding step placed **straight after `WELCOME` and before `PERMISSION`** (approved
-  setup counts, section 11 item 9, need consent to exist before the steps they measure; the
-  welcome screen itself cannot be counted). Rewire both directions
-  (`OnboardingScreen.kt`, enum at line 79, wiring about lines 108 to 156). Two equal choices,
-  nothing pre selected, Google named, policy linked.
-- **Everyone:** a Settings switch in About beside Privacy. Off by default. It is also the
-  one tap withdrawal.
-- **Existing users:** no pop up. They find the switch.
+- **One shared consent composable** with the full text and two equal buttons, used in both
+  places below.
+- **New installs:** a new onboarding step straight after `WELCOME` and before `PERMISSION`, so
+  the setup counts can see the later steps. Rewire both directions (`OnboardingScreen.kt`, enum
+  line 79, wiring lines 108 to 156): `WELCOME` next goes to consent, consent goes to
+  `PERMISSION`, and `PERMISSION` back goes to consent. After process death, show the user's
+  current choice, not a blank one. The notification prompt still fires from `onFinish`, after
+  consent, so this does not change when it appears.
+- **Everyone:** a Settings switch in About beside Privacy, off by default. **Turning it on opens
+  the same consent dialog** (full facts, Yes or No thanks). Turning it off is a single tap. A
+  one line hint on a switch is not enough for existing users, who have no other route.
+- **Existing users:** no pop up (owner decision). They find the switch.
 - Not bundled with any feature. Saying no changes nothing.
 - **Dua rule untouched.** Never in or after the disclaimer, never the word "duas".
 - **Exception to write into HANDOVER §11:** the "asked once" rule was written to ban rating and
@@ -178,44 +190,49 @@ The owner is told plainly. No compromise on "off means off".
 
 ### 4.6 Opting out and deletion
 Switching off disables collection and resets local analytics data and the instance ID. **Data
-already sent stays with Google** and ages out under the retention setting. **There is no
-"delete on request" promise** because the instance ID is the only handle and the reset destroys
-it. The policy says so. The 14 month setting covers event data; aggregated reports last longer,
-so the policy must not say everything vanishes at 14 months.
+already sent stays with Google** and ages out under the retention setting. **No "delete on
+request" promise**: the instance ID is the only handle and the reset destroys it. The policy says
+so. The 14 month setting covers event data; aggregates last longer, so the policy must not say
+everything vanishes at 14 months.
 
-## 5. Who does what: owner effort budget
+## 5. Who does what
 
-**Owner total: two short guided sessions plus one optional two minute phone check. Time
-figures are estimates, not measurements.** The assistant does everything else, including writing
-every word the owner will paste or click.
+**Required session type:** a Claude Code session with a shell on the owner's computer, able to
+run Gradle, `adb` and the emulators. A chat or Console bridge session cannot (`CLAUDE.md`), and
+then the owner would have to paste every command. Phase 0 checks this.
+
+**Owner effort, estimates not measurements: two guided sessions of roughly 30 to 45 minutes
+(Firebase) and 20 to 30 minutes (Play Console), plus an optional two minute phone check.** The
+assistant writes every word the owner pastes.
 
 | Session | Owner does | Assistant does |
 |---|---|---|
-| **Now** | Answer the five sign off questions (section 11) | Nothing further until then |
-| **Session 1: Firebase, about 15 min, on the owner's computer** | Open the Firebase console signed in to the **same Google account used for Play Console** (owner decision, 3 Oct 2026; a separate project account was the rejected alternative, worth revisiting only if the project is ever handed to someone else). Follow one screen at a time, sending a screenshot each time: create project, register the app, set retention to 14 months, switch Google signals and every data sharing option off, download `google-services.json` into the project folder | Tells the owner what to click on each screen. Registers the three package names. Reads the file. Restricts the API key instructions. Confirms each setting from the screenshots |
-| **Everything between** | Nothing | Phases 1 to 6 of the runbook (section 6): code, tests, copy, docs, builds, emulators, screenshots, graphic, the signed bundle using the existing keystore flow |
-| **Session 2: Play Console, about 15 min** | Open Play Console. Follow screens: import or fill the Data safety form from the prepared answers, update the Advertising ID answer, upload the bundle, update the listing text from the prepared copy, **press Publish** | Prepared files and exact answers. Guides each screen. Never presses submit |
-| **Optional** | Plug in the Redmi (the project's rule for layout and first run changes) for a two minute check | Installs with `installSideload`, never `installDebug` |
+| **Session 1: Firebase** | Sign in to the **same Google account used for Play Console** (owner decision). One screen at a time, with a screenshot each: create the project and **accept Google's terms and data processing terms (the owner's signature, the assistant stops here)**, register the app `com.sajdatime.app`, in Analytics admin set event data retention to 14 months, Google signals off, advertising features off, **every data sharing option off**, and send back the app ID, project ID and API key (or `google-services.json`) | Says what to click on each screen. Reads the values. Confirms each setting from the screenshots. **No API key restriction step**: it is a public identifier and restricting it is a detour |
+| **Everything between** | Nothing | Phases 1 to 6 (section 6) |
+| **Session 2: Play Console** | Fill or import Data safety from the prepared answers, update the Advertising ID answer, upload the bundle, update the listing text, **press Publish** | Prepares the answers and text. Guides each screen. Never presses submit |
+| **Optional** | Plug in the Redmi for a layout and first run check | `installSideload`, never `installDebug`. Tells him this build has analytics switched off |
 
-Things the assistant will **not** do: touch the signing key, press submit or publish, agree to
-policies, or enter credentials.
+The assistant will **not** touch the signing key, press submit or publish, agree to policies, or
+enter credentials.
 
-## 6. Runbook for the session at the owner's computer
+## 6. Runbook
 
-The first message of that session should be the **kickoff prompt** in section 12. Phases run in
-order. Each has a gate. If a gate fails, stop and report rather than improvise.
+First message: the kickoff prompt (section 12). Phases run in order. Each has a gate. If a gate
+fails, stop and report. **Keep everything on a feature branch and merge only after Phase 5**,
+because `CLAUDE.md` requires `privacy.html` to change in the same commit as any data handling
+change.
 
 | Phase | Work | Gate |
 |---|---|---|
-| 0 | Read `CLAUDE.md`, HANDOVER §11 STATE OF PLAY, this plan. Fetch the public Play listing to confirm what is live. Confirm sign off. Create a feature branch | Sign off recorded in this file |
-| 1 | **Close every UNVERIFIED row** that a browser can close: open the Firebase and Google pages named in section 2, record what they say, correct this plan | No row left UNVERIFIED that a page can settle |
-| 2 | **Session 1 with the owner** (section 5) | `google-services.json` in place, console settings confirmed from screenshots |
-| 3 | Code (section 4), tests (section 8), variant overrides | `./gradlew clean test lint` green, every variant builds |
-| 4 | Manifest diff against the current release. Opted out capture test. Opt in DebugView test. Relaunch test. No Google Play services emulator test. RTL layout check of the new screen (a layout check only) | Opted out run shows no traffic to Google. Opt in shows events. Stop rule in 4.1 applies |
-| 5 | Copy and docs (sections 7 and 9): app strings, `privacy.html`, `index.html`, `README.md`, `LISTING.md`, `tools/build-store-assets.sh` and the regenerated graphic, `CLAUDE.md`, HANDOVER, RELEASING, NEW-SESSION. Repo wide grep for `tracking`, `analytics`, `telemetry` excluding this plan and `docs/reviews/`. Retake `05-settings.png` only if the new row appears in it | Grep clean. Disclaimer tests green. Test for each new rule |
-| 6 | Full gate from `CLAUDE.md`: `clean test lint :app:bundleRelease :wear:bundleRelease`. Both emulators | Green, bundle sizes recorded |
-| 7 | **Session 2 with the owner** (section 5) | Owner presses Publish |
-| 8 | After publish: confirm "Updated on" moved, check DebugView or first real data, write STATE OF PLAY and the lessons into §15 | Recorded and pushed |
+| 0 | Read `CLAUDE.md`, HANDOVER §11 STATE OF PLAY, this plan. Fetch the public Play listing. **Confirm the session has a shell with Gradle, adb and emulators.** Create the feature branch | Sign off recorded, tooling present |
+| 1 | Close every UNVERIFIED row a browser can close. **Spike A1 versus A2** on a throwaway branch, including the capture test. Check ICO guidance on PECR, Article 9 and the Children's Code. Update this plan | Nothing left UNVERIFIED that a page can settle; approach chosen |
+| 2 | Session 1 with the owner | Values or JSON in place, settings confirmed from screenshots |
+| 3 | Code (section 4), tests (8), variant overrides | `./gradlew clean test lint` green, every variant builds |
+| 4 | Manifest diff against the current release. Opted out capture. Opt in DebugView for all three event types. Relaunch test. No Google Play services emulator. RTL layout check of the new screen (a layout check only) | Opted out: no traffic. Opt in: events. Stop rule applies |
+| 5 | Copy and docs (section 7), including a short **data protection impact note** the assistant drafts. Repo wide grep for `tracking`, `analytics`, `telemetry` excluding this plan and `docs/reviews/`. Retake `05-settings.png` only if the new row appears | Grep clean, disclaimer tests green |
+| 6 | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease`, both emulators. Merge the branch | Green, sizes recorded |
+| 7 | Session 2 with the owner | Owner presses Publish |
+| 8 | Confirm "Updated on" moved, check first real data, write STATE OF PLAY and lessons into §15 (including the sect shape trap) | Recorded and pushed |
 
 ## 7. Copy and documents
 
@@ -228,180 +245,186 @@ order. Each has a gate. If a gate fails, stop and report rather than improvise.
 | `docs/privacy.html` | 37, 39 to 40, 53 to 70 (including "no server ... nowhere for them to go"), 80 to 83, 91 to 92, 96 to 102 | date, lede, "one time", analytics, SDKs, sharing, children, permissions |
 | `docs/index.html` | 39 | "no ads or tracking" |
 | `README.md` | 5 | "No analytics. No tracking." |
-| `docs/store/LISTING.md` | 21, long description privacy block (about 170 to 182, including "no server for them to go to"), 327, 351, 355, 357, 364, 480 | short and long description, Data safety, Advertising ID, graphic text |
+| `docs/store/LISTING.md` | 21, long description privacy block (about 170 to 182, including "no server for them to go to"), 327, 351, 355, 357, 364, 480 | descriptions, Data safety, Advertising ID, graphic text |
 | `tools/build-store-assets.sh` | 130 | subtitle, then regenerate the PNG |
-| `CLAUDE.md` | 60 to 61 | founding rule |
+| `CLAUDE.md` | 60 to 61 **and 134** | founding rule; "Location stays on the device... never transmitted" must become: the device's location never leaves the phone, and for users who opt in Google estimates an approximate area from the internet connection |
 | `docs/HANDOVER.md` | 50, §2 networking and Play Services rows (about 109 to 138), §8, 2079 to 2085, §11 non-goals (about 6222) and the rating rule (6226 to 6236), 6706, STATE OF PLAY | vision, stack, privacy model, audit table, non-goals |
 | `docs/RELEASING.md` | 60, 171, 727, 764, 988 | tester and outreach copy |
 | `docs/NEW-SESSION.md`, `docs/ARCHITECTURE.md` | 179, 406 | "no tracking" (check context) |
 
-History to leave alone: `docs/reviews/`, HANDOVER line 6195, LISTING lines 28, 53, 75, 96.
-Line numbers are from the 3 Oct tree and may drift.
+Leave as history: `docs/reviews/`, HANDOVER line 6195, LISTING lines 28, 53, 75, 96. Line
+numbers are from the 3 Oct tree and may drift.
 
 ### 7.2 Wording rules (override any draft that conflicts)
-- Say **"random ID, not your name"** or "pseudonymous". Not "anonymous" alone. An instance ID is
-  personal data under UK GDPR and PECR, which is why consent is needed.
+- Say **"random ID, not your name"** or "pseudonymous". Not "anonymous" alone.
 - Say "approximate area, usually country and city, worked out by Google from your internet
-  connection. Never your GPS position or the place you type." Do not say "never your location".
+  connection. Never your GPS position or the place you type." Never "never your location".
 - Attribute the IP statement: "According to Google, it does not log or store IP addresses in
-  Analytics." Do not state it as our own guarantee.
-- Name Google, say data may be processed in the US (UNVERIFIED location, check on the day), link the policy.
+  Analytics."
+- Name Google, say data may be processed outside the UK including the US (UNVERIFIED, check),
+  link the policy.
 - Never promise deletion on request.
-- **Tone (owner request, 3 Oct 2026): friendly and low key, never understated.** Avoid the word
-  "tracking" everywhere. Use "usage counts" and "help us improve". In marketing surfaces (store
-  short description, feature graphic, website tagline) keep it brief and do not headline it. In
-  the consent screen, the Settings row description and `privacy.html`, state the material facts
-  in full: Google receives it, it is tied to a random ID, what is and is not sent. Reason: UK
-  consent rules require clear information, Play Data safety must match behaviour, and a vague
-  consent is both unlawful and the thing most likely to cost the app its trust.
-- The option is for adults. The app is not directed at children.
+- **Tone: friendly and low key, never understated.** Avoid the word "tracking". Use "usage
+  counts" and "help us improve". On marketing surfaces (store short description, feature graphic,
+  website tagline) keep it brief. On every consent surface, **including the Settings row**, state
+  the material facts: Google receives it, it is tied to a random ID, what is and is not sent.
+  Never use "counts" alone where the body text is absent. Reason: consent rules require clear
+  information and Play Data safety must match behaviour. No surface may deny it.
+- **Children:** do not write "for adults". The ICO test is whether children are likely to access
+  the app, and the Play audience includes 13 to 17 (HANDOVER about line 5400). Keep it off by
+  default, keep the language simple, and cover it in the impact note.
 - **Permanent rule: never send sect, madhab, calculation method, alert or prayer settings, a
-  typed city or coordinates**, as an event, a parameter or a user property. Knowing that someone
-  uses a prayer app is already sensitive, which is why consent is explicit. Sending which school
-  of thought they follow would cross a line the owner has not been asked to cross. Anyone who
-  later wants "which madhab is most popular" must come back to the owner and the privacy policy
-  first. Record this in HANDOVER §11.
+  typed city or coordinates,** as an event, a parameter, a user property, or by the shape of the
+  events sent. Anyone who later wants "which madhab is most popular" must go back to the owner and
+  the policy first. Record in HANDOVER §11.
 
 ### 7.3 Drafts (final only after Phase 1)
-**Onboarding step.** Title: *Help us see how SajdaTime is used?* Body: *If you say yes,
-SajdaTime sends usage counts to Google Analytics: how many people use it, how often, for how
-long, which main screen you open, which setup steps you reach, whether you allow notifications,
-alarms and location (a yes or no, never the location itself), and your approximate area, which Google works out from your
-internet connection. They
-are tied to a random ID, not your name. It never sends your GPS position, the place you type or
-your prayer settings. It is off unless you choose yes, and you can switch it off in Settings
-at any time.* Link: *Read the privacy policy.* Buttons, equal weight: **Yes, share usage
-counts** / **No thanks**.
+**Consent dialog and onboarding step.** Title: *Help us see how SajdaTime is used?* Body: *If you
+say yes, SajdaTime sends usage counts to Google Analytics. They cover how many people use the
+app, how often and for how long, which main screen you open, which setup steps you reach,
+whether you allow notifications, alarms and location (a yes or no, never the location itself),
+your phone model, Android version, app version and language, and your approximate area, which
+Google works out from your internet connection. They are tied to a random ID, not your name, and
+may be processed outside the UK, including in the US. Because using a prayer app can say
+something about your faith, this is your choice and nothing changes if you say no. It never sends
+your GPS position, the place you type, your school of thought or your prayer settings. You can
+switch it off in Settings at any time.* Link: *Read the privacy policy.* Buttons, equal weight:
+**Yes, share usage counts** / **No thanks**.
 
-**Settings row.** *Share usage counts*. Description: *Off unless you turn it on. Not your GPS
-position or the place you type.*
+**Settings row.** *Share usage counts*. Description: *Usage counts tied to a random ID, sent to
+Google. Off unless you turn it on. Tap to see exactly what is sent.* (Turning on opens the dialog above.)
 
 **`about_privacy_desc`.** *Your location stays on this phone. No accounts, no ads. Usage counts
 are optional and off unless you turn them on. Tap to read the full policy.*
 
-**`privacy.html`.** New lede and a new section "Optional usage counts" covering what is sent
-and not sent, who receives it, why, retention (event level 14 months, aggregates longer), how to
-stop and what that does not delete, that nothing is sold or used for advertising, and that the
-option is for adults. Fix "The one time something leaves your device", the permissions list, the
-children section and the "we have no server" lines. New date.
+**`privacy.html`.** New lede and a new section "Optional usage counts": what is sent and not
+sent, who receives it, why, retention (event level 14 months, aggregates longer), how to stop and
+what that does not delete, that nothing is sold or used for advertising, the children position,
+and the exact alarm "state, not decision" note. Fix "The one time something leaves your device",
+the permissions list, the children section and the "we have no server" lines. New date.
 
 **Play short description (80 limit).** Current ends *No tracking.* (79). Candidate: *Offline
-prayer times (namaz) and Qibla compass for Sunni and Shia. No accounts.* (79). `No accounts`
-has never been tested alone in the Console. Use the method in `LISTING.md` lines 20 to 100.
+prayer times (namaz) and Qibla compass for Sunni and Shia. No accounts.* (79). `No accounts` has
+never been tested alone in the Console. Use the method in `LISTING.md` lines 20 to 100.
 
 **Play long description privacy block (about 296 characters headroom).** Replace *No analytics,
 no crash reporting, no tracking of any kind* with *Optional usage counts, off unless you switch
 them on. No accounts. No crash reporting.* Check length and the wording rules in `LISTING.md`.
 
-**Feature graphic.** `LISTING.md` lines 470 to 481 say "No ads" was removed as a promotion
-word. Do not bring it back. Use *Sunni & Shia · No accounts*.
+**Feature graphic.** `LISTING.md` lines 470 to 481 say "No ads" was removed as a promotion word.
+Do not bring it back. Use *Sunni & Shia · No accounts*.
 
-**Data safety answers (prepared by the assistant, entered by the owner).** *Device or other
-IDs*, *App activity*, *App info and performance*: collected, optional, purpose Analytics,
-encrypted in transit. *Approximate location* gains Analytics as a purpose. The "shared" answer
-depends on the console sharing settings (UNVERIFIED, read Google's disclosure page in
-Phase 1). No "deletable on request". Advertising ID stays No only if the merged manifest check
-passes.
+**Data safety answers (prepared by the assistant, entered by the owner).** Likely categories:
+*Device or other IDs*, *App activity*, *App info and performance* (doubtful without Crashlytics,
+**UNVERIFIED**), and *Approximate location* gaining Analytics as a purpose (depends on how
+Google classifies IP derived area, **UNVERIFIED**). All collected, optional, purpose Analytics,
+encrypted in transit. "Shared" depends on the console sharing settings. No "deletable on
+request". Advertising ID stays No only if the merged manifest check passes. Settle every row from
+Google's Firebase "Data disclosure" page in Phase 1.
 
 ## 8. Verification
 
-**Automated:** default flag false; manifest guard (AD_ID removed, collection disabled) with the
-manifest and any new `bools.xml` added to the `inputs.files` block in `app/build.gradle.kts`,
-and **proof that the guard fails when the manifest is broken** (HANDOVER §15 lesson 84);
-overrides exist for debug, rtl and sideload; no new string contains "duas"; disclaimer and
-no translation tests stay green; onboarding order and Back in both directions; every variant
-builds.
+**Automated:**
+- Default flag false.
+- Manifest guard (AD_ID removed, collection disabled) with the manifest and any new `bools.xml`
+  in the `inputs.files` block of `app/build.gradle.kts`, **and proof the guard fails when the
+  manifest is broken** (HANDOVER §15 lesson 84).
+- Overrides exist for debug, rtl, sideload; release resolves true.
+- When opted out, no logging call is made and `FirebaseAnalytics.getInstance` is never touched.
+- Event names, parameter names and values come from a fixed allow list.
+- **The set of `setup_step` values that can be sent does not depend on sect.**
+- Collection is enabled before the first `setup_step` after "Yes".
+- No duplicate events on Back, recomposition or `rememberSaveable` restore.
+- No new string contains "duas"; disclaimer and no translation tests stay green; onboarding
+  order and Back in both directions; every variant builds.
 
-**Manual:** opted out run (fresh install, `adb shell setprop log.tag.FA VERBOSE`, logcat and a
-traffic capture across cold start, a boot broadcast, an alarm receiver start and a WorkManager
-run: nothing to Google); opt in shows events in DebugView and records whether a session that
-began before opting in is counted; on, off, on, kill, relaunch; airplane mode; emulator image
-without Google Play services; RTL layout of the new screen; merged manifest diff; bundle size
-before and after.
+**Manual, on an emulator with the flag temporarily on:**
+- Opted out: fresh install, `adb shell setprop log.tag.FA VERBOSE`, logcat, and a **whole device
+  traffic capture matched by hostname** (`app-measurement.com` and other Google analytics hosts),
+  across cold start, a boot broadcast, an alarm receiver start and a WorkManager run. Nothing
+  may go to Google.
+- Opted in: DebugView shows each event type; record whether a session that began before opting
+  in is counted.
+- On, off, on, kill, relaunch: state honoured every time.
+- Airplane mode; an emulator image without Google Play services; RTL layout of the consent
+  screen; merged manifest diff; bundle size before and after.
 
-**Cannot be proved by us, stated plainly:** what Google stores server side, real world opt in
-rates, behaviour on every manufacturer's phone.
+**Cannot be proved by us:** what Google stores server side, real world opt in rates, behaviour on
+every manufacturer's phone.
 
 ## 9. Rollback
 Before release: revert the branch, nothing has left any device. After release: only opted in
-users are affected. Ship a version without the dependency, delete collected data in the
-Firebase console (this does not reach anything already exported), and **revert the Data safety
-form and policy with their own Console submission and a new policy date**.
+users are affected. Ship a version without the dependency, delete collected data in the Firebase
+console (this does not reach anything already exported), and **revert the Data safety form and
+policy with their own Console submission and a new policy date**.
 
 ## 10. Risks
 | Risk | Severity | Mitigation |
 |---|---|---|
-| Trust: "no tracking" is part of the app's identity and testers were told it | High | Opt in, honest wording, say it in release notes |
-| Copy contradicts behaviour somewhere | High | Section 7.1 plus the final grep |
-| Overclaiming ("anonymous", "no location", "we don't store IPs") | High | Section 7.2 |
-| Traffic before consent | Medium | Capture test and the stop rule |
-| Late or missing sessions if approach B is needed | Medium | Prove before use, otherwise stop |
-| Play rejects the Data safety or policy change | Medium | Declare precisely, allow review time |
-| Debug or sideload builds pollute the data | Medium | Three overrides and a test |
+| Event shape reveals sect | High | Allow list, sect independence test, 4.3 item 7 |
+| Trust: "no tracking" was part of the app's identity and testers were told it | High | Opt in, honest wording, release notes |
+| Copy contradicts behaviour somewhere | High | 7.1 plus the final grep |
+| Overclaiming or understating | High | 7.2 |
+| Weak consent for existing users | High | Switch opens the full consent dialog |
+| Traffic before consent | Medium | Whole device capture and the stop rule |
+| Play rejects Data safety or policy changes | Medium | Declare precisely, allow review time |
+| Debug or sideload builds pollute data | Medium | Three overrides and a test |
 | Devices without Google Play services | Medium | Emulator test |
-| Sample too small or biased | Medium | Say so, use Play Console for totals |
+| Sample too small or biased, blind spot at consent | Medium | Say so, use Play Console for totals |
 | Retention default may be 2 months | Medium | Set on the console screen |
-| Scope creep into events and funnels | Medium | Out of scope |
+| Event creep beyond the two approved events | Medium | Section 4.3 item 7 requires the owner's yes |
 
 ## 11. Sign off (recorded 3 Oct 2026)
 
-Given by the owner in conversation. Items 4 and 5 were delegated: "I trust you to make the best
-decision." The owner's stated purpose: *to see what is doing well and what is not, so he can
-make improvements and plan the next phases.*
+Given by the owner in conversation. Stated purpose: *understand how people use the app, what
+makes sense to them and what does not, and use that to decide future features.* Items marked
+"delegated" were left to the assistant: "I trust you to make the best decision."
 
-1. **Approved.** Change the rule from "no analytics" to "no analytics except optional usage
-   counts, phone only", and rewrite `CLAUDE.md` and HANDOVER to match.
+1. **Approved.** Change the rule to "no analytics except optional usage counts, phone only", and
+   rewrite `CLAUDE.md` and HANDOVER to match.
 2. **Approved.** Exception to the "asked once" rule for the consent screen only.
 3. **Approved.** No pop up for existing users.
-4. **Decided by the assistant, on delegation:** onboarding step plus Settings switch. A
-   Settings switch alone would, in the assistant's judgement, give close to no data, which would
-   defeat the purpose.
-5. **Decided by the assistant, on delegation:** no "delete on request" promise. It cannot be
-   kept honestly, because resetting analytics destroys the only ID that could find a person's
-   records. The policy explains this plainly.
-6. **Added by the assistant (v4), reversible:** one screen view per main tab, and the permanent
-   "never send sect, madhab, method or settings" rule in 7.2.
+4. **Delegated, decided:** onboarding step plus Settings switch.
+5. **Delegated, decided:** no "delete on request" promise.
+6. **Delegated, decided, reversible:** one screen view per main tab, and the permanent "never
+   send sect, madhab, method or settings" rule.
+7. **Approved.** Drop "No tracking" from the Play short description and feature graphic, use "No
+   accounts". Keep marketing mentions brief and friendly; consent surfaces state the full facts.
+8. **Approved.** Firebase project under the same Google account as Play Console.
+9. **Approved.** The two setup events in 4.3 item 7. The consent step sits straight after
+   Welcome so later steps can be counted.
+10. **Decided:** analytics ships first as its own small release (1.3.0) so a baseline exists.
+    Phase two scope is otherwise undefined by the owner.
 
-7. **Approved (owner, 3 Oct 2026):** drop "No tracking" from the Play short description and the
-   feature graphic, replace with "No accounts" (to be tested in the Console, see 7.3). Keep the
-   mention of usage counts brief and friendly in marketing surfaces (tone rule in 7.2).
-8. **Phase two scope: undefined by the owner.** Stated purpose only: understand how people use
-   the app, what makes sense to them and what does not, to make better decisions. Decision: ship
-   analytics first as its own small release (1.3.0) so a baseline exists before anything else
-   changes. The data will answer "how many, how often, how long, from where, which main tab",
-   not "why".
-9. **APPROVED (owner, 3 Oct 2026: "I want to understand how users are interacting with the app
-   and if it is useful, and use it to decide future features"):** a small fixed set of setup events, so "what is not
-   making sense" has a real signal. Onboarding step reached (step name only) and permission
-   outcomes (notifications, exact alarms and location each granted or denied, as a yes or no,
-   never the location itself). Setup friction is the likeliest place users get lost in this app,
-   and screen views cannot show it. If approved, the consent step moves to straight after Welcome
-   so the later steps can be counted, and the consent text gains one line about setup steps.
-   Never sect, madhab, method or settings (rule 7.2). About 5 event calls in total, no event
-   framework. If not approved, nothing changes.
-
-Still needed from the owner, later and only as guided sessions: the Firebase console session,
-the Play Console session and pressing Publish (section 5).
+Still needed from the owner: the two guided sessions and pressing Publish (section 5).
 
 ## 12. Kickoff prompt for the session at the computer
 
-> Read `CLAUDE.md`, then `docs/ANALYTICS_PLAN.md` in full. Section 11 is already signed
-> off (recorded 3 Oct 2026), so do not ask me again. Start at Phase 0 and work through the runbook in section 6.
-> Close every UNVERIFIED row you can in Phase 1 and correct the plan before coding. Stop at
-> each gate if it fails. Walk me through the Firebase and Play Console sessions one screen at a
-> time, and never press submit or publish for me. Commit with reasoning and push as you go.
+> Read `CLAUDE.md`, then `docs/ANALYTICS_PLAN.md` in full. Section 11 is signed off, so do not
+> ask me again. Start at Phase 0 and work through section 6, stopping at any failed gate. Close
+> every UNVERIFIED row you can in Phase 1 and correct the plan before coding. Keep all work on a
+> feature branch and merge only after Phase 5. Walk me through the Firebase and Play Console
+> sessions one screen at a time, never press submit or publish for me, and stop where I have to
+> accept Google's terms. Commit with reasoning.
 
 ## 13. Review log
-**v2** (adversarial review): dropped the Consent Mode defaults (second switch); removed the
-deletion promise; reworded "anonymous" and "never your location"; three source set overrides;
-no Firebase calls for users who never opted in; unused flag cut; capture test, sharing settings,
-onboarding rewiring, inventory gaps and rollback added.
-**v3** (fact check and effort rewrite): added evidence labels and the fact check table;
-**demoted approach B** because late Analytics initialisation is doubtful; added the stop rule;
-corrected the location and IP wording to match Google's published behaviour and to attribute
-it to Google; recorded that nothing could be built here; split owner and assistant work into
-two short guided sessions; added the phased runbook, gates and the kickoff prompt. Still open:
-every UNVERIFIED row in section 2.
-**v4** (sign off): recorded the owner's approvals and the delegated decisions; added one screen
-view per main tab so the owner can see which part of the app is used; added the permanent rule
-never to send sect, madhab, method or settings.
+- **v2** (review 1): dropped Consent Mode defaults; removed the deletion promise; reworded
+  "anonymous"; three source set overrides; no Firebase calls for users who never opted in; capture
+  test, sharing settings, onboarding rewiring, inventory gaps, rollback.
+- **v3** (fact check): evidence labels; demoted manual init; stop rule; location and IP wording
+  attributed to Google; recorded that nothing was built or read from Google's pages.
+- **v4 / v4.1** (owner decisions): sign off recorded; tab screen views; setup events; wording
+  and slogan decisions; account decision.
+- **v5** (review 2, by a stronger model, plus a rewrite to remove patch damage). **B1:**
+  `setup_step=madhab` revealed sect because only Sunni users see that step, so it is banned and a
+  test enforces sect independence. **B2:** existing users would have consented through a one
+  line switch, so the switch now opens the full consent dialog. **M2:** exact alarm has no result
+  callback (logged as a state), location and notification callbacks specified from the code.
+  **M3:** `CLAUDE.md` line 134 added to the inventory. **M4:** build variants gate the SDK, not
+  the UI, and the phone check is documented as not covering analytics. **M5:** whole device
+  capture. **M6:** event tests added. **M7:** legal claims labelled, special category line added
+  to consent text, "for adults" removed, Google's terms flagged as the owner's signature.
+  **M8:** session type stated, effort estimates raised, API key step cut, plain resource
+  configuration added as the preferred spike. Minors: section references, `screen_name`, event
+  counts, device info and US processing in the consent text, feature branch rule, restore state,
+  consent blind spot, Settings row wording. Still open: every UNVERIFIED row in section 2.
