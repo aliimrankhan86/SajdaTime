@@ -383,6 +383,7 @@ declaration must match the app and `docs/privacy.html` exactly.
 - **Encrypted in transit: Yes.**
 - **Users can request deletion: No.** The ID is random and cannot be matched to a person, and
   resetting it destroys the only handle. privacy.html says so plainly. Do not tick "deletable on request".
+- The SDK also notes the time of first launch on the device before any choice and sends it only after a Yes. That is the same "App interactions" category and the same Collected / Optional answers; privacy.html says it in "Before you choose". Do not describe the app as recording nothing before consent.
 - "App info and performance" is **not** on Google's list for Analytics, so it is not ticked.
 
 Never claim nothing at all touches the network — the privacy policy already says it does, and

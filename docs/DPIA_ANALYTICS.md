@@ -23,7 +23,10 @@ installation ID; sessions and time the app is open; which main screen; which set
 reached; notifications and location allowed yes or no; exact alarms allowed at the end of setup;
 device model, Android and app version, language; and an approximate area (country, often city)
 that Google derives from the IP address. Google says IP addresses are not logged or stored in
-Analytics. **Never processed:** GPS or coordinates, typed city, sect, madhab, calculation method,
+Analytics. **Recorded on the device before any choice, never sent unless the user says yes:** the SDK stamps the
+time of first launch (`first_open`, flagged by Google as "deferred collection"). Seen on a test phone on
+4 Oct 2026: stamped at first launch and uploaded only after the user opted in; for decliners nothing left the
+device. The policy and consent text now say so. **Never processed:** GPS or coordinates, typed city, sect, madhab, calculation method,
 alert or prayer settings, name, email, any account. A test fails the build if the madhab step is
 reported, because it is shown to Sunni users only and so would reveal sect.
 
@@ -61,13 +64,14 @@ Likely users include 13 to 17 year olds. How each relevant standard is met:
 | Risk | Likelihood | Handling | Residual |
 |---|---|---|---|
 | Data revealing sect, madhab or method is sent | Low | Fixed event set, no such field, test enforces path shape | Low |
-| Anything is sent before consent | Unknown until the capture runs | Manifest keeps collection off; opted out capture over 75 minutes; stop rule: do not ship if it leaks | Medium until measured |
+| Anything is sent before consent | Measured: no | Manifest keeps collection off. Opted out run of 76 min 48 s on 3 to 4 Oct 2026 through a logging proxy that reads the host of every secure connection: no Analytics or Firebase host, no Analytics log lines; the same proxy saw `app-measurement.com` and `firebaseinstallations.googleapis.com` once opted in | Low |
+| The SDK notes first launch on the device before consent | Certain | Never sent unless the user says yes (observed); disclosed in the policy and the consent text; switching off resets the data | Low, disclosed |
 | A person cannot have their records deleted | Certain | Stated plainly in the policy; ID is random and cannot be matched; resetting destroys the handle | Accepted, disclosed |
 | Data leaves the UK | Likely | Disclosed; Google's own safeguards | Accepted, disclosed |
 | Identifier survives longer than said | Possible | Console "Reset user data on new activity" set off; 14 month retention | Low |
 | Consent screen is unclear or pressured | Low | Equal weight buttons, full text, same text in Settings, review by two independent models | Low |
 | Test builds pollute the numbers | Low | Only release builds can send; tests enforce | Low |
-| Existing users never see the choice | Certain | Owner decision: no pop up; the Settings switch is the route | Accepted, disclosed to owner |
+| Existing users never see the choice | Was certain | Superseded 3 Oct 2026 (commit 8a39b2b): a one time question for existing users, not dismissible, Yes or No saved, nothing sent until Yes. Checked on an emulator 4 Oct 2026 | Low |
 
 ## 6. Outcome
 
@@ -75,4 +79,4 @@ Proceed, provided: the opted out capture shows nothing is sent before consent; t
 in the Session 1 list (`docs/ANALYTICS_PLAN.md` section 5) are applied and match the published
 policy; the controller identity and contact route are settled; and the owner has read this.
 
-Approved by the owner, Ali Imran Khan, who said in conversation on 3 Oct 2026 that he has read this assessment and wants release to go ahead on these conditions. Recorded by the assistant, not signed.
+Update 4 Oct 2026: the opted out capture condition is met (see section 5); the first launch note is disclosed. The owner asked on 4 Oct 2026 for the wording to be made as compliant as possible; this is the assistant's reading of ICO guidance, not legal advice. Approved by the owner, Ali Imran Khan, who said in conversation on 3 Oct 2026 that he has read this assessment and wants release to go ahead on these conditions. Recorded by the assistant, not signed.

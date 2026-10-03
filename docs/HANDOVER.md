@@ -4347,6 +4347,17 @@ Gate on the new head (`clean test lint :app:bundleRelease :wear:bundleRelease`):
 5,725,773 bytes, sha256 `9896d18fe47e635fbde114e5fef67689a41972cc5aee7fd027afe25d32baa019` (**unsigned**, see above; this
 supersedes the sha256 earlier in this entry), `wear-release.aab` 3,638,937 bytes; merged manifest again free of `AD_ID`/`ADSERVICES`.
 
+**Copy changed 4 Oct 2026, at the owner's request ("make it compliant", copy throughout), after the `first_open` finding:**
+`docs/privacy.html` gained a "Before you choose" section (nothing is sent before Yes, how that was checked, and that the app notes the
+time of first launch on the phone, never sends it unless you say Yes, and sends it if you do), a bullet in "What is sent", a corrected
+"told not to send anything until you say yes" (was "not to collect", which the finding showed was too strong), and a line that a person
+who never said yes has nothing at Google to remove. The in-app consent text (`consent_body`) now lists "when you first opened the app" and
+says "Until you choose yes, nothing is sent." The DPIA records the measured result and the first-launch note, and marks the "existing users"
+risk as superseded by the one-time question. `LISTING.md` tells whoever fills Data safety not to describe the app as recording nothing
+before consent. There is **no separate terms and conditions document**; the in-app Disclaimer is the nearest thing and says nothing about
+usage counts. Not a lawyer's review: the wording follows the ICO pages read on 3 Oct and is the assistant's reading. Gate after the
+change: `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Not re-run on a device (text only).
+
 **Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
 send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
 Play services missing; a signed bundle; Play Console, Data safety and the privacy page text.
@@ -4401,8 +4412,8 @@ anything.** It reverses the old "no analytics" rule in one narrow way and nothin
 
 **Update 4 Oct 2026: steps 2 and 3 are DONE and PASSED** (see the "Usage counts verification" entry in §10): 76 min 48 s
 opted-out capture clean with a working positive control, phone opt in/out/relaunch, Sunni and Shia event names identical, the existing-user question, release
-manifest free of `AD_ID`/`ADSERVICES`. **What remains:** (a) decide whether `privacy.html` and the DPIA should add one sentence that
-the time of first launch can be sent if you opt in later (the `first_open` finding in §10); (b) build the **signed** bundles from
+manifest free of `AD_ID`/`ADSERVICES`. **What remains:** (a) DONE 4 Oct 2026: privacy page, consent text, DPIA and listing notes now say that the
+time of first launch can be sent if you opt in later (the `first_open` finding in §10); (b) build the **signed** bundles from
 the owner's main checkout (this verification built unsigned ones); (c) Data safety and Play Console, owner presses Publish.
 
 **Not tested as of the 3 Oct entry:** anything at runtime. (Superseded by the update just above.)
