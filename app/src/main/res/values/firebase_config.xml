@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
     <!--
-      Firebase project identifiers, written by hand instead of by the google-services plugin
-      (Google documents this: developers.google.com/android/guides/google-services-plugin).
-      These are public identifiers, not secrets: every APK that uses Firebase ships them.
+      Firebase project identifiers for the shipped app (package com.sajdatime.app), written by
+      hand instead of by the google-services plugin (Google documents this:
+      developers.google.com/android/guides/google-services-plugin). Firebase reads each of these
+      BY NAME at runtime, which is why lint sees them as unused.
 
-      PLACEHOLDERS until the owner's Firebase session. A release must not be built while any
-      value below still contains "PLACEHOLDER" (release gate in docs/ANALYTICS_PLAN.md).
+      These are public identifiers, not secrets: every APK that uses Firebase ships them, and
+      the repository being public does not change that. The key can only call Firebase APIs.
+      It is not restricted to specific apps (Google flags that as "action recommended"). Doing
+      so needs the exact signing fingerprints, and a wrong one would silently stop the app from
+      registering, so it was left. Optional hardening for later, not a fix.
+
+      Read from the Firebase and Google Cloud consoles on 3 Oct 2026, project SajdaTime
+      (sajdatime-37a1b), account aikstudies@gmail.com. src/sideload overrides google_app_id with
+      the TEST app (com.sajdatime.app.sideload) so phone test data never mixes with real data.
+      UsageCountsTest checks these are well formed and consistent with each other.
     -->
-    <string name="google_app_id" translatable="false">1:000000000000:android:PLACEHOLDER</string>
-    <string name="gcm_defaultSenderId" translatable="false">000000000000</string>
-    <string name="google_api_key" translatable="false">PLACEHOLDER</string>
-    <string name="project_id" translatable="false">PLACEHOLDER</string>
+    <string name="google_app_id" translatable="false">1:484173084546:android:a0154ed1ab2428905d419b</string>
+    <string name="gcm_defaultSenderId" translatable="false">484173084546</string>
+    <string name="google_api_key" translatable="false">AIzaSyCwXCXZCmrg_-Ux8sbZtn8qn63iswUgifQ</string>
+    <string name="project_id" translatable="false">sajdatime-37a1b</string>
 </resources>

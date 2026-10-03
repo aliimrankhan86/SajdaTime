@@ -191,6 +191,7 @@ tasks.withType<Test>().configureEach {
                 // UsageCountsTest reads these off disk too (docs/ANALYTICS_PLAN.md section 8).
                 "app/src/main/AndroidManifest.xml",
                 "app/src/**/res/values/bools.xml",
+                "app/src/**/res/values/firebase_config.xml",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

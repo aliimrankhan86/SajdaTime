@@ -217,6 +217,37 @@ class UsageCountsTest {
         }
     }
 
+    private fun config(dir: String) = read("app/src/$dir/res/values/firebase_config.xml")
+    private fun value(xml: String, name: String) =
+        Regex("""<string name="$name"[^>]*>([^<]*)</string>""").find(xml)?.groupValues?.get(1)
+
+    private val appIdShape = Regex("""1:\d{6,}:android:[0-9a-f]{20,}""")
+
+    @Test
+    fun `the shipped Firebase ids are real, well formed and consistent`() {
+        val main = config("main")
+        val appId = value(main, "google_app_id")!!
+        val sender = value(main, "gcm_defaultSenderId")!!
+        val key = value(main, "google_api_key")!!
+        val project = value(main, "project_id")!!
+        assertFalse("A release must not carry placeholder ids", main.contains("PLACEHOLDER"))
+        assertTrue("app id shape: $appId", appIdShape.matches(appId))
+        // The middle part of the app id IS the project number, which is the sender id. A
+        // mismatch means ids copied from two different projects.
+        assertEquals(appId.split(":")[1], sender)
+        assertTrue("api key shape", Regex("""AIza[0-9A-Za-z_-]{35}""").matches(key))
+        assertTrue("project id shape: $project", Regex("""[a-z][a-z0-9-]{4,28}[a-z0-9]""").matches(project))
+    }
+
+    @Test
+    fun `the sideload build reports to the test app, never the real one`() {
+        val realId = value(config("main"), "google_app_id")!!
+        val testId = value(config("sideload"), "google_app_id")!!
+        assertTrue("sideload app id shape: $testId", appIdShape.matches(testId))
+        assertEquals("same project", realId.split(":")[1], testId.split(":")[1])
+        assertFalse("sideload must use a different app id from the shipped app", realId == testId)
+    }
+
     @Test
     fun `the consent text states the facts and avoids the forbidden words`() {
         val strings = read("app/src/main/res/values/strings.xml")

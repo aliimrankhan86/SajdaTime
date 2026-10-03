@@ -4297,9 +4297,7 @@ anything.** It reverses the old "no analytics" rule in one narrow way and nothin
 `UsageCountsTest` (15 tests), `docs/privacy.html` and the other copy. Version stays 1.2.0 until release.
 
 **Still to do before it can ship, in order** (plan section 6):
-1. Owner Session 1 in the Firebase console, then the real ids replace the PLACEHOLDER values in
-   `app/src/main/res/values/firebase_config.xml`. **A release must not be built while any value
-   contains the word PLACEHOLDER.**
+1. Firebase project created 3 Oct 2026 (SajdaTime, `sajdatime-37a1b`, account aikstudies@gmail.com, two apps: `com.sajdatime.app` and the test app `com.sajdatime.app.sideload`). **The real ids are in `app/src/main/res/values/firebase_config.xml` and the sideload override; `UsageCountsTest` fails if they are malformed, inconsistent, or a PLACEHOLDER returns.** Still to confirm in the Google Analytics admin: retention 14 months with reset off, Google signals off, all data sharing off, three custom dimensions (plan Part 4).
 2. The opted-out network capture on an emulator, over 75 minutes. It is the proof of "off means
    off". If Firebase sends anything before opt in and the fallback cannot fix it, **do not ship**.
 3. The one phone sitting (consent, opt in and out, relaunch, device log, Settings screenshot).
@@ -7716,6 +7714,13 @@ matters more than the stable hashes, that is the trade being made.
     that does not exist, and a mandatory data protection assessment the plan had called optional.
     None was visible to the author. For anything that changes what the app tells the user about
     their data, get a review that has not seen your reasoning.
+
+
+119. **A guard that reads a file must have that file declared, and the proof must be re-run after
+    declaring it.** Adding the Firebase config tests, the first "break the file and watch it fail"
+    run printed BUILD SUCCESSFUL three times, because the new config files were not yet test inputs
+    (lesson 84 again, found 3 Oct 2026). It looked like a pass. Declare the file in the
+    `inputs.files` block, then break it, and only trust the run that goes red.
 
 ---
 
