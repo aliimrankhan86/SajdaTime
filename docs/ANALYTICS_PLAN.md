@@ -515,6 +515,10 @@ makes sense to them and what does not, and use that to decide future features.* 
 13. **Approved (owner, 3 Oct 2026):** `docs/DPIA_ANALYTICS.md`, read by the owner, release may
     proceed on its conditions (nothing sent before consent, console settings applied, policy matches).
 
+14. **Done (3 Oct 2026):** Firebase project and Analytics settings (plan section 5 Session 1) were applied
+    by Claude in Chrome and confirmed after reload, including `Reset user data on new activity` OFF.
+    **Pending, the owner's signature: accept the Google Analytics Data Processing Terms.**
+
 Still needed from the owner: the two guided sessions, the five minute DebugView check and
 pressing Publish (section 5).
 
