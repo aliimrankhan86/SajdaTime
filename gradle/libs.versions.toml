@@ -20,6 +20,7 @@ playServicesWearable = "20.0.1"
 wearToolingPreview = "1.0.0"
 coroutinesGuava = "1.10.2"
 fragment = "1.8.9"
+firebaseBom = "34.19.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -55,6 +56,9 @@ androidx-protolayout-expression = { group = "androidx.wear.protolayout", name = 
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "coroutinesGuava" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
+# Phone app only. Optional, opt-in usage counts. See docs/ANALYTICS_PLAN.md. The watch never gets this.
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

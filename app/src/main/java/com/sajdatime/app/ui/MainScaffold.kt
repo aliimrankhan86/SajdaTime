@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,6 +38,7 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
@@ -76,6 +78,8 @@ fun MainScaffold(
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
+    onSetAnalytics: (Boolean) -> Unit,
+    onScreenViewed: (Screen) -> Unit,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -90,6 +94,18 @@ fun MainScaffold(
     val openSetting: (SettingsChooser) -> Unit = {
         settingsRequest = it
         destination = Destination.SETTINGS
+    }
+
+    // Usage counts (opt-in only; a no-op otherwise): one fixed word per main tab, sent only
+    // when the tab changes. Never anything about what is on the screen.
+    LaunchedEffect(destination) {
+        onScreenViewed(
+            when (destination) {
+                Destination.TIMES -> Screen.TIMES
+                Destination.QIBLA -> Screen.QIBLA
+                Destination.SETTINGS -> Screen.SETTINGS
+            },
+        )
     }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
@@ -166,6 +182,7 @@ fun MainScaffold(
                         onRefreshLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
                         onSetThemeChoice = onSetThemeChoice,
+                        onSetAnalytics = onSetAnalytics,
                     )
                 }
             }

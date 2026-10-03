@@ -188,6 +188,9 @@ tasks.withType<Test>().configureEach {
                 "docs/index.html",
                 "docs/store/LISTING.md",
                 "README.md",
+                // UsageCountsTest reads these off disk too (docs/ANALYTICS_PLAN.md section 8).
+                "app/src/main/AndroidManifest.xml",
+                "app/src/**/res/values/bools.xml",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)
@@ -207,6 +210,12 @@ dependencies {
     // Publishes settings to a paired Wear OS watch. Local device-to-device only.
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.fragment)
+
+    // Optional, opt-in usage counts (docs/ANALYTICS_PLAN.md). Collection is switched off in the
+    // manifest and only ever enabled by the user's own choice. No google-services plugin: the
+    // app identifiers are plain string resources (res/values/firebase_config.xml).
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

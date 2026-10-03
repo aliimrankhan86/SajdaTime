@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Firebase project identifiers, written by hand instead of by the google-services plugin
+      (Google documents this: developers.google.com/android/guides/google-services-plugin).
+      These are public identifiers, not secrets: every APK that uses Firebase ships them.
+
+      PLACEHOLDERS until the owner's Firebase session. A release must not be built while any
+      value below still contains "PLACEHOLDER" (release gate in docs/ANALYTICS_PLAN.md).
+    -->
+    <string name="google_app_id" translatable="false">1:000000000000:android:PLACEHOLDER</string>
+    <string name="gcm_defaultSenderId" translatable="false">000000000000</string>
+    <string name="google_api_key" translatable="false">PLACEHOLDER</string>
+    <string name="project_id" translatable="false">PLACEHOLDER</string>
+</resources>
