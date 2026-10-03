@@ -1,8 +1,11 @@
-# Phase two: optional usage counts (plan, DRAFT v3)
+# Phase two: optional usage counts (plan, v4, APPROVED IN PRINCIPLE)
 
-**Status: DRAFT v3, awaiting owner sign off (section 11). No app code has been changed.**
-Written 3 Oct 2026. Revised twice: v2 after an adversarial review, v3 after a fact check and
-a rewrite around "the assistant does the work, the owner does the minimum".
+**Status: v4. Owner sign off recorded 3 Oct 2026 (section 11). No app code has been changed.**
+The build is waiting on the session at the owner's computer (section 6, Phase 0 onwards).
+Written 3 Oct 2026. Revised three times: v2 after an adversarial review, v3 after a fact check
+and a rewrite around "the assistant does the work, the owner does the minimum", v4 to record the
+sign off and add tab level screen views, because the owner's goal is to see what is doing well
+and what is not.
 When approved and built, fold the decisions into `docs/HANDOVER.md` (§2, §5, §8, §11, §15) and
 `CLAUDE.md`, then delete or archive this file.
 
@@ -38,7 +41,8 @@ owner's explicit sign off before any code (section 11).
 | Tool | Firebase Analytics (free) |
 | Consent | Opt in, off by default |
 | Scope | Phone only. Watch untouched |
-| Events | None custom. Automatic metrics only |
+| Events | **v4 change:** automatic metrics plus **one screen view per main tab** (Times, Qibla, Settings, and any other top level tab that exists on the day). Nothing else. Reason: the owner wants to see what is doing well, and automatic metrics alone cannot show which part of the app is used. The owner asked for the goal and delegated the method, so this is the assistant's recommendation. Say "drop it" to revert to automatic only |
+| Never sent | Sect, madhab, calculation method, prayer or alert settings, city, coordinates. These reveal religious belief and are treated as special category data under UK GDPR (legal classification UNVERIFIED, so we are conservative). A permanent rule, see 7.2 |
 
 **Rejected, with reasons:** Aptabase (tracks nothing automatically, so every metric needs event
 code); self hosted Umami, Plausible or Matomo (needs a server, breaks "no server"); on by
@@ -75,6 +79,7 @@ backend (cost and security burden, no benefit).
 | How long | Average engagement time | Foreground time only |
 | Do they stay | Day 1, 7, 28 retention | Needs enough opted in users |
 | Where from | Country, usually city | Derived from the connection, not GPS |
+| Which part of the app is used | Screen views per main tab (v4) | Counts opted in users only. Says nothing about features inside a screen |
 | Device, Android version, app version | Standard reports | |
 | True installs | **Play Console** | The only unsampled headcount |
 
@@ -121,6 +126,12 @@ The owner is told plainly. No compromise on "off means off".
    **do not touch Firebase at all** (calling disable on every launch could itself initialise
    the SDK, a reviewer's concern, UNVERIFIED but cheap to avoid).
 5. No `Application` subclass. Fix the "never transmitted" KDoc (`SettingsRepository.kt` about line 44).
+6. **Tab screen views (v4):** one `screen_view` log per main tab, sent only while opted in, with
+   the screen name set to a fixed word (for example `times`, `qibla`, `settings`). No
+   parameters, no user properties. The app is a single activity, so Analytics will not
+   produce per-tab data by itself (UNVERIFIED for Compose, confirm on the day). If the
+   navigation structure makes this more than a few lines, stop and tell the owner rather than
+   building an event layer.
 
 ### 4.4 Build variants
 `debug` shares the release package name. `rtl` and `sideload` use `initWith(debug)`, which does
@@ -217,11 +228,18 @@ Line numbers are from the 3 Oct tree and may drift.
 - Name Google, say data may be processed in the US (UNVERIFIED location, check on the day), link the policy.
 - Never promise deletion on request.
 - The option is for adults. The app is not directed at children.
+- **Permanent rule: never send sect, madhab, calculation method, alert or prayer settings, a
+  typed city or coordinates**, as an event, a parameter or a user property. Knowing that someone
+  uses a prayer app is already sensitive, which is why consent is explicit. Sending which school
+  of thought they follow would cross a line the owner has not been asked to cross. Anyone who
+  later wants "which madhab is most popular" must come back to the owner and the privacy policy
+  first. Record this in HANDOVER §11.
 
 ### 7.3 Drafts (final only after Phase 1)
 **Onboarding step.** Title: *Help us see how SajdaTime is used?* Body: *If you say yes,
 SajdaTime sends usage counts to Google Analytics: how many people use it, how often, for how
-long, and your approximate area, which Google works out from your internet connection. They
+long, which main screen you open, and your approximate area, which Google works out from your
+internet connection. They
 are tied to a random ID, not your name. It never sends your GPS position, the place you type or
 your prayer settings. It is off unless you choose yes, and you can switch it off in Settings
 at any time.* Link: *Read the privacy policy.* Buttons, equal weight: **Yes, share usage
@@ -297,19 +315,32 @@ form and policy with their own Console submission and a new policy date**.
 | Retention default may be 2 months | Medium | Set on the console screen |
 | Scope creep into events and funnels | Medium | Out of scope |
 
-## 11. Sign off needed from the owner
+## 11. Sign off (recorded 3 Oct 2026)
 
-1. Change the rule from "no analytics" to "no analytics except optional usage counts, phone
-   only", and rewrite `CLAUDE.md` and HANDOVER to match.
-2. Allow an exception to the "asked once" rule for the consent screen only.
-3. No pop up for existing users.
-4. Onboarding step plus Settings switch (recommended), or Settings switch only.
-5. No "delete on request" promise.
+Given by the owner in conversation. Items 4 and 5 were delegated: "I trust you to make the best
+decision." The owner's stated purpose: *to see what is doing well and what is not, so he can
+make improvements and plan the next phases.*
+
+1. **Approved.** Change the rule from "no analytics" to "no analytics except optional usage
+   counts, phone only", and rewrite `CLAUDE.md` and HANDOVER to match.
+2. **Approved.** Exception to the "asked once" rule for the consent screen only.
+3. **Approved.** No pop up for existing users.
+4. **Decided by the assistant, on delegation:** onboarding step plus Settings switch. A
+   Settings switch alone would, in the assistant's judgement, give close to no data, which would
+   defeat the purpose.
+5. **Decided by the assistant, on delegation:** no "delete on request" promise. It cannot be
+   kept honestly, because resetting analytics destroys the only ID that could find a person's
+   records. The policy explains this plainly.
+6. **Added by the assistant (v4), reversible:** one screen view per main tab, and the permanent
+   "never send sect, madhab, method or settings" rule in 7.2.
+
+Still needed from the owner, later and only as guided sessions: the Firebase console session,
+the Play Console session and pressing Publish (section 5).
 
 ## 12. Kickoff prompt for the session at the computer
 
-> Read `CLAUDE.md`, then `docs/ANALYTICS_PLAN.md` in full. I have signed off section 11 as
-> follows: [owner fills in 1 to 5]. Start at Phase 0 and work through the runbook in section 6.
+> Read `CLAUDE.md`, then `docs/ANALYTICS_PLAN.md` in full. Section 11 is already signed
+> off (recorded 3 Oct 2026), so do not ask me again. Start at Phase 0 and work through the runbook in section 6.
 > Close every UNVERIFIED row you can in Phase 1 and correct the plan before coding. Stop at
 > each gate if it fails. Walk me through the Firebase and Play Console sessions one screen at a
 > time, and never press submit or publish for me. Commit with reasoning and push as you go.
@@ -325,3 +356,6 @@ corrected the location and IP wording to match Google's published behaviour and 
 it to Google; recorded that nothing could be built here; split owner and assistant work into
 two short guided sessions; added the phased runbook, gates and the kickoff prompt. Still open:
 every UNVERIFIED row in section 2.
+**v4** (sign off): recorded the owner's approvals and the delegated decisions; added one screen
+view per main tab so the owner can see which part of the app is used; added the permanent rule
+never to send sect, madhab, method or settings.
