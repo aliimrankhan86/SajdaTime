@@ -175,10 +175,7 @@ not inherit the `debug` source set (matches the repo).
 - **When false, the UI is still shown** (consent step, Settings switch) so layout, RTL and the
   Redmi check can see it. **Only the SDK calls are gated** and do nothing. A test asserts the
   three overrides exist and that release resolves true.
-- The analytics path itself (events, DebugView, capture) is tested on an **emulator** with the
-  flag temporarily on in a local, uncommitted build. It cannot be tested on the owner's phone
-  through `installSideload`, because the flag is off there by design. Say this to the owner
-  rather than let him think the phone check covered it.
+- The analytics path is tested with a local, uncommitted build whose flag is switched on: on the owner's phone (as the `.sideload` package, reporting to its own Firebase app) and in **one short emulator run** for the opted out traffic capture, which a phone cannot do without root. The committed `debug` and `sideload` builds keep the flag off.
 - Nothing Firebase goes into `:wear`. Under A2 the JSON also needs clients for `.rtl` and
   `.sideload`.
 
@@ -242,10 +239,10 @@ assistant writes every word the owner pastes.
 
 | Session | Owner does | Assistant does |
 |---|---|---|
-| **Session 1: Firebase** | Sign in to the **same Google account used for Play Console** (owner decision). One screen at a time, with a screenshot each: create the project; on the **Enable Google Analytics** screen choose a Google Analytics account and the **Analytics location** (it decides whether "processed outside the UK" is accurate, so the assistant records the choice); **accept Google's terms and data processing terms (the owner's signature, the assistant stops here)**; register the app `com.sajdatime.app`; then in Analytics Admin set Data settings > Data retention to 14 months, Data collection > Google signals off, advertising features off, and in Account settings **every data sharing option off**; and send back the app ID, project ID and API key **and** `google-services.json`, so either approach can proceed | Says what to click on each screen. Reads the values. Confirms each setting from the screenshots. **No API key restriction step**: it is a public identifier and restricting it is a detour |
+| **Session 1: Firebase** | Sign in to the **same Google account used for Play Console** (owner decision). One screen at a time, with a screenshot each: create the project; on the **Enable Google Analytics** screen choose a Google Analytics account and the **Analytics location** (it decides whether "processed outside the UK" is accurate, so the assistant records the choice); **accept Google's terms and data processing terms (the owner's signature, the assistant stops here)**; register the app `com.sajdatime.app` and, as a second app, `com.sajdatime.app.sideload` (so phone test data stays separate from real data); then in Analytics Admin set Data settings > Data retention to 14 months, Data collection > Google signals off, advertising features off, and in Account settings **every data sharing option off**; and send back the app ID, project ID and API key **and** `google-services.json`, so either approach can proceed | Says what to click on each screen. Reads the values. Confirms each setting from the screenshots. **No API key restriction step**: it is a public identifier and restricting it is a detour |
 | **Everything between** | Nothing, except one **five minute check in Phase 4**: open Analytics > DebugView and send a screenshot while the assistant drives the emulator | Phases 1 to 6 (section 6) |
 | **Session 2: Play Console** | **One submission, in this order:** save Data safety (including the Advertising ID answer), save the listing text, upload the **phone** bundle with release notes, then a single **Send for review** and **Publish**. Do not edit the listing or App content while a review is open (`RELEASING.md` lines 1122 to 1123). "Updated on" moves only at rollout | Prepares the answers and text. Guides each screen. Never presses submit |
-| **Optional** | Plug in the Redmi for a layout and first run check | `installSideload`, never `installDebug`. Tells him this build has analytics switched off |
+| **Phone check (agreed by the owner, one sitting)** | Plug in the Redmi once, keep it unlocked (Developer options > Stay awake), allow USB debugging | Installs a one-off **test build** with `installSideload` (package `.sideload`, analytics switched on locally, never committed, never `installDebug`). Checks first run, the consent screen, opt in and out, relaunch and the device log. Its test data goes to a separate Firebase app, so it never mixes with real data |
 
 The assistant will **not** touch the signing key, press submit or publish, agree to policies, or
 enter credentials.
@@ -361,6 +358,12 @@ request". Advertising ID stays No only if the merged manifest check passes. Sett
 Google's Firebase "Data disclosure" page in Phase 1.
 
 ## 8. Verification
+
+**Principle (owner, 3 Oct 2026): keep checks to a minimum and one sitting. The objective is the
+analytics. The rest of the app is unchanged.** The watch emulator is waived for this release
+because the watch is untouched (it is still built and unit tested). This waives the "both
+emulators" line in `CLAUDE.md` for this release only, at the owner's instruction, and is
+reversible.
 
 **Automated:**
 - Default flag false.
