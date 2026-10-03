@@ -4303,7 +4303,7 @@ anything.** It reverses the old "no analytics" rule in one narrow way and nothin
 2. The opted-out network capture on an emulator, over 75 minutes. It is the proof of "off means
    off". If Firebase sends anything before opt in and the fallback cannot fix it, **do not ship**.
 3. The one phone sitting (consent, opt in and out, relaunch, device log, Settings screenshot).
-4. `docs/DPIA_ANALYTICS.md` read by the owner (the ICO Children's code requires it).
+4. Done 3 Oct 2026: `docs/DPIA_ANALYTICS.md` was read by the owner, who approved release on its conditions. The policy now names him and gives his email for privacy questions.
 5. Full gate, then Play Console: Data safety (CSV import exists), listing text, bundle, **owner presses
    Publish**. Phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001).
 6. After publishing: the owner reads the numbers using `docs/ANALYTICS_READING.md`.

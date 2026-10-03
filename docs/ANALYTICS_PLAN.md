@@ -510,6 +510,11 @@ makes sense to them and what does not, and use that to decide future features.* 
 11. **Delegated, decided, reversible:** phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001),
     see 4.7.
 
+12. **Approved (owner, 3 Oct 2026):** the privacy policy names him, Ali Imran Khan, and gives his
+    email address for privacy questions. **Which address:** the owner said "my email address"; the Play listing's public support email is aikstudies@gmail.com, so the policy uses that (it is already public, and the repository is public, so a different address would have been newly published). The owner can change it with one edit to `docs/privacy.html`.
+13. **Approved (owner, 3 Oct 2026):** `docs/DPIA_ANALYTICS.md`, read by the owner, release may
+    proceed on its conditions (nothing sent before consent, console settings applied, policy matches).
+
 Still needed from the owner: the two guided sessions, the five minute DebugView check and
 pressing Publish (section 5).
 

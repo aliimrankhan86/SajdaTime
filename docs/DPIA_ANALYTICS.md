@@ -14,9 +14,7 @@ see how many people use SajdaTime, how often, for how long, from which countries
 screens they open, and where setup loses people. Purpose: to maintain and improve a free charity
 app and plan its next phase. No advertising, no profiling for any other purpose, no selling.
 
-The controller is the developer, a private individual acting for a charity project. **Open: the
-owner must decide how he is named and how someone reaches him about privacy** (the published policy
-currently gives only a public GitHub issues page, which is not suitable for personal data).
+The controller is the developer, Ali Imran Khan, a private individual acting for a charity project. **Settled 3 Oct 2026:** the published policy names him and gives his email address for privacy questions (a public GitHub issues page remains for general questions only).
 
 ## 2. What is processed
 
@@ -77,4 +75,4 @@ Proceed, provided: the opted out capture shows nothing is sent before consent; t
 in the Session 1 list (`docs/ANALYTICS_PLAN.md` section 5) are applied and match the published
 policy; the controller identity and contact route are settled; and the owner has read this.
 
-Approved by the owner: ______________________   Date: ______________
+Approved by the owner, Ali Imran Khan, who said in conversation on 3 Oct 2026 that he has read this assessment and wants release to go ahead on these conditions. Recorded by the assistant, not signed.
