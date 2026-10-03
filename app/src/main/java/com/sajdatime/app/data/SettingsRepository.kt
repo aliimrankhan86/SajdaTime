@@ -117,6 +117,8 @@ data class AppSettings(
      * only record of that consent. Absent on every existing install, so it reads as false.
      */
     val analyticsEnabled: Boolean = false,
+    /** True once the user has tapped Yes or No on the usage counts question, in setup or later. */
+    val analyticsAnswered: Boolean = false,
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
     /**
@@ -375,6 +377,7 @@ class SettingsRepository(private val context: Context) {
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             analyticsEnabled = this[Keys.ANALYTICS] ?: false,
+            analyticsAnswered = Keys.ANALYTICS in this,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
             methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,

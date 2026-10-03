@@ -4280,6 +4280,22 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 DECISION — 3 Oct 2026 (usage counts: owner asked for "on by default"; recorded, NOT built)
+
+The owner asked for usage counts to be **on by default** (opt out), so the app can be improved. This
+was challenged and he confirmed, so it is recorded here. **Do not flip the default or start sending
+before the user is asked** without reading `docs/ANALYTICS_DEFAULT_ON_BRIEF.md` first. Why: PECR reg 6
+and the ePrivacy rules need consent before an identifier is stored or read, and a notice with an off
+switch is not consent; the data is faith adjacent; the ICO Children's code applies; Play's Data safety
+and prominent disclosure rules apply; the published privacy policy and the approved DPIA say "off
+until you say yes". Outcome: 1.3.0 ships opt in as built. Branch `claude/analytics-default-on-1-4-0`
+adds the part that is lawful and gets most of the benefit: a one time, non dismissible question for
+people who installed before the feature existed (they never see setup), with friendlier wording
+stating the purpose ("improve the app"). Collection still starts only after a tap on Yes. A true
+silent default on stays unbuilt until a data protection solicitor has answered the brief and the owner
+has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
+(unreliable and still faith data).
+
 ### 📍 STATE OF PLAY — 3 Oct 2026 (optional usage counts: built, not yet released)
 
 **This block supersedes the 7 Sept block below on one point: there IS engineering and owner work in

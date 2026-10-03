@@ -40,10 +40,12 @@ import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.settings.SettingsScreen
+import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.theme.ThemeChoice
 
 /** Top-level destinations. Three is comfortably inside the five-item guidance. */
@@ -91,6 +93,17 @@ fun MainScaffold(
     // because it has to outlive the tab switch that delivers it. Settings nulls it once
     // opened, so it cannot reopen on rotation or on the next visit to the tab.
     var settingsRequest by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
+
+    // People who installed before usage counts existed never saw the setup question, so ask
+    // them once. Yes or No is saved either way and it never returns. Not dismissible, so a
+    // stray tap outside is not recorded as an answer. Nothing is sent until they say yes.
+    if (!state.loading && state.settings.onboardingComplete && !state.settings.analyticsAnswered) {
+        UsageCountsConsentDialog(
+            onYes = { onSetAnalytics(true) },
+            onNo = { onSetAnalytics(false) },
+            onDismiss = {},
+        )
+    }
     val openSetting: (SettingsChooser) -> Unit = {
         settingsRequest = it
         destination = Destination.SETTINGS
