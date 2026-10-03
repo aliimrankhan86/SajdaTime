@@ -176,7 +176,7 @@ involve and what it might break before you write any code.
 
 It will:
 
-- know this is a charity project — no ads, no accounts, no tracking, no revenue, ever
+- know this is a charity project — no ads, no accounts, no revenue, ever, and that the only data the app can send is optional, opt in usage counts (`docs/ANALYTICS_PLAN.md`)
 - treat the disclaimer and the privacy promise as hard requirements, not preferences
 - run the tests **and** the app, on both emulators, and check right-to-left before a layout change
 - check prayer times against an independent reference instead of trusting its own arithmetic

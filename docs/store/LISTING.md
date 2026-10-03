@@ -18,10 +18,18 @@ SajdaTime: Prayer Times, Qibla
 ## Short description (max 80)
 
 ```
-Offline prayer times (namaz) and Qibla compass for Sunni and Shia. No tracking.
+Offline prayer times (namaz) and Qibla compass for Sunni and Shia. No accounts.
 ```
 
 `79 / 80`
+
+> **Changed 3 Oct 2026, to be applied in the Console with the 1.3.0 release.** It used to end
+> `No tracking.` The app now offers optional, opt in usage counts (docs/ANALYTICS_PLAN.md), so
+> that line would be misleading even though the counts are off by default. `No accounts` replaces
+> it: true, short, and a privacy word, which this section shows the checker accepts. `No accounts`
+> has not been tested on its own, so use the method at the end of this section (change one phrase,
+> save, reload, re-read) and revert to a wording without it if the promotion notice returns. **The
+> live listing still says `No tracking` until that release is published; leave it until then.**
 
 ### Do not put "Free" or "No ads" back
 
@@ -175,9 +183,9 @@ This one is not paid for at all.
 
 • No adverts, ever
 • No accounts, no sign-in, no email address
-• No analytics, no crash reporting, no tracking of any kind
+• Optional usage counts, off unless you switch them on. No crash reporting
 • Approximate location only, read while the app is open, never in the background
-• Your coordinates never leave your device — there is no server for them to go to
+• Your coordinates never leave your device, and are never part of the optional usage counts
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
 If you would rather not share your location at all, you can type a city name instead, and the app works the same.
@@ -348,11 +356,34 @@ an app pulled later.
 location · App functionality · Optional" — on an app whose whole pitch is privacy. That is a
 fair trade for a declaration nobody can challenge, and the privacy policy explains it in
 plain words. Over-declaring is never a violation. Under-declaring is.
-| Purpose | **App functionality** only. Not analytics, not advertising, not personalisation. |
+| Purpose | **App functionality** for the city lookup. **Analytics** is added for the usage counts (see the table below). Never advertising or personalisation. |
 | Is it required, or can users choose? | **Users can choose** — the app works from device location, or from a typed city, or not at all |
 | Is all user data encrypted in transit? | **Yes** — HTTPS |
 | Can users request deletion? | **No / not applicable** — nothing is retained to delete |
-| Crash logs, diagnostics, device IDs | **None.** No Crashlytics, no analytics SDK, nothing. Leave every box unticked. |
+| Crash logs and diagnostics | **None.** No Crashlytics. Leave those boxes unticked. |
+| Device or other IDs | **Yes**, for the optional usage counts only. See the table below. |
+
+### Optional usage counts (added 3 Oct 2026, for release 1.3.0)
+
+Every row below was read from Google's own pages on 3 Oct 2026 (Firebase "Data disclosure" and
+the Data safety help page, which also says the form can be exported and imported as a CSV). The
+declaration must match the app and `docs/privacy.html` exactly.
+
+| Data type | Why it is declared | Collected | Shared | Optional | Purpose |
+|---|---|---|---|---|---|
+| **Location → Approximate location** | Google derives country and often city from the connection (Google's help page says inferred location "such as via IP address" must be disclosed). Adds **Analytics** to the existing App functionality purpose | Yes | No | Yes | App functionality, **Analytics** |
+| **Device or other IDs** | The random Firebase installation ID | Yes | No | Yes | **Analytics** |
+| **App activity → App interactions** | Sessions, time open, which main screen, which setup step, permission yes or no | Yes | No | Yes | **Analytics** |
+
+- **Shared: No.** Google says an analytics provider that processes data "solely on your behalf"
+  is a service provider, which is collection, not sharing. That holds only while the console
+  data sharing settings and Google signals stay off (privacy.html says they are).
+- **Optional: Yes.** Google allows it only if all users can opt in or out, which they can.
+- **Ephemeral: No.** Not in memory only.
+- **Encrypted in transit: Yes.**
+- **Users can request deletion: No.** The ID is random and cannot be matched to a person, and
+  resetting it destroys the only handle. privacy.html says so plainly. Do not tick "deletable on request".
+- "App info and performance" is **not** on Google's list for Analytics, so it is not ticked.
 
 Never claim nothing at all touches the network — the privacy policy already says it does, and
 the two must agree.
@@ -361,15 +392,22 @@ the two must agree.
 
 ## Advertising ID declaration
 
-**Answer: No.** There are no ads, no analytics and no attribution SDK.
+**Answer: No.** There are no ads. The Firebase Analytics library is present (optional usage
+counts) but the advertising ID is not collected (`google_analytics_adid_collection_enabled` is
+false) and the three advertising permissions the library adds are removed in the manifest with
+`tools:node="remove"`.
 
 Before you answer, confirm nothing pulled the permission in transitively — a Play Services
 library can merge `AD_ID` into the manifest without you asking. A mismatch between this
-answer and the merged manifest is a Console error:
+answer and the merged manifest is a Console error. Run this against the **release** build:
 
 ```bash
-grep -r "AD_ID" app/build/intermediates/merged_manifests/ 2>/dev/null || echo "clean — answer No"
+grep -r -E "AD_ID|ADSERVICES" app/build/intermediates/merged_manifests/release 2>/dev/null || echo "clean — answer No"
 ```
+
+Checked on 3 Oct 2026 against the merged release manifest with the Firebase library added:
+no matches. `UsageCountsTest` also fails the build if the three removals disappear from the
+manifest source.
 
 ---
 
@@ -477,7 +515,8 @@ with `Free` already removed (see the short description section above). The banne
 flagged and never could be, so this is the second time the same fix had to be applied twice:
 once where a validator could see it, once where nothing could.
 
-It now reads `Sunni & Shia · No accounts · No tracking`. `Works offline` went for a different
+It read `Sunni & Shia · No accounts · No tracking` until 3 Oct 2026, when `No tracking` came off
+because of the optional usage counts (below). It now reads `Sunni & Shia · No accounts`. `Works offline` went for a different
 reason — redundancy: the line directly above it already says "calculated on your phone".
 
 Measured after each regeneration, not assumed. The line length changes where it ends in the

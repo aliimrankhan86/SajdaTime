@@ -57,8 +57,7 @@ private data. The Statistics page will eventually show installs and active devic
 aggregated and roughly a day behind — on 1 Aug, a day after going live, it read *"Data
 unavailable"*. **So the only way to know who is in is to ask them and keep your own list**:
 name, email, added, opted in, confirmed installed. Nothing in the Console reconstructs it,
-and nothing in the app can either — it has no analytics, no accounts and no server, and that
-is not going to change.
+and nothing in the app can either — it has no accounts and no server, and its optional usage counts are a sample that cannot say who is in, so keep the list by hand.
 
 **The email field validates nothing.** The Console accepts any string that looks like an
 address. It does not check that it is a Google account, and it cannot check that it is the
@@ -168,7 +167,7 @@ somewhere to land **before** the test starts, because "no one reported anything"
 Short on purpose. Most of these people will not have been a "tester" before, and the fastest
 way to lose one is a wall of instructions. Send this, then send the link.
 
-> *Assalamu alaikum — I've built a free prayer times and Qibla app, no ads and no tracking,
+> *Assalamu alaikum — I've built a free prayer times and Qibla app, no ads and no accounts,
 > and Google needs 12 people to try it for two weeks before it can go on the Play Store.*
 >
 > *It's a couple of taps: open the link on your Android phone, tap Join, then install it like
@@ -724,7 +723,7 @@ possible answer to that suspicion.
    A message that can be sent as-is:
 
    > Assalamu alaikum. I've built a free prayer times and Qibla app called SajdaTime — no
-   > ads, no accounts, no tracking, and it works without internet. I need a few people to
+   > ads, no accounts, and it works without internet. I need a few people to
    > test it before Google will let me release it publicly.
    >
    > Two things, and it's only a couple of minutes:
@@ -761,7 +760,7 @@ possible answer to that suspicion.
    > Assalamu alaikum,
    >
    > I've made a free prayer times app called SajdaTime — prayer times, adhan notifications
-   > and Qibla compass. No adverts, no tracking, works without internet.
+   > and Qibla compass. No adverts, no accounts, works without internet.
    >
    > It is for Android phones only. It won't work on an iPhone, sorry.
    >
@@ -985,7 +984,7 @@ for a version number rather than asking a yes/no question nobody can answer reli
 > • Fixed the compass vibrating on its own
 >
 > Now that it is public, please do share it with family and friends. It is free, no ads, no
-> tracking, and it always will be.
+> accounts, and it always will be.
 >
 > JazakAllahu khairan,
 > Ali

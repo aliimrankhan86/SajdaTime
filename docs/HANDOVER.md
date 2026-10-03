@@ -47,7 +47,7 @@ business rule, what is verified, what is not, and what is left to do.
 ## 1. Product vision
 
 SajdaTime is a **charity project — sadaqah jariyah**, built by **Ali Imran Khan**. It is
-free forever, has no ads, no in-app purchases, no accounts, no analytics, and no tracking.
+free forever, has no ads, no in-app purchases and no accounts. Since 3 Oct 2026 it can also send **optional, opt in usage counts to Google Analytics** (off by default; `docs/ANALYTICS_PLAN.md`), so the owner can see how the app is used.
 It is not a business and has no revenue model. That is the point, and it drives every
 technical decision below.
 
@@ -108,6 +108,7 @@ Read it before editing a word of `disclaimer_body`.
 | Qibla | Own maths + `GeomagneticField` | platform | The platform already ships the World Magnetic Model. |
 | Watch sync | `play-services-wearable` | 20.0.1 | The only way to move data phone↔watch. |
 | Networking | `HttpURLConnection` + `org.json` | platform | One optional GET does not justify Retrofit/OkHttp/Moshi. |
+| Usage counts | `firebase-analytics` (BoM 34.19.0) | phone only | Optional, opt in. No `google-services` plugin: ids are plain string resources. Never in `:wear`. See §8 and `docs/ANALYTICS_PLAN.md`. |
 | Java 8+ APIs | Core library desugaring | 2.1.5 | Gives `java.time` **including the Hijri calendar** down to API 24. |
 
 ### Deliberately NOT used — do not "improve" these back in
@@ -1372,6 +1373,7 @@ descriptions on the tappable location header.
 | Notification settings | DataStore, on device | Never |
 | **Typed city name** (fallback only) | Resolved on-device where possible | Only if the phone's own geocoder cannot answer, then once to Open-Meteo, with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
+| **Usage counts** (only if the user opted in) | Sent to Google Analytics, tied to a random Firebase ID | Yes, **opt in only**. A fixed set: sessions and time open, which of the three main screens, which setup steps (never the madhab step), notifications/location allowed yes or no, exact alarms allowed at the end of setup, device model, Android and app version, language, and an approximate area Google derives from the connection. **Never** sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them |
 
 **Cloud backup and device-to-device transfer are both disabled.** Android's backup service
 would otherwise copy the cached coordinates off the device, contradicting the app's own
@@ -1397,7 +1399,10 @@ Ignore it: it does not reason about `allowBackup="false"`, which already disable
 outright on every version `fullBackupContent` would apply to.
 
 Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`,
-`RECEIVE_BOOT_COMPLETED`, `INTERNET`. **No fine location. No background location.**
+`RECEIVE_BOOT_COMPLETED`, `INTERNET`, plus the install referrer permission added by the analytics
+library. `ACCESS_NETWORK_STATE`, `WAKE_LOCK` and `FOREGROUND_SERVICE` arrive from WorkManager and
+Firebase. `AD_ID`, `ACCESS_ADSERVICES_AD_ID` and `ACCESS_ADSERVICES_ATTRIBUTION` are removed with
+`tools:node="remove"`. **No fine location. No background location.**
 
 ---
 
@@ -2074,14 +2079,14 @@ were thin, which is itself the useful result:
 
 | Checked | Result |
 |---|---|
-| Network calls | Exactly one, `https://geocoding-api.open-meteo.com` in `CityLookup`, and only when the platform geocoder returns nothing. Sends the typed place name and nothing else — no identifier, no coordinates, no history. HTTPS, 12-second timeouts, connection closed in a `finally` |
+| Network calls | The city lookup, `https://geocoding-api.open-meteo.com` in `CityLookup`, only when the platform geocoder returns nothing, **plus Google Analytics uploads, only for a user who opted in** (the SDK starts with the app but is told not to collect; `UsageCounts.apply` is the only thing that enables it). Sends the typed place name and nothing else — no identifier, no coordinates, no history. HTTPS, 12-second timeouts, connection closed in a `finally` |
 | Cleartext | Already blocked by the platform default at targetSdk 36; now declared explicitly with `usesCleartextTraffic="false"`, so a future merged manifest cannot quietly re-enable it |
 | Logging | **Zero** `Log.*`, `println`, `printStackTrace` or `System.out` in any shipped source file. Nothing to leak |
 | Exported components | Phone: the launcher activity only. Both receivers `exported="false"`, `FileProvider` `exported="false"` and scoped to `cache/exports/` — the generated PDFs and nothing else. Watch: the tile service, guarded by `BIND_TILE_PROVIDER`, and the Data Layer listener below |
 | `PendingIntent` flags | Every one is `FLAG_IMMUTABLE` |
 | Storage | Both DataStores are app-private by default. Cloud backup and device-to-device transfer both excluded explicitly (§8) |
 | Permissions | Five on the phone, two on the watch, each with a written reason in the manifest. No `ACCESS_FINE_LOCATION`, no background location, no `READ/WRITE_EXTERNAL_STORAGE` |
-| Third-party SDKs | None. No analytics, ads, billing, crash reporting or attribution library anywhere in `libs.versions.toml` |
+| Third-party SDKs | One that talks to a server: `firebase-analytics`, optional and opt in, phone only. No ads, billing, crash reporting or attribution library. The watch has none |
 | Static `Context` fields | None |
 
 The one thing worth naming: **`SettingsSyncService` must be `exported`** and cannot be
@@ -4275,7 +4280,38 @@ screens, so Samsung's background policy is still the open OEM question §11 reco
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY — 7 Sept 2026
+### 📍 STATE OF PLAY — 3 Oct 2026 (optional usage counts: built, not yet released)
+
+**This block supersedes the 7 Sept block below on one point: there IS engineering and owner work in
+flight.** Everything else in the 7 Sept block (what is live, how it was verified) is still the
+record. Do not invent other work; this is the only open item.
+
+**What is happening.** The owner asked, on 3 Oct 2026, for optional usage counts so he can see how
+many people use the app, how often, for how long, from where, which main tab, and where setup loses
+people, in order to plan phase two. The full plan, with every decision, its reasoning, three
+independent reviews and the owner's sign off, is **`docs/ANALYTICS_PLAN.md`. Read it before touching
+anything.** It reverses the old "no analytics" rule in one narrow way and nothing else.
+
+**Built (on branch `claude/app-analytics-strategy-e826p5`, not merged, not released):**
+`UsageCounts.kt`, the consent step and Settings row, the manifest controls, build variant switches,
+`UsageCountsTest` (15 tests), `docs/privacy.html` and the other copy. Version stays 1.2.0 until release.
+
+**Still to do before it can ship, in order** (plan section 6):
+1. Owner Session 1 in the Firebase console, then the real ids replace the PLACEHOLDER values in
+   `app/src/main/res/values/firebase_config.xml`. **A release must not be built while any value
+   contains the word PLACEHOLDER.**
+2. The opted-out network capture on an emulator, over 75 minutes. It is the proof of "off means
+   off". If Firebase sends anything before opt in and the fallback cannot fix it, **do not ship**.
+3. The one phone sitting (consent, opt in and out, relaunch, device log, Settings screenshot).
+4. `docs/DPIA_ANALYTICS.md` read by the owner (the ICO Children's code requires it).
+5. Full gate, then Play Console: Data safety (CSV import exists), listing text, bundle, **owner presses
+   Publish**. Phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001).
+6. After publishing: the owner reads the numbers using `docs/ANALYTICS_READING.md`.
+
+**Not tested as of this entry:** anything at runtime. Unit tests and the merged manifest were checked;
+nothing has been run on an emulator or a phone.
+
+### 📍 STATE OF PLAY — 7 Sept 2026 (still the record of what is live)
 
 **Written for any assistant, on any tool, arriving with no memory of this project.** Every claim
 in this block was re-verified from scratch on 7 Sept against the live store page, the Play
@@ -6220,8 +6256,17 @@ the one true blocker since both AABs on disk are unsigned ⚠️ **— both halv
     454 × 454 files are already waiting in `docs/store/upload/wear-os/`.
 
 ### Deliberate non-goals — do not "fix" these
-Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
-location, cloud backup, a server of any kind.
+Ads, in-app purchases, accounts, crash reporting, fine location, background location, cloud
+backup, a server of our own. **Analytics is no longer on this list, with one narrow exception: the
+optional, opt in usage counts in `docs/ANALYTICS_PLAN.md`, approved by the owner on 3 Oct 2026.**
+Any other analytics, event, parameter or user property is still a non-goal until the owner agrees
+and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
+coordinates, or anything whose shape reveals them.**
+
+**Exception recorded 3 Oct 2026: the consent screen for usage counts.** The next paragraph forbids
+asking the user for things. A privacy consent is not a growth ask, it is required before data can
+be sent, so it is allowed, **once**, at setup and from Settings. It must never appear in or after
+the disclaimer, never mention the dua, and never be a nag. Do not delete it as a stray "second ask".
 
 **Also: no in-app prompt asking the user to rate, review or share the app. Added 7 Sept 2026.**
 This will look tempting, because the app is live with zero ratings and ratings are what would
@@ -6704,7 +6749,8 @@ matters more than the stable hashes, that is the trade being made.
     tab shows how many *addresses* you have added, which is a different number and reliably
     the larger one; mistaking one for the other is how a stalled test looks healthy. **So the
     only way to know who is actually in is to ask them and keep your own list.** The app
-    cannot help either: no analytics, no accounts, no server, by design and permanently.
+    cannot help either: no accounts and no server, and its optional usage counts are only a
+    sample of opted in users that cannot say who is in.
 
 37. **The tester email field validates nothing, and the failure lands on someone else's
     phone.** The Console accepts any plausible-looking address. It does not check that it is
@@ -7633,6 +7679,43 @@ matters more than the stable hashes, that is the trade being made.
     prompt, is now an explicit non-goal in §11 because it breaks the ask-once rule. Found
     7 Sept 2026.
 
+
+
+114. **A step that only one sect sees reveals the sect, even if its content is never sent.** The
+    madhab step is shown to Sunni users only (`OnboardingScreen.kt`), so an event named after it, or
+    any difference in *which* events a user produces, tells Google their school of thought. Found by
+    an independent review of the analytics plan on 3 Oct 2026, not by the author. The rule is about
+    the *shape* of what is sent, not only its fields: only steps every user passes through have an
+    event, and `UsageCountsTest` fails if that stops being true. Applies to any future event.
+
+115. **Adding a Firebase library starts Firebase for every user, opted in or not.** The SDK's
+    `FirebaseInitProvider` runs at launch and initialises Analytics for the process. "We never touch
+    Firebase for people who did not opt in" is therefore false and must never be written. What keeps
+    it quiet is the manifest (`firebase_analytics_collection_enabled=false`), what proves it is a
+    network capture of an opted-out run, and that capture has to last over an hour because uploads
+    batch hourly. Configure ids from plain string resources; Google documents this and it avoids the
+    `google-services` plugin and its AGP risk.
+
+116. **A permission callback that serves several screens must not be counted as setup.** The location
+    launcher in `MainActivity` also serves Times and Settings; only results that arrive before
+    `onboardingComplete` are setup. Exact alarms have **no result callback at all**
+    (`requestExactAlarmPermission` just opens a settings screen), so it is logged as a *state* at the
+    end of setup and described that way everywhere. A logged request is not an outcome.
+
+117. **Building in a cloud container.** It has no Android SDK and blocks `dl.google.com` unless the
+    environment's Network access allows it. With it allowed: `ANDROID_HOME=/opt/android-sdk`,
+    command line tools from `developer.android.com/studio` (zip number 15859902 on 3 Oct 2026),
+    `sdkmanager "platform-tools" "platforms;android-37.0" "build-tools;37.0.0"`, and a gitignored
+    `local.properties`. Maven Central can answer 429 (rate limit) for a transitive download: retry.
+    A background task's reported exit code is the shell's, not Gradle's, so read the log. A cloud
+    container has no `/dev/kvm`, so emulators and `adb` need the owner's computer.
+
+118. **Independent review earned its cost three times in one day.** Review of the analytics plan by a
+    second model, then a stronger one, found: a consent mechanism with two switches that could
+    disagree, a deletion promise that could not be kept, the sect leak above, an exact-alarm outcome
+    that does not exist, and a mandatory data protection assessment the plan had called optional.
+    None was visible to the author. For anything that changes what the app tells the user about
+    their data, get a review that has not seen your reasoning.
 
 ---
 

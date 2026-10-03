@@ -403,7 +403,7 @@ worth the maintenance for a solo project.
 
 **Trade-off worth knowing:** the Data Layer is part of Google Play Services, so
 `play-services-wearable` is now a dependency of the phone app too. That is the only way to
-move data between a phone and a Wear OS watch. It adds no tracking, but it does mean the
+move data between a phone and a Wear OS watch. It sends nothing to any server, but it does mean the
 phone build is no longer free of Google libraries. A no-GMS build flavour that simply drops
 watch sync is straightforward to add if that matters later.
 
