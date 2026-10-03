@@ -66,9 +66,15 @@ private fun ConsentButton(text: String, onClick: () -> Unit) {
 
 /** The same consent as a dialog, opened when the Settings switch is turned on. */
 @Composable
-fun UsageCountsConsentDialog(onYes: () -> Unit, onNo: () -> Unit) {
+fun UsageCountsConsentDialog(
+    onYes: () -> Unit,
+    onNo: () -> Unit,
+    // Tapping outside or pressing back counts as No in Settings. The one-time question for
+    // existing users passes a no-op so an accidental dismissal is never recorded as an answer.
+    onDismiss: () -> Unit = onNo,
+) {
     AlertDialog(
-        onDismissRequest = onNo,
+        onDismissRequest = onDismiss,
         confirmButton = {},
         title = { Text(stringResource(R.string.consent_title)) },
         // Scrollable for the same reason as the disclaimer: at a large system font the
