@@ -67,6 +67,78 @@ vitals covers crashes); custom backend (cost and security burden).
 | Instance ID is personal data; consent needed for storing or reading it on the device (PECR) | PARTLY, **legal position UNVERIFIED** | Check the ICO guidance in Phase 1 |
 | Religious belief is special category data, so using a prayer app may itself be sensitive | PARTLY, **legal position UNVERIFIED** | Check ICO guidance on Article 9 in Phase 1. We are conservative regardless |
 
+## 2b. Phase 1 results (read from official pages, 3 Oct 2026)
+
+**Where this section and the table in section 2 disagree, this section wins.** Pages were read
+with `curl` (WebFetch was blocked). One trap: `firebase.google.com/docs/analytics/configure-data-collection?platform=android`
+redirects to the iOS page; the Android text is at `/docs/analytics/android/configure-data-collection`.
+
+**Now CONFIRMED**
+- `setAnalyticsCollectionEnabled`: "This setting is persisted across app sessions. By default it is
+  enabled." (Android API reference). `firebase_analytics_collection_enabled=false` is the documented
+  way to wait for consent. `google_analytics_adid_collection_enabled=false` is documented. The Consent
+  Mode default keys exist, and "By default, no consent mode values are set". No page requires
+  `setConsent` for opt in, but the opt in test must still show events arriving.
+- **Plain string resources are supported** ("you can safely recreate the XML files manually") at
+  `developers.google.com/android/guides/google-services-plugin`. Keys: `google_app_id`,
+  `gcm_defaultSenderId`, `google_api_key`, `project_id`. `google_storage_bucket` is not in the list.
+  The SDK reads them (`FirebaseOptions.fromResource`). **Decision: approach A1.** No plugin.
+- Versions: firebase-bom **34.19.0**, firebase-analytics **23.2.0**; google-services plugin is
+  **4.5.0** (the plan said 4.4.4), unused under A1. Command line tools zip number 15859902.
+- Merged manifest (read from the real library manifests): `INTERNET`, `ACCESS_NETWORK_STATE`,
+  `WAKE_LOCK`, `com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE`,
+  `com.google.android.gms.permission.AD_ID`, **and `android.permission.ACCESS_ADSERVICES_ATTRIBUTION`,
+  `android.permission.ACCESS_ADSERVICES_AD_ID`, plus an optional `android.ext.adservices` library**
+  (new to the plan). Components: `AppMeasurementReceiver`, `AppMeasurementService`,
+  `AppMeasurementJobService`, `FirebaseInitProvider`, `ComponentDiscoveryService`. No `<queries>`.
+  Google documents `tools:node="remove"` for AD_ID.
+- `FirebaseInitProvider` runs at launch, and `initializeApp` "also initializes Firebase Analytics for
+  the current process". `firebase-installations` is bundled. Events upload in roughly hourly batches.
+- Data safety: collected not shared (analytics providers are "service providers"); optional is allowed
+  if all users can opt in; **approximate location "inferred, such as via IP address" must be declared**;
+  Firebase installation ID counts as *Device or other IDs*; screen views and sessions count as
+  *App interactions / App activity*. *App info and performance* is not on Google's Analytics list.
+  **CSV export and import exist** (Data safety > Start > "Export to CSV" / "Import to CSV"; imported
+  answers overwrite existing ones).
+- Console: retention is Admin > Property > Data Settings > Data Retention (2 or 14 months free);
+  Google signals under Admin > Data collection and modification > Data Collection; data sharing under
+  Admin > Account > Account details (turning every setting off means data is used only to provide
+  Analytics). Realtime shows the last 5 and 30 minutes; processing can take 24 to 48 hours.
+  **Custom parameters must be registered under Custom Definitions** and then take 24 to 48 hours.
+  Low audiences have data withheld. IP addresses "are not logged or stored".
+- ICO: PECR reg 6 applies to app SDKs. The statistical purposes exception is "not a broad exception",
+  needs a third party that is a processor not a joint controller, and does not cover keeping
+  individual level data. Opt in is correct. Explicit consent must "specify the nature of the special
+  category data" and be separate from other consents. **The Children's code applies** if more than an
+  insignificant number of children use the app, even if it says they should not, and then **a DPIA is
+  mandatory**, with settings high privacy by default (ours are off by default).
+
+**Corrections forced by those pages**
+1. **The Analytics location does not decide where data is processed.** Google: Firebase "may process
+   and store your data anywhere Google or its agents maintain facilities". Copy says "may be processed
+   outside the UK", **not** "including the US" (the pages do not name the US).
+2. **A DPIA is a required, dated document completed before release** (`docs/DPIA_ANALYTICS.md`),
+   not a side note. The assistant drafts it and the owner reads it.
+3. **"Ages out under retention" can be false.** With "Reset user data on new activity" on, an active
+   user's identifier never expires, and aggregated reports are not limited by retention. Session 1 sets
+   it off, and the policy says event level data is kept up to 14 months, not that everything vanishes.
+4. **Remove all three ad permissions:** `AD_ID`, `ACCESS_ADSERVICES_AD_ID`,
+   `ACCESS_ADSERVICES_ATTRIBUTION`, each with `tools:node="remove"`. Keep the install referrer
+   permission (it lets Play campaign links show where installs come from) and list it in `privacy.html`.
+5. **Switch off automatic screen views** with `google_analytics_automatic_screen_reporting_enabled`
+   = false, or the SDK adds its own `screen_view` events outside the approved fixed set. Our own tab
+   views stay.
+6. **The opted out capture must run for over 75 minutes** (batches upload about hourly), with the app
+   opened and backgrounded, or it can miss traffic.
+7. **Register the parameters** `step`, `permission` and `granted` in Custom Definitions (Session 1).
+8. Optional, not decided: "Granular location and device data" can be switched off per region, which
+   removes city and device model. Would simplify the "usually city" copy but loses those reports.
+
+**Still open** (only the opted out capture or later work can settle): whether a disabled SDK sends
+anything or writes a local ID; whether manual init loses `first_open` (moot unless fallback B is
+needed); the retention default for new properties (page does not state one, so set 14 months and
+reset off on the console screen); SSAID and Android ID behaviour (undocumented).
+
 ## 3. What the owner will be able to see
 
 | Question | Where | Notes |
@@ -108,8 +180,7 @@ the owner plainly. No compromise on "off means off".
 ### 4.2 Manifest (app only)
 - `firebase_analytics_collection_enabled` = false.
 - `google_analytics_adid_collection_enabled` = false (key name PARTLY confirmed).
-- Remove `com.google.android.gms.permission.AD_ID` with `tools:node="remove"` (needs
-  `xmlns:tools`, which the phone manifest lacks).
+- Remove `com.google.android.gms.permission.AD_ID`, `android.permission.ACCESS_ADSERVICES_AD_ID` and `android.permission.ACCESS_ADSERVICES_ATTRIBUTION` with `tools:node="remove"` (needs `xmlns:tools`, which the phone manifest lacks). Also `google_analytics_automatic_screen_reporting_enabled` = false (see 2b).
 - No Consent Mode default keys (a second switch that could disagree). Whether `setConsent` is
   also needed is UNVERIFIED, so the test must show events arriving after opt in.
 - Never use the "deactivated" key. Fix the `INTERNET` comment (`AndroidManifest.xml` line 11).
@@ -202,7 +273,7 @@ not inherit the `debug` source set (matches the repo).
 
 ### 4.6 Opting out and deletion
 Switching off disables collection and resets local analytics data and the instance ID. **Data
-already sent stays with Google** and ages out under the retention setting. **No "delete on
+already sent stays with Google** and is kept at event level for up to 14 months (with Reset user data on new activity off). Aggregated reports are not limited by that setting. **No "delete on
 request" promise**: the instance ID is the only handle and the reset destroys it. The policy says
 so. The 14 month setting covers event data; aggregates last longer, so the policy must not say everything vanishes at 14 months.
 On reinstall, `allowBackup=false` and the data extraction rules wipe the flag, so consent is
@@ -239,7 +310,7 @@ assistant writes every word the owner pastes.
 
 | Session | Owner does | Assistant does |
 |---|---|---|
-| **Session 1: Firebase** | Sign in to the **same Google account used for Play Console** (owner decision). One screen at a time, with a screenshot each: create the project; on the **Enable Google Analytics** screen choose a Google Analytics account and the **Analytics location** (it decides whether "processed outside the UK" is accurate, so the assistant records the choice); **accept Google's terms and data processing terms (the owner's signature, the assistant stops here)**; register the app `com.sajdatime.app` and, as a second app, `com.sajdatime.app.sideload` (so phone test data stays separate from real data); then in Analytics Admin set Data settings > Data retention to 14 months, Data collection > Google signals off, advertising features off, and in Account settings **every data sharing option off**; and send back the app ID, project ID and API key **and** `google-services.json`, so either approach can proceed | Says what to click on each screen. Reads the values. Confirms each setting from the screenshots. **No API key restriction step**: it is a public identifier and restricting it is a detour |
+| **Session 1: Firebase** | Sign in to the **same Google account used for Play Console** (owner decision). One screen at a time, with a screenshot each: create the project; on the **Enable Google Analytics** screen choose a Google Analytics account and the **Analytics location** (it sets reporting currency and region only; Google says it does not decide where data is processed); **accept Google's terms and data processing terms (the owner's signature, the assistant stops here)**; register the app `com.sajdatime.app` and, as a second app, `com.sajdatime.app.sideload` (so phone test data stays separate from real data); then in Analytics Admin set Data settings > Data retention to 14 months with **Reset user data on new activity** off, Data collection > Google signals off, advertising features off, and in Account settings **every data sharing option off**; register Custom Definitions `step`, `permission` and `granted` (reports show them 24 to 48 hours later); and send back the app ID, project ID and API key **and** `google-services.json`, so either approach can proceed | Says what to click on each screen. Reads the values. Confirms each setting from the screenshots. **No API key restriction step**: it is a public identifier and restricting it is a detour |
 | **Everything between** | Nothing, except one **five minute check in Phase 4**: open Analytics > DebugView and send a screenshot while the assistant drives the emulator | Phases 1 to 6 (section 6) |
 | **Session 2: Play Console** | **One submission, in this order:** save Data safety (including the Advertising ID answer), save the listing text, upload the **phone** bundle with release notes, then a single **Send for review** and **Publish**. Do not edit the listing or App content while a review is open (`RELEASING.md` lines 1122 to 1123). "Updated on" moves only at rollout | Prepares the answers and text. Guides each screen. Never presses submit |
 | **Phone check (agreed by the owner, one sitting)** | Plug in the Redmi once, keep it unlocked (Developer options > Stay awake), allow USB debugging | Installs a one-off **test build** with `installSideload` (package `.sideload`, analytics switched on locally, never committed, never `installDebug`). Checks first run, the consent screen, opt in and out, relaunch and the device log. Its test data goes to a separate Firebase app, so it never mixes with real data |
@@ -259,8 +330,8 @@ because `CLAUDE.md` requires `privacy.html` to change in the same commit as any 
 | 1 | Close every UNVERIFIED row a browser can close. **Compile spike A1 versus A2 with placeholder values** on a throwaway branch and run the **opted out capture only** (the opt in half needs real values, so it moves to Phase 4). Check ICO guidance on PECR, Article 9 and the Children's Code, and Firebase's Data disclosure page. Update this plan | Nothing left UNVERIFIED that a page can settle; both approaches compile; approach chosen |
 | 2 | Session 1 with the owner | Values or JSON in place, settings confirmed from screenshots |
 | 3 | Code (section 4), tests (8), variant overrides | `./gradlew clean test lint` green, every variant builds |
-| 4 | Manifest diff against the current release. Opted out capture. Opt in proof **from the device**: `adb shell setprop log.tag.FA VERBOSE` and `log.tag.FA-SVC VERBOSE`, then look for successful upload lines for all three event types. Relaunch test. No Google Play services emulator. RTL layout check of the new screen (a layout check only) | Opted out: no traffic. Opt in: device log shows uploads. Stop rule applies. DebugView in the console is confirmed by the owner in the five minute check |
-| 5 | Copy and docs (section 7), including a short **data protection impact note** the assistant drafts. Repo wide grep for `tracking`, `analytics`, `telemetry` excluding this plan and `docs/reviews/`. Retake `05-settings.png` unconditionally (the new row sits in About) | Grep clean, disclaimer tests green |
+| 4 | Manifest diff against the current release. Opted out capture (**run it for over 75 minutes**, because Analytics uploads in roughly hourly batches). Opt in proof **from the device**: `adb shell setprop log.tag.FA VERBOSE` and `log.tag.FA-SVC VERBOSE`, then look for successful upload lines for all three event types. Relaunch test. No Google Play services emulator. RTL layout check of the new screen (a layout check only) | Opted out: no traffic. Opt in: device log shows uploads. Stop rule applies. DebugView in the console is confirmed by the owner in the five minute check |
+| 5 | Copy and docs (section 7), including a **DPIA** (`docs/DPIA_ANALYTICS.md`) the assistant drafts and the owner reads, **completed before release** because the ICO Children's code requires one. Repo wide grep for `tracking`, `analytics`, `telemetry` excluding this plan and `docs/reviews/`. Retake `05-settings.png` unconditionally (the new row sits in About) | Grep clean, disclaimer tests green |
 | 6 | `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease`, both emulators. Squash merge the branch. The wear bundle is built as the gate only and is not uploaded (4.7) | Green, sizes recorded |
 | 7 | Session 2 with the owner | Owner presses Publish |
 | 8 | Confirm "Updated on" moved, ask the owner for an Analytics > Realtime screenshot (optional), write STATE OF PLAY and lessons into §15 (including the sect shape trap) | Recorded and pushed |
@@ -292,8 +363,7 @@ numbers are from the 3 Oct tree and may drift.
   connection. Never your GPS position or the place you type." Never "never your location".
 - Attribute the IP statement: "According to Google, it does not log or store IP addresses in
   Analytics."
-- Name Google, say data may be processed outside the UK including the US (UNVERIFIED, check),
-  link the policy.
+- Name Google, say data may be processed outside the UK (Google: "anywhere Google or its agents maintain facilities"), link the policy. Do not name the US.
 - Never promise deletion on request.
 - **Tone: friendly and low key, never understated.** Avoid the word "tracking". Use "usage
   counts" and "help us improve". On marketing surfaces (store short description, feature graphic,
@@ -303,7 +373,7 @@ numbers are from the 3 Oct tree and may drift.
   information and Play Data safety must match behaviour. No surface may deny it.
 - **Children:** do not write "for adults". The ICO test is whether children are likely to access
   the app, and the Play audience includes 13 to 17 (HANDOVER about line 5400). Keep it off by
-  default, keep the language simple, and cover it in the impact note.
+  default, keep the language simple, and cover it in the DPIA.
 - **Permanent rule: never send sect, madhab, calculation method, alert or prayer settings, a
   typed city or coordinates,** as an event, a parameter, a user property, or by the shape of the
   events sent. Anyone who later wants "which madhab is most popular" must go back to the owner and
@@ -316,7 +386,7 @@ app, how often and for how long, which main screen you open, which setup steps y
 whether you allow notifications and location, and whether exact alarms are allowed (a yes or no, never the location itself),
 your phone model, Android version, app version and language, and your approximate area, which
 Google works out from your internet connection. They are tied to a random ID, not your name, and
-may be processed outside the UK, including in the US. Because using a prayer app can say
+may be processed outside the UK. Because using a prayer app can say
 something about your faith, this is your choice and nothing changes if you say no. It never sends
 your GPS position, the place you type, your school of thought or your prayer settings. You can
 switch it off in Settings at any time.* Link: *Read the privacy policy.* Buttons, equal weight:
