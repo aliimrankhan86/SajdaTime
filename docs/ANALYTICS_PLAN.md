@@ -222,6 +222,16 @@ both. Release notes text is in 7.3.
 
 ## 5. Who does what
 
+**Browser access is NOT assumed.** In the planning session no tool could control the owner's
+Chrome (checked 3 Oct 2026: only Figma, Atlassian, GitHub, Vercel and similar connectors exist).
+The container's own headless Chromium is not his browser, holds no logins and cannot reach
+Google's console pages. So Phase 0 checks whether the computer session can drive his Chrome
+(for example through a browser extension that is connected to it). If it can, the assistant
+navigates and reads the Firebase and Play Console screens itself, and the owner's part shrinks
+to **signing in, accepting Google's terms and pressing Publish**, which stay with him either
+way. If it cannot, the guided screenshot method in this section is used. Nothing else in the
+plan depends on it.
+
 **Required session type:** a Claude Code session with a shell on the owner's computer, able to
 run Gradle, `adb` and the emulators. A chat or Console bridge session cannot (`CLAUDE.md`), and
 then the owner would have to paste every command. Phase 0 checks this.
@@ -248,7 +258,7 @@ because `CLAUDE.md` requires `privacy.html` to change in the same commit as any 
 
 | Phase | Work | Gate |
 |---|---|---|
-| 0 | Read `CLAUDE.md`, HANDOVER §11 STATE OF PLAY, this plan. Fetch the public Play listing. **Confirm the session has a shell with Gradle, adb and emulators.** Create the feature branch | Sign off recorded, tooling present |
+| 0 | Read `CLAUDE.md`, **check whether Chrome can be driven (see section 5)**, HANDOVER §11 STATE OF PLAY, this plan. Fetch the public Play listing. **Confirm the session has a shell with Gradle, adb and emulators.** Create the feature branch | Sign off recorded, tooling present |
 | 1 | Close every UNVERIFIED row a browser can close. **Compile spike A1 versus A2 with placeholder values** on a throwaway branch and run the **opted out capture only** (the opt in half needs real values, so it moves to Phase 4). Check ICO guidance on PECR, Article 9 and the Children's Code, and Firebase's Data disclosure page. Update this plan | Nothing left UNVERIFIED that a page can settle; both approaches compile; approach chosen |
 | 2 | Session 1 with the owner | Values or JSON in place, settings confirmed from screenshots |
 | 3 | Code (section 4), tests (8), variant overrides | `./gradlew clean test lint` green, every variant builds |
