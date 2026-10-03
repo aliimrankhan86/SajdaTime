@@ -4328,6 +4328,25 @@ deliberately not copied), so these two bundles are **unsigned**. A signed pair m
 `tools/build-store-assets.sh`: only `feature-graphic-1024.png` changed ("Sunni & Shia · No accounts"); the text sits cleanly
 on the gradient. `05-settings.png` does not show the new row, so it was left alone.
 
+**Existing-user question (commit 8a39b2b, the four checks added to `ANALYTICS_DEVICE_CHECK.md`), emulator `sajda`, new build
+over a build from `main` 93cd36e with its data kept** (the only way to get "setup done, no answer saved"; the Redmi's test copy
+was NOT upgraded, the owner was away and the install needs taps on the phone):
+1. *Upgrade:* the question "Help improve SajdaTime?" appeared once. BACK and a tap outside did not dismiss it and saved nothing:
+   after a force-stop it asked again. Tapping **Yes** saved, it never returned after force-stop and relaunch, and only
+   `first_open`, `session_start` and `screen_view` (one per tab visit) were logged. Repeated from a fresh upgrade with **No**:
+   no question on two further relaunches. PASS.
+2. *Fresh install:* the question appears once, as the setup consent step; after answering it never appears again (two relaunches). PASS.
+3. *After No nothing is sent:* zero `Logging event` and zero uploads in the app log, and the proxy saw no Analytics or Firebase
+   host over the period (only Google Play services' own `phonedeviceverification-pa.googleapis.com`). *After Yes:* the fixed events plus
+   the SDK's automatic `first_open`/`session_start`/`user_engagement`. PASS.
+4. *Font scale 1.3 and 2.0:* both buttons full width and fully visible by scrolling the dialog; at 2.0 "Yes" wraps to two
+   lines so it is taller than "No thanks" (same width). Font scale put back to 1.0. PASS.
+The 76 minute opted-out capture was taken on commit b142709; 8a39b2b changed only the consent UI, strings and a saved flag
+(`git diff b142709 8a39b2b -- app` touches four files, none of them the manifest or SDK setup), so it was not repeated.
+Gate on the new head (`clean test lint :app:bundleRelease :wear:bundleRelease`): 79 tests, 0 failures, lint clean; `app-release.aab`
+5,725,773 bytes, sha256 `9896d18fe47e635fbde114e5fef67689a41972cc5aee7fd027afe25d32baa019` (**unsigned**, see above; this
+supersedes the sha256 earlier in this entry), `wear-release.aab` 3,638,937 bytes; merged manifest again free of `AD_ID`/`ADSERVICES`.
+
 **Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
 send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
 Play services missing; a signed bundle; Play Console, Data safety and the privacy page text.
@@ -4381,7 +4400,7 @@ anything.** It reverses the old "no analytics" rule in one narrow way and nothin
 6. After publishing: the owner reads the numbers using `docs/ANALYTICS_READING.md`.
 
 **Update 4 Oct 2026: steps 2 and 3 are DONE and PASSED** (see the "Usage counts verification" entry in §10): 76 min 48 s
-opted-out capture clean with a working positive control, phone opt in/out/relaunch, Sunni and Shia event names identical, release
+opted-out capture clean with a working positive control, phone opt in/out/relaunch, Sunni and Shia event names identical, the existing-user question, release
 manifest free of `AD_ID`/`ADSERVICES`. **What remains:** (a) decide whether `privacy.html` and the DPIA should add one sentence that
 the time of first launch can be sent if you opt in later (the `first_open` finding in §10); (b) build the **signed** bundles from
 the owner's main checkout (this verification built unsigned ones); (c) Data safety and Play Console, owner presses Publish.
