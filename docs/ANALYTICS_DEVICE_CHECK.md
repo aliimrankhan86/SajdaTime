@@ -1,3 +1,5 @@
+> **COMPLETED 3 to 4 Oct 2026. Do not rerun for 1.3.0.** Results are in `docs/HANDOVER.md` section 10. Kept as the method for re-checking a future release.
+
 # Device check for the optional usage counts (run on the owner's computer)
 
 **For a Claude Code session running on the owner's own computer**, in his local clone, with his phone

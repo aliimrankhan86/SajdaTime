@@ -1,3 +1,5 @@
+> **Status 4 Oct 2026: parked, still valid.** Default-on was built and reversed the same day (see `docs/HANDOVER.md` section 10 and `CLAUDE.md`). This brief is only for a future adviser conversation; it does not describe the shipped design (opt in).
+
 # Usage counts on by default: brief for a data protection adviser
 
 Prepared 3 Oct 2026 for the owner (Ali Imran Khan). Not legal advice. Purpose: get a clear answer

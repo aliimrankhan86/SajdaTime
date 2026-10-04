@@ -4430,7 +4430,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 DECISION — 3 Oct 2026 (usage counts: owner asked for "on by default"; recorded, NOT built)
+### ⬛ SUPERSEDED — 3 Oct 2026 decision record (kept for history; the STATE OF PLAY of 4 Oct below is the truth). Default-on was later built and REVERSED; the branch named here, `claude/analytics-default-on-1-4-0`, is obsolete (its existing-user question was carried into `claude/app-analytics-strategy-e826p5`). Do not use it.
 
 The owner asked for usage counts to be **on by default** (opt out), so the app can be improved. This
 was challenged and he confirmed, so it is recorded here. **Do not flip the default or start sending
@@ -4446,14 +4446,13 @@ silent default on stays unbuilt until a data protection solicitor has answered t
 has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
 (unreliable and still faith data).
 
-### 📍 STATE OF PLAY — 4 Oct 2026 (usage counts: built, verified, signed bundle ready; waiting on the owner's Play Console steps)
+### 📍 STATE OF PLAY — 4 Oct 2026, 13:00 (usage counts: built, verified, SUBMITTED to Google and In review; branch NOT yet merged to main)
 
 **Read this first.** It supersedes the 3 Oct block that used to be here and the 7 Sept block below on one point only: release **1.3.0** (phone,
 `versionCode 5`) adds **optional, opt in usage counts**. Everything else in the 7 Sept block (what is live, how it was verified) is still the
 record. The watch stays at 1.2.0 (`versionCode 1001`) and is not part of this release. **Do not invent other work.**
 
-**Where the code is.** Branch `claude/app-analytics-strategy-e826p5`, ahead of `main`, **not merged and not published**. Never push to `main`; the owner
-merges after the release is through review. Phone app only; nothing Firebase is in `:wear`.
+**Where the code is.** Branch `claude/app-analytics-strategy-e826p5`, pushed, **36+ commits ahead of `main`, NOT merged** (pull request: https://github.com/aliimrankhan86/SajdaTime/pull/1). Assistants never push to `main`; the owner presses Merge (or explicitly tells an assistant to merge). **The merge is urgent, not a follow-up:** the privacy policy URL given to Google in Data safety (`https://aliimrankhan86.github.io/SajdaTime/privacy.html`) is served from `main`, and on 4 Oct 2026 it still showed the old text (last updated 15 Aug 2026, no mention of usage counts). Until the PR is merged and the page redeploys, Data safety declares analytics while the linked policy does not describe it. Phone app only; nothing Firebase is in `:wear`.
 
 **What the feature is (one paragraph).** Firebase Analytics, off until the user says Yes. New installs see a consent step right after Welcome
 (`OnboardingScreen.kt`, `Step.CONSENT`); people who installed earlier get the same question once (`MainScaffold.kt`, not dismissible by Back or an outside tap);
@@ -4479,12 +4478,15 @@ identical; the existing-user question, fresh install, and font scale 1.3 and 2.0
 - No separate Terms and Conditions page (the in-app Disclaimer and the privacy policy cover it); the Disclaimer is unchanged; Data safety "Optional" = Yes.
 - Firebase may record `first_open` on the device before consent and sends it only after a Yes (lesson 122); the policy and consent text say so.
 
-**Still to do, and whose job it is.**
-1. **Done by the owner 4 Oct 2026:** phone bundle 5 (1.3.0) uploaded to Production, en-GB release notes filed, Data safety saved (approximate location: App functionality + Analytics; app interactions: Analytics; device IDs: Analytics; all Optional; nothing shared; deletion = No; Advertising ID = No), short and full store description edited (two bullets), then **Submit 6 changes for review** pressed. The six changes were: release 5 (1.3.0), Ethiopia added to Production and Closed testing (Google's own automatic country addition, harmless, left in), the two description edits, Data safety. Play's pre-review quick checks run first and the submission goes through when they pass. The only warning was the usual harmless 'no debug symbols' (no native code of ours). **Confirmed 4 Oct 2026 12:42 (read from the Console by a browser assistant): submission 5 is In review** (Production, Closed testing Alpha, Store listing, App content), no errors; 'Last published' still 5 Sept until approval. **Still to confirm:** the review outcome. Play sends no email; check the public listing's 'Updated on' date (see the top of CLAUDE.md). The 'App functionality' purpose on location is the typed-city search via Open-Meteo, not GPS, and is deliberate (LISTING.md); a browser assistant flagged it as a conflict and it is not one.
-1b. **Owner, after the listing's Updated-on date moves:** merge pull request https://github.com/aliimrankhan86/SajdaTime/pull/1 into `main` (assistants never push to `main`).
-2. **Done by the owner 4 Oct 2026:** the "SajdaTime (test)" app was uninstalled from the Redmi. **Optional, his choice:** switch off Developer options *Install via USB* and *USB debugging (Security settings)* (left on; harmless). An S23 Ultra check is optional; only wording changed since the Redmi.
-3. **After it is live:** confirm the "Updated on" date on the Play listing, then merge the branch to `main` (owner), and keep the numbers routine in `docs/ANALYTICS_READING.md`.
-4. **Later, only if the yes rate is under about 25 per cent:** the 1.4.0 aggregator evaluation above.
+**What happened on 4 Oct 2026 (facts, in order).** Device check and 76 min 48 s opted-out capture PASSED (section 10). Owner asked for default-on; built, then reversed on ICO evidence; a Pakistan-only split built and removed; an independent (Fable 5) review led to the final opt in design with warmer wording and a feedback row. Redmi test app removed by the owner. S23 Ultra check skipped by the owner (wording-only change since the Redmi check). In Play Console the owner uploaded bundle 5 (1.3.0) to Production, filed en-GB release notes, saved Data safety (approximate location: App functionality + Analytics; app interactions: Analytics; device or other IDs: Analytics; all Optional; nothing shared; deletion = No; Advertising ID = No) and two store description bullet edits (with a browser assistant), then pressed **Submit 6 changes for review** at 12:42. The six changes: release 5 (1.3.0); Ethiopia added to Production and Closed testing (Google's own automatic addition, left in); short description; full description; Data safety. Console then showed submission 5 **In review**, no errors, 'Last published' still 5 Sept. The only release warning was the harmless 'no debug symbols' (no native code of ours). The 'App functionality' purpose on location is the typed-city search via Open-Meteo, not GPS, and is deliberate (`docs/store/LISTING.md`); a browser assistant flagged it as a conflict and it is not one.
+
+**Still open, in this order, and whose job.**
+1. **Owner (or an assistant he explicitly tells to): merge pull request #1 into `main` NOW**, so the live privacy policy matches Data safety. Then confirm by fetching the policy URL: it must say 'Last updated: 4 October 2026' and mention usage counts (GitHub Pages can take a few minutes).
+2. **Google:** review of submission 5. Outcome unknown. Play sends no email. It is live only when the public listing's 'Updated on' date changes to the approval date (`https://play.google.com/store/apps/details?id=com.sajdatime.app`, signed out). Typical: hours to 2 days, up to 7. If still In review after 7 days, look at Submission activity. If rejected, read the Console message first.
+3. **After it is live:** nothing to build. Check the 'Updated on' date and that the policy is live. Keep the numbers routine in `docs/ANALYTICS_READING.md`.
+4. **In about 8 weeks:** owner sends the Firebase and Play new-user counts; if the opt in yes rate is under about 25 per cent, evaluate a no-identifier aggregator for 1.4.0 (needs a fresh DPIA).
+5. **Optional, owner's choice:** switch off Developer options *Install via USB* and *USB debugging (Security settings)* on the Redmi (left on; harmless).
+Nothing else is pending. A separate claude.ai web session called 'App analytics strategy' also exists; it is obsolete, and where it disagrees with this block (for example by saying the work is merged), this block is right and was checked against GitHub on 4 Oct.
 Everything else in `docs/ANALYTICS_PLAN.md` is history (its status line says so).
 
 **Where things are (so you do not hunt).**
@@ -7933,3 +7935,6 @@ matters more than the stable hashes, that is the trade being made.
 ---
 
 *Made with love, free for the Ummah.*
+
+
+124. **A privacy policy that Google links to is served from `main`, so merge it before you submit, not after.** On 4 Oct 2026 the Data safety form was saved and the release submitted while the live policy still predated usage counts, because the branch was left unmerged 'until the release is live'. The earlier runbook (`docs/ANALYTICS_PLAY_CONSOLE_PROMPT.md`) said merge first; the order was not followed. Rule: anything the store listing or Data safety points at (policy URL, support page) must be live and matching BEFORE pressing Send for review. Also: before saying 'merged', run `git rev-list --left-right --count origin/main...origin/<branch>`; another session's claim that work was 'merged' was wrong and this check caught it.

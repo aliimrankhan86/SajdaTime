@@ -1,3 +1,5 @@
+> **DONE 4 Oct 2026. Do not rerun.** The owner did this by hand with a browser assistant (Parts 1 to 3 as written here, release and notes by hand) and submitted. One precondition below was NOT met: the branch was not merged to `main` first, so the linked privacy policy was stale at submission. See `docs/HANDOVER.md` section 15, lesson 124, and the STATE OF PLAY.
+
 # Play Console job for the 1.3.0 release (paste into Claude in Chrome or Cowork)
 
 **Run this only after the device check (`docs/ANALYTICS_DEVICE_CHECK.md`) has reported PASS for the
