@@ -53,7 +53,7 @@ PART 3. STORE LISTING (Grow > Store presence > Main store listing, English (Unit
     Replace the line
       • No analytics, no crash reporting, no tracking of any kind
     with
-      • Optional usage counts, off unless you switch them on. No crash reporting
+      • Optional usage counts that you control in Settings. No crash reporting
     Replace the line
       • Your coordinates never leave your device — there is no server for them to go to
     with
@@ -64,7 +64,7 @@ PART 3. STORE LISTING (Grow > Store presence > Main store listing, English (Unit
 PART 4. RELEASE (Test and release > Production > Create new release)
 Create the release for phones. Upload ONLY this file: <PATH OF app-release.aab, FILLED IN BY ME>.
 Release name: leave the suggested one. Release notes, English (United Kingdom), exactly:
-New: an optional setting to share usage counts, so we can see how SajdaTime is used and improve it. If you installed before, you will be asked once. Nothing is shared unless you say yes. Your prayer times and your location are not affected.
+New: optional usage counts, so we can see how SajdaTime is used and improve it. You will see a short message about it once, and you can change your choice in Settings at any time. Your prayer times and your location are not affected.
 Save the release as a draft and open its summary. It must say version code 5 (1.3.0) and no errors.
 If it shows any error or warning, copy it to me. Do NOT click Send for review.
 
@@ -82,9 +82,7 @@ in one message:
 ## The release steps (agent does 1 to 3 if it can; the owner does 4)
 1. Test and release > Production > Create new release (phone / "Phones, Tablets…" form factor only).
 2. Upload the signed `app-release.aab` (versionCode 5, 1.3.0).
-3. Release notes (en-GB): *New: an optional setting to share usage counts, so we can see how SajdaTime
-   is used and improve it. If you installed before, you will be asked once. Nothing is shared unless you say yes. Your prayer times and your location are
-   not affected.*
+3. Release notes (en-GB): *New: optional usage counts, so we can see how SajdaTime is used and improve it. You will see a short message about it once, and you can change your choice in Settings at any time. Your prayer times and your location are not affected.*
 4. Check the release summary says versionCode 5 and no errors, then **Send for review** (one submission
    with the Data safety and listing changes). **That is the owner's button.**
 5. Do not touch the listing or App content while the review is open. The watch release is not part of this.

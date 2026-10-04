@@ -183,7 +183,7 @@ This one is not paid for at all.
 
 • No adverts, ever
 • No accounts, no sign-in, no email address
-• Optional usage counts, off unless you switch them on. No crash reporting
+• Optional usage counts that you control in Settings. No crash reporting
 • Approximate location only, read while the app is open, never in the background
 • Your coordinates never leave your device, and are never part of the optional usage counts
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
