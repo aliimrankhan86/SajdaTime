@@ -72,7 +72,6 @@ import com.sajdatime.core.labelRes
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.notify.PrayerAlarmScheduler
-import com.sajdatime.app.data.NoticeRegion
 import com.sajdatime.app.data.SetupStep
 import com.sajdatime.app.ui.components.MethodChoiceList
 import com.sajdatime.app.ui.components.UsageCountsConsentBody
@@ -238,14 +237,11 @@ private fun StepScaffold(
 
 @Composable
 private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
-    // Asks, except on a phone that is positively in a listed country: see NoticeRegion.
-    val context = LocalContext.current
-    val notice = remember { NoticeRegion.forDevice(context) }
     StepScaffold(
-        title = stringResource(if (notice) R.string.notice_title else R.string.consent_title),
+        title = stringResource(R.string.consent_title),
         body = "",
     ) {
-        UsageCountsConsentBody(onYes = onYes, onNo = onNo, notice = notice)
+        UsageCountsConsentBody(onYes = onYes, onNo = onNo)
     }
 }
 

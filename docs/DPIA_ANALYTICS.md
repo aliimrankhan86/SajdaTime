@@ -93,11 +93,11 @@ defaults. **Outcome unchanged from section 6: explicit opt in, off by default.**
 pages, not legal advice. To revisit: see `docs/HANDOVER.md` §10 (4 Oct 2026).
 
 
-**Update later on 4 Oct 2026: a narrow country split was built, at the owner's request.** The app asks (opt in) everywhere except a phone that
-positively looks to be in a listed country, where it shows a notice that counts are on with an equal "Turn this off", counting only after
-the notice has been seen. The list is **Pakistan only**: the one country whose absence of an enacted data protection law was confirmed in a source
-(the Personal Data Protection Bill 2023 is still draft, searched 4 Oct 2026). The rule is deliberately conservative: SIM and network
-country must both be Pakistan (a missing signal means ask), the language region must not be the UK, EEA or Switzerland, and the time zone must be
-Asia/Karachi. `NoticeRegion.kt`, with unit tests for each way of being wrong. **Residual risk:** a traveller or someone with unusual settings is
-asked (safe), but a phone that looks Pakistani while its owner is subject to other law (for example a UK resident with a Pakistani SIM, UK time zone
-excluded, but language region left blank) could be counted without asking; Low, accepted. Not a lawyer's opinion. Do not add a country without a written source.
+**Update later on 4 Oct 2026: the Pakistan-only country split was built and then removed.** The owner has no Pakistani users, so it served nobody
+and added a residual risk (a phone that looks Pakistani while its owner is under other law). An independent review (Fable 5, same day) agreed:
+remove it and keep the policy at "asked first everywhere". **Plan recorded in `docs/HANDOVER.md` section 10:** opt in Firebase as built; use Play
+Console fully for headcount, retention and country; warm the consent wording (plain reason first, no biased buttons, no re-asking decliners);
+a "Send feedback" email row; measure the yes rate after about 8 weeks; only if it is under about 25 per cent consider a no-identifier aggregator, and only
+after a fresh DPIA and ideally an adviser's written view. Two corrections from that review: the Act itself does not say "no individual-level data", that
+is the ICO's guidance (treated as binding in practice); and the EU is not uniformly "no exception" (France's CNIL exempts strict audience measurement,
+but says Google Analytics does not qualify). Reading device information counts as "access" under PECR reg 6 even when nothing is stored.

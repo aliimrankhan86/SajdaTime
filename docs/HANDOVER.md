@@ -4399,6 +4399,22 @@ notice's "Turn this off" path in this exact build (verified in the earlier build
 Data safety remains Optional = Yes. **Signed bundles for THIS build (supersede the checksums in the paragraph below):** phone `app-release.aab`
 5,739,040 bytes, sha256 `2e4d30105034812749e05eca72c621872a9c28b2cacad210fdf6c9f2821f97b2`; watch bundle unchanged at 3,647,031 bytes (do not upload).
 Gate (`clean test lint :app:bundleRelease :wear:bundleRelease`) passed; both `jarsigner -verify` "jar verified"; no `AD_ID`/`ADSERVICES` in the release manifest.
+**Fable 5 review (4 Oct 2026, asked for a creative lawful way to get more data).** Its ranked conclusion, adopted: (1) Play Console fully, no consent needed; (2)
+better consent wording, same opt in; (3) measure the yes rate; (4) a no-identifier aggregator (e.g. Aptabase EU, daily rotated salt, processor) is the only
+option that would let counts run broadly in the UK, but it is a third party, still faith adjacent, still consent in the EEA/CH, and needs a fresh DPIA and
+ideally an adviser, so it is deferred to 1.4.0 behind a measured trigger (yes rate under about 25 per cent after about 8 weeks); (5) Firebase at 2 month retention
+still fails the ICO gloss; (6) a "Send feedback" mailto row, accepted; rejected: an in-app poll (breaks "asked once, never nagged"), a server of our own (breaks "no
+server of our own"), Firebase consent-mode cookieless pings (unverified and inference-based), any default-on. **Done in this change:** the Pakistan-only split removed
+(`NoticeRegion.kt` deleted, app code back to the opt-in state of `b3a0665` plus the two items below); `consent_body` now starts with a plain reason
+("free, no ads, these counts are the only way the developer learns what helps") with equal buttons unchanged; a Settings "Send feedback" row that opens the
+user's email app (no attachments, nothing sent by the app) with a test that its address matches `privacy.html`; the privacy page has a feedback paragraph and no
+Pakistan text; `ANALYTICS_READING.md` has a monthly Play Console table and the yes-rate rule. **Legal nuances it found:** the Act itself does not say "no
+individual level data" (that is ICO guidance, binding in practice); the EU is not uniformly "no exception" (France's CNIL exempts strict audience measurement but says
+Google Analytics does not qualify); reading device information is "access" under reg 6 even when nothing is stored. **Not verified by it:** Firebase consent mode "denied"
+behaviour on Android; Aptabase's on-device storage. The superseded Pakistan paragraph above is kept as history. **FINAL signed bundle for this build (supersedes every earlier checksum):** phone `app-release.aab`
+5,735,428 bytes, sha256 `d5e8ada34cd76037da1e061605b40df48a46d1208e8d3e42014202aa2b27b31d`, `jarsigner -verify` "jar verified", no `AD_ID`/`ADSERVICES`; the watch bundle
+(3,647,031 bytes) stays at 1.2.0 and is NOT uploaded. Gate `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Emulator: consent text reads cleanly, the
+buttons sit below the fold until scrolled, "Send feedback" opens the email app with no crash. Not tested: a real phone with a mail account, the S23 Ultra, the Redmi on this build.
 Other delegated decisions made the same day: no separate Terms and Conditions document (the in-app Disclaimer and the privacy policy cover it); the
 Disclaimer is not changed; Data safety "Optional" = Yes; the S23 Ultra check is optional, not required (only wording changed since the Redmi);
 signed bundles built from this working copy by letting Gradle read the owner's `keystore.properties` through a temporary link (never opened,

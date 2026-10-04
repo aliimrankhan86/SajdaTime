@@ -268,6 +268,22 @@ fun SettingsScreen(
                     }
                 },
             )
+            // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
+            // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
+            val feedbackEmail = stringResource(R.string.feedback_email)
+            val feedbackSubject = stringResource(R.string.feedback_subject)
+            SettingRow(
+                title = stringResource(R.string.about_feedback),
+                subtitle = stringResource(R.string.about_feedback_desc),
+                onClick = {
+                    runCatching {
+                        context.startActivity(
+                            Intent(Intent.ACTION_SENDTO, "mailto:$feedbackEmail".toUri())
+                                .putExtra(Intent.EXTRA_SUBJECT, feedbackSubject),
+                        )
+                    }
+                },
+            )
             SwitchRow(
                 title = stringResource(R.string.settings_usage_counts),
                 subtitle = stringResource(R.string.settings_usage_counts_desc),

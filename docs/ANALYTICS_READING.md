@@ -12,6 +12,22 @@ documentation and may have moved: if one is missing, search the console for the 
 
 Never quote a Firebase number as "how many users I have". Say "of the people who opted in".
 
+## Play Console first: the numbers that need no consent (monthly, 10 minutes)
+
+Play Console counts everyone, with no opt in and no privacy cost, so use it for the headcount questions. Each month, open
+**Statistics** and write one row in the table below (copy the last row):
+users (installs, new and returning), DAU and MAU, retention at day 1/7/28, top countries, Android versions, device models,
+language, app version; **Store performance** (listing visitors and the share who install); **Android vitals** (crashes and ANRs); ratings.
+
+| Month | Installs | DAU / MAU | Day 7 retention | Top countries | Listing to install % | Crashes % | Opt-in yes rate (below) |
+|---|---|---|---|---|---|---|---|
+| (first row here) | | | | | | | |
+
+**Yes rate.** Firebase new users (30 days) divided by Play new users (same 30 days). About 35 per cent or more: the Firebase ratios are usable,
+stop here. Under about 25 per cent after about 8 weeks: open a 1.4.0 item to evaluate a no-identifier aggregator (needs a fresh DPIA and
+ideally an adviser's written view first; see the DPIA section 7). Never turn Firebase on by default, pre-tick or highlight Yes, re-ask
+people who said no, or add a poll or rating prompt.
+
 ## Firebase: what to open and what it tells you
 
 - **Dashboard** (or Reports, then App developer, then Firebase): active users over 1, 7 and 30 days
