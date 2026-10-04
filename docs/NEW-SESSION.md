@@ -18,6 +18,12 @@ look, what not to undo, and how to check.**
 
 ---
 
+## Usage counts (stable facts only)
+
+The app has optional, opt in analytics. The rules that never change are in `CLAUDE.md` ("Usage counts are opt in, closed, and never about belief"); the reasoning and the
+evidence for rejecting default-on are in `docs/HANDOVER.md` section 10 (entries dated 3 to 4 Oct 2026). Do not turn it on by default, add events, or add a country list without that evidence changing.
+The way to prove "nothing is sent before consent" is `tools/log-sni-proxy.py` plus a positive control, not `emulator -tcpdump`.
+
 ## The short version
 
 Open the project folder in your assistant and paste this:

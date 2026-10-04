@@ -1,7 +1,6 @@
-# Phase two: optional usage counts (plan v6, approved by the owner, not yet built)
+# Phase two: optional usage counts (plan v6, approved by the owner, now BUILT; this file is history)
 
-**Status: v6. Owner sign off recorded 3 Oct 2026 (section 11). No app code has been changed.**
-The build waits for a session on the owner's computer (section 6).
+**Status 4 Oct 2026: BUILT AND VERIFIED. This plan is the reasoning record, not the current state: read `docs/HANDOVER.md` section 11 (STATE OF PLAY) and section 10 (4 Oct entries) for what is true now. Where they disagree, HANDOVER wins** (for example the default-on idea was built and rejected; the Pakistan notice path was added and removed).
 Written and revised 3 Oct 2026 (history in section 13). When built, fold the decisions into
 `docs/HANDOVER.md` (§2, §5, §8, §11, §15) and `CLAUDE.md`, then delete or archive this file.
 

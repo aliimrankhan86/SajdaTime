@@ -4446,39 +4446,58 @@ silent default on stays unbuilt until a data protection solicitor has answered t
 has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
 (unreliable and still faith data).
 
-### 📍 STATE OF PLAY — 3 Oct 2026 (optional usage counts: built, not yet released)
+### 📍 STATE OF PLAY — 4 Oct 2026 (usage counts: built, verified, signed bundle ready; waiting on the owner's Play Console steps)
 
-**This block supersedes the 7 Sept block below on one point: there IS engineering and owner work in
-flight.** Everything else in the 7 Sept block (what is live, how it was verified) is still the
-record. Do not invent other work; this is the only open item.
+**Read this first.** It supersedes the 3 Oct block that used to be here and the 7 Sept block below on one point only: release **1.3.0** (phone,
+`versionCode 5`) adds **optional, opt in usage counts**. Everything else in the 7 Sept block (what is live, how it was verified) is still the
+record. The watch stays at 1.2.0 (`versionCode 1001`) and is not part of this release. **Do not invent other work.**
 
-**What is happening.** The owner asked, on 3 Oct 2026, for optional usage counts so he can see how
-many people use the app, how often, for how long, from where, which main tab, and where setup loses
-people, in order to plan phase two. The full plan, with every decision, its reasoning, three
-independent reviews and the owner's sign off, is **`docs/ANALYTICS_PLAN.md`. Read it before touching
-anything.** It reverses the old "no analytics" rule in one narrow way and nothing else.
+**Where the code is.** Branch `claude/app-analytics-strategy-e826p5`, ahead of `main`, **not merged and not published**. Never push to `main`; the owner
+merges after the release is through review. Phone app only; nothing Firebase is in `:wear`.
 
-**Built (on branch `claude/app-analytics-strategy-e826p5`, not merged, not released):**
-`UsageCounts.kt`, the consent step and Settings row, the manifest controls, build variant switches,
-`UsageCountsTest` (15 tests), `docs/privacy.html` and the other copy. Version stays 1.2.0 until release.
+**What the feature is (one paragraph).** Firebase Analytics, off until the user says Yes. New installs see a consent step right after Welcome
+(`OnboardingScreen.kt`, `Step.CONSENT`); people who installed earlier get the same question once (`MainScaffold.kt`, not dismissible by Back or an outside tap);
+Settings, About, has a "Share usage counts" switch (turning it on re-shows the full consent text). The closed event set is in
+`app/src/main/java/com/sajdatime/app/data/UsageCounts.kt`: `screen_view` (times/qibla/settings), `setup_step` (permission, sect, method, confirm, finish; **never madhab**),
+`permission_result` (location, notifications, exact_alarm; a yes/no). Never sent: sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them.
+Firebase config is plain string resources, no plugin (`app/src/main/res/values/firebase_config.xml`, project `sajdatime-37a1b`); `bools.xml` sets `analytics_allowed`
+true in `main` and **false in debug, rtl and sideload** (the SDK calls are gated, the UI still shows). A "Send feedback" row opens the user's email app (nothing attached or stored).
 
-**Still to do before it can ship, in order** (plan section 6):
-1. Firebase project created 3 Oct 2026 (SajdaTime, `sajdatime-37a1b`, account aikstudies@gmail.com, two apps: `com.sajdatime.app` and the test app `com.sajdatime.app.sideload`). **The real ids are in `app/src/main/res/values/firebase_config.xml` and the sideload override; `UsageCountsTest` fails if they are malformed, inconsistent, or a PLACEHOLDER returns.** **Google Analytics admin confirmed 3 Oct 2026 after reload** (property `sajdatime-37a1b`, id 557276152, account 410603662): event retention 14 months, **reset on new activity OFF (it was ON by default)**, Google signals off, all four data sharing settings off, custom dimensions `step`, `permission`, `granted` created, UK time zone, granular location left at Google's default (on). **Data Processing Terms accepted by the owner himself on 3 Oct 2026** (Admin, Account settings, Account details: tick the GDPR box, Save). Reported saved by him; not independently re-read afterwards.
-2. The opted-out network capture on an emulator, over 75 minutes. It is the proof of "off means
-   off". If Firebase sends anything before opt in and the fallback cannot fix it, **do not ship**.
-3. The one phone sitting (consent, opt in and out, relaunch, device log, Settings screenshot).
-4. Done 3 Oct 2026: `docs/DPIA_ANALYTICS.md` was read by the owner, who approved release on its conditions. The policy now names him and gives his email for privacy questions.
-5. Full gate, then Play Console: Data safety (CSV import exists), listing text, bundle, **owner presses
-   Publish**. Phone 1.3.0 (versionCode 5), watch stays 1.2.0 (1001).
-6. After publishing: the owner reads the numbers using `docs/ANALYTICS_READING.md`.
+**Verified (details in section 10, entries 3 and 4 Oct 2026).** 79 unit tests, lint clean, both release bundles; the 76 min 48 s opted-out run through a logging proxy shows no
+Analytics or Firebase host and no Analytics log line, and the positive control in the same session does; opt in, off, on and relaunch honoured on a Redmi; Sunni and Shia event names
+identical; the existing-user question, fresh install, and font scale 1.3 and 2.0 on an emulator; release manifest has no `AD_ID` or `ADSERVICES`.
+**Signed phone bundle ready:** `app/build/outputs/bundle/release/app-release.aab` (not committed; rebuild with `./gradlew :app:bundleRelease` from a checkout that has `keystore.properties`),
+5,735,428 bytes, sha256 `d5e8ada34cd76037da1e061605b40df48a46d1208e8d3e42014202aa2b27b31d`. **Do not upload the watch bundle.**
 
-**Update 4 Oct 2026: steps 2 and 3 are DONE and PASSED** (see the "Usage counts verification" entry in §10): 76 min 48 s
-opted-out capture clean with a working positive control, phone opt in/out/relaunch, Sunni and Shia event names identical, the existing-user question, release
-manifest free of `AD_ID`/`ADSERVICES`. **What remains:** (a) DONE 4 Oct 2026: privacy page, consent text, DPIA and listing notes now say that the
-time of first launch can be sent if you opt in later (the `first_open` finding in §10); (b) build the **signed** bundles from
-the owner's main checkout (this verification built unsigned ones); (c) Data safety and Play Console, owner presses Publish.
+**Decisions already made, with reasons (do not reopen without new evidence).**
+- **Opt in, never default on.** The owner asked for default on; it was built, researched and reversed the same day. The ICO statistical purposes exception needs individual data
+  aggregated and not retained, which Firebase (2 to 14 months against a persistent ID) cannot do; the EU has no equivalent; faith is special category data; the Children's code
+  expects high privacy defaults. A Pakistan-only default-on split was built and removed (no users there). See section 10, 4 Oct 2026, lesson 123, `docs/DPIA_ANALYTICS.md` section 7, and
+  `CLAUDE.md`. To reconsider you need a written adviser opinion or a tool that keeps no individual data.
+- **How the owner still gets decision data:** Play Console (no consent, the headcount), the opt in Firebase ratios, and the feedback email. Measure the yes rate after about 8 weeks
+  (`docs/ANALYTICS_READING.md`); if under about 25 per cent, evaluate a no-identifier aggregator in 1.4.0 (needs a fresh DPIA).
+- No separate Terms and Conditions page (the in-app Disclaimer and the privacy policy cover it); the Disclaimer is unchanged; Data safety "Optional" = Yes.
+- Firebase may record `first_open` on the device before consent and sends it only after a Yes (lesson 122); the policy and consent text say so.
 
-**Not tested as of the 3 Oct entry:** anything at runtime. (Superseded by the update just above.)
+**Still to do, and whose job it is.**
+1. **Owner:** in Play Console fill Data safety (CSV import exists; table in `docs/store/LISTING.md`), upload the phone bundle and release notes, press **Send for review**. An assistant stops before that button.
+2. **Owner, optional:** uninstall the "SajdaTime (test)" app from the Redmi (it is an older sideload build with sharing on, reporting only to the test Firebase app) and switch off
+   Developer options *Install via USB* and *USB debugging (Security settings)*. An S23 Ultra check is optional; only wording changed since the Redmi.
+3. **After it is live:** confirm the "Updated on" date on the Play listing, then merge the branch to `main` (owner), and keep the numbers routine in `docs/ANALYTICS_READING.md`.
+4. **Later, only if the yes rate is under about 25 per cent:** the 1.4.0 aggregator evaluation above.
+Everything else in `docs/ANALYTICS_PLAN.md` is history (its status line says so).
+
+**Where things are (so you do not hunt).**
+`docs/privacy.html` (the published promise; change it in the same commit as any data handling change) · `docs/DPIA_ANALYTICS.md` (risk assessment, owner approved) · `docs/ANALYTICS_PLAN.md` (history and
+reasoning) · `docs/ANALYTICS_DEVICE_CHECK.md` (the on-device runbook) · `docs/ANALYTICS_READING.md` (how to read the numbers; monthly table) · `docs/ANALYTICS_DEFAULT_ON_BRIEF.md` (the adviser question, parked) ·
+`docs/ANALYTICS_PLAY_CONSOLE_PROMPT.md` · `docs/store/LISTING.md` (Data safety answers) · `tools/log-sni-proxy.py` (the capture method) · `app/src/test/java/com/sajdatime/app/UsageCountsTest.kt` (enforces most rules).
+
+**Traps that cost time here (full text in section 15, lessons 119 to 123).** Network capture is not evidence until a positive control shows the host; `emulator -tcpdump` is not reliable, use the proxy.
+A Xiaomi/HyperOS phone needs *Install via USB*, the per-app denied-list switch off, and *USB debugging (Security settings)* before `adb` taps or app logs work, and its install prompt lasts seconds.
+A sideload build with the send flag on fails the "flag is off" test by design: revert the edit before running the gate. `./gradlew clean` deletes APKs you meant to keep. The worktree has no `keystore.properties`;
+signed builds need it linked in temporarily (never opened or copied).
+
+**Not tested.** The signed bundle on a real device with the Play-installed app; a phone with a mail account for the feedback row; the S23 Ultra; the watch (waived by the owner); right-to-left; a boot broadcast and a forced background job.
 
 ### 📍 STATE OF PLAY — 7 Sept 2026 (still the record of what is live)
 
