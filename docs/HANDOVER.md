@@ -4481,8 +4481,7 @@ identical; the existing-user question, fresh install, and font scale 1.3 and 2.0
 
 **Still to do, and whose job it is.**
 1. **Owner:** in Play Console fill Data safety (CSV import exists; table in `docs/store/LISTING.md`), upload the phone bundle and release notes, press **Send for review**. An assistant stops before that button.
-2. **Owner, optional:** uninstall the "SajdaTime (test)" app from the Redmi (it is an older sideload build with sharing on, reporting only to the test Firebase app) and switch off
-   Developer options *Install via USB* and *USB debugging (Security settings)*. An S23 Ultra check is optional; only wording changed since the Redmi.
+2. **Done by the owner 4 Oct 2026:** the "SajdaTime (test)" app was uninstalled from the Redmi. **Optional, his choice:** switch off Developer options *Install via USB* and *USB debugging (Security settings)* (left on; harmless). An S23 Ultra check is optional; only wording changed since the Redmi.
 3. **After it is live:** confirm the "Updated on" date on the Play listing, then merge the branch to `main` (owner), and keep the numbers routine in `docs/ANALYTICS_READING.md`.
 4. **Later, only if the yes rate is under about 25 per cent:** the 1.4.0 aggregator evaluation above.
 Everything else in `docs/ANALYTICS_PLAN.md` is history (its status line says so).
