@@ -144,7 +144,8 @@ session inherits it instead of relearning it.
   consent text that states the facts in full (`UsageCounts.kt`, the `consent_*` strings, and
   `docs/privacy.html` must agree). **The owner asked for on-by-default on 4 Oct 2026; it was built, then reversed
   the same day on the evidence in `docs/HANDOVER.md` §10 (ICO statistical purposes exception needs individual
-  data deleted after aggregation, which Firebase cannot do). Do not rebuild it without that evidence changing.** Only the fixed events in `UsageCounts.kt` may be sent: no new
+  data deleted after aggregation, which Firebase cannot do). Do not rebuild it without that evidence changing.** The one exception built at the owner's request is a
+  strict country split (`NoticeRegion.kt`): Pakistan only, asking everywhere else; add a country only with a written source. Only the fixed events in `UsageCounts.kt` may be sent: no new
   event, parameter or user property without the owner's agreement and a privacy policy change
   first. **Never send the user's sect, madhab, calculation method, alert or prayer settings, city
   or coordinates, and never anything whose *shape* reveals them** (the madhab step is shown to

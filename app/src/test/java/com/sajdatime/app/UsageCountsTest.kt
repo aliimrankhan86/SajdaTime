@@ -258,9 +258,57 @@ class UsageCountsTest {
             .find(strings)!!.groupValues[1]
         listOf("Google Analytics", "random ID", "outside the UK", "faith", "GPS", "your prayer settings", "switch it off")
             .forEach { assertTrue("consent_body no longer says \"$it\"", body.contains(it)) }
+        // The on-by-default notice (owner decision 4 Oct 2026) must carry the same facts and the
+        // same two never-sent promises, and must say nothing is counted before a button is tapped.
+        val notice = Regex("""<string name="notice_body">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
+            .find(strings)!!.groupValues[1]
+        listOf(
+            "Google Analytics", "random ID", "outside the UK", "faith", "GPS", "your prayer settings",
+            "turn it off", "Settings", "when you first opened the app", "Nothing is counted until",
+        ).forEach { assertTrue("notice_body no longer says \"$it\"", notice.contains(it)) }
+        Regex("""<string name="(notice_[a-z_]+)">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
+            .findAll(strings).forEach {
+                assertFalse("The word tracking is not used in this app's copy", it.groupValues[2].contains("track", ignoreCase = true))
+                assertFalse("The dua request belongs in the disclaimer and nowhere else", it.groupValues[2].contains("dua", ignoreCase = true))
+            }
         consent.forEach {
             assertFalse("The word tracking is not used in this app's copy", it.contains("track", ignoreCase = true))
             assertFalse("The dua request belongs in the disclaimer and nowhere else", it.contains("dua", ignoreCase = true))
         }
+    }
+
+    // --- NoticeRegion: the default is to ask; the notice is shown only when positively in a listed country.
+    private val pk = setOf("PK")
+    private val karachi = setOf("Asia/Karachi")
+    private fun notice(sim: String?, net: String?, loc: String?, tz: String) =
+        com.sajdatime.app.data.NoticeRegion.noticeOnly(sim, net, loc, tz, pk, karachi)
+
+    @Test
+    fun `the notice is shown only when every signal says Pakistan`() {
+        assertTrue(notice("pk", "pk", "PK", "Asia/Karachi"))
+        assertTrue("a Pakistani SIM with no network yet", notice("pk", null, "", "Asia/Karachi"))
+        assertTrue("English language but not a UK or EU region", notice("pk", "pk", "US", "Asia/Karachi"))
+    }
+
+    @Test
+    fun `any doubt means the user is asked instead`() {
+        assertFalse("no telephony signal at all", notice(null, null, "PK", "Asia/Karachi"))
+        assertFalse("empty signals", notice("", " ", "PK", "Asia/Karachi"))
+        assertFalse("UK SIM", notice("gb", "gb", "GB", "Europe/London"))
+        assertFalse("Pakistani SIM roaming in the UK", notice("pk", "gb", "GB", "Europe/London"))
+        assertFalse("Pakistani SIM, UK language region", notice("pk", "pk", "GB", "Asia/Karachi"))
+        assertFalse("Pakistani SIM, German language region", notice("pk", "pk", "DE", "Asia/Karachi"))
+        assertFalse("Pakistani SIM but a European time zone", notice("pk", "pk", "PK", "Europe/London"))
+        assertFalse("Pakistani SIM, other country's network", notice("pk", "ae", "PK", "Asia/Karachi"))
+        assertFalse("another country entirely", notice("us", "us", "US", "America/New_York"))
+    }
+
+    @Test
+    fun `the notice country list is exactly what was researched and has a time zone`() {
+        val strings = read("app/src/main/res/values/strings.xml")
+        fun items(name: String) = Regex("""<string-array name="$name"[^>]*>(.*?)</string-array>""", RegexOption.DOT_MATCHES_ALL)
+            .find(strings)!!.groupValues[1].let { Regex("""<item>(.*?)</item>""").findAll(it).map { m -> m.groupValues[1] }.toList() }
+        assertEquals("only Pakistan has a source (HANDOVER 10, 4 Oct 2026); add none without one", listOf("PK"), items("notice_only_countries"))
+        assertEquals(listOf("Asia/Karachi"), items("notice_only_timezones"))
     }
 }

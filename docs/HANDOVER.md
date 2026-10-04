@@ -4389,6 +4389,16 @@ app"); the best lever is that the question is shown to everyone once (setup, or 
 `33b69fe52f70cd67473767c79288db3cd8232777898d961c6a37f9da6f64de94` (the watch stays at 1.2.0, so **do not upload the watch bundle**).
 Merged release manifest has no `AD_ID`/`ADSERVICES`. App code is identical to commit `b3a0665` (zero diff), the state verified on the emulator.
 They are in `app/build/outputs/bundle/release/` and `wear/build/outputs/bundle/release/` and are not committed.
+**Then, at the owner's request, a narrow country split was built (4 Oct 2026, same day).** Research for a safe list found only Pakistan
+confirmable (no enacted law; Bangladesh enacted one in April 2026; the UN tracker does not name countries). `NoticeRegion.kt` shows the on-by-default
+**notice** only when the SIM and network country are Pakistan, the language region is not UK/EEA/CH and the time zone is Asia/Karachi; otherwise the
+opt-in **consent** question. Verified: unit tests for every way of being wrong; on the emulator the consent question appears when signals do not match
+(a US phone, even one with a matching test list, because its en-GB language region trips the UK guard) and, in a local build with the guard relaxed,
+the notice appears, no event is sent before an answer, and events follow OK. **Not verified:** a real phone physically in Pakistan, and the
+notice's "Turn this off" path in this exact build (verified in the earlier build with the same notice code). The notice strings are the earlier ones.
+Data safety remains Optional = Yes. **Signed bundles for THIS build (supersede the checksums in the paragraph below):** phone `app-release.aab`
+5,739,040 bytes, sha256 `2e4d30105034812749e05eca72c621872a9c28b2cacad210fdf6c9f2821f97b2`; watch bundle unchanged at 3,647,031 bytes (do not upload).
+Gate (`clean test lint :app:bundleRelease :wear:bundleRelease`) passed; both `jarsigner -verify` "jar verified"; no `AD_ID`/`ADSERVICES` in the release manifest.
 Other delegated decisions made the same day: no separate Terms and Conditions document (the in-app Disclaimer and the privacy policy cover it); the
 Disclaimer is not changed; Data safety "Optional" = Yes; the S23 Ultra check is optional, not required (only wording changed since the Redmi);
 signed bundles built from this working copy by letting Gradle read the owner's `keystore.properties` through a temporary link (never opened,

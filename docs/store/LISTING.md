@@ -378,7 +378,7 @@ declaration must match the app and `docs/privacy.html` exactly.
 - **Shared: No.** Google says an analytics provider that processes data "solely on your behalf"
   is a service provider, which is collection, not sharing. That holds only while the console
   data sharing settings and Google signals stay off (privacy.html says they are).
-- **Optional: Yes.** Google's help says Optional includes the ability to opt in or opt out for all users; counts are opt in, so this is correct (checked 4 Oct 2026).
+- **Optional: Yes.** Google's help says Optional includes the ability to opt in or opt out for all users; counts are opt in everywhere except Pakistan, where they are on after a notice with an off switch, so every user can opt in or out (checked 4 Oct 2026).
 - **Ephemeral: No.** Not in memory only.
 - **Encrypted in transit: Yes.**
 - **Users can request deletion: No.** The ID is random and cannot be matched to a person, and

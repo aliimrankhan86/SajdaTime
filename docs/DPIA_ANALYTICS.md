@@ -91,3 +91,13 @@ Firebase keeps event-level data against a persistent ID for 2 or 14 months (set 
 requires prior consent. The EU has no equivalent exception, faith is special category data, and the Children's code expects high privacy
 defaults. **Outcome unchanged from section 6: explicit opt in, off by default.** Legal conclusions are the assistant's reading of the ICO's
 pages, not legal advice. To revisit: see `docs/HANDOVER.md` §10 (4 Oct 2026).
+
+
+**Update later on 4 Oct 2026: a narrow country split was built, at the owner's request.** The app asks (opt in) everywhere except a phone that
+positively looks to be in a listed country, where it shows a notice that counts are on with an equal "Turn this off", counting only after
+the notice has been seen. The list is **Pakistan only**: the one country whose absence of an enacted data protection law was confirmed in a source
+(the Personal Data Protection Bill 2023 is still draft, searched 4 Oct 2026). The rule is deliberately conservative: SIM and network
+country must both be Pakistan (a missing signal means ask), the language region must not be the UK, EEA or Switzerland, and the time zone must be
+Asia/Karachi. `NoticeRegion.kt`, with unit tests for each way of being wrong. **Residual risk:** a traveller or someone with unusual settings is
+asked (safe), but a phone that looks Pakistani while its owner is subject to other law (for example a UK resident with a Pakistani SIM, UK time zone
+excluded, but language region left blank) could be counted without asking; Low, accepted. Not a lawyer's opinion. Do not add a country without a written source.

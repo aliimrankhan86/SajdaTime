@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -38,6 +39,7 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.NoticeRegion
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
@@ -94,14 +96,16 @@ fun MainScaffold(
     // opened, so it cannot reopen on rotation or on the next visit to the tab.
     var settingsRequest by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
 
-    // People who installed before usage counts existed never saw the setup question, so ask
-    // them once. Yes or No is saved either way and it never returns. Not dismissible, so a
-    // stray tap outside is not recorded as an answer. Nothing is sent until they say yes.
+    // People who installed before usage counts existed never saw the setup notice, so show it
+    // to them once. OK or Turn off is saved either way and it never returns. Not dismissible,
+    // so a stray tap outside is not recorded as an answer, and nothing is counted until they
+    // have seen it and tapped one of the two buttons.
     if (!state.loading && state.settings.onboardingComplete && !state.settings.analyticsAnswered) {
         UsageCountsConsentDialog(
             onYes = { onSetAnalytics(true) },
             onNo = { onSetAnalytics(false) },
             onDismiss = {},
+            notice = NoticeRegion.forDevice(LocalContext.current),
         )
     }
     val openSetting: (SettingsChooser) -> Unit = {
