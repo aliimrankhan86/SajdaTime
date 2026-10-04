@@ -72,11 +72,31 @@ import com.sajdatime.core.labelRes
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.data.SetupStep
 import com.sajdatime.app.ui.components.MethodChoiceList
+import com.sajdatime.app.ui.components.UsageCountsConsentBody
 import com.sajdatime.app.ui.components.ProgressRow
 import com.sajdatime.app.ui.components.SectionHeading
 
-private enum class Step { WELCOME, PERMISSION, SECT, MADHAB, METHOD, CONFIRM }
+/**
+ * Internal, not private, so a test can prove the mapping below never depends on the user's sect.
+ * CONSENT sits straight after WELCOME so the usage counts (opt-in only) can see the later steps.
+ */
+internal enum class Step { WELCOME, CONSENT, PERMISSION, SECT, MADHAB, METHOD, CONFIRM }
+
+/**
+ * Which usage-count step, if any, an onboarding step reports. **MADHAB maps to nothing, on
+ * purpose**: only Sunni users are shown it, so reporting it would reveal the user's sect. The
+ * same goes for any step only one sect sees. WELCOME and CONSENT come before the user has agreed
+ * to anything. See docs/ANALYTICS_PLAN.md section 4.3, and `UsageCountsTest`.
+ */
+internal fun Step.setupStep(): SetupStep? = when (this) {
+    Step.WELCOME, Step.CONSENT, Step.MADHAB -> null
+    Step.PERMISSION -> SetupStep.PERMISSION
+    Step.SECT -> SetupStep.SECT
+    Step.METHOD -> SetupStep.METHOD
+    Step.CONFIRM -> SetupStep.CONFIRM
+}
 
 @Composable
 fun OnboardingScreen(
@@ -88,8 +108,13 @@ fun OnboardingScreen(
     onSelectMadhab: (Madhab) -> Unit,
     onSelectMethod: (CalcMethod) -> Unit,
     onFinish: () -> Unit,
+    onSetAnalytics: (Boolean) -> Unit,
+    onSetupStep: (SetupStep) -> Unit,
 ) {
     var step by rememberSaveable { mutableStateOf(Step.WELCOME) }
+
+    // Usage counts, opt-in only (a no-op otherwise). Once per step per run: see UsageCounts.
+    LaunchedEffect(step) { step.setupStep()?.let(onSetupStep) }
 
     Scaffold { padding ->
         AnimatedContent(
@@ -105,7 +130,24 @@ fun OnboardingScreen(
             modifier = Modifier.padding(padding),
         ) { current ->
             when (current) {
-                Step.WELCOME -> WelcomeStep(onNext = { step = Step.PERMISSION })
+                // Skipped when the choice is already yes (for example after the process was
+                // killed mid-setup), so nobody is asked to consent twice.
+                Step.WELCOME -> WelcomeStep(
+                    onNext = {
+                        step = if (state.settings.analyticsEnabled) Step.PERMISSION else Step.CONSENT
+                    },
+                )
+
+                Step.CONSENT -> ConsentStep(
+                    onYes = {
+                        onSetAnalytics(true)
+                        step = Step.PERMISSION
+                    },
+                    onNo = {
+                        onSetAnalytics(false)
+                        step = Step.PERMISSION
+                    },
+                )
 
                 Step.PERMISSION -> PermissionStep(
                     state = state,
@@ -180,13 +222,26 @@ private fun StepScaffold(
     ) {
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
-        Text(
-            text = body,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-        Spacer(Modifier.height(28.dp))
+        // The consent step carries its own, longer text inside [content], so it passes none.
+        if (body.isNotEmpty()) {
+            Text(
+                text = body,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(28.dp))
+        }
         content()
+    }
+}
+
+@Composable
+private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
+    StepScaffold(
+        title = stringResource(R.string.consent_title),
+        body = "",
+    ) {
+        UsageCountsConsentBody(onYes = onYes, onNo = onNo)
     }
 }
 

@@ -40,6 +40,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
+import com.sajdatime.app.data.Permission
+import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
@@ -61,11 +64,28 @@ class MainActivity : ComponentActivity() {
 
     private val locationPermission = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
-    ) { viewModel.refreshLocation() }
+    ) { results ->
+        // Usage counts (opt-in only): a yes or no, and only from the setup screen. This
+        // launcher also serves Times and Settings later, which must not be counted as setup.
+        if (!viewModel.state.value.settings.onboardingComplete) {
+            viewModel.recordPermission(Permission.LOCATION, results.values.any { it })
+        }
+        viewModel.refreshLocation()
+    }
+
+    /** True between the end of setup and the system's answer to the notification prompt. */
+    private var awaitingSetupNotificationResult = false
 
     private val notificationPermission = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
-    ) { /* Declining only silences alerts; times still display. */ }
+    ) { granted ->
+        // Declining only silences alerts; times still display. The answer is counted
+        // (opt-in only) when it came from the end of setup, which is the only place we ask.
+        if (awaitingSetupNotificationResult) {
+            awaitingSetupNotificationResult = false
+            viewModel.recordPermission(Permission.NOTIFICATIONS, granted)
+        }
+    }
 
     /**
      * The system ringtone picker. It already lists alarms, ringtones and any audio the
@@ -116,9 +136,18 @@ class MainActivity : ComponentActivity() {
                             onSelectMadhab = viewModel::setMadhab,
                             onSelectMethod = viewModel::setMethod,
                             onFinish = {
+                                // Counted only for users who opted in. Exact alarms have no
+                                // result callback, so this is the *state* at the end of setup.
+                                viewModel.recordSetupStep(SetupStep.FINISH)
+                                viewModel.recordPermission(
+                                    Permission.EXACT_ALARM,
+                                    PrayerAlarmScheduler.canScheduleExact(this@MainActivity),
+                                )
                                 requestNotificationsIfNeeded()
                                 viewModel.completeOnboarding()
                             },
+                            onSetAnalytics = viewModel::setAnalyticsEnabled,
+                            onSetupStep = viewModel::recordSetupStep,
                         )
 
                         else -> {
@@ -144,6 +173,8 @@ class MainActivity : ComponentActivity() {
                                 onSetThemeChoice = viewModel::setThemeChoice,
                                 onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
                                 onDismissMethodNotice = viewModel::dismissMethodNotice,
+                                onSetAnalytics = viewModel::setAnalyticsEnabled,
+                                onScreenViewed = viewModel::recordScreen,
                             )
 
                             // Shown once, immediately after setup. The app is a convenience,
@@ -206,6 +237,7 @@ class MainActivity : ComponentActivity() {
 
     private fun requestNotificationsIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            awaitingSetupNotificationResult = true
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }

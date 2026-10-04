@@ -67,6 +67,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Madhab
@@ -123,9 +124,13 @@ fun SettingsScreen(
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
+    onSetAnalytics: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
     var open by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
+    // Turning usage counts ON never flips the switch directly: it opens the full consent text
+    // and only a Yes there records the choice. Turning it OFF is a single tap.
+    var askingUsageConsent by rememberSaveable { mutableStateOf(false) }
     val settings = state.settings
 
     // Keyed on the request, so a second identical request after the first was closed still
@@ -263,6 +268,30 @@ fun SettingsScreen(
                     }
                 },
             )
+            // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
+            // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
+            val feedbackEmail = stringResource(R.string.feedback_email)
+            val feedbackSubject = stringResource(R.string.feedback_subject)
+            SettingRow(
+                title = stringResource(R.string.about_feedback),
+                subtitle = stringResource(R.string.about_feedback_desc),
+                onClick = {
+                    runCatching {
+                        context.startActivity(
+                            Intent(Intent.ACTION_SENDTO, "mailto:$feedbackEmail".toUri())
+                                .putExtra(Intent.EXTRA_SUBJECT, feedbackSubject),
+                        )
+                    }
+                },
+            )
+            SwitchRow(
+                title = stringResource(R.string.settings_usage_counts),
+                subtitle = stringResource(R.string.settings_usage_counts_desc),
+                checked = settings.analyticsEnabled,
+                onCheckedChange = { wanted ->
+                    if (wanted) askingUsageConsent = true else onSetAnalytics(false)
+                },
+            )
             SettingRow(
                 title = stringResource(R.string.about_charity),
                 subtitle = stringResource(R.string.about_charity_desc),
@@ -276,6 +305,16 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.about_data_desc),
             )
         }
+    }
+
+    if (askingUsageConsent) {
+        UsageCountsConsentDialog(
+            onYes = {
+                askingUsageConsent = false
+                onSetAnalytics(true)
+            },
+            onNo = { askingUsageConsent = false },
+        )
     }
 
     when (open) {

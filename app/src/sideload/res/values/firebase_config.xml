@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
+    <!--
+      The TEST app (package com.sajdatime.app.sideload) in the same Firebase project, so a build
+      installed on the owner's phone for checking reports to its own data stream and never mixes
+      with real users' numbers. Only the app id differs from src/main. The sideload build still
+      has analytics_allowed = false in bools.xml; a local, uncommitted flip is how a check is run.
+    -->
+    <string name="google_app_id" translatable="false">1:484173084546:android:1f8c75cf5bde3bb65d419b</string>
+</resources>

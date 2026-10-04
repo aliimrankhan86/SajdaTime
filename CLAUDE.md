@@ -58,7 +58,10 @@ that he never has to. Keep it that way: when the pick-up point moves, move it in
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS,
 built as an ongoing charity (*sadaqah jariyah*) for the Ummah. It is not a product, there is
 no business model, and there never will be one. Every decision follows from that: no ads, no
-accounts, no analytics, no tracking, no server, and no revenue.
+accounts, no server of our own, and no revenue. The one thing the app can send is **optional,
+opt in usage counts to Google Analytics, off by default**, approved by the owner on 3 Oct 2026 so
+he can see how the app is used and plan the next phases (`docs/ANALYTICS_PLAN.md`, owner sign off
+in its section 11). That is a narrow exception, not a licence: see the usage counts rule below.
 
 It has to work **for the masses** — including a phone with no signal, an old device, a user
 who has never changed a setting, and a user who cannot read English. When a trade-off appears
@@ -131,10 +134,23 @@ session inherits it instead of relearning it.
 - **Never generate, hold, request, or view the release signing key.** It is the owner's
   alone. See `docs/RELEASING.md`. `*.jks`, `*.keystore` and `keystore.properties` are
   gitignored and must never be committed.
-- **Location stays on the device.** Coarse only, foreground only, never transmitted. Cloud
-  backup and device-to-device transfer are both off. `docs/privacy.html` is a published
-  promise, so any change that touches data handling has to be reflected there in the same
-  commit.
+- **Location stays on the device.** Coarse only, foreground only. The device's location is
+  never transmitted: no coordinates are ever sent anywhere. (For a user who has opted in to usage
+  counts, Google estimates an approximate area from their internet connection; the app sends
+  nothing for that.) Cloud backup and device-to-device transfer are both off.
+  `docs/privacy.html` is a published promise, so any change that touches data handling has to be
+  reflected there in the same commit.
+- **Usage counts are opt in, closed, and never about belief.** Off until the user says yes, with a
+  consent text that states the facts in full (`UsageCounts.kt`, the `consent_*` strings, and
+  `docs/privacy.html` must agree). **The owner asked for on-by-default on 4 Oct 2026; it was built, then reversed
+  the same day on the evidence in `docs/HANDOVER.md` §10 (ICO statistical purposes exception needs individual
+  data deleted after aggregation, which Firebase cannot do). Do not rebuild it without that evidence changing.** A Pakistan-only country split was built and removed the
+  same day (no users there, extra risk); do not reintroduce a country list without a written source and a real user base. Only the fixed events in `UsageCounts.kt` may be sent: no new
+  event, parameter or user property without the owner's agreement and a privacy policy change
+  first. **Never send the user's sect, madhab, calculation method, alert or prayer settings, city
+  or coordinates, and never anything whose *shape* reveals them** (the madhab step is shown to
+  Sunni users only, so it has no event). Only the release build may send. The word "tracking" is
+  not used in the app's copy. `UsageCountsTest` enforces most of this; do not weaken it.
 - **Do not move this project into `~/Documents`, `~/Desktop`, or any iCloud-synced folder.**
   iCloud writes conflict copies into `app/build/` and breaks dexing. It cost three separate
   debugging sessions.

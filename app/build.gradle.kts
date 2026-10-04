@@ -41,8 +41,8 @@ android {
         // builds, and they are not the same app. **Never upload a saved artifact — build
         // fresh from main.** Play accepts whichever file you hand it, so a stale one ships
         // silently and cannot be corrected without burning another version code.
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -188,6 +188,10 @@ tasks.withType<Test>().configureEach {
                 "docs/index.html",
                 "docs/store/LISTING.md",
                 "README.md",
+                // UsageCountsTest reads these off disk too (docs/ANALYTICS_PLAN.md section 8).
+                "app/src/main/AndroidManifest.xml",
+                "app/src/**/res/values/bools.xml",
+                "app/src/**/res/values/firebase_config.xml",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)
@@ -207,6 +211,12 @@ dependencies {
     // Publishes settings to a paired Wear OS watch. Local device-to-device only.
     implementation(libs.play.services.wearable)
     implementation(libs.androidx.fragment)
+
+    // Optional, opt-in usage counts (docs/ANALYTICS_PLAN.md). Collection is switched off in the
+    // manifest and only ever enabled by the user's own choice. No google-services plugin: the
+    // app identifiers are plain string resources (res/values/firebase_config.xml).
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

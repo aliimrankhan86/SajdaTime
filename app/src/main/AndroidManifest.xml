@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!--
       Approximate location only. Never "fine", never "background" - prayer times shift by
@@ -8,8 +9,23 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
-    <!-- Used solely for the one-off city lookup when location is declined. -->
+    <!--
+      Two uses. The one-off city lookup when location is declined, and, only if the user
+      opts in, anonymous-ID usage counts sent to Google Analytics (docs/ANALYTICS_PLAN.md).
+      Nothing is sent to Google Analytics until the user says yes.
+    -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+      Added by the Firebase Analytics library and deliberately removed: this app shows no
+      ads and does not use the advertising ID or Privacy Sandbox ad attribution. Removing
+      them keeps the Play "Advertising ID" answer at No. tools:node="remove" is the
+      documented way (developers.google.com/android/reference/com/google/android/gms/ads/identifier/AdvertisingIdClient.Info).
+      A guard test fails the build if any of these returns to the merged manifest source.
+    -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
+    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -42,6 +58,13 @@
       quietly changes. The one request this app makes is HTTPS; saying so here means an
       accidental http:// endpoint fails loudly instead of working.
     -->
+    <!--
+      Usage counts: Firebase starts with the app but is told NOT to collect. It is enabled
+      only when the user opts in (data/UsageCounts.kt), and that choice is re-applied each
+      launch. Do not use firebase_analytics_collection_deactivated: it would block the
+      opt-in. Advertising ID collection is off. Automatic screen views are off so only the
+      fixed set of events in docs/ANALYTICS_PLAN.md section 4.3 is ever sent.
+    -->
     <application
         android:allowBackup="false"
         android:usesCleartextTraffic="false"
@@ -51,6 +74,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SajdaTime">
+
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+        <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
+        <meta-data android:name="google_analytics_automatic_screen_reporting_enabled" android:value="false" />
 
         <activity
             android:name=".MainActivity"

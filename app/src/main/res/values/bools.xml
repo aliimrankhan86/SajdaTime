@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      Whether this build may send usage counts at all. True only for the shipped release
+      build. src/debug, src/rtl and src/sideload set it to false, so a build run on a
+      developer's emulator or on the owner's phone can never add to the real numbers. The
+      UI is still shown there so layout can be checked; only the SDK calls are gated.
+      See docs/ANALYTICS_PLAN.md section 4.4.
+    -->
+    <bool name="analytics_allowed">true</bool>
+</resources>

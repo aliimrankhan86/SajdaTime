@@ -18,6 +18,12 @@ look, what not to undo, and how to check.**
 
 ---
 
+## Usage counts (stable facts only)
+
+The app has optional, opt in analytics. The rules that never change are in `CLAUDE.md` ("Usage counts are opt in, closed, and never about belief"); the reasoning and the
+evidence for rejecting default-on are in `docs/HANDOVER.md` section 10 (entries dated 3 to 4 Oct 2026). Do not turn it on by default, add events, or add a country list without that evidence changing.
+The way to prove "nothing is sent before consent" is `tools/log-sni-proxy.py` plus a positive control, not `emulator -tcpdump`.
+
 ## The short version
 
 Open the project folder in your assistant and paste this:
@@ -176,7 +182,7 @@ involve and what it might break before you write any code.
 
 It will:
 
-- know this is a charity project — no ads, no accounts, no tracking, no revenue, ever
+- know this is a charity project — no ads, no accounts, no revenue, ever, and that the only data the app can send is optional, opt in usage counts (`docs/ANALYTICS_PLAN.md`)
 - treat the disclaimer and the privacy promise as hard requirements, not preferences
 - run the tests **and** the app, on both emulators, and check right-to-left before a layout change
 - check prayer times against an independent reference instead of trusting its own arithmetic

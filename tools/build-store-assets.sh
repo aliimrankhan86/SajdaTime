@@ -127,7 +127,7 @@ cat > "$work/feature.html" <<HTML
       three things nothing else in the listing was saying, and three reads better across
       this gradient than four did.
     -->
-    <div class="sub">Sunni &amp; Shia &middot; No accounts &middot; No tracking</div>
+    <div class="sub">Sunni &amp; Shia &middot; No accounts</div>
   </div>
 </div>
 HTML

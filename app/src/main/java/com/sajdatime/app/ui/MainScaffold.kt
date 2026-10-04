@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -37,11 +38,14 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.home.HomeScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.settings.SettingsScreen
+import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.theme.ThemeChoice
 
 /** Top-level destinations. Three is comfortably inside the five-item guidance. */
@@ -76,6 +80,8 @@ fun MainScaffold(
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
+    onSetAnalytics: (Boolean) -> Unit,
+    onScreenViewed: (Screen) -> Unit,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -87,9 +93,32 @@ fun MainScaffold(
     // because it has to outlive the tab switch that delivers it. Settings nulls it once
     // opened, so it cannot reopen on rotation or on the next visit to the tab.
     var settingsRequest by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
+
+    // People who installed before usage counts existed never saw the setup question, so ask
+    // them once. Yes or No is saved either way and it never returns. Not dismissible, so a
+    // stray tap outside is not recorded as an answer. Nothing is sent until they say yes.
+    if (!state.loading && state.settings.onboardingComplete && !state.settings.analyticsAnswered) {
+        UsageCountsConsentDialog(
+            onYes = { onSetAnalytics(true) },
+            onNo = { onSetAnalytics(false) },
+            onDismiss = {},
+        )
+    }
     val openSetting: (SettingsChooser) -> Unit = {
         settingsRequest = it
         destination = Destination.SETTINGS
+    }
+
+    // Usage counts (opt-in only; a no-op otherwise): one fixed word per main tab, sent only
+    // when the tab changes. Never anything about what is on the screen.
+    LaunchedEffect(destination) {
+        onScreenViewed(
+            when (destination) {
+                Destination.TIMES -> Screen.TIMES
+                Destination.QIBLA -> Screen.QIBLA
+                Destination.SETTINGS -> Screen.SETTINGS
+            },
+        )
     }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
@@ -166,6 +195,7 @@ fun MainScaffold(
                         onRefreshLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
                         onSetThemeChoice = onSetThemeChoice,
+                        onSetAnalytics = onSetAnalytics,
                     )
                 }
             }

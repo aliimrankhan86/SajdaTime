@@ -47,7 +47,7 @@ business rule, what is verified, what is not, and what is left to do.
 ## 1. Product vision
 
 SajdaTime is a **charity project — sadaqah jariyah**, built by **Ali Imran Khan**. It is
-free forever, has no ads, no in-app purchases, no accounts, no analytics, and no tracking.
+free forever, has no ads, no in-app purchases and no accounts. Since 3 Oct 2026 it can also send **optional, opt in usage counts to Google Analytics** (off by default; `docs/ANALYTICS_PLAN.md`), so the owner can see how the app is used.
 It is not a business and has no revenue model. That is the point, and it drives every
 technical decision below.
 
@@ -108,6 +108,7 @@ Read it before editing a word of `disclaimer_body`.
 | Qibla | Own maths + `GeomagneticField` | platform | The platform already ships the World Magnetic Model. |
 | Watch sync | `play-services-wearable` | 20.0.1 | The only way to move data phone↔watch. |
 | Networking | `HttpURLConnection` + `org.json` | platform | One optional GET does not justify Retrofit/OkHttp/Moshi. |
+| Usage counts | `firebase-analytics` (BoM 34.19.0) | phone only | Optional, opt in. No `google-services` plugin: ids are plain string resources. Never in `:wear`. See §8 and `docs/ANALYTICS_PLAN.md`. |
 | Java 8+ APIs | Core library desugaring | 2.1.5 | Gives `java.time` **including the Hijri calendar** down to API 24. |
 
 ### Deliberately NOT used — do not "improve" these back in
@@ -1372,6 +1373,7 @@ descriptions on the tappable location header.
 | Notification settings | DataStore, on device | Never |
 | **Typed city name** (fallback only) | Resolved on-device where possible | Only if the phone's own geocoder cannot answer, then once to Open-Meteo, with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
+| **Usage counts** (only if the user opted in) | Sent to Google Analytics, tied to a random Firebase ID | Yes, **opt in only**. A fixed set: sessions and time open, which of the three main screens, which setup steps (never the madhab step), notifications/location allowed yes or no, exact alarms allowed at the end of setup, device model, Android and app version, language, and an approximate area Google derives from the connection. **Never** sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them |
 
 **Cloud backup and device-to-device transfer are both disabled.** Android's backup service
 would otherwise copy the cached coordinates off the device, contradicting the app's own
@@ -1397,7 +1399,10 @@ Ignore it: it does not reason about `allowBackup="false"`, which already disable
 outright on every version `fullBackupContent` would apply to.
 
 Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`,
-`RECEIVE_BOOT_COMPLETED`, `INTERNET`. **No fine location. No background location.**
+`RECEIVE_BOOT_COMPLETED`, `INTERNET`, plus the install referrer permission added by the analytics
+library. `ACCESS_NETWORK_STATE`, `WAKE_LOCK` and `FOREGROUND_SERVICE` arrive from WorkManager and
+Firebase. `AD_ID`, `ACCESS_ADSERVICES_AD_ID` and `ACCESS_ADSERVICES_ATTRIBUTION` are removed with
+`tools:node="remove"`. **No fine location. No background location.**
 
 ---
 
@@ -2074,14 +2079,14 @@ were thin, which is itself the useful result:
 
 | Checked | Result |
 |---|---|
-| Network calls | Exactly one, `https://geocoding-api.open-meteo.com` in `CityLookup`, and only when the platform geocoder returns nothing. Sends the typed place name and nothing else — no identifier, no coordinates, no history. HTTPS, 12-second timeouts, connection closed in a `finally` |
+| Network calls | The city lookup, `https://geocoding-api.open-meteo.com` in `CityLookup`, only when the platform geocoder returns nothing, **plus Google Analytics uploads, only for a user who opted in** (the SDK starts with the app but is told not to collect; `UsageCounts.apply` is the only thing that enables it). Sends the typed place name and nothing else — no identifier, no coordinates, no history. HTTPS, 12-second timeouts, connection closed in a `finally` |
 | Cleartext | Already blocked by the platform default at targetSdk 36; now declared explicitly with `usesCleartextTraffic="false"`, so a future merged manifest cannot quietly re-enable it |
 | Logging | **Zero** `Log.*`, `println`, `printStackTrace` or `System.out` in any shipped source file. Nothing to leak |
 | Exported components | Phone: the launcher activity only. Both receivers `exported="false"`, `FileProvider` `exported="false"` and scoped to `cache/exports/` — the generated PDFs and nothing else. Watch: the tile service, guarded by `BIND_TILE_PROVIDER`, and the Data Layer listener below |
 | `PendingIntent` flags | Every one is `FLAG_IMMUTABLE` |
 | Storage | Both DataStores are app-private by default. Cloud backup and device-to-device transfer both excluded explicitly (§8) |
 | Permissions | Five on the phone, two on the watch, each with a written reason in the manifest. No `ACCESS_FINE_LOCATION`, no background location, no `READ/WRITE_EXTERNAL_STORAGE` |
-| Third-party SDKs | None. No analytics, ads, billing, crash reporting or attribution library anywhere in `libs.versions.toml` |
+| Third-party SDKs | One that talks to a server: `firebase-analytics`, optional and opt in, phone only. No ads, billing, crash reporting or attribution library. The watch has none |
 | Static `Context` fields | None |
 
 The one thing worth naming: **`SettingsSyncService` must be `exported`** and cannot be
@@ -4269,13 +4274,234 @@ alarm was watched firing on it; only the scheduling was read. The watch was **no
 with it — that remains item 7 in §11. Nothing was tested on One UI's own battery-optimisation
 screens, so Samsung's background policy is still the open OEM question §11 records.
 
+### 3–4 Oct 2026 — Usage counts verification (owner's Redmi Note 13 Pro, `sajda` emulator, release build)
+
+Run from `docs/ANALYTICS_DEVICE_CHECK.md` on the owner's Mac, branch `claude/app-analytics-strategy-e826p5`. Everything
+used a local `.sideload` build with `analytics_allowed` switched to `true`; **that edit was never committed** (reverted
+and `git status` checked clean of it). `./gradlew clean test lint` passed before and after (the sideload-flag test
+fails while the edit is in place, as designed). The Redmi (HyperOS, Android 16) ran the build as `com.sajdatime.app.sideload`.
+
+**Phone (Redmi), driven by the owner tapping while the assistant read the device log** (HyperOS refuses `adb input` even
+with USB debugging on; see lesson in §15):
+- *Declined path:* "No thanks", setup, Times/Qibla/Settings: no `Logging event`, no upload for the app. PASS. Caveat: that
+  phone's log buffer is lossy and its Play-services log lines carry no package name, so this is good evidence, not proof;
+  the proof is the emulator capture below.
+- *Opt in from Settings:* full consent dialog appeared, "Yes" chosen. `screen_view` with `times`, `qibla`, `settings`
+  uploaded, one each. PASS.
+- *Off:* switching off, then changing tabs: no events and no upload. PASS.
+- *On, force-stop, relaunch:* switch still on, events flow again. PASS (on, off, on, relaunch).
+- *Setup path:* the phone log dropped lines during the fast setup (only `confirm`, `finish`, `permission_result`
+  exact_alarm/notifications survived), so the full sequence was NOT taken from the phone. See the emulator below.
+- Layout, phone: Settings About group with the "Share usage counts" row reads cleanly (dark theme). Consent step and dialog
+  fine on the emulator at the same 1080x2400. The dialog scrolls as a whole, so the two buttons sit below the fold until
+  the owner scrolls; both are reachable and equal. "No thanks" on the consent step sits tight to the bottom edge. Not a fault.
+
+**Emulator `sajda` (Google APIs, API 36), setup events**, full log, via proxy-capture below. Event names and parameters for
+both sects: `setup_step` step=permission, sect, method, confirm, finish; `permission_result` location=true (emulator),
+exact_alarm=false, notifications=true. **Shia and Sunni runs were identical** (`diff` empty); the Sunni run went through the
+madhab screen and no `madhab` event exists. PASS.
+
+**The opted-out capture (the stop rule): PASS, 76 min 48 s** (22:51:42 to 00:08:30, 3–4 Oct), fresh install, "No thanks",
+setup done, app opened, backgrounded and tab-switched every ~5 min for the whole period, `TIME_SET` broadcast each cycle.
+- App log: `App measurement disabled via the manifest`; **zero** `Logging event`, `Uploading data` or `Successful upload` lines.
+- Hosts: every connection through the logging proxy, with TLS SNI read from the ClientHello. Only `www.google.com` (connectivity)
+  appeared. No `app-measurement.com`, `region1.app-measurement.com`, `firebaseinstallations.googleapis.com`, `firebase*`,
+  `crashlytics`, `google-analytics`. `firebaseinstallations.googleapis.com` first appeared only after opt in.
+- **Positive control (same proxy, same session):** after opting in, the proxy logged `app-measurement.com`,
+  `region1.app-measurement.com` and `firebaseinstallations.googleapis.com`, and the app log showed `screen_view` uploads.
+
+**The first capture attempt was invalid and is not evidence.** `emulator -tcpdump` recorded only the boot burst (21:26) and a
+few packets at 22:14, and showed nothing at all while the app was uploading successfully at 22:44. A capture that cannot see the
+opted-in uploads proves nothing about the opted-out run, so it was thrown away and redone with a local logging proxy
+(`emulator -http-proxy http://127.0.0.1:8899`, a ~60-line Python CONNECT proxy that logs SNI). See §15.
+
+**Finding to decide on (not a stop):** the SDK records `first_open` on the device at first launch, before consent, tagged
+`deferred_analytics_collection`, and uploads it **only if the user later opts in** (seen on the Redmi: `first_open` stamped
+21:44:50, uploaded 21:55:24 after opt in, alongside `session_start` and `screen_view`). Decliners send nothing (the capture). The
+policy and DPIA should say that the time of first launch can be included if you opt in later. Not edited here.
+
+**Release build (unsigned here):** the worktree has no `keystore.properties` (it lives in the owner's main checkout and was
+deliberately not copied), so these two bundles are **unsigned**. A signed pair must be built from the main checkout.
+`app-release.aab` 5,726,823 bytes, sha256 `00c9158d55a84da9f1dee2b52be8a8a7e4a65aca5915113217f4dcfef6e97dcb`;
+`wear-release.aab` 3,638,937 bytes. Merged release manifest: **no** `AD_ID` or `ADSERVICES` (grep empty); it has
+`INTERNET`, `ACCESS_NETWORK_STATE`, `WAKE_LOCK`, the install-referrer permission and the three Firebase meta-data flags.
+`tools/build-store-assets.sh`: only `feature-graphic-1024.png` changed ("Sunni & Shia · No accounts"); the text sits cleanly
+on the gradient. `05-settings.png` does not show the new row, so it was left alone.
+
+**Existing-user question (commit 8a39b2b, the four checks added to `ANALYTICS_DEVICE_CHECK.md`), emulator `sajda`, new build
+over a build from `main` 93cd36e with its data kept** (the only way to get "setup done, no answer saved"; the Redmi's test copy
+was NOT upgraded, the owner was away and the install needs taps on the phone):
+1. *Upgrade:* the question "Help improve SajdaTime?" appeared once. BACK and a tap outside did not dismiss it and saved nothing:
+   after a force-stop it asked again. Tapping **Yes** saved, it never returned after force-stop and relaunch, and only
+   `first_open`, `session_start` and `screen_view` (one per tab visit) were logged. Repeated from a fresh upgrade with **No**:
+   no question on two further relaunches. PASS.
+2. *Fresh install:* the question appears once, as the setup consent step; after answering it never appears again (two relaunches). PASS.
+3. *After No nothing is sent:* zero `Logging event` and zero uploads in the app log, and the proxy saw no Analytics or Firebase
+   host over the period (only Google Play services' own `phonedeviceverification-pa.googleapis.com`). *After Yes:* the fixed events plus
+   the SDK's automatic `first_open`/`session_start`/`user_engagement`. PASS.
+4. *Font scale 1.3 and 2.0:* both buttons full width and fully visible by scrolling the dialog; at 2.0 "Yes" wraps to two
+   lines so it is taller than "No thanks" (same width). Font scale put back to 1.0. PASS.
+The 76 minute opted-out capture was taken on commit b142709; 8a39b2b changed only the consent UI, strings and a saved flag
+(`git diff b142709 8a39b2b -- app` touches four files, none of them the manifest or SDK setup), so it was not repeated.
+Gate on the new head (`clean test lint :app:bundleRelease :wear:bundleRelease`): 79 tests, 0 failures, lint clean; `app-release.aab`
+5,725,773 bytes, sha256 `9896d18fe47e635fbde114e5fef67689a41972cc5aee7fd027afe25d32baa019` (**unsigned**, see above; this
+supersedes the sha256 earlier in this entry), `wear-release.aab` 3,638,937 bytes; merged manifest again free of `AD_ID`/`ADSERVICES`.
+
+**Copy changed 4 Oct 2026, at the owner's request ("make it compliant", copy throughout), after the `first_open` finding:**
+`docs/privacy.html` gained a "Before you choose" section (nothing is sent before Yes, how that was checked, and that the app notes the
+time of first launch on the phone, never sends it unless you say Yes, and sends it if you do), a bullet in "What is sent", a corrected
+"told not to send anything until you say yes" (was "not to collect", which the finding showed was too strong), and a line that a person
+who never said yes has nothing at Google to remove. The in-app consent text (`consent_body`) now lists "when you first opened the app" and
+says "Until you choose yes, nothing is sent." The DPIA records the measured result and the first-launch note, and marks the "existing users"
+risk as superseded by the one-time question. `LISTING.md` tells whoever fills Data safety not to describe the app as recording nothing
+before consent. There is **no separate terms and conditions document**; the in-app Disclaimer is the nearest thing and says nothing about
+usage counts. Not a lawyer's review: the wording follows the ICO pages read on 3 Oct and is the assistant's reading. Gate after the
+change: `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Not re-run on a device (text only).
+
+### 4 Oct 2026 — "on by default" was built, researched, and REVERSED; usage counts stay opt in
+
+The owner asked for counts on by default and, on seeing the risk, delegated the legal and practical decision to the assistant
+("research it, you have authority"). A first on-by-default build (notice plus "Turn this off") was made, verified on the emulator and pushed
+(`cf8eb30`), then **reverted by the next commit** after the research below. Recorded so nobody rebuilds it without reading this.
+
+**Evidence (primary pages read 4 Oct 2026):**
+- ICO "Storage and access technologies: what are the exceptions" (the statistical purposes exception, in force 5 Feb 2026 under the Data (Use
+  and Access) Act 2025, PECR Schedule A1). It needs: the **sole purpose** is statistics about how the service is used, to improve it;
+  a third party only as a **processor** acting on our instructions; a clear simple free way to object; and **"you must not retain the
+  individual-level information after aggregating it"**. Prohibited: individual tracking or profiling. Google Analytics for Firebase keeps
+  event level data against a persistent ID for 2 or 14 months (we set 14) and Firebase cannot delete it "promptly after aggregation". So our setup
+  **does not satisfy the exception**, and without the exception PECR reg 6 needs consent before the SDK stores its ID on the phone.
+- That is the UK only. The EU's ePrivacy rules have no such exception for analytics, and the app is global.
+- Faith makes the data special category, and the ICO Children's code expects high privacy defaults. Both point the same way.
+- Google Play Data safety help: "Optional" includes the ability to opt in **or opt out**, so either design may be declared Optional = Yes.
+
+**Decision (assistant, under the owner's delegation): usage counts stay OPT IN.** Explicit consent, nothing pre-selected, two equal buttons, the existing
+one-time question for existing users, the Settings switch. The app is back to the state verified on 3 to 4 Oct. Rejected: silent default on,
+pre-ticked Yes, and notice-then-count (all fail reg 6 for UK users on the evidence above); a region split (EU on, UK off) is unnecessary
+complexity for a free app; asking the ICO/an adviser is still open to the owner (`docs/ANALYTICS_DEFAULT_ON_BRIEF.md`) but is no longer blocking.
+**To reconsider default on later** you would need: retention of individual data measured in days not months (Firebase cannot do this), or an
+adviser's written opinion that a processor-run Firebase fits the exception for a faith app with child users. Neither exists today.
+**Practical way to raise the yes rate within the law:** the consent wording already says why ("so we can see what people use and improve the
+app"); the best lever is that the question is shown to everyone once (setup, or once after updating).
+**Signed bundles (4 Oct 2026, built from this working copy by a temporary link to the owner's `keystore.properties`, never opened;
+`jarsigner -verify` says "jar verified", signed by the upload key alias):** phone `app-release.aab` 5,734,706 bytes, sha256
+`c145dad2c0a7d9d639ca95e58ec3f0fe88cdc2ff40f4da2ac5c0763a6c29bd03`; watch `wear-release.aab` 3,647,031 bytes, sha256
+`33b69fe52f70cd67473767c79288db3cd8232777898d961c6a37f9da6f64de94` (the watch stays at 1.2.0, so **do not upload the watch bundle**).
+Merged release manifest has no `AD_ID`/`ADSERVICES`. App code is identical to commit `b3a0665` (zero diff), the state verified on the emulator.
+They are in `app/build/outputs/bundle/release/` and `wear/build/outputs/bundle/release/` and are not committed.
+**Then, at the owner's request, a narrow country split was built (4 Oct 2026, same day).** Research for a safe list found only Pakistan
+confirmable (no enacted law; Bangladesh enacted one in April 2026; the UN tracker does not name countries). `NoticeRegion.kt` shows the on-by-default
+**notice** only when the SIM and network country are Pakistan, the language region is not UK/EEA/CH and the time zone is Asia/Karachi; otherwise the
+opt-in **consent** question. Verified: unit tests for every way of being wrong; on the emulator the consent question appears when signals do not match
+(a US phone, even one with a matching test list, because its en-GB language region trips the UK guard) and, in a local build with the guard relaxed,
+the notice appears, no event is sent before an answer, and events follow OK. **Not verified:** a real phone physically in Pakistan, and the
+notice's "Turn this off" path in this exact build (verified in the earlier build with the same notice code). The notice strings are the earlier ones.
+Data safety remains Optional = Yes. **Signed bundles for THIS build (supersede the checksums in the paragraph below):** phone `app-release.aab`
+5,739,040 bytes, sha256 `2e4d30105034812749e05eca72c621872a9c28b2cacad210fdf6c9f2821f97b2`; watch bundle unchanged at 3,647,031 bytes (do not upload).
+Gate (`clean test lint :app:bundleRelease :wear:bundleRelease`) passed; both `jarsigner -verify` "jar verified"; no `AD_ID`/`ADSERVICES` in the release manifest.
+**Fable 5 review (4 Oct 2026, asked for a creative lawful way to get more data).** Its ranked conclusion, adopted: (1) Play Console fully, no consent needed; (2)
+better consent wording, same opt in; (3) measure the yes rate; (4) a no-identifier aggregator (e.g. Aptabase EU, daily rotated salt, processor) is the only
+option that would let counts run broadly in the UK, but it is a third party, still faith adjacent, still consent in the EEA/CH, and needs a fresh DPIA and
+ideally an adviser, so it is deferred to 1.4.0 behind a measured trigger (yes rate under about 25 per cent after about 8 weeks); (5) Firebase at 2 month retention
+still fails the ICO gloss; (6) a "Send feedback" mailto row, accepted; rejected: an in-app poll (breaks "asked once, never nagged"), a server of our own (breaks "no
+server of our own"), Firebase consent-mode cookieless pings (unverified and inference-based), any default-on. **Done in this change:** the Pakistan-only split removed
+(`NoticeRegion.kt` deleted, app code back to the opt-in state of `b3a0665` plus the two items below); `consent_body` now starts with a plain reason
+("free, no ads, these counts are the only way the developer learns what helps") with equal buttons unchanged; a Settings "Send feedback" row that opens the
+user's email app (no attachments, nothing sent by the app) with a test that its address matches `privacy.html`; the privacy page has a feedback paragraph and no
+Pakistan text; `ANALYTICS_READING.md` has a monthly Play Console table and the yes-rate rule. **Legal nuances it found:** the Act itself does not say "no
+individual level data" (that is ICO guidance, binding in practice); the EU is not uniformly "no exception" (France's CNIL exempts strict audience measurement but says
+Google Analytics does not qualify); reading device information is "access" under reg 6 even when nothing is stored. **Not verified by it:** Firebase consent mode "denied"
+behaviour on Android; Aptabase's on-device storage. The superseded Pakistan paragraph above is kept as history. **FINAL signed bundle for this build (supersedes every earlier checksum):** phone `app-release.aab`
+5,735,428 bytes, sha256 `d5e8ada34cd76037da1e061605b40df48a46d1208e8d3e42014202aa2b27b31d`, `jarsigner -verify` "jar verified", no `AD_ID`/`ADSERVICES`; the watch bundle
+(3,647,031 bytes) stays at 1.2.0 and is NOT uploaded. Gate `clean test lint :app:bundleRelease :wear:bundleRelease` passed. Emulator: consent text reads cleanly, the
+buttons sit below the fold until scrolled, "Send feedback" opens the email app with no crash. Not tested: a real phone with a mail account, the S23 Ultra, the Redmi on this build.
+Other delegated decisions made the same day: no separate Terms and Conditions document (the in-app Disclaimer and the privacy policy cover it); the
+Disclaimer is not changed; Data safety "Optional" = Yes; the S23 Ultra check is optional, not required (only wording changed since the Redmi);
+signed bundles built from this working copy by letting Gradle read the owner's `keystore.properties` through a temporary link (never opened,
+printed or copied; link removed afterwards).
+
+**Not tested:** the Wear app (waived for this release); right-to-left; a boot-completed broadcast (protected, `adb` cannot
+send it); forcing a WorkManager job; a real alarm firing during the capture; the Samsung phone; behaviour on a phone with
+Play services missing; a signed bundle; Play Console, Data safety and the privacy page text.
+
 ## 11. ⚠️ Still pending — the honest list
 
 > **This section opens with the current state of play, then the dated record of how the project
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY — 7 Sept 2026
+### ⬛ SUPERSEDED — 3 Oct 2026 decision record (kept for history; the STATE OF PLAY of 4 Oct below is the truth). Default-on was later built and REVERSED; the branch named here, `claude/analytics-default-on-1-4-0`, is obsolete (its existing-user question was carried into `claude/app-analytics-strategy-e826p5`). Do not use it.
+
+The owner asked for usage counts to be **on by default** (opt out), so the app can be improved. This
+was challenged and he confirmed, so it is recorded here. **Do not flip the default or start sending
+before the user is asked** without reading `docs/ANALYTICS_DEFAULT_ON_BRIEF.md` first. Why: PECR reg 6
+and the ePrivacy rules need consent before an identifier is stored or read, and a notice with an off
+switch is not consent; the data is faith adjacent; the ICO Children's code applies; Play's Data safety
+and prominent disclosure rules apply; the published privacy policy and the approved DPIA say "off
+until you say yes". Outcome: 1.3.0 ships opt in as built. Branch `claude/analytics-default-on-1-4-0`
+adds the part that is lawful and gets most of the benefit: a one time, non dismissible question for
+people who installed before the feature existed (they never see setup), with friendlier wording
+stating the purpose ("improve the app"). Collection still starts only after a tap on Yes. A true
+silent default on stays unbuilt until a data protection solicitor has answered the brief and the owner
+has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
+(unreliable and still faith data).
+
+### 📍 STATE OF PLAY — 4 Oct 2026, 13:00 (usage counts: built, verified, SUBMITTED to Google and In review; branch NOT yet merged to main)
+
+**Read this first.** It supersedes the 3 Oct block that used to be here and the 7 Sept block below on one point only: release **1.3.0** (phone,
+`versionCode 5`) adds **optional, opt in usage counts**. Everything else in the 7 Sept block (what is live, how it was verified) is still the
+record. The watch stays at 1.2.0 (`versionCode 1001`) and is not part of this release. **Do not invent other work.**
+
+**Where the code is.** Branch `claude/app-analytics-strategy-e826p5`, pushed, **36+ commits ahead of `main`, NOT merged** (pull request: https://github.com/aliimrankhan86/SajdaTime/pull/1). Assistants never push to `main`; the owner presses Merge (or explicitly tells an assistant to merge). **The merge is urgent, not a follow-up:** the privacy policy URL given to Google in Data safety (`https://aliimrankhan86.github.io/SajdaTime/privacy.html`) is served from `main`, and on 4 Oct 2026 it still showed the old text (last updated 15 Aug 2026, no mention of usage counts). Until the PR is merged and the page redeploys, Data safety declares analytics while the linked policy does not describe it. Phone app only; nothing Firebase is in `:wear`.
+
+**What the feature is (one paragraph).** Firebase Analytics, off until the user says Yes. New installs see a consent step right after Welcome
+(`OnboardingScreen.kt`, `Step.CONSENT`); people who installed earlier get the same question once (`MainScaffold.kt`, not dismissible by Back or an outside tap);
+Settings, About, has a "Share usage counts" switch (turning it on re-shows the full consent text). The closed event set is in
+`app/src/main/java/com/sajdatime/app/data/UsageCounts.kt`: `screen_view` (times/qibla/settings), `setup_step` (permission, sect, method, confirm, finish; **never madhab**),
+`permission_result` (location, notifications, exact_alarm; a yes/no). Never sent: sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them.
+Firebase config is plain string resources, no plugin (`app/src/main/res/values/firebase_config.xml`, project `sajdatime-37a1b`); `bools.xml` sets `analytics_allowed`
+true in `main` and **false in debug, rtl and sideload** (the SDK calls are gated, the UI still shows). A "Send feedback" row opens the user's email app (nothing attached or stored).
+
+**Verified (details in section 10, entries 3 and 4 Oct 2026).** 79 unit tests, lint clean, both release bundles; the 76 min 48 s opted-out run through a logging proxy shows no
+Analytics or Firebase host and no Analytics log line, and the positive control in the same session does; opt in, off, on and relaunch honoured on a Redmi; Sunni and Shia event names
+identical; the existing-user question, fresh install, and font scale 1.3 and 2.0 on an emulator; release manifest has no `AD_ID` or `ADSERVICES`.
+**Signed phone bundle ready:** `app/build/outputs/bundle/release/app-release.aab` (not committed; rebuild with `./gradlew :app:bundleRelease` from a checkout that has `keystore.properties`),
+5,735,428 bytes, sha256 `d5e8ada34cd76037da1e061605b40df48a46d1208e8d3e42014202aa2b27b31d`. **Do not upload the watch bundle.**
+
+**Decisions already made, with reasons (do not reopen without new evidence).**
+- **Opt in, never default on.** The owner asked for default on; it was built, researched and reversed the same day. The ICO statistical purposes exception needs individual data
+  aggregated and not retained, which Firebase (2 to 14 months against a persistent ID) cannot do; the EU has no equivalent; faith is special category data; the Children's code
+  expects high privacy defaults. A Pakistan-only default-on split was built and removed (no users there). See section 10, 4 Oct 2026, lesson 123, `docs/DPIA_ANALYTICS.md` section 7, and
+  `CLAUDE.md`. To reconsider you need a written adviser opinion or a tool that keeps no individual data.
+- **How the owner still gets decision data:** Play Console (no consent, the headcount), the opt in Firebase ratios, and the feedback email. Measure the yes rate after about 8 weeks
+  (`docs/ANALYTICS_READING.md`); if under about 25 per cent, evaluate a no-identifier aggregator in 1.4.0 (needs a fresh DPIA).
+- No separate Terms and Conditions page (the in-app Disclaimer and the privacy policy cover it); the Disclaimer is unchanged; Data safety "Optional" = Yes.
+- Firebase may record `first_open` on the device before consent and sends it only after a Yes (lesson 122); the policy and consent text say so.
+
+**What happened on 4 Oct 2026 (facts, in order).** Device check and 76 min 48 s opted-out capture PASSED (section 10). Owner asked for default-on; built, then reversed on ICO evidence; a Pakistan-only split built and removed; an independent (Fable 5) review led to the final opt in design with warmer wording and a feedback row. Redmi test app removed by the owner. S23 Ultra check skipped by the owner (wording-only change since the Redmi check). In Play Console the owner uploaded bundle 5 (1.3.0) to Production, filed en-GB release notes, saved Data safety (approximate location: App functionality + Analytics; app interactions: Analytics; device or other IDs: Analytics; all Optional; nothing shared; deletion = No; Advertising ID = No) and two store description bullet edits (with a browser assistant), then pressed **Submit 6 changes for review** at 12:42. The six changes: release 5 (1.3.0); Ethiopia added to Production and Closed testing (Google's own automatic addition, left in); short description; full description; Data safety. Console then showed submission 5 **In review**, no errors, 'Last published' still 5 Sept. The only release warning was the harmless 'no debug symbols' (no native code of ours). The 'App functionality' purpose on location is the typed-city search via Open-Meteo, not GPS, and is deliberate (`docs/store/LISTING.md`); a browser assistant flagged it as a conflict and it is not one.
+
+**Still open, in this order, and whose job.**
+1. **Owner (or an assistant he explicitly tells to): merge pull request #1 into `main` NOW**, so the live privacy policy matches Data safety. Then confirm by fetching the policy URL: it must say 'Last updated: 4 October 2026' and mention usage counts (GitHub Pages can take a few minutes).
+2. **Google:** review of submission 5. Outcome unknown. Play sends no email. It is live only when the public listing's 'Updated on' date changes to the approval date (`https://play.google.com/store/apps/details?id=com.sajdatime.app`, signed out). Typical: hours to 2 days, up to 7. If still In review after 7 days, look at Submission activity. If rejected, read the Console message first.
+3. **After it is live:** nothing to build. Check the 'Updated on' date and that the policy is live. Keep the numbers routine in `docs/ANALYTICS_READING.md`.
+4. **In about 8 weeks:** owner sends the Firebase and Play new-user counts; if the opt in yes rate is under about 25 per cent, evaluate a no-identifier aggregator for 1.4.0 (needs a fresh DPIA).
+5. **Optional, owner's choice:** switch off Developer options *Install via USB* and *USB debugging (Security settings)* on the Redmi (left on; harmless).
+Nothing else is pending. A separate claude.ai web session called 'App analytics strategy' also exists; it is obsolete, and where it disagrees with this block (for example by saying the work is merged), this block is right and was checked against GitHub on 4 Oct.
+Everything else in `docs/ANALYTICS_PLAN.md` is history (its status line says so).
+
+**Where things are (so you do not hunt).**
+`docs/privacy.html` (the published promise; change it in the same commit as any data handling change) · `docs/DPIA_ANALYTICS.md` (risk assessment, owner approved) · `docs/ANALYTICS_PLAN.md` (history and
+reasoning) · `docs/ANALYTICS_DEVICE_CHECK.md` (the on-device runbook) · `docs/ANALYTICS_READING.md` (how to read the numbers; monthly table) · `docs/ANALYTICS_DEFAULT_ON_BRIEF.md` (the adviser question, parked) ·
+`docs/ANALYTICS_PLAY_CONSOLE_PROMPT.md` · `docs/store/LISTING.md` (Data safety answers) · `tools/log-sni-proxy.py` (the capture method) · `app/src/test/java/com/sajdatime/app/UsageCountsTest.kt` (enforces most rules).
+
+**Traps that cost time here (full text in section 15, lessons 119 to 123).** Network capture is not evidence until a positive control shows the host; `emulator -tcpdump` is not reliable, use the proxy.
+A Xiaomi/HyperOS phone needs *Install via USB*, the per-app denied-list switch off, and *USB debugging (Security settings)* before `adb` taps or app logs work, and its install prompt lasts seconds.
+A sideload build with the send flag on fails the "flag is off" test by design: revert the edit before running the gate. `./gradlew clean` deletes APKs you meant to keep. The worktree has no `keystore.properties`;
+signed builds need it linked in temporarily (never opened or copied).
+
+**Not tested.** The signed bundle on a real device with the Play-installed app; a phone with a mail account for the feedback row; the S23 Ultra; the watch (waived by the owner); right-to-left; a boot broadcast and a forced background job.
+
+### 📍 STATE OF PLAY — 7 Sept 2026 (still the record of what is live)
 
 **Written for any assistant, on any tool, arriving with no memory of this project.** Every claim
 in this block was re-verified from scratch on 7 Sept against the live store page, the Play
@@ -6220,8 +6446,17 @@ the one true blocker since both AABs on disk are unsigned ⚠️ **— both halv
     454 × 454 files are already waiting in `docs/store/upload/wear-os/`.
 
 ### Deliberate non-goals — do not "fix" these
-Ads, in-app purchases, accounts, analytics, crash reporting, fine location, background
-location, cloud backup, a server of any kind.
+Ads, in-app purchases, accounts, crash reporting, fine location, background location, cloud
+backup, a server of our own. **Analytics is no longer on this list, with one narrow exception: the
+optional, opt in usage counts in `docs/ANALYTICS_PLAN.md`, approved by the owner on 3 Oct 2026.**
+Any other analytics, event, parameter or user property is still a non-goal until the owner agrees
+and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
+coordinates, or anything whose shape reveals them.**
+
+**Exception recorded 3 Oct 2026: the consent screen for usage counts.** The next paragraph forbids
+asking the user for things. A privacy consent is not a growth ask, it is required before data can
+be sent, so it is allowed, **once**, at setup and from Settings. It must never appear in or after
+the disclaimer, never mention the dua, and never be a nag. Do not delete it as a stray "second ask".
 
 **Also: no in-app prompt asking the user to rate, review or share the app. Added 7 Sept 2026.**
 This will look tempting, because the app is live with zero ratings and ratings are what would
@@ -6704,7 +6939,8 @@ matters more than the stable hashes, that is the trade being made.
     tab shows how many *addresses* you have added, which is a different number and reliably
     the larger one; mistaking one for the other is how a stalled test looks healthy. **So the
     only way to know who is actually in is to ask them and keep your own list.** The app
-    cannot help either: no analytics, no accounts, no server, by design and permanently.
+    cannot help either: no accounts and no server, and its optional usage counts are only a
+    sample of opted in users that cannot say who is in.
 
 37. **The tester email field validates nothing, and the failure lands on someone else's
     phone.** The Console accepts any plausible-looking address. It does not check that it is
@@ -7634,6 +7870,71 @@ matters more than the stable hashes, that is the trade being made.
     7 Sept 2026.
 
 
+
+114. **A step that only one sect sees reveals the sect, even if its content is never sent.** The
+    madhab step is shown to Sunni users only (`OnboardingScreen.kt`), so an event named after it, or
+    any difference in *which* events a user produces, tells Google their school of thought. Found by
+    an independent review of the analytics plan on 3 Oct 2026, not by the author. The rule is about
+    the *shape* of what is sent, not only its fields: only steps every user passes through have an
+    event, and `UsageCountsTest` fails if that stops being true. Applies to any future event.
+
+115. **Adding a Firebase library starts Firebase for every user, opted in or not.** The SDK's
+    `FirebaseInitProvider` runs at launch and initialises Analytics for the process. "We never touch
+    Firebase for people who did not opt in" is therefore false and must never be written. What keeps
+    it quiet is the manifest (`firebase_analytics_collection_enabled=false`), what proves it is a
+    network capture of an opted-out run, and that capture has to last over an hour because uploads
+    batch hourly. Configure ids from plain string resources; Google documents this and it avoids the
+    `google-services` plugin and its AGP risk.
+
+116. **A permission callback that serves several screens must not be counted as setup.** The location
+    launcher in `MainActivity` also serves Times and Settings; only results that arrive before
+    `onboardingComplete` are setup. Exact alarms have **no result callback at all**
+    (`requestExactAlarmPermission` just opens a settings screen), so it is logged as a *state* at the
+    end of setup and described that way everywhere. A logged request is not an outcome.
+
+117. **Building in a cloud container.** It has no Android SDK and blocks `dl.google.com` unless the
+    environment's Network access allows it. With it allowed: `ANDROID_HOME=/opt/android-sdk`,
+    command line tools from `developer.android.com/studio` (zip number 15859902 on 3 Oct 2026),
+    `sdkmanager "platform-tools" "platforms;android-37.0" "build-tools;37.0.0"`, and a gitignored
+    `local.properties`. Maven Central can answer 429 (rate limit) for a transitive download: retry.
+    A background task's reported exit code is the shell's, not Gradle's, so read the log. A cloud
+    container has no `/dev/kvm`, so emulators and `adb` need the owner's computer.
+
+118. **Independent review earned its cost three times in one day.** Review of the analytics plan by a
+    second model, then a stronger one, found: a consent mechanism with two switches that could
+    disagree, a deletion promise that could not be kept, the sect leak above, an exact-alarm outcome
+    that does not exist, and a mandatory data protection assessment the plan had called optional.
+    None was visible to the author. For anything that changes what the app tells the user about
+    their data, get a review that has not seen your reasoning.
+
+
+119. **A guard that reads a file must have that file declared, and the proof must be re-run after
+    declaring it.** Adding the Firebase config tests, the first "break the file and watch it fail"
+    run printed BUILD SUCCESSFUL three times, because the new config files were not yet test inputs
+    (lesson 84 again, found 3 Oct 2026). It looked like a pass. Declare the file in the
+    `inputs.files` block, then break it, and only trust the run that goes red.
+
+120. **A network capture is only evidence once it has seen the thing it claims is absent.** On 3 Oct 2026 `emulator
+    -tcpdump` ran for 76 minutes and showed no Analytics hosts, and would have been reported as a pass; it had in fact stopped
+    recording after the boot burst and did not see an opted-in upload that succeeded in the log. Always run the positive
+    control (opt in, watch the hosts appear) in the same capture. What worked: a ~60-line local CONNECT proxy that logs
+    the TLS SNI, with `emulator -http-proxy http://127.0.0.1:8899`. A pcap is not needed.
+121. **HyperOS (Redmi) needs three things before `adb` is useful**, none obvious: *Install via USB* on, the per-app
+    entry under "Denied installation via USB" switched **off** (a timed-out install prompt adds the app there itself), and
+    *USB debugging (Security settings)* on or `adb input` fails with `INJECT_EVENTS` and app log lines are dropped. The install
+    prompt and a Play Protect box ("Don't send" is the private choice) both appear for only a few seconds. Even then the
+    device log was lossy during fast taps; use the emulator for anything that must be a complete event sequence.
+123. **"On by default" analytics failed the evidence, not the build.** The statistical purposes exception (5 Feb 2026) sounds like it permits
+    count-without-consent, but the ICO requires individual-level data to be aggregated and deleted promptly, and GA4 retains it for 2 to 14
+    months. Read the exception page, not the headlines, before building anything that relies on it (the first build was reverted, see §10).
+122. **Firebase records `first_open` before consent and sends it after.** With `firebase_analytics_collection_enabled=false`
+    the SDK still stamps the first launch on the device (`deferred_analytics_collection`); it uploads it only if the user
+    later opts in. Nothing leaves for decliners (proved by the 3 Oct capture), but any sentence claiming "nothing is recorded
+    until you say yes" would be wrong.
+
 ---
 
 *Made with love, free for the Ummah.*
+
+
+124. **A privacy policy that Google links to is served from `main`, so merge it before you submit, not after.** On 4 Oct 2026 the Data safety form was saved and the release submitted while the live policy still predated usage counts, because the branch was left unmerged 'until the release is live'. The earlier runbook (`docs/ANALYTICS_PLAY_CONSOLE_PROMPT.md`) said merge first; the order was not followed. Rule: anything the store listing or Data safety points at (policy URL, support page) must be live and matching BEFORE pressing Send for review. Also: before saying 'merged', run `git rev-list --left-right --count origin/main...origin/<branch>`; another session's claim that work was 'merged' was wrong and this check caught it.

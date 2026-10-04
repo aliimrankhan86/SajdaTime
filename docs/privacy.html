@@ -13,6 +13,7 @@
   }
   h1 { font-size: 32px; line-height: 1.2; margin: 0 0 4px; }
   h2 { font-size: 21px; margin: 40px 0 8px; color: #14624b; }
+  h3 { font-size: 17px; margin: 24px 0 6px; }
   .updated { color: #43524b; margin: 0 0 32px; font-size: 15px; }
   .lede { font-size: 19px; border-left: 4px solid #14624b; padding-left: 16px; margin: 0 0 8px; }
   ul { padding-left: 22px; }
@@ -34,10 +35,12 @@
 <body>
 
 <h1>Privacy Policy for SajdaTime</h1>
-<p class="updated">Last updated: 15 August 2026 · <a href="#disclaimer">Disclaimer</a></p>
+<p class="updated">Last updated: 4 October 2026 · <a href="#disclaimer">Disclaimer</a></p>
 
-<p class="lede">SajdaTime does not collect, store, or share any personal information. There
-are no accounts, no analytics, no advertising, and no tracking of any kind.</p>
+<p class="lede">SajdaTime has no accounts, shows no advertising, and keeps your location on
+your phone. If you choose to, it can send usage counts to Google Analytics so the developer can
+see how the app is used. That is off unless you switch it on, and it never includes your
+location, your school of thought or your prayer settings.</p>
 
 <h2>What the app needs, and why</h2>
 <p>SajdaTime works out prayer times and the direction of the Qibla from your approximate
@@ -45,12 +48,17 @@ location. To do that it asks for the <strong>approximate location</strong> permi
 (<code>ACCESS_COARSE_LOCATION</code>). It reads your location only while the app is open,
 never in the background.</p>
 <p>Your coordinates are saved on your own device so the app still works with no signal.
-<strong>They are never sent to us or to anyone else.</strong> We have no server, so there is
-nowhere for them to go.</p>
+<strong>They are never sent to us or to anyone else.</strong> SajdaTime runs no server of its
+own, and your coordinates are never part of the optional usage counts described below.</p>
 <p>You can refuse the location permission entirely and type a city name instead. The app is
 fully usable that way.</p>
 
-<h2>The one time something leaves your device</h2>
+<h2>When something leaves your device</h2>
+<p>Two things can. One happens only if you type a city name and your device cannot resolve it.
+The other happens only if you switch on the optional usage counts. Both are described in full
+below.</p>
+
+<h3>Typing a city name</h3>
 <p>If you choose to type a city name rather than use your location, that name has to be
 turned into coordinates. The app first tries to do this using the lookup service built into
 Android itself. If your device cannot resolve it, and only then, the city name you typed is
@@ -69,6 +77,73 @@ because a policy that quietly stops at our own front door would not be an honest
 <p>Open-Meteo's data is used under the
 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> licence.</p>
 
+<h2 id="usage-counts">Optional usage counts</h2>
+<p>SajdaTime can send usage counts to <a href="https://firebase.google.com/">Google Analytics for
+Firebase</a>, a service provided by Google, so the developer can see how many people use the app,
+how often, for how long, and where people get stuck during setup, and so make it better. <strong>It
+is off by default.</strong> You are asked once while setting up (or once after updating, if you installed the app before this option existed), and you can change your mind at any
+time in Settings, under About, with the switch called &ldquo;Share usage counts&rdquo;. If you say no,
+nothing about the app changes.</p>
+
+<h3>Before you choose</h3>
+<p>Until you say yes, the app sends nothing to Google Analytics. We checked this by watching all of a
+test phone&rsquo;s internet connections for over 75 minutes with the option left off: the app made no
+connection to Google Analytics or Firebase. There is one thing to know. Google&rsquo;s analytics code is
+part of the app, so when the app is first opened it makes a note, on your phone only, of the time it was
+first opened. If you say no, that note is never sent and stays on your phone until you uninstall the app.
+If you say yes later, it is sent along with the rest, as the time you first opened the app.</p>
+
+<h3>What is sent if you say yes</h3>
+<ul>
+  <li>How many people use the app, how often and for how long (sessions and time the app is open)</li>
+  <li>Which of the three main screens you open: Times, Qibla or Settings</li>
+  <li>Which setup steps you reach, and whether you allow notifications and location, as a yes or no
+      each. For exact alarms it records only whether they are allowed when setup ends</li>
+  <li>Your phone model, Android version, app version and language</li>
+  <li>When you first opened the app (the date and time)</li>
+  <li>Your approximate area, usually the country and sometimes the city, which Google works out from
+      your internet connection. According to Google, IP addresses are not logged or stored in
+      Analytics</li>
+</ul>
+<p>All of it is tied to a random ID created on your phone. It is not your name, and there is no
+account or email behind it.</p>
+
+<h3>What is never sent</h3>
+<p>Your GPS position or coordinates, the place you type, your school of thought or madhab, your
+calculation method, your alert and prayer settings, and anything you have typed. This is a fixed
+rule of the app, and nothing else can be added to the list above without this page changing first.
+Using a prayer app can say something about a person&rsquo;s faith, which is why this is a clear choice
+that you make, and why we never record which school of thought you follow.</p>
+
+<h3>Who receives it, and where</h3>
+<p>Google, acting as our analytics provider. Google says Firebase may process and store data
+anywhere Google or its agents maintain facilities, which can be outside the UK. We have switched
+off the Google settings that would let Google use the data for its own purposes, advertising or
+personalisation. The app removes the advertising permissions and does not use the advertising ID.
+We do not sell the data or use it for advertising. You can read
+<a href="https://firebase.google.com/support/privacy">Google&rsquo;s own description</a>.</p>
+
+<h3>How long it is kept</h3>
+<p>Detailed records are kept for up to 14 months. Summary reports that combine many users may be
+kept for longer. They cannot be traced to you.</p>
+
+<h3>Stopping, and what that does not undo</h3>
+<p>Switch &ldquo;Share usage counts&rdquo; off and the app stops sending anything and clears its
+random ID from your phone. If you said no and never turned it on, nothing was ever sent, so there is nothing to remove from Google. Data already sent stays with Google until it expires. Because the ID is
+random and the app never holds your name, the developer cannot tell which records are yours, so
+<strong>we cannot offer to delete your records on request</strong>. If you reinstall the app, your
+choice is not carried across: you are asked again and a new random ID is created.</p>
+
+<h3>Our basis for this</h3>
+<p>We rely on your consent, given by choosing Yes, and you can withdraw it at any time as described
+above. The consent text you are shown while setting up is the same text you see if you turn it on
+later in Settings.</p>
+
+<h2>If you email us feedback</h2>
+<p>Settings has a &ldquo;Send feedback&rdquo; row that opens your own email app with our address filled in. Nothing is
+attached and SajdaTime sends nothing itself. If you send the email, we see what you write and your email address,
+and we use them only to reply and to improve the app.</p>
+
 <h2>If you have a Wear OS watch</h2>
 <p>When a paired watch is present, your settings and location are sent to it over Google's
 local Data Layer so the watch can work out prayer times on its own. This travels directly
@@ -77,10 +152,12 @@ between two devices that belong to you. It does not go to a server, and it does 
 <h2>What SajdaTime never does</h2>
 <ul>
   <li>No user accounts, sign-in, or email collection</li>
-  <li>No analytics, crash reporting, or usage measurement</li>
+  <li>No usage measurement unless you switch on the optional usage counts above, and no crash
+      reporting</li>
   <li>No advertising and no advertising identifiers</li>
-  <li>No third-party trackers or SDKs of any kind</li>
-  <li>No selling or sharing of data — there is no data to sell</li>
+  <li>No advertising or marketing code. The only analytics code in the app is Google&rsquo;s
+      library for the optional usage counts, and it is told not to send anything until you say yes</li>
+  <li>No selling of data and no use of it for advertising</li>
   <li>No backup and no device transfer: Android's automatic backup is switched off, and
       the app is also excluded from device-to-device transfer, so your saved location is
       not copied to a backup server and is not carried across when you set up a new
@@ -88,8 +165,11 @@ between two devices that belong to you. It does not go to a server, and it does 
 </ul>
 
 <h2>Children</h2>
-<p>SajdaTime is suitable for all ages and is not directed at children specifically. It
-collects nothing from anyone, of any age.</p>
+<p>SajdaTime is suitable for all ages and is not directed at children specifically. It has no
+accounts and asks for no personal details. The optional usage counts are off by default for
+everyone, are explained in plain language before anyone can turn them on, and contain nothing
+that identifies a child or anyone else. If you are under 18, ask a parent or guardian before you
+switch them on.</p>
 
 <h2>Permissions in full</h2>
 <ul>
@@ -98,7 +178,17 @@ collects nothing from anyone, of any age.</p>
   <li><code>SCHEDULE_EXACT_ALARM</code> — so a prayer alert arrives at the right minute
       rather than whenever the system feels like it.</li>
   <li><code>RECEIVE_BOOT_COMPLETED</code> — to restore your prayer alerts after the phone restarts.</li>
-  <li><code>INTERNET</code> — used only for the optional city-name lookup described above.</li>
+  <li><code>INTERNET</code> — for the optional city-name lookup and, only if you switch them on, the
+      optional usage counts, both described above.</li>
+  <li><code>com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE</code> — added by
+      Google&rsquo;s analytics library. It lets Google Play tell that library which link brought you
+      to the app, for the optional usage counts.</li>
+  <li><code>ACCESS_NETWORK_STATE</code>, <code>WAKE_LOCK</code> and <code>FOREGROUND_SERVICE</code> —
+      added by the libraries the app uses (Android&rsquo;s background work library, which keeps your
+      prayer alerts scheduled, and Google&rsquo;s analytics library). SajdaTime does not use them for
+      anything else.</li>
+  <li>The app removes the advertising permissions that Google&rsquo;s library would otherwise add
+      (<code>AD_ID</code> and the Android ad-services permissions).</li>
   <li>On the watch, <code>WAKE_LOCK</code> — so the tile can refresh its countdown.</li>
 </ul>
 
@@ -106,9 +196,17 @@ collects nothing from anyone, of any age.</p>
 <p>If this policy ever changes, the updated version will be published on this page with a new
 date at the top.</p>
 
+<h2>Who is responsible, and how to reach them</h2>
+<p>SajdaTime is made by <strong>Ali Imran Khan</strong>, who is responsible for the app and for the
+optional usage counts described above. For any question about your privacy or your data, including
+how to withdraw consent, email
+<a href="mailto:aikstudies@gmail.com">aikstudies@gmail.com</a>.</p>
+
 <h2>Contact</h2>
-<p>Questions about privacy, or about the app in general, can be raised at
-<a href="https://github.com/aliimrankhan86/SajdaTime/issues">github.com/aliimrankhan86/SajdaTime/issues</a>.</p>
+<p>Questions about the app in general can also be raised at
+<a href="https://github.com/aliimrankhan86/SajdaTime/issues">github.com/aliimrankhan86/SajdaTime/issues</a>.
+That page is public, so please do not put personal information there; use the email address above
+for anything private.</p>
 
 <!--
   The published copy of the disclaimer the app shows on first run. Kept here, on the page

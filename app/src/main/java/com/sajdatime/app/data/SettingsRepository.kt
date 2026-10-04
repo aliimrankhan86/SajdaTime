@@ -43,7 +43,10 @@ enum class AlertStyle {
 }
 
 /**
- * All user state, stored locally on the device only. Nothing here is ever transmitted.
+ * All user state, stored locally on the device only. Nothing here is ever transmitted, with one
+ * exception that is the user's own choice: [analyticsEnabled] decides whether anonymous-ID usage
+ * counts are sent to Google Analytics (see `UsageCounts`). Even then, the *settings* held here —
+ * sect, madhab, method, alerts, city, coordinates — are never part of what is sent.
  */
 data class AppSettings(
     val onboardingComplete: Boolean = false,
@@ -109,6 +112,13 @@ data class AppSettings(
      */
     val alarmOnApproximateDays: Boolean = false,
     val disclaimerSeen: Boolean = false,
+    /**
+     * Whether the user has opted in to sending usage counts. Off until they say yes, and the
+     * only record of that consent. Absent on every existing install, so it reads as false.
+     */
+    val analyticsEnabled: Boolean = false,
+    /** True once the user has tapped Yes or No on the usage counts question, in setup or later. */
+    val analyticsAnswered: Boolean = false,
     /** True once the user has been told the app fell back to Makkah. */
     val usingDefaultLocation: Boolean = false,
     /**
@@ -284,6 +294,8 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun markDisclaimerSeen() = edit { it[Keys.DISCLAIMER] = true }
 
+    suspend fun setAnalyticsEnabled(enabled: Boolean) = edit { it[Keys.ANALYTICS] = enabled }
+
     /**
      * Records that the app fell back to Makkah because no location could be established,
      * so the UI can say so plainly instead of showing times for a place the user is not in.
@@ -328,6 +340,7 @@ class SettingsRepository(private val context: Context) {
         val NOTIFY = stringPreferencesKey("notify_slots")
         val ALERT_STYLE = stringPreferencesKey("alert_style")
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
+        val ANALYTICS = booleanPreferencesKey("analytics_enabled")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
         val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
         val METHOD_NOTICE_DISMISSED = booleanPreferencesKey("method_notice_dismissed")
@@ -363,6 +376,8 @@ class SettingsRepository(private val context: Context) {
             alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
+            analyticsEnabled = this[Keys.ANALYTICS] ?: false,
+            analyticsAnswered = Keys.ANALYTICS in this,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
             methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,

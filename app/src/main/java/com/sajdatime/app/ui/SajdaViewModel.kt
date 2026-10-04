@@ -20,7 +20,13 @@ import com.sajdatime.app.data.CityLookup
 import com.sajdatime.app.data.CompassAccuracy
 import com.sajdatime.app.data.CompassRepository
 import com.sajdatime.app.data.LocationRepository
+import com.sajdatime.app.data.FirebaseUsageSink
+import com.sajdatime.app.data.Permission
+import com.sajdatime.app.data.Screen
 import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.data.UsageCounts
+import com.sajdatime.app.R
 import com.sajdatime.app.data.WatchSync
 import com.sajdatime.app.notify.DailyRescheduleWorker
 import com.sajdatime.app.notify.Notifications
@@ -90,6 +96,16 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val exporter = PrayerPdfExporter(application)
     private val compassRepository = CompassRepository(application)
 
+    /**
+     * Optional usage counts. [UsageCounts.apply] is the only thing that ever switches
+     * Firebase on, and only for a user who opted in. `analytics_allowed` is false in the
+     * debug, rtl and sideload builds, so only the shipped release can ever send anything.
+     */
+    private val usage = UsageCounts(
+        sink = FirebaseUsageSink(application),
+        allowed = application.resources.getBoolean(R.bool.analytics_allowed),
+    )
+
     /** Sensor collection runs only while the Qibla screen is on-screen. */
     private var compassJob: Job? = null
 
@@ -101,6 +117,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             var first = true
             settingsRepository.settings.collect { settings ->
                 _state.update { it.copy(settings = settings, loading = false) }
+                // Re-applies the saved choice on every launch. A user who never opted in
+                // causes no Firebase call here at all.
+                usage.apply(settings.analyticsEnabled)
                 recalculate()
                 // MainActivity.onResume refreshes the location on every foreground visit —
                 // except the first. On a cold start onCreate, onStart and onResume run in
@@ -190,6 +209,24 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     // --- settings --------------------------------------------------------------------
+
+    /**
+     * Applies the choice **before** saving it, so collection is already on by the time the
+     * first setup or screen event is logged right after the user taps Yes. The settings
+     * flow then reports the same value and [UsageCounts.apply] does nothing.
+     */
+    fun setAnalyticsEnabled(enabled: Boolean) {
+        usage.apply(enabled)
+        viewModelScope.launch { settingsRepository.setAnalyticsEnabled(enabled) }
+    }
+
+    // Each of these is a no-op unless the user has opted in. See UsageCounts.
+    fun recordScreen(screen: Screen) = usage.screen(screen)
+
+    fun recordSetupStep(step: SetupStep) = usage.setupStep(step)
+
+    fun recordPermission(permission: Permission, granted: Boolean) =
+        usage.permission(permission, granted)
 
     fun setSect(sect: Sect) = viewModelScope.launch { settingsRepository.setSect(sect) }
 

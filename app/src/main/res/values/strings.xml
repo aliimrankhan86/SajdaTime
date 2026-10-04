@@ -28,7 +28,7 @@
     <string name="permission_title">Where are you praying?</string>
     <string name="permission_body">SajdaTime needs a rough idea of where you are to work out your prayer times and the direction of the Qibla. Tap the info icon to see exactly what that means.</string>
     <string name="permission_why_title">Why we need your location</string>
-    <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. It stays on your phone. We never send it anywhere, and we never track you.</string>
+    <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. It stays on your phone. We never send it anywhere.</string>
     <string name="action_allow_location">Allow location</string>
     <string name="action_got_it">Got it</string>
     <string name="action_understood">I understand</string>
@@ -345,7 +345,22 @@
     <string name="about_disclaimer">Disclaimer</string>
     <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no analytics, no ads. Tap to read the full policy.</string>
+    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no ads. Usage counts are optional and off unless you turn them on. Tap to read the full policy.</string>
+
+    <!-- Optional usage counts. Wording rules: docs/ANALYTICS_PLAN.md section 7.2. The consent text
+         must state the material facts in full (who receives it, the random ID, what is and is not
+         sent). Do not shorten it, and do not use the word "tracking". -->
+    <string name="consent_title">Help improve SajdaTime?</string>
+    <string name="consent_body">SajdaTime is free and has no ads, and these counts are the only way the developer learns what helps people, so the app can be improved. If you say yes, SajdaTime sends usage counts to Google Analytics. They cover how many people use the app, how often and for how long, which main screen you open, which setup steps you reach, whether you allow notifications and location, whether exact alarms are allowed (a yes or no each, never the location itself), your phone model, Android version, app version and language, when you first opened the app, and your approximate area, which Google works out from your internet connection.\n\nThey are tied to a random ID, not your name, and may be processed outside the UK. Using a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position, the place you type, your school of thought or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time.</string>
+    <string name="consent_yes">Yes, share usage counts</string>
+    <string name="consent_no">No thanks</string>
+    <string name="consent_read_policy">Read the privacy policy</string>
+    <string name="about_feedback">Send feedback</string>
+    <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email app.</string>
+    <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>
+    <string name="feedback_subject">SajdaTime feedback</string>
+    <string name="settings_usage_counts">Share usage counts</string>
+    <string name="settings_usage_counts_desc">Sent to Google, tied to a random ID. Off unless you turn it on. Turning it on shows exactly what is sent.</string>
     <string name="privacy_policy_url" translatable="false">https://aliimrankhan86.github.io/SajdaTime/privacy.html</string>
     <string name="about_charity">Free, forever</string>
     <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
