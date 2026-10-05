@@ -1,5 +1,11 @@
 # Localised Play Store listings
 
+> ⛔ **STALE, and not to be published, 5 Oct 2026.** These eight drafts were written by an assistant before usage counts existed.
+> They say there is no analytics (the app now offers optional, opt in usage counts, off by default) and that the right method is
+> chosen automatically (rule 5.17 in `docs/HANDOVER.md` forbids that claim: the app never chooses a method for the user).
+> Do not paste any of them into the Console. When a language is actually being shipped, rewrite its listing from the current
+> `LISTING.md`, keep every claim true, and apply the translation safeguards recorded in the 5 Oct block of `docs/HANDOVER.md` §11.
+
 The English listing is in [`LISTING.md`](LISTING.md). This file holds the eight additional
 languages, so the app is findable by Muslims searching in their own language rather than in
 English.

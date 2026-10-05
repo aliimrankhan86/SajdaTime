@@ -2,6 +2,7 @@ package com.sajdatime.app.ui.settings
 
 import android.content.Intent
 import android.media.RingtoneManager
+import android.text.format.DateFormat
 import androidx.core.net.toUri
 import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
@@ -37,6 +38,9 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -61,13 +65,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
+import com.sajdatime.core.AdjustmentFit
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Madhab
@@ -81,6 +89,7 @@ import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
@@ -88,7 +97,10 @@ import com.sajdatime.app.ui.components.RadioRow
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 
 /**
  * Which chooser is currently open, if any. Only one can be at a time.
@@ -320,14 +332,27 @@ fun SettingsScreen(
     when (open) {
         null -> Unit
 
-        SettingsChooser.ADJUSTMENTS -> AdjustmentsDialog(
-            adjustments = settings.adjustments,
-            hijriOffsetDays = settings.hijriOffsetDays,
-            onSetAdjustment = onSetAdjustment,
-            onSetHijriOffset = onSetHijriOffset,
-            onReset = onResetAdjustments,
-            onDismiss = { open = null },
-        )
+        SettingsChooser.ADJUSTMENTS -> {
+            // Today's times as the engine produces them *before* any correction. Typing "10:15"
+            // is fitted against these, because the stored correction is relative to them;
+            // fitting against the corrected times would count the old correction twice.
+            val uncorrected = settings.calculationPrefs.copy(adjustments = emptyMap())
+            val calculated = remember(settings.coordinates, uncorrected) {
+                settings.coordinates?.let { PrayerEngine.compute(it, LocalDate.now(), uncorrected).times }
+            }
+            AdjustmentsDialog(
+                adjustments = settings.adjustments,
+                hijriOffsetDays = settings.hijriOffsetDays,
+                calculated = calculated,
+                onSetAdjustment = onSetAdjustment,
+                onSetHijriOffset = onSetHijriOffset,
+                onReset = onResetAdjustments,
+                // One state variable holds the open chooser, so this closes this dialog as it
+                // opens the method list: the user is moved on, not stacked.
+                onChooseMethod = { open = SettingsChooser.METHOD },
+                onDismiss = { open = null },
+            )
+        }
 
         SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
@@ -957,23 +982,37 @@ private fun rememberRingtoneTitle(uri: String): String? {
  * make someone decide, before they had any information, whether their disagreement was
  * about minutes or about days.
  *
- * Steppers rather than a text field or a slider. A field invites "12:45" into a box that
- * wants "5" and needs validation, an error state and a keyboard; a slider cannot be landed
- * on an exact minute with a thumb. Two buttons and a number can only ever produce a legal
- * value, need no keyboard at all, and are the easiest thing on this screen to hit — which
- * matters, because the person reaching for this feature is often reading a printed
- * timetable in one hand.
+ * Two ways in, because the person reaching for this is often reading a printed timetable in
+ * one hand. Plus and minus steppers can only ever produce a legal value and need no
+ * keyboard, and they stay. But a twenty minute gap is twenty presses, so the number is also
+ * tappable: pick the time the mosque's board shows and [AdjustmentFit] works out the minutes.
+ * A time dial rather than a text field, so "12:45" can never be typed into a box that wants
+ * "5". It is the same earlier reasoning applied to the new control, not a reversal of it.
+ *
+ * The limit (30 minutes) did not move, and that is the point of [LimitNote]. A gap that big
+ * is a different calculation method or a board that shows the congregation, never a bigger
+ * offset. Before this the plus button simply went grey with the only explanation a line of
+ * static text above the list, nowhere near where the user was stuck. See docs/HANDOVER.md §5.17.
  */
 @Composable
 private fun AdjustmentsDialog(
     adjustments: Map<PrayerSlot, Int>,
     hijriOffsetDays: Int,
+    /** Today's uncorrected times, or null before there is a location to calculate for. */
+    calculated: Map<PrayerSlot, Instant>?,
     onSetAdjustment: (PrayerSlot, Int) -> Unit,
     onSetHijriOffset: (Int) -> Unit,
     onReset: () -> Unit,
+    onChooseMethod: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    // Which prayer's time dial is open, and which prayer's typed time was too far away.
+    // Saveable so rotating the phone mid-entry does not throw the user back to the list.
+    var picking by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+    var tooFar by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+
     ChooserDialog(title = stringResource(R.string.settings_adjustments), onDismiss = onDismiss) {
         Text(
             text = stringResource(R.string.settings_adjustments_help),
@@ -984,14 +1023,36 @@ private fun AdjustmentsDialog(
 
         PrayerSlot.entries.forEach { slot ->
             val minutes = adjustments[slot] ?: 0
+            val base = calculated?.get(slot)
+            val label = slot.label(context)
             StepperRow(
-                label = slot.label(context),
+                label = label,
                 value = minuteLabel(minutes),
                 canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
                 canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
-                onDecrease = { onSetAdjustment(slot, minutes - 1) },
-                onIncrease = { onSetAdjustment(slot, minutes + 1) },
+                onDecrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes - 1)
+                },
+                onIncrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes + 1)
+                },
+                // The time the screen now shows, only once there is a correction to check.
+                shows = if (base != null && minutes != 0) {
+                    stringResource(
+                        R.string.adjustment_now_shows,
+                        TimeFormat.clock(context, base.plusSeconds(60L * minutes), zone),
+                    )
+                } else {
+                    null
+                },
+                valueDescription = stringResource(R.string.adjustment_pick_time_description, label),
+                onValueClick = if (base != null) ({ picking = slot }) else null,
             )
+            if (abs(minutes) >= CalculationPrefs.MAX_ADJUSTMENT_MINUTES || tooFar == slot) {
+                LimitNote(onChooseMethod)
+            }
         }
 
         HorizontalDivider(Modifier.padding(vertical = 8.dp))
@@ -1014,6 +1075,7 @@ private fun AdjustmentsDialog(
         if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
             TextButton(
                 onClick = {
+                    tooFar = null
                     onReset()
                     onSetHijriOffset(0)
                 },
@@ -1022,6 +1084,104 @@ private fun AdjustmentsDialog(
             }
         }
     }
+
+    val pickingSlot = picking
+    val pickingBase = pickingSlot?.let { calculated?.get(it) }
+    if (pickingSlot != null && pickingBase != null) {
+        TimeEntryDialog(
+            title = stringResource(R.string.adjustment_pick_time_title, pickingSlot.label(context)),
+            // Opens on what the screen shows now, so a small change is a small move on the dial.
+            initial = pickingBase
+                .plusSeconds(60L * (adjustments[pickingSlot] ?: 0))
+                .atZone(zone)
+                .toLocalTime(),
+            // Same rule as every clock in the app: the device's 12/24 setting (TimeFormat.clock).
+            is24Hour = DateFormat.is24HourFormat(context.applicationContext),
+            onConfirm = { time ->
+                picking = null
+                when (val fit = AdjustmentFit.fit(pickingBase, time, zone)) {
+                    is AdjustmentFit.Result.Within -> {
+                        tooFar = null
+                        onSetAdjustment(pickingSlot, fit.minutes)
+                    }
+                    // Nothing is stored. The note under the row says why and where to go next.
+                    AdjustmentFit.Result.TooFar -> tooFar = pickingSlot
+                }
+            },
+            onDismiss = { picking = null },
+        )
+    }
+}
+
+/**
+ * Shown under a prayer that has reached the limit, or whose typed time was past it.
+ *
+ * Visible without a tap on purpose: a disabled button receives no taps, so an explanation
+ * that waited for one would never appear. Announced politely to a screen reader because
+ * "nothing happened" is the worst thing to leave someone with when they cannot see that the
+ * button went grey.
+ *
+ * It names no method and declares no time right or wrong, per §5.17. It says what a gap
+ * this size usually is and offers the one door that deals with it.
+ */
+@Composable
+private fun LimitNote(onChooseMethod: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 4.dp)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+    ) {
+        Text(
+            text = stringResource(
+                R.string.adjustment_limit_note,
+                CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
+            ),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        TextButton(onClick = onChooseMethod) {
+            Text(stringResource(R.string.adjustment_choose_method))
+        }
+    }
+}
+
+/**
+ * The time dial. Scrollable, because the dial is tall and a raised system font size makes
+ * the dialog taller than a phone in landscape.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeEntryDialog(
+    title: String,
+    initial: LocalTime,
+    is24Hour: Boolean,
+    onConfirm: (LocalTime) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val state = rememberTimePickerState(initial.hour, initial.minute, is24Hour)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                TimePicker(state = state)
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }) {
+                Text(stringResource(R.string.action_set))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
 }
 
 /**
@@ -1029,6 +1189,9 @@ private fun AdjustmentsDialog(
  *
  * The value carries the whole row's accessibility label because a screen reader landing on
  * a bare "+5 min" between two icon buttons has no way to know which prayer it belongs to.
+ *
+ * When [onValueClick] is given the value is also a button, drawn in the accent colour and
+ * underlined so it reads as tappable, and at least 48dp tall to be easy to hit.
  */
 @Composable
 private fun StepperRow(
@@ -1038,6 +1201,9 @@ private fun StepperRow(
     canIncrease: Boolean,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
+    shows: String? = null,
+    valueDescription: String? = null,
+    onValueClick: (() -> Unit)? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -1045,11 +1211,19 @@ private fun StepperRow(
             .fillMaxWidth()
             .padding(vertical = 2.dp),
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            if (shows != null) {
+                Text(
+                    text = shows,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
         FilledTonalIconButton(onClick = onDecrease, enabled = canDecrease) {
             Icon(
                 Icons.Outlined.Remove,
@@ -1058,11 +1232,33 @@ private fun StepperRow(
         }
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.let {
+                if (onValueClick != null) it.copy(textDecoration = TextDecoration.Underline) else it
+            },
+            color = if (onValueClick != null) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
             textAlign = TextAlign.Center,
             // Wide enough for "-30 min" so the plus button does not shuffle sideways as
             // the number grows a digit or loses its sign.
-            modifier = Modifier.width(64.dp),
+            modifier = Modifier
+                .width(64.dp)
+                .then(
+                    if (onValueClick != null) {
+                        Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(
+                                role = Role.Button,
+                                onClickLabel = valueDescription,
+                                onClick = onValueClick,
+                            )
+                            .minimumInteractiveComponentSize()
+                    } else {
+                        Modifier
+                    },
+                ),
         )
         FilledTonalIconButton(onClick = onIncrease, enabled = canIncrease) {
             Icon(

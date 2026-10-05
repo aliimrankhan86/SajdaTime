@@ -418,7 +418,22 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Match your mosque</string>
     <string name="settings_adjustments_none">No changes</string>
-    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here, or tap a number and pick the time your mosque shows. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <!-- Step 1 of the mosque work, 5 Oct 2026. Plain words on purpose: this is read by someone
+         holding a printed timetable who has just hit a wall, not by someone who knows what a
+         twilight rule is. It reuses the vocabulary of the "Different from your mosque?"
+         explainer (method, congregation) so the two never tell different stories. It names no
+         method and calls no time valid or invalid: it says what the gap usually is and where
+         the fix lives. %1$d is the limit, so the number is never typed twice. -->
+    <string name="adjustment_limit_note">A gap of more than %1$d minutes is usually a different calculation method, or a mosque board that shows the congregation, which is a little later. Try the method first.</string>
+    <string name="adjustment_choose_method">Choose a calculation method</string>
+    <!-- Under each prayer once a correction is set: the time the screen will now show, so the
+         effect of a nudge can be checked against the board without leaving the dialog. -->
+    <string name="adjustment_now_shows">Shows %1$s</string>
+    <string name="adjustment_pick_time_description">Set %1$s to the time your mosque shows</string>
+    <string name="adjustment_pick_time_title">%1$s: the time on your mosque\'s board</string>
+    <string name="action_set">Set</string>
+    <string name="action_cancel">Cancel</string>
     <string name="settings_adjustments_reset">Reset all</string>
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>

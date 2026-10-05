@@ -206,6 +206,20 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,704 / 4000`
 
+> **Pending change, written 5 Oct 2026, to be applied in the Console with the next release. The block above is
+> still a byte for byte copy of the live Console text and is deliberately NOT edited.** Add one bullet to WHAT YOU GET,
+> straight after the line about light and dark themes:
+>
+> ```
+> • Match your mosque: move any prayer by up to 30 minutes to the time on its board
+> ```
+>
+> That is 82 characters including the line break, so the description goes from `3,704 / 4000` to
+> `3,786 / 4000`. Why: the description lists calculation methods and never says the app can match a mosque, so a reader
+> of the listing could not know. It claims only what the build on branch `claude/customer-review-pain-points-9d35kl`
+> does (tap the number, pick the board's time). **Do not apply it until that build is released**, or the listing promises
+> something the live app lacks. After saving, hash the textarea against this file as described below.
+
 ### This block is now a copy of the Console, not the other way round
 
 The two had **drifted**, and the Console was ahead. It was caught by hashing the live
