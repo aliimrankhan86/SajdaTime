@@ -41,8 +41,8 @@ android {
         // builds, and they are not the same app. **Never upload a saved artifact — build
         // fresh from main.** Play accepts whichever file you hand it, so a stale one ships
         // silently and cannot be corrected without burning another version code.
-        versionCode = 5
-        versionName = "1.3.0"
+        versionCode = 6
+        versionName = "1.3.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -190,6 +190,7 @@ tasks.withType<Test>().configureEach {
                 "README.md",
                 // UsageCountsTest reads these off disk too (docs/ANALYTICS_PLAN.md section 8).
                 "app/src/main/AndroidManifest.xml",
+                "app/src/main/res/xml/locales_config.xml",
                 "app/src/**/res/values/bools.xml",
                 "app/src/**/res/values/firebase_config.xml",
             )

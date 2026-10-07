@@ -4446,6 +4446,14 @@ silent default on stays unbuilt until a data protection solicitor has answered t
 has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
 (unreliable and still faith data).
 
+### 📍 RESOLVED 7 Oct 2026 — which Google account runs what
+
+The docs disagreed about the Play Console account. Settled by the owner: **the Play Console runs on his personal Google account** (RELEASING.md was right; `ANALYTICS_PLAY_CONSOLE_PROMPT.md` was wrong and is corrected). **`aikstudies@gmail.com` is the public contact address and the account where Firebase and Google Analytics sit** (Chrome account slot 2). Use only `aikstudies@gmail.com` in the privacy policy, in-app dialogs and store listings; never print the personal address in a public file.
+
+### 📍 1.3.1 (versionCode 6) — built 7 Oct 2026 on branch `claude/consent-buttons-language-1-3-1`, NOT yet released
+
+Consent text rewritten (controller named, 14 month retention, install referrer stated, false "only way" claim and "how many people" removed, lists behind "See exactly what is sent"); "school of thought" is now "prayer calculation setting", with `UsageCountsTest` proving by reflection that the API cannot take a setting; `docs/privacy.html` dated 7 Oct 2026 (**live on merge, before 1.3.1 ships: it already describes the referrer, which 1.3.0 also sends**). Exact-alarm and Do Not Disturb rows are real 48dp buttons with an Allowed state (`PermissionAction.kt`). Settings has a language picker (Android 13+ only; `AppLanguage.kt`, `locales_config.xml`): Urdu, Turkish and Indonesian are listed but disabled until a native-speaker-reviewed `values-<tag>/` exists, so no machine translation shipped and `NoTranslationsYetTest` is unchanged. Not run on a device or emulator; RTL, store screenshots and the Alpha pause untouched.
+
 ### 📍 STATE OF PLAY — 4 Oct 2026, 13:00 (usage counts: built, verified, SUBMITTED to Google and In review; MERGED to main, privacy policy live)
 
 **Read this first.** It supersedes the 3 Oct block that used to be here and the 7 Sept block below on one point only: release **1.3.0** (phone,
