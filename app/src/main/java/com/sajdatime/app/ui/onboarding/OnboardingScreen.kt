@@ -64,6 +64,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.components.PermissionButton
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
@@ -666,7 +667,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         //
         // Deliberately not a blocker: Finish is right underneath, unconditional, and the
         // app works without it. See HANDOVER §10.
-        if (!exactAllowed) {
+        run {
             Spacer(Modifier.height(24.dp))
             SectionHeading(stringResource(R.string.confirm_exact_alarm_title))
             Spacer(Modifier.height(8.dp))
@@ -676,14 +677,11 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
-            OutlinedButton(
+            PermissionButton(
+                label = stringResource(R.string.settings_exact_alarms_title),
+                granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            ) {
-                Text(stringResource(R.string.settings_exact_alarms_title))
-            }
+            )
         }
 
         Spacer(Modifier.height(32.dp))
