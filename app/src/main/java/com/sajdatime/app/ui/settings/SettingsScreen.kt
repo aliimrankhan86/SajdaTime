@@ -36,7 +36,6 @@ import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Tune
-import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePicker
@@ -93,6 +92,7 @@ import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
+import com.sajdatime.app.ui.components.NoticeCard
 import com.sajdatime.app.ui.components.RadioRow
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
@@ -172,17 +172,22 @@ fun SettingsScreen(
         // themselves. These are not preferences, they are problems, and burying them
         // inside the group they belong to meant nobody found them.
         if (!PrayerAlarmScheduler.canScheduleExact(context)) {
-            WarningRow(
+            NoticeCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
                 body = stringResource(R.string.settings_exact_alarms_desc),
-                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                actionLabel = stringResource(R.string.action_allow_in_settings),
+                onAction = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                // The settings column has no gutter of its own; every row pads itself.
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
         if (settings.usesAlarm && !Notifications.hasDndAccess(context)) {
-            WarningRow(
+            NoticeCard(
                 title = stringResource(R.string.settings_dnd_title),
                 body = stringResource(R.string.settings_dnd_desc),
-                onClick = {
+                actionLabel = stringResource(R.string.action_allow_in_settings),
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                onAction = {
                     runCatching {
                         context.startActivity(
                             Intent(SystemSettings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS),
@@ -812,41 +817,6 @@ private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 8.dp),
     )
-}
-
-/** Same amber treatment as the banners on Times, so a warning looks like a warning. */
-@Composable
-private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onTertiaryContainer,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onTertiaryContainer,
-            )
-        }
-    }
 }
 
 /**

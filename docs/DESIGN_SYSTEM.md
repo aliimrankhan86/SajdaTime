@@ -259,6 +259,22 @@ shapes and this one is a picture; the subtitle above the dial already says the w
 `onTertiaryContainer` text, 16dp radius. Used for "the system is withholding something you
 asked for": exact alarms, Do Not Disturb access, compass calibration.
 
+**The action is a button, never the card (7 Oct 2026).** Banners that ask the user to do
+something (exact alarms, Do Not Disturb, set location, "Does this match your mosque?") carry
+a full-width filled button inside the card: `tertiary` fill, `onTertiary` text, 48dp minimum
+height, labelled with the outcome ("Allow in Settings", "Set my location", "See why"). The
+card itself is not clickable and the body no longer says "Tap to...". Both pairs are already
+asserted in `ColorContrastTest`, so no new colour was added. Banners with no action (polar
+notice, compass accuracy) stay plain text and say nothing about tapping. One shared
+composable, `NoticeCard` in `ui/components/Common.kt`, serves Times and Settings.
+
+> Why: the whole card was the tap target and the body said "Tap to allow." That is how a
+> notification looks, and people read notifications rather than press them, so the one
+> action the card existed for had nothing on it that looked pressable. Rejected: a text
+> button (still reads as part of the sentence), a primary green button (identity colour on
+> a warning surface, and the pair is not contrast tested), and keeping the card clickable
+> as well (a screen reader then announces a button wrapped around a button).
+
 On **home** the exact-alarm banner carries a close button (`Outlined.Close`,
 `onTertiaryContainer`, 24dp glyph in a 44dp target) and stays closed once tapped. On
 **Settings** the same banner has no close button and never hides while the permission is

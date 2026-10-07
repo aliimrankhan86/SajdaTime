@@ -1,7 +1,6 @@
 package com.sajdatime.app.ui.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,10 +24,8 @@ import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.filled.WbTwilight
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
-import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -76,6 +73,7 @@ import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
+import com.sajdatime.app.ui.components.NoticeCard
 import com.sajdatime.app.ui.components.rememberRemainingText
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
@@ -400,7 +398,8 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
         NoticeCard(
             title = stringResource(R.string.method_notice_title),
             body = stringResource(R.string.method_notice_body),
-            onClick = onOpen,
+            actionLabel = stringResource(R.string.method_notice_action),
+            onAction = onOpen,
             onDismiss = onDismissNotice,
         )
     } else {
@@ -553,7 +552,8 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
     NoticeCard(
         title = stringResource(R.string.home_default_location_title),
         body = stringResource(R.string.home_default_location_body),
-        onClick = onFix,
+        actionLabel = stringResource(R.string.home_default_location_action),
+        onAction = onFix,
     )
 }
 
@@ -610,73 +610,10 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     NoticeCard(
         title = stringResource(R.string.settings_exact_alarms_title),
         body = stringResource(R.string.settings_exact_alarms_desc),
-        onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+        actionLabel = stringResource(R.string.action_allow_in_settings),
+        onAction = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
         onDismiss = onDismiss,
     )
-}
-
-/**
- * "The system is withholding something you asked for." Amber container, amber icon and
- * amber-on-amber text, so it reads as a warning at a glance rather than as one more grey
- * card in a stack of grey cards — which is what it looked like before, and why the exact
- * alarm notice went unnoticed.
- */
-@Composable
-private fun NoticeCard(
-    title: String,
-    body: String,
-    // Null when the card only informs. Not every notice has somewhere to go: the polar
-    // one states a fact about where the user lives, and a card that looks tappable but
-    // does nothing teaches people that tapping cards here is pointless.
-    onClick: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null,
-) {
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onTertiaryContainer,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onTertiaryContainer,
-            )
-        }
-        if (onDismiss != null) {
-            // Its own clickable inside a clickable row. The row opens the system screen
-            // that grants the permission; this closes the card. They must not be the same
-            // gesture, and 44dp is the smallest target that is honestly tappable — the
-            // 24dp glyph alone would be a trap for anyone with less than perfect aim.
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(R.string.notice_dismiss),
-                tint = scheme.onTertiaryContainer,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable(role = Role.Button, onClick = onDismiss)
-                    .padding(10.dp)
-                    .size(24.dp),
-            )
-        }
-    }
 }
 
 @Composable

@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,13 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,8 +42,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -45,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.Duration
 import java.time.Instant
 
@@ -56,6 +65,96 @@ fun SectionHeading(text: String, modifier: Modifier = Modifier) {
         color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier,
     )
+}
+
+/**
+ * "The system is withholding something you asked for." Amber container, amber icon and
+ * amber-on-amber text, so it reads as a warning at a glance rather than as one more grey
+ * card in a stack of grey cards, which is what it looked like before and why the exact
+ * alarm notice went unnoticed.
+ *
+ * **The action is a button, not the card.** These cards used to be tappable as a whole
+ * with "Tap to allow." written in the body. That is what a notification looks like, and
+ * people read a notification, they do not press it: the one thing the card exists to get
+ * done was the one thing nothing on it invited. The fix is a filled button inside the card
+ * (`tertiary` on `onTertiary`, both already asserted in `ColorContrastTest`, and `tertiary`
+ * against `tertiaryContainer` is asserted at 3:1 as a boundary). The card itself is no
+ * longer clickable, so a screen reader finds one button rather than a button wrapped in
+ * another button, and "tap anywhere" is not a second way of doing the same thing.
+ *
+ * [actionLabel] and [onAction] go together. A card with neither only informs, and says
+ * nothing about tapping, because a card that looks pressable and does nothing teaches
+ * people that tapping cards here is pointless (the polar and compass notices).
+ */
+@Composable
+fun NoticeCard(
+    title: String,
+    body: String,
+    modifier: Modifier = Modifier,
+    actionLabel: String? = null,
+    onAction: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+) {
+    val scheme = MaterialTheme.colorScheme
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
+            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .padding(16.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Outlined.WarningAmber,
+                contentDescription = null,
+                tint = scheme.tertiary,
+            )
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = scheme.onTertiaryContainer,
+                )
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = scheme.onTertiaryContainer,
+                )
+            }
+            if (onDismiss != null) {
+                // The close glyph is 24dp inside a 44dp target: the smallest size that is
+                // honestly tappable for anyone with less than perfect aim. It is a different
+                // outcome from the action button and must stay a different gesture.
+                Spacer(Modifier.width(8.dp))
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = stringResource(R.string.notice_dismiss),
+                    tint = scheme.onTertiaryContainer,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable(role = Role.Button, onClick = onDismiss)
+                        .padding(10.dp)
+                        .size(24.dp),
+                )
+            }
+        }
+        if (actionLabel != null && onAction != null) {
+            Spacer(Modifier.height(12.dp))
+            Button(
+                onClick = onAction,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = scheme.tertiary,
+                    contentColor = scheme.onTertiary,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
+            ) {
+                Text(actionLabel)
+            }
+        }
+    }
 }
 
 /**

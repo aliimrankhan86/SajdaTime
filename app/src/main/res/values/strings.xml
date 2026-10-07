@@ -159,7 +159,8 @@
          emulator, a third line is exactly what the navigation bar clips. "Here" means at
          this latitude; the dialog behind it says why (twilight) and offers the chooser. -->
     <string name="method_notice_title">Does this match your mosque?</string>
-    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here. Tap to see why.</string>
+    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here.</string>
+    <string name="method_notice_action">See why</string>
     <!--
       The plain, permanent form of the door under the timetable — what everyone below 45°
       sees, and what everyone sees once the loud form above is dismissed or a method is
@@ -205,7 +206,8 @@
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
     <string name="home_default_location_title">Showing times for Makkah</string>
-    <string name="home_default_location_body">We could not work out where you are. Tap to set your location.</string>
+    <string name="home_default_location_body">We could not work out where you are.</string>
+    <string name="home_default_location_action">Set my location</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -321,7 +323,7 @@
     <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
     <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, the way a wake-up alarm does.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
-    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb. Tap to allow.</string>
+    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
     <string name="settings_ongoing_badge">Keep the next prayer in the shade</string>
     <string name="settings_ongoing_badge_desc">A silent notification showing what is next and how long you have</string>
@@ -336,7 +338,12 @@
          that silently costs them Fajr, so both strings now name the measured floor and
          the overnight case. Fajr is named because it is the one that matters and the one
          that fails. Evidence in HANDOVER section 10. -->
-    <string name="settings_exact_alarms_desc">Without this your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. Tap to allow.</string>
+    <string name="settings_exact_alarms_desc">Without this your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all.</string>
+    <!-- The label on the button inside the amber cards that send the user to a system
+         settings screen (exact alarms, Do Not Disturb). The button does not grant
+         anything itself: Android makes the user flip the switch, so "in Settings" is the
+         honest outcome and "Allow" alone would promise more than one tap can do. -->
+    <string name="action_allow_in_settings">Allow in Settings</string>
     <string name="confirm_exact_alarm_title">One last thing</string>
     <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>
     <string name="action_close">Close</string>
