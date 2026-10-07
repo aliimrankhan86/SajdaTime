@@ -14,6 +14,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -38,7 +44,27 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
+    // The two full lists sit behind one tap so the question itself stays short. Saved across
+    // rotation so a user reading the list is not bounced back to the top.
+    var showSent by rememberSaveable { mutableStateOf(false) }
+    val sentState = stringResource(if (showSent) R.string.state_expanded else R.string.state_collapsed)
     TextButton(
+        onClick = { showSent = !showSent },
+        modifier = Modifier.heightIn(min = 48.dp).semantics { stateDescription = sentState },
+    ) {
+        Text(stringResource(if (showSent) R.string.consent_hide_sent else R.string.consent_see_sent))
+    }
+    if (showSent) {
+        val listStyle = MaterialTheme.typography.bodyMedium
+        val listColor = MaterialTheme.colorScheme.onSurfaceVariant
+        Text(stringResource(R.string.consent_sent_heading), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.consent_sent_list), style = listStyle, color = listColor)
+        Spacer(Modifier.height(8.dp))
+        Text(stringResource(R.string.consent_never_heading), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.consent_never_list), style = listStyle, color = listColor)
+    }
+    TextButton(
+        modifier = Modifier.heightIn(min = 48.dp),
         onClick = {
             runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, policyUrl.toUri())) }
         },
