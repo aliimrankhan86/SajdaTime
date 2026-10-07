@@ -11,7 +11,7 @@ Source of every answer below: `docs/store/LISTING.md` ("Optional usage counts") 
 
 ```
 I manage the Android app SajdaTime (package com.sajdatime.app) in Google Play Console, signed in as
-aikstudies@gmail.com. Prepare the Console for release 1.3.0. Work alone, one screen at a time. Do only
+the owner's personal Google account (NOT aikstudies@gmail.com, which only holds Firebase and Analytics and is the public contact; corrected 7 Oct 2026). Prepare the Console for release 1.3.0. Work alone, one screen at a time. Do only
 what is listed. Change nothing else.
 
 HARD RULES
