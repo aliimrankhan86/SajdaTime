@@ -1239,10 +1239,10 @@ private fun StepperRow(
     }
 }
 
-/** "+5 min", "-3 min", or a dash for no change. */
+/** "+5 min", "-3 min", or "0 min" for no change. (Not a dash: it is underlined and tappable.) */
 @Composable
 private fun minuteLabel(minutes: Int): String = when {
-    minutes == 0 -> stringResource(R.string.adjustment_none)
+    minutes == 0 -> stringResource(R.string.adjustment_zero_minutes)
     else -> stringResource(R.string.adjustment_minutes, minutes)
 }
 

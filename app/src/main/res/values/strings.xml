@@ -445,9 +445,13 @@
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>
     <string name="settings_hijri_offset_help">The Islamic date here is calculated. If your mosque sights the moon locally, it can be a day either way. This also moves Ramadan and Eid.</string>
-    <!-- Shown when a prayer has no correction. A dash reads faster down a column of six
-         rows than the word "none" repeated six times. -->
+    <!-- Shown for the Islamic date when it has no shift. Not tappable, so a bare dash is fine. -->
     <string name="adjustment_none">\u2014</string>
+    <!-- Shown for a prayer with no correction. This number is a button (tap it to type the
+         mosque's time) and is drawn underlined in the accent colour. An underlined em dash
+         was tried first (5 Oct) and on the emulator it read as an equals sign, not as
+         something to press (7 Oct), so the zero is spelled out like every other value. -->
+    <string name="adjustment_zero_minutes">0 min</string>
     <!-- Always signed: "+5 min", "-3 min". The sign is the information. -->
     <string name="adjustment_minutes">%+d min</string>
     <plurals name="adjustment_days">
