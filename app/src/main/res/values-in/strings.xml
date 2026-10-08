@@ -84,7 +84,7 @@
     <string name="mosque_diff_follow">Jika masih ada perbedaan, ikutilah masjid Anda.</string>
     <string name="polar_notice_title">Waktu perkiraan</string>
     <string name="polar_notice_body">Sejauh ini dari khatulistiwa, matahari tidak selalu terbit atau terbenam, jadi tidak ada Subuh atau Isya yang sebenarnya untuk dihitung. Waktu ini dihitung dari lintang %1$d° sebagai gantinya. Masjid di sini menanganinya dengan cara berbeda, jadi tanyakan kepada masjid Anda apa yang diikutinya.</string>
-    <string name="polar_notice_alarm">Pada hari-hari ini alarm Anda datang sebagai notifikasi senyap, bukan berbunyi, karena aplikasi tidak bisa menjamin menit yang tepat. Aktifkan “Bunyikan pada hari perkiraan” di Pengaturan jika Anda tetap ingin dibangunkan.</string>
+    <string name="polar_notice_alarm">Pada hari-hari ini alarm Anda datang sebagai notifikasi biasa, bukan berbunyi, karena aplikasi tidak bisa menjamin menit yang tepat. Aktifkan “Bunyikan pada hari perkiraan” di Pengaturan jika Anda tetap ingin dibangunkan.</string>
     <string name="home_no_location">Atur lokasi Anda untuk melihat waktu salat.</string>
     <string name="home_countdown_a11y">%1$s dalam %2$s</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
@@ -161,7 +161,7 @@
     <string name="settings_method_auto">Otomatis · %1$s</string>
     <string name="settings_method_help">Masjid mengukur cahaya fajar dan senja dengan cara berbeda, dan itu terutama menggeser Subuh dan Isya. Makin jauh ke utara tempat tinggal Anda, makin besar selisihnya. Jika waktu ini tidak cocok dengan masjid Anda, tanyakan metode yang mereka pakai lalu pilih di sini.</string>
 
-    <string name="settings_alerts_help">Pilih ini untuk setiap waktu salat. Notifikasi itu senyap dan bergetar. Alarm memutar suara pilihan Anda dengan keras, seperti alarm bangun tidur.</string>
+    <string name="settings_alerts_help">Pilih ini untuk setiap waktu salat. Notifikasi berbunyi pelan dan bergetar. Alarm memutar suara pilihan Anda dengan keras, seperti alarm bangun tidur.</string>
     <string name="alert_style_off">Mati</string>
     <string name="alert_style_notification">Notifikasi</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -274,7 +274,7 @@
     <string name="action_increase">Tambah %1$s</string>
     <string name="notif_approximate">Waktu perkiraan</string>
     <string name="settings_alarm_on_approximate">Bunyikan pada hari perkiraan</string>
-    <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tetap senyap pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
+    <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tidak berbunyi pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
 
     <!-- Added 8 Oct 2026 with the mosque time entry, the amber buttons and the language row. Same assisted
          translation, independently reviewed by a second model (docs/translation/review-*.md); not reviewed by a native speaker. -->

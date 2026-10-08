@@ -84,7 +84,7 @@
     <string name="mosque_diff_follow">Fark kalırsa caminize uyun.</string>
     <string name="polar_notice_title">Yaklaşık vakitler</string>
     <string name="polar_notice_body">Ekvatordan bu kadar uzakta güneş her zaman doğmaz ya da batmaz. Bu yüzden hesaplanabilecek gerçek bir Sabah ya da Yatsı vakti yoktur. Bu vakitler bunun yerine %1$d° enlemi esas alınarak hesaplanır. Buradaki camiler bu durumu farklı şekillerde ele alır. Caminize hangi yolu izlediğini sorun.</string>
-    <string name="polar_notice_alarm">Bu günlerde alarmlarınız çalmak yerine sessiz bildirim olarak gelir, çünkü uygulama vaktin tam dakikasını garanti edemez. Yine de uyandırılmak istiyorsanız Ayarlar bölümünde “Yaklaşık vakitli günlerde çal” seçeneğini açın.</string>
+    <string name="polar_notice_alarm">Bu günlerde alarmlarınız çalmak yerine daha sessiz bir bildirim olarak gelir, çünkü uygulama vaktin tam dakikasını garanti edemez. Yine de uyandırılmak istiyorsanız Ayarlar bölümünde “Yaklaşık vakitli günlerde çal” seçeneğini açın.</string>
     <string name="home_no_location">Namaz vakitlerini görmek için konumunuzu belirleyin.</string>
     <string name="home_countdown_a11y">%1$s, %2$s sonra</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
@@ -161,7 +161,7 @@
     <string name="settings_method_auto">Otomatik · %1$s</string>
     <string name="settings_method_help">Camiler alacakaranlığı farklı ölçer. Bu da en çok Sabah ve Yatsı vakitlerini etkiler. Ne kadar kuzeyde yaşarsanız fark o kadar büyür. Bu vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve burada o yöntemi seçin.</string>
 
-    <string name="settings_alerts_help">Bunu her vakit için ayrı seçin. Bildirim sessizdir ve titreşir. Alarm ise seçtiğiniz sesi, bir uyandırma alarmı gibi yüksek sesle çalar.</string>
+    <string name="settings_alerts_help">Bunu her vakit için ayrı seçin. Bildirim daha sessizdir ve titreşir. Alarm ise seçtiğiniz sesi, bir uyandırma alarmı gibi yüksek sesle çalar.</string>
     <string name="alert_style_off">Kapalı</string>
     <string name="alert_style_notification">Bildirim</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -275,7 +275,7 @@
     <string name="action_increase">%1$s: artır</string>
     <string name="notif_approximate">Yaklaşık vakit</string>
     <string name="settings_alarm_on_approximate">Yaklaşık vakitli günlerde çal</string>
-    <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarmlar sessiz kalır.</string>
+    <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarm çalmaz, yalnızca bildirim gelir.</string>
 
     <!-- Added 8 Oct 2026 with the mosque time entry, the amber buttons and the language row. Same assisted
          translation, independently reviewed by a second model (docs/translation/review-*.md); not reviewed by a native speaker. -->

@@ -87,7 +87,7 @@
     <string name="mosque_diff_follow">جہاں فرق باقی رہے، وہاں اپنی مسجد کی پیروی کریں۔</string>
     <string name="polar_notice_title">تخمینی اوقات</string>
     <string name="polar_notice_body">خطِ استوا سے اتنی دوری پر سورج ہمیشہ طلوع یا غروب نہیں ہوتا، اس لیے فجر یا عشاء کا اصل وقت حساب نہیں کیا جا سکتا۔ اس کے بجائے یہ اوقات عرض بلد %1$d° سے نکالے گئے ہیں۔ یہاں کی مساجد اس معاملے کو مختلف طریقوں سے دیکھتی ہیں، اس لیے اپنی مسجد سے پوچھیں کہ وہ کس طریقے پر چلتی ہے۔</string>
-    <string name="polar_notice_alarm">ان دنوں آپ کے الارم بجنے کے بجائے خاموش اطلاع کی صورت میں آتے ہیں، کیونکہ ایپ بالکل درست منٹ کی ضمانت نہیں دے سکتی۔ اگر آپ پھر بھی جاگنا چاہیں تو ترتیبات میں “تخمینی دنوں میں الارم بجائیں” آن کر دیں۔</string>
+    <string name="polar_notice_alarm">ان دنوں آپ کے الارم بجنے کے بجائے ہلکی آواز والی اطلاع کی صورت میں آتے ہیں، کیونکہ ایپ بالکل درست منٹ کی ضمانت نہیں دے سکتی۔ اگر آپ پھر بھی جاگنا چاہیں تو ترتیبات میں “تخمینی دنوں میں الارم بجائیں” آن کر دیں۔</string>
     <string name="home_no_location">نماز کے اوقات دیکھنے کے لیے اپنا مقام مقرر کریں۔</string>
     <string name="home_countdown_a11y">%1$s، %2$s میں</string>
     <string name="home_location_a11y">%1$s۔ %2$s</string>
@@ -164,7 +164,7 @@
     <string name="settings_method_auto">خودکار · %1$s</string>
     <string name="settings_method_help">مساجد شفق کو مختلف طرح سے ناپتی ہیں، اور اس کا اثر زیادہ تر فجر اور عشاء پر پڑتا ہے۔ آپ جتنا شمال میں رہتے ہیں، فرق اتنا ہی زیادہ ہوتا ہے۔ اگر یہ اوقات آپ کی مسجد سے نہیں ملتے تو ان سے پوچھیں کہ وہ کون سا طریقہ استعمال کرتے ہیں، اور اسے یہاں منتخب کریں۔</string>
 
-    <string name="settings_alerts_help">یہ ہر نماز کے لیے الگ منتخب کریں۔ اطلاع خاموش ہوتی ہے اور وائبریٹ کرتی ہے۔ الارم آپ کی چنی ہوئی آواز اونچی آواز میں بجاتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
+    <string name="settings_alerts_help">یہ ہر نماز کے لیے الگ منتخب کریں۔ اطلاع ہلکی آواز کے ساتھ آتی ہے اور وائبریٹ کرتی ہے۔ الارم آپ کی چنی ہوئی آواز اونچی آواز میں بجاتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
     <string name="alert_style_off">بند</string>
     <string name="alert_style_notification">اطلاع</string>
     <string name="alert_style_alarm">الارم</string>
@@ -281,7 +281,7 @@
     <string name="action_increase">%1$s بڑھائیں</string>
     <string name="notif_approximate">تخمینی وقت</string>
     <string name="settings_alarm_on_approximate">تخمینی دنوں میں الارم بجائیں</string>
-    <string name="settings_alarm_on_approximate_desc">جب سورج طلوع یا غروب نہ ہو تو اوقات کسی کم عرض بلد سے نکالے جاتے ہیں۔ ان دنوں الارم خاموش رہتے ہیں، جب تک آپ اسے آن نہ کریں۔</string>
+    <string name="settings_alarm_on_approximate_desc">جب سورج طلوع یا غروب نہ ہو تو اوقات کسی کم عرض بلد سے نکالے جاتے ہیں۔ ان دنوں الارم نہیں بجتے، صرف ہلکی آواز والی اطلاع آتی ہے، جب تک آپ اسے آن نہ کریں۔</string>
 
     <!-- Added 8 Oct 2026 with the mosque time entry, the amber buttons and the language row. Same assisted
          translation, independently reviewed by a second model (docs/translation/review-*.md); not reviewed by a native speaker. -->
