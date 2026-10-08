@@ -69,7 +69,9 @@ class LocaleDisciplineTest {
             val declared = file.tagOrNull() ?: return@mapNotNull null
             val folder = file.parentFile!!.name.removePrefix("values-")
             // values-en-rGB holds en-GB; values-ar holds ar or a variant of it.
-            val expected = folder.replace("-r", "-")
+            // Android still names Indonesian's folder by its legacy code: the framework hands
+            // the app "in", not "id", so values-id/ is packaged but never matches at runtime.
+            val expected = folder.replace("-r", "-").let { if (it == "in" || it.startsWith("in-")) "id" + it.removePrefix("in") else it }
             if (declared.equals(expected, ignoreCase = true) ||
                 declared.startsWith("$expected-", ignoreCase = true)
             ) {
@@ -221,7 +223,7 @@ class LocaleDisciplineTest {
         .toList()
 
     private fun File.tagOrNull(): String? =
-        Regex("""<string name="app_language_tag">([^<]+)</string>""")
+        Regex("""<string name="app_language_tag"[^>]*>([^<]+)</string>""")
             .find(readText())
             ?.groupValues
             ?.get(1)

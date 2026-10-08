@@ -2,7 +2,9 @@
 """Mechanical checks for a translation of the app's Android string resources.
 
     python3 tools/check-translation.py <qualifier> <language-tag>
-    e.g.  python3 tools/check-translation.py in in-ID
+    e.g.  python3 tools/check-translation.py in id      (Indonesian: folder values-in, tag id)
+          python3 tools/check-translation.py tr tr
+          python3 tools/check-translation.py ur ur
 
 Checks every module (app, core, wear) that has a values-<qualifier>/strings.xml against its
 English source. It cannot judge whether a translation is *good*. It can and does catch the
@@ -61,11 +63,14 @@ def main(qualifier, tag):
         need = {k for k, v in src.items() if v[2].get("translatable") != "false"}
         if mod == "core":
             need.discard("app_language_tag")
+            need.discard("method_unused")
             declared = tr.get("app_language_tag", (None, None, None))[1]
             if declared != tag:
                 errors.append(f"core: app_language_tag is {declared!r}, expected {tag!r}")
-        elif "app_language_tag" in tr:
-            errors.append(f"{mod}: app_language_tag belongs only in core")
+        elif mod == "app" and "app_language_tag" in tr and tr["app_language_tag"][1] != tag:
+            errors.append(f"app: app_language_tag is {tr['app_language_tag'][1]!r}, expected {tag!r}")
+        elif mod == "wear" and "app_language_tag" in tr and tr["app_language_tag"][1] != tag:
+            errors.append(f"wear: app_language_tag is {tr['app_language_tag'][1]!r}, expected {tag!r}")
         missing = sorted(need - set(tr))
         extra = sorted(set(tr) - set(src) - {"app_language_tag"})
         if missing:

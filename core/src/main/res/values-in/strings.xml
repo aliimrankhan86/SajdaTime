@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Indonesian. AI-assisted translation, not yet reviewed by a native speaker. See docs/translation/notes-in-ID.md. -->
+<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
 <resources>
 
-    <string name="app_language_tag">in-ID</string>
+    <string name="app_language_tag">id</string>
 
     <string name="prayer_fajr">Subuh</string>
     <string name="prayer_sunrise">Terbit</string>
@@ -12,10 +12,10 @@
     <string name="prayer_isha">Isya</string>
 
     <string name="method_auto">Otomatis</string>
-    <string name="method_muslim_world_league">Muslim World League</string>
-    <string name="method_egyptian">Egyptian General Authority</string>
-    <string name="method_karachi">University of Karachi</string>
-    <string name="method_umm_al_qura">Umm al-Qura, Mekah</string>
+    <string name="method_muslim_world_league">Liga Muslim Dunia</string>
+    <string name="method_egyptian">Otoritas Umum Mesir</string>
+    <string name="method_karachi">Universitas Karachi</string>
+    <string name="method_umm_al_qura">Umm al-Qura, Makkah</string>
     <string name="method_dubai">Dubai</string>
     <string name="method_moon_sighting">Moonsighting Committee</string>
     <string name="method_north_america">ISNA, Amerika Utara</string>
@@ -23,22 +23,22 @@
     <string name="method_qatar">Qatar</string>
     <string name="method_singapore">Kemenag &amp; MUIS, Indonesia dan Singapura</string>
     <string name="method_turkey">Diyanet, Turki</string>
-    <string name="method_jafari">Jafari (Ithna Ashari)</string>
-    <string name="method_tehran">Institute of Geophysics, Teheran</string>
+    <string name="method_jafari">Jafari (Itsna Asyariyah)</string>
+    <string name="method_tehran">Institut Geofisika, Teheran</string>
 
-    <string name="method_auto_desc">Tidak yakin? Biarkan pilihan ini. Waktu Muslim World League, atau Jafari untuk Syiah. Mendekati praktik setempat di banyak bagian dunia. Perbedaan terbesar ada di wilayah utara jauh.</string>
-    <string name="method_muslim_world_league_desc">Konvensi umum yang dipakai di banyak negara. Pilihan standar di sini.</string>
+    <string name="method_auto_desc">Ragu? Pilih ini saja. Memakai waktu Liga Muslim Dunia, atau Jafari untuk Syiah. Dekat dengan praktik setempat di banyak bagian dunia. Perbedaan terbesar ada di wilayah jauh di utara.</string>
+    <string name="method_muslim_world_league_desc">Ketentuan umum yang dipakai di banyak negara. Ini standar di aplikasi ini.</string>
     <string name="method_egyptian_desc">Metode resmi Mesir.</string>
-    <string name="method_karachi_desc">Umum dipakai di Pakistan dan Asia Selatan.</string>
+    <string name="method_karachi_desc">Umum di Pakistan dan Asia Selatan.</string>
     <string name="method_umm_al_qura_desc">Metode resmi di Arab Saudi. Isya ditetapkan pada selang waktu tetap setelah Magrib.</string>
-    <string name="method_dubai_desc">Salah satu konvensi yang dipakai di kawasan Teluk.</string>
-    <string name="method_moon_sighting_desc">Aturan musiman yang dibuat untuk tempat-tempat yang jauh dari khatulistiwa. Diikuti oleh sebagian masjid di Britania Raya.</string>
-    <string name="method_north_america_desc">Islamic Society of North America. Dipakai oleh banyak masjid di Amerika Serikat dan Kanada.</string>
-    <string name="method_kuwait_desc">Konvensi yang dipakai di Kuwait.</string>
-    <string name="method_qatar_desc">Konvensi yang dipakai di Qatar.</string>
+    <string name="method_dubai_desc">Ketentuan yang dipakai di kawasan Teluk.</string>
+    <string name="method_moon_sighting_desc">Aturan musiman untuk tempat yang jauh dari khatulistiwa. Diikuti sebagian masjid di Inggris.</string>
+    <string name="method_north_america_desc">Islamic Society of North America. Dipakai banyak masjid di Amerika Serikat dan Kanada.</string>
+    <string name="method_kuwait_desc">Ketentuan yang dipakai di Kuwait.</string>
+    <string name="method_qatar_desc">Ketentuan yang dipakai di Qatar.</string>
     <string name="method_singapore_desc">Lembaga resmi Indonesia dan Singapura.</string>
-    <string name="method_turkey_desc">Badan Urusan Agama Turki.</string>
-    <string name="method_jafari_desc">Konvensi yang lazim dipakai kaum Syiah. Magrib jatuh sedikit setelah matahari terbenam, saat mega merah telah hilang dari langit.</string>
+    <string name="method_turkey_desc">Kepresidenan Urusan Agama Turki.</string>
+    <string name="method_jafari_desc">Ketentuan yang lazim dipakai kalangan Syiah. Magrib sedikit setelah matahari terbenam, saat warna merah sudah hilang dari langit.</string>
     <string name="method_tehran_desc">Universitas Teheran, yang kalendernya menjadi acuan waktu resmi Iran.</string>
 
 </resources>

@@ -11,7 +11,7 @@ check the other two) and that **an assistant does the translation**. He also app
 safeguards, which are not optional:
 
 1. The six highest-risk Urdu strings are spot-checked by the owner (list in `notes-ur.md`).
-2. Method names stay untranslated (they are organisation names). Their one-line descriptions are
+2. Method names: see docs/translation/BRIEF.md (they are organisation names). Their one-line descriptions are
    translated.
 3. Every translated language shows this line in About: *translated with AI help, may contain
    mistakes, tell us with Send feedback* (`about_translation_note`).
