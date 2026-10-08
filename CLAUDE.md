@@ -124,7 +124,13 @@ session inherits it instead of relearning it.
   and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
   however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
 - **Never machine-translate the app.** Prayer and madhab names are religious content; each
-  language needs a native speaker before it ships.
+  language needs a native speaker before it ships. **One exception, owner's own decision on
+  8 Oct 2026:** Urdu, Turkish and Indonesian shipped in 1.3.1 as Claude's translation,
+  unreviewed (`values-ur`, `values-tr`, `values-in`, each file says so at the top). It is
+  not a precedent: any further language still needs a native speaker. Replace or correct
+  those three the moment a reviewer is found. Indonesian's folder is `values-in`, not
+  `values-id`: Android hands the app the legacy code, so `values-id` is packaged and never
+  matches.
 - **The app follows the phone's language, and goes right-to-left only when it has the
   words to.** `AppLocale` reads the app's language out of the resources, so the day a
   reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL

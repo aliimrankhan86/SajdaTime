@@ -11,13 +11,14 @@ import java.util.Locale
  * The languages the in-app picker offers, through Android's per-app language support
  * (API 33+; `res/xml/locales_config.xml` declares the same list to the system).
  *
- * **Offering a language is not the same as having it.** CLAUDE.md forbids machine translation:
- * a language ships only after a native speaker has reviewed it. So every entry is listed, but
- * [isAvailable] is true only when a `values-<tag>/` folder really resolves `app_language_tag`
- * to that language. Until then the row is shown disabled ("awaiting review") and choosing it is
- * impossible, which also means the app can never be put into a right-to-left layout while still
- * written in English (AppLocale.kt). The day a reviewed `values-ur/` lands, Urdu becomes
- * selectable with no code change here.
+ * **Offering a language is not the same as having it.** [isAvailable] is true only when a
+ * `values-<tag>/` folder really resolves `app_language_tag` to that language; otherwise the row
+ * is shown disabled and choosing it is impossible, which also means the app can never be put
+ * into a right-to-left layout while still written in English (AppLocale.kt).
+ *
+ * Urdu, Turkish and Indonesian were translated by Claude on 8 Oct 2026 and shipped at the
+ * owner's explicit instruction WITHOUT native-speaker review (CLAUDE.md's usual rule, waived
+ * once, recorded in gbrain and docs/HANDOVER.md). Each translation file says so at the top.
  */
 enum class AppLanguage(val tag: String, val nativeName: String) {
     // Names are written in their own language and script on purpose, so a user who cannot
