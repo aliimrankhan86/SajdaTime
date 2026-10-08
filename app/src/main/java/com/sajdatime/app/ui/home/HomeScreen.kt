@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
@@ -607,9 +608,10 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     if (state.settings.exactAlarmNoticeDismissed) return
 
     Spacer(Modifier.height(12.dp))
-    NoticeCard(
+    PermissionCard(
         title = stringResource(R.string.settings_exact_alarms_title),
         body = stringResource(R.string.settings_exact_alarms_desc),
+        granted = false,
         onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
         onDismiss = onDismiss,
     )

@@ -264,6 +264,70 @@ class UsageCountsTest {
         }
     }
 
+    // ---- the prayer calculation setting is never sent ---------------------------------
+
+    @Test
+    fun `the public API can only be given the fixed enums and a yes or no`() {
+        // Proof that no setting can reach Firebase: a Madhab, Sect, CalcMethod or any String is
+        // not even a type these methods accept, so a caller cannot pass one without this test
+        // (and the compiler) failing first.
+        val allowedTypes = setOf<Class<*>>(
+            Screen::class.java, SetupStep::class.java, Permission::class.java,
+            java.lang.Boolean.TYPE, java.lang.Boolean::class.java,
+        )
+        val publicMethods = UsageCounts::class.java.declaredMethods
+            .filter { java.lang.reflect.Modifier.isPublic(it.modifiers) && !it.isSynthetic }
+        assertTrue(publicMethods.isNotEmpty())
+        publicMethods.forEach { m ->
+            m.parameterTypes.forEach {
+                assertTrue("${m.name} takes ${it.name}, which could carry a setting", it in allowedTypes)
+            }
+        }
+    }
+
+    @Test
+    fun `nothing that is sent names a madhab, sect or calculation setting`() {
+        val (sink, usage) = counts()
+        usage.apply(true)
+        Screen.entries.forEach(usage::screen)
+        SetupStep.entries.forEach(usage::setupStep)
+        Permission.entries.forEach { usage.permission(it, true) }
+        val settingNames = (com.sajdatime.core.Madhab.entries.map { it.name } +
+            com.sajdatime.core.CalcMethod.entries.map { it.name } +
+            com.sajdatime.core.Sect.entries.map { it.name }).map { it.lowercase() }
+        val sent = sink.events.flatMap { it.second.values + it.first }
+        sent.forEach { value ->
+            settingNames.forEach { name ->
+                assertFalse("\"$value\" contains the setting name $name", value.lowercase().contains(name))
+            }
+            listOf("madhab", "hanafi", "asr", "school", "juristic").forEach {
+                assertFalse("\"$value\" mentions $it", value.lowercase().contains(it))
+            }
+        }
+    }
+
+    @Test
+    fun `the consent text and the policy agree on what is sent and use the plain term`() {
+        val strings = read("app/src/main/res/values/strings.xml")
+        fun str(name: String) = Regex("""<string name="$name">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
+            .find(strings)!!.groupValues[1]
+        val all = listOf("consent_body", "consent_sent_list", "consent_never_list").joinToString("\n") { str(it) }
+        assertFalse("school of thought was renamed", all.contains("school of thought", ignoreCase = true))
+        assertTrue(str("consent_never_list").contains("prayer calculation setting"))
+        assertTrue("controller must be named", str("consent_body").contains("Ali Imran Khan"))
+        assertTrue("retention must be stated", str("consent_body").contains("14 months"))
+        assertTrue(str("consent_sent_list").contains("how you found the app"))
+        assertFalse("the false only-way claim is gone", all.contains("only way", ignoreCase = true))
+        assertFalse("describes the aggregate, not what is sent", all.contains("how many people", ignoreCase = true))
+        assertTrue(strings.contains("""name="consent_see_sent">See exactly what is sent<"""))
+
+        val policy = read("docs/privacy.html")
+        assertTrue("policy must list how you found the app", policy.contains("how you found the app"))
+        assertTrue("policy must use the same term", policy.contains("prayer calculation setting"))
+        assertFalse("policy must not use the old term", policy.contains("school of thought"))
+        assertTrue(policy.contains("Last updated: 7 October 2026"))
+    }
+
     @Test
     fun `the feedback row mails the address the privacy policy gives`() {
         val strings = read("app/src/main/res/values/strings.xml")

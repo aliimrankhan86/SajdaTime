@@ -351,7 +351,19 @@
          must state the material facts in full (who receives it, the random ID, what is and is not
          sent). Do not shorten it, and do not use the word "tracking". -->
     <string name="consent_title">Help improve SajdaTime?</string>
-    <string name="consent_body">SajdaTime is free and has no ads, and these counts are the only way the developer learns what helps people, so the app can be improved. If you say yes, SajdaTime sends usage counts to Google Analytics. They cover how many people use the app, how often and for how long, which main screen you open, which setup steps you reach, whether you allow notifications and location, whether exact alarms are allowed (a yes or no each, never the location itself), your phone model, Android version, app version and language, when you first opened the app, and your approximate area, which Google works out from your internet connection.\n\nThey are tied to a random ID, not your name, and may be processed outside the UK. Using a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position, the place you type, your school of thought or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time.</string>
+    <string name="consent_body">SajdaTime is free and has no ads. If you say yes, it sends a few usage counts to Google Analytics so the app can be improved. They are tied to a random ID, not your name, and may be processed outside the UK. Detailed records are kept for 14 months.\n\nUsing a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time. The person responsible is Ali Imran Khan, who made the app.</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_language_desc">Choose the language of the app</string>
+    <string name="language_unavailable">Translation awaiting review by a native speaker</string>
+    <string name="permission_allowed">Allowed</string>
+    <string name="state_expanded">Expanded</string>
+    <string name="state_collapsed">Collapsed</string>
+    <string name="consent_see_sent">See exactly what is sent</string>
+    <string name="consent_hide_sent">Hide the details</string>
+    <string name="consent_sent_heading">What is sent if you say yes</string>
+    <string name="consent_sent_list">• Which main screen you open: Times, Qibla or Settings\n• Which setup steps you reach\n• Whether you allow notifications, location and exact alarms (a yes or no each, never the location itself)\n• How often and for how long the app is open\n• Your phone model, Android version, app version and language\n• When you first opened the app, and how you found the app (for example a link on Google Play)\n• Your approximate area, which Google works out from your internet connection</string>
+    <string name="consent_never_heading">What is never sent</string>
+    <string name="consent_never_list">• Your GPS position or coordinates\n• The place you type\n• Your sect, your prayer calculation setting, your calculation method and your alert settings\n• Anything you have typed</string>
     <string name="consent_yes">Yes, share usage counts</string>
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>

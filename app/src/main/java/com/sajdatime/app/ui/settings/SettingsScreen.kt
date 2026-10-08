@@ -1,6 +1,9 @@
 package com.sajdatime.app.ui.settings
 
 import android.content.Intent
+import android.os.Build
+import com.sajdatime.app.ui.components.PermissionCard
+import com.sajdatime.app.ui.components.rememberGranted
 import android.media.RingtoneManager
 import androidx.core.net.toUri
 import android.provider.Settings as SystemSettings
@@ -29,7 +32,9 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
+import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.outlined.MoreTime
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
@@ -98,7 +103,7 @@ import java.time.LocalDate
  * chooser that answers them, rather than to the top of Settings with the row left to find.
  * See [SettingsScreen]'s `request` parameter.
  */
-enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, DISCLAIMER }
+enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, LANGUAGE, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -159,17 +164,23 @@ fun SettingsScreen(
         // Anything the system is withholding goes at the very top, above the settings
         // themselves. These are not preferences, they are problems, and burying them
         // inside the group they belong to meant nobody found them.
-        if (!PrayerAlarmScheduler.canScheduleExact(context)) {
-            WarningRow(
+        val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
+        val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+        // Before Android 12 there is no exact-alarm permission to ask for, so no row.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PermissionCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
                 body = stringResource(R.string.settings_exact_alarms_desc),
+                granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
-        if (settings.usesAlarm && !Notifications.hasDndAccess(context)) {
-            WarningRow(
+        if (settings.usesAlarm) {
+            PermissionCard(
                 title = stringResource(R.string.settings_dnd_title),
                 body = stringResource(R.string.settings_dnd_desc),
+                granted = dndAllowed,
                 onClick = {
                     runCatching {
                         context.startActivity(
@@ -177,6 +188,7 @@ fun SettingsScreen(
                         )
                     }
                 },
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
 
@@ -222,6 +234,14 @@ fun SettingsScreen(
 
         Group(stringResource(R.string.settings_group_appearance)) {
             ThemeRow(current = settings.themeChoice, onSelect = onSetThemeChoice)
+            if (AppLanguage.supported) {
+                SettingRow(
+                    icon = Icons.Outlined.Language,
+                    title = stringResource(R.string.settings_language_title),
+                    subtitle = AppLanguage.current(context).nativeName,
+                    onClick = { open = SettingsChooser.LANGUAGE },
+                )
+            }
         }
 
         Group(stringResource(R.string.settings_group_reminders)) {
@@ -366,6 +386,49 @@ fun SettingsScreen(
             onUseGps = onRefreshLocation,
             onSearchCity = onSearchCity,
         )
+
+        SettingsChooser.LANGUAGE -> {
+            val current = AppLanguage.current(context)
+            ChooserDialog(title = stringResource(R.string.settings_language_title), onDismiss = { open = null }) {
+                Column(Modifier.selectableGroup()) {
+                    AppLanguage.entries.forEach { language ->
+                        val available = language.isAvailable(context)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(min = 56.dp)
+                                .selectable(
+                                    selected = language == current,
+                                    enabled = available,
+                                    role = Role.RadioButton,
+                                    onClick = {
+                                        AppLanguage.apply(context, language)
+                                        open = null
+                                    },
+                                ),
+                        ) {
+                            RadioButton(selected = language == current, onClick = null, enabled = available)
+                            Spacer(Modifier.width(12.dp))
+                            Column {
+                                Text(
+                                    language.nativeName,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                if (!available) {
+                                    Text(
+                                        stringResource(R.string.language_unavailable),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
@@ -787,41 +850,6 @@ private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 8.dp),
     )
-}
-
-/** Same amber treatment as the banners on Times, so a warning looks like a warning. */
-@Composable
-private fun WarningRow(title: String, body: String, onClick: () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 6.dp)
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onTertiaryContainer,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onTertiaryContainer,
-            )
-        }
-    }
 }
 
 /**
