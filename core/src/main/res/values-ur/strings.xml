@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
+<resources>
+
+    <string name="app_language_tag">ur</string>
+
+    <string name="prayer_fajr">فجر</string>
+    <string name="prayer_sunrise">طلوع آفتاب</string>
+    <string name="prayer_dhuhr">ظہر</string>
+    <string name="prayer_asr">عصر</string>
+    <string name="prayer_maghrib">مغرب</string>
+    <string name="prayer_isha">عشاء</string>
+
+    <string name="method_auto">خودکار</string>
+    <string name="method_muslim_world_league">مسلم ورلڈ لیگ</string>
+    <string name="method_egyptian">مصری جنرل اتھارٹی</string>
+    <string name="method_karachi">کراچی یونیورسٹی</string>
+    <string name="method_umm_al_qura">ام القریٰ، مکہ</string>
+    <string name="method_dubai">دبئی</string>
+    <string name="method_moon_sighting">مون سائٹنگ کمیٹی</string>
+    <string name="method_north_america">ISNA، شمالی امریکہ</string>
+    <string name="method_kuwait">کویت</string>
+    <string name="method_qatar">قطر</string>
+    <string name="method_singapore">Kemenag &amp; MUIS، انڈونیشیا اور سنگاپور</string>
+    <string name="method_turkey">دیانت، ترکی</string>
+    <string name="method_jafari">جعفری (اثنا عشری)</string>
+    <string name="method_tehran">انسٹی ٹیوٹ آف جیو فزکس، تہران</string>
+
+    <string name="method_auto_desc">یقین نہیں؟ اسے رہنے دیں۔ مسلم ورلڈ لیگ کے اوقات، یا شیعہ کے لیے جعفری۔ دنیا کے بڑے حصے میں مقامی رواج کے قریب۔ سب سے زیادہ فرق دور شمال میں ہوتا ہے۔</string>
+    <string name="method_muslim_world_league_desc">ایک عمومی طریقہ جو کئی ممالک میں استعمال ہوتا ہے۔ یہاں یہی معیاری ہے۔</string>
+    <string name="method_egyptian_desc">مصر کا سرکاری طریقہ۔</string>
+    <string name="method_karachi_desc">پاکستان اور جنوبی ایشیا میں عام۔</string>
+    <string name="method_umm_al_qura_desc">سعودی عرب کا سرکاری طریقہ۔ عشاء کا وقت مغرب کے بعد ایک مقررہ وقفے پر رکھا جاتا ہے۔</string>
+    <string name="method_dubai_desc">خلیج میں استعمال ہونے والا ایک طریقہ۔</string>
+    <string name="method_moon_sighting_desc">خطِ استوا سے دور علاقوں کے لیے بنایا گیا ایک موسمی اصول۔ برطانیہ میں کچھ مساجد اس پر چلتی ہیں۔</string>
+    <string name="method_north_america_desc">اسلامک سوسائٹی آف نارتھ امریکہ۔ امریکہ اور کینیڈا میں بہت سی مساجد اسے استعمال کرتی ہیں۔</string>
+    <string name="method_kuwait_desc">کویت میں استعمال ہونے والا طریقہ۔</string>
+    <string name="method_qatar_desc">قطر میں استعمال ہونے والا طریقہ۔</string>
+    <string name="method_singapore_desc">انڈونیشیا اور سنگاپور کے سرکاری ادارے۔</string>
+    <string name="method_turkey_desc">ترکی کی صدارتِ امورِ دینیہ (دیانت)۔</string>
+    <string name="method_jafari_desc">عام شیعہ طریقہ۔ مغرب غروبِ آفتاب کے کچھ دیر بعد ہوتی ہے، جب آسمان سے سرخی ختم ہو جائے۔</string>
+    <string name="method_tehran_desc">تہران یونیورسٹی، جس کے کیلنڈر کے مطابق ایران کے سرکاری اوقات طے ہوتے ہیں۔</string>
+
+</resources>

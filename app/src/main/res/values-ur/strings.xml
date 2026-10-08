@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">ur</string>
+    <!-- Product name: deliberately left untranslated. -->
+    <string name="app_name">SajdaTime</string>
+
+    <!-- Navigation -->
+    <string name="nav_times">اوقات</string>
+    <string name="nav_qibla">قبلہ</string>
+    <string name="nav_settings">ترتیبات</string>
+
+    <!-- Onboarding -->
+    <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
+    <string name="bismillah_a11y">بسم اللہ الرحمٰن الرحیم</string>
+    <string name="welcome_tagline">نماز میں آپ کا ذاتی ساتھی۔ ہمیشہ مفت۔</string>
+    <string name="action_begin">شروع کریں</string>
+
+    <string name="permission_title">آپ کہاں نماز پڑھ رہے ہیں؟</string>
+    <string name="permission_body">نماز کے اوقات اور قبلے کی سمت معلوم کرنے کے لیے SajdaTime کو اندازاً پتا ہونا چاہیے کہ آپ کہاں ہیں۔ اس کا اصل مطلب جاننے کے لیے معلومات کے نشان پر ٹیپ کریں۔</string>
+    <string name="permission_why_title">ہمیں آپ کا مقام کیوں چاہیے</string>
+    <string name="permission_why_body">تاکہ آپ جہاں ہیں وہاں کے لیے نماز کے درست اوقات اور قبلے کی سمت معلوم کی جا سکے۔\n\nہم آپ کا اندازاً مقام صرف اس وقت دیکھتے ہیں جب ایپ کھلی ہو۔ یہ آپ کے فون پر ہی رہتا ہے۔ ہم اسے کبھی کہیں نہیں بھیجتے۔</string>
+    <string name="action_allow_location">مقام کی اجازت دیں</string>
+    <string name="action_got_it">ٹھیک ہے</string>
+    <string name="action_understood">میں نے سمجھ لیا</string>
+    <string name="action_continue">جاری رکھیں</string>
+    <string name="location_set_generic">آپ کا مقام</string>
+    <string name="location_finding">آپ کا مقام تلاش کیا جا رہا ہے…</string>
+    <string name="location_looking_up">یہ جگہ تلاش کی جا رہی ہے…</string>
+    <string name="location_no_fix">ہم آپ کا مقام معلوم نہیں کر سکے۔ دیکھ لیں کہ لوکیشن آن ہے، یا نیچے اپنے شہر کا نام لکھیں۔</string>
+
+    <string name="city_fallback_body">اس کے بجائے اپنے شہر کا نام لکھیں۔ جہاں ممکن ہو، آپ کا فون خود ہی اسے تلاش کر لیتا ہے۔ اگر نہ کر سکے تو صرف آپ کا لکھا ہوا نام ایک بار ایک مفت تلاش سروس کو بھیجا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
+    <string name="city_field_label">شہر</string>
+    <string name="city_field_helper">مثلاً: مانچسٹر، لاہور، قاہرہ</string>
+    <string name="city_not_found">ہمیں یہ جگہ نہیں ملی۔ ساتھ ملک کا نام بھی لکھ کر دیکھیں۔</string>
+    <string name="action_find_city">شہر تلاش کریں</string>
+    <string name="action_use_makkah">ابھی چھوڑیں اور مکہ استعمال کریں</string>
+
+    <string name="sect_title">آپ کس مسلک پر چلتے ہیں؟</string>
+    <string name="sect_body">اس سے طے ہوتا ہے کہ آپ کے نماز کے اوقات کیسے نکالے جائیں۔ آپ جب چاہیں اسے بدل سکتے ہیں۔</string>
+    <string name="sect_sunni">سنی</string>
+    <string name="sect_sunni_desc">بطورِ ڈیفالٹ مسلم ورلڈ لیگ کے اوقات</string>
+    <string name="sect_shia">شیعہ</string>
+    <string name="sect_shia_desc">جعفری (اثنا عشری) اوقات</string>
+
+    <string name="madhab_title">اپنی فقہ منتخب کریں</string>
+    <string name="madhab_body">اختیاری۔ اس سے صرف عصر کا وقت بدلتا ہے۔ اسے چھوڑ دیں تو آپ کو معیاری وقت ملے گا۔</string>
+    <string name="madhab_hanafi">حنفی</string>
+    <string name="madhab_shafii">شافعی</string>
+    <string name="madhab_maliki">مالکی</string>
+    <string name="madhab_hanbali">حنبلی</string>
+    <string name="madhab_hanafi_desc">عصر بعد میں، جب سایہ چیز کی لمبائی کا دوگنا ہو جائے</string>
+    <string name="madhab_standard_desc">معیاری عصر، جب سایہ چیز کی لمبائی کے برابر ہو جائے</string>
+    <string name="method_step_title">حساب کا طریقہ</string>
+    <string name="method_step_body">مساجد صبح اور شام کی شفق کو مختلف طریقوں سے ناپتی ہیں، اس لیے ایک طریقے سے دوسرے تک فجر اور عشاء میں کچھ منٹ کا فرق ہو سکتا ہے، اور دور شمال میں ایک گھنٹے سے بھی زیادہ کا۔ اگر آپ کی مسجد کے اوقات ایپ سے مختلف ہیں تو یہاں اس کا طریقہ منتخب کرنے سے عموماً مسئلہ حل ہو جاتا ہے۔ یقین نہیں؟ پہلا انتخاب رہنے دیں۔ آپ اسے کسی بھی وقت ترتیبات میں بدل سکتے ہیں۔</string>
+    <string name="action_back">واپس</string>
+
+    <string name="confirm_title">سب تیار ہے</string>
+    <string name="confirm_body">سب ٹھیک لگ رہا ہے؟ آپ بعد میں ترتیبات میں اس میں سے کچھ بھی بدل سکتے ہیں۔</string>
+    <string name="label_location">مقام</string>
+    <string name="label_school">مسلک</string>
+    <string name="action_finish">مکمل کریں</string>
+    <string name="state_selected">منتخب</string>
+
+    <!-- Disclaimer. All four points of the English must survive any rewording (see the
+         comment in values/strings.xml): where the times come from, how they can be wrong,
+         follow your mosque, and no warranty. -->
+    <string name="disclaimer_title">براہِ کرم پہلے یہ پڑھیں</string>
+    <string name="disclaimer_body">SajdaTime ایک مددگار ہے، کوئی دینی اتھارٹی نہیں۔\n\nیہ اوقات مجھے کسی مسجد، کسی عالم یا کسی اتھارٹی نے نہیں دیے۔ آپ کا فون انہیں سورج کی پوزیشن سے نکالتا ہے، اور اس کے لیے حساب کے وہ طریقے استعمال کرتا ہے جو اسلامی اداروں اور علماء نے شائع کیے ہیں۔ میں نہ مفتی ہوں، نہ عالم، نہ فقہ کا ماہر، اور یہ ایپ مصنوعی ذہانت کی مدد سے بنائی گئی ہے۔ سافٹ ویئر میں خرابیاں ہو سکتی ہیں، فون میں غلط مقام یا غلط وقت ہو سکتا ہے، بیٹری بچاتے ہوئے فون کسی الرٹ میں تاخیر کر سکتا ہے، اور مجھ سے بھی سیدھی سادی غلطی ہو سکتی ہے۔\n\nاس لیے براہِ کرم جو کچھ آپ یہاں دیکھیں اسے ایک حساب سمجھیں، کوئی شرعی فیصلہ نہیں۔ جہاں SajdaTime اور آپ کی مسجد میں اختلاف ہو، وہاں اپنی مسجد کی پیروی کریں۔ اگر کوئی وقت یا سمت آپ کو غلط لگے، یا آپ کو یقین نہ ہو، تو اپنی مسجد سے یا کسی اور اہل شخص سے پوچھ لیں جو آپ کی رہنمائی کر سکے۔ یہ ایپ مفت ہے اور جیسی ہے ویسی ہی دی جا رہی ہے، کسی ضمانت اور درستگی کے کسی وعدے کے بغیر۔ اس لیے جہاں بالکل درست ہونا آپ کے لیے اہم ہو، وہاں براہِ کرم صرف اسی پر بھروسہ نہ کریں۔\n\nاگر آپ گھڑی (واچ) استعمال کرتے ہیں تو براہِ کرم اسے حتمی بات نہیں بلکہ ایک سہولت سمجھیں۔ گھڑی کا کمپاس فون سے چھوٹا ہوتا ہے اور اسے آسمان بھی کم صاف نظر آتا ہے، اور ہو سکتا ہے وہ اس مقام پر چل رہی ہو جو آپ کے فون نے کچھ دیر پہلے معلوم کیا تھا۔ خاص طور پر قبلے کے لیے دونوں میں سے آپ کا فون زیادہ درست ہے۔ جب بات اہم ہو تو فون پر دیکھ لیں۔\n\nمساجد اس پر متفق نہیں کہ نماز کا وقت کب شروع ہوتا ہے۔ سب سے زیادہ فرق عشاء میں ہوتا ہے۔ برطانیہ میں اور اس سے آگے شمال میں ایک طریقے اور دوسرے کے درمیان فرق ایک گھنٹے سے زیادہ ہو سکتا ہے، کیونکہ علماء شفق کے ختم ہونے کو مختلف طرح سے ناپتے ہیں۔ میں یہ معاملہ طے نہیں کر سکتا، اور ایپ بھی اس کی کوشش نہیں کرتی۔ اگر یہاں کے اوقات آپ کی مسجد سے نہیں ملتے تو ان سے پوچھیں کہ وہ کون سا طریقہ استعمال کرتے ہیں، اور اسے ترتیبات میں “حساب کا طریقہ” کے تحت منتخب کریں۔ اگر اس کے بعد بھی چند منٹ کا فرق رہے تو “اپنی مسجد سے ملائیں” کے ذریعے آپ ہر نماز کو، اور تاریخ کو بھی، خود آگے پیچھے کر سکتے ہیں۔ جہاں پھر بھی فرق باقی رہے، وہاں اپنی مسجد کی پیروی کریں۔\n\nایک بات اور۔ یہ ایپ بتاتی ہے کہ نماز کا وقت کب شروع ہوتا ہے۔ پھر آپ کی مسجد جماعت کا اپنا وقت مقرر کرتی ہے، جو عموماً تھوڑا بعد میں ہوتا ہے، اس لیے وہاں کے بورڈ اور یہاں کے اوقات میں اکثر فرق ہوگا۔ دونوں میں سے کوئی بھی غلط نہیں۔\n\nاور ایک گزارش، اگر آپ کر سکیں: براہِ کرم مجھے، میرے گھر والوں کو اور میرے والدین کو اپنی دعاؤں میں یاد رکھیں۔</string>
+
+    <!-- Home -->
+    <string name="home_next_prayer">اگلی نماز</string>
+    <string name="home_until">شروع ہونے میں باقی</string>
+    <string name="home_today">آج</string>
+    <string name="home_next_marker">اگلی</string>
+    <string name="home_now_marker">ابھی</string>
+    <string name="home_now_marker_a11y">موجودہ نماز</string>
+    <string name="notice_dismiss">بند کریں</string>
+    <string name="method_notice_title">کیا یہ آپ کی مسجد سے ملتا ہے؟</string>
+    <string name="method_notice_body">یہاں فجر اور عشاء میں ایک گھنٹے یا اس سے زیادہ کا فرق ہو سکتا ہے۔ وجہ جاننے کے لیے ٹیپ کریں۔</string>
+    <string name="mosque_diff_link">آپ کی مسجد سے مختلف؟</string>
+    <string name="mosque_diff_title">آپ کی مسجد سے مختلف؟</string>
+    <string name="mosque_diff_congregation">یہ ایپ دکھاتی ہے کہ ہر نماز کا وقت کب شروع ہوتا ہے۔ آپ کی مسجد عموماً جماعت تھوڑی دیر بعد کرواتی ہے، اس لیے اس کے بورڈ اور ان اوقات میں اکثر چند منٹ کا فرق ہوگا۔ دونوں میں سے کوئی بھی غلط نہیں۔</string>
+    <string name="mosque_diff_twilight">فجر اور عشاء کا انحصار اس پر ہے کہ شفق کو کیسے ناپا جائے، اور مساجد اسے مختلف طرح سے ناپتی ہیں۔ اگر آپ کی مسجد کے اوقات میں چند منٹ سے زیادہ کا فرق ہے تو وہ طریقہ منتخب کریں جس پر وہ چلتی ہے۔</string>
+    <string name="mosque_diff_asr">عصر کا وقت مکتبِ فکر پر منحصر ہے۔ حنفی مساجد عصر دوسروں سے بعد میں شروع کرتی ہیں، ایک گھنٹے یا اس سے بھی زیادہ دیر سے۔</string>
+    <string name="mosque_diff_minutes">اگر پھر بھی چند منٹ کا فرق رہے تو ہر نماز کو تھوڑا آگے پیچھے کر کے اپنی مسجد کے چھپے ہوئے اوقات سے ملا لیں۔</string>
+    <string name="mosque_diff_follow">جہاں فرق باقی رہے، وہاں اپنی مسجد کی پیروی کریں۔</string>
+    <string name="polar_notice_title">تخمینی اوقات</string>
+    <string name="polar_notice_body">خطِ استوا سے اتنی دوری پر سورج ہمیشہ طلوع یا غروب نہیں ہوتا، اس لیے فجر یا عشاء کا اصل وقت حساب نہیں کیا جا سکتا۔ اس کے بجائے یہ اوقات عرض بلد %1$d° سے نکالے گئے ہیں۔ یہاں کی مساجد اس معاملے کو مختلف طریقوں سے دیکھتی ہیں، اس لیے اپنی مسجد سے پوچھیں کہ وہ کس طریقے پر چلتی ہے۔</string>
+    <string name="polar_notice_alarm">ان دنوں آپ کے الارم بجنے کے بجائے خاموش اطلاع کی صورت میں آتے ہیں، کیونکہ ایپ بالکل درست منٹ کی ضمانت نہیں دے سکتی۔ اگر آپ پھر بھی جاگنا چاہیں تو ترتیبات میں “تخمینی دنوں میں الارم بجائیں” آن کر دیں۔</string>
+    <string name="home_no_location">نماز کے اوقات دیکھنے کے لیے اپنا مقام مقرر کریں۔</string>
+    <string name="home_countdown_a11y">%1$s، %2$s میں</string>
+    <string name="home_location_a11y">%1$s۔ %2$s</string>
+    <string name="home_default_location_title">مکہ کے اوقات دکھائے جا رہے ہیں</string>
+    <string name="home_default_location_body">ہم معلوم نہیں کر سکے کہ آپ کہاں ہیں۔ اپنا مقام مقرر کرنے کے لیے ٹیپ کریں۔</string>
+    <string name="action_change_location">مقام بدلیں</string>
+
+    <!-- Location sheet -->
+    <string name="location_sheet_title">آپ کا مقام</string>
+    <string name="location_sheet_body">نماز کے اوقات اور قبلہ دونوں اس پر منحصر ہیں کہ آپ کہاں ہیں۔ جب بھی سفر کریں، اسے اپ ڈیٹ کر لیں۔\n\nآپ کی پرائیویسی کی حفاظت کے لیے ایپ ہمیشہ صرف آپ کا اندازاً مقام مانگتی ہے، اس لیے ہو سکتا ہے یہ آپ کے شہر کے بجائے کسی قریبی قصبے یا پورے علاقے کا نام دکھائے۔ اس سے اوقات میں بہت کم فرق پڑتا ہے: دس میل کا فاصلہ تقریباً ایک منٹ کے برابر ہے۔ اگر نام آپ کو غلط لگے تو نیچے اپنے شہر کا نام لکھیں۔</string>
+    <string name="action_use_my_location">میرا موجودہ مقام استعمال کریں</string>
+    <string name="location_sheet_search_heading">یا شہر کا نام لکھیں</string>
+
+    <!-- Export -->
+    <string name="action_save_timetable">نظام الاوقات PDF میں محفوظ کریں</string>
+    <string name="action_save_pdf">PDF محفوظ کریں</string>
+    <string name="export_sheet_title">اپنا نظام الاوقات محفوظ کریں</string>
+    <string name="export_sheet_body">ہم %1$s کے لیے آپ کے نماز کے اوقات کی PDF بنائیں گے۔ پھر آپ اسے محفوظ کر سکتے ہیں، پرنٹ کر سکتے ہیں یا کسی کو بھیج سکتے ہیں۔</string>
+    <string name="export_today">صرف آج</string>
+    <string name="export_today_desc">ایک دن، چھ اوقات</string>
+    <string name="export_week">اگلے 7 دن</string>
+    <string name="export_week_desc">آج اور اس کے بعد کے چھ دن</string>
+    <string name="export_month">یہ پورا مہینہ</string>
+    <string name="export_month_desc">مہینے کی پہلی تاریخ سے آخر تک ہر دن</string>
+    <string name="export_saved">ڈاؤن لوڈز میں %1$s کے نام سے محفوظ ہو گئی</string>
+    <string name="export_failed">PDF نہیں بن سکی۔ براہِ کرم دوبارہ کوشش کریں۔</string>
+
+    <!-- Text printed inside the exported PDF itself. -->
+    <string name="pdf_column_day">دن</string>
+    <string name="pdf_column_date">تاریخ</string>
+    <string name="pdf_place_unknown">آپ کا مقام</string>
+    <string name="pdf_period_onwards">%1$s سے آگے</string>
+    <string name="pdf_tagline">نماز کے اوقات اور قبلہ، امت کے لیے مفت</string>
+    <string name="pdf_area_label">اندازاً علاقہ</string>
+    <string name="pdf_header_meta">%1$s · %2$s</string>
+    <string name="pdf_approximate_note">ان میں سے کچھ اوقات تخمینی ہیں۔ اتنے شمال میں سورج ہمیشہ طلوع یا غروب نہیں ہوتا، اس لیے ان دنوں کے اوقات عرض بلد %1$d° سے نکالے گئے ہیں۔ اپنی مسجد سے پوچھیں کہ وہ کس طریقے پر چلتی ہے۔</string>
+    <string name="pdf_footer">آپ کے فون پر آف لائن حساب کیا گیا۔ SajdaTime ہمیشہ کے لیے مفت ہے۔</string>
+
+    <!-- Qibla -->
+    <string name="qibla_title">قبلہ</string>
+    <string name="qibla_subtitle">خانہ کعبہ یہاں سے تقریباً %2$d کلومیٹر دور ہے، شمال سے %1$d° پر۔</string>
+    <string name="qibla_needs_location">قبلہ معلوم کرنے کے لیے اپنا مقام مقرر کریں۔</string>
+    <string name="qibla_facing">اب آپ کا رخ خانہ کعبہ کی طرف ہے</string>
+    <string name="qibla_heading_now">رخ %1$d°</string>
+    <string name="qibla_legend_kaaba">خانہ کعبہ</string>
+    <string name="qibla_legend_facing">آپ کا رخ</string>
+    <string name="qibla_turn_left">%1$d° بائیں مڑیں</string>
+    <string name="qibla_turn_right">%1$d° دائیں مڑیں</string>
+    <string name="qibla_no_compass">اصل شمال سے %1$d° کی طرف رخ کریں</string>
+    <string name="qibla_calibrate">کمپاس کو کیلیبریٹ کرنا ضروری ہے۔ فون ہاتھ میں پکڑیں اور اسے چند بار 8 کی شکل میں گھمائیں۔</string>
+    <string name="qibla_sensor_missing">اس فون میں کمپاس نہیں ہے، اس لیے ہم آپ کو زاویہ تو بتا سکتے ہیں لیکن سمت کی طرف اشارہ نہیں کر سکتے۔</string>
+    <string name="qibla_accuracy_medium">ریڈنگ تھوڑی اِدھر اُدھر ہو سکتی ہے۔ زیادہ مستحکم نتیجے کے لیے دھات، مقناطیس اور اسپیکروں سے دور ہٹ جائیں۔</string>
+
+    <!-- Settings -->
+    <string name="title_settings">ترتیبات</string>
+    <string name="settings_group_prayer_times">نماز کے اوقات</string>
+    <string name="settings_group_appearance">ظاہری شکل</string>
+    <string name="settings_theme">تھیم</string>
+    <string name="theme_system">فون کے مطابق</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">گہرا</string>
+    <string name="settings_group_reminders">یاد دہانیاں</string>
+    <string name="settings_group_about">ایپ کے بارے میں</string>
+
+    <string name="settings_location">مقام</string>
+    <string name="settings_school">مکتبِ فکر</string>
+    <string name="settings_madhab">فقہ</string>
+    <string name="settings_alerts">نماز کے الرٹ</string>
+    <string name="settings_which_prayers_all">پانچوں</string>
+    <string name="settings_which_prayers_some">5 میں سے %1$d</string>
+    <string name="settings_which_prayers_none">کوئی نہیں</string>
+    <string name="settings_method">حساب کا طریقہ</string>
+    <string name="settings_value_pair">%1$s · %2$s</string>
+    <string name="settings_method_auto">خودکار · %1$s</string>
+    <string name="settings_method_help">مساجد شفق کو مختلف طرح سے ناپتی ہیں، اور اس کا اثر زیادہ تر فجر اور عشاء پر پڑتا ہے۔ آپ جتنا شمال میں رہتے ہیں، فرق اتنا ہی زیادہ ہوتا ہے۔ اگر یہ اوقات آپ کی مسجد سے نہیں ملتے تو ان سے پوچھیں کہ وہ کون سا طریقہ استعمال کرتے ہیں، اور اسے یہاں منتخب کریں۔</string>
+
+    <string name="settings_alerts_help">یہ ہر نماز کے لیے الگ منتخب کریں۔ اطلاع خاموش ہوتی ہے اور وائبریٹ کرتی ہے۔ الارم آپ کی چنی ہوئی آواز اونچی آواز میں بجاتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
+    <string name="alert_style_off">بند</string>
+    <string name="alert_style_notification">اطلاع</string>
+    <string name="alert_style_alarm">الارم</string>
+    <string name="alert_style_mixed">ملا جلا</string>
+    <string name="settings_alarm_sound">الارم کی آواز</string>
+    <string name="settings_alarm_sound_desc">اپنے فون میں پہلے سے موجود کوئی بھی ٹون یا اذان چنیں</string>
+    <string name="settings_alarm_respect_silent">فون سائلنٹ ہو تو خاموش رہیں</string>
+    <string name="settings_alarm_respect_silent_desc">آن: آپ کو اطلاع وقت پر ملتی ہے، مگر آواز کے بغیر۔ بند: فون سائلنٹ ہو تب بھی الارم بجتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
+    <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
+    <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔ اجازت دینے کے لیے ٹیپ کریں۔</string>
+
+    <string name="settings_ongoing_badge">اگلی نماز اطلاعاتی پٹی میں رکھیں</string>
+    <string name="settings_ongoing_badge_desc">ایک خاموش اطلاع جو بتاتی ہے کہ اگلی نماز کون سی ہے اور آپ کے پاس کتنا وقت ہے</string>
+    <string name="settings_exact_alarms_title">درست وقت کے الارم کی اجازت دیں</string>
+    <string name="settings_exact_alarms_desc">اس کے بغیر آپ کا فون نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر تک روک سکتا ہے، اور کچھ فونز پر فجر جیسا رات کا الرٹ شاید بالکل نہ آئے۔ اجازت دینے کے لیے ٹیپ کریں۔</string>
+    <string name="confirm_exact_alarm_title">ایک آخری بات</string>
+    <string name="confirm_exact_alarm_body">جب تک آپ اجازت نہ دیں، Android ایپس کو بالکل درست منٹ پر الرٹ لگانے نہیں دیتا۔ اس کے بغیر آپ کا فون نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر تک روک سکتا ہے، اور کچھ فونز پر فجر جیسا رات کا الرٹ شاید بالکل نہ آئے۔ آپ یہ بعد میں ترتیبات سے بھی کر سکتے ہیں۔</string>
+    <string name="action_close">بند کریں</string>
+
+    <string name="about_version">ورژن</string>
+    <string name="about_disclaimer">ڈس کلیمر</string>
+    <string name="about_disclaimer_short">ایک مددگار، کوئی دینی اتھارٹی نہیں۔ پڑھنے کے لیے ٹیپ کریں۔</string>
+    <string name="about_privacy">پرائیویسی</string>
+    <string name="about_privacy_desc">آپ کا مقام اسی فون پر رہتا ہے۔ نہ کوئی اکاؤنٹ، نہ اشتہارات۔ استعمال کے اعداد و شمار اختیاری ہیں اور جب تک آپ انہیں آن نہ کریں، بند رہتے ہیں۔ مکمل پالیسی پڑھنے کے لیے ٹیپ کریں۔</string>
+
+    <!-- Optional usage counts. The consent text must state the material facts in full. Do not
+         shorten it, and do not use a word meaning "tracking". -->
+    <string name="consent_title">SajdaTime کو بہتر بنانے میں مدد کریں؟</string>
+    <string name="consent_body">SajdaTime مفت ہے اور اس میں کوئی اشتہار نہیں۔ اگر آپ ہاں کہیں تو یہ استعمال کے چند اعداد و شمار Google Analytics کو بھیجتی ہے تاکہ ایپ کو بہتر بنایا جا سکے۔ یہ آپ کے نام سے نہیں بلکہ ایک رینڈم شناختی نمبر (ID) سے جڑے ہوتے ہیں، اور ہو سکتا ہے انہیں برطانیہ سے باہر پروسیس کیا جائے۔ تفصیلی ریکارڈ 14 مہینے تک رکھے جاتے ہیں۔\n\nنماز کی ایپ استعمال کرنے سے آپ کے ایمان کے بارے میں کچھ ظاہر ہو سکتا ہے، اس لیے یہ فیصلہ آپ کا ہے، اور اگر آپ نہیں کہیں تو ایپ میں کچھ نہیں بدلتا۔ SajdaTime کبھی آپ کی GPS پوزیشن یا آپ کی نماز کی ترتیبات نہیں بھیجتی۔\n\nجب تک آپ ہاں نہ چنیں، کچھ نہیں بھیجا جاتا۔ آپ اسے کسی بھی وقت ترتیبات میں بند کر سکتے ہیں۔ اس کے ذمہ دار علی عمران خان (Ali Imran Khan) ہیں، جنہوں نے یہ ایپ بنائی ہے۔</string>
+    <string name="settings_language_title">زبان</string>
+    <string name="settings_language_desc">ایپ کی زبان منتخب کریں</string>
+    <string name="language_unavailable">ترجمہ اہلِ زبان کے جائزے کا منتظر ہے</string>
+    <string name="permission_allowed">اجازت ہے</string>
+    <string name="state_expanded">کھلا ہوا</string>
+    <string name="state_collapsed">بند</string>
+    <string name="consent_see_sent">دیکھیں کہ بالکل کیا بھیجا جاتا ہے</string>
+    <string name="consent_hide_sent">تفصیل چھپائیں</string>
+    <string name="consent_sent_heading">ہاں کہنے پر کیا بھیجا جاتا ہے</string>
+    <string name="consent_sent_list">• آپ کون سی مرکزی اسکرین کھولتے ہیں: اوقات، قبلہ یا ترتیبات\n• سیٹ اپ کے کن مراحل تک آپ پہنچتے ہیں\n• آیا آپ اطلاعات، مقام اور درست وقت کے الارم کی اجازت دیتے ہیں (ہر ایک کے لیے صرف ہاں یا نہیں، خود مقام کبھی نہیں)\n• ایپ کتنی بار اور کتنی دیر کھلی رہتی ہے\n• آپ کے فون کا ماڈل، Android ورژن، ایپ ورژن اور زبان\n• آپ نے پہلی بار ایپ کب کھولی، اور آپ کو یہ ایپ کیسے ملی (مثلاً Google Play پر کوئی لنک)\n• آپ کا اندازاً علاقہ، جو Google آپ کے انٹرنیٹ کنکشن سے معلوم کرتا ہے</string>
+    <string name="consent_never_heading">کیا کبھی نہیں بھیجا جاتا</string>
+    <string name="consent_never_list">• آپ کی GPS پوزیشن یا کوآرڈینیٹس\n• وہ جگہ جو آپ لکھتے ہیں\n• آپ کا مسلک، نماز کے حساب کی آپ کی ترتیب، آپ کا حساب کا طریقہ اور آپ کی الرٹ کی ترتیبات\n• کوئی بھی چیز جو آپ نے لکھی ہو</string>
+    <string name="consent_yes">ہاں، اعداد و شمار شیئر کریں</string>
+    <string name="consent_no">نہیں، شکریہ</string>
+    <string name="consent_read_policy">پرائیویسی پالیسی پڑھیں</string>
+    <string name="about_feedback">رائے بھیجیں</string>
+    <string name="about_feedback_desc">ڈویلپر کو بتائیں کہ کیا مددگار ہے یا کیا غلط ہے۔ آپ کی ای میل ایپ کھلے گی۔</string>
+    <string name="feedback_subject">SajdaTime کے بارے میں رائے</string>
+    <string name="settings_usage_counts">استعمال کے اعداد و شمار شیئر کریں</string>
+    <string name="settings_usage_counts_desc">Google کو بھیجے جاتے ہیں، ایک رینڈم شناختی نمبر (ID) سے جڑے ہوئے۔ جب تک آپ آن نہ کریں، بند رہتا ہے۔ آن کرنے پر ٹھیک ٹھیک دکھایا جاتا ہے کہ کیا بھیجا جاتا ہے۔</string>
+    <string name="about_charity">ہمیشہ کے لیے مفت</string>
+    <string name="about_charity_desc">محبت سے بنائی گئی، امت کے لیے مفت۔ اللہ کی رضا کے لیے ایک خیراتی منصوبہ۔</string>
+    <string name="about_credits">تیار کردہ</string>
+    <string name="about_credits_desc">علی عمران خان، امت کے لیے صدقۂ جاریہ کے طور پر</string>
+    <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
+    <string name="about_data">ڈیٹا اور لائبریریاں</string>
+    <string name="about_data_desc">نماز کے اوقات کا حساب Batoul Apps کی adhan-java (MIT) سے کیا جاتا ہے۔ شہر کی تلاش Open-Meteo geocoding API استعمال کرتی ہے، جو CC BY 4.0 کے تحت لائسنس یافتہ ہے۔</string>
+
+    <!-- Notifications -->
+    <string name="channel_prayers">نماز کے اوقات</string>
+    <string name="channel_prayers_desc">ہر نماز کے شروع ہونے پر ایک اطلاع</string>
+    <string name="channel_alarm">نماز کا الارم</string>
+    <string name="channel_alarm_desc">آپ کی چنی ہوئی آواز کے ساتھ ایک زیادہ اونچا الرٹ</string>
+    <string name="channel_ongoing">اگلی نماز کا بیج</string>
+    <string name="channel_ongoing_desc">اگلی نماز کی ایک خاموش یاد دہانی، ہمیشہ اطلاعاتی پٹی میں</string>
+    <string name="notif_prayer_title">%1$s کا وقت</string>
+    <string name="notif_prayer_body">%1$s کا وقت %2$s پر شروع ہوتا ہے</string>
+    <string name="notif_next_title">%1$s، %2$s پر</string>
+    <string name="notif_next_body">%1$s میں</string>
+
+    <string name="hijri_date_format">%1$d %2$s %3$d</string>
+    <string name="home_date_line">%1$s · %2$s</string>
+    <string-array name="hijri_months">
+        <item>محرم</item>
+        <item>صفر</item>
+        <item>ربیع الاول</item>
+        <item>ربیع الثانی</item>
+        <item>جمادی الاول</item>
+        <item>جمادی الثانی</item>
+        <item>رجب</item>
+        <item>شعبان</item>
+        <item>رمضان</item>
+        <item>شوال</item>
+        <item>ذوالقعدہ</item>
+        <item>ذوالحجہ</item>
+    </string-array>
+
+    <!-- Durations -->
+    <string name="duration_h_m">%1$d گھنٹے %2$d منٹ</string>
+    <string name="duration_m">%1$d منٹ</string>
+    <string name="duration_s">%1$d سیکنڈ</string>
+
+    <!-- "Match your mosque" -->
+    <string name="settings_adjustments">اپنی مسجد سے ملائیں</string>
+    <string name="settings_adjustments_none">کوئی تبدیلی نہیں</string>
+    <string name="settings_adjustments_help">اگر آپ کی مسجد کا چھپا ہوا وقت مختلف ہے تو اسے یہاں تھوڑا آگے پیچھے کر لیں۔ پہلے حساب کا طریقہ بدل کر دیکھیں۔ عموماً اصل فرق وہی ہوتا ہے، اور یہ بچے ہوئے چند منٹوں کے لیے ہے۔</string>
+    <string name="settings_adjustments_reset">سب ری سیٹ کریں</string>
+    <string name="settings_hijri_offset">اسلامی تاریخ</string>
+    <string name="settings_hijri_offset_label">تاریخ آگے پیچھے کریں</string>
+    <string name="settings_hijri_offset_help">یہاں اسلامی تاریخ حساب سے نکالی گئی ہے۔ اگر آپ کی مسجد مقامی طور پر چاند دیکھتی ہے تو اس میں ایک دن آگے یا پیچھے کا فرق ہو سکتا ہے۔ اس سے رمضان اور عید بھی آگے پیچھے ہو جاتے ہیں۔</string>
+    <string name="adjustment_none">—</string>
+    <string name="adjustment_minutes">%+d منٹ</string>
+    <plurals name="adjustment_days">
+        <item quantity="one">%+d دن</item>
+        <item quantity="other">%+d دن</item>
+    </plurals>
+    <plurals name="adjustment_summary_times">
+        <item quantity="one">%d نماز میں تبدیلی</item>
+        <item quantity="other">%d نمازوں میں تبدیلی</item>
+    </plurals>
+    <string name="adjustment_summary_hijri">تاریخ %1$s</string>
+    <!-- Quoted so Android keeps the trailing space. -->
+    <string name="list_separator">"، "</string>
+    <string name="action_decrease">%1$s کم کریں</string>
+    <string name="action_increase">%1$s بڑھائیں</string>
+    <string name="notif_approximate">تخمینی وقت</string>
+    <string name="settings_alarm_on_approximate">تخمینی دنوں میں الارم بجائیں</string>
+    <string name="settings_alarm_on_approximate_desc">جب سورج طلوع یا غروب نہ ہو تو اوقات کسی کم عرض بلد سے نکالے جاتے ہیں۔ ان دنوں الارم خاموش رہتے ہیں، جب تک آپ اسے آن نہ کریں۔</string>
+</resources>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
+<resources>
+
+    <string name="app_language_tag">tr</string>
+
+    <string name="prayer_fajr">Sabah</string>
+    <string name="prayer_sunrise">Güneş</string>
+    <string name="prayer_dhuhr">Öğle</string>
+    <string name="prayer_asr">İkindi</string>
+    <string name="prayer_maghrib">Akşam</string>
+    <string name="prayer_isha">Yatsı</string>
+
+    <string name="method_auto">Otomatik</string>
+    <string name="method_muslim_world_league">Dünya İslam Birliği (MWL)</string>
+    <string name="method_egyptian">Mısır Genel Araştırma Kurumu</string>
+    <string name="method_karachi">Karaçi Üniversitesi</string>
+    <string name="method_umm_al_qura">Ümmülkura, Mekke</string>
+    <string name="method_dubai">Dubai</string>
+    <string name="method_moon_sighting">Moonsighting Committee (Hilal Gözlem Komitesi)</string>
+    <string name="method_north_america">ISNA, Kuzey Amerika</string>
+    <string name="method_kuwait">Kuveyt</string>
+    <string name="method_qatar">Katar</string>
+    <string name="method_singapore">Kemenag ve MUIS, Endonezya ve Singapur</string>
+    <string name="method_turkey">Diyanet, Türkiye</string>
+    <string name="method_jafari">Caferi (İsna Aşeriyye)</string>
+    <string name="method_tehran">Tahran Jeofizik Enstitüsü</string>
+
+    <string name="method_auto_desc">Emin değil misiniz? Bunu seçili bırakın. Dünya İslam Birliği vakitleri, Şiiler için Caferi vakitleri. Dünyanın birçok yerinde yerel uygulamaya yakındır. En büyük fark uzak kuzeydedir.</string>
+    <string name="method_muslim_world_league_desc">Birçok ülkede kullanılan genel bir yöntem. Buradaki varsayılan yöntem.</string>
+    <string name="method_egyptian_desc">Mısır\'ın resmî yöntemi.</string>
+    <string name="method_karachi_desc">Pakistan ve Güney Asya\'da yaygındır.</string>
+    <string name="method_umm_al_qura_desc">Suudi Arabistan\'ın resmî yöntemi. Yatsı vakti, Akşam vaktinden sabit bir süre sonra başlar.</string>
+    <string name="method_dubai_desc">Körfez bölgesinde kullanılan bir yöntem.</string>
+    <string name="method_moon_sighting_desc">Ekvatordan uzak yerler için hazırlanmış, mevsime göre değişen bir kural. Britanya\'daki bazı camiler bunu izler.</string>
+    <string name="method_north_america_desc">Kuzey Amerika İslam Topluluğu (ISNA). ABD ve Kanada\'daki birçok cami bunu kullanır.</string>
+    <string name="method_kuwait_desc">Kuveyt\'te kullanılan yöntem.</string>
+    <string name="method_qatar_desc">Katar\'da kullanılan yöntem.</string>
+    <string name="method_singapore_desc">Endonezya ve Singapur\'un resmî kurumları.</string>
+    <string name="method_turkey_desc">Türkiye Cumhuriyeti Diyanet İşleri Başkanlığı.</string>
+    <string name="method_jafari_desc">Şiilerin yaygın olarak kullandığı yöntem. Akşam, güneş battıktan biraz sonra, gökyüzündeki kızıllık kaybolunca başlar.</string>
+    <string name="method_tehran_desc">Tahran Üniversitesi. İran\'ın resmî vakitleri bu kurumun takvimini esas alır.</string>
+
+</resources>
