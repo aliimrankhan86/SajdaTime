@@ -33,7 +33,7 @@
     <string name="city_field_helper">Contoh: Jakarta, Surabaya, Medan</string>
     <string name="city_not_found">Tempat itu tidak ditemukan. Coba tambahkan nama negaranya.</string>
     <string name="action_find_city">Cari kota</string>
-    <string name="action_use_makkah">Lewati dulu dan pakai Makkah</string>
+    <string name="action_use_makkah">Lewati dulu dan pakai Mekah</string>
 
     <string name="sect_title">Aliran mana yang Anda ikuti?</string>
     <string name="sect_body">Ini menentukan cara waktu salat Anda dihitung. Anda bisa mengubahnya kapan saja.</string>
@@ -74,7 +74,7 @@
     <string name="home_now_marker_a11y">Salat saat ini</string>
     <string name="notice_dismiss">Tutup</string>
     <string name="method_notice_title">Apakah ini cocok dengan masjid Anda?</string>
-    <string name="method_notice_body">Subuh dan Isya bisa berbeda satu jam atau lebih di sini. Ketuk untuk tahu sebabnya.</string>
+    <string name="method_notice_body">Subuh dan Isya bisa berbeda satu jam atau lebih di sini.</string>
     <string name="mosque_diff_link">Berbeda dengan masjid Anda?</string>
     <string name="mosque_diff_title">Berbeda dengan masjid Anda?</string>
     <string name="mosque_diff_congregation">Aplikasi ini menunjukkan kapan setiap waktu salat masuk. Masjid Anda biasanya mengadakan salat berjamaah sedikit lebih lambat, jadi papan jadwalnya dan waktu di sini sering berbeda beberapa menit. Keduanya tidak salah.</string>
@@ -88,8 +88,8 @@
     <string name="home_no_location">Atur lokasi Anda untuk melihat waktu salat.</string>
     <string name="home_countdown_a11y">%1$s dalam %2$s</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Menampilkan waktu untuk Makkah</string>
-    <string name="home_default_location_body">Lokasi Anda tidak dapat ditentukan. Ketuk untuk mengatur lokasi Anda.</string>
+    <string name="home_default_location_title">Menampilkan waktu untuk Mekah</string>
+    <string name="home_default_location_body">Kami tidak dapat menentukan lokasi Anda.</string>
     <string name="action_change_location">Ubah lokasi</string>
 
     <!-- Location sheet -->
@@ -125,11 +125,11 @@
 
     <!-- Qibla -->
     <string name="qibla_title">Kiblat</string>
-    <string name="qibla_subtitle">Ka\'bah berjarak sekitar %2$d km dari sini, pada %1$d° dari utara.</string>
+    <string name="qibla_subtitle">Kakbah berjarak sekitar %2$d km dari sini, pada %1$d° dari utara.</string>
     <string name="qibla_needs_location">Atur lokasi Anda untuk menemukan kiblat.</string>
-    <string name="qibla_facing">Anda kini menghadap Ka\'bah</string>
+    <string name="qibla_facing">Anda kini menghadap Kakbah</string>
     <string name="qibla_heading_now">Menghadap %1$d°</string>
-    <string name="qibla_legend_kaaba">Ka\'bah</string>
+    <string name="qibla_legend_kaaba">Kakbah</string>
     <string name="qibla_legend_facing">Arah hadap Anda</string>
     <string name="qibla_turn_left">Putar ke kiri %1$d°</string>
     <string name="qibla_turn_right">Putar ke kanan %1$d°</string>
@@ -171,14 +171,14 @@
     <string name="settings_alarm_respect_silent">Tetap senyap saat ponsel dalam mode senyap</string>
     <string name="settings_alarm_respect_silent_desc">Aktif: Anda tetap mendapat notifikasi tepat waktu, tanpa suara. Mati: alarm tetap berbunyi meski ponsel disenyapkan, seperti alarm bangun tidur.</string>
     <string name="settings_dnd_title">Izinkan suara saat Jangan Ganggu</string>
-    <string name="settings_dnd_desc">Tanpa ini, alarm Anda tetap senyap saat ponsel dalam mode Jangan Ganggu. Ketuk untuk mengizinkan.</string>
+    <string name="settings_dnd_desc">Tanpa ini, alarm Anda tetap senyap saat ponsel dalam mode Jangan Ganggu.</string>
 
     <string name="settings_ongoing_badge">Tampilkan salat berikutnya di panel notifikasi</string>
     <string name="settings_ongoing_badge_desc">Notifikasi senyap yang menunjukkan salat berikutnya dan sisa waktunya</string>
     <string name="settings_exact_alarms_title">Izinkan alarm tepat waktu</string>
-    <string name="settings_exact_alarms_desc">Tanpa ini, ponsel Anda bisa menunda pengingat salat hingga satu jam atau lebih, dan di beberapa ponsel pengingat malam hari seperti Subuh bisa tidak muncul sama sekali. Ketuk untuk mengizinkan.</string>
+    <string name="settings_exact_alarms_desc">Tanpa ini, ponsel Anda bisa menunda pengingat salat satu jam atau lebih, dan di beberapa ponsel pengingat dini hari seperti Subuh bisa tidak muncul sama sekali.</string>
     <string name="confirm_exact_alarm_title">Satu hal terakhir</string>
-    <string name="confirm_exact_alarm_body">Android tidak mengizinkan aplikasi memasang pengingat pada menit yang tepat kecuali Anda mengizinkannya. Tanpa izin itu, ponsel Anda bisa menunda pengingat salat hingga satu jam atau lebih, dan di beberapa ponsel pengingat malam hari seperti Subuh bisa tidak muncul sama sekali. Anda juga bisa melakukannya nanti dari Pengaturan.</string>
+    <string name="confirm_exact_alarm_body">Android tidak mengizinkan aplikasi memasang pengingat pada menit yang tepat kecuali Anda mengizinkannya. Tanpa izin itu, ponsel Anda bisa menunda pengingat salat satu jam atau lebih, dan di beberapa ponsel pengingat dini hari seperti Subuh bisa tidak muncul sama sekali. Anda juga bisa melakukannya nanti dari Pengaturan.</string>
     <string name="action_close">Tutup</string>
 
     <string name="about_version">Versi</string>
@@ -192,7 +192,7 @@
     <string name="consent_body">SajdaTime gratis dan tanpa iklan. Jika Anda setuju, aplikasi ini mengirim sedikit data jumlah penggunaan ke Google Analytics agar aplikasi bisa ditingkatkan. Data itu terhubung ke ID acak, bukan nama Anda, dan bisa diproses di luar Inggris Raya. Catatan terperinci disimpan selama 14 bulan.\n\nMemakai aplikasi salat bisa mengungkapkan sesuatu tentang keyakinan Anda, jadi ini sepenuhnya pilihan Anda, dan tidak ada yang berubah di aplikasi jika Anda menolak. SajdaTime tidak pernah mengirim posisi GPS atau pengaturan salat Anda.\n\nSampai Anda memilih ya, tidak ada yang dikirim. Anda bisa mematikannya di Pengaturan kapan saja. Penanggung jawabnya adalah Ali Imran Khan, pembuat aplikasi ini.</string>
     <string name="settings_language_title">Bahasa</string>
     <string name="settings_language_desc">Pilih bahasa aplikasi</string>
-    <string name="language_unavailable">Terjemahan menunggu ditinjau oleh penutur asli</string>
+    <string name="language_unavailable">Tidak tersedia di versi ini</string>
     <string name="permission_allowed">Diizinkan</string>
     <string name="state_expanded">Diperluas</string>
     <string name="state_collapsed">Diciutkan</string>
@@ -255,7 +255,7 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Sesuaikan dengan masjid</string>
     <string name="settings_adjustments_none">Tidak ada perubahan</string>
-    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit.</string>
+    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini, atau ketuk angkanya lalu pilih waktu yang ditampilkan masjid Anda. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit.</string>
     <string name="settings_adjustments_reset">Atur ulang semua</string>
     <string name="settings_hijri_offset">Tanggal Hijriah</string>
     <string name="settings_hijri_offset_label">Geser tanggal</string>
