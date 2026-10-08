@@ -4474,6 +4474,33 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY — 8 Oct 2026, evening (what is live, and what the cloud branch `claude/customer-review-pain-points-9d35kl` adds on top)
+
+**Read this block first. The older blocks below are dated history.**
+
+**Live and in review (unchanged by anything below).** 1.3.1 (versionCode 6) is on `main`, submitted, In review (the public listing read "Updated on 8 Oct 2026" with languages and the new buttons in What's new when checked). It already contains the Urdu, Turkish and Indonesian text that one model produced in a single pass and nobody reviewed. **Nothing in this block is live.** There is no pull request for this branch; the owner asks for one and merges it. Merging it publishes `docs/privacy.html` on Pages at once (it is unchanged by this branch, but check the diff first).
+
+**What the branch adds to 1.3.1** (all merged with `main` at f1213d1, all pushed):
+1. Step 1 mosque work finished and run on an emulator: type the time your mosque shows, amber cards with a real button (`NoticeCard`, `PermissionCard`: the action is a button, never the card), and "0 min" instead of an underlined dash.
+2. A language selector in the right places: first row of Appearance in Settings, and a globe on the first welcome screen. "Phone language" is the first option and the default. Below Android 13 the choice is stored (`AppLocale.setOverride`) and the activity recreated; from 13 the system keeps it (`LocaleManager`).
+3. Translations: the shipped set kept as the base plus 15 reviewed strings, **the nine "quiet is not silent" corrections**, and the **independent review of the whole shipped set** (three reviewer models, back translating before reading the English: `docs/translation/review-shipped-{in,tr,ur}.md`, no blockers) with its clear findings applied: stale "tap" sentences on the amber cards, the missing "tap a number to type your mosque's time" sentence, `language_unavailable`, softened hedges ("up to", "all", "simply"), the Turkish "bırakın" ambiguity, Indonesian Kakbah and Mekah spelt the same as on the watch, and more (see the commit). Wear has its own reviewed Indonesian, Turkish and Urdu strings (main has none).
+4. The Urdu PDF export mirrors properly (checked by rendering a real Urdu PDF).
+5. Guards: `TranslationIntegrityTest`, `TranslationScopeTest`, `LanguagePickerTest`, `tools/check-translation.py`, `LocaleDisciplineTest` tightened.
+
+**Step 2, the method finder, is NOT built, and that is the decision.** The sweep (`docs/reviews/method-finder-sweep-2026-10-08.txt`) shows the original design (Asr plus Isha) cannot meet the bars, and the narrow design (Fajr, Asr and Isha within 1 minute, one answer only) is 88.3% definite on exact boards with no wrong answer, but gives a definite answer on 6.3% of mosque boards that follow no listed method (bar: 2%) and keeps matching for only 82.3% of the year (bar: 90%). Do not build it without a new design that clears those bars.
+
+**Verified on emulators:** Android 14, Urdu first run, disclaimer, Times, Settings, picker, live switching to Indonesian and Turkish, Qibla (dial not mirrored), PDF. Android 12 (software emulator, slow): globe and picker open, Urdu chosen, language and right to left layout applied, survives a force stop.
+
+**Not verified (do not claim):** a real phone (Redmi and S23 Ultra); TalkBack; large font and dark theme in the new languages; the watch screens in the new languages (`tools/wear-verify.sh` needed; the Urdu countdown is longer than the tile's roughly 8 characters, so measure before release); the alarm test T1 to T6 (real device); no native speaker has read any of the three languages (the owner accepted that on 5 and 8 Oct; he reads Urdu and should read the six flagged Urdu strings); store screenshots not retaken; the final gate `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` was not run on the merged tree (tests and lint were, and pass).
+
+**Open questions for a native reader, deliberately not changed** (details in the three `review-shipped-*.md`): Turkish "Sabah" versus "İmsak" for Fajr; "aliran" (Indonesian) and "mezhep" (Turkish) for the Sunni and Shia question; Urdu "مسلک" versus "مکتبِ فکر"; the Turkish name of the Egyptian authority; the Karachi method naming (the library's method is the University of Islamic Sciences, Karachi, so check the English first); whether Diyanet's angles (18 and 17) match Diyanet's own timetable (its published times may add a margin; unverifiable from the cloud).
+
+**A fault in the English listing, owner's to fix in the Console and not during review:** the English description line "chosen automatically for your region" contradicts rule 5.17 (the app never claims a method belongs to a place).
+
+**Next, in order, if the owner wants a follow up release (his call; it would be 1.3.2, versionCode 7 or later):** (1) the Mac session takes this branch, retakes store screenshots (the `sajdastore` 1080x1920 AVD), runs `tools/wear-verify.sh` in the three languages, builds the signed bundle and the owner uploads it after 1.3.1 is approved; (2) the alarm test on the Redmi; (3) re-baseline the health check routine after the release. Draft store listings for the three languages are in `docs/store/LISTING-ID-TR-UR.md` and are unpublished (an assistant never publishes them).
+
+**gbrain.** This cloud session cannot write the owner's gbrain (a Mac side MCP). The Mac session should record: the branch name and the commit list above, the sweep decision, the review result, and the open questions.
+
 ### ⬛ SUPERSEDED — 3 Oct 2026 decision record (kept for history; the STATE OF PLAY of 4 Oct below is the truth). Default-on was later built and REVERSED; the branch named here, `claude/analytics-default-on-1-4-0`, is obsolete (its existing-user question was carried into `claude/app-analytics-strategy-e826p5`). Do not use it.
 
 The owner asked for usage counts to be **on by default** (opt out), so the app can be improved. This
