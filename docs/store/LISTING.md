@@ -387,7 +387,7 @@ declaration must match the app and `docs/privacy.html` exactly.
 |---|---|---|---|---|---|
 | **Location → Approximate location** | Google derives country and often city from the connection (Google's help page says inferred location "such as via IP address" must be disclosed). Adds **Analytics** to the existing App functionality purpose | Yes | No | Yes | App functionality, **Analytics** |
 | **Device or other IDs** | The random Firebase installation ID | Yes | No | Yes | **Analytics** |
-| **App activity → App interactions** | Sessions, time open, which main screen, which setup step, permission yes or no | Yes | No | Yes | **Analytics** |
+| **App activity → App interactions** | Sessions, time open, which main screen, which setup step, permission yes or no, how you found the app (install referrer) | Yes | No | Yes | **Analytics** |
 
 - **Shared: No.** Google says an analytics provider that processes data "solely on your behalf"
   is a service provider, which is collection, not sharing. That holds only while the console

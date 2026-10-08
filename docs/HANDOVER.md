@@ -4469,6 +4469,14 @@ silent default on stays unbuilt until a data protection solicitor has answered t
 has signed it off. Rejected: pre ticked or highlighted Yes (not valid consent), UK/EU only gating
 (unreliable and still faith data).
 
+### 📍 RESOLVED 7 Oct 2026 — which Google account runs what
+
+The docs disagreed about the Play Console account. Settled by the owner: **the Play Console runs on his personal Google account** (RELEASING.md was right; `ANALYTICS_PLAY_CONSOLE_PROMPT.md` was wrong and is corrected). **`aikstudies@gmail.com` is the public contact address and the account where Firebase and Google Analytics sit** (Chrome account slot 2). Use only `aikstudies@gmail.com` in the privacy policy, in-app dialogs and store listings; never print the personal address in a public file.
+
+### 📍 1.3.1 (versionCode 6) — built 7 Oct 2026 on branch `claude/consent-buttons-language-1-3-1`, NOT yet released
+
+Consent text rewritten (controller named, 14 month retention, install referrer stated, false "only way" claim and "how many people" removed, lists behind "See exactly what is sent"); "school of thought" is now "prayer calculation setting", with `UsageCountsTest` proving by reflection that the API cannot take a setting; `docs/privacy.html` dated 7 Oct 2026 (**live on merge, before 1.3.1 ships: it already describes the referrer, which 1.3.0 also sends**). Exact-alarm and Do Not Disturb rows are real 48dp buttons with an Allowed state (`PermissionAction.kt`). Settings has a language picker (Android 13+ only; `AppLanguage.kt`, `locales_config.xml`): Urdu, Turkish and Indonesian are listed but disabled until a native-speaker-reviewed `values-<tag>/` exists, so no machine translation shipped and `NoTranslationsYetTest` is unchanged. Not run on a device or emulator; RTL, store screenshots and the Alpha pause untouched.
+
 ### 📍 STATE OF PLAY — 5 Oct 2026 (pain point and competitor research done; decisions taken; step 1 of the mosque work BUILT on a branch, NOT merged)
 
 **Read this first, then the 4 Oct block below (still the record of release 1.3.0).** Nothing here changes what is live. 1.3.0 was still In review on 5 Oct (public listing still read 'Updated on 1 Sept 2026'). The work below is on branch `claude/customer-review-pain-points-9d35kl`, no pull request, nothing uploaded to Play.
