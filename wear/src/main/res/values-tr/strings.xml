@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Turkish (tr-TR). AI-assisted translation, not yet reviewed by a native speaker. See docs/translation/notes-tr-TR.md. -->
+<resources>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">Sıradaki namaz</string>
+    <string name="tile_description">Sıradaki namaz ve ne kadar vaktiniz kaldığı</string>
+    <string name="tile_needs_setup">Telefonunuzdan kurun</string>
+
+    <string name="wear_locating">Konumunuz bulunuyor</string>
+    <string name="wear_no_location_title">Henüz konum yok</string>
+    <string name="wear_no_location_body">Telefonunuzda SajdaTime\'ı açın veya şimdilik Mekke\'yi kullanın.</string>
+    <string name="wear_use_makkah">Mekke\'yi kullan</string>
+
+    <string name="wear_disclaimer">Bir yardımcı, dinî otorite değil. Vakitler hesaplanmıştır. Caminize uyun.</string>
+
+    <string name="wear_polar_notice">Yaklaşık. Bugün burada güneş doğup batmıyor, bu yüzden bunlar %1$d° enleminden. Caminize sorun.</string>
+
+    <string name="wear_school">Mezhep</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">Sünni</string>
+    <string name="wear_sect_shia">Şii</string>
+    <string name="wear_madhab_hanafi">Hanefi</string>
+    <string name="wear_madhab_shafii">Şafii</string>
+    <string name="wear_madhab_maliki">Maliki</string>
+    <string name="wear_madhab_hanbali">Hanbeli</string>
+    <string name="wear_madhab_note">Yalnızca İkindi değişir. Hanefi daha geçtir.</string>
+
+    <string name="wear_qibla_needs_location">Kıble yönünü bulmak için konumunuzu ayarlayın</string>
+    <string name="wear_qibla_facing">Kâbe\'ye dönüksünüz</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">gerçek kuzeyden</string>
+
+    <string name="wear_duration_h_m">%1$dsa %2$ddk</string>
+    <string name="wear_duration_m">%1$ddk</string>
+    <string name="wear_in_h_m">%1$dsa %2$ddk</string>
+    <string name="wear_in_m">%1$ddk</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">Yaklaşık %1$s  ·  %2$s</string>
+</resources>

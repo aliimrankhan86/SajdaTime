@@ -123,8 +123,20 @@ session inherits it instead of relearning it.
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
   and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
   however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
-- **Never machine-translate the app.** Prayer and madhab names are religious content; each
-  language needs a native speaker before it ships.
+- **Never machine-translate the app, with one scoped exception.** Prayer and madhab names are
+  religious content; each language needs a native speaker before it ships. **The exception (owner,
+  decided 5 Oct 2026 and confirmed in his 7 Oct brief): Urdu, Turkish and Indonesian only.** For
+  those three he waived the native-speaker review (he reads Urdu; nobody on the project can check
+  the other two) and asked an assistant to translate, under the safeguards in
+  `docs/translation/BRIEF.md`: a stronger model translates and a second model independently
+  back-translates; the owner reads the six highest-risk Urdu strings; method names stay
+  untranslated; every translated language says in About that it was made with AI help; the
+  translated consent says the policy page is in English; `TranslationIntegrityTest` and
+  `tools/check-translation.py` guard placeholders, plurals, the disclaimer's seven paragraphs
+  with the dua last, and the agreed prayer names. `TranslationScopeTest` fails the build for **any
+  other language folder**: a fourth language is a new owner decision, written here first. The waiver
+  is the owner's risk decision, not a claim that the translations are verified. A native reader's
+  corrections are always welcome (`docs/translation/notes-*.md` lists what to check).
 - **The app follows the phone's language, and goes right-to-left only when it has the
   words to.** `AppLocale` reads the app's language out of the resources, so the day a
   reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL

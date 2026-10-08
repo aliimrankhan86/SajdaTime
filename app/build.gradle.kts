@@ -184,6 +184,8 @@ tasks.withType<Test>().configureEach {
             include(
                 "app/src/main/res/values/strings.xml",
                 "wear/src/main/res/values/strings.xml",
+                // TranslationIntegrityTest compares every translation with all three sources.
+                "core/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",
                 "docs/store/LISTING.md",

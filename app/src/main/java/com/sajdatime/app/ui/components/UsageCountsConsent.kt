@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sajdatime.app.R
+import com.sajdatime.core.AppLocale
 
 /**
  * The one consent text for optional usage counts, used by both the setup screen and the
@@ -70,6 +71,15 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         },
     ) {
         Text(stringResource(R.string.consent_read_policy))
+    }
+    // The policy page is in English. Said in the reader's language, once, only when they are
+    // not reading English: a translated consent must not imply a translated policy.
+    if (AppLocale.of(context).language != "en") {
+        Text(
+            stringResource(R.string.consent_policy_english),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
     Spacer(Modifier.height(16.dp))
     // Equal weight on purpose: a tonal button each, same size, so neither answer is steered.

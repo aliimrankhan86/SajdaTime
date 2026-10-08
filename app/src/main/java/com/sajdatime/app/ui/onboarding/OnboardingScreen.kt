@@ -64,6 +64,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.settings.LanguageChooserDialog
+import com.sajdatime.app.ui.settings.AppLanguage
+import androidx.compose.material.icons.outlined.Language
 import com.sajdatime.app.ui.components.PermissionButton
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Madhab
@@ -249,6 +252,12 @@ private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
     val bismillahSpoken = stringResource(R.string.bismillah_a11y)
+    val context = LocalContext.current
+    var pickingLanguage by rememberSaveable { mutableStateOf(false) }
+    // A person who cannot read this screen must be able to change it before the first
+    // question, not after. Always offered once there is a second language to choose.
+    val hasChoice = AppLanguage.entries.count { it.isAvailable(context) } > 1
+    Box(Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -290,6 +299,22 @@ private fun WelcomeStep(onNext: () -> Unit) {
             Text(stringResource(R.string.action_begin))
         }
     }
+    if (hasChoice) {
+        IconButton(
+            onClick = { pickingLanguage = true },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(8.dp)
+                .size(48.dp),
+        ) {
+            Icon(
+                Icons.Outlined.Language,
+                contentDescription = stringResource(R.string.settings_language_title),
+            )
+        }
+    }
+    }
+    if (pickingLanguage) LanguageChooserDialog(onDismiss = { pickingLanguage = false })
 }
 
 @Composable

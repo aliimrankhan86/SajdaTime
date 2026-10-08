@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Indonesian. AI-assisted translation, not yet reviewed by a native speaker. See docs/translation/notes-in-ID.md. -->
+<resources>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">Salat berikutnya</string>
+    <string name="tile_description">Salat berikutnya dan sisa waktu Anda</string>
+    <string name="tile_needs_setup">Atur di ponsel Anda</string>
+
+    <string name="wear_locating">Mencari lokasi Anda</string>
+    <string name="wear_no_location_title">Lokasi belum ada</string>
+    <string name="wear_no_location_body">Buka SajdaTime di ponsel Anda, atau gunakan Mekah untuk sementara.</string>
+    <string name="wear_use_makkah">Gunakan Mekah</string>
+
+    <string name="wear_disclaimer">Alat bantu, bukan otoritas agama. Waktu dihitung. Ikuti masjid Anda.</string>
+
+    <string name="wear_polar_notice">Perkiraan. Hari ini matahari tidak terbit atau terbenam di sini, jadi waktu diambil dari %1$d°. Tanya ke masjid Anda.</string>
+
+    <string name="wear_school">Aliran</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">Sunni</string>
+    <string name="wear_sect_shia">Syiah</string>
+    <string name="wear_madhab_hanafi">Hanafi</string>
+    <string name="wear_madhab_shafii">Syafi\'i</string>
+    <string name="wear_madhab_maliki">Maliki</string>
+    <string name="wear_madhab_hanbali">Hanbali</string>
+    <string name="wear_madhab_note">Hanya Asar yang berubah. Hanafi lebih lambat.</string>
+
+    <string name="wear_qibla_needs_location">Atur lokasi Anda untuk menemukan arah kiblat</string>
+    <string name="wear_qibla_facing">Menghadap Kakbah</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">dari utara sejati</string>
+
+    <string name="wear_duration_h_m">%1$dj %2$dm</string>
+    <string name="wear_duration_m">%1$dm</string>
+    <string name="wear_in_h_m">%1$dj %2$dm lagi</string>
+    <string name="wear_in_m">%1$dm lagi</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">Sekitar %1$s  ·  %2$s</string>
+</resources>

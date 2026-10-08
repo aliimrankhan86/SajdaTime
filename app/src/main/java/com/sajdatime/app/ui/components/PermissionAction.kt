@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -81,19 +82,26 @@ fun PermissionButton(
             )
         }
     } else {
-        Button(
-            onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp),
-            // Amber cards use the accent pair that ColorContrastTest already checks.
-            colors = if (amber) {
-                ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
-            } else {
-                ButtonDefaults.buttonColors()
-            },
-        ) {
-            Text(label)
+        if (amber) {
+            // Inside an amber card: the accent pair that ColorContrastTest already checks.
+            Button(
+                onClick = onClick,
+                modifier = modifier.fillMaxWidth().heightIn(min = 48.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary),
+            ) {
+                Text(label)
+            }
+        } else {
+            // On the setup screen the permission is optional and "Finish" sits right under it,
+            // so it is a tonal button: clearly a button (it has a fill, unlike the outline it
+            // replaced) without competing with the one primary action on the screen. PR #5 first
+            // made it the same solid green as Finish, which flattened the hierarchy.
+            FilledTonalButton(
+                onClick = onClick,
+                modifier = modifier.fillMaxWidth().heightIn(min = 48.dp),
+            ) {
+                Text(label)
+            }
         }
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.sajdatime.core.AppLocale
@@ -43,6 +44,44 @@ class PrayerPdfExporter(base: Context) {
     // print or send on, and its headings, day names and dates all have to be in one
     // language. See AppLocale.kt.
     private val context = AppLocale.wrap(base)
+
+    /**
+     * True when the app's own language is written right to left (Urdu). The wrapped context
+     * above has its layout direction pinned to that language, so this follows the words, not
+     * the phone's setting, exactly as the screens do.
+     *
+     * A printed timetable in Urdu that starts at the left margin, with the Day column on the
+     * left and the prayers running left to right, reads backwards to the person holding it:
+     * the sheet is the one place this app's output is read away from the app. So in a right to
+     * left language everything here starts at the **right** margin and runs leftwards: the
+     * logo, the headings, the notes, the footer and the order of the columns. The numbers and
+     * times inside the cells keep their own left-to-right shape, as they do on screen.
+     */
+    private val rtl: Boolean = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+
+    /**
+     * Draws [text] starting [offset] points in from the page's *start* margin (left in English,
+     * right in Urdu).
+     *
+     * **Not `drawTextRun(isRtl = true)`, which was tried first and is wrong.** That call declares
+     * the whole run to be one right-to-left run, so Android lays every glyph out right to left,
+     * including Latin ones: the first Urdu export printed "SajdaTime" as "emiTadjaS", a time as
+     * "MP 02:11" and the year 2026 as "6202". Found by pulling the real PDF off the emulator and
+     * rendering it, not by reading the code. A timetable is mixed text on every line (Urdu day
+     * names, Latin digits and AM/PM, a place name in either script), and the right tool for mixed
+     * text is the ordinary bidi algorithm with the paragraph direction set.
+     *
+     * So: `drawText`, with a right-to-left mark (U+200F) in front when the page is right to
+     * left. The mark is strongly right-to-left, which makes it the paragraph's first strong
+     * character, so the paragraph is right to left, Urdu runs read right to left, Latin and digit
+     * runs keep their own left-to-right order, and trailing punctuation lands on the correct
+     * side. It is zero width and not drawn (the same fact `core/Bidi.kt` relies on).
+     */
+    private fun Canvas.drawStart(text: String, offset: Float, y: Float, paint: Paint) {
+        paint.textAlign = if (rtl) Paint.Align.RIGHT else Paint.Align.LEFT
+        val x = if (rtl) PAGE_WIDTH - MARGIN - offset else MARGIN + offset
+        drawText(if (rtl) "\u200F$text" else text, x, y, paint)
+    }
 
     enum class Range { TODAY, NEXT_7_DAYS, THIS_MONTH }
 
@@ -144,7 +183,7 @@ class PrayerPdfExporter(base: Context) {
                     // the app and gets pinned to a wall, and it had no such marking at all.
                     approximateNote(rows)?.let { note ->
                         wrapped(note, PAGE_WIDTH - 2 * MARGIN, subtitlePaint).forEach { line ->
-                            canvas.drawText(line, MARGIN, y, subtitlePaint)
+                            canvas.drawStart(line, 0f, y, subtitlePaint)
                             y += 11f
                         }
                         y += 4f
@@ -161,7 +200,7 @@ class PrayerPdfExporter(base: Context) {
                     index++
                 }
 
-                canvas.drawText(footer, MARGIN, PAGE_HEIGHT - MARGIN, footerPaint)
+                canvas.drawStart(footer, 0f, PAGE_HEIGHT - MARGIN, footerPaint)
                 document.finishPage(page)
                 pageNumber++
             }
@@ -174,9 +213,9 @@ class PrayerPdfExporter(base: Context) {
 
     private fun drawHeaderRow(canvas: android.graphics.Canvas, top: Float): Float {
         val baseline = top + ROW_HEIGHT - 6f
-        var x = MARGIN
+        var x = 0f
         COLUMNS.forEach { column ->
-            canvas.drawText(column.title, x + CELL_PADDING, baseline, headerPaint)
+            canvas.drawStart(column.title, x + CELL_PADDING, baseline, headerPaint)
             x += column.width
         }
         canvas.drawLine(MARGIN, top + ROW_HEIGHT, MARGIN + tableWidth, top + ROW_HEIGHT, rulePaint)
@@ -194,9 +233,9 @@ class PrayerPdfExporter(base: Context) {
             day.date.format(dateFormat),
         ) + TABLE_SLOTS.map { slot -> TimeFormat.clock(context, day[slot]) }
 
-        var x = MARGIN
+        var x = 0f
         values.forEachIndexed { i, value ->
-            canvas.drawText(value, x + CELL_PADDING, baseline, cellPaint)
+            canvas.drawStart(value, x + CELL_PADDING, baseline, cellPaint)
             x += COLUMNS[i].width
         }
         canvas.drawLine(
@@ -235,11 +274,12 @@ class PrayerPdfExporter(base: Context) {
         start: LocalDate,
     ): Float {
         val top = MARGIN
-        drawLogo(canvas, MARGIN, top, LOGO_SIZE)
+        // The logo sits on the start side: left in English, right in Urdu.
+        drawLogo(canvas, if (rtl) PAGE_WIDTH - MARGIN - LOGO_SIZE else MARGIN, top, LOGO_SIZE)
 
-        val textLeft = MARGIN + LOGO_SIZE + 12f
-        canvas.drawText(context.getString(R.string.app_name), textLeft, top + 19f, wordmarkPaint)
-        canvas.drawText(context.getString(R.string.pdf_tagline), textLeft, top + 33f, taglinePaint)
+        val textStart = LOGO_SIZE + 12f
+        canvas.drawStart(context.getString(R.string.app_name), textStart, top + 19f, wordmarkPaint)
+        canvas.drawStart(context.getString(R.string.pdf_tagline), textStart, top + 33f, taglinePaint)
 
         var y = top + LOGO_SIZE + 20f
         canvas.drawLine(MARGIN, y - 12f, MARGIN + tableWidth, y - 12f, rulePaint)
@@ -249,7 +289,7 @@ class PrayerPdfExporter(base: Context) {
         // can refresh. See core/Bidi.kt. The isolate characters are zero-width and
         // Canvas.drawText does not draw them.
         val place = cityName.bidiIsolated().ifBlank { context.getString(R.string.pdf_place_unknown) }
-        canvas.drawText(place, MARGIN, y, placePaint)
+        canvas.drawStart(place, 0f, y, placePaint)
         y += 13f
 
         val period = when (range) {
@@ -258,9 +298,9 @@ class PrayerPdfExporter(base: Context) {
                 context.getString(R.string.pdf_period_onwards, start.format(dateFormat))
             Range.THIS_MONTH -> start.format(monthYearFormat)
         }
-        canvas.drawText(
+        canvas.drawStart(
             context.getString(R.string.pdf_header_meta, context.getString(R.string.pdf_area_label), period),
-            MARGIN,
+            0f,
             y,
             subtitlePaint,
         )

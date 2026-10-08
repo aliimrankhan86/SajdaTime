@@ -2,6 +2,7 @@ package com.sajdatime.core
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import java.util.Locale
 
 /**
@@ -90,9 +91,44 @@ object AppLocale {
      * in.
      */
     fun wrap(context: Context): Context {
-        val config = Configuration(context.resources.configuration)
+        // Below Android 13 the system has no per-app language, so a language the user picked
+        // inside the app is applied here, to the configuration the resources are resolved
+        // from. That is all it does: the language the app is *in* is still whatever the
+        // resources then resolve app_language_tag to, read back by [of] on the next line.
+        // Nothing reads the stored tag as the answer, which is what keeps the rule above
+        // true ("the app's language is the language of its words").
+        val chosen = override(context)?.let { tag ->
+            val picked = Configuration(context.resources.configuration)
+            picked.setLocale(Locale.forLanguageTag(tag))
+            context.createConfigurationContext(picked)
+        } ?: context
+        val config = Configuration(chosen.resources.configuration)
         // setLocale also sets the layout direction from the locale, which is the point.
-        config.setLocale(of(context))
-        return context.createConfigurationContext(config)
+        config.setLocale(of(chosen))
+        return chosen.createConfigurationContext(config)
     }
+
+    /**
+     * The language the user picked inside the app, as a BCP-47 tag, or null when they have
+     * not (the app then follows the phone). Only ever non-null below Android 13: from 13 on
+     * the system keeps the choice itself (`LocaleManager`), and this deliberately ignores
+     * anything stored here so the two cannot disagree.
+     */
+    fun override(context: Context): String? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            null
+        } else {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
+        }
+
+    /** Stores the in-app choice (below Android 13 only; a no-op from 13). Null = follow the phone. */
+    fun setOverride(context: Context, tag: String?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
+            if (tag == null) remove(KEY) else putString(KEY, tag)
+        }.apply()
+    }
+
+    private const val PREFS = "sajda_language"
+    private const val KEY = "tag"
 }

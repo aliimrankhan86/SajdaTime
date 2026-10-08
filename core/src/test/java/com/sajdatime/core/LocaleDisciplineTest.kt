@@ -37,16 +37,28 @@ class LocaleDisciplineTest {
         assertEquals(declared, locale.toLanguageTag())
     }
 
+    /**
+     * `app_language_tag` is one resource in `:core`, shared by the phone and the watch, so a
+     * language is correctly declared when **core's** `values-<lang>/` carries it. (This used to
+     * demand the string in every translated `strings.xml`, which was right while a translation
+     * was imagined as one file; with three modules it would force the same tag to be copied
+     * into `app` and `wear`, where it would be a second place to get wrong. A translation that
+     * ships in `app` or `wear` without a core file is still caught, because then its language
+     * has no declaration at all.)
+     */
     @Test
     fun `every translation declares its own tag`() {
-        val offenders = translatedStringFiles()
-            .filter { it.tagOrNull() == null }
-            .map { it.relativeTo(repoRoot).path }
+        val files = translatedStringFiles()
+        val languages = files.map { it.parentFile!!.name }.toSet()
+        val offenders = languages.filter { folder ->
+            val core = File(repoRoot, "core/src/main/res/$folder/strings.xml")
+            !core.isFile || core.tagOrNull() == null
+        }
 
         assertTrue(
-            "These translations do not declare app_language_tag, so their words would be " +
-                "shown with English number and date formatting. Add the string, or read " +
-                "AppLocale.kt for why it is there. Offenders: $offenders",
+            "These translations have no app_language_tag in core/src/main/res/<folder>/strings.xml, " +
+                "so their words would be shown with English number and date formatting. Add the " +
+                "string there, or read AppLocale.kt for why it is there. Offenders: $offenders",
             offenders.isEmpty(),
         )
     }

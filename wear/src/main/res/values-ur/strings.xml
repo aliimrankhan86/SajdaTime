@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Urdu (ur-PK). AI-assisted translation, 8 Oct 2026; see docs/translation/notes-ur-PK.md. -->
+<resources>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">اگلی نماز</string>
+    <string name="tile_description">اگلی نماز اور کتنا وقت باقی ہے</string>
+    <string name="tile_needs_setup">اپنے فون پر سیٹ اپ کریں</string>
+
+    <string name="wear_locating">آپ کا مقام تلاش کیا جا رہا ہے</string>
+    <string name="wear_no_location_title">ابھی مقام نہیں</string>
+    <string name="wear_no_location_body">اپنے فون پر SajdaTime کھولیں، یا فی الحال مکہ مکرمہ استعمال کریں۔</string>
+    <string name="wear_use_makkah">مکہ مکرمہ استعمال کریں</string>
+
+    <string name="wear_disclaimer">مددگار ہے، دینی اتھارٹی نہیں۔ اوقات حساب سے ہیں۔ اپنی مسجد کی پیروی کریں۔</string>
+
+    <string name="wear_polar_notice">تخمینی۔ یہاں آج سورج طلوع یا غروب نہیں ہوتا، اس لیے یہ %1$d° عرضِ بلد سے ہیں۔ اپنی مسجد سے پوچھیں۔</string>
+
+    <string name="wear_school">مکتبِ فکر</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">سنی</string>
+    <string name="wear_sect_shia">شیعہ</string>
+    <string name="wear_madhab_hanafi">حنفی</string>
+    <string name="wear_madhab_shafii">شافعی</string>
+    <string name="wear_madhab_maliki">مالکی</string>
+    <string name="wear_madhab_hanbali">حنبلی</string>
+    <string name="wear_madhab_note">صرف عصر بدلتی ہے۔ حنفی دیر سے ہے۔</string>
+
+    <string name="wear_qibla_needs_location">قبلہ معلوم کرنے کے لیے اپنا مقام مقرر کریں</string>
+    <string name="wear_qibla_facing">رخ کعبہ کی طرف ہے</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">حقیقی شمال سے</string>
+
+    <string name="wear_duration_h_m">%1$d گھنٹے %2$d منٹ</string>
+    <string name="wear_duration_m">%1$d منٹ</string>
+    <string name="wear_in_h_m">%1$d گھنٹے %2$d منٹ</string>
+    <string name="wear_in_m">%1$d منٹ</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">تقریباً %1$s  ·  %2$s</string>
+</resources>

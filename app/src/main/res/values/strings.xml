@@ -361,7 +361,19 @@
     <string name="consent_body">SajdaTime is free and has no ads. If you say yes, it sends a few usage counts to Google Analytics so the app can be improved. They are tied to a random ID, not your name, and may be processed outside the UK. Detailed records are kept for 14 months.\n\nUsing a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time. The person responsible is Ali Imran Khan, who made the app.</string>
     <string name="settings_language_title">Language</string>
     <string name="settings_language_desc">Choose the language of the app</string>
-    <string name="language_unavailable">Translation awaiting review by a native speaker</string>
+    <string name="language_unavailable">Not available in this version</string>
+    <!-- First entry of the language list: the app follows the phone's own language when it has
+         words in it. This is the default, so it is what is ticked until someone chooses. -->
+    <string name="language_phone">Phone language</string>
+    <!-- About, shown only when the app is not in English (the base language is the owner's own
+         writing). Said plainly and kept short: the translations are drafted with AI help and
+         have not been reviewed by a native speaker for every language, and a reader who can
+         tell us where they are wrong is the fastest way they get better. -->
+    <string name="about_translation">Translation</string>
+    <string name="about_translation_note">This translation was made with help from AI and may contain mistakes. If you see one, please tell us with Send feedback.</string>
+    <!-- Under the privacy policy link in the consent text, shown only when the app is not in
+         English. The policy page is in English and the consent text must not pretend it is not. -->
+    <string name="consent_policy_english">The full privacy policy is in English.</string>
     <string name="permission_allowed">Allowed</string>
     <string name="state_expanded">Expanded</string>
     <string name="state_collapsed">Collapsed</string>

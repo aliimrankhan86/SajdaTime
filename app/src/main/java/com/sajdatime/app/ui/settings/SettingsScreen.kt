@@ -80,6 +80,7 @@ import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.core.AdjustmentFit
+import com.sajdatime.core.AppLocale
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Madhab
@@ -244,15 +245,16 @@ fun SettingsScreen(
         }
 
         Group(stringResource(R.string.settings_group_appearance)) {
+            // First in the group, above Theme: a person who cannot read the app's current
+            // language looks for the globe, so it must be somewhere the eye lands.
+            SettingRow(
+                icon = Icons.Outlined.Language,
+                title = stringResource(R.string.settings_language_title),
+                subtitle = AppLanguage.chosen(context)?.nativeName
+                    ?: "${stringResource(R.string.language_phone)} · ${AppLanguage.showing(context).nativeName}",
+                onClick = { open = SettingsChooser.LANGUAGE },
+            )
             ThemeRow(current = settings.themeChoice, onSelect = onSetThemeChoice)
-            if (AppLanguage.supported) {
-                SettingRow(
-                    icon = Icons.Outlined.Language,
-                    title = stringResource(R.string.settings_language_title),
-                    subtitle = AppLanguage.current(context).nativeName,
-                    onClick = { open = SettingsChooser.LANGUAGE },
-                )
-            }
         }
 
         Group(stringResource(R.string.settings_group_reminders)) {
@@ -282,6 +284,14 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_version),
                 subtitle = versionName(context),
             )
+            // Only when the app is in a translated language: the English text is the owner's
+            // own writing, the translations were drafted with AI help.
+            if (AppLocale.of(context).language != "en") {
+                SettingRow(
+                    title = stringResource(R.string.about_translation),
+                    subtitle = stringResource(R.string.about_translation_note),
+                )
+            }
             SettingRow(
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
@@ -411,48 +421,7 @@ fun SettingsScreen(
             onSearchCity = onSearchCity,
         )
 
-        SettingsChooser.LANGUAGE -> {
-            val current = AppLanguage.current(context)
-            ChooserDialog(title = stringResource(R.string.settings_language_title), onDismiss = { open = null }) {
-                Column(Modifier.selectableGroup()) {
-                    AppLanguage.entries.forEach { language ->
-                        val available = language.isAvailable(context)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp)
-                                .selectable(
-                                    selected = language == current,
-                                    enabled = available,
-                                    role = Role.RadioButton,
-                                    onClick = {
-                                        AppLanguage.apply(context, language)
-                                        open = null
-                                    },
-                                ),
-                        ) {
-                            RadioButton(selected = language == current, onClick = null, enabled = available)
-                            Spacer(Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    language.nativeName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = if (available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                if (!available) {
-                                    Text(
-                                        stringResource(R.string.language_unavailable),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        SettingsChooser.LANGUAGE -> LanguageChooserDialog(onDismiss = { open = null })
 
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
