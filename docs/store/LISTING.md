@@ -141,6 +141,8 @@ is not a promotion word, which was the open question and is now closed.
 
 ## Full description (max 4000)
 
+> **Changed 9 Oct 2026, to be applied in the Console (not yet live).** The calculation method bullet used to say "chosen automatically for your region". That is wrong: `PrayerEngine.resolveMethod` picks Muslim World League for Sunni and Jafari for Shia from the sect setting, never from the region. The live listing (3,727 of 4,000 characters) still has the old wording until this is saved in Play Console, Store listings, Default store listing.
+
 ```
 SajdaTime tells you when to pray and which way to face.
 That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
@@ -171,7 +173,7 @@ Sunni and Shia conventions are both supported properly, not as an afterthought.
 • Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
 • Calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai,
   Kuwait, Qatar, Singapore, Turkey, Moonsighting Committee and more
-• The right method is chosen automatically for your region, and you can override it
+• The method is chosen automatically for your school (Muslim World League for Sunni, Jafari for Shia), and you can override it
 • A high-latitude rule that gives sensible Fajr and Isha times in northern countries where
   the sun never fully sets in summer
 • The Umm al-Qura Ramadan adjustment is applied automatically during Ramadan

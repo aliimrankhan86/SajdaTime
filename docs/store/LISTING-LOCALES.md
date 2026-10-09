@@ -16,6 +16,8 @@ feature graphic are reused automatically unless you upload language-specific one
 > honest to know it. In-app translation is item 12 in `HANDOVER.md` §11; the 129 strings are
 > already externalised, so it is ready when you want it.
 
+> **Corrected 9 Oct 2026 (drafts only, none of these is in Play).** The privacy bullets and short descriptions used to say "no analytics, no tracking, no crash reporting". That stopped being true when optional usage counts shipped in 1.3.0, so each language now follows the English listing: optional usage counts the user controls in Settings, no crash reporting, coordinates never part of the counts. The calculation method line used to say it was chosen for "your region"; it is chosen from the Sunni or Shia setting (Muslim World League or Jafari), so it now says that. The "app stays in English" note below is also out of date: 1.3.1 ships Urdu, Turkish and Indonesian in the app. Every corrected line was written by an assistant, so the native speaker check below still applies before any of this is published.
+
 > **Have a native speaker skim these before you publish.** They were written by an
 > assistant. The religious terminology is standard and the keywords are the ones people
 > actually search, but idiom is the kind of thing only a native reader catches. The Bengali
@@ -49,10 +51,10 @@ Muslims worldwide.
 SajdaTime: Jadwal Sholat
 ```
 
-**Short description** (80 / 80)
+**Short description** (66 / 80)
 
 ```
-Jadwal sholat offline dan arah kiblat. Tanpa iklan, tanpa akun, tanpa pelacakan.
+Jadwal sholat offline dan arah kiblat. Tanpa iklan dan tanpa akun.
 ```
 
 **Full description**
@@ -86,7 +88,7 @@ Ketentuan Sunni dan Syiah keduanya didukung dengan benar, bukan sekadar tambahan
 • Syiah: Jafari / Itsna Asyariyah, termasuk aturan Maghrib yang benar
 • Metode perhitungan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai,
   Kuwait, Qatar, Singapura, Turki, Moonsighting Committee dan lainnya
-• Metode yang tepat dipilih otomatis untuk wilayah Anda, dan dapat Anda ubah sendiri
+• Metode dipilih otomatis sesuai pilihan Anda, Sunni atau Syiah (Muslim World League untuk Sunni, Jafari untuk Syiah), dan dapat Anda ubah sendiri
 • Aturan lintang tinggi yang memberikan waktu Subuh dan Isya yang masuk akal di negara
   utara tempat matahari tidak pernah benar-benar terbenam pada musim panas
 • Penyesuaian Ramadan Umm al-Qura diterapkan otomatis selama Ramadan
@@ -99,9 +101,9 @@ Yang ini tidak dibiayai sama sekali.
 
 • Tidak ada iklan, selamanya
 • Tidak ada akun, tidak ada masuk, tidak ada alamat email
-• Tidak ada analitik, tidak ada pelaporan kerusakan, tidak ada pelacakan apa pun
+• Penghitungan penggunaan bersifat opsional dan Anda atur di Pengaturan. Tanpa pelaporan kerusakan
 • Hanya lokasi perkiraan, dibaca saat aplikasi terbuka, tidak pernah di latar belakang
-• Koordinat Anda tidak pernah meninggalkan perangkat — tidak ada server untuk menerimanya
+• Koordinat Anda tidak pernah meninggalkan perangkat, dan tidak pernah menjadi bagian dari penghitungan penggunaan opsional
 • Pencadangan awan sengaja dimatikan agar tidak ada yang dapat disalin dari ponsel Anda
 
 Jika Anda lebih memilih tidak membagikan lokasi sama sekali, Anda dapat mengetikkan nama
@@ -134,10 +136,10 @@ diberikan cuma-cuma sebagai sedekah jariyah untuk umat.
 SajdaTime: Waktu Solat, Kiblat
 ```
 
-**Short description** (76 / 80)
+**Short description** (64 / 80)
 
 ```
-Waktu solat luar talian dan arah kiblat. Tiada iklan, akaun atau penjejakan.
+Waktu solat luar talian dan arah kiblat. Tiada iklan atau akaun.
 ```
 
 **Full description**
@@ -172,7 +174,7 @@ Kaedah Sunni dan Syiah kedua-duanya disokong dengan betul, bukan sekadar tambaha
 • Syiah: Jafari / Ithna Asyari, termasuk kaedah Maghrib yang betul
 • Kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai,
   Kuwait, Qatar, Singapura, Turki, Moonsighting Committee dan banyak lagi
-• Kaedah yang betul dipilih secara automatik untuk wilayah anda, dan boleh anda ubah
+• Kaedah dipilih secara automatik mengikut pilihan anda, Sunni atau Syiah (Muslim World League untuk Sunni, Jafari untuk Syiah), dan boleh anda ubah
 • Peraturan latitud tinggi yang memberikan waktu Subuh dan Isyak yang munasabah di negara
   utara di mana matahari tidak pernah terbenam sepenuhnya pada musim panas
 • Pelarasan Ramadan Umm al-Qura digunakan secara automatik sepanjang Ramadan
@@ -185,9 +187,9 @@ anda. Yang ini tidak dibiayai langsung.
 
 • Tiada iklan, selamanya
 • Tiada akaun, tiada log masuk, tiada alamat e-mel
-• Tiada analitik, tiada laporan ranap, tiada penjejakan sebarang jenis
+• Kiraan penggunaan pilihan yang anda kawal dalam Tetapan. Tiada laporan ranap
 • Lokasi anggaran sahaja, dibaca semasa aplikasi dibuka, tidak pernah di latar belakang
-• Koordinat anda tidak pernah meninggalkan peranti — tiada pelayan untuk menerimanya
+• Koordinat anda tidak pernah meninggalkan peranti, dan tidak pernah menjadi sebahagian daripada kiraan penggunaan pilihan
 • Sandaran awan sengaja dimatikan supaya tiada apa boleh disalin dari telefon anda
 
 Jika anda lebih suka tidak berkongsi lokasi langsung, anda boleh menaip nama bandar dan
@@ -221,10 +223,10 @@ secara percuma sebagai sedekah berterusan untuk umat.
 SajdaTime: اوقات نماز و قبلہ
 ```
 
-**Short description** (68 / 80)
+**Short description** (57 / 80)
 
 ```
-آف لائن نماز کے اوقات اور قبلہ نما۔ نہ اشتہار، نہ اکاؤنٹ، نہ ٹریکنگ۔
+آف لائن نماز کے اوقات اور قبلہ نما۔ نہ اشتہار، نہ اکاؤنٹ۔
 ```
 
 **Full description**
@@ -258,7 +260,7 @@ SajdaTime آپ کو بتاتا ہے کہ نماز کا وقت کب ہے اور �
 • شیعہ: جعفری / اثنا عشری، بشمول مغرب کا درست اصول
 • حسابی طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، سنگاپور،
   ترکی، مون سائٹنگ کمیٹی اور مزید
-• آپ کے خطے کے لیے درست طریقہ خود بخود منتخب ہوتا ہے، اور آپ اسے بدل سکتے ہیں
+• طریقہ آپ کے انتخاب، سنی یا شیعہ، کے مطابق خود بخود منتخب ہوتا ہے (سنی کے لیے مسلم ورلڈ لیگ، شیعہ کے لیے جعفری)، اور آپ اسے بدل سکتے ہیں
 • بلند عرض بلد کا اصول جو شمالی ممالک میں معقول فجر اور عشاء کے اوقات دیتا ہے جہاں گرمیوں
   میں سورج پوری طرح غروب نہیں ہوتا
 • رمضان میں ام القریٰ کی ترمیم خود بخود لاگو ہوتی ہے
@@ -271,9 +273,9 @@ SajdaTime آپ کو بتاتا ہے کہ نماز کا وقت کب ہے اور �
 
 • کبھی کوئی اشتہار نہیں
 • نہ اکاؤنٹ، نہ سائن اِن، نہ ای میل پتہ
-• نہ کوئی تجزیہ، نہ کریش رپورٹنگ، نہ کسی قسم کی ٹریکنگ
+• استعمال کی اختیاری گنتی، جس پر آپ کا اختیار سیٹنگز میں ہے۔ کوئی کریش رپورٹنگ نہیں
 • صرف تخمینی مقام، وہ بھی جب ایپ کھلی ہو، پس منظر میں کبھی نہیں
-• آپ کے جغرافیائی نقاط کبھی آپ کے آلے سے باہر نہیں جاتے — کوئی سرور ہے ہی نہیں
+• آپ کے جغرافیائی نقاط کبھی آپ کے آلے سے باہر نہیں جاتے، اور اختیاری گنتی میں بھی شامل نہیں ہوتے
 • کلاؤڈ بیک اپ جان بوجھ کر بند ہے تاکہ آپ کے فون سے کچھ نقل نہ ہو سکے
 
 اگر آپ اپنا مقام بالکل بھی نہیں بتانا چاہتے تو شہر کا نام لکھ دیں، ایپ بالکل ویسے ہی کام
@@ -307,10 +309,10 @@ SajdaTime ایک مددگار ہے، دینی مرجع نہیں۔ اسے مصن�
 SajdaTime: নামাজের সময়, কিবলা
 ```
 
-**Short description** (80 / 80)
+**Short description** (65 / 80)
 
 ```
-অফলাইন নামাজের সময় ও কিবলা কম্পাস। বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই, ট্র্যাকিং নেই।
+অফলাইন নামাজের সময় ও কিবলা কম্পাস। বিজ্ঞাপন নেই, অ্যাকাউন্ট নেই।
 ```
 
 **Full description**
@@ -344,7 +346,7 @@ SajdaTime আপনাকে জানায় কখন নামাজের 
 • শিয়া: জাফরি / ইসনা আশারি, সঠিক মাগরিবের নিয়মসহ
 • গণনা পদ্ধতি: মুসলিম ওয়ার্ল্ড লিগ, ISNA, উম্মুল কুরা, মিশরীয়, করাচি, দুবাই, কুয়েত,
   কাতার, সিঙ্গাপুর, তুরস্ক, মুনসাইটিং কমিটি এবং আরও
-• আপনার অঞ্চলের জন্য সঠিক পদ্ধতি স্বয়ংক্রিয়ভাবে নির্বাচিত হয়, এবং আপনি বদলাতে পারেন
+• পদ্ধতি আপনার পছন্দ, সুন্নি বা শিয়া, অনুযায়ী স্বয়ংক্রিয়ভাবে নির্বাচিত হয় (সুন্নির জন্য মুসলিম ওয়ার্ল্ড লিগ, শিয়ার জন্য জাফরি), এবং আপনি বদলাতে পারেন
 • উচ্চ অক্ষাংশের নিয়ম, যা উত্তরের দেশগুলিতে যুক্তিসঙ্গত ফজর ও ইশার সময় দেয় যেখানে
   গ্রীষ্মে সূর্য পুরোপুরি অস্ত যায় না
 • রমজানে উম্মুল কুরা সমন্বয় স্বয়ংক্রিয়ভাবে প্রযোজ্য হয়
@@ -357,9 +359,9 @@ SajdaTime আপনাকে জানায় কখন নামাজের 
 
 • কখনও কোনও বিজ্ঞাপন নয়
 • কোনও অ্যাকাউন্ট নেই, সাইন-ইন নেই, ইমেল ঠিকানা নেই
-• কোনও অ্যানালিটিক্স নেই, ক্র্যাশ রিপোর্ট নেই, কোনও ধরনের ট্র্যাকিং নেই
+• ঐচ্ছিক ব্যবহারের গণনা, যা আপনি সেটিংসে নিয়ন্ত্রণ করেন। ক্র্যাশ রিপোর্ট নেই
 • কেবল আনুমানিক অবস্থান, অ্যাপ খোলা থাকলে পড়া হয়, কখনও পটভূমিতে নয়
-• আপনার স্থানাঙ্ক কখনও ডিভাইস ছাড়ে না — পাঠানোর মতো কোনও সার্ভারই নেই
+• আপনার স্থানাঙ্ক কখনও ডিভাইস ছাড়ে না, এবং ঐচ্ছিক ব্যবহারের গণনার অংশও হয় না
 • ক্লাউড ব্যাকআপ ইচ্ছাকৃতভাবে বন্ধ, যাতে ফোন থেকে কিছু অনুলিপি করা না যায়
 
 আপনি যদি অবস্থান একেবারেই ভাগ করতে না চান, শহরের নাম লিখে দিন — অ্যাপ ঠিক একইভাবে কাজ
@@ -392,10 +394,10 @@ SajdaTime একটি সহায়ক, ধর্মীয় কর্তৃ
 SajdaTime: أوقات الصلاة، قبلة
 ```
 
-**Short description** (73 / 80)
+**Short description** (62 / 80)
 
 ```
-أوقات الصلاة والقبلة دون إنترنت. بلا إعلانات، بلا حساب، بلا تتبّع. مجاني.
+أوقات الصلاة والقبلة دون إنترنت. بلا إعلانات، بلا حساب. مجاني.
 ```
 
 **Full description**
@@ -429,7 +431,7 @@ SajdaTime: أوقات الصلاة، قبلة
 • الشيعة: الجعفري / الإثنا عشري، بما في ذلك قاعدة المغرب الصحيحة
 • طرق الحساب: رابطة العالم الإسلامي، ISNA، أم القرى، الهيئة المصرية، كراتشي، دبي،
   الكويت، قطر، سنغافورة، تركيا، لجنة رؤية الهلال وغيرها
-• تُختار الطريقة المناسبة لمنطقتك تلقائيًا، ويمكنك تغييرها
+• تُختار الطريقة تلقائيًا بحسب اختيارك، سنّي أو شيعي (رابطة العالم الإسلامي للسنّة، الجعفري للشيعة)، ويمكنك تغييرها
 • قاعدة خطوط العرض العالية تعطي أوقاتًا معقولة للفجر والعشاء في البلدان الشمالية حيث لا
   تغيب الشمس تمامًا في الصيف
 • يُطبَّق تعديل أم القرى لرمضان تلقائيًا خلال الشهر
@@ -442,9 +444,9 @@ SajdaTime: أوقات الصلاة، قبلة
 
 • لا إعلانات، أبدًا
 • لا حسابات، ولا تسجيل دخول، ولا عنوان بريد
-• لا تحليلات، ولا تقارير أعطال، ولا تتبّع من أي نوع
+• عدّ اختياري للاستخدام تتحكم به من الإعدادات. لا تقارير أعطال
 • موقع تقريبي فقط، يُقرأ والتطبيق مفتوح، ولا يُقرأ في الخلفية أبدًا
-• إحداثياتك لا تغادر جهازك — لا يوجد خادم أصلًا لتذهب إليه
+• إحداثياتك لا تغادر جهازك، ولا تدخل أبدًا ضمن العدّ الاختياري للاستخدام
 • النسخ الاحتياطي السحابي معطّل عمدًا حتى لا يُنسخ شيء من هاتفك
 
 وإن كنت تفضّل ألا تشارك موقعك إطلاقًا، فاكتب اسم مدينتك ويعمل التطبيق بالطريقة نفسها.
@@ -474,10 +476,10 @@ SajdaTime أداة مساعدة، وليس مرجعًا شرعيًا. بُني �
 SajdaTime: Namaz Vakitleri
 ```
 
-**Short description** (79 / 80)
+**Short description** (68 / 80)
 
 ```
-Çevrimdışı namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok, takip yok.
+Çevrimdışı namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok.
 ```
 
 **Full description**
@@ -511,7 +513,7 @@ Sünni ve Şii usulleri sonradan eklenmiş gibi değil, gerçekten doğru şekil
 • Şii: Caferi / İsna Aşeri, doğru akşam kuralı dahil
 • Hesaplama yöntemleri: Müslüman Dünya Birliği, ISNA, Ümmü'l-Kura, Mısır, Karaçi, Dubai,
   Kuveyt, Katar, Singapur, Türkiye, Moonsighting Committee ve daha fazlası
-• Bölgeniz için doğru yöntem otomatik seçilir ve dilerseniz değiştirebilirsiniz
+• Yöntem, seçtiğiniz mezhebe göre otomatik belirlenir (Sünni için Müslüman Dünya Birliği, Şii için Caferi) ve dilerseniz değiştirebilirsiniz
 • Yazın güneşin tam batmadığı kuzey ülkelerinde makul imsak ve yatsı vakitleri veren yüksek
   enlem kuralı
 • Ümmü'l-Kura Ramazan düzeltmesi Ramazan boyunca otomatik uygulanır
@@ -524,9 +526,9 @@ uygulama hiçbir şeyle finanse edilmiyor.
 
 • Asla reklam yok
 • Hesap yok, giriş yok, e-posta adresi yok
-• Analitik yok, çökme raporu yok, hiçbir türde takip yok
+• Ayarlardan kontrol ettiğiniz isteğe bağlı kullanım sayıları. Çökme raporu yok
 • Yalnızca yaklaşık konum, uygulama açıkken okunur, arka planda asla
-• Koordinatlarınız cihazınızdan hiç çıkmaz — gidecek bir sunucu zaten yok
+• Koordinatlarınız cihazınızdan hiç çıkmaz ve isteğe bağlı kullanım sayılarına da girmez
 • Bulut yedeklemesi bilerek kapatılmıştır, telefonunuzdan hiçbir şey kopyalanamaz
 
 Konumunuzu hiç paylaşmak istemiyorsanız şehir adını yazmanız yeterli; uygulama tamamen aynı
@@ -559,10 +561,10 @@ sadaka olarak karşılıksız sunulmaktadır.
 SajdaTime: Heures de prière
 ```
 
-**Short description** (75 / 80)
+**Short description** (66 / 80)
 
 ```
-Heures de prière hors ligne et boussole Qibla. Sans pub ni compte ni suivi.
+Heures de prière hors ligne et boussole Qibla. Sans pub ni compte.
 ```
 
 **Full description**
@@ -597,7 +599,7 @@ traitées comme un ajout tardif.
 • Chiite : jafarite / duodécimain, y compris la règle correcte du Maghrib
 • Méthodes de calcul : Ligue islamique mondiale, ISNA, Oumm al-Qura, égyptienne, Karachi,
   Dubaï, Koweït, Qatar, Singapour, Turquie, Moonsighting Committee et d'autres
-• La méthode adaptée à votre région est choisie automatiquement, et reste modifiable
+• La méthode est choisie automatiquement selon votre choix, sunnite ou chiite (Ligue islamique mondiale pour les sunnites, Jafari pour les chiites), et reste modifiable
 • Une règle pour les hautes latitudes, qui donne des heures de Fajr et d'Isha raisonnables
   dans les pays du Nord où le soleil ne se couche jamais complètement en été
 • L'ajustement Oumm al-Qura du Ramadan est appliqué automatiquement pendant le Ramadan
@@ -610,10 +612,10 @@ vos données. Celle-ci n'est financée par rien du tout.
 
 • Aucune publicité, jamais
 • Aucun compte, aucune connexion, aucune adresse e-mail
-• Aucune statistique, aucun rapport d'erreur, aucun suivi d'aucune sorte
+• Compteurs d'usage facultatifs que vous contrôlez dans les Réglages. Aucun rapport d'erreur
 • Position approximative uniquement, lue application ouverte, jamais en arrière-plan
-• Vos coordonnées ne quittent jamais votre appareil — il n'existe aucun serveur pour les
-  recevoir
+• Vos coordonnées ne quittent jamais votre appareil et ne font jamais partie des compteurs
+  d'usage facultatifs
 • La sauvegarde dans le cloud est délibérément désactivée, rien ne peut être copié depuis
   votre téléphone
 
@@ -648,10 +650,10 @@ offert gratuitement comme une aumône continue pour la Oumma.
 SajdaTime: नमाज़ का समय
 ```
 
-**Short description** (75 / 80)
+**Short description** (65 / 80)
 
 ```
-ऑफ़लाइन नमाज़ का समय और क़िबला कम्पास। कोई विज्ञापन, खाता या ट्रैकिंग नहीं।
+ऑफ़लाइन नमाज़ का समय और क़िबला कम्पास। कोई विज्ञापन या खाता नहीं।
 ```
 
 **Full description**
@@ -685,7 +687,7 @@ SajdaTime आपको बताता है कि नमाज़ का व�
 • शिया: जाफ़री / इसना अशरी, सही मग़रिब नियम सहित
 • गणना विधियाँ: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल-क़ुरा, मिस्री, कराची, दुबई, कुवैत,
   क़तर, सिंगापुर, तुर्की, मूनसाइटिंग कमेटी और अन्य
-• आपके क्षेत्र के लिए सही विधि अपने आप चुनी जाती है, और आप उसे बदल सकते हैं
+• विधि आपकी पसंद, सुन्नी या शिया, के अनुसार अपने आप चुनी जाती है (सुन्नी के लिए मुस्लिम वर्ल्ड लीग, शिया के लिए जाफ़री), और आप उसे बदल सकते हैं
 • उच्च अक्षांश नियम, जो उत्तरी देशों में उचित फ़ज्र और इशा समय देता है जहाँ गर्मियों में
   सूरज पूरी तरह नहीं डूबता
 • रमज़ान में उम्म अल-क़ुरा समायोजन अपने आप लागू होता है
@@ -698,9 +700,9 @@ SajdaTime आपको बताता है कि नमाज़ का व�
 
 • कभी कोई विज्ञापन नहीं
 • कोई खाता नहीं, कोई साइन-इन नहीं, कोई ईमेल पता नहीं
-• कोई एनालिटिक्स नहीं, कोई क्रैश रिपोर्ट नहीं, किसी तरह की ट्रैकिंग नहीं
+• वैकल्पिक उपयोग गणना, जिसे आप सेटिंग्स में नियंत्रित करते हैं। कोई क्रैश रिपोर्ट नहीं
 • केवल अनुमानित लोकेशन, वह भी ऐप खुले होने पर, पृष्ठभूमि में कभी नहीं
-• आपके निर्देशांक कभी आपके डिवाइस से बाहर नहीं जाते — कोई सर्वर है ही नहीं
+• आपके निर्देशांक कभी आपके डिवाइस से बाहर नहीं जाते, और वैकल्पिक उपयोग गणना में भी शामिल नहीं होते
 • क्लाउड बैकअप जानबूझकर बंद है, ताकि आपके फ़ोन से कुछ भी कॉपी न हो सके
 
 अगर आप लोकेशन बिल्कुल साझा नहीं करना चाहते, तो शहर का नाम लिख दीजिए — ऐप बिल्कुल वैसे ही
