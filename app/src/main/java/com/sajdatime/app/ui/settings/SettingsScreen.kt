@@ -6,7 +6,6 @@ import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.app.ui.components.rememberGranted
 import android.media.RingtoneManager
 import androidx.core.net.toUri
-import android.provider.Settings as SystemSettings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -181,13 +180,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_dnd_title),
                 body = stringResource(R.string.settings_dnd_desc),
                 granted = dndAllowed,
-                onClick = {
-                    runCatching {
-                        context.startActivity(
-                            Intent(SystemSettings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS),
-                        )
-                    }
-                },
+                onClick = { Notifications.openDndAccessSettings(context) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
