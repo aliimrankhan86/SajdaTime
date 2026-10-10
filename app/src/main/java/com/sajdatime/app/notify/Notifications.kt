@@ -2,6 +2,7 @@ package com.sajdatime.app.notify
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -171,6 +172,9 @@ object Notifications {
             Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
         }
         for (intent in listOf(list, appNotifications)) {
+            // Settings calls this with the Activity. Anything else (the instrumented test, a
+            // future notification action) needs a new task or startActivity throws.
+            if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (runCatching { context.startActivity(intent) }.isSuccess) return
         }
     }

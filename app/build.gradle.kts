@@ -52,6 +52,11 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
+    // Instrumented tests run against debug by default. `-PtestBuildType=sideload` runs them on
+    // the owner's phone beside the Play copy instead (see LanguageAndDndDeviceTest), because a
+    // debug-signed com.sajdatime.app cannot install there.
+    testBuildType = providers.gradleProperty("testBuildType").getOrElse("debug")
+
     signingConfigs {
         keystoreProperties?.let { props ->
             create("release") {
