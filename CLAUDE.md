@@ -216,6 +216,10 @@ session inherits it instead of relearning it.
   including the module-scoping trap that cost a session, is in
   [`docs/HANDOVER.md`](docs/HANDOVER.md), "Getting the app onto an emulator when the
   assistant has no device access", just above the build-traps table.
+- **From a cloud session, releases go through his Mac in one command and through Claude in Chrome.** A
+  cloud session cannot push, run Gradle on his Mac or drive the Play Console itself. How 1.3.2 was shipped on
+  11 Oct 2026, end to end, is in `docs/HANDOVER.md` §15 lessons 128 and 129, with the script kept at
+  `docs/release-tools/release-1.3.2.sh`.
 - **He does have real devices, and they find things the emulators cannot.** A Redmi Note 13
   Pro (HyperOS) and a Galaxy S23 Ultra (One UI), which he will plug in if asked. Every
   alarm-reliability fact this project knows came off the Redmi, and the S23 Ultra found both
