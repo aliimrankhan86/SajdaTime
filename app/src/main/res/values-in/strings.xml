@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
+<!-- Translated by Claude on 8 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_language_tag" tools:ignore="ExtraTranslation">id</string>
     <string name="app_name">SajdaTime</string>
@@ -192,7 +192,7 @@
     <string name="consent_body">SajdaTime gratis dan tanpa iklan. Jika Anda setuju, aplikasi ini mengirim sedikit data jumlah penggunaan ke Google Analytics agar aplikasi bisa ditingkatkan. Data itu terhubung ke ID acak, bukan nama Anda, dan bisa diproses di luar Inggris Raya. Catatan terperinci disimpan selama 14 bulan.\n\nMemakai aplikasi salat bisa mengungkapkan sesuatu tentang keyakinan Anda, jadi ini sepenuhnya pilihan Anda, dan tidak ada yang berubah di aplikasi jika Anda menolak. SajdaTime tidak pernah mengirim posisi GPS atau pengaturan salat Anda.\n\nSampai Anda memilih ya, tidak ada yang dikirim. Anda bisa mematikannya di Pengaturan kapan saja. Penanggung jawabnya adalah Ali Imran Khan, pembuat aplikasi ini.</string>
     <string name="settings_language_title">Bahasa</string>
     <string name="settings_language_desc">Pilih bahasa aplikasi</string>
-    <string name="language_unavailable">Terjemahan menunggu ditinjau oleh penutur asli</string>
+    <string name="language_unavailable">Tidak tersedia di ponsel ini</string>
     <string name="permission_allowed">Diizinkan</string>
     <string name="state_expanded">Diperluas</string>
     <string name="state_collapsed">Diciutkan</string>

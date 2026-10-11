@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Machine-assisted translation by Claude, 8 Oct 2026, NOT reviewed by a native speaker. The owner (Ali Imran Khan) accepted this on 8 Oct 2026. Replace or correct on native review. -->
+<!-- Translated by Claude on 8 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_language_tag" tools:ignore="ExtraTranslation">ur</string>
     <!-- Product name: deliberately left untranslated. -->
@@ -196,7 +196,7 @@
     <string name="consent_body">SajdaTime مفت ہے اور اس میں کوئی اشتہار نہیں۔ اگر آپ ہاں کہیں تو یہ استعمال کے چند اعداد و شمار Google Analytics کو بھیجتی ہے تاکہ ایپ کو بہتر بنایا جا سکے۔ یہ آپ کے نام سے نہیں بلکہ ایک رینڈم شناختی نمبر (ID) سے جڑے ہوتے ہیں، اور ہو سکتا ہے انہیں برطانیہ سے باہر پروسیس کیا جائے۔ تفصیلی ریکارڈ 14 مہینے تک رکھے جاتے ہیں۔\n\nنماز کی ایپ استعمال کرنے سے آپ کے ایمان کے بارے میں کچھ ظاہر ہو سکتا ہے، اس لیے یہ فیصلہ آپ کا ہے، اور اگر آپ نہیں کہیں تو ایپ میں کچھ نہیں بدلتا۔ SajdaTime کبھی آپ کی GPS پوزیشن یا آپ کی نماز کی ترتیبات نہیں بھیجتی۔\n\nجب تک آپ ہاں نہ چنیں، کچھ نہیں بھیجا جاتا۔ آپ اسے کسی بھی وقت ترتیبات میں بند کر سکتے ہیں۔ اس کے ذمہ دار علی عمران خان (Ali Imran Khan) ہیں، جنہوں نے یہ ایپ بنائی ہے۔</string>
     <string name="settings_language_title">زبان</string>
     <string name="settings_language_desc">ایپ کی زبان منتخب کریں</string>
-    <string name="language_unavailable">ترجمہ اہلِ زبان کے جائزے کا منتظر ہے</string>
+    <string name="language_unavailable">اس فون پر دستیاب نہیں</string>
     <string name="permission_allowed">اجازت ہے</string>
     <string name="state_expanded">کھلا ہوا</string>
     <string name="state_collapsed">بند</string>

@@ -11,14 +11,17 @@ import java.util.Locale
  * The languages the in-app picker offers, through Android's per-app language support
  * (API 33+; `res/xml/locales_config.xml` declares the same list to the system).
  *
- * **Offering a language is not the same as having it.** [isAvailable] is true only when a
- * `values-<tag>/` folder really resolves `app_language_tag` to that language; otherwise the row
- * is shown disabled and choosing it is impossible, which also means the app can never be put
- * into a right-to-left layout while still written in English (AppLocale.kt).
+ * **Offering a language is not the same as having it on the phone.** [isAvailable] is true only
+ * when a `values-<tag>/` folder really resolves `app_language_tag` to that language on this
+ * device; otherwise the row is shown disabled and choosing it is impossible, which also means the
+ * app can never be put into a right-to-left layout while still written in English (AppLocale.kt).
+ * Since 1.3.2 every language is packaged into the app itself (`bundle.language.enableSplit =
+ * false` in app/build.gradle.kts), so on a Play install this is a safety net, not a gate. Before
+ * that, Play installed only the phone's own language and every other row was greyed out.
  *
- * Urdu, Turkish and Indonesian were translated by Claude on 8 Oct 2026 and shipped at the
- * owner's explicit instruction WITHOUT native-speaker review (CLAUDE.md's usual rule, waived
- * once, recorded in gbrain and docs/HANDOVER.md). Each translation file says so at the top.
+ * Urdu, Turkish and Indonesian are Claude's translation (8 Oct 2026). On 9 Oct 2026 the owner
+ * decided they need no native speaker review: SajdaTime is a free utility he makes himself, and
+ * the translator's own checking is the standard. The app must not tell users otherwise.
  */
 enum class AppLanguage(val tag: String, val nativeName: String) {
     // Names are written in their own language and script on purpose, so a user who cannot
@@ -29,12 +32,12 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     INDONESIAN("id", "Bahasa Indonesia"),
     ;
 
-    /** True when a reviewed translation for this language is compiled into the app. */
+    /** True when this language's words are installed on this phone. */
     fun isAvailable(context: Context): Boolean {
         if (this == ENGLISH) return true
         val config = Configuration(context.resources.configuration).apply { setLocale(Locale.forLanguageTag(tag)) }
         val resolved = context.createConfigurationContext(config).getString(com.sajdatime.core.R.string.app_language_tag)
-        return Locale.forLanguageTag(resolved).language == Locale.forLanguageTag(tag).language
+        return normalise(Locale.forLanguageTag(resolved).language) == normalise(Locale.forLanguageTag(tag).language)
     }
 
     companion object {
@@ -45,8 +48,31 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
         fun current(context: Context): AppLanguage {
             if (!supported) return ENGLISH
             val chosen = context.getSystemService(LocaleManager::class.java)
-                ?.applicationLocales?.takeIf { !it.isEmpty }?.get(0)?.language
-            return entries.firstOrNull { it.tag == chosen } ?: ENGLISH
+                ?.applicationLocales?.takeIf { !it.isEmpty }?.get(0)
+            return fromLocale(chosen)
+        }
+
+        /**
+         * The picker row for [locale], English when none matches.
+         *
+         * Compares by normalised language code, not by `tag == locale.language`. Android's
+         * `Locale.getLanguage()` returns the legacy code "in" for Indonesian (and "iw" for
+         * Hebrew), so the plain comparison 1.3.1 shipped could never match "id": once a user
+         * chose Indonesian, Settings would show English ticked while the app was in Indonesian.
+         * Found by reading the code on 10 Oct 2026, not seen on a phone (Indonesian could not be
+         * chosen at all from a Play install until the language split fix).
+         */
+        fun fromLocale(locale: Locale?): AppLanguage {
+            val chosen = locale?.language?.let(::normalise) ?: return ENGLISH
+            return entries.firstOrNull { normalise(it.tag) == chosen } ?: ENGLISH
+        }
+
+        /** Maps the legacy ISO 639 codes Android still hands out to the modern ones. */
+        internal fun normalise(language: String): String = when (val code = language.lowercase(Locale.ROOT)) {
+            "in" -> "id"
+            "iw" -> "he"
+            "ji" -> "yi"
+            else -> code
         }
 
         fun apply(context: Context, language: AppLanguage) {

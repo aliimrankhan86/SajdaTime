@@ -325,7 +325,9 @@ class UsageCountsTest {
         assertTrue("policy must list how you found the app", policy.contains("how you found the app"))
         assertTrue("policy must use the same term", policy.contains("prayer calculation setting"))
         assertFalse("policy must not use the old term", policy.contains("school of thought"))
-        assertTrue(policy.contains("Last updated: 7 October 2026"))
+        // Bumped to 10 October 2026 in 1.3.2 for the Do Not Disturb permission (DndAccessTest).
+        assertTrue(policy.contains("Last updated: 10 October 2026"))
+        assertTrue("policy must list every permission", policy.contains("ACCESS_NOTIFICATION_POLICY"))
     }
 
     @Test

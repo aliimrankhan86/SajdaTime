@@ -2,6 +2,7 @@ package com.sajdatime.app.notify
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -80,12 +81,31 @@ object Notifications {
     }
 
     /**
+     * The alarm channel's id: one per sound, and a separate one once the user has given
+     * SajdaTime Do Not Disturb access.
+     *
+     * Why the Do Not Disturb state is part of the id. Android lets a channel bypass Do Not
+     * Disturb only if the app held that access when the channel was CREATED. Re-creating an
+     * existing channel updates the flag only if the user has never touched any of that
+     * channel's settings (PreferencesHelper.createNotificationChannel in AOSP: it needs
+     * `getUserLockedFields() == 0 && hasDndAccess`). So a user who once changed the alarm's
+     * vibration, then granted access, would still be silenced. A new id after the grant always
+     * gets a fresh channel that really bypasses, and the stale one is deleted below.
+     *
+     * The id without access is exactly 1.3.1's, so nobody's existing channel (and anything they
+     * customised on it) changes until they actually grant access.
+     */
+    internal fun alarmChannelId(soundUri: String, bypassesDnd: Boolean): String =
+        CHANNEL_ALARM_PREFIX + soundUri.hashCode().toUInt().toString(16) + if (bypassesDnd) "_dnd" else ""
+
+    /**
      * Creates (or reuses) the alarm channel for [soundUri] and returns its id. Stale
-     * channels from previously chosen sounds are deleted so the system Settings list
-     * does not fill up with dead entries.
+     * channels from previously chosen sounds, or from before Do Not Disturb access was
+     * granted or withdrawn, are deleted so the system Settings list does not fill up with
+     * dead entries.
      */
     fun ensureAlarmChannel(context: Context, soundUri: String): String {
-        val id = CHANNEL_ALARM_PREFIX + soundUri.hashCode().toUInt().toString(16)
+        val id = alarmChannelId(soundUri, bypassesDnd = hasDndAccess(context))
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
 
         val manager = context.getSystemService(NotificationManager::class.java) ?: return id
@@ -118,10 +138,13 @@ object Notifications {
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
                         .build(),
                 )
-                // Best-effort only, and not the mechanism above. The platform ignores this
-                // unless the app holds notification policy access, which SajdaTime neither
-                // asks for nor needs — the channel really does read back mBypassDnd=false.
-                // Kept because it costs nothing and takes effect if the user ever grants it.
+                // The second, stronger mechanism, and the one the Settings button asks for.
+                // USAGE_ALARM above passes Do Not Disturb only while the user's DND rules
+                // allow alarms; a bypassing channel passes even when they do not. Android
+                // honours this only if the user has given SajdaTime Do Not Disturb access
+                // (ACCESS_NOTIFICATION_POLICY in the manifest puts the app on that list);
+                // without access the channel reads back mBypassDnd=false, which is why the id
+                // changes once access is granted (alarmChannelId).
                 setBypassDnd(true)
             },
         )
@@ -132,6 +155,29 @@ object Notifications {
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
+
+    /**
+     * Opens the system list where the user gives SajdaTime Do Not Disturb access, and the
+     * app's own notification settings on the rare phone that has no such list.
+     *
+     * The list only shows apps that declare ACCESS_NOTIFICATION_POLICY, which 1.3.1 did not,
+     * so on the owner's Samsung this button opened a list without SajdaTime in it.
+     */
+    fun openDndAccessSettings(context: Context) {
+        val list = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+        val appNotifications = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+        } else {
+            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        }
+        for (intent in listOf(list, appNotifications)) {
+            // Settings calls this with the Activity. Anything else (the instrumented test, a
+            // future notification action) needs a new task or startActivity throws.
+            if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            if (runCatching { context.startActivity(intent) }.isSuccess) return
+        }
+    }
 
     /** True once the user has allowed the app to sound through Do Not Disturb. */
     fun hasDndAccess(context: Context): Boolean = runCatching {

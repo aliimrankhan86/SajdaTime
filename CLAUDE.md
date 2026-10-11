@@ -123,14 +123,17 @@ session inherits it instead of relearning it.
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
   and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
   however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
-- **Never machine-translate the app.** Prayer and madhab names are religious content; each
-  language needs a native speaker before it ships. **One exception, owner's own decision on
-  8 Oct 2026:** Urdu, Turkish and Indonesian shipped in 1.3.1 as Claude's translation,
-  unreviewed (`values-ur`, `values-tr`, `values-in`, each file says so at the top). It is
-  not a precedent: any further language still needs a native speaker. Replace or correct
-  those three the moment a reviewer is found. Indonesian's folder is `values-in`, not
-  `values-id`: Android hands the app the legacy code, so `values-id` is packaged and never
-  matches.
+- **Translations: Claude translates and checks its own work; no native speaker review.** The
+  owner decided this on 9 Oct 2026 (SajdaTime is a free utility he makes himself), superseding
+  the old "never machine-translate" rule. Urdu, Turkish and Indonesian shipped in 1.3.1
+  (`values-ur`, `values-tr`, `values-in`). Never tell users a translation awaits review, and
+  never ask him to find a reviewer. Correct any mistake a user reports. Prayer and madhab names
+  are religious content, so take particular care with them, and the religious disclaimer is
+  never softened in any language. Indonesian's folder is `values-in`, not `values-id`: Android
+  hands the app the legacy code, so `values-id` is packaged and never matches. **Every language
+  must stay packaged in the app** (`bundle.language.enableSplit = false`): with Play's default
+  language splits, the in-app picker cannot switch to a language the phone itself is not set to
+  (`docs/HANDOVER.md` §15 lesson 125).
 - **The app follows the phone's language, and goes right-to-left only when it has the
   words to.** `AppLocale` reads the app's language out of the resources, so the day a
   reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL

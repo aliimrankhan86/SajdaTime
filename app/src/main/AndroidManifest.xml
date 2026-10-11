@@ -39,6 +39,21 @@
     -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
+    <!--
+      Lets the user put SajdaTime on the system's "Do Not Disturb access" list (Samsung calls
+      it "Do Not Disturb permission"). Settings' "Allow sound during Do Not Disturb" button
+      opens that list, and Android only lists apps that declare this permission
+      (ZenAccessController.getPackagesRequestingNotificationPolicyAccess in AOSP Settings).
+      1.3.1 shipped the button without it, so the list never contained the app: the owner
+      found that on his Samsung on 10 Oct 2026.
+
+      It is an install-time permission: no prompt, no Play declaration, and it grants nothing
+      by itself. Access is off until the user switches it on in that list. The only thing the
+      app does with it is let its own prayer alarm channel bypass Do Not Disturb
+      (Notifications.ensureAlarmChannel). It never changes the phone's Do Not Disturb state.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
     <uses-feature
         android:name="android.hardware.location"
         android:required="false" />

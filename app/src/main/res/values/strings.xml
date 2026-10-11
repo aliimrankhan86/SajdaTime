@@ -354,7 +354,7 @@
     <string name="consent_body">SajdaTime is free and has no ads. If you say yes, it sends a few usage counts to Google Analytics so the app can be improved. They are tied to a random ID, not your name, and may be processed outside the UK. Detailed records are kept for 14 months.\n\nUsing a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time. The person responsible is Ali Imran Khan, who made the app.</string>
     <string name="settings_language_title">Language</string>
     <string name="settings_language_desc">Choose the language of the app</string>
-    <string name="language_unavailable">Translation awaiting review by a native speaker</string>
+    <string name="language_unavailable">Not available on this phone</string>
     <string name="permission_allowed">Allowed</string>
     <string name="state_expanded">Expanded</string>
     <string name="state_collapsed">Collapsed</string>

@@ -41,11 +41,21 @@ android {
         // builds, and they are not the same app. **Never upload a saved artifact — build
         // fresh from main.** Play accepts whichever file you hand it, so a stale one ships
         // silently and cannot be corrected without burning another version code.
-        versionCode = 6
-        versionName = "1.3.1"
+        //
+        // 7 / 1.3.2, 10 Oct 2026: language picker works from a Play install (every language
+        // packaged, see the bundle block below) and the Do Not Disturb button finally lists
+        // the app (ACCESS_NOTIFICATION_POLICY in the manifest). Phone only: the watch stays
+        // 1001 / 1.2.0 and its bundle is never uploaded with a phone release.
+        versionCode = 7
+        versionName = "1.3.2"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
+
+    // Instrumented tests run against debug by default. `-PtestBuildType=sideload` runs them on
+    // the owner's phone beside the Play copy instead (see LanguageAndDndDeviceTest), because a
+    // debug-signed com.sajdatime.app cannot install there.
+    testBuildType = providers.gradleProperty("testBuildType").getOrElse("debug")
 
     signingConfigs {
         keystoreProperties?.let { props ->
@@ -133,6 +143,28 @@ android {
         resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
     }
 
+    // Every language ships inside the app itself. Do not turn this back on.
+    //
+    // By default an App Bundle splits each language into its own small APK, and Google Play
+    // installs only the languages the PHONE is set to. The in-app picker (Settings, Language)
+    // changes the APP's language independently of the phone, so on an English phone the Urdu,
+    // Turkish and Indonesian words were simply never installed. The picker then found no
+    // Urdu strings, greyed the row out and showed "awaiting review", and choosing a language
+    // could not work. Found on the owner's Samsung on 10 Oct 2026, running 1.3.1 from Play.
+    // Every emulator and sideload test had passed, because a locally built APK always
+    // contains every language: only a Play install drops them.
+    //
+    // Android's own guidance for an in-app language picker is exactly this, or downloading
+    // languages on demand with the Play Core library (developer.android.com/guide/app-bundle/
+    // configure-base, "Handling language changes"). On demand was rejected: it adds a Play
+    // library, a network download and a failure state to a picker that should just work
+    // offline, to save a few hundred kilobytes of text. LanguagePickerTest guards this line.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     testOptions {
         unitTests.isReturnDefaultValues = true
     }
@@ -191,6 +223,8 @@ tasks.withType<Test>().configureEach {
                 // UsageCountsTest reads these off disk too (docs/ANALYTICS_PLAN.md section 8).
                 "app/src/main/AndroidManifest.xml",
                 "app/src/main/res/xml/locales_config.xml",
+                // LanguagePickerTest reads the language split switch out of this very file.
+                "app/build.gradle.kts",
                 "app/src/**/res/values/bools.xml",
                 "app/src/**/res/values/firebase_config.xml",
             )
