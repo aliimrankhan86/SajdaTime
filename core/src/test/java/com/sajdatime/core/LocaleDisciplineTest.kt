@@ -136,7 +136,7 @@ class LocaleDisciplineTest {
             .toSet()
 
         val offenders = repoRoot.walkTopDown()
-            .onEnter { it.name != "build" && it.name != ".git" }
+            .onEnter(::isSourceDir)
             .filter { it.name == "strings.xml" && it.parentFile!!.name == "values" }
             .filterNot { it.path.contains("${File.separator}src${File.separator}rtl${File.separator}") }
             .filterNot { it.canonicalFile == defaultStrings().canonicalFile }
@@ -163,7 +163,7 @@ class LocaleDisciplineTest {
     fun `no shipped code formats from the device locale`() {
         val mainSources = "${File.separator}src${File.separator}main${File.separator}"
         val offenders = repoRoot.walkTopDown()
-            .onEnter { it.name != "build" && it.name != ".git" }
+            .onEnter(::isSourceDir)
             .filter { it.extension == "kt" && mainSources in it.path }
             .flatMap { file ->
                 file.readLines().asSequence().mapIndexedNotNull { i, line ->
@@ -203,10 +203,20 @@ class LocaleDisciplineTest {
         "nqo", // N'Ko
     )
 
+    /**
+     * Walk only the project's own sources: skip build output and every hidden folder. Claude
+     * Code keeps its worktrees in `.claude/worktrees/` inside this repo (gitignored), and each
+     * is a full copy of the project, often an older one. On 11 Oct 2026 the release gate on
+     * the owner's Mac failed here because the walk judged a stale worktree's copy of
+     * core/values/strings.xml as a second shipping source set. `.git`, `.gradle`, `.idea` and
+     * `.kotlin` hold no shipping source either. HANDOVER §15 lesson 127.
+     */
+    private fun isSourceDir(dir: File) = dir.name != "build" && !dir.name.startsWith(".")
+
     private fun defaultStrings() = File(repoRoot, "core/src/main/res/values/strings.xml")
 
     private fun translatedStringFiles(): List<File> = repoRoot.walkTopDown()
-        .onEnter { it.name != "build" && it.name != ".git" }
+        .onEnter(::isSourceDir)
         .filter { it.name == "strings.xml" && localeQualified.matches(it.parentFile!!.name) }
         .toList()
 
