@@ -23,6 +23,7 @@ import com.sajdatime.core.AppLocale
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.label
 import com.sajdatime.app.data.AlertStyle
+import java.time.Duration
 import java.time.Instant
 
 /**
@@ -47,6 +48,9 @@ object Notifications {
 
     const val ID_ONGOING = 1000
     private const val ID_PRAYER_BASE = 2000
+
+    /** One slot: tomorrow's reminder replaces today's, and the prayer ids (2000 to 2005) are untouched. */
+    const val ID_SUHOOR = 3000
 
     /** Two firm pulses: noticeable in a pocket, not startling in a quiet room. */
     private val PRAYER_VIBRATION = longArrayOf(0, 350, 250, 350)
@@ -236,12 +240,7 @@ object Notifications {
             phoneIsSilenced = { phoneIsSilenced(context) },
         )
 
-        val channelId = when (effectiveStyle) {
-            AlertStyle.NOTIFICATION -> CHANNEL_PRAYERS
-            AlertStyle.ALARM -> ensureAlarmChannel(context, alarmSoundUri)
-        }
-
-        val builder = NotificationCompat.Builder(context, channelId)
+        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_prayer_title, slot.label(context)))
             .setContentText(
@@ -255,24 +254,95 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
+            .applyStyle(effectiveStyle, alarmSoundUri)
 
-        when (effectiveStyle) {
+        post(context, ID_PRAYER_BASE + slot.ordinal, builder.build())
+    }
+
+    /**
+     * The optional suhoor reminder: "Suhoor ends at 05:10 / Fajr begins in 30m", a little before Fajr
+     * on the days of Ramadan.
+     *
+     * It goes through exactly the same style rules as a prayer alert ([effectiveAlertStyle]: a silent
+     * phone, a projected polar time) and the same two channels, so a person who has already chosen
+     * how loud their alerts are gets no surprise, and there is no third channel to explain in system
+     * settings. The shade entry clears itself at Fajr, because "Fajr begins in 30m" left on the screen
+     * after Fajr is a statement that has stopped being true.
+     *
+     * The countdown in the body is rounded to the nearest minute from [now]. An alarm delivered a few
+     * seconds late would otherwise read "29m" for a reminder the person set to 30.
+     */
+    fun postSuhoorReminder(
+        base: Context,
+        fajrAt: Instant,
+        now: Instant,
+        style: AlertStyle,
+        alarmSoundUri: String,
+        respectSilent: Boolean,
+        approximate: Boolean = false,
+        alarmOnApproximate: Boolean = false,
+    ) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+
+        val effectiveStyle = effectiveAlertStyle(
+            style = style,
+            respectSilent = respectSilent,
+            approximate = approximate,
+            alarmOnApproximate = alarmOnApproximate,
+            phoneIsSilenced = { phoneIsSilenced(context) },
+        )
+
+        val shownFrom = fajrAt.minusSeconds(60L * suhoorMinutesLeft(now, fajrAt))
+        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri))
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notif_suhoor_title, TimeFormat.clock(context, fajrAt)))
+            .setContentText(
+                context.getString(
+                    R.string.notif_suhoor_body,
+                    PrayerSlot.FAJR.label(context),
+                    TimeFormat.remaining(context, shownFrom, fajrAt),
+                ),
+            )
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setTimeoutAfter(Duration.between(now, fajrAt).toMillis().coerceAtLeast(1L))
+            .setContentIntent(openAppIntent(context))
+            .markIfApproximate(context, approximate)
+            .applyStyle(effectiveStyle, alarmSoundUri)
+
+        post(context, ID_SUHOOR, builder.build())
+    }
+
+    /** The channel an alert of [style] belongs on; the alarm channel is created on demand. */
+    private fun alertChannelId(context: Context, style: AlertStyle, alarmSoundUri: String): String =
+        when (style) {
+            AlertStyle.NOTIFICATION -> CHANNEL_PRAYERS
+            AlertStyle.ALARM -> ensureAlarmChannel(context, alarmSoundUri)
+        }
+
+    /** Category, and below Android O the sound and vibration a channel would otherwise carry. */
+    private fun NotificationCompat.Builder.applyStyle(
+        style: AlertStyle,
+        alarmSoundUri: String,
+    ): NotificationCompat.Builder {
+        when (style) {
             AlertStyle.NOTIFICATION ->
-                builder.setCategory(NotificationCompat.CATEGORY_REMINDER)
+                setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setVibrate(PRAYER_VIBRATION)
 
             AlertStyle.ALARM -> {
-                builder.setCategory(NotificationCompat.CATEGORY_ALARM)
+                setCategory(NotificationCompat.CATEGORY_ALARM)
                 // Below Android O there are no channels, so sound and vibration have to
                 // be attached to the notification itself.
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    builder.setSound(resolveAlarmSound(alarmSoundUri), AudioManager.STREAM_ALARM)
-                    builder.setVibrate(PRAYER_VIBRATION)
+                    setSound(resolveAlarmSound(alarmSoundUri), AudioManager.STREAM_ALARM)
+                    setVibrate(PRAYER_VIBRATION)
                 }
             }
         }
-
-        post(context, ID_PRAYER_BASE + slot.ordinal, builder.build())
+        return this
     }
 
     /** The optional silent badge showing what is next and how long until it starts. */
@@ -376,6 +446,14 @@ internal fun effectiveAlertStyle(
     if (approximate && !alarmOnApproximate) return AlertStyle.NOTIFICATION
     return if (respectSilent && phoneIsSilenced()) AlertStyle.NOTIFICATION else style
 }
+
+/**
+ * Whole minutes from [now] to [fajrAt], rounded to the nearest and never negative. Pure, so the
+ * rounding is tested: it is what makes a reminder set to 30 minutes read "30m" and not "29m" when the
+ * system delivers it a few seconds late.
+ */
+internal fun suhoorMinutesLeft(now: Instant, fajrAt: Instant): Long =
+    ((fajrAt.epochSecond - now.epochSecond + 30L) / 60L).coerceAtLeast(0L)
 
 /**
  * Says so when the time being announced was projected from another latitude rather than

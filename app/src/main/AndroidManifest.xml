@@ -111,6 +111,7 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.sajdatime.app.action.PRAYER_ALARM" />
+                <action android:name="com.sajdatime.app.action.SUHOOR_REMINDER" />
             </intent-filter>
         </receiver>
 
