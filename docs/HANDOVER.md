@@ -1363,12 +1363,90 @@ done, what was refused, and why:
    the label for most people. (c) The current state: honest wording plus fewer lookups. Recommended
    for 1.4.0, with (a) considered for a later release.
 
+7. **Repository and build hygiene, same pass.** (a) The owner's private email address is removed from
+   `docs/RELEASING.md` and `docs/HANDOVER.md`: the repository is public and those files were also served as web
+   pages. It is **still in the git history** (older commits), so treat it as already public and rely on the Google
+   account protections in the owner's list below, not on the removal. Only `aikstudies@gmail.com` is for publication.
+   (b) `docs/.nojekyll` stops GitHub Pages rendering every `.md` file in `docs/` into a crawlable HTML page (it was
+   serving `HANDOVER.html`, 846 KB, with HTTP 200); the raw `.md` files remain reachable by URL, so the lasting fix
+   is to move the public site to its own folder or branch, the owner's call. (c) `docs/.well-known/security.txt` and
+   a root `SECURITY.md` give researchers a way to reach a person (contact `aikstudies@gmail.com`; the `Expires` date
+   2027-10-16 needs renewing yearly). (d) `gradle-wrapper.properties` now pins `distributionSha256Sum` for Gradle 9.6.1
+   (`9c0f7faeeb306cb14e4279a3e084ca6b596894089a0638e68a07c945a32c9e14`, from gradle.org/release-checksums and then
+   **proved by a fresh wrapper download in an empty Gradle home**, which would have refused a wrong value), and
+   `gradle-wrapper.jar` is replaced by the one Gradle 9.6.1 itself generates (`497c8c2a...`, equal to the published
+   checksum): the committed jar was the one from the v1.0.0 commit. Bump the pin with every Gradle upgrade.
+   (e) `.gitignore` also covers `*.pepk *.p12 *.pk8 *.bks`. (f) **Signing values can now come from
+   `~/.gradle/gradle.properties`** (`sajdatime.storeFile`, `sajdatime.storePassword`, `sajdatime.keyAlias`,
+   `sajdatime.keyPassword`) as well as from `keystore.properties`, in that order, in both modules. Nothing the owner has
+   stops working. The point is that `~/.gradle` is outside every project folder an assistant session is given, so the
+   passwords need not live in the mounted folder. **Checked with a throwaway key made for the test, never the release
+   key:** both bundles signed via Gradle properties (`jarsigner -verify` passes, signer is the throwaway), an unsigned
+   build with neither source (no `.RSA`), and a signed build from a temporary `keystore.properties` (signed). Moving the
+   owner's real values is his step, after 1.4.0 ships: copy the four lines into `~/.gradle/gradle.properties` with the
+   `sajdatime.` prefix, then delete `keystore.properties`. The release script's "is keystore.properties in the repo
+   root?" hint still reads correctly for the old place.
+8. **Offered and deliberately not done, with the reason.** (a) `gradle/verification-metadata.xml`: it would have to be
+   generated on both Linux and macOS, because AGP downloads platform specific tools (aapt2 and similar), and a file made
+   on one would make the owner's Mac release run fail with a verification error for a tool it needed. Revisit with a macOS
+   run in the loop. (b) Dependabot version updates and a dependency submission workflow: one more CI surface on a public
+   repo and a stream of pull requests for a solo, non technical owner. The same benefit for most dependencies comes from
+   switching on **Dependabot alerts** and secret scanning in the repository settings (owner step, below), which opens no
+   pull request. (c) Kotlin 2.4.20 (fixes CVE-2026-53914, a build cache deserialisation issue that needs the attacker to
+   already be on the build machine and never reaches the APK) and a Guava constraint (CVE-2023-2976, a class this app never
+   calls, pulled in by Google's own SDK): both belong in a routine toolchain bump with the full gate, not in this pass.
+   (d) `android:taskAffinity=""` on `MainActivity`, which closes the old task hijacking family on Android 9 and 10: needs a
+   device to prove that notifications and widgets still resume the existing task. (e) Restricting the Firebase API key in the
+   Google Cloud console (owner step, below).
+
 **Not tested:** none of this has run on a device. The label throttle is unit tested as a pure
 function. The view model wiring is not covered by a test. The claim that the geocoder is answered
 by Google on most phones is from Android's documentation and the audit, not from a traffic
 capture on a handset. `tools/log-sni-proxy.py` (the method used for the analytics capture) would
 confirm it in a few minutes on the S23 Ultra: open the app after clearing its data and look for a
 Google host straight after the location fix.
+
+### 5.22 Store and website visibility (16 Oct 2026, drafts only, nothing applied in Play)
+
+Research by a read only pass over public pages (kept in `docs/store/VISIBILITY-KEYWORDS.md` and
+`docs/store/VISIBILITY-PLATFORMS.md`; its measurements are dated and not all re-checked by hand). What was decided and
+written into the repo:
+
+1. **The title stays** (`SajdaTime: Prayer Times, Qibla`, 30 of 30). "Prayer times" and "Qibla" are the two highest demand
+   phrases and the title is what Play weights most. Never add "Free", "No ads", "Best" or an emoji (the Console flagged the
+   first two on this listing).
+2. **Short description (proposed, not live):** swap "No accounts" for "with Wear OS" (80 of 80), because a search for
+   "prayer times wear os" returns about 13 apps while SajdaTime has a real watch app. Same promotability check as before.
+3. **First line of the full description now says what the app is** in search words: "an offline prayer times and Qibla
+   compass app for your phone and Wear OS watch". Plus "(Islamic calendar)" on the Hijri bullet and "azan (adhan)" on the
+   alarm bullet. The two Release A blocks in `LISTING.md` are 3,887 and 3,970 of 4,000, measured. The live block is a Console
+   copy and is not edited. The HONEST section, the 13 Oct school line and the dua are untouched.
+4. **What's new** for 1.4.0 no longer mentions Ramadan (188 characters); the January version does (306).
+5. **All eight translations are rewritten** against what each market searches (`LISTING-LOCALES.md`): price and promotion
+   words are out of every title and short description, the opening line carries the local phrase plus Qibla, offline and Wear
+   OS, the dua is in every language, and all four disclaimer points are present. Lengths are measured. French drops the high
+   latitude bullet for room. Same translation rule as always: mine, no reviewer, correct what users report.
+6. **Website:** `docs/index.html` gets a real title and description, canonical, Open Graph and Twitter tags, JSON-LD
+   (`SoftwareApplication`, with **no rating, on purpose**: add `aggregateRating` only with real Play figures), a "Get it on
+   Google Play" button whose link carries a `referrer` (the privacy page already tells users who opt in that how they found
+   the app is counted, so this adds nothing new), and a short questions section. `docs/sitemap.xml` is added. A
+   `robots.txt` is **not** added: crawlers read it only at the root of the host, and this site sits under `/SajdaTime/`.
+7. **Brand collision:** "Sajda" is another app's name. Always write SajdaTime as one word, and do not bid on bare "sajda".
+
+**Owner steps, in order of value** (none done, none needs code): reply to every Play review within a day, in the reviewer's
+language, never asking for a rating (the no prompt rule stands); paste the eight translations with the 1.4.0 release so they
+ride the same review; put the Play link (with a referrer) wherever the app is already mentioned; in Search Console add
+`https://aliimrankhan86.github.io/SajdaTime/` and submit `sitemap.xml`; custom store listings for Pakistan, Turkey and
+Indonesia; AlternativeTo and GitHub topics this month; Show HN, one honest Reddit post per community and the Islamic app
+roundups in January with the Ramadan release. Samsung Galaxy Store and Huawei AppGallery need verified accounts and are later;
+IzzyOnDroid rejects apps with analytics or substantial AI authorship; F-Droid would need an open source licence and a build
+without Firebase.
+
+**Account protection, more urgent now the private address is in git history:** the Google account behind the Play Console
+should use a passkey or security key, not SMS, and be enrolled in Google's Advanced Protection Program; check the Console's
+user list has exactly one person; back up the upload key file in the password manager; keep each release's `mapping.txt`.
+On GitHub: 2FA with a passkey, a ruleset on `main` that blocks force pushes and deletion, secret scanning with push
+protection, Dependabot alerts, and private vulnerability reporting (these four are Settings toggles on a public repo).
 
 ## 6. Notification and alarm architecture
 
@@ -4735,6 +4813,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 **PARKED 16 Oct 2026 (owner away from his computer; he picks up when he is next at it).** Everything that can be done without his Mac is done. On resume, in this order: (1) check the link to his Mac (`device_bash`); (2) redeliver the notes commits: his repo holds the branch at `bbfbce0` (all the code, A1 to A10c), while A10d to A10i exist only in the cloud copy and in the bundle `/mnt/user-data/outputs/sajdatime-1.4.0-r3.bundle` and are notes only (the Release B decisions, the measurement and ads note, the monthly numbers task, this paragraph), so deliver under a new file name (the bridge keeps an older same name file) and verify by hash; (3) bring GBrain `projects/sajdatime` up to date: it was last written at `bbfbce0` and lacks the Release B decisions, the measurement and ads note, the monthly numbers task and A10d to A10i; (4) he runs the release script with one command: `cd ~/Developer/SajdaTime && git show claude/1-4-0-ramadan-widgets:docs/release-tools/release-1.4.0.sh > build/run-1.4.0.sh && bash build/run-1.4.0.sh`. Nothing is on GitHub: the cloud cannot push and the sandbox refuses it, and step 1 of that script pushes the branch. The cloud sandbox is ephemeral, so if it has been reclaimed, the bundle in the outputs folder and his Mac's copy at `bbfbce0` are what remain.
 
+**SECURITY AND VISIBILITY PASS, 16 Oct 2026 (separate branch `claude/security-and-visibility`, cut from `c80533c`, not merged, nothing published).** Read §5.21 and §5.22. It is kept apart so the parked release is not disturbed, but it should go out **with** 1.4.0 because it corrects a published privacy sentence that is untrue today (the town name lookup goes to Android's geocoder, usually Google). It holds: the label throttle, settings corruption recovery, city lookup hardening, honest wording in the app, privacy page, README and listings, the private email removed from the docs, `security.txt`, `SECURITY.md`, `.nojekyll`, the Gradle checksum pin, the signing values option, and the rewritten English and eight language listing drafts and website. Gate on that branch: 333 unit tests, lint 0 errors, both bundles built. **Owner decisions it raises:** (1) keep the interim wording, or remove the lookup with an offline nearest city list (§5.21 item 6); (2) the Play Data safety form: review whether approximate location should now read as shared, because the geocoder lookup is an automatic transfer to Google. **On resume, recommended:** release from this branch, because it is cut from the head of the 1.4.0 branch (it contains all of it) and the 1.4.0 branch alone would ship the untrue privacy sentence. The release script takes the branch from the environment, so the one command becomes `cd ~/Developer/SajdaTime && git show claude/security-and-visibility:docs/release-tools/release-1.4.0.sh > build/run-1.4.0.sh && SAJDA_BRANCH=claude/security-and-visibility bash build/run-1.4.0.sh`; with no variable it runs the 1.4.0 branch exactly as tested. Merging to `main` publishes `docs/`, so the privacy page goes live at the merge, and its date line and `UsageCountsTest` move together if that is a later day.
+
 **Release A, phone 1.4.0 (`versionCode` 8), is built and unit tested, and has never been run on a device.** It is on branch `claude/1-4-0-ramadan-widgets` in the cloud sandbox. The cloud cannot push to GitHub, so it reaches the owner's repo as a git bundle (lesson 129). It contains the Ramadan pack (card, eve notice, timetable sheet and PDF, suhoor and iftar labels, optional suhoor reminder, Eid greeting) and two home screen widgets: §4, §5.19, §5.20, §6. The gate in the cloud: 323 unit tests (core 114, app 197, wear 12), lint 0 errors, both bundles build, the same 11 permissions, no new dependency, no new analytics event, the app bundle 6,028,577 bytes (§10).
 
 **Owner decisions: 1 (rollout date) and 3 (Turkey iftar) are open, 2 (Release B) is decided:**
@@ -6745,7 +6825,7 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
 
     The Play developer account **exists**: personal, ID 6284685113064492750, developer name
     "Ali Imran Khan", public developer email `aikstudies@gmail.com` (deliberately separate
-    from the private contact address `aliimrankhan86@gmail.com`), declared as **not earning
+    from the owner's private contact address, which is deliberately not written in this public repository), declared as **not earning
     money** — which is what keeps the street address off the public listing. Google shows
     only legal name, country and developer email.
 
@@ -8394,3 +8474,15 @@ matters more than the stable hashes, that is the trade being made.
     `WidgetRefreshReceiver` is `exported="false"` and the alarm's `PendingIntent` names it explicitly, which the system delivers
     with the app's own identity. Robolectric agrees, a real alarm firing has not been observed. `WidgetDeviceTest` waits for
     the alarm to be present in `dumpsys alarm` and the Mac run shows whether it is delivered.
+140. **A privacy promise is written in about fifteen places, and a fix has to find all of them.** "Your location never leaves
+    your phone" lived in `privacy.html`, three app strings in four languages, the README, `CLAUDE.md`, the store listing in nine
+    languages, the architecture notes, the session starter and the research drafts, and it was untrue the whole time because
+    Android's `Geocoder` can be answered by Google. It was found by comparing the platform's documentation to the policy, not by
+    testing. When a data handling sentence changes, grep the whole repository for its distinctive words in every language, not
+    just the file the change touched. The claim that is true and safe to repeat: **the times are worked out on the phone and the
+    developer never receives the location.**
+141. **Do not trust a fetched checksum until a real download has accepted it.** WebFetch cannot read a `.sha256` file (it sees
+    binary), the published list is a web page a summariser reads, and one wrong character in `distributionSha256Sum` breaks every
+    build. The pin was proved by letting the wrapper download Gradle into an empty Gradle home with the value set. Also: a
+    wrapper jar committed on day one is not the jar of the Gradle version you run; regenerate it with `gradle wrapper` and compare
+    it to the published wrapper checksum.

@@ -26,6 +26,11 @@ app/build/
 keystore.properties
 *.jks
 *.keystore
+# Shapes that Play App Signing exports and key conversion tools produce. None may ever be committed.
+*.pepk
+*.p12
+*.pk8
+*.bks
 
 # Scratch output from the designlang CLI. Competitor design extractions are
 # working notes, not part of the app.

@@ -20,7 +20,10 @@
 set -o pipefail
 REPO="$HOME/Developer/SajdaTime"
 OUT="$REPO/build/release-1.4.0"
-BRANCH="claude/1-4-0-ramadan-widgets"
+# The branch to push, build and test. Defaults to the 1.4.0 branch exactly as it was tested. The security and
+# visibility branch (HANDOVER 5.21, 5.22) is cut from the head of this one, so it contains all of it plus the
+# corrected privacy wording; to release that, run with SAJDA_BRANCH=claude/security-and-visibility.
+BRANCH="${SAJDA_BRANCH:-claude/1-4-0-ramadan-widgets}"
 PKG="com.sajdatime.app"
 mkdir -p "$OUT"
 rm -f "$OUT/finished" "$OUT"/*.png
@@ -122,7 +125,7 @@ if echo "$VERIFY" | grep "jar verified" >/dev/null; then
   if [ -z "$(git diff origin/main --stat -- wear/)" ]; then result watch-untouched "PASS (nothing under wear/ differs from main)"; else result watch-untouched "FAIL (wear/ differs from main)"; fi
 else
   if [ "$GATE" = fail ]; then result bundle "FAIL (not built, because the gate above failed)"
-  else result bundle "FAIL (no signed bundle: is keystore.properties in the repo root?)"; fi
+  else result bundle "FAIL (no signed bundle: is keystore.properties in the repo root, or are the sajdatime.* values in ~/.gradle/gradle.properties?)"; fi
 fi
 
 step "6. Emulator: on-device tests, the Ramadan clock stages, then look at the screens"

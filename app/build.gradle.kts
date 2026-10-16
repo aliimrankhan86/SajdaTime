@@ -8,11 +8,19 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// Upload key for Google Play. keystore.properties holds the password and is gitignored,
-// so a fresh clone has no key and simply builds unsigned — which is what CI and anyone
-// but the owner wants. See docs/RELEASING.md.
+// Upload key for Google Play. A fresh clone has no key and simply builds unsigned, which is what
+// CI and anyone but the owner wants. See docs/RELEASING.md. The four values are looked for in two
+// places, in this order:
+//   1. Gradle properties named sajdatime.storeFile, sajdatime.storePassword, sajdatime.keyAlias and
+//      sajdatime.keyPassword, normally in ~/.gradle/gradle.properties. That file is outside every
+//      project folder an assistant session is ever given, so this is the preferred home.
+//   2. keystore.properties in the repo root (storeFile, storePassword, keyAlias, keyPassword), the
+//      original place. Gitignored, and still works, so nothing the owner already has stops working.
 val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.exists() }
     ?.let { file -> Properties().apply { file.inputStream().use(::load) } }
+
+fun signingValue(name: String): String? =
+    providers.gradleProperty("sajdatime.$name").orNull ?: keystoreProperties?.getProperty(name)
 
 kotlin {
     compilerOptions {
@@ -63,12 +71,12 @@ android {
     testBuildType = providers.gradleProperty("testBuildType").getOrElse("debug")
 
     signingConfigs {
-        keystoreProperties?.let { props ->
+        signingValue("storeFile")?.let { storeFilePath ->
             create("release") {
-                storeFile = file(props.getProperty("storeFile"))
-                storePassword = props.getProperty("storePassword")
-                keyAlias = props.getProperty("keyAlias")
-                keyPassword = props.getProperty("keyPassword")
+                storeFile = file(storeFilePath)
+                storePassword = signingValue("storePassword")
+                keyAlias = signingValue("keyAlias")
+                keyPassword = signingValue("keyPassword")
             }
         }
     }

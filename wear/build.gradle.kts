@@ -5,9 +5,12 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// Same upload key as the phone app — see the note in app/build.gradle.kts.
+// Same upload key as the phone app, found in the same two places — see app/build.gradle.kts.
 val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.exists() }
     ?.let { file -> Properties().apply { file.inputStream().use(::load) } }
+
+fun signingValue(name: String): String? =
+    providers.gradleProperty("sajdatime.$name").orNull ?: keystoreProperties?.getProperty(name)
 
 /**
  * Wear OS companion.
@@ -46,12 +49,12 @@ android {
     }
 
     signingConfigs {
-        keystoreProperties?.let { props ->
+        signingValue("storeFile")?.let { storeFilePath ->
             create("release") {
-                storeFile = file(props.getProperty("storeFile"))
-                storePassword = props.getProperty("storePassword")
-                keyAlias = props.getProperty("keyAlias")
-                keyPassword = props.getProperty("keyPassword")
+                storeFile = file(storeFilePath)
+                storePassword = signingValue("storePassword")
+                keyAlias = signingValue("keyAlias")
+                keyPassword = signingValue("keyPassword")
             }
         }
     }

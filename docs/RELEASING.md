@@ -271,9 +271,9 @@ Created as a **personal** account:
 |---|---|
 | Developer name (public) | Ali Imran Khan |
 | Account ID | 6284685113064492750 |
-| Owner account | aliimrankhan86@gmail.com |
+| Owner account | the owner's personal Google account. The address is deliberately not written in this public repository |
 | Developer email (public) | aikstudies@gmail.com |
-| Contact email (private) | aliimrankhan86@gmail.com |
+| Contact email (private) | the same personal account, kept out of this repository for the same reason |
 | Earning money | **No** — this is what keeps the street address off the public listing |
 
 Public on the Play listing: legal name, country ("United Kingdom"), developer email. The
