@@ -308,4 +308,10 @@
     <string name="ramadan_date_differs">Apakah masjid Anda memulai Ramadan pada hari yang berbeda?</string>
     <string name="settings_ramadan_card">Kartu Ramadan</string>
     <string name="settings_ramadan_card_desc">Menampilkan waktu sahur dan buka puasa di layar Waktu selama Ramadan</string>
+
+    <string name="eid_fitr_title">Selamat Hari Raya Idulfitri</string>
+    <string name="eid_fitr_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima puasa dan ibadah kita, dan hari Anda penuh kebahagiaan.</string>
+    <string name="eid_adha_title">Selamat Hari Raya Iduladha</string>
+    <string name="eid_adha_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima ibadah dan kurban kita, serta memberkahi Anda dan keluarga.</string>
+    <string name="eid_fine_print">Tanggal ini berdasarkan perhitungan kami. Mohon maaf jika Anda berhari raya di hari lain: selamat hari raya juga untuk Anda. Silakan ikuti masjid Anda.</string>
 </resources>

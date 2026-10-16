@@ -174,6 +174,7 @@ class MainActivity : ComponentActivity() {
                                 onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
                                 onDismissMethodNotice = viewModel::dismissMethodNotice,
                                 onDismissRamadanNotice = viewModel::dismissRamadanNotice,
+                                onDismissEid = viewModel::dismissEidGreeting,
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,

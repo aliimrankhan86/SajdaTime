@@ -512,4 +512,16 @@
     <string name="ramadan_date_differs">Did your mosque begin Ramadan on a different day?</string>
     <string name="settings_ramadan_card">Ramadan card</string>
     <string name="settings_ramadan_card_desc">Shows suhoor and iftar times on the Times screen during Ramadan</string>
+
+    <!--
+      Eid greeting, shown once on the day. The main text is a plain greeting that suits everyone. The
+      fine print carries the caveat: the date is our calculation, a different day is possible, and the
+      user's mosque decides. Keep it small and warm; do not turn it into a ruling. Owner wording
+      direction, 16 Oct 2026.
+    -->
+    <string name="eid_fitr_title">Eid al-Fitr Mubarak</string>
+    <string name="eid_fitr_body">Taqabbal Allahu minna wa minkum. May Allah accept our fasting and prayers, and fill your day with joy.</string>
+    <string name="eid_adha_title">Eid al-Adha Mubarak</string>
+    <string name="eid_adha_body">Taqabbal Allahu minna wa minkum. May Allah accept our worship and sacrifice, and bless you and your family.</string>
+    <string name="eid_fine_print">This date is our calculation. Sorry if you celebrate on another day: Eid Mubarak to you then too. Please follow your mosque.</string>
 </resources>

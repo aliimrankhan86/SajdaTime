@@ -158,6 +158,12 @@ data class AppSettings(
      * returns next Ramadan without anything having to reset it.
      */
     val ramadanNoticeDismissedYear: Int = 0,
+    /**
+     * The [com.sajdatime.core.EidDay.code] of the Eid greeting the user last closed, or 0. One
+     * code and not a flag: each Eid has its own code, so closing Eid al-Fitr 1448 leaves Eid
+     * al-Adha 1448 and every later Eid to show without anything having to reset it.
+     */
+    val eidGreetingDismissedCode: Int = 0,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -333,6 +339,9 @@ class SettingsRepository(private val context: Context) {
         it[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] = hijriYear
     }
 
+    /** Closes the Eid greeting for the Eid whose [code] this is, and for that Eid only. */
+    suspend fun dismissEidGreeting(code: Int) = edit { it[Keys.EID_GREETING_DISMISSED_CODE] = code }
+
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
     }
@@ -367,6 +376,7 @@ class SettingsRepository(private val context: Context) {
         val THEME = stringPreferencesKey("theme_choice")
         val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
         val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
+        val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
     }
 
     private companion object {
@@ -406,6 +416,7 @@ class SettingsRepository(private val context: Context) {
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
+            eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
         )
     }
 

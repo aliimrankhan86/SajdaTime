@@ -97,6 +97,7 @@ fun HomeScreen(
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
     onDismissRamadanNotice: (hijriYear: Int) -> Unit,
+    onDismissEid: (code: Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
@@ -146,6 +147,9 @@ fun HomeScreen(
         // number. Present only inside Ramadan and the week before it. During the month the
         // column scrolls on a short phone: for that month this card is the second most read
         // thing on the screen, and the height budget above is spent on it knowingly.
+        // The Eid greeting takes the same slot. It cannot meet the Ramadan card: Ramadan has
+        // ended on the day before 1 Shawwal, and 10 Dhul Hijjah is months from the next notice.
+        EidSection(state = state, onDismiss = onDismissEid)
         RamadanSection(
             state = state,
             onOpenInfo = { ramadanInfo = true },

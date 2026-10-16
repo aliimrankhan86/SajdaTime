@@ -59,6 +59,32 @@ data class RamadanInfo(
     }
 }
 
+/** The two Eids, by their place on the Hijri calendar: 1 Shawwal and 10 Dhul Hijjah. */
+enum class Eid(val month: Int, val day: Int) {
+    FITR(month = 10, day = 1),
+    ADHA(month = 12, day = 10),
+}
+
+/**
+ * An Eid that falls on today's date on the user's calendar.
+ *
+ * Found by calendar, not listed by year, so 2027 and 2028 need no entries and neither does any
+ * later year (until 1600 AH, where the Umm al-Qura table ends and [HijriCalendar.eidOn] answers
+ * null). The user's date shift applies, so the greeting arrives on the day their header reads
+ * 1 Shawwal or 10 Dhul Hijjah, whichever day that is.
+ */
+data class EidDay(val eid: Eid, val hijriYear: Int) {
+    /**
+     * What the app stores to show each Eid once, for example 144810 for Eid al-Fitr 1448. Year
+     * first, so a later Eid always has a larger code than an earlier one, and the month in the last
+     * two digits so the two Eids of one year differ.
+     */
+    val code: Int get() = hijriYear * 100 + eid.month
+
+    /** False once the user has closed this very Eid. [lastDismissedCode] is 0 when they never have. */
+    fun isUnseen(lastDismissedCode: Int): Boolean = code != lastDismissedCode
+}
+
 /**
  * The one place that turns a Gregorian date into "what Hijri day is it for this user".
  *
@@ -92,6 +118,16 @@ object HijriCalendar {
 
     fun isRamadan(date: LocalDate, offsetDays: Int): Boolean =
         of(date, offsetDays)?.month == RAMADAN
+
+    /**
+     * Which Eid, if any, falls on [date] for a user whose calendar is shifted by [offsetDays].
+     * Built on [of], so it can never disagree with the date in the Home header.
+     */
+    fun eidOn(date: LocalDate, offsetDays: Int): EidDay? {
+        val h = of(date, offsetDays) ?: return null
+        val eid = Eid.entries.firstOrNull { it.month == h.month && it.day == h.day } ?: return null
+        return EidDay(eid, h.year)
+    }
 
     /**
      * The current Ramadan if [today] is inside it, otherwise the next one. Null only outside the

@@ -311,4 +311,10 @@
     <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
     <string name="settings_ramadan_card">Ramazan kartı</string>
     <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
+
+    <string name="eid_fitr_title">Ramazan Bayramınız mübarek olsun</string>
+    <string name="eid_fitr_body">Allah oruçlarımızı ve ibadetlerimizi kabul etsin, gününüzü sevinçle doldursun.</string>
+    <string name="eid_adha_title">Kurban Bayramınız mübarek olsun</string>
+    <string name="eid_adha_body">Allah ibadetlerimizi ve kurbanlarımızı kabul etsin, size ve ailenize bereket versin.</string>
+    <string name="eid_fine_print">Bu tarih bizim hesabımızdır. Bayramı başka bir gün kutluyorsanız kusura bakmayın, o gün de bayramınız mübarek olsun. Lütfen caminize uyun.</string>
 </resources>

@@ -81,6 +81,7 @@ fun MainScaffold(
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
     onDismissRamadanNotice: (Int) -> Unit,
+    onDismissEid: (Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
@@ -175,6 +176,7 @@ fun MainScaffold(
                         onDismissExactAlarmNotice = onDismissExactAlarmNotice,
                         onDismissMethodNotice = onDismissMethodNotice,
                         onDismissRamadanNotice = onDismissRamadanNotice,
+                        onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
                     )

@@ -317,4 +317,10 @@
     <string name="ramadan_date_differs">کیا آپ کی مسجد نے رمضان کسی اور دن شروع کیا؟</string>
     <string name="settings_ramadan_card">رمضان کارڈ</string>
     <string name="settings_ramadan_card_desc">رمضان میں اوقات کی اسکرین پر سحری اور افطار کے اوقات دکھاتا ہے</string>
+
+    <string name="eid_fitr_title">عید الفطر مبارک</string>
+    <string name="eid_fitr_body">تقبل اللہ منا ومنکم۔ اللہ ہمارے روزے اور عبادات قبول فرمائے اور آپ کا دن خوشیوں سے بھر دے۔</string>
+    <string name="eid_adha_title">عید الاضحیٰ مبارک</string>
+    <string name="eid_adha_body">تقبل اللہ منا ومنکم۔ اللہ ہماری عبادات اور قربانی قبول فرمائے اور آپ کو اور آپ کے اہل خانہ کو برکت عطا کرے۔</string>
+    <string name="eid_fine_print">یہ تاریخ ہمارے حساب کے مطابق ہے۔ اگر آپ کسی اور دن عید منا رہے ہیں تو معذرت، آپ کو اس دن بھی عید مبارک۔ براہِ کرم اپنی مسجد کی پیروی کریں۔</string>
 </resources>

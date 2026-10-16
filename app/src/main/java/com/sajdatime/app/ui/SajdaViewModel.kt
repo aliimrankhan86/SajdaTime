@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.EidDay
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
@@ -92,6 +94,12 @@ data class UiState(
      * about Ramadan reaches the Times screen then.
      */
     val ramadan: RamadanState? = null,
+    /**
+     * The Eid whose day it is on the user's own calendar, or null on every other day. Computed
+     * from the same date and the same Islamic date shift as the Home header, so the greeting and
+     * the header cannot disagree.
+     */
+    val eid: EidDay? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -273,6 +281,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
 
+    fun dismissEidGreeting(code: Int) =
+        viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
+
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
 
@@ -381,7 +392,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
             return
         }
 
@@ -397,7 +408,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             // the phase changes exactly when `next` rolls over, and the date change tick covers
             // midnight. No new timer.
             val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
-            Computed(today, next, current, ramadan)
+            val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
+            Computed(today, next, current, ramadan, eid)
         }
 
         _state.update {
@@ -406,6 +418,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 next = computed.next,
                 current = computed.current,
                 ramadan = computed.ramadan,
+                eid = computed.eid,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -427,4 +440,5 @@ private data class Computed(
     val next: NextPrayer,
     val current: PrayerSlot?,
     val ramadan: RamadanState?,
+    val eid: EidDay?,
 )
