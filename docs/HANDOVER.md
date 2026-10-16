@@ -13,6 +13,10 @@ business rule, what is verified, what is not, and what is left to do.
   must be unique across both: the phone counts up from 1 and the watch has its own band from 1000,
   so the two sequences can never collide. The watch ships in its own Play release (Wear OS form
   factor), never inside a phone release (`docs/RELEASING.md` Step 7).
+- **In build, not live (16 Oct 2026):** phone **1.4.0** (`versionCode` 8) on branch
+  `claude/1-4-0-ramadan-widgets`: the Ramadan pack and two home screen widgets (§4, §5.19, §5.20).
+  Built and unit tested in a cloud session, never run on a device, not submitted. Until the owner
+  submits it, what users have is 1.3.2. The watch is unchanged. §11 STATE OF PLAY says whose move it is.
 - **Status:** **live on Google Play production, 178 countries**: phone since 20 Aug 2026, watch
   since 5 Sept 2026. Closed testing (Alpha) is paused by the owner's decision. **What is true right
   now, what is waiting and whose job it is: the first block of §11 (STATE OF PLAY).** Any other
@@ -165,6 +169,24 @@ Read it before editing a word of `disclaimer_body`.
   already spent a fortnight collecting twelve testers. Sourcing:
   `docs/reviews/2026-08-01-android-alarm-facts.md` §3.
 
+- **Jetpack Glance for the widgets.** The two widgets are `RemoteViews` from XML layouts. Glance
+  would add a dependency and a Compose runtime in the launcher's process for two small widgets,
+  and the release gate checks that `releaseRuntimeClasspath` is identical to the baseline.
+- **`updatePeriodMillis` on the widgets.** It is 0 in both widget info files and `WidgetResourcesTest`
+  fails the build if that changes. The system's own periodic update is floored at 30 minutes and
+  uses a waking alarm, so a widget refreshed that way lags a prayer by up to half an hour and the
+  app would pay for it with wake-ups. `WidgetRefreshScheduler` moves the widget on instead (§5.20).
+- **`setAlarmClock`, a waking alarm or WorkManager for the widget refresh.** A widget is a display,
+  not an alert: `setAlarmClock` would claim the status bar clock for a redraw, a waking alarm would
+  wake the phone for a screen nobody is looking at, and the periodic WorkManager job is inexact
+  (`DailyRescheduleWorker` runs every 12 hours from whenever it was first enqueued).
+- **An imsak time, a country table of Ramadan start dates, or an Eid notification.** Suhoor ends
+  at Fajr and iftar is at Maghrib, as calculated, with no precaution minutes. Ramadan's start
+  depends on local sighting, so the app uses Umm al-Qura plus the user's own date shift and says
+  so, instead of presenting a table that would need upkeep and go wrong silently. Eid is an
+  in app greeting once a day, never a notification, because mosques announce it and a wrong day for
+  someone still fasting is worse than silence (§5.19).
+
 - **`USE_FULL_SCREEN_INTENT`.** Same shape of reason. Its auto-grant list at targetSdk 34+ is
   *narrower* still — "setting an alarm" or "receiving phone or video calls", with no calendar
   bullet — and a prayer notification does not need to seize the whole screen.
@@ -197,7 +219,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 
 ### Complete file map
 
-**`:core`** (8 source files, 9 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
+**`:core`** (9 source files, 12 test files, and `res/` — `values/strings.xml` for prayer and method names plus `app_language_tag`, `drawable/ic_kaaba*.xml` for the Qibla dial's Kaaba mark. Anything both screens show lives here, so it cannot be shown two different ways)
 
 | File | Contains |
 |---|---|
@@ -208,9 +230,10 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | `WatchSyncContract.kt` | The phone↔watch Data Layer path and keys, shared so the two modules cannot drift |
 | `AppLocale.kt` | The language the app's *words* are in, read back out of the resources, and `wrap(context)` which pins a whole configuration to it. Every clock, date and number in both apps formats through this rather than through the device locale — §5.11. |
 | `Bidi.kt` | `String.bidiIsolated()` — FSI/PDI isolation for text the app did not write (city names), so a Latin name inside a future RTL sentence cannot be reordered. Invisible in English. |
+| `HijriCalendar.kt` | The one place that touches `HijrahDate` (Umm al-Qura). `of(date, offset)`, `isRamadan`, `ramadan(today, offset): RamadanInfo?` (Hijri year, first and last day, length, day number, and the visibility windows for the eve notice and the timetable), `eidOn`. The Home header date, the Umm al-Qura Isha rule, the Ramadan pack and the Eid greeting all read it (§5.19). Ports to iOS as it is. |
 | `AdjustmentCodec.kt` | Encodes "Match your mosque" per-prayer minutes for DataStore and the watch wire; clamps to ±30. |
 
-**`:app`** (26 source files, 7 test files)
+**`:app`** (43 source files, 25 test files, 7 on device test files)
 
 | Area | Files |
 |---|---|
@@ -220,7 +243,10 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Notify | `notify/Notifications.kt` (channels), `notify/PrayerAlarmScheduler.kt`, `notify/PrayerAlarmReceiver.kt`, `notify/SystemEventReceiver.kt`, `notify/DailyRescheduleWorker.kt`, `notify/OngoingBadge.kt`, `notify/TimeFormat.kt` |
 | Screens | `ui/home/HomeScreen.kt`, `ui/qibla/QiblaScreen.kt`, `ui/settings/SettingsScreen.kt`, `ui/onboarding/OnboardingScreen.kt`, `ui/components/Common.kt` (`LocationSheet`, `SectionHeading`, `rememberRemainingText`), `ui/components/MethodChoices.kt` (`MethodChoiceList` — the one list of calculation methods with a plain line under each, shared by the Settings picker and the first-run step so they cannot drift; `RadioRow`) |
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
-| Export | `pdf/PrayerPdfExporter.kt` |
+| Export | `pdf/PrayerPdfExporter.kt` (`Range.RAMADAN` and the Ramadan columns since 1.4.0) |
+| Ramadan | `ui/RamadanState.kt` (pure `build`), `ui/RamadanTimetable.kt`, `ui/home/RamadanCard.kt` (card, eve notice, info dialog), `ui/home/RamadanTimetableSheet.kt`, `ui/home/EidCard.kt`, `notify/SuhoorReminderPlan.kt` (pure) |
+| Widgets | `widget/WidgetState.kt` (pure), `widget/WidgetRenderer.kt` (the `RemoteViews`), `widget/WidgetUpdater.kt` (`refreshAll`), `widget/WidgetRefreshScheduler.kt`, `widget/WidgetRefreshReceiver.kt`, `NextPrayerWidgetProvider.kt`, `TodayWidgetProvider.kt`, `res/layout/widget_*.xml`, `res/xml/widget_*_info.xml`, `res/drawable-nodpi/widget_preview_*.png` (drawn by `tools/make-widget-previews.py`, not captured) |
+| On device tests | `src/androidTest/.../` `DeviceSupport`, `LanguageAndDndDeviceTest`, `WidgetDeviceTest`, `RamadanDeviceTest`, `SuhoorReminderDeviceTest`, `RamadanPdfDeviceTest`, `ScreenSeedDeviceTest`. Compiled, never yet run. The widget tests need `appwidget grantbind` first and are run with `am instrument` (lesson 134). `docs/release-tools/release-1.4.0.sh` runs them |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
 | Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` (so `./gradlew installRtl` runs the whole app right-to-left), `app_name` set to "SajdaTime (RTL)", `applicationIdSuffix ".rtl"` so it installs beside the real app, and since 15 Aug 2026 `preview_build_notice` filled so a red "LAYOUT TEST BUILD" band sits on every screen. `:wear` has the same tag and must stay on it (§15 lesson 84). Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it. **Uninstall it when you are done** (`adb uninstall com.sajdatime.app.rtl`) — every time it has been left on an emulator the owner has seen it and, correctly, reported the app as broken |
 
@@ -265,6 +291,14 @@ data class AppSettings(
     val exactAlarmNoticeDismissed: Boolean = false,  // home only; Settings keeps the row
     val methodNoticeDismissed: Boolean = false,      // same contract as the line above
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,  // SYSTEM resolves to light
+    val analyticsEnabled: Boolean = false,    // usage counts, opt in only (§8)
+    val analyticsAnswered: Boolean = false,   // the consent question has been asked
+    // 1.4.0, Ramadan pack (§5.19) and the suhoor reminder (§6)
+    val ramadanCardEnabled: Boolean = true,         // "Show Ramadan card"; also removes the widget words
+    val ramadanNoticeDismissedYear: Int = 0,        // Hijri year whose eve notice was closed
+    val eidGreetingDismissedCode: Int = 0,          // Hijri year x 100 + month of the Eid last closed
+    val suhoorReminderMinutes: Int = 0,             // 0 = off, else 15, 30, 45 or 60 before Fajr
+    val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
 )
 ```
 
@@ -477,6 +511,38 @@ The times list opens with `initialCenterItemIndex = 0`. The default is 1, which 
 the second item and slid the countdown card up until the watch face clock sat on top of
 the prayer name — the one thing the app exists to show.
 
+### Ramadan pack (built for 1.4.0, not live)
+
+Calendar driven, for the user's own place and Islamic date shift. There is no country table.
+The rules and the reasons are in §5.19.
+
+- **Ramadan card on the Times screen, from day 1 to the last day.** Suhoor ends (Fajr) and iftar
+  (Maghrib), a countdown to whichever is next, today's fast length and its change from yesterday,
+  tomorrow's two times, the day number and the expected last day, and an info dialog that says
+  what the app does and does not decide. "Show Ramadan card" in Settings (default on) removes it.
+- **Eve notice, 7 days before day 1 through day 2.** One quiet, dismissible notice with the start
+  date on the user's calendar, the sighting note, and a way to preview the timetable. Dismissal is
+  stored per Hijri year.
+- **Ramadan timetable sheet and PDF.** Every day of the month with the six times, suhoor and iftar
+  in bold. The PDF (`PrayerTimes_Ramadan1448.pdf`) is offered in the export sheet from 30 days
+  before day 1 to the last day. Every PDF range also got more space between the wordmark, the
+  place name and the table (owner request, 16 Oct 2026).
+- **Extra timing.** While Ramadan lasts, the daily list says "Suhoor ends" under Fajr and "Iftar"
+  under Maghrib. Gone at local midnight into 1 Shawwal.
+- **Suhoor reminder.** Settings, Reminders. Off by default, or 15, 30, 45 or 60 minutes before
+  Fajr, as a notification or an alarm, on Ramadan days only (§6).
+- **Eid greeting.** On 1 Shawwal and on 10 Dhul Hijjah, once for each Eid. A warm greeting with
+  fine print that says it is our calculation and to follow your mosque. No notification.
+
+### Home screen widgets (built for 1.4.0, not live)
+
+Two `RemoteViews` widgets. **Next prayer** (3 by 2 cells): the prayer, its time and a countdown.
+**Today** (4 by 3 cells, no header): all six times with the next prayer highlighted. Both follow
+the phone's light or dark mode, read no location of their own, and say so plainly on a phone with
+no saved location. During Ramadan the Fajr and Maghrib rows carry "Suhoor ends" and "Iftar" and
+the Next prayer widget adds the same word. The "Show Ramadan card" switch removes those words too.
+How they stay current is §5.20.
+
 ---
 
 ## 5. Business rules — the exact specification
@@ -619,6 +685,9 @@ Umm al-Qura stretches Isha from 90 to 120 minutes during Ramadan; adhan implemen
 so the engine adds 30 minutes itself. Ramadan is detected as Hijri month 9 via
 `java.time.chrono.HijrahDate` — and `HijrahChronology` *is* the Umm al-Qura calendar, so
 the two agree by construction. Applies to no other method.
+
+Since 1.4.0 that detection goes through `core/HijriCalendar.kt`, the only file that touches
+`HijrahDate`, which also feeds the Home header date, the Ramadan pack and the Eid greeting (§5.19).
 
 ### 5.7 Determinism
 adhan rounds to the minute but leaves the **millisecond field carrying the wall-clock time
@@ -765,9 +834,9 @@ Two rules came out of it, both enforced in code and covered by `CityLookupParseT
 
 ### 5.11 Language and locale — the app formats in its own language, not the device's
 
-The app ships in **English only**, deliberately (§11, and `CLAUDE.md`: prayer and madhab
-names are religious content and no language ships without a native speaker). That is a
-decision about *words*. Android takes it as a decision about words only, and carries on
+The app ships in **English, Urdu, Turkish and Indonesian** (since 1.3.1). Translations are
+written and checked by Claude with no native speaker review, by the owner's decision of 9 Oct
+2026 (`CLAUDE.md`), and Arabic is not shipped. Which languages ship is a decision about *words*. Android takes it as a decision about words only, and carries on
 formatting *numbers, clock times, dates and layout direction* from the device locale — so
 a phone set to Arabic got English sentences with Arabic-Indic digits inside them, laid out
 right-to-left. What that actually looked like is in §10.
@@ -1154,6 +1223,73 @@ outside a town polygon dropped `locality` — was wrong: it is null in the UK re
 not delivered when `onResume` checks for coordinates. `SajdaViewModel` now refreshes on the
 first settings emission; a warm resume still refreshes as before.
 
+### 5.19 Ramadan and Eid: calendar driven, location based, never a ruling (built 16 Oct 2026 for 1.4.0)
+
+Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-tracker/`
+(`RAMADAN-LOCATION-SPEC.md`, `WORDING-AND-LISTING.md`). The rules that must not be "improved":
+
+1. **One calendar.** `HijriCalendar` in `:core` wraps `HijrahChronology` (Umm al-Qura) plus the
+   user's date shift (`hijriOffsetDays`, plus or minus 2). Ramadan 1448 begins on Monday 8 Feb 2027
+   (29 days, last day 8 Mar, 1 Shawwal 9 Mar 2027). Eid al-Adha 2027 is 16 May, Eid al-Fitr 2028 is
+   26 Feb, Eid al-Adha 2028 is 5 May. Pinned in `HijriCalendarTest`, `EidTest` and `RamadanGoldenTest`.
+2. **Suhoor ends at Fajr and iftar is at Maghrib, as calculated.** No imsak margin, no precaution
+   minutes, no ruling words. The times are exactly the Times screen's, so "Match your mosque" moves
+   them. The word "imsak" appears in one sentence only, saying that some timetables print it
+   (`RamadanWordingTest` fails the build on any ruling word and on "imsak" anywhere else).
+3. **No country table.** The start of Ramadan varies by sighting. The app uses Umm al-Qura plus the
+   user's own shift, an eve notice that names the shift, and an info note that says "as calculated",
+   "does not add" and "follow your mosque". Rejected: a table of countries and their announced starts.
+4. **Visibility windows** (owner decision of 16 Oct 2026, Amendment 1 in the plan README, constants
+   in `RamadanInfo`, all measured on the user's own calendar after the shift): the eve notice from 7
+   days before day 1 through day 2, the timetable and PDF from 30 days before day 1 to the last day,
+   the card and the extra timing only inside Ramadan, everything gone at local midnight into 1
+   Shawwal. The card has an off switch because not everyone fasts.
+5. **The Eid greeting** needs no yearly entries (`HijriCalendar.eidOn`), follows the date shift,
+   shows on the day until closed and then never again for that Eid (stored as Hijri year x 100 +
+   month), and does not depend on the card switch. The main text is a plain warm greeting for the
+   majority and the fine print says it is our calculation and to follow your mosque
+   (`EidWordingTest`). No notification and no analytics event.
+6. **When 1.4.0 rolls out is the owner's decision and is not made.** Claude's recommendation (plan
+   README, Amendment 1) is to ship early with the pack dormant and add the Ramadan lines to the
+   store listing in January. If he chooses later, only the date moves.
+7. **Turkey.** The app's Diyanet method is plain angles and gives iftar about 7 minutes earlier than
+   Aladhan's Diyanet output, which appears to carry Diyanet's precaution minutes. Left alone by the
+   plan's default, with the info note and "Match your mosque" as the remedy. Comparing one date with
+   Diyanet's own table and recording the result is still to do (§11).
+
+### 5.20 Widgets: drawn from saved data and moved on by one weak alarm (built 16 Oct 2026 for 1.4.0)
+
+1. **No location read, no network, no permission.** The widgets run `PrayerEngine` on the saved
+   coordinates and settings, the same calls as the Times screen. With no saved location they show a
+   message in 14sp. The privacy promise (§8) holds because of this.
+2. **Refresh is one non waking alarm.** `WidgetRefreshScheduler` sets an `RTC` alarm (not
+   `RTC_WAKEUP`), request code 20,000, action `com.sajdatime.app.action.WIDGET_REFRESH`, for the
+   earlier of the next prayer and local midnight, plus 2 seconds. Exact when the phone allows
+   exact alarms, inexact otherwise. **Every redraw (`WidgetUpdater.refreshAll`) lays down the next
+   alarm**, so any other trigger rebuilds a lost chain. It is cancelled when no widget is placed or
+   there is no location, so a phone without the widget pays nothing. Other redraw triggers:
+   `PrayerAlarmReceiver` (both branches), `DailyRescheduleWorker`, `SystemEventReceiver` (boot,
+   clock, time zone, package replaced, exact alarm permission, and the phone's language), the view
+   model's `recalculate`, and `MainActivity.onResume` (where an in app language change reaches them).
+3. **RemoteViews rules, each learned the hard way.** Only allowed classes inflate (a plain `View`
+   is not one). Every dynamic property is written both ways (max lines, text size, visibility,
+   background) because an update that omits a value keeps the previous one. No `android:text` in
+   layouts (`WidgetResourcesTest`). Colours defined in the layout XML are resolved by the launcher
+   each time it draws, so they follow dark mode without a refresh, whereas a colour chosen per row in
+   code is baked in at the moment of the update and goes stale. That is why there is no
+   "text on highlight" colour: the ordinary text colours clear 4.5:1 on the highlight in both themes
+   (`WidgetColorsTest`). Layout direction comes from the app's language, not the host's.
+4. **The countdown.** The Next prayer widget shows a `Chronometer` countdown only when exact alarms
+   are allowed, because an inexact refresh could leave one running past zero. Otherwise it shows the
+   time only. The Chronometer's digits follow the phone's language and not the app's picker
+   (lesson 131).
+5. **Sizes.** Next prayer is 3 by 2 (a 2 by 1 slot is 40 dp high and cannot hold three lines, a 2
+   by 2 square clipped the countdown), Today is 4 by 3 (six rows at 13sp need about 165 dp, a 4 by
+   2 slot is 110 dp). The smallest resize equals the default, so the widget cannot be shrunk into
+   clipping. The picker previews are two drawn PNGs (5,377 and 14,465 bytes) and not launcher
+   captures, so retake them from an emulator if a layout changes.
+6. **Rejected, with reasons:** see §2 "Deliberately NOT used".
+
 ---
 
 ## 6. Notification and alarm architecture
@@ -1276,6 +1412,35 @@ sound **cannot be changed after creation**. So:
 Vibration pattern: `longArrayOf(0, 350, 250, 350)` — two firm pulses, noticeable in a
 pocket, not startling in a quiet room.
 
+### Suhoor reminder and the widget alarm (1.4.0)
+
+Three families of alarm share one `AlarmManager`. They are kept apart by action and request code,
+because `PendingIntent` identity ignores extras and a reminder on the prayer action with the same
+code formula would silently replace a prayer. `RequestCodeTest` proves the bands are disjoint.
+
+| Family | Action | Request code | Strength |
+|---|---|---|---|
+| Prayer | `ACTION_PRAYER` | up to 3,669 | the three rung ladder above |
+| Suhoor reminder | `ACTION_SUHOOR_REMINDER`, extras `fajr_at` and `date` | `10_000 + dayOfYear`, so 10,001 to 10,366 | the same ladder |
+| Widget refresh | `com.sajdatime.app.action.WIDGET_REFRESH` | 20,000 | non waking `RTC` (§5.20) |
+
+The reminder is laid down after `cancelAll` and before the "no prayer has an alert" early return,
+because a person can switch every prayer alert off and still want the reminder. The planner call
+is wrapped in `runCatching`, so nothing about a reminder can stop a prayer alarm.
+`PrayerAlarmReceiver` branches on the action, and the reminder chains the next window and refreshes
+the badge and the widgets exactly as a prayer does. `shouldPostReminder` judges it on the settings
+of the moment it fires and drops it if the reminder was switched off, if the date is not Ramadan on
+the calendar in use now, or if it arrives more than 5 minutes late (the shortest choice is 15
+minutes before Fajr, so 5 minutes late still leaves 10 of real warning).
+`Notifications.postSuhoorReminder` (id 3000) uses the prayer alerts' channels and `effectiveAlertStyle`, so there
+is no third channel, rounds the countdown to the nearest minute, and times itself out at Fajr so
+"Fajr begins in 30m" is not left on screen after Fajr. The user's Islamic date shift moves the
+reminder with Ramadan.
+
+`SystemEventReceiver` also handles `LOCALE_CHANGED` since 1.4.0 (it redraws the widgets). Its
+manifest filter and its `HANDLED_ACTIONS` must stay the same set, and `SystemEventActionsTest`
+fails if they drift.
+
 ---
 
 ## 7. Design system
@@ -1371,6 +1536,8 @@ descriptions on the tappable location header.
 | City name | DataStore, on device | Never |
 | Sect, madhab, method | DataStore, on device | Never |
 | Notification settings | DataStore, on device | Never |
+| Ramadan card switch, notice and Eid dismissals, suhoor reminder choice (1.4.0) | DataStore, on device | Never |
+| Widgets (1.4.0) | Drawn from the saved location and settings. They read no location of their own and make no request | Never |
 | **Typed city name** (fallback only) | Resolved on-device where possible | Only if the phone's own geocoder cannot answer, then once to Open-Meteo, with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 | **Usage counts** (only if the user opted in) | Sent to Google Analytics, tied to a random Firebase ID | Yes, **opt in only**. A fixed set: sessions and time open, which of the three main screens, which setup steps (never the madhab step), notifications/location allowed yes or no, exact alarms allowed at the end of setup, device model, Android and app version, language, and an approximate area Google derives from the connection. **Never** sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them |
@@ -1402,14 +1569,15 @@ Permissions: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALA
 `RECEIVE_BOOT_COMPLETED`, `INTERNET`, plus the install referrer permission added by the analytics
 library. `ACCESS_NETWORK_STATE`, `WAKE_LOCK` and `FOREGROUND_SERVICE` arrive from WorkManager and
 Firebase. `AD_ID`, `ACCESS_ADSERVICES_AD_ID` and `ACCESS_ADSERVICES_ATTRIBUTION` are removed with
-`tools:node="remove"`. **No fine location. No background location.**
+`tools:node="remove"`. **No fine location. No background location.** 1.4.0 adds no permission
+(the same 11 merged permissions as 1.3.2, release gate 4) and no analytics event (gate 7).
 
 ---
 
 ## 9. Testing
 
-**145 unit tests, all offline and deterministic, 0 failures.** (core 83, app 50, wear 12.)
-Counted from the XML on 16 Aug 2026, not carried forward by hand — the recipe is in the note
+**323 unit tests, all offline and deterministic, 0 failures.** (core 114, app 197, wear 12.)
+Counted from the result XML on 16 Oct 2026 at the 1.4.0 build, not carried forward by hand — the recipe is in the note
 below, and it takes a second.
 
 > This table went stale twice — it said 83 while the suite ran 127. If you add a suite, add a
@@ -1431,10 +1599,30 @@ below, and it takes a second.
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
 | `PlaceNameTest` | app | 18 | The town wins over the county; the postal town is parsed from the address line when `locality` is missing, using rows copied from real 15 Aug 2026 probes — the UK emulator sweep (Slough centre, the rugby-club coarse fix, Bradford/Manningham, London, Birmingham, partial and missing postcodes, an Arabic-comma line) and the owner's S23 Ultra in Türkiye (`07410 Alanya/Antalya` must yield "Alanya", not the province); a point of interest, the street, a house number and a state/province abbreviation never become the town; the district is still used when there is no town; blank fields skipped; the country is not repeated (§5.18) |
 | `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
-| `NoTranslationsYetTest` | app | 2 | Fails the build if a language-qualified `values-*` folder ever appears (CLAUDE.md: never machine-translate). Proven by adding `values-ar/`, watching it go red, removing it, watching it go green |
 | `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
 | `AlertCodecTest` | app | 8 | Per-prayer alert round-trip and stable ordering; rubbish dropped entry by entry rather than thrown; Sunrise refused; and the upgrade from the two keys it replaced — including the empty-string-versus-absent-key distinction that decides whether a user who silenced everything gets five alerts back (§3, persisted data model) |
 | `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
+| `UsageCountsTest` | app | 21 | The closed event set, the consent text against the privacy policy, and by reflection that the API cannot take a setting (§8) |
+| `DndAccessTest` | app | 2 | The manifest declares `ACCESS_NOTIFICATION_POLICY` and the alarm channel id changes on grant and not otherwise (1.3.2) |
+| `LanguagePickerTest` | app | 6 | The language split stays off, Indonesian's legacy code, no "review" wording (1.3.2) |
+| `HijriCalendarTest` | core | 13 | First day and length of Ramadan 1447 and 1448 on the Umm al-Qura calendar, the eve, the date shift from minus 2 to plus 2, day numbers, the eve notice window (7 days before to day 2), the timetable window (30 days before to the last day), a date outside the calendar's range gives null and not a throw (1.4.0) |
+| `RamadanGoldenTest` | core | 8 | The engine against pinned Aladhan values for ten setups: Fajr and Maghrib to the minute, the rest within one, Makkah Isha by the offset table, London's clock change, Tromsø's projected ranges (1.4.0) |
+| `EidTest` | core | 10 | Eid al-Fitr and al-Adha for 2026 to 2029 found on their day and no other, the code (Hijri year x 100 + month), shown until closed and then never again, the date shift, out of range gives null (1.4.0) |
+| `RamadanStateTest` | app | 11 | The pure card state: London day 15 is a 12h18m fast and 4 minutes longer than yesterday, suhoor end and iftar are the day's own Fajr and Maghrib rows, the phase follows the clock, tomorrow, Sydney and Tromsø trends, a clock change day shows plus 5 and not plus 65, the 7 day window, the date shift, "Match your mosque" (1.4.0) |
+| `RamadanTimetableTest` | app | 7 | London pinned to the spec on days 1, 15 and 29 (1.4.0) |
+| `RamadanPdfRangeTest` | app | 8 | The PDF range, its span, its file name and its column widths (1.4.0) |
+| `RamadanSettingsDefaultsTest` | app | 2 | A new install shows the card and has dismissed nothing, and no real Eid code or Hijri year equals the "nothing dismissed" value (1.4.0) |
+| `SuhoorReminderPlanTest` | app | 13 | The pure planner: off plans nothing, outside Ramadan plans nothing, today and tomorrow inside it, a passed time is not planned again, the eve plans day 1, the last day plans itself and never 1 Shawwal, the date shift, always strictly before Fajr, Fajr is the engine's to the instant (1.4.0) |
+| `SuhoorReminderReceiverTest` | app | 10 | `shouldPostReminder`: on time and up to 5 minutes late are shown, 6 late and after Fajr are dropped, switched off or outside Ramadan on today's calendar is dropped, the minutes left round to the nearest and are never negative (1.4.0) |
+| `RequestCodeTest` | app | 7 | Prayer codes stay below the suhoor range, suhoor codes run 10,001 to 10,366, no two codes clash within a year or across the cancel horizon, the actions differ, the widget code 20,000 is above every suhoor code (1.4.0) |
+| `SystemEventActionsTest` | app | 3 | The system event filter in the manifest (now including `LOCALE_CHANGED`) and `HANDLED_ACTIONS` are the same set. Proven by deleting a manifest line and watching it fail (1.4.0) |
+| `EidWordingTest` | app | 5 | The greeting's shape in all four languages: a plain greeting, the fine print says our calculation and follow your mosque (1.4.0) |
+| `RamadanWordingTest` | app | 12 | 57 Ramadan, suhoor, Eid and widget strings: the info note, no ruling words, "imsak" in one sentence only, placeholders match across languages, no dash or semicolon (1.4.0) |
+| `WidgetStateTest` | app | 14 | The pure widget state: Ramadan days, the eve, the last day, Shawwal, switch off, shift, the word table (1.4.0) |
+| `WidgetColorsTest` | app | 5 | Every widget colour equals its `Color.kt` twin in both themes, and seven contrast pairs (1.4.0) |
+| `WidgetResourcesTest` | app | 11 | No `android:text`, children hidden from TalkBack, alignment, ids, `updatePeriodMillis` 0, previews under 30 KB (1.4.0) |
+| `WidgetManifestTest` | app | 4 | Both providers are declared with their provider files, the redraw receiver is declared, listens for its own action only and is not exported, the picker labels, and the merged permissions are those of 1.3.2 and no others (1.4.0) |
+| `WidgetRefreshSchedulerTest` | app | 8 | Boundary plus 2 seconds, midnight after Isha, local not UTC, a zone that skips midnight, and a sweep of six zones over a year proving the answer is always in the future and under 26 hours (1.4.0) |
 | `WearSettingsTest` | wear | 4 | Synced settings reach the engine intact; unpaired watch still calculates; the wire-key contract |
 
 Reference values were captured from the **Aladhan API** — an independent implementation of
@@ -1469,6 +1657,37 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ## 10. What has been verified on a device, and how
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
+
+### 16 Oct 2026, cloud build and checks of 1.4.0 (no device existed, so nothing here was seen on a phone)
+
+- **The gate, forced with `--rerun-tasks`:** 323 unit tests, 0 failures, fresh result files. Lint 0
+  errors in app, wear and core. Both bundles build. Gate 4: the same 11 merged permissions as 1.3.2.
+  Gate 5: `releaseRuntimeClasspath` identical to the baseline, no new `implementation(` line. Gate 7:
+  no analytics call outside `UsageCounts.kt`. Gate 8: no `android:text` in widget layouts and no
+  `Locale.getDefault`. Gate 9: English 282 strings, each translation 280, a difference of 2 as
+  required. The watch is untouched (`git diff origin/main -- wear/` is empty).
+- **Bundle size, gate 6.** `app-release.aab` is 6,028,577 bytes, 248,602 over the 1.3.2 baseline of
+  5,779,975, inside the 300 KB gate but not by much. 13b581d was built separately (5,779,901) and the
+  bundles diffed entry by entry: the R8 mapping file +146,022 (BUNDLE-METADATA, kept by Play for crash
+  reports and never sent to a phone), `classes.dex` +66,460 compressed (all the new code), the two
+  preview PNGs +19,044, compiled resources +8,705, widget layouts and XML +5,400, manifest +491. A
+  phone downloads about 100 KB more, not 248 KB.
+- **The widgets, drawn with the real `RemoteViews` apply path in Robolectric** (scratch harness, not
+  committed, method in lesson 132). Both widgets in English and Urdu, light and dark, at the Ramadan
+  clock of 2027-02-22 15:00 and at larger font scales. The contact sheet is
+  `docs/plans/2026-10-widget-ramadan-tracker/reference/widget-renders-robolectric.png`. A JVM layout
+  engine draws it, so it checks layout and wording closely and is not a pixel match for a launcher.
+  It found and fixed four things reading could not: a plain `View` in a layout, a clipped countdown,
+  a header that cost height, and the no location message at 11sp in grey.
+- **The alarm chain, same harness:** one alarm after three schedules, type `RTC`, trigger exactly the
+  boundary plus 2 seconds, midnight winning after Isha, cancelled when the last widget goes.
+- **NOT checked on a device, and it matters:** the widgets in a real launcher, the PDF through
+  Android's own `PdfDocument`, the desugared Hijri table on API 24 to 33 (lesson 136), the suhoor
+  reminder in `dumpsys alarm`, the Ramadan stages with the clock moved in four languages, right to
+  left (gate 10), and the store screenshots (gate 12). Each is a step of
+  `docs/release-tools/release-1.4.0.sh`, which has never been run. Treat every one as unverified.
+- **Still to do:** compare Istanbul's times with Diyanet's own table for one date and record the
+  result here (§5.19 item 7).
 
 ### 16 Aug 2026 — a session on the owner's S23 Ultra, and what only hardware could say
 
@@ -4432,18 +4651,23 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 16 Oct 2026 (read this block first, then the 13 Oct block below for the release facts)
 
-**Live state is unchanged from 13 Oct 2026:** phone 1.3.2 (`versionCode` 7) and watch 1.2.0 (`versionCode` 1001). **Nothing is built and no code has changed.** The owner has asked for new work and has approved planning only, so the "start nothing new until he asks" line in the 13 Oct block is superseded for the work below and for nothing else.
+**Live state is unchanged from 13 Oct 2026:** phone 1.3.2 (`versionCode` 7) and watch 1.2.0 (`versionCode` 1001), 178 countries. Nothing after 1.3.2 has been submitted to Google. The daily health check (12:00 UTC, `trig_0129FQnWihf8XG6rKLCB4oFr`) stays a silent regression alarm until 1.4.0 is live, and is re baselined then.
 
-**What was decided on 16 Oct 2026:** a competitor analysis (Muslim Pro, Athan, Pillars, Al-Azan, GoSolat) ranked three features SajdaTime lacks. In order of evidence: home screen widgets, a daily prayer tracker kept on the device, and a Ramadan pack based on the user's own location. The analysis is the Claude Doc "SajdaTime competitor analysis and top 3 features" (https://claude.ai/code/artifact/9e8e4d57-085d-4cb9-bb83-5e9c2a37b93e). Its limits are stated in it: small review samples, no Reddit evidence, competitor blogs not used as evidence of demand.
+**Release A, phone 1.4.0 (`versionCode` 8), is built and unit tested, and has never been run on a device.** It is on branch `claude/1-4-0-ramadan-widgets` in the cloud sandbox. The cloud cannot push to GitHub, so it reaches the owner's repo as a git bundle (lesson 129). It contains the Ramadan pack (card, eve notice, timetable sheet and PDF, suhoor and iftar labels, optional suhoor reminder, Eid greeting) and two home screen widgets: §4, §5.19, §5.20, §6. The gate in the cloud: 323 unit tests (core 114, app 197, wear 12), lint 0 errors, both bundles build, the same 11 permissions, no new dependency, no new analytics event, the app bundle 6,028,577 bytes (§10).
 
-**Where the plan is:** `docs/plans/2026-10-widget-ramadan-tracker/`. Read its `README.md` first. It holds the master plan (`PLAN.md`), the location based Ramadan design with golden values (`RAMADAN-LOCATION-SPEC.md`), the wording and store listing audit with all new strings in four languages (`WORDING-AND-LISTING.md`), the test and recording plan (`TEST-AND-RECORD.md`) and two paste ready Claude Code prompts (`SESSION-PROMPTS.md`). The plan corrects several assumptions in the first draft, listed in its README.
-
-**The release split:** Release A, phone 1.4.0 (`versionCode` 8): Ramadan pack first, then the two widgets. Ramadan 1448 is expected to begin on Monday 8 Feb 2027 on the Umm al-Qura calendar (checked with JDK 21 `java.time`), so the plan targets a pull request ready by early January 2027. Release B, phone 1.5.0 (`versionCode` 9): the tracker, kept separate for its privacy policy change. The watch is not changed and its bundle is never uploaded with a phone release.
+**The two decisions that are the owner's and are not made:**
+1. **When 1.4.0 rolls out.** Ramadan 1448 begins on Monday 8 Feb 2027. Claude recommends shipping as soon as the device checks pass, with the Ramadan pack dormant until the eve notice window and the Ramadan store lines added in January, because the alarm scheduler change should be found faulty in November and not in the week Ramadan starts (reasons and evidence: plan README, Amendment 1). He asked to review the emulator captures of every Ramadan stage first and then decide. Nothing is submitted until he does.
+2. **Release B (tracker, 1.5.0)** is not started and does not start until he says so.
 
 **Left to do, and whose job:**
-- **Owner:** say "go" with Release A or Release B to start building. Review and merge each pull request. Press Play Console submit and publish. Publish the updated privacy policy with Release B. Three decisions are listed in the plan README, each with a default he can ignore.
-- **Claude, when told to go:** follow `SESSION-PROMPTS.md`, run the gate in `TEST-AND-RECORD.md`, and record the result here, in the store docs and in the privacy policy as that file says.
-- **Existing wording that the audit found stale or wrong** (README "English only", stale LISTING.md notes, LISTING-LOCALES.md gaps, this file's section 5.11, 9 and 11, the RELEASING.md version line) is listed in `WORDING-AND-LISTING.md` with corrected text. None of it has been changed yet.
+- **Owner:** with an emulator (and optionally a phone) available, run `docs/release-tools/release-1.4.0.sh` on his Mac once. It pushes the branch, runs the full gate, builds and verifies the signed bundle, runs the device suite (widgets, the Ramadan card, the suhoor reminder in `dumpsys alarm`, the PDF), moves the emulator clock through the eve, day 1, the last day and both Eid days in four languages with screenshots, and puts the clock back. Review the screenshots. Decide the date. Merge the pull request only when he is ready to submit, because **merging publishes `docs/` through GitHub Pages**, including `privacy.html` (lesson 124 and 137). Press submit himself in Play Console.
+- **Claude:** read the script's results and fix what the device shows. Compare Istanbul's times with Diyanet's own table for one date and record it. Deliver the branch to his repo, walk him through the Play Console one screen at a time (A11 in the plan), re baseline the health check once live, and record the release here.
+- **Held until January, by decision:** the Ramadan lines of the store listing (`docs/store/LISTING.md` carries the Release A text with the Ramadan lines marked held). The widgets line and the language line can go in with the release.
+- **Known unknowns the device run decides:** whether the desugared Hijri table matches `java.time` on API 24 to 33 (lesson 136), how the widgets look in a real launcher, whether the PDF spacing is right in Android's `PdfDocument`, and whether anything in the Ramadan card clips at a large font.
+
+**The plan is in `docs/plans/2026-10-widget-ramadan-tracker/`.** Its `README.md` status table is the task by task record (A0 to A10a done, A10b is these docs, A11 waits for the owner, B0 to B8 not started), and each row says what was verified and what was not. Two deviations from the plan that he should know: the Next prayer widget is 3 by 2 and the Today widget is 4 by 3 headerless (the sizes in the plan clipped), and the picker previews are drawn, not captured.
+
+**Existing wording the audit found stale or wrong** (README "English only", the stale notes in `docs/store/LISTING.md` and `LISTING-LOCALES.md`, §5.11, §9 and §11 here, the RELEASING.md version line, `AGENTS.md`) was corrected in the A10b commit, listed in `WORDING-AND-LISTING.md` section A.
 
 ### 📍 STATE OF PLAY, 13 Oct 2026 (read this block first, it replaces every older STATE OF PLAY)
 
@@ -6380,11 +6604,11 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
    button at the foot of the times list, and that button opens a sect and madhab picker.
    An unsynced watch is now visibly, and correctably, unsynced. Verified on the emulator:
    switching to Hanafi moved Asr to 6:37 PM and every time then matched the phone exactly.
-8. **No home screen widget** and **no tablet-optimised layout**.
+8. **No tablet-optimised layout.** (Home screen widgets are built for 1.4.0, §5.20.)
 9. **No bundled adhan audio** (deliberate: licensing + tens of MB). Alarm mode plays a tone
    the user picks.
 10. **City search needs a network** unless the phone's own geocoder can answer offline.
-11. **Localisation is ready to receive translations, but none exist yet.**
+11. **Localisation shipped in 1.3.1 (Urdu, Turkish, Indonesian). The rest of this item describes the mechanism, which is still how a language is added.**
 
     Every user-facing string is now a resource, including the ones that were hardest to
     move: prayer names and calculation-method names used to be English constants on the
@@ -8045,3 +8269,44 @@ matters more than the stable hashes, that is the trade being made.
     and runs the device suite on an emulator, writing PASS or FAIL lines, a log and screenshots to `build/release-1.3.2/`,
     which the bridge can read. Its first run caught lesson 127; the second passed. After a commit is fetched on the Mac,
     check it by `git bundle list-heads` or hash: the bridge has once delivered the previous version of a just-overwritten file.
+
+130. **A widget is drawn by the launcher in another process, so most of what you know about views does not apply.** Only a short
+    list of view classes inflates (a plain `View` is not on it), every dynamic property must be written both ways because an
+    update that omits a value keeps the previous one, and colours in the layout XML are resolved at draw time (so they follow
+    dark mode) while a colour set in code is baked in at the update and goes stale. None of that fails to compile. Render it
+    through the real `RemoteViews.apply` path before believing a layout (16 Oct 2026: four defects found that reading missed).
+131. **The widget countdown's digits follow the phone's language, not the app's picker.** A `Chronometer` formats in the host's
+    locale, so an Urdu app on an English phone shows Latin digits in the countdown. Accepted and shown only when exact alarms are
+    allowed. Layout direction, by contrast, can be forced from the app's language (`AppLocale`). Not seen on a device.
+132. **How to render and check widgets and alarms in a cloud session with no emulator.** Copy the repo to a scratch folder, add
+    `org.robolectric:robolectric` and `androidx.test.ext:junit` as test dependencies, set `unitTests.isIncludeAndroidResources =
+    true`, pass the `--add-opens` flags from the 1.3.2 note, and write scratch tests that apply the widget `RemoteViews` to a
+    real view and save a bitmap. Qualifiers go in this order: `w411dp-h891dp-night-xxhdpi`. For alarms use
+    `shadowOf(alarmManager).peekNextScheduledAlarm()`, because `getNextScheduledAlarm()` consumes it, and cancel the alarm that
+    placing the widget already created before asserting. Do not commit the harness: it changes the release build's test classpath.
+133. **Gradle returns test results FROM-CACHE, which looks exactly like a pass.** A scratch test that writes files, or a guard
+    test you want to prove fails, will not run again unless you use `--no-build-cache`, `cleanTest<Variant>UnitTest` or
+    `--rerun-tasks`. A guard is only proven when you break the thing it guards, rerun with the cache off, and watch it go red.
+134. **`connectedAndroidTest` uninstalls the app when it finishes, and binding a widget needs a grant.** The widget device tests
+    need `adb shell appwidget grantbind --package com.sajdatime.app` first and are run with `am instrument` so the app stays
+    installed. `docs/release-tools/release-1.4.0.sh` does both. A future session that sees the widget test fail on a bind error
+    should look there first.
+135. **A stale Kotlin daemon gets Gradle OOM killed in the cloud sandbox.** The build dies mid task with no useful error. Stop the
+    daemons, kill the stale Kotlin daemon by pid, and build with `--no-parallel -Pkotlin.daemon.jvmargs=-Xmx1536m`. Never
+    `pkill -f GradleDaemon` there: it matched and killed the session's own shell (exit 144).
+136. **Whether `HijrahChronology` agrees with `java.time` on API 24 to 33 has not been seen.** On those releases it comes from core
+    library desugaring (`desugar_jdk_libs` 2.1.5), not the platform. The JVM tests prove the Umm al-Qura dates on JDK 21, which
+    is not the same code. `RamadanDeviceTest` checks 1 Ramadan 1448 = 8 Feb 2027 on a device. If it is a day out on an old
+    emulator, the card and the eve notice would be a day out for those phones, and the fix is a table in `:core`.
+137. **Merging to `main` publishes `docs/`, so the privacy sentence about widgets goes live at merge.** Lesson 124 says merge the
+    policy before you submit. The corollary: do not merge a branch that carries a policy change months before the release it
+    describes, and do not merge the day before you would rather wait. The Ramadan store lines are held for January for the same
+    reason (a listing is only edited when its feature is about to be used).
+138. **Bundle growth is not download growth.** An app bundle carries the R8 mapping file (BUNDLE-METADATA), which Play keeps to
+    deobfuscate crashes and never sends to a phone. Judge a size gate by diffing the entries against a freshly built baseline
+    (here 248,602 bytes up, of which 146,022 was the mapping file). Also: `dumpsys alarm` mentions an action in several
+    sections, so count alarms by parsing the `Alarm{` blocks and not by grepping the action, or one alarm counts three times.
+139. **A receiver that is not exported is right for an alarm the app sets for itself, and that was reasoned, not seen.**
+    `WidgetRefreshReceiver` is `exported="false"` and the alarm's `PendingIntent` names it explicitly, which the system delivers
+    with the app's own identity. Robolectric agrees, a real alarm firing has not been observed. `WidgetDeviceTest` waits for
+    the alarm to be present in `dumpsys alarm` and the Mac run shows whether it is delivered.

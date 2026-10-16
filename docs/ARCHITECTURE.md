@@ -164,7 +164,7 @@ minutes itself.
 
 Ramadan is detected as Hijri month 9 via `java.time.chrono.HijrahDate` — and `HijrahChronology`
 *is* the Umm al-Qura calendar, so the two agree by construction. The adjustment applies to
-no other method.
+no other method. Since 1.4.0 that call lives in one file, `core/HijriCalendar.kt` (3.10).
 
 ### 3.7 Determinism
 
@@ -223,6 +223,24 @@ seconds, and never fire it for the first heading of a session. This is measured 
 not caution: with a plain 5-degree test the app buzzed 26 times in 76 seconds on a phone
 lying still on a desk. `docs/HANDOVER.md` §5.9 carries the numbers, and `QiblaEngineTest`
 fails if the two angles are ever made equal.
+
+### 3.10 Ramadan and Eid (1.4.0)
+
+`HijriCalendar` in `:core` is the only file that touches `HijrahDate`. It gives the Hijri day for a
+date and the user's date shift (plus or minus 2 days), whether it is Ramadan, a `RamadanInfo` (Hijri
+year, first and last day, length, day number, and the two visibility windows below) and the date of
+Eid al-Fitr (1 Shawwal) and Eid al-Adha (10 Dhul Hijjah). There are no yearly tables anywhere, so 2027
+and later need no change. Ramadan 1448 is 8 Feb to 8 Mar 2027 (29 days).
+
+- **Suhoor ends at Fajr and iftar is at Maghrib**, exactly the engine's two times for the day,
+  including the user's per prayer adjustments. No imsak margin and no precaution minutes.
+- **Visibility is a function of the user's own calendar.** An eve notice from 7 days before day 1
+  through day 2, a timetable (and PDF) offered from 30 days before day 1 to the last day, the card
+  only inside Ramadan, all of it gone at local midnight into 1 Shawwal.
+- **No country table.** The app does not decide when Ramadan starts for anyone: it applies Umm al-Qura
+  and the user's shift, and says so.
+- **Port to iOS as it is.** `Calendar(identifier: .islamicUmmAlQura)` is the same calendar. The
+  windows and the Eid rule are pure date arithmetic.
 
 ---
 
@@ -314,6 +332,18 @@ settings. Settings prompts for it only once alarm mode is chosen.
 The badge refreshes when something has already woken the app rather than ticking every
 minute; a live-updating countdown would require a foreground service and a permanent
 battery cost for information already visible in the app.
+
+### Suhoor reminder and home screen widgets (1.4.0)
+
+Two more alarm families share the manager, kept apart by action and request code because
+`PendingIntent` identity ignores extras. Prayers use codes up to 3,669 and `ACTION_PRAYER`. The
+optional suhoor reminder (Ramadan days only, 15 to 60 minutes before Fajr) uses
+`ACTION_SUHOOR_REMINDER` and codes 10,001 to 10,366 and the same three rung ladder. The widgets use
+one non waking `RTC` alarm, code 20,000, set for the earlier of the next prayer and local midnight
+plus 2 seconds (exact when the phone allows exact alarms, inexact otherwise), and every redraw lays
+down the next one. A widget is a display, so it never uses `setAlarmClock` or a waking alarm and the
+`updatePeriodMillis` is 0. The widgets are `RemoteViews`, with no Glance, and read no location: they
+draw from the saved coordinates and settings. `docs/HANDOVER.md` §5.20 and §6 hold the detail.
 
 ---
 
@@ -438,6 +468,8 @@ Two rules came out of that, and both should carry to any port:
 | City name | DataStore, on device | Never |
 | Sect, madhab, method | DataStore, on device | Never |
 | Notification settings | DataStore, on device | Never |
+| Ramadan card switch, dismissals, suhoor reminder choice (1.4.0) | DataStore, on device | Never |
+| Widgets (1.4.0) | Drawn from the saved location and settings, no location read of their own | Never |
 | Typed city name (fallback only) | Resolved on-device where possible, otherwise sent once to Open-Meteo | Only if the phone's own geocoder cannot answer, and with prior on-screen disclosure |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 
@@ -453,7 +485,7 @@ equivalent is excluding the store from iCloud and iTunes backup.
 
 Permissions requested: `ACCESS_COARSE_LOCATION`, `POST_NOTIFICATIONS`,
 `SCHEDULE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`, `INTERNET`. No fine location, no
-background location.
+background location. 1.4.0 (Ramadan pack and widgets) adds none.
 
 ---
 
@@ -500,7 +532,7 @@ curl "https://api.aladhan.com/v1/timings/DD-MM-YYYY?latitude=..&longitude=..&met
 ## 8. Porting to iOS
 
 Every calculation file in `core/` — `PrayerModels.kt`, `PrayerEngine.kt`, `QiblaEngine.kt`,
-`WatchSyncContract.kt` — contains no Android imports, so everything in section 3 transfers
+`HijriCalendar.kt`, `WatchSyncContract.kt` — contains no Android imports, so everything in section 3 transfers
 directly.
 
 The one exception is `PrayerLabels.kt`, which maps `PrayerSlot` and `CalcMethod` to
@@ -512,7 +544,9 @@ instead. The enums themselves carry no text.
    adhan-java. Translate `PrayerEngine.kt` more or less line for line.
 2. **Reimplement the Jafari Maghrib probe (3.4).** adhan-swift has the same missing angle.
 3. **Set the high-latitude rule explicitly (3.5).** The Swift default has the same problem.
-4. Carry over the Ramadan adjustment (3.6) and minute truncation (3.7).
+4. Carry over the Ramadan adjustment (3.6), minute truncation (3.7) and the Ramadan and Eid
+   rules (3.10). Widgets are WidgetKit timelines on iOS, not alarms: the refresh strategy in
+   `docs/HANDOVER.md` §5.20 does not carry over, the rule that they read no location does.
 5. Replace `UserNotifications` for scheduling — iOS caps pending notifications at 64, so
    schedule roughly the next 12 days of prayers and top up on each app launch.
 6. `UNUserNotificationCenter` cannot be woken on boot, so the "reschedule on boot" strategy
@@ -568,8 +602,8 @@ Honest list of what is not covered:
   upload key. ⚠️ **No agent may generate, hold, request or view that key** — see `CLAUDE.md`
   and `docs/RELEASING.md`. This bullet previously read "a release keystore must be generated
   before publishing", which invited exactly the hard-rule violation the project forbids.
-- **No home screen widget and no tablet-optimised layout.** The watch app and tile exist;
-  a phone widget does not.
+- **No tablet-optimised layout.** The watch app and tile exist, and since 1.4.0 the phone has
+  two home screen widgets (next prayer, and today's times).
 - **The watch has *some* settings of its own.** Sect and madhab can be changed on the wrist —
   there is a school picker at the bottom of the times list, precisely so an unpaired watch is
   not stuck on Sunni/Shafi'i with Asr over an hour out. **Calculation method is still

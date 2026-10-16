@@ -28,8 +28,9 @@ Offline prayer times (namaz) and Qibla compass for Sunni and Shia. No accounts.
 > that line would be misleading even though the counts are off by default. `No accounts` replaces
 > it: true, short, and a privacy word, which this section shows the checker accepts. `No accounts`
 > has not been tested on its own, so use the method at the end of this section (change one phrase,
-> save, reload, re-read) and revert to a wording without it if the promotion notice returns. **The
-> live listing still says `No tracking` until that release is published; leave it until then.**
+> save, reload, re-read) and revert to a wording without it if the promotion notice returns. **Live
+> since 1.3.0 (4 Oct 2026). Confirmed on the public page on 16 Oct 2026: the short description ends
+> "No accounts." and the word "No tracking" appears nowhere.**
 
 ### Do not put "Free" or "No ads" back
 
@@ -141,7 +142,7 @@ is not a promotion word, which was the open question and is now closed.
 
 ## Full description (max 4000)
 
-> **Changed 9 Oct 2026, to be applied in the Console (not yet live).** The calculation method bullet used to say "chosen automatically for your region". That is wrong: `PrayerEngine.resolveMethod` picks Muslim World League for Sunni and Jafari for Shia from the sect setting, never from the region. The live listing (3,727 of 4,000 characters) still has the old wording until this is saved in Play Console, Store listings, Default store listing.
+> **Changed 9 Oct 2026, live since 13 Oct 2026 (approved together with 1.3.2).** The calculation method bullet used to say "chosen automatically for your region". That is wrong: `PrayerEngine.resolveMethod` picks Muslim World League for Sunni and Jafari for Shia from the sect setting, never from the region. The block below is the live text.
 
 ```
 SajdaTime tells you when to pray and which way to face.
@@ -206,7 +207,167 @@ as an ongoing charity for the Ummah.
 Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-`3,704 / 4000`
+`3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
+
+### Release A (1.4.0): the text to paste, and the January text
+
+Written 16 Oct 2026 by the 1.4.0 build, from `docs/plans/2026-10-widget-ramadan-tracker/WORDING-AND-LISTING.md` section C1 and audit
+items L5, L6 and L7. **Nothing here is live and nothing is pasted until the owner decides the rollout date and says go.** The
+Ramadan line is held on purpose: the Ramadan pack only shows itself seven days before Ramadan, so its line goes into the listing in
+early January as a listing edit with no new bundle. Two blocks, so that nothing has to be edited by hand at paste time.
+
+What changed from the live block, in both: the Hijri bullet loses ", with the Islamic month names built in" (room); a widgets bullet
+and a languages bullet are added (audit L7: three languages shipped in 1.3.1 and the listing never said so); the high latitude line
+is shortened; the Umm al-Qura line now says it applies only with that method (audit L6, it was true only for Umm al-Qura); the
+privacy intro is shortened; and the semicolon in the HONEST paragraph is a full stop (house style, the phrases that
+`DisclaimerContentTest` matches are unchanged). The school line the owner approved on 13 Oct is not touched.
+
+**1. At the 1.4.0 release (3,830 of 4,000)**, the Ramadan bullet is still the live one:
+
+```
+SajdaTime tells you when to pray and which way to face.
+That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
+
+Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
+
+Whether you call them namaz, salah or salat, these are the same five daily prayers.
+
+WHAT YOU GET
+
+• The five daily prayers plus sunrise, worked out for wherever you are
+• The Hijri date alongside the ordinary date
+• A live countdown to the next prayer
+• A Qibla compass corrected to true north, not magnetic north
+• Notifications at each prayer time, even when the app is closed
+• An optional alarm mode using any tone or adhan already on your phone, loud enough for Fajr
+• An optional quiet badge in the notification shade showing the next prayer
+• A printable PDF timetable for today, the next seven days, or the whole month
+• Two home screen widgets: the next prayer with a countdown, and all of today's times
+• During Ramadan it doubles as a sehri and iftar timetable: Fajr ends sehri, Maghrib opens your fast
+• A Wear OS app and watch tile that work on their own, with or without your phone
+• Light and dark themes, following your phone or set by hand, both checked for readability
+• In English, Urdu, Turkish and Indonesian, chosen in Settings
+
+BUILT FOR YOUR SCHOOL OF THOUGHT
+
+Sunni and Shia conventions are both supported properly, not as an afterthought.
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
+• Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
+• Calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai,
+  Kuwait, Qatar, Singapore, Turkey, Moonsighting Committee and more
+• The method is chosen automatically for your school (Muslim World League for Sunni, Jafari for Shia), and you can override it
+• A high-latitude rule for northern countries where the sun never fully sets in summer
+• With the Umm al-Qura method, its Ramadan Isha adjustment is applied automatically
+
+YOUR PRIVACY IS NOT THE PRICE
+
+Most free prayer apps are funded by advertising, which means you pay with your data. This one is not.
+
+• No adverts, ever
+• No accounts, no sign-in, no email address
+• Optional usage counts that you control in Settings. No crash reporting
+• Approximate location only, read while the app is open, never in the background
+• Your coordinates never leave your device, and are never part of the optional usage counts
+• Cloud backup is deliberately switched off so nothing can be copied off your phone
+
+If you would rather not share your location at all, you can type a city name instead, and the app works the same.
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods. They are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely
+as an ongoing charity for the Ummah.
+
+Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+**2. In early January, for Ramadan 1448 (3,923 of 4,000)**, the same text with the Ramadan bullet replaced by "In Ramadan: suhoor
+(sehri) end and iftar for your location, a countdown, today's fast length, tomorrow's times, a timetable to view or save as PDF, and an
+optional suhoor reminder before Fajr". "Sehri" stays in brackets because it is the South Asian search word the live line carries:
+
+```
+SajdaTime tells you when to pray and which way to face.
+That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
+
+Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
+
+Whether you call them namaz, salah or salat, these are the same five daily prayers.
+
+WHAT YOU GET
+
+• The five daily prayers plus sunrise, worked out for wherever you are
+• The Hijri date alongside the ordinary date
+• A live countdown to the next prayer
+• A Qibla compass corrected to true north, not magnetic north
+• Notifications at each prayer time, even when the app is closed
+• An optional alarm mode using any tone or adhan already on your phone, loud enough for Fajr
+• An optional quiet badge in the notification shade showing the next prayer
+• A printable PDF timetable for today, the next seven days, or the whole month
+• Two home screen widgets: the next prayer with a countdown, and all of today's times
+• In Ramadan: suhoor (sehri) end and iftar for your location, a countdown, today's fast length, tomorrow's times, a timetable to view or save as PDF, and an optional suhoor reminder before Fajr
+• A Wear OS app and watch tile that work on their own, with or without your phone
+• Light and dark themes, following your phone or set by hand, both checked for readability
+• In English, Urdu, Turkish and Indonesian, chosen in Settings
+
+BUILT FOR YOUR SCHOOL OF THOUGHT
+
+Sunni and Shia conventions are both supported properly, not as an afterthought.
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
+• Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
+• Calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai,
+  Kuwait, Qatar, Singapore, Turkey, Moonsighting Committee and more
+• The method is chosen automatically for your school (Muslim World League for Sunni, Jafari for Shia), and you can override it
+• A high-latitude rule for northern countries where the sun never fully sets in summer
+• With the Umm al-Qura method, its Ramadan Isha adjustment is applied automatically
+
+YOUR PRIVACY IS NOT THE PRICE
+
+Most free prayer apps are funded by advertising, which means you pay with your data. This one is not.
+
+• No adverts, ever
+• No accounts, no sign-in, no email address
+• Optional usage counts that you control in Settings. No crash reporting
+• Approximate location only, read while the app is open, never in the background
+• Your coordinates never leave your device, and are never part of the optional usage counts
+• Cloud backup is deliberately switched off so nothing can be copied off your phone
+
+If you would rather not share your location at all, you can type a city name instead, and the app works the same.
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods. They are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely
+as an ongoing charity for the Ummah.
+
+Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+**What's new** (Play's limit is 500 characters per language, an assumed figure to confirm against the Console's own counter). The
+English release text for 1.4.0 leads with the widgets if the release goes out ahead of Ramadan (321 characters):
+
+```
+Two home screen widgets: the next prayer with a countdown, and all of today's times. Ramadan is built in, with suhoor end and iftar for your location, the length of the fast, a full timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Where your mosque's timetable differs, follow your mosque.
+```
+
+The four language versions, written for the same release, are in `WORDING-AND-LISTING.md` C4. Only the English listing exists in
+Play today.
+
+**Screenshots for this release.** The release script (`docs/release-tools/release-1.4.0.sh`, step 6) writes candidate captures of the
+Times screen on the eve, on day 1, on the last day and on both Eid days in four languages, and of both widgets, to
+`build/release-1.4.0/`. When the Ramadan lines go live in January, retake screenshot `03` as the Ramadan Times screen (audit L14), and
+add a widget screenshot if the owner wants one.
 
 ### This block is now a copy of the Console, not the other way round
 
@@ -235,7 +396,7 @@ textarea's length *and* a djb2-xor hash of it; the text is then pulled out in fi
 slices, reassembled here, and the same two numbers recomputed. If both match, the fenced block
 above is the Console text byte for byte and not a careful-looking approximation of it. The
 slice boundaries are asserted at exactly 800 too, so a dropped or doubled chunk fails loudly
-rather than quietly shifting the text. Last run: **`len=3704 hash=441829862`, both sides, 1 Sept 2026** — computed in the browser against the Console textarea and on disk against this file.
+rather than quietly shifting the text. Last run: **`len=3704 hash=441829862`, both sides, 1 Sept 2026** — computed in the browser against the Console textarea and on disk against this file. That figure is for the text of 1 Sept. The live text changed on 13 Oct 2026 and is now 3,770 characters (sha256 beginning `ff4dccf3`, measured against the raw public page on 16 Oct 2026). Record a new `len` and hash from the Console the next time the listing is edited.
 
 > **1 Sept 2026: the drift had reversed, and this section's own claim above was stale.** The Console was on `len=3299` and *this file* was right, not the other way round. The 3,299-character version was missing both halves of the strengthened religious disclaimer written on 2 Aug in `91ae9c6` — the sentence saying the times come from a calculation and not from any mosque or scholar, the instruction to follow your mosque where the two disagree, and the no-warranty sentence. `91ae9c6` names four copies that must move together (in-app dialog, watch, `docs/privacy.html`, Play listing) and only three of them moved. The Console text was corrected to match this file, by replacing those two paragraphs in place so the remaining 3,299 characters stayed byte-identical, and both sides were re-measured. **So the rule is not "the Console is always ahead" — it is that neither side is authoritative until they are hashed against each other.**
 

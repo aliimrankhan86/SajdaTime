@@ -1108,8 +1108,16 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
 
 Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradle.kts` and
 `wear/build.gradle.kts`. Version codes are unique **per app, not per track**: the phone is
-on `4`, the watch on `1001`, so the two sequences climb in separate bands and can never
-collide.
+on `7` (1.3.2, live since 13 Oct 2026, and `8` is 1.4.0 once released), the watch on `1001`, so
+the two sequences climb in separate bands and can never collide.
+
+**Device steps for 1.4.0 and later.** The on device suite includes widget tests. A shell can bind a widget
+only after `adb shell appwidget grantbind --package com.sajdatime.app --user 0`, and the suite is run
+with `adb shell am instrument` and not `connectedAndroidTest`, which uninstalls the app when it ends.
+`docs/release-tools/release-1.4.0.sh` does both, moves the emulator clock through Ramadan and puts it
+back, and writes PASS, FAIL or CHECK lines to `build/release-1.4.0/summary.txt`. **Merging a branch
+publishes `docs/` (the privacy policy) through GitHub Pages**, so merge when you are ready to submit,
+not before (`docs/HANDOVER.md` §15 lessons 124 and 137).
 
 ### Shipping an improvement *during* the closed test
 
