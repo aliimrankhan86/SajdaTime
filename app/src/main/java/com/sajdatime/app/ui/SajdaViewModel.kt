@@ -86,6 +86,12 @@ data class UiState(
     /** Qibla bearing in degrees from true north. Null until a location is known. */
     val qiblaBearing: Double? = null,
     val qiblaDistanceKm: Double? = null,
+    /**
+     * Present only while the user's own calendar is inside Ramadan or in the week before it
+     * ([com.sajdatime.core.RamadanInfo.showsNotice]). Null the rest of the year, so nothing
+     * about Ramadan reaches the Times screen then.
+     */
+    val ramadan: RamadanState? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -369,7 +375,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null) }
             return
         }
 
@@ -380,14 +386,20 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val today = PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs)
             val next: NextPrayer = PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
             val current = PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
-            Triple(today, next, current)
+            // Built from the same `today` the list shows, so the card cannot disagree with it.
+            // Recomputed on every trigger that already exists: Fajr and Maghrib are prayers, so
+            // the phase changes exactly when `next` rolls over, and the date change tick covers
+            // midnight. No new timer.
+            val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
+            Computed(today, next, current, ramadan)
         }
 
         _state.update {
             it.copy(
-                today = computed.first,
-                next = computed.second,
-                current = computed.third,
+                today = computed.today,
+                next = computed.next,
+                current = computed.current,
+                ramadan = computed.ramadan,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -402,3 +414,11 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 }
+
+/** One recalculation's results, carried out of the background block together. */
+private data class Computed(
+    val today: DayPrayerTimes,
+    val next: NextPrayer,
+    val current: PrayerSlot?,
+    val ramadan: RamadanState?,
+)
