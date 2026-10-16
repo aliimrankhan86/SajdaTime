@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Today: 4 cells by 3. See the note at the top of widget_today.xml for why it is not 4 by 2. The
+  smallest resize is the default size, because a shorter widget would clip the last rows.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:description="@string/widget_today_desc"
+    android:initialLayout="@layout/widget_today"
+    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:minResizeWidth="250dp"
+    android:minResizeHeight="180dp"
+    android:previewImage="@drawable/widget_preview_today"
+    android:previewLayout="@layout/widget_today"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellWidth="4"
+    android:targetCellHeight="3"
+    android:updatePeriodMillis="0"
+    android:widgetCategory="home_screen"
+    tools:targetApi="s" />

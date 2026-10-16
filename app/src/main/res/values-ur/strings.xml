@@ -343,4 +343,21 @@
     <string name="eid_adha_title">عید الاضحیٰ مبارک</string>
     <string name="eid_adha_body">تقبل اللہ منا ومنکم۔ اللہ ہماری عبادات اور قربانی قبول فرمائے اور آپ کو اور آپ کے اہل خانہ کو برکت عطا کرے۔</string>
     <string name="eid_fine_print">یہ تاریخ ہمارے حساب کے مطابق ہے۔ اگر آپ کسی اور دن عید منا رہے ہیں تو معذرت، آپ کو اس دن بھی عید مبارک۔ براہِ کرم اپنی مسجد کی پیروی کریں۔</string>
+
+    <!-- ہوم اسکرین ویجٹس -->
+    <string name="widget_next_label">SajdaTime: اگلی نماز</string>
+    <string name="widget_today_label">SajdaTime: آج کی نمازیں</string>
+    <string name="widget_next_desc">اگلی نماز اور اس کا وقت، الٹی گنتی کے ساتھ۔ آپ کے فون کے ڈارک موڈ کے مطابق۔</string>
+    <string name="widget_today_desc">آج کے چھ اوقات، اگلی نماز نمایاں۔ آپ کے فون کے ڈارک موڈ کے مطابق۔</string>
+    <string name="widget_next_prayer">اگلی نماز</string>
+    <string name="widget_tomorrow">کل</string>
+    <string name="widget_next_line">اگلی: %1$s %2$s پر</string>
+    <string name="widget_next_line_tomorrow">کل: %1$s %2$s پر</string>
+    <string name="widget_no_location">اپنا مقام سیٹ کرنے کے لیے SajdaTime کھولیں</string>
+    <string name="widget_a11y_next">اگلی نماز %1$s %2$s پر، %3$s میں</string>
+    <string name="widget_a11y_next_tomorrow">اگلی نماز کل، %1$s %2$s پر، %3$s میں</string>
+    <string name="widget_a11y_today">آج کے نماز کے اوقات۔ %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">سحری ختم</string>
+    <string name="widget_iftar">افطار</string>
 </resources>

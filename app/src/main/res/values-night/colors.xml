@@ -2,4 +2,12 @@
 <resources>
     <!-- Matches DarkBackground in Color.kt. -->
     <color name="window_background">#101312</color>
+
+    <!-- Dark twins of the widget colours in values/colors.xml. See the note there. -->
+    <color name="widget_surface">#171B1A</color>
+    <color name="widget_on_surface">#E7EAE8</color>
+    <color name="widget_on_surface_variant">#A9B2AE</color>
+    <color name="widget_highlight">#143028</color>
+    <color name="widget_primary">#4FC48F</color>
+    <color name="widget_outline_variant">#2A312E</color>
 </resources>

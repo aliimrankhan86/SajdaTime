@@ -219,20 +219,5 @@ class ColorContrastTest {
         )
     }
 
-    private fun contrast(a: Color, b: Color): Double {
-        val la = relativeLuminance(a)
-        val lb = relativeLuminance(b)
-        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
-    }
-
-    /** WCAG 2.1 relative luminance. */
-    private fun relativeLuminance(color: Color): Double {
-        fun channel(value: Float): Double {
-            val c = value.toDouble()
-            return if (c <= 0.03928) c / 12.92 else ((c + 0.055) / 1.055).pow(2.4)
-        }
-        return 0.2126 * channel(color.red) +
-            0.7152 * channel(color.green) +
-            0.0722 * channel(color.blue)
-    }
+    private fun contrast(a: Color, b: Color): Double = Wcag.contrast(a, b)
 }

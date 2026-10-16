@@ -546,4 +546,28 @@
     <string name="eid_adha_title">Eid al-Adha Mubarak</string>
     <string name="eid_adha_body">Taqabbal Allahu minna wa minkum. May Allah accept our worship and sacrifice, and bless you and your family.</string>
     <string name="eid_fine_print">This date is our calculation. Sorry if you celebrate on another day: Eid Mubarak to you then too. Please follow your mosque.</string>
+
+    <!--
+      Home screen widgets. Never put android:text in the widget layouts: RemoteViews are inflated in
+      the launcher with the phone's language, so every word is set from code through AppLocale.wrap.
+      The widgets follow the phone's dark mode, not the app's Theme row, and the descriptions say so.
+      No place name on a widget: the home screen is visible to other people.
+    -->
+    <string name="widget_next_label">SajdaTime: next prayer</string>
+    <string name="widget_today_label">SajdaTime: today\'s prayers</string>
+    <string name="widget_next_desc">The next prayer and its time, with a countdown. Follows your phone\'s dark mode.</string>
+    <string name="widget_today_desc">All six times for today with the next one marked. Follows your phone\'s dark mode.</string>
+    <string name="widget_next_prayer">Next prayer</string>
+    <string name="widget_tomorrow">Tomorrow</string>
+    <string name="widget_next_line">Next: %1$s at %2$s</string>
+    <string name="widget_next_line_tomorrow">Tomorrow: %1$s at %2$s</string>
+    <string name="widget_no_location">Open SajdaTime to set your location</string>
+    <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining such as "1h 20m". -->
+    <string name="widget_a11y_next">Next prayer %1$s at %2$s, in %3$s</string>
+    <string name="widget_a11y_next_tomorrow">Next prayer tomorrow, %1$s at %2$s, in %3$s</string>
+    <!-- %1$s is the six rows joined with ". " -->
+    <string name="widget_a11y_today">Today\'s prayer times. %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">Suhoor ends</string>
+    <string name="widget_iftar">Iftar</string>
 </resources>

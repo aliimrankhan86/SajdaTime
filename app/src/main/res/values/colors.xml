@@ -2,4 +2,22 @@
 <resources>
     <!-- Matches LightBackground in Color.kt so there is no flash before Compose draws. -->
     <color name="window_background">#F7F5F3</color>
+
+    <!--
+      Home screen widget colours. These repeat Color.kt on purpose: a RemoteView is inflated by the
+      launcher, which cannot reach Compose, and it resolves these under the PHONE's dark mode, not the
+      app's Theme row (said so in the widget descriptions). WidgetColorsTest fails the build if any of
+      them drifts from its Kotlin twin or falls below WCAG AA against what it sits on.
+
+      No "on highlight" colour: a highlighted row keeps the ordinary text colours, which clear AA on it
+      in both themes. A colour chosen per row while drawing would be baked in at that moment and stay
+      wrong after the phone switched theme, until the next refresh. Colours in the layout files are
+      resolved by the launcher each time it draws, so the widget follows the phone at once.
+    -->
+    <color name="widget_surface">#FDFCFB</color>
+    <color name="widget_on_surface">#1B211E</color>
+    <color name="widget_on_surface_variant">#5A605C</color>
+    <color name="widget_highlight">#D7EAE0</color>
+    <color name="widget_primary">#0E6B4F</color>
+    <color name="widget_outline_variant">#C9CFC9</color>
 </resources>

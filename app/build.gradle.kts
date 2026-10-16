@@ -215,6 +215,14 @@ tasks.withType<Test>().configureEach {
         rootProject.fileTree(rootProject.projectDir) {
             include(
                 "app/src/main/res/values/strings.xml",
+                // EidWordingTest and the widget tests read every language file and the colour
+                // files off disk, so each is declared here or a green result is replayed from the
+                // build cache after they change.
+                "app/src/main/res/values*/strings.xml",
+                "app/src/main/res/values*/colors.xml",
+                "app/src/main/res/layout/widget_*.xml",
+                "app/src/main/res/xml/widget_*.xml",
+                "app/src/main/res/drawable-nodpi/widget_preview_*.png",
                 "wear/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",

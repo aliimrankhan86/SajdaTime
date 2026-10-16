@@ -333,4 +333,21 @@
     <string name="eid_adha_title">Selamat Hari Raya Iduladha</string>
     <string name="eid_adha_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima ibadah dan kurban kita, serta memberkahi Anda dan keluarga.</string>
     <string name="eid_fine_print">Tanggal ini berdasarkan perhitungan kami. Mohon maaf jika Anda berhari raya di hari lain: selamat hari raya juga untuk Anda. Silakan ikuti masjid Anda.</string>
+
+    <!-- Widget layar utama -->
+    <string name="widget_next_label">SajdaTime: salat berikutnya</string>
+    <string name="widget_today_label">SajdaTime: salat hari ini</string>
+    <string name="widget_next_desc">Salat berikutnya dan waktunya, dengan hitung mundur. Mengikuti mode gelap ponsel Anda.</string>
+    <string name="widget_today_desc">Enam waktu hari ini dengan yang berikutnya ditandai. Mengikuti mode gelap ponsel Anda.</string>
+    <string name="widget_next_prayer">Salat berikutnya</string>
+    <string name="widget_tomorrow">Besok</string>
+    <string name="widget_next_line">Berikutnya: %1$s pukul %2$s</string>
+    <string name="widget_next_line_tomorrow">Besok: %1$s pukul %2$s</string>
+    <string name="widget_no_location">Buka SajdaTime untuk mengatur lokasi Anda</string>
+    <string name="widget_a11y_next">Salat berikutnya %1$s pukul %2$s, dalam %3$s</string>
+    <string name="widget_a11y_next_tomorrow">Salat berikutnya besok, %1$s pukul %2$s, dalam %3$s</string>
+    <string name="widget_a11y_today">Jadwal salat hari ini. %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">Sahur berakhir</string>
+    <string name="widget_iftar">Buka puasa</string>
 </resources>
