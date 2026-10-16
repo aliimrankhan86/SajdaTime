@@ -267,6 +267,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissMethodNotice() =
         viewModelScope.launch { settingsRepository.dismissMethodNotice() }
 
+    fun setRamadanCardEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setRamadanCardEnabled(enabled) }
+
+    fun dismissRamadanNotice(hijriYear: Int) =
+        viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
+
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
 

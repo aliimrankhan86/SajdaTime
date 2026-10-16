@@ -468,4 +468,48 @@
     -->
     <string name="settings_alarm_on_approximate">Ring on approximate days</string>
     <string name="settings_alarm_on_approximate_desc">When the sun does not rise or set, times are worked out from a lower latitude. Alarms stay quiet on those days unless you turn this on.</string>
+
+    <!--
+      Ramadan. Read docs/plans/2026-10-widget-ramadan-tracker/RAMADAN-LOCATION-SPEC.md sections 2 and 5
+      before editing. The app reports Fajr and Maghrib as calculated and calls them the end of suhoor and
+      iftar. It never adds an imsak margin, never says "stop eating", "valid", "must" or "may" in the
+      ruling sense, and ends every explanation with "follow your mosque". The notice names what mosques
+      do (announce) and what the app does (a calendar). HANDOVER A11.
+    -->
+    <string name="ramadan_card_label">Ramadan</string>
+    <string name="ramadan_day_of">Day %1$d of %2$d</string>
+    <string name="ramadan_suhoor_ends">Suhoor ends</string>
+    <string name="ramadan_iftar">Iftar</string>
+    <string name="ramadan_countdown_suhoor">Suhoor ends in %1$s</string>
+    <string name="ramadan_countdown_iftar">Iftar in %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">Suhoor ends tomorrow at %1$s</string>
+    <string name="ramadan_month_ends_today">On this calendar today is the last day of Ramadan. Your mosque will announce Eid.</string>
+    <string name="ramadan_fast_length">Fast today %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="one">%d minute longer than yesterday</item>
+        <item quantity="other">%d minutes longer than yesterday</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="one">%d minute shorter than yesterday</item>
+        <item quantity="other">%d minutes shorter than yesterday</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">the same as yesterday</string>
+    <!-- Joins the fast length and the change: "Fast today 12h 18m, 3 minutes longer than yesterday". -->
+    <string name="ramadan_fast_line">%1$s, %2$s</string>
+    <string name="ramadan_tomorrow_line">Tomorrow: suhoor ends %1$s, iftar %2$s</string>
+    <string name="ramadan_info_a11y">About these Ramadan times</string>
+    <string name="ramadan_info_title">About these Ramadan times</string>
+    <string name="ramadan_info_calc">SajdaTime shows Fajr and Maghrib as calculated for your location and uses them as the end of suhoor and the time of iftar.</string>
+    <string name="ramadan_info_margin">Many timetables print an imsak time a few minutes before Fajr as a precaution, and some mosques begin Fajr earlier than this calculation. SajdaTime does not add a margin.</string>
+    <string name="ramadan_info_mosque">Where your mosque\'s timetable differs, follow your mosque.</string>
+    <string name="ramadan_info_date">The Islamic date here follows the Umm al-Qura calendar. If your mosque began Ramadan on a different day, shift the Islamic date in Settings. That also moves the day count, the suhoor reminder and the Umm al-Qura Isha rule.</string>
+    <string name="ramadan_info_hide">Hide this card</string>
+    <string name="ramadan_info_hide_note">You can show it again in Settings.</string>
+    <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from a week before day 1. -->
+    <string name="ramadan_eve_title_before">Ramadan on this calendar begins %1$s</string>
+    <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, tap to shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
+    <!-- Under the card on days 1 and 2 only, in place of the notice. -->
+    <string name="ramadan_date_differs">Did your mosque begin Ramadan on a different day?</string>
+    <string name="settings_ramadan_card">Ramadan card</string>
+    <string name="settings_ramadan_card_desc">Shows suhoor and iftar times on the Times screen during Ramadan</string>
 </resources>

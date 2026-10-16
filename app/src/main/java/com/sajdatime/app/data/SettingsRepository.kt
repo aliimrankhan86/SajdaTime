@@ -145,6 +145,19 @@ data class AppSettings(
      * and on a device that expresses no preference that resolves to light.
      */
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,
+    /**
+     * Whether the Ramadan card and the notice before it appear on the Times screen. On, because a
+     * person who never opens Settings should get Ramadan without asking for it, and a switch,
+     * because not everyone fasts (illness, travel, pregnancy) and a daily fasting card must be
+     * removable. Turning it off hides the card, the notice and the day 1 and 2 hint. It leaves the
+     * widget labels, the timetable PDF and the suhoor reminder to their own settings.
+     */
+    val ramadanCardEnabled: Boolean = true,
+    /**
+     * The Hijri year whose notice the user closed, or 0. A year and not a flag, so the notice
+     * returns next Ramadan without anything having to reset it.
+     */
+    val ramadanNoticeDismissedYear: Int = 0,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -313,6 +326,13 @@ class SettingsRepository(private val context: Context) {
     /** Closes the calculation-method notice on home for good. Settings still shows the row. */
     suspend fun dismissMethodNotice() = edit { it[Keys.METHOD_NOTICE_DISMISSED] = true }
 
+    suspend fun setRamadanCardEnabled(enabled: Boolean) = edit { it[Keys.RAMADAN_CARD] = enabled }
+
+    /** Closes the Ramadan notice for [hijriYear] only, so it returns the following year. */
+    suspend fun dismissRamadanNotice(hijriYear: Int) = edit {
+        it[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] = hijriYear
+    }
+
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
     }
@@ -345,6 +365,8 @@ class SettingsRepository(private val context: Context) {
         val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
         val METHOD_NOTICE_DISMISSED = booleanPreferencesKey("method_notice_dismissed")
         val THEME = stringPreferencesKey("theme_choice")
+        val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
+        val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
     }
 
     private companion object {
@@ -382,6 +404,8 @@ class SettingsRepository(private val context: Context) {
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
             methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
+            ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
+            ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
         )
     }
 

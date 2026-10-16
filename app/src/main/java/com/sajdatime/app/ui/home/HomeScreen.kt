@@ -96,12 +96,15 @@ fun HomeScreen(
     onSearchCity: (String) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
+    onDismissRamadanNotice: (hijriYear: Int) -> Unit,
+    onSetRamadanCard: (Boolean) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
     var explaining by rememberSaveable { mutableStateOf(false) }
+    var ramadanInfo by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
 
     Column(
@@ -138,6 +141,17 @@ fun HomeScreen(
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
+        // Below the two banners that say the times may be for the wrong place or approximate,
+        // so a card of suhoor and iftar times is never the first thing read about a doubtful
+        // number. Present only inside Ramadan and the week before it. During the month the
+        // column scrolls on a short phone: for that month this card is the second most read
+        // thing on the screen, and the height budget above is spent on it knowingly.
+        RamadanSection(
+            state = state,
+            onOpenInfo = { ramadanInfo = true },
+            onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
+            onDismissNotice = onDismissRamadanNotice,
+        )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(12.dp))
         TodayTimeline(state, onExport = { exportSheet = true })
@@ -154,6 +168,20 @@ fun HomeScreen(
             onOpen = { chooser ->
                 explaining = false
                 onOpenSetting(chooser)
+            },
+        )
+    }
+
+    if (ramadanInfo) {
+        RamadanInfoDialog(
+            onDismiss = { ramadanInfo = false },
+            onOpenDateShift = {
+                ramadanInfo = false
+                onOpenSetting(SettingsChooser.ADJUSTMENTS)
+            },
+            onHideCard = {
+                ramadanInfo = false
+                onSetRamadanCard(false)
             },
         )
     }
@@ -458,7 +486,7 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
 }
 
 @Composable
-private fun ExplainerParagraph(text: String) {
+internal fun ExplainerParagraph(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
@@ -467,7 +495,7 @@ private fun ExplainerParagraph(text: String) {
 }
 
 @Composable
-private fun ExplainerAction(label: String, onClick: () -> Unit) {
+internal fun ExplainerAction(label: String, onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         modifier = Modifier

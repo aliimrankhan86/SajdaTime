@@ -276,4 +276,39 @@
     <string name="notif_approximate">Yaklaşık vakit</string>
     <string name="settings_alarm_on_approximate">Yaklaşık vakitli günlerde çal</string>
     <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarmlar sessiz kalır.</string>
+
+    <!-- Ramazan -->
+    <string name="ramadan_card_label">Ramazan</string>
+    <string name="ramadan_day_of">%2$d günün %1$d. günü</string>
+    <string name="ramadan_suhoor_ends">İmsak (Sabah)</string>
+    <string name="ramadan_iftar">İftar</string>
+    <string name="ramadan_countdown_suhoor">İmsaka %1$s</string>
+    <string name="ramadan_countdown_iftar">İftara %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">Yarın imsak %1$s</string>
+    <string name="ramadan_month_ends_today">Bu takvime göre bugün Ramazan\'ın son günü. Bayramı caminiz duyurur.</string>
+    <string name="ramadan_fast_length">Bugünkü oruç %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="one">dünden %d dakika uzun</item>
+        <item quantity="other">dünden %d dakika uzun</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="one">dünden %d dakika kısa</item>
+        <item quantity="other">dünden %d dakika kısa</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">dünle aynı</string>
+    <string name="ramadan_fast_line">%1$s, %2$s</string>
+    <string name="ramadan_tomorrow_line">Yarın: imsak %1$s, iftar %2$s</string>
+    <string name="ramadan_info_a11y">Bu Ramazan vakitleri hakkında</string>
+    <string name="ramadan_info_title">Bu Ramazan vakitleri hakkında</string>
+    <string name="ramadan_info_calc">SajdaTime, bulunduğunuz yer için hesaplanan Sabah ve Akşam vakitlerini gösterir ve bunları imsak ile iftar vakti olarak kullanır.</string>
+    <string name="ramadan_info_margin">Birçok imsakiye ihtiyaten Sabah vaktinden birkaç dakika önce bir imsak vakti yazar ve bazı camiler Sabah vaktini bu hesaptan daha erken başlatır. SajdaTime hiçbir pay eklemez.</string>
+    <string name="ramadan_info_mosque">Caminizin imsakiyesi farklıysa caminize uyun.</string>
+    <string name="ramadan_info_date">Buradaki hicri tarih Ümmülkura takvimine göredir. Caminiz Ramazan\'a başka bir gün başladıysa Ayarlar\'dan hicri tarihi kaydırın. Bu, gün sayısını, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
+    <string name="ramadan_info_hide">Bu kartı gizle</string>
+    <string name="ramadan_info_hide_note">Ayarlar\'dan yeniden gösterebilirsiniz.</string>
+    <string name="ramadan_eve_title_before">Bu takvime göre Ramazan %1$s başlıyor</string>
+    <string name="ramadan_eve_body">Birçok cami başlangıcı hilali gördükten sonra, çoğu zaman bir gün sonra duyurur. Caminizinki farklıysa hicri tarihi kaydırmak için dokunun. Bu, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
+    <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
+    <string name="settings_ramadan_card">Ramazan kartı</string>
+    <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
 </resources>

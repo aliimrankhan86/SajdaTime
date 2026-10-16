@@ -275,4 +275,37 @@
     <string name="notif_approximate">Waktu perkiraan</string>
     <string name="settings_alarm_on_approximate">Bunyikan pada hari perkiraan</string>
     <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tetap senyap pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
+
+    <!-- Ramadan -->
+    <string name="ramadan_card_label">Ramadan</string>
+    <string name="ramadan_day_of">Hari ke-%1$d dari %2$d</string>
+    <string name="ramadan_suhoor_ends">Sahur berakhir</string>
+    <string name="ramadan_iftar">Buka puasa</string>
+    <string name="ramadan_countdown_suhoor">Sahur berakhir dalam %1$s</string>
+    <string name="ramadan_countdown_iftar">Buka puasa dalam %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">Sahur besok berakhir pukul %1$s</string>
+    <string name="ramadan_month_ends_today">Menurut kalender ini, hari ini adalah hari terakhir Ramadan. Masjid Anda yang akan mengumumkan Idulfitri.</string>
+    <string name="ramadan_fast_length">Puasa hari ini %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="other">%d menit lebih lama dari kemarin</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="other">%d menit lebih singkat dari kemarin</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">sama dengan kemarin</string>
+    <string name="ramadan_fast_line">%1$s, %2$s</string>
+    <string name="ramadan_tomorrow_line">Besok: sahur berakhir %1$s, buka puasa %2$s</string>
+    <string name="ramadan_info_a11y">Tentang waktu Ramadan ini</string>
+    <string name="ramadan_info_title">Tentang waktu Ramadan ini</string>
+    <string name="ramadan_info_calc">SajdaTime menampilkan Subuh dan Magrib sebagaimana dihitung untuk lokasi Anda dan menggunakannya sebagai akhir sahur dan waktu berbuka.</string>
+    <string name="ramadan_info_margin">Banyak jadwal mencantumkan waktu imsak beberapa menit sebelum Subuh sebagai kehati-hatian, dan sebagian masjid memulai Subuh lebih awal dari perhitungan ini. SajdaTime tidak menambahkan selisih apa pun.</string>
+    <string name="ramadan_info_mosque">Jika jadwal masjid Anda berbeda, ikuti masjid Anda.</string>
+    <string name="ramadan_info_date">Tanggal Hijriah di sini mengikuti kalender Umm al-Qura. Jika masjid Anda memulai Ramadan pada hari yang berbeda, geser tanggal Hijriah di Pengaturan. Itu juga menggeser hitungan hari, pengingat sahur, dan aturan Isya Umm al-Qura.</string>
+    <string name="ramadan_info_hide">Sembunyikan kartu ini</string>
+    <string name="ramadan_info_hide_note">Anda dapat menampilkannya lagi di Pengaturan.</string>
+    <string name="ramadan_eve_title_before">Menurut kalender ini Ramadan dimulai %1$s</string>
+    <string name="ramadan_eve_body">Banyak masjid mengumumkan awal Ramadan setelah rukyat hilal, sering kali sehari kemudian. Jika masjid Anda berbeda, ketuk untuk menggeser tanggal Hijriah. Itu juga menggeser pengingat sahur dan aturan Isya Umm al-Qura.</string>
+    <string name="ramadan_date_differs">Apakah masjid Anda memulai Ramadan pada hari yang berbeda?</string>
+    <string name="settings_ramadan_card">Kartu Ramadan</string>
+    <string name="settings_ramadan_card_desc">Menampilkan waktu sahur dan buka puasa di layar Waktu selama Ramadan</string>
 </resources>

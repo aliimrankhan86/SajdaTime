@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.outlined.MoreTime
+import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
@@ -122,6 +123,7 @@ fun SettingsScreen(
     onSetHijriOffset: (Int) -> Unit,
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
+    onSetRamadanCard: (Boolean) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
@@ -256,6 +258,16 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_ongoing_badge_desc),
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
+            )
+            // On by default and removable here, because not everyone fasts and the card is
+            // daily for a month. It lives with the reminders for now; the suhoor reminder joins
+            // it above.
+            SwitchRow(
+                icon = Icons.Outlined.NightsStay,
+                title = stringResource(R.string.settings_ramadan_card),
+                subtitle = stringResource(R.string.settings_ramadan_card_desc),
+                checked = settings.ramadanCardEnabled,
+                onCheckedChange = onSetRamadanCard,
             )
         }
 

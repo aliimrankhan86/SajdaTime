@@ -282,4 +282,39 @@
     <string name="notif_approximate">تخمینی وقت</string>
     <string name="settings_alarm_on_approximate">تخمینی دنوں میں الارم بجائیں</string>
     <string name="settings_alarm_on_approximate_desc">جب سورج طلوع یا غروب نہ ہو تو اوقات کسی کم عرض بلد سے نکالے جاتے ہیں۔ ان دنوں الارم خاموش رہتے ہیں، جب تک آپ اسے آن نہ کریں۔</string>
+
+    <!-- رمضان -->
+    <string name="ramadan_card_label">رمضان</string>
+    <string name="ramadan_day_of">%2$d میں سے %1$d واں دن</string>
+    <string name="ramadan_suhoor_ends">سحری ختم</string>
+    <string name="ramadan_iftar">افطار</string>
+    <string name="ramadan_countdown_suhoor">سحری ختم ہونے میں %1$s</string>
+    <string name="ramadan_countdown_iftar">افطار میں %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">کل سحری %1$s پر ختم ہوگی</string>
+    <string name="ramadan_month_ends_today">اس کیلنڈر کے مطابق آج رمضان کا آخری دن ہے۔ عید کا اعلان آپ کی مسجد کرے گی۔</string>
+    <string name="ramadan_fast_length">آج کا روزہ %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="one">کل سے %d منٹ لمبا</item>
+        <item quantity="other">کل سے %d منٹ لمبا</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="one">کل سے %d منٹ چھوٹا</item>
+        <item quantity="other">کل سے %d منٹ چھوٹا</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">کل جتنا ہی</string>
+    <string name="ramadan_fast_line">%1$s، %2$s</string>
+    <string name="ramadan_tomorrow_line">کل: سحری ختم %1$s، افطار %2$s</string>
+    <string name="ramadan_info_a11y">رمضان کے ان اوقات کے بارے میں</string>
+    <string name="ramadan_info_title">رمضان کے ان اوقات کے بارے میں</string>
+    <string name="ramadan_info_calc">SajdaTime آپ کے مقام کے لیے فجر اور مغرب کو حساب کے مطابق دکھاتا ہے اور انہی کو سحری کے ختم ہونے اور افطار کا وقت مانتا ہے۔</string>
+    <string name="ramadan_info_margin">بہت سے نقشوں میں احتیاطاً فجر سے چند منٹ پہلے امساک کا وقت لکھا ہوتا ہے، اور کچھ مساجد فجر اس حساب سے پہلے شروع کرتی ہیں۔ SajdaTime کوئی اضافی وقفہ نہیں جوڑتا۔</string>
+    <string name="ramadan_info_mosque">جہاں آپ کی مسجد کا نقشہ مختلف ہو، وہاں اپنی مسجد کی پیروی کریں۔</string>
+    <string name="ramadan_info_date">یہاں اسلامی تاریخ ام القریٰ کیلنڈر کے مطابق ہے۔ اگر آپ کی مسجد نے رمضان کسی اور دن شروع کیا ہے تو ترتیبات میں اسلامی تاریخ آگے پیچھے کریں۔ اس سے دنوں کی گنتی، سحری کی یاددہانی اور ام القریٰ کا عشاء کا اصول بھی بدل جاتا ہے۔</string>
+    <string name="ramadan_info_hide">یہ کارڈ چھپائیں</string>
+    <string name="ramadan_info_hide_note">آپ اسے ترتیبات میں دوبارہ دکھا سکتے ہیں۔</string>
+    <string name="ramadan_eve_title_before">اس کیلنڈر کے مطابق رمضان %1$s کو شروع ہوگا</string>
+    <string name="ramadan_eve_body">بہت سی مساجد چاند دیکھ کر اپنے آغاز کا اعلان کرتی ہیں، اکثر ایک دن بعد۔ اگر آپ کی مسجد کی تاریخ مختلف ہو تو اسلامی تاریخ بدلنے کے لیے ٹیپ کریں۔ اس سے سحری کی یاددہانی اور ام القریٰ کا عشاء کا اصول بھی بدل جاتا ہے۔</string>
+    <string name="ramadan_date_differs">کیا آپ کی مسجد نے رمضان کسی اور دن شروع کیا؟</string>
+    <string name="settings_ramadan_card">رمضان کارڈ</string>
+    <string name="settings_ramadan_card_desc">رمضان میں اوقات کی اسکرین پر سحری اور افطار کے اوقات دکھاتا ہے</string>
 </resources>

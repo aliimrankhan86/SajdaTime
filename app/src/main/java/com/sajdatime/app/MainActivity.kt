@@ -173,6 +173,8 @@ class MainActivity : ComponentActivity() {
                                 onSetThemeChoice = viewModel::setThemeChoice,
                                 onDismissExactAlarmNotice = viewModel::dismissExactAlarmNotice,
                                 onDismissMethodNotice = viewModel::dismissMethodNotice,
+                                onDismissRamadanNotice = viewModel::dismissRamadanNotice,
+                                onSetRamadanCard = viewModel::setRamadanCardEnabled,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                             )
