@@ -1,6 +1,7 @@
 package com.sajdatime.app
 
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.widget.WidgetRefreshScheduler
 import com.sajdatime.core.PrayerSlot
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -77,5 +78,15 @@ class RequestCodeTest {
     fun `the two actions are different, so identity differs even if a number ever collided`() {
         assertNotEquals(PrayerAlarmScheduler.ACTION_PRAYER, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
         assertEquals("com.sajdatime.app.action.SUHOOR_REMINDER", PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
+    }
+
+    @Test
+    fun `the widget redraw alarm has a code above every suhoor code and its own action`() {
+        val suhoorTop = PrayerAlarmScheduler.suhoorRequestCode(LocalDate.parse("2028-12-31"))
+        assertTrue(WidgetRefreshScheduler.REQUEST_CODE > suhoorTop)
+        assertEquals(20_000, WidgetRefreshScheduler.REQUEST_CODE)
+        assertEquals("com.sajdatime.app.action.WIDGET_REFRESH", WidgetRefreshScheduler.ACTION_REFRESH)
+        assertNotEquals(PrayerAlarmScheduler.ACTION_PRAYER, WidgetRefreshScheduler.ACTION_REFRESH)
+        assertNotEquals(PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER, WidgetRefreshScheduler.ACTION_REFRESH)
     }
 }

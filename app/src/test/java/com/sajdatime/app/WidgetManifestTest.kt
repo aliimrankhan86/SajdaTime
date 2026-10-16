@@ -1,5 +1,6 @@
 package com.sajdatime.app
 
+import com.sajdatime.app.widget.WidgetRefreshScheduler
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -41,6 +42,14 @@ class WidgetManifestTest {
             assertTrue("$name: wrong provider file", block.contains("""android:resource="@xml/$xml""""))
             assertTrue("$name: exported is not stated", block.contains("android:exported="))
         }
+    }
+
+    @Test
+    fun `the redraw receiver is declared, listens for its own action only and is not exported`() {
+        val block = receiver("WidgetRefreshReceiver")
+        assertTrue("must not be exported", block.contains("""android:exported="false""""))
+        val actions = Regex("""<action\s+android:name="([^"]+)"""").findAll(block).map { it.groupValues[1] }.toList()
+        assertEquals(listOf(WidgetRefreshScheduler.ACTION_REFRESH), actions)
     }
 
     @Test

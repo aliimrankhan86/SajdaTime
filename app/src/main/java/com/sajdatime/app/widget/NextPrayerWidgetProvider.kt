@@ -17,6 +17,9 @@ class NextPrayerWidgetProvider : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) = WidgetUpdater.refreshFromProvider(this, context)
 
+    /** The last instance of this widget was removed: redraw finds none of either and cancels the alarm. */
+    override fun onDisabled(context: Context) = WidgetUpdater.refreshFromProvider(this, context)
+
     override fun onAppWidgetOptionsChanged(
         context: Context,
         appWidgetManager: AppWidgetManager,

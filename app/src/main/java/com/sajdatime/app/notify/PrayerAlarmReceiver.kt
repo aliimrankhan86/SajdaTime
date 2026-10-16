@@ -11,6 +11,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 // Same chain as a prayer: lay down the next window and refresh the badge while awake.
                 PrayerAlarmScheduler.reschedule(appContext, settings)
                 OngoingBadge.refresh(appContext, settings)
+                WidgetUpdater.refreshAll(appContext, settings)
             } finally {
                 pendingResult.finish()
             }
@@ -96,6 +98,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                 // Chain the next horizon and refresh the badge while we are already awake.
                 PrayerAlarmScheduler.reschedule(appContext, settings)
                 OngoingBadge.refresh(appContext, settings)
+                WidgetUpdater.refreshAll(appContext, settings)
             } finally {
                 pendingResult.finish()
             }

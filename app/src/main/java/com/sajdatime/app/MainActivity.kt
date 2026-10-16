@@ -234,6 +234,9 @@ class MainActivity : ComponentActivity() {
         // Coordinates may be stale after travel, and alarms may have been cleared by the
         // system, so a foreground visit always refreshes both.
         if (viewModel.state.value.settings.coordinates != null) viewModel.refreshLocation()
+        // And the widgets: a language just chosen has reached the resources by now, and a widget
+        // drawn while the app was away is brought up to date at the same moment.
+        viewModel.refreshWidgets()
     }
 
     private fun requestLocation() {

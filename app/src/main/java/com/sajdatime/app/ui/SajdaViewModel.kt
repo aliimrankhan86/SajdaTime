@@ -35,6 +35,7 @@ import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.OngoingBadge
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -435,7 +436,19 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val context = getApplication<Application>()
             PrayerAlarmScheduler.reschedule(context, settings)
             OngoingBadge.refresh(context, settings)
+            WidgetUpdater.refreshAll(context, settings)
             WatchSync.publish(context, settings)
+        }
+    }
+
+    /**
+     * Redraws the home screen widgets from the settings in hand. Called when the app comes to the
+     * foreground, which is also when a language chosen in the picker has finished taking effect (the
+     * activity is recreated with the new resources first), so the widgets change language with the app.
+     */
+    fun refreshWidgets() {
+        viewModelScope.launch(Dispatchers.Default) {
+            WidgetUpdater.refreshAll(getApplication<Application>(), _state.value.settings)
         }
     }
 }

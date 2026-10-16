@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,6 +27,8 @@ class SystemEventReceiver : BroadcastReceiver() {
                 Notifications.ensureChannels(appContext)
                 PrayerAlarmScheduler.reschedule(appContext, settings)
                 OngoingBadge.refresh(appContext, settings)
+                // Also lays down the widgets' redraw alarm again, which a reboot and a clock change both lose.
+                WidgetUpdater.refreshAll(appContext, settings)
                 DailyRescheduleWorker.enqueue(appContext)
             } finally {
                 pendingResult.finish()
@@ -33,7 +36,7 @@ class SystemEventReceiver : BroadcastReceiver() {
         }
     }
 
-    private companion object {
+    internal companion object {
         /**
          * Android 12+ sends this when "Alarms & reminders" is granted or revoked.
          *
@@ -51,11 +54,18 @@ class SystemEventReceiver : BroadcastReceiver() {
         const val ACTION_EXACT_ALARM_STATE_CHANGED =
             "android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED"
 
-        val HANDLED_ACTIONS = setOf(
+        /**
+         * Every action the manifest filter delivers here, kept in one place so a test can hold the two
+         * lists together. ACTION_LOCALE_CHANGED is the phone's language: the schedule is unaffected, but
+         * the widgets are drawn in the app's own words and numerals and would otherwise keep the old
+         * language until the next prayer.
+         */
+        internal val HANDLED_ACTIONS = setOf(
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_TIMEZONE_CHANGED,
             Intent.ACTION_TIME_CHANGED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
+            Intent.ACTION_LOCALE_CHANGED,
             ACTION_EXACT_ALARM_STATE_CHANGED,
         )
     }

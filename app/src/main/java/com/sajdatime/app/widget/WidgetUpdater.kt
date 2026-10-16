@@ -14,8 +14,9 @@ import java.time.Instant
 import java.time.ZoneId
 
 /**
- * The one function that redraws every widget. Everything that can make a widget stale calls it, and
- * a phone with no widget placed pays almost nothing: it finds no instance and returns.
+ * The one function that redraws every widget, and lays down the alarm for the redraw after it.
+ * Everything that can make a widget stale calls it, and a phone with no widget placed pays almost
+ * nothing: it finds no instance, makes sure no alarm is left set, and returns.
  */
 object WidgetUpdater {
 
@@ -24,15 +25,23 @@ object WidgetUpdater {
         val manager = AppWidgetManager.getInstance(context) ?: return false
         val nextIds = manager.getAppWidgetIds(ComponentName(context, NextPrayerWidgetProvider::class.java))
         val todayIds = manager.getAppWidgetIds(ComponentName(context, TodayWidgetProvider::class.java))
-        if (nextIds.isEmpty() && todayIds.isEmpty()) return false
+        if (nextIds.isEmpty() && todayIds.isEmpty()) {
+            // The last widget has gone, so the alarm that served it goes too.
+            WidgetRefreshScheduler.cancel(context)
+            return false
+        }
 
         val now = Instant.now()
+        val zone = ZoneId.systemDefault()
         val state = WidgetState.build(
             settings = settings,
             now = now,
-            zone = ZoneId.systemDefault(),
+            zone = zone,
             canScheduleExact = PrayerAlarmScheduler.canScheduleExact(context),
         )
+        // Every redraw lays down the next one, so any trigger in the app keeps the chain alive and a
+        // chain that was lost (reboot, force stop) is rebuilt by the first redraw that follows.
+        runCatching { WidgetRefreshScheduler.scheduleNext(context, state, now, zone) }
         // The views are built once per provider and pushed to every instance of it, so the engine runs
         // once per refresh however many widgets are on the screen. A launcher that refuses an update
         // must never take the caller down, which may be the alarm receiver that is about to chain the

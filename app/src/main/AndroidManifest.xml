@@ -145,6 +145,15 @@
                 android:resource="@xml/widget_today_info" />
         </receiver>
 
+        <!-- The widgets' own redraw alarm. Not exported: only this app's PendingIntent reaches it. -->
+        <receiver
+            android:name=".widget.WidgetRefreshReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.sajdatime.app.action.WIDGET_REFRESH" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".notify.SystemEventReceiver"
             android:enabled="true"
@@ -154,6 +163,8 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <!-- The phone's language changed: the widgets are drawn in the app's words and numerals. -->
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <!-- Android 12+: "Alarms & reminders" granted or revoked. See
                      SystemEventReceiver for why both directions need a reschedule. -->
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
