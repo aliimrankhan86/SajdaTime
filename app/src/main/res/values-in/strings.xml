@@ -308,6 +308,17 @@
     <string name="ramadan_date_differs">Apakah masjid Anda memulai Ramadan pada hari yang berbeda?</string>
     <string name="settings_ramadan_card">Kartu Ramadan</string>
     <string name="settings_ramadan_card_desc">Menampilkan waktu sahur dan buka puasa di layar Waktu selama Ramadan</string>
+    <string name="ramadan_open_timetable">Jadwal lengkap</string>
+    <string name="ramadan_timetable_title">Ramadan %1$d</string>
+    <string name="ramadan_col_day">Hari</string>
+    <string name="ramadan_col_fast">Puasa</string>
+    <string name="ramadan_approx_marker">perkiraan</string>
+    <string name="export_ramadan">Ramadan %1$d</string>
+    <string name="export_ramadan_desc">Setiap hari sepanjang bulan, dengan sahur dan buka puasa</string>
+    <string name="pdf_period_ramadan">Ramadan %1$d</string>
+    <string name="pdf_column_ramadan_day">Hari</string>
+    <string name="pdf_ramadan_note">Sahur berakhir pada Subuh. Buka puasa pada Magrib. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.</string>
+    <string name="ramadan_row_a11y">Hari ke-%1$d, %2$s. Sahur berakhir %3$s. Buka puasa %4$s. Puasa %5$s.</string>
 
     <string name="eid_fitr_title">Selamat Hari Raya Idulfitri</string>
     <string name="eid_fitr_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima puasa dan ibadah kita, dan hari Anda penuh kebahagiaan.</string>

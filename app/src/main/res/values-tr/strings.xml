@@ -311,6 +311,17 @@
     <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
     <string name="settings_ramadan_card">Ramazan kartı</string>
     <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
+    <string name="ramadan_open_timetable">Tam imsakiye</string>
+    <string name="ramadan_timetable_title">Ramazan %1$d</string>
+    <string name="ramadan_col_day">Gün</string>
+    <string name="ramadan_col_fast">Oruç</string>
+    <string name="ramadan_approx_marker">yaklaşık</string>
+    <string name="export_ramadan">Ramazan %1$d</string>
+    <string name="export_ramadan_desc">Ayın her günü, imsak ve iftarla</string>
+    <string name="pdf_period_ramadan">Ramazan %1$d</string>
+    <string name="pdf_column_ramadan_day">Gün</string>
+    <string name="pdf_ramadan_note">İmsak Sabah vaktidir. İftar Akşam vaktidir. Caminizin imsakiyesi farklıysa caminize uyun.</string>
+    <string name="ramadan_row_a11y">%1$d. gün, %2$s. İmsak %3$s. İftar %4$s. Oruç %5$s.</string>
 
     <string name="eid_fitr_title">Ramazan Bayramınız mübarek olsun</string>
     <string name="eid_fitr_body">Allah oruçlarımızı ve ibadetlerimizi kabul etsin, gününüzü sevinçle doldursun.</string>

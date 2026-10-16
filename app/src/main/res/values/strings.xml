@@ -513,6 +513,19 @@
     <string name="settings_ramadan_card">Ramadan card</string>
     <string name="settings_ramadan_card_desc">Shows suhoor and iftar times on the Times screen during Ramadan</string>
 
+    <!-- Ramadan timetable: the sheet from the card, the export option and the PDF. -->
+    <string name="ramadan_open_timetable">Full timetable</string>
+    <string name="ramadan_timetable_title">Ramadan %1$d</string>
+    <string name="ramadan_col_day">Day</string>
+    <string name="ramadan_col_fast">Fast</string>
+    <string name="ramadan_approx_marker">approx.</string>
+    <string name="export_ramadan">Ramadan %1$d</string>
+    <string name="export_ramadan_desc">Every day of the month, with suhoor and iftar</string>
+    <string name="pdf_period_ramadan">Ramadan %1$d</string>
+    <string name="pdf_column_ramadan_day">Day</string>
+    <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
+    <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
+
     <!--
       Eid greeting, shown once on the day. The main text is a plain greeting that suits everyone. The
       fine print carries the caveat: the date is our calculation, a different day is possible, and the

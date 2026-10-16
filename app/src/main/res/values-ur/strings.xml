@@ -317,6 +317,17 @@
     <string name="ramadan_date_differs">کیا آپ کی مسجد نے رمضان کسی اور دن شروع کیا؟</string>
     <string name="settings_ramadan_card">رمضان کارڈ</string>
     <string name="settings_ramadan_card_desc">رمضان میں اوقات کی اسکرین پر سحری اور افطار کے اوقات دکھاتا ہے</string>
+    <string name="ramadan_open_timetable">پورا نقشہ</string>
+    <string name="ramadan_timetable_title">رمضان %1$d</string>
+    <string name="ramadan_col_day">دن</string>
+    <string name="ramadan_col_fast">روزہ</string>
+    <string name="ramadan_approx_marker">تخمینی</string>
+    <string name="export_ramadan">رمضان %1$d</string>
+    <string name="export_ramadan_desc">مہینے کا ہر دن، سحری اور افطار کے ساتھ</string>
+    <string name="pdf_period_ramadan">رمضان %1$d</string>
+    <string name="pdf_column_ramadan_day">دن</string>
+    <string name="pdf_ramadan_note">سحری فجر پر ختم ہوتی ہے۔ افطار مغرب پر۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔</string>
+    <string name="ramadan_row_a11y">دن %1$d، %2$s۔ سحری ختم %3$s۔ افطار %4$s۔ روزہ %5$s۔</string>
 
     <string name="eid_fitr_title">عید الفطر مبارک</string>
     <string name="eid_fitr_body">تقبل اللہ منا ومنکم۔ اللہ ہمارے روزے اور عبادات قبول فرمائے اور آپ کا دن خوشیوں سے بھر دے۔</string>

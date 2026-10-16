@@ -66,6 +66,7 @@ import kotlin.math.abs
 internal fun RamadanSection(
     state: UiState,
     onOpenInfo: () -> Unit,
+    onOpenTimetable: () -> Unit,
     onShiftDate: () -> Unit,
     onDismissNotice: (hijriYear: Int) -> Unit,
 ) {
@@ -86,6 +87,7 @@ internal fun RamadanSection(
             // are never two Ramadan items stacked on the same screen.
             showDateHint = noticeDay,
             onOpenInfo = onOpenInfo,
+            onOpenTimetable = onOpenTimetable,
             onShiftDate = onShiftDate,
         )
     } else if (noticeDay) {
@@ -112,6 +114,7 @@ private fun RamadanCard(
     now: Instant,
     showDateHint: Boolean,
     onOpenInfo: () -> Unit,
+    onOpenTimetable: () -> Unit,
     onShiftDate: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -206,9 +209,14 @@ private fun RamadanCard(
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
         ) {
+            // The whole month, on screen. A text button with words, not an icon: it is the one
+            // action on the card and the thing a person comes to it for in the second week.
+            TextButton(onClick = onOpenTimetable) {
+                Text(stringResource(R.string.ramadan_open_timetable))
+            }
             // 48dp target: this is the only way to the explanation, and it is small.
             IconButton(onClick = onOpenInfo, modifier = Modifier.size(48.dp)) {
                 Icon(

@@ -16,8 +16,10 @@ import com.sajdatime.core.AppLocale
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.RamadanInfo
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.label
 import com.sajdatime.app.R
@@ -27,6 +29,7 @@ import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -44,7 +47,7 @@ class PrayerPdfExporter(base: Context) {
     // language. See AppLocale.kt.
     private val context = AppLocale.wrap(base)
 
-    enum class Range { TODAY, NEXT_7_DAYS, THIS_MONTH }
+    enum class Range { TODAY, NEXT_7_DAYS, THIS_MONTH, RAMADAN }
 
     /** Where the finished PDF ended up, which decides what the app tells the user. */
     sealed interface Outcome {
@@ -66,15 +69,11 @@ class PrayerPdfExporter(base: Context) {
         prefs: CalculationPrefs,
         today: LocalDate = LocalDate.now(),
     ): Outcome = withContext(Dispatchers.IO) {
-        val (start, days) = when (range) {
-            Range.TODAY -> today to 1
-            Range.NEXT_7_DAYS -> today to 7
-            Range.THIS_MONTH -> today.withDayOfMonth(1) to today.lengthOfMonth()
-        }
+        val span = spanOf(range, today, prefs)
 
-        val rows = PrayerEngine.computeRange(coordinates, start, days, prefs)
-        val name = fileName(range, start)
-        val bytes = renderPdf(rows, cityName, range, start)
+        val rows = PrayerEngine.computeRange(coordinates, span.start, span.days, prefs)
+        val name = fileNameFor(range, span)
+        val bytes = renderPdf(rows, cityName, range, span)
 
         // Downloads first: the button says "save", so the file should be somewhere the
         // user can actually go and look for it afterwards. The share sheet alone left
@@ -124,8 +123,9 @@ class PrayerPdfExporter(base: Context) {
         rows: List<DayPrayerTimes>,
         cityName: String,
         range: Range,
-        start: LocalDate,
+        span: Span,
     ): ByteArray {
+        val columns = columnsFor(range)
         val document = PdfDocument()
         try {
             var index = 0
@@ -138,26 +138,33 @@ class PrayerPdfExporter(base: Context) {
 
                 var y = MARGIN + 28f
                 if (pageNumber == 1) {
-                    y = drawBrandHeader(canvas, cityName, range, start)
-                    // Only when a day in this range was actually projected. Above the polar
-                    // circles the home screen shows a banner; the PDF is the copy that leaves
-                    // the app and gets pinned to a wall, and it had no such marking at all.
-                    approximateNote(rows)?.let { note ->
+                    y = drawBrandHeader(canvas, cityName, range, span)
+                    // Notes under the masthead, each wrapped to the table width. The Ramadan
+                    // one says what the two highlighted columns are and defers to the mosque.
+                    // The approximate one only appears when a day in this range was actually
+                    // projected: above the polar circles the home screen shows a banner, the PDF
+                    // is the copy that leaves the app and gets pinned to a wall, and it had no
+                    // such marking at all.
+                    val notes = listOfNotNull(
+                        if (range == Range.RAMADAN) context.getString(R.string.pdf_ramadan_note) else null,
+                        approximateNote(rows),
+                    )
+                    notes.forEach { note ->
                         wrapped(note, PAGE_WIDTH - 2 * MARGIN, subtitlePaint).forEach { line ->
                             canvas.drawText(line, MARGIN, y, subtitlePaint)
-                            y += 11f
+                            y += NOTE_LINE
                         }
                         y += 4f
                     }
-                    y += 12f
+                    y += BEFORE_TABLE
                 } else {
                     y += 6f
                 }
 
-                y = drawHeaderRow(canvas, y)
+                y = drawHeaderRow(canvas, y, columns)
 
                 while (index < rows.size && y + ROW_HEIGHT <= PAGE_HEIGHT - MARGIN - FOOTER_SPACE) {
-                    y = drawDataRow(canvas, y, rows[index])
+                    y = drawDataRow(canvas, y, rows[index], columns, span.ramadan)
                     index++
                 }
 
@@ -172,32 +179,47 @@ class PrayerPdfExporter(base: Context) {
         }
     }
 
-    private fun drawHeaderRow(canvas: android.graphics.Canvas, top: Float): Float {
+    /**
+     * The column titles and, for the Ramadan range, a small second line under Fajr and Maghrib
+     * saying what they are for the month: "Suhoor ends" and "Iftar". Both stay plain slot names
+     * on the first line, so the table still reads as the prayer timetable it is.
+     */
+    private fun drawHeaderRow(canvas: Canvas, top: Float, columns: List<Column>): Float {
+        val twoLine = columns.any { it.sub != null }
+        val height = ROW_HEIGHT + if (twoLine) SUB_LINE else 0f
         val baseline = top + ROW_HEIGHT - 6f
         var x = MARGIN
-        COLUMNS.forEach { column ->
+        columns.forEach { column ->
             canvas.drawText(column.title, x + CELL_PADDING, baseline, headerPaint)
+            column.sub?.let { sub ->
+                drawFitted(canvas, sub, x + CELL_PADDING, baseline + SUB_LINE, subLabelPaint, column.width - 2 * CELL_PADDING)
+            }
             x += column.width
         }
-        canvas.drawLine(MARGIN, top + ROW_HEIGHT, MARGIN + tableWidth, top + ROW_HEIGHT, rulePaint)
-        return top + ROW_HEIGHT + 2f
+        canvas.drawLine(MARGIN, top + height, MARGIN + tableWidth, top + height, rulePaint)
+        return top + height + 2f
     }
 
     private fun drawDataRow(
-        canvas: android.graphics.Canvas,
+        canvas: Canvas,
         top: Float,
         day: DayPrayerTimes,
+        columns: List<Column>,
+        ramadan: RamadanInfo?,
     ): Float {
         val baseline = top + ROW_HEIGHT - 6f
-        val values = listOf(
+        val values = listOfNotNull(
+            // The day of the month, 1 to 29 or 30, counted from the first day on the user's own
+            // calendar, so it agrees with the Day number on the card.
+            ramadan?.let { (ChronoUnit.DAYS.between(it.firstDay, day.date) + 1).toString() },
             day.date.format(dayNameFormat),
             day.date.format(dateFormat),
         ) + TABLE_SLOTS.map { slot -> TimeFormat.clock(context, day[slot]) }
 
         var x = MARGIN
         values.forEachIndexed { i, value ->
-            canvas.drawText(value, x + CELL_PADDING, baseline, cellPaint)
-            x += COLUMNS[i].width
+            canvas.drawText(value, x + CELL_PADDING, baseline, if (columns[i].strong) cellBoldPaint else cellPaint)
+            x += columns[i].width
         }
         canvas.drawLine(
             MARGIN,
@@ -207,6 +229,18 @@ class PrayerPdfExporter(base: Context) {
             hairlinePaint,
         )
         return top + ROW_HEIGHT
+    }
+
+    /**
+     * Draws [text] at [paint]'s size, or smaller if it would not fit in [maxWidth]. A second
+     * language's longer word for "Suhoor ends" must shrink a little, not run into the next column.
+     */
+    private fun drawFitted(canvas: Canvas, text: String, x: Float, baseline: Float, paint: Paint, maxWidth: Float) {
+        val fitted = Paint(paint)
+        while (fitted.textSize > MIN_FITTED_SIZE && fitted.measureText(text) > maxWidth) {
+            fitted.textSize -= 0.25f
+        }
+        canvas.drawText(text, x, baseline, fitted)
     }
 
     // --- naming ----------------------------------------------------------------------
@@ -232,17 +266,25 @@ class PrayerPdfExporter(base: Context) {
         canvas: Canvas,
         cityName: String,
         range: Range,
-        start: LocalDate,
+        span: Span,
     ): Float {
         val top = MARGIN
         drawLogo(canvas, MARGIN, top, LOGO_SIZE)
 
+        // The two lines are centred on the mark, wordmark baseline 21 and tagline 34 below the
+        // top edge, so the pair reads as one block beside it and not as a title with a caption
+        // pushed up under it.
         val textLeft = MARGIN + LOGO_SIZE + 12f
-        canvas.drawText(context.getString(R.string.app_name), textLeft, top + 19f, wordmarkPaint)
-        canvas.drawText(context.getString(R.string.pdf_tagline), textLeft, top + 33f, taglinePaint)
+        canvas.drawText(context.getString(R.string.app_name), textLeft, top + 21f, wordmarkPaint)
+        canvas.drawText(context.getString(R.string.pdf_tagline), textLeft, top + 34f, taglinePaint)
 
-        var y = top + LOGO_SIZE + 20f
-        canvas.drawLine(MARGIN, y - 12f, MARGIN + tableWidth, y - 12f, rulePaint)
+        // The rule sits 14 below the mark and the place name 22 below the rule. They were 8 and 0,
+        // which put the largest text on the page against the line above it, directly beneath the
+        // wordmark. Each step down the masthead now has its own air: mark, rule, place, qualifier,
+        // hairline, content.
+        val ruleY = top + LOGO_SIZE + 14f
+        canvas.drawLine(MARGIN, ruleY, MARGIN + tableWidth, ruleY, rulePaint)
+        var y = ruleY + 22f
 
         // Isolated because this is the line a user prints and pins to a wall, so a place
         // name reordered by the text around it survives longer here than on a screen they
@@ -250,13 +292,15 @@ class PrayerPdfExporter(base: Context) {
         // Canvas.drawText does not draw them.
         val place = cityName.bidiIsolated().ifBlank { context.getString(R.string.pdf_place_unknown) }
         canvas.drawText(place, MARGIN, y, placePaint)
-        y += 13f
+        y += 15f
 
         val period = when (range) {
-            Range.TODAY -> start.format(dateFormat)
+            Range.TODAY -> span.start.format(dateFormat)
             Range.NEXT_7_DAYS ->
-                context.getString(R.string.pdf_period_onwards, start.format(dateFormat))
-            Range.THIS_MONTH -> start.format(monthYearFormat)
+                context.getString(R.string.pdf_period_onwards, span.start.format(dateFormat))
+            Range.THIS_MONTH -> span.start.format(monthYearFormat)
+            Range.RAMADAN ->
+                context.getString(R.string.pdf_period_ramadan, requireNotNull(span.ramadan).hijriYear)
         }
         canvas.drawText(
             context.getString(R.string.pdf_header_meta, context.getString(R.string.pdf_area_label), period),
@@ -264,9 +308,9 @@ class PrayerPdfExporter(base: Context) {
             y,
             subtitlePaint,
         )
-        y += 8f
+        y += 10f
         canvas.drawLine(MARGIN, y, MARGIN + tableWidth, y, hairlinePaint)
-        return y + 14f
+        return y + 16f
     }
 
     /**
@@ -337,23 +381,21 @@ class PrayerPdfExporter(base: Context) {
             lines
         }
 
-    // PrayerTimes_July2026.pdf / PrayerTimes_30Jul2026.pdf. Locale.US is deliberate and is
-    // the one place in the app that ignores the user's language: this string is a file name
-    // in a shared Downloads folder, and it has to stay sortable, ASCII, and safe on the
-    // FAT-derived filesystems that USB and SD transfers still land on.
-    private fun fileName(range: Range, start: LocalDate): String {
-        val stamp = when (range) {
-            Range.THIS_MONTH -> start.format(DateTimeFormatter.ofPattern("MMMMyyyy", Locale.US))
-            else -> start.format(DateTimeFormatter.ofPattern("ddMMMyyyy", Locale.US))
-        }
-        return "PrayerTimes_$stamp.pdf"
-    }
-
     private fun exportDir(): File = File(context.cacheDir, "exports").apply { mkdirs() }
 
     // --- paints & layout -------------------------------------------------------------
 
-    private data class Column(val title: String, val width: Float)
+    /**
+     * One table column. [sub] is a small second header line (Ramadan only) and [strong] draws the
+     * cells in bold, which is how the two columns that bound the fast stand out on a black and
+     * white printout where colour cannot be used.
+     */
+    private data class Column(
+        val title: String,
+        val width: Float,
+        val sub: String? = null,
+        val strong: Boolean = false,
+    )
 
     private val TABLE_SLOTS = listOf(
         PrayerSlot.FAJR,
@@ -364,12 +406,31 @@ class PrayerPdfExporter(base: Context) {
         PrayerSlot.ISHA,
     )
 
-    private val COLUMNS = listOf(
-        Column(context.getString(R.string.pdf_column_day), 72f),
-        Column(context.getString(R.string.pdf_column_date), 91f),
-    ) + TABLE_SLOTS.map { Column(it.label(context), 60f) }
+    private fun columnsFor(range: Range): List<Column> = when (range) {
+        Range.RAMADAN -> listOf(
+            Column(context.getString(R.string.pdf_column_ramadan_day), RAMADAN_WIDTHS[0]),
+            Column(context.getString(R.string.pdf_column_day), RAMADAN_WIDTHS[1]),
+            Column(context.getString(R.string.pdf_column_date), RAMADAN_WIDTHS[2]),
+        ) + TABLE_SLOTS.mapIndexed { i, slot ->
+            Column(
+                title = slot.label(context),
+                width = RAMADAN_WIDTHS[3 + i],
+                sub = when (slot) {
+                    PrayerSlot.FAJR -> context.getString(R.string.ramadan_suhoor_ends)
+                    PrayerSlot.MAGHRIB -> context.getString(R.string.ramadan_iftar)
+                    else -> null
+                },
+                strong = slot == PrayerSlot.FAJR || slot == PrayerSlot.MAGHRIB,
+            )
+        }
 
-    private val tableWidth = COLUMNS.sumOf { it.width.toDouble() }.toFloat()
+        else -> listOf(
+            Column(context.getString(R.string.pdf_column_day), ORDINARY_WIDTHS[0]),
+            Column(context.getString(R.string.pdf_column_date), ORDINARY_WIDTHS[1]),
+        ) + TABLE_SLOTS.mapIndexed { i, slot -> Column(slot.label(context), ORDINARY_WIDTHS[2 + i]) }
+    }
+
+    private val tableWidth = (PAGE_WIDTH - 2 * MARGIN)
 
     // The wordmark is the app's own name at the top of a document that leaves the app, so
     // it is set larger and looser than anything else on the page and never competes with
@@ -409,6 +470,16 @@ class PrayerPdfExporter(base: Context) {
         isAntiAlias = true
         textSize = 10f
     }
+    private val cellBoldPaint = Paint().apply {
+        isAntiAlias = true
+        textSize = 10f
+        typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+    }
+    private val subLabelPaint = Paint().apply {
+        isAntiAlias = true
+        textSize = 7.5f
+        color = 0xFF555555.toInt()
+    }
     private val rulePaint = Paint().apply { strokeWidth = 1f }
     private val hairlinePaint = Paint().apply {
         strokeWidth = 0.4f
@@ -435,20 +506,80 @@ class PrayerPdfExporter(base: Context) {
     private val dateFormat = DateTimeFormatter.ofPattern("d MMM yyyy", AppLocale.of(context))
     private val monthYearFormat = DateTimeFormatter.ofPattern("MMMM yyyy", AppLocale.of(context))
 
-    private companion object {
+    companion object {
         // A4 at 72 dpi.
-        const val PAGE_WIDTH = 595
-        const val PAGE_HEIGHT = 842
-        const val MARGIN = 36f
-        const val ROW_HEIGHT = 19f
-        const val CELL_PADDING = 3f
-        const val FOOTER_SPACE = 16f
-        const val LOGO_SIZE = 40f
+        private const val PAGE_WIDTH = 595
+        private const val PAGE_HEIGHT = 842
+        private const val MARGIN = 36f
+        private const val ROW_HEIGHT = 19f
+        private const val CELL_PADDING = 3f
+        private const val FOOTER_SPACE = 16f
+        private const val LOGO_SIZE = 40f
+
+        /** Line pitch of the 9pt notes under the masthead. */
+        private const val NOTE_LINE = 11f
+
+        /** Space between the last note (or the masthead) and the table's header row. */
+        private const val BEFORE_TABLE = 6f
+
+        /** Extra height of the header row when it carries the second line, "Suhoor ends". */
+        private const val SUB_LINE = 9f
+
+        private const val MIN_FITTED_SIZE = 5.5f
 
         /** 108/72: an adaptive icon draws at 108 units and only the middle 72 are shown. */
-        const val LOGO_FOREGROUND_SCALE = 1.5f
+        private const val LOGO_FOREGROUND_SCALE = 1.5f
 
         /** LightPrimary, the same #0E6B4F as ic_launcher_background.xml. Keep them together. */
-        const val LOGO_GREEN = 0xFF0E6B4F.toInt()
+        private const val LOGO_GREEN = 0xFF0E6B4F.toInt()
+
+        /**
+         * Column widths in points. Both rows add up to the 523 points between the margins
+         * (`PdfWidthsTest`), so the table is flush with the rules above it. Ramadan has a narrow
+         * Day column, a day name, a date and six times at 57.5.
+         */
+        internal val ORDINARY_WIDTHS = listOf(72f, 91f, 60f, 60f, 60f, 60f, 60f, 60f)
+        internal val RAMADAN_WIDTHS = listOf(31f, 62f, 85f, 57.5f, 57.5f, 57.5f, 57.5f, 57.5f, 57.5f)
+
+        /**
+         * The days a range covers, and for Ramadan the month they belong to. [ramadan] is the
+         * Ramadan whose first day is [start], on the user's own shifted calendar, or null for the
+         * other ranges.
+         */
+        internal data class Span(val start: LocalDate, val days: Int, val ramadan: RamadanInfo? = null)
+
+        /**
+         * Pure, so the arithmetic is tested without a Canvas. Ramadan is the current month or, if
+         * today is before it, the next one, on the user's calendar (their shift applies through
+         * [CalculationPrefs.hijriOffset]). The export sheet only offers it from 30 days before day 1
+         * to the last day, so the "next one" case is the weeks before the month, which is what
+         * lets a family print the timetable ahead of time. Throws only outside the calendar's
+         * range, which the caller turns into the same failed export message as any other error.
+         */
+        internal fun spanOf(range: Range, today: LocalDate, prefs: CalculationPrefs): Span = when (range) {
+            Range.TODAY -> Span(today, 1)
+            Range.NEXT_7_DAYS -> Span(today, 7)
+            Range.THIS_MONTH -> Span(today.withDayOfMonth(1), today.lengthOfMonth())
+            Range.RAMADAN -> {
+                val info = checkNotNull(HijriCalendar.ramadan(today, prefs.hijriOffset)) {
+                    "No Ramadan within the supported calendar range for $today"
+                }
+                Span(info.firstDay, info.length, info)
+            }
+        }
+
+        // PrayerTimes_July2026.pdf / PrayerTimes_30Jul2026.pdf / PrayerTimes_Ramadan1448.pdf.
+        // Locale.US is deliberate and is the one place in the app that ignores the user's
+        // language: this string is a file name in a shared Downloads folder, and it has to stay
+        // sortable, ASCII, and safe on the FAT-derived filesystems that USB and SD transfers
+        // still land on.
+        internal fun fileNameFor(range: Range, span: Span): String {
+            val stamp = when (range) {
+                Range.THIS_MONTH -> span.start.format(DateTimeFormatter.ofPattern("MMMMyyyy", Locale.US))
+                Range.RAMADAN -> "Ramadan${requireNotNull(span.ramadan).hijriYear}"
+                else -> span.start.format(DateTimeFormatter.ofPattern("ddMMMyyyy", Locale.US))
+            }
+            return "PrayerTimes_$stamp.pdf"
+        }
     }
 }

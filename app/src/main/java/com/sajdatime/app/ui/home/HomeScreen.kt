@@ -106,7 +106,21 @@ fun HomeScreen(
     var locationSheet by rememberSaveable { mutableStateOf(false) }
     var explaining by rememberSaveable { mutableStateOf(false) }
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
+    var ramadanTimetable by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
+    // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
+    val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // The Ramadan option in the export sheet: offered from 30 days before day 1 to the last day,
+    // on the user's own calendar (RamadanInfo.offersTimetable), so a family can print it ahead.
+    // Keyed on the date and the shift, so it is not recomputed on the clock's every tick.
+    val exportToday = state.today?.date
+    val exportShift = state.settings.calculationPrefs.hijriOffset
+    val ramadanExportYear = remember(exportToday, exportShift) {
+        exportToday?.let { day ->
+            HijriCalendar.ramadan(day, exportShift)?.takeIf { it.offersTimetable(day) }?.hijriYear
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -153,6 +167,7 @@ fun HomeScreen(
         RamadanSection(
             state = state,
             onOpenInfo = { ramadanInfo = true },
+            onOpenTimetable = { ramadanTimetable = true },
             onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
             onDismissNotice = onDismissRamadanNotice,
         )
@@ -190,10 +205,27 @@ fun HomeScreen(
         )
     }
 
+    if (ramadanTimetable) {
+        RamadanTimetableSheet(
+            state = state,
+            sheetState = timetableSheetState,
+            onExport = {
+                onExport(PrayerPdfExporter.Range.RAMADAN)
+                ramadanTimetable = false
+            },
+            onShiftDate = {
+                ramadanTimetable = false
+                onOpenSetting(SettingsChooser.ADJUSTMENTS)
+            },
+            onDismiss = { ramadanTimetable = false },
+        )
+    }
+
     if (exportSheet) {
         ExportSheet(
             sheetState = exportSheetState,
             cityName = state.settings.cityName,
+            ramadanYear = ramadanExportYear,
             onDismiss = { exportSheet = false },
             onPick = { range ->
                 onExport(range)
@@ -516,6 +548,8 @@ internal fun ExplainerAction(label: String, onClick: () -> Unit) {
 private fun ExportSheet(
     sheetState: SheetState,
     cityName: String,
+    /** The Hijri year when the Ramadan timetable is on offer today, otherwise null and the option is absent. */
+    ramadanYear: Int?,
     onDismiss: () -> Unit,
     onPick: (PrayerPdfExporter.Range) -> Unit,
 ) {
@@ -543,23 +577,26 @@ private fun ExportSheet(
             )
             Spacer(Modifier.height(16.dp))
 
-            PrayerPdfExporter.Range.entries.forEach { range ->
-                ExportOption(range = range, onClick = { onPick(range) })
-                HorizontalDivider(
-                    Modifier.padding(horizontal = 24.dp),
-                    color = MaterialTheme.colorScheme.outlineVariant,
-                )
-            }
+            PrayerPdfExporter.Range.entries
+                .filter { it != PrayerPdfExporter.Range.RAMADAN || ramadanYear != null }
+                .forEach { range ->
+                    ExportOption(range = range, ramadanYear = ramadanYear, onClick = { onPick(range) })
+                    HorizontalDivider(
+                        Modifier.padding(horizontal = 24.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                }
         }
     }
 }
 
 @Composable
-private fun ExportOption(range: PrayerPdfExporter.Range, onClick: () -> Unit) {
+private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onClick: () -> Unit) {
     val (titleRes, subtitleRes) = when (range) {
         PrayerPdfExporter.Range.TODAY -> R.string.export_today to R.string.export_today_desc
         PrayerPdfExporter.Range.NEXT_7_DAYS -> R.string.export_week to R.string.export_week_desc
         PrayerPdfExporter.Range.THIS_MONTH -> R.string.export_month to R.string.export_month_desc
+        PrayerPdfExporter.Range.RAMADAN -> R.string.export_ramadan to R.string.export_ramadan_desc
     }
 
     Column(
@@ -568,7 +605,14 @@ private fun ExportOption(range: PrayerPdfExporter.Range, onClick: () -> Unit) {
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 14.dp),
     ) {
-        Text(text = stringResource(titleRes), style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = if (range == PrayerPdfExporter.Range.RAMADAN && ramadanYear != null) {
+                stringResource(titleRes, ramadanYear)
+            } else {
+                stringResource(titleRes)
+            },
+            style = MaterialTheme.typography.bodyLarge,
+        )
         Text(
             text = stringResource(subtitleRes),
             style = MaterialTheme.typography.bodyMedium,
@@ -743,6 +787,14 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }
 
+    // During Ramadan, and only then, Fajr is also where suhoor ends and Maghrib is iftar. The
+    // labels come from the same state as the card, so they start with day 1 on the user's own
+    // calendar and are gone at midnight into 1 Shawwal with nothing to switch off. They follow
+    // the "Ramadan card" setting: someone who is not fasting hid it to stop seeing fasting.
+    val inRamadan = state.ramadan?.info?.isRamadan == true && state.settings.ramadanCardEnabled
+    val suhoorLabel = stringResource(R.string.ramadan_suhoor_ends)
+    val iftarLabel = stringResource(R.string.ramadan_iftar)
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -754,6 +806,12 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
                 isNext = next != null && slot == next.slot && !next.isTomorrow,
                 isCurrent = slot == state.current,
+                note = when {
+                    !inRamadan -> null
+                    slot == PrayerSlot.FAJR -> suhoorLabel
+                    slot == PrayerSlot.MAGHRIB -> iftarLabel
+                    else -> null
+                },
             )
             if (index != slots.lastIndex) {
                 HorizontalDivider(color = scheme.outlineVariant)
@@ -782,7 +840,7 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
  * chains below need no tie-break.
  */
 @Composable
-private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent: Boolean) {
+private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent: Boolean, note: String?) {
     val scheme = MaterialTheme.colorScheme
     val dimmed = !slot.isPrayer && !isNext
 
@@ -827,16 +885,29 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
             modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
         )
         Spacer(Modifier.width(14.dp))
-        Text(
-            text = stringResource(slot.labelRes),
-            style = if (dimmed) {
-                MaterialTheme.typography.bodyMedium
-            } else {
-                MaterialTheme.typography.bodyLarge
-            },
-            color = contentColor,
-            modifier = Modifier.weight(1f),
-        )
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = stringResource(slot.labelRes),
+                style = if (dimmed) {
+                    MaterialTheme.typography.bodyMedium
+                } else {
+                    MaterialTheme.typography.bodyLarge
+                },
+                color = contentColor,
+            )
+            // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
+            // a pill beside the name: the row already holds the name, a Next or Now marker and the
+            // time, and a third item squeezes them at 360dp.
+            if (note != null) {
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.labelMedium,
+                    // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
+                    // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
+                    color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                )
+            }
+        }
         if (isNext) {
             // Not colour alone: the next prayer also carries a text marker.
             Text(
