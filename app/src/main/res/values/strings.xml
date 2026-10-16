@@ -28,7 +28,7 @@
     <string name="permission_title">Where are you praying?</string>
     <string name="permission_body">SajdaTime needs a rough idea of where you are to work out your prayer times and the direction of the Qibla. Tap the info icon to see exactly what that means.</string>
     <string name="permission_why_title">Why we need your location</string>
-    <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. It stays on your phone. We never send it anywhere.</string>
+    <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. The times are worked out on your phone and we never receive your location. To show your town\'s name, the app asks your phone\'s own place lookup, which on most phones is answered over the internet by Google.</string>
     <string name="action_allow_location">Allow location</string>
     <string name="action_got_it">Got it</string>
     <string name="action_understood">I understand</string>
@@ -38,7 +38,7 @@
     <string name="location_looking_up">Looking up that place…</string>
     <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
 
-    <string name="city_fallback_body">Type your city instead. Your phone looks it up on its own where it can. If it cannot, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+    <string name="city_fallback_body">Type your city instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
     <string name="city_field_label">City</string>
     <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
     <string name="city_not_found">We could not find that place. Try adding the country.</string>
@@ -345,7 +345,7 @@
     <string name="about_disclaimer">Disclaimer</string>
     <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Your location stays on this phone. No accounts, no ads. Usage counts are optional and off unless you turn them on. Tap to read the full policy.</string>
+    <string name="about_privacy_desc">Times are worked out on this phone and we never receive your location. No accounts, no ads. Usage counts are optional and off unless you turn them on. Tap to read the full policy.</string>
 
     <!-- Optional usage counts. Wording rules: docs/ANALYTICS_PLAN.md section 7.2. The consent text
          must state the material facts in full (who receives it, the random ID, what is and is not

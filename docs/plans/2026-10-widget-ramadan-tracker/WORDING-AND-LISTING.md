@@ -99,14 +99,14 @@ byte identical to the fenced block in `docs/store/LISTING.md` (3,770 characters,
 
 | # | String | Line | Evidence | Status |
 |---|---|---|---|---|
-| S1 | `permission_why_body` "We only check your approximate location while the app is open. It stays on your phone. We never send it anywhere." | 31 | as P2, P3 | correct |
-| S2 | `city_fallback_body` "just the name you typed is sent once to a free lookup service" | 41 | `CityLookup.fromOpenMeteo` | correct |
+| S1 | `permission_why_body` "We only check your approximate location while the app is open. It stays on your phone. We never send it anywhere." | 31 | as P2, P3 | **changed 16 Oct 2026 (HANDOVER 5.21): the old sentence was untrue because of the geocoder** |
+| S2 | `city_fallback_body` "just the name you typed is sent once to a free lookup service" | 41 | `CityLookup.fromOpenMeteo` | **changed 16 Oct 2026 (HANDOVER 5.21): now says the phone's lookup may use the network** |
 | S3 | `location_sheet_body` "ten miles is about a minute" | 219 | measured in HANDOVER §10 | correct |
 | S4 | `export_month_desc` "Every day from the 1st to the end of the month" | 234 | `withDayOfMonth(1)`, `lengthOfMonth()` | correct |
 | S5 | `export_saved` "Saved to Downloads as %1$s" | 235 | API 29 and later only, the share sheet path shows no toast of its own | correct in context |
 | S6 | `pdf_footer` "Calculated offline on your device" | 261 | engine is local | correct |
 | S7 | `settings_exact_alarms_desc`, `confirm_exact_alarm_body` "hold prayer alerts back by an hour or more" | 339, 341 | measured, HANDOVER §6 | correct |
-| S8 | `about_privacy_desc` "Your location stays on this phone. No accounts, no ads. Usage counts are optional and off unless you turn them on." | 348 | | correct |
+| S8 | `about_privacy_desc` "Your location stays on this phone. No accounts, no ads. Usage counts are optional and off unless you turn them on." | 348 | | **changed 16 Oct 2026 (HANDOVER 5.21)** |
 | S9 | `consent_body`, `consent_sent_list`, `consent_never_list` | 354-366 | `UsageCountsTest` checks them against the policy | correct. B adds "Your prayer tracker" to the never list (C5) |
 | S10 | `about_data_desc` adhan-java MIT, Open-Meteo CC BY 4.0 | 384 | | correct |
 | S11 | `settings_hijri_offset_help` "This also moves Ramadan and Eid" | 437 | `PrayerEngine.kt:425-436` | correct, and A3's note says the shift also moves the suhoor reminder |

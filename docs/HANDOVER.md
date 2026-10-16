@@ -1339,8 +1339,36 @@ done, what was refused, and why:
 4. `QiblaEngine.distanceKm(a, b)` is the haversine generalised to two points. `distanceToKaabaKm`
    delegates to it, and its existing tests are unchanged.
 
+5. **The wording that said "never leaves the device" is corrected everywhere it appeared.**
+   `docs/privacy.html` (new "The name of your town" section, the typed city section now says the
+   Android lookup may use the network, the PDF and the Data Layer copy are mentioned), the three
+   in app strings `permission_why_body`, `city_fallback_body` and `about_privacy_desc` in values,
+   values-ur, values-tr and values-in, `README.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`,
+   `docs/NEW-SESSION.md`, the three blocks of `docs/store/LISTING.md` and all eight languages in
+   `docs/store/LISTING-LOCALES.md`. The true claim that replaces it, and that is safe to repeat, is
+   **"the times are worked out on your phone and we never receive your location"**: the developer
+   has no server and receives nothing. Old dated documents (`ANALYTICS_PLAY_CONSOLE_PROMPT.md`,
+   `AFTER_THE_TEST.md`, the planning tables) still quote the old sentence as history.
+   **Merge step:** `privacy.html` still says "Last updated: 16 October 2026" and `UsageCountsTest`
+   asserts it. If this branch merges on a later day, move both together.
+   **Play Console step for the owner:** the Data safety form should declare approximate location
+   as collected and shared for app functionality, because the geocoder lookup is a transfer to a
+   third party on the user's behalf. Review it before 1.4.0 goes to Play. Nothing was changed in
+   the Console.
+6. **Options for removing the lookup altogether, for the owner to choose** (none built):
+   (a) an offline nearest city list shipped in the app (GeoNames style, roughly 1 to 3 MB for
+   cities over 15,000 people, CC BY licence, needs a one line attribution beside the Open-Meteo
+   one). Fully offline, no wording caveat at all, and the label becomes "nearest city" rather than
+   the exact town. (b) Show no label unless the user taps "Show my town name". Least work, loses
+   the label for most people. (c) The current state: honest wording plus fewer lookups. Recommended
+   for 1.4.0, with (a) considered for a later release.
+
 **Not tested:** none of this has run on a device. The label throttle is unit tested as a pure
-function. The view model wiring is not covered by a test.
+function. The view model wiring is not covered by a test. The claim that the geocoder is answered
+by Google on most phones is from Android's documentation and the audit, not from a traffic
+capture on a handset. `tools/log-sni-proxy.py` (the method used for the analytics capture) would
+confirm it in a few minutes on the S23 Ultra: open the app after clearing its data and look for a
+Google host straight after the location fix.
 
 ## 6. Notification and alarm architecture
 
@@ -1582,13 +1610,15 @@ descriptions on the tappable location header.
 
 | Data | Where it lives | Leaves the device? |
 |---|---|---|
-| Coordinates | DataStore, on device | Never |
+| Coordinates | DataStore, on device. Also copied into the Wear Data Layer item store on the phone (`WatchSync`), which Play services keeps even with no watch paired | **Never sent to us, and the prayer times never need the network.** But see the next row: the town name lookup hands the approximate position to Android's geocoder |
+| **Town name label** (found 16 Oct 2026) | `Geocoder.getFromLocation` (Android). Documented as possibly network backed, and on phones with Google Play services it is answered by Google | **Yes, on most phones, the approximate position goes to the geocoding provider (usually Google).** Asked only with no label or after a 5 km move (§5.21). Stated in `privacy.html`, the permission screen and the About row. **Do not write "never leaves the device" again** |
 | City name | DataStore, on device | Never |
 | Sect, madhab, method | DataStore, on device | Never |
 | Notification settings | DataStore, on device | Never |
 | Ramadan card switch, notice and Eid dismissals, suhoor reminder choice (1.4.0) | DataStore, on device | Never |
 | Widgets (1.4.0) | Drawn from the saved location and settings. They read no location of their own and make no request | Never |
-| **Typed city name** (fallback only) | Resolved on-device where possible | Only if the phone's own geocoder cannot answer, then once to Open-Meteo, with prior on-screen disclosure |
+| **Typed city name** | Android's geocoder first, which on most phones asks the network (Google). Then, only if that cannot answer, once to Open-Meteo | The typed name only, never the position. Disclosed on screen before it happens (`city_fallback_body`) and in `privacy.html` |
+| Saved or shared PDF | Built on the phone. Carries the area name, not the coordinates | Only where the user puts it (Downloads, or the app they pick) |
 | Sect, madhab, method, location | Published to a paired watch | Only to the user's own watch, over the local Data Layer |
 | **Usage counts** (only if the user opted in) | Sent to Google Analytics, tied to a random Firebase ID | Yes, **opt in only**. A fixed set: sessions and time open, which of the three main screens, which setup steps (never the madhab step), notifications/location allowed yes or no, exact alarms allowed at the end of setup, device model, Android and app version, language, and an approximate area Google derives from the connection. **Never** sect, madhab, method, settings, city, coordinates, or anything whose shape reveals them |
 

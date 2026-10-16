@@ -146,7 +146,7 @@ is not a promotion word, which was the open question and is now closed.
 
 ```
 SajdaTime tells you when to pray and which way to face.
-That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
+That is all it does, and it does it without ads, without an account, and without us ever receiving your location.
 
 Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
 
@@ -188,7 +188,8 @@ This one is not paid for at all.
 • No accounts, no sign-in, no email address
 • Optional usage counts that you control in Settings. No crash reporting
 • Approximate location only, read while the app is open, never in the background
-• Your coordinates never leave your device, and are never part of the optional usage counts
+• Times are worked out on your phone. We never receive your location, and it is never part of the optional usage counts
+• The town name is looked up through Android, which on most phones asks Google (see the privacy policy)
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
 If you would rather not share your location at all, you can type a city name instead, and the app works the same.
@@ -226,7 +227,7 @@ privacy intro is shortened; and the semicolon in the HONEST paragraph is a full 
 
 ```
 SajdaTime tells you when to pray and which way to face.
-That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
+That is all it does, and it does it without ads, without an account, and without us ever receiving your location.
 
 Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
 
@@ -268,7 +269,8 @@ Most free prayer apps are funded by advertising, which means you pay with your d
 • No accounts, no sign-in, no email address
 • Optional usage counts that you control in Settings. No crash reporting
 • Approximate location only, read while the app is open, never in the background
-• Your coordinates never leave your device, and are never part of the optional usage counts
+• Times are worked out on your phone. We never receive your location, and it is never part of the optional usage counts
+• The town name is looked up through Android, which on most phones asks Google (see the privacy policy)
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
 If you would rather not share your location at all, you can type a city name instead, and the app works the same.
@@ -293,7 +295,7 @@ optional suhoor reminder before Fajr". "Sehri" stays in brackets because it is t
 
 ```
 SajdaTime tells you when to pray and which way to face.
-That is all it does, and it does it without ads, without an account, and without sending your location anywhere.
+That is all it does, and it does it without ads, without an account, and without us ever receiving your location.
 
 Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
 
@@ -335,7 +337,8 @@ Most free prayer apps are funded by advertising, which means you pay with your d
 • No accounts, no sign-in, no email address
 • Optional usage counts that you control in Settings. No crash reporting
 • Approximate location only, read while the app is open, never in the background
-• Your coordinates never leave your device, and are never part of the optional usage counts
+• Times are worked out on your phone. We never receive your location, and it is never part of the optional usage counts
+• The town name is looked up through Android, which on most phones asks Google (see the privacy policy)
 • Cloud backup is deliberately switched off so nothing can be copied off your phone
 
 If you would rather not share your location at all, you can type a city name instead, and the app works the same.

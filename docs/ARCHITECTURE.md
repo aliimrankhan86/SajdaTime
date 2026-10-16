@@ -17,7 +17,7 @@ Three constraints shaped every technical decision:
 | Constraint | Consequence |
 |---|---|
 | Zero running cost | Prayer times are computed on-device. There is no server, and no paid API. |
-| Privacy by design | Only coarse location, only in the foreground, never transmitted, never backed up. |
+| Privacy by design | Only coarse location, only in the foreground, never sent to the developer (there is no server), never backed up. The town name label is the one exception: see HANDOVER 5.21. |
 | Solo maintainer | Minimal dependencies, no build-time codegen, no framework the author must relearn. |
 
 ---

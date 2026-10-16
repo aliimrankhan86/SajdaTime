@@ -18,7 +18,7 @@
     <string name="permission_title">Nerede namaz kılıyorsunuz?</string>
     <string name="permission_body">SajdaTime, namaz vakitlerinizi ve kıble yönünü hesaplamak için nerede olduğunuzu kabaca bilmelidir. Bunun tam olarak ne anlama geldiğini görmek için bilgi simgesine dokunun.</string>
     <string name="permission_why_title">Konumunuza neden ihtiyacımız var</string>
-    <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Konumunuz telefonunuzda kalır. Onu hiçbir yere göndermeyiz.</string>
+    <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Vakitler telefonunuzda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Şehrinizin adını göstermek için uygulama telefonunuzun kendi yer arama hizmetine sorar. Çoğu telefonda bu hizmete internet üzerinden Google yanıt verir.</string>
     <string name="action_allow_location">Konuma izin ver</string>
     <string name="action_got_it">Anladım</string>
     <string name="action_understood">Anlıyorum</string>
@@ -28,7 +28,7 @@
     <string name="location_looking_up">Bu yer aranıyor…</string>
     <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da şehrinizi aşağıya yazın.</string>
 
-    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Telefonunuz mümkünse onu kendisi bulur. Bulamazsa, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
     <string name="city_field_label">Şehir</string>
     <string name="city_field_helper">Örneğin: İstanbul, Lahor, Kahire</string>
     <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
@@ -185,7 +185,7 @@
     <string name="about_disclaimer">Sorumluluk reddi</string>
     <string name="about_disclaimer_short">Bir yardımcı, dinî bir otorite değil. Okumak için dokunun.</string>
     <string name="about_privacy">Gizlilik</string>
-    <string name="about_privacy_desc">Konumunuz bu telefonda kalır. Hesap yok, reklam yok. Kullanım sayımları isteğe bağlıdır ve siz açmadıkça kapalıdır. Politikanın tamamını okumak için dokunun.</string>
+    <string name="about_privacy_desc">Vakitler bu telefonda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Hesap yok, reklam yok. Kullanım sayımları isteğe bağlıdır ve siz açmadıkça kapalıdır. Politikanın tamamını okumak için dokunun.</string>
 
     <!-- Optional usage counts -->
     <string name="consent_title">SajdaTime\'ı geliştirmeye yardım eder misiniz?</string>

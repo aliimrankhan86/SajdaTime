@@ -2,7 +2,7 @@
 
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS.
 
-No accounts. No ads. Your location never leaves your phone. Optional usage counts, off unless you switch them on, help the developer see how the app is used (never your location, school of thought or settings).
+No accounts. No ads. Times are worked out on your phone and we never receive your location. Optional usage counts, off unless you switch them on, help the developer see how the app is used (never your location, school of thought or settings).
 
 ---
 
@@ -131,11 +131,14 @@ tools/  Release helpers, all runnable from the repo root. wear-verify.sh checks 
 
 The only sensitive permission is approximate location, read while the app is open. The full
 list, with what each one is for, is in the privacy policy. Coordinates are stored on the device
-and never transmitted. The home screen widgets read no location of their own.
+and never sent to the developer: SajdaTime runs no server. One exception is worth knowing: the
+town name shown above the times is looked up by Android's own place lookup, which on most phones
+is answered over the internet by Google, and the app asks for it only when it has no name yet or
+the phone has moved about 5 km. The home screen widgets read no location of their own.
 
 One optional feature touches the network: you can type a city name instead of using
-location. Your phone resolves it on its own where it can, and only if it cannot is the
-name you typed sent once to a free lookup service. The app tells you this before it
+location. Android's own place lookup is asked first (on most phones that goes to Google), and only if it
+cannot answer is the name you typed sent once to a free lookup service. The app tells you this before it
 happens. Cloud backup and device-to-device transfer are both switched off, so your cached
 location is neither copied to a backup server nor carried across to a new phone.
 

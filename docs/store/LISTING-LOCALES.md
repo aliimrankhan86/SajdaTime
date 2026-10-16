@@ -69,7 +69,7 @@ Jadwal sholat offline dan arah kiblat. Tanpa iklan dan tanpa akun.
 
 ```
 SajdaTime memberi tahu kapan waktu sholat tiba dan ke arah mana Anda menghadap. Hanya itu
-yang dilakukannya, tanpa iklan, tanpa akun, dan tanpa mengirim lokasi Anda ke mana pun.
+yang dilakukannya, tanpa iklan, tanpa akun, dan tanpa pernah menerima lokasi Anda.
 
 Jadwal sholat dihitung langsung di ponsel Anda, sehingga aplikasi tetap berfungsi di dalam
 pesawat, di ruang bawah tanah, atau tanpa sinyal sama sekali.
@@ -113,7 +113,8 @@ Kebanyakan aplikasi sholat gratis dibiayai iklan, artinya dibiayai data Anda. Ya
 • Tidak ada akun, tidak ada masuk, tidak ada alamat email
 • Penghitungan penggunaan bersifat opsional dan Anda atur di Pengaturan. Tanpa pelaporan kerusakan
 • Hanya lokasi perkiraan, dibaca saat aplikasi terbuka, tidak pernah di latar belakang
-• Koordinat Anda tidak pernah meninggalkan perangkat, dan tidak pernah menjadi bagian dari penghitungan penggunaan opsional
+• Waktu dihitung di ponsel Anda. Kami tidak pernah menerima lokasi Anda, dan lokasi tidak pernah menjadi bagian dari penghitungan penggunaan opsional
+• Nama kota dicari lewat layanan lokasi bawaan Android, yang di sebagian besar ponsel bertanya ke Google (lihat kebijakan privasi)
 • Pencadangan awan sengaja dimatikan agar tidak ada yang dapat disalin dari ponsel Anda
 
 Jika Anda lebih memilih tidak membagikan lokasi sama sekali, Anda dapat mengetikkan nama
@@ -153,8 +154,7 @@ Waktu solat luar talian dan arah kiblat. Tiada iklan atau akaun.
 
 ```
 SajdaTime memberitahu anda bila masuk waktu solat dan ke arah mana untuk mengadap. Itu
-sahaja yang dilakukannya, tanpa iklan, tanpa akaun, dan tanpa menghantar lokasi anda ke
-mana-mana.
+sahaja yang dilakukannya, tanpa iklan, tanpa akaun, dan tanpa pernah menerima lokasi anda.
 
 Waktu solat dikira terus di telefon anda, jadi aplikasi ini terus berfungsi di dalam
 kapal terbang, di tingkat bawah tanah, atau tanpa isyarat langsung.
@@ -198,7 +198,8 @@ Kebanyakan aplikasi solat percuma dibiayai iklan, bermakna dibiayai data anda. Y
 • Tiada akaun, tiada log masuk, tiada alamat e-mel
 • Kiraan penggunaan pilihan yang anda kawal dalam Tetapan. Tiada laporan ranap
 • Lokasi anggaran sahaja, dibaca semasa aplikasi dibuka, tidak pernah di latar belakang
-• Koordinat anda tidak pernah meninggalkan peranti, dan tidak pernah menjadi sebahagian daripada kiraan penggunaan pilihan
+• Waktu dikira pada telefon anda. Kami tidak pernah menerima lokasi anda, dan lokasi tidak pernah menjadi sebahagian daripada kiraan penggunaan pilihan
+• Nama bandar dicari melalui perkhidmatan tempat terbina dalam Android, yang pada kebanyakan telefon bertanya kepada Google (lihat dasar privasi)
 • Sandaran awan sengaja dimatikan supaya tiada apa boleh disalin dari telefon anda
 
 Jika anda lebih suka tidak berkongsi lokasi langsung, anda boleh menaip nama bandar dan
@@ -238,7 +239,7 @@ SajdaTime: اوقات نماز و قبلہ
 
 ```
 SajdaTime آپ کو بتاتا ہے کہ نماز کا وقت کب ہے اور کس سمت رخ کرنا ہے۔ بس یہی اس کا کام ہے،
-بغیر اشتہارات کے، بغیر اکاؤنٹ کے، اور آپ کا مقام کہیں بھیجے بغیر۔
+بغیر اشتہارات کے، بغیر اکاؤنٹ کے، اور آپ کا مقام کبھی وصول کیے بغیر۔
 
 نماز کے اوقات آپ کے اپنے فون پر ہی شمار کیے جاتے ہیں، اس لیے یہ ایپ جہاز میں، تہہ خانے
 میں، یا بالکل سگنل کے بغیر بھی کام کرتی رہتی ہے۔
@@ -284,7 +285,8 @@ SajdaTime آپ کو بتاتا ہے کہ نماز کا وقت کب ہے اور �
 • نہ اکاؤنٹ، نہ سائن اِن، نہ ای میل پتہ
 • استعمال کی اختیاری گنتی، جس پر آپ کا اختیار سیٹنگز میں ہے۔ کوئی کریش رپورٹنگ نہیں
 • صرف تخمینی مقام، وہ بھی جب ایپ کھلی ہو، پس منظر میں کبھی نہیں
-• آپ کے جغرافیائی نقاط کبھی آپ کے آلے سے باہر نہیں جاتے، اور اختیاری گنتی میں بھی شامل نہیں ہوتے
+• اوقات آپ کے فون پر نکالے جاتے ہیں۔ ہم آپ کا مقام کبھی وصول نہیں کرتے، اور وہ اختیاری گنتی میں بھی شامل نہیں ہوتا
+• شہر کا نام اینڈرائیڈ کی اپنی مقام تلاش سروس سے معلوم کیا جاتا ہے، جو زیادہ تر فونز پر گوگل سے پوچھتی ہے (رازداری کی پالیسی دیکھیں)
 • کلاؤڈ بیک اپ جان بوجھ کر بند ہے تاکہ آپ کے فون سے کچھ نقل نہ ہو سکے
 
 اگر آپ اپنا مقام بالکل بھی نہیں بتانا چاہتے تو شہر کا نام لکھ دیں، ایپ بالکل ویسے ہی کام
@@ -324,7 +326,7 @@ SajdaTime: নামাজের সময়, কিবলা
 
 ```
 SajdaTime আপনাকে জানায় কখন নামাজের সময় এবং কোন দিকে মুখ করতে হবে। এটুকুই এর কাজ — কোনও
-বিজ্ঞাপন ছাড়া, কোনও অ্যাকাউন্ট ছাড়া, এবং আপনার অবস্থান কোথাও না পাঠিয়ে।
+বিজ্ঞাপন ছাড়া, কোনও অ্যাকাউন্ট ছাড়া, এবং আপনার অবস্থান কখনও না পেয়ে।
 
 নামাজের সময় আপনার নিজের ফোনেই গণনা করা হয়, তাই অ্যাপটি বিমানে, বেসমেন্টে, বা একেবারে
 নেটওয়ার্ক ছাড়াও কাজ করে।
@@ -370,7 +372,8 @@ SajdaTime আপনাকে জানায় কখন নামাজের 
 • কোনও অ্যাকাউন্ট নেই, সাইন-ইন নেই, ইমেল ঠিকানা নেই
 • ঐচ্ছিক ব্যবহারের গণনা, যা আপনি সেটিংসে নিয়ন্ত্রণ করেন। ক্র্যাশ রিপোর্ট নেই
 • কেবল আনুমানিক অবস্থান, অ্যাপ খোলা থাকলে পড়া হয়, কখনও পটভূমিতে নয়
-• আপনার স্থানাঙ্ক কখনও ডিভাইস ছাড়ে না, এবং ঐচ্ছিক ব্যবহারের গণনার অংশও হয় না
+• সময় আপনার ফোনেই হিসাব করা হয়। আমরা আপনার অবস্থান কখনও পাই না, এবং তা ঐচ্ছিক ব্যবহারের গণনার অংশও হয় না
+• শহরের নাম অ্যান্ড্রয়েডের নিজস্ব স্থান অনুসন্ধান থেকে আসে, যা বেশিরভাগ ফোনে গুগলকে জিজ্ঞাসা করে (গোপনীয়তা নীতি দেখুন)
 • ক্লাউড ব্যাকআপ ইচ্ছাকৃতভাবে বন্ধ, যাতে ফোন থেকে কিছু অনুলিপি করা না যায়
 
 আপনি যদি অবস্থান একেবারেই ভাগ করতে না চান, শহরের নাম লিখে দিন — অ্যাপ ঠিক একইভাবে কাজ
@@ -410,7 +413,7 @@ SajdaTime: أوقات الصلاة، قبلة
 
 ```
 يخبرك SajdaTime بموعد الصلاة وباتجاه القبلة. هذا كل ما يفعله، بلا إعلانات، وبلا حساب،
-ودون إرسال موقعك إلى أي جهة.
+ودون أن نستلم موقعك أبدًا.
 
 تُحسب أوقات الصلاة على هاتفك نفسه، لذا يظل التطبيق يعمل في الطائرة، أو في قبو، أو دون أي
 تغطية إطلاقًا.
@@ -456,7 +459,8 @@ SajdaTime: أوقات الصلاة، قبلة
 • لا حسابات، ولا تسجيل دخول، ولا عنوان بريد
 • عدّ اختياري للاستخدام تتحكم به من الإعدادات. لا تقارير أعطال
 • موقع تقريبي فقط، يُقرأ والتطبيق مفتوح، ولا يُقرأ في الخلفية أبدًا
-• إحداثياتك لا تغادر جهازك، ولا تدخل أبدًا ضمن العدّ الاختياري للاستخدام
+• تُحسب الأوقات على هاتفك. لا نستلم موقعك أبدًا، ولا يدخل ضمن العدّ الاختياري للاستخدام
+• اسم مدينتك يُجلب عبر خدمة تحديد الأماكن المدمجة في أندرويد، وهي تسأل غوغل في معظم الهواتف (راجع سياسة الخصوصية)
 • النسخ الاحتياطي السحابي معطّل عمدًا حتى لا يُنسخ شيء من هاتفك
 
 وإن كنت تفضّل ألا تشارك موقعك إطلاقًا، فاكتب اسم مدينتك ويعمل التطبيق بالطريقة نفسها.
@@ -494,7 +498,7 @@ SajdaTime: Namaz Vakitleri
 
 ```
 SajdaTime size namaz vaktinin ne zaman girdiğini ve hangi yöne döneceğinizi söyler. Yaptığı
-tek şey budur. Reklamsız, hesapsız ve konumunuzu hiçbir yere göndermeden.
+tek şey budur. Reklamsız, hesapsız ve konumunuzu biz hiç almadan.
 
 Namaz vakitleri doğrudan telefonunuzda hesaplanır, bu yüzden uygulama uçakta, bodrumda ya
 da hiç sinyal yokken bile çalışmaya devam eder.
@@ -540,7 +544,8 @@ uygulama hiçbir şeyle finanse edilmiyor.
 • Hesap yok, giriş yok, e-posta adresi yok
 • Ayarlardan kontrol ettiğiniz isteğe bağlı kullanım sayıları. Çökme raporu yok
 • Yalnızca yaklaşık konum, uygulama açıkken okunur, arka planda asla
-• Koordinatlarınız cihazınızdan hiç çıkmaz ve isteğe bağlı kullanım sayılarına da girmez
+• Vakitler telefonunuzda hesaplanır. Konumunuzu biz hiç almayız ve isteğe bağlı kullanım sayılarına da girmez
+• Şehir adı Android’in kendi yer arama hizmetiyle bulunur, bu hizmet çoğu telefonda Google’a sorar (gizlilik politikasına bakın)
 • Bulut yedeklemesi bilerek kapatılmıştır, telefonunuzdan hiçbir şey kopyalanamaz
 
 Konumunuzu hiç paylaşmak istemiyorsanız şehir adını yazmanız yeterli. Uygulama tamamen aynı
@@ -580,7 +585,7 @@ Heures de prière hors ligne et boussole Qibla. Sans pub ni compte.
 
 ```
 SajdaTime vous indique quand prier et dans quelle direction vous tourner. C'est tout ce
-qu'il fait, sans publicité, sans compte, et sans envoyer votre position où que ce soit.
+qu'il fait, sans publicité, sans compte, et sans jamais recevoir votre position.
 
 Les heures de prière sont calculées sur votre propre téléphone : l'application continue
 donc de fonctionner en avion, dans un sous-sol, ou sans aucun réseau.
@@ -624,8 +629,9 @@ Pas celle-ci.
 • Aucun compte, aucune connexion, aucune adresse e-mail
 • Compteurs d'usage facultatifs que vous contrôlez dans les Réglages. Aucun rapport d'erreur
 • Position approximative uniquement, lue application ouverte, jamais en arrière-plan
-• Vos coordonnées ne quittent jamais votre appareil et ne font jamais partie des compteurs
+• Les heures sont calculées sur votre téléphone. Nous ne recevons jamais votre position, et elle ne fait jamais partie des compteurs
   d'usage facultatifs
+• Le nom de votre ville est trouvé par le service de lieux intégré à Android, qui interroge Google sur la plupart des téléphones (voir la politique de confidentialité)
 • Sauvegarde cloud volontairement désactivée : rien ne peut être copié depuis votre téléphone
 
 Si vous préférez ne pas partager votre position, saisissez un nom de ville :
@@ -665,7 +671,7 @@ SajdaTime: नमाज़ का समय
 
 ```
 SajdaTime आपको बताता है कि नमाज़ का वक़्त कब है और किस दिशा में मुँह करना है। बस इतना ही
-इसका काम है — बिना विज्ञापन, बिना खाते, और आपकी लोकेशन कहीं भेजे बिना।
+इसका काम है — बिना विज्ञापन, बिना खाते, और आपकी लोकेशन कभी प्राप्त किए बिना।
 
 नमाज़ के समय आपके अपने फ़ोन पर ही निकाले जाते हैं, इसलिए यह ऐप हवाई जहाज़ में, तहख़ाने में,
 या बिल्कुल सिग्नल के बिना भी काम करता रहता है।
@@ -711,7 +717,8 @@ SajdaTime आपको बताता है कि नमाज़ का व�
 • कोई खाता नहीं, कोई साइन-इन नहीं, कोई ईमेल पता नहीं
 • वैकल्पिक उपयोग गणना, जिसे आप सेटिंग्स में नियंत्रित करते हैं। कोई क्रैश रिपोर्ट नहीं
 • केवल अनुमानित लोकेशन, वह भी ऐप खुले होने पर, पृष्ठभूमि में कभी नहीं
-• आपके निर्देशांक कभी आपके डिवाइस से बाहर नहीं जाते, और वैकल्पिक उपयोग गणना में भी शामिल नहीं होते
+• समय आपके फ़ोन पर ही निकाले जाते हैं। हम आपकी लोकेशन कभी प्राप्त नहीं करते, और वह वैकल्पिक उपयोग गणना में भी शामिल नहीं होती
+• शहर का नाम Android की अपनी जगह-खोज सेवा से मिलता है, जो ज़्यादातर फ़ोन पर Google से पूछती है (गोपनीयता नीति देखें)
 • क्लाउड बैकअप जानबूझकर बंद है, ताकि आपके फ़ोन से कुछ भी कॉपी न हो सके
 
 अगर आप लोकेशन बिल्कुल साझा नहीं करना चाहते, तो शहर का नाम लिख दीजिए — ऐप बिल्कुल वैसे ही

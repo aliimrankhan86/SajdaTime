@@ -18,7 +18,7 @@
     <string name="permission_title">Di mana Anda salat?</string>
     <string name="permission_body">SajdaTime perlu tahu kira-kira di mana Anda berada untuk menghitung waktu salat dan arah kiblat. Ketuk ikon info untuk melihat apa artinya secara persis.</string>
     <string name="permission_why_title">Mengapa kami perlu lokasi Anda</string>
-    <string name="permission_why_body">Untuk menghitung waktu salat dan arah kiblat yang tepat untuk tempat Anda.\n\nKami hanya memeriksa perkiraan lokasi Anda saat aplikasi terbuka. Lokasi itu tetap di ponsel Anda. Kami tidak pernah mengirimnya ke mana pun.</string>
+    <string name="permission_why_body">Untuk menghitung waktu salat dan arah kiblat yang tepat untuk tempat Anda.\n\nKami hanya memeriksa perkiraan lokasi Anda saat aplikasi terbuka. Waktu salat dihitung di ponsel Anda dan kami tidak pernah menerima lokasi Anda. Untuk menampilkan nama kota Anda, aplikasi bertanya ke layanan pencarian tempat bawaan ponsel Anda. Di sebagian besar ponsel, layanan itu dijawab lewat internet oleh Google.</string>
     <string name="action_allow_location">Izinkan lokasi</string>
     <string name="action_got_it">Mengerti</string>
     <string name="action_understood">Saya mengerti</string>
@@ -28,7 +28,7 @@
     <string name="location_looking_up">Mencari tempat itu…</string>
     <string name="location_no_fix">Lokasi Anda belum bisa ditemukan. Pastikan lokasi aktif, atau ketik kota Anda di bawah.</string>
 
-    <string name="city_fallback_body">Ketik kota Anda saja. Bila bisa, ponsel Anda mencarinya sendiri. Bila tidak bisa, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
+    <string name="city_fallback_body">Ketik kota Anda saja. Nama itu ditanyakan dulu ke layanan pencarian tempat bawaan ponsel Anda, yang di sebagian besar ponsel bertanya ke Google lewat internet. Bila layanan itu tidak bisa menjawab, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
     <string name="city_field_label">Kota</string>
     <string name="city_field_helper">Contoh: Jakarta, Surabaya, Medan</string>
     <string name="city_not_found">Tempat itu tidak ditemukan. Coba tambahkan nama negaranya.</string>
@@ -185,7 +185,7 @@
     <string name="about_disclaimer">Penafian</string>
     <string name="about_disclaimer_short">Alat bantu, bukan otoritas agama. Ketuk untuk membaca.</string>
     <string name="about_privacy">Privasi</string>
-    <string name="about_privacy_desc">Lokasi Anda tetap di ponsel ini. Tanpa akun, tanpa iklan. Data jumlah penggunaan bersifat opsional dan mati kecuali Anda mengaktifkannya. Ketuk untuk membaca kebijakan lengkapnya.</string>
+    <string name="about_privacy_desc">Waktu salat dihitung di ponsel ini dan kami tidak pernah menerima lokasi Anda. Tanpa akun, tanpa iklan. Data jumlah penggunaan bersifat opsional dan mati kecuali Anda mengaktifkannya. Ketuk untuk membaca kebijakan lengkapnya.</string>
 
     <!-- Optional usage counts. -->
     <string name="consent_title">Bantu tingkatkan SajdaTime?</string>

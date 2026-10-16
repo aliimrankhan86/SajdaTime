@@ -147,10 +147,16 @@ session inherits it instead of relearning it.
 - **Never generate, hold, request, or view the release signing key.** It is the owner's
   alone. See `docs/RELEASING.md`. `*.jks`, `*.keystore` and `keystore.properties` are
   gitignored and must never be committed.
-- **Location stays on the device.** Coarse only, foreground only. The device's location is
-  never transmitted: no coordinates are ever sent anywhere. (For a user who has opted in to usage
-  counts, Google estimates an approximate area from their internet connection; the app sends
-  nothing for that.) Cloud backup and device-to-device transfer are both off.
+- **Location stays on the device, and the developer never receives it.** Coarse only, foreground
+  only. The app sends no coordinates to any server of its own or of anyone it chose to call, and
+  the prayer times never need the network. **One caveat, found 16 Oct 2026 and now stated in
+  `docs/privacy.html`:** the town name label comes from Android's `Geocoder`, which the platform
+  documents as possibly network backed, and on phones with Google Play services it is answered by
+  Google. So "never leaves the device" is not true and must not be written again. The app now asks
+  only when it has no label or has moved 5 km (`PlaceLabelPolicy`). The full fix, no network at
+  all, is an offline nearest city list, which is the owner's decision (HANDOVER 5.21). (For a user
+  who has opted in to usage counts, Google estimates an approximate area from their internet
+  connection; the app sends nothing for that.) Cloud backup and device-to-device transfer are both off.
   `docs/privacy.html` is a published promise, so any change that touches data handling has to be
   reflected there in the same commit.
 - **Usage counts are opt in, closed, and never about belief.** Off until the user says yes, with a
