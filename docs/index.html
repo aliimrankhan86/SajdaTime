@@ -3,7 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SajdaTime — Prayer Times and Qibla</title>
+<title>SajdaTime: Offline Prayer Times and Qibla App for Android</title>
+<meta name="description" content="Android prayer times (namaz, salah) and Qibla compass app. Calculated on your phone, works offline, no ads, no accounts. Sunni and Shia. Wear OS.">
+<link rel="canonical" href="https://aliimrankhan86.github.io/SajdaTime/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#14624B">
+<link rel="icon" type="image/png" sizes="512x512" href="store/upload/app-icon/icon-512.png">
+<link rel="apple-touch-icon" href="store/upload/app-icon/icon-512.png">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SajdaTime">
+<meta property="og:locale" content="en_GB">
+<meta property="og:url" content="https://aliimrankhan86.github.io/SajdaTime/">
+<meta property="og:title" content="SajdaTime: Prayer Times and Qibla for Android and Wear OS">
+<meta property="og:description" content="Prayer times and Qibla, calculated on your phone. No ads, no accounts, works offline. Sunni and Shia. Phone and Wear OS.">
+<meta property="og:image" content="https://aliimrankhan86.github.io/SajdaTime/store/upload/feature-graphic/feature-graphic-1024.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="500">
+<meta property="og:image:alt" content="SajdaTime feature graphic">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="SajdaTime: Prayer Times and Qibla for Android and Wear OS">
+<meta name="twitter:description" content="Prayer times and Qibla, calculated on your phone. No ads, no accounts, works offline. Sunni and Shia. Phone and Wear OS.">
+<meta name="twitter:image" content="https://aliimrankhan86.github.io/SajdaTime/store/upload/feature-graphic/feature-graphic-1024.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": [
+    "SoftwareApplication",
+    "MobileApplication"
+  ],
+  "name": "SajdaTime",
+  "alternateName": "SajdaTime: Prayer Times, Qibla",
+  "url": "https://aliimrankhan86.github.io/SajdaTime/",
+  "description": "Free, ad-free, privacy-first Muslim prayer times (namaz, salah) and Qibla compass app for Android and Wear OS. Prayer times are calculated on the device and work offline. Sunni and Shia conventions, a choice of calculation methods, Hijri date, per-prayer alarms and notifications, monthly timetable PDF, two home screen widgets, watch app and tile.",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Android 7.0 or later, Wear OS 3 or later",
+  "installUrl": "https://play.google.com/store/apps/details?id=com.sajdatime.app",
+  "downloadUrl": "https://play.google.com/store/apps/details?id=com.sajdatime.app",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "GBP",
+    "availability": "https://schema.org/InStock"
+  },
+  "inLanguage": [
+    "en",
+    "ur",
+    "tr",
+    "id"
+  ],
+  "featureList": [
+    "Prayer times calculated offline on the device",
+    "Qibla compass corrected to true north",
+    "Sunni (Hanafi, Shafi'i, Maliki, Hanbali) and Shia (Jafari) conventions",
+    "Calculation methods including Muslim World League, ISNA, Umm al-Qura, Karachi and Turkey",
+    "Hijri date",
+    "Notifications and optional alarm mode for each prayer",
+    "Monthly prayer timetable as PDF",
+    "Two home screen widgets",
+    "Wear OS watch app and tile",
+    "No ads, no accounts, and the developer never receives your location"
+  ],
+  "author": {
+    "@type": "Person",
+    "name": "Ali Imran Khan"
+  },
+  "sameAs": [
+    "https://play.google.com/store/apps/details?id=com.sajdatime.app",
+    "https://github.com/aliimrankhan86/SajdaTime"
+  ],
+  "image": "https://aliimrankhan86.github.io/SajdaTime/store/upload/app-icon/icon-512.png",
+  "screenshot": [
+    "https://aliimrankhan86.github.io/SajdaTime/store/upload/phone/01-times-light.png",
+    "https://aliimrankhan86.github.io/SajdaTime/store/upload/phone/02-qibla.png",
+    "https://aliimrankhan86.github.io/SajdaTime/store/upload/phone/04-school-of-thought.png"
+  ],
+  "privacyPolicy": "https://aliimrankhan86.github.io/SajdaTime/privacy.html"
+}
+</script>
 <style>
   :root { color-scheme: light dark; }
   body {
@@ -17,6 +96,14 @@
   li { margin: 8px 0; }
   a { color: #14624b; }
   .links a { display: inline-block; margin: 0 12px; }
+  .install { margin: 0 0 40px; }
+  .button { display: inline-block; padding: 14px 28px; border-radius: 999px; background: #14624B; color: #F0D69A;
+            font-weight: 600; text-decoration: none; font-size: 18px; }
+  .button:hover, .button:focus { background: #0E4F3C; outline: 2px solid #F0D69A; outline-offset: 2px; }
+  .faq { text-align: left; margin: 0 0 40px; }
+  .faq h2 { font-size: 24px; margin: 0 0 12px; }
+  .faq h3 { font-size: 18px; margin: 20px 0 4px; }
+  .faq p { margin: 0; }
   footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid #c9d2cd;
            font-size: 15px; color: #43524b; text-align: left; }
   @media (prefers-color-scheme: dark) {
@@ -24,6 +111,8 @@
     .tag, footer { color: #b4ccc0; }
     footer { border-color: #2a322e; }
     a { color: #7fd1ae; }
+    .button { background: #7fd1ae; color: #101613; }
+    .button:hover, .button:focus { background: #a5e3c8; outline-color: #7fd1ae; }
   }
 </style>
 </head>
@@ -36,7 +125,11 @@
 </svg>
 
 <h1>SajdaTime</h1>
-<p class="tag">Prayer times and Qibla, calculated on your phone.<br>Free, works offline, with no ads and no accounts.</p>
+<p class="tag">Prayer times and Qibla for Android and Wear OS, calculated on your phone.<br>Free, works offline, with no ads and no accounts.</p>
+
+<p class="install">
+  <a class="button" href="https://play.google.com/store/apps/details?id=com.sajdatime.app&amp;referrer=utm_source%3Dsajdatime_site%26utm_medium%3Dweb%26utm_campaign%3Dlanding" rel="noopener">Get it on Google Play</a>
+</p>
 
 <ul>
   <li>The five daily prayers plus sunrise, worked out offline</li>
@@ -50,6 +143,20 @@
   <li>A Wear OS app and tile that work on their own</li>
   <li>In English, Urdu, Turkish and Indonesian</li>
 </ul>
+
+<section class="faq" aria-labelledby="faq-heading">
+  <h2 id="faq-heading">Questions people ask</h2>
+  <h3>Does it work without internet?</h3>
+  <p>Yes. Prayer times and the Qibla are calculated on your phone from your approximate location, so the app works on a plane, underground, or with no signal. Two small things can use the network: the town name shown above the times, which Android looks up, and the optional &ldquo;type a city name&rdquo; feature. The <a href="privacy.html">privacy policy</a> explains both.</p>
+  <h3>Which calculation method does it use?</h3>
+  <p>Thirteen are built in, including Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Singapore, Turkey and the Moonsighting Committee. By default the method follows your school of thought (Muslim World League for Sunni, Jafari for Shia), and you can change it. The Asr rule follows your madhab.</p>
+  <h3>Does it support Shia prayer times?</h3>
+  <p>Yes. Jafari (Ithna Ashari) timings are built in, including the later Maghrib, and each Sunni madhab gets the correct Asr rule.</p>
+  <h3>Is there a watch app?</h3>
+  <p>Yes. The Wear OS app and tile calculate times on the watch itself, so they work with or without the phone nearby.</p>
+  <h3>Why is it free, and what does it collect?</h3>
+  <p>It is given as an ongoing charity. There are no ads, no accounts and no paid tier. The developer never receives your location, because the times are worked out on your phone. Optional usage counts are off until you switch them on, and never include your location, school of thought or settings.</p>
+</section>
 
 <p class="links">
   <a href="privacy.html">Privacy policy</a>
