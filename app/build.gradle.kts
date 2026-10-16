@@ -46,8 +46,13 @@ android {
         // packaged, see the bundle block below) and the Do Not Disturb button finally lists
         // the app (ACCESS_NOTIFICATION_POLICY in the manifest). Phone only: the watch stays
         // 1001 / 1.2.0 and its bundle is never uploaded with a phone release.
-        versionCode = 7
-        versionName = "1.3.2"
+        //
+        // 8 / 1.4.0, 16 Oct 2026: Ramadan pack (card, timetable, PDF, optional suhoor reminder, Eid
+        // greeting) and two home screen widgets. Phone only again: the watch stays 1001 / 1.2.0.
+        // Docs: docs/plans/2026-10-widget-ramadan-tracker/. When the Ramadan content goes live is the
+        // owner's decision (README Amendment 1), not something this number settles.
+        versionCode = 8
+        versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
