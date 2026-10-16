@@ -526,6 +526,28 @@ differs", applies "Match your mosque" minutes to the card, and asks the implemen
 Istanbul times with Diyanet's official page for one date before Ramadan and record the result in
 `docs/HANDOVER.md` section 10, so the owner decides on evidence.
 
+**Result of the comparison with Diyanet's own table, 16 October 2026.** Diyanet's Istanbul page
+(`namazvakitleri.diyanet.gov.tr`, two URLs) returned a server error from the cloud, so the check used a
+Diyanet town page that did load: Ayas, Ankara province, 16 to 18 August 2026 (Diyanet's table first, then the
+engine's TURKEY method at 40.0167 N, 32.3333 E, approximate coordinates so a minute either way is expected).
+
+| Date | Fajr | Sunrise | Dhuhr | Asr | Maghrib | Isha |
+|---|---|---|---|---|---|---|
+| 16 Aug Diyanet | 04:21 | 05:56 | 13:00 | 16:48 | 19:54 | 21:22 |
+| 16 Aug engine | 04:21 | 06:03 | 12:55 | 16:43 | 19:46 | 21:21 |
+| 17 Aug Diyanet | 04:23 | 05:57 | 13:00 | 16:47 | 19:53 | 21:21 |
+| 17 Aug engine | 04:23 | 06:04 | 12:55 | 16:42 | 19:45 | 21:19 |
+| 18 Aug Diyanet | 04:24 | 05:58 | 13:00 | 16:46 | 19:51 | 21:19 |
+| 18 Aug engine | 04:24 | 06:05 | 12:55 | 16:42 | 19:44 | 21:17 |
+
+Fajr equal on all three days, Isha 1 to 2 minutes, Sunrise 7 earlier on Diyanet's table, Dhuhr 5 later, Asr
+4 to 5 later, Maghrib 7 to 8 later. The same pattern as Aladhan's Diyanet output, so the offsets are
+Diyanet's own and the finding above stands: the app's iftar for Turkey is early against the ezan. Suhoor
+(Fajr) is unaffected. Istanbul itself is not measured. The method is unchanged in this branch. Claude's
+recommendation to the owner is to add the offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib
+plus 7) to the TURKEY parameters in a separate commit before Ramadan, with the Istanbul rows of
+`RamadanGoldenTest` and any Turkey assertion moved in that same commit.
+
 ### 9.5 What cannot be known until the engine runs
 
 - The exact "change from yesterday" for days whose previous day is not tabulated (derive, do not pin).
@@ -534,7 +556,7 @@ Istanbul times with Diyanet's official page for one date before Ramadan and reco
 - The device's rendering of the chronometer at font scale 2.0 (device test).
 - Whether `View.setLayoutDirection` is honoured by a given launcher (device test through
   `AppWidgetHost`).
-- Diyanet's own offsets (section 9.4).
+- ~~Diyanet's own offsets (section 9.4)~~ Checked for Ayas on 16 Oct 2026, Istanbul not measured.
 
 ## 10. Open points for the owner (defaults in `README.md`)
 

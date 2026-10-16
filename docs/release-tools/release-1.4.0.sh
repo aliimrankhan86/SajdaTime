@@ -46,9 +46,26 @@ step "1. Push the fix to GitHub"
 if git push -u origin "$BRANCH"; then result push PASS; else result push FAIL; fi
 
 step "2. Switch to the fix"
-if [ -n "$(git status --porcelain)" ]; then
-  result checkout "FAIL (the repo has uncommitted changes, nothing was touched)"
-  touch "$OUT/finished"; exit 1
+# One known leftover is allowed: the planning session left docs/HANDOVER.md and docs/plans/ uncommitted
+# on main. The branch already holds them byte for byte (commit 3140b96). If every changed file is one of
+# those and still identical to that commit, they are put in a labelled git stash (nothing is lost) so the
+# switch can happen. Anything else, or any file that differs, still stops the script untouched.
+PLAN_COMMIT="3140b9606529573eed9ad0e18525e6e166c9658c"
+DIRTY="$(git status --porcelain --untracked-files=all | cut -c4-)"
+if [ -n "$DIRTY" ]; then
+  SAFE=1
+  git cat-file -e "$PLAN_COMMIT^{commit}" 2>/dev/null || SAFE=0
+  while IFS= read -r P; do
+    [ -z "$P" ] && continue
+    case "$P" in docs/HANDOVER.md|docs/plans/*) ;; *) SAFE=0 ;; esac
+    if [ "$SAFE" = 1 ] && ! git show "$PLAN_COMMIT:$P" 2>/dev/null | cmp -s - "$P"; then SAFE=0; fi
+  done <<< "$DIRTY"
+  if [ "$SAFE" = 1 ] && git stash push --include-untracked -m "planning copies, identical to $PLAN_COMMIT on the 1.4.0 branch" >/dev/null; then
+    result stash "PASS (planning files stashed, the branch already has them: git stash list)"
+  else
+    result checkout "FAIL (the repo has uncommitted changes, nothing was touched)"
+    touch "$OUT/finished"; exit 1
+  fi
 fi
 if git switch "$BRANCH"; then result checkout "PASS ($(git rev-parse --short HEAD))"; else result checkout FAIL; touch "$OUT/finished"; exit 1; fi
 

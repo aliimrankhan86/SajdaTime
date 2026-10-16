@@ -1254,8 +1254,16 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    store listing in January. If he chooses later, only the date moves.
 7. **Turkey.** The app's Diyanet method is plain angles and gives iftar about 7 minutes earlier than
    Aladhan's Diyanet output, which appears to carry Diyanet's precaution minutes. Left alone by the
-   plan's default, with the info note and "Match your mosque" as the remedy. Comparing one date with
-   Diyanet's own table and recording the result is still to do (§11).
+   plan's default, with the info note and "Match your mosque" as the remedy. **Compared with Diyanet's
+   own table on 16 Oct 2026 and confirmed:** Diyanet's published times for Ayas (Ankara province) on
+   16, 17 and 18 Aug 2026 carry the precaution minutes. Against the engine's plain angles at the same
+   place, Fajr matches (0 minutes) and Isha is within 2, Sunrise is 7 minutes earlier on Diyanet's table,
+   Dhuhr 5 later, Asr 4 to 5 later and **Maghrib (iftar) 7 to 8 minutes later**. So a user in Turkey
+   comparing the card's iftar with the ezan finds the app early. Suhoor (Fajr) is unaffected. Diyanet's
+   Istanbul page would not load from the cloud (two URLs, both a server error), so Istanbul itself is
+   not measured, only a town whose page did load; the offsets are a property of Diyanet's method, not of
+   the town. Not changed: the plan makes any change to the method an owner decision (§11). Details in
+   `RAMADAN-LOCATION-SPEC.md` section 9.4.
 
 ### 5.20 Widgets: drawn from saved data and moved on by one weak alarm (built 16 Oct 2026 for 1.4.0)
 
@@ -1686,8 +1694,8 @@ Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 3
   reminder in `dumpsys alarm`, the Ramadan stages with the clock moved in four languages, right to
   left (gate 10), and the store screenshots (gate 12). Each is a step of
   `docs/release-tools/release-1.4.0.sh`, which has never been run. Treat every one as unverified.
-- **Still to do:** compare Istanbul's times with Diyanet's own table for one date and record the
-  result here (§5.19 item 7).
+- **Done 16 Oct 2026:** Diyanet's own table compared with the engine for Ayas on three dates, result in
+  §5.19 item 7. Istanbul's own page could not be fetched.
 
 ### 16 Aug 2026 — a session on the owner's S23 Ultra, and what only hardware could say
 
@@ -4655,13 +4663,14 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 **Release A, phone 1.4.0 (`versionCode` 8), is built and unit tested, and has never been run on a device.** It is on branch `claude/1-4-0-ramadan-widgets` in the cloud sandbox. The cloud cannot push to GitHub, so it reaches the owner's repo as a git bundle (lesson 129). It contains the Ramadan pack (card, eve notice, timetable sheet and PDF, suhoor and iftar labels, optional suhoor reminder, Eid greeting) and two home screen widgets: §4, §5.19, §5.20, §6. The gate in the cloud: 323 unit tests (core 114, app 197, wear 12), lint 0 errors, both bundles build, the same 11 permissions, no new dependency, no new analytics event, the app bundle 6,028,577 bytes (§10).
 
-**The two decisions that are the owner's and are not made:**
+**The three decisions that are the owner's and are not made:**
 1. **When 1.4.0 rolls out.** Ramadan 1448 begins on Monday 8 Feb 2027. Claude recommends shipping as soon as the device checks pass, with the Ramadan pack dormant until the eve notice window and the Ramadan store lines added in January, because the alarm scheduler change should be found faulty in November and not in the week Ramadan starts (reasons and evidence: plan README, Amendment 1). He asked to review the emulator captures of every Ramadan stage first and then decide. Nothing is submitted until he does.
 2. **Release B (tracker, 1.5.0)** is not started and does not start until he says so.
+3. **Turkey iftar (plan decision 3), found on 16 Oct 2026, to settle before Ramadan, not before the build.** Diyanet's own table puts Maghrib 7 to 8 minutes after the app's Turkey method (§5.19 item 7), so a Turkish user sees the card's iftar before the ezan. Claude recommends adding Diyanet's offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib plus 7) to the TURKEY method in a separate commit, because early is the dangerous direction for a fast. It moves every Turkish user's prayer alarms and the Istanbul golden rows, so it is his call and it is not in the 1.4.0 branch.
 
 **Left to do, and whose job:**
-- **Owner:** with an emulator (and optionally a phone) available, run `docs/release-tools/release-1.4.0.sh` on his Mac once. It pushes the branch, runs the full gate, builds and verifies the signed bundle, runs the device suite (widgets, the Ramadan card, the suhoor reminder in `dumpsys alarm`, the PDF), moves the emulator clock through the eve, day 1, the last day and both Eid days in four languages with screenshots, and puts the clock back. Review the screenshots. Decide the date. Merge the pull request only when he is ready to submit, because **merging publishes `docs/` through GitHub Pages**, including `privacy.html` (lesson 124 and 137). Press submit himself in Play Console.
-- **Claude:** read the script's results and fix what the device shows. Compare Istanbul's times with Diyanet's own table for one date and record it. Deliver the branch to his repo, walk him through the Play Console one screen at a time (A11 in the plan), re baseline the health check once live, and record the release here.
+- **Owner:** with an emulator (and optionally a phone) available, run `docs/release-tools/release-1.4.0.sh` on his Mac once. It pushes the branch, runs the full gate, builds and verifies the signed bundle, runs the device suite (widgets, the Ramadan card, the suhoor reminder in `dumpsys alarm`, the PDF), moves the emulator clock through the eve, day 1, the last day and both Eid days in four languages with screenshots, and puts the clock back. Review the screenshots. Decide the date. Merge the pull request only when he is ready to submit, because **merging publishes `docs/` through GitHub Pages**, including `privacy.html` (lesson 124 and 137). Press submit himself in Play Console. Step 2 of the script stashes `docs/HANDOVER.md` and `docs/plans/` if they are the uncommitted planning copies left on his `main` (it checks each is identical to commit 3140b96 on the branch, and stops untouched on any other change). The stash stays in `git stash list` and can be dropped once the branch is merged.
+- **Claude:** read the script's results and fix what the device shows. Deliver the branch to his repo, walk him through the Play Console one screen at a time (A11 in the plan), re baseline the health check once live, and record the release here.
 - **Held until January, by decision:** the Ramadan lines of the store listing (`docs/store/LISTING.md` carries the Release A text with the Ramadan lines marked held). The widgets line and the language line can go in with the release.
 - **Known unknowns the device run decides:** whether the desugared Hijri table matches `java.time` on API 24 to 33 (lesson 136), how the widgets look in a real launcher, whether the PDF spacing is right in Android's `PdfDocument`, and whether anything in the Ramadan card clips at a large font.
 
