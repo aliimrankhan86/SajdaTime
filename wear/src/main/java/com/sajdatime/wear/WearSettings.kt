@@ -2,9 +2,11 @@ package com.sajdatime.wear
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -18,7 +20,13 @@ import com.sajdatime.core.Sect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sajdatime_wear")
+// An unreadable settings file becomes an empty one, so the watch shows "set up on your phone"
+// again instead of crashing on open and at every tile refresh. The phone re-sends everything
+// on its next sync. Same reasoning and same handler as the phone: see SettingsRepository.
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "sajdatime_wear",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+)
 
 /**
  * The watch's own copy of the settings that affect calculation.

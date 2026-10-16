@@ -56,7 +56,12 @@ class CityLookup(private val context: Context) {
             Geocoder(context, AppLocale.of(context))
                 .getFromLocationName(query, 1)
                 ?.firstOrNull()
-                ?.let { Result(city = it.describeAddress(query), coordinates = Coordinates(it.latitude, it.longitude)) }
+                ?.let { address ->
+                    // Same range check as every other pair that enters the app from outside.
+                    Coordinates.orNull(address.latitude, address.longitude)?.let { coordinates ->
+                        Result(city = address.describeAddress(query).capped(), coordinates = coordinates)
+                    }
+                }
         }.getOrNull()
     }
 
@@ -84,10 +89,13 @@ class CityLookup(private val context: Context) {
             connection.connectTimeout = TIMEOUT_MS
             connection.readTimeout = TIMEOUT_MS
             connection.requestMethod = "GET"
+            // One fixed HTTPS host. A redirect is not expected, so one is treated as a
+            // failure rather than followed to somewhere the app never chose.
+            connection.instanceFollowRedirects = false
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 throw IOException("HTTP ${connection.responseCode}")
             }
-            connection.inputStream.bufferedReader().use { it.readText() }
+            connection.inputStream.bufferedReader().use { readCapped(it, MAX_BODY_CHARS) }
         } finally {
             connection.disconnect()
         }
@@ -95,6 +103,30 @@ class CityLookup(private val context: Context) {
 
     internal companion object {
         private const val TIMEOUT_MS = 12_000
+
+        /**
+         * A `count=1` answer is well under a kilobyte. Anything past this is not a city, and
+         * reading it all into memory is the only thing an unbounded response could do to us.
+         */
+        internal const val MAX_BODY_CHARS = 64 * 1024
+
+        /** A place name longer than this is not a place name. Also bounds the PDF masthead. */
+        internal const val MAX_CITY_CHARS = 80
+
+        internal fun String.capped(): String = take(MAX_CITY_CHARS)
+
+        /** Reads at most [max] characters, and fails (rather than truncates) on more. */
+        internal fun readCapped(reader: java.io.Reader, max: Int): String {
+            val out = StringBuilder()
+            val buffer = CharArray(4096)
+            while (true) {
+                val read = reader.read(buffer)
+                if (read < 0) break
+                out.append(buffer, 0, read)
+                if (out.length > max) throw IOException("response too large")
+            }
+            return out.toString()
+        }
 
         /**
          * Kept separate from the request, and free of any Android type, so the parsing
@@ -108,13 +140,15 @@ class CityLookup(private val context: Context) {
                 city = listOfNotNull(
                     first.optString("name").takeIf { it.isNotBlank() },
                     first.optString("country").takeIf { it.isNotBlank() },
-                ).joinToString(", ").ifBlank { fallbackName },
-                coordinates = Coordinates(
-                    // getDouble throws when absent, which is what we want: no coordinates
-                    // means no result, never a silent fallback to zero, zero.
-                    latitude = first.getDouble("latitude"),
-                    longitude = first.getDouble("longitude"),
-                ),
+                ).joinToString(", ").ifBlank { fallbackName }.capped(),
+                // getDouble throws when absent, which is what we want: no coordinates means
+                // no result, never a silent fallback to zero, zero. orNull then rejects a
+                // pair outside -90..90 and -180..180 (and NaN) like every other writer the
+                // app does not control, so a bad answer is a miss, not a stored location.
+                coordinates = Coordinates.orNull(
+                    first.getDouble("latitude"),
+                    first.getDouble("longitude"),
+                ) ?: return null,
             )
         }.getOrNull()
     }

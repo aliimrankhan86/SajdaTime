@@ -11,6 +11,7 @@ import com.sajdatime.core.EidDay
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
@@ -201,7 +202,17 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 return@launch
             }
-            val city = locationRepository.cityName(coordinates)
+            // The town name is a label, not an input to any calculation, and asking for it
+            // can send the approximate position to the phone's geocoding provider (Google,
+            // on most phones). So ask only when there is no label yet or the phone has moved
+            // far enough that the old one could be wrong, not on every foreground visit.
+            // The coordinates themselves are always stored fresh. See PlaceLabelPolicy.
+            val before = _state.value.settings
+            val city = if (PlaceLabelPolicy.needsNewLabel(before.coordinates, before.cityName, coordinates)) {
+                locationRepository.cityName(coordinates)
+            } else {
+                before.cityName
+            }
             settingsRepository.setLocation(coordinates, city)
             _state.update { it.copy(resolvingLocation = false, problem = null) }
         }

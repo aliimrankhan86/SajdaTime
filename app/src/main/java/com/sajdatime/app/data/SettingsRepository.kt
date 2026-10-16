@@ -2,10 +2,12 @@ package com.sajdatime.app.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,7 +23,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sajdatime")
+/**
+ * A settings file that cannot be parsed becomes an empty one.
+ *
+ * DataStore's default is to rethrow on every read, and a read happens at the top of every
+ * receiver and every launch. One unreadable file (a full disk during a write, a bad flash
+ * block: rare, because DataStore writes atomically, but not impossible) would then crash the
+ * app on open and crash the alarm receiver at every prayer, silently, with no crash reporting
+ * to say so. Starting again from defaults costs the user a repeat of setup. Every field below
+ * already has a default for exactly this case. Tested in SettingsCorruptionTest.
+ */
+internal fun settingsCorruptionHandler(): ReplaceFileCorruptionHandler<Preferences> =
+    ReplaceFileCorruptionHandler { emptyPreferences() }
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "sajdatime",
+    corruptionHandler = settingsCorruptionHandler(),
+)
 
 /**
  * How a prayer time announces itself.

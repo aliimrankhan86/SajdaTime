@@ -1300,6 +1300,48 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
 
 ---
 
+### 5.21 Security and visibility pass (16 Oct 2026, branch `claude/security-and-visibility`, not in 1.4.0 as built)
+
+A read only audit by a second model (report kept in the session scratchpad, findings re-checked
+against the code here before acting) found no critical or high issue and one medium. What was
+done, what was refused, and why:
+
+1. **The town name asks Android's geocoder only when it has to.** `LocationRepository.cityName`
+   calls `Geocoder.getFromLocation`. Android documents that the answer "may be obtained by means of
+   a network lookup", and on a phone with Google Play services it usually is, so each call handed the
+   phone's approximate position to the geocoding provider. `refreshLocation` made that call on every
+   foreground visit. It now goes through `PlaceLabelPolicy.needsNewLabel` (core, pure, tested): ask
+   only when there is no label, or the new fix is 5 km or more from the last stored one. The
+   coordinates are always stored fresh, because they drive the times; only the cosmetic label is
+   held. **Accepted trade-offs, on purpose:** (a) the comparison is against the last stored position,
+   so hops under 5 km can keep a label a little longer than 5 km from where it was fetched; (b) after
+   the user changes the app language the label stays in the old language until they move 5 km or
+   have no label. Both are cosmetic. The rejected alternative was storing the position and language
+   the label was fetched at: more state for a label.
+   **Not fixed here:** the lookup still exists, and the wording that said it did not happen is
+   corrected in the next commit. The proper fix (no network at all) is an offline nearest city
+   dataset, which is the owner's decision (size, licence, and whether a label is worth it).
+2. **A corrupt settings file reads as first run instead of crashing.** Both DataStores
+   (`SettingsRepository`, `WearSettings`) now have a `ReplaceFileCorruptionHandler { emptyPreferences() }`.
+   Before, DataStore rethrew from every read, and a read is the first line of every receiver and
+   every launch. `SettingsCorruptionTest` writes random bytes to a temp file; it was run with the
+   handler removed and fails, so it tests the handler and not the happy path.
+   **Rejected:** wrapping the receiver bodies in `runCatching`. A crash in a receiver is visible
+   in Play's Android vitals, which is this project's only crash signal (no crash reporting library),
+   and swallowing it would turn a visible fault into silent missed alerts. The corruption case,
+   the realistic trigger, is now handled at its source, and `DailyRescheduleWorker` is the safety
+   net for a broken chain.
+3. **The typed city lookup trusts the network response less.** `CityLookup` no longer follows
+   redirects, reads at most 64 KB, range checks the coordinates with `Coordinates.orNull` (a
+   latitude of 999 is a miss, not a stored location), and caps the place name at 80 characters
+   (it is drawn in the PDF masthead and sent to the watch). `CityLookupParseTest` covers all three.
+   Needs a compromised Open-Meteo or a mis-issued certificate to matter, so this is hardening.
+4. `QiblaEngine.distanceKm(a, b)` is the haversine generalised to two points. `distanceToKaabaKm`
+   delegates to it, and its existing tests are unchanged.
+
+**Not tested:** none of this has run on a device. The label throttle is unit tested as a pure
+function. The view model wiring is not covered by a test.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
