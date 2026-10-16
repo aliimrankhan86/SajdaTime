@@ -122,7 +122,12 @@ if echo "$VERIFY" | grep "jar verified" >/dev/null; then
   SIZE="$(wc -c < "$AAB" | tr -d ' ')"
   if [ "$SIZE" -le 6079975 ]; then result bundle-size "PASS ($SIZE bytes, 1.3.2 was 5779975)"; else result bundle-size "FAIL ($SIZE bytes, more than 300 KB over 1.3.2)"; fi
   git fetch -q origin main 2>/dev/null
-  if [ -z "$(git diff origin/main --stat -- wear/)" ]; then result watch-untouched "PASS (nothing under wear/ differs from main)"; else result watch-untouched "FAIL (wear/ differs from main)"; fi
+  # The watch is its own Play release and is not part of this one. What must hold is that its version is
+  # unchanged. On the security and visibility branch two files under wear/ do differ from main on purpose
+  # (settings corruption recovery, and the signing values option), and they ship with the next watch release.
+  WEAR_VER="$(git diff origin/main -- wear/build.gradle.kts | grep -E '^[+-][[:space:]]*(versionCode|versionName)')"
+  WEAR_FILES="$(git diff origin/main --name-only -- wear/ | tr '\n' ' ')"
+  if [ -z "$WEAR_VER" ]; then result watch-untouched "PASS (watch version unchanged, no watch update in this release; files under wear/ that differ from main and wait for the next watch release: ${WEAR_FILES:-none})"; else result watch-untouched "FAIL (the watch version changed: $WEAR_VER)"; fi
 else
   if [ "$GATE" = fail ]; then result bundle "FAIL (not built, because the gate above failed)"
   else result bundle "FAIL (no signed bundle: is keystore.properties in the repo root, or are the sajdatime.* values in ~/.gradle/gradle.properties?)"; fi
