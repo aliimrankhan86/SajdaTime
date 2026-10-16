@@ -90,20 +90,36 @@ Ramadan on short phones. The widget countdown's digits follow the phone's langua
 
 ## Decisions on Release B (16 October 2026)
 
-The owner answered four questions about the tracker. They override `PLAN.md` section 7 (B1, B3, B4, B6),
+The owner answered four questions about the tracker, then added the Pause idea and asked about analytics. They override `PLAN.md` section 7 (B1, B3, B4, B6),
 `TEST-AND-RECORD.md` section 2.3 and the one screen summary above where they differ.
 
 1. **Streak: hidden until switched on.** The Settings switch "Show streak" is off by default.
-2. **Excused days: dropped.** His words: "Lets not complicate it", and the option might make female users
-   uncomfortable. So `DayRecord` loses the excused bit (bit 5 stays reserved and is ignored on load, so a
-   later version can use it), `TickState` loses `EXCUSED`, and the excused control, its strings and its
-   tests are not built. **Consequence Claude flagged:** a consecutive streak breaks on any day with a missing
-   tick, including days someone could not pray. **Default applied unless he says otherwise:** the number
-   shown when the streak is switched on is "days with all five ticked in the last 30", which has no
-   consecutive rule and no penalty for a gap. `TrackerLogic.streak` becomes that count.
+2. **Excused days: dropped, replaced by a Pause (the owner's idea, same day).** First answer: "Lets not
+   complicate it", and the option might make female users uncomfortable. Then he proposed: when someone
+   cannot pray (for example during a period), they pause the tracker, the streak stops where it is, and
+   when they resume it carries on unbroken. That is adopted because it needs no label and no reason, so it
+   is neutral and also covers illness and travel. How it works:
+   - A **Pause tracking** action in the tracker's Settings group, and a one line "Tracking is paused. Resume"
+     on the Times screen while it is on, so it is not forgotten. No reason is asked or stored.
+   - It is **not** the "Show streak" switch. That one only shows or hides the number. If hiding paused the
+     streak, everyone on the default (hidden) would be paused.
+   - Stored as date ranges (start date, and an end date once resumed), not a flag per day, so nothing needs
+     to be opened each day. The pause can start today or yesterday, so someone who notices a day late is not
+     penalised. Resuming makes today a normal tracked day.
+   - The history sheet shows paused days as "Paused" and nothing else. The streak skips them: they neither
+     add to it nor break it. A consecutive streak therefore stays the measure (the "last 30 days" count
+     Claude proposed earlier is withdrawn).
+   - Code: `DayRecord` has no excused bit (bit 5 stays reserved and is ignored on load), `TickState` has no
+     `EXCUSED` (a paused day is `PAUSED`), `TrackerLogic.streak` takes the pause ranges, the save file
+     carries the ranges, and `TEST-AND-RECORD.md` 2.3 gains cases for a pause that bridges, an open ended
+     pause, a same day resume, a one day back start, adjacent and overlapping ranges, and a year boundary.
 3. **Phase B of the tracker (missed prayer counter, notification action, widget tick): not planned.** Keep
    it simple.
-4. **Timing: delegated to Claude ("I trust you will make the best and appropriate decision").** Order: the
+4. **Analytics and personal details: none added.** The tracker collects no details, has no account, and
+   adds nothing to the opt-in usage counts (ticks, pauses and streaks are faith practice data and never
+   leave the phone). How well it is used is read from Play Console's own aggregate numbers (installs,
+   retention, crashes) and the existing opt-in screen counts. Revisit only if he asks for a measure.
+5. **Timing: delegated to Claude ("I trust you will make the best and appropriate decision").** Order: the
    1.4.0 alarm scheduler change goes first and is proven in the field. Release B starts when 1.4.0 has been
    live for about two weeks with a clean health check, and aims to be live by mid December 2026. No release
    from 18 January to 9 March 2027 (the three weeks before Ramadan 1448, 8 Feb to 8 Mar, and Ramadan itself)
