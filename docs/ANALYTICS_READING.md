@@ -14,7 +14,7 @@ Never quote a Firebase number as "how many users I have". Say "of the people who
 
 ## Play Console first: the numbers that need no consent (monthly, 10 minutes)
 
-Since 16 Oct 2026 a scheduled task does this for you on the 2nd of each month and writes the row to the Claude Doc "SajdaTime monthly numbers" (trigger `trig_01AzcQUNWSkgGmdJmNXkaQoD`, runs on the owner's Mac, read only). The table below is the format it follows and the way to do it by hand if the task could not run.
+Since 16 Oct 2026 a scheduled task does this for you on days 2 to 9 of each month (around midday UK time, retrying until the month has its row) and writes the row to the Claude Doc "SajdaTime monthly numbers" (trigger `trig_01AzcQUNWSkgGmdJmNXkaQoD`, runs on the owner's Mac, read only). The table below is the format it follows and the way to do it by hand if the task could not run.
 
 Play Console counts everyone, with no opt in and no privacy cost, so use it for the headcount questions. Each month, open
 **Statistics** and write one row in the table below (copy the last row):
