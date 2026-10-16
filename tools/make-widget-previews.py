@@ -67,31 +67,33 @@ def finish(img, name, out_dir):
 
 
 def next_prayer(out_dir):
-    img, d = card(110, 110)
-    text(d, 12, 12, "Next prayer", font(FONT, 11), ON_VARIANT)
-    text(d, 12, 28, "Asr", font(FONT_BOLD, 20), ON_SURFACE)
-    text(d, 12, 56, "2:56 pm", font(FONT, 18), ON_SURFACE)
-    text(d, 12, 82, "1h 20m", font(FONT, 14), PRIMARY)
+    # 3 x 2 cells at its smallest (180 x 110 dp): name, time, and the countdown as the Chronometer
+    # shows it (h:mm:ss). No context line, because an ordinary afternoon has none.
+    img, d = card(180, 110)
+    text(d, 14, 10, "Asr", font(FONT_BOLD, 20), ON_SURFACE)
+    text(d, 14, 38, "2:56 pm", font(FONT, 16), ON_SURFACE)
+    text(d, 14, 62, "1:20:00", font(FONT, 14), PRIMARY)
     finish(img, "widget_preview_next.png", out_dir)
 
 
 def today(out_dir):
+    # 4 x 3 cells at its smallest (250 x 180 dp). Six rows from the top, no header: the highlighted
+    # row says which prayer is next, and the first row starts 8 dp down, as in the layout.
     img, d = card(250, 180)
-    text(d, 16, 14, "Next: Asr at 2:56 pm", font(FONT_BOLD, 13), PRIMARY)
-    text(d, 234, 14, "1h 20m", font(FONT, 13), PRIMARY, anchor="ra")
-    d.line((px(16), px(36), px(234), px(36)), fill=OUTLINE, width=int(px(1)))
     rows = [("Fajr", "5:10 am"), ("Sunrise", "7:01 am"), ("Dhuhr", "12:15 pm"),
             ("Asr", "2:56 pm"), ("Maghrib", "5:28 pm"), ("Isha", "7:13 pm")]
-    y = 41
+    y = 8
+    row_h = 21.7
     for name, t in rows:
-        row_h = 21
         dim = name == "Sunrise"
         colour = ON_VARIANT if dim else ON_SURFACE
-        if name == "Asr":
+        bold = name == "Asr"
+        if bold:
             d.rounded_rectangle((px(8), px(y), px(242), px(y + row_h)), radius=px(8), fill=HIGHLIGHT)
-            text(d, 70, y + 4, "Next", font(FONT, 10), ON_VARIANT)
-        text(d, 16, y + 3, name, font(FONT, 13), colour)
-        text(d, 234, y + 3, t, font(FONT, 13), colour, anchor="ra")
+            text(d, 74, y + 5, "Next", font(FONT, 10), ON_VARIANT)
+        f = font(FONT_BOLD if bold else FONT, 13)
+        text(d, 16, y + 3.5, name, f, colour)
+        text(d, 234, y + 3.5, t, f, colour, anchor="ra")
         y += row_h
     finish(img, "widget_preview_today.png", out_dir)
 

@@ -349,10 +349,7 @@
     <string name="widget_today_label">SajdaTime: آج کی نمازیں</string>
     <string name="widget_next_desc">اگلی نماز اور اس کا وقت، الٹی گنتی کے ساتھ۔ آپ کے فون کے ڈارک موڈ کے مطابق۔</string>
     <string name="widget_today_desc">آج کے چھ اوقات، اگلی نماز نمایاں۔ آپ کے فون کے ڈارک موڈ کے مطابق۔</string>
-    <string name="widget_next_prayer">اگلی نماز</string>
     <string name="widget_tomorrow">کل</string>
-    <string name="widget_next_line">اگلی: %1$s %2$s پر</string>
-    <string name="widget_next_line_tomorrow">کل: %1$s %2$s پر</string>
     <string name="widget_no_location">اپنا مقام سیٹ کرنے کے لیے SajdaTime کھولیں</string>
     <string name="widget_a11y_next">اگلی نماز %1$s %2$s پر، %3$s میں</string>
     <string name="widget_a11y_next_tomorrow">اگلی نماز کل، %1$s %2$s پر، %3$s میں</string>

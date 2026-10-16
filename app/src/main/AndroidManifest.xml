@@ -115,6 +115,36 @@
             </intent-filter>
         </receiver>
 
+        <!--
+          The two home screen widgets. exported="false" is what the current Android Studio template
+          generates: the system, not another app, sends APPWIDGET_UPDATE. ASSUMED until the widget
+          device test has run on the API 36 emulator; if a provider is never updated there, flip it to
+          true and record why. updatePeriodMillis is 0 in both provider files on purpose.
+        -->
+        <receiver
+            android:name=".widget.NextPrayerWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_prayer_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.TodayWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_today_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_today_info" />
+        </receiver>
+
         <receiver
             android:name=".notify.SystemEventReceiver"
             android:enabled="true"

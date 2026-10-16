@@ -44,6 +44,26 @@ class WidgetResourcesTest {
         }
     }
 
+    /**
+     * RemoteViews can inflate only a short list of classes, and a launcher shows "Problem loading
+     * widget" for the whole widget if one other is used. A plain View is the classic one, and the first
+     * version of the Today layout used it for its divider. Found by rendering the layout under
+     * Robolectric, not by reading it: nothing on the JVM, in lint or in the build objects to it.
+     * The list is the one in the RemoteViews documentation, trimmed to what could plausibly be added.
+     */
+    @Test
+    fun `layouts use only classes a RemoteViews may inflate`() {
+        val allowed = setOf(
+            "LinearLayout", "FrameLayout", "RelativeLayout", "GridLayout", "TextView", "Chronometer",
+            "ImageView", "ImageButton", "Button", "ProgressBar", "TextClock", "AnalogClock", "ViewFlipper",
+            "ListView", "GridView", "StackView", "AdapterViewFlipper", "ViewStub",
+        )
+        for (layout in layouts) {
+            val used = Regex("""<([A-Za-z.]+)\b""").findAll(withoutComments(read(layout))).map { it.groupValues[1] }.toSet()
+            assertEquals("$layout uses a class RemoteViews cannot inflate", emptySet<String>(), used - allowed)
+        }
+    }
+
     @Test
     fun `every text view and chronometer is hidden from accessibility and says which edge it aligns to`() {
         for (layout in layouts) {
@@ -66,11 +86,11 @@ class WidgetResourcesTest {
     @Test
     fun `each layout has the ids the renderer sets`() {
         val next = read("layout/widget_next_prayer.xml")
-        for (id in listOf("widget_root", "widget_label", "widget_name", "widget_time", "widget_sublabel", "widget_countdown")) {
+        for (id in listOf("widget_root", "widget_name", "widget_time", "widget_sublabel", "widget_countdown")) {
             assertTrue("next prayer lacks $id", next.contains("""@+id/$id""""))
         }
         val today = read("layout/widget_today.xml")
-        val ids = mutableListOf("widget_root", "widget_next_line", "widget_countdown", "widget_footer")
+        val ids = mutableListOf("widget_root", "widget_message", "widget_footer")
         for (slot in listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")) {
             ids += listOf("widget_row_$slot", "widget_name_$slot", "widget_label_$slot", "widget_time_$slot")
         }
@@ -115,7 +135,9 @@ class WidgetResourcesTest {
     @Test
     fun `the sizes are the ones the layouts were designed for`() {
         val next = read("xml/widget_next_prayer_info.xml")
-        assertTrue(next.contains("""android:targetCellWidth="2"""") && next.contains("""android:targetCellHeight="2""""))
+        assertTrue(next.contains("""android:targetCellWidth="3"""") && next.contains("""android:targetCellHeight="2""""))
+        // Neither widget may be resized below the size its content was drawn for.
+        assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minResizeHeight="110dp""""))
         val today = read("xml/widget_today_info.xml")
         assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
         // The Today widget must never be resizable below the height its six rows need.
@@ -136,7 +158,7 @@ class WidgetResourcesTest {
     @Test
     fun `every widget string exists in all four languages`() {
         val names = Regex("""<string name="(widget_[a-z0-9_]+)"""").findAll(read("values/strings.xml")).map { it.groupValues[1] }.toList()
-        assertEquals(15, names.size)
+        assertEquals(12, names.size)
         for (language in languages) {
             val strings = read("$language/strings.xml")
             for (name in names) assertTrue("$language lacks $name", strings.contains("""name="$name""""))

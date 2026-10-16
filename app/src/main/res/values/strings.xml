@@ -557,10 +557,7 @@
     <string name="widget_today_label">SajdaTime: today\'s prayers</string>
     <string name="widget_next_desc">The next prayer and its time, with a countdown. Follows your phone\'s dark mode.</string>
     <string name="widget_today_desc">All six times for today with the next one marked. Follows your phone\'s dark mode.</string>
-    <string name="widget_next_prayer">Next prayer</string>
     <string name="widget_tomorrow">Tomorrow</string>
-    <string name="widget_next_line">Next: %1$s at %2$s</string>
-    <string name="widget_next_line_tomorrow">Tomorrow: %1$s at %2$s</string>
     <string name="widget_no_location">Open SajdaTime to set your location</string>
     <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining such as "1h 20m". -->
     <string name="widget_a11y_next">Next prayer %1$s at %2$s, in %3$s</string>

@@ -339,10 +339,7 @@
     <string name="widget_today_label">SajdaTime: salat hari ini</string>
     <string name="widget_next_desc">Salat berikutnya dan waktunya, dengan hitung mundur. Mengikuti mode gelap ponsel Anda.</string>
     <string name="widget_today_desc">Enam waktu hari ini dengan yang berikutnya ditandai. Mengikuti mode gelap ponsel Anda.</string>
-    <string name="widget_next_prayer">Salat berikutnya</string>
     <string name="widget_tomorrow">Besok</string>
-    <string name="widget_next_line">Berikutnya: %1$s pukul %2$s</string>
-    <string name="widget_next_line_tomorrow">Besok: %1$s pukul %2$s</string>
     <string name="widget_no_location">Buka SajdaTime untuk mengatur lokasi Anda</string>
     <string name="widget_a11y_next">Salat berikutnya %1$s pukul %2$s, dalam %3$s</string>
     <string name="widget_a11y_next_tomorrow">Salat berikutnya besok, %1$s pukul %2$s, dalam %3$s</string>

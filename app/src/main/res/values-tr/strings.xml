@@ -343,10 +343,7 @@
     <string name="widget_today_label">SajdaTime: bugünün namazları</string>
     <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla. Telefonunuzun koyu temasına uyar.</string>
     <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli. Telefonunuzun koyu temasına uyar.</string>
-    <string name="widget_next_prayer">Sonraki namaz</string>
     <string name="widget_tomorrow">Yarın</string>
-    <string name="widget_next_line">Sonraki: %1$s %2$s</string>
-    <string name="widget_next_line_tomorrow">Yarın: %1$s %2$s</string>
     <string name="widget_no_location">Konumunuzu ayarlamak için SajdaTime\'ı açın</string>
     <string name="widget_a11y_next">Sonraki namaz %1$s, saat %2$s, %3$s sonra</string>
     <string name="widget_a11y_next_tomorrow">Sonraki namaz yarın, %1$s, saat %2$s, %3$s sonra</string>
