@@ -4430,6 +4430,21 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 16 Oct 2026 (read this block first, then the 13 Oct block below for the release facts)
+
+**Live state is unchanged from 13 Oct 2026:** phone 1.3.2 (`versionCode` 7) and watch 1.2.0 (`versionCode` 1001). **Nothing is built and no code has changed.** The owner has asked for new work and has approved planning only, so the "start nothing new until he asks" line in the 13 Oct block is superseded for the work below and for nothing else.
+
+**What was decided on 16 Oct 2026:** a competitor analysis (Muslim Pro, Athan, Pillars, Al-Azan, GoSolat) ranked three features SajdaTime lacks. In order of evidence: home screen widgets, a daily prayer tracker kept on the device, and a Ramadan pack based on the user's own location. The analysis is the Claude Doc "SajdaTime competitor analysis and top 3 features" (https://claude.ai/code/artifact/9e8e4d57-085d-4cb9-bb83-5e9c2a37b93e). Its limits are stated in it: small review samples, no Reddit evidence, competitor blogs not used as evidence of demand.
+
+**Where the plan is:** `docs/plans/2026-10-widget-ramadan-tracker/`. Read its `README.md` first. It holds the master plan (`PLAN.md`), the location based Ramadan design with golden values (`RAMADAN-LOCATION-SPEC.md`), the wording and store listing audit with all new strings in four languages (`WORDING-AND-LISTING.md`), the test and recording plan (`TEST-AND-RECORD.md`) and two paste ready Claude Code prompts (`SESSION-PROMPTS.md`). The plan corrects several assumptions in the first draft, listed in its README.
+
+**The release split:** Release A, phone 1.4.0 (`versionCode` 8): Ramadan pack first, then the two widgets. Ramadan 1448 is expected to begin on Monday 8 Feb 2027 on the Umm al-Qura calendar (checked with JDK 21 `java.time`), so the plan targets a pull request ready by early January 2027. Release B, phone 1.5.0 (`versionCode` 9): the tracker, kept separate for its privacy policy change. The watch is not changed and its bundle is never uploaded with a phone release.
+
+**Left to do, and whose job:**
+- **Owner:** say "go" with Release A or Release B to start building. Review and merge each pull request. Press Play Console submit and publish. Publish the updated privacy policy with Release B. Three decisions are listed in the plan README, each with a default he can ignore.
+- **Claude, when told to go:** follow `SESSION-PROMPTS.md`, run the gate in `TEST-AND-RECORD.md`, and record the result here, in the store docs and in the privacy policy as that file says.
+- **Existing wording that the audit found stale or wrong** (README "English only", stale LISTING.md notes, LISTING-LOCALES.md gaps, this file's section 5.11, 9 and 11, the RELEASING.md version line) is listed in `WORDING-AND-LISTING.md` with corrected text. None of it has been changed yet.
+
 ### 📍 STATE OF PLAY, 13 Oct 2026 (read this block first, it replaces every older STATE OF PLAY)
 
 **SajdaTime is finished and parked.** Everything is live and nothing is waiting with Google.
