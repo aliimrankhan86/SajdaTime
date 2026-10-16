@@ -27,9 +27,10 @@ buttons. Read the files in this order.
 on Monday 8 February 2027 on the Umm al-Qura calendar (verified with `java.time` `HijrahChronology`, see
 `RAMADAN-LOCATION-SPEC.md` section 3). The pack has a hard date and the widgets reuse its shared Hijri
 code, so they ship together. Inside the release the Ramadan tasks come first so that, if time runs out, the
-pack can ship as 1.4.0 on its own and the widgets as 1.4.1 without reordering any work. Target: pull
-request ready by 10 January 2027, so a Play review that takes a week still lands before 1 Ramadan and
-leaves room for one correction release.
+pack can ship as 1.4.0 on its own and the widgets as 1.4.1 without reordering any work. Target (amended 16 October 2026, see Amendment 1): release as soon as the gate passes, aiming for
+November 2026, with the Ramadan pack dormant until a week before Ramadan. The original target of a pull
+request ready by 10 January 2027 is dropped because the alarm scheduler change should have months of real
+use before Ramadan, not days.
 
 **Release B, phone 1.5.0, versionCode 9: the prayer tracker, phase A only.** No deadline, the most design
 and privacy risk, a privacy policy change, a second DataStore file and the system file picker. Kept apart so
@@ -73,7 +74,7 @@ otherwise. Wear strings stay English. `bundle.language.enableSplit` stays false.
 uploaded with a phone release. Claude never pushes to `main` and never presses submit, publish or merge.
 UK English, no em dashes, no en dashes, no semicolons in anything user facing or in these documents.
 
-## Three decisions for the owner (each has a default, so he can ignore them)
+## Four decisions for the owner (each has a default, so he can ignore them)
 
 | # | Decision | Default, applied unless he says otherwise |
 |---|---|---|
@@ -81,9 +82,58 @@ UK English, no em dashes, no en dashes, no semicolons in anything user facing or
 | 2 | How Ramadan's start is decided for a user | No country table. Umm al-Qura plus the user's own date shift, an eve notice that points to the shift, an info note that says what the app does and does not decide (`RAMADAN-LOCATION-SPEC.md` section 6) |
 | 3 | Turkey: the app's Diyanet method is plain angles and gives iftar about 7 minutes earlier than Aladhan's Diyanet output, which appears to carry Diyanet's precaution minutes | Leave the method alone, rely on the note and "Match your mosque", and have the implementer compare one date with Diyanet's own table and record the result (`RAMADAN-LOCATION-SPEC.md` section 9.4). Any change to the method is a separate, owner approved commit |
 
+| 4 | When Ramadan shows up in the app, and when it is rolled out | Amendment 1 below. Code ships as soon as it passes the gate. Nothing about Ramadan appears on Home until 7 days before the start. Ramadan is added to the store listing in early January, not in the 1.4.0 release notes |
+
 Stated defaults that are not decisions: widget previews below Android 12 are two small PNGs captured from
 the emulator (the first raster assets in the app, under 30 KB each). The Times screen scrolls during
 Ramadan on short phones. The widget countdown's digits follow the phone's language.
+
+## Amendments made during the build
+
+### Amendment 1 (16 October 2026): Ramadan visibility and rollout timing
+
+The owner asked, mid build, whether a Ramadan screen weeks before Ramadan would make the app feel odd and
+asked for evidence before any early rollout. The answer is recorded here so a later session does not
+re-open it. It changes the windows in `PLAN.md` A1 to A4 and `RAMADAN-LOCATION-SPEC.md` 4.6, 4.7 and 4.10.
+
+**Visibility windows** (all measured on the user's own calendar, after their Islamic date shift, and held
+as constants in `RamadanInfo` so nothing else hard codes a number):
+
+| Days before 1 Ramadan | What the user sees |
+|---|---|
+| More than 30 | Nothing on Home. Settings has the Suhoor reminder row, Off by default |
+| 30 to 8 | Only the Ramadan timetable PDF in the export sheet. A pull surface, nothing pushed |
+| 7 to 1, and days 1 and 2 of Ramadan | One quiet, dismissible notice (neutral surface, not amber) with the start date on this calendar, the sighting note and an action to preview the timetable. Never returns once dismissed that Hijri year. Replaced by the card from day 1, so on days 1 and 2 it becomes a single line |
+| Ramadan | The Ramadan card, unless the user switched it off in Settings ("Show Ramadan card", on by default, also reachable from the card's info dialog). Not everyone fasts, so the card must be removable |
+| After the last day | Card, notice, export option, reminder and widget labels all end at local midnight into 1 Shawwal. No Eid greeting from the app: Eid is announced by mosques, and a wrong day for someone still fasting is worse than silence |
+
+The original notice window (2 days before) is replaced by 7 days. The widgets and the suhoor reminder are
+unchanged: the labels appear only on Ramadan days and the reminder only on Ramadan days, as before.
+
+**Rollout.** Ship 1.4.0 as soon as the gate passes. Reasons: the alarm scheduler change runs for every user
+every day and should be found faulty in November, not in the week Ramadan starts. Widgets are useful all
+year. A January release risks a Play review delay at the worst moment and leaves users who have not updated.
+The 1.4.0 What's new leads with the widgets. Ramadan text goes into the store listing in early January as a
+listing edit with no new bundle. `WORDING-AND-LISTING.md` section C holds the Ramadan lines as "held until
+January" and A10 prepares them separately.
+
+**Evidence and limits** (fetched 16 October 2026). TGM Research, Malaysia, February 2023, n about 780: 35 per
+cent start Ramadan preparations 1 to 2 weeks before, 19 per cent under a week, 10 per cent just before, 36
+per cent more than 2 weeks before. Statista 2022: Malaysia 32 per cent at 1 to 2 weeks, Nigeria 28 per cent.
+East London Mosque published its Ramadan timetable 17, 16 and 14 days before the start in 2022, 2023 and
+2024, each time saying the start depends on moon sighting. Google shopper data puts planning at up to 8
+weeks before (shopping, not prayer apps). An AGBI column citing Google data says religious app download
+searches rose 1,860 per cent in the first two weeks of Ramadan 2024, so the pack must be ready on day one.
+Limits: Asia and Africa surveys, not the UK. They measure general preparation, not what a prayer app should
+show. Nobody measured whether an early notice feels odd, and there is no analytics to test it, so the
+cautious window was chosen. A window that is too short can be lengthened in an update, one that annoys
+people cannot be taken back, so the constant favours short.
+
+**What changes in the code.** `RamadanInfo` gains `showsNotice(today)` (daysUntilStart in minus 1 to 7) and
+`offersTimetable(today)` (daysUntilStart in 0 to 30, or inside Ramadan). `RamadanState` is built when
+`showsNotice` or `isRamadan`. The notice taps through to the timetable sheet (the Islamic date shift link
+lives in the sheet footer and in the info dialog). A new setting `ramadanCardEnabled` (default true) and a
+"Show Ramadan card" switch. The notice window and the card switch each have a unit test.
 
 ## How to use these files
 
@@ -104,8 +154,8 @@ short hash. Do not mark a task done until its verification command in `PLAN.md` 
 
 | Task | Release | Status | Commit | Notes |
 |---|---|---|---|---|
-| A0 Baselines captured (tests, lint, bundle size, merged permissions, dependency list) | A | not started | | |
-| A1 `HijriCalendar` and `RamadanInfo` in `:core`, engine and Home header moved onto it | A | not started | | |
+| A0 Baselines captured (tests, lint, bundle size, merged permissions, dependency list) | A | done | 3140b96 base | Cloud, 16 Oct 2026, `--rerun-tasks`: 172 unit tests (core 83, app 77, wear 12), 0 failures. `app-release.aab` 5,779,975 bytes. 11 permissions (the six app ones plus library ones plus the Firebase install referrer one), none of AD_ID or ADSERVICES. `releaseRuntimeClasspath` 1,014 lines. Lint 0 errors. Numbers are in `build/plan-baseline/`, which is gitignored |
+| A1 `HijriCalendar` and `RamadanInfo` in `:core`, engine and Home header moved onto it | A | done | next commit fills | Also `RamadanInfo.showsNotice` and `offersTimetable` (Amendment 1). `HijriCalendarTest` 13 tests, new `RamadanGoldenTest` 8 tests (the engine matches the pinned mirror values on the first run: Fajr and Maghrib to the minute at all ten setups, the rest within a minute, Makkah Isha by offset table exact, London DST change +5, Tromsø projected ranges exact). Unit total 172 -> 193, 0 failures. `HijrahDate` now only in `HijriCalendar.kt` |
 | A2 Ramadan state in `SajdaViewModel` and `UiState` | A | not started | | |
 | A3 Ramadan card on the Times screen, info note, eve of Ramadan notice | A | not started | | |
 | A4 Ramadan timetable sheet and PDF range | A | not started | | |

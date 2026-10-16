@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
@@ -84,8 +85,6 @@ import com.sajdatime.app.ui.theme.heroStyle
 import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.Instant
 import java.time.ZoneId
-import java.time.chrono.HijrahDate
-import java.time.temporal.ChronoField
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -897,18 +896,12 @@ private fun hijriToday(now: Instant, offsetDays: Int): String {
     // otherwise kept yesterday's Hijri date until the app was killed.
     val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
     val parts = remember(months, date, offsetDays) {
-        runCatching {
-            // The user's own sighting correction. java.time's HijrahChronology is the
-            // Umm al-Qura calendar, which is calculated and announced from Makkah; a
-            // mosque that sighted the moon locally can legitimately be a day either side
-            // of it, and this is the only place in the app that lets them say so.
-            val today = HijrahDate.from(date.plusDays(offsetDays.toLong()))
-            Triple(
-                today.get(ChronoField.DAY_OF_MONTH),
-                today.get(ChronoField.MONTH_OF_YEAR),
-                today.get(ChronoField.YEAR),
-            )
-        }.getOrNull()
+        // The user's own sighting correction. HijriCalendar is the Umm al-Qura calendar,
+        // which is calculated and announced from Makkah; a mosque that sighted the moon
+        // locally can legitimately be a day either side of it, and the offset is how a
+        // user says so. The Ramadan card, the widgets and the engine's Isha rule ask the
+        // same object, so none of them can disagree with this line.
+        HijriCalendar.of(date, offsetDays)?.let { Triple(it.day, it.month, it.year) }
     } ?: return ""
 
     val (day, month, year) = parts
