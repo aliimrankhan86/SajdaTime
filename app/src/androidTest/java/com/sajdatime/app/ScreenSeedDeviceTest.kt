@@ -6,6 +6,7 @@ import com.sajdatime.app.data.SettingsRepository
 import com.sajdatime.core.Coordinates
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -28,7 +29,11 @@ class ScreenSeedDeviceTest {
             repository.setLocation(Coordinates(51.5074, -0.1278), "London")
             repository.completeOnboarding()
             repository.markDisclaimerSeen()
+            // Answer the usage counts question with No, as a person who tapped "No thanks" would have. Without
+            // this the question sits on top of every screenshot. Nothing is sent: No only records the answer.
+            repository.setAnalyticsEnabled(false)
             assertEquals("London", repository.current().cityName)
+            assertTrue(repository.current().analyticsAnswered)
         }
     }
 }

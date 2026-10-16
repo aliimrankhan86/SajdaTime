@@ -325,7 +325,7 @@
     <string name="export_ramadan">رمضان %1$d</string>
     <string name="export_ramadan_desc">مہینے کا ہر دن، سحری اور افطار کے ساتھ</string>
     <string name="pdf_period_ramadan">رمضان %1$d</string>
-    <string name="pdf_column_ramadan_day">دن</string>
+    <string name="pdf_column_ramadan_day">#</string>
     <string name="pdf_ramadan_note">سحری فجر پر ختم ہوتی ہے۔ افطار مغرب پر۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔</string>
     <string name="ramadan_row_a11y">دن %1$d، %2$s۔ سحری ختم %3$s۔ افطار %4$s۔ روزہ %5$s۔</string>
     <string name="settings_suhoor">سحری کی یاددہانی</string>

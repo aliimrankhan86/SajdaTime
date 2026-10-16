@@ -522,7 +522,9 @@
     <string name="export_ramadan">Ramadan %1$d</string>
     <string name="export_ramadan_desc">Every day of the month, with suhoor and iftar</string>
     <string name="pdf_period_ramadan">Ramadan %1$d</string>
-    <string name="pdf_column_ramadan_day">Day</string>
+    <!-- The Ramadan day number. A "#" and not "Day", because the next column is the weekday and the first device
+         render of the PDF (16 Oct 2026) showed two columns headed "Day". It is also the same in every language. -->
+    <string name="pdf_column_ramadan_day">#</string>
     <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
     <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
     <string name="settings_suhoor">Suhoor reminder</string>
