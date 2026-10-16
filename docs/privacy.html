@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SajdaTime — Privacy Policy</title>
+<meta name="description" content="What SajdaTime does with your data: no ads, no accounts, no cloud backup, optional usage counts off by default, and the developer never receives your location.">
+<link rel="canonical" href="https://aliimrankhan86.github.io/SajdaTime/privacy.html">
+<meta name="robots" content="index, follow">
 <style>
   :root { color-scheme: light dark; }
   body {
@@ -35,36 +38,54 @@
 <body>
 
 <h1>Privacy Policy for SajdaTime</h1>
-<p class="updated">Last updated: 10 October 2026 · <a href="#disclaimer">Disclaimer</a></p>
+<p class="updated">Last updated: 16 October 2026 · <a href="#disclaimer">Disclaimer</a></p>
 
-<p class="lede">SajdaTime has no accounts, shows no advertising, and keeps your location on
-your phone. If you choose to, it can send usage counts to Google Analytics so the developer can
-see how the app is used. That is off unless you switch it on, and it never includes your
-location, your sect, your prayer calculation setting or your other prayer settings.</p>
+<p class="lede">SajdaTime has no accounts, shows no advertising and runs no server. Your prayer
+times are worked out on your phone and your location is never sent to us. To show the name of
+your town, the app asks Android&rsquo;s own place lookup, which on most phones is answered over
+the internet, usually by Google (explained below). If you choose to, the app can also send usage
+counts to Google Analytics so the developer can see how it is used. That is off unless you switch
+it on, and it never includes your location, your sect, your prayer calculation setting or your
+other prayer settings.</p>
 
 <h2>What the app needs, and why</h2>
 <p>SajdaTime works out prayer times and the direction of the Qibla from your approximate
 location. To do that it asks for the <strong>approximate location</strong> permission
 (<code>ACCESS_COARSE_LOCATION</code>). It reads your location only while the app is open,
 never in the background.</p>
-<p>Your coordinates are saved on your own device so the app still works with no signal.
-<strong>They are never sent to us or to anyone else.</strong> SajdaTime runs no server of its
-own, and your coordinates are never part of the optional usage counts described below.</p>
+<p>Your coordinates are saved on your own device so the app still works with no signal, and the
+prayer times and the Qibla are worked out there. <strong>SajdaTime never sends your coordinates to
+us.</strong> It runs no server of its own, and your coordinates are never part of the optional
+usage counts described below. There is one thing to know about the name of your town, explained in
+the next section.</p>
 <p>You can refuse the location permission entirely and type a city name instead. The app is
 fully usable that way.</p>
 
 <h2>When something leaves your device</h2>
-<p>Two things can. One happens only if you type a city name and your device cannot resolve it.
-The other happens only if you switch on the optional usage counts. Both are described in full
-below.</p>
+<p>Three things can. The first is the name of your town, which is looked up through Android. The
+second happens only if you type a city name. The third happens only if you switch on the optional
+usage counts. All three are described in full below.</p>
+
+<h3>The name of your town</h3>
+<p>The prayer times do not need a town name. It is only a label above the times and on the PDF. To
+get it, the app asks the place lookup that is built into Android (called a geocoder) to name your
+approximate position. <strong>On most phones that lookup is answered over the internet, usually by
+Google, so your approximate position is sent to Google (or to your phone maker&rsquo;s provider) for
+that one purpose.</strong> SajdaTime itself does not receive it, and nothing is sent to us. On a
+phone with no such service the app shows no town name and sends nothing. The lookup is covered by
+the privacy policy of whoever provides it on your phone, not by this one.</p>
+<p>The app asks each time it refreshes your position, which happens when you open it. If you would
+rather not have your position looked up at all, do not allow the location permission and type a
+city name instead (see the next heading). The prayer times work the same way.</p>
 
 <h3>Typing a city name</h3>
 <p>If you choose to type a city name rather than use your location, that name has to be
 turned into coordinates. The app first tries to do this using the lookup service built into
-Android itself. If your device cannot resolve it, and only then, the city name you typed is
-sent once to <a href="https://open-meteo.com/">Open-Meteo</a>, a free geocoding service, which
-sends back the coordinates.</p>
-<p>What is sent is the place name you typed and nothing else — no identifier, no device
+Android itself. As above, on most phones that lookup is answered over the internet, usually by
+Google, so the name you typed may be sent there. If it cannot resolve the name, and only then,
+the city name you typed is sent once to <a href="https://open-meteo.com/">Open-Meteo</a>, a free
+geocoding service, which sends back the coordinates.</p>
+<p>What is sent to Open-Meteo is the place name you typed and nothing else — no identifier, no device
 information, no account, nothing that says the request came from you. The app tells you this
 is going to happen before it does it. Nothing about that lookup is stored by SajdaTime beyond
 the coordinates it gives back, which stay on your device.</p>
@@ -146,7 +167,13 @@ and we use them only to reply and to improve the app.</p>
 <h2>If you have a Wear OS watch</h2>
 <p>When a paired watch is present, your settings and location are sent to it over Google's
 local Data Layer so the watch can work out prayer times on its own. This travels directly
-between two devices that belong to you. It does not go to a server, and it does not reach us.</p>
+between two devices that belong to you. It does not go to a server, and it does not reach us.
+Google Play services also keeps a copy of it on your phone while it is delivered.</p>
+
+<h2>If you save or share the prayer times PDF</h2>
+<p>The PDF is made on your phone. It contains the times and the name of your area, not your
+coordinates. If you save it, it goes to your Downloads folder, and if you share it, it goes to the
+app you choose. After that it is wherever you put it.</p>
 
 <h2>What SajdaTime never does</h2>
 <ul>
