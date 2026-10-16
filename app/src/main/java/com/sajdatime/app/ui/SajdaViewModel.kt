@@ -281,6 +281,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
 
+    fun setSuhoorReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setSuhoorReminderMinutes(minutes) }
+
+    fun setSuhoorReminderStyle(style: AlertStyle) =
+        viewModelScope.launch { settingsRepository.setSuhoorReminderStyle(style) }
+
     fun dismissEidGreeting(code: Int) =
         viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
 

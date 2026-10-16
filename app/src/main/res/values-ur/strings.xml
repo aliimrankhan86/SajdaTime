@@ -328,6 +328,15 @@
     <string name="pdf_column_ramadan_day">دن</string>
     <string name="pdf_ramadan_note">سحری فجر پر ختم ہوتی ہے۔ افطار مغرب پر۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔</string>
     <string name="ramadan_row_a11y">دن %1$d، %2$s۔ سحری ختم %3$s۔ افطار %4$s۔ روزہ %5$s۔</string>
+    <string name="settings_suhoor">سحری کی یاددہانی</string>
+    <string name="settings_suhoor_help">رمضان کے دنوں میں فجر سے پہلے ایک یاددہانی، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔ اس کی آواز اور خاموش موڈ کے اصول وہی ہیں جو آپ کے نماز کے الرٹس کے ہیں۔</string>
+    <string name="suhoor_off">بند</string>
+    <plurals name="suhoor_minutes_before">
+        <item quantity="one">فجر سے %d منٹ پہلے</item>
+        <item quantity="other">فجر سے %d منٹ پہلے</item>
+    </plurals>
+    <string name="notif_suhoor_title">سحری %1$s پر ختم ہوگی</string>
+    <string name="notif_suhoor_body">%1$s %2$s میں شروع ہوگی</string>
 
     <string name="eid_fitr_title">عید الفطر مبارک</string>
     <string name="eid_fitr_body">تقبل اللہ منا ومنکم۔ اللہ ہمارے روزے اور عبادات قبول فرمائے اور آپ کا دن خوشیوں سے بھر دے۔</string>

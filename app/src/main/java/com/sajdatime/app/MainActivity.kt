@@ -176,6 +176,8 @@ class MainActivity : ComponentActivity() {
                                 onDismissRamadanNotice = viewModel::dismissRamadanNotice,
                                 onDismissEid = viewModel::dismissEidGreeting,
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
+                                onSetSuhoorMinutes = viewModel::setSuhoorReminderMinutes,
+                                onSetSuhoorStyle = viewModel::setSuhoorReminderStyle,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                             )

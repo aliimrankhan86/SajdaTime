@@ -525,6 +525,15 @@
     <string name="pdf_column_ramadan_day">Day</string>
     <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
     <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
+    <string name="settings_suhoor">Suhoor reminder</string>
+    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. It uses the same sound and silent mode rules as your prayer alerts.</string>
+    <string name="suhoor_off">Off</string>
+    <plurals name="suhoor_minutes_before">
+        <item quantity="one">%d minute before Fajr</item>
+        <item quantity="other">%d minutes before Fajr</item>
+    </plurals>
+    <string name="notif_suhoor_title">Suhoor ends at %1$s</string>
+    <string name="notif_suhoor_body">%1$s begins in %2$s</string>
 
     <!--
       Eid greeting, shown once on the day. The main text is a plain greeting that suits everyone. The

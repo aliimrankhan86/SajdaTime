@@ -164,6 +164,19 @@ data class AppSettings(
      * al-Adha 1448 and every later Eid to show without anything having to reset it.
      */
     val eidGreetingDismissedCode: Int = 0,
+    /**
+     * Minutes before Fajr at which the optional suhoor reminder fires during Ramadan, or 0 for off.
+     * **Off by default**: it is an alert, and nothing here makes noise until asked. Read through
+     * [SUHOOR_CHOICES], so a stored value that is not one of the five choices (a corrupt store, an
+     * older or newer build) reads as off rather than as some odd number of minutes.
+     */
+    val suhoorReminderMinutes: Int = 0,
+    /**
+     * How the reminder announces itself. The same two styles as a prayer alert, and it goes through
+     * the same [com.sajdatime.app.notify.effectiveAlertStyle], so the silent phone switch, the
+     * polar approximate day downgrade and the Do Not Disturb handling apply to it unchanged.
+     */
+    val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -177,8 +190,19 @@ data class AppSettings(
     /** The prayers that announce themselves at all, in any style. */
     val notifyFor: Set<PrayerSlot> get() = alertFor.keys
 
-    /** True when at least one prayer is set to the loud style. */
-    val usesAlarm: Boolean get() = alertFor.containsValue(AlertStyle.ALARM)
+    /**
+     * True when at least one prayer, or the suhoor reminder, is set to the loud style. The reminder
+     * counts so that a person whose only alarm is the reminder still gets the Do Not Disturb card
+     * and the sound row in Settings.
+     */
+    val usesAlarm: Boolean
+        get() = alertFor.containsValue(AlertStyle.ALARM) ||
+            (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.ALARM)
+
+    companion object {
+        /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
+        val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
+    }
 }
 
 /**
@@ -307,6 +331,15 @@ class SettingsRepository(private val context: Context) {
     suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
         edit { it[Keys.ALARM_ON_APPROXIMATE] = allowed }
 
+    /** Anything that is not one of [AppSettings.SUHOOR_CHOICES] is stored as 0, off. */
+    suspend fun setSuhoorReminderMinutes(minutes: Int) = edit {
+        it[Keys.SUHOOR_MINUTES] = minutes.takeIf { m -> m in AppSettings.SUHOOR_CHOICES } ?: 0
+    }
+
+    suspend fun setSuhoorReminderStyle(style: AlertStyle) = edit {
+        it[Keys.SUHOOR_STYLE] = style.name
+    }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -377,6 +410,8 @@ class SettingsRepository(private val context: Context) {
         val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
         val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
+        val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
+        val SUHOOR_STYLE = stringPreferencesKey("suhoor_reminder_style")
     }
 
     private companion object {
@@ -417,6 +452,9 @@ class SettingsRepository(private val context: Context) {
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
             eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
+            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: 0)
+                .takeIf { it in AppSettings.SUHOOR_CHOICES } ?: 0,
+            suhoorReminderStyle = enumOr(this[Keys.SUHOOR_STYLE], AlertStyle.NOTIFICATION),
         )
     }
 

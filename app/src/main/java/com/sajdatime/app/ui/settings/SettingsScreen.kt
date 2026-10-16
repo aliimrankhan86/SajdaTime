@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Language
@@ -103,7 +104,7 @@ import java.time.LocalDate
  * chooser that answers them, rather than to the top of Settings with the row left to find.
  * See [SettingsScreen]'s `request` parameter.
  */
-enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, LOCATION, LANGUAGE, DISCLAIMER }
+enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -124,6 +125,8 @@ fun SettingsScreen(
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetSuhoorMinutes: (Int) -> Unit,
+    onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
@@ -259,9 +262,17 @@ fun SettingsScreen(
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
             )
+            // Off until chosen. A reminder before Fajr on the days of Ramadan only, on the Islamic
+            // date the user has set, through the same alarm ladder and silent mode rules as a
+            // prayer alert. The row says nothing about dates: the help line inside does.
+            SettingRow(
+                icon = Icons.Outlined.Alarm,
+                title = stringResource(R.string.settings_suhoor),
+                subtitle = suhoorSummary(settings.suhoorReminderMinutes, settings.suhoorReminderStyle),
+                onClick = { open = SettingsChooser.SUHOOR },
+            )
             // On by default and removable here, because not everyone fasts and the card is
-            // daily for a month. It lives with the reminders for now; the suhoor reminder joins
-            // it above.
+            // daily for a month.
             SwitchRow(
                 icon = Icons.Outlined.NightsStay,
                 title = stringResource(R.string.settings_ramadan_card),
@@ -374,6 +385,7 @@ fun SettingsScreen(
 
         SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
+            showAlarmOptions = settings.usesAlarm,
             alarmSoundUri = settings.alarmSoundUri,
             respectsSilent = settings.alarmRespectsSilent,
             alarmOnApproximate = settings.alarmOnApproximateDays,
@@ -381,6 +393,18 @@ fun SettingsScreen(
             onSetAlert = onSetAlert,
             onSetRespectsSilent = onSetAlarmRespectsSilent,
             onSetAlarmOnApproximate = onSetAlarmOnApproximateDays,
+            onPickAlarmSound = onPickAlarmSound,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.SUHOOR -> SuhoorDialog(
+            minutes = settings.suhoorReminderMinutes,
+            style = settings.suhoorReminderStyle,
+            alarmSoundUri = settings.alarmSoundUri,
+            respectsSilent = settings.alarmRespectsSilent,
+            onSetMinutes = onSetSuhoorMinutes,
+            onSetStyle = onSetSuhoorStyle,
+            onSetRespectsSilent = onSetAlarmRespectsSilent,
             onPickAlarmSound = onPickAlarmSound,
             onDismiss = { open = null },
         )
@@ -486,6 +510,24 @@ private fun alertSummary(alertFor: Map<PrayerSlot, AlertStyle>): String {
     return stringResource(R.string.settings_value_pair, count, style)
 }
 
+/** "30 minutes before Fajr · Notification", or just "Off". Plain words, no date logic. */
+@Composable
+private fun suhoorSummary(minutes: Int, style: AlertStyle): String {
+    if (minutes <= 0) return stringResource(R.string.suhoor_off)
+    val styleLabel = stringResource(
+        if (style == AlertStyle.ALARM) R.string.alert_style_alarm else R.string.alert_style_notification,
+    )
+    return stringResource(R.string.settings_value_pair, suhoorChoiceLabel(minutes), styleLabel)
+}
+
+@Composable
+private fun suhoorChoiceLabel(minutes: Int): String =
+    if (minutes <= 0) {
+        stringResource(R.string.suhoor_off)
+    } else {
+        pluralStringResource(R.plurals.suhoor_minutes_before, minutes, minutes)
+    }
+
 // --- choosers ----------------------------------------------------------------------------
 
 /**
@@ -570,6 +612,8 @@ private fun MethodPickerDialog(
 @Composable
 private fun AlertsDialog(
     alertFor: Map<PrayerSlot, AlertStyle>,
+    /** True when any prayer or the suhoor reminder is an alarm, so the sound and silent rows apply. */
+    showAlarmOptions: Boolean,
     alarmSoundUri: String,
     respectsSilent: Boolean,
     alarmOnApproximate: Boolean,
@@ -596,7 +640,7 @@ private fun AlertsDialog(
             )
         }
 
-        if (alertFor.containsValue(AlertStyle.ALARM)) {
+        if (showAlarmOptions) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SettingRow(
                 title = stringResource(R.string.settings_alarm_sound),
@@ -624,6 +668,81 @@ private fun AlertsDialog(
                     subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
                     checked = alarmOnApproximate,
                     onCheckedChange = onSetAlarmOnApproximate,
+                    horizontalPadding = 0.dp,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The suhoor reminder: off, or 15, 30, 45 or 60 minutes before Fajr, and how it announces itself.
+ *
+ * It is a second heads up and not a ruling: suhoor ends at Fajr, and the reminder is simply earlier
+ * than that by the amount the person picked. When it is an alarm, the sound and the silent phone
+ * switch are the same two settings the prayer alerts use, shown here too so a person who only wants
+ * the reminder never has to go and find them elsewhere.
+ */
+@Composable
+private fun SuhoorDialog(
+    minutes: Int,
+    style: AlertStyle,
+    alarmSoundUri: String,
+    respectsSilent: Boolean,
+    onSetMinutes: (Int) -> Unit,
+    onSetStyle: (AlertStyle) -> Unit,
+    onSetRespectsSilent: (Boolean) -> Unit,
+    onPickAlarmSound: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_suhoor), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_suhoor_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Column(Modifier.selectableGroup()) {
+            AppSettings.SUHOOR_CHOICES.forEach { choice ->
+                RadioRow(
+                    label = suhoorChoiceLabel(choice),
+                    selected = minutes == choice,
+                    onSelect = { onSetMinutes(choice) },
+                )
+            }
+        }
+        if (minutes > 0) {
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.selectableGroup(),
+            ) {
+                ChoiceChip(
+                    label = stringResource(R.string.alert_style_notification),
+                    selected = style == AlertStyle.NOTIFICATION,
+                    onClick = { onSetStyle(AlertStyle.NOTIFICATION) },
+                )
+                ChoiceChip(
+                    label = stringResource(R.string.alert_style_alarm),
+                    selected = style == AlertStyle.ALARM,
+                    onClick = { onSetStyle(AlertStyle.ALARM) },
+                )
+            }
+            if (style == AlertStyle.ALARM) {
+                Spacer(Modifier.height(8.dp))
+                SettingRow(
+                    title = stringResource(R.string.settings_alarm_sound),
+                    subtitle = rememberRingtoneTitle(alarmSoundUri)
+                        ?: stringResource(R.string.settings_alarm_sound_desc),
+                    onClick = onPickAlarmSound,
+                    horizontalPadding = 0.dp,
+                )
+                SwitchRow(
+                    title = stringResource(R.string.settings_alarm_respect_silent),
+                    subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
+                    checked = respectsSilent,
+                    onCheckedChange = onSetRespectsSilent,
                     horizontalPadding = 0.dp,
                 )
             }
