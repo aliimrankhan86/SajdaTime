@@ -88,6 +88,29 @@ Stated defaults that are not decisions: widget previews below Android 12 are two
 the emulator (the first raster assets in the app, under 30 KB each). The Times screen scrolls during
 Ramadan on short phones. The widget countdown's digits follow the phone's language.
 
+## Decisions on Release B (16 October 2026)
+
+The owner answered four questions about the tracker. They override `PLAN.md` section 7 (B1, B3, B4, B6),
+`TEST-AND-RECORD.md` section 2.3 and the one screen summary above where they differ.
+
+1. **Streak: hidden until switched on.** The Settings switch "Show streak" is off by default.
+2. **Excused days: dropped.** His words: "Lets not complicate it", and the option might make female users
+   uncomfortable. So `DayRecord` loses the excused bit (bit 5 stays reserved and is ignored on load, so a
+   later version can use it), `TickState` loses `EXCUSED`, and the excused control, its strings and its
+   tests are not built. **Consequence Claude flagged:** a consecutive streak breaks on any day with a missing
+   tick, including days someone could not pray. **Default applied unless he says otherwise:** the number
+   shown when the streak is switched on is "days with all five ticked in the last 30", which has no
+   consecutive rule and no penalty for a gap. `TrackerLogic.streak` becomes that count.
+3. **Phase B of the tracker (missed prayer counter, notification action, widget tick): not planned.** Keep
+   it simple.
+4. **Timing: delegated to Claude ("I trust you will make the best and appropriate decision").** Order: the
+   1.4.0 alarm scheduler change goes first and is proven in the field. Release B starts when 1.4.0 has been
+   live for about two weeks with a clean health check, and aims to be live by mid December 2026. No release
+   from 18 January to 9 March 2027 (the three weeks before Ramadan 1448, 8 Feb to 8 Mar, and Ramadan itself)
+   except a critical fix. If 1.4.0 is not live by early December, Release B waits until after Ramadan. This
+   is Claude's rule, not a Play requirement. Release B still branches from the merged Release A and still
+   needs its privacy policy change live on `main` before the owner submits.
+
 ## Amendments made during the build
 
 ### Amendment 1 (16 October 2026): Ramadan visibility and rollout timing
