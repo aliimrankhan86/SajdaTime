@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.StyleSpan
+import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.IdRes
@@ -55,6 +56,8 @@ internal object WidgetRenderer {
             views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_no_location))
             views.setViewVisibility(R.id.widget_sublabel, View.VISIBLE)
             views.setInt(R.id.widget_sublabel, "setMaxLines", NO_LOCATION_LINES)
+            // A sentence the person has to read and act on, so it is larger than the context line it borrows.
+            views.setTextViewTextSize(R.id.widget_sublabel, TypedValue.COMPLEX_UNIT_SP, MESSAGE_SP)
             for (id in listOf(R.id.widget_name, R.id.widget_time, R.id.widget_countdown)) {
                 views.setViewVisibility(id, View.GONE)
             }
@@ -83,6 +86,7 @@ internal object WidgetRenderer {
             },
         )
         views.setInt(R.id.widget_sublabel, "setMaxLines", 1)
+        views.setTextViewTextSize(R.id.widget_sublabel, TypedValue.COMPLEX_UNIT_SP, CONTEXT_SP)
         if (parts.isNotEmpty()) {
             views.setTextViewText(R.id.widget_sublabel, parts.reduce { a, b -> context.getString(R.string.settings_value_pair, a, b) })
             views.setViewVisibility(R.id.widget_sublabel, View.VISIBLE)
@@ -182,6 +186,10 @@ internal object WidgetRenderer {
 
     /** How many lines the "open SajdaTime" message may take before it is cut. Normal text takes one. */
     private const val NO_LOCATION_LINES = 4
+
+    /** The context line is 11sp in the layout; the no location message uses 14sp. Both are written every time. */
+    private const val CONTEXT_SP = 11f
+    private const val MESSAGE_SP = 14f
 
     /** The four view ids of one row of the Today widget. */
     private class RowIds(val row: Int, val name: Int, val label: Int, val time: Int)
