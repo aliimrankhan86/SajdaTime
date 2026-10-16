@@ -26,7 +26,7 @@ OUT="$REPO/build/release-1.4.0"
 BRANCH="${SAJDA_BRANCH:-claude/1-4-0-ramadan-widgets}"
 PKG="com.sajdatime.app"
 mkdir -p "$OUT"
-rm -f "$OUT/finished" "$OUT"/*.png
+rm -f "$OUT/finished" "$OUT"/*.png "$OUT"/*.xml
 rm -rf "$OUT"/renders-*
 SUM="$OUT/summary.txt"
 : > "$SUM"
@@ -188,8 +188,11 @@ if [ -n "$EMU_SERIAL" ]; then
     local b
     b="$(grep -o "text=\"$1\"[^>]*bounds=\"\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]\"" "$OUT/ui.xml" | head -1 | grep -o '\[[0-9]*,[0-9]*\]\[[0-9]*,[0-9]*\]')"
     [ -z "$b" ] && return 1
-    local x y
-    x="$(echo "$b" | tr -d '[]' | awk -F'[, ]' '{print int(($1+$3)/2)}')"; y="$(echo "$b" | tr -d '[]' | awk -F'[, ]' '{print int(($2+$4)/2)}')"
+    # "[127,1385][365,1438]" becomes "127,1385,365,1438". The first version of this deleted both brackets
+    # without a separator, which glued 1385 and 365 into one number and tapped far off the screen.
+    local c x y
+    c="$(echo "$b" | sed 's/\]\[/,/; s/[][]//g' | awk -F, '{print int(($1+$3)/2), int(($2+$4)/2)}')"
+    x="${c% *}"; y="${c#* }"
     "$ADB" shell input tap "$x" "$y"; sleep 2
     return 0
   }
@@ -201,6 +204,12 @@ if [ -n "$EMU_SERIAL" ]; then
   # --- 6a. The normal on device run, at the emulator's own clock. WidgetDeviceTest, the reminder test and
   # the seed test are left out here: the first needs the bind permission granted after install, the
   # second needs the clock inside Ramadan, and the third is not a check. They run below.
+  # The emulator keeps its apps between runs. A run on 16 Oct 2026 failed here with INSTALL_FAILED_VERSION_DOWNGRADE
+  # because something with version code 1001 (the watch's lane) was already installed over our package name, and
+  # this step does not allow a downgrade. Say what is installed, then start from nothing so the result is the app's.
+  echo "Installed on the emulator before the run: $("$ADB" shell pm list packages --show-versioncode 2>/dev/null | grep -i sajdatime | tr '\r\n' '  ')"
+  "$ADB" uninstall "$TESTPKG" >/dev/null 2>&1
+  "$ADB" uninstall "$PKG" >/dev/null 2>&1
   if ./gradlew :app:connectedDebugAndroidTest \
        -Pandroid.testInstrumentationRunnerArguments.notClass=com.sajdatime.app.WidgetDeviceTest,com.sajdatime.app.SuhoorReminderDeviceTest,com.sajdatime.app.ScreenSeedDeviceTest; then
     result emulator-tests PASS
@@ -258,10 +267,23 @@ if [ -n "$EMU_SERIAL" ]; then
     done
     "$ADB" shell cmd locale set-app-locales "$PKG" --locales "en" >/dev/null 2>&1; sleep 2
     open_app
-    if tap_text "Full timetable"; then shot ramadan-timetable-en; result ramadan-timetable "TAKEN (ramadan-timetable-en.png)"
-    else "$ADB" shell input swipe 540 1800 540 700 400; sleep 1
-         if tap_text "Full timetable"; then shot ramadan-timetable-en; result ramadan-timetable "TAKEN (ramadan-timetable-en.png)"
-         else result ramadan-timetable "CHECK (could not find the Full timetable button, see ramadan-times-en.png)"; fi; fi
+    # Tap the button, then prove the sheet opened by finding its title ("Ramadan 1448") in the UI dump, which is
+    # what the person would see. The title is only on screen when the sheet is. Screenshot and dump are kept.
+    if ! tap_text "Full timetable"; then
+      "$ADB" shell input swipe 540 1800 540 700 400; sleep 1
+      tap_text "Full timetable" || result ramadan-timetable "CHECK (could not find the Full timetable button, see ramadan-times-en.png and ui.xml)"
+    fi
+    if ! grep -q 'ramadan-timetable' "$OUT/summary.txt" 2>/dev/null; then
+      sleep 2
+      "$ADB" shell uiautomator dump /sdcard/ui.xml >/dev/null 2>&1; "$ADB" pull /sdcard/ui.xml "$OUT/ramadan-timetable-en.xml" >/dev/null 2>&1
+      shot ramadan-timetable-en
+      if grep -q 'text="Ramadan 14[0-9][0-9]"' "$OUT/ramadan-timetable-en.xml" 2>/dev/null; then
+        result ramadan-timetable "PASS (the sheet opened, title found, see ramadan-timetable-en.png)"
+        "$ADB" shell input swipe 540 1700 540 500 400; sleep 1; shot ramadan-timetable-en-scrolled
+      else
+        result ramadan-timetable "CHECK (tapped Full timetable but the sheet title was not on screen, see ramadan-timetable-en.png and ramadan-timetable-en.xml)"
+      fi
+    fi
 
     # --- 6g. The other days that change what the app says. English only.
     for STAGE in "eve-of-ramadan:020612002027" "last-day-evening:030820002027" "eid-al-fitr:030910002027" "eid-al-adha:051610002027"; do
