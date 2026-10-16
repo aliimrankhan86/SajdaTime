@@ -139,7 +139,8 @@ Read it before editing a word of `disclaimer_body`.
      network API identically. A fallback would be a parachute for a fall that cannot happen.
   2. **It would put the user's GPS coordinates on the wire to a third party**, on every
      calculation, for a whole month at a time when the PDF is exported. That directly
-     contradicts `docs/privacy.html`, which promises coordinates never leave the device.
+     contradicts `docs/privacy.html`, which promises the developer never receives the coordinates (this sentence
+     originally said "never leave the device", which stopped being true for the town name label, §5.21).
      Shipping it would make the published privacy policy a lie.
   3. **It would make the app worse offline**, which is the case it exists for: a phone in a
      mosque basement with no signal.

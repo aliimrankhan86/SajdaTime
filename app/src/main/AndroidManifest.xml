@@ -60,8 +60,8 @@
 
     <!--
       Backup is off deliberately. Cloud backup would copy the user's cached coordinates
-      to Google's servers, which directly contradicts the promise that their location
-      never leaves the device. Settings are two taps to re-enter; the privacy guarantee
+      to Google's servers, which directly contradicts the promise that the developer never
+      receives their location. Settings are two taps to re-enter; the privacy guarantee
       is worth more.
 
       allowBackup covers Android 11 and below. From Android 12 it stops cloud backup but
