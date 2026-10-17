@@ -372,4 +372,7 @@
     <string name="alert_choice_a11y">%2$s کے لیے %1$s</string>
     <string name="location_permission_denied">مقام کی اجازت نہیں دی گئی۔ نیچے اپنے شہر کا نام لکھیں، یا بعد میں مقام والے صفحے سے اجازت دیں۔</string>
     <string name="confirm_notifications_hint">جب آپ «مکمل کریں» پر ٹیپ کریں گے تو Android پوچھے گا کہ کیا SajdaTime اطلاعات بھیج سکتی ہے۔ نماز کے الرٹ پانے کے لیے ہاں کہیں۔ آپ اسے بعد میں فون کی ترتیبات میں بدل سکتے ہیں۔</string>
+    <string name="about_share">SajdaTime شیئر کریں</string>
+    <string name="about_share_desc">لنک گھر والوں اور دوستوں کو بھیجیں۔</string>
+    <string name="about_share_message">SajdaTime: نماز کے مفت اوقات اور قبلہ نما، بغیر اشتہارات اور بغیر اکاؤنٹ کے۔ https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
 </resources>

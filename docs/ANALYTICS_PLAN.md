@@ -503,6 +503,10 @@ makes sense to them and what does not, and use that to decide future features.* 
 8. **Approved.** Firebase project under the same Google account as Play Console.
 9. **Approved.** The two setup events in 4.3 item 7. The consent step sits straight after
    Welcome so later steps can be counted.
+   **Changed 17 Oct 2026 by the owner:** the consent step now sits after Method and before All
+   set, so a new user sees the app's choices before a privacy decision. Same events, no new
+   ones: after a Yes, the steps already passed (permission, sect, method) are sent then, once
+   each, in order. A No sends nothing, as before. Enforced in `UsageCountsTest`.
 10. **Decided:** analytics ships first as its own small release (1.3.0) so a baseline exists.
     Phase two scope is otherwise undefined by the owner.
 

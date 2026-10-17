@@ -366,4 +366,7 @@
     <string name="alert_choice_a11y">%2$s için %1$s</string>
     <string name="location_permission_denied">Konum izni verilmedi. Şehrinizi aşağıya yazın ya da izni daha sonra konum sayfasından verin.</string>
     <string name="confirm_notifications_hint">Bitir\'e dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
+    <string name="about_share">SajdaTime\'ı paylaş</string>
+    <string name="about_share_desc">Bağlantıyı ailenize ve arkadaşlarınıza gönderin.</string>
+    <string name="about_share_message">SajdaTime: ücretsiz namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
 </resources>

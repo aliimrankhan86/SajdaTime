@@ -362,4 +362,7 @@
     <string name="alert_choice_a11y">%1$s untuk %2$s</string>
     <string name="location_permission_denied">Lokasi tidak diizinkan. Ketik kota Anda di bawah, atau izinkan nanti dari halaman lokasi.</string>
     <string name="confirm_notifications_hint">Saat Anda mengetuk Selesai, Android akan bertanya apakah SajdaTime boleh mengirim notifikasi. Pilih izinkan agar pengingat salat bisa muncul. Anda bisa mengubahnya nanti di pengaturan ponsel.</string>
+    <string name="about_share">Bagikan SajdaTime</string>
+    <string name="about_share_desc">Kirim tautannya ke keluarga dan teman.</string>
+    <string name="about_share_message">SajdaTime: waktu salat dan kompas kiblat gratis, tanpa iklan dan tanpa akun. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
 </resources>

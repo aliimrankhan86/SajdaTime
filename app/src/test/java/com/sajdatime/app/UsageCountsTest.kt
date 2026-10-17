@@ -7,6 +7,7 @@ import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.data.UsageSink
 import com.sajdatime.app.ui.onboarding.Step
 import com.sajdatime.app.ui.onboarding.setupStep
+import com.sajdatime.app.ui.onboarding.stepsBeforeConsent
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -161,15 +162,25 @@ class UsageCountsTest {
 
     @Test
     fun `the reported path is identical for a Sunni and a Shia user`() {
-        val sunni = listOf(Step.WELCOME, Step.CONSENT, Step.PERMISSION, Step.SECT, Step.MADHAB, Step.METHOD, Step.CONFIRM)
+        val sunni = Step.entries.toList()
         val shia = sunni - Step.MADHAB
         assertEquals(sunni.mapNotNull { it.setupStep() }, shia.mapNotNull { it.setupStep() })
     }
 
     @Test
-    fun `nothing before consent is reported`() {
+    fun `welcome and consent themselves are never reported`() {
         assertEquals(null, Step.WELCOME.setupStep())
         assertEquals(null, Step.CONSENT.setupStep())
+    }
+
+    // Consent moved after METHOD on 17 Oct 2026. The steps passed before it are replayed after a
+    // Yes, so the replay must be exactly what the live path reports, for either sect.
+    @Test
+    fun `the replay after consent is the live path up to consent, for both sects`() {
+        val beforeConsent = Step.entries.takeWhile { it != Step.CONSENT }
+        assertEquals(beforeConsent.mapNotNull { it.setupStep() }, stepsBeforeConsent)
+        assertEquals((beforeConsent - Step.MADHAB).mapNotNull { it.setupStep() }, stepsBeforeConsent)
+        assertEquals(Step.CONFIRM, Step.entries.last())
     }
 
     // ---- the manifest and resources, read from disk ----------------------------------

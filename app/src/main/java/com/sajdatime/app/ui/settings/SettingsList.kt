@@ -2,6 +2,7 @@ package com.sajdatime.app.ui.settings
 
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.outlined.StarOutline
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -153,6 +154,7 @@ private fun iconFor(item: SettingsItem): ImageVector = when (item) {
     "privacy" -> Icons.Outlined.Lock
     "feedback" -> Icons.Outlined.MailOutline
     "rate" -> Icons.Outlined.StarOutline
+    "share" -> Icons.Outlined.Share
     "usage_counts" -> Icons.Outlined.BarChart
     "charity" -> Icons.Outlined.FavoriteBorder
     "credits" -> Icons.Outlined.Person

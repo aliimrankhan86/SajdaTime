@@ -85,9 +85,20 @@ import com.sajdatime.app.ui.components.SectionHeading
 
 /**
  * Internal, not private, so a test can prove the mapping below never depends on the user's sect.
- * CONSENT sits straight after WELCOME so the usage counts (opt-in only) can see the later steps.
+ *
+ * CONSENT sits just before CONFIRM since 17 Oct 2026 (owner's decision, research F1). It used to
+ * be the second screen, so a new user met a privacy decision before seeing one prayer time. The
+ * steps passed before it are counted after a Yes instead ([stepsBeforeConsent]); the disclaimer
+ * still comes after CONFIRM, so consent never follows it. Order here is the order on screen.
  */
-internal enum class Step { WELCOME, CONSENT, PERMISSION, SECT, MADHAB, METHOD, CONFIRM }
+internal enum class Step { WELCOME, PERMISSION, SECT, MADHAB, METHOD, CONSENT, CONFIRM }
+
+/**
+ * The counted steps every path passes before CONSENT, in order, reported once the user says yes.
+ * Fixed rather than remembered: every path goes through all three, MADHAB counts as nothing on
+ * either path, so the list cannot reveal anything the live path would not have.
+ */
+internal val stepsBeforeConsent = listOf(Step.PERMISSION, Step.SECT, Step.METHOD).mapNotNull { it.setupStep() }
 
 /**
  * Which usage-count step, if any, an onboarding step reports. **MADHAB maps to nothing, on
@@ -137,22 +148,7 @@ fun OnboardingScreen(
             when (current) {
                 // Skipped when the choice is already yes (for example after the process was
                 // killed mid-setup), so nobody is asked to consent twice.
-                Step.WELCOME -> WelcomeStep(
-                    onNext = {
-                        step = if (state.settings.analyticsEnabled) Step.PERMISSION else Step.CONSENT
-                    },
-                )
-
-                Step.CONSENT -> ConsentStep(
-                    onYes = {
-                        onSetAnalytics(true)
-                        step = Step.PERMISSION
-                    },
-                    onNo = {
-                        onSetAnalytics(false)
-                        step = Step.PERMISSION
-                    },
-                )
+                Step.WELCOME -> WelcomeStep(onNext = { step = Step.PERMISSION })
 
                 Step.PERMISSION -> PermissionStep(
                     state = state,
@@ -194,9 +190,25 @@ fun OnboardingScreen(
                     sect = state.settings.sect,
                     selected = state.settings.method,
                     onSelect = onSelectMethod,
-                    onNext = { step = Step.CONFIRM },
+                    // Skipped when the choice is already yes (for example after the process was
+                    // killed mid-setup), so nobody is asked to consent twice.
+                    onNext = { step = if (state.settings.analyticsEnabled) Step.CONFIRM else Step.CONSENT },
                     onBack = {
                         step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.SECT
+                    },
+                )
+
+                Step.CONSENT -> ConsentStep(
+                    onYes = {
+                        // Collection is on before this returns (setAnalyticsEnabled), so the
+                        // replay below is sent; UsageCounts still sends each step once per run.
+                        onSetAnalytics(true)
+                        stepsBeforeConsent.forEach(onSetupStep)
+                        step = Step.CONFIRM
+                    },
+                    onNo = {
+                        onSetAnalytics(false)
+                        step = Step.CONFIRM
                     },
                 )
 

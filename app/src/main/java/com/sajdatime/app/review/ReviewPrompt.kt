@@ -83,6 +83,18 @@ object ReviewPrompt {
             }
     }
 
+    /**
+     * The Settings Share row (owner's decision, 17 Oct 2026). A door like Rate, never a prompt:
+     * nothing in the app suggests sharing. The handover's own growth advice is that the link,
+     * passed on by hand, does more than any dialog.
+     */
+    fun shareApp(context: Context, message: String) {
+        runCatching {
+            val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, message)
+            context.startActivity(Intent.createChooser(send, null))
+        }
+    }
+
     // SharedPreferences rather than the settings DataStore: five counters nobody else reads, and
     // the sharedpref domain is already excluded from backup and transfer (data_extraction_rules.xml),
     // so they stay on the phone, survive updates and reset on reinstall like everything else.

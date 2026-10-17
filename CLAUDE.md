@@ -130,8 +130,11 @@ session inherits it instead of relearning it.
   and 3 days opened, only on a calm Times screen away from prayer times, at most every 120 days
   and 3 times ever, plus a passive "Rate SajdaTime on Google Play" row in About. **No "do you
   like it?" question, no button that calls the card, no usage counts event, no app copy asking
-  for a rating, no religious wording.** A "share this app" prompt is still not built; a passive
-  Share row is the owner's open question.
+  for a rating, no religious wording.** A passive "Share SajdaTime" row sits beside it (owner,
+  17 Oct 2026). Both are doors the user opens; nothing in the app ever suggests sharing or rating.
+- **Play reviews: the owner replies, Claude drafts.** Agreed 17 Oct 2026. When he sends a
+  screenshot of a review, draft a short, kind reply on the issue raised. Never ask for a higher
+  rating in a reply (Play policy).
 - **Translations: Claude translates and checks its own work; no native speaker review.** The
   owner decided this on 9 Oct 2026 (SajdaTime is a free utility he makes himself), superseding
   the old "never machine-translate" rule. Urdu, Turkish and Indonesian shipped in 1.3.1

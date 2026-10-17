@@ -311,6 +311,7 @@ fun SettingsScreen(
     // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
     val feedbackEmail = stringResource(R.string.feedback_email)
     val feedbackSubject = stringResource(R.string.feedback_subject)
+    val shareMessage = stringResource(R.string.about_share_message)
     val about = SettingsSection(
         SettingsSectionId.ABOUT,
         stringResource(R.string.settings_group_about),
@@ -357,6 +358,12 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_rate),
                 subtitle = stringResource(R.string.about_rate_desc),
                 onClick = { ReviewPrompt.openStorePage(context) },
+            ),
+            SettingsItem.Link(
+                key = "share",
+                title = stringResource(R.string.about_share),
+                subtitle = stringResource(R.string.about_share_desc),
+                onClick = { ReviewPrompt.shareApp(context, shareMessage) },
             ),
             SettingsItem.Toggle(
                 key = "usage_counts",
