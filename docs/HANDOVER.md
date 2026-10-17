@@ -1582,10 +1582,14 @@ signed with the same key, on the paired phone); secret scanning with push protec
    active on the default branch (restrict deletions, block force pushes, nothing else, no bypass). Dependency graph,
    Dependabot alerts and private vulnerability reporting are on. Dependabot *security updates* stay **off**: their pull
    requests can never pass dependency verification without new checksums. Act on an alert by hand, per the paragraphs
-   above. Secret scanning and push protection were already on. **Still open: a passkey on the GitHub account.**
+   above. Secret scanning and push protection were already on. The GitHub account passkey was added the same day,
+   using the Mac's Touch ID.
 3. **Signing values** into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, then delete `keystore.properties`
    (§5.21 item 7f).
-4. **Google account** that owns the Play developer account: a passkey and Advanced Protection.
+4. **Passkeys DONE 18 Oct 2026.** The owner added a Touch ID passkey to GitHub and to both Google accounts: the Play
+   owner (`authuser=0`) and the Firebase owner (`authuser=2`). **Advanced Protection: skipped on Claude's advice, and
+   the owner did not object.** It stops most third party apps reaching Gmail and Drive, which would cut off his Claude
+   connectors and n8n. With passkeys in place, the extra protection is small.
 
 ## 6. Notification and alarm architecture
 
@@ -4986,8 +4990,8 @@ Before merging, merge `main` into the branch.
 (`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
 file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
 empty `GRADLE_USER_HOME`. On 18 Oct the Firebase key restriction and the GitHub protections were done (§5.24). Still
-open, and his to press: passkeys on GitHub and Google, Advanced Protection, and moving the signing values into
-`~/.gradle`. Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
+open, and his to press: moving the signing values into `~/.gradle`. Passkeys were added the same day, and Advanced
+Protection was skipped on purpose (§5.24 item 4). Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
 
 **Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
 then decided: "if you test it emulator then no need to test it on real phone". Emulator testing is the standard
