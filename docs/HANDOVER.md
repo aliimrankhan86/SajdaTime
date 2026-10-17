@@ -4878,9 +4878,7 @@ notice. Owner submits around **4 Jan 2027**, live mid January, latest 25 Jan (tw
 Before merging, merge `main` into the branch.
 
 **Waiting on the owner.**
-1. Listen once to the built-in adhan (commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg) before 1.5.0
-   ships, and say if it contains "hayya ala khayr al-amal" (that would make it Shia and change the plan).
-   He chose it by licence ("just pick one") on 17 Oct 2026.
+1. ~~Listen to the built-in adhan~~ **Done 17 Oct 2026: the owner listened and approved it ("its fine to use").**
 2. Turkey iftar offsets (Diyanet), before Ramadan.
 3. January store listing: the Ramadan lines and the 1.5.0 What's new (`docs/store/LISTING.md`).
 
@@ -4960,6 +4958,37 @@ commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg, and say if it contains "hay
 
 **Open items.** Commission a Shia adhan with a written licence (then remove the notice in that release);
 later, a Sunni Fajr adhan ("as-salatu khayrun min an-nawm") with a written licence.
+
+#### More adhan candidates found 17 Oct 2026 (not yet listened to; nothing shipped from this list)
+
+The owner approved the built-in adhan the same evening and asked for more free, high quality ones. Found by
+listing every audio file in Commons' Adhan categories and searches, then reading each file page. Only
+recordings the uploader made themselves, with a licence that allows use in an app, are listed. **Each needs
+the owner to listen, and a Shia candidate needs him to confirm it is a Shia adhan** ("ashhadu anna
+aliyyan waliyyullah", "hayya ala khayr al-amal").
+- **Possible Shia adhan:** `File:AzaanMaahur.ogg`, CC BY-SA 4.0, sung by the uploader himself, Saeed
+  Hatamzadeh-Varmazyar ("خوانده شده توسط من", read by me), Iranian, in the Mahur mode, 2 min 48 s,
+  about 109 kbps. The cleanest Shia lead found: performer and licensor are the same person.
+- **Possible Shia adhan, needs work:** `File:اذان حسین صبحدل.webm`, "Adhan of Master Hussein Sobhdel",
+  CC BY-SA 4.0 **with a Wikimedia VRT permission ticket** (2020110810007063, so the permission was
+  verified by Wikimedia). It is an 8 min 30 s video; the adhan would have to be cut out, and the cut file
+  would then be CC BY-SA too (fine for an app, credit and licence link required).
+- **Sunni, studio or unknown:** `File:Azan.ogg`, CC BY-SA 4.0, Andrewler, own work 2022, 3 min 3 s, about
+  64 kbps. `File:Adhan.ogg`, CC0, Aishatu98, own work July 2026, 42 s, about 64 kbps (short, may be
+  partial; the same uploader has `File:Iqamah.ogg`, CC0, 93 s).
+- **Sunni, field recordings (likely background noise, the class rejected below):** Wiki Loves Ramadan
+  2026 Ghana, `File:Athan during Ramadan 2.wav` (84 s) and `File:Athan in Ramadan.wav` (37 s), CC BY-SA
+  4.0, daSupremo; `File:Call to prayer.ogg` (Nigeria, 65 s, CC BY-SA 4.0); `File:Adhan in Istanbul.webm`
+  (CC0 video, 50 s).
+- **Not usable:** `File:Islamic call to worship.oga` (a talk about the adhan, not an adhan);
+  `File:Adhan wiki.oga` (a plain spoken reading); `File:Call to prayer by Sabah Fakhry.mp3` (marked public
+  domain but taken from YouTube); the Makkah and Madinah videos re-uploaded from YouTube (the uploader is
+  not the recorder); the 1885 Makkah recording (historic, too poor for an alarm).
+- No Fajr adhan ("as-salatu khayrun min an-nawm") with a clean licence was found. Freesound, Internet
+  Archive, Pixabay and assabile add nothing new: the free ones are the rejected entries below, Pixabay's
+  licence forbids distributing a sound on its own, and assabile states no licence.
+- **The most reliable route to more voices is still written permission:** a local mosque's muezzin
+  recording a clean adhan (and a Fajr one) for the app, with a one line licence (CC BY 4.0 or CC0).
 
 #### Adhan sources rejected (17 Oct 2026). Do not reuse them.
 - Freesound "Adhan/Call to Prayer" by sonically_sound: labelled CC0 but extracted from YouTube, so the
