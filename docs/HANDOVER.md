@@ -4822,6 +4822,15 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 Settings redesign, 17 Oct 2026: previews only, awaiting the owner's choice (branch `claude/settings-design-preview`)
+
+The owner asked for a modern Settings screen (brand colours kept) through a preview-first process: three options, emulator screenshots, stop for his decision, no wider rollout without explicit approval. Done so far, on this branch only (cut from `claude/security-and-visibility` at 64efdcc; the 1.4.0 branch and its signed bundle are untouched):
+- `SettingsScreen` now builds its rows as data (`SettingsItem`, `SettingsSection`) and draws them through a renderer. Release always draws `OriginalSettings`, which is the shipping look pixel for pixel (checked by screenshot against the untouched build). The rows, strings, handlers, ordering comments and choosers are unchanged.
+- Three candidate looks live in `app/src/debug` only (`SettingsLooks.kt`, `SettingsLookActivity`, sentence-case section titles in `preview_strings.xml` for en, ur, tr, in). Pick one on an emulator with `adb shell am start -n com.sajdatime.app/com.sajdatime.app.SettingsLookActivity --es look A|B|C`; force-stop to go back. A: Clean Minimal (no cards, hairlines, stock segmented button). B: Modern Refined (inset cards, green icon tiles, medium weight titles, sliding theme selector, three info rows folded). C: Premium Contemporary (green summary card for the prayer setup, round badges, filled sliding selector with icons, version footer).
+- Recommended: **B**. Rejected for now: C's summary card uses `primaryContainer`, which the design system reserves for "next prayer" and "facing the Qibla", so it would dilute that meaning; A loses grouping and its stock segmented button wraps "Follow phone" at large text.
+- Screenshots (light, dark, font 2.0, Urdu RTL, interaction states) were taken on the `sajda` AVD; the comparison page was built locally at `build/settings-design-preview/index.html` (gitignored). Not checked: a real phone, TalkBack read-through, Turkish and Indonesian layouts.
+- Next: the owner picks an option or gives feedback; refine on this branch; nothing reaches `src/main` styling or another screen until he approves in words. Whether it ships in 1.4.0 or later is his call (recommendation: later, so the device-tested 1.4.0 bundle stays as is).
+
 ### 📍 STATE OF PLAY, 16 Oct 2026 (read this block first, then the 13 Oct block below for the release facts)
 
 **Live state is unchanged from 13 Oct 2026:** phone 1.3.2 (`versionCode` 7) and watch 1.2.0 (`versionCode` 1001), 178 countries. Nothing after 1.3.2 has been submitted to Google. The daily health check (12:00 UTC, `trig_0129FQnWihf8XG6rKLCB4oFr`) stays a silent regression alarm until 1.4.0 is live, and is re baselined then.

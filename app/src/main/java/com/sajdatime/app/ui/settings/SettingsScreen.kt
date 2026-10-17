@@ -151,25 +151,12 @@ fun SettingsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 40.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.title_settings),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
-                .semantics { heading() },
-        )
-
-        // Anything the system is withholding goes at the very top, above the settings
-        // themselves. These are not preferences, they are problems, and burying them
-        // inside the group they belong to meant nobody found them.
-        val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
-        val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    // Anything the system is withholding goes at the very top, above the settings
+    // themselves. These are not preferences, they are problems, and burying them
+    // inside the group they belong to meant nobody found them.
+    val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
+    val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    val banners: @Composable () -> Unit = {
         // Before Android 12 there is no exact-alarm permission to ask for, so no row.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionCard(
@@ -189,23 +176,30 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
+    }
 
-        Group(stringResource(R.string.settings_group_prayer_times)) {
-            SettingRow(
+    val prayerTimes = SettingsSection(
+        SettingsSectionId.PRAYER_TIMES,
+        stringResource(R.string.settings_group_prayer_times),
+        listOf(
+            SettingsItem.Link(
+                key = "location",
                 icon = Icons.Outlined.LocationOn,
                 title = stringResource(R.string.settings_location),
                 subtitle = settings.cityName.ifBlank {
                     stringResource(R.string.location_set_generic)
                 },
                 onClick = { open = SettingsChooser.LOCATION },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "school",
                 icon = Icons.Outlined.Schedule,
                 title = stringResource(R.string.settings_school),
                 subtitle = schoolSummary(settings.sect, settings.madhab),
                 onClick = { open = SettingsChooser.SCHOOL },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "method",
                 icon = Icons.Outlined.Tune,
                 title = stringResource(R.string.settings_method),
                 subtitle = if (settings.method == CalcMethod.AUTO) {
@@ -217,85 +211,118 @@ fun SettingsScreen(
                     stringResource(settings.method.labelRes)
                 },
                 onClick = { open = SettingsChooser.METHOD },
-            )
+            ),
             // Last in this group on purpose. The method and school rows above explain the
             // two divergences that have a reason; this one is the catch-all for whatever is
             // left, and offering it first would invite someone to nudge a number when the
             // honest fix was to pick the convention their mosque actually follows.
-            SettingRow(
+            SettingsItem.Link(
+                key = "adjustments",
                 icon = Icons.Outlined.MoreTime,
                 title = stringResource(R.string.settings_adjustments),
                 subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
-            )
-        }
+            ),
+        ),
+    )
 
-        Group(stringResource(R.string.settings_group_appearance)) {
-            ThemeRow(current = settings.themeChoice, onSelect = onSetThemeChoice)
+    val appearance = SettingsSection(
+        SettingsSectionId.APPEARANCE,
+        stringResource(R.string.settings_group_appearance),
+        buildList {
+            add(
+                SettingsItem.Theme(
+                    title = stringResource(R.string.settings_theme),
+                    current = settings.themeChoice,
+                    onSelect = onSetThemeChoice,
+                ),
+            )
             if (AppLanguage.supported) {
-                SettingRow(
-                    icon = Icons.Outlined.Language,
-                    title = stringResource(R.string.settings_language_title),
-                    subtitle = AppLanguage.current(context).nativeName,
-                    onClick = { open = SettingsChooser.LANGUAGE },
+                add(
+                    SettingsItem.Link(
+                        key = "language",
+                        icon = Icons.Outlined.Language,
+                        title = stringResource(R.string.settings_language_title),
+                        subtitle = AppLanguage.current(context).nativeName,
+                        onClick = { open = SettingsChooser.LANGUAGE },
+                    ),
                 )
             }
-        }
+        },
+    )
 
-        Group(stringResource(R.string.settings_group_reminders)) {
+    val reminders = SettingsSection(
+        SettingsSectionId.REMINDERS,
+        stringResource(R.string.settings_group_reminders),
+        listOf(
             // One row, not two. "Which prayers" and "How you are told" were separate
             // choosers answering halves of the same question, and between them they could
             // not express "wake me for Fajr, a quiet notification for the rest" — which is
             // what a tester asked for. Off is now simply having no style.
-            SettingRow(
+            SettingsItem.Link(
+                key = "alerts",
                 icon = Icons.Outlined.NotificationsActive,
                 title = stringResource(R.string.settings_alerts),
                 subtitle = alertSummary(settings.alertFor),
                 onClick = { open = SettingsChooser.ALERTS },
-            )
+            ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
-            SwitchRow(
+            SettingsItem.Toggle(
+                key = "ongoing_badge",
                 icon = Icons.Outlined.PushPin,
                 title = stringResource(R.string.settings_ongoing_badge),
                 subtitle = stringResource(R.string.settings_ongoing_badge_desc),
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
-            )
+            ),
             // Off until chosen. A reminder before Fajr on the days of Ramadan only, on the Islamic
             // date the user has set, through the same alarm ladder and silent mode rules as a
             // prayer alert. The row says nothing about dates: the help line inside does.
-            SettingRow(
+            SettingsItem.Link(
+                key = "suhoor",
                 icon = Icons.Outlined.Alarm,
                 title = stringResource(R.string.settings_suhoor),
                 subtitle = suhoorSummary(settings.suhoorReminderMinutes, settings.suhoorReminderStyle),
                 onClick = { open = SettingsChooser.SUHOOR },
-            )
+            ),
             // On by default and removable here, because not everyone fasts and the card is
             // daily for a month.
-            SwitchRow(
+            SettingsItem.Toggle(
+                key = "ramadan_card",
                 icon = Icons.Outlined.NightsStay,
                 title = stringResource(R.string.settings_ramadan_card),
                 subtitle = stringResource(R.string.settings_ramadan_card_desc),
                 checked = settings.ramadanCardEnabled,
                 onCheckedChange = onSetRamadanCard,
-            )
-        }
+            ),
+        ),
+    )
 
-        Group(stringResource(R.string.settings_group_about)) {
-            SettingRow(
+    // Play requires a privacy policy reachable from inside the app, not only from
+    // the Console field. Opening the hosted policy satisfies that.
+    val privacyUrl = stringResource(R.string.privacy_policy_url)
+    // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
+    // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
+    val feedbackEmail = stringResource(R.string.feedback_email)
+    val feedbackSubject = stringResource(R.string.feedback_subject)
+    val about = SettingsSection(
+        SettingsSectionId.ABOUT,
+        stringResource(R.string.settings_group_about),
+        listOf(
+            SettingsItem.Link(
+                key = "version",
                 title = stringResource(R.string.about_version),
                 subtitle = versionName(context),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "disclaimer",
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
                 onClick = { open = SettingsChooser.DISCLAIMER },
-            )
-            // Play requires a privacy policy reachable from inside the app, not only from
-            // the Console field. Opening the hosted policy satisfies that.
-            val privacyUrl = stringResource(R.string.privacy_policy_url)
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "privacy",
                 title = stringResource(R.string.about_privacy),
                 subtitle = stringResource(R.string.about_privacy_desc),
                 onClick = {
@@ -303,12 +330,9 @@ fun SettingsScreen(
                         context.startActivity(Intent(Intent.ACTION_VIEW, privacyUrl.toUri()))
                     }
                 },
-            )
-            // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
-            // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
-            val feedbackEmail = stringResource(R.string.feedback_email)
-            val feedbackSubject = stringResource(R.string.feedback_subject)
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "feedback",
                 title = stringResource(R.string.about_feedback),
                 subtitle = stringResource(R.string.about_feedback_desc),
                 onClick = {
@@ -319,29 +343,38 @@ fun SettingsScreen(
                         )
                     }
                 },
-            )
-            SwitchRow(
+            ),
+            SettingsItem.Toggle(
+                key = "usage_counts",
                 title = stringResource(R.string.settings_usage_counts),
                 subtitle = stringResource(R.string.settings_usage_counts_desc),
                 checked = settings.analyticsEnabled,
                 onCheckedChange = { wanted ->
                     if (wanted) askingUsageConsent = true else onSetAnalytics(false)
                 },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "charity",
                 title = stringResource(R.string.about_charity),
                 subtitle = stringResource(R.string.about_charity_desc),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "credits",
                 title = stringResource(R.string.about_credits),
                 subtitle = stringResource(R.string.about_credits_desc),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "data",
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
-            )
-        }
-    }
+            ),
+        ),
+    )
+
+    val sections = listOf(prayerTimes, appearance, reminders, about)
+    val title = stringResource(R.string.title_settings)
+    val preview = settingsPreviewRenderer
+    if (preview != null) preview(title, banners, sections) else OriginalSettings(title, banners, sections)
 
     if (askingUsageConsent) {
         UsageCountsConsentDialog(
@@ -474,6 +507,113 @@ fun SettingsScreen(
                 }
             },
         )
+    }
+}
+
+// --- what the screen shows, kept apart from how it is drawn ------------------------------
+
+/**
+ * One row of the Settings screen as data. The screen builds these and a renderer draws
+ * them, so a different look can be drawn from exactly the same rows, the same strings and
+ * the same handlers. `key` names the row for a renderer that treats one specially (the
+ * version line, say); it never changes what the row does.
+ */
+internal sealed interface SettingsItem {
+    val key: String
+    val title: String
+
+    /** A row that opens something, or, with no [onClick], a line of information. */
+    data class Link(
+        override val key: String,
+        override val title: String,
+        val subtitle: String? = null,
+        val icon: ImageVector? = null,
+        val onClick: (() -> Unit)? = null,
+    ) : SettingsItem
+
+    data class Toggle(
+        override val key: String,
+        override val title: String,
+        val subtitle: String?,
+        val checked: Boolean,
+        val onCheckedChange: (Boolean) -> Unit,
+        val icon: ImageVector? = null,
+    ) : SettingsItem
+
+    data class Theme(
+        override val title: String,
+        val current: ThemeChoice,
+        val onSelect: (ThemeChoice) -> Unit,
+    ) : SettingsItem {
+        override val key: String get() = "theme"
+    }
+}
+
+internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
+
+internal class SettingsSection(
+    val id: SettingsSectionId,
+    val title: String,
+    val items: List<SettingsItem>,
+)
+
+internal typealias SettingsRenderer =
+    @Composable (title: String, banners: @Composable () -> Unit, sections: List<SettingsSection>) -> Unit
+
+/**
+ * Set only by the debug build's design preview (`src/debug`, `SettingsLookActivity`), to
+ * draw candidate looks from the real rows on an emulator. Nothing in `src/main` ever sets
+ * it, so a release build always draws [OriginalSettings].
+ *
+ * ponytail: a global rather than a CompositionLocal, because one debug-only activity is
+ * the only writer and the screen is the only reader. Remove it with the previews once a
+ * look is chosen and becomes the real renderer.
+ */
+internal var settingsPreviewRenderer: SettingsRenderer? by mutableStateOf(null)
+
+/** The shipping look: titled groups, each one bordered card. */
+@Composable
+private fun OriginalSettings(
+    title: String,
+    banners: @Composable () -> Unit,
+    sections: List<SettingsSection>,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = 40.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier
+                .padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
+                .semantics { heading() },
+        )
+        banners()
+        sections.forEach { section ->
+            Group(section.title) {
+                section.items.forEach { item ->
+                    when (item) {
+                        is SettingsItem.Link -> SettingRow(
+                            title = item.title,
+                            subtitle = item.subtitle,
+                            icon = item.icon,
+                            onClick = item.onClick,
+                        )
+                        is SettingsItem.Toggle -> SwitchRow(
+                            title = item.title,
+                            subtitle = item.subtitle,
+                            checked = item.checked,
+                            onCheckedChange = item.onCheckedChange,
+                            icon = item.icon,
+                        )
+                        is SettingsItem.Theme -> ThemeRow(current = item.current, onSelect = item.onSelect)
+                    }
+                }
+            }
+        }
     }
 }
 

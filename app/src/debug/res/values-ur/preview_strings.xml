@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: section titles in sentence case for the Settings design preview. -->
+<resources>
+    <string name="preview_group_prayer_times">نماز کے اوقات</string>
+    <string name="preview_group_appearance">ظاہری شکل</string>
+    <string name="preview_group_reminders">یاد دہانیاں</string>
+    <string name="preview_group_about">ایپ کے بارے میں</string>
+    <string name="preview_expanded">کھلا ہوا</string>
+    <string name="preview_collapsed">بند</string>
+</resources>
