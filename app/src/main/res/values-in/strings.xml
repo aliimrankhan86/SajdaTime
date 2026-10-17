@@ -161,7 +161,7 @@
     <string name="settings_method_auto">Otomatis · %1$s</string>
     <string name="settings_method_help">Masjid mengukur cahaya fajar dan senja dengan cara berbeda, dan itu terutama menggeser Subuh dan Isya. Makin jauh ke utara tempat tinggal Anda, makin besar selisihnya. Jika waktu ini tidak cocok dengan masjid Anda, tanyakan metode yang mereka pakai lalu pilih di sini.</string>
 
-    <string name="settings_alerts_help">Notifikasi: senyap, dengan getar. Alarm: berbunyi keras, bahkan dalam mode senyap.</string>
+    <string name="settings_alerts_help">Notifikasi: pesan dengan nada biasa ponsel Anda. Alarm: memutar azan atau suara pilihan Anda.</string>
     <string name="alert_style_off">Mati</string>
     <string name="alert_style_notification">Notifikasi</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -169,6 +169,8 @@
     <string name="settings_alarm_sound">Suara alarm</string>
     <string name="settings_alarm_sound_default">Alarm bawaan ponsel Anda</string>
     <string name="settings_alarm_sound_phone">Dari ponsel Anda</string>
+    <string name="settings_alarm_play_on_silent">Bunyikan saat senyap</string>
+    <string name="settings_alarm_play_on_silent_desc">Tetap berbunyi saat ponsel senyap atau mode Jangan Ganggu. Nonaktif: hanya notifikasi dan getar.</string>
     <string name="adhan_builtin">Azan</string>
     <string name="adhan_shia_title">Belum ada azan Syiah</string>
     <string name="adhan_shia_brief">Sampai kami menemukan rekaman yang boleh disertakan, pilih azan apa pun di ponsel Anda.</string>

@@ -142,6 +142,7 @@ fun SettingsScreen(
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
+    onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
@@ -463,7 +464,7 @@ fun SettingsScreen(
         SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
             showAlarmOptions = settings.usesAlarm,
-            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan),
+            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan, settings.alarmRespectsSilent, onSetAlarmRespectsSilent),
             alarmOnApproximate = settings.alarmOnApproximateDays,
             hasApproximateDays = rememberHasApproximateDays(settings),
             onSetAlert = onSetAlert,
@@ -482,7 +483,7 @@ fun SettingsScreen(
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
-            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan),
+            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan, settings.alarmRespectsSilent, onSetAlarmRespectsSilent),
             onSetMinutes = onSetSuhoorMinutes,
             onSetStyle = onSetSuhoorStyle,
             onDismiss = { open = null },
@@ -856,6 +857,8 @@ private class AlarmSound(
     val uri: String,
     val onPickPhone: () -> Unit,
     val onPickBuiltIn: (BuiltInAdhan) -> Unit,
+    val respectsSilent: Boolean,
+    val onSetRespectsSilent: (Boolean) -> Unit,
 )
 
 /**
@@ -890,7 +893,7 @@ private fun AlarmSoundChoices(sound: AlarmSound) {
             onClick = sound.onPickPhone,
             horizontalPadding = 0.dp,
         )
-        Spacer(Modifier.height(8.dp))
+        PlayOnSilentRow(sound)
         return
     }
     Column(Modifier.selectableGroup()) {
@@ -908,8 +911,24 @@ private fun AlarmSoundChoices(sound: AlarmSound) {
             onSelect = sound.onPickPhone,
         )
     }
-    // space2 between the sound group and the switch below it, as between every group in a dialog.
-    Spacer(Modifier.height(8.dp))
+    PlayOnSilentRow(sound)
+}
+
+/**
+ * "Play on silent", off by default: a phone on silent, vibrate or Do Not Disturb gets the notification
+ * and vibration only, unless the user turns this on. Positive wording over the old "Stay quiet when your
+ * phone is silent", which read as a double negative beside an Alarm choice (owner, 17 Oct 2026). Stored
+ * inverted, as `alarmRespectsSilent`, so every existing user keeps the choice they made.
+ */
+@Composable
+private fun PlayOnSilentRow(sound: AlarmSound) {
+    SwitchRow(
+        title = stringResource(R.string.settings_alarm_play_on_silent),
+        subtitle = stringResource(R.string.settings_alarm_play_on_silent_desc),
+        checked = !sound.respectsSilent,
+        onCheckedChange = { sound.onSetRespectsSilent(!it) },
+        horizontalPadding = 0.dp,
+    )
 }
 
 /**

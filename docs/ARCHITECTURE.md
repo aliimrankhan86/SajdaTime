@@ -314,7 +314,7 @@ recording from Wikimedia Commons, credited in About, sources and hashes in
 adhan is included yet. The choice is stored as an ordinary sound address, so the alarm channel
 works exactly as it does for a phone sound (HANDOVER §5.23).
 
-**Alarm always plays out loud (since 1.5.0, owner 17 Oct 2026).** The old "stay quiet when the phone is silent" switch is gone: it made Alarm mean "sometimes silent", which nobody could predict. Each prayer is Off, Notification (quiet, vibrates) or Alarm (out loud); a person at work picks Notification for the prayers that fall in work hours.
+**An alarm stays quiet while the phone is on silent, vibrate or Do Not Disturb**, unless the user turns on "Play on silent" (1.5.0 wording of the same setting, off by default). Android deliberately does not mute the alarm stream with the ringer, which is right for a one-off wake-up alarm and wrong for a recurring alert; the notification still arrives on time and only the sound is dropped.
 
 Sound is bound to the channel, not to the notification, and a channel's sound cannot be
 changed after creation. Choosing a new tone therefore creates a new channel id and deletes
@@ -510,7 +510,7 @@ All unit tests are offline and deterministic.
 | `DisclaimerContentTest` | The religious disclaimer still makes all four of its points, the dua request is still last and appears once, and the published copies have not drifted apart. |
 | `BidiTest` | Right-to-left ordering asserted against `java.text.Bidi`, including a test that pins the *wrong* fix so it cannot be "simplified" back in. |
 | `PlaceNameTest` | The town wins over the county; a point of interest never outranks an administrative area; a house number is never shown as a place. |
-| `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, and a Notification is never upgraded to an Alarm. Since 1.5.0 there is no silent phone rule: Alarm means out loud. |
+| `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless — and a Notification is never upgraded to an Alarm. |
 | `AlertCodecTest` | Per-prayer alert round-trip, rubbish dropped entry by entry, and the upgrade from the two keys it replaced. |
 
 **18 suites, 145 tests** as of 16 Aug 2026. `docs/HANDOVER.md` §9 carries the

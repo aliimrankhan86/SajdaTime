@@ -12,20 +12,28 @@ import org.junit.Test
 import java.time.LocalDate
 
 /**
- * The one reason an alarm is allowed to arrive without making a noise: a projected polar time.
+ * The two reasons an alarm is allowed to arrive without making a noise.
  *
- * Deliberate, invisible in a screenshot, and it looks like a bug to anyone who meets it without
- * knowing why. That is exactly the shape of decision that gets "fixed" back out by a later
- * session, so it is pinned here rather than only described in a comment. The silent phone rule
- * that used to sit beside it was removed in 1.5.0 (owner): Alarm now means out loud.
+ * Both are deliberate, both are invisible in a screenshot, and both look like a bug to
+ * anyone who meets them without knowing why. That is exactly the shape of decision that
+ * gets "fixed" back out by a later session, so it is pinned here rather than only
+ * described in a comment.
  */
 class AlertStyleDowngradeTest {
 
     private fun style(
         style: AlertStyle = AlertStyle.ALARM,
+        respectSilent: Boolean = true,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
-    ) = effectiveAlertStyle(style = style, approximate = approximate, alarmOnApproximate = alarmOnApproximate)
+        silenced: Boolean = false,
+    ) = effectiveAlertStyle(
+        style = style,
+        respectSilent = respectSilent,
+        approximate = approximate,
+        alarmOnApproximate = alarmOnApproximate,
+        phoneIsSilenced = { silenced },
+    )
 
     @Test
     fun `an ordinary alarm on an ordinary day still rings`() {
@@ -45,25 +53,72 @@ class AlertStyleDowngradeTest {
      */
     @Test
     fun `a projected time rings when the user has asked for it`() {
-        assertEquals(AlertStyle.ALARM, style(approximate = true, alarmOnApproximate = true))
+        assertEquals(
+            AlertStyle.ALARM,
+            style(approximate = true, alarmOnApproximate = true),
+        )
+    }
+
+    @Test
+    fun `a silenced phone still suppresses the sound, override or not`() {
+        assertEquals(AlertStyle.NOTIFICATION, style(silenced = true))
+        assertEquals(
+            "the approximate override is not a licence to ignore the ringer",
+            AlertStyle.NOTIFICATION,
+            style(approximate = true, alarmOnApproximate = true, silenced = true),
+        )
+    }
+
+    @Test
+    fun `turning off respect for silent brings the sound back`() {
+        assertEquals(AlertStyle.ALARM, style(respectSilent = false, silenced = true))
     }
 
     /**
      * Nothing here may ever turn a notification *into* an alarm. Every path is a downgrade,
      * so a user who asked for quiet can never be shouted at by a code path they did not
-     * choose. Since 1.5.0 that is the whole of "quiet": there is no silent phone rule, a person
-     * who wants no sound picks Notification (owner, 17 Oct 2026).
+     * choose.
      */
     @Test
     fun `notification style is never upgraded, whatever the flags`() {
-        listOf(false, true).forEach { approximate ->
-            listOf(false, true).forEach { alarmOnApproximate ->
-                assertEquals(
-                    AlertStyle.NOTIFICATION,
-                    style(style = AlertStyle.NOTIFICATION, approximate = approximate, alarmOnApproximate = alarmOnApproximate),
-                )
+        listOf(false, true).forEach { respectSilent ->
+            listOf(false, true).forEach { approximate ->
+                listOf(false, true).forEach { alarmOnApproximate ->
+                    listOf(false, true).forEach { silenced ->
+                        assertEquals(
+                            AlertStyle.NOTIFICATION,
+                            style(
+                                style = AlertStyle.NOTIFICATION,
+                                respectSilent = respectSilent,
+                                approximate = approximate,
+                                alarmOnApproximate = alarmOnApproximate,
+                                silenced = silenced,
+                            ),
+                        )
+                    }
+                }
             }
         }
+    }
+
+    /**
+     * The AudioManager read is skipped whenever a cheaper answer already settles it.
+     *
+     * Not a micro-optimisation: this runs on a BroadcastReceiver that has already been woken
+     * from Doze and is about to reschedule a two-day horizon, and the projected-time case
+     * would otherwise query the ringer to reach a conclusion it had already reached.
+     */
+    @Test
+    fun `the ringer is not consulted when the answer is already known`() {
+        var asked = false
+        effectiveAlertStyle(
+            style = AlertStyle.ALARM,
+            respectSilent = true,
+            approximate = true,
+            alarmOnApproximate = false,
+            phoneIsSilenced = { asked = true; false },
+        )
+        assertFalse("read the ringer for a decision it did not need", asked)
     }
 
     // --- who is offered the switch at all -------------------------------------------------

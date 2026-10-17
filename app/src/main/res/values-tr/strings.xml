@@ -161,7 +161,7 @@
     <string name="settings_method_auto">Otomatik · %1$s</string>
     <string name="settings_method_help">Camiler alacakaranlığı farklı ölçer. Bu da en çok Sabah ve Yatsı vakitlerini etkiler. Ne kadar kuzeyde yaşarsanız fark o kadar büyür. Bu vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve burada o yöntemi seçin.</string>
 
-    <string name="settings_alerts_help">Bildirim: sessiz, titreşimli. Alarm: sessiz modda bile yüksek sesle çalar.</string>
+    <string name="settings_alerts_help">Bildirim: telefonunuzun olağan sesiyle bir mesaj. Alarm: ezanı ya da seçtiğiniz sesi çalar.</string>
     <string name="alert_style_off">Kapalı</string>
     <string name="alert_style_notification">Bildirim</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -169,6 +169,8 @@
     <string name="settings_alarm_sound">Alarm sesi</string>
     <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
     <string name="settings_alarm_sound_phone">Telefonunuzdan</string>
+    <string name="settings_alarm_play_on_silent">Sessizdeyken de çal</string>
+    <string name="settings_alarm_play_on_silent_desc">Telefon sessizde veya Rahatsız Etmeyin modundayken de çalar. Kapalı: yalnızca bildirim ve titreşim.</string>
     <string name="adhan_builtin">Ezan</string>
     <string name="adhan_shia_title">Şii ezanı henüz yok</string>
     <string name="adhan_shia_brief">Eklemeye iznimiz olan bir kayıt bulana kadar telefonunuzdaki herhangi bir ezanı seçin.</string>

@@ -31,7 +31,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - A live system countdown in the next prayer notification.
   - **Reminder before prayer** (added 17 Oct 2026 from the competitor review): off by default, 5 to 30 minutes before, chosen per prayer, always a quiet notification.
   - **Built-in adhan for Sunni users** (17 Oct 2026): one CC0 recording from Wikimedia Commons, opt in, never the default, credited in About (+1.2 MB). Any phone sound still works. Shia users see "No Shia adhan yet" in the sound picker.
-  - **Simpler alerts:** each prayer is Off, Notification (quiet, vibrates) or Alarm (always out loud). The "stay quiet when silent" switch is gone.
+  - **Clearer alerts:** each prayer is Off, Notification or Alarm (the adhan or a chosen sound). "Play on silent" (off by default) decides whether an alarm plays when the phone is on silent or Do Not Disturb.
   - Screen reader fixes.
   - The habit tracker, only if it is built by then (see below).
 - **Store screenshots** are retaken once, when 1.5.0 ships.

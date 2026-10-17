@@ -172,6 +172,7 @@ class MainActivity : ComponentActivity() {
                                     openAlarmSoundPicker(state.settings.alarmSoundUri, state.settings.phoneAlarmSoundUri)
                                 },
                                 onPickBuiltInAdhan = viewModel::setBuiltInAdhan,
+                                onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                                 onRefreshLocation = ::requestLocation,
                                 onSearchCity = viewModel::searchCity,
                                 onQiblaVisible = viewModel::setQiblaVisible,

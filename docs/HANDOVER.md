@@ -288,6 +288,7 @@ data class AppSettings(
     val hijriOffsetDays: Int = 0,                          // clamped to +/-2 days
     val ongoingBadge: Boolean = true,      // silent, costs nothing, so on by default
     val alarmSoundUri: String = "",        // empty = device default alarm
+    val alarmRespectsSilent: Boolean = true,      // alarm -> quiet notification when silenced ("Play on silent" off)
     val phoneAlarmSoundUri: String = "",   // phone sound a built-in adhan replaced (§5.23)
     val alarmOnApproximateDays: Boolean = false,  // §5.14 — projected days do not ring
     val disclaimerSeen: Boolean = false,
@@ -463,7 +464,7 @@ twice for the same thing is asking too often.
   the rest, and a single global radio could not say that. See §5.12.
 - **Alarm mode is opt-in.** The tone is the phone's default until the user picks one: a sound
   from the phone, or (Sunni users, since 1.5.0) the built-in adhan. See §5.23.
-- **Alarm always plays out loud (since 1.5.0, owner 17 Oct 2026).** The old "stay quiet when the phone is silent" switch is gone: it made Alarm mean "sometimes silent", which nobody could predict. Each prayer is Off, Notification (quiet, vibrates) or Alarm (out loud); a person at work picks Notification for the prayers that fall in work hours. See §5.13.
+- **"Play on silent", off by default (1.5.0 wording, owner 17 Oct 2026).** Each prayer is Off, Notification or Alarm (the adhan or a chosen sound). When the phone is on silent, vibrate or Do Not Disturb, an Alarm arrives as the notification and vibration only, unless the user turns on "Play on silent" under the alarm sound. Same rule as before 1.5.0 (§5.13), positive wording; stored as `alarmRespectsSilent`, so existing users keep their choice. See §5.13.
 - **An alarm also stays quiet on a day whose times had to be projected from another latitude**,
   unless the user turns *that* off. Same treatment: it arrives on time, in the shade, and
   additionally carries the "Approximate time" marking. The switch appears only for users whose
@@ -899,9 +900,9 @@ leave the default.
 Rejected: keeping the global style and adding a per-prayer override set. It preserves the
 same two-settings confusion and needs a rule for what happens when the two disagree.
 
-### 5.13 An alarm stays quiet while the phone is silenced (REMOVED in 1.5.0)
+### 5.13 An alarm stays quiet while the phone is silenced
 
-> **Superseded 17 Oct 2026 by the owner: Alarm always plays out loud, and the switch is gone.** Three plain choices per prayer replace it (Off, Notification, Alarm). The reasoning below is kept as history: it is why the switch existed, and why removing it was a decision, not an oversight. `alarm_respects_silent` stays unread in old settings files. Do not bring the switch back without the owner.
+> **1.5.0: the switch is now labelled "Play on silent" (off by default), the same setting inverted.** On 17 Oct 2026 it was removed for an afternoon ("Alarm always out loud") and restored the same day: the owner wanted the user to choose, and a look at other prayer apps (Mawaqit plays through the notification sound, so silent stays silent; iPhone apps that sound on silent make it an opt in) showed that a silent phone staying quiet unless asked is what people expect. Measured on the Android 16 emulator: Do Not Disturb (priority) reads as silenced too, so it also gives the notification only, which the owner asked for.
 
 
 `alarmRespectsSilent`, **on by default**. When it is on and `AudioManager.getRingerMode()`
@@ -969,9 +970,11 @@ alert sounds — and the watch module schedules no alarms and posts no prayer al
 `WatchSyncContract` would ship a key nothing reads. If the watch ever gains its own alerts,
 this is the setting to carry across, and this paragraph is why it was not there already.
 
-**Since 1.5.0 this is the only downgrade** (the silent phone rule of §5.13 was removed). It can
-never turn a Notification *into* an Alarm, and `AlertStyleDowngradeTest` sweeps every flag
-combination to keep it that way.
+**The order of the two downgrades matters and is deliberate.** `effectiveAlertStyle` checks
+the projected case *before* the ringer, so the AudioManager read is skipped whenever the
+cheaper answer already settles it — this runs on a receiver that has just been woken from
+Doze. Neither path can ever turn a Notification *into* an Alarm; both are downgrades only,
+and `AlertStyleDowngradeTest` sweeps all sixteen flag combinations to keep it that way.
 
 ---
 
@@ -1461,10 +1464,12 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   dropped the same day: its file was replaced by the uploader in Dec 2025 and its page credits the
   uploader while naming a reciter.
 - **Opt in and never the default.** No existing user's sound changes on upgrade.
-- **The model, per prayer:** Off · Notification (quiet, vibrates) · Alarm (out loud). The Alarm sound
-  is one setting for all alarms: "Adhan" (Sunni only) or "From your phone" (the system picker, any
-  sound, including an adhan the user saved). So a person at work sets Dhuhr and Asr to Notification
-  and keeps Fajr as Alarm with the adhan.
+- **The model, per prayer:** Off · Notification (a message with the phone's usual tone) · Alarm. The
+  Alarm sound is one setting for all alarms: "Adhan" (Sunni only) or "From your phone" (the system
+  picker, any sound, including an adhan the user saved). Under it, **"Play on silent"**, off by
+  default: on silent, vibrate or Do Not Disturb an Alarm gives the notification and vibration only,
+  unless that is on. So a person at work sets Dhuhr and Asr to Notification, or keeps the phone on
+  silent, and keeps Fajr as Alarm with the adhan.
 - **Shia users** get one quiet Notice above "From your phone": "No Shia adhan yet / Until we find
   one we are free to include, choose any adhan saved on your phone." In that picker only: never
   on Times, never as a notification, never to Sunni users. **It is removed in the release that
@@ -1474,8 +1479,8 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   and same reason as the method reset in `SettingsRepository.setSect`.
 - **Stored as an ordinary sound address**, `android.resource://<package>/raw/adhan`, in the same
   `alarm_sound` setting. The alarm channel id is a hash of the address (§6 Channels), so the adhan is
-  just another channel: `USAGE_ALARM`, Do Not Disturb, volume and dismissing behave exactly as with
-  a phone sound. By name, not resource id (ids move between builds); `res/raw/keep.xml` stops
+  just another channel: `USAGE_ALARM`, Do Not Disturb, "Play on silent", volume and dismissing behave
+  exactly as with a phone sound. By name, not resource id (ids move between builds); `res/raw/keep.xml` stops
   resource shrinking from removing a file referred to only by name.
 - Backing out of the phone's sound picker no longer resets the sound to the default.
 - No network, no permission, no new usage counts event. The sect never leaves the phone.
@@ -1805,7 +1810,7 @@ below, and it takes a second.
 | `ColorContrastTest` | app | 4 | WCAG AA for every pair in both themes |
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
 | `PlaceNameTest` | app | 18 | The town wins over the county; the postal town is parsed from the address line when `locality` is missing, using rows copied from real 15 Aug 2026 probes — the UK emulator sweep (Slough centre, the rugby-club coarse fix, Bradford/Manningham, London, Birmingham, partial and missing postcodes, an Arabic-comma line) and the owner's S23 Ultra in Türkiye (`07410 Alanya/Antalya` must yield "Alanya", not the province); a point of interest, the street, a house number and a state/province abbreviation never become the town; the district is still used when there is no town; blank fields skipped; the country is not repeated (§5.18) |
-| `AlertStyleDowngradeTest` | app | 6 | The one alert downgrade left since 1.5.0 (§5.14): an ordinary alarm rings, a projected time does not, an override brings it back; **every flag combination proves a Notification is never upgraded to an Alarm**; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
+| `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
 | `BuiltInAdhanTest` | app | 5 | The built-in adhan (§5.23): never the default, the stored address names the raw file in any build variant, Sunni only, a move to Shia falls back to the earlier phone sound or the default, anything else is left alone |
 | `BuiltInAdhanDeviceTest` | app, device | 3 | The stored address opens the exact file, the alarm channel carries it with `USAGE_ALARM`, and an upgraded user's phone sound survives adhan then Shia |
 | `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
@@ -4867,7 +4872,7 @@ live. The short project brief is `docs/PROJECT_BRIEF.md`, read live from `main` 
 project (PR #14).
 
 **Next: 1.5.0 on `claude/quiet-glass`, not merged.** Quiet Glass design, Arabic, watch translations, the
-review card, reminder before prayer, **built-in Sunni adhan with Alarm always out loud** (block below), Shia
+review card, reminder before prayer, **built-in Sunni adhan and "Play on silent"** (block below), Shia
 notice. Owner submits around **4 Jan 2027**, live mid January, latest 25 Jan (two weeks before Ramadan
 1448, Mon 8 Feb 2027). A local reminder fires Sun 20 Dec 18:00 and the prep job runs Mon 21 Dec 10:00.
 Before merging, merge `main` into the branch.
@@ -4882,13 +4887,13 @@ Before merging, merge `main` into the branch.
 **Claude's carry-overs.** Re baseline the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr` for 1.4.0
 live. Post the drafted Arabic review reply only once 1.5.0 (Arabic) is live; the owner posts it.
 
-### 📍 Built-in adhan, Alarm always out loud, Shia notice, 17 Oct 2026 late (same branch, NOT merged, ships in 1.5.0)
+### 📍 Built-in adhan, "Play on silent", Shia notice, 17 Oct 2026 late (same branch, NOT merged, ships in 1.5.0)
 
 **Why.** The owner decided to ship a free, clearly licensed Sunni adhan as an alarm sound, and to tell
 Shia users honestly that no Shia adhan is included yet. Then, testing the idea against how people live
 ("a lot of people at work don't want the adhan to play out loud"), he asked for it to be simple: per
-prayer, nothing, a quiet notification, or out loud; one adhan that is safe to use; any phone sound for
-everything else. Rules: §5.23, and §5.13 for the removed switch.
+prayer, nothing, a notification, or out loud; one adhan that is safe to use; any phone sound for
+everything else; and the user decides whether an alarm plays on a silent phone. Rules: §5.23, §5.13.
 
 **Built.**
 - `data/BuiltInAdhan.kt` (one entry, `ADHAN`), `res/raw/adhan.ogg` (CC0, unmodified, hash in
@@ -4896,10 +4901,12 @@ everything else. Rules: §5.23, and §5.13 for the removed switch.
 - `AlarmSoundChoices` in `SettingsScreen.kt`: "Adhan" (Sunni only) and "From your phone", one radio group,
   in the Prayer alerts and Suhoor dialogs. It replaces `AlarmSoundRow` and its "save an adhan on your
   phone" hint.
-- **The "Stay quiet when your phone is silent" switch is removed** (`alarmRespectsSilent`, `phoneIsSilenced`,
-  their strings in five languages). `effectiveAlertStyle` now drops an alarm to a notification for one reason
-  only, a projected polar time. The Prayer alerts help line says it plainly: "Notification: quiet, with
-  vibration. Alarm: plays out loud, even on silent."
+- **"Play on silent"** replaces "Stay quiet when your phone is silent": the same setting
+  (`alarmRespectsSilent`), inverted, off by default, under the alarm sound. It was removed for an
+  afternoon ("Alarm always out loud") and restored at the owner's request after a look at other prayer
+  apps; see §5.13. Help line: "Notification: a message with your phone's usual tone. Alarm: plays the
+  adhan or a sound you choose." (The old "quiet, with vibration" was untrue: a notification makes the
+  phone's usual tone when its sound is on.)
 - `phone_alarm_sound` and the Shia fallback in `SettingsRepository`; backing out of the phone's picker no
   longer resets the sound.
 - About → "Adhan recording": one credit line and a "Source" link, in the paragraph's type and line height
@@ -4927,11 +4934,13 @@ heard which radio was chosen: now `selectable` (every radio list in the app bene
 (4) Release shrinking: `aapt2` shows `raw/adhan` survives (`res/lE.ogg`).
 
 **Verified (emulator, Android 16, London).**
-- Gate green (5 tests in `BuiltInAdhanTest`, `AlertStyleDowngradeTest` rewritten for the one rule left);
+- Gate green (5 tests in `BuiltInAdhanTest`, `AlertStyleDowngradeTest` restored with the silent rule);
   device suite 21 of 21 (3 in `BuiltInAdhanDeviceTest`: the stored address opens the exact file, the channel
   carries it with `USAGE_ALARM`, the upgrade sequence ends on the old phone sound).
 - A real Maghrib alarm with the adhan: its own `prayer_alarm_v…` channel, SystemUI's alarm player started.
-  **With the phone on vibrate it played out loud; under Do Not Disturb (priority) it played out loud.**
+  **Phone on vibrate, "Play on silent" off: a quiet notification on `prayer_times`, no sound. Turned on:
+  the adhan played out loud. Phone sound on: it played.** (With the switch removed earlier the same day it
+  also played under Do Not Disturb, the path "Play on silent" on now takes.)
   Swiping the notification away stopped it at once. It plays in full: started, then stopped about
   154 s later, the file being 2 min 34 s (polled every 2 s, under Do Not Disturb).
 - Sunni to Shia: back to the earlier phone sound or the default; Shia shows the notice and no adhan.
@@ -4947,9 +4956,7 @@ chose by licence ("just pick one") and should listen once before release, at
 commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg, and say if it contains "hayya ala khayr al-amal"
 (that would make it a Shia adhan).
 
-**Behaviour change for existing users.** Anyone who relied on the old switch (on by default) will now hear
-their Alarm prayers on a silenced phone. The What's new says so in one line. They switch those prayers to
-Notification.
+**No behaviour change for existing users.** "Play on silent" is the old switch inverted, so whatever they chose is kept.
 
 **Open items.** Commission a Shia adhan with a written licence (then remove the notice in that release);
 later, a Sunni Fajr adhan ("as-salatu khayrun min an-nawm") with a written licence.

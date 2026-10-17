@@ -331,6 +331,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissEidGreeting(code: Int) =
         viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
 
+    fun setAlarmRespectsSilent(respects: Boolean) =
+        viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
+
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
 

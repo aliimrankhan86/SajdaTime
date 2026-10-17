@@ -94,6 +94,12 @@ data class AppSettings(
     val ongoingBadge: Boolean = true,
     /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
     val alarmSoundUri: String = "",
+    /**
+     * Whether an Alarm falls back to a quiet notification while the phone is on silent, vibrate or
+     * Do Not Disturb. Shown inverted as "Play on silent" (off by default), so a phone on silent stays
+     * quiet unless the user asks otherwise, like other prayer apps. Existing users keep their choice.
+     */
+    val alarmRespectsSilent: Boolean = true,
     /** The phone sound a built-in adhan replaced, so the phone's own picker can open on it. */
     val phoneAlarmSoundUri: String = "",
     /**
@@ -352,6 +358,9 @@ class SettingsRepository(private val context: Context) {
     /** A sound from the phone's own list, or "" for the phone's default alarm. */
     suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
 
+    suspend fun setAlarmRespectsSilent(respects: Boolean) =
+        edit { it[Keys.ALARM_RESPECTS_SILENT] = respects }
+
     /**
      * A built-in adhan. The sound it replaces, when that is a phone sound, is remembered in
      * [Keys.PHONE_ALARM_SOUND], so a move to the Shia school can put it back (see [setSect]).
@@ -440,6 +449,7 @@ class SettingsRepository(private val context: Context) {
         val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
         val ONGOING = booleanPreferencesKey("ongoing_badge")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
+        val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
 
         /**
          * The phone sound (or "" for the default) in use when a built-in adhan replaced it (1.5.0).
@@ -495,6 +505,7 @@ class SettingsRepository(private val context: Context) {
             hijriOffsetDays = this[Keys.HIJRI_OFFSET] ?: 0,
             ongoingBadge = this[Keys.ONGOING] ?: true,
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
+            alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
             phoneAlarmSoundUri = this[Keys.PHONE_ALARM_SOUND] ?: "",
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,

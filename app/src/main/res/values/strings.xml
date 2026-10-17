@@ -310,7 +310,7 @@
     <string name="settings_method_auto">Automatic · %1$s</string>
     <string name="settings_method_help">Mosques measure the twilight differently, and that mainly moves Fajr and Isha. The further north you live, the bigger the gap. If these times do not match your mosque, ask them which method they use and pick it here.</string>
 
-    <string name="settings_alerts_help">Notification: quiet, with vibration. Alarm: plays out loud, even in silent mode.</string>
+    <string name="settings_alerts_help">Notification: a message with your phone\'s usual tone. Alarm: plays the adhan or a sound you choose.</string>
     <string name="alert_style_off">Off</string>
     <string name="alert_style_notification">Notification</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -320,6 +320,8 @@
     <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
     <!-- 1.5.0 built-in adhan (data/BuiltInAdhan.kt). The Shia notice shows in the sound picker only and is removed in the release that ships a Shia adhan. -->
     <string name="settings_alarm_sound_phone">From your phone</string>
+    <string name="settings_alarm_play_on_silent">Play on silent</string>
+    <string name="settings_alarm_play_on_silent_desc">Plays even when your phone is on silent or Do Not Disturb. Off: notification and vibration only.</string>
     <string name="adhan_builtin">Adhan</string>
     <string name="adhan_shia_title">No Shia adhan yet</string>
     <string name="adhan_shia_brief">Until we find one we are free to include, choose any adhan saved on your phone.</string>
