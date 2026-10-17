@@ -1,5 +1,9 @@
 package com.sajdatime.app.ui.settings
 
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.foundation.selection.toggleable
+import com.sajdatime.app.review.ReviewPrompt
+import androidx.compose.ui.text.font.FontWeight
 import android.content.Intent
 import android.os.Build
 import com.sajdatime.app.ui.components.PermissionCard
@@ -344,6 +348,15 @@ fun SettingsScreen(
                         )
                     }
                 },
+            ),
+            // A door, never an ask: the user chooses to go. Opens the store page, not the
+            // In-App Review card, because Google says that card must not sit behind a button
+            // (it may silently not show once the quota is spent). See review/ReviewPrompt.kt.
+            SettingsItem.Link(
+                key = "rate",
+                title = stringResource(R.string.about_rate),
+                subtitle = stringResource(R.string.about_rate_desc),
+                onClick = { ReviewPrompt.openStorePage(context) },
             ),
             SettingsItem.Toggle(
                 key = "usage_counts",
@@ -888,16 +901,19 @@ private fun AlertChoiceRow(
         ) {
             ChoiceChip(
                 label = stringResource(R.string.alert_style_off),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_off), label),
                 selected = selected == null,
                 onClick = { onSelect(null) },
             )
             ChoiceChip(
                 label = stringResource(R.string.alert_style_notification),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_notification), label),
                 selected = selected == AlertStyle.NOTIFICATION,
                 onClick = { onSelect(AlertStyle.NOTIFICATION) },
             )
             ChoiceChip(
                 label = stringResource(R.string.alert_style_alarm),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_alarm), label),
                 selected = selected == AlertStyle.ALARM,
                 onClick = { onSelect(AlertStyle.ALARM) },
             )
@@ -931,8 +947,10 @@ private fun ChooserDialog(
 private fun SectionLabel(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
-        color = MaterialTheme.colorScheme.primary,
+        // Same voice as the Settings section titles (SettingsList): Quiet Glass retired the
+        // letterspaced green label, and two dialogs still had it (research F22).
+        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
             .padding(vertical = 8.dp)
             .semantics { heading() },
@@ -946,7 +964,7 @@ private fun SectionLabel(title: String) {
  * chip, and a set of chips is one choice rather than three independent buttons.
  */
 @Composable
-private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit, spokenAs: String? = null) {
     val scheme = MaterialTheme.colorScheme
     Text(
         text = label,
@@ -966,6 +984,9 @@ private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
                 shape = RoundedCornerShape(50),
             )
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            // Five rows of "Notification, radio button" were indistinguishable by ear; this
+            // says "Alarm for Fajr" (research D4).
+            .then(if (spokenAs != null) Modifier.semantics { contentDescription = spokenAs } else Modifier)
             .padding(horizontal = 14.dp, vertical = 8.dp),
     )
 }
@@ -1040,7 +1061,8 @@ private fun SwitchRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Switch) { onCheckedChange(!checked) }
+            // toggleable so a screen reader hears "on" or "off" (research D3).
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
             .heightIn(min = 56.dp)
             .padding(horizontal = horizontalPadding, vertical = 8.dp),
     ) {

@@ -4822,6 +4822,27 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 Research pass and fixes, 17 Oct 2026 (same branch `claude/quiet-glass`, NOT merged)
+
+**What happened.** Fable 5.1 did a full UX, wording and Play ratings research pass over every screen, string and screenshot, in two rounds (Claude sent it back once for thin sections, accessibility from code, simpler rating rules, and a fact check of every proposed string). The report is `build/ux-research-input/FINDINGS.md` on the Mac (gitignored); after screenshots are in `build/ux-research-input/after/`.
+
+**Built from it.**
+- Three untrue sentences fixed: the madhab step promised a Skip that does not exist (`madhab_body` now explains the Shafi'i preselection honestly); the Makkah notice told users who chose to skip "We could not work out where you are" (now "Your location is not set yet…", action "Set location"); All set told Android 7 to 11 users about an exact alarm permission they do not have (gated on API 31).
+- City search with no internet now says so (`LocationProblem.OFFLINE`, `city_lookup_offline`) instead of "not found". ACCESS_NETWORK_STATE comes from Firebase's merged manifest; `WidgetManifestTest` pins ours, so it is not declared, and the check falls back to "not found" if it is ever absent.
+- "Skip for now and use Makkah" now moves on; a denied location says so; All set warns, on Android 13+, that a notification question follows Finish.
+- Settings no longer shows a permanent "Allowed" card once a permission is granted (DESIGN_SYSTEM §4 "furniture"). Two dialog labels lost the old green letterspaced style.
+- The next prayer notification uses the system countdown (`setUsesChronometer`, count down, `setTimeoutAfter` at the prayer so it never goes negative when that prayer has no alert). Verified ticking on the emulator. Its digits follow the phone's locale, not the app's: a known trade.
+- Hero card says "Next prayer · Tomorrow" after Isha, on the label line (no height cost).
+- Screen reader: prayer rows merged into one stop; Settings switches use `toggleable` so on/off is spoken (with ToggleOn/Off haptics); alert chips say "Alarm for Fajr"; onboarding choices are radio buttons (verified checked state on the emulator).
+- Notices 24dp radius like every other card. Rating card and Rate row (see CLAUDE.md rule).
+
+**Deliberately not taken from the research, and why.** iOS chevron swap (the owner asked for an iPhone feel); location step and sheet copy rewrite (the privacy sentence must stay visible before a name is sent, gain was small); Qibla no location action (unreachable after setup, which always sets Makkah); Ramadan card de-duplication and motion tokens (P1/P2, not urgent before Ramadan); splash screen dependency; localised compass letters; alarm Stop action (needs the Redmi and S23 first).
+
+**Waiting for the owner.** Q1 move the usage counts consent from second screen to before All set? Q2 a passive "Share SajdaTime" row? Q4 replying to Play reviews (Claude drafts from a screenshot). Q5 retake store screenshots once Quiet Glass ships.
+
+**Verified.** Full gate green (343 unit tests incl. 9 new ReviewTimingTest, lint 0 errors); device suite on a clean install 16 run, 0 failed, 1 skipped by its own time-of-day assumption; emulator walk through onboarding (offline search, Skip, madhab radios, All set hint), Times with Makkah notice, Settings top and Rate row, live badge countdown, Urdu Settings.
+**Not verified.** That the Play card actually appears (only an internal test track install can show it; sideload and debug never do); review library size after R8; TalkBack spoken output on a device (semantics checked in the UI dump only); dark and 2x screenshots of these exact changes; Android 7 to 11; a real phone.
+
 ### 📍 Quiet Glass redesign, 17 Oct 2026: built and tested on branch `claude/quiet-glass`, NOT merged, NOT for 1.4.0
 
 **Where it is.** Branch `claude/quiet-glass` (pushed), cut from `claude/settings-design-preview`, which is cut from `claude/security-and-visibility` at 64efdcc. The 1.4.0 branch and its signed bundle (sha256 395c4513…) are untouched. This ships in a release after 1.4.0, at the owner's word.
@@ -6976,6 +6997,8 @@ coordinates, or anything whose shape reveals them.**
 asking the user for things. A privacy consent is not a growth ask, it is required before data can
 be sent, so it is allowed, **once**, at setup and from Settings. It must never appear in or after
 the disclaimer, never mention the dua, and never be a nag. Do not delete it as a stray "second ask".
+
+**SUPERSEDED 17 Oct 2026 by the owner:** the app may now show Google Play's own rating card, under the rules in `review/ReviewPrompt.kt` and CLAUDE.md. The reasoning below still governs everything else: no copy of ours asks for a rating, nothing nags, the dua request stays the only ask in our words.
 
 **Also: no in-app prompt asking the user to rate, review or share the app. Added 7 Sept 2026.**
 This will look tempting, because the app is live with zero ratings and ratings are what would

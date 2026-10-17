@@ -9,9 +9,9 @@ import java.time.ZoneId
 /**
  * The optional silent "next prayer" badge in the notification shade.
  *
- * ponytail: refreshed when something already woke us (alarm fires, app opens, daily job)
- * rather than ticking every minute. A live-updating badge would need a foreground
- * service and a permanent wake cost for a countdown the user can already see in the app.
+ * ponytail: reposted when something already woke us (alarm fires, app opens, daily job).
+ * The countdown itself is the system chronometer, so it stays right between those wakes
+ * with no foreground service and no wake cost (Notifications.postOngoingBadge).
  */
 object OngoingBadge {
 

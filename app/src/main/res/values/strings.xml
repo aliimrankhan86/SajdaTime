@@ -53,7 +53,7 @@
     <string name="sect_shia_desc">Jafari (Ithna Ashari) times</string>
 
     <string name="madhab_title">Select your madhab</string>
-    <string name="madhab_body">Optional. This only changes the Asr time. Skip it and you will get the standard timing.</string>
+    <string name="madhab_body">This only changes the Asr time. Hanafi mosques begin Asr later. Shafi\'i, Maliki and Hanbali use the standard time. Not sure? Keep Shafi\'i for the standard time. You can change it later in Settings.</string>
     <string name="madhab_hanafi">Hanafi</string>
     <string name="madhab_shafii">Shafi\'i</string>
     <string name="madhab_maliki">Maliki</string>
@@ -204,8 +204,8 @@
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Showing times for Makkah</string>
-    <string name="home_default_location_body">We could not work out where you are.</string>
+    <string name="home_default_location_title">Times for Makkah</string>
+    <string name="home_default_location_body">Your location is not set yet, so these times are for Makkah.</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -323,11 +323,11 @@
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
     <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
-    <string name="settings_ongoing_badge">Show the next prayer in notifications</string>
+    <string name="settings_ongoing_badge">Next prayer in notifications</string>
     <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and the time left</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Prayer alerts may arrive late.</string>
+    <string name="settings_exact_alarms_brief">Prayer alerts can arrive an hour late.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">Allow</string>
     <!-- These two said only "and deliver them late", with no number, because Android
@@ -397,7 +397,6 @@
     <string name="notif_prayer_title">Time for %1$s</string>
     <string name="notif_prayer_body">%1$s begins at %2$s</string>
     <string name="notif_next_title">%1$s at %2$s</string>
-    <string name="notif_next_body">In %1$s</string>
 
     <!--
       Hijri month names are listed here rather than left to the platform. Month name data
@@ -577,4 +576,12 @@
     <string name="action_see_why">See why</string>
     <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
     <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
+    <string name="action_set_location">Set location</string>
+    <string name="city_lookup_offline">No internet connection. Connect once to look up a city, or use your location.</string>
+    <string name="about_rate">Rate SajdaTime on Google Play</string>
+    <string name="about_rate_desc">Opens the store page.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%1$s for %2$s</string>
+    <string name="location_permission_denied">Location was not allowed. Type your city below, or allow it later from the location sheet.</string>
+    <string name="confirm_notifications_hint">When you tap Finish, Android will ask whether SajdaTime may send notifications. Say yes to get prayer alerts. You can change this later in your phone\'s settings.</string>
 </resources>

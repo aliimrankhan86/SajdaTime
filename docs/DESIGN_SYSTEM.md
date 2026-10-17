@@ -416,6 +416,11 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   Turkish and Indonesian (Urdu has no case). Written that way in the strings, never cased in
   code.
 
+- **17 Oct 2026, research pass (FINDINGS.md):** granted permissions show nothing on Settings;
+  every card is 24dp, notices included; dialog section labels speak in the Settings section
+  voice. Kept against the research: the iOS style chevron (the owner asked for an iPhone feel).
+  Rating is Google's card only, never a component of ours.
+
 ---
 
 ## 10. The learning loop

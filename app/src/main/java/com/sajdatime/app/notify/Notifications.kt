@@ -364,13 +364,21 @@ object Notifications {
             .setContentTitle(
                 context.getString(R.string.notif_next_title, slot.label(context), TimeFormat.clock(context, at)),
             )
-            .setContentText(
-                context.getString(R.string.notif_next_body, TimeFormat.remaining(context, now, at)),
-            )
+            // The system's own countdown, not a written "In 41m". The written one was only
+            // refreshed when something else woke the app, so it sat wrong for hours (research
+            // F28, 17 Oct 2026). The chronometer ticks in the shade at no wake cost (API 24+).
+            // Trade-off taken: its digits follow the phone's locale, not the app's language.
+            .setWhen(at.toEpochMilli())
+            .setShowWhen(true)
+            .setUsesChronometer(true)
+            .setChronometerCountDown(true)
+            // Only prayers with an alert wake the app to repost this, so without a limit a
+            // prayer with alerts off would leave it counting below zero. It goes at the time
+            // instead, and the next wake (alarm, app open, daily job) brings it back.
+            .setTimeoutAfter(Duration.between(now, at).toMillis().coerceAtLeast(1))
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setSilent(true)
             .setOngoing(true)
-            .setShowWhen(false)
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
             .build()

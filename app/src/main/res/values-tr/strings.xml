@@ -43,7 +43,7 @@
     <string name="sect_shia_desc">Caferi (İsna Aşeriyye) vakitleri</string>
 
     <string name="madhab_title">Fıkıh mezhebinizi seçin</string>
-    <string name="madhab_body">İsteğe bağlı. Bu yalnızca İkindi vaktini değiştirir. Atlarsanız standart vakit kullanılır.</string>
+    <string name="madhab_body">Bu yalnızca İkindi vaktini değiştirir. Hanefi camilerinde İkindi daha geç başlar. Şafii, Maliki ve Hanbeli standart vakti kullanır. Emin değil misiniz? Standart vakit için Şafii seçili kalsın. Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="madhab_hanafi">Hanefi</string>
     <string name="madhab_shafii">Şafii</string>
     <string name="madhab_maliki">Maliki</string>
@@ -88,8 +88,8 @@
     <string name="home_no_location">Namaz vakitlerini görmek için konumunuzu belirleyin.</string>
     <string name="home_countdown_a11y">%1$s, %2$s sonra</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Mekke vakitleri gösteriliyor</string>
-    <string name="home_default_location_body">Nerede olduğunuzu bulamadık.</string>
+    <string name="home_default_location_title">Mekke vakitleri</string>
+    <string name="home_default_location_body">Konumunuz henüz ayarlanmadı, bu yüzden bu vakitler Mekke içindir.</string>
     <string name="action_change_location">Konumu değiştir</string>
 
     <!-- Location sheet -->
@@ -177,7 +177,7 @@
     <string name="settings_ongoing_badge_desc">Sıradaki vakti ve ne kadar süre kaldığını gösteren sessiz bir bildirim</string>
     <string name="settings_exact_alarms_title">Tam zamanlı alarmlara izin ver</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Namaz uyarıları gecikebilir.</string>
+    <string name="settings_exact_alarms_brief">Namaz uyarıları bir saat gecikebilir.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">İzin ver</string>
     <string name="settings_exact_alarms_desc">Bu izin olmadan namaz uyarıları bir saat ya da daha geç gelebilir. Bazı telefonlarda Sabah uyarısı hiç gelmeyebilir.</string>
@@ -231,7 +231,6 @@
     <string name="notif_prayer_title">%1$s vakti</string>
     <string name="notif_prayer_body">%1$s vakti saat %2$s itibarıyla giriyor</string>
     <string name="notif_next_title">%1$s · %2$s</string>
-    <string name="notif_next_body">Kalan süre: %1$s</string>
 
     <string name="hijri_date_format">%1$d %2$s %3$d</string>
     <string name="home_date_line">%1$s · %2$s</string>
@@ -359,4 +358,12 @@
     <string name="action_see_why">Nedenini gör</string>
     <string name="ramadan_eve_brief">Caminiz bir gün sonra başlayabilir.</string>
     <string name="polar_notice_brief">Burada Sabah ve Yatsı %1$d° enlemine göre hesaplanır.</string>
+    <string name="action_set_location">Konumu ayarla</string>
+    <string name="city_lookup_offline">İnternet bağlantısı yok. Şehir aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>
+    <string name="about_rate">SajdaTime\'ı Google Play\'de puanlayın</string>
+    <string name="about_rate_desc">Mağaza sayfasını açar.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%2$s için %1$s</string>
+    <string name="location_permission_denied">Konum izni verilmedi. Şehrinizi aşağıya yazın ya da izni daha sonra konum sayfasından verin.</string>
+    <string name="confirm_notifications_hint">Bitir\'e dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
 </resources>

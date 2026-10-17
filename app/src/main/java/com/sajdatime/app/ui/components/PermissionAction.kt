@@ -131,21 +131,10 @@ fun PermissionCard(
     details: String? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
-    val scheme = MaterialTheme.colorScheme
-    if (granted) {
-        val shape = RoundedCornerShape(20.dp)
-        PermissionButton(
-            label = title,
-            granted = true,
-            onClick = onClick,
-            allowedColor = scheme.onSecondaryContainer,
-            modifier = modifier
-                .fillMaxWidth()
-                .sajdaSurface(shape, scheme.secondaryContainer)
-                .padding(horizontal = 16.dp, vertical = 6.dp),
-        )
-        return
-    }
+    // Granted: nothing. A permanent "Allowed" card at the top of Settings is the furniture
+    // DESIGN_SYSTEM §4 forbids; the user did the right thing and needs no badge for it
+    // (research F21, 17 Oct 2026). Onboarding keeps its "Allowed" line via PermissionButton.
+    if (granted) return
     Notice(
         title = title,
         brief = body,

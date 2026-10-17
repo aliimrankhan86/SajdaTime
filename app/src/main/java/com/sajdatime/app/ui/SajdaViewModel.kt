@@ -55,6 +55,8 @@ enum class LocationProblem {
     PERMISSION_DENIED,
     NO_FIX,
     CITY_NOT_FOUND,
+    /** City search failed and the phone has no network: "not found" would be untrue. */
+    OFFLINE,
 }
 
 /**
@@ -224,15 +226,27 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             _state.update { it.copy(resolvingLocation = true, problem = null) }
             val result = cityLookup.search(query)
             if (result == null) {
-                _state.update {
-                    it.copy(resolvingLocation = false, problem = LocationProblem.CITY_NOT_FOUND)
-                }
+                // A null from the lookup means "not found" or "no network", and the second
+                // told a user with no data that Lahore does not exist (research F10).
+                val problem = if (isOnline()) LocationProblem.CITY_NOT_FOUND else LocationProblem.OFFLINE
+                _state.update { it.copy(resolvingLocation = false, problem = problem) }
                 return@launch
             }
             settingsRepository.setLocation(result.coordinates, result.city)
             _state.update { it.copy(resolvingLocation = false, problem = null) }
         }
     }
+
+    /**
+     * ACCESS_NETWORK_STATE comes in through Firebase's manifest, not ours: WidgetManifestTest
+     * pins our own permission list, and the merged one already has it. If it ever goes, this
+     * answers "online" and the message falls back to "not found", as before.
+     */
+    private fun isOnline(): Boolean = runCatching {
+        val cm = getApplication<Application>().getSystemService(android.net.ConnectivityManager::class.java)
+        @Suppress("DEPRECATION") // activeNetworkInfo is the one call that works back to API 24.
+        cm?.activeNetworkInfo?.isConnected == true
+    }.getOrDefault(true)
 
     // --- settings --------------------------------------------------------------------
 

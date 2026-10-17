@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.settings
 
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -150,6 +152,7 @@ private fun iconFor(item: SettingsItem): ImageVector = when (item) {
     "disclaimer" -> Icons.Outlined.Info
     "privacy" -> Icons.Outlined.Lock
     "feedback" -> Icons.Outlined.MailOutline
+    "rate" -> Icons.Outlined.StarOutline
     "usage_counts" -> Icons.Outlined.BarChart
     "charity" -> Icons.Outlined.FavoriteBorder
     "credits" -> Icons.Outlined.Person
@@ -196,13 +199,19 @@ private fun PlainRow(item: SettingsItem, leading: @Composable () -> Unit, titleS
     val onClick = (item as? SettingsItem.Link)?.onClick
     val toggle = item as? SettingsItem.Toggle
     val subtitle = (item as? SettingsItem.Link)?.subtitle ?: toggle?.subtitle
+    val haptics = LocalHapticFeedback.current
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .then(
                 when {
-                    toggle != null -> Modifier.clickable(role = Role.Switch) { toggle.onCheckedChange(!toggle.checked) }
+                    // toggleable, not clickable: a clickable with a Switch role never told a
+                    // screen reader whether it was on or off (research D3).
+                    toggle != null -> Modifier.toggleable(value = toggle.checked, role = Role.Switch) { on ->
+                        haptics.performHapticFeedback(if (on) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
+                        toggle.onCheckedChange(on)
+                    }
                     onClick != null -> Modifier.clickable(role = Role.Button, onClick = onClick)
                     else -> Modifier
                 },

@@ -1,5 +1,9 @@
 package com.sajdatime.app.ui.onboarding
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.selection.selectable
+import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -372,10 +376,13 @@ private fun PermissionStep(
             LocatedRow(cityName = state.settings.cityName)
         }
 
-        if (state.problem == LocationProblem.NO_FIX) {
+        // Denying used to change nothing visible at all (research F7).
+        if (state.problem == LocationProblem.NO_FIX || state.problem == LocationProblem.PERMISSION_DENIED) {
             Spacer(Modifier.height(16.dp))
             Text(
-                text = stringResource(R.string.location_no_fix),
+                text = stringResource(
+                    if (state.problem == LocationProblem.NO_FIX) R.string.location_no_fix else R.string.location_permission_denied,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -404,7 +411,7 @@ private fun PermissionStep(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(Modifier.height(12.dp))
-            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND
+            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
                 value = city,
                 onValueChange = { city = it },
@@ -412,7 +419,7 @@ private fun PermissionStep(
                 supportingText = {
                     Text(
                         text = stringResource(
-                            if (notFound) R.string.city_not_found else R.string.city_field_helper,
+                            if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
                         ),
                     )
                 },
@@ -447,7 +454,12 @@ private fun PermissionStep(
             // app usable and the main screen says clearly that this is what happened.
             Spacer(Modifier.height(20.dp))
             TextButton(
-                onClick = onUseDefaultLocation,
+                // It says "Skip", so it moves on. It used to tick Makkah and stay, leaving the
+                // user under the same Allow button (research F3).
+                onClick = {
+                    onUseDefaultLocation()
+                    onNext()
+                },
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.action_use_makkah))
@@ -667,7 +679,11 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         //
         // Deliberately not a blocker: Finish is right underneath, unconditional, and the
         // app works without it. See HANDOVER §10.
-        run {
+        //
+        // Android 12 and later only: before that there is no such permission, and this block
+        // told a third of the installed base about a setting their phone does not have
+        // (research F5). Settings has carried the same gate since the start.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             Spacer(Modifier.height(24.dp))
             SectionHeading(stringResource(R.string.confirm_exact_alarm_title))
             Spacer(Modifier.height(8.dp))
@@ -682,6 +698,17 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
                 modifier = Modifier.fillMaxWidth(),
+            )
+        }
+
+        // Android 13+ asks about notifications the moment Finish is tapped, and every prayer
+        // alert depends on the answer. Said here, before the system box appears (research F6).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Spacer(Modifier.height(24.dp))
+            Text(
+                text = stringResource(R.string.confirm_notifications_hint),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -718,7 +745,6 @@ private fun ChoiceCard(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
                 MaterialTheme.colorScheme.primaryContainer
@@ -726,9 +752,12 @@ private fun ChoiceCard(
                 MaterialTheme.colorScheme.surfaceVariant
             },
         ),
+        // A radio choice, so a screen reader says "selected" as a state, once, instead of
+        // reading the word "Selected" out of the tick as part of the text (research D5).
         modifier = Modifier
             .fillMaxWidth()
-            .semantics { /* role and selection are conveyed by the check icon + text */ },
+            .clip(CardDefaults.shape)
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -746,7 +775,7 @@ private fun ChoiceCard(
             if (selected) {
                 Icon(
                     Icons.Filled.Check,
-                    contentDescription = stringResource(R.string.state_selected),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }

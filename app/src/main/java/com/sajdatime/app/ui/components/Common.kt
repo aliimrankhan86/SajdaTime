@@ -198,7 +198,7 @@ fun LocationSheet(
             )
             Spacer(Modifier.height(12.dp))
 
-            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND
+            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -206,7 +206,7 @@ fun LocationSheet(
                 supportingText = {
                     Text(
                         stringResource(
-                            if (notFound) R.string.city_not_found else R.string.city_field_helper,
+                            if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
                         ),
                     )
                 },

@@ -94,7 +94,8 @@ fun Notice(
         NoticeTone.WARNING -> Triple(scheme.tertiaryContainer, scheme.onTertiaryContainer, scheme.tertiary)
         NoticeTone.QUIET -> Triple(scheme.secondaryContainer, scheme.onSecondaryContainer, scheme.onSecondaryContainer)
     }
-    val shape = RoundedCornerShape(20.dp)
+    // 24, the same as every other card: at 20 a notice between two 24dp cards read as a mistake.
+    val shape = RoundedCornerShape(24.dp)
     var open by rememberSaveable(title, brief) { mutableStateOf(false) }
     val turn by animateFloatAsState(if (open) 180f else 0f, tween(200), label = "notice fold")
     val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)

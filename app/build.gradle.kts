@@ -273,6 +273,7 @@ dependencies {
     // app identifiers are plain string resources (res/values/firebase_config.xml).
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.play.review.ktx)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

@@ -43,7 +43,7 @@
     <string name="sect_shia_desc">Waktu Jafari (Itsna Asyariyah)</string>
 
     <string name="madhab_title">Pilih mazhab Anda</string>
-    <string name="madhab_body">Opsional. Ini hanya mengubah waktu Asar. Lewati saja dan Anda akan mendapat waktu standar.</string>
+    <string name="madhab_body">Ini hanya mengubah waktu Asar. Masjid bermazhab Hanafi memulai Asar lebih lambat. Syafi\'i, Maliki, dan Hanbali memakai waktu standar. Tidak yakin? Biarkan Syafi\'i untuk waktu standar. Anda bisa mengubahnya nanti di Pengaturan.</string>
     <string name="madhab_hanafi">Hanafi</string>
     <string name="madhab_shafii">Syafi\'i</string>
     <string name="madhab_maliki">Maliki</string>
@@ -88,8 +88,8 @@
     <string name="home_no_location">Atur lokasi Anda untuk melihat waktu salat.</string>
     <string name="home_countdown_a11y">%1$s dalam %2$s</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Menampilkan waktu untuk Makkah</string>
-    <string name="home_default_location_body">Lokasi Anda tidak dapat ditentukan.</string>
+    <string name="home_default_location_title">Waktu untuk Makkah</string>
+    <string name="home_default_location_body">Lokasi Anda belum diatur, jadi waktu ini untuk Makkah.</string>
     <string name="action_change_location">Ubah lokasi</string>
 
     <!-- Location sheet -->
@@ -177,7 +177,7 @@
     <string name="settings_ongoing_badge_desc">Notifikasi senyap yang menunjukkan salat berikutnya dan sisa waktunya</string>
     <string name="settings_exact_alarms_title">Izinkan alarm tepat waktu</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Pengingat salat bisa terlambat.</string>
+    <string name="settings_exact_alarms_brief">Pengingat salat bisa terlambat satu jam.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">Izinkan</string>
     <string name="settings_exact_alarms_desc">Tanpa izin ini, pengingat salat bisa terlambat satu jam atau lebih, dan di beberapa ponsel pengingat Subuh bisa tidak muncul sama sekali.</string>
@@ -231,7 +231,6 @@
     <string name="notif_prayer_title">Waktunya %1$s</string>
     <string name="notif_prayer_body">%1$s masuk pukul %2$s</string>
     <string name="notif_next_title">%1$s pukul %2$s</string>
-    <string name="notif_next_body">Dalam %1$s</string>
 
     <!-- Hijri -->
     <string name="hijri_date_format">%1$d %2$s %3$d</string>
@@ -355,4 +354,12 @@
     <string name="action_see_why">Lihat sebabnya</string>
     <string name="ramadan_eve_brief">Masjid Anda mungkin mulai sehari kemudian.</string>
     <string name="polar_notice_brief">Subuh dan Isya di sini dihitung dari lintang %1$d°.</string>
+    <string name="action_set_location">Atur lokasi</string>
+    <string name="city_lookup_offline">Tidak ada koneksi internet. Sambungkan sekali untuk mencari kota, atau gunakan lokasi Anda.</string>
+    <string name="about_rate">Beri rating SajdaTime di Google Play</string>
+    <string name="about_rate_desc">Membuka halaman toko.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%1$s untuk %2$s</string>
+    <string name="location_permission_denied">Lokasi tidak diizinkan. Ketik kota Anda di bawah, atau izinkan nanti dari halaman lokasi.</string>
+    <string name="confirm_notifications_hint">Saat Anda mengetuk Selesai, Android akan bertanya apakah SajdaTime boleh mengirim notifikasi. Pilih izinkan agar pengingat salat bisa muncul. Anda bisa mengubahnya nanti di pengaturan ponsel.</string>
 </resources>

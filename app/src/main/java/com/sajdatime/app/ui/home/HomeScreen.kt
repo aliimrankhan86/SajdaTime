@@ -78,6 +78,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.review.ReviewPrompt
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.UiState
@@ -114,6 +115,27 @@ fun HomeScreen(
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
     val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Google's rating card, at most at a settled moment (review/ReviewPrompt.kt). Calm means
+    // nothing open on top and no warning on screen: a card must not land on a problem. Keyed on
+    // all of that, so opening a sheet inside the five seconds cancels the wait.
+    val activity = androidx.activity.compose.LocalActivity.current
+    val exactWarning = !PrayerAlarmScheduler.canScheduleExact(LocalContext.current) &&
+        !state.settings.exactAlarmNoticeDismissed
+    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable &&
+        state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
+    val times = state.today?.times
+    LaunchedEffect(calm, times) {
+        if (activity == null || times == null) return@LaunchedEffect
+        kotlinx.coroutines.delay(5_000)
+        ReviewPrompt.onTimesShown(
+            activity = activity,
+            calmScreen = calm,
+            todayTimes = times.values.toList(),
+            fajr = times[PrayerSlot.FAJR],
+            sunrise = times[PrayerSlot.SUNRISE],
+        )
+    }
 
     // The Ramadan option in the export sheet: offered from 30 days before day 1 to the last day,
     // on the user's own calendar (RamadanInfo.offersTimetable), so a family can print it ahead.
@@ -370,8 +392,18 @@ private fun NextPrayerCard(state: UiState) {
         // capitals, but String.uppercase() on a translated string is a trap — Turkish
         // dotted/dotless i, and scripts with no case at all. If a language wants capitals
         // its translator writes them into the string.
+        // After Isha the next prayer is tomorrow's Fajr, and the widget already says so; the
+        // card now does too, on the label line so the 823dp fit is untouched (research F13).
         Text(
-            text = stringResource(R.string.home_next_prayer),
+            text = if (next.isTomorrow) {
+                stringResource(
+                    R.string.settings_value_pair,
+                    stringResource(R.string.home_next_prayer),
+                    stringResource(R.string.widget_tomorrow),
+                )
+            } else {
+                stringResource(R.string.home_next_prayer)
+            },
             // Sentence case and medium weight since Quiet Glass (17 Oct 2026), matching the
             // section titles in Settings; the letterspaced capitals read as dated.
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
@@ -639,7 +671,7 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
     Notice(
         title = stringResource(R.string.home_default_location_title),
         brief = stringResource(R.string.home_default_location_body),
-        actionLabel = stringResource(R.string.action_change_location),
+        actionLabel = stringResource(R.string.action_set_location),
         onAction = onFix,
     )
 }
@@ -813,6 +845,8 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
+            .semantics(mergeDescendants = true) {}
             .background(background)
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this

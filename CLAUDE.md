@@ -47,8 +47,8 @@ curl -sL -A "Mozilla/5.0" "https://play.google.com/store/search?q=SajdaTime&c=ap
 **Say the second half in the same breath or the question returns:** it is *available* to
 everyone but not yet *discoverable* — searching "prayer times" or "qibla" does not surface it,
 because Play ranks on installs and ratings and this app has few of one and none of the other.
-That is not a fault, not a setting, and **not work to invent**. §15 lesson 113, and the §11
-non-goal on rating prompts.
+That is not a fault, not a setting, and **not work to invent**. §15 lesson 113. (Since 17 Oct
+2026 the app may show Google's own rating card, at the owner's word; see the rule below.)
 
 **The owner should not have to tell you any of this, and has asked not to have to.** He does
 not want to paste a briefing at the start of a session. This file is loaded automatically so
@@ -121,8 +121,17 @@ session inherits it instead of relearning it.
 
 - **The religious disclaimer must never be removed, softened, or buried**, and the dua
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
-  and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
-  however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
+  and never nagged, so no copy of ours ever asks for anything else.
+- **Rating: Google's card only, rarely, never in our words.** The owner reversed the old "no
+  rate prompt" rule on 17 Oct 2026 ("We need rate this app since we are trying to better ratings
+  and be promoted"). He asked for a weekly reminder "or other best practice"; research said no
+  to weekly (Google's quota swallows asks under a month apart, and Play policy names forced
+  rating pop ups). Built: `review/ReviewPrompt.kt`, Play In-App Review card after 14 days kept
+  and 3 days opened, only on a calm Times screen away from prayer times, at most every 120 days
+  and 3 times ever, plus a passive "Rate SajdaTime on Google Play" row in About. **No "do you
+  like it?" question, no button that calls the card, no usage counts event, no app copy asking
+  for a rating, no religious wording.** A "share this app" prompt is still not built; a passive
+  Share row is the owner's open question.
 - **Translations: Claude translates and checks its own work; no native speaker review.** The
   owner decided this on 9 Oct 2026 (SajdaTime is a free utility he makes himself), superseding
   the old "never machine-translate" rule. Urdu, Turkish and Indonesian shipped in 1.3.1
