@@ -4878,6 +4878,10 @@ Before merging, merge `main` into the branch.
 2. Turkey iftar offsets (Diyanet), before Ramadan.
 3. January store listing: the Ramadan lines and the 1.5.0 What's new (`docs/store/LISTING.md`).
 
+**Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
+then decided: "if you test it emulator then no need to test it on real phone". Emulator testing is the standard
+for 1.5.0, adhan and alarms included. Do not ask him to plug in a phone, and do not add a phone step to any job.
+
 **Claude's carry-overs.** Re baseline the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr` for 1.4.0
 live. Post the drafted Arabic review reply only once 1.5.0 (Arabic) is live; the owner posts it.
 
