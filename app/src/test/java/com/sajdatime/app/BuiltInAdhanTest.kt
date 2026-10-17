@@ -5,19 +5,20 @@ import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.alarmSoundForSect
 import com.sajdatime.core.Sect
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * The built-in adhan (1.5.0): opt in, Sunni only, and a move to Shia falls back quietly to the
- * phone sound chosen before. Never the default.
+ * The built-in adhans (1.5.0): opt in, never the default, one per school, and a chosen adhan follows
+ * the school when it changes.
  */
 class BuiltInAdhanTest {
 
+    private val pkg = "com.sajdatime.app"
     private val phone = "content://media/internal/audio/media/42"
-    private val adhan = BuiltInAdhan.ADHAN.uri("com.sajdatime.app")
+    private val sunni = BuiltInAdhan.ADHAN.uri(pkg)
+    private val shia = BuiltInAdhan.SHIA_ADHAN.uri(pkg)
 
     @Test
     fun `never the default sound`() {
@@ -27,30 +28,33 @@ class BuiltInAdhanTest {
 
     @Test
     fun `the stored address names the raw file, whatever the build's package`() {
-        assertEquals("android.resource://com.sajdatime.app/raw/adhan", adhan)
-        assertEquals(BuiltInAdhan.ADHAN, BuiltInAdhan.of(BuiltInAdhan.ADHAN.uri("com.sajdatime.app.sideload")))
+        assertEquals("android.resource://com.sajdatime.app/raw/adhan", sunni)
+        assertEquals("android.resource://com.sajdatime.app/raw/adhan_shia", shia)
+        assertEquals(BuiltInAdhan.SHIA_ADHAN, BuiltInAdhan.of(BuiltInAdhan.SHIA_ADHAN.uri("com.sajdatime.app.sideload")))
+        assertEquals(BuiltInAdhan.ADHAN, BuiltInAdhan.of(sunni))
         assertNull(BuiltInAdhan.of(phone))
         assertNull(BuiltInAdhan.of(""))
-        // The resource name must match the real file: this fails to compile if it is renamed.
-        assertTrue(R.raw.adhan != 0)
+        // The resource names must match the real files: this fails to compile if one is renamed.
+        assertTrue(R.raw.adhan != 0 && R.raw.adhan_shia != 0)
     }
 
     @Test
-    fun `offered to Sunni users only`() {
-        assertTrue(BuiltInAdhan.offeredTo(Sect.SUNNI))
-        assertFalse(BuiltInAdhan.offeredTo(Sect.SHIA))
+    fun `each school is offered exactly its own adhan`() {
+        assertEquals(listOf(BuiltInAdhan.ADHAN), BuiltInAdhan.forSect(Sect.SUNNI))
+        assertEquals(listOf(BuiltInAdhan.SHIA_ADHAN), BuiltInAdhan.forSect(Sect.SHIA))
     }
 
     @Test
-    fun `moving to Shia falls back to the earlier phone sound, or the default`() {
-        assertEquals(phone, alarmSoundForSect(Sect.SHIA, adhan, phone))
-        assertEquals("", alarmSoundForSect(Sect.SHIA, adhan, ""))
+    fun `a chosen adhan follows the school`() {
+        assertEquals(shia, alarmSoundForSect(Sect.SHIA, sunni, phone, pkg))
+        assertEquals(sunni, alarmSoundForSect(Sect.SUNNI, shia, phone, pkg))
     }
 
     @Test
-    fun `any other sound, or staying Sunni, is left exactly as it was`() {
-        assertEquals(adhan, alarmSoundForSect(Sect.SUNNI, adhan, phone))
-        assertEquals(phone, alarmSoundForSect(Sect.SHIA, phone, "content://other"))
-        assertEquals("", alarmSoundForSect(Sect.SHIA, "", phone))
+    fun `any other sound, or the same school, is left exactly as it was`() {
+        assertEquals(sunni, alarmSoundForSect(Sect.SUNNI, sunni, phone, pkg))
+        assertEquals(shia, alarmSoundForSect(Sect.SHIA, shia, phone, pkg))
+        assertEquals(phone, alarmSoundForSect(Sect.SHIA, phone, "content://other", pkg))
+        assertEquals("", alarmSoundForSect(Sect.SHIA, "", phone, pkg))
     }
 }

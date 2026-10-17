@@ -37,7 +37,6 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.RadioButton
@@ -98,8 +97,6 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
-import com.sajdatime.app.ui.components.Notice
-import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RadioRow
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
@@ -406,13 +403,18 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
             ),
-            // CC0 needs no credit; it is given anyway, with the source. Shown to every user, Shia
-            // included, because the file ships in every copy of the app.
+            // A licence obligation, like the row above: the Shia adhan is CC BY-SA 4.0, which requires
+            // the credit and a link to the licence. The Sunni one is CC0 and credited anyway. Shown to
+            // every user, because both files ship in every copy of the app.
             SettingsItem.Link(
                 key = "adhan",
                 title = stringResource(R.string.about_adhan),
                 subtitle = stringResource(R.string.about_adhan_desc),
-                links = listOf(stringResource(R.string.about_adhan_link_source) to ADHAN_SOURCE),
+                links = listOf(
+                    stringResource(R.string.about_adhan_link_source) to ADHAN_SOURCE,
+                    stringResource(R.string.about_adhan_link_shia) to SHIA_ADHAN_SOURCE,
+                    stringResource(R.string.about_adhan_link_licence) to CC_BY_SA_4,
+                ),
             ),
         ),
     )
@@ -598,8 +600,10 @@ internal sealed interface SettingsItem {
     }
 }
 
-// The built-in adhan's source (docs/licences/ADHAN.md). Not translatable, so not a string.
+// The built-in adhans' sources and licence (docs/licences/ADHAN.md). Not translatable, so not strings.
 private const val ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg"
+private const val SHIA_ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:AzaanMaahur.ogg"
+private const val CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
 
 internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
 
@@ -862,16 +866,14 @@ private class AlarmSound(
 )
 
 /**
- * The alarm sound, shared by the prayer alerts and the suhoor reminder.
+ * The alarm sound, shared by the prayer alerts and the suhoor reminder: the built-in adhan for the
+ * user's school (1.5.0; Sunni and Shia each have their own, data/BuiltInAdhan.kt), then "From your
+ * phone" (the system picker: alarms, ringtones and any audio the user has added), as one radio group.
+ * Under the phone row, the tone chosen there, because naming it is the only confirmation the pick
+ * stuck. Then "Play on silent".
  *
- * Sunni (1.5.0): the built-in adhan, above "From your phone", as one radio group.
- * The phone row opens the system picker, which lists alarms, ringtones and any audio the user has
- * added; under it, the tone chosen there, because naming it is the only confirmation the pick stuck.
- *
- * Shia: no built-in recording, so a quiet notice saying why, above today's single row. The notice
- * lives here and nowhere else (never on Times, never as a notification), and goes in the release
- * that ships a Shia adhan. It replaced the 1.5.0 "save an adhan on your phone" hint, which said
- * the same thing to everyone and read oddly under a list that now contains adhans.
+ * The 1.5.0 "No Shia adhan yet" notice that stood here was removed the same day, when a Shia adhan
+ * with a clean licence was found, as its own rule required.
  */
 @Composable
 private fun AlarmSoundChoices(sound: AlarmSound) {
@@ -879,28 +881,13 @@ private fun AlarmSoundChoices(sound: AlarmSound) {
     val phoneTitle = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
         ?: stringResource(R.string.settings_alarm_sound_default)
     SectionLabel(stringResource(R.string.settings_alarm_sound))
-    if (!BuiltInAdhan.offeredTo(sound.sect)) {
-        Notice(
-            title = stringResource(R.string.adhan_shia_title),
-            brief = stringResource(R.string.adhan_shia_brief),
-            tone = NoticeTone.QUIET,
-            icon = Icons.Outlined.Info,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        SettingRow(
-            title = stringResource(R.string.settings_alarm_sound_phone),
-            subtitle = phoneTitle,
-            onClick = sound.onPickPhone,
-            horizontalPadding = 0.dp,
-        )
-        PlayOnSilentRow(sound)
-        return
-    }
     Column(Modifier.selectableGroup()) {
-        BuiltInAdhan.entries.forEach { adhan ->
+        BuiltInAdhan.forSect(sound.sect).forEach { adhan ->
             RadioRow(
                 label = stringResource(adhan.labelRes),
-                selected = builtIn == adhan,
+                // Any built-in adhan counts as this row: each school has one, and a stored adhan from the
+                // other school (not reachable today, setSect moves it) must not leave the group unticked.
+                selected = builtIn != null,
                 onSelect = { sound.onPickBuiltIn(adhan) },
             )
         }

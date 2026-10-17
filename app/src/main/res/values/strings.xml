@@ -318,13 +318,11 @@
     <string name="alert_style_mixed">Mixed</string>
     <string name="settings_alarm_sound">Alarm sound</string>
     <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
-    <!-- 1.5.0 built-in adhan (data/BuiltInAdhan.kt). The Shia notice shows in the sound picker only and is removed in the release that ships a Shia adhan. -->
+    <!-- 1.5.0 built-in adhans, one per school (data/BuiltInAdhan.kt). -->
     <string name="settings_alarm_sound_phone">From your phone</string>
     <string name="settings_alarm_play_on_silent">Play on silent</string>
     <string name="settings_alarm_play_on_silent_desc">Plays even when your phone is on silent or Do Not Disturb. Off: notification and vibration only.</string>
     <string name="adhan_builtin">Adhan</string>
-    <string name="adhan_shia_title">No Shia adhan yet</string>
-    <string name="adhan_shia_brief">Until we find one we are free to include, choose any adhan saved on your phone.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
     <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
@@ -391,9 +389,11 @@
          licence obligation, not a courtesy — do not remove it. -->
     <string name="about_data">Data and libraries</string>
     <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
-    <string name="about_adhan">Adhan recording</string>
-    <string name="about_adhan_desc">Recorded by Adam-synagda, shared on Wikimedia Commons under CC0.</string>
-    <string name="about_adhan_link_source">Source</string>
+    <string name="about_adhan">Adhan recordings</string>
+    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons.</string>
+    <string name="about_adhan_link_source">Sunni source</string>
+    <string name="about_adhan_link_shia">Shia source</string>
+    <string name="about_adhan_link_licence">CC BY-SA 4.0 licence</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Prayer times</string>

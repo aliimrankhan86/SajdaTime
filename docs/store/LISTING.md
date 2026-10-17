@@ -399,44 +399,44 @@ English text above, because the C4 versions are too long to share the 500 with t
 "Shia" with the app's own words for them. If the 1.5.0 note also has to mention Arabic or the new look, something here has to give,
 and that is the owner's choice.
 
-1.5.0, English (391):
+1.5.0, English (383):
 
 ```
 Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
 
-Built-in adhan for Sunni users. Shia users can pick any adhan saved on their phone.
+Built-in adhan for Sunni and Shia users, or choose any sound on your phone.
 ```
 
-1.5.0, Urdu (381):
+1.5.0, Urdu (372):
 
 ```
 رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے رمضان کا نقشہ، اور فجر سے پہلے سحری کی اختیاری یاددہانی۔ ہوم اسکرین کے دو ویجٹ اگلی نماز اور آج کے اوقات دکھاتے ہیں۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔
 
-سنی صارفین کے لیے ایپ میں اذان۔ شیعہ صارفین فون میں محفوظ کوئی بھی اذان چن سکتے ہیں۔
+سنی اور شیعہ صارفین کے لیے ایپ میں اذان، یا اپنے فون کی کوئی بھی آواز چنیں۔
 ```
 
-1.5.0, Turkish (405):
+1.5.0, Turkish (400):
 
 ```
 Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, görüntülenecek veya PDF olarak kaydedilecek imsakiye ve sabah namazından önce isteğe bağlı sahur hatırlatıcısı. İki ana ekran widget'ı sonraki namazı ve bugünün vakitlerini gösterir. Caminizin imsakiyesi farklıysa caminize uyun.
 
-Sünni kullanıcılar için yerleşik ezan. Şii kullanıcılar telefonlarındaki herhangi bir ezanı seçebilir.
+Sünni ve Şii kullanıcılar için yerleşik ezan; dilerseniz telefonunuzdaki herhangi bir sesi seçin.
 ```
 
-1.5.0, Indonesian (399):
+1.5.0, Indonesian (390):
 
 ```
 Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal Ramadan untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional sebelum Subuh. Dua widget layar utama menampilkan salat berikutnya dan waktu hari ini. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
 
-Azan bawaan untuk pengguna Sunni. Pengguna Syiah dapat memilih azan apa pun di ponsel mereka.
+Azan bawaan untuk pengguna Sunni dan Syiah, atau pilih suara apa pun di ponsel Anda.
 ```
 
-1.5.0, Arabic (341):
+1.5.0, Arabic (314):
 
 ```
 رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية رمضان للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور قبل الفجر. ويعرض ودجتان على الشاشة الرئيسية الصلاة التالية ومواقيت اليوم. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
 
-أذان مدمج لمستخدمي المذهب السنّي. ويمكن لمستخدمي المذهب الشيعي اختيار أي أذان محفوظ على هواتفهم.
+أذان مدمج لمستخدمي المذهبين السنّي والشيعي، أو اختر أي صوت على هاتفك.
 ```
 
 The four language versions, written for the same release, are in `WORDING-AND-LISTING.md` C4. Only the English listing exists in

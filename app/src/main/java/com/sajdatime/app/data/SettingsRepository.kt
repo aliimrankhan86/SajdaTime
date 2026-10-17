@@ -307,11 +307,10 @@ class SettingsRepository(private val context: Context) {
         // same definition of "offered" the list itself uses.
         val method = enumOr(it[Keys.METHOD], CalcMethod.AUTO)
         if (!method.offeredTo(sect)) it[Keys.METHOD] = CalcMethod.AUTO.name
-        // The same rule for the alarm sound: the built-in adhans are Sunni recordings, offered to
-        // Sunni users only, so on the way to Shia one quietly gives way to the phone sound chosen
-        // before it (or the default). Nothing else about the sound changes.
+        // The same rule for the alarm sound: each school has its own built-in adhan, so a chosen
+        // adhan follows the school (alarmSoundForSect). Nothing else about the sound changes.
         val sound = it[Keys.ALARM_SOUND] ?: ""
-        it[Keys.ALARM_SOUND] = alarmSoundForSect(sect, sound, it[Keys.PHONE_ALARM_SOUND] ?: "")
+        it[Keys.ALARM_SOUND] = alarmSoundForSect(sect, sound, it[Keys.PHONE_ALARM_SOUND] ?: "", context.packageName)
     }
 
     suspend fun setMadhab(madhab: Madhab) = edit { it[Keys.MADHAB] = madhab.name }
@@ -363,7 +362,7 @@ class SettingsRepository(private val context: Context) {
 
     /**
      * A built-in adhan. The sound it replaces, when that is a phone sound, is remembered in
-     * [Keys.PHONE_ALARM_SOUND], so a move to the Shia school can put it back (see [setSect]).
+     * [Keys.PHONE_ALARM_SOUND], so the phone's own picker opens on it later (MainActivity).
      * Copied here rather than when the phone sound is picked, so a sound chosen before 1.5.0, which
      * never went through the new code, is remembered too (independent review, 17 Oct 2026).
      */

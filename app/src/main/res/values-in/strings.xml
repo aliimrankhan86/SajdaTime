@@ -172,8 +172,6 @@
     <string name="settings_alarm_play_on_silent">Bunyikan saat senyap</string>
     <string name="settings_alarm_play_on_silent_desc">Tetap berbunyi saat ponsel senyap atau mode Jangan Ganggu. Nonaktif: hanya notifikasi dan getar.</string>
     <string name="adhan_builtin">Azan</string>
-    <string name="adhan_shia_title">Belum ada azan Syiah</string>
-    <string name="adhan_shia_brief">Sampai kami menemukan rekaman yang boleh disertakan, pilih azan apa pun di ponsel Anda.</string>
     <string name="settings_dnd_title">Izinkan suara saat Jangan Ganggu</string>
     <string name="settings_dnd_desc">Tanpa ini, alarm Anda tetap senyap saat ponsel dalam mode Jangan Ganggu.</string>
 
@@ -225,8 +223,10 @@
     <string name="about_data">Data dan pustaka</string>
     <string name="about_data_desc">Waktu salat dihitung dengan adhan-java dari Batoul Apps (MIT). Pencarian kota memakai API geocoding Open-Meteo, berlisensi CC BY 4.0.</string>
     <string name="about_adhan">Rekaman azan</string>
-    <string name="about_adhan_desc">Direkam oleh Adam-synagda, dibagikan di Wikimedia Commons dengan CC0.</string>
-    <string name="about_adhan_link_source">Sumber</string>
+    <string name="about_adhan_desc">Azan Sunni: direkam oleh Adam-synagda, CC0.\nAzan Syiah: dilantunkan oleh Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nKeduanya melalui Wikimedia Commons.</string>
+    <string name="about_adhan_link_source">Sumber azan Sunni</string>
+    <string name="about_adhan_link_shia">Sumber azan Syiah</string>
+    <string name="about_adhan_link_licence">Lisensi CC BY-SA 4.0</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Waktu salat</string>

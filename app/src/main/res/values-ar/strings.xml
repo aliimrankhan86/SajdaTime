@@ -195,8 +195,6 @@
     <string name="settings_alarm_play_on_silent">التشغيل في الوضع الصامت</string>
     <string name="settings_alarm_play_on_silent_desc">يعمل حتى لو كان الهاتف صامتًا أو في وضع عدم الإزعاج. عند الإيقاف: إشعار واهتزاز فقط.</string>
     <string name="adhan_builtin">الأذان</string>
-    <string name="adhan_shia_title">لا يوجد أذان شيعي بعد</string>
-    <string name="adhan_shia_brief">إلى أن نجد تسجيلًا يُسمح لنا بتضمينه، اختر أي أذان محفوظ على هاتفك.</string>
     <string name="settings_dnd_title">السماح بالصوت في وضع عدم الإزعاج</string>
     <string name="settings_dnd_desc">بدون هذا، يبقى منبّهك صامتًا حين يكون الهاتف في وضع عدم الإزعاج.</string>
 
@@ -250,9 +248,11 @@
     <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
     <string name="about_data">البيانات والمكتبات</string>
     <string name="about_data_desc">تُحسب مواقيت الصلاة بمكتبة adhan-java من Batoul Apps (MIT). ويستخدم البحث عن المدن واجهة Open-Meteo geocoding API، المرخّصة بموجب CC BY 4.0.</string>
-    <string name="about_adhan">تسجيل الأذان</string>
-    <string name="about_adhan_desc">تسجيل ⁨Adam-synagda⁩، منشور على ⁨Wikimedia Commons⁩ بترخيص ⁨CC0⁩.</string>
-    <string name="about_adhan_link_source">المصدر</string>
+    <string name="about_adhan">تسجيلات الأذان</string>
+    <string name="about_adhan_desc">الأذان السنّي: تسجيل ⁨Adam-synagda⁩، ⁨CC0⁩.\nالأذان الشيعي: بصوت ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩.\nكلاهما عبر ⁨Wikimedia Commons⁩.</string>
+    <string name="about_adhan_link_source">مصدر الأذان السنّي</string>
+    <string name="about_adhan_link_shia">مصدر الأذان الشيعي</string>
+    <string name="about_adhan_link_licence">ترخيص ⁨CC BY-SA 4.0⁩</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">مواقيت الصلاة</string>

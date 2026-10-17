@@ -175,8 +175,6 @@
     <string name="settings_alarm_play_on_silent">سائلنٹ پر بھی بجائیں</string>
     <string name="settings_alarm_play_on_silent_desc">فون سائلنٹ یا ڈسٹرب نہ کریں پر ہو تب بھی بجتا ہے۔ بند: صرف اطلاع اور وائبریشن۔</string>
     <string name="adhan_builtin">اذان</string>
-    <string name="adhan_shia_title">شیعہ اذان ابھی نہیں</string>
-    <string name="adhan_shia_brief">جب تک ہمیں شامل کرنے کی اجازت والی اذان نہیں ملتی، اپنے فون میں محفوظ کوئی بھی اذان منتخب کریں۔</string>
     <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
     <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔</string>
 
@@ -229,9 +227,11 @@
     <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
     <string name="about_data">ڈیٹا اور لائبریریاں</string>
     <string name="about_data_desc">نماز کے اوقات کا حساب Batoul Apps کی adhan-java (MIT) سے کیا جاتا ہے۔ شہر کی تلاش Open-Meteo geocoding API استعمال کرتی ہے، جو CC BY 4.0 کے تحت لائسنس یافتہ ہے۔</string>
-    <string name="about_adhan">اذان کی ریکارڈنگ</string>
-    <string name="about_adhan_desc">ریکارڈنگ: ⁨Adam-synagda⁩، ⁨Wikimedia Commons⁩ پر ⁨CC0⁩ کے تحت۔</string>
-    <string name="about_adhan_link_source">ماخذ</string>
+    <string name="about_adhan">اذان کی ریکارڈنگز</string>
+    <string name="about_adhan_desc">سنی اذان: ریکارڈنگ ⁨Adam-synagda⁩، ⁨CC0⁩۔\nشیعہ اذان: آواز ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩۔\nدونوں بذریعہ ⁨Wikimedia Commons⁩۔</string>
+    <string name="about_adhan_link_source">سنی اذان کا ماخذ</string>
+    <string name="about_adhan_link_shia">شیعہ اذان کا ماخذ</string>
+    <string name="about_adhan_link_licence">⁨CC BY-SA 4.0⁩ لائسنس</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">نماز کے اوقات</string>

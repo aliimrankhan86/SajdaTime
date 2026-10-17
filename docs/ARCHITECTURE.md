@@ -308,11 +308,7 @@ for Fajr, a quiet notification for the rest* — cannot be expressed by a single
 Five full alarms a day, unasked for, is the sort of thing that gets an app uninstalled, so
 alarm mode is opt-in. When the user chooses it, they pick their own tone through the system
 ringtone picker, which already lists every alarm, ringtone and audio file on the device.
-Since 1.5.0 Sunni users can instead pick the built-in adhan (`data/BuiltInAdhan.kt`, one CC0
-recording from Wikimedia Commons, credited in About, sources and hashes in
-`docs/licences/ADHAN.md`). Opt in, never the default. Shia users see a notice that no Shia
-adhan is included yet. The choice is stored as an ordinary sound address, so the alarm channel
-works exactly as it does for a phone sound (HANDOVER §5.23).
+Since 1.5.0 users can instead pick the built-in adhan for their school (`data/BuiltInAdhan.kt`: a CC0 Sunni recording and a CC BY-SA Shia recording from Wikimedia Commons, credited in About, sources and hashes in `docs/licences/ADHAN.md`). Opt in, never the default. The choice is stored as an ordinary sound address, so the alarm channel works exactly as it does for a phone sound (HANDOVER §5.23).
 
 **An alarm stays quiet while the phone is on silent, vibrate or Do Not Disturb**, unless the user turns on "Play on silent" (1.5.0 wording of the same setting, off by default). Android deliberately does not mute the alarm stream with the ringer, which is right for a one-off wake-up alarm and wrong for a recurring alert; the notification still arrives on time and only the sound is dropped.
 

@@ -18,9 +18,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * The built-in adhan (1.5.0) as the device sees it: the stored address opens the real file, the
- * alarm channel carries it with alarm usage, and the settings sequence an upgraded user can take
- * (a phone sound from before 1.5.0, then an adhan, then Shia) ends on their phone sound.
+ * The built-in adhans (1.5.0) as the device sees them: each stored address opens the real file, the
+ * alarm channel carries it with alarm usage, a chosen adhan follows the school, and an upgraded
+ * user's phone sound from before 1.5.0 is still remembered behind it.
  *
  * Puts the settings and the alarm channel back the way it found them.
  */
@@ -49,7 +49,7 @@ class BuiltInAdhanDeviceTest {
 
     @Test
     fun each_stored_address_opens_the_whole_file() {
-        val sizes = mapOf(BuiltInAdhan.ADHAN to 1_229_032L)
+        val sizes = mapOf(BuiltInAdhan.ADHAN to 1_229_032L, BuiltInAdhan.SHIA_ADHAN to 2_289_817L)
         sizes.forEach { (adhan, bytes) ->
             val uri = Uri.parse(adhan.uri(context.packageName))
             context.contentResolver.openAssetFileDescriptor(uri, "r").use { fd ->
@@ -69,16 +69,18 @@ class BuiltInAdhanDeviceTest {
     }
 
     @Test
-    fun an_upgraded_user_who_moves_to_shia_gets_their_phone_sound_back() = runBlocking {
+    fun a_chosen_adhan_follows_the_school_and_the_phone_sound_stays_remembered() = runBlocking {
         val phone = "content://media/internal/audio/media/1"
         repository.setSect(Sect.SUNNI)
         // As 1.4.0 left it: the sound written, nothing else.
         repository.setAlarmSound(phone)
         repository.setBuiltInAdhan(BuiltInAdhan.ADHAN)
+        repository.setSect(Sect.SHIA)
+        assertEquals(BuiltInAdhan.SHIA_ADHAN, BuiltInAdhan.of(repository.current().alarmSoundUri))
+        repository.setSect(Sect.SUNNI)
         assertEquals(BuiltInAdhan.ADHAN, BuiltInAdhan.of(repository.current().alarmSoundUri))
         // Choosing the adhan again must not overwrite the remembered phone sound with the adhan.
         repository.setBuiltInAdhan(BuiltInAdhan.ADHAN)
-        repository.setSect(Sect.SHIA)
-        assertEquals(phone, repository.current().alarmSoundUri)
+        assertEquals(phone, repository.current().phoneAlarmSoundUri)
     }
 }

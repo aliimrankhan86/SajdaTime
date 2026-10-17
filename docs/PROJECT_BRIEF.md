@@ -30,7 +30,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - An offline message when the city search fails.
   - A live system countdown in the next prayer notification.
   - **Reminder before prayer** (added 17 Oct 2026 from the competitor review): off by default, 5 to 30 minutes before, chosen per prayer, always a quiet notification.
-  - **Built-in adhan for Sunni users** (17 Oct 2026): one CC0 recording from Wikimedia Commons, opt in, never the default, credited in About (+1.2 MB). Ali listened and approved it on 17 Oct 2026. Any phone sound still works. Shia users see "No Shia adhan yet" in the sound picker.
+  - **Built-in adhan for both schools** (17 Oct 2026): Sunni, a CC0 recording Ali listened to and approved; Shia, a studio recording by Saeed Hatamzadeh-Varmazyar (CC BY-SA 4.0), checked by transcription to be a complete Shia adhan. Both from Wikimedia Commons, opt in, never the default, credited in About (+3.5 MB). Any phone sound still works.
   - **Clearer alerts:** each prayer is Off, Notification or Alarm (the adhan or a chosen sound). "Play on silent" (off by default) decides whether an alarm plays when the phone is on silent or Do Not Disturb.
   - Screen reader fixes.
   - The habit tracker, only if it is built by then (see below).
@@ -49,7 +49,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 
 ## Ideas from the competitor review (17 Oct 2026), not planned
 - **Saved places for travel** is a real gap. It is medium effort and lower priority, because the city search already covers travel.
-- **Bundled adhan voices:** one Sunni adhan is now in 1.5.0 (Ali's decision, 17 Oct 2026). A Shia adhan will be commissioned with a written licence; a Sunni Fajr adhan later.
+- **Bundled adhan voices:** one per school in 1.5.0 (Ali's decision, 17 Oct 2026). No better free Sunni recording exists (checked Commons, Freesound, Internet Archive). Later: a Fajr adhan, ideally recorded by a mosque with written permission.
 - **A record of missed fasts: Claude advised no.** It is too close to the "no missed prayer counter" decision. Ali has not ruled on it.
 - **Quran reader, duas, dhikr: no.** They are outside the app's one job.
 - **Ads, paywalls and a double adhan after the clock change** are where competitors fail. SajdaTime has no ads and nothing to buy, and its alarms replace rather than duplicate.
