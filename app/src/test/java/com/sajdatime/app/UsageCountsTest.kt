@@ -326,9 +326,9 @@ class UsageCountsTest {
         assertTrue("policy must use the same term", policy.contains("prayer calculation setting"))
         assertFalse("policy must not use the old term", policy.contains("school of thought"))
         // Bumped to 10 October 2026 in 1.3.2 for the Do Not Disturb permission (DndAccessTest), and to
-        // 16 October 2026 for the town name lookup disclosure. If the branch is merged on a later
-        // day, move this date and the policy's date line together.
-        assertTrue(policy.contains("Last updated: 16 October 2026"))
+        // 17 October 2026 in 1.4.0 (published at the 1.4.0 merge) for the sentence about the widgets and the suhoor reminder. If the
+        // branch is merged on a later day, move this date and the policy's date line together.
+        assertTrue(policy.contains("Last updated: 17 October 2026"))
         assertTrue("policy must list every permission", policy.contains("ACCESS_NOTIFICATION_POLICY"))
     }
 

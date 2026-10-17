@@ -7,6 +7,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.widget.WidgetUpdater
 import java.util.concurrent.TimeUnit
 
 /**
@@ -23,6 +24,8 @@ class DailyRescheduleWorker(
         Notifications.ensureChannels(applicationContext)
         PrayerAlarmScheduler.reschedule(applicationContext, settings)
         OngoingBadge.refresh(applicationContext, settings)
+        // The twice a day backstop for the widgets as well, and it rebuilds their alarm if it was lost.
+        WidgetUpdater.refreshAll(applicationContext, settings)
         return Result.success()
     }
 

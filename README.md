@@ -2,7 +2,7 @@
 
 A free, ad-free, privacy-first Muslim prayer times and Qibla app for Android and Wear OS.
 
-No accounts. No ads. Your location never leaves your phone. Optional usage counts, off unless you switch them on, help the developer see how the app is used (never your location, school of thought or settings).
+No accounts. No ads. Times are worked out on your phone and we never receive your location. Optional usage counts, off unless you switch them on, help the developer see how the app is used (never your location, school of thought or settings).
 
 ---
 
@@ -16,13 +16,20 @@ No accounts. No ads. Your location never leaves your phone. Optional usage count
 - Local notifications at each prayer time, working even when the app is closed
 - Optional alarm mode with a sound you choose, able to sound through Do Not Disturb
 - Optional silent "next prayer" badge in the notification shade
-- PDF timetable for today, the next 7 days, or the whole month, saved to Downloads
+- PDF timetable for today, the next 7 days, or the whole month, saved to Downloads (on Android 10 and
+  later, older phones get a share sheet)
+- Two home screen widgets: the next prayer with a countdown, and all of today's times
+- During Ramadan, suhoor end and iftar for your location, the length of the fast, a full timetable
+  to view or save as a PDF, and an optional suhoor reminder before Fajr. Suhoor ends at Fajr and
+  iftar is at Maghrib, as calculated. No imsak margin is added, and where your mosque's timetable
+  differs, follow your mosque
 - A Wear OS app and tile that work on their own, with or without the phone nearby
 - Light and dark themes, following your phone by default or set by hand, both verified
   against WCAG 2.1 AA contrast
-- English only for now, and it stays readable on a phone set to any other language: the app
-  formats its clock times, dates and numbers in the language its words are in, rather than
-  the device's. See `docs/HANDOVER.md` §5.11 for why that is not the same thing.
+- In English, Urdu, Turkish and Indonesian, chosen in Settings on Android 13 and later. The
+  translations were written with AI help by the developer and are corrected when users report
+  mistakes. Clock times, dates and numbers follow the language the app is showing, not the
+  phone's: see `docs/HANDOVER.md` §5.11 for why that is not the same thing.
 
 ## Build and run
 
@@ -37,11 +44,14 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ./gradlew :app:assembleDebug :wear:assembleDebug
 ```
 
-Install onto a connected phone or emulator:
+Install onto an emulator:
 
 ```bash
-./gradlew :app:installDebug
+ANDROID_SERIAL=emulator-5554 ./gradlew :app:installDebug
 ```
+
+On a phone that already has SajdaTime from Google Play use `./gradlew :app:installSideload`, which
+installs beside it as a separate app (see `CLAUDE.md`).
 
 Run the checks:
 
@@ -119,12 +129,16 @@ tools/  Release helpers, all runnable from the repo root. wear-verify.sh checks 
 
 ## Privacy
 
-The only permission the app needs is approximate location, read while the app is open.
-Coordinates are stored on the device and never transmitted.
+The only sensitive permission is approximate location, read while the app is open. The full
+list, with what each one is for, is in the privacy policy. Coordinates are stored on the device
+and never sent to the developer: SajdaTime runs no server. One exception is worth knowing: the
+town name shown above the times is looked up by Android's own place lookup, which on most phones
+is answered over the internet by Google, and the app asks for it only when it has no name yet or
+the phone has moved about 5 km. The home screen widgets read no location of their own.
 
 One optional feature touches the network: you can type a city name instead of using
-location. Your phone resolves it on its own where it can, and only if it cannot is the
-name you typed sent once to a free lookup service. The app tells you this before it
+location. Android's own place lookup is asked first (on most phones that goes to Google), and only if it
+cannot answer is the name you typed sent once to a free lookup service. The app tells you this before it
 happens. Cloud backup and device-to-device transfer are both switched off, so your cached
 location is neither copied to a backup server nor carried across to a new phone.
 

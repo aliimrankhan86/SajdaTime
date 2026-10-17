@@ -18,7 +18,7 @@
     <string name="permission_title">Nerede namaz kılıyorsunuz?</string>
     <string name="permission_body">SajdaTime, namaz vakitlerinizi ve kıble yönünü hesaplamak için nerede olduğunuzu kabaca bilmelidir. Bunun tam olarak ne anlama geldiğini görmek için bilgi simgesine dokunun.</string>
     <string name="permission_why_title">Konumunuza neden ihtiyacımız var</string>
-    <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Konumunuz telefonunuzda kalır. Onu hiçbir yere göndermeyiz.</string>
+    <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Vakitler telefonunuzda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Şehrinizin adını göstermek için uygulama telefonunuzun kendi yer arama hizmetine sorar. Çoğu telefonda bu hizmete internet üzerinden Google yanıt verir.</string>
     <string name="action_allow_location">Konuma izin ver</string>
     <string name="action_got_it">Anladım</string>
     <string name="action_understood">Anlıyorum</string>
@@ -28,7 +28,7 @@
     <string name="location_looking_up">Bu yer aranıyor…</string>
     <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da şehrinizi aşağıya yazın.</string>
 
-    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Telefonunuz mümkünse onu kendisi bulur. Bulamazsa, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
     <string name="city_field_label">Şehir</string>
     <string name="city_field_helper">Örneğin: İstanbul, Lahor, Kahire</string>
     <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
@@ -185,7 +185,7 @@
     <string name="about_disclaimer">Sorumluluk reddi</string>
     <string name="about_disclaimer_short">Bir yardımcı, dinî bir otorite değil. Okumak için dokunun.</string>
     <string name="about_privacy">Gizlilik</string>
-    <string name="about_privacy_desc">Konumunuz bu telefonda kalır. Hesap yok, reklam yok. Kullanım sayımları isteğe bağlıdır ve siz açmadıkça kapalıdır. Politikanın tamamını okumak için dokunun.</string>
+    <string name="about_privacy_desc">Vakitler bu telefonda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Hesap yok, reklam yok. Kullanım sayımları isteğe bağlıdır ve siz açmadıkça kapalıdır. Politikanın tamamını okumak için dokunun.</string>
 
     <!-- Optional usage counts -->
     <string name="consent_title">SajdaTime\'ı geliştirmeye yardım eder misiniz?</string>
@@ -276,4 +276,79 @@
     <string name="notif_approximate">Yaklaşık vakit</string>
     <string name="settings_alarm_on_approximate">Yaklaşık vakitli günlerde çal</string>
     <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarmlar sessiz kalır.</string>
+
+    <!-- Ramazan -->
+    <string name="ramadan_card_label">Ramazan</string>
+    <string name="ramadan_day_of">%2$d günün %1$d. günü</string>
+    <string name="ramadan_suhoor_ends">İmsak (Sabah)</string>
+    <string name="ramadan_iftar">İftar</string>
+    <string name="ramadan_countdown_suhoor">İmsaka %1$s</string>
+    <string name="ramadan_countdown_iftar">İftara %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">Yarın imsak %1$s</string>
+    <string name="ramadan_month_ends_today">Bu takvime göre bugün Ramazan\'ın son günü. Bayramı caminiz duyurur.</string>
+    <string name="ramadan_fast_length">Bugünkü oruç %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="one">dünden %d dakika uzun</item>
+        <item quantity="other">dünden %d dakika uzun</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="one">dünden %d dakika kısa</item>
+        <item quantity="other">dünden %d dakika kısa</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">dünle aynı</string>
+    <string name="ramadan_fast_line">%1$s, %2$s</string>
+    <string name="ramadan_tomorrow_line">Yarın: imsak %1$s, iftar %2$s</string>
+    <string name="ramadan_info_a11y">Bu Ramazan vakitleri hakkında</string>
+    <string name="ramadan_info_title">Bu Ramazan vakitleri hakkında</string>
+    <string name="ramadan_info_calc">SajdaTime, bulunduğunuz yer için hesaplanan Sabah ve Akşam vakitlerini gösterir ve bunları imsak ile iftar vakti olarak kullanır.</string>
+    <string name="ramadan_info_margin">Birçok imsakiye ihtiyaten Sabah vaktinden birkaç dakika önce bir imsak vakti yazar ve bazı camiler Sabah vaktini bu hesaptan daha erken başlatır. SajdaTime hiçbir pay eklemez.</string>
+    <string name="ramadan_info_mosque">Caminizin imsakiyesi farklıysa caminize uyun.</string>
+    <string name="ramadan_info_date">Buradaki hicri tarih Ümmülkura takvimine göredir. Caminiz Ramazan\'a başka bir gün başladıysa Ayarlar\'dan hicri tarihi kaydırın. Bu, gün sayısını, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
+    <string name="ramadan_info_hide">Bu kartı gizle</string>
+    <string name="ramadan_info_hide_note">Ayarlar\'dan yeniden gösterebilirsiniz.</string>
+    <string name="ramadan_eve_title_before">Bu takvime göre Ramazan %1$s başlıyor</string>
+    <string name="ramadan_eve_body">Birçok cami başlangıcı hilali gördükten sonra, çoğu zaman bir gün sonra duyurur. Caminizinki farklıysa hicri tarihi kaydırmak için dokunun. Bu, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
+    <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
+    <string name="settings_ramadan_card">Ramazan kartı</string>
+    <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
+    <string name="ramadan_open_timetable">Tam imsakiye</string>
+    <string name="ramadan_timetable_title">Ramazan %1$d</string>
+    <string name="ramadan_col_day">Gün</string>
+    <string name="ramadan_col_fast">Oruç</string>
+    <string name="ramadan_approx_marker">yaklaşık</string>
+    <string name="export_ramadan">Ramazan %1$d</string>
+    <string name="export_ramadan_desc">Ayın her günü, imsak ve iftarla</string>
+    <string name="pdf_period_ramadan">Ramazan %1$d</string>
+    <string name="pdf_column_ramadan_day">#</string>
+    <string name="pdf_ramadan_note">İmsak Sabah vaktidir. İftar Akşam vaktidir. Caminizin imsakiyesi farklıysa caminize uyun.</string>
+    <string name="ramadan_row_a11y">%1$d. gün, %2$s. İmsak %3$s. İftar %4$s. Oruç %5$s.</string>
+    <string name="settings_suhoor">Sahur hatırlatıcısı</string>
+    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Ses ve sessiz mod kuralları namaz uyarılarınızla aynıdır.</string>
+    <string name="suhoor_off">Kapalı</string>
+    <plurals name="suhoor_minutes_before">
+        <item quantity="one">Sabah vaktinden %d dakika önce</item>
+        <item quantity="other">Sabah vaktinden %d dakika önce</item>
+    </plurals>
+    <string name="notif_suhoor_title">İmsak %1$s</string>
+    <string name="notif_suhoor_body">%1$s vakti %2$s sonra</string>
+
+    <string name="eid_fitr_title">Ramazan Bayramınız mübarek olsun</string>
+    <string name="eid_fitr_body">Allah oruçlarımızı ve ibadetlerimizi kabul etsin, gününüzü sevinçle doldursun.</string>
+    <string name="eid_adha_title">Kurban Bayramınız mübarek olsun</string>
+    <string name="eid_adha_body">Allah ibadetlerimizi ve kurbanlarımızı kabul etsin, size ve ailenize bereket versin.</string>
+    <string name="eid_fine_print">Bu tarih bizim hesabımızdır. Bayramı başka bir gün kutluyorsanız kusura bakmayın, o gün de bayramınız mübarek olsun. Lütfen caminize uyun.</string>
+
+    <!-- Ana ekran widget\'ları -->
+    <string name="widget_next_label">SajdaTime: sonraki namaz</string>
+    <string name="widget_today_label">SajdaTime: bugünün namazları</string>
+    <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla. Telefonunuzun koyu temasına uyar.</string>
+    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli. Telefonunuzun koyu temasına uyar.</string>
+    <string name="widget_tomorrow">Yarın</string>
+    <string name="widget_no_location">Konumunuzu ayarlamak için SajdaTime\'ı açın</string>
+    <string name="widget_a11y_next">Sonraki namaz %1$s, saat %2$s, %3$s sonra</string>
+    <string name="widget_a11y_next_tomorrow">Sonraki namaz yarın, %1$s, saat %2$s, %3$s sonra</string>
+    <string name="widget_a11y_today">Bugünün namaz vakitleri. %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">İmsak</string>
+    <string name="widget_iftar">İftar</string>
 </resources>

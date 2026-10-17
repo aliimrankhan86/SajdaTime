@@ -33,6 +33,24 @@ object PrayerAlarmScheduler {
     const val EXTRA_SLOT = "slot"
     const val EXTRA_AT_MILLIS = "at"
 
+    /**
+     * The optional suhoor reminder rides the same receiver, the same alarm ladder and the same
+     * four reschedule triggers as the prayer alerts, with its own action so a prayer alarm and a
+     * reminder can never be mistaken for one another. The extras carry the Fajr it precedes and the
+     * Ramadan date it is for, which the receiver checks against the settings of the moment it fires.
+     */
+    const val ACTION_SUHOOR_REMINDER = "com.sajdatime.app.action.SUHOOR_REMINDER"
+    const val EXTRA_FAJR_AT_MILLIS = "fajr_at"
+    const val EXTRA_DATE_EPOCH_DAY = "date"
+
+    /**
+     * Request codes for the reminders start here. Prayer codes are `dayOfYear * 10 + slot`, which
+     * tops out at 3,669, so the two families cannot meet, and they have different actions as well.
+     * Suhoor codes run 10,001 to 10,366: one per Ramadan date, so rescheduling replaces rather than
+     * duplicates, exactly as for prayers.
+     */
+    internal const val SUHOOR_REQUEST_BASE = 10_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -41,18 +59,35 @@ object PrayerAlarmScheduler {
         val manager = ContextCompat.getSystemService(context, AlarmManager::class.java) ?: return
 
         cancelAll(context, manager)
-        if (settings.alertFor.isEmpty()) return
 
         val zone = ZoneId.systemDefault()
         val now = Instant.now()
         val today = now.atZone(zone).toLocalDate()
+
+        // Laid down BEFORE the early return below: a person can switch every prayer alert off and
+        // still want the suhoor reminder, and an early return first would silently drop it. The
+        // planner is wrapped so that nothing about a reminder can ever stop the prayer alarms that
+        // follow, which are the thing this class exists for.
+        runCatching {
+            SuhoorReminderPlan.plan(
+                coordinates = coordinates,
+                prefs = settings.calculationPrefs,
+                minutesBefore = settings.suhoorReminderMinutes,
+                today = today,
+                now = now,
+            )
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, suhoorIntent(context, reminder), reminder.at)
+        }
+
+        if (settings.alertFor.isEmpty()) return
 
         // The style is not consulted here any more: every prayer that alerts at all gets
         // the same, strongest available alarm. Which sound it then makes is decided when
         // it fires, in PrayerAlarmReceiver. See schedule().
         upcoming(coordinates, settings, today, now)
             .filter { (slot, _) -> slot in settings.alertFor }
-            .forEach { (slot, at) -> schedule(context, manager, slot, at) }
+            .forEach { (slot, at) -> schedule(context, manager, alarmIntent(context, slot, at), at) }
     }
 
     /** Prayer slots between [now] and the end of the scheduling horizon, in order. */
@@ -154,10 +189,9 @@ object PrayerAlarmScheduler {
     private fun schedule(
         context: Context,
         manager: AlarmManager,
-        slot: PrayerSlot,
+        pendingIntent: PendingIntent,
         at: Instant,
     ) {
-        val pendingIntent = alarmIntent(context, slot, at)
         val triggerAt = at.toEpochMilli()
 
         // Each rung is attempted only if the one above it failed. runCatching rather than
@@ -213,24 +247,30 @@ object PrayerAlarmScheduler {
 
     private fun cancelAll(context: Context, manager: AlarmManager) {
         // Request codes are derived from slot + day-of-year, so cancelling the same
-        // horizon we are about to write covers every alarm we could have created.
+        // horizon we are about to write covers every alarm we could have created. The suhoor
+        // reminders are cancelled in the same pass, which is what makes switching the reminder
+        // off, or leaving Ramadan, take effect on the very next reschedule.
         val today = LocalDate.now()
         (-1..HORIZON_DAYS).forEach { dayOffset ->
             val date = today.plusDays(dayOffset.toLong())
             PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
-                val intent = Intent(context, PrayerAlarmReceiver::class.java)
-                    .setAction(ACTION_PRAYER)
-                val pending = PendingIntent.getBroadcast(
-                    context,
-                    requestCode(slot, date),
-                    intent,
-                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
-                )
-                pending?.let {
-                    manager.cancel(it)
-                    it.cancel()
-                }
+                cancelPending(context, manager, ACTION_PRAYER, prayerRequestCode(slot, date))
             }
+            cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
+        }
+    }
+
+    private fun cancelPending(context: Context, manager: AlarmManager, action: String, requestCode: Int) {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java).setAction(action)
+        val pending = PendingIntent.getBroadcast(
+            context,
+            requestCode,
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+        )
+        pending?.let {
+            manager.cancel(it)
+            it.cancel()
         }
     }
 
@@ -246,7 +286,20 @@ object PrayerAlarmScheduler {
             .putExtra(EXTRA_AT_MILLIS, at.toEpochMilli())
         return PendingIntent.getBroadcast(
             context,
-            requestCode(slot, date),
+            prayerRequestCode(slot, date),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    private fun suhoorIntent(context: Context, reminder: SuhoorReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_SUHOOR_REMINDER)
+            .putExtra(EXTRA_FAJR_AT_MILLIS, reminder.fajrAt.toEpochMilli())
+            .putExtra(EXTRA_DATE_EPOCH_DAY, reminder.date.toEpochDay())
+        return PendingIntent.getBroadcast(
+            context,
+            suhoorRequestCode(reminder.date),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
@@ -263,6 +316,10 @@ object PrayerAlarmScheduler {
         )
 
     /** Stable per (slot, calendar day) so rescheduling replaces rather than duplicates. */
-    private fun requestCode(slot: PrayerSlot, date: LocalDate): Int =
+    internal fun prayerRequestCode(slot: PrayerSlot, date: LocalDate): Int =
         date.dayOfYear * 10 + slot.ordinal
+
+    /** Stable per Ramadan date, in a range no prayer code can reach. */
+    internal fun suhoorRequestCode(date: LocalDate): Int =
+        SUHOOR_REQUEST_BASE + date.dayOfYear
 }

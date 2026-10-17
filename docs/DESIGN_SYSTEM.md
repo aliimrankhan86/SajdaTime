@@ -280,6 +280,27 @@ missing.
 > because as one more grey card in a stack of grey cards the exact-alarm notice went
 > unread.
 
+**Ramadan card** (1.4.0, Times screen, inside Ramadan only): the same flat surface as the
+next-prayer card (`sajdaSurface`, 24dp radius, 1dp `outlineVariant` border). Suhoor end and iftar sit
+side by side as two 16dp blocks. The one coming next is `primaryContainer` and carries the word
+"Next" in a small `primary` pill (not colour alone), the other is `surfaceContainerLow`. Below them
+the fast length and tomorrow's two times. It adds no colour of its own. The info button is 48dp.
+The **eve notice** is a quiet 16dp radius `secondaryContainer` row, neutral and not amber: it is
+information, not a fault. The **Eid greeting** is a 24dp `secondaryContainer` card, deliberately not
+`tertiaryContainer`.
+
+**Home screen widgets** (1.4.0): drawn in the launcher with `RemoteViews`, so colours cannot be Compose
+roles. Six colours in `res/values/colors.xml` and `values-night/colors.xml` (`widget_surface`,
+`widget_on_surface`, `widget_on_surface_variant`, `widget_highlight`, `widget_primary`,
+`widget_outline_variant`), each the same hex as its `Color.kt` twin in both themes, which
+`WidgetColorsTest` enforces along with seven contrast pairs. They are set in the layout XML and not in
+code, so the launcher re resolves them when the phone changes theme. There is deliberately no "text on
+highlight" colour: the ordinary text colours clear 4.5:1 on the highlight in both themes. Corner
+radius is 16dp, or the system's own on Android 12 and later (`values-v31`). Text sizes are 11sp for
+labels and context, 13sp for times, 14sp for messages, 16 to 20sp for the next prayer, never below 11sp
+(lint `SmallSp`). Minimum sizes: Next prayer 3 by 2, Today 4 by 3, headerless. The picker previews are
+drawn PNGs from `tools/make-widget-previews.py`.
+
 **Settings groups** — a letterspaced `primary` label, then the rows inside one card with a
 1dp `outlineVariant` border, 16dp gutter, 20dp radius.
 
@@ -336,7 +357,8 @@ applied in the "dark design system" and "light design system" commits. What was 
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
-and it should stay that way.
+and it should stay that way. (The Ramadan card and the widgets in 1.4.0 reuse these tokens and
+add none. A prayer tracker, if it is ever built, is its own design pass.)
 
 One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
 and 52sp in dark, on the argument that dark text on a pale background carries more optical

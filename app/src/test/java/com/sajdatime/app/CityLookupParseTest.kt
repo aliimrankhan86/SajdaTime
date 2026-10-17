@@ -57,4 +57,32 @@ class CityLookupParseTest {
         assertNull(CityLookup.parseOpenMeteo(noCoords, "Lahore"))
     }
 
+    @Test
+    fun `coordinates outside the valid range are a miss, not a stored location`() {
+        val badLat = """{"results":[{"name":"Atlantis","latitude":999,"longitude":10,"country":"X"}]}"""
+        val badLon = """{"results":[{"name":"Atlantis","latitude":10,"longitude":-181,"country":"X"}]}"""
+        assertNull(CityLookup.parseOpenMeteo(badLat, "Atlantis"))
+        assertNull(CityLookup.parseOpenMeteo(badLon, "Atlantis"))
+    }
+
+    @Test
+    fun `an absurdly long place name is capped`() {
+        val long = "A".repeat(500)
+        val body = """{"results":[{"name":"$long","latitude":10,"longitude":10}]}"""
+        assertEquals(80, CityLookup.parseOpenMeteo(body, "x")!!.city.length)
+    }
+
+    @Test
+    fun `a response over the size cap is refused, not read into memory`() {
+        val within = "x".repeat(CityLookup.MAX_BODY_CHARS)
+        assertEquals(within, with(CityLookup) { readCapped(within.reader(), MAX_BODY_CHARS) })
+        val over = "x".repeat(CityLookup.MAX_BODY_CHARS + 1)
+        var refused = false
+        try {
+            with(CityLookup) { readCapped(over.reader(), MAX_BODY_CHARS) }
+        } catch (_: java.io.IOException) {
+            refused = true
+        }
+        assertEquals(true, refused)
+    }
 }

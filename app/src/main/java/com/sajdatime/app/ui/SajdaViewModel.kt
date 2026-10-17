@@ -7,8 +7,11 @@ import androidx.lifecycle.viewModelScope
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.EidDay
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
@@ -33,6 +36,7 @@ import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.OngoingBadge
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -86,6 +90,18 @@ data class UiState(
     /** Qibla bearing in degrees from true north. Null until a location is known. */
     val qiblaBearing: Double? = null,
     val qiblaDistanceKm: Double? = null,
+    /**
+     * Present only while the user's own calendar is inside Ramadan or in the week before it
+     * ([com.sajdatime.core.RamadanInfo.showsNotice]). Null the rest of the year, so nothing
+     * about Ramadan reaches the Times screen then.
+     */
+    val ramadan: RamadanState? = null,
+    /**
+     * The Eid whose day it is on the user's own calendar, or null on every other day. Computed
+     * from the same date and the same Islamic date shift as the Home header, so the greeting and
+     * the header cannot disagree.
+     */
+    val eid: EidDay? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -186,7 +202,17 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 return@launch
             }
-            val city = locationRepository.cityName(coordinates)
+            // The town name is a label, not an input to any calculation, and asking for it
+            // can send the approximate position to the phone's geocoding provider (Google,
+            // on most phones). So ask only when there is no label yet or the phone has moved
+            // far enough that the old one could be wrong, not on every foreground visit.
+            // The coordinates themselves are always stored fresh. See PlaceLabelPolicy.
+            val before = _state.value.settings
+            val city = if (PlaceLabelPolicy.needsNewLabel(before.coordinates, before.cityName, coordinates)) {
+                locationRepository.cityName(coordinates)
+            } else {
+                before.cityName
+            }
             settingsRepository.setLocation(coordinates, city)
             _state.update { it.copy(resolvingLocation = false, problem = null) }
         }
@@ -260,6 +286,21 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissMethodNotice() =
         viewModelScope.launch { settingsRepository.dismissMethodNotice() }
+
+    fun setRamadanCardEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setRamadanCardEnabled(enabled) }
+
+    fun dismissRamadanNotice(hijriYear: Int) =
+        viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
+
+    fun setSuhoorReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setSuhoorReminderMinutes(minutes) }
+
+    fun setSuhoorReminderStyle(style: AlertStyle) =
+        viewModelScope.launch { settingsRepository.setSuhoorReminderStyle(style) }
+
+    fun dismissEidGreeting(code: Int) =
+        viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
 
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
@@ -369,7 +410,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
             return
         }
 
@@ -380,14 +421,22 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val today = PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs)
             val next: NextPrayer = PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
             val current = PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
-            Triple(today, next, current)
+            // Built from the same `today` the list shows, so the card cannot disagree with it.
+            // Recomputed on every trigger that already exists: Fajr and Maghrib are prayers, so
+            // the phase changes exactly when `next` rolls over, and the date change tick covers
+            // midnight. No new timer.
+            val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
+            val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
+            Computed(today, next, current, ramadan, eid)
         }
 
         _state.update {
             it.copy(
-                today = computed.first,
-                next = computed.second,
-                current = computed.third,
+                today = computed.today,
+                next = computed.next,
+                current = computed.current,
+                ramadan = computed.ramadan,
+                eid = computed.eid,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -398,7 +447,28 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val context = getApplication<Application>()
             PrayerAlarmScheduler.reschedule(context, settings)
             OngoingBadge.refresh(context, settings)
+            WidgetUpdater.refreshAll(context, settings)
             WatchSync.publish(context, settings)
         }
     }
+
+    /**
+     * Redraws the home screen widgets from the settings in hand. Called when the app comes to the
+     * foreground, which is also when a language chosen in the picker has finished taking effect (the
+     * activity is recreated with the new resources first), so the widgets change language with the app.
+     */
+    fun refreshWidgets() {
+        viewModelScope.launch(Dispatchers.Default) {
+            WidgetUpdater.refreshAll(getApplication<Application>(), _state.value.settings)
+        }
+    }
 }
+
+/** One recalculation's results, carried out of the background block together. */
+private data class Computed(
+    val today: DayPrayerTimes,
+    val next: NextPrayer,
+    val current: PrayerSlot?,
+    val ramadan: RamadanState?,
+    val eid: EidDay?,
+)

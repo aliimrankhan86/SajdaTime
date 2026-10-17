@@ -10,8 +10,6 @@ import com.batoulapps.adhan.data.DateComponents
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.chrono.HijrahDate
-import java.time.temporal.ChronoField
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
 import kotlin.math.withSign
@@ -430,10 +428,8 @@ object PrayerEngine {
      * rule that depends on it would show "1 Ramadan" beside an Isha still calculated as
      * though it were Sha'ban.
      */
-    private fun isRamadan(date: LocalDate, offsetDays: Int): Boolean = runCatching {
-        HijrahDate.from(date.plusDays(offsetDays.toLong()))
-            .get(ChronoField.MONTH_OF_YEAR) == 9
-    }.getOrDefault(false)
+    private fun isRamadan(date: LocalDate, offsetDays: Int): Boolean =
+        HijriCalendar.isRamadan(date, offsetDays)
 
     /**
      * Asr timing: Hanafi waits until an object's shadow is twice its length; Shafi'i,

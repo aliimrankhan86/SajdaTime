@@ -2,10 +2,12 @@ package com.sajdatime.app.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -21,7 +23,23 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sajdatime")
+/**
+ * A settings file that cannot be parsed becomes an empty one.
+ *
+ * DataStore's default is to rethrow on every read, and a read happens at the top of every
+ * receiver and every launch. One unreadable file (a full disk during a write, a bad flash
+ * block: rare, because DataStore writes atomically, but not impossible) would then crash the
+ * app on open and crash the alarm receiver at every prayer, silently, with no crash reporting
+ * to say so. Starting again from defaults costs the user a repeat of setup. Every field below
+ * already has a default for exactly this case. Tested in SettingsCorruptionTest.
+ */
+internal fun settingsCorruptionHandler(): ReplaceFileCorruptionHandler<Preferences> =
+    ReplaceFileCorruptionHandler { emptyPreferences() }
+
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+    name = "sajdatime",
+    corruptionHandler = settingsCorruptionHandler(),
+)
 
 /**
  * How a prayer time announces itself.
@@ -145,6 +163,38 @@ data class AppSettings(
      * and on a device that expresses no preference that resolves to light.
      */
     val themeChoice: ThemeChoice = ThemeChoice.SYSTEM,
+    /**
+     * Whether the Ramadan card and the notice before it appear on the Times screen. On, because a
+     * person who never opens Settings should get Ramadan without asking for it, and a switch,
+     * because not everyone fasts (illness, travel, pregnancy) and a daily fasting card must be
+     * removable. Turning it off hides the card, the notice and the day 1 and 2 hint. It leaves the
+     * widget labels, the timetable PDF and the suhoor reminder to their own settings.
+     */
+    val ramadanCardEnabled: Boolean = true,
+    /**
+     * The Hijri year whose notice the user closed, or 0. A year and not a flag, so the notice
+     * returns next Ramadan without anything having to reset it.
+     */
+    val ramadanNoticeDismissedYear: Int = 0,
+    /**
+     * The [com.sajdatime.core.EidDay.code] of the Eid greeting the user last closed, or 0. One
+     * code and not a flag: each Eid has its own code, so closing Eid al-Fitr 1448 leaves Eid
+     * al-Adha 1448 and every later Eid to show without anything having to reset it.
+     */
+    val eidGreetingDismissedCode: Int = 0,
+    /**
+     * Minutes before Fajr at which the optional suhoor reminder fires during Ramadan, or 0 for off.
+     * **Off by default**: it is an alert, and nothing here makes noise until asked. Read through
+     * [SUHOOR_CHOICES], so a stored value that is not one of the five choices (a corrupt store, an
+     * older or newer build) reads as off rather than as some odd number of minutes.
+     */
+    val suhoorReminderMinutes: Int = 0,
+    /**
+     * How the reminder announces itself. The same two styles as a prayer alert, and it goes through
+     * the same [com.sajdatime.app.notify.effectiveAlertStyle], so the silent phone switch, the
+     * polar approximate day downgrade and the Do Not Disturb handling apply to it unchanged.
+     */
+    val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -158,8 +208,19 @@ data class AppSettings(
     /** The prayers that announce themselves at all, in any style. */
     val notifyFor: Set<PrayerSlot> get() = alertFor.keys
 
-    /** True when at least one prayer is set to the loud style. */
-    val usesAlarm: Boolean get() = alertFor.containsValue(AlertStyle.ALARM)
+    /**
+     * True when at least one prayer, or the suhoor reminder, is set to the loud style. The reminder
+     * counts so that a person whose only alarm is the reminder still gets the Do Not Disturb card
+     * and the sound row in Settings.
+     */
+    val usesAlarm: Boolean
+        get() = alertFor.containsValue(AlertStyle.ALARM) ||
+            (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.ALARM)
+
+    companion object {
+        /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
+        val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
+    }
 }
 
 /**
@@ -288,6 +349,15 @@ class SettingsRepository(private val context: Context) {
     suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
         edit { it[Keys.ALARM_ON_APPROXIMATE] = allowed }
 
+    /** Anything that is not one of [AppSettings.SUHOOR_CHOICES] is stored as 0, off. */
+    suspend fun setSuhoorReminderMinutes(minutes: Int) = edit {
+        it[Keys.SUHOOR_MINUTES] = minutes.takeIf { m -> m in AppSettings.SUHOOR_CHOICES } ?: 0
+    }
+
+    suspend fun setSuhoorReminderStyle(style: AlertStyle) = edit {
+        it[Keys.SUHOOR_STYLE] = style.name
+    }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -312,6 +382,16 @@ class SettingsRepository(private val context: Context) {
 
     /** Closes the calculation-method notice on home for good. Settings still shows the row. */
     suspend fun dismissMethodNotice() = edit { it[Keys.METHOD_NOTICE_DISMISSED] = true }
+
+    suspend fun setRamadanCardEnabled(enabled: Boolean) = edit { it[Keys.RAMADAN_CARD] = enabled }
+
+    /** Closes the Ramadan notice for [hijriYear] only, so it returns the following year. */
+    suspend fun dismissRamadanNotice(hijriYear: Int) = edit {
+        it[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] = hijriYear
+    }
+
+    /** Closes the Eid greeting for the Eid whose [code] this is, and for that Eid only. */
+    suspend fun dismissEidGreeting(code: Int) = edit { it[Keys.EID_GREETING_DISMISSED_CODE] = code }
 
     private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
@@ -345,6 +425,11 @@ class SettingsRepository(private val context: Context) {
         val EXACT_ALARM_DISMISSED = booleanPreferencesKey("exact_alarm_notice_dismissed")
         val METHOD_NOTICE_DISMISSED = booleanPreferencesKey("method_notice_dismissed")
         val THEME = stringPreferencesKey("theme_choice")
+        val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
+        val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
+        val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
+        val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
+        val SUHOOR_STYLE = stringPreferencesKey("suhoor_reminder_style")
     }
 
     private companion object {
@@ -382,6 +467,12 @@ class SettingsRepository(private val context: Context) {
             exactAlarmNoticeDismissed = this[Keys.EXACT_ALARM_DISMISSED] ?: false,
             methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
+            ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
+            ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
+            eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
+            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: 0)
+                .takeIf { it in AppSettings.SUHOOR_CHOICES } ?: 0,
+            suhoorReminderStyle = enumOr(this[Keys.SUHOOR_STYLE], AlertStyle.NOTIFICATION),
         )
     }
 

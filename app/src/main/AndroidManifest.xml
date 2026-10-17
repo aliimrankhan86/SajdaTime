@@ -60,8 +60,8 @@
 
     <!--
       Backup is off deliberately. Cloud backup would copy the user's cached coordinates
-      to Google's servers, which directly contradicts the promise that their location
-      never leaves the device. Settings are two taps to re-enter; the privacy guarantee
+      to Google's servers, which directly contradicts the promise that the developer never
+      receives their location. Settings are two taps to re-enter; the privacy guarantee
       is worth more.
 
       allowBackup covers Android 11 and below. From Android 12 it stops cloud backup but
@@ -111,6 +111,46 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="com.sajdatime.app.action.PRAYER_ALARM" />
+                <action android:name="com.sajdatime.app.action.SUHOOR_REMINDER" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+          The two home screen widgets. exported="false" is what the current Android Studio template
+          generates: the system, not another app, sends APPWIDGET_UPDATE. ASSUMED until the widget
+          device test has run on the API 36 emulator; if a provider is never updated there, flip it to
+          true and record why. updatePeriodMillis is 0 in both provider files on purpose.
+        -->
+        <receiver
+            android:name=".widget.NextPrayerWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_next_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_next_prayer_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.TodayWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_today_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_today_info" />
+        </receiver>
+
+        <!-- The widgets' own redraw alarm. Not exported: only this app's PendingIntent reaches it. -->
+        <receiver
+            android:name=".widget.WidgetRefreshReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.sajdatime.app.action.WIDGET_REFRESH" />
             </intent-filter>
         </receiver>
 
@@ -123,6 +163,8 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <!-- The phone's language changed: the widgets are drawn in the app's words and numerals. -->
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
                 <!-- Android 12+: "Alarms & reminders" granted or revoked. See
                      SystemEventReceiver for why both directions need a reschedule. -->
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />

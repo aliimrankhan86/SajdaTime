@@ -271,9 +271,9 @@ Created as a **personal** account:
 |---|---|
 | Developer name (public) | Ali Imran Khan |
 | Account ID | 6284685113064492750 |
-| Owner account | aliimrankhan86@gmail.com |
+| Owner account | the owner's personal Google account. The address is deliberately not written in this public repository |
 | Developer email (public) | aikstudies@gmail.com |
-| Contact email (private) | aliimrankhan86@gmail.com |
+| Contact email (private) | the same personal account, kept out of this repository for the same reason |
 | Earning money | **No** — this is what keeps the street address off the public listing |
 
 Public on the Play listing: legal name, country ("United Kingdom"), developer email. The
@@ -1108,8 +1108,16 @@ JAVA_HOME=$(/usr/libexec/java_home -v 21) ./gradlew --rerun-tasks \
 
 Then bump `versionCode` (and usually `versionName`) in **both** `app/build.gradle.kts` and
 `wear/build.gradle.kts`. Version codes are unique **per app, not per track**: the phone is
-on `4`, the watch on `1001`, so the two sequences climb in separate bands and can never
-collide.
+on `7` (1.3.2, live since 13 Oct 2026, and `8` is 1.4.0 once released), the watch on `1001`, so
+the two sequences climb in separate bands and can never collide.
+
+**Device steps for 1.4.0 and later.** The on device suite includes widget tests. A shell can bind a widget
+only after `adb shell appwidget grantbind --package com.sajdatime.app --user 0`, and the suite is run
+with `adb shell am instrument` and not `connectedAndroidTest`, which uninstalls the app when it ends.
+`docs/release-tools/release-1.4.0.sh` does both, moves the emulator clock through Ramadan and puts it
+back, and writes PASS, FAIL or CHECK lines to `build/release-1.4.0/summary.txt`. **Merging a branch
+publishes `docs/` (the privacy policy) through GitHub Pages**, so merge when you are ready to submit,
+not before (`docs/HANDOVER.md` §15 lessons 124 and 137).
 
 ### Shipping an improvement *during* the closed test
 

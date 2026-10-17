@@ -8,11 +8,19 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// Upload key for Google Play. keystore.properties holds the password and is gitignored,
-// so a fresh clone has no key and simply builds unsigned — which is what CI and anyone
-// but the owner wants. See docs/RELEASING.md.
+// Upload key for Google Play. A fresh clone has no key and simply builds unsigned, which is what
+// CI and anyone but the owner wants. See docs/RELEASING.md. The four values are looked for in two
+// places, in this order:
+//   1. Gradle properties named sajdatime.storeFile, sajdatime.storePassword, sajdatime.keyAlias and
+//      sajdatime.keyPassword, normally in ~/.gradle/gradle.properties. That file is outside every
+//      project folder an assistant session is ever given, so this is the preferred home.
+//   2. keystore.properties in the repo root (storeFile, storePassword, keyAlias, keyPassword), the
+//      original place. Gitignored, and still works, so nothing the owner already has stops working.
 val keystoreProperties = rootProject.file("keystore.properties").takeIf { it.exists() }
     ?.let { file -> Properties().apply { file.inputStream().use(::load) } }
+
+fun signingValue(name: String): String? =
+    providers.gradleProperty("sajdatime.$name").orNull ?: keystoreProperties?.getProperty(name)
 
 kotlin {
     compilerOptions {
@@ -46,8 +54,13 @@ android {
         // packaged, see the bundle block below) and the Do Not Disturb button finally lists
         // the app (ACCESS_NOTIFICATION_POLICY in the manifest). Phone only: the watch stays
         // 1001 / 1.2.0 and its bundle is never uploaded with a phone release.
-        versionCode = 7
-        versionName = "1.3.2"
+        //
+        // 8 / 1.4.0, 16 Oct 2026: Ramadan pack (card, timetable, PDF, optional suhoor reminder, Eid
+        // greeting) and two home screen widgets. Phone only again: the watch stays 1001 / 1.2.0.
+        // Docs: docs/plans/2026-10-widget-ramadan-tracker/. When the Ramadan content goes live is the
+        // owner's decision (README Amendment 1), not something this number settles.
+        versionCode = 8
+        versionName = "1.4.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -58,12 +71,12 @@ android {
     testBuildType = providers.gradleProperty("testBuildType").getOrElse("debug")
 
     signingConfigs {
-        keystoreProperties?.let { props ->
+        signingValue("storeFile")?.let { storeFilePath ->
             create("release") {
-                storeFile = file(props.getProperty("storeFile"))
-                storePassword = props.getProperty("storePassword")
-                keyAlias = props.getProperty("keyAlias")
-                keyPassword = props.getProperty("keyPassword")
+                storeFile = file(storeFilePath)
+                storePassword = signingValue("storePassword")
+                keyAlias = signingValue("keyAlias")
+                keyPassword = signingValue("keyPassword")
             }
         }
     }
@@ -215,6 +228,14 @@ tasks.withType<Test>().configureEach {
         rootProject.fileTree(rootProject.projectDir) {
             include(
                 "app/src/main/res/values/strings.xml",
+                // EidWordingTest and the widget tests read every language file and the colour
+                // files off disk, so each is declared here or a green result is replayed from the
+                // build cache after they change.
+                "app/src/main/res/values*/strings.xml",
+                "app/src/main/res/values*/colors.xml",
+                "app/src/main/res/layout/widget_*.xml",
+                "app/src/main/res/xml/widget_*.xml",
+                "app/src/main/res/drawable-nodpi/widget_preview_*.png",
                 "wear/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",

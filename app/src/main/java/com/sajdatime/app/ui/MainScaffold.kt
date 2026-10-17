@@ -80,6 +80,11 @@ fun MainScaffold(
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onDismissExactAlarmNotice: () -> Unit,
     onDismissMethodNotice: () -> Unit,
+    onDismissRamadanNotice: (Int) -> Unit,
+    onDismissEid: (Int) -> Unit,
+    onSetRamadanCard: (Boolean) -> Unit,
+    onSetSuhoorMinutes: (Int) -> Unit,
+    onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
 ) {
@@ -172,6 +177,9 @@ fun MainScaffold(
                         onSearchCity = onSearchCity,
                         onDismissExactAlarmNotice = onDismissExactAlarmNotice,
                         onDismissMethodNotice = onDismissMethodNotice,
+                        onDismissRamadanNotice = onDismissRamadanNotice,
+                        onDismissEid = onDismissEid,
+                        onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
                     )
 
@@ -189,6 +197,9 @@ fun MainScaffold(
                         onSetHijriOffset = onSetHijriOffset,
                         onResetAdjustments = onResetAdjustments,
                         onSetOngoingBadge = onSetOngoingBadge,
+                        onSetRamadanCard = onSetRamadanCard,
+                        onSetSuhoorMinutes = onSetSuhoorMinutes,
+                        onSetSuhoorStyle = onSetSuhoorStyle,
                         onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
                         onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
                         onPickAlarmSound = onPickAlarmSound,

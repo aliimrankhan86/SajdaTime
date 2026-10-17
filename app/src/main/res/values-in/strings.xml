@@ -18,7 +18,7 @@
     <string name="permission_title">Di mana Anda salat?</string>
     <string name="permission_body">SajdaTime perlu tahu kira-kira di mana Anda berada untuk menghitung waktu salat dan arah kiblat. Ketuk ikon info untuk melihat apa artinya secara persis.</string>
     <string name="permission_why_title">Mengapa kami perlu lokasi Anda</string>
-    <string name="permission_why_body">Untuk menghitung waktu salat dan arah kiblat yang tepat untuk tempat Anda.\n\nKami hanya memeriksa perkiraan lokasi Anda saat aplikasi terbuka. Lokasi itu tetap di ponsel Anda. Kami tidak pernah mengirimnya ke mana pun.</string>
+    <string name="permission_why_body">Untuk menghitung waktu salat dan arah kiblat yang tepat untuk tempat Anda.\n\nKami hanya memeriksa perkiraan lokasi Anda saat aplikasi terbuka. Waktu salat dihitung di ponsel Anda dan kami tidak pernah menerima lokasi Anda. Untuk menampilkan nama kota Anda, aplikasi bertanya ke layanan pencarian tempat bawaan ponsel Anda. Di sebagian besar ponsel, layanan itu dijawab lewat internet oleh Google.</string>
     <string name="action_allow_location">Izinkan lokasi</string>
     <string name="action_got_it">Mengerti</string>
     <string name="action_understood">Saya mengerti</string>
@@ -28,7 +28,7 @@
     <string name="location_looking_up">Mencari tempat itu…</string>
     <string name="location_no_fix">Lokasi Anda belum bisa ditemukan. Pastikan lokasi aktif, atau ketik kota Anda di bawah.</string>
 
-    <string name="city_fallback_body">Ketik kota Anda saja. Bila bisa, ponsel Anda mencarinya sendiri. Bila tidak bisa, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
+    <string name="city_fallback_body">Ketik kota Anda saja. Nama itu ditanyakan dulu ke layanan pencarian tempat bawaan ponsel Anda, yang di sebagian besar ponsel bertanya ke Google lewat internet. Bila layanan itu tidak bisa menjawab, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
     <string name="city_field_label">Kota</string>
     <string name="city_field_helper">Contoh: Jakarta, Surabaya, Medan</string>
     <string name="city_not_found">Tempat itu tidak ditemukan. Coba tambahkan nama negaranya.</string>
@@ -185,7 +185,7 @@
     <string name="about_disclaimer">Penafian</string>
     <string name="about_disclaimer_short">Alat bantu, bukan otoritas agama. Ketuk untuk membaca.</string>
     <string name="about_privacy">Privasi</string>
-    <string name="about_privacy_desc">Lokasi Anda tetap di ponsel ini. Tanpa akun, tanpa iklan. Data jumlah penggunaan bersifat opsional dan mati kecuali Anda mengaktifkannya. Ketuk untuk membaca kebijakan lengkapnya.</string>
+    <string name="about_privacy_desc">Waktu salat dihitung di ponsel ini dan kami tidak pernah menerima lokasi Anda. Tanpa akun, tanpa iklan. Data jumlah penggunaan bersifat opsional dan mati kecuali Anda mengaktifkannya. Ketuk untuk membaca kebijakan lengkapnya.</string>
 
     <!-- Optional usage counts. -->
     <string name="consent_title">Bantu tingkatkan SajdaTime?</string>
@@ -275,4 +275,76 @@
     <string name="notif_approximate">Waktu perkiraan</string>
     <string name="settings_alarm_on_approximate">Bunyikan pada hari perkiraan</string>
     <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tetap senyap pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
+
+    <!-- Ramadan -->
+    <string name="ramadan_card_label">Ramadan</string>
+    <string name="ramadan_day_of">Hari ke-%1$d dari %2$d</string>
+    <string name="ramadan_suhoor_ends">Sahur berakhir</string>
+    <string name="ramadan_iftar">Buka puasa</string>
+    <string name="ramadan_countdown_suhoor">Sahur berakhir dalam %1$s</string>
+    <string name="ramadan_countdown_iftar">Buka puasa dalam %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">Sahur besok berakhir pukul %1$s</string>
+    <string name="ramadan_month_ends_today">Menurut kalender ini, hari ini adalah hari terakhir Ramadan. Masjid Anda yang akan mengumumkan Idulfitri.</string>
+    <string name="ramadan_fast_length">Puasa hari ini %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="other">%d menit lebih lama dari kemarin</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="other">%d menit lebih singkat dari kemarin</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">sama dengan kemarin</string>
+    <string name="ramadan_fast_line">%1$s, %2$s</string>
+    <string name="ramadan_tomorrow_line">Besok: sahur berakhir %1$s, buka puasa %2$s</string>
+    <string name="ramadan_info_a11y">Tentang waktu Ramadan ini</string>
+    <string name="ramadan_info_title">Tentang waktu Ramadan ini</string>
+    <string name="ramadan_info_calc">SajdaTime menampilkan Subuh dan Magrib sebagaimana dihitung untuk lokasi Anda dan menggunakannya sebagai akhir sahur dan waktu berbuka.</string>
+    <string name="ramadan_info_margin">Banyak jadwal mencantumkan waktu imsak beberapa menit sebelum Subuh sebagai kehati-hatian, dan sebagian masjid memulai Subuh lebih awal dari perhitungan ini. SajdaTime tidak menambahkan selisih apa pun.</string>
+    <string name="ramadan_info_mosque">Jika jadwal masjid Anda berbeda, ikuti masjid Anda.</string>
+    <string name="ramadan_info_date">Tanggal Hijriah di sini mengikuti kalender Umm al-Qura. Jika masjid Anda memulai Ramadan pada hari yang berbeda, geser tanggal Hijriah di Pengaturan. Itu juga menggeser hitungan hari, pengingat sahur, dan aturan Isya Umm al-Qura.</string>
+    <string name="ramadan_info_hide">Sembunyikan kartu ini</string>
+    <string name="ramadan_info_hide_note">Anda dapat menampilkannya lagi di Pengaturan.</string>
+    <string name="ramadan_eve_title_before">Menurut kalender ini Ramadan dimulai %1$s</string>
+    <string name="ramadan_eve_body">Banyak masjid mengumumkan awal Ramadan setelah rukyat hilal, sering kali sehari kemudian. Jika masjid Anda berbeda, ketuk untuk menggeser tanggal Hijriah. Itu juga menggeser pengingat sahur dan aturan Isya Umm al-Qura.</string>
+    <string name="ramadan_date_differs">Apakah masjid Anda memulai Ramadan pada hari yang berbeda?</string>
+    <string name="settings_ramadan_card">Kartu Ramadan</string>
+    <string name="settings_ramadan_card_desc">Menampilkan waktu sahur dan buka puasa di layar Waktu selama Ramadan</string>
+    <string name="ramadan_open_timetable">Jadwal lengkap</string>
+    <string name="ramadan_timetable_title">Ramadan %1$d</string>
+    <string name="ramadan_col_day">Hari</string>
+    <string name="ramadan_col_fast">Puasa</string>
+    <string name="ramadan_approx_marker">perkiraan</string>
+    <string name="export_ramadan">Ramadan %1$d</string>
+    <string name="export_ramadan_desc">Setiap hari sepanjang bulan, dengan sahur dan buka puasa</string>
+    <string name="pdf_period_ramadan">Ramadan %1$d</string>
+    <string name="pdf_column_ramadan_day">#</string>
+    <string name="pdf_ramadan_note">Sahur berakhir pada Subuh. Buka puasa pada Magrib. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.</string>
+    <string name="ramadan_row_a11y">Hari ke-%1$d, %2$s. Sahur berakhir %3$s. Buka puasa %4$s. Puasa %5$s.</string>
+    <string name="settings_suhoor">Pengingat sahur</string>
+    <string name="settings_suhoor_help">Pengingat sebelum Subuh pada hari-hari Ramadan, menurut kalender yang diatur di SajdaTime. Suara dan aturan mode senyapnya sama dengan notifikasi salat Anda.</string>
+    <string name="suhoor_off">Nonaktif</string>
+    <plurals name="suhoor_minutes_before">
+        <item quantity="other">%d menit sebelum Subuh</item>
+    </plurals>
+    <string name="notif_suhoor_title">Sahur berakhir pukul %1$s</string>
+    <string name="notif_suhoor_body">%1$s dalam %2$s</string>
+
+    <string name="eid_fitr_title">Selamat Hari Raya Idulfitri</string>
+    <string name="eid_fitr_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima puasa dan ibadah kita, dan hari Anda penuh kebahagiaan.</string>
+    <string name="eid_adha_title">Selamat Hari Raya Iduladha</string>
+    <string name="eid_adha_body">Taqabbalallahu minna wa minkum. Semoga Allah menerima ibadah dan kurban kita, serta memberkahi Anda dan keluarga.</string>
+    <string name="eid_fine_print">Tanggal ini berdasarkan perhitungan kami. Mohon maaf jika Anda berhari raya di hari lain: selamat hari raya juga untuk Anda. Silakan ikuti masjid Anda.</string>
+
+    <!-- Widget layar utama -->
+    <string name="widget_next_label">SajdaTime: salat berikutnya</string>
+    <string name="widget_today_label">SajdaTime: salat hari ini</string>
+    <string name="widget_next_desc">Salat berikutnya dan waktunya, dengan hitung mundur. Mengikuti mode gelap ponsel Anda.</string>
+    <string name="widget_today_desc">Enam waktu hari ini dengan yang berikutnya ditandai. Mengikuti mode gelap ponsel Anda.</string>
+    <string name="widget_tomorrow">Besok</string>
+    <string name="widget_no_location">Buka SajdaTime untuk mengatur lokasi Anda</string>
+    <string name="widget_a11y_next">Salat berikutnya %1$s pukul %2$s, dalam %3$s</string>
+    <string name="widget_a11y_next_tomorrow">Salat berikutnya besok, %1$s pukul %2$s, dalam %3$s</string>
+    <string name="widget_a11y_today">Jadwal salat hari ini. %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">Sahur berakhir</string>
+    <string name="widget_iftar">Buka puasa</string>
 </resources>

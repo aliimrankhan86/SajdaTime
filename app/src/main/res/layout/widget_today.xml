@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Today widget: the six times with the next one marked. Same rules as widget_next_prayer.xml: no
+  android:text, colours resolved by the launcher, children hidden from accessibility, and only classes
+  a RemoteViews may inflate.
+
+  It is 4 cells wide and 3 high (180dp), not 2 high as first planned. Six rows at 13sp need about
+  135dp and a 4 by 2 slot is 110dp. A two column grid fitted the height but had no room for the
+  Ramadan words and cut "Maghrib" at the 250dp minimum width. There is no header: the highlighted row
+  already says which prayer is next, the countdown belongs to the Next prayer widget, and a header cost
+  about 30dp, which at a 30 percent larger font pushed Isha off the bottom in a rendered check. The
+  Ramadan word sits in the middle of its row, so Ramadan adds no height. Rows are wrap_content so a
+  larger font grows them and the last one clips rather than overlapping.
+
+  Sunrise is dimmed and is never the highlighted row, as on the Times screen.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:orientation="vertical"
+    android:paddingStart="8dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="8dp"
+    android:paddingBottom="8dp">
+
+    <!-- Shown instead of the rows when there is no location yet. -->
+    <TextView
+        android:id="@+id/widget_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textAlignment="viewStart"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/widget_row_fajr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_fajr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+
+        <!-- Always present and weighted, so the time stays at the far end of the row whether or not
+             there is a word here. Holds "Next", or a Ramadan word, or both. -->
+        <TextView
+            android:id="@+id/widget_label_fajr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_fajr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_row_sunrise"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_sunrise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_label_sunrise"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_sunrise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_row_dhuhr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_dhuhr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_label_dhuhr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_dhuhr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_row_asr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_asr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_label_asr"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_asr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_row_maghrib"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_maghrib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_label_maghrib"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_maghrib"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_row_isha"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/widget_name_isha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/widget_label_isha"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/widget_time_isha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/widget_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        android:textAlignment="viewStart"
+        android:textColor="@color/widget_on_surface_variant"
+        android:textSize="11sp"
+        android:visibility="gone" />
+</LinearLayout>

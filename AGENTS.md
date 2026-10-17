@@ -9,5 +9,5 @@ Four things that are easy to get wrong, each explained in `CLAUDE.md`:
 - Usage counts (Firebase Analytics) are **opt in, closed, and never about belief**. Do not turn them on by default, add events or
   add a country list. The evidence is in `docs/HANDOVER.md` section 10 (3 to 4 Oct 2026).
 - Never touch, print or copy the release signing key or `keystore.properties`. Never push to `main`.
-- The religious disclaimer and its dua request stay exactly where they are; never machine-translate the app.
+- The religious disclaimer and its dua request stay exactly where they are. Translations are written and checked by Claude with no native speaker review, by the owner's decision of 9 Oct 2026, and the app never says a translation awaits review.
 - Watch testing is finished. Do not ask the owner to test the watch.

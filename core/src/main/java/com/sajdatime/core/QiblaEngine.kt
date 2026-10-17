@@ -107,11 +107,14 @@ object QiblaEngine {
      * Great-circle distance to the Kaaba in kilometres. Shown alongside the compass so
      * the reading has a sanity check the user can recognise.
      */
-    fun distanceToKaabaKm(from: Coordinates): Double {
+    fun distanceToKaabaKm(from: Coordinates): Double = distanceKm(from, KAABA)
+
+    /** Great-circle (haversine) distance between two points in kilometres. */
+    fun distanceKm(from: Coordinates, to: Coordinates): Double {
         val lat1 = Math.toRadians(from.latitude)
-        val lat2 = Math.toRadians(KAABA.latitude)
+        val lat2 = Math.toRadians(to.latitude)
         val deltaLat = lat2 - lat1
-        val deltaLon = Math.toRadians(KAABA.longitude - from.longitude)
+        val deltaLon = Math.toRadians(to.longitude - from.longitude)
 
         val a = sin(deltaLat / 2) * sin(deltaLat / 2) +
             cos(lat1) * cos(lat2) * sin(deltaLon / 2) * sin(deltaLon / 2)
