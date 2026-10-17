@@ -4968,6 +4968,12 @@ Before merging, merge `main` into the branch.
 2. Turkey iftar offsets (Diyanet), before Ramadan.
 3. January store listing: the Ramadan lines and the 1.5.0 What's new (`docs/store/LISTING.md`).
 
+**Security hardening done (17 Oct 2026, §5.24).** Gradle dependency verification is ON
+(`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
+file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
+empty `GRADLE_USER_HOME`. Owner security steps still open (his to press): restrict the Firebase API key, GitHub
+ruleset on `main`, Dependabot alerts, private vulnerability reporting, passkeys, signing values into `~/.gradle`.
+
 **Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
 then decided: "if you test it emulator then no need to test it on real phone". Emulator testing is the standard
 for 1.5.0, adhan and alarms included. Do not ask him to plug in a phone, and do not add a phone step to any job.
