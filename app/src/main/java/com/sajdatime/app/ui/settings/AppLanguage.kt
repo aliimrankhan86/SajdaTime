@@ -30,6 +30,10 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     URDU("ur", "اردو"),
     TURKISH("tr", "Türkçe"),
     INDONESIAN("id", "Bahasa Indonesia"),
+    // Added 17 Oct 2026 after a 1 star review asked for it ("إضافة اللغة العربية"). Claude's
+    // translation, checked by Claude, as the owner decided for every language on 9 Oct 2026.
+    // Choosing it turns the app right to left with Arabic-Indic digits through AppLocale.
+    ARABIC("ar", "العربية"),
     ;
 
     /** True when this language's words are installed on this phone. */

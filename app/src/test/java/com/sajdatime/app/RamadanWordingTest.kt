@@ -22,7 +22,7 @@ import java.io.File
 class RamadanWordingTest {
 
     private val root = File("..").canonicalFile
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in")
+    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
 
     private fun strings(folder: String): Map<String, String> {
         val file = File(root, "app/src/main/res/$folder/strings.xml")

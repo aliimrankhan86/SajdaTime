@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.data.placeName
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -250,7 +251,7 @@ fun HomeScreen(
     if (exportSheet) {
         ExportSheet(
             sheetState = exportSheetState,
-            cityName = state.settings.cityName,
+            cityName = state.settings.placeName(LocalContext.current),
             ramadanYear = ramadanExportYear,
             onDismiss = { exportSheet = false },
             onPick = { range ->
@@ -284,7 +285,7 @@ fun HomeScreen(
  */
 @Composable
 private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
-    val city = state.settings.cityName.ifBlank {
+    val city = state.settings.placeName(LocalContext.current).ifBlank {
         stringResource(R.string.location_set_generic)
     }
     // Through a resource rather than "$city. $changeLabel": the full stop and the order of

@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.onboarding
 
+import com.sajdatime.app.data.placeName
 import android.content.pm.PackageManager
 import android.Manifest
 import androidx.core.content.ContextCompat
@@ -404,7 +405,7 @@ private fun PermissionStep(
 
         if (located && !state.resolvingLocation) {
             Spacer(Modifier.height(20.dp))
-            LocatedRow(cityName = state.settings.cityName)
+            LocatedRow(cityName = state.settings.placeName(LocalContext.current))
         }
 
         // Denying used to change nothing visible at all (research F7).
@@ -669,7 +670,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
             Column(Modifier.padding(20.dp)) {
                 SummaryRow(
                     stringResource(R.string.label_location),
-                    state.settings.cityName.ifBlank {
+                    state.settings.placeName(LocalContext.current).ifBlank {
                         stringResource(R.string.location_set_generic)
                     },
                 )

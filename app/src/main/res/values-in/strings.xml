@@ -365,4 +365,6 @@
     <string name="about_share">Bagikan SajdaTime</string>
     <string name="about_share_desc">Kirim tautannya ke keluarga dan teman.</string>
     <string name="about_share_message">SajdaTime: waktu salat dan kompas kiblat gratis, tanpa iklan dan tanpa akun. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
+    <!-- The fallback place, shown in the app's own language. -->
+    <string name="location_makkah">Makkah</string>
 </resources>

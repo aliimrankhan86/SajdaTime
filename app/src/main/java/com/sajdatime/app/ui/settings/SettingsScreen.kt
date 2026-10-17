@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.settings
 
+import com.sajdatime.app.data.placeName
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.selection.toggleable
 import com.sajdatime.app.review.ReviewPrompt
@@ -191,7 +192,7 @@ fun SettingsScreen(
                 key = "location",
                 icon = Icons.Outlined.LocationOn,
                 title = stringResource(R.string.settings_location),
-                subtitle = settings.cityName.ifBlank {
+                subtitle = settings.placeName(LocalContext.current).ifBlank {
                     stringResource(R.string.location_set_generic)
                 },
                 onClick = { open = SettingsChooser.LOCATION },

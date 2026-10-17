@@ -24,8 +24,8 @@ class LanguagePickerTest {
     private fun read(path: String) = File("..", path).readText()
 
     @Test
-    fun `the picker offers English first, then Urdu, Turkish and Indonesian`() {
-        assertEquals(listOf("en", "ur", "tr", "id"), AppLanguage.entries.map { it.tag })
+    fun `the picker offers English first, then Urdu, Turkish, Indonesian and Arabic`() {
+        assertEquals(listOf("en", "ur", "tr", "id", "ar"), AppLanguage.entries.map { it.tag })
     }
 
     @Test

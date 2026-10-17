@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui
 
+import com.sajdatime.app.data.placeName
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -358,7 +359,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 exporter.export(
                     range = range,
                     coordinates = coordinates,
-                    cityName = settings.cityName,
+                    cityName = settings.placeName(com.sajdatime.core.AppLocale.wrap(getApplication())),
                     prefs = settings.calculationPrefs,
                 )
             }.fold(

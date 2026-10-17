@@ -480,3 +480,12 @@ class SettingsRepository(private val context: Context) {
     private inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: fallback
 }
+
+/**
+ * The place name to show. The Makkah fallback is stored under a fixed English name, so it is
+ * shown in the app's own language instead ("مكة", "مکہ", "Mekke"); a real place keeps the name
+ * the phone or the lookup gave it. [context] must carry the app's language (AppLocale.wrap, or
+ * a Compose LocalContext, which already does). Added 17 Oct 2026 with the Arabic translation.
+ */
+fun AppSettings.placeName(context: android.content.Context): String =
+    if (usingDefaultLocation) context.getString(com.sajdatime.app.R.string.location_makkah) else cityName

@@ -26,7 +26,7 @@ No accounts. No ads. Times are worked out on your phone and we never receive you
 - A Wear OS app and tile that work on their own, with or without the phone nearby
 - Light and dark themes, following your phone by default or set by hand, both verified
   against WCAG 2.1 AA contrast
-- In English, Urdu, Turkish and Indonesian, chosen in Settings on Android 13 and later. The
+- In English, Arabic, Urdu, Turkish and Indonesian, chosen in Settings on Android 13 and later. The
   translations were written with AI help by the developer and are corrected when users report
   mistakes. Clock times, dates and numbers follow the language the app is showing, not the
   phone's: see `docs/HANDOVER.md` §5.11 for why that is not the same thing.

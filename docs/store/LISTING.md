@@ -271,7 +271,7 @@ WHAT YOU GET
 • During Ramadan it doubles as a sehri and iftar timetable: Fajr ends sehri, Maghrib opens your fast
 • A Wear OS app and watch tile that work on their own, with or without your phone
 • Light and dark themes, following your phone or set by hand
-• In English, Urdu, Turkish and Indonesian, chosen in Settings
+• In English, Arabic, Urdu, Turkish and Indonesian, chosen in Settings
 
 BUILT FOR YOUR SCHOOL OF THOUGHT
 
@@ -336,7 +336,7 @@ WHAT YOU GET
 • In Ramadan: suhoor (sehri) end and iftar for your location, a countdown, today's fast length, a Ramadan timetable to view or save as PDF, and an optional suhoor reminder before Fajr
 • A Wear OS app and watch tile that work on their own, with or without your phone
 • Light and dark themes, following your phone or set by hand
-• In English, Urdu, Turkish and Indonesian, chosen in Settings
+• In English, Arabic, Urdu, Turkish and Indonesian, chosen in Settings
 
 BUILT FOR YOUR SCHOOL OF THOUGHT
 

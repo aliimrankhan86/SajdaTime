@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modern Standard Arabic. Translated by Claude on 17 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">ar</string>
+    <!-- Product name: deliberately left untranslated. -->
+    <string name="app_name">SajdaTime</string>
+
+    <!-- Navigation -->
+    <string name="nav_times">المواقيت</string>
+    <string name="nav_qibla">القبلة</string>
+    <string name="nav_settings">الإعدادات</string>
+
+    <!-- Onboarding -->
+    <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
+    <!-- Spoken by the screen reader. Plain unvocalised text reads cleanly in Arabic. -->
+    <string name="bismillah_a11y">بسم الله الرحمن الرحيم</string>
+    <string name="welcome_tagline">رفيقك الخاص في الصلاة. مجاني دائمًا.</string>
+    <string name="action_begin">ابدأ</string>
+
+    <string name="permission_title">أين تصلي؟</string>
+    <string name="permission_body">يحتاج SajdaTime إلى معرفة تقريبية بمكانك ليحسب مواقيت صلاتك واتجاه القبلة. انقر على أيقونة المعلومات لترى ما يعنيه ذلك بالضبط.</string>
+    <string name="permission_why_title">لماذا نحتاج إلى موقعك</string>
+    <string name="permission_why_body">لحساب مواقيت الصلاة الصحيحة واتجاه القبلة حيث أنت.\n\nلا نتحقق من موقعك التقريبي إلا والتطبيق مفتوح. تُحسب الأوقات على هاتفك ولا نتلقى موقعك أبدًا. ولعرض اسم بلدتك، يسأل التطبيق خدمة البحث عن الأماكن في هاتفك نفسه، وتجيب عنها Google عبر الإنترنت في معظم الهواتف.</string>
+    <string name="action_allow_location">اسمح بالموقع</string>
+    <string name="action_got_it">حسنًا</string>
+    <string name="action_understood">فهمت</string>
+    <string name="action_continue">متابعة</string>
+    <string name="location_set_generic">موقعك</string>
+    <string name="location_finding">جارٍ تحديد موقعك…</string>
+    <string name="location_looking_up">جارٍ البحث عن هذا المكان…</string>
+    <string name="location_no_fix">لم نتمكن من تحديد موقعك. تأكد من أن خدمة الموقع مفعّلة، أو اكتب مدينتك أدناه.</string>
+
+    <string name="city_fallback_body">اكتب مدينتك بدلًا من ذلك. يُبحث عن الاسم عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي تسأل Google عبر الإنترنت في معظم الهواتف. وإن لم تستطع الإجابة، يُرسَل الاسم الذي كتبته وحده مرة واحدة إلى خدمة بحث مجانية. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
+    <string name="city_field_label">المدينة</string>
+    <string name="city_field_helper">على سبيل المثال: مانشستر، لاهور، القاهرة</string>
+    <string name="city_not_found">لم نجد هذا المكان. جرّب إضافة اسم البلد.</string>
+    <string name="action_find_city">ابحث عن المدينة</string>
+    <string name="action_use_makkah">تخطَّ الآن واستخدم مكة</string>
+
+    <string name="sect_title">ما انتماؤك المذهبي؟</string>
+    <string name="sect_body">يحدد هذا طريقة حساب مواقيت صلاتك. يمكنك تغييره متى شئت.</string>
+    <string name="sect_sunni">سنّي</string>
+    <string name="sect_sunni_desc">أوقات رابطة العالم الإسلامي افتراضيًا</string>
+    <string name="sect_shia">شيعي</string>
+    <string name="sect_shia_desc">أوقات المذهب الجعفري (الاثنا عشري)</string>
+
+    <string name="madhab_title">اختر مذهبك</string>
+    <string name="madhab_body">هذا يغيّر وقت العصر فقط. تبدأ المساجد الحنفية العصر متأخرًا. ويأخذ الشافعي والمالكي والحنبلي بالوقت المعتاد. لست متأكدًا؟ أبقِ الشافعي للوقت المعتاد. يمكنك تغييره لاحقًا في الإعدادات.</string>
+    <string name="madhab_hanafi">الحنفي</string>
+    <string name="madhab_shafii">الشافعي</string>
+    <string name="madhab_maliki">المالكي</string>
+    <string name="madhab_hanbali">الحنبلي</string>
+    <string name="madhab_hanafi_desc">عصر متأخر، حين يصير ظل الشيء مثلَي طوله</string>
+    <string name="madhab_standard_desc">العصر المعتاد، حين يصير ظل الشيء مثل طوله</string>
+    <!-- Same words as the Settings row on purpose. Names no method and no country. -->
+    <string name="method_step_title">طريقة الحساب</string>
+    <string name="method_step_body">تقيس المساجد شفق الفجر والمساء بطرق مختلفة، لذا قد يختلف الفجر والعشاء بضع دقائق من طريقة إلى أخرى، وبأكثر من ساعة في أقصى الشمال. إن اختلفت أوقات مسجدك عن التطبيق، فاختيار طريقته هنا هو الحل عادةً. لست متأكدًا؟ أبقِ الخيار الأول. يمكنك تغيير هذا في أي وقت من الإعدادات.</string>
+    <string name="action_back">رجوع</string>
+
+    <string name="confirm_title">كل شيء جاهز</string>
+    <string name="confirm_body">هل يبدو هذا صحيحًا؟ يمكنك تغيير أي شيء من هذا لاحقًا في الإعدادات.</string>
+    <string name="label_location">الموقع</string>
+    <string name="label_school">الانتماء المذهبي</string>
+    <string name="action_finish">إنهاء</string>
+    <string name="state_selected">محدَّد</string>
+
+    <!-- Disclaimer. All four points of the English must survive any rewording (see the
+         comment in values/strings.xml): where the times come from, how they can be wrong,
+         follow your mosque, and no warranty. The dua request stays the last paragraph and
+         appears nowhere else. First person throughout: the author speaks. -->
+    <string name="disclaimer_title">يُرجى قراءة هذا أولًا</string>
+    <string name="disclaimer_body">SajdaTime مساعد، وليس مرجعًا دينيًا.\n\nهذه الأوقات لم يعطني إياها مسجد ولا عالم ولا أي جهة. يحسبها هاتفك من موقع الشمس، مستخدمًا طرق حساب نشرتها هيئات إسلامية وعلماء. لست مفتيًا ولا عالمًا ولا خبيرًا في الفقه، وقد بُني هذا التطبيق بمساعدة الذكاء الاصطناعي. قد يحتوي البرنامج على أخطاء، وقد يحمل الهاتف موقعًا خاطئًا أو ساعة خاطئة، وقد يؤخر الهاتف تنبيهًا حين يوفّر البطارية، وقد أكون أنا مخطئًا.\n\nلذا أرجو أن تعدّ ما تراه هنا حسابًا لا حكمًا شرعيًا. وحيث يختلف SajdaTime ومسجدك، فاتبع مسجدك. إن بدا لك وقت أو اتجاه غير صحيح، أو لم تكن متأكدًا، فاسألهم أو اسأل شخصًا آخر مؤهلًا لينصحك. التطبيق مجاني ويُقدَّم كما هو، دون أي ضمان ودون أي وعد بالدقة، فحيث تهمّك الدقة التامة، أرجو ألا تعتمد عليه وحده.\n\nإن كنت تستخدم الساعة، فأرجو أن تعدّها وسيلة تيسير لا الكلمة الأخيرة. فبوصلة الساعة أصغر من بوصلة الهاتف ورؤيتها للسماء أضعف، وقد تعمل بموقع وجده هاتفك قبل مدة. وفي القبلة خاصةً، هاتفك هو الأدق بين الاثنين. وحين يكون الأمر مهمًا، فتحقق منه هناك.\n\nلا تتفق المساجد كلها على وقت بدء الصلاة. والعشاء أكثرها اختلافًا. وفي بريطانيا وما يقع شمالها قد يزيد الفرق بين طريقة وأخرى على ساعة، لأن العلماء يقيسون اختفاء الشفق بطرق مختلفة. لا أستطيع أن أحسم ذلك، ولا يحاول التطبيق ذلك. إن لم تطابق الأوقات هنا مسجدك، فاسألهم عن الطريقة التي يتبعونها واخترها في الإعدادات، تحت طريقة الحساب. وإن بقيت بينكما بضع دقائق بعد ذلك، فإن خيار «طابِق مسجدك» يتيح لك أن تعدّل كل صلاة، والتاريخ أيضًا، بيدك. وحيث يبقى اختلاف، فاتبع مسجدك.\n\nأمر أخير. يبيّن هذا التطبيق متى يدخل وقت الصلاة. ثم يحدد مسجدك وقته الخاص لصلاة الجماعة، وغالبًا ما يكون بعده بقليل، لذا سيختلف لوح المسجد عن الأوقات هنا في كثير من الأحيان. وليس أيٌّ منهما خاطئًا.\n\nوطلب واحد، إن تكرّمت: أرجو أن تذكرني وعائلتي ووالديّ في دعائك.</string>
+
+    <!-- Home -->
+    <string name="home_next_prayer">الصلاة التالية</string>
+    <string name="home_until">حتى دخول وقتها</string>
+    <string name="home_today">اليوم</string>
+    <string name="home_next_marker">التالية</string>
+    <!-- One word in a pill. Reports which prayer has come in; it is not a ruling. -->
+    <string name="home_now_marker">الآن</string>
+    <string name="home_now_marker_a11y">الصلاة الحالية</string>
+    <string name="notice_dismiss">إغلاق</string>
+    <!-- Two lines of body at most at the default font. -->
+    <string name="method_notice_title">هل يطابق هذا مسجدك؟</string>
+    <string name="method_notice_body">قد يختلف الفجر والعشاء هنا بساعة أو أكثر.</string>
+    <!-- "Becomes due" (يدخل وقت) is deliberate and matches the disclaimer; keep them aligned. -->
+    <string name="mosque_diff_link">مختلف عن مسجدك؟</string>
+    <string name="mosque_diff_title">مختلف عن مسجدك؟</string>
+    <string name="mosque_diff_congregation">يبيّن هذا التطبيق متى يدخل وقت كل صلاة. وعادةً يقيم مسجدك الجماعة بعد ذلك بقليل، لذا سيختلف لوح المسجد عن هذه الأوقات ببضع دقائق في كثير من الأحيان. وليس أيٌّ منهما خاطئًا.</string>
+    <string name="mosque_diff_twilight">يتوقف الفجر والعشاء على طريقة قياس الشفق، والمساجد تقيسه بطرق مختلفة. إن اختلف مسجدك بأكثر من بضع دقائق، فاختر الطريقة التي يتبعها.</string>
+    <string name="mosque_diff_asr">يتوقف العصر على المذهب الفقهي. تبدأ المساجد الحنفية العصر بعد غيرها، بما قد يصل إلى ساعة أو أكثر.</string>
+    <string name="mosque_diff_minutes">إن بقيت بينكما بضع دقائق، فعدّل كل صلاة قليلًا لتطابق الأوقات المطبوعة في مسجدك.</string>
+    <string name="mosque_diff_follow">وحيث يبقى اختلاف، فاتبع مسجدك.</string>
+    <string name="polar_notice_title">أوقات تقريبية</string>
+    <!-- %1$d is a latitude (45 or 60). Keep it a placeholder, with the degree sign directly after it. -->
+    <string name="polar_notice_body">على هذا البعد من خط الاستواء لا تشرق الشمس أو تغرب دائمًا، فلا يوجد فجر أو عشاء حقيقي يمكن حسابه. لذا تُحسب هذه الأوقات من خط العرض %1$d° بدلًا من ذلك. وتتعامل المساجد هنا مع الأمر بطرق مختلفة، فاسأل مسجدك عمّا يتبعه.</string>
+    <string name="polar_notice_alarm">في هذه الأيام تصلك المنبّهات إشعارات هادئة بدل الرنين، لأن التطبيق لا يستطيع ضمان الدقيقة بالضبط. فعّل «الرنين في الأيام التقريبية» في الإعدادات إن كنت تفضّل أن يوقظك المنبّه رغم ذلك.</string>
+    <string name="home_no_location">حدّد موقعك لترى مواقيت الصلاة.</string>
+    <string name="home_countdown_a11y">%1$s بعد %2$s</string>
+    <!-- Spoken for the location row: the place, then what tapping it does. -->
+    <string name="home_location_a11y">%1$s. %2$s</string>
+    <string name="home_default_location_title">مواقيت مكة</string>
+    <string name="home_default_location_body">لم يُحدَّد موقعك بعد، لذا هذه الأوقات لمكة.</string>
+    <string name="action_change_location">تغيير الموقع</string>
+
+    <!-- Location sheet. "Ten miles is about a minute" is measured; keep the figure. -->
+    <string name="location_sheet_title">موقعك</string>
+    <string name="location_sheet_body">تعتمد مواقيت الصلاة والقبلة كلتاهما على مكان وجودك. حدّث هذا كلما سافرت.\n\nلحماية خصوصيتك لا يطلب التطبيق إلا موقعك التقريبي، لذا قد يذكر بلدة قريبة أو المنطقة الأوسع بدلًا من بلدتك. وهذا يغيّر الأوقات قليلًا جدًا: عشرة أميال تعادل نحو دقيقة. إن بدا لك الاسم خاطئًا، فاكتب مدينتك أدناه.</string>
+    <string name="action_use_my_location">استخدم موقعي الحالي</string>
+    <string name="location_sheet_search_heading">أو اكتب اسم مدينة</string>
+
+    <!-- Export -->
+    <string name="action_save_timetable">حفظ الجدول بصيغة PDF</string>
+    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <string name="action_save_pdf">حفظ بصيغة PDF</string>
+    <string name="export_sheet_title">احفظ جدول مواقيتك</string>
+    <string name="export_sheet_body">سنُعِدّ ملف PDF لمواقيت صلاتك في %1$s. ويمكنك بعدها حفظه أو طباعته أو إرساله إلى أحد.</string>
+    <string name="export_today">اليوم فقط</string>
+    <string name="export_today_desc">يوم واحد، ستة أوقات</string>
+    <string name="export_week">الأيام السبعة القادمة</string>
+    <string name="export_week_desc">اليوم والأيام الستة التي تليه</string>
+    <string name="export_month">هذا الشهر كله</string>
+    <string name="export_month_desc">كل يوم من أول الشهر حتى آخره</string>
+    <string name="export_saved">حُفظ في التنزيلات باسم %1$s</string>
+    <string name="export_failed">تعذّر إنشاء ملف PDF. يُرجى المحاولة مرة أخرى.</string>
+
+    <!-- Text printed inside the exported PDF itself. -->
+    <string name="pdf_column_day">اليوم</string>
+    <string name="pdf_column_date">التاريخ</string>
+    <string name="pdf_place_unknown">موقعك</string>
+    <string name="pdf_period_onwards">من %1$s فصاعدًا</string>
+    <string name="pdf_tagline">مواقيت الصلاة والقبلة، مجانًا للأمة</string>
+    <!-- Sits under the place name: the app only takes a coarse location. -->
+    <string name="pdf_area_label">منطقة تقريبية</string>
+    <!-- "Approximate area · August 2026". Separator only; both halves are translated. -->
+    <string name="pdf_header_meta">%1$s · %2$s</string>
+    <!-- "These times", not "Fajr and Isha": a projected day replaces all six slots. -->
+    <string name="pdf_approximate_note">بعض هذه الأوقات تقريبية. في هذا الشمال البعيد لا تشرق الشمس أو تغرب دائمًا، لذا تُحسب تلك الأيام من خط العرض %1$d° بدلًا من ذلك. اسأل مسجدك عمّا يتبعه.</string>
+    <string name="pdf_footer">حُسبت دون اتصال على جهازك. SajdaTime مجاني، إلى الأبد.</string>
+
+    <!-- Qibla -->
+    <string name="qibla_title">القبلة</string>
+    <string name="qibla_subtitle">تبعد الكعبة نحو %2$d كم من هنا، على زاوية %1$d° من الشمال.</string>
+    <string name="qibla_needs_location">حدّد موقعك لتجد القبلة.</string>
+    <string name="qibla_facing">أنت الآن تتجه نحو الكعبة</string>
+    <string name="qibla_heading_now">الاتجاه %1$d°</string>
+    <!-- The dial's legend. The needle is the user: it points the way the phone points. -->
+    <string name="qibla_legend_kaaba">الكعبة</string>
+    <string name="qibla_legend_facing">الاتجاه الذي تواجهه</string>
+    <string name="qibla_turn_left">استدر يسارًا %1$d°</string>
+    <string name="qibla_turn_right">استدر يمينًا %1$d°</string>
+    <string name="qibla_no_compass">اتجه إلى %1$d° من الشمال الحقيقي</string>
+    <string name="qibla_calibrate">تحتاج البوصلة إلى معايرة. أمسك هاتفك وحرّكه على شكل الرقم ثمانية بضع مرات.</string>
+    <string name="qibla_sensor_missing">لا يحتوي هذا الهاتف على بوصلة، لذا يمكننا أن نعطيك الزاوية لكن لا يمكننا أن نشير إلى الاتجاه.</string>
+    <string name="qibla_accuracy_medium">قد تتذبذب القراءة قليلًا. ابتعد عن المعادن والمغناطيسات ومكبرات الصوت لتحصل على نتيجة أثبت.</string>
+
+    <!-- Settings -->
+    <string name="title_settings">الإعدادات</string>
+    <string name="settings_group_prayer_times">مواقيت الصلاة</string>
+    <string name="settings_group_appearance">المظهر</string>
+    <string name="settings_theme">السمة</string>
+    <string name="theme_system">حسب الهاتف</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="settings_group_reminders">التذكيرات</string>
+    <string name="settings_group_about">حول التطبيق</string>
+
+    <string name="settings_location">الموقع</string>
+    <string name="settings_school">الانتماء المذهبي</string>
+    <string name="settings_madhab">المذهب</string>
+    <string name="settings_alerts">تنبيهات الصلاة</string>
+    <string name="settings_which_prayers_all">الخمس كلها</string>
+    <string name="settings_which_prayers_some">%1$d من الخمس</string>
+    <string name="settings_which_prayers_none">لا شيء</string>
+    <string name="settings_method">طريقة الحساب</string>
+    <!-- Method and madhab labels can contain brackets, so this separator avoids nesting. -->
+    <string name="settings_value_pair">%1$s · %2$s</string>
+    <string name="settings_method_auto">تلقائي · %1$s</string>
+    <string name="settings_method_help">تقيس المساجد الشفق بطرق مختلفة، وهذا يغيّر الفجر والعشاء أساسًا. وكلما سكنت شمالًا أكثر، كبر الفرق. إن لم تطابق هذه الأوقات مسجدك، فاسألهم عن الطريقة التي يتبعونها واخترها هنا.</string>
+
+    <string name="settings_alerts_help">اختر هذا لكل صلاة. الإشعار هادئ ويهتز. والمنبّه يشغّل الصوت الذي تختاره، بصوت عالٍ، مثل المنبّه العادي.</string>
+    <string name="alert_style_off">إيقاف</string>
+    <string name="alert_style_notification">إشعار</string>
+    <string name="alert_style_alarm">منبّه</string>
+    <!-- Shown under "Prayer alerts" when the five prayers do not all use the same style. -->
+    <string name="alert_style_mixed">مختلط</string>
+    <string name="settings_alarm_sound">صوت المنبّه</string>
+    <string name="settings_alarm_sound_desc">اختر أي نغمة أو أذان موجود على هاتفك</string>
+    <string name="settings_alarm_respect_silent">عدم الرنين حين يكون الهاتف صامتًا</string>
+    <string name="settings_alarm_respect_silent_desc">تشغيل: يصلك الإشعار في وقته، دون صوت. إيقاف: يرنّ المنبّه حتى لو كان الهاتف صامتًا، مثل المنبّه العادي.</string>
+    <string name="settings_dnd_title">السماح بالصوت في وضع عدم الإزعاج</string>
+    <string name="settings_dnd_desc">بدون هذا، يبقى منبّهك صامتًا حين يكون الهاتف في وضع عدم الإزعاج.</string>
+
+    <string name="settings_ongoing_badge">الصلاة التالية في الإشعارات</string>
+    <string name="settings_ongoing_badge_desc">إشعار صامت يعرض الصلاة التالية والوقت المتبقي</string>
+    <string name="settings_exact_alarms_title">السماح بالمنبّهات الدقيقة</string>
+    <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
+    <string name="settings_exact_alarms_brief">قد تصل تنبيهات الصلاة متأخرة ساعة.</string>
+    <!-- The action on a permission notice. It opens the phone's own settings screen. -->
+    <string name="action_allow">السماح</string>
+    <!-- "An hour or more late" is measured on two phones. Keep the figure and the Fajr case. -->
+    <string name="settings_exact_alarms_desc">بدونه، قد تصل تنبيهات الصلاة متأخرة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل الفجر أبدًا.</string>
+    <string name="confirm_exact_alarm_title">أمر أخير</string>
+    <string name="confirm_exact_alarm_body">لا يسمح Android للتطبيقات بضبط التنبيهات على دقيقة محددة إلا بإذنك. وبدونه قد يؤخر هاتفك تنبيهات الصلاة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل أبدًا تنبيه ليلي مثل الفجر. يمكنك فعل ذلك لاحقًا من الإعدادات أيضًا.</string>
+    <string name="action_close">إغلاق</string>
+
+    <string name="about_version">الإصدار</string>
+    <string name="about_disclaimer">إخلاء المسؤولية</string>
+    <string name="about_disclaimer_short">مساعد، وليس مرجعًا دينيًا. انقر للقراءة.</string>
+    <string name="about_privacy">الخصوصية</string>
+    <string name="about_privacy_desc">تُحسب الأوقات على هذا الهاتف، ولا نتلقى موقعك أبدًا. لا حسابات ولا إعلانات. وتبقى إحصاءات الاستخدام متوقفة ما لم تفعّلها.</string>
+
+    <!-- Optional usage counts. The consent text must state the material facts in full. Do not
+         shorten it, and do not use a word meaning "tracking" (no تتبع). -->
+    <string name="consent_title">هل تساعد في تحسين SajdaTime؟</string>
+    <string name="consent_body">SajdaTime مجاني ولا يحتوي على إعلانات. إن قلت نعم، يرسل بعض إحصاءات الاستخدام إلى Google Analytics كي يمكن تحسين التطبيق. وهي مرتبطة بمعرّف عشوائي، لا باسمك، وقد تُعالَج خارج المملكة المتحدة. وتُحفظ السجلات المفصّلة مدة أربعة عشر شهرًا.\n\nقد يكشف استخدام تطبيق للصلاة شيئًا عن إيمانك، لذا فهذا اختيارك، ولا يتغير شيء في التطبيق إن قلت لا. لا يرسل SajdaTime أبدًا موقعك عبر GPS ولا إعدادات صلاتك.\n\nلا يُرسَل شيء حتى تختار نعم. ويمكنك إيقاف ذلك من الإعدادات في أي وقت. والمسؤول عن ذلك هو علي عمران خان (Ali Imran Khan)، صانع التطبيق.</string>
+    <string name="settings_language_title">اللغة</string>
+    <string name="settings_language_desc">اختر لغة التطبيق</string>
+    <string name="language_unavailable">غير متاحة على هذا الهاتف</string>
+    <string name="permission_allowed">مسموح</string>
+    <string name="state_expanded">موسَّع</string>
+    <string name="state_collapsed">مطويّ</string>
+    <string name="consent_see_sent">اطّلع على ما يُرسَل بالضبط</string>
+    <string name="consent_hide_sent">إخفاء التفاصيل</string>
+    <string name="consent_sent_heading">ما يُرسَل إن قلت نعم</string>
+    <string name="consent_sent_list">• الشاشة الرئيسية التي تفتحها: المواقيت أو القبلة أو الإعدادات\n• خطوات الإعداد التي تصل إليها\n• هل تسمح بالإشعارات والموقع والمنبّهات الدقيقة (نعم أو لا لكل منها، وليس الموقع نفسه أبدًا)\n• عدد مرات فتح التطبيق ومدة بقائه مفتوحًا\n• طراز هاتفك وإصدار Android وإصدار التطبيق واللغة\n• متى فتحت التطبيق أول مرة، وكيف وجدته (مثلًا رابط على Google Play)\n• منطقتك التقريبية، التي تستنتجها Google من اتصالك بالإنترنت</string>
+    <string name="consent_never_heading">ما لا يُرسَل أبدًا</string>
+    <string name="consent_never_list">• موقعك عبر GPS أو إحداثياتك\n• المكان الذي تكتبه\n• انتماؤك المذهبي، وإعداد حساب صلاتك، وطريقة الحساب، وإعدادات التنبيه\n• أي شيء كتبته</string>
+    <string name="consent_yes">نعم، شارك إحصاءات الاستخدام</string>
+    <string name="consent_no">لا، شكرًا</string>
+    <string name="consent_read_policy">اقرأ سياسة الخصوصية</string>
+    <string name="about_feedback">إرسال ملاحظات</string>
+    <string name="about_feedback_desc">أخبر المطوّر بما يفيد أو بما هو خاطئ. يفتح بريدك الإلكتروني.</string>
+    <string name="feedback_subject">ملاحظات حول SajdaTime</string>
+    <string name="settings_usage_counts">مشاركة إحصاءات الاستخدام</string>
+    <string name="settings_usage_counts_desc">متوقفة ما لم تفعّلها. تُرسَل إلى Google مع معرّف عشوائي. وعند تفعيلها يُعرض لك أولًا ما يُرسَل بالضبط.</string>
+    <string name="about_charity">مجاني، إلى الأبد</string>
+    <string name="about_charity_desc">صُنع بحب، مجانًا للأمة. مشروع خيري، ابتغاء وجه الله.</string>
+    <string name="about_credits">من صنع</string>
+    <string name="about_credits_desc">علي عمران خان، صدقةً جارية للأمة</string>
+    <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
+    <string name="about_data">البيانات والمكتبات</string>
+    <string name="about_data_desc">تُحسب مواقيت الصلاة بمكتبة adhan-java من Batoul Apps (MIT). ويستخدم البحث عن المدن واجهة Open-Meteo geocoding API، المرخّصة بموجب CC BY 4.0.</string>
+
+    <!-- Notifications -->
+    <string name="channel_prayers">مواقيت الصلاة</string>
+    <string name="channel_prayers_desc">إشعار عند دخول وقت كل صلاة</string>
+    <string name="channel_alarm">منبّه الصلاة</string>
+    <string name="channel_alarm_desc">تنبيه أعلى صوتًا بالصوت الذي اخترته</string>
+    <string name="channel_ongoing">شارة الصلاة التالية</string>
+    <string name="channel_ongoing_desc">تذكير صامت بالصلاة التالية، دائمًا في لوحة الإشعارات</string>
+    <string name="notif_prayer_title">حان وقت %1$s</string>
+    <string name="notif_prayer_body">يدخل وقت %1$s الساعة %2$s</string>
+    <string name="notif_next_title">%1$s الساعة %2$s</string>
+
+    <!-- Hijri month names are listed here rather than left to the platform. -->
+    <string name="hijri_date_format">%1$d %2$s %3$d</string>
+    <string name="home_date_line">%1$s · %2$s</string>
+    <string-array name="hijri_months">
+        <item>محرم</item>
+        <item>صفر</item>
+        <item>ربيع الأول</item>
+        <item>ربيع الآخر</item>
+        <item>جمادى الأولى</item>
+        <item>جمادى الآخرة</item>
+        <item>رجب</item>
+        <item>شعبان</item>
+        <item>رمضان</item>
+        <item>شوال</item>
+        <item>ذو القعدة</item>
+        <item>ذو الحجة</item>
+    </string-array>
+
+    <!-- Durations. س = hour, د = minute, ث = second: the usual short forms in Arabic. -->
+    <string name="duration_h_m">%1$d س %2$d د</string>
+    <string name="duration_m">%1$d د</string>
+    <string name="duration_s">%1$d ث</string>
+
+    <!-- "Match your mosque" -->
+    <string name="settings_adjustments">طابِق مسجدك</string>
+    <string name="settings_adjustments_none">بلا تغييرات</string>
+    <string name="settings_adjustments_help">إذا طبع مسجدك وقتًا مختلفًا، فعدّله هنا قليلًا. جرّب طريقة الحساب أولًا. فهي عادةً سبب الفرق الحقيقي، وهذا للدقائق القليلة المتبقية.</string>
+    <string name="settings_adjustments_reset">إعادة ضبط الكل</string>
+    <string name="settings_hijri_offset">التاريخ الهجري</string>
+    <string name="settings_hijri_offset_label">تقديم التاريخ أو تأخيره</string>
+    <string name="settings_hijri_offset_help">التاريخ الهجري هنا محسوب. إذا كان مسجدك يتحرّى الهلال محليًا، فقد يختلف بيوم في أي من الاتجاهين. وهذا يغيّر أيضًا موعد رمضان والعيد.</string>
+    <!-- Shown when a prayer has no correction. A dash reads faster down a column. -->
+    <string name="adjustment_none">\u2014</string>
+    <!-- Always signed: "+5", "-3". The sign is the information. -->
+    <string name="adjustment_minutes">%+d دقيقة</string>
+    <plurals name="adjustment_days">
+        <item quantity="zero">%+d يوم</item>
+        <item quantity="one">%+d يوم</item>
+        <item quantity="two">%+d يوم</item>
+        <item quantity="few">%+d أيام</item>
+        <item quantity="many">%+d يومًا</item>
+        <item quantity="other">%+d يوم</item>
+    </plurals>
+    <plurals name="adjustment_summary_times">
+        <item quantity="zero">%d صلاة معدّلة</item>
+        <item quantity="one">%d صلاة معدّلة</item>
+        <item quantity="two">صلاتان معدّلتان</item>
+        <item quantity="few">%d صلوات معدّلة</item>
+        <item quantity="many">%d صلاةً معدّلة</item>
+        <item quantity="other">%d صلاة معدّلة</item>
+    </plurals>
+    <string name="adjustment_summary_hijri">التاريخ %1$s</string>
+    <!-- Quoted so Android keeps the trailing space. Arabic comma. -->
+    <string name="list_separator">"، "</string>
+    <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->
+    <string name="action_decrease">تقليل %1$s</string>
+    <string name="action_increase">زيادة %1$s</string>
+    <!-- "Approximate" is the same word in all three places on purpose. -->
+    <string name="notif_approximate">وقت تقريبي</string>
+    <string name="settings_alarm_on_approximate">الرنين في الأيام التقريبية</string>
+    <string name="settings_alarm_on_approximate_desc">حين لا تشرق الشمس أو لا تغرب، تُحسب الأوقات من خط عرض أدنى. وتبقى المنبّهات صامتة في تلك الأيام ما لم تفعّل هذا الخيار.</string>
+
+    <!-- Ramadan. Never "stop eating", "valid", "must" or "may" in the ruling sense. No imsak
+         margin is added. Every explanation ends with "follow your mosque". -->
+    <string name="ramadan_card_label">رمضان</string>
+    <string name="ramadan_day_of">اليوم %1$d من %2$d</string>
+    <string name="ramadan_suhoor_ends">نهاية السحور</string>
+    <string name="ramadan_iftar">الإفطار</string>
+    <string name="ramadan_countdown_suhoor">ينتهي السحور بعد %1$s</string>
+    <string name="ramadan_countdown_iftar">الإفطار بعد %1$s</string>
+    <string name="ramadan_next_suhoor_tomorrow">ينتهي السحور غدًا الساعة %1$s</string>
+    <string name="ramadan_month_ends_today">في هذا التقويم، اليوم هو آخر أيام رمضان. وسيعلن مسجدك العيد.</string>
+    <string name="ramadan_fast_length">صيام اليوم %1$s</string>
+    <plurals name="ramadan_fast_change_longer">
+        <item quantity="zero">أطول من أمس بـ %d دقيقة</item>
+        <item quantity="one">أطول من أمس بـ %d دقيقة</item>
+        <item quantity="two">أطول من أمس بدقيقتين</item>
+        <item quantity="few">أطول من أمس بـ %d دقائق</item>
+        <item quantity="many">أطول من أمس بـ %d دقيقة</item>
+        <item quantity="other">أطول من أمس بـ %d دقيقة</item>
+    </plurals>
+    <plurals name="ramadan_fast_change_shorter">
+        <item quantity="zero">أقصر من أمس بـ %d دقيقة</item>
+        <item quantity="one">أقصر من أمس بـ %d دقيقة</item>
+        <item quantity="two">أقصر من أمس بدقيقتين</item>
+        <item quantity="few">أقصر من أمس بـ %d دقائق</item>
+        <item quantity="many">أقصر من أمس بـ %d دقيقة</item>
+        <item quantity="other">أقصر من أمس بـ %d دقيقة</item>
+    </plurals>
+    <string name="ramadan_fast_change_same">مثل أمس</string>
+    <!-- Joins the fast length and the change. -->
+    <string name="ramadan_fast_line">%1$s، %2$s</string>
+    <string name="ramadan_tomorrow_line">غدًا: ينتهي السحور %1$s، والإفطار %2$s</string>
+    <string name="ramadan_info_a11y">حول مواقيت رمضان هذه</string>
+    <string name="ramadan_info_title">حول مواقيت رمضان هذه</string>
+    <string name="ramadan_info_calc">يعرض SajdaTime الفجر والمغرب كما حُسبا لموقعك، ويعدّهما نهاية السحور ووقت الإفطار.</string>
+    <string name="ramadan_info_margin">تطبع جداول كثيرة وقتًا للإمساك قبل الفجر ببضع دقائق احتياطًا، وتبدأ بعض المساجد الفجر قبل هذا الحساب. ولا يضيف SajdaTime أي هامش.</string>
+    <string name="ramadan_info_mosque">وحيث يختلف جدول مسجدك، فاتبع مسجدك.</string>
+    <string name="ramadan_info_date">يتبع التاريخ الهجري هنا تقويم أم القرى. إن بدأ مسجدك رمضان في يوم مختلف، فقدّم التاريخ الهجري أو أخّره في الإعدادات. وهذا يغيّر أيضًا عدّ الأيام وتذكير السحور وقاعدة العشاء في أم القرى.</string>
+    <string name="ramadan_info_hide">إخفاء هذه البطاقة</string>
+    <string name="ramadan_info_hide_note">يمكنك إظهارها مجددًا من الإعدادات.</string>
+    <!-- %1$s is a date such as "Mon 8 Feb". Shown from a week before day 1. -->
+    <string name="ramadan_eve_title_before">يبدأ رمضان في هذا التقويم %1$s</string>
+    <string name="ramadan_eve_body">تعلن مساجد كثيرة بدايتها بعد رؤية الهلال، وغالبًا ما يكون ذلك بعد يوم. إن اختلف مسجدك، فعدّل التاريخ الهجري. وهذا يغيّر أيضًا تذكير السحور وقاعدة العشاء في أم القرى.</string>
+    <!-- Under the card on days 1 and 2 only, in place of the notice. -->
+    <string name="ramadan_date_differs">هل بدأ مسجدك رمضان في يوم مختلف؟</string>
+    <string name="settings_ramadan_card">بطاقة رمضان</string>
+    <string name="settings_ramadan_card_desc">تعرض وقتي السحور والإفطار في شاشة المواقيت خلال رمضان</string>
+
+    <!-- Ramadan timetable: the sheet from the card, the export option and the PDF. -->
+    <string name="ramadan_open_timetable">الجدول الكامل</string>
+    <string name="ramadan_timetable_title">رمضان %1$d</string>
+    <string name="ramadan_col_day">اليوم</string>
+    <string name="ramadan_col_fast">الصيام</string>
+    <string name="ramadan_approx_marker">تقريبي</string>
+    <string name="export_ramadan">رمضان %1$d</string>
+    <string name="export_ramadan_desc">كل أيام الشهر، مع السحور والإفطار</string>
+    <string name="pdf_period_ramadan">رمضان %1$d</string>
+    <!-- The Ramadan day number. "#" in every language. -->
+    <string name="pdf_column_ramadan_day">#</string>
+    <string name="pdf_ramadan_note">ينتهي السحور عند الفجر. والإفطار عند المغرب. اتبع مسجدك حيث يختلف جدوله.</string>
+    <string name="ramadan_row_a11y">اليوم %1$d، %2$s. ينتهي السحور %3$s. الإفطار %4$s. الصيام %5$s.</string>
+    <string name="settings_suhoor">تذكير السحور</string>
+    <string name="settings_suhoor_help">تذكير قبل الفجر في أيام رمضان، بحسب التقويم المضبوط عليه SajdaTime. ويتبع قواعد الصوت والوضع الصامت نفسها التي تتبعها تنبيهات صلاتك.</string>
+    <string name="suhoor_off">إيقاف</string>
+    <plurals name="suhoor_minutes_before">
+        <item quantity="zero">قبل الفجر بـ %d دقيقة</item>
+        <item quantity="one">قبل الفجر بـ %d دقيقة</item>
+        <item quantity="two">قبل الفجر بدقيقتين</item>
+        <item quantity="few">قبل الفجر بـ %d دقائق</item>
+        <item quantity="many">قبل الفجر بـ %d دقيقة</item>
+        <item quantity="other">قبل الفجر بـ %d دقيقة</item>
+    </plurals>
+    <string name="notif_suhoor_title">ينتهي السحور الساعة %1$s</string>
+    <string name="notif_suhoor_body">يدخل وقت %1$s بعد %2$s</string>
+
+    <!-- Eid greeting, shown once on the day. Small and warm; not a ruling. -->
+    <string name="eid_fitr_title">عيد الفطر مبارك</string>
+    <string name="eid_fitr_body">تقبّل الله منا ومنكم صيامنا وصلاتنا، وملأ يومك فرحًا.</string>
+    <string name="eid_adha_title">عيد الأضحى مبارك</string>
+    <string name="eid_adha_body">تقبّل الله منا ومنكم عبادتنا وأضحيتنا، وبارك فيك وفي أهلك.</string>
+    <string name="eid_fine_print">هذا التاريخ من حسابنا. نعتذر إن كنت تحتفل في يوم آخر: عيدك مبارك حينها أيضًا. يُرجى اتباع مسجدك.</string>
+
+    <!-- Home screen widgets. No place name on a widget: the home screen is visible to others. -->
+    <string name="widget_next_label">SajdaTime: الصلاة التالية</string>
+    <string name="widget_today_label">SajdaTime: صلوات اليوم</string>
+    <string name="widget_next_desc">الصلاة التالية ووقتها، مع عدّ تنازلي. يتبع الوضع الداكن في هاتفك.</string>
+    <string name="widget_today_desc">أوقات اليوم الستة كلها مع تمييز الوقت التالي. يتبع الوضع الداكن في هاتفك.</string>
+    <string name="widget_tomorrow">غدًا</string>
+    <string name="widget_no_location">افتح SajdaTime لتحديد موقعك</string>
+    <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining. -->
+    <string name="widget_a11y_next">الصلاة التالية %1$s الساعة %2$s، بعد %3$s</string>
+    <string name="widget_a11y_next_tomorrow">الصلاة التالية غدًا، %1$s الساعة %2$s، بعد %3$s</string>
+    <!-- %1$s is the six rows joined with ". " -->
+    <string name="widget_a11y_today">مواقيت صلاة اليوم. %1$s</string>
+    <string name="widget_a11y_row">%1$s %2$s</string>
+    <string name="widget_suhoor_ends">نهاية السحور</string>
+    <string name="widget_iftar">الإفطار</string>
+    <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
+    <string name="action_see_why">اعرف السبب</string>
+    <string name="ramadan_eve_brief">قد يبدأ مسجدك بعد يوم.</string>
+    <string name="polar_notice_brief">يُحسب الفجر والعشاء هنا من خط العرض %1$d°.</string>
+    <string name="action_set_location">تحديد الموقع</string>
+    <string name="city_lookup_offline">لا يوجد اتصال بالإنترنت. اتصل مرة واحدة للبحث عن مدينة، أو استخدم موقعك.</string>
+    <string name="about_rate">قيّم SajdaTime على Google Play</string>
+    <string name="about_rate_desc">يفتح صفحة المتجر.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%1$s عند %2$s</string>
+    <string name="location_permission_denied">لم يُسمح بالوصول إلى الموقع. اكتب مدينتك أدناه، أو انقر على اسمح بالموقع للمحاولة مجددًا.</string>
+    <string name="confirm_notifications_hint">عند النقر على %1$s، سيسألك Android هل يُسمح لـ SajdaTime بإرسال الإشعارات. وافق لتصلك تنبيهات الصلاة. ويمكنك تغيير ذلك لاحقًا من إعدادات هاتفك.</string>
+    <string name="about_share">شارك SajdaTime</string>
+    <string name="about_share_desc">أرسل الرابط إلى العائلة والأصدقاء.</string>
+    <string name="about_share_message">SajdaTime: مواقيت صلاة مجانية وبوصلة للقبلة، بلا إعلانات ولا حسابات. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
+    <!-- The fallback place, shown in the app's own language. -->
+    <string name="location_makkah">مكة</string>
+</resources>

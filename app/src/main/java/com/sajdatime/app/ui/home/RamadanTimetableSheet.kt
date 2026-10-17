@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.data.placeName
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -105,7 +106,7 @@ internal fun RamadanTimetableSheet(
                     Spacer(Modifier.height(4.dp))
                     Text(
                         // isBlank is checked before isolating, so the fallback still fires.
-                        text = state.settings.cityName.bidiIsolated().ifBlank {
+                        text = state.settings.placeName(LocalContext.current).bidiIsolated().ifBlank {
                             stringResource(R.string.pdf_place_unknown)
                         },
                         style = MaterialTheme.typography.bodyMedium,

@@ -375,4 +375,6 @@
     <string name="about_share">SajdaTime شیئر کریں</string>
     <string name="about_share_desc">لنک گھر والوں اور دوستوں کو بھیجیں۔</string>
     <string name="about_share_message">SajdaTime: نماز کے مفت اوقات اور قبلہ نما، بغیر اشتہارات اور بغیر اکاؤنٹ کے۔ https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
+    <!-- The fallback place, shown in the app's own language. -->
+    <string name="location_makkah">مکہ</string>
 </resources>
