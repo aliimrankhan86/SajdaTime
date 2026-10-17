@@ -1562,13 +1562,27 @@ signed with the same key, on the paired phone); secret scanning with push protec
   requests) are recommended instead, an owner step.
 
 **Owner steps (account settings, his to press; Claude can walk him through one screen at a time):**
-1. **Restrict the Firebase API key** in Google Cloud console (project `sajdatime-37a1b`, APIs and services, Credentials):
-   Application restriction "Android apps" with package `com.sajdatime.app` and the SHA-1 of both the Play app signing
-   certificate and the upload certificate (Play Console, App integrity); API restriction to the Firebase Installations
-   API and the Google Analytics APIs Firebase uses. This answers the open GitHub secret scanning alert, which then can be
-   closed as "used in tests / public by design". Not done by Claude: it is an account security setting.
-2. **GitHub repository:** a ruleset on `main` blocking force pushes and deletion; Dependabot alerts on; private
-   vulnerability reporting on. **GitHub account:** a passkey.
+1. **DONE 18 Oct 2026. The Firebase API key is restricted.** It is the "Android key (auto created by Firebase)" in Google
+   Cloud (project `sajdatime-37a1b`, which the owner's *third* signed in Google account owns, `authuser=2`; the Play
+   developer account is on `authuser=0`). Claude did this in Chrome at the owner's request while he watched. It has the
+   Application restriction "Android apps", with `com.sajdatime.app` and three SHA-1s from Play Console → App signing:
+   - `9F:E8:5A:DB:9C:92:27:11:80:C4:D0:77:6A:07:71:99:AB:AE:FA:F9`
+   - `02:D4:F8:A2:7E:52:E8:B5:36:01:07:E5:35:23:83:EE:99:9D:A4:EA`
+   - `46:73:3C:1E:5B:08:F5:94:78:37:1A:9E:B2:39:50:C6:D1:3C:E3:55`
+
+   **All three are needed.** One is the current app signing key. One is the previous app signing key: the key was
+   upgraded, and Play still signs for Android 12 and older with the old key. The third is the upload key. A missing
+   SHA-1 silently stops usage counts on those phones. The existing API restriction (the 25 APIs Firebase set) was left
+   as it was. The "Browser key (auto created by Firebase)" is unused by the app and not in the repo, so it was left
+   alone. The GitHub secret scanning alert #1 was resolved as "won't fix" with that reason: the key ships in every APK
+   by design. **Not verified:** that usage counts still arrive from release builds. Check Firebase Analytics a day or
+   two after 18 Oct; a sudden drop to zero means a SHA-1 is missing. The fix is to add it on the same page, or to set
+   Application restrictions back to None.
+2. **DONE 18 Oct 2026 (owner pressed, Claude confirmed through the API): GitHub repository.** Ruleset "Protect main" is
+   active on the default branch (restrict deletions, block force pushes, nothing else, no bypass). Dependency graph,
+   Dependabot alerts and private vulnerability reporting are on. Dependabot *security updates* stay **off**: their pull
+   requests can never pass dependency verification without new checksums. Act on an alert by hand, per the paragraphs
+   above. Secret scanning and push protection were already on. **Still open: a passkey on the GitHub account.**
 3. **Signing values** into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, then delete `keystore.properties`
    (§5.21 item 7f).
 4. **Google account** that owns the Play developer account: a passkey and Advanced Protection.
@@ -4971,8 +4985,9 @@ Before merging, merge `main` into the branch.
 **Security hardening done (17 Oct 2026, §5.24).** Gradle dependency verification is ON
 (`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
 file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
-empty `GRADLE_USER_HOME`. Owner security steps still open (his to press): restrict the Firebase API key, GitHub
-ruleset on `main`, Dependabot alerts, private vulnerability reporting, passkeys, signing values into `~/.gradle`.
+empty `GRADLE_USER_HOME`. On 18 Oct the Firebase key restriction and the GitHub protections were done (§5.24). Still
+open, and his to press: passkeys on GitHub and Google, Advanced Protection, and moving the signing values into
+`~/.gradle`. Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
 
 **Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
 then decided: "if you test it emulator then no need to test it on real phone". Emulator testing is the standard
