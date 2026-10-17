@@ -1566,7 +1566,9 @@ signed with the same key, on the paired phone); secret scanning with push protec
    Cloud (project `sajdatime-37a1b`, which the owner's *third* signed in Google account owns, `authuser=2`; the Play
    developer account is on `authuser=0`). Claude did this in Chrome at the owner's request while he watched. It has the
    Application restriction "Android apps", with `com.sajdatime.app` and three SHA-1s from Play Console → App signing:
-   - `9F:E8:5A:DB:9C:92:27:11:80:C4:D0:77:6A:07:71:99:AB:AE:FA:F9`
+   - `9F:E8:5A:DB:9C:92:27:11:80:C4:D0:77:6A:07:71:99:AB:AE:FA:F9`: the **upload key**. This is proven: the 1.3.2 and
+     1.4.0 bundles Play accepted are signed with it. The other two are the current and previous Play app signing
+     keys.
    - `02:D4:F8:A2:7E:52:E8:B5:36:01:07:E5:35:23:83:EE:99:9D:A4:EA`
    - `46:73:3C:1E:5B:08:F5:94:78:37:1A:9E:B2:39:50:C6:D1:3C:E3:55`
 
@@ -1584,8 +1586,17 @@ signed with the same key, on the paired phone); secret scanning with push protec
    requests can never pass dependency verification without new checksums. Act on an alert by hand, per the paragraphs
    above. Secret scanning and push protection were already on. The GitHub account passkey was added the same day,
    using the Mac's Touch ID.
-3. **Signing values** into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, then delete `keystore.properties`
-   (§5.21 item 7f).
+3. **Signing values: COPIED 18 Oct 2026.** The owner ran the copy himself in Terminal: a `sed` that writes the four
+   values into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, mode 600. Claude never saw the values. It
+   was proved twice:
+   - first as a rehearsal, with a throwaway test key and a separate `GRADLE_USER_HOME`;
+   - then for real, from the worktree, which has no `keystore.properties`. `:app:bundleRelease` and
+     `:wear:bundleRelease` both came out signed with the upload key `9F:E8:…:FA:F9` ("jar verified"), the same key as
+     the 1.4.0 bundle.
+
+   `storeFile` is an absolute path, so it works from every worktree. The `.jks` itself was not moved and must not be.
+   The repo root `keystore.properties` is now redundant, because Gradle properties win (§5.21 item 7f). Moving it to
+   the Bin is the owner's step. Keep the Bin until the 1.5.0 release has been signed.
 4. **Passkeys DONE 18 Oct 2026.** The owner added a Touch ID passkey to GitHub and to both Google accounts: the Play
    owner (`authuser=0`) and the Firebase owner (`authuser=2`). **Advanced Protection: skipped on Claude's advice, and
    the owner did not object.** It stops most third party apps reaching Gmail and Drive, which would cut off his Claude
@@ -4990,7 +5001,7 @@ Before merging, merge `main` into the branch.
 (`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
 file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
 empty `GRADLE_USER_HOME`. On 18 Oct the Firebase key restriction and the GitHub protections were done (§5.24). Still
-open, and his to press: moving the signing values into `~/.gradle`. Passkeys were added the same day, and Advanced
+open: only moving the now redundant repo root `keystore.properties` to the Bin (§5.24 item 3; the values are in `~/.gradle` and proven). Passkeys were added the same day, and Advanced
 Protection was skipped on purpose (§5.24 item 4). Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
 
 **Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
