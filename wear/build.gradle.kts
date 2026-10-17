@@ -94,6 +94,16 @@ android {
 }
 
 dependencies {
+    // Security floor (HANDOVER §5.24). Guava arrives transitively at 31.x (Firebase on the phone,
+    // coroutines-guava on the watch), which carries CVE-2023-2976 (temp file permissions) and
+    // CVE-2020-8908 (Files.createTempDir), both fixed in 32.0.0. A constraint raises it without
+    // making Guava a direct dependency: Gradle picks the highest version asked for, so nothing in the
+    // graph can bring it back below this floor. A newer one from a library update is still allowed.
+    constraints {
+        implementation(libs.guava) {
+            because("CVE-2023-2976 and CVE-2020-8908, fixed in Guava 32.0.0")
+        }
+    }
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(project(":core"))

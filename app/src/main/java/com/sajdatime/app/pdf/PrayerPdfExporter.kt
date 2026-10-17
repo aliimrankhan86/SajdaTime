@@ -80,6 +80,9 @@ class PrayerPdfExporter(base: Context) {
         // people wondering where the timetable had gone.
         saveToDownloads(name, bytes)?.let { return@withContext Outcome.SavedToDownloads(it, name) }
 
+        // One file at a time: the share sheet has what it needs, and older timetables (the city and
+        // its times) should not pile up in the cache (HANDOVER §5.24).
+        exportDir().listFiles()?.forEach { it.delete() }
         val file = File(exportDir(), name)
         file.writeBytes(bytes)
         Outcome.ReadyToShare(

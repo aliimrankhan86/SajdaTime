@@ -33,6 +33,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - **Built-in adhan for both schools** (17 Oct 2026): Sunni, a CC0 recording Ali listened to and approved; Shia, a studio recording by Saeed Hatamzadeh-Varmazyar (CC BY-SA 4.0), checked by transcription to be a complete Shia adhan. Both from Wikimedia Commons, opt in, never the default, credited in About (+3.5 MB). Any phone sound still works.
   - **Clearer alerts:** each prayer is Off, Notification or Alarm (the adhan or a chosen sound). "Play on silent" (off by default) decides whether an alarm plays when the phone is on silent or Do Not Disturb.
   - Screen reader fixes.
+  - **Security hardening** (17 Oct 2026): every library checksum-verified at build time, the two known library vulnerabilities fixed (0 known in the 204 shipped libraries), task hijacking blocked, network trust locked to the system's certificates. Owner steps still open: restrict the Firebase key, GitHub protections, passkeys.
   - The habit tracker, only if it is built by then (see below).
 - **Store screenshots** are retaken once, when 1.5.0 ships.
 - **Timeline:**

@@ -92,6 +92,11 @@ class CityLookup(private val context: Context) {
             // One fixed HTTPS host. A redirect is not expected, so one is treated as a
             // failure rather than followed to somewhere the app never chose.
             connection.instanceFollowRedirects = false
+            // A plain name instead of Android's default User-Agent, which carries the phone model and
+            // Android version ("Dalvik/2.1.0 (Linux; U; Android 14; SM-S918B ...)"). privacy.html promises
+            // Open-Meteo gets the place name and the app's language and no device information
+            // (independent security review, 17 Oct 2026, HANDOVER §5.24).
+            connection.setRequestProperty("User-Agent", "SajdaTime")
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 throw IOException("HTTP ${connection.responseCode}")
             }

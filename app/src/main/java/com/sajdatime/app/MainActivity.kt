@@ -102,6 +102,11 @@ class MainActivity : ComponentActivity() {
         if (result.resultCode != RESULT_OK) return@registerForActivityResult
         val uri = result.data
             ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        // Any app can answer the picker intent. Only a content:// or android.resource:// sound is
+        // kept: a file:// one makes posting the alarm throw, which post() catches, so the prayer alert
+        // would silently never appear (independent security review, 17 Oct 2026). Null is the
+        // phone's default, as before.
+        if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
         viewModel.setAlarmSound(uri?.toString().orEmpty())
     }
 
@@ -340,3 +345,7 @@ private fun PreviewBuildFrame(content: @Composable () -> Unit) {
         ) { content() }
     }
 }
+
+/** The sound address schemes the alarm channel can safely play: a media or settings provider, or an app's raw resource. */
+internal fun isAcceptedAlarmSound(scheme: String?): Boolean =
+    scheme == "content" || scheme == "android.resource"

@@ -1483,6 +1483,96 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
 - The listing's short and full descriptions are unchanged; any change is the owner's decision. The 1.5.0
   What's new carries one line.
 
+### 5.24 Security hardening (17 Oct 2026, owner: "improve the security ... apply the best possible solution", ships in 1.5.0)
+
+Builds on §5.21. Audit first, then only changes worth their cost. The app has no server, no account and no secret
+of its own, so the realistic threats are a tampered dependency or build tool, another app on the phone, and a
+network observer of the one city search.
+
+**What the audit found already right (left alone):** backup and device transfer off; cleartext off; every receiver,
+the FileProvider and the widget providers not exported; every PendingIntent `FLAG_IMMUTABLE`; the receiver
+validates its extras against the enum; no logging in any module; no advertising ID; R8 and resource shrinking on;
+the watch's Data Layer service filtered to `/sajdatime` paths (and Data Layer items can only come from this app,
+signed with the same key, on the paired phone); secret scanning with push protection on the repository.
+
+**Changed.**
+1. **Guava floor** (`libs.guava`, a dependency *constraint* in app and wear, not a direct dependency). Firebase pulled
+   Guava 31.1 into the phone and coroutines-guava pulled 31.0.1 into the watch; both carry CVE-2023-2976 and
+   CVE-2020-8908 (GHSA-7g45-4rm6-3mm3, GHSA-5mg8-w23w-74h3), fixed in 32.0.0. Now 33.7.2-android on both.
+2. **Every shipped library scanned against OSV** (osv.dev batch API, the resolved release runtime classpaths of app,
+   wear and core): **204 packages, 0 known vulnerabilities**. The scanner was proved by querying the old Guava,
+   which it flags with both advisories. Re-run the scan before each release (the script is short: resolve the three
+   classpaths with `:module:dependencies --configuration releaseRuntimeClasspath`, post group:artifact:version to
+   `https://api.osv.dev/v1/querybatch`).
+3. **Kotlin 2.4.21** (from 2.3.21; includes the CVE-2026-53914 build cache fix §5.21 deferred). Full gate green.
+4. **Dependency verification**, `gradle/verification-metadata.xml`: a SHA-256 for every one of the 608 components the
+   build downloads (libraries, plugins, AGP's tools). Gradle now refuses any artifact whose hash differs, so a
+   compromised mirror, a substituted library or a poisoned cache cannot reach the app or the signing step. §5.21
+   deferred this because AGP's `aapt2` is a different file per OS: it was generated on the Mac, and the Linux and
+   Windows `aapt2` jars were hashed from dl.google.com and added by hand (the Mac jar from the same URL matched the hash
+   Gradle generated). Sources and javadoc are trusted by pattern, for IDEs only. **Proved three ways:** the intact
+   build passes; with one hash changed the build stops with "Dependency verification failed ... activity-1.13.0.aar";
+   and the full gate (plus both test APKs) passed from an **empty Gradle home**, every file downloaded fresh and
+   checked. That clean-room run is not optional: the first one failed, because a warm cache had never needed
+   `guava-parent-33.7.2-android.pom`, so write mode never recorded it. It was added by hand after its hash matched
+   Maven Central's published `.sha256`, the download and Gradle's cache. **Always prove a regenerated file from an
+   empty `GRADLE_USER_HOME`** (`GRADLE_USER_HOME=<empty dir> ./gradlew --no-daemon clean test lint :app:bundleRelease
+   :wear:bundleRelease`).
+   **After any dependency, plugin, Kotlin, AGP or Gradle change**, regenerate on the Mac with
+   `./gradlew --write-verification-metadata sha256 :app:assemble :wear:assemble :app:assembleAndroidTest :wear:assembleAndroidTest :app:bundleRelease :wear:bundleRelease test lint help`,
+   re-add the linux and windows aapt2 hashes for the new AGP version, and review the diff. Never write `--` inside an
+   XML comment in that file: it stops Gradle reading it (found the hard way).
+5. **Network security config** (`res/xml/network_security_config.xml`): no cleartext, and only the system's certificate
+   authorities, so a user or device management certificate (a proxy on the phone) cannot read the city search. Android's
+   default for targetSdk 24+, now written down so a library's merged manifest cannot change it.
+6. **`android:taskAffinity=""` on `MainActivity`** (task hijacking, "StrandHogg"): with the default affinity another app
+   could put its own screen into SajdaTime's task, shown when the user opens SajdaTime from Recents. The watch app already
+   had it. §5.21 deferred it for a device check of notifications and widgets. **Checked on the Android 16 emulator:**
+   launched, sent Home, relaunched from the launcher, then replayed the notification's and the widgets' exact intent
+   (`NEW_TASK | CLEAR_TOP`, the flags in `Notifications.openAppIntent`, `WidgetRenderer.applyTap` and the alarm clock
+   show intent): every time the one existing task (#227) came forward with one `MainActivity`, never a second task.
+   (A real notification tap could not be done: the overloaded emulator's System UI kept showing "isn't responding";
+   the replayed intent is the same one the tap sends.)
+7. **The watch caps the synced city name at 80 characters**, like the phone's own lookup, and states
+   `usesCleartextTraffic="false"` like the phone (it makes no HTTP calls today).
+8. **From the independent security review of items 1 to 7 (no regressions found):**
+   - **A published privacy sentence was false.** `privacy.html` said Open-Meteo receives "no device information", but
+     `HttpURLConnection` sends Android's default User-Agent (phone model and Android version). `CityLookup` now sends
+     `User-Agent: SajdaTime`, and the policy also names the `language=` it sends.
+   - **The alarm sound picker accepted any address.** Any app can answer `ACTION_RINGTONE_PICKER`; a `file://` sound made
+     posting the alarm throw, which `post()` swallows, so the alert silently never appeared. Only `content://` and
+     `android.resource://` are kept now (`isAcceptedAlarmSound`, unit tested).
+   - **Old PDF exports piled up** in `cache/exports` below Android 10 (the share fallback). The folder is cleared before
+     each export.
+   - Caveats written down: with `verify-signatures=false` the hashes prove nothing changed since they were recorded, not
+     that the first download was authentic (it came over HTTPS from Google's Maven and Maven Central, and spot checks
+     matched their published checksums); and a debug build can no longer be inspected through a user-installed proxy
+     certificate (add a `debug-overrides` block if that is ever needed).
+
+**Considered and rejected, with the reason.**
+- **Certificate pinning** for Open-Meteo and Google: certificates rotate, and a stale pin silently breaks city search for
+  every user until an update. The system-CA-only config above gets most of the benefit.
+- **Encrypting the settings file** (DataStore with Tink): it holds a coarse location and preferences, inside the app's
+  private storage, on a phone whose storage is already encrypted; it would add a crypto dependency and a key that can be
+  lost (a wiped key reads as a first run). No secret to protect.
+- **Blocking touches when another window covers the app** (tapjacking): Android 12+ already blocks untrusted overlays, the
+  app has no money or account action, and it would break blue light filter and accessibility overlay users.
+- **Root detection, Play Integrity, obfuscation beyond R8:** there is no server, secret or paid feature to defend.
+- **Dependabot version updates / CI:** as §5.21, a pull request stream for a solo owner. Dependabot **alerts** (no pull
+  requests) are recommended instead, an owner step.
+
+**Owner steps (account settings, his to press; Claude can walk him through one screen at a time):**
+1. **Restrict the Firebase API key** in Google Cloud console (project `sajdatime-37a1b`, APIs and services, Credentials):
+   Application restriction "Android apps" with package `com.sajdatime.app` and the SHA-1 of both the Play app signing
+   certificate and the upload certificate (Play Console, App integrity); API restriction to the Firebase Installations
+   API and the Google Analytics APIs Firebase uses. This answers the open GitHub secret scanning alert, which then can be
+   closed as "used in tests / public by design". Not done by Claude: it is an account security setting.
+2. **GitHub repository:** a ruleset on `main` blocking force pushes and deletion; Dependabot alerts on; private
+   vulnerability reporting on. **GitHub account:** a passkey.
+3. **Signing values** into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, then delete `keystore.properties`
+   (§5.21 item 7f).
+4. **Google account** that owns the Play developer account: a passkey and Advanced Protection.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
