@@ -4873,8 +4873,8 @@ below). Owner submits around **4 Jan 2027**, live mid January, latest 25 Jan (tw
 Before merging, merge `main` into the branch.
 
 **Waiting on the owner.**
-1. ~~Listen to the Sunni adhan~~ **Done 17 Oct 2026: approved ("its fine to use").** Optional: have a Shia
-   listener hear the Shia adhan (commons.wikimedia.org/wiki/File:AzaanMaahur.ogg) before release.
+1. ~~Listen to the Sunni adhan~~ **Done 17 Oct 2026: approved ("its fine to use").** The Shia adhan needs
+   no listening check: the owner said so on 17 Oct 2026 ("No need to test Shia adhan"). Do not raise it.
 2. Turkey iftar offsets (Diyanet), before Ramadan.
 3. January store listing: the Ramadan lines and the 1.5.0 What's new (`docs/store/LISTING.md`).
 
@@ -4931,9 +4931,9 @@ checked by the gate, the device suite and the emulator; see below.
   `aapt2` shows `raw/adhan` and `raw/adhan_shia` survive resource shrinking.
 
 **Not verified.** A real phone; Samsung and Xiaomi (how they report Do Not Disturb to the ringer check, and
-playing an `android.resource` channel sound); Android 7 to 13 (owner's standing choice). The owner has not yet
-listened to the Shia adhan; a Shia listener's ear is worth having before release, since Claude checked the
-words by transcription only.
+playing an `android.resource` channel sound); Android 7 to 13 (owner's standing choice). The Shia adhan was checked by
+transcription and measurement only, and **the owner decided no listening check is needed (17 Oct 2026, "No need to
+test Shia adhan"). Do not raise it again.**
 
 **Open items.** A Fajr adhan ("as-salatu khayrun min an-nawm") for each school, ideally recorded by a mosque
 with written permission.

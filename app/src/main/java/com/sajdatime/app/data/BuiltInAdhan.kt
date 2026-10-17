@@ -19,8 +19,8 @@ import com.sajdatime.core.Sect
  * Each school sees only its own, under the one label "Adhan". Do not add a recording without a licence
  * that allows it in an app, checked on its source page, and without the owner's approval: he listened
  * to the Sunni one; for the Shia one he delegated the choice ("use the best possible, high quality and
- * free to use adhans", 17 Oct 2026), so it was checked by transcription and measurement, and a Shia
- * listener should hear it before release. Sources already rejected are in HANDOVER §11.
+ * free to use adhans", 17 Oct 2026), so it was checked by transcription and measurement, and he ruled
+ * that no listening check is needed. Sources already rejected are in HANDOVER §11.
  *
  * A choice is stored as an ordinary sound address, `android.resource://<package>/raw/<name>`, in
  * the same setting as a phone sound, so the alarm channel, Do Not Disturb, "Play on silent", volume
