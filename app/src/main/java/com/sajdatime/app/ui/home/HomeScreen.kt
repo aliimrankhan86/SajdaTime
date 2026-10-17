@@ -18,13 +18,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Brightness3
-import androidx.compose.material.icons.filled.Brightness5
-import androidx.compose.material.icons.filled.Brightness6
-import androidx.compose.material.icons.filled.NightsStay
-import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.Brightness3
+import androidx.compose.material.icons.rounded.Brightness5
+import androidx.compose.material.icons.rounded.Brightness6
+import androidx.compose.material.icons.rounded.NightsStay
+import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
@@ -49,6 +49,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.sajdatime.app.ui.components.Notice
+import androidx.compose.ui.text.font.FontWeight
+import com.sajdatime.app.ui.components.BottomBarClearance
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
@@ -126,11 +130,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            // 8dp, not 24: this sits below the last element, where the navigation bar is
-            // already providing the separation, and on a short screen it was 24dp of the
-            // 37dp that pushed the mosque door under the bar.
-            .padding(bottom = 8.dp),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Order and heights are budgeted so that on a phone at the default font size the
@@ -179,6 +179,10 @@ fun HomeScreen(
             onOpen = { explaining = true },
             onDismissNotice = onDismissMethodNotice,
         )
+        // The floating tab bar sits over the bottom of this column (Quiet Glass); this is the
+        // room to scroll the mosque button clear of it. Measured, so it grows with the bar.
+        Spacer(Modifier.height(8.dp))
+        BottomBarClearance()
     }
 
     if (explaining) {
@@ -274,39 +278,42 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
         stringResource(R.string.action_change_location),
     )
 
+    // The same large, start aligned title as Qibla and Settings (Quiet Glass, 17 Oct 2026), so
+    // the three tabs open the same way. Here the title is the city, because the city is what
+    // decides every time on this screen. 4dp in from the column's 16dp, so it sits on the same
+    // 20dp line as the other titles.
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 4.dp)
+            .clip(RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = 10.dp)
+            .padding(horizontal = 4.dp, vertical = 6.dp)
             .semantics { contentDescription = spokenLocation },
     ) {
-        Icon(
-            Icons.Outlined.LocationOn,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp),
-        )
-        Spacer(Modifier.width(6.dp))
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = city, style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.width(4.dp))
-                // A pin alone reads as a label. The caret is what says "you can change
-                // this", which is the single most common thing a traveller needs and was
-                // previously discoverable only by guessing the city name was a button.
+                Text(
+                    text = city,
+                    style = MaterialTheme.typography.headlineMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Spacer(Modifier.width(2.dp))
+                // A name alone reads as a label. The green caret is what says "you can change
+                // this", which is the single most common thing a traveller needs.
                 Icon(
-                    Icons.Filled.ArrowDropDown,
+                    Icons.Rounded.ArrowDropDown,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(28.dp),
                 )
             }
             Text(
                 text = dateLine(now, state.settings.hijriOffsetDays),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -365,7 +372,9 @@ private fun NextPrayerCard(state: UiState) {
         // its translator writes them into the string.
         Text(
             text = stringResource(R.string.home_next_prayer),
-            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.6.sp),
+            // Sentence case and medium weight since Quiet Glass (17 Oct 2026), matching the
+            // section titles in Settings; the letterspaced capitals read as dated.
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
             color = hero.label,
             textAlign = TextAlign.Center,
         )
@@ -461,10 +470,11 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
 
     Spacer(Modifier.height(12.dp))
     if (loud) {
-        NoticeCard(
+        Notice(
             title = stringResource(R.string.method_notice_title),
-            body = stringResource(R.string.method_notice_body),
-            onClick = onOpen,
+            brief = stringResource(R.string.method_notice_body),
+            actionLabel = stringResource(R.string.action_see_why),
+            onAction = onOpen,
             onDismiss = onDismissNotice,
         )
     } else {
@@ -626,10 +636,11 @@ private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onCl
 private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
     if (!state.settings.usingDefaultLocation) return
     Spacer(Modifier.height(12.dp))
-    NoticeCard(
+    Notice(
         title = stringResource(R.string.home_default_location_title),
-        body = stringResource(R.string.home_default_location_body),
-        onClick = onFix,
+        brief = stringResource(R.string.home_default_location_body),
+        actionLabel = stringResource(R.string.action_change_location),
+        onAction = onFix,
     )
 }
 
@@ -669,9 +680,11 @@ private fun PolarBanner(state: UiState) {
     // shown to everyone, most polar users would read a paragraph about a feature they never
     // enabled. See AppSettings.alarmOnApproximateDays.
     val quietened = state.settings.usesAlarm && !state.settings.alarmOnApproximateDays
-    NoticeCard(
+    // Brief first (where the times come from), the reasoning folded behind it.
+    Notice(
         title = stringResource(R.string.polar_notice_title),
-        body = stringResource(R.string.polar_notice_body, from.toInt()) +
+        brief = stringResource(R.string.polar_notice_brief, from.toInt()),
+        details = stringResource(R.string.polar_notice_body, from.toInt()) +
             if (quietened) "\n\n" + stringResource(R.string.polar_notice_alarm) else "",
     )
 }
@@ -685,75 +698,12 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     Spacer(Modifier.height(12.dp))
     PermissionCard(
         title = stringResource(R.string.settings_exact_alarms_title),
-        body = stringResource(R.string.settings_exact_alarms_desc),
+        body = stringResource(R.string.settings_exact_alarms_brief),
+        details = stringResource(R.string.settings_exact_alarms_desc),
         granted = false,
         onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
         onDismiss = onDismiss,
     )
-}
-
-/**
- * "The system is withholding something you asked for." Amber container, amber icon and
- * amber-on-amber text, so it reads as a warning at a glance rather than as one more grey
- * card in a stack of grey cards — which is what it looked like before, and why the exact
- * alarm notice went unnoticed.
- */
-@Composable
-private fun NoticeCard(
-    title: String,
-    body: String,
-    // Null when the card only informs. Not every notice has somewhere to go: the polar
-    // one states a fact about where the user lives, and a card that looks tappable but
-    // does nothing teaches people that tapping cards here is pointless.
-    onClick: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null,
-) {
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onTertiaryContainer,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onTertiaryContainer,
-            )
-        }
-        if (onDismiss != null) {
-            // Its own clickable inside a clickable row. The row opens the system screen
-            // that grants the permission; this closes the card. They must not be the same
-            // gesture, and 44dp is the smallest target that is honestly tappable — the
-            // 24dp glyph alone would be a trap for anyone with less than perfect aim.
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(R.string.notice_dismiss),
-                tint = scheme.onTertiaryContainer,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable(role = Role.Button, onClick = onDismiss)
-                    .padding(10.dp)
-                    .size(24.dp),
-            )
-        }
-    }
 }
 
 @Composable
@@ -948,12 +898,12 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
 }
 
 private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
-    PrayerSlot.FAJR -> Icons.Filled.Brightness3
-    PrayerSlot.SUNRISE -> Icons.Filled.WbTwilight
-    PrayerSlot.DHUHR -> Icons.Filled.WbSunny
-    PrayerSlot.ASR -> Icons.Filled.Brightness5
-    PrayerSlot.MAGHRIB -> Icons.Filled.Brightness6
-    PrayerSlot.ISHA -> Icons.Filled.NightsStay
+    PrayerSlot.FAJR -> Icons.Rounded.Brightness3
+    PrayerSlot.SUNRISE -> Icons.Rounded.WbTwilight
+    PrayerSlot.DHUHR -> Icons.Rounded.WbSunny
+    PrayerSlot.ASR -> Icons.Rounded.Brightness5
+    PrayerSlot.MAGHRIB -> Icons.Rounded.Brightness6
+    PrayerSlot.ISHA -> Icons.Rounded.NightsStay
 }
 
 /**

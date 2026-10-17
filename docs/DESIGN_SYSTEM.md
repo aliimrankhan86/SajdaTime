@@ -47,7 +47,7 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 | surfaceHighlight | `primaryContainer` | `#D7EAE0` | Next-prayer row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
-| primary | `primary` | `#0E6B4F` | Accent bar, Qibla arrow and arc, "Next" pill |
+| primary | `primary` | `#0B5A43` | Accent bar, Qibla arrow and arc, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
 | onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
 | onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
@@ -255,67 +255,48 @@ drawn twice cannot end up as two different buildings.
 A legend names the two abstract marks. The Kaaba is not in it, because a legend explains
 shapes and this one is a picture; the subtitle above the dial already says the word.
 
-**Warning banner** — `tertiaryContainer` fill, `tertiary` icon and border,
-`onTertiaryContainer` text, 16dp radius. Used for "the system is withholding something you
-asked for": exact alarms, Do Not Disturb access, compass calibration.
+**Notices** (one component, `ui/components/Notice.kt`, since 17 Oct 2026). Every message that
+is not a setting goes through it, so a person learns one shape and reads every notice the same
+way. Two tones only: **warning** (`tertiaryContainer`, amber: something is wrong or withheld)
+and **quiet** (`secondaryContainer`, soft green: information or an occasion, Ramadan and Eid).
+Anatomy, in order: a round mark (the icon on a 14% tile of the tone's accent); the title; **one
+brief sentence**; the full explanation folded behind a chevron when there is more to say
+("expanded"/"collapsed" spoken); a footnote that must stay visible (Eid's "follow your mosque");
+the action as a **bold link with an arrow** ("Allow", "See why", "Change location", "Shift the
+date"), never "Tap to…"; a close button on Times only.
 
-On **home** the exact-alarm banner carries a close button (`Outlined.Close`,
-`onTertiaryContainer`, 24dp glyph in a 44dp target) and stays closed once tapped. On
-**Settings** the same banner has no close button and never hides while the permission is
-missing.
+> Why: the owner found the old notices bland and the full width amber button unclean, and asked
+> for a brief accordion "applied systemically", not to one card. The old exact alarm card was
+> four lines of explanation and a button that repeated its title; closed, it is now two lines
+> and a link, and Times fits all six prayers with it showing. The card never does the action
+> itself: opening and closing must never be the same gesture.
 
-> A warning that cannot be put away is not a warning, it is furniture. Shown on every
-> launch it stops being read — and worse, people learn to skip that whole band of the
-> screen, which is where the Makkah notice lives too, and *that* one they need to act on.
-> Closable on home, permanent in Settings: it is said once, and the way to fix it is still
-> exactly where someone would go looking for it.
->
-> The close button has its own `clickable` inside the card's `clickable`. The card opens
-> the system permission screen; the button closes the card. Two different outcomes must
-> never share one gesture. 44dp because a bare 24dp glyph is a target only someone with a
-> steady hand and good eyes can hit.
+On **home** a notice may carry a close button and stays closed once tapped. On **Settings** the
+same notice has no close button and never hides while the permission is missing.
 
-> Amber, not red. Prayer alerts still arrive; they are just at the mercy of the scheduler.
-> An error colour would say the app is broken when it is not. And it is not grey any more,
-> because as one more grey card in a stack of grey cards the exact-alarm notice went
-> unread.
+> A warning that cannot be put away is not a warning, it is furniture. Closable on home,
+> permanent in Settings: it is said once, and the way to fix it is still exactly where someone
+> would go looking for it. Amber, not red: prayer alerts still arrive, just at the mercy of the
+> scheduler, and an error colour would say the app is broken when it is not.
 
-**Ramadan card** (1.4.0, Times screen, inside Ramadan only): the same flat surface as the
-next-prayer card (`sajdaSurface`, 24dp radius, 1dp `outlineVariant` border). Suhoor end and iftar sit
-side by side as two 16dp blocks. The one coming next is `primaryContainer` and carries the word
-"Next" in a small `primary` pill (not colour alone), the other is `surfaceContainerLow`. Below them
-the fast length and tomorrow's two times. It adds no colour of its own. The info button is 48dp.
-The **eve notice** is a quiet 16dp radius `secondaryContainer` row, neutral and not amber: it is
-information, not a fault. The **Eid greeting** is a 24dp `secondaryContainer` card, deliberately not
-`tertiaryContainer`.
-
-**Home screen widgets** (1.4.0): drawn in the launcher with `RemoteViews`, so colours cannot be Compose
-roles. Six colours in `res/values/colors.xml` and `values-night/colors.xml` (`widget_surface`,
-`widget_on_surface`, `widget_on_surface_variant`, `widget_highlight`, `widget_primary`,
-`widget_outline_variant`), each the same hex as its `Color.kt` twin in both themes, which
-`WidgetColorsTest` enforces along with seven contrast pairs. They are set in the layout XML and not in
-code, so the launcher re resolves them when the phone changes theme. There is deliberately no "text on
-highlight" colour: the ordinary text colours clear 4.5:1 on the highlight in both themes. Corner
-radius is 16dp, or the system's own on Android 12 and later (`values-v31`). Text sizes are 11sp for
-labels and context, 13sp for times, 14sp for messages, 16 to 20sp for the next prayer, never below 11sp
-(lint `SmallSp`). Minimum sizes: Next prayer 3 by 2, Today 4 by 3, headerless. The picker previews are
-drawn PNGs from `tools/make-widget-previews.py`.
-
-**Settings groups** — a letterspaced `primary` label, then the rows inside one card with a
-1dp `outlineVariant` border, 16dp gutter, 20dp radius.
-
----
+**Settings groups** (Quiet Glass, 17 Oct 2026): a sentence case `onSurfaceVariant` title
+(labelLarge, medium), then the rows inside one `sajdaSurface` card, 24dp radius, 16dp gutter.
+Each row: a 36dp `secondaryContainer` tile with a 20dp `onSecondaryContainer` icon, a
+titleMedium title over a bodyMedium `onSurfaceVariant` description, hairline dividers inset to
+the text (66dp). Information-only rows (charity, credits, data) fold behind their title.
+Code: `ui/settings/SettingsList.kt`.
 
 ## 5. Choosing a theme
 
 `ThemeChoice` is `SYSTEM` (default), `LIGHT` or `DARK`, persisted in DataStore under
-`theme_choice`, and shown as three chips under **Settings → Appearance**.
+`theme_choice`, and shown as a sliding three way selector under **Settings → Appearance**
+(three chips until 17 Oct 2026; they read as filters rather than one choice).
 
 `SYSTEM` reads `isSystemInDarkTheme()`, which reports **false** when the OS expresses no
 preference — on older devices, and on any device where the user has never chosen. So
 following the phone resolves to light, and light is the effective default.
 
-Chips rather than a chooser dialog, because unlike every other setting on that screen the
+A selector rather than a chooser dialog, because unlike every other setting on that screen the
 result is visible the instant it is tapped, and a dialog would sit on top of the change it
 just made. They are `selectable` with `Role.RadioButton`, not `clickable`, so a screen
 reader announces the active one as selected and treats the three as one choice.
@@ -365,3 +346,98 @@ and 52sp in dark, on the argument that dark text on a pale background carries mo
 weight. That is a fair argument, and acting on it means a whole second `Typography` that
 exists to change one number by 6sp. Not worth the machinery. Noted here so the next
 session knows it was considered rather than missed.
+
+---
+
+## 8. Quiet Glass (17 Oct 2026)
+
+The owner chose "Quiet Glass" from three researched directions (research, mockups and the
+rejected options: `docs/HANDOVER.md` §11, the Quiet Glass block). The rules it adds:
+
+**Glass is for what floats, never for content.** The tab bar floats over the screens as a
+pill, `surface` at `GlassBarAlpha` (90%), so what scrolls underneath shows through faintly.
+Prayer times, cards and every line of text stay on solid surfaces. This is Apple's own rule for
+Liquid Glass, and the usability research behind it is in the HANDOVER block. The bar's labels
+are tested against pure black and pure white behind it (`ColorContrastTest`).
+
+> ponytail: translucency without blur, on every Android version. Real backdrop blur needs
+> Android 12+ and the Haze library; at 90% opacity the visible difference is small. Add it only
+> if the owner asks for more glass, and keep the current bar as the Android 7 to 11 fallback.
+
+**Every tab opens the same way.** `ScreenTitle` (headlineMedium, start aligned, 20dp gutter)
+on Qibla and Settings; on Times the title is the city, same size and line, with a green caret
+because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
+which is the bar's measured height, so it grows with large text.
+
+**Links and actions are bold and green.** `labelLarge` is SemiBold, and Material draws every
+button and text button label in it, so "Save as PDF" and "Got it" read as tappable without a
+guess. Rows that open something carry a chevron.
+
+**Green means something.** It is the colour of Paradise in the Qur'an, and here it marks the
+next prayer, the Qibla and anything you can tap. It is never decoration.
+
+**Times fits without scrolling** on a phone at the default text size: city, next prayer, all
+six times and the mosque button. Measured 17 Oct 2026 on 914dp (fits, including the far north
+notice) and on 823dp, the owner's S23 Ultra (all six times fit; the far north notice needs a
+short scroll). Large text and the rare banners are allowed to scroll; they never clip.
+
+**Words.** Plain, short, human and accurate; no hyphens or em dashes in app text, except
+where a name requires one (ir-Rahman, Eid al-Fitr, Rabi al-Awwal, Open-Meteo). Religious names
+are never "simplified". The disclaimer is never softened.
+
+**Icons.** The selected tab uses the Rounded (filled) set, the rest the Outlined set, from the
+already installed `material-icons-extended`. Google has stopped maintaining that library;
+moving to Material Symbols Rounded vector drawables is the planned next step (it removes a
+dependency), not done yet because it means downloading the icon files.
+
+---
+
+## 9. Decision log
+
+Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
+"improves" it back.
+
+- **17 Oct 2026, Quiet Glass chosen.** Rejected: *Refined Calm* (no glass; the owner wanted
+  the premium feel), *Night & Emerald* (glass and five changing colours behind the countdown,
+  against Apple's guidance and the readability research; a second brand colour). Also
+  rejected: a shiny "glossy" finish (dates fast), Material 3 Expressive components (need
+  material3 1.5.0, still beta), a time of day gradient (removed once already because contrast
+  under the countdown could not be tested).
+- **17 Oct 2026, primary deepened to `#0B5A43`.** 7.5:1 on the page, up from 6.0:1. Green kept
+  as the identity on purpose. The widgets moved with it (`WidgetColorsTest` holds them equal).
+  Not moved: launcher icon and PDF logo (`#0E6B4F`), to be moved together in an icon refresh.
+- **17 Oct 2026, one Notice component for every notice** (exact alarms, Do Not Disturb, no
+  location, far north, mosque difference, compass accuracy, Ramadan eve, Eid). Rejected: fixing
+  only the exact alarm card (the owner: "applied in a systemic design system"); a whole-card tap
+  for the action (opening and closing would share a gesture); folding Eid's fine print (it says
+  follow your mosque, so it stays visible as a footnote).
+- **17 Oct 2026, Settings "option B" chosen** over a no-card list and a green summary card.
+- **17 Oct 2026, section titles and the next prayer label in sentence case** in English,
+  Turkish and Indonesian (Urdu has no case). Written that way in the strings, never cased in
+  code.
+
+---
+
+## 10. The learning loop
+
+A design system that only lists colours decays. Every visual change goes round this loop, and
+each lesson ends as a rule here or a test that fails the build.
+
+1. **Observe.** Play reviews (the daily health check watches them), the owner's two phones,
+   opt in screen counts, user emails.
+2. **Propose.** A preview, never straight into the shipping screen: a branch, emulator
+   screenshots, or a debug only switch as Settings was done.
+3. **Verify, automatically where possible.** `ColorContrastTest` for every pair, including the
+   glass bar over its worst backdrop. Screenshots in light, dark, 2.0 text, Urdu right to left
+   and on a short (823dp) screen. No hex outside `ui/theme`.
+4. **Decide.** The owner chooses from screenshots. Silence is never a yes.
+5. **Record.** An entry in §9, with what was rejected and why.
+6. **Enforce.** Turn the lesson into a test or into one of the review questions below.
+
+**Review questions** (the owner's, 17 Oct 2026), answered with a screenshot for every change:
+Is the text easier to read? Is the hierarchy clearer? Is the type consistent? Is the spacing
+comfortable? Can someone understand the screen quickly? Are the controls obvious? Are
+unnecessary taps avoided? Is information grouped logically? Does it look modern rather than
+dated? Is the layout balanced? Are colours and components consistent? Has clutter been removed?
+Does it work at large text? Is contrast sufficient? Are touch targets comfortable? Does it read
+in Urdu right to left?

@@ -4,21 +4,47 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import com.sajdatime.app.ui.components.LocalBottomBarClearance
+import com.sajdatime.app.ui.theme.GlassBarAlpha
+import com.sajdatime.app.ui.theme.LocalDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Explore
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -54,9 +80,9 @@ enum class Destination(
     val selectedIcon: ImageVector,
     val icon: ImageVector,
 ) {
-    TIMES(R.string.nav_times, Icons.Filled.Schedule, Icons.Outlined.Schedule),
-    QIBLA(R.string.nav_qibla, Icons.Filled.Explore, Icons.Outlined.Explore),
-    SETTINGS(R.string.nav_settings, Icons.Filled.Settings, Icons.Outlined.Settings),
+    TIMES(R.string.nav_times, Icons.Rounded.Schedule, Icons.Outlined.Schedule),
+    QIBLA(R.string.nav_qibla, Icons.Rounded.Explore, Icons.Outlined.Explore),
+    SETTINGS(R.string.nav_settings, Icons.Rounded.Settings, Icons.Outlined.Settings),
 }
 
 @Composable
@@ -132,36 +158,18 @@ fun MainScaffold(
         onDispose { onQiblaVisible(false) }
     }
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = {
-            NavigationBar(containerColor = MaterialTheme.colorScheme.surfaceContainer) {
-                Destination.entries.forEach { item ->
-                    val selected = destination == item
-                    NavigationBarItem(
-                        selected = selected,
-                        onClick = { destination = item },
-                        icon = {
-                            Icon(
-                                imageVector = if (selected) item.selectedIcon else item.icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(24.dp),
-                            )
-                        },
-                        // Always labelled: icon-only navigation is guesswork for anyone
-                        // who has not used the app before.
-                        label = { Text(stringResource(item.labelRes)) },
-                        alwaysShowLabel = true,
-                    )
-                }
-            }
-        },
-    ) { padding ->
-        Column(
+    // Quiet Glass (17 Oct 2026): no bottomBar slot. The tab bar floats over the content in the
+    // same Box, so the screens scroll softly underneath it; each screen ends with
+    // BottomBarClearance() so its last row can still be scrolled clear of the bar.
+    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
+        var barHeight by remember { mutableStateOf(0.dp) }
+        val density = LocalDensity.current
+        Box(
             Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
+          CompositionLocalProvider(LocalBottomBarClearance provides barHeight) {
             AnimatedContent(
                 targetState = destination,
                 // A crossfade, not a slide: tabs are siblings, so directional motion
@@ -209,6 +217,91 @@ fun MainScaffold(
                         onSetAnalytics = onSetAnalytics,
                     )
                 }
+            }
+          }
+            GlassTabBar(
+                current = destination,
+                onSelect = { destination = it },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onSizeChanged { barHeight = with(density) { it.height.toDp() } },
+            )
+        }
+    }
+}
+
+/**
+ * The floating tab bar: a pill that hovers over the content, translucent so what scrolls
+ * underneath shows through faintly (GlassBarAlpha, contrast checked against pure black and
+ * pure white behind it in ColorContrastTest).
+ *
+ * Always labelled: icon-only navigation is guesswork for anyone who has not used the app
+ * before. The selected tab has three signals, not one: a filled icon, a tinted pill and a
+ * bolder label, so it reads on a greyscale screen too. Tabs are `selectable` with Role.Tab so a
+ * screen reader says "selected". A light tick of haptic feedback on change, nothing more.
+ */
+@Composable
+private fun GlassTabBar(
+    current: Destination,
+    onSelect: (Destination) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val scheme = MaterialTheme.colorScheme
+    val shape = RoundedCornerShape(32.dp)
+    val haptics = LocalHapticFeedback.current
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .fillMaxWidth()
+            .heightIn(min = 64.dp)
+            // Light lifts on a soft shadow; dark has none to show, so a hairline does the work.
+            .then(if (LocalDarkTheme.current) Modifier else Modifier.shadow(10.dp, shape, clip = false))
+            .clip(shape)
+            .background(scheme.surface.copy(alpha = GlassBarAlpha))
+            .border(1.dp, scheme.outlineVariant.copy(alpha = 0.7f), shape)
+            .selectableGroup(),
+    ) {
+        Destination.entries.forEach { item ->
+            val selected = item == current
+            val pill by animateColorAsState(
+                if (selected) scheme.secondaryContainer else Color.Transparent,
+                label = "tab pill",
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .selectable(selected = selected, role = Role.Tab) {
+                        if (!selected) {
+                            haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                            onSelect(item)
+                        }
+                    }
+                    .padding(vertical = 8.dp),
+            ) {
+                Box(
+                    Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(pill)
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                ) {
+                    Icon(
+                        imageVector = if (selected) item.selectedIcon else item.icon,
+                        contentDescription = null,
+                        tint = if (selected) scheme.onSecondaryContainer else scheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = stringResource(item.labelRes),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                    ),
+                    color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
     }

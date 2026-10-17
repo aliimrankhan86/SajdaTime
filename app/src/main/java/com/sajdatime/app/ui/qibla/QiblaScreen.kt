@@ -36,6 +36,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.BottomBarClearance
+import com.sajdatime.app.ui.components.ScreenTitle
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -79,21 +82,28 @@ import kotlin.math.sin
 
 @Composable
 fun QiblaScreen(state: UiState) {
+    // Same large start aligned title as the other two tabs (Quiet Glass), then the dial
+    // block centred under it, then room to scroll clear of the floating tab bar.
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp)
-            .padding(bottom = 32.dp),
+            .verticalScroll(rememberScrollState()),
+    ) {
+        ScreenTitle(stringResource(R.string.qibla_title))
+        QiblaBody(state)
+        Spacer(Modifier.height(24.dp))
+        BottomBarClearance()
+    }
+}
+
+@Composable
+private fun QiblaBody(state: UiState) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.qibla_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.semantics { heading() },
-        )
-        Spacer(Modifier.height(6.dp))
 
         val qibla = state.qiblaBearing
         if (qibla == null) {
@@ -115,7 +125,9 @@ fun QiblaScreen(state: UiState) {
             ),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
+            // Start aligned under the title, like the date under the city on Times.
+            textAlign = TextAlign.Start,
+            modifier = Modifier.fillMaxWidth(),
         )
 
         // Worked out once, here, and handed to both halves. The dial and the sentence are
@@ -654,26 +666,6 @@ private fun AccuracyNotice(accuracy: CompassAccuracy) {
         CompassAccuracy.HIGH -> return
     }
 
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Text(
-            text = stringResource(messageRes),
-            style = MaterialTheme.typography.bodyMedium,
-            color = scheme.onTertiaryContainer,
-        )
-    }
+    // A warning Notice with no title (17 Oct 2026): the one sentence is the whole message.
+    Notice(brief = stringResource(messageRes))
 }

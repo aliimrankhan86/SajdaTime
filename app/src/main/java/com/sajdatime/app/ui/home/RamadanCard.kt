@@ -27,6 +27,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.rounded.Brightness3
+import com.sajdatime.app.ui.components.NoticeTone
+import com.sajdatime.app.ui.components.Notice
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -346,50 +349,18 @@ private fun FastLine(ramadan: RamadanState) {
 @Composable
 private fun RamadanNotice(ramadan: RamadanState, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.secondaryContainer)
-            .clickable(role = Role.Button, onClick = onShiftDate)
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Filled.Brightness3,
-            contentDescription = null,
-            tint = scheme.onSecondaryContainer,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(
-                    R.string.ramadan_eve_title_before,
-                    TimeFormat.date(context, ramadan.info.firstDay),
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onSecondaryContainer,
-            )
-            Text(
-                text = stringResource(R.string.ramadan_eve_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSecondaryContainer,
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        // Its own target inside a clickable row, 44dp, as NoticeCard does: opening the date
-        // shift and closing the card must never be the same gesture.
-        Icon(
-            imageVector = Icons.Outlined.Close,
-            contentDescription = stringResource(R.string.notice_dismiss),
-            tint = scheme.onSecondaryContainer,
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .clickable(role = Role.Button, onClick = onDismiss)
-                .padding(10.dp)
-                .size(24.dp),
-        )
-    }
+    // A quiet Notice (17 Oct 2026): the date and one line up front, the moon sighting reasoning
+    // folded, and the date shift as the action rather than the whole card.
+    Notice(
+        tone = NoticeTone.QUIET,
+        icon = Icons.Rounded.Brightness3,
+        title = stringResource(R.string.ramadan_eve_title_before, TimeFormat.date(context, ramadan.info.firstDay)),
+        brief = stringResource(R.string.ramadan_eve_brief),
+        details = stringResource(R.string.ramadan_eve_body),
+        actionLabel = stringResource(R.string.settings_hijri_offset_label),
+        onAction = onShiftDate,
+        onDismiss = onDismiss,
+    )
 }
 
 /**

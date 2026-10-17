@@ -19,6 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.rounded.Brightness3
+import com.sajdatime.app.ui.components.NoticeTone
+import com.sajdatime.app.ui.components.Notice
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -59,7 +62,6 @@ internal fun EidSection(state: UiState, onDismiss: (code: Int) -> Unit) {
 
 @Composable
 private fun EidCard(eid: Eid, onDismiss: () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
     val title = when (eid) {
         Eid.FITR -> R.string.eid_fitr_title
         Eid.ADHA -> R.string.eid_adha_title
@@ -68,51 +70,14 @@ private fun EidCard(eid: Eid, onDismiss: () -> Unit) {
         Eid.FITR -> R.string.eid_fitr_body
         Eid.ADHA -> R.string.eid_adha_body
     }
-    Row(
-        verticalAlignment = Alignment.Top,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(24.dp), scheme.secondaryContainer)
-            .padding(start = 20.dp, top = 16.dp, end = 10.dp, bottom = 16.dp),
-    ) {
-        Icon(
-            Icons.Filled.Brightness3,
-            contentDescription = null,
-            tint = scheme.onSecondaryContainer,
-            // Level with the first line of the title, not the middle of the card.
-            modifier = Modifier.padding(top = 2.dp),
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(title),
-                style = MaterialTheme.typography.titleLarge,
-                color = scheme.onSecondaryContainer,
-                modifier = Modifier.semantics { heading() },
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(body),
-                style = MaterialTheme.typography.bodyLarge,
-                color = scheme.onSecondaryContainer,
-            )
-            Spacer(Modifier.height(10.dp))
-            Text(
-                text = stringResource(R.string.eid_fine_print),
-                style = MaterialTheme.typography.bodySmall,
-                color = scheme.onSecondaryContainer,
-            )
-        }
-        Spacer(Modifier.width(4.dp))
-        Icon(
-            imageVector = Icons.Outlined.Close,
-            contentDescription = stringResource(R.string.notice_dismiss),
-            tint = scheme.onSecondaryContainer,
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .clickable(role = Role.Button, onClick = onDismiss)
-                .padding(10.dp)
-                .size(24.dp),
-        )
-    }
+    // A quiet Notice (17 Oct 2026). The fine print is a footnote, always visible, not folded:
+    // "this date is our calculation, follow your mosque" must never be one tap away.
+    Notice(
+        tone = NoticeTone.QUIET,
+        icon = Icons.Rounded.Brightness3,
+        title = stringResource(title),
+        brief = stringResource(body),
+        footnote = stringResource(R.string.eid_fine_print),
+        onDismiss = onDismiss,
+    )
 }

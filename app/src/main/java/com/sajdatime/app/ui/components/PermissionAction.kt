@@ -26,6 +26,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.draw.rotate
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.rounded.WarningAmber
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -89,9 +103,7 @@ fun PermissionButton(
     } else {
         Button(
             onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp),
+            modifier = modifier.heightIn(min = 48.dp),
             // Amber cards use the accent pair that ColorContrastTest already checks.
             colors = if (amber) {
                 ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
@@ -105,9 +117,9 @@ fun PermissionButton(
 }
 
 /**
- * The amber "the system is withholding something" card with the action as its own button
- * (not a whole-card tap), turning into a calm "Allowed" card once granted. [onDismiss] is for
- * Times only; Settings never offers a close button.
+ * A permission the system is withholding, as a [Notice] (warning tone), turning into a calm
+ * "Allowed" line once granted. [onDismiss] is for Times only; Settings never hides a problem.
+ * The action opens the phone's own settings screen. Redesigned 17 Oct 2026: see [Notice].
  */
 @Composable
 fun PermissionCard(
@@ -116,50 +128,32 @@ fun PermissionCard(
     granted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    details: String? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(16.dp)
-    val container = if (granted) scheme.secondaryContainer else scheme.tertiaryContainer
-    val content = if (granted) scheme.onSecondaryContainer else scheme.onTertiaryContainer
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .sajdaSurface(shape, container)
-            .border(1.dp, (if (granted) scheme.primary else scheme.tertiary).copy(alpha = 0.35f), shape)
-            .padding(16.dp),
-    ) {
-        if (!granted) {
-            Row(verticalAlignment = Alignment.Top) {
-                Icon(Icons.Outlined.WarningAmber, contentDescription = null, tint = scheme.tertiary)
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(title, style = MaterialTheme.typography.titleMedium, color = content)
-                    Text(body, style = MaterialTheme.typography.bodyMedium, color = content)
-                }
-                if (onDismiss != null) {
-                    // 48dp, separate from the action button: one gesture opens the system
-                    // screen, the other closes the card, and they must never be the same tap.
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = stringResource(R.string.notice_dismiss),
-                        tint = content,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .clickable(role = Role.Button, onClick = onDismiss)
-                            .padding(12.dp),
-                    )
-                }
-            }
-        Spacer(Modifier.height(12.dp))
-        }
+    if (granted) {
+        val shape = RoundedCornerShape(20.dp)
         PermissionButton(
             label = title,
-            granted = granted,
+            granted = true,
             onClick = onClick,
-            amber = true,
-            allowedColor = content,
-            modifier = Modifier.fillMaxWidth(),
+            allowedColor = scheme.onSecondaryContainer,
+            modifier = modifier
+                .fillMaxWidth()
+                .sajdaSurface(shape, scheme.secondaryContainer)
+                .padding(horizontal = 16.dp, vertical = 6.dp),
         )
+        return
     }
+    Notice(
+        title = title,
+        brief = body,
+        details = details,
+        actionLabel = stringResource(R.string.action_allow),
+        actionSpokenAs = title,
+        onAction = onClick,
+        onDismiss = onDismiss,
+        modifier = modifier,
+    )
 }

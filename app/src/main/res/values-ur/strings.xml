@@ -77,7 +77,7 @@
     <string name="home_now_marker_a11y">موجودہ نماز</string>
     <string name="notice_dismiss">بند کریں</string>
     <string name="method_notice_title">کیا یہ آپ کی مسجد سے ملتا ہے؟</string>
-    <string name="method_notice_body">یہاں فجر اور عشاء میں ایک گھنٹے یا اس سے زیادہ کا فرق ہو سکتا ہے۔ وجہ جاننے کے لیے ٹیپ کریں۔</string>
+    <string name="method_notice_body">یہاں فجر اور عشاء میں ایک گھنٹے یا اس سے زیادہ کا فرق ہو سکتا ہے۔</string>
     <string name="mosque_diff_link">آپ کی مسجد سے مختلف؟</string>
     <string name="mosque_diff_title">آپ کی مسجد سے مختلف؟</string>
     <string name="mosque_diff_congregation">یہ ایپ دکھاتی ہے کہ ہر نماز کا وقت کب شروع ہوتا ہے۔ آپ کی مسجد عموماً جماعت تھوڑی دیر بعد کرواتی ہے، اس لیے اس کے بورڈ اور ان اوقات میں اکثر چند منٹ کا فرق ہوگا۔ دونوں میں سے کوئی بھی غلط نہیں۔</string>
@@ -92,7 +92,7 @@
     <string name="home_countdown_a11y">%1$s، %2$s میں</string>
     <string name="home_location_a11y">%1$s۔ %2$s</string>
     <string name="home_default_location_title">مکہ کے اوقات دکھائے جا رہے ہیں</string>
-    <string name="home_default_location_body">ہم معلوم نہیں کر سکے کہ آپ کہاں ہیں۔ اپنا مقام مقرر کرنے کے لیے ٹیپ کریں۔</string>
+    <string name="home_default_location_body">ہم معلوم نہیں کر سکے کہ آپ کہاں ہیں۔</string>
     <string name="action_change_location">مقام بدلیں</string>
 
     <!-- Location sheet -->
@@ -174,12 +174,16 @@
     <string name="settings_alarm_respect_silent">فون سائلنٹ ہو تو خاموش رہیں</string>
     <string name="settings_alarm_respect_silent_desc">آن: آپ کو اطلاع وقت پر ملتی ہے، مگر آواز کے بغیر۔ بند: فون سائلنٹ ہو تب بھی الارم بجتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
     <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
-    <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔ اجازت دینے کے لیے ٹیپ کریں۔</string>
+    <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔</string>
 
     <string name="settings_ongoing_badge">اگلی نماز اطلاعاتی پٹی میں رکھیں</string>
     <string name="settings_ongoing_badge_desc">ایک خاموش اطلاع جو بتاتی ہے کہ اگلی نماز کون سی ہے اور آپ کے پاس کتنا وقت ہے</string>
     <string name="settings_exact_alarms_title">درست وقت کے الارم کی اجازت دیں</string>
-    <string name="settings_exact_alarms_desc">اس کے بغیر آپ کا فون نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر تک روک سکتا ہے، اور کچھ فونز پر فجر جیسا رات کا الرٹ شاید بالکل نہ آئے۔ اجازت دینے کے لیے ٹیپ کریں۔</string>
+    <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
+    <string name="settings_exact_alarms_brief">نماز کے الرٹ دیر سے آ سکتے ہیں۔</string>
+    <!-- The action on a permission notice. It opens the phone's own settings screen. -->
+    <string name="action_allow">اجازت دیں</string>
+    <string name="settings_exact_alarms_desc">اس کے بغیر نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر سے آ سکتے ہیں، اور کچھ فونز پر فجر کا الرٹ شاید بالکل نہ آئے۔</string>
     <string name="confirm_exact_alarm_title">ایک آخری بات</string>
     <string name="confirm_exact_alarm_body">جب تک آپ اجازت نہ دیں، Android ایپس کو بالکل درست منٹ پر الرٹ لگانے نہیں دیتا۔ اس کے بغیر آپ کا فون نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر تک روک سکتا ہے، اور کچھ فونز پر فجر جیسا رات کا الرٹ شاید بالکل نہ آئے۔ آپ یہ بعد میں ترتیبات سے بھی کر سکتے ہیں۔</string>
     <string name="action_close">بند کریں</string>
@@ -188,7 +192,7 @@
     <string name="about_disclaimer">ڈس کلیمر</string>
     <string name="about_disclaimer_short">ایک مددگار، کوئی دینی اتھارٹی نہیں۔ پڑھنے کے لیے ٹیپ کریں۔</string>
     <string name="about_privacy">پرائیویسی</string>
-    <string name="about_privacy_desc">اوقات اسی فون پر نکالے جاتے ہیں اور ہم آپ کا مقام کبھی وصول نہیں کرتے۔ نہ کوئی اکاؤنٹ، نہ اشتہارات۔ استعمال کے اعداد و شمار اختیاری ہیں اور جب تک آپ انہیں آن نہ کریں، بند رہتے ہیں۔ مکمل پالیسی پڑھنے کے لیے ٹیپ کریں۔</string>
+    <string name="about_privacy_desc">اوقات اسی فون پر نکالے جاتے ہیں اور ہم آپ کا مقام کبھی وصول نہیں کرتے۔ نہ کوئی اکاؤنٹ، نہ اشتہارات۔ استعمال کے اعداد و شمار تب تک بند رہتے ہیں جب تک آپ انہیں آن نہ کریں۔</string>
 
     <!-- Optional usage counts. The consent text must state the material facts in full. Do not
          shorten it, and do not use a word meaning "tracking". -->
@@ -213,7 +217,7 @@
     <string name="about_feedback_desc">ڈویلپر کو بتائیں کہ کیا مددگار ہے یا کیا غلط ہے۔ آپ کی ای میل ایپ کھلے گی۔</string>
     <string name="feedback_subject">SajdaTime کے بارے میں رائے</string>
     <string name="settings_usage_counts">استعمال کے اعداد و شمار شیئر کریں</string>
-    <string name="settings_usage_counts_desc">Google کو بھیجے جاتے ہیں، ایک رینڈم شناختی نمبر (ID) سے جڑے ہوئے۔ جب تک آپ آن نہ کریں، بند رہتا ہے۔ آن کرنے پر ٹھیک ٹھیک دکھایا جاتا ہے کہ کیا بھیجا جاتا ہے۔</string>
+    <string name="settings_usage_counts_desc">جب تک آپ آن نہ کریں، بند رہتا ہے۔ ایک رینڈم شناختی نمبر (ID) کے ساتھ Google کو بھیجا جاتا ہے۔ آن کرنے سے پہلے ٹھیک ٹھیک دکھایا جاتا ہے کہ کیا بھیجا جائے گا۔</string>
     <string name="about_charity">ہمیشہ کے لیے مفت</string>
     <string name="about_charity_desc">محبت سے بنائی گئی، امت کے لیے مفت۔ اللہ کی رضا کے لیے ایک خیراتی منصوبہ۔</string>
     <string name="about_credits">تیار کردہ</string>
@@ -313,7 +317,7 @@
     <string name="ramadan_info_hide">یہ کارڈ چھپائیں</string>
     <string name="ramadan_info_hide_note">آپ اسے ترتیبات میں دوبارہ دکھا سکتے ہیں۔</string>
     <string name="ramadan_eve_title_before">اس کیلنڈر کے مطابق رمضان %1$s کو شروع ہوگا</string>
-    <string name="ramadan_eve_body">بہت سی مساجد چاند دیکھ کر اپنے آغاز کا اعلان کرتی ہیں، اکثر ایک دن بعد۔ اگر آپ کی مسجد کی تاریخ مختلف ہو تو اسلامی تاریخ بدلنے کے لیے ٹیپ کریں۔ اس سے سحری کی یاددہانی اور ام القریٰ کا عشاء کا اصول بھی بدل جاتا ہے۔</string>
+    <string name="ramadan_eve_body">بہت سی مساجد چاند دیکھ کر اپنے آغاز کا اعلان کرتی ہیں، اکثر ایک دن بعد۔ اگر آپ کی مسجد کی تاریخ مختلف ہو تو اسلامی تاریخ بدل دیں۔ اس سے سحری کی یاددہانی اور ام القریٰ کا عشاء کا اصول بھی بدل جاتا ہے۔</string>
     <string name="ramadan_date_differs">کیا آپ کی مسجد نے رمضان کسی اور دن شروع کیا؟</string>
     <string name="settings_ramadan_card">رمضان کارڈ</string>
     <string name="settings_ramadan_card_desc">رمضان میں اوقات کی اسکرین پر سحری اور افطار کے اوقات دکھاتا ہے</string>
@@ -357,4 +361,8 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">سحری ختم</string>
     <string name="widget_iftar">افطار</string>
+    <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
+    <string name="action_see_why">وجہ دیکھیں</string>
+    <string name="ramadan_eve_brief">آپ کی مسجد ایک دن بعد شروع کر سکتی ہے۔</string>
+    <string name="polar_notice_brief">یہاں فجر اور عشاء عرض بلد %1$d° کے حساب سے نکالے جاتے ہیں۔</string>
 </resources>

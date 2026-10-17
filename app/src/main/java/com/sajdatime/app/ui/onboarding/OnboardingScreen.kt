@@ -681,6 +681,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                 label = stringResource(R.string.settings_exact_alarms_title),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 

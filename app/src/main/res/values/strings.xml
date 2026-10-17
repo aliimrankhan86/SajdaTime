@@ -122,7 +122,7 @@
     <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
-    <string name="home_next_prayer">NEXT PRAYER</string>
+    <string name="home_next_prayer">Next prayer</string>
     <string name="home_until">until it begins</string>
     <string name="home_today">Today</string>
     <string name="home_next_marker">Next</string>
@@ -159,7 +159,7 @@
          emulator, a third line is exactly what the navigation bar clips. "Here" means at
          this latitude; the dialog behind it says why (twilight) and offers the chooser. -->
     <string name="method_notice_title">Does this match your mosque?</string>
-    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here. Tap to see why.</string>
+    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here.</string>
     <!--
       The plain, permanent form of the door under the timetable — what everyone below 45°
       sees, and what everyone sees once the loud form above is dismissed or a method is
@@ -205,7 +205,7 @@
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
     <string name="home_default_location_title">Showing times for Makkah</string>
-    <string name="home_default_location_body">We could not work out where you are. Tap to set your location.</string>
+    <string name="home_default_location_body">We could not work out where you are.</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -288,14 +288,14 @@
       without opening anything.
     -->
     <string name="title_settings">Settings</string>
-    <string name="settings_group_prayer_times">PRAYER TIMES</string>
-    <string name="settings_group_appearance">APPEARANCE</string>
+    <string name="settings_group_prayer_times">Prayer times</string>
+    <string name="settings_group_appearance">Appearance</string>
     <string name="settings_theme">Theme</string>
     <string name="theme_system">Follow phone</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="settings_group_reminders">REMINDERS</string>
-    <string name="settings_group_about">ABOUT</string>
+    <string name="settings_group_reminders">Reminders</string>
+    <string name="settings_group_about">About</string>
 
     <string name="settings_location">Location</string>
     <string name="settings_school">School of thought</string>
@@ -310,7 +310,7 @@
     <string name="settings_method_auto">Automatic · %1$s</string>
     <string name="settings_method_help">Mosques measure the twilight differently, and that mainly moves Fajr and Isha. The further north you live, the bigger the gap. If these times do not match your mosque, ask them which method they use and pick it here.</string>
 
-    <string name="settings_alerts_help">Choose this for each prayer. A notification is quiet and vibrates. An alarm plays the sound you pick, loudly, the way a wake-up alarm does.</string>
+    <string name="settings_alerts_help">Choose this for each prayer. A notification is quiet and vibrates. An alarm plays the sound you pick, loudly, like an alarm clock.</string>
     <string name="alert_style_off">Off</string>
     <string name="alert_style_notification">Notification</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -319,13 +319,17 @@
     <string name="settings_alarm_sound">Alarm sound</string>
     <string name="settings_alarm_sound_desc">Pick any tone or adhan already on your phone</string>
     <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
-    <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, the way a wake-up alarm does.</string>
+    <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, like an alarm clock.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
-    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb. Tap to allow.</string>
+    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
-    <string name="settings_ongoing_badge">Keep the next prayer in the shade</string>
-    <string name="settings_ongoing_badge_desc">A silent notification showing what is next and how long you have</string>
+    <string name="settings_ongoing_badge">Show the next prayer in notifications</string>
+    <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and the time left</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
+    <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
+    <string name="settings_exact_alarms_brief">Prayer alerts may arrive late.</string>
+    <!-- The action on a permission notice. It opens the phone's own settings screen. -->
+    <string name="action_allow">Allow</string>
     <!-- These two said only "and deliver them late", with no number, because Android
          documents no upper bound and "a few minutes" was a promise we could not keep.
          That was right while we were reasoning; it is wrong now that we have measured.
@@ -336,7 +340,7 @@
          that silently costs them Fajr, so both strings now name the measured floor and
          the overnight case. Fajr is named because it is the one that matters and the one
          that fails. Evidence in HANDOVER section 10. -->
-    <string name="settings_exact_alarms_desc">Without this your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. Tap to allow.</string>
+    <string name="settings_exact_alarms_desc">Without it, prayer alerts can arrive an hour or more late, and on some phones Fajr may not arrive at all.</string>
     <string name="confirm_exact_alarm_title">One last thing</string>
     <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>
     <string name="action_close">Close</string>
@@ -345,7 +349,7 @@
     <string name="about_disclaimer">Disclaimer</string>
     <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Times are worked out on this phone and we never receive your location. No accounts, no ads. Usage counts are optional and off unless you turn them on. Tap to read the full policy.</string>
+    <string name="about_privacy_desc">Times are worked out on this phone, and we never receive your location. No accounts and no ads. Usage counts stay off unless you turn them on.</string>
 
     <!-- Optional usage counts. Wording rules: docs/ANALYTICS_PLAN.md section 7.2. The consent text
          must state the material facts in full (who receives it, the random ID, what is and is not
@@ -368,11 +372,11 @@
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>
     <string name="about_feedback">Send feedback</string>
-    <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email app.</string>
+    <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email.</string>
     <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>
     <string name="feedback_subject">SajdaTime feedback</string>
     <string name="settings_usage_counts">Share usage counts</string>
-    <string name="settings_usage_counts_desc">Sent to Google, tied to a random ID. Off unless you turn it on. Turning it on shows exactly what is sent.</string>
+    <string name="settings_usage_counts_desc">Off unless you turn it on. Sent to Google with a random ID. Turning it on first shows exactly what is sent.</string>
     <string name="privacy_policy_url" translatable="false">https://aliimrankhan86.github.io/SajdaTime/privacy.html</string>
     <string name="about_charity">Free, forever</string>
     <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
@@ -507,7 +511,7 @@
     <string name="ramadan_info_hide_note">You can show it again in Settings.</string>
     <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from a week before day 1. -->
     <string name="ramadan_eve_title_before">Ramadan on this calendar begins %1$s</string>
-    <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, tap to shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
+    <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
     <!-- Under the card on days 1 and 2 only, in place of the notice. -->
     <string name="ramadan_date_differs">Did your mosque begin Ramadan on a different day?</string>
     <string name="settings_ramadan_card">Ramadan card</string>
@@ -569,4 +573,8 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">Suhoor ends</string>
     <string name="widget_iftar">Iftar</string>
+    <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
+    <string name="action_see_why">See why</string>
+    <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
+    <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
 </resources>

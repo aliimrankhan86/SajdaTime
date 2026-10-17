@@ -31,6 +31,7 @@ import com.sajdatime.app.ui.theme.DarkPrimary
 import com.sajdatime.app.ui.theme.DarkPrimaryContainer
 import com.sajdatime.app.ui.theme.DarkSecondary
 import com.sajdatime.app.ui.theme.DarkSurface
+import com.sajdatime.app.ui.theme.GlassBarAlpha
 import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
 import com.sajdatime.app.ui.theme.LightKiswah
@@ -189,6 +190,33 @@ class ColorContrastTest {
                 }
             },
         )
+    }
+
+    /**
+     * The floating tab bar is see-through (GlassBarAlpha), so what is behind its labels is
+     * whatever has scrolled underneath. Composited over the two extremes, pure black and pure
+     * white, every colour drawn straight on the bar must still hold AA. The selected pill is
+     * opaque secondaryContainer and is covered by the pair above.
+     */
+    @Test
+    fun `glass tab bar labels hold over the worst backdrop`() {
+        fun over(top: Color, alpha: Float, under: Color) = Color(
+            red = top.red * alpha + under.red * (1 - alpha),
+            green = top.green * alpha + under.green * (1 - alpha),
+            blue = top.blue * alpha + under.blue * (1 - alpha),
+        )
+        val pairs = listOf(Color.Black, Color.White).flatMap { under ->
+            val u = if (under == Color.Black) "black" else "white"
+            val light = over(LightSurface, GlassBarAlpha, under)
+            val dark = over(DarkSurface, GlassBarAlpha, under)
+            listOf(
+                Pair("light bar label over $u", LightOnSurfaceVariant, light, 4.5),
+                Pair("light bar selected label over $u", LightOnSurface, light, 4.5),
+                Pair("dark bar label over $u", DarkOnSurfaceVariant, dark, 4.5),
+                Pair("dark bar selected label over $u", DarkOnSurface, dark, 4.5),
+            )
+        }
+        assertAll(pairs)
     }
 
     /**

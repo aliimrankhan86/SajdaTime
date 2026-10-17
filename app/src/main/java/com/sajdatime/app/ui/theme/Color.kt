@@ -32,7 +32,14 @@ import androidx.compose.ui.graphics.Color
 //  - Its `warning` (#B4740B) is listed at 4.6:1 and is actually **3.76:1** on surface,
 //    with white on it at 3.86:1. #9A6208 is the nearest value on the same hue that clears
 //    4.5:1 both ways.
-val LightPrimary = Color(0xFF0E6B4F)
+// #0B5A43 since 17 Oct 2026 (Quiet Glass), was #0E6B4F. A deeper emerald: 7.5:1 on the page
+// rather than 6.0:1, and it reads richer next to the warm sand. Green stays the identity on
+// purpose: it is the colour of Paradise in the Qur'an (18:31, 76:21), so it is used with intent,
+// for the next prayer, the Qibla and anything you can tap, and never as decoration.
+// The widgets moved with it (widget_primary, held equal by WidgetColorsTest). Deliberately NOT
+// moved: the launcher icon and the PDF logo keep #0E6B4F. The icon is the Play listing's face;
+// the two greens are one step apart. Move both together in an icon refresh, not as a side effect.
+val LightPrimary = Color(0xFF0B5A43)
 val LightOnPrimary = Color(0xFFFFFFFF)
 // #D7EAE0 rather than the design's #DDEDE4: at 1.18:1 against the surface behind it, that
 // value is below the floor ColorContrastTest sets for "the highlighted row must be
@@ -177,4 +184,16 @@ val DarkInverseSurface = Color(0xFFE7EAE8)
 val DarkInverseOnSurface = Color(0xFF171B1A)
 // The inverse roles are each other's primary, so these two move together with the palette.
 // This one was missed when light changed and sat on the old #14624B for a commit.
-val DarkInversePrimary = Color(0xFF0E6B4F)
+val DarkInversePrimary = Color(0xFF0B5A43)
+
+/**
+ * How opaque the floating tab bar is (Quiet Glass, 17 Oct 2026). Content scrolls under it and
+ * shows through faintly, which is the glass. 90%, not less, because the labels on it must hold
+ * AA against the worst thing that can scroll underneath: ColorContrastTest composites the bar
+ * over pure black and pure white and checks every label colour on both.
+ *
+ * ponytail: translucency without blur, on every Android version. Real backdrop blur needs
+ * Android 12 and a library (Haze); at 90% opacity the difference is small. Add it when the
+ * owner asks for more glass, and keep this value as the fallback for Android 7 to 11.
+ */
+const val GlassBarAlpha = 0.90f

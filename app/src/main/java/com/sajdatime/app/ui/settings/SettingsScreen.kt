@@ -161,7 +161,8 @@ fun SettingsScreen(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
-                body = stringResource(R.string.settings_exact_alarms_desc),
+                body = stringResource(R.string.settings_exact_alarms_brief),
+                details = stringResource(R.string.settings_exact_alarms_desc),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
@@ -373,8 +374,7 @@ fun SettingsScreen(
 
     val sections = listOf(prayerTimes, appearance, reminders, about)
     val title = stringResource(R.string.title_settings)
-    val preview = settingsPreviewRenderer
-    if (preview != null) preview(title, banners, sections) else OriginalSettings(title, banners, sections)
+    SettingsList(title, banners, sections)
 
     if (askingUsageConsent) {
         UsageCountsConsentDialog(
@@ -556,66 +556,6 @@ internal class SettingsSection(
     val title: String,
     val items: List<SettingsItem>,
 )
-
-internal typealias SettingsRenderer =
-    @Composable (title: String, banners: @Composable () -> Unit, sections: List<SettingsSection>) -> Unit
-
-/**
- * Set only by the debug build's design preview (`src/debug`, `SettingsLookActivity`), to
- * draw candidate looks from the real rows on an emulator. Nothing in `src/main` ever sets
- * it, so a release build always draws [OriginalSettings].
- *
- * ponytail: a global rather than a CompositionLocal, because one debug-only activity is
- * the only writer and the screen is the only reader. Remove it with the previews once a
- * look is chosen and becomes the real renderer.
- */
-internal var settingsPreviewRenderer: SettingsRenderer? by mutableStateOf(null)
-
-/** The shipping look: titled groups, each one bordered card. */
-@Composable
-private fun OriginalSettings(
-    title: String,
-    banners: @Composable () -> Unit,
-    sections: List<SettingsSection>,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 40.dp),
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
-                .semantics { heading() },
-        )
-        banners()
-        sections.forEach { section ->
-            Group(section.title) {
-                section.items.forEach { item ->
-                    when (item) {
-                        is SettingsItem.Link -> SettingRow(
-                            title = item.title,
-                            subtitle = item.subtitle,
-                            icon = item.icon,
-                            onClick = item.onClick,
-                        )
-                        is SettingsItem.Toggle -> SwitchRow(
-                            title = item.title,
-                            subtitle = item.subtitle,
-                            checked = item.checked,
-                            onCheckedChange = item.onCheckedChange,
-                            icon = item.icon,
-                        )
-                        is SettingsItem.Theme -> ThemeRow(current = item.current, onSelect = item.onSelect)
-                    }
-                }
-            }
-        }
-    }
-}
 
 // --- summaries shown under each row ------------------------------------------------------
 
@@ -987,35 +927,6 @@ private fun ChooserDialog(
 
 // --- small building blocks -------------------------------------------------------------
 
-/**
- * A titled group of rows, drawn as one bounded card.
- *
- * The rows used to run edge to edge under a coloured heading, which left the screen as a
- * single unbroken column and made "where does Prayer times end and Reminders begin"
- * something you worked out by reading. A border is faster than reading.
- */
-@Composable
-private fun Group(title: String, content: @Composable () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    Spacer(Modifier.height(24.dp))
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
-        color = scheme.primary,
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .semantics { heading() },
-    )
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(20.dp)),
-    ) {
-        content()
-    }
-}
-
 @Composable
 private fun SectionLabel(title: String) {
     Text(
@@ -1029,64 +940,7 @@ private fun SectionLabel(title: String) {
 }
 
 /**
- * Light, dark, or follow the phone.
- *
- * Three chips rather than a chooser dialog, because unlike every other setting on this
- * screen the result is visible the instant it is tapped — sending the user into a dialog
- * to see a change that happens behind the dialog would be perverse.
- *
- * "Follow the phone" is first and is the default. On a device that expresses no dark
- * preference it resolves to light, which is what the plain-English label promises.
- */
-@Composable
-private fun ThemeRow(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    val labels = mapOf(
-        ThemeChoice.SYSTEM to R.string.theme_system,
-        ThemeChoice.LIGHT to R.string.theme_light,
-        ThemeChoice.DARK to R.string.theme_dark,
-    )
-
-    Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Outlined.Contrast,
-                contentDescription = null,
-                tint = scheme.onSurfaceVariant,
-                modifier = Modifier.size(22.dp),
-            )
-            Spacer(Modifier.width(16.dp))
-            Text(
-                text = stringResource(R.string.settings_theme),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        // A FlowRow, not a Row: at a large font size three chips no longer fit across a
-        // phone, and a fixed Row would clip the third one — which is "Dark", the whole
-        // reason anyone opens this.
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(start = 38.dp)
-                .selectableGroup(),
-        ) {
-            ThemeChoice.entries.forEach { choice ->
-                ChoiceChip(
-                    label = stringResource(labels.getValue(choice)),
-                    selected = current == choice,
-                    onClick = { onSelect(choice) },
-                )
-            }
-        }
-    }
-}
-
-/**
- * One option in a small horizontal set. Used by the theme picker and by the per-prayer
- * alert picker, which is the only reason it is not still inlined in the theme row.
+ * One option in a small horizontal set: the per-prayer alert picker and the suhoor style.
  *
  * `selectable`, not `clickable`: a screen reader should announce "selected" on the active
  * chip, and a set of chips is one choice rather than three independent buttons.
