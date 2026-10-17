@@ -323,6 +323,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setSuhoorReminderStyle(style: AlertStyle) =
         viewModelScope.launch { settingsRepository.setSuhoorReminderStyle(style) }
 
+    fun setPrayerReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setPrayerReminderMinutes(minutes) }
+
+    fun setPrayerReminder(slot: PrayerSlot, on: Boolean) =
+        viewModelScope.launch { settingsRepository.setPrayerReminder(slot, on) }
+
     fun dismissEidGreeting(code: Int) =
         viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
 

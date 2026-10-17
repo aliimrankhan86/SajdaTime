@@ -52,6 +52,9 @@ object Notifications {
     /** One slot: tomorrow's reminder replaces today's, and the prayer ids (2000 to 2005) are untouched. */
     const val ID_SUHOOR = 3000
 
+    /** One per prayer, so a Dhuhr heads up never replaces an unread Asr one. */
+    private const val ID_PRAYER_REMINDER_BASE = 4000
+
     /** Two firm pulses: noticeable in a pocket, not startling in a quiet room. */
     private val PRAYER_VIBRATION = longArrayOf(0, 350, 250, 350)
 
@@ -313,6 +316,40 @@ object Notifications {
             .applyStyle(effectiveStyle, alarmSoundUri)
 
         post(context, ID_SUHOOR, builder.build())
+    }
+
+    /**
+     * The optional heads up before a prayer: "Asr at 15:42 / Asr begins in 10m". Always the quiet
+     * channel, never the alarm one, because it comes before an alert the person has already chosen
+     * and two loud sounds ten minutes apart is the nagging this app refuses. It clears itself at the
+     * prayer, like the suhoor reminder, and shares that one's body text, which is generic.
+     */
+    fun postPrayerReminder(
+        base: Context,
+        slot: PrayerSlot,
+        prayerAt: Instant,
+        now: Instant,
+        approximate: Boolean = false,
+    ) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+
+        val shownFrom = prayerAt.minusSeconds(60L * suhoorMinutesLeft(now, prayerAt))
+        val builder = NotificationCompat.Builder(context, CHANNEL_PRAYERS)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notif_next_title, slot.label(context), TimeFormat.clock(context, prayerAt)))
+            .setContentText(
+                context.getString(R.string.notif_suhoor_body, slot.label(context), TimeFormat.remaining(context, shownFrom, prayerAt)),
+            )
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setTimeoutAfter(Duration.between(now, prayerAt).toMillis().coerceAtLeast(1L))
+            .setContentIntent(openAppIntent(context))
+            .markIfApproximate(context, approximate)
+            .applyStyle(AlertStyle.NOTIFICATION, alarmSoundUri = "")
+
+        post(context, ID_PRAYER_REMINDER_BASE + slot.ordinal, builder.build())
     }
 
     /** The channel an alert of [style] belongs on; the alarm channel is created on demand. */

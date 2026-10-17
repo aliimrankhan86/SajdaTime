@@ -317,7 +317,8 @@
     <!-- Shown under "Prayer alerts" when the five prayers do not all use the same style. -->
     <string name="alert_style_mixed">Mixed</string>
     <string name="settings_alarm_sound">Alarm sound</string>
-    <string name="settings_alarm_sound_desc">Pick any tone or adhan already on your phone</string>
+    <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
+    <string name="settings_alarm_sound_adhan">Want the adhan? Save an adhan recording on your phone, then choose it here.</string>
     <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
     <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, like an alarm clock.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
@@ -536,6 +537,12 @@
     <plurals name="suhoor_minutes_before">
         <item quantity="one">%d minute before Fajr</item>
         <item quantity="other">%d minutes before Fajr</item>
+    </plurals>
+    <string name="settings_prayer_reminder">Reminder before prayer</string>
+    <string name="settings_prayer_reminder_help">A quiet notification a few minutes before each prayer you choose, so you have time to get ready.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="one">%d minute before</item>
+        <item quantity="other">%d minutes before</item>
     </plurals>
     <string name="notif_suhoor_title">Suhoor ends at %1$s</string>
     <string name="notif_suhoor_body">%1$s begins in %2$s</string>

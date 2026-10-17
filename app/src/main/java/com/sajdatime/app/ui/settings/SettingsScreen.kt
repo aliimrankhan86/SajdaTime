@@ -45,6 +45,7 @@ import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
@@ -109,7 +110,7 @@ import java.time.LocalDate
  * chooser that answers them, rather than to the top of Settings with the row left to find.
  * See [SettingsScreen]'s `request` parameter.
  */
-enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER }
+enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER }
 
 @Composable
 fun SettingsScreen(
@@ -132,6 +133,8 @@ fun SettingsScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
+    onSetPrayerReminderMinutes: (Int) -> Unit,
+    onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
@@ -271,6 +274,14 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_alerts),
                 subtitle = alertSummary(settings.alertFor),
                 onClick = { open = SettingsChooser.ALERTS },
+            ),
+            // Off until chosen (1.5.0): a quiet heads up a few minutes before the prayers picked.
+            SettingsItem.Link(
+                key = "prayer_reminder",
+                icon = Icons.Outlined.Timer,
+                title = stringResource(R.string.settings_prayer_reminder),
+                subtitle = prayerReminderSummary(settings.prayerReminderMinutes, settings.prayerReminderFor),
+                onClick = { open = SettingsChooser.PRAYER_REMINDER },
             ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
@@ -451,6 +462,14 @@ fun SettingsScreen(
             onDismiss = { open = null },
         )
 
+        SettingsChooser.PRAYER_REMINDER -> PrayerReminderDialog(
+            minutes = settings.prayerReminderMinutes,
+            slots = settings.prayerReminderFor,
+            onSetMinutes = onSetPrayerReminderMinutes,
+            onSetSlot = onSetPrayerReminder,
+            onDismiss = { open = null },
+        )
+
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
@@ -611,6 +630,26 @@ private fun alertSummary(alertFor: Map<PrayerSlot, AlertStyle>): String {
     return stringResource(R.string.settings_value_pair, count, style)
 }
 
+/** "10 minutes before · All five", "10 minutes before · 2 of 5", or just "Off". */
+@Composable
+private fun prayerReminderSummary(minutes: Int, slots: Set<PrayerSlot>): String {
+    if (minutes <= 0 || slots.isEmpty()) return stringResource(R.string.suhoor_off)
+    val which = if (slots.size == 5) {
+        stringResource(R.string.settings_which_prayers_all)
+    } else {
+        stringResource(R.string.settings_which_prayers_some, slots.size)
+    }
+    return stringResource(R.string.settings_value_pair, prayerReminderChoiceLabel(minutes), which)
+}
+
+@Composable
+private fun prayerReminderChoiceLabel(minutes: Int): String =
+    if (minutes <= 0) {
+        stringResource(R.string.suhoor_off)
+    } else {
+        pluralStringResource(R.plurals.prayer_reminder_minutes_before, minutes, minutes)
+    }
+
 /** "30 minutes before Fajr · Notification", or just "Off". Plain words, no date logic. */
 @Composable
 private fun suhoorSummary(minutes: Int, style: AlertStyle): String {
@@ -743,15 +782,7 @@ private fun AlertsDialog(
 
         if (showAlarmOptions) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            SettingRow(
-                title = stringResource(R.string.settings_alarm_sound),
-                // Naming the chosen tone is the only confirmation the user gets that the
-                // pick stuck. The generic hint stays until something is chosen.
-                subtitle = rememberRingtoneTitle(alarmSoundUri)
-                    ?: stringResource(R.string.settings_alarm_sound_desc),
-                onClick = onPickAlarmSound,
-                horizontalPadding = 0.dp,
-            )
+            AlarmSoundRow(alarmSoundUri, onPickAlarmSound)
             SwitchRow(
                 title = stringResource(R.string.settings_alarm_respect_silent),
                 subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
@@ -774,6 +805,71 @@ private fun AlertsDialog(
             }
         }
     }
+}
+
+/**
+ * The heads up before a prayer: how long before, then which prayers. Always a quiet notification,
+ * so there is no style or sound here; the prayer alerts keep those.
+ */
+@Composable
+private fun PrayerReminderDialog(
+    minutes: Int,
+    slots: Set<PrayerSlot>,
+    onSetMinutes: (Int) -> Unit,
+    onSetSlot: (PrayerSlot, Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_prayer_reminder), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_prayer_reminder_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        Column(Modifier.selectableGroup()) {
+            AppSettings.PRAYER_REMINDER_CHOICES.forEach { choice ->
+                RadioRow(
+                    label = prayerReminderChoiceLabel(choice),
+                    selected = minutes == choice,
+                    onSelect = { onSetMinutes(choice) },
+                )
+            }
+        }
+        if (minutes > 0) {
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
+                SwitchRow(
+                    title = stringResource(slot.labelRes),
+                    checked = slot in slots,
+                    onCheckedChange = { onSetSlot(slot, it) },
+                    horizontalPadding = 0.dp,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The alarm sound row, shared by the prayer alerts and the suhoor reminder: the chosen tone (or the
+ * phone's default), and under it how to get an adhan. The app ships no recording on purpose
+ * (licensing, download size: MainActivity.alarmSoundPicker), so the line says where one comes from.
+ * Added 1.5.0 from the competitor review, where paid adhan voices were a common upsell.
+ */
+@Composable
+private fun AlarmSoundRow(alarmSoundUri: String, onPickAlarmSound: () -> Unit) {
+    SettingRow(
+        title = stringResource(R.string.settings_alarm_sound),
+        // Naming the chosen tone is the only confirmation the user gets that the pick stuck.
+        subtitle = rememberRingtoneTitle(alarmSoundUri) ?: stringResource(R.string.settings_alarm_sound_default),
+        onClick = onPickAlarmSound,
+        horizontalPadding = 0.dp,
+    )
+    Text(
+        text = stringResource(R.string.settings_alarm_sound_adhan),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(bottom = 8.dp),
+    )
 }
 
 /**
@@ -832,13 +928,7 @@ private fun SuhoorDialog(
             }
             if (style == AlertStyle.ALARM) {
                 Spacer(Modifier.height(8.dp))
-                SettingRow(
-                    title = stringResource(R.string.settings_alarm_sound),
-                    subtitle = rememberRingtoneTitle(alarmSoundUri)
-                        ?: stringResource(R.string.settings_alarm_sound_desc),
-                    onClick = onPickAlarmSound,
-                    horizontalPadding = 0.dp,
-                )
+                AlarmSoundRow(alarmSoundUri, onPickAlarmSound)
                 SwitchRow(
                     title = stringResource(R.string.settings_alarm_respect_silent),
                     subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),

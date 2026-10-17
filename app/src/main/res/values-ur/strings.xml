@@ -170,7 +170,8 @@
     <string name="alert_style_alarm">الارم</string>
     <string name="alert_style_mixed">ملا جلا</string>
     <string name="settings_alarm_sound">الارم کی آواز</string>
-    <string name="settings_alarm_sound_desc">اپنے فون میں پہلے سے موجود کوئی بھی ٹون یا اذان چنیں</string>
+    <string name="settings_alarm_sound_default">آپ کے فون کا ڈیفالٹ الارم</string>
+    <string name="settings_alarm_sound_adhan">اذان چاہیے؟ اذان کی ریکارڈنگ اپنے فون میں محفوظ کریں، پھر اسے یہاں چنیں۔</string>
     <string name="settings_alarm_respect_silent">فون سائلنٹ ہو تو خاموش رہیں</string>
     <string name="settings_alarm_respect_silent_desc">آن: آپ کو اطلاع وقت پر ملتی ہے، مگر آواز کے بغیر۔ بند: فون سائلنٹ ہو تب بھی الارم بجتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
     <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
@@ -337,6 +338,12 @@
     <plurals name="suhoor_minutes_before">
         <item quantity="one">فجر سے %d منٹ پہلے</item>
         <item quantity="other">فجر سے %d منٹ پہلے</item>
+    </plurals>
+    <string name="settings_prayer_reminder">نماز سے پہلے یاددہانی</string>
+    <string name="settings_prayer_reminder_help">آپ کی چنی ہوئی ہر نماز سے چند منٹ پہلے ایک خاموش اطلاع، تاکہ آپ تیاری کر سکیں۔</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="one">%d منٹ پہلے</item>
+        <item quantity="other">%d منٹ پہلے</item>
     </plurals>
     <string name="notif_suhoor_title">سحری %1$s پر ختم ہوگی</string>
     <string name="notif_suhoor_body">%1$s %2$s میں شروع ہوگی</string>

@@ -167,7 +167,8 @@
     <string name="alert_style_alarm">Alarm</string>
     <string name="alert_style_mixed">Karışık</string>
     <string name="settings_alarm_sound">Alarm sesi</string>
-    <string name="settings_alarm_sound_desc">Telefonunuzdaki herhangi bir zil sesini ya da ezanı seçin</string>
+    <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
+    <string name="settings_alarm_sound_adhan">Ezan mı istiyorsunuz? Bir ezan kaydını telefonunuza kaydedin, sonra burada seçin.</string>
     <string name="settings_alarm_respect_silent">Telefon sessizdeyken sessiz kal</string>
     <string name="settings_alarm_respect_silent_desc">Açık: bildirimi yine zamanında alırsınız, ama ses çalmaz. Kapalı: telefon sessizdeyken bile alarm, bir uyandırma alarmı gibi çalar.</string>
     <string name="settings_dnd_title">Rahatsız Etmeyin modunda sese izin ver</string>
@@ -331,6 +332,12 @@
     <plurals name="suhoor_minutes_before">
         <item quantity="one">Sabah vaktinden %d dakika önce</item>
         <item quantity="other">Sabah vaktinden %d dakika önce</item>
+    </plurals>
+    <string name="settings_prayer_reminder">Namazdan önce hatırlatıcı</string>
+    <string name="settings_prayer_reminder_help">Seçtiğiniz her namazdan birkaç dakika önce sessiz bir bildirim gelir, böylece hazırlanmaya vaktiniz olur.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="one">%d dakika önce</item>
+        <item quantity="other">%d dakika önce</item>
     </plurals>
     <string name="notif_suhoor_title">İmsak %1$s</string>
     <string name="notif_suhoor_body">%1$s vakti %2$s sonra</string>

@@ -51,6 +51,14 @@ object PrayerAlarmScheduler {
      */
     internal const val SUHOOR_REQUEST_BASE = 10_000
 
+    /**
+     * The "prayer in N minutes" reminder (1.5.0). Its own action, and codes `30,000 + dayOfYear * 10 +
+     * slot`, so 30,010 to 33,669: clear of prayers, suhoor and the widget redraw alarm (20,000). The
+     * day is the prayer's, not the reminder's, matching how prayer codes are made.
+     */
+    const val ACTION_PRAYER_REMINDER = "com.sajdatime.app.action.PRAYER_REMINDER"
+    internal const val PRAYER_REMINDER_REQUEST_BASE = 30_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -80,12 +88,22 @@ object PrayerAlarmScheduler {
             schedule(context, manager, suhoorIntent(context, reminder), reminder.at)
         }
 
+        val upcoming = upcoming(coordinates, settings, today, now)
+
+        // Also before the early return: a reminder is wanted with or without that prayer's alert.
+        // Wrapped for the same reason as the suhoor reminder above.
+        runCatching {
+            PrayerReminderPlan.plan(upcoming, settings.prayerReminderMinutes, settings.prayerReminderFor, now)
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, prayerReminderIntent(context, reminder), reminder.at)
+        }
+
         if (settings.alertFor.isEmpty()) return
 
         // The style is not consulted here any more: every prayer that alerts at all gets
         // the same, strongest available alarm. Which sound it then makes is decided when
         // it fires, in PrayerAlarmReceiver. See schedule().
-        upcoming(coordinates, settings, today, now)
+        upcoming
             .filter { (slot, _) -> slot in settings.alertFor }
             .forEach { (slot, at) -> schedule(context, manager, alarmIntent(context, slot, at), at) }
     }
@@ -255,6 +273,7 @@ object PrayerAlarmScheduler {
             val date = today.plusDays(dayOffset.toLong())
             PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
                 cancelPending(context, manager, ACTION_PRAYER, prayerRequestCode(slot, date))
+                cancelPending(context, manager, ACTION_PRAYER_REMINDER, prayerReminderRequestCode(slot, date))
             }
             cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
         }
@@ -305,6 +324,20 @@ object PrayerAlarmScheduler {
         )
     }
 
+    private fun prayerReminderIntent(context: Context, reminder: PrayerReminder): PendingIntent {
+        val date = reminder.prayerAt.atZone(ZoneId.systemDefault()).toLocalDate()
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_PRAYER_REMINDER)
+            .putExtra(EXTRA_SLOT, reminder.slot.name)
+            .putExtra(EXTRA_AT_MILLIS, reminder.prayerAt.toEpochMilli())
+        return PendingIntent.getBroadcast(
+            context,
+            prayerReminderRequestCode(reminder.slot, date),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     /** Where the system sends the user if they tap the alarm-clock icon in the status bar. */
     private fun openAppIntent(context: Context): PendingIntent =
         PendingIntent.getActivity(
@@ -322,4 +355,8 @@ object PrayerAlarmScheduler {
     /** Stable per Ramadan date, in a range no prayer code can reach. */
     internal fun suhoorRequestCode(date: LocalDate): Int =
         SUHOOR_REQUEST_BASE + date.dayOfYear
+
+    /** Stable per (slot, the prayer's calendar day), in its own range. */
+    internal fun prayerReminderRequestCode(slot: PrayerSlot, date: LocalDate): Int =
+        PRAYER_REMINDER_REQUEST_BASE + prayerRequestCode(slot, date)
 }

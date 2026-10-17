@@ -167,7 +167,8 @@
     <string name="alert_style_alarm">Alarm</string>
     <string name="alert_style_mixed">Campuran</string>
     <string name="settings_alarm_sound">Suara alarm</string>
-    <string name="settings_alarm_sound_desc">Pilih nada atau azan apa saja yang sudah ada di ponsel Anda</string>
+    <string name="settings_alarm_sound_default">Alarm bawaan ponsel Anda</string>
+    <string name="settings_alarm_sound_adhan">Ingin azan? Simpan rekaman azan di ponsel Anda, lalu pilih di sini.</string>
     <string name="settings_alarm_respect_silent">Tetap senyap saat ponsel dalam mode senyap</string>
     <string name="settings_alarm_respect_silent_desc">Aktif: Anda tetap mendapat notifikasi tepat waktu, tanpa suara. Mati: alarm tetap berbunyi meski ponsel disenyapkan, seperti alarm bangun tidur.</string>
     <string name="settings_dnd_title">Izinkan suara saat Jangan Ganggu</string>
@@ -327,6 +328,11 @@
     <string name="suhoor_off">Nonaktif</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="other">%d menit sebelum Subuh</item>
+    </plurals>
+    <string name="settings_prayer_reminder">Pengingat sebelum salat</string>
+    <string name="settings_prayer_reminder_help">Notifikasi tanpa suara beberapa menit sebelum setiap salat yang Anda pilih, agar sempat bersiap.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="other">%d menit sebelumnya</item>
     </plurals>
     <string name="notif_suhoor_title">Sahur berakhir pukul %1$s</string>
     <string name="notif_suhoor_body">%1$s dalam %2$s</string>

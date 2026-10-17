@@ -195,6 +195,18 @@ data class AppSettings(
      * polar approximate day downgrade and the Do Not Disturb handling apply to it unchanged.
      */
     val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
+    /**
+     * Minutes before each chosen prayer at which a quiet heads up arrives, or 0 for off. **Off by
+     * default** (owner, 17 Oct 2026, from the competitor review: "prenotifications" was the feature a
+     * Pillars user missed most). Read through [PRAYER_REMINDER_CHOICES], like the suhoor minutes.
+     * Always a notification, never an alarm: it is a nudge before the alert the person already chose.
+     */
+    val prayerReminderMinutes: Int = 0,
+    /**
+     * Which prayers get that heads up. All five until the person unticks some; it means nothing
+     * while [prayerReminderMinutes] is 0.
+     */
+    val prayerReminderFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -220,6 +232,9 @@ data class AppSettings(
     companion object {
         /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
         val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
+
+        /** Minutes before a prayer. 0 is off. Kept short: this is "get ready", not a second alarm. */
+        val PRAYER_REMINDER_CHOICES: List<Int> = listOf(0, 5, 10, 15, 20, 30)
     }
 }
 
@@ -358,6 +373,18 @@ class SettingsRepository(private val context: Context) {
         it[Keys.SUHOOR_STYLE] = style.name
     }
 
+    /** Anything that is not one of [AppSettings.PRAYER_REMINDER_CHOICES] is stored as 0, off. */
+    suspend fun setPrayerReminderMinutes(minutes: Int) = edit {
+        it[Keys.PRAYER_REMINDER_MINUTES] = minutes.takeIf { m -> m in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0
+    }
+
+    suspend fun setPrayerReminder(slot: PrayerSlot, on: Boolean) = edit { prefs ->
+        val current = decodeSlots(prefs[Keys.PRAYER_REMINDER_FOR])
+        val updated = if (on) current + slot else current - slot
+        // Written in the enum's order, so the stored string is stable (see AlertCodec.encode).
+        prefs[Keys.PRAYER_REMINDER_FOR] = updated.sortedBy { it.ordinal }.joinToString(",") { it.name }
+    }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -430,6 +457,8 @@ class SettingsRepository(private val context: Context) {
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
         val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
         val SUHOOR_STYLE = stringPreferencesKey("suhoor_reminder_style")
+        val PRAYER_REMINDER_MINUTES = intPreferencesKey("prayer_reminder_minutes")
+        val PRAYER_REMINDER_FOR = stringPreferencesKey("prayer_reminder_for")
     }
 
     private companion object {
@@ -473,12 +502,25 @@ class SettingsRepository(private val context: Context) {
             suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: 0)
                 .takeIf { it in AppSettings.SUHOOR_CHOICES } ?: 0,
             suhoorReminderStyle = enumOr(this[Keys.SUHOOR_STYLE], AlertStyle.NOTIFICATION),
+            prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
+                .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
+            prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
         )
     }
 
     /** Tolerates renamed/removed enum constants across app updates rather than crashing. */
     private inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: fallback
+}
+
+/**
+ * The prayers named in a stored "FAJR,ASR" string. Absent means never touched, so all five; blank
+ * means the person unticked every one. Unknown names are dropped, as in [AlertCodec.decode].
+ */
+internal fun decodeSlots(raw: String?): Set<PrayerSlot> {
+    val prayers = PrayerSlot.entries.filter { it.isPrayer }
+    if (raw == null) return prayers.toSet()
+    return raw.split(",").mapNotNull { name -> prayers.firstOrNull { it.name == name } }.toSet()
 }
 
 /**

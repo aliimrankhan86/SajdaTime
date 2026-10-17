@@ -190,7 +190,8 @@
     <!-- Shown under "Prayer alerts" when the five prayers do not all use the same style. -->
     <string name="alert_style_mixed">مختلط</string>
     <string name="settings_alarm_sound">صوت المنبّه</string>
-    <string name="settings_alarm_sound_desc">اختر أي نغمة أو أذان موجود على هاتفك</string>
+    <string name="settings_alarm_sound_default">المنبّه الافتراضي في هاتفك</string>
+    <string name="settings_alarm_sound_adhan">تريد الأذان؟ احفظ تسجيلًا للأذان على هاتفك، ثم اختره من هنا.</string>
     <string name="settings_alarm_respect_silent">عدم الرنين حين يكون الهاتف صامتًا</string>
     <string name="settings_alarm_respect_silent_desc">تشغيل: يصلك الإشعار في وقته، دون صوت. إيقاف: يرنّ المنبّه حتى لو كان الهاتف صامتًا، مثل المنبّه العادي.</string>
     <string name="settings_dnd_title">السماح بالصوت في وضع عدم الإزعاج</string>
@@ -390,6 +391,16 @@
         <item quantity="few">قبل الفجر بـ %d دقائق</item>
         <item quantity="many">قبل الفجر بـ %d دقيقة</item>
         <item quantity="other">قبل الفجر بـ %d دقيقة</item>
+    </plurals>
+    <string name="settings_prayer_reminder">تذكير قبل الصلاة</string>
+    <string name="settings_prayer_reminder_help">إشعار هادئ قبل كل صلاة تختارها ببضع دقائق، ليكون لديك وقت للاستعداد.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="zero">قبل الصلاة بـ %d دقيقة</item>
+        <item quantity="one">قبل الصلاة بدقيقة</item>
+        <item quantity="two">قبل الصلاة بدقيقتين</item>
+        <item quantity="few">قبل الصلاة بـ %d دقائق</item>
+        <item quantity="many">قبل الصلاة بـ %d دقيقة</item>
+        <item quantity="other">قبل الصلاة بـ %d دقيقة</item>
     </plurals>
     <string name="notif_suhoor_title">ينتهي السحور الساعة %1$s</string>
     <string name="notif_suhoor_body">يدخل وقت %1$s بعد %2$s</string>

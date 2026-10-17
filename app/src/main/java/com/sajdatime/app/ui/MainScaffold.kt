@@ -111,6 +111,8 @@ fun MainScaffold(
     onSetRamadanCard: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
+    onSetPrayerReminderMinutes: (Int) -> Unit,
+    onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
 ) {
@@ -208,6 +210,8 @@ fun MainScaffold(
                         onSetRamadanCard = onSetRamadanCard,
                         onSetSuhoorMinutes = onSetSuhoorMinutes,
                         onSetSuhoorStyle = onSetSuhoorStyle,
+                        onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
+                        onSetPrayerReminder = onSetPrayerReminder,
                         onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
                         onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
                         onPickAlarmSound = onPickAlarmSound,

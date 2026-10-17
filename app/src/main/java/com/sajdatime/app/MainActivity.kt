@@ -178,6 +178,8 @@ class MainActivity : ComponentActivity() {
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
                                 onSetSuhoorMinutes = viewModel::setSuhoorReminderMinutes,
                                 onSetSuhoorStyle = viewModel::setSuhoorReminderStyle,
+                                onSetPrayerReminderMinutes = viewModel::setPrayerReminderMinutes,
+                                onSetPrayerReminder = viewModel::setPrayerReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                             )
