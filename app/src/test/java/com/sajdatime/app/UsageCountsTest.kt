@@ -71,6 +71,32 @@ class UsageCountsTest {
         assertEquals(listOf("collection=true", "event:setup_step"), sink.calls)
     }
 
+    // The Yes on the consent step, as OnboardingScreen does it since 17 Oct 2026: the steps
+    // already passed were silent no-ops, then apply(true), then the replay, then All set live.
+    @Test
+    fun `a late yes sends the steps already passed once each, then the rest live`() {
+        val (sink, usage) = counts()
+        stepsBeforeConsent.forEach(usage::setupStep)
+        assertEquals(emptyList<String>(), sink.calls)
+        usage.apply(true)
+        stepsBeforeConsent.forEach(usage::setupStep)
+        stepsBeforeConsent.forEach(usage::setupStep)
+        usage.setupStep(SetupStep.CONFIRM)
+        assertEquals(
+            listOf("collection=true") + List(stepsBeforeConsent.size + 1) { "event:setup_step" },
+            sink.calls,
+        )
+    }
+
+    @Test
+    fun `a late no sends nothing at all`() {
+        val (sink, usage) = counts()
+        stepsBeforeConsent.forEach(usage::setupStep)
+        usage.apply(false)
+        usage.setupStep(SetupStep.CONFIRM)
+        assertEquals(emptyList<String>(), sink.calls)
+    }
+
     @Test
     fun `re-applying the same choice does not repeat the call`() {
         val (sink, usage) = counts()

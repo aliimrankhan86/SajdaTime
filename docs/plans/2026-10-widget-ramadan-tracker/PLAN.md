@@ -1344,8 +1344,28 @@ prompt from lesson 128, upload `SajdaTime-1.4.0/app-release.aab` only (never the
 
 ## 7. Release B: the prayer tracker, phase A (phone 1.5.0, versionCode 9)
 
-Branch: `claude/1-5-0-tracker`, from `main` after Release A is live. One pull request. The privacy policy
-changes in this release and must be live on `main` before the owner submits.
+Branch: `claude/1-5-0-tracker`, from `claude/quiet-glass` after Release A is live and `main` has been
+merged into it. One pull request. The privacy policy changes in this release and must be live on `main`
+before the owner submits.
+
+**1.5.0 also ships the Quiet Glass redesign (owner, 17 Oct 2026: "make sure the design system is applied
+there also, which includes the widgets and other things").** The redesign, the research fixes, the rating
+card and the Share row are on `claude/quiet-glass` (HANDOVER §11), built after this plan was written. So
+every screen below is specified in Quiet Glass terms, not in the pre redesign components this plan first
+named (`Group`, `SwitchRow`, `SettingRow` and the old banner are gone). The rules that bind every B step:
+
+- Read `docs/DESIGN_SYSTEM.md` §4, §8, §9, §10 first. Colours are Material 3 roles only, asserted in
+  `ColorContrastTest`. Cards are 24dp `sajdaSurface`; inner tiles 12dp. Type: the one line height rule
+  in `Type.kt`; titles `titleMedium`, body `bodyMedium`, actions `labelLarge` (SemiBold, so bold).
+  Sentence case written into the strings. No hyphens or em dashes in copy.
+- Any message is a `Notice` (WARNING or QUIET), never a new card shape. Any link is a bold action with
+  an arrow (`NoticeAction` style). Every screen ends with `BottomBarClearance()`.
+- Accessibility as built in the research pass: a row is one stop (`semantics(mergeDescendants = true)`),
+  every on/off is `toggleable` (state spoken), every target 48dp, haptic `ToggleOn`/`ToggleOff` on ticks.
+- Times must still fit with no scrolling on the 823dp S23 Ultra at default text. Measure it.
+- Widgets: the tracker adds nothing to them. They already carry Quiet Glass colours (`widget_primary`
+  `#0B5A43`, held by `WidgetColorsTest`) and the 12dp highlight; B0 re-renders both and B7 compares.
+- Store screenshots: the one retake the owner agreed happens in B7, all five, with Quiet Glass.
 
 ### B0. Re capture the baselines
 
@@ -1505,16 +1525,23 @@ device test in B7 (DataStore needs a real file system).
 
 ### B3. Settings: the tracker group
 
-A new `Group(stringResource(R.string.settings_group_tracker))` between REMINDERS and ABOUT (F25):
+A new `SettingsSection(SettingsSectionId.TRACKER, stringResource(R.string.settings_group_tracker), items)`
+between REMINDERS and ABOUT, drawn by `SettingsList` like every other section (Quiet Glass: inset 24dp
+card, 36dp green icon tiles, hairlines inset to the text). Add `TRACKER` to `SettingsSectionId` and the
+icon keys to `iconFor` in `SettingsList.kt`:
 
-- `SwitchRow(icon = Icons.Outlined.TaskAlt, title = settings_tracker, subtitle = settings_tracker_desc, checked = settings.trackerEnabled)`.
-- When enabled: `SwitchRow(title = settings_tracker_streak, subtitle = settings_tracker_streak_desc)`,
-  `SettingRow(title = settings_tracker_save, subtitle = settings_tracker_save_desc, onClick = onSaveTracker)`,
-  `SettingRow(title = settings_tracker_load, subtitle = settings_tracker_load_desc, onClick = onLoadTracker)`,
-  `SettingRow(title = settings_tracker_delete, subtitle = settings_tracker_delete_desc, onClick = { confirmDelete = true })`
-  with an `AlertDialog` (`tracker_delete_title`, `tracker_delete_body`, `action_delete`, `action_close`).
+- `SettingsItem.Toggle(key = "tracker", title = settings_tracker, subtitle = settings_tracker_desc, checked = settings.trackerEnabled)`, icon `Icons.Outlined.TaskAlt`.
+- When enabled: `SettingsItem.Toggle(key = "tracker_streak", …settings_tracker_streak…)` (icon
+  `Outlined.LocalFireDepartment` is rejected as gamey: use `Outlined.CalendarMonth`),
+  `SettingsItem.Link(key = "tracker_save", …, onClick = onSaveTracker)` (`Outlined.FileDownload`),
+  `SettingsItem.Link(key = "tracker_load", …, onClick = onLoadTracker)` (`Outlined.FileUpload`),
+  `SettingsItem.Link(key = "tracker_delete", …, onClick = { confirmDelete = true })` (`Outlined.DeleteOutline`),
+  with the app's `AlertDialog` (`tracker_delete_title`, `tracker_delete_body`, `action_delete`, `action_close`),
+  the confirm button in `error` colour as the only destructive action in the app.
 - When disabled but records exist (`state.trackerHasData`): only the delete row stays visible under the
   switch, so data can always be removed.
+- Toggles inherit `toggleable` and the ToggleOn/Off haptic from `PlainRow`; extend
+  `SettingsSemanticsDeviceTest` with the tracker switch.
 
 `MainScaffold` and `MainActivity` gain the three callbacks (`onSaveTracker`, `onLoadTracker`,
 `onDeleteTracker`). The save and load launchers live in `MainActivity` (B5).
@@ -1539,22 +1566,33 @@ data class TrackerState(
 The ViewModel collects `TrackerRepository.records` only while enabled (a `flatMapLatest` on
 `settings.trackerEnabled`). `fun tick(date, slot, ticked)`, `fun setExcused(date, excused)`.
 
-*Times screen.* `PrayerRow` (F22) gains `tick: TickState?` and `onTick: (() -> Unit)?`. When non null a
-48dp `IconToggleButton` at the row's end: `Icons.Outlined.Circle` for NOT_TICKED, `Icons.Filled.CheckCircle`
-(`primary`) for TICKED, `Icons.Outlined.RemoveCircleOutline` (`onSurfaceVariant`) for EXCUSED, and for
-NOT_DUE_YET the outline at 38 percent alpha and disabled. Content description from `tracker_tick_a11y`
-("%1$s, %2$s") with the state word. Sunrise has no tick. The row stays 50dp minimum: the icon is 24dp in
-a 48dp target, which the row's `heightIn(min = 50.dp)` already allows. `due` is
-`state.today.times[slot] <= state.now`. The streak, when `trackerShowStreak`, is one line under the Today
-heading: plurals `tracker_streak_days` ("%d day streak"), hidden when 0 (no nag, no zero).
+*Times screen (Quiet Glass).* `PrayerRow` gains `tick: TickState?` and `onTick: (() -> Unit)?`. When
+non null, a `Tick` composable (new, `ui/components/Tick.kt`, the design system's tick component, added to
+`DESIGN_SYSTEM.md` §4) sits at the row's end after the time: a 24dp mark in a 48dp `toggleable`
+target (`Role.Checkbox`, haptic `ToggleOn`/`ToggleOff`). States: NOT_TICKED `Icons.Rounded.RadioButtonUnchecked`
+in `outline`; TICKED `Icons.Rounded.CheckCircle` in `primary`; EXCUSED `Icons.Rounded.RemoveCircleOutline`
+in `onSurfaceVariant`; NOT_DUE_YET the unchecked mark at 38 percent and disabled. The Next row's tint and
+start bar are unchanged, so the tick never competes with "Next". The tick is its own screen reader stop
+(a clickable child is a merge boundary inside the row's merged semantics): state from
+`tracker_tick_a11y` ("%1$s, %2$s"). Sunrise has no tick. The row height does not change (the 48dp
+target already fits the row), so the six rows still fit on 823dp; measure it.
 
-*History.* A `TextButton` `tracker_open_history` ("Last 30 days") on the Today heading line next to
-"Save as PDF" opens `TrackerHistorySheet` (a `ModalBottomSheet` in a new file
-`app/ui/home/TrackerHistory.kt`): one row per date from `TrackerLogic.historyDates`, newest first,
-`TimeFormat.date` at the start, five 40dp tick toggles (48dp targets) in `TRACKED_SLOTS` order each
-with the prayer label as content description, and an "Excused" toggle (`tracker_excused`) at the end.
-Future prayers on today's row follow NOT_DUE_YET. Past days are fully editable. When `readOnly`, every
-control is disabled and `tracker_newer_version` is shown at the top.
+The streak and the history link share ONE line under the Today heading, so the Times budget grows by one
+line only when the tracker is on: start, the streak in `labelLarge` Medium `onSurfaceVariant` when
+`trackerShowStreak` and above 0 (plurals `tracker_streak_days`, "%d day streak"; hidden at 0: no nag, no
+zero); end, the bold link "Last 30 days" with the arrow (`tracker_open_history`, `NoticeAction` style,
+48dp target). "Save as PDF" stays where it is. If the line pushes the mosque door off 823dp, the line
+moves under the list instead; decide on the measurement, not by eye.
+
+*History (Quiet Glass).* `TrackerHistorySheet`, a `ModalBottomSheet` (full height, like the Ramadan
+timetable) in `app/ui/home/TrackerHistory.kt`: title `headlineSmall` start aligned; rows inside one 24dp
+`sajdaSurface` card with hairlines inset, newest first, `TimeFormat.date` in `titleMedium` at the start,
+five `Tick`s in `TRACKED_SLOTS` order (each spoken with its prayer), and the day control at the end as a
+small filter style chip (`secondaryContainer` when on). Note: the README's "Decisions on Release B"
+replaced Excused with a neutral Pause that freezes the streak; build Pause, in this same chip style. At 2x text the
+row wraps the ticks under the date rather than shrinking targets. Future prayers on today's row follow
+NOT_DUE_YET. Past days are fully editable. When `readOnly`, every control is disabled and
+`tracker_newer_version` is shown at the top as a QUIET `Notice`.
 
 *The post midnight Isha rule.* On the Times screen the Isha tick belongs to `state.today.date`, which is
 the calendar day of the list. After midnight at a high latitude where yesterday's Isha is still the
@@ -1618,10 +1656,13 @@ subtitle says the data stays on this phone.
    "no prayer tracker" sentence in the design system paragraph at `docs/HANDOVER.md:6533-6537` updated
    to say phase A shipped and phase B is not agreed), section 15 lessons.
 4. `README.md`, `docs/index.html`, `docs/store/LISTING.md`, `docs/store/LISTING-LOCALES.md`,
-   `docs/ARCHITECTURE.md` (privacy model and file map), `docs/DESIGN_SYSTEM.md` (the tick component).
+   `docs/ARCHITECTURE.md` (privacy model and file map), `docs/DESIGN_SYSTEM.md` (the tick component in
+   §4, a decision log line in §9, the §10 review questions answered for the tracker screens).
 5. `docs/release-tools/release-1.5.0.sh` from the 1.4.0 script, with the tracker device test and a
    screenshot of the Times screen with ticks.
-6. `docs/store/screenshots/`: one new phone screenshot with the tracker on.
+6. `docs/store/screenshots/`: the agreed one time retake of all five, in Quiet Glass (owner, 17 Oct
+   2026), one of them Times with the tracker on, plus the Today widget on a launcher. No text in the
+   screenshots, so one set serves every language.
 
 **Verify.** The full gate, the script run by the owner, `TEST-AND-RECORD.md` section 4 checks, and
 `grep -n "tracker" docs/privacy.html` shows the section before the pull request is opened.
