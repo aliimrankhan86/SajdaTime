@@ -4822,6 +4822,40 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 Reminder before prayer and the adhan hint, 17 Oct 2026 evening (same branch, NOT merged, ships in 1.5.0)
+
+**Why.** The owner ran a competitor review in his claude.ai project (6 apps, about 40 review excerpts, no Reddit). Every "gap" was checked against the code. Two were real: a heads up before each prayer (a Pillars user named "prenotifications" as the thing they missed) and saved places. Adhan voices were left out on purpose. The owner approved: "add the pre-prayer reminder (off by default, per prayer) and the adhan hint line under the sound picker to 1.5.0".
+
+**Built.**
+- Settings, Reminders, **Reminder before prayer**. It is off by default, and the choices are 5, 10, 15, 20 or 30 minutes.
+  - When it is turned on, a switch appears for each prayer, all five on to start.
+  - Stored as `prayer_reminder_minutes` and `prayer_reminder_for`. When `prayer_reminder_for` is absent, all five are on.
+- `PrayerReminderPlan` is pure, so it is unit tested. It is fed the scheduler's own upcoming list, so a reminder can only sit N minutes before a time the alerts themselves use.
+- Alarms use action `PRAYER_REMINDER` and codes `30,000 + prayer code`, and are cancelled in the same pass as prayers.
+- The receiver re-checks on arrival (`shouldPostPrayerReminder`). It shows nothing if the reminder is off, the prayer is unticked, it is more than 5 minutes late, or less than a minute is left. The notification clears itself at the prayer, and `onPrayer` also clears it for Android 7, which ignores `setTimeoutAfter`.
+- **Its own channel, `prayer_reminders`:** IMPORTANCE_DEFAULT, no sound, one 200 ms buzz, no pop up. It is always a notification, never an alarm.
+- **The alarm sound row is shared** (`AlarmSoundRow`). It shows the chosen tone, or "Your phone's default alarm". A hint under it says to save an adhan recording and add it from the sound list. On the Pixel picker the add option is My Sounds, then Add sound files. `settings_alarm_sound_desc` was removed.
+
+**Independent review, and what it changed.**
+1. **The reminder first shared the sounding prayer channel**, which made it a second alert, and "quiet" was untrue. It now has its own quiet channel.
+2. **`setAlarmClock` made reminders the phone's "next alarm"**, and could end a Do Not Disturb schedule early. Reminders now skip rung 1 of the ladder (`asAlarmClock = false`). Verified in `dumpsys alarm`: reminder flags 0x5, prayer alarm flags 0x3.
+3. **The Android 7 leftover text** is fixed by the clear in `onPrayer`, described above.
+4. **In Ramadan, a Fajr reminder at the same minute as the suhoor reminder is dropped**, because the suhoor one says more.
+5. **The adhan hint was reworded to "add it from the sound list"**, because a file in Downloads does not appear in the list by itself.
+
+Not changed: a narrow request code clash already shared with the prayer codes. Two Isha times can land on one calendar date only when Isha crosses midnight.
+
+**Verified.**
+- The gate passes, including 7 new tests in `PrayerReminderTest`.
+- The device suite passes, 18 of 18 on a clean install.
+- On the emulator (Android 16, London):
+  - the row says "Off" by default;
+  - with 10 minutes and Dhuhr unticked, `dumpsys alarm` shows reminders 10 minutes before every other prayer and none for Dhuhr;
+  - with the clock moved to 17:52:40, "Maghrib at 6:03 pm / Maghrib begins in 10m" arrived on `prayer_reminders` with no sound;
+  - light, dark at 2x text and Arabic RTL (plural forms right, Western digits) all look right, and the Arabic adhan line was checked too.
+
+**Not verified.** A real phone. Other makers' sound pickers (Samsung, Xiaomi): the hint says "add it from the sound list", which is true on the Pixel. Urdu, Turkish and Indonesian were not walked through on screen, only written and checked.
+
 ### 📍 Research pass and fixes, 17 Oct 2026 (same branch `claude/quiet-glass`, NOT merged)
 
 **What happened.** Fable 5.1 did a full UX, wording and Play ratings research pass over every screen, string and screenshot, in two rounds (Claude sent it back once for thin sections, accessibility from code, simpler rating rules, and a fact check of every proposed string). The report is `build/ux-research-input/FINDINGS.md` on the Mac (gitignored); after screenshots are in `build/ux-research-input/after/`.
