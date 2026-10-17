@@ -1598,8 +1598,8 @@ signed with the same key, on the paired phone); secret scanning with push protec
    The repo root `keystore.properties` is redundant now, because Gradle properties win (§5.21 item 7f). The owner moved
    it out of the repo on 18 Oct. It went to the Bin first, but he might empty the Bin by accident, so at his request the
    spare copy now lives at **`~/.gradle/sajdatime-keystore.properties.backup`** (mode 600, outside every project, not
-   iCloud synced). It goes once 1.5.0 is live and signed. The daily `sajdatime-review-replies` task reminds him with the
-   exact `rm` command when it sees Arabic live (that is 1.5.0). The owner deletes it himself. Claude never opens it and
+   iCloud synced). It goes once 1.5.0 is live and signed. The daily `sajdatime-review-replies` task (step 4b) reminds him EVERY day, with the
+   exact `rm` command, from the day Arabic (that is 1.5.0) is live until the file is gone (owner: a reminder "I cant miss"). Its `ls` is pre-allowed in `.claude/settings.local.json`. The owner deletes it himself. Claude never opens it and
    never deletes it.
 4. **Passkeys DONE 18 Oct 2026.** The owner added a Touch ID passkey to GitHub and to both Google accounts: the Play
    owner (`authuser=0`) and the Firebase owner (`authuser=2`). **Advanced Protection: skipped on Claude's advice, and
