@@ -4822,7 +4822,6 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-<<<<<<< HEAD
 ### 📍 Research pass and fixes, 17 Oct 2026 (same branch `claude/quiet-glass`, NOT merged)
 
 **What happened.** Fable 5.1 did a full UX, wording and Play ratings research pass over every screen, string and screenshot, in two rounds (Claude sent it back once for thin sections, accessibility from code, simpler rating rules, and a fact check of every proposed string). The report is `build/ux-research-input/FINDINGS.md` on the Mac (gitignored); after screenshots are in `build/ux-research-input/after/`.
@@ -4876,11 +4875,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 **Not verified.** A real phone; Android 7 to 11 (no image on this Mac; nothing here needs Android 12, the bar is translucent everywhere); TalkBack read through; Turkish and Indonesian layouts; the `rtl` build type; onboarding was not restyled.
 
 **Next, in order.** 1) The owner reviews the screenshots and says yes or what to change. 2) Optional follow ups, his call: Material Symbols Rounded icons as vector drawables (removes the unmaintained `material-icons-extended`, needs the icon files downloaded); real blur with the Haze library on Android 12+; onboarding and dialogs in the same style; store screenshots retaken. 3) Merge only after 1.4.0 is live. **Decided 17 Oct 2026: it ships as part of 1.5.0 (Release B), which is built from this branch;** see the plan README and PLAN.md section 7.
-=======
+
 ### 📍 17 Oct 2026, afternoon: 1.4.0 ready to submit, pull request #13 open
 
 Run 4 of the release script (on the owner's Mac, from a Claude Code session there, branch tip 64efdcc, app code identical to 53a5671) was clean: every line PASS or TAKEN. **Upload this signed bundle:** `~/Developer/SajdaTime/SajdaTime-1.4.0/app-release.aab`, sha256 `8daeb8d0c38016470f5507ecab3f494c48a2daedb5dfe96a596176bdc1e9ce5c` (it replaces run 3's file at the same path). Screens looked at: Ramadan day 15, Eid al-Fitr, the welcome screen. The listing text and What's new for 1.4.0 (below, `docs/store/LISTING.md`) were checked against what 1.4.0 contains: accurate, no Arabic (that is 1.5.0). Pull request https://github.com/aliimrankhan86/SajdaTime/pull/13 (`claude/security-and-visibility` into `main`) merges cleanly. **Owner's decision 1 is answered: roll out now** ("let's just roll out 1.4 for now"). Left, all his: press Merge on #13 (merge commit), then Play Console step E one screen at a time (upload, What's new, Data safety question, Submit). Then step F. 1.5.0 (Quiet Glass, Arabic, rating card, tracker plan) waits on `claude/quiet-glass` and is not in this release.
->>>>>>> origin/main
 
 ### 📍 STATE OF PLAY, 16 Oct 2026 (read this block first, then the 13 Oct block below for the release facts)
 
