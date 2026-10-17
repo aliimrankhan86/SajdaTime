@@ -1595,8 +1595,12 @@ signed with the same key, on the paired phone); secret scanning with push protec
      the 1.4.0 bundle.
 
    `storeFile` is an absolute path, so it works from every worktree. The `.jks` itself was not moved and must not be.
-   The repo root `keystore.properties` is redundant now, because Gradle properties win (§5.21 item 7f), and the owner moved it to
-   the Bin on 18 Oct. Keep the Bin until the 1.5.0 release has been signed.
+   The repo root `keystore.properties` is redundant now, because Gradle properties win (§5.21 item 7f). The owner moved
+   it out of the repo on 18 Oct. It went to the Bin first, but he might empty the Bin by accident, so at his request the
+   spare copy now lives at **`~/.gradle/sajdatime-keystore.properties.backup`** (mode 600, outside every project, not
+   iCloud synced). It goes once 1.5.0 is live and signed. The daily `sajdatime-review-replies` task reminds him with the
+   exact `rm` command when it sees Arabic live (that is 1.5.0). The owner deletes it himself. Claude never opens it and
+   never deletes it.
 4. **Passkeys DONE 18 Oct 2026.** The owner added a Touch ID passkey to GitHub and to both Google accounts: the Play
    owner (`authuser=0`) and the Firebase owner (`authuser=2`). **Advanced Protection: skipped on Claude's advice, and
    the owner did not object.** It stops most third party apps reaching Gmail and Drive, which would cut off his Claude
@@ -5001,7 +5005,7 @@ Before merging, merge `main` into the branch.
 (`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
 file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
 empty `GRADLE_USER_HOME`. On 18 Oct the Firebase key restriction and the GitHub protections were done (§5.24). Still
-open: nothing. Signing values are in `~/.gradle` and proven; the old `keystore.properties` is in the Bin (§5.24 item 3). Passkeys were added the same day, and Advanced
+open: nothing. Signing values are in `~/.gradle` and proven; the spare copy is `~/.gradle/sajdatime-keystore.properties.backup`, to be deleted by the owner once 1.5.0 is live (§5.24 item 3). Passkeys were added the same day, and Advanced
 Protection was skipped on purpose (§5.24 item 4). Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
 
 **Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
