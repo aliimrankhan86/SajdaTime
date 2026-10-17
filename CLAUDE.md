@@ -90,6 +90,10 @@ So, as part of every commit that changes behaviour:
 2. **Update `docs/HANDOVER.md`** — it is the single source of truth. Add new business rules
    to §5, new verification evidence to §10, new pending items to §11, and anything that must
    never be reverted to §2 "Deliberately NOT used" or §11 "Deliberate non-goals".
+   **When what is live, what is next or an open decision changes, also update
+   `docs/PROJECT_BRIEF.md`** (one page, plain words). The owner's claude.ai project reads it live
+   from `main` on GitHub so he never has to re-upload anything (his request, 17 Oct 2026). On a
+   release branch, update it there; it reaches the project when he merges.
 3. **Record rejected options, with the reason.** A decision without its rationale looks like
    an oversight and will be reversed.
 4. **Comment the non-obvious in the code itself**, where the next reader will actually be
