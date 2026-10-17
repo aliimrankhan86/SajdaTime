@@ -4981,7 +4981,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 17 Oct 2026 evening (read this first; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
+### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read this first; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
 **Live.** Phone **1.4.0** (versionCode 8), published 17 Oct 2026 (Play "Updated on 17 Oct 2026"), all
 178 countries: widgets, the Ramadan pack (dormant until the eve), the corrected privacy wording. Watch 1.2.0
