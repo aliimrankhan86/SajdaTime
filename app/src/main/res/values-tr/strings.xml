@@ -168,7 +168,7 @@
     <string name="alert_style_mixed">Karışık</string>
     <string name="settings_alarm_sound">Alarm sesi</string>
     <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
-    <string name="settings_alarm_sound_adhan">Ezan mı istiyorsunuz? Bir ezan kaydını telefonunuza kaydedin, sonra burada seçin.</string>
+    <string name="settings_alarm_sound_adhan">Ezan mı istiyorsunuz? Bir ezan kaydını telefonunuza kaydedin, sonra ses listesinden ekleyin.</string>
     <string name="settings_alarm_respect_silent">Telefon sessizdeyken sessiz kal</string>
     <string name="settings_alarm_respect_silent_desc">Açık: bildirimi yine zamanında alırsınız, ama ses çalmaz. Kapalı: telefon sessizdeyken bile alarm, bir uyandırma alarmı gibi çalar.</string>
     <string name="settings_dnd_title">Rahatsız Etmeyin modunda sese izin ver</string>

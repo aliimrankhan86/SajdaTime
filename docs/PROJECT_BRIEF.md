@@ -29,6 +29,8 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - Clearer setup and notice wording.
   - An offline message when the city search fails.
   - A live system countdown in the next prayer notification.
+  - **Reminder before prayer** (added 17 Oct 2026 from the competitor review): off by default, 5 to 30 minutes before, chosen per prayer, always a quiet notification.
+  - A line under the alarm sound explaining how to use an adhan saved on the phone. The app deliberately bundles no adhan recording, because of licensing and download size.
   - Screen reader fixes.
   - The habit tracker, only if it is built by then (see below).
 - **Store screenshots** are retaken once, when 1.5.0 ships.
@@ -43,6 +45,13 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 ## Decisions still open (Ali's)
 - **Turkey iftar times.** Diyanet's table puts Maghrib 7 to 8 minutes after the app's Turkey method. Claude recommends adding Diyanet's offsets, because an iftar shown too early is the dangerous direction. Settle this before Ramadan.
 - **January store listing.** Add the Ramadan lines (already written in `docs/store/LISTING.md`) in January.
+
+## Ideas from the competitor review (17 Oct 2026), not planned
+- **Saved places for travel** is a real gap. It is medium effort and lower priority, because the city search already covers travel.
+- **Bundled adhan voices: no.** Licensing and download size; users choose any sound saved on their phone.
+- **A record of missed fasts: Claude advised no.** It is too close to the "no missed prayer counter" decision. Ali has not ruled on it.
+- **Quran reader, duas, dhikr: no.** They are outside the app's one job.
+- **Ads, paywalls and a double adhan after the clock change** are where competitors fail. SajdaTime has no ads and nothing to buy, and its alarms replace rather than duplicate.
 
 ## Habit tracker (not started)
 Ali decided on 16 Oct 2026:

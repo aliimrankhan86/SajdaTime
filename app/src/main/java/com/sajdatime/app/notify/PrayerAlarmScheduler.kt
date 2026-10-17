@@ -76,7 +76,7 @@ object PrayerAlarmScheduler {
         // still want the suhoor reminder, and an early return first would silently drop it. The
         // planner is wrapped so that nothing about a reminder can ever stop the prayer alarms that
         // follow, which are the thing this class exists for.
-        runCatching {
+        val suhoor = runCatching {
             SuhoorReminderPlan.plan(
                 coordinates = coordinates,
                 prefs = settings.calculationPrefs,
@@ -84,7 +84,8 @@ object PrayerAlarmScheduler {
                 today = today,
                 now = now,
             )
-        }.getOrDefault(emptyList()).forEach { reminder ->
+        }.getOrDefault(emptyList())
+        suhoor.forEach { reminder ->
             schedule(context, manager, suhoorIntent(context, reminder), reminder.at)
         }
 
@@ -92,10 +93,17 @@ object PrayerAlarmScheduler {
 
         // Also before the early return: a reminder is wanted with or without that prayer's alert.
         // Wrapped for the same reason as the suhoor reminder above.
+        // In Ramadan a Fajr heads up at the same minute as the suhoor reminder would say the same
+        // thing twice at once, so the suhoor one, which says more, is the one kept.
+        val suhoorTimes = suhoor.map { it.at }.toSet()
         runCatching {
             PrayerReminderPlan.plan(upcoming, settings.prayerReminderMinutes, settings.prayerReminderFor, now)
+                .filterNot { it.slot == PrayerSlot.FAJR && it.at in suhoorTimes }
         }.getOrDefault(emptyList()).forEach { reminder ->
-            schedule(context, manager, prayerReminderIntent(context, reminder), reminder.at)
+            // asAlarmClock = false: a heads up must not become the phone's "next alarm" on the lock
+            // screen or end a Do Not Disturb schedule early (independent review, 17 Oct 2026). It
+            // tolerates a little lateness anyway: shouldPostPrayerReminder drops a stale one.
+            schedule(context, manager, prayerReminderIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
         if (settings.alertFor.isEmpty()) return
@@ -209,13 +217,14 @@ object PrayerAlarmScheduler {
         manager: AlarmManager,
         pendingIntent: PendingIntent,
         at: Instant,
+        asAlarmClock: Boolean = true,
     ) {
         val triggerAt = at.toEpochMilli()
 
         // Each rung is attempted only if the one above it failed. runCatching rather than
         // a permission check alone, because some OEM builds and work profiles revoke the
         // capability between the check and the call.
-        val exact = canScheduleExact(manager) && runCatching {
+        val exact = asAlarmClock && canScheduleExact(manager) && runCatching {
             manager.setAlarmClock(
                 AlarmManager.AlarmClockInfo(triggerAt, openAppIntent(context)),
                 pendingIntent,

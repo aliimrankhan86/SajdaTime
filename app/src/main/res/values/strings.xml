@@ -318,7 +318,7 @@
     <string name="alert_style_mixed">Mixed</string>
     <string name="settings_alarm_sound">Alarm sound</string>
     <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
-    <string name="settings_alarm_sound_adhan">Want the adhan? Save an adhan recording on your phone, then choose it here.</string>
+    <string name="settings_alarm_sound_adhan">Want the adhan? Save an adhan recording on your phone, then add it from the sound list.</string>
     <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
     <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, like an alarm clock.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>

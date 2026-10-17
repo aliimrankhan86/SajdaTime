@@ -117,6 +117,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val settings = SettingsRepository(appContext).current()
+                Notifications.clearPrayerReminder(appContext, slot)
                 settings.alertFor[slot]?.let { style ->
                     Notifications.postPrayerAlert(
                         base = appContext,

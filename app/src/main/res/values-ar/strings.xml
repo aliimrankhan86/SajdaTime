@@ -191,7 +191,7 @@
     <string name="alert_style_mixed">مختلط</string>
     <string name="settings_alarm_sound">صوت المنبّه</string>
     <string name="settings_alarm_sound_default">المنبّه الافتراضي في هاتفك</string>
-    <string name="settings_alarm_sound_adhan">تريد الأذان؟ احفظ تسجيلًا للأذان على هاتفك، ثم اختره من هنا.</string>
+    <string name="settings_alarm_sound_adhan">تريد الأذان؟ احفظ تسجيلًا للأذان على هاتفك، ثم أضفه من قائمة الأصوات.</string>
     <string name="settings_alarm_respect_silent">عدم الرنين حين يكون الهاتف صامتًا</string>
     <string name="settings_alarm_respect_silent_desc">تشغيل: يصلك الإشعار في وقته، دون صوت. إيقاف: يرنّ المنبّه حتى لو كان الهاتف صامتًا، مثل المنبّه العادي.</string>
     <string name="settings_dnd_title">السماح بالصوت في وضع عدم الإزعاج</string>

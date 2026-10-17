@@ -41,6 +41,13 @@ object Notifications {
     const val CHANNEL_ONGOING = "next_prayer_badge"
 
     /**
+     * The heads up before a prayer (1.5.0) has its own channel so it can be truly quiet: no sound,
+     * no pop up, one short buzz. On the prayer channel it sounded like a second alert ten minutes
+     * early (independent review, 17 Oct 2026). Named with the Settings row's own words.
+     */
+    const val CHANNEL_REMINDERS = "prayer_reminders"
+
+    /**
      * Versioned by sound: a channel's sound cannot be changed after creation, so a new
      * tone means a new channel id and the old channel is deleted.
      */
@@ -54,6 +61,9 @@ object Notifications {
 
     /** One per prayer, so a Dhuhr heads up never replaces an unread Asr one. */
     private const val ID_PRAYER_REMINDER_BASE = 4000
+
+    /** One short buzz for the heads up before a prayer: a nudge, not an alert. */
+    private val REMINDER_VIBRATION = longArrayOf(0, 200)
 
     /** Two firm pulses: noticeable in a pocket, not startling in a quiet room. */
     private val PRAYER_VIBRATION = longArrayOf(0, 350, 250, 350)
@@ -71,6 +81,20 @@ object Notifications {
                 description = context.getString(R.string.channel_prayers_desc)
                 enableVibration(true)
                 vibrationPattern = PRAYER_VIBRATION
+            },
+        )
+
+        manager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_REMINDERS,
+                context.getString(R.string.settings_prayer_reminder),
+                // DEFAULT, not HIGH: it lands in the shade without popping over what is on screen.
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ).apply {
+                description = context.getString(R.string.settings_prayer_reminder_help)
+                setSound(null, null)
+                enableVibration(true)
+                vibrationPattern = REMINDER_VIBRATION
             },
         )
 
@@ -319,9 +343,9 @@ object Notifications {
     }
 
     /**
-     * The optional heads up before a prayer: "Asr at 15:42 / Asr begins in 10m". Always the quiet
-     * channel, never the alarm one, because it comes before an alert the person has already chosen
-     * and two loud sounds ten minutes apart is the nagging this app refuses. It clears itself at the
+     * The optional heads up before a prayer: "Asr at 15:42 / Asr begins in 10m". On its own quiet
+     * channel ([CHANNEL_REMINDERS]), never a prayer or alarm one, because it comes before an alert the
+     * person has already chosen and two sounds ten minutes apart is the nagging this app refuses. It clears itself at the
      * prayer, like the suhoor reminder, and shares that one's body text, which is generic.
      */
     fun postPrayerReminder(
@@ -336,20 +360,31 @@ object Notifications {
         ensureChannels(context)
 
         val shownFrom = prayerAt.minusSeconds(60L * suhoorMinutesLeft(now, prayerAt))
-        val builder = NotificationCompat.Builder(context, CHANNEL_PRAYERS)
+        val builder = NotificationCompat.Builder(context, CHANNEL_REMINDERS)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_next_title, slot.label(context), TimeFormat.clock(context, prayerAt)))
             .setContentText(
                 context.getString(R.string.notif_suhoor_body, slot.label(context), TimeFormat.remaining(context, shownFrom, prayerAt)),
             )
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            // Below Android O these stand in for the channel: no sound, one short buzz.
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSound(null)
+            .setVibrate(REMINDER_VIBRATION)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setTimeoutAfter(Duration.between(now, prayerAt).toMillis().coerceAtLeast(1L))
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
-            .applyStyle(AlertStyle.NOTIFICATION, alarmSoundUri = "")
 
         post(context, ID_PRAYER_REMINDER_BASE + slot.ordinal, builder.build())
+    }
+
+    /**
+     * Clears a prayer's heads up when the prayer arrives. `setTimeoutAfter` already does this on
+     * Android 8+, but Android 7 ignores it, and a "begins in 10m" left after the prayer is untrue.
+     */
+    fun clearPrayerReminder(context: Context, slot: PrayerSlot) {
+        runCatching { NotificationManagerCompat.from(context).cancel(ID_PRAYER_REMINDER_BASE + slot.ordinal) }
     }
 
     /** The channel an alert of [style] belongs on; the alarm channel is created on demand. */
