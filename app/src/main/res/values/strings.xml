@@ -310,7 +310,7 @@
     <string name="settings_method_auto">Automatic · %1$s</string>
     <string name="settings_method_help">Mosques measure the twilight differently, and that mainly moves Fajr and Isha. The further north you live, the bigger the gap. If these times do not match your mosque, ask them which method they use and pick it here.</string>
 
-    <string name="settings_alerts_help">Choose this for each prayer. A notification is quiet and vibrates. An alarm plays the sound you pick, loudly, like an alarm clock.</string>
+    <string name="settings_alerts_help">Notification: quiet, with vibration. Alarm: plays out loud, even in silent mode.</string>
     <string name="alert_style_off">Off</string>
     <string name="alert_style_notification">Notification</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -318,9 +318,11 @@
     <string name="alert_style_mixed">Mixed</string>
     <string name="settings_alarm_sound">Alarm sound</string>
     <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
-    <string name="settings_alarm_sound_adhan">Want the adhan? Save an adhan recording on your phone, then add it from the sound list.</string>
-    <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
-    <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, like an alarm clock.</string>
+    <!-- 1.5.0 built-in adhan (data/BuiltInAdhan.kt). The Shia notice shows in the sound picker only and is removed in the release that ships a Shia adhan. -->
+    <string name="settings_alarm_sound_phone">From your phone</string>
+    <string name="adhan_builtin">Adhan</string>
+    <string name="adhan_shia_title">No Shia adhan yet</string>
+    <string name="adhan_shia_brief">Until we find one we are free to include, choose any adhan saved on your phone.</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
     <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
@@ -387,6 +389,9 @@
          licence obligation, not a courtesy — do not remove it. -->
     <string name="about_data">Data and libraries</string>
     <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
+    <string name="about_adhan">Adhan recording</string>
+    <string name="about_adhan_desc">Recorded by Adam-synagda, shared on Wikimedia Commons under CC0.</string>
+    <string name="about_adhan_link_source">Source</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Prayer times</string>
@@ -532,7 +537,7 @@
     <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
     <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
     <string name="settings_suhoor">Suhoor reminder</string>
-    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. It uses the same sound and silent mode rules as your prayer alerts.</string>
+    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. As an alarm it uses the same sound as your prayer alerts.</string>
     <string name="suhoor_off">Off</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">%d minute before Fajr</item>

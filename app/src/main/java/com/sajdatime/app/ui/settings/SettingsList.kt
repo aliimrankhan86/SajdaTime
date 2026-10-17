@@ -39,6 +39,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MailOutline
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material3.HorizontalDivider
@@ -64,14 +65,21 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -158,12 +166,13 @@ private fun iconFor(item: SettingsItem): ImageVector = when (item) {
     "usage_counts" -> Icons.Outlined.BarChart
     "charity" -> Icons.Outlined.FavoriteBorder
     "credits" -> Icons.Outlined.Person
+    "adhan" -> Icons.Outlined.MusicNote
     else -> Icons.Outlined.Code
 }
 
 /** Rows that only inform, folded behind their title. Nothing that does something is folded. */
 private fun SettingsItem.isFoldable() =
-    this is SettingsItem.Link && onClick == null && key in setOf("charity", "credits", "data")
+    this is SettingsItem.Link && onClick == null && key in setOf("charity", "credits", "data", "adhan")
 
 @Composable
 private fun SettingsItemRow(item: SettingsItem) {
@@ -285,12 +294,37 @@ private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, ti
             )
         }
         AnimatedVisibility(open) {
-            Text(
-                text = item.subtitle.orEmpty(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = TextStart, end = 16.dp, bottom = 14.dp),
-            )
+            Column(Modifier.padding(start = TextStart, end = 16.dp, bottom = 14.dp)) {
+                Text(
+                    text = item.subtitle.orEmpty(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                // One line of inline links, in the paragraph's own type and line height, 8dp below it
+                // (DESIGN_SYSTEM §2). Three 48dp rows read as loose and uneven (owner, 17 Oct 2026).
+                // Inline text links are the platform's pattern for credits; a phone with no browser
+                // must not crash, so the opening is caught.
+                if (item.links.isNotEmpty()) {
+                    val uriHandler = LocalUriHandler.current
+                    val linkStyle = TextLinkStyles(
+                        SpanStyle(color = MaterialTheme.colorScheme.primary, textDecoration = TextDecoration.Underline),
+                    )
+                    val links = buildAnnotatedString {
+                        item.links.forEachIndexed { i, (label, url) ->
+                            if (i > 0) append("  ·  ")
+                            withLink(
+                                LinkAnnotation.Url(url, linkStyle) { runCatching { uriHandler.openUri(url) } },
+                            ) { append(label.replace(' ', '\u00A0')) } // a label never breaks in two
+                        }
+                    }
+                    Text(
+                        text = links,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            }
         }
     }
 }

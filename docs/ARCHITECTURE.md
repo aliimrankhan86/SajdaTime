@@ -308,13 +308,13 @@ for Fajr, a quiet notification for the rest* — cannot be expressed by a single
 Five full alarms a day, unasked for, is the sort of thing that gets an app uninstalled, so
 alarm mode is opt-in. When the user chooses it, they pick their own tone through the system
 ringtone picker, which already lists every alarm, ringtone and audio file on the device.
-No adhan recording is bundled: it would raise licensing questions and inflate the download
-of a charity app for a sound many users already have.
+Since 1.5.0 Sunni users can instead pick the built-in adhan (`data/BuiltInAdhan.kt`, one CC0
+recording from Wikimedia Commons, credited in About, sources and hashes in
+`docs/licences/ADHAN.md`). Opt in, never the default. Shia users see a notice that no Shia
+adhan is included yet. The choice is stored as an ordinary sound address, so the alarm channel
+works exactly as it does for a phone sound (HANDOVER §5.23).
 
-**An alarm stays quiet while the phone is silenced**, unless the user turns that off. Android
-deliberately does not mute the alarm stream with the ringer, which is right for a one-off
-wake-up alarm and wrong for a recurring alert; the notification still arrives on time and
-only the sound is dropped. Vibrate counts as silenced.
+**Alarm always plays out loud (since 1.5.0, owner 17 Oct 2026).** The old "stay quiet when the phone is silent" switch is gone: it made Alarm mean "sometimes silent", which nobody could predict. Each prayer is Off, Notification (quiet, vibrates) or Alarm (out loud); a person at work picks Notification for the prayers that fall in work hours.
 
 Sound is bound to the channel, not to the notification, and a channel's sound cannot be
 changed after creation. Choosing a new tone therefore creates a new channel id and deletes
@@ -510,7 +510,7 @@ All unit tests are offline and deterministic.
 | `DisclaimerContentTest` | The religious disclaimer still makes all four of its points, the dua request is still last and appears once, and the published copies have not drifted apart. |
 | `BidiTest` | Right-to-left ordering asserted against `java.text.Bidi`, including a test that pins the *wrong* fix so it cannot be "simplified" back in. |
 | `PlaceNameTest` | The town wins over the county; a point of interest never outranks an administrative area; a house number is never shown as a place. |
-| `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless — and a Notification is never upgraded to an Alarm. |
+| `AlertStyleDowngradeTest` | An alarm rings, a projected time does not, an override brings it back, and a Notification is never upgraded to an Alarm. Since 1.5.0 there is no silent phone rule: Alarm means out loud. |
 | `AlertCodecTest` | Per-prayer alert round-trip, rubbish dropped entry by entry, and the upgrade from the two keys it replaced. |
 
 **18 suites, 145 tests** as of 16 Aug 2026. `docs/HANDOVER.md` §9 carries the

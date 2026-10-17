@@ -164,16 +164,17 @@
     <string name="settings_method_auto">خودکار · %1$s</string>
     <string name="settings_method_help">مساجد شفق کو مختلف طرح سے ناپتی ہیں، اور اس کا اثر زیادہ تر فجر اور عشاء پر پڑتا ہے۔ آپ جتنا شمال میں رہتے ہیں، فرق اتنا ہی زیادہ ہوتا ہے۔ اگر یہ اوقات آپ کی مسجد سے نہیں ملتے تو ان سے پوچھیں کہ وہ کون سا طریقہ استعمال کرتے ہیں، اور اسے یہاں منتخب کریں۔</string>
 
-    <string name="settings_alerts_help">یہ ہر نماز کے لیے الگ منتخب کریں۔ اطلاع خاموش ہوتی ہے اور وائبریٹ کرتی ہے۔ الارم آپ کی چنی ہوئی آواز اونچی آواز میں بجاتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
+    <string name="settings_alerts_help">اطلاع: خاموش، صرف وائبریشن۔ الارم: اونچی آواز میں بجتا ہے، سائلنٹ موڈ میں بھی۔</string>
     <string name="alert_style_off">بند</string>
     <string name="alert_style_notification">اطلاع</string>
     <string name="alert_style_alarm">الارم</string>
     <string name="alert_style_mixed">ملا جلا</string>
     <string name="settings_alarm_sound">الارم کی آواز</string>
     <string name="settings_alarm_sound_default">آپ کے فون کا ڈیفالٹ الارم</string>
-    <string name="settings_alarm_sound_adhan">اذان چاہیے؟ اذان کی ریکارڈنگ اپنے فون میں محفوظ کریں، پھر آوازوں کی فہرست سے اسے شامل کریں۔</string>
-    <string name="settings_alarm_respect_silent">فون سائلنٹ ہو تو خاموش رہیں</string>
-    <string name="settings_alarm_respect_silent_desc">آن: آپ کو اطلاع وقت پر ملتی ہے، مگر آواز کے بغیر۔ بند: فون سائلنٹ ہو تب بھی الارم بجتا ہے، بالکل جگانے والے الارم کی طرح۔</string>
+    <string name="settings_alarm_sound_phone">آپ کے فون سے</string>
+    <string name="adhan_builtin">اذان</string>
+    <string name="adhan_shia_title">شیعہ اذان ابھی نہیں</string>
+    <string name="adhan_shia_brief">جب تک ہمیں شامل کرنے کی اجازت والی اذان نہیں ملتی، اپنے فون میں محفوظ کوئی بھی اذان منتخب کریں۔</string>
     <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
     <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔</string>
 
@@ -226,6 +227,9 @@
     <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
     <string name="about_data">ڈیٹا اور لائبریریاں</string>
     <string name="about_data_desc">نماز کے اوقات کا حساب Batoul Apps کی adhan-java (MIT) سے کیا جاتا ہے۔ شہر کی تلاش Open-Meteo geocoding API استعمال کرتی ہے، جو CC BY 4.0 کے تحت لائسنس یافتہ ہے۔</string>
+    <string name="about_adhan">اذان کی ریکارڈنگ</string>
+    <string name="about_adhan_desc">ریکارڈنگ: ⁨Adam-synagda⁩، ⁨Wikimedia Commons⁩ پر ⁨CC0⁩ کے تحت۔</string>
+    <string name="about_adhan_link_source">ماخذ</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">نماز کے اوقات</string>
@@ -333,7 +337,7 @@
     <string name="pdf_ramadan_note">سحری فجر پر ختم ہوتی ہے۔ افطار مغرب پر۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔</string>
     <string name="ramadan_row_a11y">دن %1$d، %2$s۔ سحری ختم %3$s۔ افطار %4$s۔ روزہ %5$s۔</string>
     <string name="settings_suhoor">سحری کی یاددہانی</string>
-    <string name="settings_suhoor_help">رمضان کے دنوں میں فجر سے پہلے ایک یاددہانی، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔ اس کی آواز اور خاموش موڈ کے اصول وہی ہیں جو آپ کے نماز کے الرٹس کے ہیں۔</string>
+    <string name="settings_suhoor_help">رمضان کے دنوں میں فجر سے پہلے ایک یاددہانی، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔ الارم کے طور پر یہ وہی آواز استعمال کرتی ہے جو آپ کے نماز کے الرٹس کی ہے۔</string>
     <string name="suhoor_off">بند</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">فجر سے %d منٹ پہلے</item>

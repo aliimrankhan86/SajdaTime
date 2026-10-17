@@ -161,16 +161,17 @@
     <string name="settings_method_auto">Otomatik · %1$s</string>
     <string name="settings_method_help">Camiler alacakaranlığı farklı ölçer. Bu da en çok Sabah ve Yatsı vakitlerini etkiler. Ne kadar kuzeyde yaşarsanız fark o kadar büyür. Bu vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve burada o yöntemi seçin.</string>
 
-    <string name="settings_alerts_help">Bunu her vakit için ayrı seçin. Bildirim sessizdir ve titreşir. Alarm ise seçtiğiniz sesi, bir uyandırma alarmı gibi yüksek sesle çalar.</string>
+    <string name="settings_alerts_help">Bildirim: sessiz, titreşimli. Alarm: sessiz modda bile yüksek sesle çalar.</string>
     <string name="alert_style_off">Kapalı</string>
     <string name="alert_style_notification">Bildirim</string>
     <string name="alert_style_alarm">Alarm</string>
     <string name="alert_style_mixed">Karışık</string>
     <string name="settings_alarm_sound">Alarm sesi</string>
     <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
-    <string name="settings_alarm_sound_adhan">Ezan mı istiyorsunuz? Bir ezan kaydını telefonunuza kaydedin, sonra ses listesinden ekleyin.</string>
-    <string name="settings_alarm_respect_silent">Telefon sessizdeyken sessiz kal</string>
-    <string name="settings_alarm_respect_silent_desc">Açık: bildirimi yine zamanında alırsınız, ama ses çalmaz. Kapalı: telefon sessizdeyken bile alarm, bir uyandırma alarmı gibi çalar.</string>
+    <string name="settings_alarm_sound_phone">Telefonunuzdan</string>
+    <string name="adhan_builtin">Ezan</string>
+    <string name="adhan_shia_title">Şii ezanı henüz yok</string>
+    <string name="adhan_shia_brief">Eklemeye iznimiz olan bir kayıt bulana kadar telefonunuzdaki herhangi bir ezanı seçin.</string>
     <string name="settings_dnd_title">Rahatsız Etmeyin modunda sese izin ver</string>
     <string name="settings_dnd_desc">Bu izin olmadan, telefon Rahatsız Etmeyin modundayken alarmınız sessiz kalır.</string>
 
@@ -221,6 +222,9 @@
     <string name="about_credits_desc">Ali Imran Khan, ümmet için bir sadaka-i câriye olarak</string>
     <string name="about_data">Veriler ve kütüphaneler</string>
     <string name="about_data_desc">Namaz vakitleri Batoul Apps tarafından geliştirilen adhan-java (MIT) ile hesaplanır. Şehir arama, CC BY 4.0 lisanslı Open-Meteo geocoding API\'sini kullanır.</string>
+    <string name="about_adhan">Ezan kaydı</string>
+    <string name="about_adhan_desc">Kayıt: Adam-synagda, Wikimedia Commons üzerinden CC0 ile paylaşıldı.</string>
+    <string name="about_adhan_link_source">Kaynak</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Namaz vakitleri</string>
@@ -327,7 +331,7 @@
     <string name="pdf_ramadan_note">İmsak Sabah vaktidir. İftar Akşam vaktidir. Caminizin imsakiyesi farklıysa caminize uyun.</string>
     <string name="ramadan_row_a11y">%1$d. gün, %2$s. İmsak %3$s. İftar %4$s. Oruç %5$s.</string>
     <string name="settings_suhoor">Sahur hatırlatıcısı</string>
-    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Ses ve sessiz mod kuralları namaz uyarılarınızla aynıdır.</string>
+    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Alarm olarak namaz uyarılarınızla aynı sesi kullanır.</string>
     <string name="suhoor_off">Kapalı</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">Sabah vaktinden %d dakika önce</item>

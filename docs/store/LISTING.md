@@ -61,7 +61,7 @@ Rejected, and why:
 |---|---|
 | `… No ads, no accounts, no tracking.` (73) | Safe, but leaves seven characters unused and says nothing a dozen other apps do not |
 | `… for Sunni and Shia. Private by design.` (77) | "Private by design" is marketing abstraction. `CLAUDE.md` requires this app to work for someone who has never changed a setting and may not read English well; "no ads, no tracking" is concrete and survives translation, "private by design" does not |
-| Adding *Adhan* for search volume | The app plays a **user-chosen** sound, not a bundled recitation. It would be a keyword that over-promises |
+| Adding *Adhan* for search volume | Rejected while the app played only a user-chosen sound. **Since 1.5.0 a built-in adhan ships for Sunni users**, so the word is now accurate; whether to add it is the owner's decision |
 | Adding *Namaz* / *Salah* for search volume | ~~Keyword stuffing in an English sentence, and Play flags that separately~~ — **this was later reversed for `namaz` only.** See "Why *namaz* went in after all" below |
 
 `no accounts` was the item dropped from the trust triad — it is the least sharp of the
@@ -390,6 +390,53 @@ In early January, as a listing edit if no bundle ships, or as the release note o
 
 ```
 Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
+```
+
+**At the 1.5.0 release (January 2027).** 1.5.0 is the bundle that ships in January, so its release note is the January Ramadan
+text above plus one line for the built-in adhan and "Alarm always plays out loud" (owner, 17 Oct 2026; the second matters because people who relied on the removed silent switch will now hear their alarms), in every language. Counted with Python's `len`, newline
+included; all five are under 500. The Urdu, Turkish, Indonesian and Arabic Ramadan sentences are new translations of the short
+English text above, because the C4 versions are too long to share the 500 with the adhan line. The adhan line says "Sunni" and
+"Shia" with the app's own words for them. If the 1.5.0 note also has to mention Arabic or the new look, something here has to give,
+and that is the owner's choice.
+
+1.5.0, English (468):
+
+```
+Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
+
+Built-in adhan for Sunni users. Alarm now always plays out loud; choose Notification to keep a prayer quiet. Shia users can pick any adhan saved on their phone.
+```
+
+1.5.0, Urdu (446):
+
+```
+رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے رمضان کا نقشہ، اور فجر سے پہلے سحری کی اختیاری یاددہانی۔ ہوم اسکرین کے دو ویجٹ اگلی نماز اور آج کے اوقات دکھاتے ہیں۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔
+
+سنی صارفین کے لیے ایپ میں اذان۔ الارم اب ہمیشہ اونچی آواز میں بجتا ہے؛ خاموشی کے لیے اطلاع چنیں۔ شیعہ صارفین فون میں محفوظ کوئی بھی اذان چن سکتے ہیں۔
+```
+
+1.5.0, Turkish (483):
+
+```
+Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, görüntülenecek veya PDF olarak kaydedilecek imsakiye ve sabah namazından önce isteğe bağlı sahur hatırlatıcısı. İki ana ekran widget'ı sonraki namazı ve bugünün vakitlerini gösterir. Caminizin imsakiyesi farklıysa caminize uyun.
+
+Sünni kullanıcılar için yerleşik ezan. Alarm artık her zaman yüksek sesle çalar; sessiz kalması için Bildirim seçin. Şii kullanıcılar telefonlarındaki herhangi bir ezanı seçebilir.
+```
+
+1.5.0, Indonesian (469):
+
+```
+Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal Ramadan untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional sebelum Subuh. Dua widget layar utama menampilkan salat berikutnya dan waktu hari ini. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
+
+Azan bawaan untuk pengguna Sunni. Alarm kini selalu berbunyi keras; pilih Notifikasi agar tetap senyap. Pengguna Syiah dapat memilih azan apa pun di ponsel mereka.
+```
+
+1.5.0, Arabic (406):
+
+```
+رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية رمضان للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور قبل الفجر. ويعرض ودجتان على الشاشة الرئيسية الصلاة التالية ومواقيت اليوم. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
+
+أذان مدمج لمستخدمي المذهب السنّي. المنبّه يرنّ الآن دائمًا بصوت عالٍ؛ اختر الإشعار للتنبيه الصامت. ويمكن لمستخدمي المذهب الشيعي اختيار أي أذان محفوظ على هواتفهم.
 ```
 
 The four language versions, written for the same release, are in `WORDING-AND-LISTING.md` C4. Only the English listing exists in

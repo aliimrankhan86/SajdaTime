@@ -216,38 +216,12 @@ object Notifications {
             ?.isNotificationPolicyAccessGranted == true
     }.getOrDefault(false)
 
-    /**
-     * True when the user has silenced this phone with the ringer control.
-     *
-     * This is asked because the alarm stream deliberately ignores it. On stock Android the
-     * streams the ringer mutes are RING, NOTIFICATION, SYSTEM and SYSTEM_ENFORCED —
-     * STREAM_ALARM is not among them, and turning it into one is an opt-in device resource
-     * (`config_audio_ringer_mode_affects_alarm_stream`) that defaults to false. That is
-     * correct for a clock someone set for one morning and wrong for a recurring prayer
-     * alert, which is why a tester reported the alarm sounding through a silenced phone.
-     *
-     * Vibrate counts as silenced. Someone who has turned the ringer down to vibrate has
-     * asked for no sound just as plainly as someone on full silent, and the quieter
-     * channel this routes to still vibrates.
-     *
-     * Deliberately not consulting Do Not Disturb: DND allows alarms by default, has its
-     * own separate opt-in on the Settings screen, and reading the ringer mode is the
-     * question the user actually answered with the volume keys.
-     */
-    private fun phoneIsSilenced(context: Context): Boolean = runCatching {
-        when (context.getSystemService(AudioManager::class.java)?.ringerMode) {
-            AudioManager.RINGER_MODE_SILENT, AudioManager.RINGER_MODE_VIBRATE -> true
-            else -> false
-        }
-    }.getOrDefault(false)
-
     fun postPrayerAlert(
         base: Context,
         slot: PrayerSlot,
         at: Instant,
         style: AlertStyle,
         alarmSoundUri: String,
-        respectSilent: Boolean,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
     ) {
@@ -261,10 +235,8 @@ object Notifications {
 
         val effectiveStyle = effectiveAlertStyle(
             style = style,
-            respectSilent = respectSilent,
             approximate = approximate,
             alarmOnApproximate = alarmOnApproximate,
-            phoneIsSilenced = { phoneIsSilenced(context) },
         )
 
         val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri))
@@ -305,7 +277,6 @@ object Notifications {
         now: Instant,
         style: AlertStyle,
         alarmSoundUri: String,
-        respectSilent: Boolean,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
     ) {
@@ -315,10 +286,8 @@ object Notifications {
 
         val effectiveStyle = effectiveAlertStyle(
             style = style,
-            respectSilent = respectSilent,
             approximate = approximate,
             alarmOnApproximate = alarmOnApproximate,
-            phoneIsSilenced = { phoneIsSilenced(context) },
         )
 
         val shownFrom = fajrAt.minusSeconds(60L * suhoorMinutesLeft(now, fajrAt))
@@ -493,39 +462,30 @@ object Notifications {
 /**
  * Which of the two alert channels this alert actually lands on.
  *
- * Two independent reasons drop an alarm to a notification, and **neither suppresses the
- * alert** — it still arrives, on time, in the shade and as a heads-up, still marked. Only
- * the sound is dropped. Nothing about the ringer or the channel suppresses a notification's
- * visual treatment, so "quiet, but still there" is what both cases produce.
+ * An alarm drops to a notification for one reason only: **the time was projected from another
+ * latitude.** Above the polar circles there is no true Fajr or Isha to calculate, so the app borrows
+ * the times from a lower latitude under a published ruling. A notification states such a time and
+ * marks it approximate; an alarm asserts it hard enough to wake someone at two in the morning, on a
+ * number the app itself is telling them not to be certain of. The user can override this (see
+ * [com.sajdatime.app.data.AppSettings.alarmOnApproximateDays], and read the note there before
+ * removing the override: without it a polar user loses their Fajr alarm for two months a year).
+ * The alert still arrives, on time and marked; only the sound is dropped.
  *
- *  1. **The phone is silenced and the user asked that to be respected.** The alarm stream
- *     deliberately ignores the ringer, which is right for a clock someone set for one
- *     morning and wrong for a recurring alert five times a day. See [phoneIsSilenced].
- *  2. **The time was projected from another latitude.** Above the polar circles there is no
- *     true Fajr or Isha to calculate, so the app borrows the times from a lower latitude
- *     under a published ruling. A notification states such a time and marks it approximate;
- *     an alarm asserts it hard enough to wake someone at two in the morning, on a number
- *     the app itself is telling them not to be certain of. The user can override this —
- *     see [com.sajdatime.app.data.AppSettings.alarmOnApproximateDays], and read the note
- *     there before removing the override, because the cost of not having one is a polar
- *     user losing their Fajr alarm for two months a year.
+ * **There is no longer a "stay quiet when the phone is silent" rule (owner, 17 Oct 2026, 1.5.0).**
+ * Alarm means out loud, always; a person who wants quiet chooses Notification for that prayer. The
+ * switch was added after a tester heard an alarm through a silenced phone, and was removed because
+ * it made "Alarm" mean "sometimes silent", which nobody could predict: on the emulator Do Not
+ * Disturb also counted as silenced. Three plain choices per prayer replace it. Do not bring it back
+ * without the owner. `alarm_respects_silent` is left unread in old settings files.
  *
- * Pure, and split out of [Notifications.postPrayerAlert] only so it can be tested: posting
- * needs a live NotificationManager and this does not. [phoneIsSilenced] is a lambda rather
- * than a Boolean so the AudioManager read stays skipped in the cases that never reach it,
- * which is the overwhelming majority of alerts.
+ * Pure, so it is tested: posting needs a live NotificationManager and this does not.
  */
 internal fun effectiveAlertStyle(
     style: AlertStyle,
-    respectSilent: Boolean,
     approximate: Boolean,
     alarmOnApproximate: Boolean,
-    phoneIsSilenced: () -> Boolean,
-): AlertStyle {
-    if (style != AlertStyle.ALARM) return style
-    if (approximate && !alarmOnApproximate) return AlertStyle.NOTIFICATION
-    return if (respectSilent && phoneIsSilenced()) AlertStyle.NOTIFICATION else style
-}
+): AlertStyle =
+    if (style == AlertStyle.ALARM && approximate && !alarmOnApproximate) AlertStyle.NOTIFICATION else style
 
 /**
  * Whole minutes from [now] to [fajrAt], rounded to the nearest and never negative. Pure, so the

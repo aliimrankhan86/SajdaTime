@@ -183,7 +183,7 @@
     <string name="settings_method_auto">تلقائي · %1$s</string>
     <string name="settings_method_help">تقيس المساجد الشفق بطرق مختلفة، وهذا يغيّر الفجر والعشاء أساسًا. وكلما سكنت شمالًا أكثر، كبر الفرق. إن لم تطابق هذه الأوقات مسجدك، فاسألهم عن الطريقة التي يتبعونها واخترها هنا.</string>
 
-    <string name="settings_alerts_help">اختر هذا لكل صلاة. الإشعار هادئ ويهتز. والمنبّه يشغّل الصوت الذي تختاره، بصوت عالٍ، مثل المنبّه العادي.</string>
+    <string name="settings_alerts_help">الإشعار: صامت مع اهتزاز. المنبّه: يرنّ بصوت عالٍ حتى في الوضع الصامت.</string>
     <string name="alert_style_off">إيقاف</string>
     <string name="alert_style_notification">إشعار</string>
     <string name="alert_style_alarm">منبّه</string>
@@ -191,9 +191,10 @@
     <string name="alert_style_mixed">مختلط</string>
     <string name="settings_alarm_sound">صوت المنبّه</string>
     <string name="settings_alarm_sound_default">المنبّه الافتراضي في هاتفك</string>
-    <string name="settings_alarm_sound_adhan">تريد الأذان؟ احفظ تسجيلًا للأذان على هاتفك، ثم أضفه من قائمة الأصوات.</string>
-    <string name="settings_alarm_respect_silent">عدم الرنين حين يكون الهاتف صامتًا</string>
-    <string name="settings_alarm_respect_silent_desc">تشغيل: يصلك الإشعار في وقته، دون صوت. إيقاف: يرنّ المنبّه حتى لو كان الهاتف صامتًا، مثل المنبّه العادي.</string>
+    <string name="settings_alarm_sound_phone">من هاتفك</string>
+    <string name="adhan_builtin">الأذان</string>
+    <string name="adhan_shia_title">لا يوجد أذان شيعي بعد</string>
+    <string name="adhan_shia_brief">إلى أن نجد تسجيلًا يُسمح لنا بتضمينه، اختر أي أذان محفوظ على هاتفك.</string>
     <string name="settings_dnd_title">السماح بالصوت في وضع عدم الإزعاج</string>
     <string name="settings_dnd_desc">بدون هذا، يبقى منبّهك صامتًا حين يكون الهاتف في وضع عدم الإزعاج.</string>
 
@@ -247,6 +248,9 @@
     <!-- Licence obligation (CC BY 4.0 attribution). Do not remove. -->
     <string name="about_data">البيانات والمكتبات</string>
     <string name="about_data_desc">تُحسب مواقيت الصلاة بمكتبة adhan-java من Batoul Apps (MIT). ويستخدم البحث عن المدن واجهة Open-Meteo geocoding API، المرخّصة بموجب CC BY 4.0.</string>
+    <string name="about_adhan">تسجيل الأذان</string>
+    <string name="about_adhan_desc">تسجيل ⁨Adam-synagda⁩، منشور على ⁨Wikimedia Commons⁩ بترخيص ⁨CC0⁩.</string>
+    <string name="about_adhan_link_source">المصدر</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">مواقيت الصلاة</string>
@@ -382,7 +386,7 @@
     <string name="pdf_ramadan_note">ينتهي السحور عند الفجر. والإفطار عند المغرب. اتبع مسجدك حيث يختلف جدوله.</string>
     <string name="ramadan_row_a11y">اليوم %1$d، %2$s. ينتهي السحور %3$s. الإفطار %4$s. الصيام %5$s.</string>
     <string name="settings_suhoor">تذكير السحور</string>
-    <string name="settings_suhoor_help">تذكير قبل الفجر في أيام رمضان، بحسب التقويم المضبوط عليه SajdaTime. ويتبع قواعد الصوت والوضع الصامت نفسها التي تتبعها تنبيهات صلاتك.</string>
+    <string name="settings_suhoor_help">تذكير قبل الفجر في أيام رمضان، بحسب التقويم المضبوط عليه SajdaTime. وكمنبّه يستخدم الصوت نفسه الذي تستخدمه تنبيهات صلاتك.</string>
     <string name="suhoor_off">إيقاف</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="zero">قبل الفجر بـ %d دقيقة</item>

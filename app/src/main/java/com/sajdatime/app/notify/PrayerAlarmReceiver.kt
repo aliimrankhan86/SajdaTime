@@ -88,7 +88,6 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         now = now,
                         style = settings.suhoorReminderStyle,
                         alarmSoundUri = settings.alarmSoundUri,
-                        respectSilent = settings.alarmRespectsSilent,
                         approximate = settings.isApproximateOn(fajrAt),
                         alarmOnApproximate = settings.alarmOnApproximateDays,
                     )
@@ -125,7 +124,6 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         at = at,
                         style = style,
                         alarmSoundUri = settings.alarmSoundUri,
-                        respectSilent = settings.alarmRespectsSilent,
                         approximate = settings.isApproximateOn(at),
                         alarmOnApproximate = settings.alarmOnApproximateDays,
                     )

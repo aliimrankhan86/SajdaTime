@@ -37,6 +37,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.RadioButton
@@ -89,6 +90,7 @@ import com.sajdatime.core.Sect
 import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
@@ -96,6 +98,8 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
+import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RadioRow
 import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
@@ -135,9 +139,9 @@ fun SettingsScreen(
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
-    onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
+    onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
@@ -401,6 +405,14 @@ fun SettingsScreen(
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
             ),
+            // CC0 needs no credit; it is given anyway, with the source. Shown to every user, Shia
+            // included, because the file ships in every copy of the app.
+            SettingsItem.Link(
+                key = "adhan",
+                title = stringResource(R.string.about_adhan),
+                subtitle = stringResource(R.string.about_adhan_desc),
+                links = listOf(stringResource(R.string.about_adhan_link_source) to ADHAN_SOURCE),
+            ),
         ),
     )
 
@@ -451,14 +463,11 @@ fun SettingsScreen(
         SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
             showAlarmOptions = settings.usesAlarm,
-            alarmSoundUri = settings.alarmSoundUri,
-            respectsSilent = settings.alarmRespectsSilent,
+            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan),
             alarmOnApproximate = settings.alarmOnApproximateDays,
             hasApproximateDays = rememberHasApproximateDays(settings),
             onSetAlert = onSetAlert,
-            onSetRespectsSilent = onSetAlarmRespectsSilent,
             onSetAlarmOnApproximate = onSetAlarmOnApproximateDays,
-            onPickAlarmSound = onPickAlarmSound,
             onDismiss = { open = null },
         )
 
@@ -473,12 +482,9 @@ fun SettingsScreen(
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
-            alarmSoundUri = settings.alarmSoundUri,
-            respectsSilent = settings.alarmRespectsSilent,
+            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan),
             onSetMinutes = onSetSuhoorMinutes,
             onSetStyle = onSetSuhoorStyle,
-            onSetRespectsSilent = onSetAlarmRespectsSilent,
-            onPickAlarmSound = onPickAlarmSound,
             onDismiss = { open = null },
         )
 
@@ -569,6 +575,8 @@ internal sealed interface SettingsItem {
         val subtitle: String? = null,
         val icon: ImageVector? = null,
         val onClick: (() -> Unit)? = null,
+        /** Web links shown under a folded row's text, as (label, address). */
+        val links: List<Pair<String, String>> = emptyList(),
     ) : SettingsItem
 
     data class Toggle(
@@ -588,6 +596,9 @@ internal sealed interface SettingsItem {
         override val key: String get() = "theme"
     }
 }
+
+// The built-in adhan's source (docs/licences/ADHAN.md). Not translatable, so not a string.
+private const val ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg"
 
 internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
 
@@ -746,22 +757,19 @@ private fun MethodPickerDialog(
  * alarm — chosen per prayer, because "wake me for Fajr, do not shout at me for Dhuhr" is
  * the request this screen exists to answer.
  *
- * The alarm sound and the silent-mode switch appear only once at least one prayer is set
+ * The alarm sound appears only once at least one prayer is set
  * to Alarm, rather than sitting greyed out for the majority who never leave the default.
  */
 @Composable
 private fun AlertsDialog(
     alertFor: Map<PrayerSlot, AlertStyle>,
-    /** True when any prayer or the suhoor reminder is an alarm, so the sound and silent rows apply. */
+    /** True when any prayer or the suhoor reminder is an alarm, so the sound choice applies. */
     showAlarmOptions: Boolean,
-    alarmSoundUri: String,
-    respectsSilent: Boolean,
+    sound: AlarmSound,
     alarmOnApproximate: Boolean,
     hasApproximateDays: Boolean,
     onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
-    onSetRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximate: (Boolean) -> Unit,
-    onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_alerts), onDismiss = onDismiss) {
@@ -782,14 +790,7 @@ private fun AlertsDialog(
 
         if (showAlarmOptions) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            AlarmSoundRow(alarmSoundUri, onPickAlarmSound)
-            SwitchRow(
-                title = stringResource(R.string.settings_alarm_respect_silent),
-                subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
-                checked = respectsSilent,
-                onCheckedChange = onSetRespectsSilent,
-                horizontalPadding = 0.dp,
-            )
+            AlarmSoundChoices(sound)
             // Only for the few thousand people on earth this can ever apply to. Everyone
             // below the polar circles has no approximated days, so the switch would be a
             // question about astronomy they will never meet — and this app is used by
@@ -849,47 +850,83 @@ private fun PrayerReminderDialog(
     }
 }
 
+/** What the alarm sound choices need: the school decides whether the built-in adhans are offered. */
+private class AlarmSound(
+    val sect: Sect,
+    val uri: String,
+    val onPickPhone: () -> Unit,
+    val onPickBuiltIn: (BuiltInAdhan) -> Unit,
+)
+
 /**
- * The alarm sound row, shared by the prayer alerts and the suhoor reminder: the chosen tone (or the
- * phone's default), and under it how to get an adhan. The app ships no recording on purpose
- * (licensing, download size: MainActivity.alarmSoundPicker), so the line says where one comes from.
- * Added 1.5.0 from the competitor review, where paid adhan voices were a common upsell.
+ * The alarm sound, shared by the prayer alerts and the suhoor reminder.
+ *
+ * Sunni (1.5.0): the built-in adhan, above "From your phone", as one radio group.
+ * The phone row opens the system picker, which lists alarms, ringtones and any audio the user has
+ * added; under it, the tone chosen there, because naming it is the only confirmation the pick stuck.
+ *
+ * Shia: no built-in recording, so a quiet notice saying why, above today's single row. The notice
+ * lives here and nowhere else (never on Times, never as a notification), and goes in the release
+ * that ships a Shia adhan. It replaced the 1.5.0 "save an adhan on your phone" hint, which said
+ * the same thing to everyone and read oddly under a list that now contains adhans.
  */
 @Composable
-private fun AlarmSoundRow(alarmSoundUri: String, onPickAlarmSound: () -> Unit) {
-    SettingRow(
-        title = stringResource(R.string.settings_alarm_sound),
-        // Naming the chosen tone is the only confirmation the user gets that the pick stuck.
-        subtitle = rememberRingtoneTitle(alarmSoundUri) ?: stringResource(R.string.settings_alarm_sound_default),
-        onClick = onPickAlarmSound,
-        horizontalPadding = 0.dp,
-    )
-    Text(
-        text = stringResource(R.string.settings_alarm_sound_adhan),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(bottom = 8.dp),
-    )
+private fun AlarmSoundChoices(sound: AlarmSound) {
+    val builtIn = BuiltInAdhan.of(sound.uri)
+    val phoneTitle = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
+        ?: stringResource(R.string.settings_alarm_sound_default)
+    SectionLabel(stringResource(R.string.settings_alarm_sound))
+    if (!BuiltInAdhan.offeredTo(sound.sect)) {
+        Notice(
+            title = stringResource(R.string.adhan_shia_title),
+            brief = stringResource(R.string.adhan_shia_brief),
+            tone = NoticeTone.QUIET,
+            icon = Icons.Outlined.Info,
+            modifier = Modifier.padding(bottom = 8.dp),
+        )
+        SettingRow(
+            title = stringResource(R.string.settings_alarm_sound_phone),
+            subtitle = phoneTitle,
+            onClick = sound.onPickPhone,
+            horizontalPadding = 0.dp,
+        )
+        Spacer(Modifier.height(8.dp))
+        return
+    }
+    Column(Modifier.selectableGroup()) {
+        BuiltInAdhan.entries.forEach { adhan ->
+            RadioRow(
+                label = stringResource(adhan.labelRes),
+                selected = builtIn == adhan,
+                onSelect = { sound.onPickBuiltIn(adhan) },
+            )
+        }
+        RadioRow(
+            label = stringResource(R.string.settings_alarm_sound_phone),
+            supporting = phoneTitle.takeIf { builtIn == null },
+            selected = builtIn == null,
+            onSelect = sound.onPickPhone,
+        )
+    }
+    // space2 between the sound group and the switch below it, as between every group in a dialog.
+    Spacer(Modifier.height(8.dp))
 }
 
 /**
  * The suhoor reminder: off, or 15, 30, 45 or 60 minutes before Fajr, and how it announces itself.
  *
  * It is a second heads up and not a ruling: suhoor ends at Fajr, and the reminder is simply earlier
- * than that by the amount the person picked. When it is an alarm, the sound and the silent phone
- * switch are the same two settings the prayer alerts use, shown here too so a person who only wants
- * the reminder never has to go and find them elsewhere.
+ * than that by the amount the person picked. When it is an alarm, the sound is the same setting the
+ * prayer alerts use, shown here too so a person who only wants the reminder never has to go and find
+ * it elsewhere.
  */
 @Composable
 private fun SuhoorDialog(
     minutes: Int,
     style: AlertStyle,
-    alarmSoundUri: String,
-    respectsSilent: Boolean,
+    sound: AlarmSound,
     onSetMinutes: (Int) -> Unit,
     onSetStyle: (AlertStyle) -> Unit,
-    onSetRespectsSilent: (Boolean) -> Unit,
-    onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_suhoor), onDismiss = onDismiss) {
@@ -928,14 +965,7 @@ private fun SuhoorDialog(
             }
             if (style == AlertStyle.ALARM) {
                 Spacer(Modifier.height(8.dp))
-                AlarmSoundRow(alarmSoundUri, onPickAlarmSound)
-                SwitchRow(
-                    title = stringResource(R.string.settings_alarm_respect_silent),
-                    subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
-                    checked = respectsSilent,
-                    onCheckedChange = onSetRespectsSilent,
-                    horizontalPadding = 0.dp,
-                )
+                AlarmSoundChoices(sound)
             }
         }
     }

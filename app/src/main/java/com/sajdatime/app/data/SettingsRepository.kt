@@ -94,20 +94,8 @@ data class AppSettings(
     val ongoingBadge: Boolean = true,
     /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
     val alarmSoundUri: String = "",
-    /**
-     * Whether an alarm-style alert falls back to a silent notification while the phone
-     * itself is silenced.
-     *
-     * On by default, and that is a real decision rather than a shrug. An alarm plays on
-     * the alarm stream, which Android deliberately does *not* mute with the ringer — that
-     * is right for a clock the user set for one morning, and wrong for a recurring alert
-     * five times a day from an app they installed yesterday. Making noise from a phone
-     * someone has visibly silenced is how a charity app earns an uninstall.
-     *
-     * The user who genuinely wants to be woken for Fajr regardless turns this off, and
-     * the switch says plainly what that means. Requested by a tester.
-     */
-    val alarmRespectsSilent: Boolean = true,
+    /** The phone sound a built-in adhan replaced, so the phone's own picker can open on it. */
+    val phoneAlarmSoundUri: String = "",
     /**
      * Whether a prayer whose time had to be projected from another latitude may still ring
      * as a full alarm. **Off by default** — those days drop to a notification.
@@ -313,6 +301,11 @@ class SettingsRepository(private val context: Context) {
         // same definition of "offered" the list itself uses.
         val method = enumOr(it[Keys.METHOD], CalcMethod.AUTO)
         if (!method.offeredTo(sect)) it[Keys.METHOD] = CalcMethod.AUTO.name
+        // The same rule for the alarm sound: the built-in adhans are Sunni recordings, offered to
+        // Sunni users only, so on the way to Shia one quietly gives way to the phone sound chosen
+        // before it (or the default). Nothing else about the sound changes.
+        val sound = it[Keys.ALARM_SOUND] ?: ""
+        it[Keys.ALARM_SOUND] = alarmSoundForSect(sect, sound, it[Keys.PHONE_ALARM_SOUND] ?: "")
     }
 
     suspend fun setMadhab(madhab: Madhab) = edit { it[Keys.MADHAB] = madhab.name }
@@ -356,10 +349,20 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setOngoingBadge(enabled: Boolean) = edit { it[Keys.ONGOING] = enabled }
 
+    /** A sound from the phone's own list, or "" for the phone's default alarm. */
     suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
 
-    suspend fun setAlarmRespectsSilent(respects: Boolean) =
-        edit { it[Keys.ALARM_RESPECTS_SILENT] = respects }
+    /**
+     * A built-in adhan. The sound it replaces, when that is a phone sound, is remembered in
+     * [Keys.PHONE_ALARM_SOUND], so a move to the Shia school can put it back (see [setSect]).
+     * Copied here rather than when the phone sound is picked, so a sound chosen before 1.5.0, which
+     * never went through the new code, is remembered too (independent review, 17 Oct 2026).
+     */
+    suspend fun setBuiltInAdhan(adhan: BuiltInAdhan) = edit {
+        val current = it[Keys.ALARM_SOUND] ?: ""
+        if (BuiltInAdhan.of(current) == null) it[Keys.PHONE_ALARM_SOUND] = current
+        it[Keys.ALARM_SOUND] = adhan.uri(context.packageName)
+    }
 
     suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
         edit { it[Keys.ALARM_ON_APPROXIMATE] = allowed }
@@ -437,7 +440,12 @@ class SettingsRepository(private val context: Context) {
         val HIJRI_OFFSET = intPreferencesKey("hijri_offset_days")
         val ONGOING = booleanPreferencesKey("ongoing_badge")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
-        val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
+
+        /**
+         * The phone sound (or "" for the default) in use when a built-in adhan replaced it (1.5.0).
+         * Absent until a built-in adhan is first chosen, and only read while one is.
+         */
+        val PHONE_ALARM_SOUND = stringPreferencesKey("phone_alarm_sound")
         val ALARM_ON_APPROXIMATE = booleanPreferencesKey("alarm_on_approximate_days")
 
         // Read but never written: the two keys ALERTS replaced. Kept so that an existing
@@ -487,7 +495,7 @@ class SettingsRepository(private val context: Context) {
             hijriOffsetDays = this[Keys.HIJRI_OFFSET] ?: 0,
             ongoingBadge = this[Keys.ONGOING] ?: true,
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
-            alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
+            phoneAlarmSoundUri = this[Keys.PHONE_ALARM_SOUND] ?: "",
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             analyticsEnabled = this[Keys.ANALYTICS] ?: false,

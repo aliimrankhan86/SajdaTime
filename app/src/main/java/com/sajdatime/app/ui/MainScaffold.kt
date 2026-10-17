@@ -64,6 +64,7 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
@@ -97,9 +98,9 @@ fun MainScaffold(
     onSetHijriOffset: (Int) -> Unit,
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
-    onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
+    onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onQiblaVisible: (Boolean) -> Unit,
@@ -212,9 +213,9 @@ fun MainScaffold(
                         onSetSuhoorStyle = onSetSuhoorStyle,
                         onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
                         onSetPrayerReminder = onSetPrayerReminder,
-                        onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
                         onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
                         onPickAlarmSound = onPickAlarmSound,
+                        onPickBuiltInAdhan = onPickBuiltInAdhan,
                         onRefreshLocation = onRefreshLocation,
                         onSearchCity = onSearchCity,
                         onSetThemeChoice = onSetThemeChoice,

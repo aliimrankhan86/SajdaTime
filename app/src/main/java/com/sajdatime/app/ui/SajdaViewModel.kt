@@ -18,6 +18,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
@@ -299,8 +300,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setOngoingBadge(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setOngoingBadge(enabled) }
 
-    fun setAlarmRespectsSilent(respects: Boolean) =
-        viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
 
     fun setAlarmOnApproximateDays(allowed: Boolean) =
         viewModelScope.launch { settingsRepository.setAlarmOnApproximateDays(allowed) }
@@ -334,6 +333,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
+
+    fun setBuiltInAdhan(adhan: BuiltInAdhan) =
+        viewModelScope.launch { settingsRepository.setBuiltInAdhan(adhan) }
 
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }

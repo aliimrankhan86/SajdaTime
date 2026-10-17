@@ -40,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
 import com.sajdatime.app.notify.PrayerAlarmScheduler
@@ -88,13 +89,17 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * The system ringtone picker. It already lists alarms, ringtones and any audio the
-     * user has added themselves, so there is no need to bundle an adhan recording —
-     * which would also raise licensing questions and inflate a charity app's download.
+     * The system ringtone picker: alarms, ringtones and any audio the user has added. Since
+     * 1.5.0 Sunni users can also pick a built-in adhan in Settings (data/BuiltInAdhan.kt);
+     * this is "a sound from your phone", for everyone.
+     *
+     * Only an OK changes anything. Backing out used to arrive here with no data and reset the
+     * sound to the phone's default, which would also have thrown away a chosen built-in adhan.
      */
     private val alarmSoundPicker = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
         val uri = result.data
             ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
         viewModel.setAlarmSound(uri?.toString().orEmpty())
@@ -162,11 +167,11 @@ class MainActivity : ComponentActivity() {
                                 onSetHijriOffset = viewModel::setHijriOffsetDays,
                                 onResetAdjustments = viewModel::resetAdjustments,
                                 onSetOngoingBadge = viewModel::setOngoingBadge,
-                                onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                                 onSetAlarmOnApproximateDays = viewModel::setAlarmOnApproximateDays,
                                 onPickAlarmSound = {
-                                    openAlarmSoundPicker(state.settings.alarmSoundUri)
+                                    openAlarmSoundPicker(state.settings.alarmSoundUri, state.settings.phoneAlarmSoundUri)
                                 },
+                                onPickBuiltInAdhan = viewModel::setBuiltInAdhan,
                                 onRefreshLocation = ::requestLocation,
                                 onSearchCity = viewModel::searchCity,
                                 onQiblaVisible = viewModel::setQiblaVisible,
@@ -252,14 +257,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun openAlarmSoundPicker(current: String) {
+    private fun openAlarmSoundPicker(current: String, phoneSound: String) {
+        // A built-in adhan is not in the phone's list, so the picker opens on the phone sound it replaced.
+        val existing = if (BuiltInAdhan.of(current) == null) current else phoneSound
         val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
             putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
             putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.settings_alarm_sound))
             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
             putExtra(
                 RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                current.takeIf { it.isNotBlank() }?.let(Uri::parse)
+                existing.takeIf { it.isNotBlank() }?.let(Uri::parse)
                     ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
             )
         }
