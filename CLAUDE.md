@@ -147,12 +147,13 @@ session inherits it instead of relearning it.
   language splits, the in-app picker cannot switch to a language the phone itself is not set to
   (`docs/HANDOVER.md` §15 lesson 125).
 - **The app follows the phone's language, and goes right-to-left only when it has the
-  words to.** `AppLocale` reads the app's language out of the resources, so the day a
-  reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL
-  layout with no code change. Until that day the app stays English and left-to-right on
-  *every* phone, whatever the phone is set to — because English laid out right-to-left is
-  genuinely wrong, not merely unusual, and the owner has ruled it out. Two tests in
-  `LocaleDisciplineTest` fail the build if either half slips. See `docs/HANDOVER.md` §5.16.
+  words to.** `AppLocale` reads the app's language out of the resources. Urdu (1.3.1) and
+  Arabic (`values-ar`, 1.5.0, owner's request 17 Oct 2026) are right-to-left; Arabic's
+  `app_language_tag` is `ar-u-nu-latn`, so its digits stay Western on every Android version
+  (java.time and `String.format` disagree otherwise). A phone set to any language we have no
+  words for stays English and left-to-right — English laid out right-to-left is genuinely
+  wrong, and the owner has ruled it out. Two tests in `LocaleDisciplineTest` fail the build if
+  either half slips. See `docs/HANDOVER.md` §5.16.
 - **Never call the Aladhan API — or any network — from the shipped app to calculate times.**
   Verifying against it during development is correct and encouraged. Calling it at runtime is
   not, and the reasons are in `docs/HANDOVER.md` §2. The owner was asked directly and said no.
