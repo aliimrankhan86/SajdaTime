@@ -1,5 +1,10 @@
 package com.sajdatime.app.ui.onboarding
 
+import android.content.pm.PackageManager
+import android.Manifest
+import androidx.core.content.ContextCompat
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.activity.compose.BackHandler
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.selection.selectable
@@ -128,6 +133,20 @@ fun OnboardingScreen(
     onSetupStep: (SetupStep) -> Unit,
 ) {
     var step by rememberSaveable { mutableStateOf(Step.WELCOME) }
+
+    // System Back steps back through setup instead of closing the app (research review, 17 Oct
+    // 2026). Welcome has nowhere to go back to, so there Back leaves as usual.
+    BackHandler(enabled = step != Step.WELCOME) {
+        step = when (step) {
+            Step.WELCOME, Step.PERMISSION -> Step.WELCOME
+            Step.SECT -> Step.PERMISSION
+            Step.MADHAB -> Step.SECT
+            Step.METHOD -> if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.SECT
+            Step.CONSENT -> Step.METHOD
+            // Consent is skipped going forward when the answer is already yes, so likewise back.
+            Step.CONFIRM -> if (state.settings.analyticsEnabled) Step.METHOD else Step.CONSENT
+        }
+    }
 
     // Usage counts, opt-in only (a no-op otherwise). Once per step per run: see UsageCounts.
     LaunchedEffect(step) { step.setupStep()?.let(onSetupStep) }
@@ -557,6 +576,7 @@ private fun SectStep(
         title = stringResource(R.string.sect_title),
         body = stringResource(R.string.sect_body),
     ) {
+        Column(Modifier.selectableGroup()) {
         ChoiceCard(
             title = stringResource(R.string.sect_sunni),
             subtitle = stringResource(R.string.sect_sunni_desc),
@@ -570,6 +590,7 @@ private fun SectStep(
             selected = selected == Sect.SHIA,
             onClick = { onSelect(Sect.SHIA) },
         )
+        }
         StepButtons(onBack = onBack, onNext = onNext)
     }
 }
@@ -585,6 +606,7 @@ private fun MadhabStep(
         title = stringResource(R.string.madhab_title),
         body = stringResource(R.string.madhab_body),
     ) {
+        Column(Modifier.selectableGroup()) {
         Madhab.entries.forEach { madhab ->
             ChoiceCard(
                 title = madhabLabel(madhab),
@@ -596,6 +618,7 @@ private fun MadhabStep(
                 onClick = { onSelect(madhab) },
             )
             Spacer(Modifier.height(12.dp))
+        }
         }
         // Skip used to sit here next to Back. It was removed rather than relabelled: one of
         // the four is always already selected, so Skip and Continue did the same thing while
@@ -715,10 +738,13 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
 
         // Android 13+ asks about notifications the moment Finish is tapped, and every prayer
         // alert depends on the answer. Said here, before the system box appears (research F6).
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Only when the system box will actually appear: not once notifications are already allowed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
             Spacer(Modifier.height(24.dp))
             Text(
-                text = stringResource(R.string.confirm_notifications_hint),
+                text = stringResource(R.string.confirm_notifications_hint, stringResource(R.string.action_finish)),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

@@ -176,7 +176,7 @@
     <string name="settings_dnd_title">ڈسٹرب نہ کریں میں آواز کی اجازت دیں</string>
     <string name="settings_dnd_desc">اس کے بغیر، جب فون ڈسٹرب نہ کریں پر ہو تو آپ کا الارم خاموش رہتا ہے۔</string>
 
-    <string name="settings_ongoing_badge">اگلی نماز اطلاعاتی پٹی میں رکھیں</string>
+    <string name="settings_ongoing_badge">اگلی نماز اطلاعات میں</string>
     <string name="settings_ongoing_badge_desc">ایک خاموش اطلاع جو بتاتی ہے کہ اگلی نماز کون سی ہے اور آپ کے پاس کتنا وقت ہے</string>
     <string name="settings_exact_alarms_title">درست وقت کے الارم کی اجازت دیں</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
@@ -370,8 +370,8 @@
     <string name="about_rate_desc">اسٹور کا صفحہ کھولتا ہے۔</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%2$s کے لیے %1$s</string>
-    <string name="location_permission_denied">مقام کی اجازت نہیں دی گئی۔ نیچے اپنے شہر کا نام لکھیں، یا بعد میں مقام والے صفحے سے اجازت دیں۔</string>
-    <string name="confirm_notifications_hint">جب آپ «مکمل کریں» پر ٹیپ کریں گے تو Android پوچھے گا کہ کیا SajdaTime اطلاعات بھیج سکتی ہے۔ نماز کے الرٹ پانے کے لیے ہاں کہیں۔ آپ اسے بعد میں فون کی ترتیبات میں بدل سکتے ہیں۔</string>
+    <string name="location_permission_denied">مقام کی اجازت نہیں دی گئی۔ نیچے اپنے شہر کا نام لکھیں، یا دوبارہ کوشش کے لیے «مقام کی اجازت دیں» پر ٹیپ کریں۔</string>
+    <string name="confirm_notifications_hint">جب آپ «%1$s» پر ٹیپ کریں گے تو Android پوچھے گا کہ کیا SajdaTime اطلاعات بھیج سکتی ہے۔ نماز کے الرٹ پانے کے لیے ہاں کہیں۔ آپ اسے بعد میں فون کی ترتیبات میں بدل سکتے ہیں۔</string>
     <string name="about_share">SajdaTime شیئر کریں</string>
     <string name="about_share_desc">لنک گھر والوں اور دوستوں کو بھیجیں۔</string>
     <string name="about_share_message">SajdaTime: نماز کے مفت اوقات اور قبلہ نما، بغیر اشتہارات اور بغیر اکاؤنٹ کے۔ https://play.google.com/store/apps/details?id=com.sajdatime.app</string>

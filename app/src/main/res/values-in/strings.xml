@@ -173,7 +173,7 @@
     <string name="settings_dnd_title">Izinkan suara saat Jangan Ganggu</string>
     <string name="settings_dnd_desc">Tanpa ini, alarm Anda tetap senyap saat ponsel dalam mode Jangan Ganggu.</string>
 
-    <string name="settings_ongoing_badge">Tampilkan salat berikutnya di panel notifikasi</string>
+    <string name="settings_ongoing_badge">Salat berikutnya di notifikasi</string>
     <string name="settings_ongoing_badge_desc">Notifikasi senyap yang menunjukkan salat berikutnya dan sisa waktunya</string>
     <string name="settings_exact_alarms_title">Izinkan alarm tepat waktu</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
@@ -360,8 +360,8 @@
     <string name="about_rate_desc">Membuka halaman toko.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%1$s untuk %2$s</string>
-    <string name="location_permission_denied">Lokasi tidak diizinkan. Ketik kota Anda di bawah, atau izinkan nanti dari halaman lokasi.</string>
-    <string name="confirm_notifications_hint">Saat Anda mengetuk Selesai, Android akan bertanya apakah SajdaTime boleh mengirim notifikasi. Pilih izinkan agar pengingat salat bisa muncul. Anda bisa mengubahnya nanti di pengaturan ponsel.</string>
+    <string name="location_permission_denied">Lokasi tidak diizinkan. Ketik kota Anda di bawah, atau ketuk Izinkan lokasi untuk mencoba lagi.</string>
+    <string name="confirm_notifications_hint">Saat Anda mengetuk %1$s, Android akan bertanya apakah SajdaTime boleh mengirim notifikasi. Pilih izinkan agar pengingat salat bisa muncul. Anda bisa mengubahnya nanti di pengaturan ponsel.</string>
     <string name="about_share">Bagikan SajdaTime</string>
     <string name="about_share_desc">Kirim tautannya ke keluarga dan teman.</string>
     <string name="about_share_message">SajdaTime: waktu salat dan kompas kiblat gratis, tanpa iklan dan tanpa akun. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>

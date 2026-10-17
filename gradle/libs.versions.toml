@@ -57,9 +57,9 @@ androidx-protolayout-expression = { group = "androidx.wear.protolayout", name = 
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
 kotlinx-coroutines-guava = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-guava", version.ref = "coroutinesGuava" }
 play-services-wearable = { group = "com.google.android.gms", name = "play-services-wearable", version.ref = "playServicesWearable" }
-# Phone app only. Optional, opt-in usage counts. See docs/ANALYTICS_PLAN.md. The watch never gets this.
 # Phone app only. The Play rating card; fails silent without Play. See review/ReviewPrompt.kt.
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "playReview" }
+# Phone app only. Optional, opt-in usage counts. See docs/ANALYTICS_PLAN.md. The watch never gets this.
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
 

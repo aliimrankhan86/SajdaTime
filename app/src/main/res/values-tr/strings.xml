@@ -173,7 +173,7 @@
     <string name="settings_dnd_title">Rahatsız Etmeyin modunda sese izin ver</string>
     <string name="settings_dnd_desc">Bu izin olmadan, telefon Rahatsız Etmeyin modundayken alarmınız sessiz kalır.</string>
 
-    <string name="settings_ongoing_badge">Sıradaki vakit bildirim panelinde kalsın</string>
+    <string name="settings_ongoing_badge">Bildirimlerde sıradaki vakit</string>
     <string name="settings_ongoing_badge_desc">Sıradaki vakti ve ne kadar süre kaldığını gösteren sessiz bir bildirim</string>
     <string name="settings_exact_alarms_title">Tam zamanlı alarmlara izin ver</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
@@ -364,8 +364,8 @@
     <string name="about_rate_desc">Mağaza sayfasını açar.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%2$s için %1$s</string>
-    <string name="location_permission_denied">Konum izni verilmedi. Şehrinizi aşağıya yazın ya da izni daha sonra konum sayfasından verin.</string>
-    <string name="confirm_notifications_hint">Bitir\'e dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
+    <string name="location_permission_denied">Konum izni verilmedi. Şehrinizi aşağıya yazın ya da yeniden denemek için Konuma izin ver\'e dokunun.</string>
+    <string name="confirm_notifications_hint">%1$s düğmesine dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
     <string name="about_share">SajdaTime\'ı paylaş</string>
     <string name="about_share_desc">Bağlantıyı ailenize ve arkadaşlarınıza gönderin.</string>
     <string name="about_share_message">SajdaTime: ücretsiz namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>

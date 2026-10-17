@@ -506,7 +506,10 @@ makes sense to them and what does not, and use that to decide future features.* 
    **Changed 17 Oct 2026 by the owner:** the consent step now sits after Method and before All
    set, so a new user sees the app's choices before a privacy decision. Same events, no new
    ones: after a Yes, the steps already passed (permission, sect, method) are sent then, once
-   each, in order. A No sends nothing, as before. Enforced in `UsageCountsTest`.
+   each, in order. A No sends nothing, as before. Enforced in `UsageCountsTest`. The setup location answer is held the
+   same way and sent after a Yes. Known cost: drop off between permission, sect and method can no
+   longer be told apart, because those steps are only sent once the user reaches consent; finish
+   and consent rates are unaffected.
 10. **Decided:** analytics ships first as its own small release (1.3.0) so a baseline exists.
     Phase two scope is otherwise undefined by the owner.
 

@@ -582,8 +582,8 @@
     <string name="about_rate_desc">Opens the store page.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%1$s for %2$s</string>
-    <string name="location_permission_denied">Location was not allowed. Type your city below, or allow it later from the location sheet.</string>
-    <string name="confirm_notifications_hint">When you tap Finish, Android will ask whether SajdaTime may send notifications. Say yes to get prayer alerts. You can change this later in your phone\'s settings.</string>
+    <string name="location_permission_denied">Location was not allowed. Type your city below, or tap Allow location to try again.</string>
+    <string name="confirm_notifications_hint">When you tap %1$s, Android will ask whether SajdaTime may send notifications. Say yes to get prayer alerts. You can change this later in your phone\'s settings.</string>
     <string name="about_share">Share SajdaTime</string>
     <string name="about_share_desc">Send the link to family and friends.</string>
     <string name="about_share_message">SajdaTime: free prayer times and a Qibla compass, with no ads and no accounts. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>

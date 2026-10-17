@@ -227,6 +227,11 @@ class WidgetDeviceTest {
     fun the_redraw_alarm_exists_only_while_a_widget_does_and_is_set_for_the_right_moment() {
         val pkg = context.packageName
         val action = WidgetRefreshScheduler.ACTION_REFRESH
+        // Since 17 Oct 2026 the same alarm also reposts the next prayer badge, so it stays while the
+        // badge is on (the default). This test is about widgets, so the badge is off for it, and any
+        // alarm the badge left is cleared through the same path the app uses.
+        runBlocking { SettingsRepository(context).setOngoingBadge(false) }
+        runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
         assertEquals("an alarm is set with no widget placed", 0, DeviceSupport.alarmTimes(pkg, action).size)
 
         val (id, view) = bindOrFail(NextPrayerWidgetProvider::class.java)
@@ -248,6 +253,16 @@ class WidgetDeviceTest {
         waitFor("the alarm to be cancelled with the last widget", timeoutMs = 20_000) {
             DeviceSupport.alarmTimes(pkg, action).isEmpty()
         }
+        runBlocking { SettingsRepository(context).setOngoingBadge(true) }
+    }
+
+    @Test
+    fun the_redraw_alarm_stays_for_the_badge_when_no_widget_is_placed() {
+        val pkg = context.packageName
+        val action = WidgetRefreshScheduler.ACTION_REFRESH
+        runBlocking { SettingsRepository(context).setOngoingBadge(true) }
+        runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
+        waitFor("the badge's repost alarm with no widget placed") { DeviceSupport.alarmTimes(pkg, action).size == 1 }
     }
 
     private fun tag(): String = if (context.resources.configuration.fontScale > 1.0f) "font${context.resources.configuration.fontScale}" else "normal"

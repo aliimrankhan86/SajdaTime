@@ -257,6 +257,11 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun setAnalyticsEnabled(enabled: Boolean) {
         usage.apply(enabled)
+        // The setup location answer came before the consent step (moved there 17 Oct 2026), so it
+        // was held and goes now, once, after a yes. ponytail: held in memory only, so a process
+        // death between the two loses that one count; nothing else depends on it.
+        if (enabled) heldSetupLocation?.let { usage.permission(Permission.LOCATION, it) }
+        heldSetupLocation = null
         viewModelScope.launch { settingsRepository.setAnalyticsEnabled(enabled) }
     }
 
@@ -265,8 +270,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun recordSetupStep(step: SetupStep) = usage.setupStep(step)
 
-    fun recordPermission(permission: Permission, granted: Boolean) =
+    fun recordPermission(permission: Permission, granted: Boolean) {
+        if (permission == Permission.LOCATION && !_state.value.settings.analyticsEnabled) heldSetupLocation = granted
         usage.permission(permission, granted)
+    }
+
+    private var heldSetupLocation: Boolean? = null
 
     fun setSect(sect: Sect) = viewModelScope.launch { settingsRepository.setSect(sect) }
 

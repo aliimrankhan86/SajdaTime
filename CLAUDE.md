@@ -190,6 +190,14 @@ session inherits it instead of relearning it.
 
 ## How to work here
 
+- **The quality bar is the owner's, and it is not negotiable** (17 Oct 2026: "make sure its all done
+  to a good standard ... so nothing is done of bad standard and UX design, clean, easy to use and
+  read"). Nothing is finished until it meets `docs/DESIGN_SYSTEM.md` (Quiet Glass): its components and
+  Material roles only, even spacing, the one line height rule, short human accurate copy with no
+  hyphens or em dashes, checked on the emulator in light, dark, 2x text and Urdu right to left, the
+  full gate and device suite green, an independent review of the diff before commit, and every gap
+  written down. Answer the review questions in `DESIGN_SYSTEM.md` §10 for every screen you touch.
+
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
 - **Before any layout change, check it right-to-left — and read the result as a *layout*

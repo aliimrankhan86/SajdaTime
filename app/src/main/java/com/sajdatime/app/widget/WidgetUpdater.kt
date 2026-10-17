@@ -25,8 +25,13 @@ object WidgetUpdater {
         val manager = AppWidgetManager.getInstance(context) ?: return false
         val nextIds = manager.getAppWidgetIds(ComponentName(context, NextPrayerWidgetProvider::class.java))
         val todayIds = manager.getAppWidgetIds(ComponentName(context, TodayWidgetProvider::class.java))
-        if (nextIds.isEmpty() && todayIds.isEmpty()) {
-            // The last widget has gone, so the alarm that served it goes too.
+        val anyWidget = nextIds.isNotEmpty() || todayIds.isNotEmpty()
+        // The same alarm also reposts the next prayer badge at each prayer (since 17 Oct 2026, when the
+        // badge became a system countdown that times out at the prayer). Prayer alarms only exist for
+        // prayers with an alert, so without this a badge would vanish at a prayer with alerts off and
+        // stay gone for hours. So the alarm stays while a widget OR the badge needs it.
+        if (!anyWidget && !settings.ongoingBadge) {
+            // The last widget has gone and there is no badge, so the alarm that served them goes too.
             WidgetRefreshScheduler.cancel(context)
             return false
         }
@@ -46,6 +51,7 @@ object WidgetUpdater {
         // once per refresh however many widgets are on the screen. A launcher that refuses an update
         // must never take the caller down, which may be the alarm receiver that is about to chain the
         // next prayer.
+        if (!anyWidget) return false
         runCatching {
             if (nextIds.isNotEmpty()) manager.updateAppWidget(nextIds, WidgetRenderer.nextPrayer(context, state, now))
             if (todayIds.isNotEmpty()) manager.updateAppWidget(todayIds, WidgetRenderer.today(context, state, now))
