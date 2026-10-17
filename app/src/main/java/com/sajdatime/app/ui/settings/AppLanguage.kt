@@ -32,7 +32,8 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
     INDONESIAN("id", "Bahasa Indonesia"),
     // Added 17 Oct 2026 after a 1 star review asked for it ("إضافة اللغة العربية"). Claude's
     // translation, checked by Claude, as the owner decided for every language on 9 Oct 2026.
-    // Choosing it turns the app right to left with Arabic-Indic digits through AppLocale.
+    // Choosing it turns the app right to left through AppLocale, with Western digits: its tag is
+    // ar-u-nu-latn (see values-ar/strings.xml for why).
     ARABIC("ar", "العربية"),
     ;
 

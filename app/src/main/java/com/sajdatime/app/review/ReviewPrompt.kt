@@ -6,6 +6,8 @@ import android.content.Intent
 import androidx.core.net.toUri
 import com.google.android.play.core.review.ReviewManagerFactory
 import java.time.Duration
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -35,34 +37,43 @@ object ReviewPrompt {
      * [calmScreen] is the caller's word that no sheet, dialog or warning notice is showing.
      * Never throws, never blocks: the card is a nicety and the app must not notice its absence.
      */
-    fun onTimesShown(activity: Activity, calmScreen: Boolean, todayTimes: List<Instant>, fajr: Instant?, sunrise: Instant?) {
+    suspend fun onTimesShown(activity: Activity, calmScreen: Boolean, todayTimes: List<Instant>, fajr: Instant?, sunrise: Instant?) {
+        // The counters are read and written off the main thread (a first SharedPreferences
+        // read touches disk); only the Play call itself runs on the main thread.
+        val ask = withContext(Dispatchers.IO) {
+            runCatching {
+                val prefs = prefs(activity)
+                val today = LocalDate.now(ZoneId.systemDefault()).toEpochDay()
+                val edit = prefs.edit()
+                if (!prefs.contains(ELIGIBLE_FROM)) edit.putLong(ELIGIBLE_FROM, today)
+                if (prefs.getLong(LAST_OPEN_DAY, -1) != today) {
+                    edit.putLong(LAST_OPEN_DAY, today)
+                    edit.putInt(OPEN_DAYS, (prefs.getInt(OPEN_DAYS, 0) + 1).coerceAtMost(10))
+                }
+                edit.apply()
+
+                val due = ReviewTiming.isDue(
+                    today = today,
+                    eligibleFrom = prefs.getLong(ELIGIBLE_FROM, today),
+                    openDays = prefs.getInt(OPEN_DAYS, 0),
+                    askCount = prefs.getInt(ASK_COUNT, 0),
+                    lastAskedDay = prefs.getLong(LAST_ASKED_DAY, Long.MIN_VALUE / 2),
+                )
+                due && calmScreen && ReviewTiming.isCalmMoment(Instant.now(), todayTimes, fajr, sunrise)
+            }.getOrDefault(false)
+        }
+        if (!ask) return
         runCatching {
-            val prefs = prefs(activity)
+            // Counted here, on the main thread right before the call, not inside the IO block: a
+            // count written there could be spent if the screen changed before this line, and
+            // there are only three. Google never says whether the card showed, so every call
+            // is an ask. The prefs are loaded by now, so this is a memory write.
             val today = LocalDate.now(ZoneId.systemDefault()).toEpochDay()
-            val edit = prefs.edit()
-            if (!prefs.contains(ELIGIBLE_FROM)) edit.putLong(ELIGIBLE_FROM, today)
-            if (prefs.getLong(LAST_OPEN_DAY, -1) != today) {
-                edit.putLong(LAST_OPEN_DAY, today)
-                edit.putInt(OPEN_DAYS, (prefs.getInt(OPEN_DAYS, 0) + 1).coerceAtMost(10))
-            }
-            edit.apply()
-
-            val due = ReviewTiming.isDue(
-                today = today,
-                eligibleFrom = prefs.getLong(ELIGIBLE_FROM, today),
-                openDays = prefs.getInt(OPEN_DAYS, 0),
-                askCount = prefs.getInt(ASK_COUNT, 0),
-                lastAskedDay = prefs.getLong(LAST_ASKED_DAY, Long.MIN_VALUE / 2),
-            )
-            if (!due || !calmScreen || !ReviewTiming.isCalmMoment(Instant.now(), todayTimes, fajr, sunrise)) return
-
-            // Counted before the call: Google never says whether the card showed, so every
-            // attempt is an ask.
+            val prefs = prefs(activity)
             prefs.edit()
                 .putInt(ASK_COUNT, prefs.getInt(ASK_COUNT, 0) + 1)
                 .putLong(LAST_ASKED_DAY, today)
                 .apply()
-
             val manager = ReviewManagerFactory.create(activity)
             manager.requestReviewFlow().addOnCompleteListener { task ->
                 // No Play Store, sideloaded, offline, quota spent: all land here as a failure
@@ -126,12 +137,14 @@ object ReviewTiming {
 
     /**
      * Not near a prayer: never from 20 minutes before any of today's times to 30 minutes after,
-     * and never from an hour before Fajr until sunrise (the alarm and the waking up). Missing
-     * times mean no location, which is never calm.
+     * and never from midnight until sunrise. The night rule covers the Fajr alarm and waking up,
+     * and also an Isha that falls after midnight far north in summer, which is yesterday's
+     * prayer and so not in [todayTimes] (found in review, 17 Oct 2026). Missing times mean no
+     * location, which is never calm.
      */
     fun isCalmMoment(now: Instant, todayTimes: List<Instant>, fajr: Instant?, sunrise: Instant?): Boolean {
         if (todayTimes.isEmpty() || fajr == null || sunrise == null) return false
-        if (!now.isBefore(fajr.minus(Duration.ofMinutes(60))) && now.isBefore(sunrise)) return false
+        if (now.isBefore(sunrise)) return false
         return todayTimes.none { t ->
             !now.isBefore(t.minus(Duration.ofMinutes(20))) && now.isBefore(t.plus(Duration.ofMinutes(30)))
         }

@@ -35,6 +35,12 @@
       through by the time, in grey on grey, and the one screen element that must never be
       buried is the one that gets buried.
 
+      ⚠️ Known and accepted, 17 Oct 2026: on the 192dp round at font scale 1.3 this wraps to
+      four lines and, at the very end of the scroll only, its top line meets the clock. It is
+      read in full on the way past. Moving it below the school button was tried and put the
+      button, the thing the user taps, under the clock instead, which is worse. The list's
+      bottom stop was lowered from 26% to 20% to shrink the overlap (roundListPadding).
+
       Measured on the 192dp round, font scale 1.0, at the bottom of the scroll. Character
       count is a poor guide because the wrap is by word: 88 chars fitted three lines, 85
       needed four, 78 fitted. If you reword this, screenshot the bottom of the scroll —

@@ -45,7 +45,8 @@ import java.util.Locale
  * is what he asked for in the same breath.** Both follow from one rule: the app's language
  * is whichever language its resources resolved to. A phone set to Arabic gets English and
  * left-to-right, because English is all the app has words in; the day a reviewed
- * `values-ar/` ships, that same phone gets Arabic, Arabic-Indic digits and an RTL layout,
+ * `values-ar/` ships, that same phone gets Arabic and an RTL layout (with Western digits since
+ * 17 Oct 2026: Arabic's tag is ar-u-nu-latn, see values-ar/strings.xml),
  * and nothing here changes. `LocaleDisciplineTest` fails the build if either half slips.
  * Verified on an `ar-EG` phone and watch rather than argued — HANDOVER §5.16 and §10.
  *

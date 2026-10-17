@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Watch strings. Same terms as the phone app's values-tr; the wear_disclaimer three line budget in values/strings.xml applies here too: check it with tools/wear-verify.sh. Claude's translation, 17 Oct 2026. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">tr</string>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">Sıradaki vakit</string>
+    <string name="tile_description">Sıradaki vakit ve kalan süre</string>
+    <string name="tile_needs_setup">Telefonunuzda ayarlayın</string>
+    <string name="wear_locating">Konumunuz bulunuyor</string>
+    <string name="wear_no_location_title">Henüz konum yok</string>
+    <string name="wear_no_location_body">Telefonunuzda SajdaTime\'ı açın ya da şimdilik Mekke\'yi kullanın.</string>
+    <string name="wear_use_makkah">Mekke\'yi kullan</string>
+    <string name="wear_disclaimer">Bir yardımcı, dinî bir otorite değil. Vakitler hesaplanır. Caminize uyun.</string>
+    <string name="wear_polar_notice">Yaklaşık. Burada bugün güneş doğmuyor ya da batmıyor, bu yüzden vakitler %1$d° enleminden alınır. Caminize sorun.</string>
+    <string name="wear_school">Mezhep</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">Sünni</string>
+    <string name="wear_sect_shia">Şii</string>
+    <string name="wear_madhab_hanafi">Hanefi</string>
+    <string name="wear_madhab_shafii">Şafii</string>
+    <string name="wear_madhab_maliki">Maliki</string>
+    <string name="wear_madhab_hanbali">Hanbeli</string>
+    <string name="wear_madhab_note">Yalnızca İkindi değişir. Hanefi daha geçtir.</string>
+    <string name="wear_qibla_needs_location">Kıbleyi bulmak için konumunuzu belirleyin</string>
+    <string name="wear_qibla_facing">Kâbe yönündesiniz</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">gerçek kuzeyden</string>
+    <string name="wear_duration_h_m">%1$d sa %2$d dk</string>
+    <string name="wear_duration_m">%1$d dk</string>
+    <string name="wear_in_h_m">%1$d sa %2$d dk sonra</string>
+    <string name="wear_in_m">%1$d dk sonra</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">Yaklaşık %1$s  ·  %2$s</string>
+</resources>

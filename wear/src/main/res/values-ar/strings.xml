@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Watch strings. Same terms as the phone app's values-ar; the wear_disclaimer three line budget in values/strings.xml applies here too: check it with tools/wear-verify.sh. Claude's translation, 17 Oct 2026. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- ar-u-nu-latn, not plain ar: Western digits everywhere in Arabic. Times are formatted with
+         java.time, which always prints Western digits, while String.format follows the Android
+         version (Arabic-Indic on Android 14, Western on 16), so plain ar mixed both styles on one
+         screen (seen on the watch, 17 Oct 2026). Pinning Latin makes every number match, on every
+         version, and matches what current Android picks for Arabic itself. -->
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">ar-u-nu-latn</string>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">الصلاة التالية</string>
+    <string name="tile_description">الصلاة التالية والوقت المتبقي لها</string>
+    <string name="tile_needs_setup">اضبطه على هاتفك</string>
+    <string name="wear_locating">جارٍ تحديد موقعك</string>
+    <string name="wear_no_location_title">لا يوجد موقع بعد</string>
+    <string name="wear_no_location_body">افتح SajdaTime على هاتفك، أو استخدم مكة الآن.</string>
+    <string name="wear_use_makkah">استخدم مكة</string>
+    <string name="wear_disclaimer">مساعد، وليس مرجعًا دينيًا. الأوقات محسوبة. اتبع مسجدك.</string>
+    <string name="wear_polar_notice">تقريبية. لا تشرق الشمس هنا أو تغرب اليوم، لذا تُحسب من خط العرض %1$d°. اسأل مسجدك.</string>
+    <string name="wear_school">الانتماء المذهبي</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">سنّي</string>
+    <string name="wear_sect_shia">شيعي</string>
+    <string name="wear_madhab_hanafi">الحنفي</string>
+    <string name="wear_madhab_shafii">الشافعي</string>
+    <string name="wear_madhab_maliki">المالكي</string>
+    <string name="wear_madhab_hanbali">الحنبلي</string>
+    <string name="wear_madhab_note">يتغيّر العصر فقط، ويتأخر عند الحنفية.</string>
+    <string name="wear_qibla_needs_location">حدّد موقعك لتجد القبلة</string>
+    <string name="wear_qibla_facing">باتجاه الكعبة</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">من الشمال الحقيقي</string>
+    <string name="wear_duration_h_m">%1$d س %2$d د</string>
+    <string name="wear_duration_m">%1$d د</string>
+    <string name="wear_in_h_m">بعد %1$d س %2$d د</string>
+    <string name="wear_in_m">بعد %1$d د</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">حوالي %1$s  ·  %2$s</string>
+</resources>

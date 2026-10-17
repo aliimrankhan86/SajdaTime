@@ -96,9 +96,13 @@ private const val PAGE_QIBLA = 1
  * 199dp at 26% up from the bottom, 123dp at 8%, and 77dp at 3% — so the inset that keeps a
  * wide item inside the glass has to be proportional to the diameter, not constant.
  *
- * 26% is a verified value, not a derived one: it is what was screenshotted clean on both
- * 192dp and 227dp at font scale 1.0 and 1.3, with `tools/wear-round-check.py` confirming
- * nothing lands behind the bezel. It is not claimed to be the minimum, and it should not be
+ * 20% is a verified value, not a derived one. It was 26% until 17 Oct 2026, when captures at
+ * font scale 1.3 (in English and the four translations) showed the disclaimer's first line under
+ * the clock at the bottom of the scroll: lowering the stop by 6% clears it fully on the 227dp
+ * round and mostly on the 192dp one, with the school button still inside the glass on both and
+ * `tools/wear-round-check.py` passing every capture. On the 192dp round at 1.3 the disclaimer's
+ * top line still meets the clock at the very end of the scroll; it is read in full on the way
+ * past, and the button below it, the thing to tap, stays clear (see the item order below). It is not claimed to be the minimum, and it should not be
  * trimmed on arithmetic alone — pull it down and the last item drifts towards the rim, push
  * it up and the list scrolls further, which is what put the button under the clock to begin
  * with. Both directions fail, so re-run `tools/wear-verify.sh` before changing it.
@@ -110,7 +114,7 @@ private const val PAGE_QIBLA = 1
 @Composable
 private fun roundListPadding(fromScaffold: PaddingValues): PaddingValues = PaddingValues(
     top = fromScaffold.calculateTopPadding(),
-    bottom = (LocalConfiguration.current.screenHeightDp * 0.26f).dp,
+    bottom = (LocalConfiguration.current.screenHeightDp * 0.20f).dp,
 )
 
 @Composable

@@ -28,7 +28,8 @@ class ReviewTimingTest {
     private fun calm(now: Instant) = ReviewTiming.isCalmMoment(now, times, fajr, sunrise)
 
     @Test fun `calm mid morning`() = assertTrue(calm(at(10)))
-    @Test fun `not in the hour before Fajr or until sunrise`() {
+    @Test fun `not from midnight until sunrise, which covers Fajr and an Isha after midnight`() {
+        assertFalse(calm(at(0, 30)))
         assertFalse(calm(at(4, 0)))
         assertFalse(calm(at(6, 29)))
         assertTrue(calm(at(7, 0)))

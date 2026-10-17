@@ -3,7 +3,12 @@
 <resources>
 
     <!-- BCP-47 tag of this file's language. Read back by AppLocale; LocaleDisciplineTest checks it. -->
-    <string name="app_language_tag">ar</string>
+    <!-- ar-u-nu-latn, not plain ar: Western digits everywhere in Arabic. Times are formatted with
+         java.time, which always prints Western digits, while String.format follows the Android
+         version (Arabic-Indic on Android 14, Western on 16), so plain ar mixed both styles on one
+         screen (seen on the watch, 17 Oct 2026). Pinning Latin makes every number match, on every
+         version, and matches what current Android picks for Arabic itself. -->
+    <string name="app_language_tag">ar-u-nu-latn</string>
 
     <!-- In Arabic the prayer names are the native words themselves, with the article. -->
     <string name="prayer_fajr">الفجر</string>

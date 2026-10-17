@@ -47,7 +47,8 @@ class LanguagePickerTest {
             assertTrue("${language.tag}: missing $core", core.isFile)
             assertTrue(
                 "${language.tag}: core must declare app_language_tag \"${language.tag}\"",
-                core.readText().contains("""name="app_language_tag">${language.tag}<"""),
+                // The tag or a variant of it: Arabic is ar-u-nu-latn, to pin Western digits.
+                Regex("""name="app_language_tag">${language.tag}(-[^<]*)?<""").containsMatchIn(core.readText()),
             )
         }
     }

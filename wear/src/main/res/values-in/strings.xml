@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Watch strings. Same terms as the phone app's values-in; the wear_disclaimer three line budget in values/strings.xml applies here too: check it with tools/wear-verify.sh. Claude's translation, 17 Oct 2026. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">id</string>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">Salat berikutnya</string>
+    <string name="tile_description">Salat berikutnya dan sisa waktunya</string>
+    <string name="tile_needs_setup">Atur di ponsel Anda</string>
+    <string name="wear_locating">Mencari lokasi Anda</string>
+    <string name="wear_no_location_title">Belum ada lokasi</string>
+    <string name="wear_no_location_body">Buka SajdaTime di ponsel Anda, atau pakai Makkah dulu.</string>
+    <string name="wear_use_makkah">Pakai Makkah</string>
+    <string name="wear_disclaimer">Alat bantu, bukan otoritas agama. Waktu dihitung. Ikuti masjid Anda.</string>
+    <string name="wear_polar_notice">Perkiraan. Di sini matahari tidak terbit atau terbenam hari ini, jadi waktu diambil dari %1$d°. Tanyakan masjid Anda.</string>
+    <string name="wear_school">Aliran</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">Sunni</string>
+    <string name="wear_sect_shia">Syiah</string>
+    <string name="wear_madhab_hanafi">Hanafi</string>
+    <string name="wear_madhab_shafii">Syafi\'i</string>
+    <string name="wear_madhab_maliki">Maliki</string>
+    <string name="wear_madhab_hanbali">Hanbali</string>
+    <string name="wear_madhab_note">Hanya Asar yang berubah. Hanafi lebih akhir.</string>
+    <string name="wear_qibla_needs_location">Atur lokasi Anda untuk menemukan kiblat</string>
+    <string name="wear_qibla_facing">Menghadap Ka\'bah</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">dari utara sejati</string>
+    <string name="wear_duration_h_m">%1$d j %2$d mnt</string>
+    <string name="wear_duration_m">%1$d mnt</string>
+    <string name="wear_in_h_m">%1$d j %2$d mnt lagi</string>
+    <string name="wear_in_m">%1$d mnt lagi</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">Sekitar %1$s  ·  %2$s</string>
+</resources>
