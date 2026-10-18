@@ -5083,7 +5083,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, on `ccr-23a38578-c5vz7d`, NOT yet merged into `claude/quiet-glass`** (his rule: screenshots first, merge after he approves).
+**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.** Next: he installs it and listens to the sounds on his emulator; then he wants the work parked.
 (1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
 by tapping outside the edge in the scratch render harness, not a committed test) for every button beside text, Times block gaps on the `Space`
 scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
