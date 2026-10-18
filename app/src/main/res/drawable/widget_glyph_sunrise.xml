@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sunrise: the sun crossing the horizon, rising. The moment Fajr's window shuts. Drawn white and tinted by the ImageView in the layout, so the launcher resolves the colour at
+     each draw and the glyph follows the phone's dark mode (lesson 130). Shared by both widgets. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:autoMirrored="false"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M3,19H21M7,19A5,5 0,0 1,17,19M12,3V10M9,6L12,3L15,6"
+        android:strokeWidth="1.8"
+        android:strokeAlpha="1"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

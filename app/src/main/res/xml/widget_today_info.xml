@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Today: 4 cells by 3. See the note at the top of widget_today.xml for why it is not 4 by 2. The
-  smallest resize is the default size, because a shorter widget would clip the last rows.
+  Today: placed at 4 cells by 4 since the hero countdown design (18 Oct 2026), so a new widget opens on
+  the large layout (date, countdown card, the day; widget_today_large.xml, from 280dp tall). It can
+  still be shrunk to the old 4 by 3 minimum, where the compact list takes over (widget_today.xml says
+  why that is not 4 by 2). The smallest resize stays the compact list's own minimum, because a
+  shorter widget would clip the last rows.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,7 +18,7 @@
     android:previewLayout="@layout/widget_today"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="4"
-    android:targetCellHeight="3"
+    android:targetCellHeight="4"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"
     tools:targetApi="s" />

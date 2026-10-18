@@ -1,6 +1,6 @@
 # Widget redesign: research and visual language (18 Oct 2026)
 
-Status: **proposal, waiting for the owner's choice.** Nothing in the app has changed. Mockups:
+Status: **chosen and built (18 Oct 2026): the owner picked A, hero countdown; one Asr glyph for all.** Built on `ccr-23a38578-c5vz7d`, see HANDOVER §5.20 item 7. Mockups:
 the private design canvas "SajdaTime widget redesign" (https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf),
 boards A, B, C, "Visual language" and "A+ refined" in dark and light. Target release: 1.5.0, on top of
 `claude/quiet-glass`.

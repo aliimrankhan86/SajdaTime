@@ -3,6 +3,7 @@ package com.sajdatime.app
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.widget.WidgetState
 import com.sajdatime.app.widget.WidgetState.RamadanWord
+import com.sajdatime.app.widget.WidgetState.Segment
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.PrayerSlot
@@ -173,5 +174,53 @@ class WidgetStateTest {
     @Test
     fun `an ordinary London day is not approximate`() {
         assertFalse(build("2027-02-22", "04:00").nextIsApproximate)
+    }
+
+    // --- the day's bars and the header date (hero countdown design, 18 Oct 2026) ---------------
+
+    @Test
+    fun `before Fajr the bars show Fajr next and the rest still to come`() {
+        val state = build("2027-02-22", "04:00")
+        assertEquals(listOf(Segment.NEXT, Segment.TODO, Segment.TODO, Segment.TODO, Segment.TODO), state.progress)
+    }
+
+    @Test
+    fun `after Isha every bar is done until midnight`() {
+        assertEquals(List(5) { Segment.DONE }, build("2027-02-22", "23:30").progress)
+    }
+
+    @Test
+    fun `without a location there are no bars`() {
+        assertTrue(build("2027-02-22", "04:00", settings(where = null)).progress.isEmpty())
+    }
+
+    /**
+     * Every minute of a day: five bars, done ones first, then at most one next, then the rest, and the
+     * next bar is exactly the highlighted row. So the bars can never disagree with the list beside them.
+     */
+    @Test
+    fun `the bars run done then next then to come and agree with the highlight, at every minute of a day`() {
+        var moment = at("2027-03-01", "00:00")
+        val end = at("2027-03-02", "00:00")
+        while (moment.isBefore(end)) {
+            val state = WidgetState.build(settings(), moment, zone, true)
+            val bars = state.progress
+            assertEquals("$moment", 5, bars.size)
+            assertEquals("$moment $bars", bars.sortedBy { it.ordinal }, bars)
+            assertTrue("$moment $bars", bars.count { it == Segment.NEXT } <= 1)
+            for ((i, slot) in WidgetState.PRAYERS.withIndex()) {
+                assertEquals("$slot at $moment", state.isHighlighted(slot), bars[i] == Segment.NEXT)
+            }
+            moment = moment.plusSeconds(60)
+        }
+    }
+
+    @Test
+    fun `the header date is the calendar day, with the Hijri date and the person's shift, location or not`() {
+        // 18 Oct 2026 is 7 Jumada al-Ula 1448 on the Umm al-Qura calendar.
+        val plain = build("2026-10-18", "00:56", settings(where = null))
+        assertEquals(java.time.LocalDate.of(2026, 10, 18), plain.date)
+        assertEquals(Triple(7, 5, 1448), plain.hijri!!.let { Triple(it.day, it.month, it.year) })
+        assertEquals(8, build("2026-10-18", "00:56", settings(offset = 1)).hijri!!.day)
     }
 }

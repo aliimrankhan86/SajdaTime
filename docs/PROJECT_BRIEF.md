@@ -1,4 +1,4 @@
-# SajdaTime: project brief (snapshot 17 Oct 2026, Play "Updated on" 17 Oct 2026)
+# SajdaTime: project brief (snapshot 18 Oct 2026, Play "Updated on" 17 Oct 2026)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
@@ -18,7 +18,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Privacy policy:** https://aliimrankhan86.github.io/SajdaTime/privacy.html, dated 17 Oct 2026.
 
 ## Next release: 1.5.0
-- **Branch:** `claude/quiet-glass`. It passes all checks and is not merged.
+- **Branch:** `claude/quiet-glass`. It passes all checks and is not merged. The widget redesign below is on `ccr-23a38578-c5vz7d`, built on top of it, and is not merged into it yet.
 - **Contents:**
   - The Quiet Glass design: a floating tab bar, one header style, a new Settings screen, one Notice style for every notice, a slightly deeper green, and widgets restyled to match.
   - Arabic as the fifth language. It reads right to left and uses Western digits.
@@ -33,6 +33,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - **Built-in adhan for both schools** (17 Oct 2026): Sunni, a CC0 recording Ali listened to and approved; Shia, a studio recording by Saeed Hatamzadeh-Varmazyar (CC BY-SA 4.0), checked by transcription to be a complete Shia adhan. Both from Wikimedia Commons, opt in, never the default, credited in About (+3.5 MB). Any phone sound still works.
   - **Clearer alerts:** each prayer is Off, Notification or Alarm (the adhan or a chosen sound). "Play on silent" (off by default) decides whether an alarm plays when the phone is on silent or Do Not Disturb.
   - Screen reader fixes.
+  - **Widget redesign, "hero countdown"** (18 Oct 2026, Ali chose it from three drawn designs; Ali called 1.4.0's widgets bland): the countdown is now the biggest thing on the widget, each prayer has a small picture of where the sun is, five bars show how the day is going, and the large Today widget has the date, the Hijri date and the app's mark. Both widgets switch layout by size and fill the space they are given. Checked by drawing them with Android's own code in light, dark, five languages and large text; not yet seen on a real launcher.
   - **Security hardening** (17 Oct 2026): every library checksum-verified at build time, the two known library vulnerabilities fixed (0 known in the 204 shipped libraries), task hijacking blocked, network trust locked to the system's certificates. Firebase key restricted to the app and GitHub protections on (18 Oct). Passkeys on GitHub and Google. Signing values moved to ~/.gradle and proven (18 Oct); a spare copy is kept in ~/.gradle until 1.5.0 is live, then Ali deletes it (he gets a reminder).
   - The habit tracker, only if it is built by then (see below).
 - **Store screenshots** are retaken once, when 1.5.0 ships.

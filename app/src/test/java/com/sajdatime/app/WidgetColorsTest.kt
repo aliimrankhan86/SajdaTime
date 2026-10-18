@@ -95,6 +95,8 @@ class WidgetColorsTest {
         Pair("countdown and next line on surface", "widget_primary", "widget_surface", 4.5),
         Pair("text on the highlighted row", "widget_on_surface", "widget_highlight", 4.5),
         Pair("secondary text on the highlighted row", "widget_on_surface_variant", "widget_highlight", 4.5),
+        // The large Today widget's countdown card: the next prayer's name in green on the highlight.
+        Pair("next prayer name on the countdown card", "widget_primary", "widget_highlight", 4.5),
         Pair("the highlighted row against the surface", "widget_highlight", "widget_surface", 1.1),
         Pair("the hairline against the surface", "widget_outline_variant", "widget_surface", 1.2),
     )

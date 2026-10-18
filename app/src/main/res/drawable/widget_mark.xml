@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The SajdaTime mark (the launcher icon's mihrab and minarets) on its green tile, for the Today
+  widget's header and its "set your location" state only. Not on the small widgets: a mark there costs
+  the prayer name its room, and Apple's widget guidance is not to spend a widget's space on branding.
+
+  The two colours are written out, not theme roles, exactly as in ic_launcher_foreground.xml and
+  ic_launcher_background.xml: this is the app's icon, which looks the same in light and dark, so it is
+  depictive and is not resolved per theme. Same paths as ic_launcher_foreground.xml, scaled into a
+  64 unit tile. Move all three together in the planned icon refresh (DESIGN_SYSTEM.md section 9).
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <path
+        android:fillColor="#0E6B4F"
+        android:pathData="M16,0H48A16,16 0,0 1,64,16V48A16,16 0,0 1,48,64H16A16,16 0,0 1,0,48V16A16,16 0,0 1,16,0Z" />
+    <group
+        android:scaleX="0.64"
+        android:scaleY="0.64"
+        android:translateX="-2.56"
+        android:translateY="-2.56">
+        <path
+            android:fillColor="#F0D69A"
+            android:pathData="M54,26C44.9,31.3 39.6,40.9 39.6,52.2V82H48.6V52.2C48.6,45.1 50.5,40.1 54,37C57.5,40.1 59.4,45.1 59.4,52.2V82H68.4V52.2C68.4,40.9 63.1,31.3 54,26Z" />
+        <path
+            android:fillColor="#F0D69A"
+            android:pathData="M30,82H35.4V56.4H30V82ZM72.6,82H78V56.4H72.6V82Z" />
+    </group>
+</vector>
