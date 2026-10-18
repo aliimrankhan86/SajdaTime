@@ -81,6 +81,8 @@
     <string name="home_now_marker">Sekarang</string>
     <string name="home_now_marker_a11y">Salat saat ini</string>
     <string name="notice_dismiss">Tutup</string>
+    <string name="notice_show_details">Detail</string>
+    <string name="notice_hide_details">Sembunyikan detail</string>
     <string name="method_notice_title">Apakah ini cocok dengan masjid Anda?</string>
     <string name="method_notice_body">Subuh dan Isya bisa berbeda satu jam atau lebih di sini.</string>
     <string name="mosque_diff_link">Berbeda dengan masjid Anda?</string>

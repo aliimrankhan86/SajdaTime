@@ -5042,6 +5042,28 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
+**PICK UP HERE (end of 18 Oct 2026).** The owner is testing the latest 1.5.0 build on his own
+emulator. **Wait for his verdict; do not start new design work until he says he is happy or names
+what to change**, then work on the improvements together (his words: "Once I am happy then I will
+let you know so that we can work on the improvements together"). Everything below is merged into
+`claude/quiet-glass`.
+
+How he installs it on his Mac, one step at a time (lesson 144: a pulled branch changes nothing on
+the device until it is installed). **On his Mac `claude/quiet-glass` is checked out in the
+worktree `~/Developer/SajdaTime-settings-preview`, not in `~/Developer/SajdaTime`** (git refuses the
+same branch in two folders):
+
+```
+cd ~/Developer/SajdaTime-settings-preview && git pull origin claude/quiet-glass && git log --oneline -1
+${ANDROID_HOME:-$HOME/Library/Android/sdk}/emulator/emulator -avd sajda -no-snapshot-load -no-audio &
+cd ~/Developer/SajdaTime-settings-preview && export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew :app:installSideload
+```
+
+The sideload copy (`com.sajdatime.app.sideload`) sits beside any Play copy. Proof the new build is
+on: solid mint buttons, an X alone in the corner of notices with "Allow" as a button and "Details"
+beside it, a glossy next prayer card. If an older sideload is already on the emulator, settings
+persist; to see setup again, uninstall it first (`adb uninstall com.sajdatime.app.sideload`).
+
 **Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 gained four owner requests
 on 18 Oct 2026**, built on `ccr-23a38578-c5vz7d` and **merged into `claude/quiet-glass` the same day**
 at his word ("Do the merge"; merge commit, the merged tree identical to the tested tip).
@@ -5090,6 +5112,16 @@ Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `di
 **Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
 chip's tap and the location refresh it relies on (read, not run), the on device suite.
 
+8. **Notices, dialogs and spacing restructured** (from his emulator screenshots, 18 Oct, "I
+   already told you this many many times"). Notice: the close X alone at the top right; the action
+   a solid button; "Details" with a down chevron as its own button beside it (the chevron used to
+   sit beside the X); title and brief 4dp apart, buttons 16dp under the text. Every dismissable
+   dialog has a close X at the top right (`DialogTitle`) plus its bottom button. Explainers pair
+   each paragraph with its button (8dp), groups 16dp apart. Gaps now come from `ui/theme/Spacing.kt`
+   by relationship. `DesignRulesTest` fails the build on an `OutlinedButton`, a dismissable dialog
+   without the X, or a stray gap in `Notice.kt`. The rules are in CLAUDE.md so no session misses
+   them. **Lesson 144.**
+
 **Items 5 to 7, verified:** the full gate again (core 120, app 239, wear 12, 0 failures; lint 0 errors;
 both release bundles); Times, the mosque explainer and every state of the setup location step (empty,
 typed, dialog, located) rendered through Robolectric in light, dark, Urdu right to left and 2.0 text
@@ -5114,7 +5146,11 @@ the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and 
 > Re-date privacy.html when it reaches main. Later the same day: Times next prayer card glossy in both
 > themes (dark in the widgets' green); every call to action a solid tonal button, never outlined ("buttons
 > must not be easy to miss"); setup location screen shortened, privacy text word for word behind "How
-> your location is used". Also merged into `claude/quiet-glass`.
+> your location is used". Also merged into `claude/quiet-glass`. Then, from his emulator screenshots:
+> notices restructured (X alone top right, action a solid button, "Details" a labelled button), every
+> dismissable dialog has a close X, gaps come from a spacing scale (ui/theme/Spacing.kt) by
+> relationship; rules in CLAUDE.md and DesignRulesTest so he never repeats them. He is testing on his
+> emulator; wait for his verdict before new design work.
 
 ### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
@@ -9075,3 +9111,10 @@ matters more than the stable hashes, that is the trade being made.
     `Surface`, not a bare `Box`, or text that takes its colour from the surface draws black on dark; and
     call `ShadowAlarmManager.setCanScheduleExactAlarms(true)` or the exact alarm banner appears. Shadows
     (`Modifier.shadow`) do not draw at all, so a shadow is never verified by these renders (18 Oct 2026).
+144. **Check which build is on the emulator before the owner tests it.** On 18 Oct 2026 he pulled the
+    branch and started the emulator, but the install step had not been given yet, so he tested the
+    previous day's sideload and reported every new change as missing ("where is the dark glossy
+    effect?"). Pulling code changes nothing on a device. Hand over the install command together with
+    "now test", and say which visible change proves the new build is on (here: solid mint buttons).
+    The same day's other lesson: when the owner repeats a design complaint, turn it into a rule in
+    DESIGN_SYSTEM, a line in CLAUDE.md and a failing test, in that commit, not a promise.

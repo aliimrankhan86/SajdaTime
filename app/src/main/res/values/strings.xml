@@ -147,6 +147,8 @@
     <!-- Screen-reader label for the row carrying that pill. -->
     <string name="home_now_marker_a11y">Current prayer</string>
     <string name="notice_dismiss">Dismiss</string>
+    <string name="notice_show_details">Details</string>
+    <string name="notice_hide_details">Hide details</string>
     <!-- The far-north form of the "Different from your mosque?" door under the timetable
          (HomeScreen.MosqueDifferenceDoor). Shown only above ~45° of latitude, only while the
          method is still AUTO, and only until dismissed; everywhere else the door is a plain

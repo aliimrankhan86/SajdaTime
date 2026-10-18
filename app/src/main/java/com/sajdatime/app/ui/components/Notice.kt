@@ -1,11 +1,19 @@
 package com.sajdatime.app.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
+import com.sajdatime.app.ui.theme.Space
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Button
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,10 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -56,24 +62,31 @@ import com.sajdatime.app.ui.theme.sajdaSurface
 enum class NoticeTone { WARNING, QUIET }
 
 /**
- * Every notice in the app (Quiet Glass, 17 Oct 2026). One anatomy, so a person learns it
- * once and reads every notice the same way, in this order:
+ * Every notice in the app (Quiet Glass, 17 Oct 2026; restructured 18 Oct 2026). One anatomy,
+ * so a person learns it once and reads every notice the same way:
  *
  *  1. a round mark ([icon] on a soft tile in the tone's colour)
- *  2. the [title], if there is one
- *  3. one [brief] line: what is wrong, or what is happening
- *  4. [details], when given: the full explanation, folded until the card is tapped, with a
- *     chevron that says so and "expanded" or "collapsed" for a screen reader
- *  5. [footnote], when given: small print that must always be visible
- *  6. the action, when given: a bold link with a direction arrow, spoken as [actionSpokenAs]
- *  7. a close button, when [onDismiss] is given (Times only; Settings never hides a problem)
+ *  2. the [title], if there is one, then [brief] 4dp under it (they belong together)
+ *  3. a close X alone at the top right, when [onDismiss] is given (Times only; Settings never
+ *     hides a problem)
+ *  4. [footnote], when given: small print that must always be visible
+ *  5. [details], when given, folded until "Details" is pressed
+ *  6. one row of buttons, 16dp under the text: the action as a solid button in the tone's
+ *     colour, then "Details" with a down chevron when there are details
+ *
+ * Why this shape (owner, 18 Oct 2026, from the emulator): the fold chevron used to sit right
+ * beside the close X, two icon buttons that do opposite things a finger's width apart, and the
+ * action was a bold link the owner could not see as a button. Every reference consulted agrees:
+ * a close control is the last trailing element and stands alone; "show more" is a labelled
+ * button with a down chevron; the main action is a filled button. The card itself is never
+ * clickable, so opening, folding and closing are three different targets.
  *
  * Rules every caller keeps: the brief is one sentence; anything longer goes in details; the
- * action is a verb ("Allow", "See why", "Change location"), never "Tap here"; the card itself
- * never does the action, because opening and closing must never be the same gesture.
+ * action is a verb ("Allow", "See why", "Change location"), never "Tap here".
  *
- * Contrast: text is the tone's on-container ink (asserted in ColorContrastTest); the mark is
- * the tone's accent on a 14% tile of itself, 3:1 or better.
+ * Contrast: text is the tone's on-container ink; the warning button is tertiary/onTertiary and
+ * the quiet one primary/onPrimary (all asserted in ColorContrastTest); the mark is the tone's
+ * accent on a 14% tile of itself, 3:1 or better.
  */
 @Composable
 fun Notice(
@@ -94,11 +107,14 @@ fun Notice(
         NoticeTone.WARNING -> Triple(scheme.tertiaryContainer, scheme.onTertiaryContainer, scheme.tertiary)
         NoticeTone.QUIET -> Triple(scheme.secondaryContainer, scheme.onSecondaryContainer, scheme.onSecondaryContainer)
     }
+    val buttonColors = when (tone) {
+        NoticeTone.WARNING -> ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
+        NoticeTone.QUIET -> ButtonDefaults.buttonColors()
+    }
     // 24, the same as every other card: at 20 a notice between two 24dp cards read as a mistake.
     val shape = RoundedCornerShape(24.dp)
     var open by rememberSaveable(title, brief) { mutableStateOf(false) }
     val turn by animateFloatAsState(if (open) 180f else 0f, tween(200), label = "notice fold")
-    val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)
     val hasAction = actionLabel != null && onAction != null
 
     Column(
@@ -106,31 +122,19 @@ fun Notice(
             .fillMaxWidth()
             .sajdaSurface(shape, container)
             .border(1.dp, accent.copy(alpha = 0.22f), shape)
-            .padding(bottom = if (hasAction) 6.dp else 14.dp),
+            .padding(Space.Group),
     ) {
-        Row(
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (details != null) {
-                        Modifier
-                            .clickable(role = Role.Button) { open = !open }
-                            .semantics { stateDescription = stateText }
-                    } else {
-                        Modifier
-                    },
-                )
-                .padding(start = 14.dp, top = 14.dp, end = if (onDismiss != null) 4.dp else 14.dp),
-        ) {
+        Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
             Box(
-                Modifier.size(36.dp).clip(RoundedCornerShape(50)).background(accent.copy(alpha = 0.14f)),
+                Modifier.size(MarkSize).clip(RoundedCornerShape(50)).background(accent.copy(alpha = 0.14f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(20.dp))
             }
-            Spacer(Modifier.width(12.dp))
-            Column(Modifier.weight(1f).padding(top = if (title != null) 1.dp else 7.dp)) {
+            Spacer(Modifier.width(Space.Paragraph))
+            // The text column's first line is centred on the 36dp mark: 7dp down for a 23sp title
+            // line, 8dp for a 21sp brief line.
+            Column(Modifier.weight(1f).padding(top = if (title != null) 6.dp else 8.dp)) {
                 if (title != null) {
                     Text(
                         title,
@@ -138,75 +142,85 @@ fun Notice(
                         color = ink,
                         modifier = Modifier.semantics { heading() },
                     )
+                    Spacer(Modifier.height(Space.Tight))
                 }
                 Text(brief, style = MaterialTheme.typography.bodyMedium, color = ink)
-            }
-            if (details != null) {
-                Icon(
-                    Icons.Rounded.ExpandMore,
-                    contentDescription = null,
-                    tint = ink,
-                    modifier = Modifier.padding(start = 4.dp, top = 6.dp).rotate(turn),
-                )
+                if (footnote != null) {
+                    Spacer(Modifier.height(Space.Related))
+                    Text(footnote, style = MaterialTheme.typography.bodyMedium, color = ink)
+                }
+                if (details != null) {
+                    AnimatedVisibility(open) {
+                        Text(
+                            text = details,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = ink,
+                            modifier = Modifier.padding(top = Space.Paragraph),
+                        )
+                    }
+                }
             }
             if (onDismiss != null) {
-                Icon(
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = stringResource(R.string.notice_dismiss),
-                    tint = ink,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .clickable(role = Role.Button, onClick = onDismiss)
-                        .padding(12.dp),
-                )
+                // Alone in the corner. The offset draws it into the card's padding so the glyph
+                // lines up with the 16dp margin; the text column still keeps clear of its 48dp.
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.offset(x = 12.dp, y = (-12).dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = stringResource(R.string.notice_dismiss),
+                        tint = ink,
+                    )
+                }
             }
         }
-        if (details != null) {
-            AnimatedVisibility(open) {
-                Text(
-                    text = details,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = ink,
-                    modifier = Modifier.padding(start = NoticeTextStart, end = 16.dp, top = 6.dp),
-                )
+        if (hasAction || details != null) {
+            Spacer(Modifier.height(Space.Group))
+            // FlowRow, not Row: "Hide details" beside a long action label in Urdu, Arabic or at 2x
+            // text does not fit one line, and a Row would squeeze the second button. It wraps
+            // under instead, Space.Related below (independent review, 18 Oct 2026).
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Space.Related),
+                verticalArrangement = Arrangement.spacedBy(Space.Related),
+                modifier = Modifier.padding(start = MarkSize + Space.Paragraph),
+            ) {
+                if (hasAction) {
+                    val spoken = actionSpokenAs ?: actionLabel!!
+                    Button(
+                        onClick = onAction!!,
+                        colors = buttonColors,
+                        modifier = Modifier
+                            .heightIn(min = 44.dp)
+                            .semantics(mergeDescendants = true) { contentDescription = spoken },
+                    ) {
+                        Text(actionLabel!!)
+                        Spacer(Modifier.width(6.dp))
+                        Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
+                if (details != null) {
+                    val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)
+                    TextButton(
+                        onClick = { open = !open },
+                        colors = ButtonDefaults.textButtonColors(contentColor = ink),
+                        modifier = Modifier
+                            .heightIn(min = 44.dp)
+                            .semantics { stateDescription = stateText },
+                    ) {
+                        Text(stringResource(if (open) R.string.notice_hide_details else R.string.notice_show_details))
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            Icons.Rounded.ExpandMore,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp).rotate(turn),
+                        )
+                    }
+                }
             }
-        }
-        if (footnote != null) {
-            Text(
-                text = footnote,
-                style = MaterialTheme.typography.bodyMedium,
-                color = ink,
-                modifier = Modifier.padding(start = NoticeTextStart, end = 16.dp, top = 8.dp),
-            )
-        }
-        if (hasAction) {
-            NoticeAction(actionLabel!!, actionSpokenAs ?: actionLabel, ink, onAction!!)
         }
     }
 }
 
-/** Where a notice's text starts: 14 padding + 36 mark + 12 gap. */
-private val NoticeTextStart = 62.dp
-
-/**
- * A notice's action as a link: bold (labelLarge is SemiBold), in the notice's own ink, with a
- * direction arrow that mirrors in right to left. Its own 12dp padding lines its words up with
- * the text above; 48dp tall so it is honestly tappable.
- */
-@Composable
-private fun NoticeAction(label: String, spokenAs: String, ink: Color, onClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(start = NoticeTextStart - 12.dp, top = 2.dp)
-            .clip(RoundedCornerShape(50))
-            .clickable(role = Role.Button, onClick = onClick)
-            .semantics(mergeDescendants = true) { contentDescription = spokenAs }
-            .heightIn(min = 48.dp)
-            .padding(horizontal = 12.dp),
-    ) {
-        Text(label, style = MaterialTheme.typography.labelLarge, color = ink)
-        Spacer(Modifier.width(6.dp))
-        Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null, tint = ink, modifier = Modifier.size(18.dp))
-    }
-}
+/** The notice's round mark. The text and the button row both start after it. */
+private val MarkSize = 36.dp

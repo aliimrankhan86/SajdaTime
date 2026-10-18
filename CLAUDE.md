@@ -203,6 +203,12 @@ session inherits it instead of relearning it.
   full gate and device suite green, an independent review of the diff before commit, and every gap
   written down. Answer the review questions in `DESIGN_SYSTEM.md` §10 for every screen you touch.
 
+- **Rules he has had to repeat, so never again** (18 Oct 2026, `docs/DESIGN_SYSTEM.md` §2 and
+  §4, `DesignRulesTest`): every gap comes from `Space` by relationship, never by eye; no two icon
+  buttons side by side (a close X stands alone at the top right); every call to action is a solid
+  button, never outlined or a bare link; every dismissable dialog has the close X. And before he
+  tests on the emulator, make sure the build on it is the new one: give the install command, and
+  never let him judge a change on a stale install.
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
 - **Before any layout change, check it right-to-left — and read the result as a *layout*

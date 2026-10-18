@@ -1,6 +1,7 @@
 package com.sajdatime.app.ui.settings
 
 import com.sajdatime.app.data.placeName
+import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.foundation.selection.toggleable
 import com.sajdatime.app.review.ReviewPrompt
@@ -548,7 +549,7 @@ fun SettingsScreen(
                     Text(stringResource(R.string.action_got_it))
                 }
             },
-            title = { Text(stringResource(R.string.disclaimer_title)) },
+            title = { DialogTitle(stringResource(R.string.disclaimer_title)) { open = null } },
             // Scrollable for the same reason every chooser on this screen is.
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -1070,7 +1071,7 @@ private fun ChooserDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(title) },
+        title = { DialogTitle(title, onDismiss) },
         text = { Column(Modifier.verticalScroll(rememberScrollState())) { content() } },
     )
 }

@@ -81,6 +81,8 @@
     <string name="home_now_marker">Şimdi</string>
     <string name="home_now_marker_a11y">Şu anki vakit</string>
     <string name="notice_dismiss">Kapat</string>
+    <string name="notice_show_details">Ayrıntılar</string>
+    <string name="notice_hide_details">Ayrıntıları gizle</string>
     <string name="method_notice_title">Caminizle uyuşuyor mu?</string>
     <string name="method_notice_body">Burada Sabah ve Yatsı bir saat ya da daha fazla farklı olabilir.</string>
     <string name="mosque_diff_link">Caminizden farklı mı?</string>

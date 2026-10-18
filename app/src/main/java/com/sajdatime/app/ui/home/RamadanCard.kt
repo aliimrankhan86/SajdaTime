@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -381,11 +383,11 @@ internal fun RamadanInfoDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(stringResource(R.string.ramadan_info_title)) },
+        title = { DialogTitle(stringResource(R.string.ramadan_info_title), onDismiss) },
         // Scrollable, like every long dialog here: AlertDialog will not scroll its body for you.
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ExplainerParagraph(stringResource(R.string.ramadan_info_calc))
+                ExplainerParagraph(stringResource(R.string.ramadan_info_calc), first = true)
                 ExplainerParagraph(stringResource(R.string.ramadan_info_margin))
                 ExplainerParagraph(stringResource(R.string.ramadan_info_mosque))
                 ExplainerParagraph(stringResource(R.string.ramadan_info_date))
@@ -397,7 +399,7 @@ internal fun RamadanInfoDialog(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = Space.Related),
                 )
             }
         },

@@ -1,5 +1,8 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,6 +50,28 @@ import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import java.time.Duration
 import java.time.Instant
+
+/**
+ * A dialog's title with a close X at the top right (owner, 18 Oct 2026). The X is the one
+ * place every phone user looks for "get me out"; the text button at the bottom stays for
+ * people who read to the end. The X is a 48dp IconButton, drawn up and out so its glyph
+ * sits on the dialog's own margin; the title still wraps clear of its 48dp.
+ */
+@Composable
+fun DialogTitle(text: String, onClose: () -> Unit) {
+    Row(verticalAlignment = Alignment.Top) {
+        Text(
+            text = text,
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = 4.dp)
+                .semantics { heading() },
+        )
+        IconButton(onClick = onClose, modifier = Modifier.offset(x = 12.dp, y = (-8).dp)) {
+            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.action_close))
+        }
+    }
+}
 
 @Composable
 fun SectionHeading(text: String, modifier: Modifier = Modifier) {

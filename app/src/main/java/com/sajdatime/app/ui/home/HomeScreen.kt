@@ -1,6 +1,8 @@
 package com.sajdatime.app.ui.home
 
 import com.sajdatime.app.data.placeName
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.rounded.Mosque
@@ -561,12 +563,12 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(stringResource(R.string.mosque_diff_title)) },
+        title = { DialogTitle(stringResource(R.string.mosque_diff_title), onDismiss) },
         // Scrollable, like every long dialog here: AlertDialog will not scroll its body for
         // you, and at a raised font size the last paragraph is what falls off the bottom.
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation))
+                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation), first = true)
                 ExplainerParagraph(stringResource(R.string.mosque_diff_twilight))
                 ExplainerAction(stringResource(R.string.settings_method)) {
                     onOpen(SettingsChooser.METHOD)
@@ -585,12 +587,18 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
     )
 }
 
+/**
+ * A paragraph in an explainer dialog. With [ExplainerAction] it follows the spacing scale
+ * (theme/Spacing.kt): a paragraph sits [Space.Group] under whatever came before, and the button
+ * that acts on it sits [Space.Related] under it, so each paragraph and its button read as one
+ * group. The first paragraph adds nothing, because the dialog already spaces it from the title.
+ */
 @Composable
-internal fun ExplainerParagraph(text: String) {
+internal fun ExplainerParagraph(text: String, first: Boolean = false) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = Modifier.padding(top = if (first) 0.dp else Space.Group),
     )
 }
 
@@ -600,8 +608,8 @@ internal fun ExplainerAction(label: String, onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
-            .heightIn(min = 48.dp),
+            .padding(top = Space.Related)
+            .heightIn(min = 52.dp),
     ) {
         Text(label)
     }

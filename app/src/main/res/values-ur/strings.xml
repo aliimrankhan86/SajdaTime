@@ -84,6 +84,8 @@
     <string name="home_now_marker">ابھی</string>
     <string name="home_now_marker_a11y">موجودہ نماز</string>
     <string name="notice_dismiss">بند کریں</string>
+    <string name="notice_show_details">تفصیل</string>
+    <string name="notice_hide_details">تفصیل چھپائیں</string>
     <string name="method_notice_title">کیا یہ آپ کی مسجد سے ملتا ہے؟</string>
     <string name="method_notice_body">یہاں فجر اور عشاء میں ایک گھنٹے یا اس سے زیادہ کا فرق ہو سکتا ہے۔</string>
     <string name="mosque_diff_link">آپ کی مسجد سے مختلف؟</string>

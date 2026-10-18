@@ -158,9 +158,28 @@ threshold and the build fails.** Add the pair to the test when you add a role.
 Applied as: screen gutter **16dp** · card padding **20dp** · list row minimum **56dp** ·
 tap target **48dp** · gap between sections **24dp**.
 
-> ponytail: these are dp literals in the screens, not a `Spacing` object. An indirection
-> whose every call site reads `space4` instead of `16.dp` buys nothing a grep cannot do,
-> and Compose already has the unit. The scale is the contract; the constant is not.
+### Gaps by relationship (owner, 18 Oct 2026; enforced)
+
+The owner reported uneven gaps between bold and normal text many times. The cause was never
+the line heights; it was gaps chosen by eye, so a title, its sentence and its button were
+spaced 0, 12 and 20 in one card and 12, 8 and 12 in the next. Now a gap is chosen by **how
+closely the two things belong together**, from `ui/theme/Spacing.kt` (`Space`):
+
+| Relationship | Token | dp |
+|---|---|---|
+| A title and the line that belongs to it | `Space.Tight` | 4 |
+| A paragraph and the button that acts on it; two buttons side by side | `Space.Related` | 8 |
+| One paragraph and the next in the same block | `Space.Paragraph` | 12 |
+| One group (text plus its button) and the next; card padding | `Space.Group` | 16 |
+| One section of a screen and the next | `Space.Section` | 24 |
+
+Closer means related (proximity), so a reader can tell which button belongs to which paragraph
+without reading. Never two different gaps for the same relationship on one screen.
+`DesignRulesTest` fails the build if `Notice.kt` uses a gap outside the scale.
+
+> Reversed 18 Oct 2026: this section used to say "dp literals, not a `Spacing` object". The
+> literals are exactly how the gaps drifted apart, card by card. Named tokens make the
+> relationship part of the code, so the reviewer sees `Space.Related` where a 12 would hide.
 
 ---
 
@@ -268,11 +287,24 @@ shapes and this one is a picture; the subtitle above the dial already says the w
 is not a setting goes through it, so a person learns one shape and reads every notice the same
 way. Two tones only: **warning** (`tertiaryContainer`, amber: something is wrong or withheld)
 and **quiet** (`secondaryContainer`, soft green: information or an occasion, Ramadan and Eid).
-Anatomy, in order: a round mark (the icon on a 14% tile of the tone's accent); the title; **one
-brief sentence**; the full explanation folded behind a chevron when there is more to say
-("expanded"/"collapsed" spoken); a footnote that must stay visible (Eid's "follow your mosque");
-the action as a **bold link with an arrow** ("Allow", "See why", "Change location", "Shift the
-date"), never "Tap to…"; a close button on Times only.
+Anatomy, since 18 Oct 2026: a round mark (the icon on a 14% tile of the tone's accent); the
+title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
+"follow your mosque"); the full explanation, folded; then, 16dp under the text, **one row of
+buttons**: the action as a **solid button** in the tone's colour with an arrow ("Allow", "See
+why", "Change location", "Shift the date"; never "Tap to…") and, when there is more to say, a
+**"Details" button with a down chevron** ("expanded"/"collapsed" spoken). The close X sits
+**alone at the top right**, on Times only.
+
+**Never put two icon buttons side by side** (owner, 18 Oct 2026, from the emulator: the fold
+chevron sat next to the close X, two opposite actions a finger apart). A close X is the last
+trailing element and stands alone; "show more" is a labelled button with a chevron; the main
+action is a filled button (Android banner guidance, Devon and Primer design standards).
+
+**Dialogs.** Every dialog a person can simply leave has a close X at the top right
+(`DialogTitle`) as well as its text button at the bottom (owner's request). Two must be
+answered, not closed, and have no X: the first run disclaimer and the usage counts question.
+Explainer dialogs pair each paragraph with its button (`ExplainerParagraph`, `ExplainerAction`):
+paragraph to its button 8dp, group to group 16dp. `DesignRulesTest` checks the X.
 
 > Why: the owner found the old notices bland and the full width amber button unclean, and asked
 > for a brief accordion "applied systemically", not to one card. The old exact alarm card was
@@ -454,6 +486,11 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026, notices restructured, dialogs given a close X, spacing made a scale.** From the
+  owner's emulator screenshots. Rejected: keeping the chevron in the header and moving the X
+  away from it (still two icon buttons in one corner); making the whole card the fold target
+  (it was, and nobody knew; a labelled "Details" button says so); the notice action as a bold
+  link (he could not see it as a button); an X instead of the bottom "Close" (he wants both).
 - **18 Oct 2026, the Times card made glossy, calls to action made solid, setup location screen
   shortened**, each approved by the owner from screenshots. This extends the widgets' gloss override
   to the next prayer card (fixed gradient, opaque, tested; still no colour that moves with the time).
@@ -526,4 +563,8 @@ comfortable? Can someone understand the screen quickly? Are the controls obvious
 unnecessary taps avoided? Is information grouped logically? Does it look modern rather than
 dated? Is the layout balanced? Are colours and components consistent? Has clutter been removed?
 Does it work at large text? Is contrast sufficient? Are touch targets comfortable? Does it read
-in Urdu right to left?
+in Urdu right to left? **Added 18 Oct 2026, because the owner had to repeat them:** Is every gap
+a `Space` token chosen by relationship? Is any icon button sitting next to another? Is every call
+to action a solid button? Does every dismissable dialog have the X? **Is the build he will test the
+one these screenshots came from** (an emulator still running yesterday's install showed none of
+the day's changes, and that cost a round of his trust)?

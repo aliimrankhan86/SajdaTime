@@ -93,6 +93,8 @@
     <string name="home_now_marker">الآن</string>
     <string name="home_now_marker_a11y">الصلاة الحالية</string>
     <string name="notice_dismiss">إغلاق</string>
+    <string name="notice_show_details">التفاصيل</string>
+    <string name="notice_hide_details">إخفاء التفاصيل</string>
     <!-- Two lines of body at most at the default font. -->
     <string name="method_notice_title">هل يطابق هذا مسجدك؟</string>
     <string name="method_notice_body">قد يختلف الفجر والعشاء هنا بساعة أو أكثر.</string>

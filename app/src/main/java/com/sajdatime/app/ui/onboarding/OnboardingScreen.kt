@@ -4,6 +4,8 @@ import com.sajdatime.app.data.placeName
 import android.content.pm.PackageManager
 import android.Manifest
 import androidx.core.content.ContextCompat
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.selection.selectableGroup
@@ -368,13 +370,13 @@ private fun PermissionStep(
                     Text(stringResource(R.string.action_got_it))
                 }
             },
-            title = { Text(stringResource(R.string.action_how_location_used)) },
+            title = { DialogTitle(stringResource(R.string.action_how_location_used)) { explaining = false } },
             // The full detail for both routes, one tap away (owner, 18 Oct 2026: a short setup
             // screen). The city box carries a one line summary of the second part, always visible.
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(stringResource(R.string.permission_why_body))
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(Space.Paragraph))
                     Text(stringResource(R.string.city_lookup_detail))
                 }
             },
