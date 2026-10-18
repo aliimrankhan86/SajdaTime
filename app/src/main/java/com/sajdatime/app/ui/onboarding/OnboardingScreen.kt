@@ -384,7 +384,7 @@ private fun PermissionStep(
 
     // 18 Oct 2026, the owner did not like this screen. It opened on 66 words about the city
     // lookup and two greyed out buttons, so the one choice it asks for was hard to see. Now:
-    // a pin, one line, one big Allow button, and the detail behind a link. Find city appears
+    // a pin, one line, one big Allow button, and the detail behind a second button. Find city appears
     // once there is something to find, and Continue once there is somewhere to continue
     // with, so nothing on the screen is ever a dead grey button.
     StepScaffold(
@@ -403,11 +403,11 @@ private fun PermissionStep(
             Spacer(Modifier.width(8.dp))
             Text(stringResource(R.string.action_allow_location))
         }
-        TextButton(
+        // Solid like every action (owner, 18 Oct 2026), Related below the button it explains.
+        Spacer(Modifier.height(Space.Related))
+        CtaButton(
             onClick = { explaining = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Icon(Icons.Outlined.Info, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
@@ -516,16 +516,14 @@ private fun PermissionStep(
             // Nobody should be stuck at setup. If neither route works, Makkah keeps the
             // app usable and the main screen says clearly that this is what happened.
             Spacer(Modifier.height(20.dp))
-            TextButton(
+            CtaButton(
                 // It says "Skip", so it moves on. It used to tick Makkah and stay, leaving the
                 // user under the same Allow button (research F3).
                 onClick = {
                     onUseDefaultLocation()
                     onNext()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.action_use_makkah))
             }

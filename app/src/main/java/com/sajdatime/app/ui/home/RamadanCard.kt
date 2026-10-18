@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.foundation.background
@@ -206,7 +207,7 @@ private fun RamadanCard(
                     color = scheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = onShiftDate) {
+                CtaButton(onClick = onShiftDate) {
                     Text(stringResource(R.string.settings_hijri_offset_label))
                 }
             }
@@ -217,9 +218,10 @@ private fun RamadanCard(
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // The whole month, on screen. A text button with words, not an icon: it is the one
+            // The whole month, on screen. A button with words, not an icon: it is the one
             // action on the card and the thing a person comes to it for in the second week.
-            TextButton(onClick = onOpenTimetable) {
+            // Solid, like every action (owner, 18 Oct 2026).
+            CtaButton(onClick = onOpenTimetable) {
                 Text(stringResource(R.string.ramadan_open_timetable))
             }
             // 48dp target: this is the only way to the explanation, and it is small.

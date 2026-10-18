@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.FlowRow
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
@@ -84,8 +83,9 @@ enum class NoticeTone { WARNING, QUIET }
  * Rules every caller keeps: the brief is one sentence; anything longer goes in details; the
  * action is a verb ("Allow", "See why", "Change location"), never "Tap here".
  *
- * Contrast: text is the tone's on-container ink; the warning button is tertiary/onTertiary and
- * the quiet one primary/onPrimary (all asserted in ColorContrastTest); the mark is the tone's
+ * Contrast: text is the tone's on-container ink; both buttons (the action and "Details") are
+ * solid, tertiary/onTertiary in a warning and the CtaButton green in a quiet notice (all
+ * asserted in ColorContrastTest); the mark is the tone's
  * accent on a 14% tile of itself, 3:1 or better.
  */
 @Composable
@@ -201,9 +201,11 @@ fun Notice(
                 }
                 if (details != null) {
                     val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)
-                    TextButton(
+                    // Solid, in the notice's own button colour, like the action beside it: the
+                    // owner chose solid buttons for every action (18 Oct 2026).
+                    Button(
                         onClick = { open = !open },
-                        colors = ButtonDefaults.textButtonColors(contentColor = ink),
+                        colors = buttonColors,
                         modifier = Modifier
                             .heightIn(min = 44.dp)
                             .semantics { stateDescription = stateText },

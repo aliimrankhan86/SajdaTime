@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.settings
 
+import com.sajdatime.app.ui.components.ctaIconButtonColors
+import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.semantics.contentDescription
@@ -56,7 +58,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -1315,7 +1317,7 @@ private fun AdjustmentsDialog(
         )
 
         if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
-            TextButton(
+            CtaButton(
                 onClick = {
                     onReset()
                     onSetHijriOffset(0)
@@ -1353,7 +1355,7 @@ private fun StepperRow(
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
-        FilledTonalIconButton(onClick = onDecrease, enabled = canDecrease) {
+        FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
             Icon(
                 Icons.Outlined.Remove,
                 contentDescription = stringResource(R.string.action_decrease, label),
@@ -1367,7 +1369,7 @@ private fun StepperRow(
             // the number grows a digit or loses its sign.
             modifier = Modifier.width(64.dp),
         )
-        FilledTonalIconButton(onClick = onIncrease, enabled = canIncrease) {
+        FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
             Icon(
                 Icons.Outlined.Add,
                 contentDescription = stringResource(R.string.action_increase, label),

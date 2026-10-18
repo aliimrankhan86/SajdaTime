@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
@@ -28,6 +30,11 @@ import com.sajdatime.app.ui.theme.OnCta
  * with white, and 3.2:1 or more against every dark surface so the shape itself stands out).
  * Both are in ColorContrastTest. DesignRulesTest fails the build on a FilledTonalButton or an
  * OutlinedButton anywhere in the app.
+ *
+ * That includes the secondary actions that used to be green text links ("Timetable", "Save as
+ * PDF", "Details", "See what is sent"): on 18 Oct 2026 the owner chose solid buttons for every
+ * action. The only text links left are "Close" and "Got it" at the foot of a dialog, which he
+ * said are fine, and DesignRulesTest holds that line.
  *
  * Two answers of equal weight (the usage counts question) are both a CtaButton: equal
  * prominence is the point of that screen, and the same strong style keeps it equal.
@@ -54,6 +61,13 @@ fun CtaButton(
 /** The call to action colours, for the few places that need a Material Button directly. */
 @Composable
 fun ctaButtonColors(): ButtonColors = ButtonDefaults.buttonColors(
+    containerColor = if (LocalDarkTheme.current) DarkCta else LightCta,
+    contentColor = OnCta,
+)
+
+/** The same green and white for icon buttons that act, such as the minute steppers in Settings. */
+@Composable
+fun ctaIconButtonColors(): IconButtonColors = IconButtonDefaults.filledIconButtonColors(
     containerColor = if (LocalDarkTheme.current) DarkCta else LightCta,
     contentColor = OnCta,
 )

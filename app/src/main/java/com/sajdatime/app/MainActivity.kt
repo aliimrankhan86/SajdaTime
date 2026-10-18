@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -349,17 +348,16 @@ internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
                 Text(stringResource(R.string.action_understood))
             }
         },
-        // The way to the full text, gone once it is showing. A text
-        // button: secondary to Understood, never competing with it.
+        // The way to the full text, gone once it is showing. Solid,
+        // like every action in the app (owner, 18 Oct 2026); it was a
+        // text link, and he asked that no action look like one.
         dismissButton = if (full) {
             null
         } else {
             {
-                TextButton(
+                CtaButton(
                     onClick = { full = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(stringResource(R.string.disclaimer_read_full))
                 }

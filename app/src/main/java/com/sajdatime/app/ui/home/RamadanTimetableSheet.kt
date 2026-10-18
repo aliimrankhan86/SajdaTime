@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -117,7 +117,7 @@ internal fun RamadanTimetableSheet(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                TextButton(onClick = onExport) {
+                CtaButton(onClick = onExport) {
                     Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
                     Text(stringResource(R.string.action_save_pdf))
@@ -257,7 +257,7 @@ private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
                 color = scheme.onSurfaceVariant,
             )
         }
-        TextButton(onClick = onShiftDate) {
+        CtaButton(onClick = onShiftDate) {
             Text(stringResource(R.string.settings_hijri_offset_label))
         }
     }

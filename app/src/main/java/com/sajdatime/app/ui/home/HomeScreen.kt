@@ -786,7 +786,7 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                 .weight(1f)
                 .semantics { heading() },
         )
-        TextButton(onClick = onExport) {
+        CtaButton(onClick = onExport) {
             Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
             Text(stringResource(R.string.action_save_pdf))

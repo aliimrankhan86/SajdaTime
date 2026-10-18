@@ -36,6 +36,27 @@ class DesignRulesTest {
             allowed = setOf("CtaButton.kt", "Notice.kt", "PermissionAction.kt"),
         )
         assertTrue("Use CtaButton, not a bare Material Button: $bare", bare.isEmpty())
+        val paleIcons = offenders(Regex("""\b(FilledTonalIconButton|OutlinedIconButton)\s*\("""))
+        assertTrue("Use FilledIconButton with ctaIconButtonColors(): $paleIcons", paleIcons.isEmpty())
+    }
+
+    /**
+     * No action is a text link. The owner chose on 18 Oct 2026 that every link becomes a solid
+     * button except Close and Got it at the foot of a dialog, which he said are fine. So a
+     * TextButton may only ever hold one of those two words, and nothing else in its braces.
+     */
+    @Test
+    fun `text links only close a dialog`() {
+        val closing = Regex(
+            """\bTextButton\([^()]*\)\s*\{\s*Text\(stringResource\(R\.string\.(action_close|action_got_it)\)\)\s*}""",
+        )
+        val found = sources.mapNotNull { file ->
+            val text = file.readText()
+            val links = Regex("""\bTextButton\(""").findAll(text).count()
+            val allowed = closing.findAll(text).count()
+            if (links > allowed) "${file.name} (${links - allowed})" else null
+        }
+        assertTrue("Make these a CtaButton; only Close or Got it may be a text link: $found", found.isEmpty())
     }
 
     /**

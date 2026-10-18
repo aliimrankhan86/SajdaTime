@@ -11,7 +11,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.theme.Space
 
 /**
  * The one consent text for optional usage counts, used by both the setup screen and the
@@ -43,38 +43,44 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
+    Spacer(Modifier.height(Space.Group))
     // The two full lists sit behind one tap so the question itself stays short. Saved across
     // rotation so a user reading the list is not bounced back to the top.
     var showSent by rememberSaveable { mutableStateOf(false) }
     val sentState = stringResource(if (showSent) R.string.state_expanded else R.string.state_collapsed)
-    TextButton(
+    // Solid, like every action (owner, 18 Oct 2026). The two answers below stay apart from these
+    // by a Section gap, so reading the lists is never mistaken for answering.
+    CtaButton(
         onClick = { showSent = !showSent },
-        modifier = Modifier.heightIn(min = 48.dp).semantics { stateDescription = sentState },
+        modifier = Modifier.fillMaxWidth().semantics { stateDescription = sentState },
     ) {
         Text(stringResource(if (showSent) R.string.consent_hide_sent else R.string.consent_see_sent))
     }
     if (showSent) {
+        Spacer(Modifier.height(Space.Paragraph))
         val listStyle = MaterialTheme.typography.bodyMedium
         val listColor = MaterialTheme.colorScheme.onSurfaceVariant
         Text(stringResource(R.string.consent_sent_heading), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(stringResource(R.string.consent_sent_list), style = listStyle, color = listColor)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Paragraph))
         Text(stringResource(R.string.consent_never_heading), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
         Text(stringResource(R.string.consent_never_list), style = listStyle, color = listColor)
     }
-    TextButton(
-        modifier = Modifier.heightIn(min = 48.dp),
+    // Two related buttons sit Related apart; after the open lists, text to a button is a Group.
+    Spacer(Modifier.height(if (showSent) Space.Group else Space.Related))
+    CtaButton(
+        modifier = Modifier.fillMaxWidth(),
         onClick = {
             runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, policyUrl.toUri())) }
         },
     ) {
         Text(stringResource(R.string.consent_read_policy))
     }
-    Spacer(Modifier.height(16.dp))
+    Spacer(Modifier.height(Space.Section))
     // Equal weight on purpose: the same solid CtaButton each, same size, so neither answer is
     // steered (and neither is easy to miss).
     ConsentButton(stringResource(R.string.consent_yes), onYes)
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Paragraph))
     ConsentButton(stringResource(R.string.consent_no), onNo)
 }
 
