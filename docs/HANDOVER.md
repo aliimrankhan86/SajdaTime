@@ -1563,9 +1563,34 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   notification sound, whose row is hidden if every prayer is an Alarm; it is then the usual tone unless
   one was chosen earlier. `docs/privacy.html` and `docs/store/LISTING.md` still say "type a city name":
   wording only, nothing about data handling changed, left for the 1.5.0 privacy re-date.
-- **Not verified on any device:** that a long adhan as a notification plays in full and stops when the
-  notification is swiped away, the channel swap above, and the picker's Default row. Android's own
-  behaviour, reasoned from its documentation; check on the emulator.
+- **Verified on the emulator, 18 Oct 2026** (`sajda`, API 36, the sideload build of `1b4b2c2`, Dhuhr set
+  to Notification with the Adhan, the clock moved with `adb shell cmd alarm set-time` and put back on
+  automatic afterwards; evidence from logcat, `dumpsys notification` and `dumpsys audio`, screenshots
+  taken with adb and not committed):
+  - The alert posts at Dhuhr on `prayer_notif_vc4b36268` with sound
+    `android.resource://com.sajdatime.app.sideload/raw/adhan`, `USAGE_NOTIFICATION`, `mBypassDnd=false`.
+    `prayer_times` reads `mDeleted=true`, so the phone lists one "Prayer times" channel: the channel swap
+    works.
+  - SystemUI's `RingtonePlayer` plays it on the speaker. **Left alone it plays the whole recording**:
+    `player.start` 20:54:01.14, `onCompletion` 20:56:35.65, 154.5 s for a 154.0 s file. The notification
+    stays in the shade afterwards.
+  - **Swiping the heads up away stops it at once**: the notification is removed and the player released
+    in the same few milliseconds (20:54:06.39).
+  - **Opening the notification panel also stops it.** About 50 ms after the shade opened, SystemUI
+    stopped the sound while the notification stayed in the list. This is Android's behaviour, not the
+    app's: the system plays a notification sound and the system stopped it, and the app's process was
+    frozen at the time. Nothing on the channel or the notification changes it. Accepted as a natural "I
+    have seen it" gesture; an adhan that keeps playing with the panel open would be a different design
+    (the app playing the audio itself), not a setting.
+  - **Android 16 notification cooldown** ("polite notifications", on in this image with the setting
+    untouched) muted a third Dhuhr alert posted close behind two others from the app: it appeared, with no
+    sound and no error in the log. Proved by setting `notification_cooldown_enabled` to 0 for one run (the
+    adhan played) and deleting the key afterwards. A testing artefact of re-running the same prayer (lesson
+    148); one prayer alert hours after the last is not affected.
+  - Not heard: "plays" means the platform's own playback records, not listening.
+- **Still not verified:** the picker's Default row, a real phone, what opening the panel does to the
+  Alarm style, and whether a "Reminder before prayer" 5 minutes earlier (silent, but it vibrates) counts
+  towards the cooldown. Android 7 as above.
 - No network, no permission, no usage counts event, no privacy change: the sound choice stays on the phone.
 
 ### 5.24 Security hardening (17 Oct 2026, owner: "improve the security ... apply the best possible solution", ships in 1.5.0)
@@ -2089,6 +2114,11 @@ colour (4.30:1) and passed the corrected one; renders in light, dark, Ramadan, 1
 Turkish, no location.
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
+
+**Notification adhan, 18 Oct 2026 (Claude on the owner's Mac, adb to `sajda`, API 36).** Dhuhr as a
+Notification with the Adhan: posts on its own channel, plays the full 154 s recording, stops when the heads
+up is swiped away, and stops when the notification panel is opened (Android's behaviour). The evidence and
+what is still not verified are in §5.25; the cooldown trap met on the way is lesson 148.
 
 ### 16 Oct 2026, cloud build and checks of 1.4.0 (no device existed, so nothing here was seen on a phone)
 
@@ -5083,7 +5113,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.** Next: he installs it and listens to the sounds on his emulator; then he wants the work parked.
+**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.** Next: his verdict on the emulator (the build is installed there, and Claude tested the notification adhan on it, below); then he wants the work parked.
 (1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
 by tapping outside the edge in the scratch render harness, not a committed test) for every button beside text, Times block gaps on the `Space`
 scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
@@ -5092,7 +5122,7 @@ York", in all five languages (DESIGN_SYSTEM §9 has the reasoning and what was r
 Notification sound row and an Alarm sound row under Prayer alerts (§5.25), because "From your phone" was hidden
 below a fold. Asked with AskUserQuestion: rows chosen; vibration "follow the phone". Screenshots he was sent:
 `docs/plans/2026-10-times-gloss/round-times.png`, `round-sounds.png`, `round-place.png`,
-`round-settings.png`, `round-ramadan.png`. He replied "all good", with one change: the Ramadan card's button says "Get the full Ramadan timetable" and fills its row; then "spacing looks tight": 24dp above and below it, the (i) centred beside it (done, `round-ramadan.png` retaken). **Not verified on a device**: sound playback, Android 7. Next: his
+`round-settings.png`, `round-ramadan.png`. He replied "all good", with one change: the Ramadan card's button says "Get the full Ramadan timetable" and fills its row; then "spacing looks tight": 24dp above and below it, the (i) centred beside it (done, `round-ramadan.png` retaken). **Sound tested on his emulator by Claude over adb, at his request (18 Oct 2026, §5.25 has the evidence):** Dhuhr as a Notification with the Adhan posts on time, plays the full 154 s recording, and stops at once when swiped away. **Opening the notification panel also stops it: Android's behaviour, not the app's.** Android 16's notification cooldown muted a repeat alert during the test, a testing artefact (lesson 148). **Not verified on a device**: Android 7, a real phone, the picker's Default row. Next: his
 verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it").
 
 **Earlier, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
@@ -9227,3 +9257,13 @@ matters more than the stable hashes, that is the trade being made.
     sign it scrolled. His screenshot ended at "Adhan". Before saying "it already exists", render the screen
     at a real phone height (411 by 891dp) and look at what shows without scrolling. A choice people must
     find goes where it is seen first: here, its own Settings row with the current value under it.
+148. **Testing a sound by moving the clock back runs into Android 16's notification cooldown, and
+    looking at the shade stops the sound.** On 18 Oct 2026 the third Dhuhr test in a row posted with no
+    sound and nothing in the log to say why. Android 16 quietens, then mutes, alerts from the same app that
+    arrive close together, and setting the clock back to 20:53:50 each time lands every run on the same
+    20:54:00. Before calling a sound broken, look for `RingtonePlayer: playAsync` in logcat and
+    `mSoundNotificationKey` in `adb shell dumpsys notification`; to rule the cooldown out, run with
+    `adb shell settings put system notification_cooldown_enabled 0` and afterwards
+    `adb shell settings delete system notification_cooldown_enabled`. Also, opening the shade to look
+    (`adb shell cmd statusbar expand-notifications`) stops a notification sound, so read the playing state
+    from `dumpsys audio` first, and swipe the heads up rather than a card in the open shade.
