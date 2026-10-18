@@ -24,6 +24,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -244,37 +245,51 @@ private fun StepScaffold(
     title: String,
     body: String,
     leading: (@Composable () -> Unit)? = null,
+    /**
+     * At the foot of the screen when there is room, and simply after the content when there is
+     * not (large text, or the keyboard up), so it never squeezes the step or covers the city box.
+     * Pinning it outside the scroll was tried first and took a quarter of the screen at 2x text.
+     */
+    footer: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            // imePadding *outside* verticalScroll, so the keyboard shrinks the scrolling
-            // viewport rather than being drawn over the end of it. The other order
-            // compiles, looks identical in a preview, and leaves the last control
-            // permanently under the keyboard. enableEdgeToEdge means adjustResize in the
-            // manifest no longer moves the window on its own, so without this the city
-            // field on the location step is typed into blind. See HANDOVER §15.
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-    ) {
-        if (leading != null) {
-            leading()
-            Spacer(Modifier.height(20.dp))
+    // imePadding *outside* verticalScroll, so the keyboard shrinks the scrolling viewport
+    // rather than being drawn over the end of it. The other order compiles, looks identical in
+    // a preview, and leaves the last control permanently under the keyboard. enableEdgeToEdge
+    // means adjustResize in the manifest no longer moves the window on its own, so without this
+    // the city field on the location step is typed into blind. See HANDOVER §15.
+    BoxWithConstraints(Modifier.fillMaxSize().imePadding()) {
+        val viewport = maxHeight
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .heightIn(min = viewport)
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+            ) {
+                Column {
+                    if (leading != null) {
+                        leading()
+                        Spacer(Modifier.height(20.dp))
+                    }
+                    Text(text = title, style = MaterialTheme.typography.headlineMedium)
+                    Spacer(Modifier.height(12.dp))
+                    // The consent step carries its own, longer text inside [content], so it passes none.
+                    if (body.isNotEmpty()) {
+                        Text(
+                            text = body,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(28.dp))
+                    }
+                    content()
+                }
+                if (footer != null) {
+                    Column(Modifier.padding(top = Space.Section)) { footer() }
+                }
+            }
         }
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(12.dp))
-        // The consent step carries its own, longer text inside [content], so it passes none.
-        if (body.isNotEmpty()) {
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(28.dp))
-        }
-        content()
     }
 }
 
@@ -391,6 +406,31 @@ private fun PermissionStep(
         title = stringResource(R.string.permission_title),
         body = stringResource(R.string.permission_body),
         leading = { LocationBadge() },
+        // Nobody should be stuck at setup. If neither route works, Makkah keeps the app usable
+        // and the main screen says clearly that this is what happened. At the foot of the
+        // screen, under a line saying what it means (owner, 18 Oct 2026, DESIGN_SYSTEM §9): as
+        // a solid button beside Allow it looked as good a choice as Allow, and a person in
+        // London who took it would get times hours out. It says "Skip", so it moves on; it used
+        // to tick Makkah and stay, leaving the user under the same Allow button (research F3).
+        footer = if (located) null else {
+            {
+                Text(
+                    text = stringResource(R.string.setup_makkah_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(Space.Related))
+                CtaButton(
+                    onClick = {
+                        onUseDefaultLocation()
+                        onNext()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.action_use_makkah))
+                }
+            }
+        },
     ) {
         CtaButton(
             onClick = onAllow,
@@ -511,20 +551,6 @@ private fun PermissionStep(
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
 
-            // Nobody should be stuck at setup. If neither route works, Makkah keeps the
-            // app usable and the main screen says clearly that this is what happened.
-            Spacer(Modifier.height(20.dp))
-            CtaButton(
-                // It says "Skip", so it moves on. It used to tick Makkah and stay, leaving the
-                // user under the same Allow button (research F3).
-                onClick = {
-                    onUseDefaultLocation()
-                    onNext()
-                },
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.action_use_makkah))
-            }
         }
 
         if (located) {

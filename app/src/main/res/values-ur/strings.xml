@@ -39,6 +39,7 @@
     <string name="city_not_found">ہمیں یہ جگہ نہیں ملی۔ ساتھ ملک کا نام بھی لکھ کر دیکھیں۔</string>
     <string name="action_find_city">شہر تلاش کریں</string>
     <string name="action_use_makkah">ابھی چھوڑیں اور مکہ استعمال کریں</string>
+    <string name="setup_makkah_note">جب تک آپ اپنا مقام طے نہیں کرتے، نماز کے اوقات مکہ کے ہوں گے۔</string>
 
     <string name="sect_title">آپ کس مسلک پر چلتے ہیں؟</string>
     <string name="sect_body">اس سے طے ہوتا ہے کہ آپ کے نماز کے اوقات کیسے نکالے جائیں۔ آپ جب چاہیں اسے بدل سکتے ہیں۔</string>
@@ -225,6 +226,8 @@
     <string name="consent_yes">ہاں، اعداد و شمار شیئر کریں</string>
     <string name="consent_no">نہیں، شکریہ</string>
     <string name="consent_read_policy">پرائیویسی پالیسی پڑھیں</string>
+    <string name="consent_more_heading">فیصلہ کرنے سے پہلے</string>
+    <string name="consent_answer_heading">آپ کا جواب</string>
     <string name="about_feedback">رائے بھیجیں</string>
     <string name="about_feedback_desc">ڈویلپر کو بتائیں کہ کیا مددگار ہے یا کیا غلط ہے۔ آپ کی ای میل ایپ کھلے گی۔</string>
     <string name="feedback_subject">SajdaTime کے بارے میں رائے</string>

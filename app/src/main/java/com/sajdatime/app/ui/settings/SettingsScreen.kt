@@ -82,6 +82,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
@@ -1317,11 +1318,16 @@ private fun AdjustmentsDialog(
         )
 
         if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
+            // Its own row, full width (so centred), a Section below the steppers it resets: the
+            // owner asked for it wider and easier to press (18 Oct 2026). Full width is also the
+            // DESIGN_SYSTEM 4.1 rule for a button alone on its line.
+            Spacer(Modifier.height(Space.Section))
             CtaButton(
                 onClick = {
                     onReset()
                     onSetHijriOffset(0)
                 },
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_adjustments_reset))
             }

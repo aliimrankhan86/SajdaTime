@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.Modifier
@@ -43,13 +44,16 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
-    Spacer(Modifier.height(Space.Group))
+    Spacer(Modifier.height(Space.Section))
+    // Two labelled sections, so finding out more is never mistaken for answering (owner, 18 Oct
+    // 2026: "it does need a dedicated section"). Headings in the same style as the lists' own.
+    ConsentHeading(stringResource(R.string.consent_more_heading))
+    Spacer(Modifier.height(Space.Related))
     // The two full lists sit behind one tap so the question itself stays short. Saved across
     // rotation so a user reading the list is not bounced back to the top.
     var showSent by rememberSaveable { mutableStateOf(false) }
     val sentState = stringResource(if (showSent) R.string.state_expanded else R.string.state_collapsed)
-    // Solid, like every action (owner, 18 Oct 2026). The two answers below stay apart from these
-    // by a Section gap, so reading the lists is never mistaken for answering.
+    // Solid, like every action (owner, 18 Oct 2026).
     CtaButton(
         onClick = { showSent = !showSent },
         modifier = Modifier.fillMaxWidth().semantics { stateDescription = sentState },
@@ -77,11 +81,23 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         Text(stringResource(R.string.consent_read_policy))
     }
     Spacer(Modifier.height(Space.Section))
+    ConsentHeading(stringResource(R.string.consent_answer_heading))
+    Spacer(Modifier.height(Space.Related))
     // Equal weight on purpose: the same solid CtaButton each, same size, so neither answer is
     // steered (and neither is easy to miss).
     ConsentButton(stringResource(R.string.consent_yes), onYes)
     Spacer(Modifier.height(Space.Related))
     ConsentButton(stringResource(R.string.consent_no), onNo)
+}
+
+@Composable
+private fun ConsentHeading(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.semantics { heading() },
+    )
 }
 
 @Composable

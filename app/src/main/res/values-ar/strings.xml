@@ -45,6 +45,7 @@
     <string name="city_not_found">لم نجد هذا المكان. جرّب إضافة اسم البلد.</string>
     <string name="action_find_city">ابحث عن المدينة</string>
     <string name="action_use_makkah">تخطَّ الآن واستخدم مكة</string>
+    <string name="setup_makkah_note">ستكون مواقيت الصلاة لمكة حتى تحدِّد موقعك.</string>
 
     <string name="sect_title">ما انتماؤك المذهبي؟</string>
     <string name="sect_body">يحدد هذا طريقة حساب مواقيت صلاتك. يمكنك تغييره متى شئت.</string>
@@ -246,6 +247,8 @@
     <string name="consent_yes">نعم، شارك إحصاءات الاستخدام</string>
     <string name="consent_no">لا، شكرًا</string>
     <string name="consent_read_policy">اقرأ سياسة الخصوصية</string>
+    <string name="consent_more_heading">قبل أن تقرر</string>
+    <string name="consent_answer_heading">إجابتك</string>
     <string name="about_feedback">إرسال ملاحظات</string>
     <string name="about_feedback_desc">أخبر المطوّر بما يفيد أو بما هو خاطئ. يفتح بريدك الإلكتروني.</string>
     <string name="feedback_subject">ملاحظات حول SajdaTime</string>

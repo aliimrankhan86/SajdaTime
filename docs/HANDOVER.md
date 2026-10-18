@@ -5049,9 +5049,14 @@ label style and height rule for every solid button, and `docs/DESIGN_SYSTEM.md` 
 him, and never "done" or "every" without the checks), §4.1 (the full button spec and an inventory a
 test enforces) and §11 (open decisions D1 to D5). Screenshots he was sent:
 `docs/plans/2026-10-times-gloss/solid-actions-1.png` to `-6.png` (retaken after the label size and
-height alignment; the location sheet in Times is not in them, it was not rendered). **Next: ask him to approve and to
-answer D1 to D5 (DESIGN_SYSTEM §11), then run the full gate, merge into `claude/quiet-glass` and give
-him the install command.** Do not merge before he approves.
+height alignment; the location sheet in Times is not in them, it was not rendered). He then answered D1, D3, D4 and D5 (recorded in DESIGN_SYSTEM §9): Makkah skip at the foot of the
+setup screen under a line saying times will be for Makkah; "Reset all" full width on its own row;
+notices kept; spacing to be converted screen by screen after this merge (§11 "Decided, work not yet
+done"). **Still open: D2**, the usage question's two information buttons, shown to him as (A) a
+"Before you decide" section of solid buttons (in the code now) or (B) bold links. **Next: his choice
+on D2 and his approval of the new screenshots (`solid-actions-*.png`, `usage-question-options.png`),
+then the full gate, merge into `claude/quiet-glass`, and the install command.** He chose "apply, show
+me, then merge": do not merge before he approves.
 
 **PICK UP HERE (end of 18 Oct 2026).** The owner is testing the latest 1.5.0 build on his own
 emulator. **Wait for his verdict; do not start new design work until he says he is happy or names

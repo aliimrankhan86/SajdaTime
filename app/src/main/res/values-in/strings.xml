@@ -38,6 +38,7 @@
     <string name="city_not_found">Tempat itu tidak ditemukan. Coba tambahkan nama negaranya.</string>
     <string name="action_find_city">Cari kota</string>
     <string name="action_use_makkah">Lewati dulu dan pakai Makkah</string>
+    <string name="setup_makkah_note">Waktu salat akan mengikuti Makkah sampai Anda mengatur lokasi.</string>
 
     <string name="sect_title">Aliran mana yang Anda ikuti?</string>
     <string name="sect_body">Ini menentukan cara waktu salat Anda dihitung. Anda bisa mengubahnya kapan saja.</string>
@@ -221,6 +222,8 @@
     <string name="consent_yes">Ya, bagikan data penggunaan</string>
     <string name="consent_no">Tidak, terima kasih</string>
     <string name="consent_read_policy">Baca kebijakan privasi</string>
+    <string name="consent_more_heading">Sebelum memutuskan</string>
+    <string name="consent_answer_heading">Jawaban Anda</string>
     <string name="about_feedback">Kirim masukan</string>
     <string name="about_feedback_desc">Beri tahu pengembang apa yang membantu atau apa yang salah. Membuka aplikasi email Anda.</string>
     <string name="feedback_subject">Masukan SajdaTime</string>

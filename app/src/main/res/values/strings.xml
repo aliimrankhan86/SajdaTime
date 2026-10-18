@@ -48,6 +48,7 @@
     <string name="city_not_found">We could not find that place. Try adding the country.</string>
     <string name="action_find_city">Find city</string>
     <string name="action_use_makkah">Skip for now and use Makkah</string>
+    <string name="setup_makkah_note">Prayer times will be for Makkah until you set your location.</string>
 
     <string name="sect_title">Which school do you follow?</string>
     <string name="sect_body">This sets how your prayer times are worked out. You can change it whenever you like.</string>
@@ -384,6 +385,8 @@
     <string name="consent_yes">Yes, share usage counts</string>
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>
+    <string name="consent_more_heading">Before you decide</string>
+    <string name="consent_answer_heading">Your answer</string>
     <string name="about_feedback">Send feedback</string>
     <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email.</string>
     <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>

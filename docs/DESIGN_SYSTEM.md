@@ -365,15 +365,15 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Setup, location | Allow location (pin icon) | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | How your location is used (info icon) | A | 52, full | `OnboardingScreen.kt` |
 | Setup, location | Find city (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
-| Setup, location | Skip for now and use Makkah | A | 52, full | `OnboardingScreen.kt` (§11 D1) |
+| Setup, location | Skip for now and use Makkah, at the **foot of the screen** under "Prayer times will be for Makkah until you set your location." (after the content at large text) | A | 52, full | `OnboardingScreen.kt` |
 | Setup, location | Continue, once located | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | "How your location is used" dialog: Got it | E | | `OnboardingScreen.kt` |
 | Setup, sect, madhab, method | Back, Continue | A | 56, half each, 8 apart | `OnboardingScreen.kt` |
 | Setup, confirm | Allow exact alarms, until allowed | A (`PermissionButton`) | 52, wraps | `OnboardingScreen.kt`, `PermissionAction.kt` |
 | Setup, confirm | Finish | A | 56, full | `OnboardingScreen.kt` |
-| Usage question (setup, and the Settings switch) | See exactly what is sent / Hide | A | 52, full | `UsageCountsConsent.kt` (§11 D2) |
+| Usage question (setup, and the Settings switch) | Under the heading "Before you decide": See exactly what is sent / Hide | A | 52, full | `UsageCountsConsent.kt` (§11 D2) |
 | Usage question | Read the privacy policy | A | 52, full | `UsageCountsConsent.kt` |
-| Usage question | Yes, share usage counts; No thanks | A | 56, full, equal | `UsageCountsConsent.kt` |
+| Usage question | Under the heading "Your answer": Yes, share usage counts; No thanks | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
 | First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
 | Times | Save as PDF (PDF icon), end of the Today heading | A | 52, wraps | `HomeScreen.kt` |
@@ -386,8 +386,8 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Ramadan timetable | Save as PDF; Shift the date | A | 52, wraps | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find city, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
-| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` (§11 D3) |
-| Settings, Match your mosque | Reset all, once something is adjusted | A | 52, wraps | `SettingsScreen.kt` |
+| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
+| Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
 
 Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row
@@ -687,6 +687,15 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026 (late evening), the owner's answers to D1, D3, D4 and D5.** D1: "Skip for now and
+  use Makkah" stays solid but moves to the foot of the setup location screen, under "Prayer times
+  will be for Makkah until you set your location." (his choice of the recommended option). Pinning it
+  outside the scroll was built first and took a quarter of the screen at 2x text, so it sits at the
+  foot when there is room and after the content when not. D3: he kept the fourteen steppers and asked
+  for "Reset all" centred, in its own row and wider: it is now full width, 24dp under the steppers. D4:
+  "happy with" notices as they are (Allow and Details equal in weight; order and the arrow lead). D5:
+  spacing to be converted screen by screen, each with light and dark screenshots, after this merge.
+  D2 is still open (§11).
 - **18 Oct 2026 (evening), every action a solid button, and this document made the place that
   stops repeat mistakes.** The owner, after the third round on buttons: "You always say it's done
   but nothing is done." Asked, not guessed (§0.2), he chose: every text link becomes a solid
@@ -797,8 +806,10 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
-| D1 | 18 Oct 2026 | Setup: "Skip for now and use Makkah" is now as strong as "Allow location". A person in London who taps it gets Makkah's times, hours off. | Keep it solid, move it to the foot of the screen under one line saying the times will be for Makkah until a location is set | OPEN |
-| D2 | 18 Oct 2026 | Usage question: four identical buttons; only a 24dp gap separates the two links from the two answers. | Keep as built; the gap and the order separate them | OPEN |
-| D3 | 18 Oct 2026 | Match your mosque: fourteen solid green circles. Clear, but heavy. | Keep as built | OPEN |
-| D4 | 18 Oct 2026 | Warning notices: "Allow" and "Details" have the same weight. | Keep as built; order and the arrow mark "Allow" as the action | OPEN |
-| D5 | 18 Oct 2026 | Spacing: 74 gaps in 10 files are still eyeballed numbers, not `Space` tokens. Only `Notice.kt`, the location sheet and the buttons touched on 18 Oct are on the scale. Converting moves every screen a few dp. | Convert screen by screen with light and dark screenshots for each, then extend `DesignRulesTest` to every file | OPEN |
+| D2 | 18 Oct 2026 | Usage question: he asked for "a dedicated section, or maybe a link with bold text" for "See exactly what is sent" and "Read the privacy policy". Two versions shown to him: (A) solid buttons under a "Before you decide" heading, with "Your answer" over Yes and No; (B) bold underlined green links, which would be an exception to the "no text links" rule. | (A), because it keeps the one button rule; (A) is what the code has until he chooses | OPEN |
+
+**Decided, work not yet done** (do not report these as done):
+
+| Id | Decision | Next step |
+|---|---|---|
+| D5 | Spacing: the 74 eyeballed gaps in 10 files move to `Space` tokens, **screen by screen**, light and dark screenshots of each shown to the owner before it merges (owner, 18 Oct 2026) | After the 1.5.0 solid button merge. Then extend `DesignRulesTest`'s spacing check from `Notice.kt` to every file |

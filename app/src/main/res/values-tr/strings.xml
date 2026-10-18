@@ -38,6 +38,7 @@
     <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
     <string name="action_find_city">Şehri bul</string>
     <string name="action_use_makkah">Şimdilik geç, Mekke\'yi kullan</string>
+    <string name="setup_makkah_note">Konumunuzu ayarlayana kadar namaz vakitleri Mekke için olacak.</string>
 
     <string name="sect_title">Hangi mezhebe uyuyorsunuz?</string>
     <string name="sect_body">Bu seçim, namaz vakitlerinizin nasıl hesaplanacağını belirler. İstediğiniz zaman değiştirebilirsiniz.</string>
@@ -221,6 +222,8 @@
     <string name="consent_yes">Evet, kullanım sayımlarını paylaş</string>
     <string name="consent_no">Hayır, teşekkürler</string>
     <string name="consent_read_policy">Gizlilik politikasını okuyun</string>
+    <string name="consent_more_heading">Karar vermeden önce</string>
+    <string name="consent_answer_heading">Cevabınız</string>
     <string name="about_feedback">Geri bildirim gönder</string>
     <string name="about_feedback_desc">Geliştiriciye neyin işe yaradığını ya da neyin yanlış olduğunu söyleyin. E-posta uygulamanızı açar.</string>
     <string name="feedback_subject">SajdaTime geri bildirimi</string>
