@@ -390,7 +390,7 @@
     <string name="settings_ramadan_card_desc">تعرض وقتي السحور والإفطار في شاشة المواقيت خلال رمضان</string>
 
     <!-- Ramadan timetable: the sheet from the card, the export option and the PDF. -->
-    <string name="ramadan_open_timetable">الجدول الكامل</string>
+    <string name="ramadan_open_timetable">احصل على جدول رمضان الكامل</string>
     <string name="ramadan_timetable_title">رمضان %1$d</string>
     <string name="ramadan_col_day">اليوم</string>
     <string name="ramadan_col_fast">الصيام</string>

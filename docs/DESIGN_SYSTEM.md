@@ -385,7 +385,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
 | Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
-| Times, Ramadan card | Full timetable; (i) | A, compact; info icon | 40 drawn, 48 target, wraps; 48 | `RamadanCard.kt` |
+| Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
 | Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
 | Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
@@ -695,7 +695,7 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
 - **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
   - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
     button that shares a line with text (Save as PDF on Times and in the Ramadan timetable, Shift the
-    date and Full timetable on the Ramadan card). Times gaps moved to the scale at the same time:
+    date on the Ramadan card). Times gaps moved to the scale at the same time:
     `Space.Group` between blocks, `Space.Related` from the Today heading to its list.
   - *Place wording*: he asked for "your nearest region" and then for help ("city, town, village ...
     something suitable for the masses"). Chosen, with his request for help as the brief: heading
@@ -714,6 +714,9 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   - *Vibration*: every prayer notification, alarm and reminder already vibrates. He chose **"follow
     the phone"** (Ring: sound and buzz; Vibrate: buzz; Silent: nothing; Do Not Disturb: nothing unless
     the alarm's Play on silent is on). Rejected: forcing a buzz on Silent (overrides the person's mute).
+  - *Ramadan card*, after the screenshots ("all good but"): the timetable button says **"Get the full
+    Ramadan timetable"** (was "Full timetable") and **fills its row** beside the (i), at 52dp. Then,
+    "spacing looks tight": 24dp above and below it, the (i) centred beside it.
 
 - **18 Oct 2026 (night), D2 decided, and D1 and D3 approved from screenshots.** Usage question: the
   owner chose **B, bold links**, over A (solid buttons under "Before you decide" and "Your answer"

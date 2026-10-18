@@ -333,7 +333,7 @@
     <string name="ramadan_date_differs">Apakah masjid Anda memulai Ramadan pada hari yang berbeda?</string>
     <string name="settings_ramadan_card">Kartu Ramadan</string>
     <string name="settings_ramadan_card_desc">Menampilkan waktu sahur dan buka puasa di layar Waktu selama Ramadan</string>
-    <string name="ramadan_open_timetable">Jadwal lengkap</string>
+    <string name="ramadan_open_timetable">Dapatkan jadwal lengkap Ramadan</string>
     <string name="ramadan_timetable_title">Ramadan %1$d</string>
     <string name="ramadan_col_day">Hari</string>
     <string name="ramadan_col_fast">Puasa</string>

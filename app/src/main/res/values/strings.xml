@@ -540,7 +540,7 @@
     <string name="settings_ramadan_card_desc">Shows suhoor and iftar times on the Times screen during Ramadan</string>
 
     <!-- Ramadan timetable: the sheet from the card, the export option and the PDF. -->
-    <string name="ramadan_open_timetable">Full timetable</string>
+    <string name="ramadan_open_timetable">Get the full Ramadan timetable</string>
     <string name="ramadan_timetable_title">Ramadan %1$d</string>
     <string name="ramadan_col_day">Day</string>
     <string name="ramadan_col_fast">Fast</string>

@@ -30,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.material.icons.rounded.Brightness3
 import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.Notice
@@ -199,7 +200,7 @@ private fun RamadanCard(
         }
 
         if (showDateHint) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.Related))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.ramadan_date_differs),
@@ -213,16 +214,22 @@ private fun RamadanCard(
             }
         }
 
+        // A section of its own, 24dp above and 24dp below (8dp here plus the card's 16dp), with the (i)
+        // centred beside it (owner, 18 Oct 2026: "spacing looks tight ... give it some spacing from top
+        // and bottom and i should be aligned to it"). It used to sit 4dp under "Shift the date".
+        Spacer(Modifier.height(Space.Section))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(Space.Related),
             modifier = Modifier.fillMaxWidth(),
         ) {
             // The whole month, on screen. A button with words, not an icon: it is the one
             // action on the card and the thing a person comes to it for in the second week.
-            // Solid, like every action (owner, 18 Oct 2026).
-            CtaButton(onClick = onOpenTimetable, compact = true) {
-                Text(stringResource(R.string.ramadan_open_timetable))
+            // Solid, like every action, and filling its row beside the (i) with the full
+            // label "Get the full Ramadan timetable" (owner, 18 Oct 2026, from screenshots:
+            // "should be wider on its row").
+            CtaButton(onClick = onOpenTimetable, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.ramadan_open_timetable), textAlign = TextAlign.Center)
             }
             // 48dp target: this is the only way to the explanation, and it is small.
             IconButton(onClick = onOpenInfo, modifier = Modifier.size(48.dp)) {
@@ -233,6 +240,7 @@ private fun RamadanCard(
                 )
             }
         }
+        Spacer(Modifier.height(Space.Related))
     }
 }
 

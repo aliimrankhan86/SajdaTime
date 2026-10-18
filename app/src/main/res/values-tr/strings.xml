@@ -336,7 +336,7 @@
     <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
     <string name="settings_ramadan_card">Ramazan kartı</string>
     <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
-    <string name="ramadan_open_timetable">Tam imsakiye</string>
+    <string name="ramadan_open_timetable">Tüm Ramazan imsakiyesini al</string>
     <string name="ramadan_timetable_title">Ramazan %1$d</string>
     <string name="ramadan_col_day">Gün</string>
     <string name="ramadan_col_fast">Oruç</string>

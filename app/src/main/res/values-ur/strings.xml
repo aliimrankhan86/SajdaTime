@@ -342,7 +342,7 @@
     <string name="ramadan_date_differs">کیا آپ کی مسجد نے رمضان کسی اور دن شروع کیا؟</string>
     <string name="settings_ramadan_card">رمضان کارڈ</string>
     <string name="settings_ramadan_card_desc">رمضان میں اوقات کی اسکرین پر سحری اور افطار کے اوقات دکھاتا ہے</string>
-    <string name="ramadan_open_timetable">پورا نقشہ</string>
+    <string name="ramadan_open_timetable">رمضان کا پورا نقشہ حاصل کریں</string>
     <string name="ramadan_timetable_title">رمضان %1$d</string>
     <string name="ramadan_col_day">دن</string>
     <string name="ramadan_col_fast">روزہ</string>

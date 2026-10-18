@@ -5092,7 +5092,7 @@ York", in all five languages (DESIGN_SYSTEM §9 has the reasoning and what was r
 Notification sound row and an Alarm sound row under Prayer alerts (§5.25), because "From your phone" was hidden
 below a fold. Asked with AskUserQuestion: rows chosen; vibration "follow the phone". Screenshots he was sent:
 `docs/plans/2026-10-times-gloss/round-times.png`, `round-sounds.png`, `round-place.png`,
-`round-settings.png`, `round-ramadan.png`. **Not verified on a device**: sound playback, Android 7. Next: his
+`round-settings.png`, `round-ramadan.png`. He replied "all good", with one change: the Ramadan card's button says "Get the full Ramadan timetable" and fills its row; then "spacing looks tight": 24dp above and below it, the (i) centred beside it (done, `round-ramadan.png` retaken). **Not verified on a device**: sound playback, Android 7. Next: his
 verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it").
 
 **Earlier, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
