@@ -77,7 +77,8 @@ descriptions live in `core` because both the phone and the watch show them.
 ### The religious disclaimer (non-negotiable)
 
 The user was explicit about this. The app states plainly — **once after onboarding as a
-dialog, and permanently in Settings → About → Disclaimer** — that:
+dialog (the short form since 18 Oct 2026, see §5.15), and permanently in full in Settings → About →
+Disclaimer** — that:
 
 - the author is **not a Mufti, Aalim, or an expert in Islam or fiqh**
 - it was **built with the help of artificial intelligence**
@@ -997,7 +998,8 @@ have to survive any rewording:
 
 | Where | What it carries | File |
 |---|---|---|
-| **In-app dialog** — once after setup, and any time from Settings → About → Disclaimer | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **In-app dialog** — any time from Settings → About → Disclaimer, and one press away ("Read in full") in the setup dialog | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **Setup dialog, short form** — once after setup, never after an update (since 18 Oct 2026) | All four points in about 70 words, no dua, a "Read in full" button that shows `disclaimer_body` in the same dialog | `R.string.disclaimer_brief` (`FirstRunDisclaimer` in `MainActivity.kt`) |
 | **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
 | **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
 | **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
@@ -1019,9 +1021,21 @@ budget. Two things about it are deliberate:
   Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
   restoring it turns it green.
 
+**The short form after setup (owner, 18 Oct 2026).** He did not want a long message straight after
+installing; it was already shown only once, after setup, never after an update (the flag is stored).
+So the setup dialog shows `disclaimer_brief`: the same four points in three short paragraphs, under
+90 words, fitting one screen, with "Understood" and "Read in full". The full text stays canonical,
+unchanged, in Settings and one press away. `DisclaimerContentTest` holds the short form to all four
+points, no dua and under 90 words; proved by deleting "no warranty" from it and watching it go red.
+**Consequence the owner should know:** the dua request is now read at setup only by someone who
+presses "Read in full"; it is still asked once, in the full text, and nowhere else. Rejected: no
+dialog at all (the rule is that it is shown, not merely available); the short form without points 2
+and 4 (that is the watch's budget, not the phone's). Rendered in light, dark and Urdu (Robolectric
+Compose harness, not committed); not seen on a device.
+
 **Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
 does not have room for, and every watch owner also has the phone app, where all four are shown
-once, unavoidably, at setup. Points 1 and 3 are the two that change what someone *does*.
+once, unavoidably, at setup (in the short form since 18 Oct 2026, still all four). Points 1 and 3 are the two that change what someone *does*.
 
 **The watch string has a hard three-line budget**, and that is why it reads more bluntly than
 the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top

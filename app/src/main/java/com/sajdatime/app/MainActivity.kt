@@ -35,6 +35,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -195,45 +198,17 @@ class MainActivity : ComponentActivity() {
                                 onScreenViewed = viewModel::recordScreen,
                             )
 
-                            // Shown once, immediately after setup. The app is a convenience,
-                            // not a religious authority, and saying so should not be buried.
+                            // Shown once, immediately after setup, never after an update (the flag is
+                            // stored). The app is a convenience, not a religious authority, and saying
+                            // so should not be buried.
+                            //
+                            // Short form first, since 18 Oct 2026 (the owner: no long message straight
+                            // after installing). disclaimer_brief still makes all four points of
+                            // HANDOVER 5.15 (DisclaimerContentTest), and "Read in full" swaps in the
+                            // complete disclaimer_body, dua request last, in this same dialog. The
+                            // complete text is also always in Settings, About, Disclaimer.
                             if (!state.settings.disclaimerSeen) {
-                                AlertDialog(
-                                    onDismissRequest = { },
-                                    // A filled, full-width button, not a text link. This is the
-                                    // one control on the one screen every user must pass
-                                    // through, and as a small tinted word in the corner it did
-                                    // not read as pressable — a tester said so. 56dp clears the
-                                    // 48dp minimum touch target with room for shaky hands.
-                                    confirmButton = {
-                                        Button(
-                                            onClick = { viewModel.markDisclaimerSeen() },
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .heightIn(min = 56.dp),
-                                        ) {
-                                            Text(stringResource(R.string.action_understood))
-                                        }
-                                    },
-                                    title = { Text(stringResource(R.string.disclaimer_title)) },
-                                    // Scrollable. AlertDialog does not scroll its body for
-                                    // you, and this text is now seven paragraphs — at a large
-                                    // system font size the last of them, the dua request, is
-                                    // exactly what would fall off the bottom unread.
-                                    //
-                                    // Seven, not five, since the Isha and congregation-time
-                                    // paragraphs were added. Only four fit on a 1080x1920
-                                    // screen at default font, so the dua is three swipes down
-                                    // and the scroll is the only thing keeping it reachable.
-                                    // Verified by screenshot in RTL — see HANDOVER §10. Do not
-                                    // lengthen this further without re-checking that the dua
-                                    // still arrives, and do not remove the scroll.
-                                    text = {
-                                        Column(Modifier.verticalScroll(rememberScrollState())) {
-                                            Text(stringResource(R.string.disclaimer_body))
-                                        }
-                                    },
-                                )
+                                FirstRunDisclaimer(onUnderstood = viewModel::markDisclaimerSeen)
                             }
                         }
                     }
@@ -349,3 +324,57 @@ private fun PreviewBuildFrame(content: @Composable () -> Unit) {
 /** The sound address schemes the alarm channel can safely play: a media or settings provider, or an app's raw resource. */
 internal fun isAcceptedAlarmSound(scheme: String?): Boolean =
     scheme == "content" || scheme == "android.resource"
+
+/**
+ * The disclaimer shown once after setup: the short form, a way to the full text, and Understood.
+ * A composable of its own so the render harness (HANDOVER lesson 132) draws exactly what ships.
+ */
+@Composable
+internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
+    var full by rememberSaveable { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = { },
+        // A filled, full-width button, not a text link. This is the
+        // one control on the one screen every user must pass
+        // through, and as a small tinted word in the corner it did
+        // not read as pressable — a tester said so. 56dp clears the
+        // 48dp minimum touch target with room for shaky hands.
+        confirmButton = {
+            Button(
+                onClick = onUnderstood,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_understood))
+            }
+        },
+        // The way to the full text, gone once it is showing. A text
+        // button: secondary to Understood, never competing with it.
+        dismissButton = if (full) {
+            null
+        } else {
+            {
+                TextButton(
+                    onClick = { full = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 48.dp),
+                ) {
+                    Text(stringResource(R.string.disclaimer_read_full))
+                }
+            }
+        },
+        title = { Text(stringResource(R.string.disclaimer_title)) },
+        // Scrollable. AlertDialog does not scroll its body for you.
+        // The short form fits one screen at the default font; the
+        // full one is seven paragraphs, and at a large font the last
+        // of them, the dua request, is exactly what would fall off
+        // the bottom unread. Do not remove the scroll.
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(if (full) R.string.disclaimer_body else R.string.disclaimer_brief))
+            }
+        },
+    )
+}
