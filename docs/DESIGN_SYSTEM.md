@@ -10,6 +10,69 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 
 ---
 
+## 0. Read this before any visual change: the owner's rules, and when to ask him
+
+This section exists because the same mistakes were made again and again, each time after
+being told it was done. It is written so that the next session cannot repeat them.
+
+### 0.1 What went wrong, so you recognise it in yourself
+
+| Date | What the owner asked | What was done instead | Why it happened |
+|---|---|---|---|
+| Up to 18 Oct 2026 | Buttons that stand out, hard to miss | Outlined buttons | Material's default "secondary" choice was taken as good enough |
+| 18 Oct 2026 | Same, again | Tonal buttons (pale green fill) | Material calls tonal "medium emphasis"; in dark it was green on dark green and read as a panel |
+| 18 Oct 2026 | "Make the text white" | Solid green, but about 15 actions left as green text links, and the reply said "every action button" was solid | The claim was made without listing the buttons; this document itself said text links were right for "Skip", "Details" and "Save as PDF", contradicting him |
+| 18 Oct 2026 | Even gaps between bold and normal text | Said "every gap comes from `Space`" | Only `Notice.kt` was checked; 74 eyeballed gaps remained in 10 files |
+| 18 Oct 2026 | Test on the emulator | He judged an old build twice | Nobody checked which build was installed |
+
+The pattern: **a general instruction was applied to the place in front of you, then reported
+as applied everywhere.** The fix is §0.3: never say "every" without the inventory.
+
+### 0.2 When to ask the owner first (do not guess)
+
+Ask him **before building** when any of these is true:
+
+1. The change alters how something **looks** on a screen he has seen, and no rule below
+   decides it exactly.
+2. Two of his instructions, or one of his instructions and a rule here, **pull in different
+   directions** (for example "every action solid" against "a clear main action").
+3. You would **reverse an entry in §9** (the decision log), or in §11 the item is marked OPEN.
+4. A choice changes **what the user can do or what they see first** (order of buttons, what is
+   hidden behind a tap, what is removed).
+5. You are about to use a word like "prominent", "clean", "premium" or "consistent" to justify
+   a choice. Those are his words; ask what he means by them on this screen.
+6. You cannot say in one sentence which rule in this document makes the choice for you.
+
+How to ask: with the `AskUserQuestion` tool, at most four questions, two to four options each,
+your recommendation first and labelled "(Recommended)", each option saying what he will see.
+Show screenshots, light and dark, of the options when the question is visual. **Silence is never
+a yes.** Record the answer in §9 the same day, and remove the item from §11.
+
+Do **not** ask about engineering detail he cannot judge (dp values, component names). Decide
+those from §1 to §4 and say what you decided.
+
+### 0.3 The words "done", "every" and "all"
+
+Do not tell him a rule is applied "everywhere" or that a change is "done" until all of these
+are true, and say which you checked:
+
+1. **The inventory is clean.** Run the command in §4.1 "How to check" and read every line.
+   Paste the count into your reply ("19 solid buttons, 2 text links, both Close").
+2. **The tests pass**: `DesignRulesTest` and `ColorContrastTest` at least; the full gate before
+   a merge.
+3. **Screenshots** of every screen you changed, light and dark, have been shown to him.
+4. **The build he will test is the new one**: give him the install command and the commit he
+   should see (`git log --oneline -1`).
+5. **What you did not check is written down**, in the reply and in `docs/HANDOVER.md`.
+
+### 0.4 When this document and the owner disagree
+
+The owner wins, and this document is corrected **in the same commit**, with the old rule moved to
+§9 as reversed. When this document and the code disagree, the code is the bug unless §9 says
+otherwise; if neither says, ask him (§0.2).
+
+---
+
 ## 1. Colour
 
 ### Dark
@@ -212,6 +275,137 @@ Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp
 ---
 
 ## 4. Components
+
+### 4.1 Buttons and actions: the full specification (owner, 18 Oct 2026)
+
+**The rule in one line:** every action a person can take is a **solid button with white bold text**
+in light and dark, so nobody has to guess what is tappable. The only text links in the app are
+**"Close" and "Got it" at the foot of a dialog**. Decided by the owner on 18 Oct 2026, after
+outlined and then tonal buttons were both too easy to miss (§0.1).
+
+#### The five kinds of control that act, and nothing else
+
+| Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
+|---|---|---|---|---|---|
+| **A. Solid green** | `CtaButton` (or `ctaButtonColors()` on a Material `Button` inside `Notice` and `PermissionButton`) | `#0B5A43` (`LightCta`) | `#17805A` (`DarkCta`) | `#FFFFFF` (`OnCta`) | Every action that is not a warning |
+| **B. Solid amber** | Material `Button` with `tertiary`/`onTertiary`, only inside `Notice` (warning tone) | `#9A6208` | `#E8B14A` | light `#FFFFFF`, dark `#3A2A00` | The action and "Details" in a warning notice ("Allow exact alarms") |
+| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque" |
+| **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
+| **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
+
+Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
+row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
+to another icon button.
+
+Dark amber text is `#3A2A00`, not white, because white on `#E8B14A` is about 1.9:1 and fails. This
+is the only exception to white text, and the owner accepted it on 18 Oct 2026 ("keep amber for
+warnings").
+
+#### Every property of a solid button (kinds A and B)
+
+| Property | Value | Notes |
+|---|---|---|
+| Shape | Full pill (Material `Button` default) | Never square corners, never a custom radius |
+| Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
+| Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
+| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice | Minimums; large text grows them |
+| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | |
+| Padding | Material default (24dp each side) | |
+| Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
+| Elevation and shadow | None | Flat on purpose: the fill does the work |
+| Pressed | Material ripple | |
+| Disabled | Material default (12% `onSurface` fill, 38% label). **Only while the action is running** (finding your location) | Never shown as a grey placeholder: hide the button until it can be used ("Find city" appears once something is typed) |
+| Contrast | Label to fill at least 4.5:1; fill to the surface behind it at least 3:1 | `ColorContrastTest` asserts both, in both themes |
+
+#### Order, hierarchy and wording
+
+- **Order:** the main action comes first: top of a column, start of a row (right in Urdu and
+  Arabic, which mirror automatically). The one exception is setup's Back and Continue pair,
+  where Back is first because that is where every phone puts it.
+- **Hierarchy comes from order, position and wording, never from fading a button.** A button that
+  is easy to miss is a bug, however secondary it is.
+- **Two equal answers stay equal.** The usage question's "Yes, share usage counts" and "No thanks"
+  are the same size, colour and height, and neither is first by accident (yes is first because it
+  is the question's own word). Nudging either way breaks the consent.
+- **Wording:** a verb first ("Allow location", "Save as PDF", "Shift the date"), two to five words,
+  no full stop, never "Tap here" or "Click". A question may label a button that opens an
+  explanation ("Different from your mosque?").
+
+#### Spacing around buttons (from §2, by relationship)
+
+| Between | Gap |
+|---|---|
+| A single paragraph and the button that acts on it (explainer dialogs) | `Space.Related` 8dp |
+| A text field and its button ("Find city") | `Space.Related` 8dp |
+| Two buttons stacked or side by side | `Space.Related` 8dp |
+| A block of several lines (title and sentence, or several paragraphs) and its button row | `Space.Group` 16dp |
+| A group of buttons and a different group (the usage question's two links and its two answers) | `Space.Section` 24dp |
+| A button and the next section of the screen | `Space.Section` 24dp |
+
+#### Banned, and the test that fails the build
+
+| Banned | Why | Enforced by |
+|---|---|---|
+| `OutlinedButton`, `FilledTonalButton` | Easy to miss (§0.1) | `DesignRulesTest` |
+| `FilledTonalIconButton`, `OutlinedIconButton` | Pale, the same problem as tonal | `DesignRulesTest` |
+| A bare Material `Button` outside `CtaButton.kt`, `Notice.kt`, `PermissionAction.kt` | Its dark default is pale mint with black text | `DesignRulesTest` |
+| A `TextButton` saying anything but "Close" or "Got it" | Every action is solid (owner, 18 Oct 2026) | `DesignRulesTest` |
+| A file with a button that is not in the inventory below | So no button is added without being specified here | `DesignRulesTest` |
+| Two icon buttons next to each other | Opposite actions a finger apart (§4 Notices) | Review question in §10 |
+| A disabled button shown as a placeholder | Reads as broken | Review question in §10 |
+
+#### The inventory: every button in the app
+
+Update this table in the same commit as any button you add, move or remove. `DesignRulesTest`
+fails if a Kotlin file containing a button is missing from the **File** column.
+
+| Screen | Label | Kind | Height, width | File |
+|---|---|---|---|---|
+| Setup, welcome | Begin | A | 56, full | `OnboardingScreen.kt` |
+| Setup, location | Allow location (pin icon) | A | 56, full | `OnboardingScreen.kt` |
+| Setup, location | How your location is used (info icon) | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Find city (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Skip for now and use Makkah | A | 52, full | `OnboardingScreen.kt` (§11 D1) |
+| Setup, location | Continue, once located | A | 56, full | `OnboardingScreen.kt` |
+| Setup, location | "How your location is used" dialog: Got it | E | | `OnboardingScreen.kt` |
+| Setup, sect, madhab, method | Back, Continue | A | 56, half each, 8 apart | `OnboardingScreen.kt` |
+| Setup, confirm | Allow exact alarms, until allowed | A (`PermissionButton`) | 52, wraps | `OnboardingScreen.kt`, `PermissionAction.kt` |
+| Setup, confirm | Finish | A | 56, full | `OnboardingScreen.kt` |
+| Usage question (setup, and the Settings switch) | See exactly what is sent / Hide | A | 52, full | `UsageCountsConsent.kt` (§11 D2) |
+| Usage question | Read the privacy policy | A | 52, full | `UsageCountsConsent.kt` |
+| Usage question | Yes, share usage counts; No thanks | A | 56, full, equal | `UsageCountsConsent.kt` |
+| First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
+| First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
+| Times | Save as PDF (PDF icon), end of the Today heading | A | 52, wraps | `HomeScreen.kt` |
+| Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
+| Times, Ramadan card | Shift the date, days 1 and 2 only | A | 52, wraps | `RamadanCard.kt` |
+| Times, Ramadan card | Full timetable; (i) | A; info icon | 52, wraps; 48 | `RamadanCard.kt` |
+| Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
+| Ramadan timetable | Save as PDF; Shift the date | A | 52, wraps | `RamadanTimetableSheet.kt` |
+| Location sheet | Use my current location; Find city, once something is typed | A | 52, full | `Common.kt` |
+| Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` (§11 D3) |
+| Settings, Match your mosque | Reset all, once something is adjusted | A | 52, wraps | `SettingsScreen.kt` |
+| Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
+
+Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row
+is the target, with a chevron), switches, radio rows, the tab bar, and the city name with its caret
+on Times, which opens the location sheet.
+
+#### How to check, before you say "every"
+
+```bash
+# Every acting control in the app, with file and line. Read all of it.
+grep -rnE "\b(CtaButton|PermissionButton|FilledIconButton|IconButton|TextButton|Button)\(" \
+  app/src/main/java --include=*.kt | grep -v "fun \|import"
+# Must print only Close and Got it:
+grep -rn -A1 "TextButton(" app/src/main/java --include=*.kt | grep -oE "R\.string\.[a-z_]+" | sort | uniq -c
+./gradlew :app:testDebugUnitTest --tests '*DesignRulesTest' --tests '*ColorContrastTest'
+```
+
+Then screenshots of each changed screen in light and dark, and §0.3.
 
 **Next-prayer card** — `primaryContainer`, 24dp radius, 1dp `outlineVariant` border, flat.
 Label, then name and time on one optical line, then the countdown, then "until it begins".
@@ -456,22 +650,18 @@ hard to miss, look like a button with prominent text ... make the text white"). 
 `#0B5A43` (white 8.2:1), dark fill `#17805A` (white 4.9:1; 3.2:1 or more against every dark
 surface, so the shape stands out too). `ColorContrastTest` asserts both.
 
-Not used, and banned by `DesignRulesTest`: `OutlinedButton` and `FilledTonalButton` (Material's
-low emphasis buttons; in dark the tonal one was green on dark green and read as a panel), and a
-bare Material `Button` (its dark default is pale mint with black text). Amber stays only where it
-means a warning (notice and permission buttons). Two equal answers (usage counts) are both
-`CtaButton`, so they stay equal. A text button is right only for a dialog's dismiss ("Close",
-"Got it"), an escape that must not compete ("Skip for now and use Makkah"), "Details" inside a
-notice, and an action in a heading line ("Save as PDF"). Never show a disabled button as a
-placeholder: show it when it can be used.
+**The full specification, with every property, the inventory and the checks, is §4.1.** It
+replaces what this paragraph used to say: until 18 Oct 2026 it allowed text links for "Skip for
+now and use Makkah", "Details" and "Save as PDF". That contradicted the owner, and it is how
+about 15 actions stayed as easy-to-miss green text after he had asked for solid buttons. The
+owner then chose (18 Oct 2026): every action solid, only "Close" and "Got it" stay text.
 
 > History, so nobody softens it again: outlined until 18 Oct 2026 ("easy to miss"), then tonal
 > for one day ("do you think this button stands out?"), then this. Hierarchy between two buttons
 > comes from position and wording, never from making one of them faint.
 
-**Links and actions are bold and green.** `labelLarge` is SemiBold, and Material draws every
-button and text button label in it, so "Save as PDF" and "Got it" read as tappable without a
-guess. Rows that open something carry a chevron.
+**Actions are solid buttons; the only links are "Close" and "Got it".** Both are labelLarge
+(SemiBold), so they read as tappable without a guess. Rows that open something carry a chevron.
 
 **Green means something.** It is the colour of Paradise in the Qur'an, and here it marks the
 next prayer, the Qibla and anything you can tap. It is never decoration.
@@ -497,6 +687,18 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026 (evening), every action a solid button, and this document made the place that
+  stops repeat mistakes.** The owner, after the third round on buttons: "You always say it's done
+  but nothing is done." Asked, not guessed (§0.2), he chose: every text link becomes a solid
+  button except "Close" and "Got it" at the foot of a dialog; warning buttons stay amber; the
+  minute steppers go solid green; screenshots before merging. At the same time every solid
+  button was given one label style (16sp SemiBold; notice and permission buttons had been 14sp)
+  and heights by placement (56, 52, 48), and the location sheet's "Find city" stopped being a
+  grey placeholder. Reversed: the 18 Oct entry below that rejected "the full green fill for
+  secondary actions", and the §8 list of allowed text links. Added: §0 (when to ask, and the
+  words "done" and "every"), §4.1 (the full button spec and inventory), §11 (open decisions),
+  and a `DesignRulesTest` check that fails when a file with a button is missing from the
+  inventory.
 - **18 Oct 2026, notices restructured, dialogs given a close X, spacing made a scale.** From the
   owner's emulator screenshots. Rejected: keeping the chevron in the header and moving the X
   away from it (still two icon buttons in one corner); making the whole card the fold target
@@ -507,7 +709,7 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   to the next prayer card (fixed gradient, opaque, tested; still no colour that moves with the time).
   Rejected: a graphite glass card in dark (the widget body colour; the green card is what he pointed
   at and keeps "green means the next prayer"); the full green fill for secondary actions (two filled
-  buttons on one screen lose the main one); keeping the 66 word city lookup paragraph above the empty
+  buttons on one screen lose the main one; **reversed the same evening by the owner, see above**); keeping the 66 word city lookup paragraph above the empty
   field (it hid the choice); putting it only behind "How your location is used" (missed at the moment
   of typing, the independent review); showing it only once typing starts (text jumping in under the
   cursor; the owner found it confusing). Chosen: the standard short notice plus detail, one line in the
@@ -579,3 +781,24 @@ a `Space` token chosen by relationship? Is any icon button sitting next to anoth
 to action a solid button? Does every dismissable dialog have the X? **Is the build he will test the
 one these screenshots came from** (an emulator still running yesterday's install showed none of
 the day's changes, and that cost a round of his trust)?
+
+**Added 18 Oct 2026 (evening):** Did any choice here depend on a guess about what he wants
+(§0.2)? If so, did you ask? Is every button in the §4.1 inventory, with the right kind, height and
+width? Did you run the §4.1 checks and paste the counts before writing "every" or "done"? Is any
+§11 item still OPEN on the screen you changed?
+
+---
+
+## 11. Open decisions: waiting for the owner
+
+Anything here is **not decided**. Do not build an answer to it, do not describe it as done, and
+raise it with him (§0.2) the next time the screen is touched. When he answers, move it to §9 with
+the date and his words, and delete it here.
+
+| Id | Raised | Question | Recommendation given to him | Status |
+|---|---|---|---|---|
+| D1 | 18 Oct 2026 | Setup: "Skip for now and use Makkah" is now as strong as "Allow location". A person in London who taps it gets Makkah's times, hours off. | Keep it solid, move it to the foot of the screen under one line saying the times will be for Makkah until a location is set | OPEN |
+| D2 | 18 Oct 2026 | Usage question: four identical buttons; only a 24dp gap separates the two links from the two answers. | Keep as built; the gap and the order separate them | OPEN |
+| D3 | 18 Oct 2026 | Match your mosque: fourteen solid green circles. Clear, but heavy. | Keep as built | OPEN |
+| D4 | 18 Oct 2026 | Warning notices: "Allow" and "Details" have the same weight. | Keep as built; order and the arrow mark "Allow" as the action | OPEN |
+| D5 | 18 Oct 2026 | Spacing: 74 gaps in 10 files are still eyeballed numbers, not `Space` tokens. Only `Notice.kt`, the location sheet and the buttons touched on 18 Oct are on the scale. Converting moves every screen a few dp. | Convert screen by screen with light and dark screenshots for each, then extend `DesignRulesTest` to every file | OPEN |

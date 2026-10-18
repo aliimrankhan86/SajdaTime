@@ -191,10 +191,10 @@ fun Notice(
                         onClick = onAction!!,
                         colors = buttonColors,
                         modifier = Modifier
-                            .heightIn(min = 44.dp)
+                            .heightIn(min = 48.dp)
                             .semantics(mergeDescendants = true) { contentDescription = spoken },
                     ) {
-                        Text(actionLabel!!)
+                        Text(actionLabel!!, style = actionLabelStyle())
                         Spacer(Modifier.width(6.dp))
                         Icon(Icons.AutoMirrored.Rounded.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
                     }
@@ -207,10 +207,13 @@ fun Notice(
                         onClick = { open = !open },
                         colors = buttonColors,
                         modifier = Modifier
-                            .heightIn(min = 44.dp)
+                            .heightIn(min = 48.dp)
                             .semantics { stateDescription = stateText },
                     ) {
-                        Text(stringResource(if (open) R.string.notice_hide_details else R.string.notice_show_details))
+                        Text(
+                            stringResource(if (open) R.string.notice_hide_details else R.string.notice_show_details),
+                            style = actionLabelStyle(),
+                        )
                         Spacer(Modifier.width(4.dp))
                         Icon(
                             Icons.Rounded.ExpandMore,

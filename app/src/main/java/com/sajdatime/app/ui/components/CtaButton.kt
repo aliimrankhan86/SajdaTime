@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.ui.theme.DarkCta
@@ -52,11 +53,19 @@ fun CtaButton(
         colors = ctaButtonColors(),
         modifier = modifier.heightIn(min = 52.dp),
     ) {
-        ProvideTextStyle(MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp)) {
+        ProvideTextStyle(actionLabelStyle()) {
             content()
         }
     }
 }
+
+/**
+ * The one label style for every solid button in the app, green or amber: labelLarge (SemiBold)
+ * at 16sp. Notice and permission buttons used Material's 14sp default until 18 Oct 2026, so
+ * three sizes of button text sat side by side. docs/DESIGN_SYSTEM.md 4.1 has the full spec.
+ */
+@Composable
+fun actionLabelStyle(): TextStyle = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp)
 
 /** The call to action colours, for the few places that need a Material Button directly. */
 @Composable

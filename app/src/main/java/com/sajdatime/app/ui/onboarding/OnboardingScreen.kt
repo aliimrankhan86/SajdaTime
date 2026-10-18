@@ -491,16 +491,14 @@ private fun PermissionStep(
                 modifier = Modifier.fillMaxWidth(),
             )
             if (city.isNotBlank()) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Related))
                 CtaButton(
                     onClick = findCity,
                     enabled = !state.resolvingLocation,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 52.dp),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(Icons.Outlined.Search, contentDescription = null)
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(Space.Related))
                     Text(stringResource(R.string.action_find_city))
                 }
             }
@@ -604,7 +602,8 @@ private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
         ) {
             Text(stringResource(R.string.action_back))
         }
-        Spacer(Modifier.width(12.dp))
+        // Two buttons side by side: Related (DESIGN_SYSTEM 2).
+        Spacer(Modifier.width(Space.Related))
         CtaButton(
             onClick = onNext,
             modifier = Modifier

@@ -5042,6 +5042,17 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
+**NEWEST, 18 Oct 2026 evening: waiting for the owner's approval, NOT merged.** On
+`ccr-23a38578-c5vz7d` only: every remaining text link made a solid button (his choice when asked:
+all except "Close" and "Got it"; warnings stay amber; steppers solid green; screenshots first), one
+label style and height rule for every solid button, and `docs/DESIGN_SYSTEM.md` given §0 (when to ask
+him, and never "done" or "every" without the checks), §4.1 (the full button spec and an inventory a
+test enforces) and §11 (open decisions D1 to D5). Screenshots he was sent:
+`docs/plans/2026-10-times-gloss/solid-actions-1.png` to `-6.png` (retaken after the label size and
+height alignment; the location sheet in Times is not in them, it was not rendered). **Next: ask him to approve and to
+answer D1 to D5 (DESIGN_SYSTEM §11), then run the full gate, merge into `claude/quiet-glass` and give
+him the install command.** Do not merge before he approves.
+
 **PICK UP HERE (end of 18 Oct 2026).** The owner is testing the latest 1.5.0 build on his own
 emulator. **Wait for his verdict; do not start new design work until he says he is happy or names
 what to change**, then work on the improvements together (his words: "Once I am happy then I will
@@ -5060,7 +5071,7 @@ cd ~/Developer/SajdaTime-settings-preview && export JAVA_HOME=$(/usr/libexec/jav
 ```
 
 The sideload copy (`com.sajdatime.app.sideload`) sits beside any Play copy. Proof the new build is
-on: solid mint buttons, an X alone in the corner of notices with "Allow" as a button and "Details"
+on: solid dark green buttons with white text (the mosque button has a mosque icon), an X alone in the corner of notices with "Allow" as a button and "Details"
 beside it, a glossy next prayer card. If an older sideload is already on the emulator, settings
 persist; to see setup again, uninstall it first (`adb uninstall com.sajdatime.app.sideload`).
 
@@ -9134,3 +9145,14 @@ matters more than the stable hashes, that is the trade being made.
     (solid fill, white text) first and justify any step down, never the reverse. Also: his first
     screenshot that day still showed the outlined mosque button with no icon, which is the previous
     build; check which build he is looking at before changing anything (lesson 144).
+146. **A rule applied where you are looking is not a rule applied everywhere, and the design system
+    can be the thing that contradicts the owner.** On 18 Oct 2026 the reply said "every action button"
+    was solid while about 15 actions were still green text links, and an earlier reply said "every gap
+    comes from `Space`" when only one file did; the owner: "you always say it's done but nothing is
+    done". Worse, `DESIGN_SYSTEM.md` §8 itself listed text links as correct for "Skip", "Details" and
+    "Save as PDF", so following the document reproduced the mistake. Fixes: before writing "every" or
+    "done", run the inventory in DESIGN_SYSTEM §4.1 and paste the counts; when a rule and the owner
+    disagree, change the rule in the same commit; when not sure what he means, ask him with options
+    and screenshots (§0.2) rather than build a guess; keep undecided questions in §11, not in your
+    head. `DesignRulesTest` now fails when a file with a button is missing from the inventory, so a
+    new button cannot skip the spec.

@@ -70,7 +70,7 @@ fun rememberGranted(check: (Context) -> Boolean): State<Boolean> {
 
 /**
  * A real button until the permission is granted, then a plain "Allowed" line with a tick.
- * The button is 48dp tall at least and announces itself as a button; the allowed line is not
+ * The button is 52dp tall at least and announces itself as a button; the allowed line is not
  * clickable (there is nothing left to do) and says "Allowed" as its state, so TalkBack does
  * not rely on the tick glyph alone.
  */
@@ -101,9 +101,10 @@ fun PermissionButton(
             )
         }
     } else {
+        // 52dp and 16sp, the same as a standalone CtaButton (DESIGN_SYSTEM 4.1).
         Button(
             onClick = onClick,
-            modifier = modifier.heightIn(min = 48.dp),
+            modifier = modifier.heightIn(min = 52.dp),
             // Amber cards use the accent pair that ColorContrastTest already checks.
             colors = if (amber) {
                 ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
@@ -111,7 +112,7 @@ fun PermissionButton(
                 ctaButtonColors()
             },
         ) {
-            Text(label)
+            Text(label, style = actionLabelStyle())
         }
     }
 }

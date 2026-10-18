@@ -80,7 +80,7 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
     // Equal weight on purpose: the same solid CtaButton each, same size, so neither answer is
     // steered (and neither is easy to miss).
     ConsentButton(stringResource(R.string.consent_yes), onYes)
-    Spacer(Modifier.height(Space.Paragraph))
+    Spacer(Modifier.height(Space.Related))
     ConsentButton(stringResource(R.string.consent_no), onNo)
 }
 

@@ -44,6 +44,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import java.time.Duration
@@ -190,16 +191,16 @@ fun LocationSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
-            Spacer(Modifier.height(20.dp))
+            // Gaps by relationship (DESIGN_SYSTEM 2): text block to its button Group, field to
+            // its button Related, section to section Section.
+            Spacer(Modifier.height(Space.Group))
             CtaButton(
                 onClick = onUseGps,
                 enabled = !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 52.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Outlined.MyLocation, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(Space.Related))
                 Text(stringResource(R.string.action_use_my_location))
             }
 
@@ -208,7 +209,7 @@ fun LocationSheet(
                 ProgressRow(stringResource(R.string.location_finding))
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.Section))
             Text(
                 text = stringResource(R.string.location_sheet_search_heading),
                 style = MaterialTheme.typography.titleMedium,
@@ -239,17 +240,19 @@ fun LocationSheet(
                 keyboardActions = KeyboardActions(onSearch = { if (query.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(10.dp))
-            CtaButton(
-                onClick = findCity,
-                enabled = query.isNotBlank() && !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            ) {
-                Icon(Icons.Outlined.Search, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.action_find_city))
+            // Shown once there is something to find, never as a grey placeholder (DESIGN_SYSTEM
+            // 4.1), the same as the setup screen.
+            if (query.isNotBlank()) {
+                Spacer(Modifier.height(Space.Related))
+                CtaButton(
+                    onClick = findCity,
+                    enabled = !state.resolvingLocation,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                    Spacer(Modifier.width(Space.Related))
+                    Text(stringResource(R.string.action_find_city))
+                }
             }
             if (searching) {
                 Spacer(Modifier.height(12.dp))

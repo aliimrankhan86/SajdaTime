@@ -203,14 +203,23 @@ session inherits it instead of relearning it.
   full gate and device suite green, an independent review of the diff before commit, and every gap
   written down. Answer the review questions in `DESIGN_SYSTEM.md` §10 for every screen you touch.
 
-- **Rules he has had to repeat, so never again** (18 Oct 2026, `docs/DESIGN_SYSTEM.md` §2 and
-  §4, `DesignRulesTest`): every gap comes from `Space` by relationship, never by eye; no two icon
-  buttons side by side (a close X stands alone at the top right); **every call to action is a
-  `CtaButton`: solid green with white bold text, never outlined, never tonal, never pale, never a
-  bare link** (he asked many times; tonal was tried for a day and failed); every dismissable dialog
-  has the close X. And before he
-  tests on the emulator, make sure the build on it is the new one: give the install command, and
-  never let him judge a change on a stale install.
+- **Rules he has had to repeat, so never again: read `docs/DESIGN_SYSTEM.md` §0 before any visual
+  change.** It lists the mistakes that were repeated and why, and the rules that stop them:
+  - **Ask him first when you are not sure** (§0.2 lists exactly when), with `AskUserQuestion`, your
+    recommendation first, screenshots for anything visual. He asked for this on 18 Oct 2026 ("why
+    can't you ask me if you are not sure"). Guessing and then reporting it as done is the failure.
+  - **Never write "done", "every" or "all" until the §4.1 checks have run and you have pasted the
+    counts** (§0.3). Twice on 18 Oct 2026 a rule was reported as applied everywhere when it was not.
+  - **Every action is a solid button with white bold text, light and dark**; the only text links
+    are "Close" and "Got it" at the foot of a dialog. The full spec, every button in the app and the
+    checks are §4.1; `DesignRulesTest` fails the build on a breach, including a button in a file the
+    inventory does not list.
+  - Gaps come from `Space` by relationship (§2). **This is only true of some files so far** (open
+    decision D5); do not claim it for the whole app.
+  - No two icon buttons side by side; every dismissable dialog has the close X.
+  - **§11 lists the decisions still waiting for him.** Do not build an answer to an OPEN item.
+  - Before he tests on the emulator, give the install command and the commit he should see. Never
+    let him judge a change on a stale install.
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
 - **Before any layout change, check it right-to-left — and read the result as a *layout*

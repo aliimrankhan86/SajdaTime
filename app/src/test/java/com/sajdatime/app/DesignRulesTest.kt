@@ -60,6 +60,32 @@ class DesignRulesTest {
     }
 
     /**
+     * docs/DESIGN_SYSTEM.md 4.1 lists every button in the app. A file that gains a button without
+     * being in that inventory fails here, so no button is added without the spec being read and
+     * the table updated (owner, 18 Oct 2026: "design system should be so detailed that it stops
+     * you making these mistakes again"). CtaButton.kt is the component itself, not a use of it.
+     */
+    @Test
+    fun `every file with a button is in the design system inventory`() {
+        val doc = File(File("..").canonicalFile, "docs/DESIGN_SYSTEM.md").readText()
+        val start = doc.indexOf("#### The inventory")
+        val end = doc.indexOf("Not buttons, and not to be turned into buttons", start)
+        assertTrue("DESIGN_SYSTEM.md 4.1 inventory not found", start >= 0 && end > start)
+        val listed = Regex("""`(\w+\.kt)`""").findAll(doc.substring(start, end)).map { it.groupValues[1] }.toSet()
+        val button = Regex("""(?<![A-Za-z])(CtaButton|PermissionButton|FilledIconButton|IconButton|TextButton|Button)\s*\(""")
+        val missing = sources
+            .filter { it.name != "CtaButton.kt" }
+            .filter { file -> button.findAll(file.readText()).any { m -> !isDeclaration(file.readText(), m.range.first) } }
+            .map { it.name }
+            .filter { it !in listed }
+        assertTrue("Add these to the DESIGN_SYSTEM.md 4.1 inventory: $missing", missing.isEmpty())
+        val stale = listed - sources.map { it.name }.toSet()
+        assertTrue("The inventory names files that no longer exist: $stale", stale.isEmpty())
+    }
+
+    private fun isDeclaration(text: String, at: Int) = text.substring(maxOf(0, at - 4), at) == "fun "
+
+    /**
      * Every dialog the user can simply leave shows a close X at the top right (DialogTitle).
      * The exceptions must be answered, never closed: the first run disclaimer (MainActivity)
      * and the usage counts question, where an X would be an answer nobody gave.
