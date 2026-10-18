@@ -310,7 +310,7 @@ warnings").
 | Shape | Full pill (Material `Button` default) | Never square corners, never a custom radius |
 | Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
 | Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
-| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area is measured, not assumed: taps 2 and 3.5dp outside the drawn edge press it, 6dp does not |
+| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area was measured once, in the scratch render harness (Robolectric, not part of the repo's tests, which carry no Robolectric): taps 2 and 3.5dp outside the drawn edge pressed it, 6dp did not. Material 3 `Button` gives it that area through `minimumInteractiveComponentSize` |
 | Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
 | Padding | Material default (24dp each side); compact 16dp each side | |
 | Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
@@ -689,6 +689,9 @@ dependency), not done yet because it means downloading the icon files.
 
 ## 9. Decision log
 
+Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
+"improves" it back.
+
 - **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
   - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
     button that shares a line with text (Save as PDF on Times and in the Ramadan timetable, Shift the
@@ -705,13 +708,12 @@ dependency), not done yet because it means downloading the icon files.
     alerts, showing the current choice, over moving it to the top of the dialog or adding a scroll
     hint. He then asked for a sound choice for notifications too ("adhan or another sound for an
     alarm or notification"): a **Notification sound** row beside **Alarm sound**, each offering Adhan
-    or From your phone. Nobody's sound changes until they pick one.
+    or From your phone. Nobody's sound changes until they pick one. Found by the independent review
+    and fixed before he saw it: the phone picker's "Default" row now means the default for that sound
+    and is saved as blank, and only one "Prayer times" channel exists at a time.
   - *Vibration*: every prayer notification, alarm and reminder already vibrates. He chose **"follow
     the phone"** (Ring: sound and buzz; Vibrate: buzz; Silent: nothing; Do Not Disturb: nothing unless
     the alarm's Play on silent is on). Rejected: forcing a buzz on Silent (overrides the person's mute).
-
-Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
-"improves" it back.
 
 - **18 Oct 2026 (night), D2 decided, and D1 and D3 approved from screenshots.** Usage question: the
   owner chose **B, bold links**, over A (solid buttons under "Before you decide" and "Your answer"

@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
         // would silently never appear (independent security review, 17 Oct 2026). Null is the
         // phone's default, as before.
         if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
-        viewModel.setAlarmSound(uri?.toString().orEmpty())
+        viewModel.setAlarmSound(storedSound(uri, RingtoneManager.TYPE_ALARM))
     }
 
     /** The same, for the notification sound (18 Oct 2026). A launcher of its own, so no state says which. */
@@ -120,7 +120,7 @@ class MainActivity : ComponentActivity() {
         val uri = result.data
             ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
         if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
-        viewModel.setNotificationSound(uri?.toString().orEmpty())
+        viewModel.setNotificationSound(storedSound(uri, RingtoneManager.TYPE_NOTIFICATION))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -278,6 +278,9 @@ class MainActivity : ComponentActivity() {
             putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
             putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(title))
             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            // The picker's "Default" row. Without this, with TYPE_ALL, it meant the default *ringtone*,
+            // so a person going back to "default" got their ringtone on every prayer (review, 18 Oct 2026).
+            putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, RingtoneManager.getDefaultUri(defaultType))
             putExtra(
                 RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
                 existing.takeIf { it.isNotBlank() }?.let(Uri::parse)
@@ -285,6 +288,13 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+
+    /**
+     * What is saved for a pick: "" when it is the phone's default for [defaultType], which keeps a
+     * notification on its original channel and follows the phone if its default tone changes later.
+     */
+    private fun storedSound(uri: Uri?, defaultType: Int): String =
+        uri?.takeIf { it != RingtoneManager.getDefaultUri(defaultType) }?.toString().orEmpty()
 
     private fun toast(message: String) =
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()

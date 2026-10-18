@@ -80,17 +80,11 @@ object Notifications {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
 
-        manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_PRAYERS,
-                context.getString(R.string.channel_prayers),
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                description = context.getString(R.string.channel_prayers_desc)
-                enableVibration(true)
-                vibrationPattern = PRAYER_VIBRATION
-            },
-        )
+        // Not while a chosen sound's channel stands in for it: two "Prayer times" entries in the
+        // phone's settings, one doing nothing, would let someone turn off the wrong one.
+        if (manager.notificationChannels.none { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }) {
+            createPrayersChannel(context, manager)
+        }
 
         manager.createNotificationChannel(
             NotificationChannel(
@@ -190,6 +184,22 @@ object Notifications {
         return id
     }
 
+    /** The original prayer notification channel, the phone's usual tone. */
+    private fun createPrayersChannel(context: Context, manager: NotificationManager) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        manager.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_PRAYERS,
+                context.getString(R.string.channel_prayers),
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = context.getString(R.string.channel_prayers_desc)
+                enableVibration(true)
+                vibrationPattern = PRAYER_VIBRATION
+            },
+        )
+    }
+
     internal fun notificationChannelId(soundUri: String): String =
         if (soundUri.isBlank()) CHANNEL_PRAYERS else CHANNEL_NOTIFICATION_PREFIX + soundUri.hashCode().toUInt().toString(16)
 
@@ -199,6 +209,11 @@ object Notifications {
      * phone's silent, vibrate and Do Not Disturb settings apply to it like any other notification,
      * which is the behaviour the owner chose ("follow the phone", 18 Oct 2026). Never bypasses
      * Do Not Disturb: only an Alarm with "Play on silent" does that.
+     *
+     * Only one of the two exists at a time, so the phone's settings list one "Prayer times" (independent
+     * review, 18 Oct 2026). [CHANNEL_PRAYERS] is deleted while a chosen sound is in use; Android restores
+     * a deleted channel with all its old settings when the same id is created again (documented on
+     * NotificationManager.deleteNotificationChannel), so going back to the usual tone loses nothing.
      */
     fun ensureNotificationChannel(context: Context, soundUri: String): String {
         val id = notificationChannelId(soundUri)
@@ -209,7 +224,12 @@ object Notifications {
             .filter { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) && it.id != id }
             .forEach { manager.deleteNotificationChannel(it.id) }
 
-        if (id == CHANNEL_PRAYERS || manager.getNotificationChannel(id) != null) return id
+        if (id == CHANNEL_PRAYERS) {
+            createPrayersChannel(context, manager)
+            return id
+        }
+        manager.deleteNotificationChannel(CHANNEL_PRAYERS)
+        if (manager.getNotificationChannel(id) != null) return id
 
         manager.createNotificationChannel(
             NotificationChannel(

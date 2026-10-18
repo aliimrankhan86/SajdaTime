@@ -40,6 +40,16 @@ class NotificationSoundTest {
         assertTrue(body.contains("USAGE_NOTIFICATION"))
         assertTrue(body.contains("enableVibration(true)"))
         assertFalse("A notification follows the phone; only an Alarm with Play on silent may bypass", body.contains("setBypassDnd"))
+        // One "Prayer times" in the phone's settings at a time: the original goes while a chosen sound's is in use.
+        assertTrue(body.contains("deleteNotificationChannel(CHANNEL_PRAYERS)"))
+    }
+
+    @Test
+    fun `the picker's Default row is the default for the sound being chosen, saved as blank`() {
+        val source = File("..", "app/src/main/java/com/sajdatime/app/MainActivity.kt").readText()
+        assertTrue(source.contains("EXTRA_RINGTONE_DEFAULT_URI, RingtoneManager.getDefaultUri(defaultType)"))
+        assertTrue(source.contains("setNotificationSound(storedSound(uri, RingtoneManager.TYPE_NOTIFICATION))"))
+        assertTrue(source.contains("setAlarmSound(storedSound(uri, RingtoneManager.TYPE_ALARM))"))
     }
 
     @Test

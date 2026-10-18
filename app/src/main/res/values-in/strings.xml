@@ -172,7 +172,7 @@
     <string name="settings_method_auto">Otomatis · %1$s</string>
     <string name="settings_method_help">Masjid mengukur cahaya fajar dan senja dengan cara berbeda, dan itu terutama menggeser Subuh dan Isya. Makin jauh ke utara tempat tinggal Anda, makin besar selisihnya. Jika waktu ini tidak cocok dengan masjid Anda, tanyakan metode yang mereka pakai lalu pilih di sini.</string>
 
-    <string name="settings_alerts_help">Notifikasi: memutar suara notifikasi dan bergetar. Alarm: memutar suara alarm pada volume alarm dan bergetar. Pilih kedua suara itu di Setelan, tepat di bawah Pengingat salat.</string>
+    <string name="settings_alerts_help">Notifikasi: memutar suara notifikasi dan bergetar. Alarm: memutar suara alarm pada volume alarm dan bergetar. Pilih kedua suara itu di Pengaturan, tepat di bawah Pengingat salat.</string>
     <string name="alert_style_off">Mati</string>
     <string name="alert_style_notification">Notifikasi</string>
     <string name="alert_style_alarm">Alarm</string>

@@ -1551,8 +1551,21 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   notification style set only a vibration, so on Android 7 a "Notification" buzzed silently although Prayer
   alerts promised the phone's usual tone. It now sets the chosen sound or the default notification tone.
   **Not verified on an Android 7 device or emulator**: reasoned from the platform, compiled and unit tested.
+- **One "Prayer times" channel at a time** (independent review, 18 Oct 2026): `prayer_times` and a
+  `prayer_notif_v…` channel used to coexist, two identical entries in the phone's settings, one of them dead.
+  Now `prayer_times` is deleted while a chosen sound is in use and `ensureChannels` does not recreate it.
+  Android's documented behaviour restores a deleted channel's settings when the id is created again.
+- **The phone picker's "Default" row** (same review): with `TYPE_ALL` it meant the default ringtone, so
+  "going back to default" put the ringtone on every prayer. `EXTRA_RINGTONE_DEFAULT_URI` now names the
+  default for the sound being chosen, and that pick is saved as blank (`MainActivity.storedSound`). Applies
+  to the alarm picker too; a sound saved before keeps its stored value until picked again.
+- **Known and accepted:** an Alarm that drops to a notification (polar approximated day) plays the
+  notification sound, whose row is hidden if every prayer is an Alarm; it is then the usual tone unless
+  one was chosen earlier. `docs/privacy.html` and `docs/store/LISTING.md` still say "type a city name":
+  wording only, nothing about data handling changed, left for the 1.5.0 privacy re-date.
 - **Not verified on any device:** that a long adhan as a notification plays in full and stops when the
-  notification is swiped away. Both are Android's own notification sound handling; check on the emulator.
+  notification is swiped away, the channel swap above, and the picker's Default row. Android's own
+  behaviour, reasoned from its documentation; check on the emulator.
 - No network, no permission, no usage counts event, no privacy change: the sound choice stays on the phone.
 
 ### 5.24 Security hardening (17 Oct 2026, owner: "improve the security ... apply the best possible solution", ships in 1.5.0)
@@ -1791,6 +1804,7 @@ sound **cannot be changed after creation**. So:
 | Prayer times | `prayer_times` | HIGH |
 | Next prayer badge | `next_prayer_badge` | LOW, silent, no badge dot |
 | Prayer alarm | `prayer_alarm_v<hash-of-sound-uri>` | HIGH, `USAGE_ALARM`, `setBypassDnd(true)` |
+| Prayer times, chosen sound (1.5.0, §5.25) | `prayer_notif_v<hash-of-sound-uri>`, only while a notification sound is chosen; `prayer_times` is deleted meanwhile and restored with its old settings when the usual tone is chosen again | HIGH, `USAGE_NOTIFICATION`, never bypasses Do Not Disturb |
 
 `ensureAlarmChannel()` hashes the chosen sound URI into the id and **deletes stale
 `prayer_alarm_v*` channels**, so the system Settings list does not fill with dead entries.
@@ -5070,8 +5084,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
 **NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, on `ccr-23a38578-c5vz7d`, NOT yet merged into `claude/quiet-glass`** (his rule: screenshots first, merge after he approves).
-(1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, measured
-by tapping outside the edge in Robolectric) for every button beside text, Times block gaps on the `Space`
+(1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
+by tapping outside the edge in the scratch render harness, not a committed test) for every button beside text, Times block gaps on the `Space`
 scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
 help; chosen "Or type where you are" / "Town, city or village" / his examples "Karachi, London, Makkah, New
 York", in all five languages (DESIGN_SYSTEM §9 has the reasoning and what was rejected). (3) Sounds: a
