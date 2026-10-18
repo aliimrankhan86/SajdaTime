@@ -5040,27 +5040,51 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 Widget redesign, 18 Oct 2026 early (branch `ccr-23a38578-c5vz7d`, on top of `claude/quiet-glass`, NOT merged, for 1.5.0)
+### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-The owner sent a screenshot of the live 1.4.0 widgets on his S23 Ultra and called them "extremely bland",
-asking for an Apple style design with decent sized fonts and more information. Three directions were
-drawn on a design canvas (private artifact https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf), desk
-research done at his request (`docs/plans/2026-10-widget-redesign/RESEARCH.md`: desk only, no users), and
-he chose **hero countdown**, then asked for the town the times are for to be shown on it, then for a
-glossy "Apple premium" finish and a location chip that reads as "update location". Built as
-§5.20 items 5 and 7 describe. **Verified:** the whole gate (see §10);
-48 widget unit tests (5 new); renders through the real `RemoteViews.apply` path (lesson 132) of every
-layout in light, dark, ordinary, Ramadan, no exact alarms, no location, 1.3 and 2.0 text, English, Urdu,
-Arabic, Turkish and Indonesian, which found and fixed three defects (rows squashed on top of each other,
-the prayer name cut before its time at 2.0, the wide widget's times clipped). **Not verified:** a real
-launcher (the size the S23 Ultra's One UI actually gives a 4 by 4, and whether it switches layouts as
-the map asks), Android 11 and older (single layout), the device suite on an emulator (the ids and rules
-it checks are unchanged), the glyphs at the smallest size on a real screen. **Next:** merge this branch
-into `claude/quiet-glass` (or open a pull request) once the owner has seen the screenshots; the
-emulator run in the December preparation job covers the device suite. Store screenshots are retaken with
-1.5.0 anyway.
+**Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 grew on branch
+`ccr-23a38578-c5vz7d`**, which is `claude/quiet-glass` plus four owner requests from 18 Oct 2026. It
+is pushed, NOT merged into `claude/quiet-glass` yet; the owner said "looks good" to all four and has
+not yet said to merge.
 
-### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read this first; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
+1. **Widget redesign, "hero countdown"** (he called the 1.4.0 widgets "extremely bland" from his S23
+   Ultra). Chosen from three drawn directions on a private design canvas
+   (https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf) after desk research
+   (`docs/plans/2026-10-widget-redesign/RESEARCH.md`, desk only, no users). Big light countdown,
+   sun position glyphs, five day bars, date and Hijri date, two layouts per widget by size. §5.20
+   items 5 and 7.
+2. **The town on every widget**, reversing 1.4.0's "no place name on a home screen" (his call). The
+   privacy page says so; **re-date `docs/privacy.html` the day this reaches `main`** (lesson 137).
+3. **Glossy "Apple premium" finish and a location chip** (pin, town, update arrow; opens the app,
+   which refreshes the location on resume). Opaque, fixed gradient, contrast tested. It overrides the
+   17 Oct "no glossy finish" rejection for widgets only (DESIGN_SYSTEM §9).
+4. **Short disclaimer after setup**, full text in Settings and behind "Read in full" (§5.15). Still all
+   four points; the dua request is now only in the full text.
+
+**Verified:** the full gate on the branch tip (core 120, app 238, wear 12, 0 failures; lint 0 errors;
+both release bundles); widgets and the setup dialog rendered through Robolectric (lesson 132, harness
+not committed) in light, dark, Ramadan, 1.3 and 2.0 text, English, Urdu, Arabic, Turkish, Indonesian.
+Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `disclaimer-short-form.png`.
+**Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
+chip's tap and the location refresh it relies on (read, not run), the on device suite.
+
+**Next, in order:** (a) when the owner says so, merge `ccr-23a38578-c5vz7d` into `claude/quiet-glass`
+(merge commit) and push; (b) the December preparation job's emulator run covers the device suite;
+(c) retake store screenshots with 1.5.0 as already planned. Nothing else is waiting.
+
+**GBrain and Cowork memory were NOT updated on 18 Oct 2026:** this was a cloud session with neither
+connected. The next session that has GBrain should write the entry below to `projects/sajdatime`, and
+the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and the entry:
+
+> 18 Oct 2026. Owner decisions: widgets redesigned "hero countdown" (chosen from A/B/C); town shown on
+> every widget (reverses 1.4.0 no-place rule); glossy finish allowed for widgets only (fixed gradient,
+> opaque, contrast tested; overrides 17 Oct no-gloss); location chip opens the app to refresh location
+> (no background location, ever); one Asr glyph for every madhab; setup disclaimer is a short form with
+> all four points and "Read in full", full text in Settings (dua only in the full text). All on branch
+> `ccr-23a38578-c5vz7d` over `claude/quiet-glass`, gate green, not merged; owner said "looks good".
+> Re-date privacy.html when it reaches main.
+
+### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
 **Live.** Phone **1.4.0** (versionCode 8), published 17 Oct 2026 (Play "Updated on 17 Oct 2026"), all
 178 countries: widgets, the Ramadan pack (dormant until the eve), the corrected privacy wording. Watch 1.2.0

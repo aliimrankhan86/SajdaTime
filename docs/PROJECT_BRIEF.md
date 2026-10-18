@@ -47,6 +47,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Ramadan 1448** begins on Monday 8 Feb 2027.
 
 ## Decisions still open (Ali's)
+- **Merge the 18 Oct work into the 1.5.0 branch.** The widget redesign, the town and location chip, the glossy finish and the short disclaimer are on branch `ccr-23a38578-c5vz7d`, checked and pushed. Ali said "looks good"; merging waits on his word.
 - **Turkey iftar times.** Diyanet's table puts Maghrib 7 to 8 minutes after the app's Turkey method. Claude recommends adding Diyanet's offsets, because an iftar shown too early is the dangerous direction. Settle this before Ramadan.
 - **January store listing.** Add the Ramadan lines (already written in `docs/store/LISTING.md`) in January.
 
