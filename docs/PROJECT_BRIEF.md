@@ -18,7 +18,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Privacy policy:** https://aliimrankhan86.github.io/SajdaTime/privacy.html, dated 17 Oct 2026.
 
 ## Next release: 1.5.0
-- **Branch:** `claude/quiet-glass`, prepared and parked on 18 Oct 2026: everything merged into it, all checks pass, phone and watch both set to 1.5.0 (codes 9 and 1002, both ship), What's new final in five languages. Not merged into `main` until the day Ali submits. Release day steps: `docs/release-tools/RELEASE-1.5.0.md`. The new store description is approved by Ali on condition it is checked line by line for accuracy before it is pasted (it also removes a false privacy line from the live one). The rest is done from Ali's Mac.
+- **Branch:** `claude/quiet-glass`, prepared and parked on 18 Oct 2026: everything merged into it, all checks pass, phone and watch both set to 1.5.0 (codes 9 and 1002, both ship), What's new final in five languages. Not merged into `main` until the day Ali submits. Release day steps: `docs/release-tools/RELEASE-1.5.0.md`. The new store description is approved by Ali on condition it is checked line by line for accuracy before it is pasted (it also removes a false privacy line from the live one). The rest is done from Ali's Mac: the cloud session handed over on 18 Oct 2026, and a new Mac session starts from "Starting the Mac session" at the top of that checklist.
 - **Contents:**
   - The Quiet Glass design: a floating tab bar, one header style, a new Settings screen, one Notice style for every notice, a slightly deeper green, and widgets restyled to match.
   - Arabic as the fifth language. It reads right to left and uses Western digits.

@@ -8,6 +8,40 @@ January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027).
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
 is done by touching the signing key, and **he presses every submit, publish and consent button**.
 
+## Starting the Mac session (the owner's handover, 18 Oct 2026)
+
+The cloud session is finished. The owner continues in Claude Code **on his Mac** and will open a new
+session and ask it to do the rest. A Mac session reading this: the brief below is yours, and it is
+the same one he was given to paste. Results from an earlier Mac session may already be in the shared
+memory (GBrain `projects/sajdatime`); `recall` it first and do not redo work it proves done.
+
+1. **Treat every claim on this branch as unverified until you have checked it.** Report each as
+   confirmed, wrong or not checkable:
+   - the branch is level with `origin/claude/quiet-glass` (at `9038d3a` or later), the tree is clean,
+     and how far it is ahead of `origin/main`;
+   - versions are phone 9 / 1.5.0 and watch 1002 / 1.5.0;
+   - the full gate passes (`clean test lint :app:bundleRelease :wear:bundleRelease`), with the test,
+     failure and lint counts pasted (the cloud run on 18 Oct: 384 tests, 0 failures, 0 lint errors);
+   - `DesignRulesTest` covers buttons, button sizes and spacing: prove one rule by breaking it once,
+     then put it back;
+   - Turkey (Diyanet) applies Sunrise −7, Dhuhr +5, Asr +4, Maghrib +7: compare Istanbul with Aladhan
+     method 13 on the three `RamadanGoldenTest` dates, within 1 minute;
+   - the 1.5.0 description and the five What's new texts in `docs/store/LISTING.md` are true of the
+     1.5.0 build on the emulator and of `docs/privacy.html`, under 4000 and 500 characters, and the
+     description still says "Wear OS".
+2. **Then do the Mac only items** in "From the Mac readiness check" below and step 1 of "Still to do":
+   the one line widget device test, `release-1.5.0.sh` (run it and fix what it finds; the device suite
+   runs through `am instrument` after `grantbind`), the store screenshots, and anything wrong on the
+   emulator in light, dark, Urdu or 2x text.
+3. **Rules:** do not merge into `main`; do not touch the Play Console or the signing key; never ask him
+   to test the watch; when unsure, ask with `AskUserQuestion`, recommendation first, screenshots for
+   anything visual; never write "done", "every" or "all" without the counts; get an independent review
+   of the diff before committing; follow the commit rule in `CLAUDE.md` (HANDOVER §11 NEWEST,
+   `PROJECT_BRIEF.md`, this file) and push to `claude/quiet-glass`; leave the emulator as you found it.
+4. **Report to him in plain English:** a table of what was verified, what was wrong and what was fixed;
+   what is still not verified; what remains for release day and who does each item; the commit he
+   should see. Then stop and wait for him.
+
 ## Already done on the branch (18 Oct 2026)
 
 - [x] Every 1.5.0 change merged into `claude/quiet-glass`; full gate green (tests, lint, both bundles).
