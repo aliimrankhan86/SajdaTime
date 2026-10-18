@@ -97,7 +97,7 @@ android {
             )
         }
 
-        // `./gradlew installRtl` — a debug build that runs entirely right-to-left, for
+        // `./gradlew :app:installRtl` (never bare: lesson 149) — a debug build that runs entirely right-to-left, for
         // previewing what a translation into Arabic or Urdu will actually look like before
         // one exists. See core/AppLocale.kt; docs/HANDOVER.md §10 has what it has caught.
         create("rtl") {

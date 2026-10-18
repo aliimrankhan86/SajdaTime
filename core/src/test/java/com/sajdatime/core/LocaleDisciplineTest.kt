@@ -108,7 +108,7 @@ class LocaleDisciplineTest {
                 "to a language the app is actually translated into. If a native-speaker " +
                 "translation has genuinely shipped, this test is the one to change, in the " +
                 "same commit, naming the reviewer. To preview right-to-left without shipping " +
-                "it, run ./gradlew installRtl.",
+                "it, run ./gradlew :app:installRtl.",
             language !in rightToLeftLanguages,
         )
     }

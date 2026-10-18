@@ -51,7 +51,7 @@ import java.util.Locale
  * Verified on an `ar-EG` phone and watch rather than argued — HANDOVER §5.16 and §10.
  *
  * To see what a right-to-left translation will look like before one exists, run
- * `./gradlew installRtl`. That build type overrides `app_language_tag` with `ur` — a real
+ * `./gradlew :app:installRtl`. That build type overrides `app_language_tag` with `ur` — a real
  * right-to-left locale, on both phone and watch — which is enough to flip the entire app,
  * because everything below follows this one string. Read what it shows you as a check on
  * *layout*, not on prose: the words are still English, and English in a right-to-left

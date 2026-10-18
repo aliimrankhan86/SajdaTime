@@ -117,7 +117,7 @@ it is not work to invent. §15 lesson 113.
   because the build cache keys off the same list. This has happened **three times** — §15
   lessons 42, 84 and 91. If you add such a guard, declare the file, and prove it by breaking
   *that* file rather than a sibling.
-- **`./gradlew installRtl` shows English words laid out right-to-left.** That always looks
+- **`./gradlew :app:installRtl` shows English words laid out right-to-left.** That always looks
   wrong, because it is. Read it as a check on *layout* — mirroring, margins, clipping — and
   never put its screenshots in front of the owner as findings. §15 lesson 86.
 - **Character count does not predict where text wraps.** On the watch, 88 characters fitted

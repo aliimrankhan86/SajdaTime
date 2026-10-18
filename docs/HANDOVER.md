@@ -1553,8 +1553,20 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   Match your mosque, you can remove them"). The method's description says "with its precaution minutes"
   in all five languages.
 - **Verified:** `RamadanGoldenTest` Istanbul rows moved by exactly the offsets and pass (the old rows now
-  fail, so the minutes really apply). **Not verified:** a fresh comparison with Aladhan method 13 (its
-  server is blocked from the cloud session; a Mac session can run it).
+  fail, so the minutes really apply). **Compared on the Mac, 18 Oct 2026** (engine output printed by a
+  throwaway test, Istanbul 41.0082, 28.9784). Aladhan method 13 reports exactly these offsets in its
+  `meta` (Sunrise -7, Dhuhr 5, Asr 4, Maghrib 7, Fajr and Isha 0). On the three `RamadanGoldenTest`
+  dates Fajr, Sunrise, Dhuhr and Maghrib match to the minute and Isha within 1; **Asr is 2 minutes
+  later than Aladhan on 8 Feb and 8 Mar 2027** (1 on 22 Feb). That gap is the two libraries' Asr formula,
+  not the Turkey minutes: London MWL, with no offsets, shows the same 2 to 3 minutes (3 is outside the
+  ±2 the suite usually allows, and `RamadanGoldenTest` checks only Fajr and Maghrib against Aladhan, so
+  Asr against Aladhan is worth a look after 1.5.0 alongside the Turkish cities). Against
+  **Diyanet's own Istanbul page** (it loads from the Mac), 18 to 24 Oct 2026: Fajr and Dhuhr exact on
+  7 of 7 days, Sunrise exact or 1 later, **Maghrib 1 minute earlier on 7 of 7 days**, Asr and Isha 1 to 2
+  earlier. Left as it is for 1.5.0: inside the 1 minute the release check asked for and inside what
+  "follow your mosque" covers; the cause (Diyanet's reference point for Istanbul, or its rounding) is
+  not known, and a blind +1 would move every Turkish city. Worth a look with more Turkish cities after
+  1.5.0.
 - **Near the polar circle** (about 65.5°N at midsummer, a night under about 25 minutes), Maghrib +7 can
   land after the twilight Isha, so the order check fails and the day is projected from the reference
   latitude and marked approximate. Safe and honest; noted so it is not mistaken for a bug (found by the
@@ -2134,6 +2146,26 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.5.0 release check on the owner's Mac (18 Oct 2026, late; `claude/quiet-glass`).** Emulators `sajda`
+(Pixel 7, Android 16), `sajdastore` (Pixel 2 profile, 1080 by 1920), `sajdawear` and `sajdawear_large`,
+every one started `-read-only`. Gate without the build cache: 384 unit tests, 0 failures, lint 0 errors,
+both bundles signed by the owner's certificate. `release-1.5.0.sh` ran four times; the gate in runs 1 and 2
+came before the last widget XML change (the independent review caught that "after the visual fixes" was
+not true of the final file); run 3 came after the attribute change but before a last comment edit, so
+only run 4 built the final code. Each run prints 24 summary
+lines: tree was CHECK every time (the uncommitted work), push FAIL in run 2 only (the cloud had pushed
+`deb0877`, since merged), phone SKIPPED (his choice), and the other lines PASS or TAKEN (run 4's exact
+summary is in §11 NEWEST). Device suite 19 of 19 through `am instrument` after `grantbind`, then on the
+Ramadan clock suhoor 1 of 1, Ramadan 4 of 4, widgets 4 of 4 and 4 of 4 at text 2.0, PDF 2 of 2, the
+timetable sheet opened, Do Not Disturb list shows SajdaTime, screens in five languages. Widgets added
+through the Pixel Launcher's own picker (first time on a real launcher): Next at 3 by 2 and Today at
+4 by 4 draw everything at their default size in light, dark and text 2.0 (at 2.0 a long town and the date
+are shortened with "…"); the location chip opens the app. The store emulator's own place lookup named
+nothing ("Your location"), so Manchester was typed into the location sheet. Watch: `tools/wear-verify.sh`
+at 1.0 and 1.3, 24 of 24 bezel checks pass; read by eye, the 192dp watch at 1.3 still has the
+disclaimer's first line under the clock at the end of the scroll. Istanbul against Aladhan method 13 and
+Diyanet: §5.26. **Not verified:** a real phone, Android 7 to 13, the review card.
 
 **Widget redesign, hero countdown (18 Oct 2026, cloud session, branch `ccr-23a38578-c5vz7d`).** Gate
 `clean test lint :app:bundleRelease :wear:bundleRelease` passed: unit tests core 120, app 235, wear 12, 0
@@ -2862,8 +2894,9 @@ for.
 
 ```bash
 # Run the whole app right-to-left, without touching a device setting or shipping
-# a translation. Phone and watch both have the build type.
-./gradlew installRtl
+# a translation. Phone and watch both have the build type; name the module, because a bare
+# installRtl puts the watch app over the phone app (§15 lesson 149). :wear:installRtl for the watch.
+./gradlew :app:installRtl
 ```
 
 ```bash
@@ -5147,9 +5180,63 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
+### 📍 STATE OF PLAY, 18 Oct 2026 late (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 night: 1.5.0 is prepared and PARKED.** At the owner's word ("merge everything then make sure for the release 1.5 everything is ready to roll out"): everything below is merged into `claude/quiet-glass`; versions set (phone 9 / 1.5.0, watch 1002 / 1.5.0, both ship); What's new final in five languages plus a watch note (`docs/store/LISTING.md`), including the redesigned widgets at his request ("it should include widgets and their styles"); and **the release day checklist is `docs/release-tools/RELEASE-1.5.0.md`**: follow it, in order. **The Mac readiness check's results came in and are folded in** (18 Oct 2026): of its 15 items, Turkey, D5, the watch release, What's new and the version bump were already done; the rest are in `RELEASE-1.5.0.md` with who does each. Done here from it: a **1.5.0 store description draft** (`docs/store/LISTING.md`), which also removes a false line in the live description ("Your coordinates never leave your device"; the town name goes through the geocoder). **His answers (18 Oct 2026):** the description and What's new are approved "as long as they are accurate", so a Mac session checks every line against the 1.5.0 build before pasting; the habit tracker is out of 1.5.0; and **all remaining work is done in a Claude Code session on his Mac, not in the cloud**. **For a session on his Mac:** fix the one line device test the check found, write and run `release-1.5.0.sh` (the 1.4.0 script's version, size and watch checks are wrong for 1.5.0; the checklist says exactly how), retake the store screenshots, and check whether Play shows translated release notes without translated listings. **He is moving to his Mac** ("I want to merge it all so I can take it with my local computer session"): everything is on `claude/quiet-glass`. **The cloud session has handed over and stopped** (18 Oct 2026, his words: "handing over everything to local claude ... I will ask on a new session"). A new Mac session's brief is the section "Starting the Mac session" at the top of `docs/release-tools/RELEASE-1.5.0.md`: verify the cloud claims first, then the Mac only items, then report and wait.
+**In one line: 1.4.0 is live; 1.5.0 is finished and checked on `claude/quiet-glass` (pushed, not merged
+into `main`); the next step is release day, around 4 Jan 2027, unless Ali asks for something else. Start
+nothing new on your own.** The cloud session that built 1.5.0 is closed for good: never rely on it or ask
+him to go back to it. Everything it knew is in this file, `docs/release-tools/RELEASE-1.5.0.md` and
+`docs/PROJECT_BRIEF.md`; if a reason is missing, search those first, then ask him.
+
+- **Live on Play:** phone 1.4.0 (versionCode 8, "Updated on 17 Oct 2026"), watch 1.2.0 (1001). Read
+  "Updated on" before believing any claim that something else is live.
+- **Ready:** 1.5.0 on `claude/quiet-glass`: phone 9 / 1.5.0, watch 1002 / 1.5.0, both ship. What is in
+  it: PROJECT_BRIEF "Next release". Owner decisions that are settled (do not reopen without him):
+  vibration follows the phone; the adhan or a phone sound for both a notification and an alarm, each on
+  its own Settings row; one line saying that opening the notification panel stops the adhan; place
+  wording "Town, city or village" with Karachi, London, Makkah, New York; the Ramadan button "Get the
+  full Ramadan timetable", full row, 24dp above and below; spacing from the `Space` tokens; Turkey with
+  Diyanet's minutes; tab bar 97% solid; the Hijri date shrinks to fit; "I ask only one thing in return";
+  the description and What's new approved as long as they are accurate (checked, three lines fixed); the
+  widgets and their styles in What's new; the habit tracker out of 1.5.0; all remaining work on his Mac.
+- **Verified on his Mac, 18 Oct 2026 late** (detail in NEWEST below): the uncached gate, 384 unit tests
+  (core 120, app 252, wear 12), 0 failures, lint 0 errors, both bundles signed `CN=Ali Imran Khan` with
+  the right versions;
+  `release-1.5.0.sh` run 4 on the final code 22 of its 24 lines PASS or TAKEN, the other two tree CHECK (the uncommitted work this commit carries) and phone SKIPPED (his choice) (device suite 19 of 19, suhoor 1,
+  Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1, timetable sheet opened, languages,
+  the same 11 phone and 3 watch permissions, size); `DesignRulesTest` proved by breaking one rule; six new
+  phone store screenshots; both widgets on a real launcher.
+- **Open, none blocks 1.5.0** (RELEASE-1.5.0.md "Open items"): Turkey's Maghrib is 1 minute early against
+  Diyanet's Istanbul page on 7 of 7 days (check other Turkish cities after 1.5.0; Asr's 2 minutes against
+  Aladhan is the libraries, not Turkey, §5.26); the Settings line "A helper, not a religious authority.
+  Tap to read." breaks the no "Tap to" rule (live since 1.4.0, fix after 1.5.0 if he agrees); the cloud
+  accidentally published a private copy of RELEASE-1.5.0.md at claude.ai/artifact/GxU35nSJAfxqedU7DYa35L
+  (only he can see it; he can delete it).
+- **Not verified:** a real phone; Android 7 to 13 (his choice); the phone sound picker's "Default" row;
+  Google's review card (Play installs only); whether Play shows the translated What's new without
+  translated listings (his choice if not); Turkish cities other than Istanbul. Full list: RELEASE-1.5.0.md
+  "Not verified yet".
+- **Release day, in order** (RELEASE-1.5.0.md "Still to do" is the exact list): 1. Claude runs
+  `release-1.5.0.sh` again (the 21 Dec job does); 2. Claude, on the day, dates `docs/privacy.html` and
+  pushes; 3. Ali merges `claude/quiet-glass` into `main` that same day, not before (merging publishes the
+  privacy policy); 4. Ali builds both bundles fresh from `main`; 5. Ali in the Console, Claude walking
+  him through one screen at a time: both bundles, five What's new texts, the watch note, the checked
+  description, the six screenshots, Data safety (expected unchanged), whether the translated notes show,
+  then he presses Send for review; 6. after it is live: the Arabic reviewer reply (Claude drafts, Ali
+  posts), the January Ramadan listing lines, Ali deletes the spare signing file in `~/.gradle`, record
+  it here and in PROJECT_BRIEF.
+- **Dates and jobs:** reminder Sun 20 Dec 2026 18:00; the preparation job (local scheduled task
+  `sajdatime-1-5-0-reminder`) Mon 21 Dec 2026 10:00, its prompt rewritten 18 Oct 2026 late to run
+  `release-1.5.0.sh`, never set the versions again and stop before any merge, pull request, submit or
+  Console step; submit around 4 Jan 2027; latest acceptable 25 Jan 2027; Ramadan 1448 begins Mon 8 Feb
+  2027. The daily review replies job keeps running.
+
+
+**NEWEST, 18 Oct 2026 late: the Mac session checked the cloud's claims and did the Mac only items. 1.5.0 is ready for release day; PARKED again.** A Claude Code session on his Mac (worktree `~/Developer/SajdaTime-settings-preview`) followed the brief at the top of `docs/release-tools/RELEASE-1.5.0.md`. **Checked:** branch level with origin (at `9038d3a`, then `deb0877` which the cloud pushed during the session, docs only), clean, 63 commits ahead of `origin/main` before this commit; versions 9 / 1.5.0 and 1002 / 1.5.0 in the source and in both signed bundles (signed `CN=Ali Imran Khan`); the gate `--no-build-cache clean test lint :app:bundleRelease :wear:bundleRelease`: **384 unit tests (core 120, app 252, wear 12), 0 failures, lint 0 errors**; `DesignRulesTest` (7 tests) proved by breaking one rule (a `16.dp` Spacer in `EidCard.kt`: exactly 1 failure, then 7 of 7 after putting it back). **Turkey** against Aladhan method 13: same offsets, 5 of 6 times within a minute, Asr 2 later than Aladhan on two dates (the libraries' Asr formula, London MWL shows it too); against Diyanet's own Istanbul page, Maghrib 1 minute early on 7 of 7 days, left as is (§5.26). **Store text:** two lines of the description and one of the watch note were not true and were changed (`docs/store/LISTING.md`), all within limits (description 3969 of 4000 with "Wear OS"; What's new 495, 394, 490, 421, 311 of 500; watch note 147). **Done:** the device test fix (`DeviceSupport.alarmTimes`, exact package; old line 2 of 4 fail beside the sideload copy, fixed 4 of 4); `docs/release-tools/release-1.5.0.sh`, run four times, every line PASS or TAKEN apart from tree CHECK (uncommitted work) every time, push FAIL once (run 2, the cloud's `deb0877`) and phone SKIPPED (his choice) (device suite 19 of 19, suhoor 1, Ramadan 4, widgets 4 and 4 at 2.0 text, PDF 2, timetable sheet opened); it found that **a bare `./gradlew installRtl` installs the watch app over the phone app** (lesson 149, fixed in the script and CLAUDE.md); **six store screenshots** retaken from the 1.5.0 build (the watch ones did not change); both widgets **seen on a real launcher** for the first time (Pixel Launcher, Android 16, light, dark, 2.0 text; the chip opens the app). **Two visual fixes, each the owner's choice from screenshots with AskUserQuestion:** the floating tab bar is now 97% solid instead of 90% (text under it ran into its labels, worst in dark), and the large Today widget's Hijri date shrinks to fit one line instead of being cut ("2 Rabi al-Awwal 14…" on a 5 column home screen; wrapping it was offered first and withdrawn because it pushed Isha off at 4 by 3). DESIGN_SYSTEM §9 has both. **He also chose:** a sixth store screenshot of the widgets, and "I ask only one thing in return" for the description's last line. Emulators: every one was booted `-read-only` (lesson 150), so the AVDs are as they were. **Left for release day, in order (RELEASE-1.5.0.md "Still to do"):** Claude runs `release-1.5.0.sh` once more (the 21 Dec job can); Claude re-dates `docs/privacy.html` on the day; he merges into `main` that day; he builds both bundles from `main`; in the Console, with Claude walking him through, he uploads both bundles, pastes the What's new texts, the watch note and the checked description, replaces the phone screenshots with the six, confirms Data safety, checks whether Play shows the translated release notes without translated listings, and presses Send for review. **Seen, not changed:** the Settings row "A helper, not a religious authority. Tap to read." breaks the no "Tap to" copy rule but is already live in 1.4.0; the wide strip under the floating tab bar shows content fully (how a floating bar works). **Not verified:** a real phone, Android 7 to 13 (his choice), Turkish cities other than Istanbul, the review card (Play installs only), what Play does with translated release notes.
+
+**Then, the same Mac session, 18 Oct 2026 late: secured, reviewed, committed and pushed (the owner's finishing brief).** The cloud session is closed for good and pushed one last docs only commit, `1a9df4f` (step 0 of the RELEASE-1.5.0.md brief: secure the Mac session's work first); it was merged by fast forward, no force push, both sides' text kept. Other clones checked: `~/Developer/SajdaTime` (main, level with `origin/main`, clean) and its old worktree `kind-kirch-cf2a70` (clean, its branch already in `origin/main`); the one stash entry is the 1.4.0 planning copy, not this work. **The 21 Dec preparation job's prompt was rewritten** (`~/.claude/scheduled-tasks/sajdatime-1-5-0-reminder/SKILL.md`, outside the repo): it was written before the versions were set, so it bumped versionCode, built its own script, added the January listing lines and opened a pull request; now it runs `release-1.5.0.sh`, never sets the versions, and stops before any merge, pull request, submit or Console step. **The independent review** (a subagent, the whole diff) found five things to fix before commit, all done: a placeholder left in this section; the gate had not run on the final widget XML (run 4 did; run 3 differed from it only by an XML comment); the new files were untracked; "every line PASS or TAKEN" was an overclaim (push FAIL in run 2, tree CHECK, phone SKIPPED: now worded exactly here, in §10 and in RELEASE-1.5.0.md); and **a random false "no signed bundle" in the script** (`echo | grep -q` under pipefail, lesson 151). Also from it: the script no longer picks a running watch emulator, deletes an earlier run's bundles before checksumming, and says truthfully what it puts back; the live `installRtl` instructions (a test message, three code comments, NEW-SESSION, AFTER_THE_TEST and two recipes here) now say `:app:installRtl`; the store README "five files" notes say six; LISTING's "retake 03 in January" note is marked done; DESIGN_SYSTEM §9 records that 9sp is below the floor on purpose and that the autosize shrink can stay until the launcher redraws (cosmetic); §5.26 notes London's 3 minutes is outside the usual ±2. Seen by the review and left: a dirty tree still copies its bundles to `SajdaTime-1.5.0/` (the owner builds fresh from `main` on the day anyway); a hand deleted worktree folder would confuse the script's worktree lookup. **Run 4, on the final code:** push PASS; tree CHECK (`1a9df4f` plus this commit's changes); gate PASS (app 252, core 120, wear 12 tests, 0 failed; lint 0 errors in all three); phone bundle 9 / 1.5.0, 9,475,204 bytes, and watch bundle 1002 / 1.5.0, 3,652,192 bytes, both signed `CN=Ali Imran Khan`; languages `()(ar)(in)(tr)(ur)`; the same 11 and 3 permissions; size PASS; grantbind PASS; device suite 19 of 19; Do Not Disturb list; suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1; timetable sheet opened; right to left and screens TAKEN; phone SKIPPED (his choice); restore PASS. **22 of 24 lines PASS or TAKEN**, the other two tree CHECK and phone SKIPPED. The phone emulator still had versionCode 9 afterwards. Open items and not verified: STATE OF PLAY above.
+
+**Before that, 18 Oct 2026 night: 1.5.0 is prepared and PARKED.** At the owner's word ("merge everything then make sure for the release 1.5 everything is ready to roll out"): everything below is merged into `claude/quiet-glass`; versions set (phone 9 / 1.5.0, watch 1002 / 1.5.0, both ship); What's new final in five languages plus a watch note (`docs/store/LISTING.md`), including the redesigned widgets at his request ("it should include widgets and their styles"); and **the release day checklist is `docs/release-tools/RELEASE-1.5.0.md`**: follow it, in order. **The Mac readiness check's results came in and are folded in** (18 Oct 2026): of its 15 items, Turkey, D5, the watch release, What's new and the version bump were already done; the rest are in `RELEASE-1.5.0.md` with who does each. Done here from it: a **1.5.0 store description draft** (`docs/store/LISTING.md`), which also removes a false line in the live description ("Your coordinates never leave your device"; the town name goes through the geocoder). **His answers (18 Oct 2026):** the description and What's new are approved "as long as they are accurate", so a Mac session checks every line against the 1.5.0 build before pasting; the habit tracker is out of 1.5.0; and **all remaining work is done in a Claude Code session on his Mac, not in the cloud**. **For a session on his Mac:** fix the one line device test the check found, write and run `release-1.5.0.sh` (the 1.4.0 script's version, size and watch checks are wrong for 1.5.0; the checklist says exactly how), retake the store screenshots, and check whether Play shows translated release notes without translated listings. **He is moving to his Mac** ("I want to merge it all so I can take it with my local computer session"): everything is on `claude/quiet-glass`. **The cloud session has handed over and stopped** (18 Oct 2026, his words: "handing over everything to local claude ... I will ask on a new session"). A new Mac session's brief is the section "Starting the Mac session" at the top of `docs/release-tools/RELEASE-1.5.0.md`: verify the cloud claims first, then the Mac only items, then report and wait.
 
 **Earlier the same night, two release items done at the owner's word.** (1) **D5, spacing on every phone screen** ("you should know the clean, spacing, and premium look"): every `Spacer`, every column's spacing and every top or bottom padding in the phone app's screens is a `Space` token by relationship, and `DesignRulesTest` fails on a literal one (mutation tested). Not covered: horizontal gaps in a row, a component's own padding, and the watch app. Rules and every visible change in DESIGN_SYSTEM §2 and §9; renders `docs/plans/2026-10-times-gloss/d5-*.png`. (2) **Turkey times now carry Diyanet's minutes** (§5.26), decided by Claude at his request with a Fable review. Both on `ccr-23a38578-c5vz7d`. **He approved the D5 screenshots** ("the screenshots look correct to me and I am happy to proceed further"). **His instruction for what happens next:** a Claude Code session on his Mac is running the release readiness check (the prompt asks it to report what is still needed for 1.5.0 and push only docs to `claude/quiet-glass`); when its results are in, act on them, then merge this work into `claude/quiet-glass`, commit, push, and park ("once claude code results are in then merge, commit and do everything required because I want to park it now"). Still for release day, in `docs/RELEASING.md` order: version bump (app and wear), What's new (include the Turkey line), store screenshots, privacy policy date, merge to `main` on the day of submitting, and he presses submit.
 
@@ -5289,25 +5376,10 @@ has only been read), the permission prompt itself.
 retake store screenshots with 1.5.0 as already planned; (c) re-date `docs/privacy.html` when 1.5.0
 reaches `main`. Nothing else is waiting.
 
-**GBrain and Cowork memory were NOT updated on 18 Oct 2026:** this was a cloud session with neither
-connected. The next session that has GBrain should write the entry below to `projects/sajdatime`, and
-the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and the entry:
-
-> 18 Oct 2026. Owner decisions: widgets redesigned "hero countdown" (chosen from A/B/C); town shown on
-> every widget (reverses 1.4.0 no-place rule); glossy finish allowed for widgets only (fixed gradient,
-> opaque, contrast tested; overrides 17 Oct no-gloss); location chip opens the app to refresh location
-> (no background location, ever); one Asr glyph for every madhab; setup disclaimer is a short form with
-> all four points and "Read in full", full text in Settings (dua only in the full text). All on branch
-> `ccr-23a38578-c5vz7d`, merged into `claude/quiet-glass` the same day at his word; gate green.
-> Re-date privacy.html when it reaches main. Later the same day: Times next prayer card glossy in both
-> themes (dark in the widgets' green); every call to action a solid tonal button, never outlined ("buttons
-> must not be easy to miss"); setup location screen shortened, privacy text word for word behind "How
-> your location is used". Also merged into `claude/quiet-glass`. Then, from his emulator screenshots:
-> notices restructured (X alone top right, action a solid button, "Details" a labelled button), every
-> dismissable dialog has a close X, gaps come from a spacing scale (ui/theme/Spacing.kt) by
-> relationship; rules in CLAUDE.md and DesignRulesTest so he never repeats them. Every call to action is
-> a CtaButton: solid green, white bold text, both themes (tonal tried and rejected the same day). He is
-> testing on his emulator; wait for his verdict before new design work.
+**GBrain updated 18 Oct 2026 (late) by the Mac session:** the cloud session's 18 Oct decisions, the Mac
+check's results and the Turkey comparison are saved to `projects/sajdatime` (facts 1803 to 1805), so the
+entry that stood here is gone. Cowork memory `/areas/sajdatime.md` was not reachable from Claude Code and
+was not updated.
 
 ### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
@@ -7564,7 +7636,7 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
       only English listed would show a picker with one entry.
     - An in-app language row, for phones below Android 13, which have no system picker.
 
-    **Previewing RTL before a translation exists:** `./gradlew installRtl`. The `rtl` build
+    **Previewing RTL before a translation exists:** `./gradlew :app:installRtl`. The `rtl` build
     type is `debug` plus one file, `app|wear/src/rtl/res/values/strings.xml`, which
     overrides `app_language_tag` with **`ur`** (it was `ar-XB` until 2 Aug 2026 — see §15
     lesson 84; do not restore it). The whole app then runs right-to-left with
@@ -9309,3 +9381,27 @@ matters more than the stable hashes, that is the trade being made.
     `adb shell settings delete system notification_cooldown_enabled`. Also, opening the shade to look
     (`adb shell cmd statusbar expand-notifications`) stops a notification sound, so read the playing state
     from `dumpsys audio` first, and swipe the heads up rather than a card in the open shade.
+149. **A bare `./gradlew installRtl` installs the watch app over the phone app.** Both modules have an
+    `rtl` build type; the phone's has the `.rtl` suffix, the watch's has none, so the root task also
+    installs the watch's rtl build as `com.sajdatime.app` (versionCode 1002) on whatever phone emulator is
+    connected, replacing the debug app. Found 18 Oct 2026 when the phone emulator showed
+    `com.sajdatime.app versionCode:1002` after `release-1.5.0.sh` step 6h. It is also the unexplained
+    "something with version code 1001 was already installed" that failed a 1.4.0 run
+    (`release-1.4.0.sh` step 6a comment). Always `./gradlew :app:installRtl` (CLAUDE.md, the 1.5.0 script).
+150. **Leave an emulator as you found it by booting it `-read-only`, and check widgets on a real
+    launcher.** `emulator -avd <name> -read-only` runs on throwaway copies of the disk: installs, clock,
+    font and theme changes all vanish when it is killed, and the AVD's files are untouched (checked 18 Oct
+    2026: after a full session the next boot showed exactly the packages it started with). Separately,
+    `WidgetDeviceTest`'s renders force each widget to its exact minimum size (180 by 110, 250 by 180), so
+    they show clipping a launcher never produces at the default size; and a 5 column home screen (the
+    Pixel 2 profile) gives a 4 by 4 widget about 290dp, where the 4 column Pixel 7 gives about 360dp.
+    The large Today header's Hijri date was cut only on the narrow one. Add the widgets from the
+    launcher's own picker (long press, Widgets, search, Add) and look.
+151. **`echo "$big" | grep -q x` under `set -o pipefail` fails at random on long output.** `grep -q`
+    exits at the first match; once the text is over the 64 KB pipe buffer, `echo` is still writing, gets
+    SIGPIPE (141), and pipefail makes the whole test false. In `release-1.5.0.sh` that turned a good signed
+    bundle into "no signed bundle: are the sajdatime.* values in ~/.gradle/gradle.properties?" in 8 to 100
+    of 300 runs as the jarsigner output grew (found by the independent review, 18 Oct 2026, reproduced
+    with macOS bash 3.2; the 1.4.0 form `grep x >/dev/null` failed 0 of 300). Use
+    `grep -q x <<< "$big"`. The false message is the dangerous part: it points an unattended session at
+    the signing values.

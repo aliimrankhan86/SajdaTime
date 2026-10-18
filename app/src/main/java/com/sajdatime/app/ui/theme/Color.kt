@@ -211,12 +211,15 @@ val DarkInversePrimary = Color(0xFF0B5A43)
 
 /**
  * How opaque the floating tab bar is (Quiet Glass, 17 Oct 2026). Content scrolls under it and
- * shows through faintly, which is the glass. 90%, not less, because the labels on it must hold
- * AA against the worst thing that can scroll underneath: ColorContrastTest composites the bar
- * over pure black and pure white and checks every label colour on both.
+ * shows through faintly, which is the glass. ColorContrastTest composites the bar over pure black
+ * and pure white and checks every label colour on both.
+ *
+ * 97% since 18 Oct 2026 (owner's choice from screenshots). At 90% the words and buttons scrolling
+ * underneath were readable through the bar and ran into its labels, worst in dark (a notice's
+ * "See why" behind "Times", measured +19 shades over the bar; +4 at 97%). Do not lower it.
  *
  * ponytail: translucency without blur, on every Android version. Real backdrop blur needs
- * Android 12 and a library (Haze); at 90% opacity the difference is small. Add it when the
- * owner asks for more glass, and keep this value as the fallback for Android 7 to 11.
+ * Android 12 and a library (Haze). Add it when the owner asks for more glass, and keep this value
+ * as the fallback for Android 7 to 11.
  */
-const val GlassBarAlpha = 0.90f
+const val GlassBarAlpha = 0.97f

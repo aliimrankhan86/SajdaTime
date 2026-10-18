@@ -3,7 +3,7 @@
   Only in the `rtl` build type. Not in debug, not in release, not in the AAB, and it cannot
   reach a user.
 
-  `./gradlew installRtl` gives a build that runs entirely right-to-left. AppLocale reads
+  `./gradlew :app:installRtl` gives a build that runs entirely right-to-left. AppLocale reads
   app_language_tag and pins the whole configuration to it, so overriding the tag here turns
   layout direction, digits and date formatting to Arabic conventions everywhere at once —
   which is exactly what will happen on its own the day values-ar/ ships and an Arabic phone

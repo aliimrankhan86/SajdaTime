@@ -72,16 +72,26 @@
                 android:textColor="@color/widget_on_surface"
                 android:textSize="14sp"
                 android:textStyle="bold" />
+            <!-- Shrinks (12 to 9sp) rather than cutting the year: beside the town chip on a 5 column home
+                 screen it read "2 Rabi al-Awwal 14…" (18 Oct 2026). Not two lines: that pushed Isha off at
+                 4 by 3. Android 7 ignores autosize and falls back to the ellipsis. Owner's choice, 9sp too
+         (below the usual floor on purpose, DESIGN_SYSTEM §9). With wrap_content the shrink can stay
+         until the launcher redraws the widget from scratch: a shorter month may show small, never cut. -->
             <TextView
                 android:id="@+id/widget_hijri"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="12sp"
+                android:autoSizeMinTextSize="9sp"
+                android:autoSizeStepGranularity="0.5sp"
+                android:autoSizeTextType="uniform"
                 android:ellipsize="end"
                 android:importantForAccessibility="no"
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="12sp"
+                tools:ignore="UnusedAttribute" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/widget_place_chip"

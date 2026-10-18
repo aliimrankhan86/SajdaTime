@@ -227,7 +227,9 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate: check every line against the 1.5.0 build first; 3973 characters)
+### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate; CHECKED on the Mac 18 Oct 2026; 3969 characters)
+
+**Checked line by line on the Mac, 18 Oct 2026**, against the 1.5.0 debug build on the emulator and `docs/privacy.html`. Two lines were not true and were changed: "Cloud backup is switched off, so nothing is copied off your phone" (the watch sync, the town lookup and opted in usage counts all leave the phone; the privacy policy says backup, so it now says "to a backup server"), and "Only one thing is ever asked in return" became "I ask only one thing in return" (Google's rating card can now appear; the owner chose this wording with AskUserQuestion). Everything else was seen on screen or in code: Hijri date beside the date, widgets with countdown and town, Qibla from true north (`GeomagneticField`), Off, Notification or Alarm per prayer, "Adhan" in the sound picker, the 5 to 30 minute reminder, the Ramadan card and timetable, the PDF for today, 7 days, the month and Ramadan, the watch tile, the five languages, the three themes, four madhabs, Jafari's Maghrib angle, the methods list, Automatic resolving to MWL or Jafari, Match your mosque (up to 30 minutes, up to 2 days), backup off in both manifests, no crash reporting library.
 
 Written after the Mac readiness check found the live description out of date. **It also corrects a false line in the live text:** "without sending your location anywhere" and "Your coordinates never leave your device" are not true, because the town name is looked up by the phone's geocoder, usually Google (CLAUDE.md forbids that wording; `docs/privacy.html` says it in full). New in it: the redesigned widgets, the built-in adhan and phone sounds for alerts and alarms, the reminder before prayer, Ramadan, Match your mosque, Diyanet (Turkey), and the language list. "type a city name" becomes "type where you are", the app's own words. Still contains "Wear OS" (the Wear review checks the live listing for it). Paste on release day, once approved; the Ramadan lines are in it because 1.5.0 ships in January.
 
@@ -275,7 +277,7 @@ Most free prayer apps are funded by advertising, which means you pay with your d
 • Approximate location only, read while the app is open, never in the background
 • Your coordinates are never sent to the developer and never part of the usage counts
 • The name of your town is looked up by your phone's own place service, usually Google. The privacy policy explains exactly what that means
-• Cloud backup is switched off, so nothing is copied off your phone
+• Cloud backup is switched off, so nothing is copied to a backup server
 
 If you would rather not share your location at all, type where you are instead, and the app works the same.
 
@@ -289,7 +291,7 @@ FREE, AND STAYING FREE
 
 There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
 
-Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
 ### Release A (1.4.0): the text to paste, and the January text
@@ -491,14 +493,15 @@ Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa,
 
 **Watch 1.5.0 note** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):
 
+Corrected on the Mac, 18 Oct 2026: it said "The disclaimer no longer runs under the clock at large text", which is false on the small (192dp) round watch at 1.3 text, where the first line still meets the clock at the end of the scroll (`tools/wear-verify.sh`, 24 of 24 bezel checks pass, read by eye). It is clear on the 227dp watch, so "reads more easily" is the true claim.
+
 ```
-Now in Urdu, Turkish, Indonesian and Arabic. Turkey times now include Diyanet's precaution minutes. The disclaimer no longer runs under the clock at large text.
+Now in Urdu, Turkish, Indonesian and Arabic. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
 ```
 
-**Screenshots for this release.** The release script (`docs/release-tools/release-1.4.0.sh`, step 6) writes candidate captures of the
-Times screen on the eve, on day 1, on the last day and on both Eid days in four languages, and of both widgets, to
-`build/release-1.4.0/`. When the Ramadan lines go live in January, retake screenshot `03` as the Ramadan Times screen (audit L14), and
-add a widget screenshot if the owner wants one.
+**Screenshots for this release.** Done 18 Oct 2026 for 1.5.0: `03` is now the Ramadan Times screen and `06` the widgets
+(owner's choice), see "What the six phone screenshots show"; do not retake them for the January lines. (Was: retake `03` as the
+Ramadan screen in January and maybe add a widget shot, from `release-1.4.0.sh`'s captures.)
 
 ### This block is now a copy of the Console, not the other way round
 
@@ -737,7 +740,7 @@ the capture recipe, are in [`upload/README.md`](upload/README.md).
 |---|---|---|---|
 | `upload/app-icon/` | App icon | `icon-512.png` | 512 × 512 |
 | `upload/feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
-| `upload/phone/` | Phone screenshots | 5, upload all in filename order | 1080 × 1920 |
+| `upload/phone/` | Phone screenshots | 6, upload all in filename order | 1080 × 1920 |
 | `upload/wear-os/` | Wear OS screenshots | `w1-times`, `w2-qibla` | 454 × 454 |
 | `upload/tablet-7in/`, `tablet-10in/`, `chromebook/` | those boxes | **empty on purpose** | — |
 
@@ -760,27 +763,30 @@ automatically rejected.
 They are now captured **natively at 1080 × 1920** on a Pixel 2 profile AVD and copied
 through untouched — no scaling, no reframing, no invented pixels.
 
-### What the five phone screenshots show
+### What the six phone screenshots show (retaken from the 1.5.0 build, 18 Oct 2026)
 
-Chosen so no two show the same screen. The previous set spent two of its five slots on the
-same Times screen in light and dark, and two more on the same Qibla screen.
+Captured on the `sajdastore` AVD (1080 × 1920, started `-read-only` so the AVD itself is unchanged) from
+the 1.5.0 debug build, Manchester typed into the location sheet (the emulator's own place lookup gave
+no name), the clock set and the status bar in demo mode as in `upload/README.md`. Upload all six in
+filename order.
 
 | File | Screen | Why it earns a slot |
 |---|---|---|
-| `01-times-light.png` | Times, light | The core screen, with the hero gradient |
-| `02-qibla.png` | Qibla | The second core feature, with a live heading |
-| `03-times-dark.png` | Times, dark, scrolled | Dark theme, the full six times, and the PDF button |
-| `04-school-of-thought.png` | Madhab picker | Evidence for the "built for your school of thought" claim |
-| `05-settings.png` | Settings | Calculation method, theme, per-prayer reminders |
+| `01-times-light.png` | Times, light, 15 Aug 2026 15:00 | The core screen: glossy next prayer card, the Hijri date, Now and Next |
+| `02-qibla.png` | Qibla, facing 60° | The second core feature. Free maths check: Qibla 118°, "Turn right 58°" |
+| `03-ramadan-dark.png` | Times, dark, 15 Ramadan 1448 (22 Feb 2027) | Dark theme and the Ramadan card (suhoor, iftar, length of the fast, timetable). Replaces the old `03-times-dark.png`, which was the same view as `01` |
+| `04-school-of-thought.png` | Setup, madhab step | Evidence for "built for your school of thought" |
+| `05-settings.png` | Settings | Location, school, method, Match your mosque, theme, language |
+| `06-widgets.png` | Home screen, the Today widget at its default 4 × 4 | The redesigned widgets that What's new leads with (owner's choice, 18 Oct 2026) |
 
-> **This was wrong, and is corrected here rather than quietly dropped.** It used to say the Times
-list does not fit on one screen at 9:16 and that `03` is therefore scrolled. It is not scrolled:
-`01` and `03` are the same view, same scroll position, in the two themes, and both already show
-all six times and the PDF button. So the carousel does spend two of its five slots on one screen,
-which is exactly the fault the paragraph above says the previous set had. It is not worth a
-retake on its own — the screenshots need an emulator, and the dark theme is a real thing to show
-— but if the set is ever recaptured, `03` should be genuinely different: scrolled, or the PDF
-export sheet, or the Ramadan sehri/iftar framing.
+The "Does this match your mosque?" notice (Manchester in August is far enough north for it) was closed
+before `01`, as a user would. In `01` and `03` the last row sits under the floating tab bar; that is
+the app as it is at 9:16, not a capture fault. The watch screenshots (`w1-times`, `w2-qibla`) were not
+retaken: on the 1.5.0 build the watch Times screen lays out exactly as in `w1` (checked on
+`sajdawear_large`), and nothing in 1.5.0 changed the Qibla page.
+
+> **History.** The 1.4.0 set had `03-times-dark.png`, the same view as `01` in dark. The note that used
+> to stand here asked for `03` to become genuinely different when the set was recaptured; it now is.
 
 ### Colours come from the design system
 

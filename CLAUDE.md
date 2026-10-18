@@ -226,7 +226,7 @@ session inherits it instead of relearning it.
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
 - **Before any layout change, check it right-to-left — and read the result as a *layout*
-  check.** `./gradlew installRtl` runs the whole app in RTL without a translation or a
+  check.** `./gradlew :app:installRtl` runs the whole app in RTL without a translation or a
   device setting. Roughly half the world's Muslims read right-to-left, and the first Arabic
   or Urdu translation should not be the moment anyone finds out whether the screens survive
   it. But it shows **English words in a right-to-left paragraph**, which always looks
@@ -304,7 +304,7 @@ Then run it on both emulators, and tell the owner what you verified and what you
 The on device suite includes widget tests. A shell can bind a widget only after
 `adb shell appwidget grantbind --package com.sajdatime.app --user 0`, and the suite is run with
 `am instrument`, because `connectedAndroidTest` uninstalls the app when it ends. If a widget test fails
-on a bind error, that is why. `docs/release-tools/release-1.4.0.sh` does both (`docs/HANDOVER.md` §15
+on a bind error, that is why. `docs/release-tools/release-1.5.0.sh` does both (`docs/HANDOVER.md` §15
 lesson 134).
 
 *Made with love, free for the Ummah.*

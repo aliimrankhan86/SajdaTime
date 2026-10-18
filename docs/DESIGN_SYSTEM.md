@@ -572,7 +572,10 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
   Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
   opening the app is what updates the location (onResume); it cannot update without opening the app,
   because location is read only in the foreground. The large header uses the short date ("Sun, 18
-  Oct") so the chip never cuts it short.
+  Oct") so the chip never cuts it short. The Hijri line under it shrinks from 12 to as small as 9sp
+  rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
+  screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
+  pressing the chip opens the app.
 - **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
   the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
   town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
@@ -655,13 +658,14 @@ The owner chose "Quiet Glass" from three researched directions (research, mockup
 rejected options: `docs/HANDOVER.md` §11, the Quiet Glass block). The rules it adds:
 
 **Glass is for what floats, never for content.** The tab bar floats over the screens as a
-pill, `surface` at `GlassBarAlpha` (90%), so what scrolls underneath shows through faintly.
+pill, `surface` at `GlassBarAlpha` (97% since 18 Oct 2026; it was 90%, see §9), so what scrolls
+underneath shows through only as a hint, never as words that run into the labels.
 Prayer times, cards and every line of text stay on solid surfaces. This is Apple's own rule for
 Liquid Glass, and the usability research behind it is in the HANDOVER block. The bar's labels
 are tested against pure black and pure white behind it (`ColorContrastTest`).
 
 > ponytail: translucency without blur, on every Android version. Real backdrop blur needs
-> Android 12+ and the Haze library; at 90% opacity the visible difference is small. Add it only
+> Android 12+ and the Haze library; at 97% opacity the visible difference is small. Add it only
 > if the owner asks for more glass, and keep the current bar as the Android 7 to 11 fallback.
 
 **Every tab opens the same way.** `ScreenTitle` (headlineMedium, start aligned, 20dp gutter)
@@ -711,6 +715,28 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **18 Oct 2026 (Mac release check), the tab bar made 97% solid.** Found on the emulator while
+  retaking the store screenshots: at 90% the text and buttons scrolling under the floating bar were
+  readable through it and ran into its labels, clearest in dark (a notice's amber "See why" behind
+  "Times" and "Qibla"; Isha's time behind "Settings"). Measured over the bar: +19 shades at 90%, +4 at
+  97%. The owner chose 97% from before and after screenshots, asked with AskUserQuestion. Rejected:
+  keeping 90% (the collision is a legibility fault, not a look); fully solid (loses the glass he chose
+  on 17 Oct). Still true and not changed: content is fully visible in the strip between the floating
+  bar and the bottom edge, which is how a floating bar works.
+- **18 Oct 2026 (Mac release check), the large Today widget's Hijri line shrinks to fit.** Found
+  while taking the store widget screenshot: on a 5 column home screen (the Pixel 2 profile) the town
+  chip left the Hijri line too little room and it read "2 Rabi al-Awwal 14…". First offered and
+  approved: wrap onto a second line; **then withdrawn the same hour**, because measured on the launcher
+  at 4 by 3 the extra line pushed Isha off the bottom. Chosen by the owner instead: one line that
+  autosizes from 12 down to 9sp (`widget_today_large.xml`). Rejected: leaving the year cut; dropping
+  the year (a longer month such as "Jumada al-Akhirah" would still be cut); raising the large layout's
+  height threshold (4 by 3 users would lose the countdown card). Android 7 ignores autosize and keeps
+  the ellipsis. **9sp is deliberately below the floor** (14sp in §3, 12sp in the widget research): it
+  applies to this one line only, only when it would otherwise be cut, and the owner chose it from
+  screenshots, so do not raise the minimum without asking him. Known and cosmetic: with a wrap_content
+  height the shrink can stay until the launcher redraws the widget from scratch (a resize, a restart),
+  so a shorter month can show a little small; it is never cut.
 
 - **18 Oct 2026 (night), D5 built: the gaps between text and buttons on the scale, on every phone screen.** The owner, asked whether to do
   it before 1.5.0: "I told you about the design system ... you should know the clean, spacing, and
