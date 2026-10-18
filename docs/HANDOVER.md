@@ -5060,6 +5060,24 @@ at his word ("Do the merge"; merge commit, the merged tree identical to the test
    17 Oct "no glossy finish" rejection for widgets only (DESIGN_SYSTEM §9).
 4. **Short disclaimer after setup**, full text in Settings and behind "Read in full" (§5.15). Still all
    four points; the dua request is now only in the full text.
+5. **Glossy next prayer card on Times** (later on 18 Oct, approved from screenshots). Dark: the widgets'
+   countdown card colours, a fixed green gradient `#18382D` → `primaryContainer` → `#0F241D` with the
+   widgets' sheen and a light rim (it was a flat panel). Light: the mint to sand gradient kept, plus a
+   white sheen over the top half, a rim brightest at the top and a soft green shadow. Every stop and the
+   top stop under the sheen are in `ColorContrastTest` (dark worst case 5.75:1). DESIGN_SYSTEM §2 and §9.
+6. **Every call to action is a solid button** ("I don't want buttons to be easy to miss"). Every
+   `OutlinedButton` became `FilledTonalButton`: "Different from your mosque?" (now with a mosque icon),
+   the three buttons in its explainer, "Find city" in setup and in the location sheet, and "Back" in
+   setup. Kept as text on purpose: dialog "Close"/"Got it", "Skip for now and use Makkah" (an escape must
+   not compete with Allow) and "Save as PDF" (it sits in a heading). DESIGN_SYSTEM §8.
+7. **Setup location screen redesigned** (he did not like it): a pin badge, one line of text, a full
+   width "Allow location", a "How your location is used" link, the city field, then "Skip". The location
+   explanation moved, **word for word**, into the dialog behind the link. The 66 word city lookup
+   paragraph now appears under the field **the moment the user types**, before "Find city" or the
+   keyboard's search can be pressed (the independent review's point: behind a location link it would be
+   missed exactly when it applies). `docs/privacy.html` is unchanged. "Find city" appears once something
+   is typed and "Continue" once a location is found, so the screen never shows a dead grey button. The old "Tap the info icon" sentence is gone. New and changed strings in
+   all five languages, translated by Claude (`permission_body`, `action_how_location_used`).
 
 **Verified:** the full gate on the branch tip (core 120, app 238, wear 12, 0 failures; lint 0 errors;
 both release bundles); widgets and the setup dialog rendered through Robolectric (lesson 132, harness
@@ -5067,6 +5085,13 @@ not committed) in light, dark, Ramadan, 1.3 and 2.0 text, English, Urdu, Arabic,
 Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `disclaimer-short-form.png`.
 **Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
 chip's tap and the location refresh it relies on (read, not run), the on device suite.
+
+**Items 5 to 7, verified:** the full gate again (core 120, app 239, wear 12, 0 failures; lint 0 errors;
+both release bundles); Times, the mosque explainer and every state of the setup location step (empty,
+typed, dialog, located) rendered through Robolectric in light, dark, Urdu right to left and 2.0 text
+(lesson 143); an independent review of the diff. Screens in `docs/plans/2026-10-times-gloss/`. **Not
+verified:** a real phone or emulator (the light card's shadow cannot be drawn by the renderer, so it
+has only been read), the permission prompt itself.
 
 **Next, in order:** (a) the December preparation job's emulator run covers the device suite; (b)
 retake store screenshots with 1.5.0 as already planned; (c) re-date `docs/privacy.html` when 1.5.0
@@ -5082,7 +5107,10 @@ the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and 
 > (no background location, ever); one Asr glyph for every madhab; setup disclaimer is a short form with
 > all four points and "Read in full", full text in Settings (dua only in the full text). All on branch
 > `ccr-23a38578-c5vz7d`, merged into `claude/quiet-glass` the same day at his word; gate green.
-> Re-date privacy.html when it reaches main.
+> Re-date privacy.html when it reaches main. Later the same day: Times next prayer card glossy in both
+> themes (dark in the widgets' green); every call to action a solid tonal button, never outlined ("buttons
+> must not be easy to miss"); setup location screen shortened, privacy text word for word behind "How
+> your location is used". Also merged into `claude/quiet-glass`.
 
 ### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
@@ -9036,3 +9064,10 @@ matters more than the stable hashes, that is the trade being made.
     when there is not. Found by rendering Urdu at the large Today widget's minimum (18 Oct 2026), not by
     reading. Related: a launcher picks a responsive layout by size alone, never by font scale or
     script, so the app has to choose which layouts to offer from both.
+143. **To screenshot a whole Compose screen in Robolectric, draw the window, do not capture the node.**
+    `onRoot().captureToImage()` timed out ("Condition still not satisfied after 2000 ms") on the full
+    Times screen and on dialogs. Drawing `activity.window.decorView` (or the dialog's, via
+    `ShadowDialog.getLatestDialog()`) into a Bitmap works with `@GraphicsMode(NATIVE)`. Wrap the screen in a
+    `Surface`, not a bare `Box`, or text that takes its colour from the surface draws black on dark; and
+    call `ShadowAlarmManager.setCanScheduleExactAlarms(true)` or the exact alarm banner appears. Shadows
+    (`Modifier.shadow`) do not draw at all, so a shadow is never verified by these renders (18 Oct 2026).

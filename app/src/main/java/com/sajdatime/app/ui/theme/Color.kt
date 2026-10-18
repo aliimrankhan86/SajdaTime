@@ -104,9 +104,8 @@ val LightInversePrimary = Color(0xFF4FC48F)
 
 // --- The light hero gradient -----------------------------------------------------------
 //
-// Mint at the top, sand at the bottom. **Light theme only** — in dark the same card is a
-// flat surface with a hairline border, and that asymmetry is the design's, not an
-// oversight.
+// Mint at the top, sand at the bottom, in light. Dark has its own fixed green gradient below
+// (flat until 18 Oct 2026, when the owner asked for the widgets' glossy look on this card).
 //
 // This is not the old time-of-day gradient, and the difference is the whole point. That
 // one changed colour with the prayer slot, so the contrast ratio under the countdown was
@@ -118,6 +117,24 @@ val LightHeroEnd = Color(0xFFE4D2B4)
 val LightOnHero = Color(0xFF0A2419)
 val LightOnHeroLabel = Color(0xFF2C4A3C)
 val LightOnHeroSecondary = Color(0xFF3E5C4C)
+
+// The gloss (owner, 18 Oct 2026, "apple style premium look", matching the widgets). A white
+// sheen over the top half that fades out by the middle, a white rim brightest at the top, and a
+// soft green shadow. The sheen only ever lightens the mint stop, so it can only raise the
+// contrast of the dark inks on it; ColorContrastTest checks the composite anyway.
+val LightHeroSheen = Color(0x99FFFFFF)
+val LightHeroRim = Color(0xCCFFFFFF)
+val LightHeroRimBottom = Color(0x33FFFFFF)
+val LightHeroGlow = Color(0x590B5A43)
+
+// The dark card, in the widgets' countdown card colours (values-night/colors.xml
+// widget_highlight_top and widget_highlight; the bottom is one step deeper). The sheen is the
+// widgets' sheen, which lightens the top stop, so the composite is what ColorContrastTest checks.
+val DarkHeroTop = Color(0xFF18382D)
+val DarkHeroBottom = Color(0xFF0F241D)
+val DarkHeroSheen = Color(0x12FFFFFF)
+val DarkHeroRim = Color(0x29FFFFFF)
+val DarkHeroRimBottom = Color(0x0AFFFFFF)
 
 // --- Dark ----------------------------------------------------------------------------
 //

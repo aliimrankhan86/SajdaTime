@@ -70,8 +70,17 @@ a gradient is permitted here: it is **fixed**. The gradient this replaced change
 prayer slot, so the contrast under the countdown was different at Isha than at Fajr and
 could not be asserted at all. Fixed gradient, testable. Moving gradient, not.
 
-In **dark** the same card is a flat `primaryContainer` with a hairline border — never a
-gradient. That asymmetry is the design's and is deliberate.
+In **dark** the card is a fixed green gradient in the widgets' countdown card colours: `#18382D` →
+`primaryContainer` `#143028` → `#0F241D`. It was flat until 18 Oct 2026, when the owner asked for
+"the widget style glossy look". Ink: countdown `onSurface`, label `onPrimaryContainer`, time
+`secondary`.
+
+**The gloss, both themes** (owner, 18 Oct 2026): a white sheen over the top half fading out by the
+middle (light `#99FFFFFF`, dark `#12FFFFFF`), a 1dp rim brightest at the top (light `#CCFFFFFF` to
+`#33FFFFFF`, dark `#29FFFFFF` to `#0AFFFFFF`), and in light only a soft green shadow (`#590B5A43`,
+12dp). The tokens are `LightHero*` and `DarkHero*` in `Color.kt`. `ColorContrastTest` checks every
+ink against every stop and against the top stop under the sheen; the sheen lightens, so in dark it
+is the worst case (5.75:1 for the time).
 
 ### The rule that has bitten this project four times
 
@@ -409,6 +418,14 @@ on Qibla and Settings; on Times the title is the city, same size and line, with 
 because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
 which is the bar's measured height, so it grows with large text.
 
+**Calls to action are solid, never outlined** (owner, 18 Oct 2026: "I don't want buttons to be easy
+to miss"). One main action per screen is a filled `Button` (`primary`); every other action that is a
+button is a `FilledTonalButton` (`secondaryContainer`/`onSecondaryContainer`, already in
+`ColorContrastTest`), full width, at least 48dp, ideally 52dp with a leading icon where one exists.
+`OutlinedButton` is not used. A text button is right only for a dialog's dismiss, an escape that must
+not compete with the main action ("Skip for now and use Makkah"), and an action inside a heading line
+("Save as PDF"). Do not show a disabled button as a placeholder: show it when it can be used.
+
 **Links and actions are bold and green.** `labelLarge` is SemiBold, and Material draws every
 button and text button label in it, so "Save as PDF" and "Got it" read as tappable without a
 guess. Rows that open something carry a chevron.
@@ -437,6 +454,15 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026, the Times card made glossy, calls to action made solid, setup location screen
+  shortened**, each approved by the owner from screenshots. This extends the widgets' gloss override
+  to the next prayer card (fixed gradient, opaque, tested; still no colour that moves with the time).
+  Rejected: a graphite glass card in dark (the widget body colour; the green card is what he pointed
+  at and keeps "green means the next prayer"); the full green fill for secondary actions (two filled
+  buttons on one screen lose the main one); keeping the 66 word city lookup paragraph above the empty
+  field (it hid the choice; it now appears word for word as soon as a city is typed, which is when it
+  applies); putting it only behind "How your location is used" (missed at the moment of typing, the
+  independent review); a shortened privacy paraphrase (a paraphrase can drift from privacy.html).
 - **18 Oct 2026, widgets made glossy, at the owner's request** ("a bit glossy background like apple
   premium style"). This overrides, for the widgets only, the 17 Oct rejection of a shiny finish below.
   Built within the rules that made the rejection sensible: a fixed gradient (testable), no colour

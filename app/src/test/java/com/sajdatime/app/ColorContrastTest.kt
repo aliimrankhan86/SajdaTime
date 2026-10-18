@@ -36,7 +36,11 @@ import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
 import com.sajdatime.app.ui.theme.LightKiswah
 import com.sajdatime.app.ui.theme.DarkKiswah
+import com.sajdatime.app.ui.theme.DarkHeroBottom
+import com.sajdatime.app.ui.theme.DarkHeroSheen
+import com.sajdatime.app.ui.theme.DarkHeroTop
 import com.sajdatime.app.ui.theme.LightHeroEnd
+import com.sajdatime.app.ui.theme.LightHeroSheen
 import com.sajdatime.app.ui.theme.LightHeroMiddle
 import com.sajdatime.app.ui.theme.LightHeroStart
 import com.sajdatime.app.ui.theme.LightOnHero
@@ -188,6 +192,44 @@ class ColorContrastTest {
                 inks.map { (inkName, ink) ->
                     Pair("light hero $inkName on $stopName", ink, stop, 4.5)
                 }
+            },
+        )
+    }
+
+    /**
+     * The gloss (18 Oct 2026). The sheen is white over the top half of each card, so the top
+     * stop is checked with the sheen composited on it, as well as every stop bare. In dark the
+     * sheen lightens the stop under light text, which is the direction that can fail.
+     */
+    @Test
+    fun `glossy hero cards are readable at every stop and under the sheen`() {
+        fun over(top: Color, under: Color) = Color(
+            red = top.red * top.alpha + under.red * (1 - top.alpha),
+            green = top.green * top.alpha + under.green * (1 - top.alpha),
+            blue = top.blue * top.alpha + under.blue * (1 - top.alpha),
+        )
+        val dark = listOf(
+            "top" to DarkHeroTop,
+            "middle" to DarkPrimaryContainer,
+            "bottom" to DarkHeroBottom,
+            "top under sheen" to over(DarkHeroSheen, DarkHeroTop),
+        )
+        val darkInks = listOf(
+            "countdown" to DarkOnSurface,
+            "label" to DarkOnPrimaryContainer,
+            "time" to DarkSecondary,
+        )
+        val light = listOf("start under sheen" to over(LightHeroSheen, LightHeroStart))
+        val lightInks = listOf(
+            "countdown" to LightOnHero,
+            "label" to LightOnHeroLabel,
+            "time" to LightOnHeroSecondary,
+        )
+        assertAll(
+            dark.flatMap { (stopName, stop) ->
+                darkInks.map { (inkName, ink) -> Pair("dark hero $inkName on $stopName", ink, stop, 4.5) }
+            } + light.flatMap { (stopName, stop) ->
+                lightInks.map { (inkName, ink) -> Pair("light hero $inkName on $stopName", ink, stop, 4.5) }
             },
         )
     }

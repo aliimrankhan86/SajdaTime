@@ -4,6 +4,8 @@ import com.sajdatime.app.data.placeName
 import android.content.pm.PackageManager
 import android.Manifest
 import androidx.core.content.ContextCompat
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.ui.semantics.Role
@@ -46,9 +48,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -242,6 +242,7 @@ fun OnboardingScreen(
 private fun StepScaffold(
     title: String,
     body: String,
+    leading: (@Composable () -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
@@ -257,6 +258,10 @@ private fun StepScaffold(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp, vertical = 32.dp),
     ) {
+        if (leading != null) {
+            leading()
+            Spacer(Modifier.height(20.dp))
+        }
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(12.dp))
         // The consent step carries its own, longer text inside [content], so it passes none.
@@ -363,37 +368,48 @@ private fun PermissionStep(
                     Text(stringResource(R.string.action_got_it))
                 }
             },
-            title = { Text(stringResource(R.string.permission_why_title)) },
-            text = { Text(stringResource(R.string.permission_why_body)) },
+            title = { Text(stringResource(R.string.action_how_location_used)) },
+            // The location explanation, word for word, one tap away (owner, 18 Oct 2026: a short
+            // setup screen). The city lookup paragraph is not in here: it is shown under the field
+            // the moment the user starts typing, which is when it applies.
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(stringResource(R.string.permission_why_body))
+                }
+            },
         )
     }
 
+    // 18 Oct 2026, the owner did not like this screen. It opened on 66 words about the city
+    // lookup and two greyed out buttons, so the one choice it asks for was hard to see. Now:
+    // a pin, one line, one big Allow button, and the detail behind a link. Find city appears
+    // once there is something to find, and Continue once there is somewhere to continue
+    // with, so nothing on the screen is ever a dead grey button.
     StepScaffold(
         title = stringResource(R.string.permission_title),
         body = stringResource(R.string.permission_body),
+        leading = { LocationBadge() },
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Button(
-                onClick = onAllow,
-                enabled = !state.resolvingLocation,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 56.dp),
-            ) {
-                Icon(Icons.Outlined.LocationOn, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.action_allow_location))
-            }
+        Button(
+            onClick = onAllow,
+            enabled = !state.resolvingLocation,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp),
+        ) {
+            Icon(Icons.Outlined.LocationOn, contentDescription = null)
             Spacer(Modifier.width(8.dp))
-            IconButton(
-                onClick = { explaining = true },
-                modifier = Modifier.size(48.dp),
-            ) {
-                Icon(
-                    Icons.Outlined.Info,
-                    contentDescription = stringResource(R.string.permission_why_title),
-                )
-            }
+            Text(stringResource(R.string.action_allow_location))
+        }
+        TextButton(
+            onClick = { explaining = true },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp),
+        ) {
+            Icon(Icons.Outlined.Info, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.action_how_location_used))
         }
 
         // Without this the buttons simply grey out while a fix is awaited, which reads as
@@ -434,14 +450,8 @@ private fun PermissionStep(
         // Showing it up front also answers T3's fourth point: manual entry was always
         // there and nobody could find it.
         if (!located) {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(20.dp))
             SectionHeading(stringResource(R.string.location_sheet_search_heading))
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.city_fallback_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
             Spacer(Modifier.height(12.dp))
             val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
@@ -463,15 +473,29 @@ private fun PermissionStep(
                 keyboardActions = KeyboardActions(onSearch = { if (city.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = findCity,
-                enabled = city.isNotBlank() && !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            ) {
-                Text(stringResource(R.string.action_find_city))
+            if (city.isNotBlank()) {
+                // What happens to a typed name, said as soon as there is one and before Find city
+                // can be pressed (the keyboard's search key included). It used to sit above the
+                // empty field, where at 66 words it buried the screen's one choice. Word for word
+                // the same promise as docs/privacy.html; independent review, 18 Oct 2026.
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.city_fallback_body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
+                FilledTonalButton(
+                    onClick = findCity,
+                    enabled = !state.resolvingLocation,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 52.dp),
+                ) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.action_find_city))
+                }
             }
 
             // Said next to the field it belongs to, and in its own words. The one spinner
@@ -492,22 +516,43 @@ private fun PermissionStep(
                     onUseDefaultLocation()
                     onNext()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.action_use_makkah))
             }
         }
 
-        Spacer(Modifier.height(32.dp))
-        Button(
-            onClick = onNext,
-            enabled = located,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
-        ) {
-            Text(stringResource(R.string.action_continue))
+        if (located) {
+            Spacer(Modifier.height(32.dp))
+            Button(
+                onClick = onNext,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_continue))
+            }
         }
+    }
+}
+
+/** The setup location step's picture: a pin on a soft green disc. Decorative, so TalkBack skips it. */
+@Composable
+private fun LocationBadge() {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            Icons.Outlined.LocationOn,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(32.dp),
+        )
     }
 }
 
@@ -546,7 +591,7 @@ private fun LocatedRow(cityName: String) {
 private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
     Spacer(Modifier.height(8.dp))
     Row {
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onBack,
             modifier = Modifier
                 .weight(1f)
