@@ -5042,8 +5042,16 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 evening: waiting for the owner's approval, NOT merged.** On
-`ccr-23a38578-c5vz7d` only: every remaining text link made a solid button (his choice when asked:
+**NEWEST, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
+He asked to move from the cloud session to his own computer with everything merged and recorded.
+A session on his Mac starts here: this block, then `docs/DESIGN_SYSTEM.md` §0 (when to ask him) and
+§4.1 (every button). **Next, in this order:** (1) he installs the build and gives his verdict (commands
+in the PICK UP HERE note below; the commit to see is the newest on `claude/quiet-glass`); (2) do not
+start design work until he does; (3) then D5, spacing screen by screen with light and dark
+screenshots for each (DESIGN_SYSTEM §11). The GBrain `projects/sajdatime` entry is still to be
+written by a session that has GBrain (this cloud session did not); the text to record is this block
+and DESIGN_SYSTEM §0. Full gate on the merged tree: 377 tests, 0 failures, lint 0 errors, both
+bundles built. What was built, on `ccr-23a38578-c5vz7d` first: every remaining text link made a solid button (his choice when asked:
 all except "Close" and "Got it"; warnings stay amber; steppers solid green; screenshots first), one
 label style and height rule for every solid button, and `docs/DESIGN_SYSTEM.md` given §0 (when to ask
 him, and never "done" or "every" without the checks), §4.1 (the full button spec and an inventory a
