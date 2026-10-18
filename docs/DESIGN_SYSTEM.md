@@ -729,7 +729,8 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   (were 2); the export sheet title to its text 4 (was 6); Settings rows 4 between title and subtitle
   (was 2), the folded row's text 16 above the next row (was 14); the tab bar icon to label 4 (was 2);
   Qibla's "set your location" 24 from the top (was 48). **Shown to the owner as screenshots before
-  merging** (`docs/plans/2026-10-times-gloss/d5-*.png`), as D5 was agreed. Rendered in light, dark, Urdu and 2x text (`docs/plans/2026-10-times-gloss/d5-*.png`).
+  merging** (`docs/plans/2026-10-times-gloss/d5-*.png`), as D5 was agreed. **Approved:** "the
+  screenshots look correct to me and I am happy to proceed further" (owner, 18 Oct 2026). Rendered in light, dark, Urdu and 2x text (`docs/plans/2026-10-times-gloss/d5-*.png`).
 
 - **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
   - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
@@ -896,4 +897,4 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| D5 | Spacing on every phone screen (§9, 18 Oct 2026 night) | **Built, not merged:** the owner looks at `d5-setup.png`, `d5-screens.png`, `d5-dialogs.png` first. Then merge and delete this row |
+| (none) | Nothing decided is waiting to be built. D5 was approved from screenshots on 18 Oct 2026 (§9). | |
