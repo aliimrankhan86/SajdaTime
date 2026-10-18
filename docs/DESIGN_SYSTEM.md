@@ -717,6 +717,10 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   - *Ramadan card*, after the screenshots ("all good but"): the timetable button says **"Get the full
     Ramadan timetable"** (was "Full timetable") and **fills its row** beside the (i), at 52dp. Then,
     "spacing looks tight": 24dp above and below it, the (i) centred beside it.
+  - *Panel stops the adhan* (Android's rule, found on his emulator): he chose to **tell users briefly
+    and change nothing else for now**. The Notification sound pop up's help ends "Pulling down your
+    notifications or swiping the notification away stops the sound". Rejected for now: the app playing
+    the adhan itself so the panel cannot stop it (a different design, his decision if ever).
 
 - **18 Oct 2026 (night), D2 decided, and D1 and D3 approved from screenshots.** Usage question: the
   owner chose **B, bold links**, over A (solid buttons under "Before you decide" and "Your answer"

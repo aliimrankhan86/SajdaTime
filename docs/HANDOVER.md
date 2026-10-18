@@ -1581,7 +1581,11 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
     app's: the system plays a notification sound and the system stopped it, and the app's process was
     frozen at the time. Nothing on the channel or the notification changes it. Accepted as a natural "I
     have seen it" gesture; an adhan that keeps playing with the panel open would be a different design
-    (the app playing the audio itself), not a setting.
+    (the app playing the audio itself), not a setting. **The owner decided (18 Oct 2026): tell users in
+    brief, change nothing else for now** ("we should inform the users in brief and concise wording so
+    that they are aware ... we can't do anything else for now"). The Notification sound pop up ends:
+    "Pulling down your notifications or swiping the notification away stops the sound", in all five
+    languages. Not added to the Alarm sound pop up: what the panel does to an Alarm is untested.
   - **Android 16 notification cooldown** ("polite notifications", on in this image with the setting
     untouched) muted a third Dhuhr alert posted close behind two others from the app: it appeared, with no
     sound and no error in the log. Proved by setting `notification_cooldown_enabled` to 0 for one run (the
@@ -5113,7 +5117,9 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.** Next: his verdict on the emulator (the build is installed there, and Claude tested the notification adhan on it, below); then he wants the work parked.
+**NEWEST, 18 Oct 2026 late night: PARKED. This round is approved, merged into `claude/quiet-glass` and ready for the 1.5.0 release.** The owner saw it on his emulator, approved it, and asked for one last line: the Notification sound pop up now tells users that pulling down the notifications or swiping the notification away stops the sound (§5.25). Then: "park it and ensure the local repository knows it is merged and all ready for the next release". **Nothing from this round is open.** When he comes back, the next agreed job is D5 (spacing on the remaining screens, one at a time with screenshots, DESIGN_SYSTEM §11); until he asks, do nothing.
+
+**Before parking, the round itself:** three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.
 (1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
 by tapping outside the edge in the scratch render harness, not a committed test) for every button beside text, Times block gaps on the `Space`
 scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
@@ -5123,7 +5129,7 @@ Notification sound row and an Alarm sound row under Prayer alerts (§5.25), beca
 below a fold. Asked with AskUserQuestion: rows chosen; vibration "follow the phone". Screenshots he was sent:
 `docs/plans/2026-10-times-gloss/round-times.png`, `round-sounds.png`, `round-place.png`,
 `round-settings.png`, `round-ramadan.png`. He replied "all good", with one change: the Ramadan card's button says "Get the full Ramadan timetable" and fills its row; then "spacing looks tight": 24dp above and below it, the (i) centred beside it (done, `round-ramadan.png` retaken). **Sound tested on his emulator by Claude over adb, at his request (18 Oct 2026, §5.25 has the evidence):** Dhuhr as a Notification with the Adhan posts on time, plays the full 154 s recording, and stops at once when swiped away. **Opening the notification panel also stops it: Android's behaviour, not the app's.** Android 16's notification cooldown muted a repeat alert during the test, a testing artefact (lesson 148). **Not verified on a device**: Android 7, a real phone, the picker's Default row. Next: his
-verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it").
+verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it"). **Done: approved and parked, see the top of this block.**
 
 **Earlier, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
 He asked to move from the cloud session to his own computer with everything merged and recorded.

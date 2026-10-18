@@ -182,7 +182,7 @@
     <string name="settings_alarm_sound_phone">Dari ponsel Anda</string>
     <string name="settings_notification_sound">Suara notifikasi</string>
     <string name="settings_notification_sound_default">Nada biasa ponsel Anda</string>
-    <string name="settings_notification_sound_help">Berbunyi saat notifikasi salat masuk, pada volume notifikasi. Setelan senyap, getar, dan Jangan Ganggu di ponsel Anda tetap berlaku.</string>
+    <string name="settings_notification_sound_help">Berbunyi saat notifikasi salat masuk, pada volume notifikasi. Setelan senyap, getar, dan Jangan Ganggu di ponsel Anda tetap berlaku. Menarik turun notifikasi atau menggeser notifikasi ini akan menghentikan suaranya.</string>
     <string name="settings_alarm_sound_help">Berbunyi untuk salat yang diatur ke Alarm, pada volume alarm.</string>
     <string name="settings_alarm_play_on_silent">Bunyikan saat senyap</string>
     <string name="settings_alarm_play_on_silent_desc">Tetap berbunyi saat ponsel senyap atau mode Jangan Ganggu. Nonaktif: hanya notifikasi dan getar.</string>

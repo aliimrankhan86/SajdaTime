@@ -185,7 +185,7 @@
     <string name="settings_alarm_sound_phone">آپ کے فون سے</string>
     <string name="settings_notification_sound">اطلاع کی آواز</string>
     <string name="settings_notification_sound_default">آپ کے فون کی معمول کی ٹون</string>
-    <string name="settings_notification_sound_help">نماز کی اطلاع آنے پر اطلاع کے والیوم پر بجتی ہے۔ فون کی سائلنٹ، وائبریٹ اور ڈسٹرب نہ کریں کی سیٹنگز پھر بھی لاگو رہتی ہیں۔</string>
+    <string name="settings_notification_sound_help">نماز کی اطلاع آنے پر اطلاع کے والیوم پر بجتی ہے۔ فون کی سائلنٹ، وائبریٹ اور ڈسٹرب نہ کریں کی سیٹنگز پھر بھی لاگو رہتی ہیں۔ اطلاعات نیچے کھینچنے یا اطلاع کو سوائپ کر کے ہٹانے سے آواز رک جاتی ہے۔</string>
     <string name="settings_alarm_sound_help">جن نمازوں کے لیے الارم چنا گیا ہو، ان کے لیے الارم کے والیوم پر بجتی ہے۔</string>
     <string name="settings_alarm_play_on_silent">سائلنٹ پر بھی بجائیں</string>
     <string name="settings_alarm_play_on_silent_desc">فون سائلنٹ یا ڈسٹرب نہ کریں پر ہو تب بھی بجتا ہے۔ بند: صرف اطلاع اور وائبریشن۔</string>

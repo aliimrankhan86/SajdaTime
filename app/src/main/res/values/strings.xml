@@ -333,7 +333,7 @@
     <string name="settings_alarm_sound_phone">From your phone</string>
     <string name="settings_notification_sound">Notification sound</string>
     <string name="settings_notification_sound_default">Your phone\'s usual tone</string>
-    <string name="settings_notification_sound_help">Plays when a prayer notification arrives, at your notification volume. Your phone\'s silent, vibrate and Do Not Disturb settings still apply.</string>
+    <string name="settings_notification_sound_help">Plays when a prayer notification arrives, at your notification volume. Your phone\'s silent, vibrate and Do Not Disturb settings still apply. Pulling down your notifications or swiping the notification away stops the sound.</string>
     <string name="settings_alarm_sound_help">Plays for prayers set to Alarm, at your alarm volume.</string>
     <string name="settings_alarm_play_on_silent">Play on silent</string>
     <string name="settings_alarm_play_on_silent_desc">Plays even when your phone is on silent or Do Not Disturb. Off: notification and vibration only.</string>

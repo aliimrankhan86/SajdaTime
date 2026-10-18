@@ -182,7 +182,7 @@
     <string name="settings_alarm_sound_phone">Telefonunuzdan</string>
     <string name="settings_notification_sound">Bildirim sesi</string>
     <string name="settings_notification_sound_default">Telefonunuzun olağan sesi</string>
-    <string name="settings_notification_sound_help">Namaz bildirimi geldiğinde bildirim ses düzeyinde çalar. Telefonunuzun sessiz, titreşim ve Rahatsız Etmeyin ayarları yine geçerlidir.</string>
+    <string name="settings_notification_sound_help">Namaz bildirimi geldiğinde bildirim ses düzeyinde çalar. Telefonunuzun sessiz, titreşim ve Rahatsız Etmeyin ayarları yine geçerlidir. Bildirimleri aşağı çekmek ya da bildirimi kaydırıp kapatmak sesi durdurur.</string>
     <string name="settings_alarm_sound_help">Alarm seçilen namazlar için alarm ses düzeyinde çalar.</string>
     <string name="settings_alarm_play_on_silent">Sessizdeyken de çal</string>
     <string name="settings_alarm_play_on_silent_desc">Telefon sessizde veya Rahatsız Etmeyin modundayken de çalar. Kapalı: yalnızca bildirim ve titreşim.</string>

@@ -205,7 +205,7 @@
     <string name="settings_alarm_sound_phone">من هاتفك</string>
     <string name="settings_notification_sound">صوت الإشعار</string>
     <string name="settings_notification_sound_default">النغمة المعتادة في هاتفك</string>
-    <string name="settings_notification_sound_help">يعمل عند وصول إشعار الصلاة، بمستوى صوت الإشعارات. وتبقى إعدادات الصامت والاهتزاز وعدم الإزعاج في هاتفك سارية.</string>
+    <string name="settings_notification_sound_help">يعمل عند وصول إشعار الصلاة، بمستوى صوت الإشعارات. وتبقى إعدادات الصامت والاهتزاز وعدم الإزعاج في هاتفك سارية. يتوقف الصوت عند سحب الإشعارات إلى الأسفل أو إزالة الإشعار بالسحب.</string>
     <string name="settings_alarm_sound_help">يعمل للصلوات المضبوطة على منبّه، بمستوى صوت المنبّه.</string>
     <string name="settings_alarm_play_on_silent">التشغيل في الوضع الصامت</string>
     <string name="settings_alarm_play_on_silent_desc">يعمل حتى لو كان الهاتف صامتًا أو في وضع عدم الإزعاج. عند الإيقاف: إشعار واهتزاز فقط.</string>
