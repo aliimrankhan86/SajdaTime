@@ -227,7 +227,7 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 full description (DRAFT 18 Oct 2026, waiting for the owner's approval; 3973 characters)
+### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate: check every line against the 1.5.0 build first; 3973 characters)
 
 Written after the Mac readiness check found the live description out of date. **It also corrects a false line in the live text:** "without sending your location anywhere" and "Your coordinates never leave your device" are not true, because the town name is looked up by the phone's geocoder, usually Google (CLAUDE.md forbids that wording; `docs/privacy.html` says it in full). New in it: the redesigned widgets, the built-in adhan and phone sounds for alerts and alarms, the reminder before prayer, Ramadan, Match your mosque, Diyanet (Turkey), and the language list. "type a city name" becomes "type where you are", the app's own words. Still contains "Wear OS" (the Wear review checks the live listing for it). Paste on release day, once approved; the Ramadan lines are in it because 1.5.0 ships in January.
 

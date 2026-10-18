@@ -20,11 +20,15 @@ is done by touching the signing key, and **he presses every submit, publish and 
 - [x] Privacy policy content already matches 1.5.0 (widget location chip; sounds stay on the phone,
       so nothing new to declare). Data safety answers unchanged.
 
-## Waiting for the owner (asked 18 Oct 2026)
+## Decided by the owner (18 Oct 2026)
 
-- The 1.5.0 **full store description**: draft in `docs/store/LISTING.md` ("1.5.0 full description"). It
-  also removes a false line from the live text ("Your coordinates never leave your device").
-- The **habit tracker** stays out of 1.5.0 (not started; the Mac check and Claude both advise leaving it out).
+- The 1.5.0 **full store description** (`docs/store/LISTING.md`, "1.5.0 full description") and the What's
+  new texts: **approved on condition they are accurate** (the owner, 18 Oct 2026: "approved as long as they are accurate"). So before pasting them, a
+  session on his Mac checks every line against the 1.5.0 build on the emulator and against
+  `docs/privacy.html`, fixes anything that is not true, and tells him what changed.
+- The **habit tracker is out of 1.5.0** ("leave it out").
+- **All remaining work happens in a Claude Code session on his Mac, not in the cloud** (his words: "we do
+  the rest on my mac claude not in cloud one").
 
 ## From the Mac readiness check (18 Oct 2026), for a session on his Mac
 

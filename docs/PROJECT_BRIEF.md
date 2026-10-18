@@ -18,7 +18,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Privacy policy:** https://aliimrankhan86.github.io/SajdaTime/privacy.html, dated 17 Oct 2026.
 
 ## Next release: 1.5.0
-- **Branch:** `claude/quiet-glass`, prepared and parked on 18 Oct 2026: everything merged into it, all checks pass, phone and watch both set to 1.5.0 (codes 9 and 1002, both ship), What's new final in five languages. Not merged into `main` until the day Ali submits. Release day steps: `docs/release-tools/RELEASE-1.5.0.md`. Waiting for Ali: the new store description (drafted, it also removes a false privacy line from the live one) and leaving the habit tracker out.
+- **Branch:** `claude/quiet-glass`, prepared and parked on 18 Oct 2026: everything merged into it, all checks pass, phone and watch both set to 1.5.0 (codes 9 and 1002, both ship), What's new final in five languages. Not merged into `main` until the day Ali submits. Release day steps: `docs/release-tools/RELEASE-1.5.0.md`. The new store description is approved by Ali on condition it is checked line by line for accuracy before it is pasted (it also removes a false privacy line from the live one). The rest is done from Ali's Mac.
 - **Contents:**
   - The Quiet Glass design: a floating tab bar, one header style, a new Settings screen, one Notice style for every notice, a slightly deeper green, and widgets restyled to match.
   - Arabic as the fifth language. It reads right to left and uses Western digits.
@@ -42,7 +42,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - **Turkey times match Diyanet** (decided 18 Oct 2026; Ali delegated it, with an independent review): the Turkey method now adds Diyanet's precaution minutes, so iftar is no longer 7 to 8 minutes before the ezan. Sunrise 7 minutes earlier; Dhuhr 5, Asr 4 and Maghrib 7 minutes later; Fajr and Isha unchanged. Every change is in the safe direction. The watch gets the same change, so ship both.
   - **Even spacing on every phone screen** (18 Oct 2026, approved by Ali from screenshots): the gaps between text and buttons follow the design system's spacing scale, and the build fails if a hand-picked gap is added. Not covered: the watch app.
   - **Security hardening** (17 Oct 2026): every library checksum-verified at build time, the two known library vulnerabilities fixed (0 known in the 204 shipped libraries), task hijacking blocked, network trust locked to the system's certificates. Firebase key restricted to the app and GitHub protections on (18 Oct). Passkeys on GitHub and Google. Signing values moved to ~/.gradle and proven (18 Oct); a spare copy is kept in ~/.gradle until 1.5.0 is live, then Ali deletes it (he gets a reminder).
-  - The habit tracker: not started. Claude advises leaving it out of 1.5.0; waiting for Ali's word.
+  - The habit tracker is not in 1.5.0 (Ali, 18 Oct 2026: "leave it out").
 - **Store screenshots** are retaken once, when 1.5.0 ships.
 - **Timeline:**
   - Sun 20 Dec 2026, 18:00 UK time: a phone reminder to leave the Mac on.
