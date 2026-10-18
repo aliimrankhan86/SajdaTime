@@ -279,6 +279,46 @@ same notice has no close button and never hides while the permission is missing.
 > would go looking for it. Amber, not red: prayer alerts still arrive, just at the mercy of the
 > scheduler, and an error colour would say the app is broken when it is not.
 
+**Home screen widgets** (hero countdown, 18 Oct 2026; research in
+`docs/plans/2026-10-widget-redesign/RESEARCH.md`). Two widgets, each with two layouts the launcher
+chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`):
+
+| Widget | Layout | Shows |
+|---|---|---|
+| Next prayer | small (default, and the only one below Android 12) | glyph, name, time; the countdown at the foot; the day's five bars |
+| Next prayer | wide (from 270 by 150dp) | the small widget's countdown beside the six rows |
+| Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
+| Today | large (from 250 by 280dp, 330dp in Urdu and Arabic; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+
+- **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
+  in dp because it is already three times the body text and a large font setting pushed the prayer
+  name off a 110dp widget. Names and times stay in sp.
+- **Prayer glyphs show where the sun is**, so they read without the language: Fajr rays above an empty
+  horizon, Sunrise a rising half sun, Dhuhr the sun over a post with no shadow, Asr a post whose shadow
+  equals its height (the Asr rule), Maghrib a setting half sun, Isha a crescent and star. One Asr glyph
+  for every madhab. Drawn white, tinted in the layout from a widget colour (never from code).
+- **The day's five bars** (Sunrise is not a prayer): done in `primary`, next outlined in `primary`, to
+  come in `outlineVariant`. Shape as well as fill separates next from done.
+- **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the
+  large Today widget and its empty state only. Never on a small widget.
+- **Glossy finish** (owner, 18 Oct 2026, "Apple premium style"): the surface is a FIXED three stop
+  gradient (lighter at the top), a white sheen over the top half that fades out (7 percent in dark,
+  none in light, where the top stop is already white), and a rim (16 percent white in dark, the
+  hairline in light). The countdown card has the same treatment in the highlight colour. Opaque on
+  purpose. `WidgetColorsTest` holds every ink to AA on every stop and on the top stop under the
+  sheen; it caught the first dark card top (#1C4034, 4.30:1) and set it to #18382D.
+- **The location chip**: a highlight pill with a pin, the town and an update arrow, on every widget
+  (under the countdown on Next, at the end of the large Today header, at the foot of the compact
+  Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
+  opening the app is what updates the location (onResume); it cannot update without opening the app,
+  because location is read only in the foreground. The large header uses the short date ("Sun, 18
+  Oct") so the chip never cuts it short.
+- **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
+  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
+  town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
+  1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
+  more.
+
 **Settings groups** (Quiet Glass, 17 Oct 2026): a sentence case `onSurfaceVariant` title
 (labelLarge, medium), then the rows inside one `sajdaSurface` card, 24dp radius, 16dp gutter.
 Each row: a 36dp `secondaryContainer` tile with a 20dp `onSecondaryContainer` icon, a
@@ -338,8 +378,8 @@ applied in the "dark design system" and "light design system" commits. What was 
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
-and it should stay that way. (The Ramadan card and the widgets in 1.4.0 reuse these tokens and
-add none. A prayer tracker, if it is ever built, is its own design pass.)
+and it should stay that way. (The Ramadan card and the widgets reuse these tokens and add none; the
+widget glyphs and the mark are drawings, not colours. A prayer tracker, if it is ever built, is its own design pass.)
 
 One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
 and 52sp in dark, on the argument that dark text on a pale background carries more optical
@@ -397,6 +437,20 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026, widgets made glossy, at the owner's request** ("a bit glossy background like apple
+  premium style"). This overrides, for the widgets only, the 17 Oct rejection of a shiny finish below.
+  Built within the rules that made the rejection sensible: a fixed gradient (testable), no colour
+  that moves with the time of day, opaque. Rejected: real translucency (text over an unknown photo
+  wallpaper cannot be contrast tested, and a RemoteViews cannot blur the backdrop); a "Tap to update"
+  sentence (DESIGN_SYSTEM 4 bans "Tap to" wording, and a pill with a pin and an arrow says it in every
+  language); a background location update without opening the app (needs background location,
+  against the foreground only rule and Play policy).
+- **18 Oct 2026, widgets: hero countdown chosen** by the owner from three drawn directions (A hero
+  countdown, B ring and sun path, C timeline strip). Rejected: B's sun arc (a bitmap drawn per refresh
+  bakes in colours that go stale when the phone changes theme, lesson 130); C as the main design (names
+  too small at 4 by 2); the mark on every widget (costs a 2 by 2 its prayer name, against Apple's
+  widget guidance); a time of day colour behind the countdown (§4, untestable contrast); a bundled
+  display font (§3); "4h 59m" wording (needs a redraw every minute; the Chronometer ticks for free).
 - **17 Oct 2026, Quiet Glass chosen.** Rejected: *Refined Calm* (no glass; the owner wanted
   the premium feel), *Night & Emerald* (glass and five changing colours behind the countdown,
   against Apple's guidance and the readability research; a second brand colour). Also

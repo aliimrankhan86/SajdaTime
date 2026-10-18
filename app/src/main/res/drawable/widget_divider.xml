@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The hairline between the countdown and the list on the wide Next prayer widget. A drawable on an
+     ImageView, because a plain View cannot be inflated by a RemoteViews (WidgetResourcesTest). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_outline_variant" />
+</shape>

@@ -77,7 +77,8 @@ descriptions live in `core` because both the phone and the watch show them.
 ### The religious disclaimer (non-negotiable)
 
 The user was explicit about this. The app states plainly — **once after onboarding as a
-dialog, and permanently in Settings → About → Disclaimer** — that:
+dialog (the short form since 18 Oct 2026, see §5.15), and permanently in full in Settings → About →
+Disclaimer** — that:
 
 - the author is **not a Mufti, Aalim, or an expert in Islam or fiqh**
 - it was **built with the help of artificial intelligence**
@@ -249,7 +250,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` (`Range.RAMADAN` and the Ramadan columns since 1.4.0) |
 | Ramadan | `ui/RamadanState.kt` (pure `build`), `ui/RamadanTimetable.kt`, `ui/home/RamadanCard.kt` (card, eve notice, info dialog), `ui/home/RamadanTimetableSheet.kt`, `ui/home/EidCard.kt`, `notify/SuhoorReminderPlan.kt` (pure) |
-| Widgets | `widget/WidgetState.kt` (pure), `widget/WidgetRenderer.kt` (the `RemoteViews`), `widget/WidgetUpdater.kt` (`refreshAll`), `widget/WidgetRefreshScheduler.kt`, `widget/WidgetRefreshReceiver.kt`, `NextPrayerWidgetProvider.kt`, `TodayWidgetProvider.kt`, `res/layout/widget_*.xml`, `res/xml/widget_*_info.xml`, `res/drawable-nodpi/widget_preview_*.png` (drawn by `tools/make-widget-previews.py`, not captured) |
+| Widgets | `widget/WidgetState.kt` (pure), `widget/WidgetRenderer.kt` (the `RemoteViews`), `widget/WidgetUpdater.kt` (`refreshAll`), `widget/WidgetRefreshScheduler.kt`, `widget/WidgetRefreshReceiver.kt`, `NextPrayerWidgetProvider.kt`, `TodayWidgetProvider.kt`, `res/layout/widget_*.xml`, `res/xml/widget_*_info.xml`, `res/drawable/widget_glyph_*.xml` (prayer glyphs), `widget_mark.xml`, `widget_seg_*.xml`, `res/drawable-nodpi/widget_preview_*.png` (captured from the real renderer through the Robolectric harness of lesson 132, 18 Oct 2026; the old drawing script was removed because it drew the 1.4.0 design) |
 | On device tests | `src/androidTest/.../` `DeviceSupport`, `LanguageAndDndDeviceTest`, `WidgetDeviceTest`, `RamadanDeviceTest`, `SuhoorReminderDeviceTest`, `RamadanPdfDeviceTest`, `ScreenSeedDeviceTest`. Compiled, never yet run. The widget tests need `appwidget grantbind` first and are run with `am instrument` (lesson 134). `docs/release-tools/release-1.4.0.sh` runs them |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
 | Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` (so `./gradlew installRtl` runs the whole app right-to-left), `app_name` set to "SajdaTime (RTL)", `applicationIdSuffix ".rtl"` so it installs beside the real app, and since 15 Aug 2026 `preview_build_notice` filled so a red "LAYOUT TEST BUILD" band sits on every screen. `:wear` has the same tag and must stay on it (§15 lesson 84). Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it. **Uninstall it when you are done** (`adb uninstall com.sajdatime.app.rtl`) — every time it has been left on an emulator the owner has seen it and, correctly, reported the app as broken |
@@ -997,7 +998,8 @@ have to survive any rewording:
 
 | Where | What it carries | File |
 |---|---|---|
-| **In-app dialog** — once after setup, and any time from Settings → About → Disclaimer | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **In-app dialog** — any time from Settings → About → Disclaimer, and one press away ("Read in full") in the setup dialog | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **Setup dialog, short form** — once after setup, never after an update (since 18 Oct 2026) | All four points in about 70 words, no dua, a "Read in full" button that shows `disclaimer_body` in the same dialog | `R.string.disclaimer_brief` (`FirstRunDisclaimer` in `MainActivity.kt`) |
 | **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
 | **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
 | **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
@@ -1019,9 +1021,21 @@ budget. Two things about it are deliberate:
   Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
   restoring it turns it green.
 
+**The short form after setup (owner, 18 Oct 2026).** He did not want a long message straight after
+installing; it was already shown only once, after setup, never after an update (the flag is stored).
+So the setup dialog shows `disclaimer_brief`: the same four points in three short paragraphs, under
+90 words, fitting one screen, with "Understood" and "Read in full". The full text stays canonical,
+unchanged, in Settings and one press away. `DisclaimerContentTest` holds the short form to all four
+points, no dua and under 90 words; proved by deleting "no warranty" from it and watching it go red.
+**Consequence the owner should know:** the dua request is now read at setup only by someone who
+presses "Read in full"; it is still asked once, in the full text, and nowhere else. Rejected: no
+dialog at all (the rule is that it is shown, not merely available); the short form without points 2
+and 4 (that is the watch's budget, not the phone's). Rendered in light, dark and Urdu (Robolectric
+Compose harness, not committed); not seen on a device.
+
 **Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
 does not have room for, and every watch owner also has the phone app, where all four are shown
-once, unavoidably, at setup. Points 1 and 3 are the two that change what someone *does*.
+once, unavoidably, at setup (in the short form since 18 Oct 2026, still all four). Points 1 and 3 are the two that change what someone *does*.
 
 **The watch string has a hard three-line budget**, and that is why it reads more bluntly than
 the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top
@@ -1297,12 +1311,43 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    are allowed, because an inexact refresh could leave one running past zero. Otherwise it shows the
    time only. The Chronometer's digits follow the phone's language and not the app's picker
    (lesson 131).
-5. **Sizes.** Next prayer is 3 by 2 (a 2 by 1 slot is 40 dp high and cannot hold three lines, a 2
-   by 2 square clipped the countdown), Today is 4 by 3 (six rows at 13sp need about 165 dp, a 4 by
-   2 slot is 110 dp). The smallest resize equals the default, so the widget cannot be shrunk into
-   clipping. The picker previews are two drawn PNGs (5,377 and 14,465 bytes) and not launcher
-   captures, so retake them from an emulator if a layout changes.
+5. **Sizes (hero countdown redesign, 18 Oct 2026).** Each widget has two layouts and, on Android 12
+   and later, hands the launcher both (`RemoteViews(Map<SizeF, RemoteViews>)`) so it picks by size
+   without waking the app. Next prayer: small from 180 by 110dp (placed 3 by 2), wide from 270 by
+   150dp. Today: compact from 250 by 180dp, large from 250 by 280dp (330dp in Urdu and Arabic, whose
+   script sits taller), placed 4 by 4. Below Android 12, and at 130 percent text or more, each widget
+   keeps its first layout, because the second stops showing the whole day at large text (rendered).
+   Rows sit at their natural height with weighted gaps between them, so a short widget clips its last
+   row instead of squashing rows on top of each other (lesson 142). The countdown is in dp, not sp.
+   The smallest resize equals the first layout's minimum. The picker previews (3,925 and 8,980 bytes)
+   are captured from the real renderer through the lesson 132 harness, light, an ordinary afternoon.
 6. **Rejected, with reasons:** see §2 "Deliberately NOT used".
+7. **What the widgets show since the redesign (18 Oct 2026; the owner chose "hero countdown" from three
+   drawn directions, research in `docs/plans/2026-10-widget-redesign/RESEARCH.md`, design rules in
+   `docs/DESIGN_SYSTEM.md` §4).** The countdown is the largest thing on every widget (light weight,
+   34 to 38dp). Each prayer has a glyph of where the sun is, drawn white and tinted in the layout
+   (never from code, rule 3). The five day bars (`WidgetState.progress`, Sunrise is not a prayer) are
+   DONE for a prayer whose time is not after now, NEXT for the highlighted prayer, TODO otherwise, and
+   all DONE after Isha until the midnight redraw; `WidgetStateTest` proves at every minute of a day
+   that they run done, next, to come and agree with the highlighted row. The large Today widget adds
+   the full date and the Hijri date with the person's own shift (`WidgetState.date`, `hijri`, built
+   the same way as the Times screen's header) and the mark. One Asr glyph for every madhab (the
+   shadow equals the post): recommended and not objected to, and the madhab never changes a widget's
+   look. No new string, no new colour, no new permission, no new dependency.
+   **The town the times are for is shown on every widget** (the owner asked, 18 Oct 2026, reversing the
+   1.4.0 choice of no place name on a home screen others can see): under the countdown on the small
+   Next widget (so at a large font it clips before the countdown does), under the time on the wide one, at the end of the large Today header, in the compact Today footer, and first in the spoken
+   description. Only the town part of the saved label (`WidgetState.town`, "London" from "London,
+   United Kingdom"), and the Makkah fallback in the app's language (as `AppSettings.placeName`).
+   Nothing new leaves the phone. `docs/privacy.html` says the widgets show it; **re-date the privacy
+   page on the day this reaches `main`**, because merging publishes it (lesson 137).
+   **Glossy finish and location chip (owner, 18 Oct 2026, the same day):** the surface and the
+   countdown card are a fixed gradient with a sheen and a rim (`widget_background.xml`,
+   `widget_hero_background.xml`, five new widget colours), and the town now sits in a chip with a pin
+   and an update arrow (`widget_place_chip`), its own tap (request code 2, same destination as the
+   root) and its own spoken label (`widget_update_location`, five languages, Claude's translations).
+   Pressing it opens the app; `MainActivity.onResume` already fetches the location and recalculates,
+   which redraws the widgets. That path was read, not run on a device.
 
 ---
 
@@ -1987,6 +2032,20 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**Widget redesign, hero countdown (18 Oct 2026, cloud session, branch `ccr-23a38578-c5vz7d`).** Gate
+`clean test lint :app:bundleRelease :wear:bundleRelease` passed: unit tests core 120, app 235, wear 12, 0
+failures; lint 0 errors and no widget warning (three deliberate kinds suppressed on the layout roots, with
+the reason in the layout comment). Renders through the real `RemoteViews.apply` path (lesson 132, harness not
+committed) of all four layouts at their minimum and typical sizes, in light and dark, ordinary, Ramadan
+iftar and after Isha, no exact alarms, no location, text 1.3 and 2.0, English, Urdu, Arabic, Turkish and
+Indonesian; the showcase is `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png`. The renders run
+in the harness's UTC clock, so their times are not London's: that is the harness, not the app. **Not
+verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the on device suite.
+Glossy finish and location chip, same day: gate passed again (core 120, app 237, wear 12, 0 failures;
+lint 0 errors, no widget warning; both bundles); the new sheen contrast test failed the first dark card
+colour (4.30:1) and passed the corrected one; renders in light, dark, Ramadan, 1.3 and 2.0 text, Urdu,
+Turkish, no location.
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
 
@@ -4981,7 +5040,51 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read this first; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
+### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
+
+**Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 grew on branch
+`ccr-23a38578-c5vz7d`**, which is `claude/quiet-glass` plus four owner requests from 18 Oct 2026. It
+is pushed, NOT merged into `claude/quiet-glass` yet; the owner said "looks good" to all four and has
+not yet said to merge.
+
+1. **Widget redesign, "hero countdown"** (he called the 1.4.0 widgets "extremely bland" from his S23
+   Ultra). Chosen from three drawn directions on a private design canvas
+   (https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf) after desk research
+   (`docs/plans/2026-10-widget-redesign/RESEARCH.md`, desk only, no users). Big light countdown,
+   sun position glyphs, five day bars, date and Hijri date, two layouts per widget by size. §5.20
+   items 5 and 7.
+2. **The town on every widget**, reversing 1.4.0's "no place name on a home screen" (his call). The
+   privacy page says so; **re-date `docs/privacy.html` the day this reaches `main`** (lesson 137).
+3. **Glossy "Apple premium" finish and a location chip** (pin, town, update arrow; opens the app,
+   which refreshes the location on resume). Opaque, fixed gradient, contrast tested. It overrides the
+   17 Oct "no glossy finish" rejection for widgets only (DESIGN_SYSTEM §9).
+4. **Short disclaimer after setup**, full text in Settings and behind "Read in full" (§5.15). Still all
+   four points; the dua request is now only in the full text.
+
+**Verified:** the full gate on the branch tip (core 120, app 238, wear 12, 0 failures; lint 0 errors;
+both release bundles); widgets and the setup dialog rendered through Robolectric (lesson 132, harness
+not committed) in light, dark, Ramadan, 1.3 and 2.0 text, English, Urdu, Arabic, Turkish, Indonesian.
+Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `disclaimer-short-form.png`.
+**Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
+chip's tap and the location refresh it relies on (read, not run), the on device suite.
+
+**Next, in order:** (a) when the owner says so, merge `ccr-23a38578-c5vz7d` into `claude/quiet-glass`
+(merge commit) and push; (b) the December preparation job's emulator run covers the device suite;
+(c) retake store screenshots with 1.5.0 as already planned. Nothing else is waiting.
+
+**GBrain and Cowork memory were NOT updated on 18 Oct 2026:** this was a cloud session with neither
+connected. The next session that has GBrain should write the entry below to `projects/sajdatime`, and
+the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and the entry:
+
+> 18 Oct 2026. Owner decisions: widgets redesigned "hero countdown" (chosen from A/B/C); town shown on
+> every widget (reverses 1.4.0 no-place rule); glossy finish allowed for widgets only (fixed gradient,
+> opaque, contrast tested; overrides 17 Oct no-gloss); location chip opens the app to refresh location
+> (no background location, ever); one Asr glyph for every madhab; setup disclaimer is a short form with
+> all four points and "Read in full", full text in Settings (dua only in the full text). All on branch
+> `ccr-23a38578-c5vz7d` over `claude/quiet-glass`, gate green, not merged; owner said "looks good".
+> Re-date privacy.html when it reaches main.
+
+### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
 **Live.** Phone **1.4.0** (versionCode 8), published 17 Oct 2026 (Play "Updated on 17 Oct 2026"), all
 178 countries: widgets, the Ramadan pack (dormant until the eve), the corrected privacy wording. Watch 1.2.0
@@ -8925,3 +9028,11 @@ matters more than the stable hashes, that is the trade being made.
     build. The pin was proved by letting the wrapper download Gradle into an empty Gradle home with the value set. Also: a
     wrapper jar committed on day one is not the jar of the Gradle version you run; regenerate it with `gradle wrapper` and compare
     it to the published wrapper checksum.
+
+142. **In a widget, weight the gaps, not the rows.** Rows given `layout_height="0dp"` and a weight fill a
+    tall widget nicely and, when the widget is too short (Urdu script, 2.0 text), squash every row to
+    less than its text height so the lines draw over each other. Rows at their natural height with
+    weighted empty gaps between them spread the same way when there is room and clip only the last row
+    when there is not. Found by rendering Urdu at the large Today widget's minimum (18 Oct 2026), not by
+    reading. Related: a launcher picks a responsive layout by size alone, never by font scale or
+    script, so the app has to choose which layouts to offer from both.

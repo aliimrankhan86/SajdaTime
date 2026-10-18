@@ -1,76 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Next prayer widget, 3 cells by 2. No android:text anywhere, on purpose: a RemoteViews layout is
-  inflated by the launcher, which would resolve @string/ in the PHONE's language and not the app's.
-  Every word is set from WidgetRenderer through AppLocale.wrap. WidgetResourcesTest fails the build if
-  one slips in, and it fails if a class RemoteViews may not inflate (a plain View, for one) does.
+  The Next prayer widget, small (hero countdown design, 18 Oct 2026; docs/plans/2026-10-widget-redesign/).
+  Used from its 180 by 110dp minimum, on every launcher below Android 12, and whenever the widget is
+  shorter than 150dp or narrower than 270dp (WidgetRenderer.NEXT_SIZES).
 
-  Colours are resolved by the launcher each time it draws, so the widget follows the phone's dark mode
-  the moment the phone changes it. Children are hidden from accessibility: the root carries one spoken
-  sentence for the whole widget.
+  Top: the prayer's glyph, its name and its time. Bottom: the countdown, large and light, then five bars
+  for the day's prayers. A weighted spacer between them takes whatever height the launcher gives, so
+  the countdown sits at the foot of the widget instead of the content floating in the middle of a tall
+  one, which is what the owner's screenshot of 1.4.0 showed. Under the countdown: the location chip (pin,
+  town, update arrow) and beside it "Tomorrow" or the Ramadan word when they apply. That line sits under
+  the countdown, not above it, so that at a large font on a 110dp widget it is the line that is clipped
+  and never the countdown (rendered at 2.0, 18 Oct 2026). When there is no countdown (no exact
+  alarms) the time takes the countdown's place and the small time at the top is hidden.
 
-  A vertical stack in order of importance: the prayer, its time, one small line of context, the
-  countdown. When a larger font does not fit, it is the lines at the bottom that are clipped and never
-  the prayer or its time. The context line holds "Tomorrow", the Ramadan word or the approximate
-  marker, joined when more than one applies, which is the usual case after Isha in Ramadan. Four
-  lines fit 110dp at the normal font size, checked by rendering it. It is 3 cells wide, not 2, so the
-  prayer name and the time each stay on one line at 200 percent text size.
+  Rules for every widget layout (WidgetResourcesTest fails the build on each): no android:text, because
+  the launcher would resolve it in the PHONE's language; only classes a RemoteViews may inflate (no plain
+  View, so hairlines and progress bars are ImageViews with a drawable); every text view hidden from
+  TalkBack, the root carries one spoken sentence; every colour a resource, resolved by the launcher at
+  each draw so the widget follows the phone's dark mode. Glyphs are drawn white and tinted here, for the
+  same reason (lesson 130).
+
+  The countdown is set in the light weight, Apple Clock style, and its size is written from
+  WidgetRenderer in dp rather than sp: it is already about three times the body text, and scaled by a
+  large font setting it pushed the prayer name off a 110dp widget. Names and times stay in sp.
+
+  tools:ignore on the root, all three deliberate: the empty weighted LinearLayouts are the gaps that
+  spread the content (HANDOVER lesson 142), the nested weight is the wide layout's two columns, and a
+  compound drawable cannot be tinted per theme from a layout the way an ImageView's glyph is.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:gravity="center_vertical"
     android:orientation="vertical"
     android:paddingStart="14dp"
-    android:paddingTop="8dp"
+    android:paddingTop="12dp"
     android:paddingEnd="14dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="12dp"
+    tools:ignore="UselessLeaf,NestedWeights,UseCompoundDrawables">
 
-    <TextView
-        android:id="@+id/widget_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/widget_glyph"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_fajr"
+            android:tint="@color/widget_primary" />
+        <TextView
+            android:id="@+id/widget_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/widget_time"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewEnd"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="13sp" />
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/widget_time"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:fontFeatureSettings="tnum"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/widget_sublabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="11sp"
-        android:visibility="gone" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" />
 
     <Chronometer
         android:id="@+id/widget_countdown"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:fontFeatureSettings="tnum"
         android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:maxLines="1"
         android:textAlignment="viewStart"
-        android:textColor="@color/widget_primary"
-        android:textSize="14sp"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="36sp"
         android:visibility="gone" />
+    <TextView
+        android:id="@+id/widget_hero_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-light"
+        android:fontFeatureSettings="tnum"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textAlignment="viewStart"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="36sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/widget_place_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_chip"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="yes"
+            android:minHeight="24dp"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_pin"
+                android:tint="@color/widget_primary" />
+            <TextView
+                android:id="@+id/widget_place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:maxWidth="120dp"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/widget_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="11dp"
+                android:layout_height="11dp"
+                android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_update"
+                android:tint="@color/widget_primary" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/widget_sublabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/widget_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/widget_seg_1"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_seg_todo"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_seg_2"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_seg_todo"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_seg_3"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_seg_todo"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_seg_4"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_seg_todo"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_seg_5"
+            android:layout_width="0dp"
+            android:layout_height="5dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_weight="1"
+            android:background="@drawable/widget_seg_todo"
+            android:importantForAccessibility="no" />
+    </LinearLayout>
 </LinearLayout>
