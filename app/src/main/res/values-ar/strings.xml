@@ -418,7 +418,7 @@
     <string name="eid_adha_body">تقبّل الله منا ومنكم عبادتنا وأضحيتنا، وبارك فيك وفي أهلك.</string>
     <string name="eid_fine_print">هذا التاريخ من حسابنا. نعتذر إن كنت تحتفل في يوم آخر: عيدك مبارك حينها أيضًا. يُرجى اتباع مسجدك.</string>
 
-    <!-- Home screen widgets. No place name on a widget: the home screen is visible to others. -->
+    <!-- Home screen widgets. They show the town the times are for, from the saved label (18 Oct 2026). -->
     <string name="widget_next_label">SajdaTime: الصلاة التالية</string>
     <string name="widget_today_label">SajdaTime: صلوات اليوم</string>
     <string name="widget_next_desc">الصلاة التالية ووقتها، مع عدّ تنازلي. يتبع الوضع الداكن في هاتفك.</string>

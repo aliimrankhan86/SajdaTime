@@ -17,8 +17,8 @@ import java.time.ZoneId
  *
  * The widgets never calculate anything a screen does not. The times are [PrayerEngine.compute] with the
  * same [AppSettings] the Times screen uses, the next prayer is [PrayerEngine.nextPrayer], and the
- * highlight rule is the one the Times screen applies to its own rows ([isHighlighted]). No place name is
- * carried at all: a home screen is seen by other people.
+ * highlight rule is the one the Times screen applies to its own rows ([isHighlighted]). The place the
+ * times are for is carried since 18 Oct 2026, at the owner's request ([cityName]).
  *
  * Only two things on a widget can go stale if every refresh is missed: which row is highlighted and the
  * countdown. The clock times are for the calendar day and stay right.
@@ -61,6 +61,16 @@ data class WidgetState(
      */
     val date: LocalDate? = null,
     val hijri: HijriDay? = null,
+    /**
+     * The saved place label exactly as the Times screen holds it ("London, United Kingdom"), and
+     * whether it is the Makkah fallback, whose name the renderer shows in the app's language
+     * (AppSettings.placeName). Shown on every widget since 18 Oct 2026: the owner asked for the place
+     * the times are for. It was left off in 1.4.0 because a home screen is seen by other people; he
+     * decided the answer to "times for where?" matters more. Nothing new leaves the phone: it is the
+     * label already saved.
+     */
+    val cityName: String = "",
+    val usingDefaultLocation: Boolean = false,
 ) {
     /** The Times screen's rule: the next prayer, and only if it is still today. Sunrise is never next. */
     fun isHighlighted(slot: PrayerSlot): Boolean = next != null && slot == next.slot && !next.isTomorrow
@@ -76,6 +86,13 @@ data class WidgetState(
                 else -> null
             }
         }
+
+    /**
+     * The town part of the saved label, "London" from "London, United Kingdom": a widget has room for
+     * one word or two, and the country adds nothing the person does not know. Empty when there is no
+     * label. Not used for the Makkah fallback, which the renderer names in the app's language.
+     */
+    val town: String get() = cityName.substringBefore(',').trim()
 
     enum class RamadanWord { SUHOOR_ENDS, IFTAR }
 
@@ -101,6 +118,8 @@ data class WidgetState(
                     countdownAllowed = canScheduleExact,
                     date = todayDate,
                     hijri = hijri,
+                    cityName = settings.cityName,
+                    usingDefaultLocation = settings.usingDefaultLocation,
                 )
             val prefs = settings.calculationPrefs
             val today = PrayerEngine.compute(coordinates, todayDate, prefs)
@@ -118,6 +137,8 @@ data class WidgetState(
                 progress = progress(today, next, now),
                 date = todayDate,
                 hijri = hijri,
+                cityName = settings.cityName,
+                usingDefaultLocation = settings.usingDefaultLocation,
             )
         }
 

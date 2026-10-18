@@ -1305,7 +1305,7 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    keeps its first layout, because the second stops showing the whole day at large text (rendered).
    Rows sit at their natural height with weighted gaps between them, so a short widget clips its last
    row instead of squashing rows on top of each other (lesson 142). The countdown is in dp, not sp.
-   The smallest resize equals the first layout's minimum. The picker previews (3,347 and 8,006 bytes)
+   The smallest resize equals the first layout's minimum. The picker previews (3,461 and 8,257 bytes)
    are captured from the real renderer through the lesson 132 harness, light, an ordinary afternoon.
 6. **Rejected, with reasons:** see §2 "Deliberately NOT used".
 7. **What the widgets show since the redesign (18 Oct 2026; the owner chose "hero countdown" from three
@@ -1320,6 +1320,13 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    the same way as the Times screen's header) and the mark. One Asr glyph for every madhab (the
    shadow equals the post): recommended and not objected to, and the madhab never changes a widget's
    look. No new string, no new colour, no new permission, no new dependency.
+   **The town the times are for is shown on every widget** (the owner asked, 18 Oct 2026, reversing the
+   1.4.0 choice of no place name on a home screen others can see): under the countdown on the small
+   Next widget (so at a large font it clips before the countdown does), under the time on the wide one, at the end of the large Today header, in the compact Today footer, and first in the spoken
+   description. Only the town part of the saved label (`WidgetState.town`, "London" from "London,
+   United Kingdom"), and the Makkah fallback in the app's language (as `AppSettings.placeName`).
+   Nothing new leaves the phone. `docs/privacy.html` says the widgets show it; **re-date the privacy
+   page on the day this reaches `main`**, because merging publishes it (lesson 137).
 
 ---
 
@@ -2006,7 +2013,7 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ## 10. What has been verified on a device, and how
 
 **Widget redesign, hero countdown (18 Oct 2026, cloud session, branch `ccr-23a38578-c5vz7d`).** Gate
-`clean test lint :app:bundleRelease :wear:bundleRelease` passed: unit tests core 120, app 234, wear 12, 0
+`clean test lint :app:bundleRelease :wear:bundleRelease` passed: unit tests core 120, app 235, wear 12, 0
 failures; lint 0 errors and no widget warning (three deliberate kinds suppressed on the layout roots, with
 the reason in the layout comment). Renders through the real `RemoteViews.apply` path (lesson 132, harness not
 committed) of all four layouts at their minimum and typical sizes, in light and dark, ordinary, Ramadan
@@ -5014,7 +5021,8 @@ The owner sent a screenshot of the live 1.4.0 widgets on his S23 Ultra and calle
 asking for an Apple style design with decent sized fonts and more information. Three directions were
 drawn on a design canvas (private artifact https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf), desk
 research done at his request (`docs/plans/2026-10-widget-redesign/RESEARCH.md`: desk only, no users), and
-he chose **hero countdown**. Built as §5.20 items 5 and 7 describe. **Verified:** the whole gate (see §10);
+he chose **hero countdown**, then asked for the town the times are for to be shown on it. Built as
+§5.20 items 5 and 7 describe. **Verified:** the whole gate (see §10);
 48 widget unit tests (5 new); renders through the real `RemoteViews.apply` path (lesson 132) of every
 layout in light, dark, ordinary, Ramadan, no exact alarms, no location, 1.3 and 2.0 text, English, Urdu,
 Arabic, Turkish and Indonesian, which found and fixed three defects (rows squashed on top of each other,

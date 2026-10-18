@@ -97,7 +97,7 @@ class WidgetResourcesTest {
             "layout/widget_next_prayer.xml" to hero,
             "layout/widget_next_prayer_wide.xml" to hero + rows,
             "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows,
-            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows,
+            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_place", "widget_hero") + hero + rows,
         )
         for ((layout, ids) in expected) {
             val xml = read(layout)

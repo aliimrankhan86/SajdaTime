@@ -7,7 +7,10 @@
   Top: the prayer's glyph, its name and its time. Bottom: the countdown, large and light, then five bars
   for the day's prayers. A weighted spacer between them takes whatever height the launcher gives, so
   the countdown sits at the foot of the widget instead of the content floating in the middle of a tall
-  one, which is what the owner's screenshot of 1.4.0 showed. When there is no countdown (no exact
+  one, which is what the owner's screenshot of 1.4.0 showed. The small line under the countdown starts
+  with the town the times are for, then "Tomorrow" or the Ramadan word when they apply. It sits under
+  the countdown, not above it, so that at a large font on a 110dp widget it is the line that is clipped
+  and never the countdown (rendered at 2.0, 18 Oct 2026). When there is no countdown (no exact
   alarms) the time takes the countdown's place and the small time at the top is hidden.
 
   Rules for every widget layout (WidgetResourcesTest fails the build on each): no android:text, because
@@ -78,19 +81,6 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/widget_sublabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:ellipsize="end"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="12sp"
-        android:visibility="gone" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -125,11 +115,24 @@
         android:textSize="36sp"
         android:visibility="gone" />
 
+    <TextView
+        android:id="@+id/widget_sublabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:maxLines="1"
+        android:textAlignment="viewStart"
+        android:textColor="@color/widget_on_surface_variant"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
     <LinearLayout
         android:id="@+id/widget_progress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="8dp"
         android:orientation="horizontal">
         <ImageView
             android:id="@+id/widget_seg_1"

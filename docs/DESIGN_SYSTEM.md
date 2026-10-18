@@ -301,7 +301,11 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
   come in `outlineVariant`. Shape as well as fill separates next from done.
 - **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the
   large Today widget and its empty state only. Never on a small widget.
-- **No town name** on any widget: a home screen is seen by other people.
+- **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
+  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
+  town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
+  1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
+  more.
 
 **Settings groups** (Quiet Glass, 17 Oct 2026): a sentence case `onSurfaceVariant` title
 (labelLarge, medium), then the rows inside one `sajdaSurface` card, 24dp radius, 16dp gutter.

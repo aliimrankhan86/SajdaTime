@@ -570,7 +570,7 @@
       Home screen widgets. Never put android:text in the widget layouts: RemoteViews are inflated in
       the launcher with the phone's language, so every word is set from code through AppLocale.wrap.
       The widgets follow the phone's dark mode, not the app's Theme row, and the descriptions say so.
-      No place name on a widget: the home screen is visible to other people.
+      The widgets show the town the times are for, from the saved label (owner request, 18 Oct 2026).
     -->
     <string name="widget_next_label">SajdaTime: next prayer</string>
     <string name="widget_today_label">SajdaTime: today\'s prayers</string>

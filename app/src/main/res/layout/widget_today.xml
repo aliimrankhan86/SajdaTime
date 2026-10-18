@@ -6,7 +6,8 @@
   launcher gives instead of stopping a third of the way down (the owner's 1.4.0 screenshot). No header
   here, for the reason the 1.4.0 version gave: at 180dp a header pushed Isha off at a larger font.
 
-  Sunrise is dimmed and is never the highlighted row, as on the Times screen.
+  Sunrise is dimmed and is never the highlighted row, as on the Times screen. The footer names the town
+  the times are for, joined with the approximate marker on a projected polar day.
 
   Rules for every widget layout (WidgetResourcesTest fails the build on each): no android:text, because
   the launcher would resolve it in the PHONE's language; only classes a RemoteViews may inflate (no plain

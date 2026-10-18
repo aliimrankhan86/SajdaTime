@@ -223,4 +223,15 @@ class WidgetStateTest {
         assertEquals(Triple(7, 5, 1448), plain.hijri!!.let { Triple(it.day, it.month, it.year) })
         assertEquals(8, build("2026-10-18", "00:56", settings(offset = 1)).hijri!!.day)
     }
+
+    @Test
+    fun `the widget carries the saved place and shortens it to the town`() {
+        val state = WidgetState.build(settings().copy(cityName = "Slough, United Kingdom"), at("2027-02-22", "04:00"), zone, true)
+        assertEquals("Slough, United Kingdom", state.cityName)
+        assertEquals("Slough", state.town)
+        assertFalse(state.usingDefaultLocation)
+        assertEquals("Makkah", state.copy(cityName = "Makkah").town)
+        assertEquals("", state.copy(cityName = "").town)
+        assertTrue(WidgetState.build(settings().copy(usingDefaultLocation = true), at("2027-02-22", "04:00"), zone, true).usingDefaultLocation)
+    }
 }

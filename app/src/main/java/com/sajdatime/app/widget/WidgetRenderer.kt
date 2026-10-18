@@ -131,13 +131,13 @@ internal object WidgetRenderer {
             return views
         }
 
-        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP)
+        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP, place(context, state))
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             fillRows(context, views, state, labels = false)
         }
 
-        views.setContentDescription(R.id.widget_root, nextSentence(context, next, now))
+        views.setContentDescription(R.id.widget_root, withPlace(context, state, nextSentence(context, next, now)))
         return views
     }
 
@@ -164,13 +164,19 @@ internal object WidgetRenderer {
         views.setViewVisibility(R.id.widget_message, View.GONE)
         if (large) {
             views.setViewVisibility(R.id.widget_hero, View.VISIBLE)
-            fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
+            fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP, place = null)
         }
 
         val spoken = fillRows(context, views, state, labels = true)
 
-        if (today.approximated) {
-            views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
+        // The compact list has no header, so its footer names the town, joined with the approximate
+        // marker on a projected polar day. The large widget names the town in its header instead.
+        val footer = listOfNotNull(
+            if (large) null else place(context, state)?.bidiIsolated(),
+            if (today.approximated) context.getString(R.string.notif_approximate) else null,
+        )
+        if (footer.isNotEmpty()) {
+            views.setTextViewText(R.id.widget_footer, footer.reduce { a, b -> context.getString(R.string.settings_value_pair, a, b) })
             views.setViewVisibility(R.id.widget_footer, View.VISIBLE)
         } else {
             views.setViewVisibility(R.id.widget_footer, View.GONE)
@@ -179,7 +185,7 @@ internal object WidgetRenderer {
         // One sentence for the whole widget: which prayer is next and in how long, then the six rows.
         views.setContentDescription(
             R.id.widget_root,
-            context.getString(R.string.widget_a11y_today, nextSentence(context, next, now) + ". " + spoken.joinToString(". ")),
+            withPlace(context, state, context.getString(R.string.widget_a11y_today, nextSentence(context, next, now) + ". " + spoken.joinToString(". "))),
         )
         return views
     }
@@ -191,7 +197,15 @@ internal object WidgetRenderer {
      * glyph, name and time, one small line of context, the countdown (or the time in its place) and
      * the day's five bars.
      */
-    private fun fillHero(context: Context, views: RemoteViews, state: WidgetState, next: NextPrayer, now: Instant, countdownDp: Float) {
+    private fun fillHero(
+        context: Context,
+        views: RemoteViews,
+        state: WidgetState,
+        next: NextPrayer,
+        now: Instant,
+        countdownDp: Float,
+        place: String?,
+    ) {
         val time = TimeFormat.clock(context, next.at)
         views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
         views.setTextViewText(R.id.widget_name, next.slot.label(context))
@@ -199,11 +213,14 @@ internal object WidgetRenderer {
         views.setViewVisibility(R.id.widget_glyph, View.VISIBLE)
         views.setViewVisibility(R.id.widget_name, View.VISIBLE)
 
-        // One small line of context: "Tomorrow", then either the approximate marker or the Ramadan
-        // word, joined when both apply (after Isha in Ramadan, the usual case). A projected polar time
-        // is marked before the Ramadan word: a guess presented as a measurement is the worse mistake,
-        // and the word for Fajr or Maghrib is a convenience.
+        // One small line of context: the town the times are for (not on the large Today card, whose
+        // header names it), "Tomorrow", then either the approximate marker or the Ramadan word, joined
+        // when more than one applies (after Isha in Ramadan, the usual case). A projected polar time is
+        // marked before the Ramadan word: a guess presented as a measurement is the worse mistake, and
+        // the word for Fajr or Maghrib is a convenience. The town is isolated: it comes from the
+        // geocoder and stays Latin in an Urdu or Arabic line (core/Bidi.kt).
         val parts = listOfNotNull(
+            place?.bidiIsolated(),
             if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
             if (state.nextIsApproximate) {
                 context.getString(R.string.notif_approximate)
@@ -302,6 +319,13 @@ internal object WidgetRenderer {
             return
         }
         views.setViewVisibility(R.id.widget_header, View.VISIBLE)
+        val place = if (state.hasLocation) place(context, state) else null
+        if (place != null) {
+            views.setTextViewText(R.id.widget_place, place)
+            views.setViewVisibility(R.id.widget_place, View.VISIBLE)
+        } else {
+            views.setViewVisibility(R.id.widget_place, View.GONE)
+        }
         val locale = AppLocale.of(context)
         // Asked for, not written out, as in TimeFormat.date: field order differs between languages.
         val pattern = DateFormat.getBestDateTimePattern(locale, "EEEEdMMMM")
@@ -367,6 +391,18 @@ internal object WidgetRenderer {
         PrayerSlot.MAGHRIB -> R.drawable.widget_glyph_maghrib
         PrayerSlot.ISHA -> R.drawable.widget_glyph_isha
     }
+
+    /**
+     * The town the times are for, as the person would say it: the Makkah fallback in the app's own
+     * language (AppSettings.placeName), otherwise the town part of the saved label. Null when there is
+     * nothing to show, so no widget ever shows an empty dot.
+     */
+    private fun place(context: Context, state: WidgetState): String? =
+        if (state.usingDefaultLocation) context.getString(R.string.location_makkah) else state.town.ifBlank { null }
+
+    /** The spoken description, led by the town when there is one, as the Times screen's header leads. */
+    private fun withPlace(context: Context, state: WidgetState, sentence: String): String =
+        place(context, state)?.let { context.getString(R.string.settings_value_pair, it.bidiIsolated(), sentence) } ?: sentence
 
     private fun nextSentence(context: Context, next: NextPrayer, now: Instant): String = context.getString(
         if (next.isTomorrow) R.string.widget_a11y_next_tomorrow else R.string.widget_a11y_next,
