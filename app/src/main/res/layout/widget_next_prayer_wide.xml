@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   The Next prayer widget, wide: from 270 by 150dp on Android 12 and later (WidgetRenderer.NEXT_SIZES).
-  The small widget's countdown on the start side, and the whole day on the end side, the six rows
+  The small widget's countdown block on the start side (the time on its own line under the name, where
+  beside it the name left it no room), and the whole day on the end side, the six rows
   spread over the height. The rows use the Today widget's ids, so one function fills both. Their
   label column is left empty here: at this width the bold, highlighted row already says which is next,
   and "Suhoor ends" would not fit beside the time. Not used at 130 percent text or more, where the
@@ -78,18 +79,6 @@
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
             android:textSize="13sp" />
-        <TextView
-            android:id="@+id/widget_sublabel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:importantForAccessibility="no"
-            android:maxLines="1"
-            android:textAlignment="viewStart"
-            android:textColor="@color/widget_on_surface_variant"
-            android:textSize="12sp"
-            android:visibility="gone" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -123,10 +112,71 @@
             android:textSize="34sp"
             android:visibility="gone" />
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/widget_place_chip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/widget_chip"
+                android:gravity="center_vertical"
+                android:importantForAccessibility="yes"
+                android:minHeight="24dp"
+                android:orientation="horizontal"
+                android:paddingStart="7dp"
+                android:paddingTop="3dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="3dp"
+                android:visibility="gone">
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/widget_icon_pin"
+                    android:tint="@color/widget_primary" />
+                <TextView
+                    android:id="@+id/widget_place"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:maxWidth="120dp"
+                    android:ellipsize="end"
+                    android:importantForAccessibility="no"
+                    android:maxLines="1"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/widget_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+                <ImageView
+                    android:layout_width="11dp"
+                    android:layout_height="11dp"
+                    android:layout_marginStart="5dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/widget_icon_update"
+                    android:tint="@color/widget_primary" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/widget_sublabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/widget_on_surface_variant"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+        <LinearLayout
             android:id="@+id/widget_progress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:orientation="horizontal">
             <ImageView
                 android:id="@+id/widget_seg_1"

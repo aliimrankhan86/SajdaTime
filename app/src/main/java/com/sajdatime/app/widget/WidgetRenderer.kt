@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.SystemClock
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.format.DateFormat
 import android.text.style.StyleSpan
 import android.util.SizeF
 import android.util.TypedValue
@@ -28,7 +27,6 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.label
 import java.time.Instant
-import java.time.format.DateTimeFormatter
 
 /**
  * Turns a [WidgetState] into the views a launcher draws. All the decisions are already in the state;
@@ -113,6 +111,7 @@ internal object WidgetRenderer {
         val wide = layout == R.layout.widget_next_prayer_wide
         applyDirection(context, views)
         applyTap(context, views)
+        fillChip(context, views, state)
 
         val next = state.next
         if (!state.hasLocation || next == null) {
@@ -131,7 +130,7 @@ internal object WidgetRenderer {
             return views
         }
 
-        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP, place(context, state))
+        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP)
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             fillRows(context, views, state, labels = false)
@@ -146,6 +145,7 @@ internal object WidgetRenderer {
         val large = layout == R.layout.widget_today_large
         applyDirection(context, views)
         applyTap(context, views)
+        fillChip(context, views, state)
         if (large) fillHeader(context, views, state)
 
         val today = state.today
@@ -164,19 +164,13 @@ internal object WidgetRenderer {
         views.setViewVisibility(R.id.widget_message, View.GONE)
         if (large) {
             views.setViewVisibility(R.id.widget_hero, View.VISIBLE)
-            fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP, place = null)
+            fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
         }
 
         val spoken = fillRows(context, views, state, labels = true)
 
-        // The compact list has no header, so its footer names the town, joined with the approximate
-        // marker on a projected polar day. The large widget names the town in its header instead.
-        val footer = listOfNotNull(
-            if (large) null else place(context, state)?.bidiIsolated(),
-            if (today.approximated) context.getString(R.string.notif_approximate) else null,
-        )
-        if (footer.isNotEmpty()) {
-            views.setTextViewText(R.id.widget_footer, footer.reduce { a, b -> context.getString(R.string.settings_value_pair, a, b) })
+        if (today.approximated) {
+            views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
             views.setViewVisibility(R.id.widget_footer, View.VISIBLE)
         } else {
             views.setViewVisibility(R.id.widget_footer, View.GONE)
@@ -204,7 +198,6 @@ internal object WidgetRenderer {
         next: NextPrayer,
         now: Instant,
         countdownDp: Float,
-        place: String?,
     ) {
         val time = TimeFormat.clock(context, next.at)
         views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
@@ -213,14 +206,11 @@ internal object WidgetRenderer {
         views.setViewVisibility(R.id.widget_glyph, View.VISIBLE)
         views.setViewVisibility(R.id.widget_name, View.VISIBLE)
 
-        // One small line of context: the town the times are for (not on the large Today card, whose
-        // header names it), "Tomorrow", then either the approximate marker or the Ramadan word, joined
-        // when more than one applies (after Isha in Ramadan, the usual case). A projected polar time is
-        // marked before the Ramadan word: a guess presented as a measurement is the worse mistake, and
-        // the word for Fajr or Maghrib is a convenience. The town is isolated: it comes from the
-        // geocoder and stays Latin in an Urdu or Arabic line (core/Bidi.kt).
+        // One small line of context, beside the location chip: "Tomorrow", then either the approximate
+        // marker or the Ramadan word, joined when both apply (after Isha in Ramadan, the usual case).
+        // A projected polar time is marked before the Ramadan word: a guess presented as a measurement
+        // is the worse mistake, and the word for Fajr or Maghrib is a convenience.
         val parts = listOfNotNull(
-            place?.bidiIsolated(),
             if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
             if (state.nextIsApproximate) {
                 context.getString(R.string.notif_approximate)
@@ -319,17 +309,9 @@ internal object WidgetRenderer {
             return
         }
         views.setViewVisibility(R.id.widget_header, View.VISIBLE)
-        val place = if (state.hasLocation) place(context, state) else null
-        if (place != null) {
-            views.setTextViewText(R.id.widget_place, place)
-            views.setViewVisibility(R.id.widget_place, View.VISIBLE)
-        } else {
-            views.setViewVisibility(R.id.widget_place, View.GONE)
-        }
-        val locale = AppLocale.of(context)
-        // Asked for, not written out, as in TimeFormat.date: field order differs between languages.
-        val pattern = DateFormat.getBestDateTimePattern(locale, "EEEEdMMMM")
-        views.setTextViewText(R.id.widget_date, DateTimeFormatter.ofPattern(pattern, locale).format(date))
+        // The Times screen's short date ("Fri 19 Feb"). The full "Friday 19 February" was cut short
+        // beside the location chip at the large widget's 250dp minimum (rendered, 18 Oct 2026).
+        views.setTextViewText(R.id.widget_date, TimeFormat.date(context, date))
 
         // The same construction as the Times screen's header (HomeScreen.hijriToday): month names from
         // the string array, and only the month isolated, which is what keeps "7 Jumada al-Ula 1448" in
@@ -438,17 +420,35 @@ internal object WidgetRenderer {
 
     /** A tap anywhere on either widget opens the app. FLAG_IMMUTABLE: nothing needs to fill it in. */
     private fun applyTap(context: Context, views: RemoteViews) {
-        val intent = Intent(context, MainActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        views.setOnClickPendingIntent(
-            R.id.widget_root,
-            PendingIntent.getActivity(
-                context,
-                TAP_REQUEST_CODE,
-                intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-            ),
-        )
+        views.setOnClickPendingIntent(R.id.widget_root, openApp(context, TAP_REQUEST_CODE))
+    }
+
+    private fun openApp(context: Context, requestCode: Int): PendingIntent = PendingIntent.getActivity(
+        context,
+        requestCode,
+        Intent(context, MainActivity::class.java).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
+
+    /**
+     * The location chip: pin, the town the times are for, an update arrow (owner's request, 18 Oct
+     * 2026). Pressing it opens the app, and opening the app is what updates the location: every
+     * foreground visit fetches the current position and recalculates, which redraws the widgets
+     * (MainActivity.onResume, SajdaViewModel.refreshLocation). It cannot update without opening the
+     * app, because location is read only while the app is in the foreground (CLAUDE.md, a hard rule).
+     * Its own tap and spoken label make it a button TalkBack can find; the action is the same as the
+     * rest of the widget. Hidden with no location: the widget then says how to set one.
+     */
+    private fun fillChip(context: Context, views: RemoteViews, state: WidgetState) {
+        val place = if (state.hasLocation) place(context, state) else null
+        if (place == null) {
+            views.setViewVisibility(R.id.widget_place_chip, View.GONE)
+            return
+        }
+        views.setTextViewText(R.id.widget_place, place)
+        views.setViewVisibility(R.id.widget_place_chip, View.VISIBLE)
+        views.setContentDescription(R.id.widget_place_chip, context.getString(R.string.widget_update_location, place.bidiIsolated()))
+        views.setOnClickPendingIntent(R.id.widget_place_chip, openApp(context, CHIP_REQUEST_CODE))
     }
 
     /**
@@ -464,4 +464,7 @@ internal object WidgetRenderer {
 
     /** Distinct from the scheduler's open intent (request code 0), so neither replaces the other. */
     private const val TAP_REQUEST_CODE = 1
+
+    /** The chip's own open intent. Same destination as [TAP_REQUEST_CODE]; distinct so neither replaces the other. */
+    private const val CHIP_REQUEST_CODE = 2
 }

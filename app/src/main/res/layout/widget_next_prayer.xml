@@ -7,8 +7,8 @@
   Top: the prayer's glyph, its name and its time. Bottom: the countdown, large and light, then five bars
   for the day's prayers. A weighted spacer between them takes whatever height the launcher gives, so
   the countdown sits at the foot of the widget instead of the content floating in the middle of a tall
-  one, which is what the owner's screenshot of 1.4.0 showed. The small line under the countdown starts
-  with the town the times are for, then "Tomorrow" or the Ramadan word when they apply. It sits under
+  one, which is what the owner's screenshot of 1.4.0 showed. Under the countdown: the location chip (pin,
+  town, update arrow) and beside it "Tomorrow" or the Ramadan word when they apply. That line sits under
   the countdown, not above it, so that at a large font on a 110dp widget it is the line that is clipped
   and never the countdown (rendered at 2.0, 18 Oct 2026). When there is no countdown (no exact
   alarms) the time takes the countdown's place and the small time at the top is hidden.
@@ -115,18 +115,67 @@
         android:textSize="36sp"
         android:visibility="gone" />
 
-    <TextView
-        android:id="@+id/widget_sublabel"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:ellipsize="end"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="12sp"
-        android:visibility="gone" />
+        android:layout_marginTop="6dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/widget_place_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_chip"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="yes"
+            android:minHeight="24dp"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_pin"
+                android:tint="@color/widget_primary" />
+            <TextView
+                android:id="@+id/widget_place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:maxWidth="120dp"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/widget_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="11dp"
+                android:layout_height="11dp"
+                android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_update"
+                android:tint="@color/widget_primary" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/widget_sublabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/widget_progress"

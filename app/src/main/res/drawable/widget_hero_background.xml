@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Today widget's countdown card: the highlight colour the Times screen's next prayer card uses. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/widget_highlight" />
-    <corners android:radius="18dp" />
-</shape>
+<!-- The Today widget's countdown card: the highlight colour the Times screen's next prayer card uses,
+     with the same glossy finish as the widget (a fixed gradient and the sheen). Both stops are
+     contrast tested (WidgetColorsTest). -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:endColor="@color/widget_highlight"
+                android:startColor="@color/widget_highlight_top"
+                android:type="linear" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="@android:color/transparent"
+                android:centerY="0.5"
+                android:endColor="@android:color/transparent"
+                android:startColor="@color/widget_sheen"
+                android:type="linear" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+</layer-list>

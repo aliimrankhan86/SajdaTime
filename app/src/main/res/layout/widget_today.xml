@@ -6,8 +6,8 @@
   launcher gives instead of stopping a third of the way down (the owner's 1.4.0 screenshot). No header
   here, for the reason the 1.4.0 version gave: at 180dp a header pushed Isha off at a larger font.
 
-  Sunrise is dimmed and is never the highlighted row, as on the Times screen. The footer names the town
-  the times are for, joined with the approximate marker on a projected polar day.
+  Sunrise is dimmed and is never the highlighted row, as on the Times screen. The foot holds the
+  location chip and, on a projected polar day, the approximate marker beside it.
 
   Rules for every widget layout (WidgetResourcesTest fails the build on each): no android:text, because
   the launcher would resolve it in the PHONE's language; only classes a RemoteViews may inflate (no plain
@@ -412,17 +412,65 @@
         android:layout_weight="1"
         android:orientation="vertical" />
 
-    <TextView
-        android:id="@+id/widget_footer"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:ellipsize="end"
-        android:importantForAccessibility="no"
-        android:maxLines="1"
-        android:textAlignment="viewStart"
-        android:textColor="@color/widget_on_surface_variant"
-        android:textSize="11sp"
-        android:visibility="gone" />
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:id="@+id/widget_place_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_chip"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="yes"
+            android:minHeight="24dp"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_pin"
+                android:tint="@color/widget_primary" />
+            <TextView
+                android:id="@+id/widget_place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:maxWidth="120dp"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/widget_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="11dp"
+                android:layout_height="11dp"
+                android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_update"
+                android:tint="@color/widget_primary" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/widget_footer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="11sp"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>

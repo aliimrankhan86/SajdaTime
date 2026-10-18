@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The location chip: pin, town, update arrow. A pill in the highlight colour, so it reads as
+     something to press in every language without the words "Tap to" (DESIGN_SYSTEM 4, Notices). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_highlight" />
+    <corners android:radius="100dp" />
+</shape>

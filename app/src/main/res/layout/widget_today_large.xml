@@ -9,8 +9,9 @@
   layout is not used, because the countdown card leaves room for only three rows (WidgetRenderer).
 
   The mark appears here and on the "set your location" state only, never on the small widgets
-  (docs/plans/2026-10-widget-redesign/RESEARCH.md). The town the times are for sits at the end of the
-  header (the owner's request, 18 Oct 2026; 1.4.0 had none because a home screen is seen by others).
+  (docs/plans/2026-10-widget-redesign/RESEARCH.md). The location chip (pin, town, update arrow) sits at
+  the end of the header (the owner's request, 18 Oct 2026; 1.4.0 had no town because a home screen is
+  seen by others).
 
   Rules for every widget layout (WidgetResourcesTest fails the build on each): no android:text, because
   the launcher would resolve it in the PHONE's language; only classes a RemoteViews may inflate (no plain
@@ -82,19 +83,47 @@
                 android:textColor="@color/widget_on_surface_variant"
                 android:textSize="12sp" />
         </LinearLayout>
-        <TextView
-            android:id="@+id/widget_place"
+        <LinearLayout
+            android:id="@+id/widget_place_chip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:maxWidth="120dp"
-            android:ellipsize="end"
-            android:importantForAccessibility="no"
-            android:maxLines="1"
-            android:textAlignment="viewEnd"
-            android:textColor="@color/widget_on_surface_variant"
-            android:textSize="13sp"
-            android:visibility="gone" />
+            android:background="@drawable/widget_chip"
+            android:gravity="center_vertical"
+            android:importantForAccessibility="yes"
+            android:minHeight="24dp"
+            android:orientation="horizontal"
+            android:paddingStart="7dp"
+            android:paddingTop="3dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="3dp"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_pin"
+                android:tint="@color/widget_primary" />
+            <TextView
+                android:id="@+id/widget_place"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:maxWidth="120dp"
+                android:ellipsize="end"
+                android:importantForAccessibility="no"
+                android:maxLines="1"
+                android:textAlignment="viewStart"
+                android:textColor="@color/widget_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+            <ImageView
+                android:layout_width="11dp"
+                android:layout_height="11dp"
+                android:layout_marginStart="5dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_icon_update"
+                android:tint="@color/widget_primary" />
+        </LinearLayout>
     </LinearLayout>
 
     <TextView

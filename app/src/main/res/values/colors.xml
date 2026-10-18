@@ -20,4 +20,17 @@
     <color name="widget_highlight">#D7EAE0</color>
     <color name="widget_primary">#0B5A43</color>
     <color name="widget_outline_variant">#C9CFC9</color>
+
+    <!--
+      The glossy finish (owner's request, 18 Oct 2026). A FIXED three stop gradient, top to bottom, so
+      every stop can be contrast tested like the Times screen's light hero gradient (DESIGN_SYSTEM 1),
+      a sheen of white over the top half, and a rim. Opaque on purpose: text over a see through widget
+      on a photo wallpaper cannot be tested, and a RemoteViews cannot blur what is behind it.
+      widget_surface stays the middle stop and the Color.kt twin.
+    -->
+    <color name="widget_surface_top">#FFFFFF</color>
+    <color name="widget_surface_bottom">#EEF1EC</color>
+    <color name="widget_highlight_top">#E6F3EC</color>
+    <color name="widget_sheen">#00FFFFFF</color>
+    <color name="widget_edge">#FFC9CFC9</color>
 </resources>

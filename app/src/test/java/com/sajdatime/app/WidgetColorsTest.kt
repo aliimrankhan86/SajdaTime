@@ -54,6 +54,11 @@ class WidgetColorsTest {
         "widget_highlight" to LightPrimaryContainer,
         "widget_primary" to LightPrimary,
         "widget_outline_variant" to LightOutlineVariant,
+        // The glossy finish's other stops (18 Oct 2026). Widget only, so no Color.kt twin: the
+        // values are written here once and the pairs below hold them to AA.
+        "widget_surface_top" to Color(0xFFFFFFFF),
+        "widget_surface_bottom" to Color(0xFFEEF1EC),
+        "widget_highlight_top" to Color(0xFFE6F3EC),
     )
     private val dark = mapOf(
         "widget_surface" to DarkSurface,
@@ -62,6 +67,9 @@ class WidgetColorsTest {
         "widget_highlight" to DarkPrimaryContainer,
         "widget_primary" to DarkPrimary,
         "widget_outline_variant" to DarkOutlineVariant,
+        "widget_surface_top" to Color(0xFF252C29),
+        "widget_surface_bottom" to Color(0xFF121514),
+        "widget_highlight_top" to Color(0xFF18382D),
     )
 
     @Test
@@ -99,7 +107,52 @@ class WidgetColorsTest {
         Pair("next prayer name on the countdown card", "widget_primary", "widget_highlight", 4.5),
         Pair("the highlighted row against the surface", "widget_highlight", "widget_surface", 1.1),
         Pair("the hairline against the surface", "widget_outline_variant", "widget_surface", 1.2),
+        // The glossy finish: every ink against every stop of the gradient it can sit on.
+        Pair("text on the top of the gradient", "widget_on_surface", "widget_surface_top", 4.5),
+        Pair("secondary text on the top of the gradient", "widget_on_surface_variant", "widget_surface_top", 4.5),
+        Pair("green on the top of the gradient", "widget_primary", "widget_surface_top", 4.5),
+        Pair("text on the foot of the gradient", "widget_on_surface", "widget_surface_bottom", 4.5),
+        Pair("secondary text on the foot of the gradient", "widget_on_surface_variant", "widget_surface_bottom", 4.5),
+        Pair("green on the foot of the gradient", "widget_primary", "widget_surface_bottom", 4.5),
+        Pair("text on the top of the countdown card", "widget_on_surface", "widget_highlight_top", 4.5),
+        Pair("secondary text on the top of the countdown card", "widget_on_surface_variant", "widget_highlight_top", 4.5),
+        Pair("green on the top of the countdown card", "widget_primary", "widget_highlight_top", 4.5),
+        // The location chip: green pin, town and arrow on the highlight pill.
+        Pair("the location chip", "widget_primary", "widget_highlight", 4.5),
     )
+
+    /** An 8 digit (#AARRGGBB) widget colour, for the translucent sheen. */
+    private fun translucent(folder: String, name: String): Long {
+        val text = File(root, "app/src/main/res/$folder/colors.xml").readText()
+        return Regex("""<color name="$name">#([0-9A-Fa-f]{8})</color>""").find(text)!!.groupValues[1].toLong(16)
+    }
+
+    /** [over] (#AARRGGBB) drawn on the opaque [under], as the launcher composites the sheen. */
+    private fun composite(over: Long, under: Int): Color {
+        val a = ((over shr 24) and 0xFF) / 255f
+        fun ch(shift: Int) = (((over shr shift) and 0xFF) * a + ((under shr shift) and 0xFF) * (1 - a)) / 255f
+        return Color(ch(16), ch(8), ch(0))
+    }
+
+    /** The top stop is the lightest point in dark and is under the sheen, so it is the worst case there. */
+    private fun checkSheen(theme: String, folder: String) {
+        val xml = colours(folder)
+        val top = composite(translucent(folder, "widget_sheen"), xml.getValue("widget_surface_top"))
+        val cardTop = composite(translucent(folder, "widget_sheen"), xml.getValue("widget_highlight_top"))
+        for (ink in listOf("widget_on_surface", "widget_on_surface_variant", "widget_primary")) {
+            val fg = asColor(xml.getValue(ink))
+            val r1 = Wcag.contrast(fg, top)
+            val r2 = Wcag.contrast(fg, cardTop)
+            assertTrue("$theme $ink under the sheen: %.2f:1".format(r1), r1 >= 4.5)
+            assertTrue("$theme $ink on the card under the sheen: %.2f:1".format(r2), r2 >= 4.5)
+        }
+    }
+
+    @Test
+    fun `light text clears AA under the gloss sheen`() = checkSheen("light", "values")
+
+    @Test
+    fun `dark text clears AA under the gloss sheen`() = checkSheen("dark", "values-night")
 
     private fun check(theme: String, folder: String) {
         val xml = colours(folder)

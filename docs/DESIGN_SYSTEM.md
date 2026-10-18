@@ -301,6 +301,18 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
   come in `outlineVariant`. Shape as well as fill separates next from done.
 - **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the
   large Today widget and its empty state only. Never on a small widget.
+- **Glossy finish** (owner, 18 Oct 2026, "Apple premium style"): the surface is a FIXED three stop
+  gradient (lighter at the top), a white sheen over the top half that fades out (7 percent in dark,
+  none in light, where the top stop is already white), and a rim (16 percent white in dark, the
+  hairline in light). The countdown card has the same treatment in the highlight colour. Opaque on
+  purpose. `WidgetColorsTest` holds every ink to AA on every stop and on the top stop under the
+  sheen; it caught the first dark card top (#1C4034, 4.30:1) and set it to #18382D.
+- **The location chip**: a highlight pill with a pin, the town and an update arrow, on every widget
+  (under the countdown on Next, at the end of the large Today header, at the foot of the compact
+  Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
+  opening the app is what updates the location (onResume); it cannot update without opening the app,
+  because location is read only in the foreground. The large header uses the short date ("Sun, 18
+  Oct") so the chip never cuts it short.
 - **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
   the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
   town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
@@ -425,6 +437,14 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026, widgets made glossy, at the owner's request** ("a bit glossy background like apple
+  premium style"). This overrides, for the widgets only, the 17 Oct rejection of a shiny finish below.
+  Built within the rules that made the rejection sensible: a fixed gradient (testable), no colour
+  that moves with the time of day, opaque. Rejected: real translucency (text over an unknown photo
+  wallpaper cannot be contrast tested, and a RemoteViews cannot blur the backdrop); a "Tap to update"
+  sentence (DESIGN_SYSTEM 4 bans "Tap to" wording, and a pill with a pin and an arrow says it in every
+  language); a background location update without opening the app (needs background location,
+  against the foreground only rule and Play policy).
 - **18 Oct 2026, widgets: hero countdown chosen** by the owner from three drawn directions (A hero
   countdown, B ring and sun path, C timeline strip). Rejected: B's sun arc (a bitmap drawn per refresh
   bakes in colours that go stale when the phone changes theme, lesson 130); C as the main design (names

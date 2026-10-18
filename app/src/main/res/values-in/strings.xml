@@ -362,6 +362,7 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">Sahur berakhir</string>
     <string name="widget_iftar">Buka puasa</string>
+    <string name="widget_update_location">Perbarui lokasi, %1$s</string>
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">Lihat sebabnya</string>
     <string name="ramadan_eve_brief">Masjid Anda mungkin mulai sehari kemudian.</string>

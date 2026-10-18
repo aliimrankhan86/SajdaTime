@@ -1305,7 +1305,7 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    keeps its first layout, because the second stops showing the whole day at large text (rendered).
    Rows sit at their natural height with weighted gaps between them, so a short widget clips its last
    row instead of squashing rows on top of each other (lesson 142). The countdown is in dp, not sp.
-   The smallest resize equals the first layout's minimum. The picker previews (3,461 and 8,257 bytes)
+   The smallest resize equals the first layout's minimum. The picker previews (3,925 and 8,980 bytes)
    are captured from the real renderer through the lesson 132 harness, light, an ordinary afternoon.
 6. **Rejected, with reasons:** see §2 "Deliberately NOT used".
 7. **What the widgets show since the redesign (18 Oct 2026; the owner chose "hero countdown" from three
@@ -1327,6 +1327,13 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    United Kingdom"), and the Makkah fallback in the app's language (as `AppSettings.placeName`).
    Nothing new leaves the phone. `docs/privacy.html` says the widgets show it; **re-date the privacy
    page on the day this reaches `main`**, because merging publishes it (lesson 137).
+   **Glossy finish and location chip (owner, 18 Oct 2026, the same day):** the surface and the
+   countdown card are a fixed gradient with a sheen and a rim (`widget_background.xml`,
+   `widget_hero_background.xml`, five new widget colours), and the town now sits in a chip with a pin
+   and an update arrow (`widget_place_chip`), its own tap (request code 2, same destination as the
+   root) and its own spoken label (`widget_update_location`, five languages, Claude's translations).
+   Pressing it opens the app; `MainActivity.onResume` already fetches the location and recalculates,
+   which redraws the widgets. That path was read, not run on a device.
 
 ---
 
@@ -2021,6 +2028,10 @@ iftar and after Isha, no exact alarms, no location, text 1.3 and 2.0, English, U
 Indonesian; the showcase is `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png`. The renders run
 in the harness's UTC clock, so their times are not London's: that is the harness, not the app. **Not
 verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the on device suite.
+Glossy finish and location chip, same day: gate passed again (core 120, app 237, wear 12, 0 failures;
+lint 0 errors, no widget warning; both bundles); the new sheen contrast test failed the first dark card
+colour (4.30:1) and passed the corrected one; renders in light, dark, Ramadan, 1.3 and 2.0 text, Urdu,
+Turkish, no location.
 
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
 
@@ -5021,7 +5032,8 @@ The owner sent a screenshot of the live 1.4.0 widgets on his S23 Ultra and calle
 asking for an Apple style design with decent sized fonts and more information. Three directions were
 drawn on a design canvas (private artifact https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf), desk
 research done at his request (`docs/plans/2026-10-widget-redesign/RESEARCH.md`: desk only, no users), and
-he chose **hero countdown**, then asked for the town the times are for to be shown on it. Built as
+he chose **hero countdown**, then asked for the town the times are for to be shown on it, then for a
+glossy "Apple premium" finish and a location chip that reads as "update location". Built as
 §5.20 items 5 and 7 describe. **Verified:** the whole gate (see §10);
 48 widget unit tests (5 new); renders through the real `RemoteViews.apply` path (lesson 132) of every
 layout in light, dark, ordinary, Ramadan, no exact alarms, no location, 1.3 and 2.0 text, English, Urdu,

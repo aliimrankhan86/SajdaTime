@@ -93,11 +93,13 @@ class WidgetResourcesTest {
         val hero = listOf(
             "widget_glyph", "widget_name", "widget_time", "widget_sublabel", "widget_countdown", "widget_hero_time", "widget_progress",
         ) + (1..5).map { "widget_seg_$it" }
+        // The location chip, on every layout (owner's request, 18 Oct 2026).
+        val chip = listOf("widget_place_chip", "widget_place")
         val expected = mapOf(
-            "layout/widget_next_prayer.xml" to hero,
-            "layout/widget_next_prayer_wide.xml" to hero + rows,
-            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows,
-            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_place", "widget_hero") + hero + rows,
+            "layout/widget_next_prayer.xml" to hero + chip,
+            "layout/widget_next_prayer_wide.xml" to hero + rows + chip,
+            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + chip,
+            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows + chip,
         )
         for ((layout, ids) in expected) {
             val xml = read(layout)
@@ -168,7 +170,7 @@ class WidgetResourcesTest {
     @Test
     fun `every colour the widget files use is defined in both themes`() {
         val drawables = listOf(
-            "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider",
+            "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
             "widget_seg_done", "widget_seg_next", "widget_seg_todo",
         )
         val files = layouts + drawables.map { "drawable/$it.xml" }
@@ -183,7 +185,7 @@ class WidgetResourcesTest {
     @Test
     fun `every widget string exists in all four languages`() {
         val names = Regex("""<string name="(widget_[a-z0-9_]+)"""").findAll(read("values/strings.xml")).map { it.groupValues[1] }.toList()
-        assertEquals(12, names.size)
+        assertEquals(13, names.size)
         for (language in languages) {
             val strings = read("$language/strings.xml")
             for (name in names) assertTrue("$language lacks $name", strings.contains("""name="$name""""))
