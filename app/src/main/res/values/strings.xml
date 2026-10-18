@@ -39,6 +39,10 @@
     <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
 
     <string name="city_fallback_body">Type your city instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+
+    <string name="city_lookup_note">The name you type is looked up over the internet. After that, everything is worked out on your phone.</string>
+
+    <string name="city_lookup_detail">If you type a city instead, the name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
     <string name="city_field_label">City</string>
     <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
     <string name="city_not_found">We could not find that place. Try adding the country.</string>

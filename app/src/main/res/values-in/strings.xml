@@ -29,6 +29,10 @@
     <string name="location_no_fix">Lokasi Anda belum bisa ditemukan. Pastikan lokasi aktif, atau ketik kota Anda di bawah.</string>
 
     <string name="city_fallback_body">Ketik kota Anda saja. Nama itu ditanyakan dulu ke layanan pencarian tempat bawaan ponsel Anda, yang di sebagian besar ponsel bertanya ke Google lewat internet. Bila layanan itu tidak bisa menjawab, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
+
+    <string name="city_lookup_note">Nama yang Anda ketik dicari lewat internet. Setelah itu, semuanya dihitung di ponsel Anda.</string>
+
+    <string name="city_lookup_detail">Bila Anda mengetik nama kota, nama itu ditanyakan dulu ke layanan pencarian tempat bawaan ponsel Anda, yang di sebagian besar ponsel bertanya ke Google lewat internet. Bila layanan itu tidak bisa menjawab, hanya nama yang Anda ketik yang dikirim sekali ke layanan pencarian gratis. Setelah itu, semuanya dihitung di ponsel Anda.</string>
     <string name="city_field_label">Kota</string>
     <string name="city_field_helper">Contoh: Jakarta, Surabaya, Medan</string>
     <string name="city_not_found">Tempat itu tidak ditemukan. Coba tambahkan nama negaranya.</string>

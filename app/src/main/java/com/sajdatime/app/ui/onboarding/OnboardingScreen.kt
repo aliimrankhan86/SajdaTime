@@ -369,12 +369,13 @@ private fun PermissionStep(
                 }
             },
             title = { Text(stringResource(R.string.action_how_location_used)) },
-            // The location explanation, word for word, one tap away (owner, 18 Oct 2026: a short
-            // setup screen). The city lookup paragraph is not in here: it is shown under the field
-            // the moment the user starts typing, which is when it applies.
+            // The full detail for both routes, one tap away (owner, 18 Oct 2026: a short setup
+            // screen). The city box carries a one line summary of the second part, always visible.
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(stringResource(R.string.permission_why_body))
+                    Spacer(Modifier.height(12.dp))
+                    Text(stringResource(R.string.city_lookup_detail))
                 }
             },
         )
@@ -459,11 +460,26 @@ private fun PermissionStep(
                 onValueChange = { city = it },
                 label = { Text(stringResource(R.string.city_field_label)) },
                 supportingText = {
-                    Text(
-                        text = stringResource(
-                            if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
-                        ),
-                    )
+                    Column {
+                        Text(
+                            text = stringResource(
+                                if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
+                            ),
+                        )
+                        // What happens to a typed name, in one line, always on screen before anyone
+                        // can type, so nobody searches without being told (independent review,
+                        // 18 Oct 2026). Inside the field's own hint area so it lines up with the
+                        // example and is read with the field. The detail (the phone's place lookup,
+                        // usually Google, else once to a free service) is behind "How your location
+                        // is used". Rejected: the 66 word paragraph above the field (it buried the
+                        // screen's one choice) and showing it only once typing starts (text jumping
+                        // in under the cursor; the owner found it confusing). Its colour stays
+                        // neutral when the field shows an error, so it never reads as the error.
+                        Text(
+                            text = stringResource(R.string.city_lookup_note),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 },
                 isError = notFound,
                 singleLine = true,
@@ -474,16 +490,6 @@ private fun PermissionStep(
                 modifier = Modifier.fillMaxWidth(),
             )
             if (city.isNotBlank()) {
-                // What happens to a typed name, said as soon as there is one and before Find city
-                // can be pressed (the keyboard's search key included). It used to sit above the
-                // empty field, where at 66 words it buried the screen's one choice. Word for word
-                // the same promise as docs/privacy.html; independent review, 18 Oct 2026.
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.city_fallback_body),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
                 Spacer(Modifier.height(12.dp))
                 FilledTonalButton(
                     onClick = findCity,

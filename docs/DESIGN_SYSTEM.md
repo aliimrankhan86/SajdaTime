@@ -460,9 +460,10 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   Rejected: a graphite glass card in dark (the widget body colour; the green card is what he pointed
   at and keeps "green means the next prayer"); the full green fill for secondary actions (two filled
   buttons on one screen lose the main one); keeping the 66 word city lookup paragraph above the empty
-  field (it hid the choice; it now appears word for word as soon as a city is typed, which is when it
-  applies); putting it only behind "How your location is used" (missed at the moment of typing, the
-  independent review); a shortened privacy paraphrase (a paraphrase can drift from privacy.html).
+  field (it hid the choice); putting it only behind "How your location is used" (missed at the moment
+  of typing, the independent review); showing it only once typing starts (text jumping in under the
+  cursor; the owner found it confusing). Chosen: the standard short notice plus detail, one line in the
+  city box's hint area, always visible, with the full detail behind the link.
 - **18 Oct 2026, widgets made glossy, at the owner's request** ("a bit glossy background like apple
   premium style"). This overrides, for the widgets only, the 17 Oct rejection of a shiny finish below.
   Built within the rules that made the rejection sensible: a fixed gradient (testable), no colour

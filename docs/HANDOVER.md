@@ -5072,10 +5072,14 @@ at his word ("Do the merge"; merge commit, the merged tree identical to the test
    not compete with Allow) and "Save as PDF" (it sits in a heading). DESIGN_SYSTEM §8.
 7. **Setup location screen redesigned** (he did not like it): a pin badge, one line of text, a full
    width "Allow location", a "How your location is used" link, the city field, then "Skip". The location
-   explanation moved, **word for word**, into the dialog behind the link. The 66 word city lookup
-   paragraph now appears under the field **the moment the user types**, before "Find city" or the
-   keyboard's search can be pressed (the independent review's point: behind a location link it would be
-   missed exactly when it applies). `docs/privacy.html` is unchanged. "Find city" appears once something
+   explanation moved, **word for word**, into the dialog behind the link, followed by the city lookup
+   detail (`city_lookup_detail`: the phone's place lookup, usually Google, else once to a free service).
+   Under the city box, in its own hint area and **always visible**, one line says what happens to a typed
+   name (`city_lookup_note`: "looked up over the internet, then everything is worked out on your phone"),
+   so nobody can search without being told (the independent review's point). Tried and dropped the same
+   day: the full paragraph popping in once typing started (the owner found it confusing). The location
+   sheet in Settings still shows `city_fallback_body` inline; it was not part of this request.
+   `docs/privacy.html` is unchanged. "Find city" appears once something
    is typed and "Continue" once a location is found, so the screen never shows a dead grey button. The old "Tap the info icon" sentence is gone. New and changed strings in
    all five languages, translated by Claude (`permission_body`, `action_how_location_used`).
 

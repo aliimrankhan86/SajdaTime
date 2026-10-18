@@ -29,6 +29,10 @@
     <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da şehrinizi aşağıya yazın.</string>
 
     <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+
+    <string name="city_lookup_note">Yazdığınız ad internet üzerinden aranır. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+
+    <string name="city_lookup_detail">Bunun yerine bir şehir yazarsanız, ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
     <string name="city_field_label">Şehir</string>
     <string name="city_field_helper">Örneğin: İstanbul, Lahor, Kahire</string>
     <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
