@@ -20,6 +20,31 @@ is done by touching the signing key, and **he presses every submit, publish and 
 - [x] Privacy policy content already matches 1.5.0 (widget location chip; sounds stay on the phone,
       so nothing new to declare). Data safety answers unchanged.
 
+## Waiting for the owner (asked 18 Oct 2026)
+
+- The 1.5.0 **full store description**: draft in `docs/store/LISTING.md` ("1.5.0 full description"). It
+  also removes a false line from the live text ("Your coordinates never leave your device").
+- The **habit tracker** stays out of 1.5.0 (not started; the Mac check and Claude both advise leaving it out).
+
+## From the Mac readiness check (18 Oct 2026), for a session on his Mac
+
+- **Fix the one line device test** the check found failing (test code only; its notes are in that
+  session's results, saved to the shared memory). Without it the 21 Dec preparation run reports a false
+  failure.
+- **Write `docs/release-tools/release-1.5.0.sh`** from the 1.4.0 script and run it. What must change:
+  versionCode 9 and versionName 1.5.0 (line 98 to 99 of the 1.4.0 script); the bundle size check (it
+  allows 300 KB over 1.3.2, but the two built in adhans alone add about 3.5 MB: measure the 1.5.0 bundle
+  and set the limit from that); the watch: 1.4.0 expected it unchanged, 1.5.0 builds and checks the watch
+  bundle too (1002 / 1.5.0); the branch is `claude/quiet-glass`; drop the 1.4.0 planning copy stash step;
+  check the permission list still matches (no new permission was added in 1.5.0).
+- **Store screenshots**: retake the five phone screenshots from the 1.5.0 build (the old design is
+  still in them) plus the planned Ramadan one, and the watch ones if they changed.
+- **Data safety:** the check's reading is that no answer changes (the language sent with a typed place
+  name is already in the policy). The answers are his to confirm in the Console.
+- **Release notes languages:** check in the Console whether Play shows the Urdu, Turkish, Indonesian and
+  Arabic What's new when only the English store listing exists. If it does not, either add translated
+  listings (`docs/store/LISTING-LOCALES.md`) or ship the English note only; his choice.
+
 ## Still to do, in order
 
 1. **Claude, any time before the release, on his Mac:**
