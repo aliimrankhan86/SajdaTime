@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui
 
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -304,7 +305,7 @@ private fun GlassTabBar(
                         modifier = Modifier.size(24.dp),
                     )
                 }
-                Spacer(Modifier.height(2.dp))
+                Spacer(Modifier.height(Space.Tight))
                 Text(
                     text = stringResource(item.labelRes),
                     style = MaterialTheme.typography.labelMedium.copy(

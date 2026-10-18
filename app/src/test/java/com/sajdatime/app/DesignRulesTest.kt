@@ -132,6 +132,28 @@ class DesignRulesTest {
         assertTrue("These dialogs have no DialogTitle close X: $found", found.isEmpty())
     }
 
+    /**
+     * Every vertical gap in the phone app's screens comes from the scale (D5, 18 Oct 2026: the owner, "I told you
+     * about the design system ... you should know the clean, spacing, and premium look"). A Spacer height
+     * or a column's spacedBy written as a number is how the gaps drifted apart, card by card. Horizontal
+     * gaps inside a row (an icon beside its label) and a component's own padding are its fixed metrics,
+     * not gaps between pieces of text, so they are not checked here.
+     */
+    @Test
+    fun `every vertical gap uses the spacing scale`() {
+        // A Spacer sized by number in any form, a column spaced by number, or a top or bottom padding
+        // written as a number (the gap above or below a heading). Horizontal ones are not matched.
+        val literal = Regex(
+            """Spacer\([^)]*\.(height|size)\(\d+(\.\d+)?\.dp\)|""" +
+                """verticalArrangement = Arrangement\.spacedBy\(\d|""" +
+                """\b(top|bottom) = \d+(\.\d+)?\.dp""",
+        )
+        val found = sources.filter { "/ui/" in it.path.replace('\\', '/') }.flatMap { file ->
+            literal.findAll(file.readText()).map { "${file.name}: ${it.value}" }.toList()
+        }
+        assertTrue("Use Space.Tight, Related, Paragraph, Group or Section: $found", found.isEmpty())
+    }
+
     /** Spacing between text and its buttons comes from the scale, not from eyeballed numbers. */
     @Test
     fun `notices and explainers use the spacing scale`() {

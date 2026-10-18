@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.settings
 
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Share
@@ -128,7 +129,7 @@ internal fun SettingsList(
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
                 color = scheme.onSurfaceVariant,
                 modifier = Modifier
-                    .padding(start = 32.dp, end = 32.dp, top = 24.dp, bottom = 8.dp)
+                    .padding(start = 32.dp, end = 32.dp, top = Space.Section, bottom = Space.Related)
                     .semantics { heading() },
             )
             Column(
@@ -143,7 +144,7 @@ internal fun SettingsList(
                 }
             }
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.Group))
         BottomBarClearance()
     }
 }
@@ -193,7 +194,7 @@ private fun SettingsItemRow(item: SettingsItem) {
                 leading()
                 Text(item.title, style = titleStyle)
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Paragraph))
             ThemeSelector(item.current, item.onSelect)
         }
 
@@ -237,7 +238,7 @@ private fun PlainRow(item: SettingsItem, leading: @Composable () -> Unit, titleS
             Text(subtitle.orEmpty(), style = MaterialTheme.typography.bodyLarge, color = scheme.onSurfaceVariant)
             return@Row
         }
-        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Space.Tight)) {
             Text(item.title, style = titleStyle)
             subtitle?.let { Text(it, style = MaterialTheme.typography.bodyMedium, color = scheme.onSurfaceVariant) }
         }
@@ -294,7 +295,7 @@ private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, ti
             )
         }
         AnimatedVisibility(open) {
-            Column(Modifier.padding(start = TextStart, end = 16.dp, bottom = 14.dp)) {
+            Column(Modifier.padding(start = TextStart, end = 16.dp, bottom = Space.Group)) {
                 Text(
                     text = item.subtitle.orEmpty(),
                     style = MaterialTheme.typography.bodyMedium,
@@ -321,7 +322,7 @@ private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, ti
                         text = links,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 8.dp),
+                        modifier = Modifier.padding(top = Space.Related),
                     )
                 }
             }

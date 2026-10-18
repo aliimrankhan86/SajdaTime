@@ -152,7 +152,7 @@ private fun RamadanCard(
                 color = scheme.onSurfaceVariant,
             )
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.Paragraph))
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TimeColumn(
@@ -168,15 +168,15 @@ private fun RamadanCard(
                 modifier = Modifier.weight(1f),
             )
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Paragraph))
 
         Countdown(ramadan = ramadan, now = now, phase = phase)
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(Space.Tight))
         FastLine(ramadan = ramadan)
 
         if (ramadan.tomorrowIsRamadan) {
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(
                     R.string.ramadan_tomorrow_line,
@@ -191,7 +191,7 @@ private fun RamadanCard(
         if (ramadan.today.approximated) {
             // The polar banner above names the latitude. This line keeps the marking on the card
             // itself, so a card that is looked at on its own is never taken for measured times.
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.notif_approximate),
                 style = MaterialTheme.typography.bodyMedium,
@@ -274,7 +274,7 @@ private fun TimeColumn(label: String, time: String, isNext: Boolean, modifier: M
                 )
             }
         }
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(
             text = time,
             style = PrayerTimeTextStyle,

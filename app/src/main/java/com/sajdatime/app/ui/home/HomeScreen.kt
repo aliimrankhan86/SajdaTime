@@ -209,7 +209,7 @@ fun HomeScreen(
         )
         // The floating tab bar sits over the bottom of this column (Quiet Glass); this is the
         // room to scroll the mosque button clear of it. Measured, so it grows with the bar.
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
         BottomBarClearance()
     }
 
@@ -314,7 +314,7 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
+            .padding(top = Space.Tight)
             .clip(RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
             .padding(horizontal = 4.dp, vertical = 6.dp)
@@ -429,7 +429,7 @@ private fun NextPrayerCard(state: UiState) {
             color = hero.label,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
 
         // Name and time share one optical line so the block reads as a single
         // centred unit rather than three stacked fragments.
@@ -451,7 +451,7 @@ private fun NextPrayerCard(state: UiState) {
             )
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
 
         // A per-second live region would interrupt a screen reader constantly, so
         // the digits are hidden and a readable summary is announced instead.
@@ -469,7 +469,7 @@ private fun NextPrayerCard(state: UiState) {
                 contentDescription = spokenCountdown
             },
         )
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(
             text = stringResource(R.string.home_until),
             style = MaterialTheme.typography.labelMedium,
@@ -623,7 +623,7 @@ private fun ExportSheet(
     onPick: (PrayerPdfExporter.Range) -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column(Modifier.padding(bottom = 32.dp)) {
+        Column(Modifier.padding(bottom = Space.Section)) {
             Text(
                 text = stringResource(R.string.export_sheet_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -631,7 +631,7 @@ private fun ExportSheet(
                     .padding(horizontal = 24.dp)
                     .semantics { heading() },
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(
                     R.string.export_sheet_body,
@@ -644,7 +644,7 @@ private fun ExportSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(Space.Group))
 
             PrayerPdfExporter.Range.entries
                 .filter { it != PrayerPdfExporter.Range.RAMADAN || ramadanYear != null }

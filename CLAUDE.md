@@ -215,8 +215,10 @@ session inherits it instead of relearning it.
     question's two bold underlined links ("See exactly what is sent", "Read the privacy policy"). The full spec, every button in the app and the
     checks are §4.1; `DesignRulesTest` fails the build on a breach, including a button in a file the
     inventory does not list.
-  - Gaps come from `Space` by relationship (§2). **This is only true of some files so far**; the rest
-    is decided work (D5 in §11: screen by screen, screenshots each time). Do not claim it for the whole app.
+  - Gaps come from `Space` by relationship (§2). Since 18 Oct 2026 that holds for every `Spacer`, column
+    spacing and top or bottom padding in the phone app's screens, and `DesignRulesTest` fails the build on
+    one written as a number. **Not covered, so never claim them:** horizontal gaps inside a row, a
+    component's own padding (a row's height, a pill, a card's edge), and the watch app.
   - No two icon buttons side by side; every dismissable dialog has the close X.
   - **§11 lists the decisions still waiting for him.** Do not build an answer to an OPEN item.
   - Before he tests on the emulator, give the install command and the commit he should see. Never

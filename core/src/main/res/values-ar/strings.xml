@@ -46,7 +46,7 @@
     <string name="method_kuwait_desc">الطريقة المتعارف عليها في الكويت.</string>
     <string name="method_qatar_desc">الطريقة المتعارف عليها في قطر.</string>
     <string name="method_singapore_desc">الجهات الرسمية في إندونيسيا وسنغافورة.</string>
-    <string name="method_turkey_desc">رئاسة الشؤون الدينية في تركيا.</string>
+    <string name="method_turkey_desc">رئاسة الشؤون الدينية في تركيا، مع دقائق الاحتياط (التمكين).</string>
     <string name="method_jafari_desc">الطريقة الشيعية المعتادة. يكون المغرب بعد غروب الشمس بقليل، حين تزول الحمرة من السماء.</string>
     <string name="method_tehran_desc">جامعة طهران، وعلى تقويمها تقوم الأوقات الرسمية في إيران.</string>
 

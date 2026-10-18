@@ -773,7 +773,7 @@ private fun SchoolDialog(
         }
 
         if (sect == Sect.SUNNI) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             SectionLabel(stringResource(R.string.settings_madhab))
             Column(Modifier.selectableGroup()) {
                 Madhab.entries.forEach { entry ->
@@ -809,7 +809,7 @@ private fun MethodPickerDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.Group))
         MethodChoiceList(sect = sect, current = current, onSelect = onSelect)
     }
 }
@@ -839,7 +839,7 @@ private fun AlertsDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
 
         PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
             AlertChoiceRow(
@@ -854,7 +854,7 @@ private fun AlertsDialog(
         // question about astronomy they will never meet — and this app is used by
         // people who have never opened a settings screen. See rememberHasApproximateDays.
         if (showAlarmOptions && hasApproximateDays) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             SwitchRow(
                 title = stringResource(R.string.settings_alarm_on_approximate),
                 subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
@@ -884,7 +884,7 @@ private fun PrayerReminderDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
         Column(Modifier.selectableGroup()) {
             AppSettings.PRAYER_REMINDER_CHOICES.forEach { choice ->
                 RadioRow(
@@ -895,7 +895,7 @@ private fun PrayerReminderDialog(
             }
         }
         if (minutes > 0) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
                 SwitchRow(
                     title = stringResource(slot.labelRes),
@@ -943,7 +943,7 @@ private fun SoundDialog(title: String, help: String, sound: SoundChoice, onDismi
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
         SoundChoices(sound)
     }
 }
@@ -1021,7 +1021,7 @@ private fun SuhoorDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
         Column(Modifier.selectableGroup()) {
             AppSettings.SUHOOR_CHOICES.forEach { choice ->
                 RadioRow(
@@ -1032,10 +1032,10 @@ private fun SuhoorDialog(
             }
         }
         if (minutes > 0) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Space.Related),
+                verticalArrangement = Arrangement.spacedBy(Space.Related),
                 modifier = Modifier.selectableGroup(),
             ) {
                 ChoiceChip(
@@ -1101,12 +1101,12 @@ private fun AlertChoiceRow(
     selected: AlertStyle?,
     onSelect: (AlertStyle?) -> Unit,
 ) {
-    Column(Modifier.padding(vertical = 10.dp)) {
+    Column(Modifier.padding(vertical = Space.Related)) {
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Space.Related),
+            verticalArrangement = Arrangement.spacedBy(Space.Related),
             modifier = Modifier.selectableGroup(),
         ) {
             ChoiceChip(
@@ -1162,7 +1162,7 @@ private fun SectionLabel(title: String) {
         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
-            .padding(vertical = 8.dp)
+            .padding(vertical = Space.Related)
             .semantics { heading() },
     )
 }
@@ -1357,7 +1357,7 @@ private fun AdjustmentsDialog(
             text = stringResource(R.string.settings_adjustments_help),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = Space.Group),
         )
 
         PrayerSlot.entries.forEach { slot ->
@@ -1372,13 +1372,13 @@ private fun AdjustmentsDialog(
             )
         }
 
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+        HorizontalDivider(Modifier.padding(vertical = Space.Related))
         SectionLabel(stringResource(R.string.settings_hijri_offset))
         Text(
             text = stringResource(R.string.settings_hijri_offset_help),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = Space.Group),
         )
         StepperRow(
             label = stringResource(R.string.settings_hijri_offset_label),
@@ -1426,7 +1426,7 @@ private fun StepperRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
+            .padding(vertical = Space.Tight),
     ) {
         Text(
             text = label,

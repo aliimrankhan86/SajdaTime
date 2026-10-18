@@ -104,7 +104,7 @@ internal fun RamadanTimetableSheet(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.semantics { heading() },
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(Space.Tight))
                     Text(
                         // isBlank is checked before isolating, so the fallback still fires.
                         text = state.settings.placeName(LocalContext.current).bidiIsolated().ifBlank {
@@ -124,14 +124,14 @@ internal fun RamadanTimetableSheet(
                     Text(stringResource(R.string.action_save_pdf))
                 }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Paragraph))
             HeaderRow()
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f, fill = false),
-                contentPadding = PaddingValues(bottom = 24.dp),
+                contentPadding = PaddingValues(bottom = Space.Section),
             ) {
                 items(rows, key = { it.dayNumber }) { row ->
                     TimetableRow(row = row, isToday = row.date == todayDate)
@@ -241,7 +241,7 @@ private fun TimeCell(
 private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(Space.Related),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 16.dp),

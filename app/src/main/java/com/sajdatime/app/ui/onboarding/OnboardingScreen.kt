@@ -270,10 +270,10 @@ private fun StepScaffold(
                 Column {
                     if (leading != null) {
                         leading()
-                        Spacer(Modifier.height(20.dp))
+                        Spacer(Modifier.height(Space.Group))
                     }
                     Text(text = title, style = MaterialTheme.typography.headlineMedium)
-                    Spacer(Modifier.height(12.dp))
+                    Spacer(Modifier.height(Space.Paragraph))
                     // The consent step carries its own, longer text inside [content], so it passes none.
                     if (body.isNotEmpty()) {
                         Text(
@@ -281,7 +281,7 @@ private fun StepScaffold(
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(Modifier.height(28.dp))
+                        Spacer(Modifier.height(Space.Section))
                     }
                     content()
                 }
@@ -324,20 +324,20 @@ private fun WelcomeStep(onNext: () -> Unit) {
                 contentDescription = bismillahSpoken
             },
         )
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(Space.Section))
         Text(
             text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Paragraph))
         Text(
             text = stringResource(R.string.welcome_tagline),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(48.dp))
+        Spacer(Modifier.height(Space.Section))
         CtaButton(
             onClick = onNext,
             modifier = Modifier
@@ -457,18 +457,18 @@ private fun PermissionStep(
         // Without this the buttons simply grey out while a fix is awaited, which reads as
         // a frozen screen. Location can legitimately take several seconds indoors.
         if (state.resolvingLocation && !searchingCity) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Space.Related))
             ProgressRow(stringResource(R.string.location_finding))
         }
 
         if (located && !state.resolvingLocation) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Space.Group))
             LocatedRow(cityName = state.settings.placeName(LocalContext.current))
         }
 
         // Denying used to change nothing visible at all (research F7).
         if (state.problem == LocationProblem.NO_FIX || state.problem == LocationProblem.PERMISSION_DENIED) {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(Space.Group))
             Text(
                 text = stringResource(
                     if (state.problem == LocationProblem.NO_FIX) R.string.location_no_fix else R.string.location_permission_denied,
@@ -492,9 +492,9 @@ private fun PermissionStep(
         // Showing it up front also answers T3's fourth point: manual entry was always
         // there and nobody could find it.
         if (!located) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Space.Section))
             SectionHeading(stringResource(R.string.location_sheet_search_heading))
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Related))
             val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
                 value = city,
@@ -547,14 +547,14 @@ private fun PermissionStep(
             // this screen had said "Finding your location…" beside the GPS button, which
             // is the wrong sentence in the wrong place for a typed-in city.
             if (searchingCity && state.resolvingLocation) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
 
         }
 
         if (located) {
-            Spacer(Modifier.height(32.dp))
+            Spacer(Modifier.height(Space.Section))
             CtaButton(
                 onClick = onNext,
                 modifier = Modifier
@@ -618,7 +618,7 @@ private fun LocatedRow(cityName: String) {
  */
 @Composable
 private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Space.Section))
     Row {
         CtaButton(
             onClick = onBack,
@@ -659,7 +659,7 @@ private fun SectStep(
             selected = selected == Sect.SUNNI,
             onClick = { onSelect(Sect.SUNNI) },
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Paragraph))
         ChoiceCard(
             title = stringResource(R.string.sect_shia),
             subtitle = stringResource(R.string.sect_shia_desc),
@@ -683,7 +683,9 @@ private fun MadhabStep(
         body = stringResource(R.string.madhab_body),
     ) {
         Column(Modifier.selectableGroup()) {
-        Madhab.entries.forEach { madhab ->
+        Madhab.entries.forEachIndexed { i, madhab ->
+            // Between the cards only: after the last one, StepButtons brings its own section gap.
+            if (i > 0) Spacer(Modifier.height(Space.Paragraph))
             ChoiceCard(
                 title = madhabLabel(madhab),
                 subtitle = stringResource(
@@ -693,7 +695,6 @@ private fun MadhabStep(
                 selected = selected == madhab,
                 onClick = { onSelect(madhab) },
             )
-            Spacer(Modifier.height(12.dp))
         }
         }
         // Skip used to sit here next to Back. It was removed rather than relabelled: one of
@@ -749,7 +750,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                         stringResource(R.string.location_set_generic)
                     },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Paragraph))
                 SummaryRow(
                     stringResource(R.string.label_school),
                     when (state.settings.sect) {
@@ -764,7 +765,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                         Sect.SHIA -> stringResource(R.string.sect_shia)
                     },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Paragraph))
                 SummaryRow(
                     stringResource(R.string.settings_method),
                     // Same wording as the Settings row, so "Automatic · Muslim World League"
@@ -795,15 +796,15 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         // told a third of the installed base about a setting their phone does not have
         // (research F5). Settings has carried the same gate since the start.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.Section))
             SectionHeading(stringResource(R.string.confirm_exact_alarm_title))
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.confirm_exact_alarm_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Related))
             PermissionButton(
                 label = stringResource(R.string.settings_exact_alarms_title),
                 granted = exactAllowed,
@@ -818,7 +819,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
         ) {
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.Section))
             Text(
                 text = stringResource(R.string.confirm_notifications_hint, stringResource(R.string.action_finish)),
                 style = MaterialTheme.typography.bodyMedium,
@@ -826,7 +827,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
             )
         }
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(Space.Section))
         CtaButton(
             onClick = onFinish,
             modifier = Modifier
@@ -846,7 +847,7 @@ private fun SummaryRow(label: String, value: String) {
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(text = value, style = MaterialTheme.typography.titleMedium)
     }
 }
@@ -879,7 +880,7 @@ private fun ChoiceCard(
         ) {
             Column(Modifier.weight(1f)) {
                 Text(text = title, style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Space.Tight))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,

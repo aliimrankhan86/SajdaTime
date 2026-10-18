@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.components
 
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,7 +41,7 @@ fun ScreenTitle(text: String, modifier: Modifier = Modifier) {
         text = text,
         style = MaterialTheme.typography.headlineMedium,
         modifier = modifier
-            .padding(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 4.dp)
+            .padding(start = 20.dp, end = 20.dp, top = Space.Paragraph, bottom = Space.Tight)
             .semantics { heading() },
     )
 }

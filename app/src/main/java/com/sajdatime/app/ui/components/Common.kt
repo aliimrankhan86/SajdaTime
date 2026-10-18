@@ -63,7 +63,7 @@ fun DialogTitle(text: String, onClose: () -> Unit) {
             text = text,
             modifier = Modifier
                 .weight(1f)
-                .padding(top = 4.dp)
+                .padding(top = Space.Tight)
                 .semantics { heading() },
         )
         IconButton(onClick = onClose, modifier = Modifier.offset(x = 12.dp, y = (-8).dp)) {
@@ -177,14 +177,14 @@ fun LocationSheet(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
+                .padding(bottom = Space.Section),
         ) {
             Text(
                 text = stringResource(R.string.location_sheet_title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() },
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.location_sheet_body),
                 style = MaterialTheme.typography.bodyMedium,
@@ -205,7 +205,7 @@ fun LocationSheet(
             }
 
             if (state.resolvingLocation && !searching) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_finding))
             }
 
@@ -214,13 +214,13 @@ fun LocationSheet(
                 text = stringResource(R.string.location_sheet_search_heading),
                 style = MaterialTheme.typography.titleMedium,
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.city_fallback_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Group))
 
             val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
@@ -255,7 +255,7 @@ fun LocationSheet(
                 }
             }
             if (searching) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
         }

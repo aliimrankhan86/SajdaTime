@@ -1283,7 +1283,7 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    Istanbul page would not load from the cloud (two URLs, both a server error), so Istanbul itself is
    not measured, only a town whose page did load; the offsets are a property of Diyanet's method, not of
    the town. Not changed: the plan makes any change to the method an owner decision (§11). Details in
-   `RAMADAN-LOCATION-SPEC.md` section 9.4.
+   `RAMADAN-LOCATION-SPEC.md` section 9.4. **Superseded 18 Oct 2026: the offsets are now applied, §5.26.**
 
 ### 5.20 Widgets: drawn from saved data and moved on by one weak alarm (built 16 Oct 2026 for 1.4.0)
 
@@ -1527,6 +1527,38 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
   the Data safety answers need no change: the audio is part of the app.
 - The listing's short and full descriptions are unchanged; any change is the owner's decision. The 1.5.0
   What's new carries one line.
+
+### 5.26 Turkey (Diyanet) carries Diyanet's precaution minutes (decided 18 Oct 2026, ships in 1.5.0)
+
+- **The decision.** The owner delegated it ("Turkey iftar one you have make, use Fable to help you make
+  that decision"). Claude recommended adopting the offsets; an independent review on the Fable model
+  reached the same answer from its own sources. The TURKEY method is now Fajr 18, Isha 17, plus Sunrise
+  -7, Dhuhr +5, Asr +4, Maghrib +7 minutes (`PrayerEngine`, adhan's `withMethodAdjustments`).
+- **Why.** Measured on 16 Oct 2026 against Diyanet's own table (§5.19 item 7): without the minutes the app
+  put iftar 7 to 8 minutes before Diyanet's ezan, and early is the dangerous direction for a fast. The
+  same constants ship in adhan-kotlin and adhan-js for Turkey; Diyanet describes them as temkin, and Turkish
+  sources citing its 1981 ruling (Din İşleri Yüksek Kurulu) give no margin for imsak or Isha. The measured residual at Ayas
+  with the minutes is 0 to 1 minute.
+- **Every change is cautious:** suhoor end (Fajr) unchanged; the Fajr window ends 7 minutes earlier;
+  Dhuhr, Asr and Maghrib start later, so no alert fires before the time has surely come in.
+- **Rejected:** leaving it with "Match your mosque" as the remedy (every Turkish user would have had to
+  find it to avoid an early iftar); swapping adhan-java for adhan-kotlin to get a built in Turkey method
+  (a library swap for one line). Accepted counter argument, not decisive: temkin is a national average,
+  so Diyanet's own city tables stay the authority, which the disclaimer already says.
+- **Side effects.** Everything reads `PrayerEngine`, so Times, alerts, the badge, the suhoor reminder,
+  both widgets, the PDF, the Ramadan card and the **watch** move together. **Ship the phone and the watch
+  in the same release**, or a Turkish user's phone and watch disagree by 7 minutes. A Turkish user who had
+  already added +7 by hand in Match your mosque now gets +14 (late, not early); say it in the 1.5.0 What's
+  new for Turkey ("Turkey times now include Diyanet's precaution minutes; if you added these yourself in
+  Match your mosque, you can remove them"). The method's description says "with its precaution minutes"
+  in all five languages.
+- **Verified:** `RamadanGoldenTest` Istanbul rows moved by exactly the offsets and pass (the old rows now
+  fail, so the minutes really apply). **Not verified:** a fresh comparison with Aladhan method 13 (its
+  server is blocked from the cloud session; a Mac session can run it).
+- **Near the polar circle** (about 65.5°N at midsummer, a night under about 25 minutes), Maghrib +7 can
+  land after the twilight Isha, so the order check fails and the day is projected from the reference
+  latitude and marked approximate. Safe and honest; noted so it is not mistaken for a bug (found by the
+  independent review).
 
 ### 5.25 Two sounds, each its own Settings row; notifications follow the phone (owner, 18 Oct 2026, 1.5.0)
 
@@ -5117,7 +5149,9 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 late night: PARKED. This round is approved, merged into `claude/quiet-glass` and ready for the 1.5.0 release.** The owner saw it on his emulator, approved it, and asked for one last line: the Notification sound pop up now tells users that pulling down the notifications or swiping the notification away stops the sound (§5.25). Then: "park it and ensure the local repository knows it is merged and all ready for the next release". **Nothing from this round is open.** When he comes back, the next agreed job is D5 (spacing on the remaining screens, one at a time with screenshots, DESIGN_SYSTEM §11); until he asks, do nothing.
+**NEWEST, 18 Oct 2026 night, after parking: two release items done at the owner's word.** (1) **D5, spacing on every phone screen** ("you should know the clean, spacing, and premium look"): every `Spacer`, every column's spacing and every top or bottom padding in the phone app's screens is a `Space` token by relationship, and `DesignRulesTest` fails on a literal one (mutation tested). Not covered: horizontal gaps in a row, a component's own padding, and the watch app. Rules and every visible change in DESIGN_SYSTEM §2 and §9; renders `docs/plans/2026-10-times-gloss/d5-*.png`. (2) **Turkey times now carry Diyanet's minutes** (§5.26), decided by Claude at his request with a Fable review. Both on `ccr-23a38578-c5vz7d`, **merged into `claude/quiet-glass` only after he has seen the D5 screenshots**. Still for release day, in `docs/RELEASING.md` order: version bump (app and wear), What's new (include the Turkey line), store screenshots, privacy policy date, merge to `main` on the day of submitting, and he presses submit.
+
+**Before that, 18 Oct 2026 late night: PARKED. This round is approved, merged into `claude/quiet-glass` and ready for the 1.5.0 release.** The owner saw it on his emulator, approved it, and asked for one last line: the Notification sound pop up now tells users that pulling down the notifications or swiping the notification away stops the sound (§5.25). Then: "park it and ensure the local repository knows it is merged and all ready for the next release". **Nothing from this round is open.** When he comes back, the next agreed job is D5 (spacing on the remaining screens, one at a time with screenshots, DESIGN_SYSTEM §11); until he asks, do nothing.
 
 **Before parking, the round itself:** three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.
 (1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
@@ -5549,7 +5583,7 @@ I. **Not a task, a standing direction:** the owner's monetisation and data visio
 **Owner decisions: 1 (rollout date) and 3 (Turkey iftar) are open, 2 (Release B) is decided:**
 1. **When 1.4.0 rolls out.** Ramadan 1448 begins on Monday 8 Feb 2027. Claude recommends shipping as soon as the device checks pass, with the Ramadan pack dormant until the eve notice window and the Ramadan store lines added in January, because the alarm scheduler change should be found faulty in November and not in the week Ramadan starts (reasons and evidence: plan README, Amendment 1). He asked to review the emulator captures of every Ramadan stage first and then decide. Nothing is submitted until he does.
 2. **Release B (tracker, 1.5.0)** is not started. He decided on 16 Oct 2026: streak hidden until switched on, excused days replaced by a neutral Pause that freezes the streak (his idea), no missed prayer counter, no new analytics, and Claude chooses the timing (start about two weeks after 1.4.0 is live and clean, aim live by mid December, no release 18 Jan to 9 Mar 2027, otherwise after Ramadan). Detail is in the plan README, "Decisions on Release B".
-3. **Turkey iftar (plan decision 3), found on 16 Oct 2026, to settle before Ramadan, not before the build.** Diyanet's own table puts Maghrib 7 to 8 minutes after the app's Turkey method (§5.19 item 7), so a Turkish user sees the card's iftar before the ezan. Claude recommends adding Diyanet's offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib plus 7) to the TURKEY method in a separate commit, because early is the dangerous direction for a fast. It moves every Turkish user's prayer alarms and the Istanbul golden rows, so it is his call and it is not in the 1.4.0 branch.
+3. **DECIDED 18 Oct 2026, see §5.26: the offsets are applied.** Turkey iftar (plan decision 3), found on 16 Oct 2026, to settle before Ramadan, not before the build. Diyanet's own table puts Maghrib 7 to 8 minutes after the app's Turkey method (§5.19 item 7), so a Turkish user sees the card's iftar before the ezan. Claude recommends adding Diyanet's offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib plus 7) to the TURKEY method in a separate commit, because early is the dangerous direction for a fast. It moves every Turkish user's prayer alarms and the Istanbul golden rows, so it is his call and it is not in the 1.4.0 branch.
 
 **Left to do, and whose job:**
 - **Owner:** with an emulator (and optionally a phone) available, run `docs/release-tools/release-1.4.0.sh` on his Mac once. It pushes the branch, runs the full gate, builds and verifies the signed bundle, runs the device suite (widgets, the Ramadan card, the suhoor reminder in `dumpsys alarm`, the PDF), moves the emulator clock through the eve, day 1, the last day and both Eid days in four languages with screenshots, and puts the clock back. Review the screenshots. Decide the date. Merge the pull request only when he is ready to submit, because **merging publishes `docs/` through GitHub Pages**, including `privacy.html` (lesson 124 and 137). Press submit himself in Play Console. Step 2 of the script stashes `docs/HANDOVER.md` and `docs/plans/` if they are the uncommitted planning copies left on his `main` (it checks each is identical to commit 3140b96 on the branch, and stops untouched on any other change). The stash stays in `git stash list` and can be dropped once the branch is merged.

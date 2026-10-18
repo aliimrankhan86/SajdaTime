@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.qibla
 
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -91,7 +92,7 @@ fun QiblaScreen(state: UiState) {
     ) {
         ScreenTitle(stringResource(R.string.qibla_title))
         QiblaBody(state)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.Section))
         BottomBarClearance()
     }
 }
@@ -107,7 +108,7 @@ private fun QiblaBody(state: UiState) {
 
         val qibla = state.qiblaBearing
         if (qibla == null) {
-            Spacer(Modifier.height(48.dp))
+            Spacer(Modifier.height(Space.Section))
             Text(
                 text = stringResource(R.string.qibla_needs_location),
                 style = MaterialTheme.typography.bodyLarge,
@@ -168,15 +169,15 @@ private fun QiblaBody(state: UiState) {
             haveRead = true
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.Section))
         CompassDial(state = state, qiblaTrueBearing = qibla, aligned = aligned)
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(Space.Section))
         GuidanceText(state = state, qiblaTrueBearing = qibla, aligned = aligned)
         if (state.compassHeading != null) {
-            Spacer(Modifier.height(14.dp))
+            Spacer(Modifier.height(Space.Paragraph))
             DialLegend()
         }
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.Group))
         AccuracyNotice(state.compassAccuracy)
     }
 }
@@ -587,7 +588,7 @@ private fun GuidanceText(state: UiState, qiblaTrueBearing: Double, aligned: Bool
         // The raw heading is hidden once you have arrived. It is a debugging number that
         // helps while you are still turning and competes with the answer once you are not.
         if (heading != null && !aligned) {
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.qibla_heading_now, heading.roundToInt()),
                 style = PrayerTimeTextStyle,

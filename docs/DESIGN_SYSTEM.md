@@ -238,7 +238,27 @@ closely the two things belong together**, from `ui/theme/Spacing.kt` (`Space`):
 
 Closer means related (proximity), so a reader can tell which button belongs to which paragraph
 without reading. Never two different gaps for the same relationship on one screen.
-`DesignRulesTest` fails the build if `Notice.kt` uses a gap outside the scale.
+`DesignRulesTest` fails the build if every `Spacer`, every column's spacing and every top or bottom padding in the phone app's screens is written as a
+number instead of a token (D5, 18 Oct 2026). Not covered, so never claim them: horizontal gaps inside a
+row, a component's own `padding(vertical = …)` (a row's height, a pill, a card's edge), and the watch app
+(`wear/`), which has its own small screens and was not converted.
+
+How the common cases were decided, so the next screen uses the same answers:
+
+| Between | Token |
+|---|---|
+| A screen headline (headlineMedium or larger) and its paragraph | `Paragraph` 12 (bigger type needs more than `Tight`) |
+| A sheet or card title (titleLarge or smaller) and its line; a label and its value | `Tight` 4 |
+| A dialog's help text and the choices under it | `Group` 16 (it was 8 in some dialogs and 16 in one) |
+| A section heading and the field it introduces | `Related` 8 |
+| The last choice card and setup's Back and Continue | `Section` 24 (it was 8: the buttons looked stuck to the cards) |
+| Stacked choice cards; summary rows | `Paragraph` 12 |
+| A divider and what is either side of it | `Related` 8 each side |
+| A progress line under the button that started it | `Related` 8 |
+
+Not covered by the check, on purpose: horizontal gaps inside a row (an icon beside its label, two
+tiles side by side) and a component's own padding (a pill, a card, a sheet's edge). Those are the
+component's fixed metrics, not gaps between pieces of text.
 
 > Reversed 18 Oct 2026: this section used to say "dp literals, not a `Spacing` object". The
 > literals are exactly how the gaps drifted apart, card by card. Named tokens make the
@@ -692,6 +712,25 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026 (night), D5 built: the gaps between text and buttons on the scale, on every phone screen.** The owner, asked whether to do
+  it before 1.5.0: "I told you about the design system ... you should know the clean, spacing, and
+  premium look of the app." So it was done in one pass across every screen (setup, Times, Ramadan
+  card and timetable, export sheet, location sheet, Qibla, Settings and every dialog): 88 hand picked
+  gaps replaced by tokens by relationship (the table in §2), and `DesignRulesTest` fails on a new one
+  (mutation tested). An independent review caught the first write-up claiming "every vertical gap"
+  while four paddings and the watch were left; the four were converted, the check widened, the claim
+  narrowed (§0.3 again). Visible changes, so nobody is surprised: setup's Back and Continue 24dp under
+  the cards (was 8); every Settings dialog's help text 16dp above its choices (was 8, one was 16); the
+  Hijri help 16dp above its stepper (was 4); the welcome button 24dp under the tagline (was 48) and the
+  Bismillah 24dp above the name (was 32); the confirm step's gaps 24, 4 and 8 (were 32, 8 and 12); the
+  permission step's progress line 8 under its button (was 20) and the located row 16 (was 20); the
+  location sheet's text 16dp above its field (was 12) and the progress line 8 (was 16); the Ramadan
+  card's header 12 above the times (was 10), the countdown to the fast line 4 (was 6), small lines 4
+  (were 2); the export sheet title to its text 4 (was 6); Settings rows 4 between title and subtitle
+  (was 2), the folded row's text 16 above the next row (was 14); the tab bar icon to label 4 (was 2);
+  Qibla's "set your location" 24 from the top (was 48). **Shown to the owner as screenshots before
+  merging** (`docs/plans/2026-10-times-gloss/d5-*.png`), as D5 was agreed. Rendered in light, dark, Urdu and 2x text (`docs/plans/2026-10-times-gloss/d5-*.png`).
+
 - **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
   - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
     button that shares a line with text (Save as PDF on Times and in the Ramadan timetable, Shift the
@@ -857,4 +896,4 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| D5 | Spacing: the 74 eyeballed gaps in 10 files move to `Space` tokens, **screen by screen**, light and dark screenshots of each shown to the owner before it merges (owner, 18 Oct 2026) | **Times screen's block gaps done 18 Oct 2026 (late night)**; the rest of Times (inside the cards) and every other screen still to do. Then extend `DesignRulesTest`'s spacing check from `Notice.kt` to every file |
+| D5 | Spacing on every phone screen (§9, 18 Oct 2026 night) | **Built, not merged:** the owner looks at `d5-setup.png`, `d5-screens.png`, `d5-dialogs.png` first. Then merge and delete this row |
