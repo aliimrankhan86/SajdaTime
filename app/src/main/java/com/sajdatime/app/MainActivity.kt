@@ -112,6 +112,17 @@ class MainActivity : ComponentActivity() {
         viewModel.setAlarmSound(uri?.toString().orEmpty())
     }
 
+    /** The same, for the notification sound (18 Oct 2026). A launcher of its own, so no state says which. */
+    private val notificationSoundPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val uri = result.data
+            ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
+        viewModel.setNotificationSound(uri?.toString().orEmpty())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -179,6 +190,13 @@ class MainActivity : ComponentActivity() {
                                     openAlarmSoundPicker(state.settings.alarmSoundUri, state.settings.phoneAlarmSoundUri)
                                 },
                                 onPickBuiltInAdhan = viewModel::setBuiltInAdhan,
+                                onPickNotificationSound = {
+                                    openNotificationSoundPicker(
+                                        state.settings.notificationSoundUri,
+                                        state.settings.phoneNotificationSoundUri,
+                                    )
+                                },
+                                onPickBuiltInNotificationAdhan = viewModel::setBuiltInNotificationAdhan,
                                 onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                                 onRefreshLocation = ::requestLocation,
                                 onSearchCity = viewModel::searchCity,
@@ -237,20 +255,35 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun openAlarmSoundPicker(current: String, phoneSound: String) {
+    private fun openAlarmSoundPicker(current: String, phoneSound: String) =
+        runCatching {
+            alarmSoundPicker.launch(soundPickerIntent(current, phoneSound, R.string.settings_alarm_sound, RingtoneManager.TYPE_ALARM))
+        }
+
+    private fun openNotificationSoundPicker(current: String, phoneSound: String) =
+        runCatching {
+            notificationSoundPicker.launch(
+                soundPickerIntent(current, phoneSound, R.string.settings_notification_sound, RingtoneManager.TYPE_NOTIFICATION),
+            )
+        }
+
+    /**
+     * The phone's own sound list. TYPE_ALL, so alarms, ringtones and notification tones are all offered
+     * whichever is being chosen; [defaultType] only decides where it opens when nothing is chosen yet.
+     */
+    private fun soundPickerIntent(current: String, phoneSound: String, title: Int, defaultType: Int): Intent {
         // A built-in adhan is not in the phone's list, so the picker opens on the phone sound it replaced.
         val existing = if (BuiltInAdhan.of(current) == null) current else phoneSound
-        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+        return Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
             putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
-            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.settings_alarm_sound))
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(title))
             putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
             putExtra(
                 RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
                 existing.takeIf { it.isNotBlank() }?.let(Uri::parse)
-                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
+                    ?: RingtoneManager.getDefaultUri(defaultType),
             )
         }
-        runCatching { alarmSoundPicker.launch(intent) }
     }
 
     private fun toast(message: String) =

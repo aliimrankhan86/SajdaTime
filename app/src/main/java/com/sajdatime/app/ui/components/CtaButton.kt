@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Button
@@ -39,25 +40,34 @@ import com.sajdatime.app.ui.theme.OnCta
  *
  * Two answers of equal weight (the usage counts question) are both a CtaButton: equal
  * prominence is the point of that screen, and the same strong style keeps it equal.
+ *
+ * [compact] is for a button that shares a line with a heading or a sentence ("Save as PDF" beside
+ * "Today"): 40dp drawn, 16dp side padding. At 52dp beside a heading it looked squashed against the
+ * list under it (owner, 18 Oct 2026: "make a smaller button ... still look actionable"). Material
+ * still gives it a 48dp touch target, so it is no harder to hit. Same colours, same 16sp bold label.
  */
 @Composable
 fun CtaButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    compact: Boolean = false,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
         colors = ctaButtonColors(),
-        modifier = modifier.heightIn(min = 52.dp),
+        contentPadding = if (compact) CompactPadding else ButtonDefaults.ContentPadding,
+        modifier = modifier.heightIn(min = if (compact) 40.dp else 52.dp),
     ) {
         ProvideTextStyle(actionLabelStyle()) {
             content()
         }
     }
 }
+
+private val CompactPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
 
 /**
  * The one label style for every solid button in the app, green or amber: labelLarge (SemiBold)

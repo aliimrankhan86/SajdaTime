@@ -47,6 +47,7 @@ import com.sajdatime.app.ui.RamadanRow
 import com.sajdatime.app.ui.RamadanTimetable
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.core.bidiIsolated
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -117,9 +118,9 @@ internal fun RamadanTimetableSheet(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                CtaButton(onClick = onExport) {
+                CtaButton(onClick = onExport, compact = true) {
                     Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.width(Space.Related))
                     Text(stringResource(R.string.action_save_pdf))
                 }
             }
@@ -257,7 +258,8 @@ private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
                 color = scheme.onSurfaceVariant,
             )
         }
-        CtaButton(onClick = onShiftDate) {
+        // Alone on its line, so full width (DESIGN_SYSTEM 4.1).
+        CtaButton(onClick = onShiftDate, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.settings_hijri_offset_label))
         }
     }

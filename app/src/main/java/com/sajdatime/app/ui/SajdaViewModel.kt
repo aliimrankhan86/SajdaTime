@@ -340,6 +340,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setBuiltInAdhan(adhan: BuiltInAdhan) =
         viewModelScope.launch { settingsRepository.setBuiltInAdhan(adhan) }
 
+    fun setNotificationSound(uri: String) =
+        viewModelScope.launch { settingsRepository.setNotificationSound(uri) }
+
+    fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) =
+        viewModelScope.launch { settingsRepository.setBuiltInNotificationAdhan(adhan) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 

@@ -27,17 +27,17 @@
     <string name="location_set_generic">آپ کا مقام</string>
     <string name="location_finding">آپ کا مقام تلاش کیا جا رہا ہے…</string>
     <string name="location_looking_up">یہ جگہ تلاش کی جا رہی ہے…</string>
-    <string name="location_no_fix">ہم آپ کا مقام معلوم نہیں کر سکے۔ دیکھ لیں کہ لوکیشن آن ہے، یا نیچے اپنے شہر کا نام لکھیں۔</string>
+    <string name="location_no_fix">ہم آپ کا مقام معلوم نہیں کر سکے۔ دیکھ لیں کہ لوکیشن آن ہے، یا نیچے لکھیں کہ آپ کہاں ہیں۔</string>
 
-    <string name="city_fallback_body">اس کے بجائے اپنے شہر کا نام لکھیں۔ نام پہلے آپ کے فون کی اپنی مقام تلاش سروس سے پوچھا جاتا ہے، جو زیادہ تر فونز پر انٹرنیٹ کے ذریعے گوگل سے پوچھتی ہے۔ اگر وہ جواب نہ دے سکے تو صرف آپ کا لکھا ہوا نام ایک بار ایک مفت تلاش سروس کو بھیجا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
+    <string name="city_fallback_body">اس کے بجائے لکھیں کہ آپ کہاں ہیں۔ نام پہلے آپ کے فون کی اپنی مقام تلاش سروس سے پوچھا جاتا ہے، جو زیادہ تر فونز پر انٹرنیٹ کے ذریعے گوگل سے پوچھتی ہے۔ اگر وہ جواب نہ دے سکے تو صرف آپ کا لکھا ہوا نام ایک بار ایک مفت تلاش سروس کو بھیجا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
 
     <string name="city_lookup_note">آپ کا لکھا ہوا نام انٹرنیٹ پر تلاش کیا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
 
-    <string name="city_lookup_detail">اگر آپ اس کے بجائے شہر کا نام لکھیں تو نام پہلے آپ کے فون کی اپنی مقام تلاش سروس سے پوچھا جاتا ہے، جو زیادہ تر فونز پر انٹرنیٹ کے ذریعے گوگل سے پوچھتی ہے۔ اگر وہ جواب نہ دے سکے تو صرف آپ کا لکھا ہوا نام ایک بار ایک مفت تلاش سروس کو بھیجا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
-    <string name="city_field_label">شہر</string>
-    <string name="city_field_helper">مثلاً: مانچسٹر، لاہور، قاہرہ</string>
-    <string name="city_not_found">ہمیں یہ جگہ نہیں ملی۔ ساتھ ملک کا نام بھی لکھ کر دیکھیں۔</string>
-    <string name="action_find_city">شہر تلاش کریں</string>
+    <string name="city_lookup_detail">اگر آپ اس کے بجائے کسی جگہ کا نام لکھیں تو نام پہلے آپ کے فون کی اپنی مقام تلاش سروس سے پوچھا جاتا ہے، جو زیادہ تر فونز پر انٹرنیٹ کے ذریعے گوگل سے پوچھتی ہے۔ اگر وہ جواب نہ دے سکے تو صرف آپ کا لکھا ہوا نام ایک بار ایک مفت تلاش سروس کو بھیجا جاتا ہے۔ اس کے بعد سارا حساب آپ کے فون پر ہی ہوتا ہے۔</string>
+    <string name="city_field_label">شہر، قصبہ یا گاؤں</string>
+    <string name="city_field_helper">مثلاً: کراچی، لندن، مکہ، نیویارک</string>
+    <string name="city_not_found">ہمیں یہ جگہ نہیں ملی۔ ساتھ ملک کا نام لکھ کر دیکھیں، یا قریب ترین قصبے کا نام لکھیں۔</string>
+    <string name="action_find_city">جگہ تلاش کریں</string>
     <string name="action_use_makkah">ابھی چھوڑیں اور مکہ استعمال کریں</string>
     <string name="setup_makkah_note">جب تک آپ اپنا مقام طے نہیں کرتے، نماز کے اوقات مکہ کے ہوں گے۔</string>
 
@@ -108,9 +108,9 @@
 
     <!-- Location sheet -->
     <string name="location_sheet_title">آپ کا مقام</string>
-    <string name="location_sheet_body">نماز کے اوقات اور قبلہ دونوں اس پر منحصر ہیں کہ آپ کہاں ہیں۔ جب بھی سفر کریں، اسے اپ ڈیٹ کر لیں۔\n\nآپ کی پرائیویسی کی حفاظت کے لیے ایپ ہمیشہ صرف آپ کا اندازاً مقام مانگتی ہے، اس لیے ہو سکتا ہے یہ آپ کے شہر کے بجائے کسی قریبی قصبے یا پورے علاقے کا نام دکھائے۔ اس سے اوقات میں بہت کم فرق پڑتا ہے: دس میل کا فاصلہ تقریباً ایک منٹ کے برابر ہے۔ اگر نام آپ کو غلط لگے تو نیچے اپنے شہر کا نام لکھیں۔</string>
+    <string name="location_sheet_body">نماز کے اوقات اور قبلہ دونوں اس پر منحصر ہیں کہ آپ کہاں ہیں۔ جب بھی سفر کریں، اسے اپ ڈیٹ کر لیں۔\n\nآپ کی پرائیویسی کی حفاظت کے لیے ایپ ہمیشہ صرف آپ کا اندازاً مقام مانگتی ہے، اس لیے ہو سکتا ہے یہ آپ کی اپنی جگہ کے بجائے کسی قریبی قصبے یا پورے علاقے کا نام دکھائے۔ اس سے اوقات میں بہت کم فرق پڑتا ہے: دس میل کا فاصلہ تقریباً ایک منٹ کے برابر ہے۔ اگر نام آپ کو غلط لگے تو نیچے لکھیں کہ آپ کہاں ہیں۔</string>
     <string name="action_use_my_location">میرا موجودہ مقام استعمال کریں</string>
-    <string name="location_sheet_search_heading">یا شہر کا نام لکھیں</string>
+    <string name="location_sheet_search_heading">یا لکھیں کہ آپ کہاں ہیں</string>
 
     <!-- Export -->
     <string name="action_save_timetable">نظام الاوقات PDF میں محفوظ کریں</string>
@@ -175,7 +175,7 @@
     <string name="settings_method_auto">خودکار · %1$s</string>
     <string name="settings_method_help">مساجد شفق کو مختلف طرح سے ناپتی ہیں، اور اس کا اثر زیادہ تر فجر اور عشاء پر پڑتا ہے۔ آپ جتنا شمال میں رہتے ہیں، فرق اتنا ہی زیادہ ہوتا ہے۔ اگر یہ اوقات آپ کی مسجد سے نہیں ملتے تو ان سے پوچھیں کہ وہ کون سا طریقہ استعمال کرتے ہیں، اور اسے یہاں منتخب کریں۔</string>
 
-    <string name="settings_alerts_help">اطلاع: آپ کے فون کی معمول کی ٹون کے ساتھ پیغام۔ الارم: اذان یا آپ کی چنی ہوئی آواز بجاتا ہے۔</string>
+    <string name="settings_alerts_help">اطلاع: اطلاع کی آواز بجتی ہے اور فون وائبریٹ ہوتا ہے۔ الارم: الارم کی آواز الارم کے والیوم پر بجتی ہے اور فون وائبریٹ ہوتا ہے۔ دونوں آوازیں سیٹنگز میں «نماز کے الرٹ» کے بالکل نیچے چنیں۔</string>
     <string name="alert_style_off">بند</string>
     <string name="alert_style_notification">اطلاع</string>
     <string name="alert_style_alarm">الارم</string>
@@ -183,6 +183,10 @@
     <string name="settings_alarm_sound">الارم کی آواز</string>
     <string name="settings_alarm_sound_default">آپ کے فون کا ڈیفالٹ الارم</string>
     <string name="settings_alarm_sound_phone">آپ کے فون سے</string>
+    <string name="settings_notification_sound">اطلاع کی آواز</string>
+    <string name="settings_notification_sound_default">آپ کے فون کی معمول کی ٹون</string>
+    <string name="settings_notification_sound_help">نماز کی اطلاع آنے پر اطلاع کے والیوم پر بجتی ہے۔ فون کی سائلنٹ، وائبریٹ اور ڈسٹرب نہ کریں کی سیٹنگز پھر بھی لاگو رہتی ہیں۔</string>
+    <string name="settings_alarm_sound_help">جن نمازوں کے لیے الارم چنا گیا ہو، ان کے لیے الارم کے والیوم پر بجتی ہے۔</string>
     <string name="settings_alarm_play_on_silent">سائلنٹ پر بھی بجائیں</string>
     <string name="settings_alarm_play_on_silent_desc">فون سائلنٹ یا ڈسٹرب نہ کریں پر ہو تب بھی بجتا ہے۔ بند: صرف اطلاع اور وائبریشن۔</string>
     <string name="adhan_builtin">اذان</string>
@@ -390,12 +394,12 @@
     <string name="ramadan_eve_brief">آپ کی مسجد ایک دن بعد شروع کر سکتی ہے۔</string>
     <string name="polar_notice_brief">یہاں فجر اور عشاء عرض بلد %1$d° کے حساب سے نکالے جاتے ہیں۔</string>
     <string name="action_set_location">مقام طے کریں</string>
-    <string name="city_lookup_offline">انٹرنیٹ کنکشن نہیں ہے۔ شہر تلاش کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، یا اپنا مقام استعمال کریں۔</string>
+    <string name="city_lookup_offline">انٹرنیٹ کنکشن نہیں ہے۔ جگہ تلاش کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، یا اپنا مقام استعمال کریں۔</string>
     <string name="about_rate">Google Play پر SajdaTime کی ریٹنگ دیں</string>
     <string name="about_rate_desc">اسٹور کا صفحہ کھولتا ہے۔</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%2$s کے لیے %1$s</string>
-    <string name="location_permission_denied">مقام کی اجازت نہیں دی گئی۔ نیچے اپنے شہر کا نام لکھیں، یا دوبارہ کوشش کے لیے «مقام کی اجازت دیں» پر ٹیپ کریں۔</string>
+    <string name="location_permission_denied">مقام کی اجازت نہیں دی گئی۔ نیچے لکھیں کہ آپ کہاں ہیں، یا دوبارہ کوشش کے لیے «مقام کی اجازت دیں» پر ٹیپ کریں۔</string>
     <string name="confirm_notifications_hint">جب آپ «%1$s» پر ٹیپ کریں گے تو Android پوچھے گا کہ کیا SajdaTime اطلاعات بھیج سکتی ہے۔ نماز کے الرٹ پانے کے لیے ہاں کہیں۔ آپ اسے بعد میں فون کی ترتیبات میں بدل سکتے ہیں۔</string>
     <string name="about_share">SajdaTime شیئر کریں</string>
     <string name="about_share_desc">لنک گھر والوں اور دوستوں کو بھیجیں۔</string>

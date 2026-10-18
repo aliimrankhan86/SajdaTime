@@ -310,13 +310,13 @@ warnings").
 | Shape | Full pill (Material `Button` default) | Never square corners, never a custom radius |
 | Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
 | Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
-| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice | Minimums; large text grows them |
-| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | |
-| Padding | Material default (24dp each side) | |
+| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area is measured, not assumed: taps 2 and 3.5dp outside the drawn edge press it, 6dp does not |
+| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
+| Padding | Material default (24dp each side); compact 16dp each side | |
 | Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
 | Elevation and shadow | None | Flat on purpose: the fill does the work |
 | Pressed | Material ripple | |
-| Disabled | Material default (12% `onSurface` fill, 38% label). **Only while the action is running** (finding your location) | Never shown as a grey placeholder: hide the button until it can be used ("Find city" appears once something is typed) |
+| Disabled | Material default (12% `onSurface` fill, 38% label). **Only while the action is running** (finding your location) | Never shown as a grey placeholder: hide the button until it can be used ("Find place" appears once something is typed) |
 | Contrast | Label to fill at least 4.5:1; fill to the surface behind it at least 3:1 | `ColorContrastTest` asserts both, in both themes |
 
 #### Order, hierarchy and wording
@@ -338,7 +338,7 @@ warnings").
 | Between | Gap |
 |---|---|
 | A single paragraph and the button that acts on it (explainer dialogs) | `Space.Related` 8dp |
-| A text field and its button ("Find city") | `Space.Related` 8dp |
+| A text field and its button ("Find place") | `Space.Related` 8dp |
 | Two buttons stacked or side by side | `Space.Related` 8dp |
 | A block of several lines (title and sentence, or several paragraphs) and its button row | `Space.Group` 16dp |
 | A group of buttons and a different group (the usage question's two links and its two answers) | `Space.Section` 24dp |
@@ -356,6 +356,7 @@ warnings").
 | A file with a button that is not in the inventory below | So no button is added without being specified here | `DesignRulesTest` |
 | Two icon buttons next to each other | Opposite actions a finger apart (§4 Notices) | Review question in §10 |
 | A disabled button shown as a placeholder | Reads as broken | Review question in §10 |
+| A `CtaButton` with no stated size (no `fillMaxWidth`, `weight` or `compact = true`) | It defaults to 52dp wrapped, which looked squashed beside a heading | `DesignRulesTest` |
 
 #### The inventory: every button in the app
 
@@ -367,7 +368,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Setup, welcome | Begin | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | Allow location (pin icon) | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | How your location is used (info icon) | A | 52, full | `OnboardingScreen.kt` |
-| Setup, location | Find city (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Find place (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
 | Setup, location | Skip for now and use Makkah, at the **foot of the screen** under "Prayer times will be for Makkah until you set your location." (after the content at large text) | A | 52, full | `OnboardingScreen.kt` |
 | Setup, location | Continue, once located | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | "How your location is used" dialog: Got it | E | | `OnboardingScreen.kt` |
@@ -379,15 +380,16 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Usage question | Yes, share usage counts; No thanks, 24dp under the links | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
 | First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
-| Times | Save as PDF (PDF icon), end of the Today heading | A | 52, wraps | `HomeScreen.kt` |
+| Times | Save as PDF (PDF icon), end of the Today heading; 16dp under the card above, 8dp over the list it saves | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
 | Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
-| Times, Ramadan card | Shift the date, days 1 and 2 only | A | 52, wraps | `RamadanCard.kt` |
-| Times, Ramadan card | Full timetable; (i) | A; info icon | 52, wraps; 48 | `RamadanCard.kt` |
+| Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
+| Times, Ramadan card | Full timetable; (i) | A, compact; info icon | 40 drawn, 48 target, wraps; 48 | `RamadanCard.kt` |
 | Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
-| Ramadan timetable | Save as PDF; Shift the date | A | 52, wraps | `RamadanTimetableSheet.kt` |
-| Location sheet | Use my current location; Find city, once something is typed | A | 52, full | `Common.kt` |
+| Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
+| Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
+| Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
 | Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
@@ -687,6 +689,27 @@ dependency), not done yet because it means downloading the icon files.
 
 ## 9. Decision log
 
+- **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
+  - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
+    button that shares a line with text (Save as PDF on Times and in the Ramadan timetable, Shift the
+    date and Full timetable on the Ramadan card). Times gaps moved to the scale at the same time:
+    `Space.Group` between blocks, `Space.Related` from the Today heading to its list.
+  - *Place wording*: he asked for "your nearest region" and then for help ("city, town, village ...
+    something suitable for the masses"). Chosen, with his request for help as the brief: heading
+    **"Or type where you are"**, box **"Town, city or village"**, hint **"For example: Karachi,
+    London, Makkah, New York"** (his examples, in every language), not found **"... or type the
+    nearest town"**, button **"Find place"**. Rejected: "region" (vague, translates as province, and a
+    province name gives times for its middle, minutes out); "city" (excludes villages, his objection).
+  - *Sounds*: "From your phone" already existed but sat below a fold at the foot of Prayer alerts, so
+    he never saw it. He chose (AskUserQuestion) **each sound its own Settings row** under Prayer
+    alerts, showing the current choice, over moving it to the top of the dialog or adding a scroll
+    hint. He then asked for a sound choice for notifications too ("adhan or another sound for an
+    alarm or notification"): a **Notification sound** row beside **Alarm sound**, each offering Adhan
+    or From your phone. Nobody's sound changes until they pick one.
+  - *Vibration*: every prayer notification, alarm and reminder already vibrates. He chose **"follow
+    the phone"** (Ring: sound and buzz; Vibrate: buzz; Silent: nothing; Do Not Disturb: nothing unless
+    the alarm's Play on silent is on). Rejected: forcing a buzz on Silent (overrides the person's mute).
+
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
@@ -825,4 +848,4 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| D5 | Spacing: the 74 eyeballed gaps in 10 files move to `Space` tokens, **screen by screen**, light and dark screenshots of each shown to the owner before it merges (owner, 18 Oct 2026) | After the 1.5.0 solid button merge. Then extend `DesignRulesTest`'s spacing check from `Notice.kt` to every file |
+| D5 | Spacing: the 74 eyeballed gaps in 10 files move to `Space` tokens, **screen by screen**, light and dark screenshots of each shown to the owner before it merges (owner, 18 Oct 2026) | **Times screen's block gaps done 18 Oct 2026 (late night)**; the rest of Times (inside the cards) and every other screen still to do. Then extend `DesignRulesTest`'s spacing check from `Notice.kt` to every file |

@@ -33,17 +33,17 @@
     <string name="location_set_generic">موقعك</string>
     <string name="location_finding">جارٍ تحديد موقعك…</string>
     <string name="location_looking_up">جارٍ البحث عن هذا المكان…</string>
-    <string name="location_no_fix">لم نتمكن من تحديد موقعك. تأكد من أن خدمة الموقع مفعّلة، أو اكتب مدينتك أدناه.</string>
+    <string name="location_no_fix">لم نتمكن من تحديد موقعك. تأكد من أن خدمة الموقع مفعّلة، أو اكتب اسم المكان الذي أنت فيه أدناه.</string>
 
-    <string name="city_fallback_body">اكتب مدينتك بدلًا من ذلك. يُبحث عن الاسم عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي تسأل Google عبر الإنترنت في معظم الهواتف. وإن لم تستطع الإجابة، يُرسَل الاسم الذي كتبته وحده مرة واحدة إلى خدمة بحث مجانية. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
+    <string name="city_fallback_body">اكتب اسم المكان الذي أنت فيه بدلًا من ذلك. يُبحث عن الاسم عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي تسأل Google عبر الإنترنت في معظم الهواتف. وإن لم تستطع الإجابة، يُرسَل الاسم الذي كتبته وحده مرة واحدة إلى خدمة بحث مجانية. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
 
     <string name="city_lookup_note">يُبحث عن الاسم الذي تكتبه عبر الإنترنت. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
 
-    <string name="city_lookup_detail">إن كتبت اسم مدينة بدلًا من ذلك، يُبحث عن الاسم عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي تسأل Google عبر الإنترنت في معظم الهواتف. وإن لم تستطع الإجابة، يُرسَل الاسم الذي كتبته وحده مرة واحدة إلى خدمة بحث مجانية. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
-    <string name="city_field_label">المدينة</string>
-    <string name="city_field_helper">على سبيل المثال: مانشستر، لاهور، القاهرة</string>
-    <string name="city_not_found">لم نجد هذا المكان. جرّب إضافة اسم البلد.</string>
-    <string name="action_find_city">ابحث عن المدينة</string>
+    <string name="city_lookup_detail">إن كتبت اسم مكان بدلًا من ذلك، يُبحث عن الاسم عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي تسأل Google عبر الإنترنت في معظم الهواتف. وإن لم تستطع الإجابة، يُرسَل الاسم الذي كتبته وحده مرة واحدة إلى خدمة بحث مجانية. بعد ذلك، يُحسب كل شيء على هاتفك.</string>
+    <string name="city_field_label">مدينة أو بلدة أو قرية</string>
+    <string name="city_field_helper">على سبيل المثال: كراتشي، لندن، مكة، نيويورك</string>
+    <string name="city_not_found">لم نجد هذا المكان. جرّب إضافة اسم البلد، أو اكتب اسم أقرب بلدة.</string>
+    <string name="action_find_city">ابحث عن المكان</string>
     <string name="action_use_makkah">تخطَّ الآن واستخدم مكة</string>
     <string name="setup_makkah_note">ستكون مواقيت الصلاة لمكة حتى تحدِّد موقعك.</string>
 
@@ -121,9 +121,9 @@
 
     <!-- Location sheet. "Ten miles is about a minute" is measured; keep the figure. -->
     <string name="location_sheet_title">موقعك</string>
-    <string name="location_sheet_body">تعتمد مواقيت الصلاة والقبلة كلتاهما على مكان وجودك. حدّث هذا كلما سافرت.\n\nلحماية خصوصيتك لا يطلب التطبيق إلا موقعك التقريبي، لذا قد يذكر بلدة قريبة أو المنطقة الأوسع بدلًا من بلدتك. وهذا يغيّر الأوقات قليلًا جدًا: عشرة أميال تعادل نحو دقيقة. إن بدا لك الاسم خاطئًا، فاكتب مدينتك أدناه.</string>
+    <string name="location_sheet_body">تعتمد مواقيت الصلاة والقبلة كلتاهما على مكان وجودك. حدّث هذا كلما سافرت.\n\nلحماية خصوصيتك لا يطلب التطبيق إلا موقعك التقريبي، لذا قد يذكر بلدة قريبة أو المنطقة الأوسع بدلًا من مكانك. وهذا يغيّر الأوقات قليلًا جدًا: عشرة أميال تعادل نحو دقيقة. إن بدا لك الاسم خاطئًا، فاكتب اسم المكان الذي أنت فيه أدناه.</string>
     <string name="action_use_my_location">استخدم موقعي الحالي</string>
-    <string name="location_sheet_search_heading">أو اكتب اسم مدينة</string>
+    <string name="location_sheet_search_heading">أو اكتب اسم المكان الذي أنت فيه</string>
 
     <!-- Export -->
     <string name="action_save_timetable">حفظ الجدول بصيغة PDF</string>
@@ -194,7 +194,7 @@
     <string name="settings_method_auto">تلقائي · %1$s</string>
     <string name="settings_method_help">تقيس المساجد الشفق بطرق مختلفة، وهذا يغيّر الفجر والعشاء أساسًا. وكلما سكنت شمالًا أكثر، كبر الفرق. إن لم تطابق هذه الأوقات مسجدك، فاسألهم عن الطريقة التي يتبعونها واخترها هنا.</string>
 
-    <string name="settings_alerts_help">الإشعار: رسالة بنغمة هاتفك المعتادة. المنبّه: يشغّل الأذان أو صوتًا تختاره.</string>
+    <string name="settings_alerts_help">الإشعار: يشغّل صوت الإشعار ويهتز الهاتف. المنبّه: يشغّل صوت المنبّه بمستوى صوت المنبّه ويهتز الهاتف. اختر كلا الصوتين من الإعدادات، أسفل تنبيهات الصلاة مباشرة.</string>
     <string name="alert_style_off">إيقاف</string>
     <string name="alert_style_notification">إشعار</string>
     <string name="alert_style_alarm">منبّه</string>
@@ -203,6 +203,10 @@
     <string name="settings_alarm_sound">صوت المنبّه</string>
     <string name="settings_alarm_sound_default">المنبّه الافتراضي في هاتفك</string>
     <string name="settings_alarm_sound_phone">من هاتفك</string>
+    <string name="settings_notification_sound">صوت الإشعار</string>
+    <string name="settings_notification_sound_default">النغمة المعتادة في هاتفك</string>
+    <string name="settings_notification_sound_help">يعمل عند وصول إشعار الصلاة، بمستوى صوت الإشعارات. وتبقى إعدادات الصامت والاهتزاز وعدم الإزعاج في هاتفك سارية.</string>
+    <string name="settings_alarm_sound_help">يعمل للصلوات المضبوطة على منبّه، بمستوى صوت المنبّه.</string>
     <string name="settings_alarm_play_on_silent">التشغيل في الوضع الصامت</string>
     <string name="settings_alarm_play_on_silent_desc">يعمل حتى لو كان الهاتف صامتًا أو في وضع عدم الإزعاج. عند الإيقاف: إشعار واهتزاز فقط.</string>
     <string name="adhan_builtin">الأذان</string>
@@ -450,12 +454,12 @@
     <string name="ramadan_eve_brief">قد يبدأ مسجدك بعد يوم.</string>
     <string name="polar_notice_brief">يُحسب الفجر والعشاء هنا من خط العرض %1$d°.</string>
     <string name="action_set_location">تحديد الموقع</string>
-    <string name="city_lookup_offline">لا يوجد اتصال بالإنترنت. اتصل مرة واحدة للبحث عن مدينة، أو استخدم موقعك.</string>
+    <string name="city_lookup_offline">لا يوجد اتصال بالإنترنت. اتصل مرة واحدة للبحث عن مكان، أو استخدم موقعك.</string>
     <string name="about_rate">قيّم SajdaTime على Google Play</string>
     <string name="about_rate_desc">يفتح صفحة المتجر.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%1$s عند %2$s</string>
-    <string name="location_permission_denied">لم يُسمح بالوصول إلى الموقع. اكتب مدينتك أدناه، أو انقر على اسمح بالموقع للمحاولة مجددًا.</string>
+    <string name="location_permission_denied">لم يُسمح بالوصول إلى الموقع. اكتب اسم المكان الذي أنت فيه أدناه، أو انقر على اسمح بالموقع للمحاولة مجددًا.</string>
     <string name="confirm_notifications_hint">عند النقر على %1$s، سيسألك Android هل يُسمح لـ SajdaTime بإرسال الإشعارات. وافق لتصلك تنبيهات الصلاة. ويمكنك تغيير ذلك لاحقًا من إعدادات هاتفك.</string>
     <string name="about_share">شارك SajdaTime</string>
     <string name="about_share_desc">أرسل الرابط إلى العائلة والأصدقاء.</string>

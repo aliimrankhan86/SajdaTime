@@ -36,17 +36,17 @@
     <string name="location_set_generic">Your location</string>
     <string name="location_finding">Finding your location…</string>
     <string name="location_looking_up">Looking up that place…</string>
-    <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
+    <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type where you are below.</string>
 
-    <string name="city_fallback_body">Type your city instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+    <string name="city_fallback_body">Type where you are instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
 
     <string name="city_lookup_note">The name you type is looked up over the internet. After that, everything is worked out on your phone.</string>
 
-    <string name="city_lookup_detail">If you type a city instead, the name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
-    <string name="city_field_label">City</string>
-    <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
-    <string name="city_not_found">We could not find that place. Try adding the country.</string>
-    <string name="action_find_city">Find city</string>
+    <string name="city_lookup_detail">If you type a place instead, the name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+    <string name="city_field_label">Town, city or village</string>
+    <string name="city_field_helper">For example: Karachi, London, Makkah, New York</string>
+    <string name="city_not_found">We could not find that place. Try adding the country, or type the nearest town.</string>
+    <string name="action_find_city">Find place</string>
     <string name="action_use_makkah">Skip for now and use Makkah</string>
     <string name="setup_makkah_note">Prayer times will be for Makkah until you set your location.</string>
 
@@ -227,9 +227,9 @@
          latitude moves every prayer by at most 2 minutes, in midsummer, midwinter and
          between. See HANDOVER §10. Shown only when the user opens this sheet — the app
          does not volunteer it, and it is not a second disclaimer. -->
-    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little: ten miles is about a minute. If the name looks wrong to you, type your city below.</string>
+    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little: ten miles is about a minute. If the name looks wrong to you, type where you are below.</string>
     <string name="action_use_my_location">Use my current location</string>
-    <string name="location_sheet_search_heading">Or type a city</string>
+    <string name="location_sheet_search_heading">Or type where you are</string>
 
     <!-- Export -->
     <string name="action_save_timetable">Save timetable as PDF</string>
@@ -321,7 +321,7 @@
     <string name="settings_method_auto">Automatic · %1$s</string>
     <string name="settings_method_help">Mosques measure the twilight differently, and that mainly moves Fajr and Isha. The further north you live, the bigger the gap. If these times do not match your mosque, ask them which method they use and pick it here.</string>
 
-    <string name="settings_alerts_help">Notification: a message with your phone\'s usual tone. Alarm: plays the adhan or a sound you choose.</string>
+    <string name="settings_alerts_help">Notification: plays the notification sound and vibrates. Alarm: plays the alarm sound at alarm volume and vibrates. Choose each sound in Settings, just below Prayer alerts.</string>
     <string name="alert_style_off">Off</string>
     <string name="alert_style_notification">Notification</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -331,6 +331,10 @@
     <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
     <!-- 1.5.0 built-in adhans, one per school (data/BuiltInAdhan.kt). -->
     <string name="settings_alarm_sound_phone">From your phone</string>
+    <string name="settings_notification_sound">Notification sound</string>
+    <string name="settings_notification_sound_default">Your phone\'s usual tone</string>
+    <string name="settings_notification_sound_help">Plays when a prayer notification arrives, at your notification volume. Your phone\'s silent, vibrate and Do Not Disturb settings still apply.</string>
+    <string name="settings_alarm_sound_help">Plays for prayers set to Alarm, at your alarm volume.</string>
     <string name="settings_alarm_play_on_silent">Play on silent</string>
     <string name="settings_alarm_play_on_silent_desc">Plays even when your phone is on silent or Do Not Disturb. Off: notification and vibration only.</string>
     <string name="adhan_builtin">Adhan</string>
@@ -603,12 +607,12 @@
     <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
     <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
     <string name="action_set_location">Set location</string>
-    <string name="city_lookup_offline">No internet connection. Connect once to look up a city, or use your location.</string>
+    <string name="city_lookup_offline">No internet connection. Connect once to look up a place, or use your location.</string>
     <string name="about_rate">Rate SajdaTime on Google Play</string>
     <string name="about_rate_desc">Opens the store page.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%1$s for %2$s</string>
-    <string name="location_permission_denied">Location was not allowed. Type your city below, or tap Allow location to try again.</string>
+    <string name="location_permission_denied">Location was not allowed. Type where you are below, or tap Allow location to try again.</string>
     <string name="confirm_notifications_hint">When you tap %1$s, Android will ask whether SajdaTime may send notifications. Say yes to get prayer alerts. You can change this later in your phone\'s settings.</string>
     <string name="about_share">Share SajdaTime</string>
     <string name="about_share_desc">Send the link to family and friends.</string>

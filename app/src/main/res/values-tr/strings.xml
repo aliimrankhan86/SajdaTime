@@ -26,17 +26,17 @@
     <string name="location_set_generic">Konumunuz</string>
     <string name="location_finding">Konumunuz bulunuyor…</string>
     <string name="location_looking_up">Bu yer aranıyor…</string>
-    <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da şehrinizi aşağıya yazın.</string>
+    <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da nerede olduğunuzu aşağıya yazın.</string>
 
-    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+    <string name="city_fallback_body">Bunun yerine nerede olduğunuzu yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
 
     <string name="city_lookup_note">Yazdığınız ad internet üzerinden aranır. Bundan sonra her şey telefonunuzda hesaplanır.</string>
 
-    <string name="city_lookup_detail">Bunun yerine bir şehir yazarsanız, ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
-    <string name="city_field_label">Şehir</string>
-    <string name="city_field_helper">Örneğin: İstanbul, Lahor, Kahire</string>
-    <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
-    <string name="action_find_city">Şehri bul</string>
+    <string name="city_lookup_detail">Bunun yerine bir yer adı yazarsanız, ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+    <string name="city_field_label">Şehir, kasaba ya da köy</string>
+    <string name="city_field_helper">Örneğin: Karaçi, Londra, Mekke, New York</string>
+    <string name="city_not_found">Bu yer bulunamadı. Ülke adını eklemeyi ya da en yakın kasabayı yazmayı deneyin.</string>
+    <string name="action_find_city">Yeri bul</string>
     <string name="action_use_makkah">Şimdilik geç, Mekke\'yi kullan</string>
     <string name="setup_makkah_note">Konumunuzu ayarlayana kadar namaz vakitleri Mekke için olacak.</string>
 
@@ -105,9 +105,9 @@
 
     <!-- Location sheet -->
     <string name="location_sheet_title">Konumunuz</string>
-    <string name="location_sheet_body">Namaz vakitleri de kıble de nerede olduğunuza bağlıdır. Yolculuğa çıktığınızda bunu güncelleyin.\n\nGizliliğinizi korumak için uygulama yalnızca yaklaşık konumunuzu ister. Bu yüzden sizin yeriniz yerine yakındaki bir kasabanın ya da daha geniş bölgenin adını gösterebilir. Bu, vakitleri çok az değiştirir: 16 km yaklaşık bir dakikaya denk gelir. Ad size yanlış görünüyorsa şehrinizi aşağıya yazın.</string>
+    <string name="location_sheet_body">Namaz vakitleri de kıble de nerede olduğunuza bağlıdır. Yolculuğa çıktığınızda bunu güncelleyin.\n\nGizliliğinizi korumak için uygulama yalnızca yaklaşık konumunuzu ister. Bu yüzden sizin yeriniz yerine yakındaki bir kasabanın ya da daha geniş bölgenin adını gösterebilir. Bu, vakitleri çok az değiştirir: 16 km yaklaşık bir dakikaya denk gelir. Ad size yanlış görünüyorsa nerede olduğunuzu aşağıya yazın.</string>
     <string name="action_use_my_location">Şu anki konumumu kullan</string>
-    <string name="location_sheet_search_heading">Ya da bir şehir yazın</string>
+    <string name="location_sheet_search_heading">Ya da nerede olduğunuzu yazın</string>
 
     <!-- Export -->
     <string name="action_save_timetable">Vakit çizelgesini PDF olarak kaydet</string>
@@ -172,7 +172,7 @@
     <string name="settings_method_auto">Otomatik · %1$s</string>
     <string name="settings_method_help">Camiler alacakaranlığı farklı ölçer. Bu da en çok Sabah ve Yatsı vakitlerini etkiler. Ne kadar kuzeyde yaşarsanız fark o kadar büyür. Bu vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve burada o yöntemi seçin.</string>
 
-    <string name="settings_alerts_help">Bildirim: telefonunuzun olağan sesiyle bir mesaj. Alarm: ezanı ya da seçtiğiniz sesi çalar.</string>
+    <string name="settings_alerts_help">Bildirim: bildirim sesini çalar ve titreşir. Alarm: alarm sesini alarm ses düzeyinde çalar ve titreşir. Her iki sesi de Ayarlar\'da, Namaz uyarılarının hemen altında seçin.</string>
     <string name="alert_style_off">Kapalı</string>
     <string name="alert_style_notification">Bildirim</string>
     <string name="alert_style_alarm">Alarm</string>
@@ -180,6 +180,10 @@
     <string name="settings_alarm_sound">Alarm sesi</string>
     <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
     <string name="settings_alarm_sound_phone">Telefonunuzdan</string>
+    <string name="settings_notification_sound">Bildirim sesi</string>
+    <string name="settings_notification_sound_default">Telefonunuzun olağan sesi</string>
+    <string name="settings_notification_sound_help">Namaz bildirimi geldiğinde bildirim ses düzeyinde çalar. Telefonunuzun sessiz, titreşim ve Rahatsız Etmeyin ayarları yine geçerlidir.</string>
+    <string name="settings_alarm_sound_help">Alarm seçilen namazlar için alarm ses düzeyinde çalar.</string>
     <string name="settings_alarm_play_on_silent">Sessizdeyken de çal</string>
     <string name="settings_alarm_play_on_silent_desc">Telefon sessizde veya Rahatsız Etmeyin modundayken de çalar. Kapalı: yalnızca bildirim ve titreşim.</string>
     <string name="adhan_builtin">Ezan</string>
@@ -384,12 +388,12 @@
     <string name="ramadan_eve_brief">Caminiz bir gün sonra başlayabilir.</string>
     <string name="polar_notice_brief">Burada Sabah ve Yatsı %1$d° enlemine göre hesaplanır.</string>
     <string name="action_set_location">Konumu ayarla</string>
-    <string name="city_lookup_offline">İnternet bağlantısı yok. Şehir aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>
+    <string name="city_lookup_offline">İnternet bağlantısı yok. Bir yer aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>
     <string name="about_rate">SajdaTime\'ı Google Play\'de puanlayın</string>
     <string name="about_rate_desc">Mağaza sayfasını açar.</string>
     <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
     <string name="alert_choice_a11y">%2$s için %1$s</string>
-    <string name="location_permission_denied">Konum izni verilmedi. Şehrinizi aşağıya yazın ya da yeniden denemek için Konuma izin ver\'e dokunun.</string>
+    <string name="location_permission_denied">Konum izni verilmedi. Nerede olduğunuzu aşağıya yazın ya da yeniden denemek için Konuma izin ver\'e dokunun.</string>
     <string name="confirm_notifications_hint">%1$s düğmesine dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
     <string name="about_share">SajdaTime\'ı paylaş</string>
     <string name="about_share_desc">Bağlantıyı ailenize ve arkadaşlarınıza gönderin.</string>

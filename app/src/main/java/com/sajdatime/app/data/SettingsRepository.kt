@@ -103,6 +103,16 @@ data class AppSettings(
     /** The phone sound a built-in adhan replaced, so the phone's own picker can open on it. */
     val phoneAlarmSoundUri: String = "",
     /**
+     * Chosen sound for [AlertStyle.NOTIFICATION] (owner, 18 Oct 2026: "user can select adhan or another
+     * sound for an alarm or notification"). Empty means the phone's usual notification tone, which is
+     * what every notification played before this existed, so nobody's sound changes until they pick one.
+     * It plays on the notification volume, so silent, vibrate and Do Not Disturb treat it like any
+     * other notification.
+     */
+    val notificationSoundUri: String = "",
+    /** As [phoneAlarmSoundUri], for the notification sound. */
+    val phoneNotificationSoundUri: String = "",
+    /**
      * Whether a prayer whose time had to be projected from another latitude may still ring
      * as a full alarm. **Off by default** — those days drop to a notification.
      *
@@ -223,6 +233,11 @@ data class AppSettings(
         get() = alertFor.containsValue(AlertStyle.ALARM) ||
             (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.ALARM)
 
+    /** True when any prayer or the suhoor reminder is a notification, so the notification sound applies. */
+    val usesNotification: Boolean
+        get() = alertFor.containsValue(AlertStyle.NOTIFICATION) ||
+            (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.NOTIFICATION)
+
     companion object {
         /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
         val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
@@ -311,6 +326,10 @@ class SettingsRepository(private val context: Context) {
         // adhan follows the school (alarmSoundForSect). Nothing else about the sound changes.
         val sound = it[Keys.ALARM_SOUND] ?: ""
         it[Keys.ALARM_SOUND] = alarmSoundForSect(sect, sound, it[Keys.PHONE_ALARM_SOUND] ?: "", context.packageName)
+        val notificationSound = it[Keys.NOTIFICATION_SOUND] ?: ""
+        it[Keys.NOTIFICATION_SOUND] = alarmSoundForSect(
+            sect, notificationSound, it[Keys.PHONE_NOTIFICATION_SOUND] ?: "", context.packageName,
+        )
     }
 
     suspend fun setMadhab(madhab: Madhab) = edit { it[Keys.MADHAB] = madhab.name }
@@ -370,6 +389,16 @@ class SettingsRepository(private val context: Context) {
         val current = it[Keys.ALARM_SOUND] ?: ""
         if (BuiltInAdhan.of(current) == null) it[Keys.PHONE_ALARM_SOUND] = current
         it[Keys.ALARM_SOUND] = adhan.uri(context.packageName)
+    }
+
+    /** A sound from the phone's own list, or "" for the phone's usual notification tone. */
+    suspend fun setNotificationSound(uri: String) = edit { it[Keys.NOTIFICATION_SOUND] = uri }
+
+    /** [setBuiltInAdhan], for the notification sound. */
+    suspend fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) = edit {
+        val current = it[Keys.NOTIFICATION_SOUND] ?: ""
+        if (BuiltInAdhan.of(current) == null) it[Keys.PHONE_NOTIFICATION_SOUND] = current
+        it[Keys.NOTIFICATION_SOUND] = adhan.uri(context.packageName)
     }
 
     suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
@@ -455,6 +484,8 @@ class SettingsRepository(private val context: Context) {
          * Absent until a built-in adhan is first chosen, and only read while one is.
          */
         val PHONE_ALARM_SOUND = stringPreferencesKey("phone_alarm_sound")
+        val NOTIFICATION_SOUND = stringPreferencesKey("notification_sound")
+        val PHONE_NOTIFICATION_SOUND = stringPreferencesKey("phone_notification_sound")
         val ALARM_ON_APPROXIMATE = booleanPreferencesKey("alarm_on_approximate_days")
 
         // Read but never written: the two keys ALERTS replaced. Kept so that an existing
@@ -506,6 +537,8 @@ class SettingsRepository(private val context: Context) {
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
             phoneAlarmSoundUri = this[Keys.PHONE_ALARM_SOUND] ?: "",
+            notificationSoundUri = this[Keys.NOTIFICATION_SOUND] ?: "",
+            phoneNotificationSoundUri = this[Keys.PHONE_NOTIFICATION_SOUND] ?: "",
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             analyticsEnabled = this[Keys.ANALYTICS] ?: false,

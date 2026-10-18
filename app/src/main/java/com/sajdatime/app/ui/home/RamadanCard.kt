@@ -84,7 +84,7 @@ internal fun RamadanSection(
     val dismissed = settings.ramadanNoticeDismissedYear == info.hijriYear
     val noticeDay = info.showsNotice(ramadan.today.date) && !dismissed
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     if (info.isRamadan) {
         RamadanCard(
             ramadan = ramadan,
@@ -207,7 +207,7 @@ private fun RamadanCard(
                     color = scheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                CtaButton(onClick = onShiftDate) {
+                CtaButton(onClick = onShiftDate, compact = true) {
                     Text(stringResource(R.string.settings_hijri_offset_label))
                 }
             }
@@ -221,7 +221,7 @@ private fun RamadanCard(
             // The whole month, on screen. A button with words, not an icon: it is the one
             // action on the card and the thing a person comes to it for in the second week.
             // Solid, like every action (owner, 18 Oct 2026).
-            CtaButton(onClick = onOpenTimetable) {
+            CtaButton(onClick = onOpenTimetable, compact = true) {
                 Text(stringResource(R.string.ramadan_open_timetable))
             }
             // 48dp target: this is the only way to the explanation, and it is small.

@@ -89,6 +89,31 @@ class DesignRulesTest {
     private fun isDeclaration(text: String, at: Int) = text.substring(maxOf(0, at - 4), at) == "fun "
 
     /**
+     * Every CtaButton states its size (DESIGN_SYSTEM 4.1, "Width" and "Height"): full width when it stands
+     * alone, a share of the row (weight) beside another button, or compact when it shares a line with a
+     * heading or a sentence. A bare CtaButton(onClick) is the one that looked squashed beside "Today"
+     * (owner, 18 Oct 2026: "save PDF button is too large and squashing").
+     */
+    @Test
+    fun `every call to action states its size`() {
+        val found = sources.filter { it.name != "CtaButton.kt" }.flatMap { file ->
+            val text = file.readText()
+            Regex("""(?<![A-Za-z])CtaButton\(""").findAll(text).mapNotNull { m ->
+                var i = m.range.last + 1
+                var depth = 1
+                while (depth > 0) {
+                    when (text[i]) { '(' -> depth++; ')' -> depth-- }
+                    i++
+                }
+                val args = text.substring(m.range.last + 1, i - 1)
+                val sized = "fillMaxWidth" in args || "weight(" in args || "compact = true" in args
+                if (sized) null else "${file.name}:${text.take(m.range.first).count { it == '\n' } + 1}"
+            }.toList()
+        }
+        assertTrue("Give these CtaButtons fillMaxWidth, a weight, or compact = true: $found", found.isEmpty())
+    }
+
+    /**
      * Every dialog the user can simply leave shows a close X at the top right (DialogTitle).
      * The exceptions must be answered, never closed: the first run disclaimer (MainActivity)
      * and the usage counts question, where an X would be an answer nobody gave.

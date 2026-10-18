@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,7 +57,7 @@ internal fun EidSection(state: UiState, onDismiss: (code: Int) -> Unit) {
     val eid = state.eid ?: return
     if (!eid.isUnseen(state.settings.eidGreetingDismissedCode)) return
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     EidCard(eid = eid.eid, onDismiss = { onDismiss(eid.code) })
 }
 

@@ -180,7 +180,7 @@ fun HomeScreen(
         // and note that the column stays `verticalScroll` on purpose so that a screen
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
         LocationHeader(state = state, now = state.now, onClick = { locationSheet = true })
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Group))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
@@ -200,7 +200,7 @@ fun HomeScreen(
             onDismissNotice = onDismissRamadanNotice,
         )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Group))
         TodayTimeline(state, onExport = { exportSheet = true })
         MosqueDifferenceDoor(
             state = state,
@@ -519,7 +519,7 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
         state.settings.method == CalcMethod.AUTO &&
         latitude != null && abs(latitude) >= METHOD_NOTICE_LATITUDE
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     if (loud) {
         Notice(
             title = stringResource(R.string.method_notice_title),
@@ -694,7 +694,7 @@ private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onCl
 @Composable
 private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
     if (!state.settings.usingDefaultLocation) return
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     Notice(
         title = stringResource(R.string.home_default_location_title),
         brief = stringResource(R.string.home_default_location_body),
@@ -732,7 +732,7 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
 @Composable
 private fun PolarBanner(state: UiState) {
     val from = state.today?.approximatedFrom ?: return
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     // The alarm sentence is added only when it is both true and about to matter: the user
     // has set at least one alarm, and has not already turned the override on. Without it the
     // only way to learn that today's alarms will not ring is to not be woken by one. With it
@@ -754,7 +754,7 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     if (PrayerAlarmScheduler.canScheduleExact(context)) return
     if (state.settings.exactAlarmNoticeDismissed) return
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     PermissionCard(
         title = stringResource(R.string.settings_exact_alarms_title),
         body = stringResource(R.string.settings_exact_alarms_brief),
@@ -775,6 +775,8 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     // button under everything, and on a 20:9 phone it was the thing that fell below the
     // fold; beside the list it exports it costs no height at all and reads as what it is —
     // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
+    // Compact (40dp drawn, 48dp to touch) and 8dp above the list it saves, 16dp under the card:
+    // at full size it looked squashed between the two (owner, 18 Oct 2026, screenshot).
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
@@ -786,12 +788,13 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                 .weight(1f)
                 .semantics { heading() },
         )
-        CtaButton(onClick = onExport) {
+        CtaButton(onClick = onExport, compact = true) {
             Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(Space.Related))
             Text(stringResource(R.string.action_save_pdf))
         }
     }
+    Spacer(Modifier.height(Space.Related))
 
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }

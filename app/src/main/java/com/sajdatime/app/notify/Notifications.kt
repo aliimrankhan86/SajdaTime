@@ -17,6 +17,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.R
 import com.sajdatime.core.AppLocale
@@ -52,6 +53,13 @@ object Notifications {
      * tone means a new channel id and the old channel is deleted.
      */
     private const val CHANNEL_ALARM_PREFIX = "prayer_alarm_v"
+
+    /**
+     * A notification with a chosen sound (18 Oct 2026). Versioned by sound for the same reason as the
+     * alarm. With no sound chosen, notifications stay on [CHANNEL_PRAYERS] exactly as before, so an
+     * existing user's channel, and anything they changed on it in system settings, is untouched.
+     */
+    private const val CHANNEL_NOTIFICATION_PREFIX = "prayer_notif_v"
 
     const val ID_ONGOING = 1000
     private const val ID_PRAYER_BASE = 2000
@@ -182,6 +190,48 @@ object Notifications {
         return id
     }
 
+    internal fun notificationChannelId(soundUri: String): String =
+        if (soundUri.isBlank()) CHANNEL_PRAYERS else CHANNEL_NOTIFICATION_PREFIX + soundUri.hashCode().toUInt().toString(16)
+
+    /**
+     * The channel a prayer notification posts on: [CHANNEL_PRAYERS] for the phone's usual tone, or one
+     * made for the chosen sound. It plays on the notification volume (USAGE_NOTIFICATION), so the
+     * phone's silent, vibrate and Do Not Disturb settings apply to it like any other notification,
+     * which is the behaviour the owner chose ("follow the phone", 18 Oct 2026). Never bypasses
+     * Do Not Disturb: only an Alarm with "Play on silent" does that.
+     */
+    fun ensureNotificationChannel(context: Context, soundUri: String): String {
+        val id = notificationChannelId(soundUri)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+        val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+
+        manager.notificationChannels
+            .filter { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) && it.id != id }
+            .forEach { manager.deleteNotificationChannel(it.id) }
+
+        if (id == CHANNEL_PRAYERS || manager.getNotificationChannel(id) != null) return id
+
+        manager.createNotificationChannel(
+            NotificationChannel(
+                id,
+                context.getString(R.string.channel_prayers),
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = context.getString(R.string.channel_prayers_desc)
+                enableVibration(true)
+                vibrationPattern = PRAYER_VIBRATION
+                setSound(
+                    soundUri.toUri(),
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build(),
+                )
+            },
+        )
+        return id
+    }
+
     fun canPost(context: Context): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
@@ -252,6 +302,7 @@ object Notifications {
         respectSilent: Boolean,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
+        notificationSoundUri: String = "",
     ) {
         // Everything below builds text the user reads, so it is built from a context
         // pinned to the app's own language rather than the device's. Wrapped here at the
@@ -269,7 +320,7 @@ object Notifications {
             phoneIsSilenced = { phoneIsSilenced(context) },
         )
 
-        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri))
+        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri, notificationSoundUri))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_prayer_title, slot.label(context)))
             .setContentText(
@@ -283,7 +334,7 @@ object Notifications {
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
-            .applyStyle(effectiveStyle, alarmSoundUri)
+            .applyStyle(effectiveStyle, alarmSoundUri, notificationSoundUri)
 
         post(context, ID_PRAYER_BASE + slot.ordinal, builder.build())
     }
@@ -310,6 +361,7 @@ object Notifications {
         respectSilent: Boolean,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
+        notificationSoundUri: String = "",
     ) {
         val context = AppLocale.wrap(base)
         if (!canPost(context)) return
@@ -324,7 +376,7 @@ object Notifications {
         )
 
         val shownFrom = fajrAt.minusSeconds(60L * suhoorMinutesLeft(now, fajrAt))
-        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri))
+        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri, notificationSoundUri))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_suhoor_title, TimeFormat.clock(context, fajrAt)))
             .setContentText(
@@ -339,7 +391,7 @@ object Notifications {
             .setTimeoutAfter(Duration.between(now, fajrAt).toMillis().coerceAtLeast(1L))
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
-            .applyStyle(effectiveStyle, alarmSoundUri)
+            .applyStyle(effectiveStyle, alarmSoundUri, notificationSoundUri)
 
         post(context, ID_SUHOOR, builder.build())
     }
@@ -390,9 +442,9 @@ object Notifications {
     }
 
     /** The channel an alert of [style] belongs on; the alarm channel is created on demand. */
-    private fun alertChannelId(context: Context, style: AlertStyle, alarmSoundUri: String): String =
+    private fun alertChannelId(context: Context, style: AlertStyle, alarmSoundUri: String, notificationSoundUri: String): String =
         when (style) {
-            AlertStyle.NOTIFICATION -> CHANNEL_PRAYERS
+            AlertStyle.NOTIFICATION -> ensureNotificationChannel(context, notificationSoundUri)
             AlertStyle.ALARM -> ensureAlarmChannel(context, alarmSoundUri)
         }
 
@@ -400,11 +452,21 @@ object Notifications {
     private fun NotificationCompat.Builder.applyStyle(
         style: AlertStyle,
         alarmSoundUri: String,
+        notificationSoundUri: String,
     ): NotificationCompat.Builder {
         when (style) {
-            AlertStyle.NOTIFICATION ->
+            AlertStyle.NOTIFICATION -> {
                 setCategory(NotificationCompat.CATEGORY_REMINDER)
                     .setVibrate(PRAYER_VIBRATION)
+                // Below Android O there is no channel to carry a sound, so it rides on the notification.
+                // Until 18 Oct 2026 nothing was set here, so on Android 7 a "Notification" only buzzed,
+                // although the Prayer alerts text promised the phone's usual tone. Blank is that tone.
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    val sound = notificationSoundUri.takeIf { it.isNotBlank() }?.let(Uri::parse)
+                        ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+                    setSound(sound, AudioManager.STREAM_NOTIFICATION)
+                }
+            }
 
             AlertStyle.ALARM -> {
                 setCategory(NotificationCompat.CATEGORY_ALARM)

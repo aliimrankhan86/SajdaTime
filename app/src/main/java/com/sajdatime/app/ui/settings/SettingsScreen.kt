@@ -13,6 +13,7 @@ import android.os.Build
 import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.app.ui.components.rememberGranted
 import android.media.RingtoneManager
+import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -44,6 +45,7 @@ import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.outlined.MoreTime
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
@@ -115,7 +117,9 @@ import java.time.LocalDate
  * chooser that answers them, rather than to the top of Settings with the row left to find.
  * See [SettingsScreen]'s `request` parameter.
  */
-enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER }
+enum class SettingsChooser {
+    SCHOOL, METHOD, ADJUSTMENTS, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+}
 
 @Composable
 fun SettingsScreen(
@@ -143,6 +147,8 @@ fun SettingsScreen(
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
+    onPickNotificationSound: () -> Unit,
+    onPickBuiltInNotificationAdhan: (BuiltInAdhan) -> Unit,
     onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
@@ -266,10 +272,31 @@ fun SettingsScreen(
         },
     )
 
+    // The two sounds, each a row of its own under Prayer alerts (owner, 18 Oct 2026). The alarm sound
+    // used to sit at the foot of the Prayer alerts dialog, below a fold with nothing showing there was
+    // more, so he never found "From your phone". A row says what is chosen without opening anything.
+    // Each appears only while some prayer (or suhoor) uses that style, like the alarm sound did.
+    val notificationSound = SoundChoice(
+        sect = settings.sect,
+        uri = settings.notificationSoundUri,
+        defaultLabel = R.string.settings_notification_sound_default,
+        onPickPhone = onPickNotificationSound,
+        onPickBuiltIn = onPickBuiltInNotificationAdhan,
+    )
+    val alarmSound = SoundChoice(
+        sect = settings.sect,
+        uri = settings.alarmSoundUri,
+        defaultLabel = R.string.settings_alarm_sound_default,
+        onPickPhone = onPickAlarmSound,
+        onPickBuiltIn = onPickBuiltInAdhan,
+        respectsSilent = settings.alarmRespectsSilent,
+        onSetRespectsSilent = onSetAlarmRespectsSilent,
+    )
+
     val reminders = SettingsSection(
         SettingsSectionId.REMINDERS,
         stringResource(R.string.settings_group_reminders),
-        listOf(
+        listOfNotNull(
             // One row, not two. "Which prayers" and "How you are told" were separate
             // choosers answering halves of the same question, and between them they could
             // not express "wake me for Fajr, a quiet notification for the rest" — which is
@@ -281,6 +308,20 @@ fun SettingsScreen(
                 subtitle = alertSummary(settings.alertFor),
                 onClick = { open = SettingsChooser.ALERTS },
             ),
+            SettingsItem.Link(
+                key = "notification_sound",
+                icon = Icons.Outlined.MusicNote,
+                title = stringResource(R.string.settings_notification_sound),
+                subtitle = soundSummary(notificationSound),
+                onClick = { open = SettingsChooser.NOTIFICATION_SOUND },
+            ).takeIf { settings.usesNotification },
+            SettingsItem.Link(
+                key = "alarm_sound",
+                icon = Icons.Outlined.MusicNote,
+                title = stringResource(R.string.settings_alarm_sound),
+                subtitle = soundSummary(alarmSound),
+                onClick = { open = SettingsChooser.ALARM_SOUND },
+            ).takeIf { settings.usesAlarm },
             // Off until chosen (1.5.0): a quiet heads up a few minutes before the prayers picked.
             SettingsItem.Link(
                 key = "prayer_reminder",
@@ -470,11 +511,24 @@ fun SettingsScreen(
         SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
             showAlarmOptions = settings.usesAlarm,
-            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan, settings.alarmRespectsSilent, onSetAlarmRespectsSilent),
             alarmOnApproximate = settings.alarmOnApproximateDays,
             hasApproximateDays = rememberHasApproximateDays(settings),
             onSetAlert = onSetAlert,
             onSetAlarmOnApproximate = onSetAlarmOnApproximateDays,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.NOTIFICATION_SOUND -> SoundDialog(
+            title = stringResource(R.string.settings_notification_sound),
+            help = stringResource(R.string.settings_notification_sound_help),
+            sound = notificationSound,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.ALARM_SOUND -> SoundDialog(
+            title = stringResource(R.string.settings_alarm_sound),
+            help = stringResource(R.string.settings_alarm_sound_help),
+            sound = alarmSound,
             onDismiss = { open = null },
         )
 
@@ -489,7 +543,6 @@ fun SettingsScreen(
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
-            sound = AlarmSound(settings.sect, settings.alarmSoundUri, onPickAlarmSound, onPickBuiltInAdhan, settings.alarmRespectsSilent, onSetAlarmRespectsSilent),
             onSetMinutes = onSetSuhoorMinutes,
             onSetStyle = onSetSuhoorStyle,
             onDismiss = { open = null },
@@ -766,15 +819,14 @@ private fun MethodPickerDialog(
  * alarm — chosen per prayer, because "wake me for Fajr, do not shout at me for Dhuhr" is
  * the request this screen exists to answer.
  *
- * The alarm sound appears only once at least one prayer is set
- * to Alarm, rather than sitting greyed out for the majority who never leave the default.
+ * The sounds are not here: since 18 Oct 2026 each is its own Settings row (see the rows above), because
+ * at the foot of this dialog the alarm sound sat below a fold and the owner never found it.
  */
 @Composable
 private fun AlertsDialog(
     alertFor: Map<PrayerSlot, AlertStyle>,
-    /** True when any prayer or the suhoor reminder is an alarm, so the sound choice applies. */
+    /** True when any prayer or the suhoor reminder is an alarm, so the approximate days switch applies. */
     showAlarmOptions: Boolean,
-    sound: AlarmSound,
     alarmOnApproximate: Boolean,
     hasApproximateDays: Boolean,
     onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
@@ -797,22 +849,19 @@ private fun AlertsDialog(
             )
         }
 
-        if (showAlarmOptions) {
+        // Only for the few thousand people on earth this can ever apply to. Everyone
+        // below the polar circles has no approximated days, so the switch would be a
+        // question about astronomy they will never meet — and this app is used by
+        // people who have never opened a settings screen. See rememberHasApproximateDays.
+        if (showAlarmOptions && hasApproximateDays) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            AlarmSoundChoices(sound)
-            // Only for the few thousand people on earth this can ever apply to. Everyone
-            // below the polar circles has no approximated days, so the switch would be a
-            // question about astronomy they will never meet — and this app is used by
-            // people who have never opened a settings screen. See rememberHasApproximateDays.
-            if (hasApproximateDays) {
-                SwitchRow(
-                    title = stringResource(R.string.settings_alarm_on_approximate),
-                    subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
-                    checked = alarmOnApproximate,
-                    onCheckedChange = onSetAlarmOnApproximate,
-                    horizontalPadding = 0.dp,
-                )
-            }
+            SwitchRow(
+                title = stringResource(R.string.settings_alarm_on_approximate),
+                subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
+                checked = alarmOnApproximate,
+                onCheckedChange = onSetAlarmOnApproximate,
+                horizontalPadding = 0.dp,
+            )
         }
     }
 }
@@ -859,32 +908,61 @@ private fun PrayerReminderDialog(
     }
 }
 
-/** What the alarm sound choices need: the school decides whether the built-in adhans are offered. */
-private class AlarmSound(
+/**
+ * What a sound chooser needs, for the notification sound or the alarm sound: the school decides which
+ * built-in adhan is offered. Only the alarm carries "Play on silent" ([onSetRespectsSilent] non null):
+ * a notification always follows the phone's silent and Do Not Disturb settings (owner, 18 Oct 2026).
+ */
+private class SoundChoice(
     val sect: Sect,
     val uri: String,
+    @StringRes val defaultLabel: Int,
     val onPickPhone: () -> Unit,
     val onPickBuiltIn: (BuiltInAdhan) -> Unit,
-    val respectsSilent: Boolean,
-    val onSetRespectsSilent: (Boolean) -> Unit,
+    val respectsSilent: Boolean = true,
+    val onSetRespectsSilent: ((Boolean) -> Unit)? = null,
 )
 
+/** What a sound row says is chosen: "Adhan", the phone sound's own name, or the phone's default. */
+@Composable
+private fun soundSummary(sound: SoundChoice): String {
+    val builtIn = BuiltInAdhan.of(sound.uri)
+    val title = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
+    return when {
+        builtIn != null -> stringResource(builtIn.labelRes)
+        else -> title ?: stringResource(sound.defaultLabel)
+    }
+}
+
+/** One sound: a line on when it plays, then the choices. */
+@Composable
+private fun SoundDialog(title: String, help: String, sound: SoundChoice, onDismiss: () -> Unit) {
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Text(
+            text = help,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(8.dp))
+        SoundChoices(sound)
+    }
+}
+
 /**
- * The alarm sound, shared by the prayer alerts and the suhoor reminder: the built-in adhan for the
+ * A sound, for notifications or alarms: the built-in adhan for the
  * user's school (1.5.0; Sunni and Shia each have their own, data/BuiltInAdhan.kt), then "From your
  * phone" (the system picker: alarms, ringtones and any audio the user has added), as one radio group.
  * Under the phone row, the tone chosen there, because naming it is the only confirmation the pick
- * stuck. Then "Play on silent".
+ * stuck. Then, for the alarm only, "Play on silent".
  *
  * The 1.5.0 "No Shia adhan yet" notice that stood here was removed the same day, when a Shia adhan
  * with a clean licence was found, as its own rule required.
  */
 @Composable
-private fun AlarmSoundChoices(sound: AlarmSound) {
+private fun SoundChoices(sound: SoundChoice) {
     val builtIn = BuiltInAdhan.of(sound.uri)
     val phoneTitle = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
-        ?: stringResource(R.string.settings_alarm_sound_default)
-    SectionLabel(stringResource(R.string.settings_alarm_sound))
+        ?: stringResource(sound.defaultLabel)
     Column(Modifier.selectableGroup()) {
         BuiltInAdhan.forSect(sound.sect).forEach { adhan ->
             RadioRow(
@@ -902,7 +980,7 @@ private fun AlarmSoundChoices(sound: AlarmSound) {
             onSelect = sound.onPickPhone,
         )
     }
-    PlayOnSilentRow(sound)
+    sound.onSetRespectsSilent?.let { PlayOnSilentRow(sound.respectsSilent, it) }
 }
 
 /**
@@ -912,12 +990,12 @@ private fun AlarmSoundChoices(sound: AlarmSound) {
  * inverted, as `alarmRespectsSilent`, so every existing user keeps the choice they made.
  */
 @Composable
-private fun PlayOnSilentRow(sound: AlarmSound) {
+private fun PlayOnSilentRow(respectsSilent: Boolean, onSetRespectsSilent: (Boolean) -> Unit) {
     SwitchRow(
         title = stringResource(R.string.settings_alarm_play_on_silent),
         subtitle = stringResource(R.string.settings_alarm_play_on_silent_desc),
-        checked = !sound.respectsSilent,
-        onCheckedChange = { sound.onSetRespectsSilent(!it) },
+        checked = !respectsSilent,
+        onCheckedChange = { onSetRespectsSilent(!it) },
         horizontalPadding = 0.dp,
     )
 }
@@ -926,15 +1004,13 @@ private fun PlayOnSilentRow(sound: AlarmSound) {
  * The suhoor reminder: off, or 15, 30, 45 or 60 minutes before Fajr, and how it announces itself.
  *
  * It is a second heads up and not a ruling: suhoor ends at Fajr, and the reminder is simply earlier
- * than that by the amount the person picked. When it is an alarm, the sound is the same setting the
- * prayer alerts use, shown here too so a person who only wants the reminder never has to go and find
- * it elsewhere.
+ * than that by the amount the person picked. Its sound is the Notification sound or Alarm sound row,
+ * which appears in Settings as soon as the style here is chosen (18 Oct 2026: one place for each sound).
  */
 @Composable
 private fun SuhoorDialog(
     minutes: Int,
     style: AlertStyle,
-    sound: AlarmSound,
     onSetMinutes: (Int) -> Unit,
     onSetStyle: (AlertStyle) -> Unit,
     onDismiss: () -> Unit,
@@ -972,10 +1048,6 @@ private fun SuhoorDialog(
                     selected = style == AlertStyle.ALARM,
                     onClick = { onSetStyle(AlertStyle.ALARM) },
                 )
-            }
-            if (style == AlertStyle.ALARM) {
-                Spacer(Modifier.height(8.dp))
-                AlarmSoundChoices(sound)
             }
         }
     }

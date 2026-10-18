@@ -1528,6 +1528,33 @@ protection, Dependabot alerts, and private vulnerability reporting (these four a
 - The listing's short and full descriptions are unchanged; any change is the owner's decision. The 1.5.0
   What's new carries one line.
 
+### 5.25 Two sounds, each its own Settings row; notifications follow the phone (owner, 18 Oct 2026, 1.5.0)
+
+- **Notification sound and Alarm sound are rows under Prayer alerts**, each showing what is chosen ("Adhan",
+  the phone sound's name, or the phone's default), each opening Adhan / From your phone. A row appears only
+  while some prayer or the suhoor reminder uses that style. Why rows: at the foot of the Prayer alerts dialog
+  the alarm sound sat below a fold with nothing showing there was more, and the owner, looking for a way to
+  pick a phone sound, never found the "From your phone" that was already there. He chose rows (asked, three
+  options). Then he asked for the same choice for notifications: "user can select adhan or another sound
+  for an alarm or notification".
+- **Nobody's sound changes on upgrade.** `notification_sound` is empty by default, and empty keeps every
+  notification on the original `prayer_times` channel, untouched (anything the user changed on it in system
+  settings survives). A chosen sound gets a channel `prayer_notif_v<hash>`, created on first post, the same
+  versioning as the alarm (§6), with `USAGE_NOTIFICATION`, the two pulse vibration and **no Do Not Disturb
+  bypass**. A chosen adhan follows the school like the alarm's (`setSect`).
+- **Vibration, as he chose ("follow the phone"):** every prayer notification, alarm, suhoor reminder and
+  heads up vibrates (each channel `enableVibration(true)`). Ring mode: sound and buzz. Vibrate: buzz. Silent:
+  Android stops the buzz too, deliberately left alone (forcing it would override the person's mute). Do Not
+  Disturb: nothing, unless the alarm's "Play on silent" is on. `NotificationSoundTest` pins the no bypass and
+  the vibration in source.
+- **Fixed on the way: Android 7 notifications made no sound.** Below Android O there are no channels, and the
+  notification style set only a vibration, so on Android 7 a "Notification" buzzed silently although Prayer
+  alerts promised the phone's usual tone. It now sets the chosen sound or the default notification tone.
+  **Not verified on an Android 7 device or emulator**: reasoned from the platform, compiled and unit tested.
+- **Not verified on any device:** that a long adhan as a notification plays in full and stops when the
+  notification is swiped away. Both are Android's own notification sound handling; check on the emulator.
+- No network, no permission, no usage counts event, no privacy change: the sound choice stays on the phone.
+
 ### 5.24 Security hardening (17 Oct 2026, owner: "improve the security ... apply the best possible solution", ships in 1.5.0)
 
 Builds on §5.21. Audit first, then only changes worth their cost. The app has no server, no account and no secret
@@ -5042,7 +5069,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**NEWEST, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
+**NEWEST, 18 Oct 2026 late night: three fixes from his emulator screenshots, on `ccr-23a38578-c5vz7d`, NOT yet merged into `claude/quiet-glass`** (his rule: screenshots first, merge after he approves).
+(1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, measured
+by tapping outside the edge in Robolectric) for every button beside text, Times block gaps on the `Space`
+scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
+help; chosen "Or type where you are" / "Town, city or village" / his examples "Karachi, London, Makkah, New
+York", in all five languages (DESIGN_SYSTEM §9 has the reasoning and what was rejected). (3) Sounds: a
+Notification sound row and an Alarm sound row under Prayer alerts (§5.25), because "From your phone" was hidden
+below a fold. Asked with AskUserQuestion: rows chosen; vibration "follow the phone". Screenshots he was sent:
+`docs/plans/2026-10-times-gloss/round-times.png`, `round-sounds.png`, `round-place.png`,
+`round-settings.png`, `round-ramadan.png`. **Not verified on a device**: sound playback, Android 7. Next: his
+verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it").
+
+**Earlier, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
 He asked to move from the cloud session to his own computer with everything merged and recorded.
 A session on his Mac starts here: this block, then `docs/DESIGN_SYSTEM.md` §0 (when to ask him) and
 §4.1 (every button). **Next, in this order:** (1) he installs the build and gives his verdict (commands
@@ -9168,3 +9207,9 @@ matters more than the stable hashes, that is the trade being made.
     and screenshots (§0.2) rather than build a guess; keep undecided questions in §11, not in your
     head. `DesignRulesTest` now fails when a file with a button is missing from the inventory, so a
     new button cannot skip the spec.
+147. **A feature below a fold with no cue does not exist for the person looking for it.** On 18 Oct 2026
+    the owner asked for a way to pick a sound from his phone. It had been there since 1.3: "From your
+    phone", at the foot of the Prayer alerts dialog, under five rows of chips, in a scrolling box with no
+    sign it scrolled. His screenshot ended at "Adhan". Before saying "it already exists", render the screen
+    at a real phone height (411 by 891dp) and look at what shows without scrolling. A choice people must
+    find goes where it is seen first: here, its own Settings row with the current value under it.
