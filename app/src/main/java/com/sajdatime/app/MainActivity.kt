@@ -1,5 +1,6 @@
 package com.sajdatime.app
 
+import com.sajdatime.app.ui.components.CtaButton
 import android.Manifest
 import android.content.ClipData
 import android.content.Context
@@ -28,7 +29,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -340,7 +340,7 @@ internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
         // not read as pressable — a tester said so. 56dp clears the
         // 48dp minimum touch target with room for shaky hands.
         confirmButton = {
-            Button(
+            CtaButton(
                 onClick = onUnderstood,
                 modifier = Modifier
                     .fillMaxWidth()

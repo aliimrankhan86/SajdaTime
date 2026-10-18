@@ -108,7 +108,7 @@ fun PermissionButton(
             colors = if (amber) {
                 ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
             } else {
-                ButtonDefaults.buttonColors()
+                ctaButtonColors()
             },
         ) {
             Text(label)

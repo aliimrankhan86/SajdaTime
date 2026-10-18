@@ -109,7 +109,7 @@ fun Notice(
     }
     val buttonColors = when (tone) {
         NoticeTone.WARNING -> ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
-        NoticeTone.QUIET -> ButtonDefaults.buttonColors()
+        NoticeTone.QUIET -> ctaButtonColors()
     }
     // 24, the same as every other card: at 20 a notice between two 24dp cards read as a mistake.
     val shape = RoundedCornerShape(24.dp)

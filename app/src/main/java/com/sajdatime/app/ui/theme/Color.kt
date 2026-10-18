@@ -122,6 +122,12 @@ val LightOnHeroSecondary = Color(0xFF3E5C4C)
 // sheen over the top half that fades out by the middle, a white rim brightest at the top, and a
 // soft green shadow. The sheen only ever lightens the mint stop, so it can only raise the
 // contrast of the dark inks on it; ColorContrastTest checks the composite anyway.
+// The call to action fill and its text (owner, 18 Oct 2026: solid, white text, hard to miss).
+// Light is primary; dark is its own green because dark primary (#4FC48F) cannot carry white text.
+val LightCta = Color(0xFF0B5A43)
+val DarkCta = Color(0xFF17805A)
+val OnCta = Color(0xFFFFFFFF)
+
 val LightHeroSheen = Color(0x99FFFFFF)
 val LightHeroRim = Color(0xCCFFFFFF)
 val LightHeroRimBottom = Color(0x33FFFFFF)

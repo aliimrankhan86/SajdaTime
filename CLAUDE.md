@@ -205,8 +205,10 @@ session inherits it instead of relearning it.
 
 - **Rules he has had to repeat, so never again** (18 Oct 2026, `docs/DESIGN_SYSTEM.md` §2 and
   §4, `DesignRulesTest`): every gap comes from `Space` by relationship, never by eye; no two icon
-  buttons side by side (a close X stands alone at the top right); every call to action is a solid
-  button, never outlined or a bare link; every dismissable dialog has the close X. And before he
+  buttons side by side (a close X stands alone at the top right); **every call to action is a
+  `CtaButton`: solid green with white bold text, never outlined, never tonal, never pale, never a
+  bare link** (he asked many times; tonal was tried for a day and failed); every dismissable dialog
+  has the close X. And before he
   tests on the emulator, make sure the build on it is the new one: give the install command, and
   never let him judge a change on a stale install.
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an

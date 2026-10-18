@@ -3,7 +3,6 @@ package com.sajdatime.app.ui.components
 import androidx.compose.foundation.layout.offset
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -193,7 +191,7 @@ fun LocationSheet(
             )
 
             Spacer(Modifier.height(20.dp))
-            Button(
+            CtaButton(
                 onClick = onUseGps,
                 enabled = !state.resolvingLocation,
                 modifier = Modifier
@@ -242,7 +240,7 @@ fun LocationSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
-            FilledTonalButton(
+            CtaButton(
                 onClick = findCity,
                 enabled = query.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier

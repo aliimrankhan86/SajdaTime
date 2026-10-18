@@ -36,7 +36,10 @@ import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
 import com.sajdatime.app.ui.theme.LightKiswah
 import com.sajdatime.app.ui.theme.DarkKiswah
+import com.sajdatime.app.ui.theme.DarkCta
 import com.sajdatime.app.ui.theme.DarkHeroBottom
+import com.sajdatime.app.ui.theme.LightCta
+import com.sajdatime.app.ui.theme.OnCta
 import com.sajdatime.app.ui.theme.DarkHeroSheen
 import com.sajdatime.app.ui.theme.DarkHeroTop
 import com.sajdatime.app.ui.theme.LightHeroEnd
@@ -193,6 +196,26 @@ class ColorContrastTest {
                     Pair("light hero $inkName on $stopName", ink, stop, 4.5)
                 }
             },
+        )
+    }
+
+    /**
+     * The call to action button (CtaButton): white text on the fill, AA in both themes, and the
+     * fill itself 3:1 against every surface it sits on, so the button's shape is seen, not only
+     * its words (WCAG 1.4.11).
+     */
+    @Test
+    fun `call to action buttons are readable and stand out`() {
+        assertAll(
+            listOf(
+                Pair("light CTA text", OnCta, LightCta, 4.5),
+                Pair("dark CTA text", OnCta, DarkCta, 4.5),
+                Pair("light CTA on surface", LightCta, LightSurface, 3.0),
+                Pair("light CTA on dialog", LightCta, LightSurfaceContainerHigh, 3.0),
+                Pair("dark CTA on background", DarkCta, DarkBackground, 3.0),
+                Pair("dark CTA on surface", DarkCta, DarkSurface, 3.0),
+                Pair("dark CTA on dialog", DarkCta, DarkSurfaceContainerHigh, 3.0),
+            ),
         )
     }
 

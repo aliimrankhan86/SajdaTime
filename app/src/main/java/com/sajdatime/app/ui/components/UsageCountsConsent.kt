@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -72,7 +71,8 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         Text(stringResource(R.string.consent_read_policy))
     }
     Spacer(Modifier.height(16.dp))
-    // Equal weight on purpose: a tonal button each, same size, so neither answer is steered.
+    // Equal weight on purpose: the same solid CtaButton each, same size, so neither answer is
+    // steered (and neither is easy to miss).
     ConsentButton(stringResource(R.string.consent_yes), onYes)
     Spacer(Modifier.height(12.dp))
     ConsentButton(stringResource(R.string.consent_no), onNo)
@@ -80,7 +80,7 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
 
 @Composable
 private fun ConsentButton(text: String, onClick: () -> Unit) {
-    FilledTonalButton(
+    CtaButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()

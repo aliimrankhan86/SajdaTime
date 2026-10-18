@@ -1,12 +1,12 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.shadow
 import androidx.compose.material.icons.rounded.Mosque
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -487,13 +487,10 @@ private fun NextPrayerCard(state: UiState) {
  *
  * Two forms, one door:
  *
- *  - **Plain**, for everyone: a filled tonal button with a mosque icon. A button and not a
- *    text link, since 15 Aug 2026 — the owner asked for the calls to action to be findable,
- *    and a tinted word under a card did not read as one. It was outlined until 18 Oct 2026,
- *    "so it never competes with the next-prayer card"; the owner then found it easy to miss
- *    and asked for every call to action to be prominent. Tonal, not the full green fill,
- *    keeps it a step below the card and below a primary action. It never goes away, so it
- *    must still not nag: no motion, no badge, no colour that changes.
+ *  - **Plain**, for everyone: a solid CtaButton (green, white text) with a mosque icon. A
+ *    button and not a text link since 15 Aug 2026; outlined until 18 Oct 2026, then tonal for
+ *    one day; the owner found both easy to miss and asked for white text on a solid button. It
+ *    never goes away, so it must still not nag: no motion, no badge, no colour that changes.
  *  - **Loud**, above 45° of latitude while the method is still AUTO and until dismissed:
  *    the amber notice card. That threshold is where the spread between methods crosses an
  *    hour (78 minutes on Isha in Slough against the mosques' Moonsighting convention).
@@ -532,7 +529,7 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
             onDismiss = onDismissNotice,
         )
     } else {
-        FilledTonalButton(
+        CtaButton(
             onClick = onOpen,
             modifier = Modifier
                 .fillMaxWidth()
@@ -604,7 +601,7 @@ internal fun ExplainerParagraph(text: String, first: Boolean = false) {
 
 @Composable
 internal fun ExplainerAction(label: String, onClick: () -> Unit) {
-    FilledTonalButton(
+    CtaButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()

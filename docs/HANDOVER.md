@@ -5121,6 +5121,14 @@ chip's tap and the location refresh it relies on (read, not run), the on device 
    by relationship. `DesignRulesTest` fails the build on an `OutlinedButton`, a dismissable dialog
    without the X, or a stray gap in `Notice.kt`. The rules are in CLAUDE.md so no session misses
    them. **Lesson 144.**
+9. **Every call to action is now a `CtaButton`** (his emulator screenshots, 18 Oct: "do you think
+   this button stands out? Make the text white"). Tonal buttons were Material's low emphasis style
+   and in dark read as green text on a dark green panel. Now solid green with white bold 16sp text
+   in both themes (light `#0B5A43`, dark `#17805A`), 52dp minimum: setup, Times, the mosque
+   explainer, the location sheet, the usage counts answers (both equal), the first run disclaimer,
+   green notice actions. Amber stays only for warnings. `DesignRulesTest` bans outlined, tonal and
+   bare Material buttons; `ColorContrastTest` checks white on both fills and each fill against every
+   surface. **Lesson 145.**
 
 **Items 5 to 7, verified:** the full gate again (core 120, app 239, wear 12, 0 failures; lint 0 errors;
 both release bundles); Times, the mosque explainer and every state of the setup location step (empty,
@@ -5149,8 +5157,9 @@ the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and 
 > your location is used". Also merged into `claude/quiet-glass`. Then, from his emulator screenshots:
 > notices restructured (X alone top right, action a solid button, "Details" a labelled button), every
 > dismissable dialog has a close X, gaps come from a spacing scale (ui/theme/Spacing.kt) by
-> relationship; rules in CLAUDE.md and DesignRulesTest so he never repeats them. He is testing on his
-> emulator; wait for his verdict before new design work.
+> relationship; rules in CLAUDE.md and DesignRulesTest so he never repeats them. Every call to action is
+> a CtaButton: solid green, white bold text, both themes (tonal tried and rejected the same day). He is
+> testing on his emulator; wait for his verdict before new design work.
 
 ### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
 
@@ -9118,3 +9127,10 @@ matters more than the stable hashes, that is the trade being made.
     "now test", and say which visible change proves the new build is on (here: solid mint buttons).
     The same day's other lesson: when the owner repeats a design complaint, turn it into a rule in
     DESIGN_SYSTEM, a line in CLAUDE.md and a failing test, in that commit, not a promise.
+145. **"Prominent" means the strongest style, not a step up from the weakest.** Asked for buttons that
+    are hard to miss, this project went outlined, then tonal, each time picking Material's next quietest
+    option and calling it prominent, and each time the owner had to ask again. Tonal is documented by
+    Material as *low emphasis*. When the owner asks for emphasis, use the high emphasis component
+    (solid fill, white text) first and justify any step down, never the reverse. Also: his first
+    screenshot that day still showed the outlined mosque button with no icon, which is the previous
+    build; check which build he is looking at before changing anything (lesson 144).

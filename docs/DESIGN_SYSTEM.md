@@ -450,13 +450,24 @@ on Qibla and Settings; on Times the title is the city, same size and line, with 
 because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
 which is the bar's measured height, so it grows with large text.
 
-**Calls to action are solid, never outlined** (owner, 18 Oct 2026: "I don't want buttons to be easy
-to miss"). One main action per screen is a filled `Button` (`primary`); every other action that is a
-button is a `FilledTonalButton` (`secondaryContainer`/`onSecondaryContainer`, already in
-`ColorContrastTest`), full width, at least 48dp, ideally 52dp with a leading icon where one exists.
-`OutlinedButton` is not used. A text button is right only for a dialog's dismiss, an escape that must
-not compete with the main action ("Skip for now and use Makkah"), and an action inside a heading line
-("Save as PDF"). Do not show a disabled button as a placeholder: show it when it can be used.
+**Every call to action is a `CtaButton`: solid green, white bold 16sp text, at least 52dp tall,
+full width where it stands alone** (owner, 18 Oct 2026, many times: "make the buttons stand out,
+hard to miss, look like a button with prominent text ... make the text white"). Light fill
+`#0B5A43` (white 8.2:1), dark fill `#17805A` (white 4.9:1; 3.2:1 or more against every dark
+surface, so the shape stands out too). `ColorContrastTest` asserts both.
+
+Not used, and banned by `DesignRulesTest`: `OutlinedButton` and `FilledTonalButton` (Material's
+low emphasis buttons; in dark the tonal one was green on dark green and read as a panel), and a
+bare Material `Button` (its dark default is pale mint with black text). Amber stays only where it
+means a warning (notice and permission buttons). Two equal answers (usage counts) are both
+`CtaButton`, so they stay equal. A text button is right only for a dialog's dismiss ("Close",
+"Got it"), an escape that must not compete ("Skip for now and use Makkah"), "Details" inside a
+notice, and an action in a heading line ("Save as PDF"). Never show a disabled button as a
+placeholder: show it when it can be used.
+
+> History, so nobody softens it again: outlined until 18 Oct 2026 ("easy to miss"), then tonal
+> for one day ("do you think this button stands out?"), then this. Hierarchy between two buttons
+> comes from position and wording, never from making one of them faint.
 
 **Links and actions are bold and green.** `labelLarge` is SemiBold, and Material draws every
 button and text button label in it, so "Save as PDF" and "Got it" read as tappable without a

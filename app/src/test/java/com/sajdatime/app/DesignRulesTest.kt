@@ -21,10 +21,21 @@ class DesignRulesTest {
         .filter { it.name !in allowed && pattern.containsMatchIn(it.readText()) }
         .map { it.name }
 
+    /**
+     * Every call to action is a CtaButton: solid green, white bold text (owner, 18 Oct 2026, after
+     * outlined and then tonal buttons were both too easy to miss). Material's outlined and tonal
+     * buttons are banned outright, and a bare Material Button only where a colour other than the
+     * call to action green is meant: the amber notice and permission buttons, and CtaButton itself.
+     */
     @Test
-    fun `calls to action are solid, never outlined`() {
-        val found = offenders(Regex("""\bOutlinedButton\s*\("""))
-        assertTrue("OutlinedButton is not used; use FilledTonalButton or Button: $found", found.isEmpty())
+    fun `calls to action are solid CtaButtons`() {
+        val banned = offenders(Regex("""\b(OutlinedButton|FilledTonalButton)\s*\("""))
+        assertTrue("Use CtaButton, not an outlined or tonal button: $banned", banned.isEmpty())
+        val bare = offenders(
+            Regex("""(?<![A-Za-z])Button\s*\("""),
+            allowed = setOf("CtaButton.kt", "Notice.kt", "PermissionAction.kt"),
+        )
+        assertTrue("Use CtaButton, not a bare Material Button: $bare", bare.isEmpty())
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.onboarding
 
+import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
 import android.content.pm.PackageManager
 import android.Manifest
@@ -7,7 +8,6 @@ import androidx.core.content.ContextCompat
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.ui.semantics.Role
@@ -46,7 +46,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -324,7 +323,7 @@ private fun WelcomeStep(onNext: () -> Unit) {
             textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(48.dp))
-        Button(
+        CtaButton(
             onClick = onNext,
             modifier = Modifier
                 .fillMaxWidth()
@@ -393,7 +392,7 @@ private fun PermissionStep(
         body = stringResource(R.string.permission_body),
         leading = { LocationBadge() },
     ) {
-        Button(
+        CtaButton(
             onClick = onAllow,
             enabled = !state.resolvingLocation,
             modifier = Modifier
@@ -493,7 +492,7 @@ private fun PermissionStep(
             )
             if (city.isNotBlank()) {
                 Spacer(Modifier.height(12.dp))
-                FilledTonalButton(
+                CtaButton(
                     onClick = findCity,
                     enabled = !state.resolvingLocation,
                     modifier = Modifier
@@ -534,7 +533,7 @@ private fun PermissionStep(
 
         if (located) {
             Spacer(Modifier.height(32.dp))
-            Button(
+            CtaButton(
                 onClick = onNext,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -599,7 +598,7 @@ private fun LocatedRow(cityName: String) {
 private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
     Spacer(Modifier.height(8.dp))
     Row {
-        FilledTonalButton(
+        CtaButton(
             onClick = onBack,
             modifier = Modifier
                 .weight(1f)
@@ -608,7 +607,7 @@ private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
             Text(stringResource(R.string.action_back))
         }
         Spacer(Modifier.width(12.dp))
-        Button(
+        CtaButton(
             onClick = onNext,
             modifier = Modifier
                 .weight(1f)
@@ -805,7 +804,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         }
 
         Spacer(Modifier.height(32.dp))
-        Button(
+        CtaButton(
             onClick = onFinish,
             modifier = Modifier
                 .fillMaxWidth()
