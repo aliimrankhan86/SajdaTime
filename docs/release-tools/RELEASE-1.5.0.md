@@ -104,6 +104,56 @@ memory (GBrain `projects/sajdatime`); `recall` it first and do not redo work it 
   Arabic What's new when only the English store listing exists. If it does not, either add translated
   listings (`docs/store/LISTING-LOCALES.md`) or ship the English note only; his choice.
 
+## FIRST, before release day: bring the unmerged 8 Oct work into 1.5.0 (owner's decision, 18 Oct 2026 late)
+
+**Why.** After the Mac check (`5143282`), the cloud session compared every remote branch with
+`claude/quiet-glass` and `main`. All 31 of its own commits are in the release. Two older branches are
+not, and the owner said: "I don't want anything to be lost in any branch ... all merged then that gets
+added to release 1.5 fully tested". Asked how, he chose **audit, then merge into 1.5.0**, done by
+**Claude Code on his Mac** ("I don't want to continue cloud session"), not a blind merge.
+
+**Branch 1: `claude/customer-review-pain-points-9d35kl`** (8 Oct 2026, 13 commits, none
+patch equivalent to anything in the release; `git cherry` shows all 13 as `+`). 1.3.2 was shipped from
+a different branch (`claude/1-3-2-language-dnd`, PR #9), so this one was never merged. Its own state
+block is in its copy of `docs/HANDOVER.md` ("STATE OF PLAY — 8 Oct 2026, evening"). Of its 51 changed
+files, **26 exist in the release in a different form** and **25 exist nowhere in the release**:
+- code: `app/.../ui/settings/LanguageChooser.kt` (the "Phone language" first option and the picker below
+  Android 13 via `AppLocale.setOverride`; the release has neither `language_phone` nor `setOverride`),
+  `core/.../AdjustmentFit.kt` with `AdjustmentFitTest` and `MethodFinderSweepTest` (the method finder
+  groundwork; **the method finder itself was decided NOT built**, see its sweep file);
+- tests and tools: `TranslationIntegrityTest`, `TranslationScopeTest`, `tools/check-translation.py`;
+- docs: `docs/reviews/method-finder-sweep-2026-10-08.txt`, `docs/store/LISTING-ID-TR-UR.md`, and 16
+  files in `docs/translation/` (the brief, back translations, notes and the independent reviews of the
+  shipped Indonesian, Turkish and Urdu, including the nine "quiet is not silent" corrections).
+- Its other features (the mosque time typing, "0 min", banner actions as real buttons, the Urdu PDF
+  mirroring) may already be in the release under new names after the Quiet Glass redesign
+  (`NoticeCard` is gone; `PermissionCard` exists). Check each by behaviour, not by name.
+
+**How (the Mac session):**
+1. Go through the branch feature by feature and file by file. For each, say: already in the release,
+   replaced on purpose (cite the HANDOVER line), or missing. Show Ali the list before changing anything.
+2. Bring in what is missing, on top of `claude/quiet-glass`, adapted to today's code and the Quiet Glass
+   design (`docs/DESIGN_SYSTEM.md`), never by overwriting newer files with the 8 Oct versions. Arabic
+   (`values-ar`) did not exist on 8 Oct: anything added to the other languages needs Arabic too. Keep the
+   decision that the method finder is not built; keeping its research files is fine.
+3. **Known bug to fix first:** on an Android 12 emulator, choosing "Phone language" while the app was in
+   Urdu once showed English words laid out right to left, which `CLAUDE.md` forbids. Reproduce it below
+   Android 13 and fix it before the option ships.
+4. Then everything 1.5.0 passed must pass again: the full gate, `release-1.5.0.sh` (device suite), checks
+   in light, dark, Urdu, Arabic and 2x text, and the screenshots retaken if a screen changed. If the
+   app changed, update the What's new texts (still under 500 characters) and recheck the description.
+5. Independent review of the diff, commit by the `CLAUDE.md` rule, push to `claude/quiet-glass`.
+6. **Do not delete either old branch.** They stay on GitHub as the record, so nothing is lost.
+
+**Branch 2: `claude/analytics-default-on-1-4-0`** (3 Oct 2026, 1 commit): usage counts on by default.
+**Never merge it** (owner, 18 Oct 2026 late: keep it, never merge). He reversed default-on on 4 Oct, and
+`CLAUDE.md` forbids rebuilding it without new evidence. It stays on GitHub as history.
+
+**Checked by the cloud on `5143282` before this:** the gate on Linux, 384 tests, 0 failures (core 120,
+app 252, wear 12); the description 3969 characters and containing "Wear OS"; the What's new texts 495,
+394, 490, 421 and 311 and the watch note 147, each measured; versions 9 / 1.5.0 and 1002 / 1.5.0;
+`main` untouched; privacy policy still dated 17 October 2026.
+
 ## Still to do, in order
 
 Dates: a reminder on Sun 20 Dec 2026 (18:00), the preparation job on Mon 21 Dec 2026 (10:00), submit

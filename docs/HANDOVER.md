@@ -5182,9 +5182,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**In one line: 1.4.0 is live; 1.5.0 is finished and checked on `claude/quiet-glass` (pushed, not merged
-into `main`); the next step is release day, around 4 Jan 2027, unless Ali asks for something else. Start
-nothing new on your own.** The cloud session that built 1.5.0 is closed for good: never rely on it or ask
+**In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`).
+BEFORE release day, one owner decision is waiting to be done (18 Oct 2026 late): audit the unmerged
+8 Oct branch `claude/customer-review-pain-points-9d35kl` feature by feature, show him the list, merge
+what is missing into `claude/quiet-glass`, fix its "Phone language" right to left bug, and retest
+1.5.0 fully. The exact brief is `docs/release-tools/RELEASE-1.5.0.md`, "FIRST, before release day".
+Never merge `claude/analytics-default-on-1-4-0` (his word). Then release day, around 4 Jan 2027.
+Start nothing else on your own.** The cloud session that built 1.5.0 is closed for good: never rely on it or ask
 him to go back to it. Everything it knew is in this file, `docs/release-tools/RELEASE-1.5.0.md` and
 `docs/PROJECT_BRIEF.md`; if a reason is missing, search those first, then ask him.
 
