@@ -59,8 +59,13 @@ android {
         // greeting) and two home screen widgets. Phone only again: the watch stays 1001 / 1.2.0.
         // Docs: docs/plans/2026-10-widget-ramadan-tracker/. When the Ramadan content goes live is the
         // owner's decision (README Amendment 1), not something this number settles.
-        versionCode = 8
-        versionName = "1.4.0"
+        //
+        // 9 / 1.5.0, set 18 Oct 2026 for the January release: Quiet Glass design, Arabic, redesigned
+        // widgets, built-in adhan and notification and alarm sounds, reminder before prayer, Turkey with
+        // Diyanet's minutes. **Phone and watch together this time**: the watch shares the core, so the
+        // Turkey change reaches it too, and its new translations ship (watch 1002 / 1.5.0).
+        versionCode = 9
+        versionName = "1.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

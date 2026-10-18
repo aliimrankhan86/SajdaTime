@@ -37,7 +37,7 @@ android {
         // Google recommends exactly this (an independent scheme per form factor) in
         // https://developer.android.com/training/wearables/packaging. Bump freely; the two
         // sequences can never collide. Version codes can never be reused or decreased.
-        versionCode = 1001
+        versionCode = 1002
         // Normally kept in step with the phone's versionName so one release never shows two
         // version numbers to the same user. **Deliberate exception for phone 1.3.0 (3 Oct
         // 2026):** that release adds optional usage counts to the phone app only and changes
@@ -45,7 +45,10 @@ android {
         // Wear review. If the owner would rather match the numbers, bump this to "1.3.0" and
         // versionCode 1002 and upload both. See docs/ANALYTICS_PLAN.md section 4.7. The
         // *code* stays in its own 1000+ lane on purpose — see the note by versionCode above.
-        versionName = "1.2.0"
+        // 1002 / 1.5.0 (set 18 Oct 2026): back in step with the phone, because 1.5.0 changes the watch
+        // too (Turkey with Diyanet's minutes, from the shared core; Urdu, Turkish, Indonesian and Arabic;
+        // the disclaimer no longer under the clock at large text). Upload both bundles in that release.
+        versionName = "1.5.0"
     }
 
     signingConfigs {

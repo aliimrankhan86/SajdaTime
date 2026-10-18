@@ -392,55 +392,43 @@ In early January, as a listing edit if no bundle ships, or as the release note o
 Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
 ```
 
-**At the 1.5.0 release (January 2027).** 1.5.0 is the bundle that ships in January, so its release note is the January Ramadan
-text above plus one line for the built-in adhan (owner, 17 Oct 2026; "Play on silent" is the old switch renamed, so it needs no line), in every language. Counted with Python's `len`, newline
-included; all five are under 500. The Urdu, Turkish, Indonesian and Arabic Ramadan sentences are new translations of the short
-English text above, because the C4 versions are too long to share the 500 with the adhan line. The adhan line says "Sunni" and
-"Shia" with the app's own words for them. If the 1.5.0 note also has to mention Arabic or the new look, something here has to give,
-and that is the owner's choice.
+**At the 1.5.0 release (January 2027): FINAL, 18 Oct 2026.** The owner: "it should include widgets and their styles, we agreed everything should be there". So the note names everything 1.5.0 brings, not only Ramadan: the Ramadan pack (built in 1.4.0, shown from the eve of Ramadan), the redesigned widgets (big countdown and the town's name), the built-in adhan for Sunni and Shia or any phone sound for alarms and notifications, Arabic, the cleaner look, and "follow your mosque". The old draft's widgets sentence described the 1.4.0 widgets as new, so it was replaced. **Turkey line in English and Turkish only** (where Turkish users read it): their times now include Diyanet's precaution minutes, and anyone who added them by hand in Match your mosque should remove them, or they count twice (HANDOVER §5.26). Counted with Python's `len`; all five under 500. Check the Console's own counter when pasting.
 
-1.5.0, English (383):
+1.5.0, English (495):
 
 ```
-Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
-
-Built-in adhan for Sunni and Shia users, or choose any sound on your phone.
+Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a timetable to view or save as a PDF, and an optional suhoor reminder. Redesigned widgets with a big countdown and your town. Built-in adhan for Sunni and Shia, or any phone sound, for alarms and notifications. Now in Arabic, with a cleaner look. Turkey: times now include Diyanet's precaution minutes; if you added them in Match your mosque, remove them. Where your mosque differs, follow your mosque.
 ```
 
-1.5.0, Urdu (372):
+1.5.0, Urdu (394):
 
 ```
-رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے رمضان کا نقشہ، اور فجر سے پہلے سحری کی اختیاری یاددہانی۔ ہوم اسکرین کے دو ویجٹ اگلی نماز اور آج کے اوقات دکھاتے ہیں۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔
-
-سنی اور شیعہ صارفین کے لیے ایپ میں اذان، یا اپنے فون کی کوئی بھی آواز چنیں۔
+رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے نقشہ، اور سحری کی اختیاری یاددہانی۔ نئے ویجٹ، بڑی الٹی گنتی اور آپ کے شہر کے نام کے ساتھ۔ سنی اور شیعہ کے لیے اذان، یا فون کی کوئی بھی آواز، الارم اور اطلاعات دونوں کے لیے۔ اب عربی میں بھی، نئی صاف ستھری شکل کے ساتھ۔ جہاں آپ کی مسجد کا وقت مختلف ہو، اپنی مسجد کی پیروی کریں۔
 ```
 
-1.5.0, Turkish (400):
+1.5.0, Turkish (490):
 
 ```
-Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, görüntülenecek veya PDF olarak kaydedilecek imsakiye ve sabah namazından önce isteğe bağlı sahur hatırlatıcısı. İki ana ekran widget'ı sonraki namazı ve bugünün vakitlerini gösterir. Caminizin imsakiyesi farklıysa caminize uyun.
-
-Sünni ve Şii kullanıcılar için yerleşik ezan; dilerseniz telefonunuzdaki herhangi bir sesi seçin.
+Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, PDF olarak da kaydedilebilen imsakiye ve isteğe bağlı sahur uyarısı. Büyük geri sayımlı ve şehrinizin adını gösteren yeni widget'lar. Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki bir ses, alarm ve bildirimler için. Türkiye vakitleri artık Diyanet'in temkin sürelerini içeriyor; bunları Camiye göre ayarla'da eklediyseniz kaldırın. Arapça desteği ve daha sade görünüm. Caminizin vakti farklıysa caminize uyun.
 ```
 
-1.5.0, Indonesian (390):
+1.5.0, Indonesian (421):
 
 ```
-Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal Ramadan untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional sebelum Subuh. Dua widget layar utama menampilkan salat berikutnya dan waktu hari ini. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
-
-Azan bawaan untuk pengguna Sunni dan Syiah, atau pilih suara apa pun di ponsel Anda.
+Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional. Widget baru dengan hitung mundur besar dan nama kota Anda. Azan bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda, untuk alarm dan notifikasi. Kini dalam bahasa Arab, dengan tampilan lebih bersih. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
 ```
 
-1.5.0, Arabic (314):
+1.5.0, Arabic (311):
 
 ```
-رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية رمضان للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور قبل الفجر. ويعرض ودجتان على الشاشة الرئيسية الصلاة التالية ومواقيت اليوم. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
-
-أذان مدمج لمستخدمي المذهبين السنّي والشيعي، أو اختر أي صوت على هاتفك.
+رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
 ```
 
-The four language versions, written for the same release, are in `WORDING-AND-LISTING.md` C4. Only the English listing exists in
-Play today.
+**Watch 1.5.0 note** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):
+
+```
+Now in Urdu, Turkish, Indonesian and Arabic. Turkey times now include Diyanet's precaution minutes. The disclaimer no longer runs under the clock at large text.
+```
 
 **Screenshots for this release.** The release script (`docs/release-tools/release-1.4.0.sh`, step 6) writes candidate captures of the
 Times screen on the eve, on day 1, on the last day and on both Eid days in four languages, and of both widgets, to
