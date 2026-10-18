@@ -57,6 +57,9 @@ class DesignRulesTest {
             if (links > allowed) "${file.name} (${links - allowed})" else null
         }
         assertTrue("Make these a CtaButton; only Close or Got it may be a text link: $found", found.isEmpty())
+        // The one owner-approved exception (18 Oct 2026): the usage question's two bold links.
+        val infoLinks = offenders(Regex("""\bInfoLink\("""), allowed = setOf("UsageCountsConsent.kt"))
+        assertTrue("InfoLink is only for the usage question (DESIGN_SYSTEM 4.1 kind F): $infoLinks", infoLinks.isEmpty())
     }
 
     /**

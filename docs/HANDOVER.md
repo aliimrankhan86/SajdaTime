@@ -5052,11 +5052,10 @@ test enforces) and §11 (open decisions D1 to D5). Screenshots he was sent:
 height alignment; the location sheet in Times is not in them, it was not rendered). He then answered D1, D3, D4 and D5 (recorded in DESIGN_SYSTEM §9): Makkah skip at the foot of the
 setup screen under a line saying times will be for Makkah; "Reset all" full width on its own row;
 notices kept; spacing to be converted screen by screen after this merge (§11 "Decided, work not yet
-done"). **Still open: D2**, the usage question's two information buttons, shown to him as (A) a
-"Before you decide" section of solid buttons (in the code now) or (B) bold links. **Next: his choice
-on D2 and his approval of the new screenshots (`solid-actions-*.png`, `usage-question-options.png`),
-then the full gate, merge into `claude/quiet-glass`, and the install command.** He chose "apply, show
-me, then merge": do not merge before he approves.
+done"). **D2 decided the same night: B, bold links** ("See exactly what is sent", "Read the privacy
+policy" as bold underlined green links, `InfoLink`, the one allowed exception, test enforced). He
+approved the setup and Match your mosque screenshots ("happy with it"). DESIGN_SYSTEM §11 has nothing
+open; D5 (spacing, screen by screen) is decided work not yet done.
 
 **PICK UP HERE (end of 18 Oct 2026).** The owner is testing the latest 1.5.0 build on his own
 emulator. **Wait for his verdict; do not start new design work until he says he is happy or names

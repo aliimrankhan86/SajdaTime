@@ -211,7 +211,8 @@ session inherits it instead of relearning it.
   - **Never write "done", "every" or "all" until the §4.1 checks have run and you have pasted the
     counts** (§0.3). Twice on 18 Oct 2026 a rule was reported as applied everywhere when it was not.
   - **Every action is a solid button with white bold text, light and dark**; the only text links
-    are "Close" and "Got it" at the foot of a dialog. The full spec, every button in the app and the
+    are "Close" and "Got it" at the foot of a dialog, plus his one chosen exception: the usage
+    question's two bold underlined links ("See exactly what is sent", "Read the privacy policy"). The full spec, every button in the app and the
     checks are §4.1; `DesignRulesTest` fails the build on a breach, including a button in a file the
     inventory does not list.
   - Gaps come from `Space` by relationship (§2). **This is only true of some files so far**; the rest

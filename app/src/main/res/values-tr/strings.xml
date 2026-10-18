@@ -222,8 +222,6 @@
     <string name="consent_yes">Evet, kullanım sayımlarını paylaş</string>
     <string name="consent_no">Hayır, teşekkürler</string>
     <string name="consent_read_policy">Gizlilik politikasını okuyun</string>
-    <string name="consent_more_heading">Karar vermeden önce</string>
-    <string name="consent_answer_heading">Cevabınız</string>
     <string name="about_feedback">Geri bildirim gönder</string>
     <string name="about_feedback_desc">Geliştiriciye neyin işe yaradığını ya da neyin yanlış olduğunu söyleyin. E-posta uygulamanızı açar.</string>
     <string name="feedback_subject">SajdaTime geri bildirimi</string>

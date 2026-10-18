@@ -280,10 +280,11 @@ Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp
 
 **The rule in one line:** every action a person can take is a **solid button with white bold text**
 in light and dark, so nobody has to guess what is tappable. The only text links in the app are
-**"Close" and "Got it" at the foot of a dialog**. Decided by the owner on 18 Oct 2026, after
+**"Close" and "Got it" at the foot of a dialog**, and **one named exception the owner chose: the
+two bold links on the usage question** (kind F below). Decided by the owner on 18 Oct 2026, after
 outlined and then tonal buttons were both too easy to miss (§0.1).
 
-#### The five kinds of control that act, and nothing else
+#### The six kinds of control that act, and nothing else
 
 | Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
 |---|---|---|---|---|---|
@@ -292,6 +293,7 @@ outlined and then tonal buttons were both too easy to miss (§0.1).
 | **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque" |
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
+| **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
 
 Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
 row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
@@ -350,6 +352,7 @@ warnings").
 | `FilledTonalIconButton`, `OutlinedIconButton` | Pale, the same problem as tonal | `DesignRulesTest` |
 | A bare Material `Button` outside `CtaButton.kt`, `Notice.kt`, `PermissionAction.kt` | Its dark default is pale mint with black text | `DesignRulesTest` |
 | A `TextButton` saying anything but "Close" or "Got it" | Every action is solid (owner, 18 Oct 2026) | `DesignRulesTest` |
+| `InfoLink` outside `UsageCountsConsent.kt` | It is his exception for one screen, not a new style | `DesignRulesTest` |
 | A file with a button that is not in the inventory below | So no button is added without being specified here | `DesignRulesTest` |
 | Two icon buttons next to each other | Opposite actions a finger apart (§4 Notices) | Review question in §10 |
 | A disabled button shown as a placeholder | Reads as broken | Review question in §10 |
@@ -371,9 +374,9 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Setup, sect, madhab, method | Back, Continue | A | 56, half each, 8 apart | `OnboardingScreen.kt` |
 | Setup, confirm | Allow exact alarms, until allowed | A (`PermissionButton`) | 52, wraps | `OnboardingScreen.kt`, `PermissionAction.kt` |
 | Setup, confirm | Finish | A | 56, full | `OnboardingScreen.kt` |
-| Usage question (setup, and the Settings switch) | Under the heading "Before you decide": See exactly what is sent / Hide | A | 52, full | `UsageCountsConsent.kt` (§11 D2) |
-| Usage question | Read the privacy policy | A | 52, full | `UsageCountsConsent.kt` |
-| Usage question | Under the heading "Your answer": Yes, share usage counts; No thanks | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
+| Usage question (setup, and the Settings switch) | See exactly what is sent / Hide, 16dp under the text | F | 48 target, wraps | `UsageCountsConsent.kt` |
+| Usage question | Read the privacy policy, straight under it | F | 48 target, wraps | `UsageCountsConsent.kt` |
+| Usage question | Yes, share usage counts; No thanks, 24dp under the links | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
 | First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
 | Times | Save as PDF (PDF icon), end of the Today heading | A | 52, wraps | `HomeScreen.kt` |
@@ -400,7 +403,7 @@ on Times, which opens the location sheet.
 # Every acting control in the app, with file and line. Read all of it.
 grep -rnE "\b(CtaButton|PermissionButton|FilledIconButton|IconButton|TextButton|Button)\(" \
   app/src/main/java --include=*.kt | grep -v "fun \|import"
-# Must print only Close and Got it:
+# Must print only Close and Got it (the usage question's InfoLinks are kind F, not TextButtons):
 grep -rn -A1 "TextButton(" app/src/main/java --include=*.kt | grep -oE "R\.string\.[a-z_]+" | sort | uniq -c
 ./gradlew :app:testDebugUnitTest --tests '*DesignRulesTest' --tests '*ColorContrastTest'
 ```
@@ -687,6 +690,16 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **18 Oct 2026 (night), D2 decided, and D1 and D3 approved from screenshots.** Usage question: the
+  owner chose **B, bold links**, over A (solid buttons under "Before you decide" and "Your answer"
+  headings), from the two drawn side by side in light and dark. "See exactly what is sent" and
+  "Read the privacy policy" are bold, underlined green links (kind F, `InfoLink`), 16dp under the
+  text; Yes and No stay equal solid buttons 24dp below. So finding out more never looks like an
+  answer. This is the **only** exception to "every action is a solid button", allowed on this
+  screen alone; `DesignRulesTest` fails if `InfoLink` appears anywhere else. Rejected: A (four
+  solid buttons read as four answers even with headings). He also approved the setup screen (Makkah
+  skip at the foot) and Match your mosque (Reset all full width, the steppers as they are): "happy
+  with it".
 - **18 Oct 2026 (late evening), the owner's answers to D1, D3, D4 and D5.** D1: "Skip for now and
   use Makkah" stays solid but moves to the foot of the setup location screen, under "Prayer times
   will be for Makkah until you set your location." (his choice of the recommended option). Pinning it
@@ -695,7 +708,7 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   for "Reset all" centred, in its own row and wider: it is now full width, 24dp under the steppers. D4:
   "happy with" notices as they are (Allow and Details equal in weight; order and the arrow lead). D5:
   spacing to be converted screen by screen, each with light and dark screenshots, after this merge.
-  D2 is still open (§11).
+  D2 followed (next entry up).
 - **18 Oct 2026 (evening), every action a solid button, and this document made the place that
   stops repeat mistakes.** The owner, after the third round on buttons: "You always say it's done
   but nothing is done." Asked, not guessed (§0.2), he chose: every text link becomes a solid
@@ -806,7 +819,7 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
-| D2 | 18 Oct 2026 | Usage question: he asked for "a dedicated section, or maybe a link with bold text" for "See exactly what is sent" and "Read the privacy policy". Two versions shown to him: (A) solid buttons under a "Before you decide" heading, with "Your answer" over Yes and No; (B) bold underlined green links, which would be an exception to the "no text links" rule. | (A), because it keeps the one button rule; (A) is what the code has until he chooses | OPEN |
+| (none) | | Nothing is waiting for the owner on 18 Oct 2026. | | |
 
 **Decided, work not yet done** (do not report these as done):
 

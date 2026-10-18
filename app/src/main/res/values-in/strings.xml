@@ -222,8 +222,6 @@
     <string name="consent_yes">Ya, bagikan data penggunaan</string>
     <string name="consent_no">Tidak, terima kasih</string>
     <string name="consent_read_policy">Baca kebijakan privasi</string>
-    <string name="consent_more_heading">Sebelum memutuskan</string>
-    <string name="consent_answer_heading">Jawaban Anda</string>
     <string name="about_feedback">Kirim masukan</string>
     <string name="about_feedback_desc">Beri tahu pengembang apa yang membantu atau apa yang salah. Membuka aplikasi email Anda.</string>
     <string name="feedback_subject">Masukan SajdaTime</string>

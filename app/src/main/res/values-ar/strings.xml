@@ -247,8 +247,6 @@
     <string name="consent_yes">نعم، شارك إحصاءات الاستخدام</string>
     <string name="consent_no">لا، شكرًا</string>
     <string name="consent_read_policy">اقرأ سياسة الخصوصية</string>
-    <string name="consent_more_heading">قبل أن تقرر</string>
-    <string name="consent_answer_heading">إجابتك</string>
     <string name="about_feedback">إرسال ملاحظات</string>
     <string name="about_feedback_desc">أخبر المطوّر بما يفيد أو بما هو خاطئ. يفتح بريدك الإلكتروني.</string>
     <string name="feedback_subject">ملاحظات حول SajdaTime</string>

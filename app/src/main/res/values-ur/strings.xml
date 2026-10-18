@@ -226,8 +226,6 @@
     <string name="consent_yes">ہاں، اعداد و شمار شیئر کریں</string>
     <string name="consent_no">نہیں، شکریہ</string>
     <string name="consent_read_policy">پرائیویسی پالیسی پڑھیں</string>
-    <string name="consent_more_heading">فیصلہ کرنے سے پہلے</string>
-    <string name="consent_answer_heading">آپ کا جواب</string>
     <string name="about_feedback">رائے بھیجیں</string>
     <string name="about_feedback_desc">ڈویلپر کو بتائیں کہ کیا مددگار ہے یا کیا غلط ہے۔ آپ کی ای میل ایپ کھلے گی۔</string>
     <string name="feedback_subject">SajdaTime کے بارے میں رائے</string>

@@ -385,8 +385,6 @@
     <string name="consent_yes">Yes, share usage counts</string>
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>
-    <string name="consent_more_heading">Before you decide</string>
-    <string name="consent_answer_heading">Your answer</string>
     <string name="about_feedback">Send feedback</string>
     <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email.</string>
     <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>
