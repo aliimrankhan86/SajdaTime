@@ -5042,10 +5042,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 (read this first; the 17 Oct evening block below still holds for everything not named here)
 
-**Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 grew on branch
-`ccr-23a38578-c5vz7d`**, which is `claude/quiet-glass` plus four owner requests from 18 Oct 2026. It
-is pushed, NOT merged into `claude/quiet-glass` yet; the owner said "looks good" to all four and has
-not yet said to merge.
+**Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 gained four owner requests
+on 18 Oct 2026**, built on `ccr-23a38578-c5vz7d` and **merged into `claude/quiet-glass` the same day**
+at his word ("Do the merge"; merge commit, the merged tree identical to the tested tip).
+`claude/quiet-glass` is the 1.5.0 branch again; the working branch has nothing it lacks.
 
 1. **Widget redesign, "hero countdown"** (he called the 1.4.0 widgets "extremely bland" from his S23
    Ultra). Chosen from three drawn directions on a private design canvas
@@ -5068,9 +5068,9 @@ Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `di
 **Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
 chip's tap and the location refresh it relies on (read, not run), the on device suite.
 
-**Next, in order:** (a) when the owner says so, merge `ccr-23a38578-c5vz7d` into `claude/quiet-glass`
-(merge commit) and push; (b) the December preparation job's emulator run covers the device suite;
-(c) retake store screenshots with 1.5.0 as already planned. Nothing else is waiting.
+**Next, in order:** (a) the December preparation job's emulator run covers the device suite; (b)
+retake store screenshots with 1.5.0 as already planned; (c) re-date `docs/privacy.html` when 1.5.0
+reaches `main`. Nothing else is waiting.
 
 **GBrain and Cowork memory were NOT updated on 18 Oct 2026:** this was a cloud session with neither
 connected. The next session that has GBrain should write the entry below to `projects/sajdatime`, and
@@ -5081,7 +5081,7 @@ the same to Cowork memory `/areas/sajdatime.md`, then delete this paragraph and 
 > opaque, contrast tested; overrides 17 Oct no-gloss); location chip opens the app to refresh location
 > (no background location, ever); one Asr glyph for every madhab; setup disclaimer is a short form with
 > all four points and "Read in full", full text in Settings (dua only in the full text). All on branch
-> `ccr-23a38578-c5vz7d` over `claude/quiet-glass`, gate green, not merged; owner said "looks good".
+> `ccr-23a38578-c5vz7d`, merged into `claude/quiet-glass` the same day at his word; gate green.
 > Re-date privacy.html when it reaches main.
 
 ### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
