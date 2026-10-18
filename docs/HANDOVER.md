@@ -5071,11 +5071,12 @@ at his word ("Do the merge"; merge commit, the merged tree identical to the test
    setup. Kept as text on purpose: dialog "Close"/"Got it", "Skip for now and use Makkah" (an escape must
    not compete with Allow) and "Save as PDF" (it sits in a heading). DESIGN_SYSTEM §8.
 7. **Setup location screen redesigned** (he did not like it): a pin badge, one line of text, a full
-   width "Allow location", a "How your location is used" link, the city field, then "Skip". The 66 word
-   city lookup paragraph and the location explanation moved, **word for word**, into the dialog behind
-   the link, so nothing the screen promised is out of reach and `docs/privacy.html` is unchanged. "Find
-   city" appears once something is typed and "Continue" once a location is found, so the screen never
-   shows a dead grey button. The old "Tap the info icon" sentence is gone. New and changed strings in
+   width "Allow location", a "How your location is used" link, the city field, then "Skip". The location
+   explanation moved, **word for word**, into the dialog behind the link. The 66 word city lookup
+   paragraph now appears under the field **the moment the user types**, before "Find city" or the
+   keyboard's search can be pressed (the independent review's point: behind a location link it would be
+   missed exactly when it applies). `docs/privacy.html` is unchanged. "Find city" appears once something
+   is typed and "Continue" once a location is found, so the screen never shows a dead grey button. The old "Tap the info icon" sentence is gone. New and changed strings in
    all five languages, translated by Claude (`permission_body`, `action_how_location_used`).
 
 **Verified:** the full gate on the branch tip (core 120, app 238, wear 12, 0 failures; lint 0 errors;

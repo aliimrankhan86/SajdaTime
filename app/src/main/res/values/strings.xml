@@ -27,7 +27,6 @@
 
     <string name="permission_title">Where are you praying?</string>
     <string name="permission_body">SajdaTime works out your prayer times and the Qibla from a rough idea of where you are.</string>
-    <string name="permission_why_title">Why we need your location</string>
     <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. The times are worked out on your phone and we never receive your location. To show your town\'s name, the app asks your phone\'s own place lookup, which on most phones is answered over the internet by Google.</string>
     <string name="action_allow_location">Allow location</string>
     <string name="action_how_location_used">How your location is used</string>

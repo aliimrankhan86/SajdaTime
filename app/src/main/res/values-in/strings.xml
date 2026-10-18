@@ -17,7 +17,6 @@
 
     <string name="permission_title">Di mana Anda salat?</string>
     <string name="permission_body">SajdaTime menghitung waktu salat dan arah kiblat dari perkiraan lokasi Anda.</string>
-    <string name="permission_why_title">Mengapa kami perlu lokasi Anda</string>
     <string name="permission_why_body">Untuk menghitung waktu salat dan arah kiblat yang tepat untuk tempat Anda.\n\nKami hanya memeriksa perkiraan lokasi Anda saat aplikasi terbuka. Waktu salat dihitung di ponsel Anda dan kami tidak pernah menerima lokasi Anda. Untuk menampilkan nama kota Anda, aplikasi bertanya ke layanan pencarian tempat bawaan ponsel Anda. Di sebagian besar ponsel, layanan itu dijawab lewat internet oleh Google.</string>
     <string name="action_allow_location">Izinkan lokasi</string>
     <string name="action_how_location_used">Cara lokasi Anda digunakan</string>

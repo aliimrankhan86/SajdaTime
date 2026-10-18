@@ -369,20 +369,12 @@ private fun PermissionStep(
                 }
             },
             title = { Text(stringResource(R.string.action_how_location_used)) },
-            // Both privacy texts, word for word, one tap away (owner, 18 Oct 2026: a short setup
-            // screen). The city lookup paragraph used to sit inline above the field; it is the
-            // same sentence here under the same heading, so nothing it promises has moved out of
-            // reach, and docs/privacy.html is unchanged.
+            // The location explanation, word for word, one tap away (owner, 18 Oct 2026: a short
+            // setup screen). The city lookup paragraph is not in here: it is shown under the field
+            // the moment the user starts typing, which is when it applies.
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
                     Text(stringResource(R.string.permission_why_body))
-                    Spacer(Modifier.height(16.dp))
-                    Text(
-                        stringResource(R.string.location_sheet_search_heading),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                    Spacer(Modifier.height(4.dp))
-                    Text(stringResource(R.string.city_fallback_body))
                 }
             },
         )
@@ -482,7 +474,17 @@ private fun PermissionStep(
                 modifier = Modifier.fillMaxWidth(),
             )
             if (city.isNotBlank()) {
-                Spacer(Modifier.height(8.dp))
+                // What happens to a typed name, said as soon as there is one and before Find city
+                // can be pressed (the keyboard's search key included). It used to sit above the
+                // empty field, where at 66 words it buried the screen's one choice. Word for word
+                // the same promise as docs/privacy.html; independent review, 18 Oct 2026.
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.city_fallback_body),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(Modifier.height(12.dp))
                 FilledTonalButton(
                     onClick = findCity,
                     enabled = !state.resolvingLocation,
@@ -514,7 +516,9 @@ private fun PermissionStep(
                     onUseDefaultLocation()
                     onNext()
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 48.dp),
             ) {
                 Text(stringResource(R.string.action_use_makkah))
             }

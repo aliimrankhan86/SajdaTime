@@ -17,7 +17,6 @@
 
     <string name="permission_title">Nerede namaz kılıyorsunuz?</string>
     <string name="permission_body">SajdaTime, namaz vakitlerinizi ve kıble yönünü nerede olduğunuzu kabaca bilerek hesaplar.</string>
-    <string name="permission_why_title">Konumunuza neden ihtiyacımız var</string>
     <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Vakitler telefonunuzda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Şehrinizin adını göstermek için uygulama telefonunuzun kendi yer arama hizmetine sorar. Çoğu telefonda bu hizmete internet üzerinden Google yanıt verir.</string>
     <string name="action_allow_location">Konuma izin ver</string>
     <string name="action_how_location_used">Konumunuz nasıl kullanılır</string>
