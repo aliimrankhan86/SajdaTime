@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -217,7 +217,7 @@ fun LocationSheet(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(10.dp))
-            OutlinedButton(
+            FilledTonalButton(
                 onClick = findCity,
                 enabled = query.isNotBlank() && !state.resolvingLocation,
                 modifier = Modifier

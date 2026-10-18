@@ -23,10 +23,11 @@
     <string name="action_begin">ابدأ</string>
 
     <string name="permission_title">أين تصلي؟</string>
-    <string name="permission_body">يحتاج SajdaTime إلى معرفة تقريبية بمكانك ليحسب مواقيت صلاتك واتجاه القبلة. انقر على أيقونة المعلومات لترى ما يعنيه ذلك بالضبط.</string>
+    <string name="permission_body">يحسب SajdaTime مواقيت صلاتك واتجاه القبلة من معرفة تقريبية بمكانك.</string>
     <string name="permission_why_title">لماذا نحتاج إلى موقعك</string>
     <string name="permission_why_body">لحساب مواقيت الصلاة الصحيحة واتجاه القبلة حيث أنت.\n\nلا نتحقق من موقعك التقريبي إلا والتطبيق مفتوح. تُحسب الأوقات على هاتفك ولا نتلقى موقعك أبدًا. ولعرض اسم بلدتك، يسأل التطبيق خدمة البحث عن الأماكن في هاتفك نفسه، وتجيب عنها Google عبر الإنترنت في معظم الهواتف.</string>
     <string name="action_allow_location">اسمح بالموقع</string>
+    <string name="action_how_location_used">كيف يُستخدم موقعك</string>
     <string name="action_got_it">حسنًا</string>
     <string name="action_understood">فهمت</string>
     <string name="action_continue">متابعة</string>

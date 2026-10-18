@@ -189,17 +189,25 @@ fun Modifier.sajdaSurface(shape: Shape, brush: Brush): Modifier {
 fun kiswahGold(): Color = if (LocalDarkTheme.current) DarkKiswah else LightKiswah
 
 /**
- * The next-prayer card's fill, and the three text colours that sit on it.
+ * The next-prayer card's fill, its gloss, and the three text colours that sit on it.
  *
- * Light keeps the design's mint-to-sand gradient; dark is a flat `primaryContainer`. All
- * three light stops are asserted against all three of these text colours in
- * `ColorContrastTest`, which is the only reason a gradient is allowed here at all.
+ * Light keeps the design's mint-to-sand gradient; dark is a fixed green gradient in the widgets'
+ * countdown card colours (since 18 Oct 2026; flat before). Every stop of both, and the top stop
+ * under the sheen, is asserted against all three text colours in `ColorContrastTest`, which is
+ * the only reason a gradient is allowed here at all.
  */
 data class HeroStyle(
     val brush: Brush,
     val label: Color,
     val prominent: Color,
     val secondary: Color,
+    /** White laid over the top half of the card, fading out by the middle: the gloss. */
+    val sheen: Color,
+    /** The rim at the top of the card, and where it fades to at the bottom. */
+    val rim: Color,
+    val rimBottom: Color,
+    /** The shadow's tint, or transparent for none (dark: a shadow does not show on black). */
+    val glow: Color,
 )
 
 @Composable
@@ -207,10 +215,20 @@ fun heroStyle(): HeroStyle {
     val scheme = MaterialTheme.colorScheme
     return if (LocalDarkTheme.current) {
         HeroStyle(
-            brush = SolidColor(scheme.primaryContainer),
+            // The widgets' countdown card (owner, 18 Oct 2026: "similar to the widget style
+            // glossy look"): primaryContainer in the middle, a step lighter at the top and a
+            // step deeper at the bottom. All three stops, and the top under the sheen, are
+            // checked in ColorContrastTest.
+            brush = Brush.verticalGradient(
+                listOf(DarkHeroTop, scheme.primaryContainer, DarkHeroBottom),
+            ),
             label = scheme.onPrimaryContainer,
             prominent = scheme.onSurface,
             secondary = scheme.secondary,
+            sheen = DarkHeroSheen,
+            rim = DarkHeroRim,
+            rimBottom = DarkHeroRimBottom,
+            glow = Color.Transparent,
         )
     } else {
         HeroStyle(
@@ -223,6 +241,10 @@ fun heroStyle(): HeroStyle {
             label = LightOnHeroLabel,
             prominent = LightOnHero,
             secondary = LightOnHeroSecondary,
+            sheen = LightHeroSheen,
+            rim = LightHeroRim,
+            rimBottom = LightHeroRimBottom,
+            glow = LightHeroGlow,
         )
     }
 }

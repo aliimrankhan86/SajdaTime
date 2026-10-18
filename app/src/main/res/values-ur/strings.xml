@@ -17,10 +17,11 @@
     <string name="action_begin">شروع کریں</string>
 
     <string name="permission_title">آپ کہاں نماز پڑھ رہے ہیں؟</string>
-    <string name="permission_body">نماز کے اوقات اور قبلے کی سمت معلوم کرنے کے لیے SajdaTime کو اندازاً پتا ہونا چاہیے کہ آپ کہاں ہیں۔ اس کا اصل مطلب جاننے کے لیے معلومات کے نشان پر ٹیپ کریں۔</string>
+    <string name="permission_body">SajdaTime آپ کے اندازاً مقام سے نماز کے اوقات اور قبلے کی سمت معلوم کرتا ہے۔</string>
     <string name="permission_why_title">ہمیں آپ کا مقام کیوں چاہیے</string>
     <string name="permission_why_body">تاکہ آپ جہاں ہیں وہاں کے لیے نماز کے درست اوقات اور قبلے کی سمت معلوم کی جا سکے۔\n\nہم آپ کا اندازاً مقام صرف اس وقت دیکھتے ہیں جب ایپ کھلی ہو۔ اوقات آپ کے فون پر ہی نکالے جاتے ہیں اور ہم آپ کا مقام کبھی وصول نہیں کرتے۔ آپ کے شہر کا نام دکھانے کے لیے ایپ آپ کے فون کی اپنی مقام تلاش سروس سے پوچھتی ہے، جس کا جواب زیادہ تر فونز پر انٹرنیٹ کے ذریعے گوگل دیتا ہے۔</string>
     <string name="action_allow_location">مقام کی اجازت دیں</string>
+    <string name="action_how_location_used">آپ کا مقام کیسے استعمال ہوتا ہے</string>
     <string name="action_got_it">ٹھیک ہے</string>
     <string name="action_understood">میں نے سمجھ لیا</string>
     <string name="action_continue">جاری رکھیں</string>
