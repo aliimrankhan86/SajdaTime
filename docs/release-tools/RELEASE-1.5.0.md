@@ -15,6 +15,12 @@ session and ask it to do the rest. A Mac session reading this: the brief below i
 the same one he was given to paste. Results from an earlier Mac session may already be in the shared
 memory (GBrain `projects/sajdatime`); `recall` it first and do not redo work it proves done.
 
+0. **First, secure the previous Mac session's work.** On 18 Oct 2026 the owner parked the cloud session
+   while a Claude Code session on his Mac was still working, so its results may exist only on the Mac.
+   In every local clone it used (at least `~/Developer/SajdaTime-settings-preview`), run `git status`,
+   `git stash list` and `git log --oneline origin/claude/quiet-glass..HEAD`. Show him anything
+   uncommitted or unpushed, commit and push what belongs on the branch (with his yes), and read its
+   final report and the GBrain memory before doing anything else. Do not redo work it proves done.
 1. **Treat every claim on this branch as unverified until you have checked it.** Report each as
    confirmed, wrong or not checkable:
    - the branch is level with `origin/claude/quiet-glass` (at `9038d3a` or later), the tree is clean,
