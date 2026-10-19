@@ -57,7 +57,8 @@ class NextPrayerTileService : TileService() {
      * while this service is still bound leaves its own context in the old language until the
      * service is created again; `applicationContext` was tried and is worse (it ignored the
      * app's language altogether), so it stays `this`. A change of the watch's own language was
-     * not run.
+     * run on the evening of 19 Oct 2026 (English to Urdu to Arabic and back, HANDOVER lesson 167):
+     * the watch restarts its tile renderer, and the tile came back in the new language each time.
      */
     private fun localised(): Context = AppLocale.wrap(this)
 

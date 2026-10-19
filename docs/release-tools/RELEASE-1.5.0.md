@@ -185,7 +185,7 @@ Mon 8 Feb 2027).
    (phone SKIPPED is his choice). The 21 Dec preparation job does this (its prompt was rewritten on
    18 Oct 2026 late to use this script, never set the versions again, and stop before any merge, pull
    request, submit or Console step). The last run, 19 Oct 2026 after the emulator checks and their fixes, gave
-   406 unit tests (app 261, core 129, wear 16), 0 failed, lint 0 errors, a device suite of 25 of 25 straight after a cold boot, both bundles 9 / 1.5.0 and 1002 / 1.5.0 signed CN=Ali Imran Khan, 22 of 24 lines PASS or TAKEN (tree CHECK, the uncommitted work, and phone SKIPPED); the job's prompt says so, and also re-runs `LanguageAndDndDeviceTest` on the Android 12 emulator
+   406 unit tests (app 261, core 129, wear 16; 407 with core 130 since the evening's `AdjustmentFit` test, gate only), 0 failed, lint 0 errors, a device suite of 25 of 25 straight after a cold boot, both bundles 9 / 1.5.0 and 1002 / 1.5.0 signed CN=Ali Imran Khan, 22 of 24 lines PASS or TAKEN (tree CHECK, the uncommitted work, and phone SKIPPED); the job's prompt says so, and also re-runs `LanguageAndDndDeviceTest` on the Android 12 emulator
    `sajda12` (7 of 7 on 19 Oct), because the script runs on Android 16 only and the language code below 13 is new.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
@@ -229,7 +229,7 @@ Mon 8 Feb 2027).
   split changed together); on Google's Pixel sound picker, once another sound is chosen there is no "Default" card to
   go back to the phone's usual tone (only that tone by name), so an app row "Your phone's usual tone" would help; the
   watch tile keeps its old language after a per-app language switch until its service is made again (a change of the
-  watch's own language was not run). Accepted, not to be "fixed": "Reset all" in Match your mosque lets TalkBack read
+  watch's own language was run on the evening of 19 Oct 2026 and the tile followed, HANDOVER §10). Accepted, not to be "fixed": "Reset all" in Match your mosque lets TalkBack read
   each row that changed.
 
 - **Turkey:** against Diyanet's own Istanbul page (18 to 24 Oct 2026) Maghrib is 1 minute early on 7 of 7
@@ -254,7 +254,7 @@ fact here changes, change the job too: nothing updates it automatically.
 | SajdaTime review replies, `sajdatime-review-replies` | local task, daily 12:40 | Drafts replies to new reviews (he posts them); the Arabic reply and spare signing file reminders | **Added:** a one time notice when the new description is live (file `build/review-replies/description-live.txt` in `~/Developer/SajdaTime`), one notice on 26 Oct 2026 only if it is still not live; after 1.5.0 replies may mention "Phone language" and "Use your mosque's board" |
 | SajdaTime monthly numbers, `trig_01AzcQUNWSkgGmdJmNXkaQoD` | routine run in his Chrome, days 2 to 9 at 11:51 UK | Play numbers into the "SajdaTime monthly numbers" Claude Doc | Nothing: it does not depend on a version |
 | Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, Sun 20 Dec 2026 18:00 | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct |
-| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11. **Later on 19 Oct:** counts updated to the final run (406 unit tests, device suite 25, `LanguageAndDndDeviceTest` 7) |
+| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11. **Later on 19 Oct:** counts updated to the final run (406 unit tests, device suite 25, `LanguageAndDndDeviceTest` 7). **Evening, 19 Oct:** its Android 12 step gives up after 5 minutes if `sajda12` does not boot (it hung at start that evening, HANDOVER §10); the unit test count is now 407 |
 | SajdaTime: submit 1.5.0 today, `trig_01VexqUd1cJz8jfD5QFT874W` | cloud routine, once, Mon 4 Jan 2027 09:00 | Push reminder of the submit day and the 25 Jan limit | **New.** Replies with fixed text only (Read tool only; the account's default connectors got attached and are unused) |
 
 ## Not verified yet (say so, do not assume)
@@ -264,8 +264,8 @@ its log), Turkish and Indonesian at 2.0 text, the clock in landscape and at 320d
 in Urdu on Android 12, the watch tile in Urdu and Arabic, the large Today widget in Urdu and Arabic, the sound picker's
 "Default" card. Six faults found and fixed on the way (TalkBack silent on plus and minus; words split at large text;
 wrapped button labels off centre; the clock in landscape; "Prayer alarm" left in English below 13; the tile's frozen
-countdown). Still not run from that list: the look up from the phone's location below 13 (no GPS fix on the headless
-emulator) and a change of the watch's own language. A real phone is not needed (the owner, 17 Oct 2026: emulator
+countdown). Run on the evening of 19 Oct 2026 (HANDOVER §10): a change of the watch's own language (the tile followed) and the
+look up from the phone's location on Android 16; still not run below 13, because the `sajda12` emulator no longer starts. A real phone is not needed (the owner, 17 Oct 2026: emulator
 testing is the standard).
 
 A real phone (not needed, above); Android 7 to 11 (his choice; Android 12 was run on an emulator on 19 Oct 2026 for the

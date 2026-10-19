@@ -126,9 +126,11 @@
 
         <!--
           The two home screen widgets. exported="false" is what the current Android Studio template
-          generates: the system, not another app, sends APPWIDGET_UPDATE. ASSUMED until the widget
-          device test has run on the API 36 emulator; if a provider is never updated there, flip it to
-          true and record why. updatePeriodMillis is 0 in both provider files on purpose.
+          generates: the system, not another app, sends APPWIDGET_UPDATE. Verified, no longer assumed:
+          WidgetDeviceTest binds both providers through the system's widget service on the API 36 emulator
+          and reads back what they drew (device suite passing since 18 Oct 2026), and both were placed and
+          drawn on the emulator's Pixel Launcher home screen that day. A real phone is still not verified.
+          updatePeriodMillis is 0 in both provider files on purpose.
         -->
         <receiver
             android:name=".widget.NextPrayerWidgetProvider"

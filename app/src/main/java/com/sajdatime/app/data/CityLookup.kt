@@ -18,12 +18,15 @@ import java.net.URLEncoder
  * location permission.
  *
  * Two sources, in order:
- *  1. The phone's own geocoder. Nothing leaves the app, and most phones have it.
+ *  1. The phone's own geocoder, which most phones have. Android documents it as possibly
+ *     network backed, and on phones with Google Play services Google answers it, so the
+ *     typed name may reach Google. Until 19 Oct 2026 this line said nothing left the app,
+ *     the same false claim found on 16 Oct 2026 and corrected in docs/privacy.html.
  *  2. Open-Meteo's free geocoding API, for phones with no geocoder backend.
  *
- * Only the place name is ever sent, and only when the first source comes up empty. No
- * device identifier, no coordinates, no history. Once resolved the coordinates are stored
- * locally and every prayer calculation from then on is offline.
+ * Open-Meteo is sent the place name and the app's language, and only when the first source
+ * comes up empty. No device identifier, no coordinates, no history. Once resolved the
+ * coordinates are stored locally and every prayer calculation from then on is offline.
  *
  * This previously read the coordinates out of Aladhan's timingsByAddress response. That
  * endpoint now returns a fixed placeholder (8.8889, 7.7778) for every address, so every

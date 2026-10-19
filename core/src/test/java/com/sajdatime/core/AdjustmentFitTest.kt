@@ -107,6 +107,26 @@ class AdjustmentFitTest {
     }
 
     @Test
+    fun `the wrong half of the day from a 12 hour dial is read as the nearer half`() {
+        // Material's 12 hour dial keeps a.m. when the hand passes 12, so Dhuhr 11:58 moved to a
+        // board's 12:05 arrives as 00:05. Isha 11:50 p.m. moved to 12:05 a.m. arrives as 12:05.
+        assertEquals(
+            AdjustmentFit.Result.Within(7),
+            AdjustmentFit.fit(at(day, 11, 58), LocalTime.of(0, 5), london),
+        )
+        assertEquals(
+            AdjustmentFit.Result.Within(15),
+            AdjustmentFit.fit(at(day, 23, 50), LocalTime.of(12, 5), london),
+        )
+        // Still refused when neither half is within the limit: 2:15 is 58 minutes from 13:17
+        // read as p.m., and further still as a.m.
+        assertEquals(
+            AdjustmentFit.Result.TooFar,
+            AdjustmentFit.fit(at(day, 13, 17), LocalTime.of(2, 15), london),
+        )
+    }
+
+    @Test
     fun `a clock change day still counts real minutes`() {
         // Europe/London springs forward at 01:00 on 29 March 2026. Nothing is prayed at that
         // hour, but a calculated Fajr at 04:40 BST and a board saying 04:45 must still be 5.

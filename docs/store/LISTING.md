@@ -252,8 +252,13 @@ about 13 apps for "prayer times wear os"). "Qibla compass" and "adhan" cannot bo
 Offline prayer times (namaz), adhan and Qibla for Sunni and Shia, with Wear OS.
 ```
 
-**Full description** `3976 / 4000` (Python `len`, newlines counted, no final newline). Contains "Wear OS" twice. Ramadan
-is in it, so the separate "January Ramadan lines" step in RELEASE-1.5.0.md is done by pasting this.
+**Full description** `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
+after the Qibla line below). Contains "Wear OS" twice. Ramadan is in it, so the separate "January Ramadan lines" step in
+RELEASE-1.5.0.md is done by pasting this. **One line changed after the review (19 Oct 2026, later):** "A Qibla compass
+corrected…" became "Qibla direction: a compass corrected…", so the description carries the search phrase "qibla direction"
+(VISIBILITY-KEYWORDS.md row 2; four of the large competitors use it), +11 characters, the claim itself unchanged. The
+translated listings in LISTING-LOCALES.md were left as they are: the phrase is an English search term, and each translation
+already targets its own (Arabic اتجاه القبلة, Urdu قبلہ رخ, Indonesian arah kiblat).
 
 ```
 SajdaTime gives you prayer times, adhan alerts and a Qibla compass for Sunni and Shia Muslims, on your Android phone and Wear OS watch. No ads, no account, and prayer times work offline.
@@ -264,7 +269,7 @@ WHAT YOU GET
 
 • Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha for wherever you are, with a live countdown to the next prayer
 • The Hijri date (Islamic calendar) beside today's date
-• A Qibla compass corrected to true north that buzzes once when you face the Kaaba
+• Qibla direction: a compass corrected to true north that buzzes once when you face the Kaaba
 • Alerts for each prayer, even when the app is closed: none, a notification, or an alarm loud enough for Fajr
 • A built-in adhan (azan) for Sunni and Shia users, or any sound on your phone
 • An optional reminder 5 to 30 minutes before the prayers you choose

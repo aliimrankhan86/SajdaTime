@@ -4,7 +4,9 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 /**
  * Turns "my mosque's board says 10:15" into the minutes "Match your mosque" needs.
@@ -44,6 +46,23 @@ object AdjustmentFit {
         // that is what the screen shows. A calculated 21:58:50 is displayed as 21:58, so a
         // board reading 22:15 is seventeen minutes away on screen, not sixteen.
         val shown = calculated.atZone(zone).truncatedTo(ChronoUnit.MINUTES)
+
+        // Either half of the day, whichever is nearer. Material's 12 hour dial keeps the a.m.
+        // or p.m. the user started in when the hand passes 12 (seen on the emulator, 19 Oct
+        // 2026: 11:58 p.m. moved to 12:05 gave 12:05 p.m., noon), so a board time just past 12
+        // arrived half a day away and was refused; Dhuhr at 11:58 a.m. moved to 12:05 would
+        // arrive as 00:05 the same way. Boards are often 12 hour too, with no a.m. or p.m. A time 12
+        // hours out can never be a real correction, so the nearer reading is the only one
+        // that could be meant, and the row then shows the minutes it stored.
+        val minutes = listOf(target, target.plusHours(12)).map { minutesTo(shown, it, zone) }.minBy { abs(it) }
+        return if (minutes in -CalculationPrefs.MAX_ADJUSTMENT_MINUTES..CalculationPrefs.MAX_ADJUSTMENT_MINUTES) {
+            Result.Within(minutes)
+        } else {
+            Result.TooFar
+        }
+    }
+
+    private fun minutesTo(shown: ZonedDateTime, target: LocalTime, zone: ZoneId): Int {
         var wanted = shown.toLocalDate().atTime(target).atZone(zone)
 
         // Take the short way round the clock. Isha at 23:58 and a board saying 00:05 is
@@ -53,12 +72,7 @@ object AdjustmentFit {
         if (Duration.between(shown, wanted) > HALF_DAY) wanted = wanted.minusDays(1)
         if (Duration.between(shown, wanted) < HALF_DAY.negated()) wanted = wanted.plusDays(1)
 
-        val minutes = Duration.between(shown, wanted).toMinutes().toInt()
-        return if (minutes in -CalculationPrefs.MAX_ADJUSTMENT_MINUTES..CalculationPrefs.MAX_ADJUSTMENT_MINUTES) {
-            Result.Within(minutes)
-        } else {
-            Result.TooFar
-        }
+        return Duration.between(shown, wanted).toMinutes().toInt()
     }
 
     private val HALF_DAY: Duration = Duration.ofHours(12)

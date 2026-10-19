@@ -1238,8 +1238,12 @@ board that shows the congregation, with a "Choose a calculation method" button, 
 screen reader. It names no method and calls no time right or wrong. (2) "Use your mosque's board" (one
 button above the list, the owner's choice from screenshots on 19 Oct 2026, DESIGN_SYSTEM §9), then "Which
 prayer?" with each prayer's current time, then a clock: `AdjustmentFit` stores the minutes, compared from
-the *truncated* calculated time because the screen truncates, the short way round midnight, and a gap past
-30 is refused, never clamped. Stored values are unchanged: whole minutes, ±30, synced to the watch. (The 8
+the *truncated* calculated time because the screen truncates, the short way round midnight, **either half of
+the day, whichever is nearer** (19 Oct 2026 evening: Material's 12 hour dial keeps a.m. or p.m. when the hand
+passes 12, so a prayer at 11:58 p.m. (Asr, for a test place shown in London time) moved to a board's 12:05 a.m. arrived as
+12:05 p.m. and was refused; measured on
+the emulator, lesson 165; a time 12 hours out can never be a real correction, and boards are often 12 hour
+too), and a gap past 30 is refused, never clamped. Stored values are unchanged: whole minutes, ±30, synced to the watch. (The 8
 Oct branch made the minutes number an underlined link instead; that style is banned since 18 Oct 2026.) (3)
 For any future method finder the wording rules are fixed: 'gives the same times as your mosque today',
 never 'you follow X' or 'your school'; school means Asr only; Moonsighting Committee is a twilight rule; two
@@ -2192,6 +2196,48 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**The last four items from the read-only review, and the emulator checks still open (19 Oct 2026, evening;
+owner: "apply items 1, 4, 5 and the listing count edit, run the full gate, the 12 hour clock, the tile, the
+place from the phone's location on Android 12 and changing the watch language, review, commit, push").**
+- **12 hour clock, before and after.** `AdjustmentFitTest`'s new test (Dhuhr 11:58 against 00:05 gives +7, Isha
+  23:50 against 12:05 gives +15, 13:17 against 2:15 still too far) was run against the old `AdjustmentFit` and
+  failed (1 of 9), then passed with the fix (9 of 9). Android 16 emulator, phone set to 12 hour
+  (`settings put system time_12_24 12`), sideload build of this commit, location Mountain View shown in London
+  time so Asr was 11:58 pm: "Use your mosque's board", Asr, the dial opened on 11:58 p.m.; tapping 12 then 05
+  showed **"12:05 p.m."** (screenshot; Material kept p.m., lesson 165), Set time stored **+7 min** and the Times
+  screen showed Asr **12:05 am**. Reopened on 12:05 a.m., 1:05 a.m. (67 minutes out) was still refused with the
+  limit note and the +7 kept. Put back: Reset all, `time_12_24` deleted (it was unset).
+- **Watch tile against the watch app** (watch emulator, Wear OS 4, 1002 / 1.5.0 debug of this commit): four
+  tile changes measured at 18 to 33 seconds after the minute (sampled every 2 to 3 seconds for 4 minutes); the
+  watch app's own countdown changed between 16:55:58 and 16:56:02, on the minute within the sampling step. Confirms the review's item 3 (lesson 166);
+  not fixed (§11). During the run the watch's time zone changed by itself from Europe/Istanbul (left from an
+  earlier check) to Europe/London, the Mac's zone; nothing in this work set it. **Found by it (the independent
+  review spotted it in the samples):** the countdown stayed right, but the tile went on saying "7:32 pm", Isha's
+  time in Istanbul, for the 4 minutes sampled, when the watch now said 5:32 pm; it showed 5:32 pm once the watch
+  app had been opened (which asks for a redraw). The watch module has no time zone change handling, so the tile
+  keeps the old zone's clock time until its own refresh, up to an hour. Seen, not tested further; §11.
+- **Changing the watch's own language** (lesson 167): with the tile on screen and its service bound, the
+  watch went en-US to ur-PK, to ar, and back to en-US at runtime. The tile followed every time: "اگلی نماز /
+  عشاء / 5:32 PM · 32 منٹ میں"; "الصلاة التالية / العشاء / 5:32 م · بعد 32 د" with Western digits; "NEXT PRAYER
+  / Isha / 5:32 pm · in 31m". The watch's tile renderer restarted with each change, so this proves a new
+  service draws in the new language; a language change with the same service kept alive was not seen, because
+  the watch never kept it. Put back: en-US, the helper deleted, "stay awake" off.
+- **Place from the phone's own location: NOT run on Android 12.** The `sajda12` emulator, which worked on the
+  morning of 19 Oct, hangs before its kernel starts ("QEMU2 main loop" not responding after about 18 seconds,
+  no kernel output with `-show-kernel`) under every start tried: from its snapshot, cold, `-read-only`,
+  software graphics without Vulkan, `-no-window`, with its data wiped, and alone on the Mac. Its system image
+  files read in full; the Android 16 and watch emulators start normally. **Run on Android 16 instead:** a
+  location fix (`geo fix`, the step that failed last time) gave "London, United Kingdom" and London's times;
+  with the app set to Urdu, a fix at Birmingham gave "Birmingham, سلطنت متحدہ" (country in Urdu, the city as
+  the geocoder has it) and Birmingham's times. The below 13 route (`AppLocale.setOverride`) is still read,
+  not run.
+- **Gate on this commit** (run twice, the second time after the review's fixes, on the final code):
+  `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` passed: 407 unit
+  tests (app 261, core 130 with the one opt in sweep skipped, wear 16), 0 failed, every test task executed (none
+  from cache); lint 0 errors in all three; phone bundle 9,583,601 bytes and watch bundle 3,657,983 bytes, both
+  signed CN=Ali Imran Khan. `release-1.5.0.sh` and the device suite were not re-run: this commit changes one
+  pure function (unit tested and run on the emulator) and comments.
 
 **The emulator checks left from the 8 Oct merge, and the store copy (19 Oct 2026, later the same day; owner:
 "whatever is left to test in the emulator ... needs to be done. Do it now ... do it all autonomously and get it
@@ -5356,7 +5402,7 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
 - **Brought in:** "Phone language" first and the default (§5.16); the language list on Android 7 to 12
   (`AppLocale.setOverride`; before this the Language row did not exist below 13); the list on the welcome
   screen; Match your mosque from the mosque's board, with the 30 minute limit explained in place and a
-  "Choose a calculation method" button (§5.17; `AdjustmentFit` and its 8 tests unchanged); the PDF right to
+  "Choose a calculation method" button (§5.17; `AdjustmentFit` and its 8 tests unchanged, then changed the same evening: the nearer half of the day, below); the PDF right to
   left in Urdu and Arabic; the watch tile re-reads its language; "The full privacy policy is in English."
   under the usage question when the app is not in English; translation fixes still missing from 1.5.0 (the
   "quiet" alarms translated "silent" in Urdu, Turkish and Indonesian, and the same in one Arabic string; Urdu
@@ -5440,12 +5486,36 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   after, every new test was run once against the old code and failed, and two independent code reviews found three
   more faults in the fixes themselves (the tile a minute ahead, the channel rename only at the next alert, labels
   growing at the Small text size), all fixed. **Store copy:** a new 1.5.0 English listing names every feature with the
-  search words (LISTING.md "1.5.0 listing, FINAL": full description 3976 of 4000, a new short description with "adhan"
+  search words (LISTING.md "1.5.0 listing, FINAL": full description 3976 of 4000, 3987 since its Qibla line changed the same evening, a new short description with "adhan"
   and "Wear OS" that needs his yes on the day, a watch note); an independent review checked it against the code and
   five corrections were made; the eight translated listings were rebuilt from it and reviewed (LISTING-LOCALES.md
   "1.5.0"). The store screenshots did not change. Release day now also adds the eight translations; the separate
   January Ramadan listing step is gone (the description carries Ramadan). Results of the last `release-1.5.0.sh` run
   are in §10.
+- **Evening, 19 Oct 2026 (two read-only sessions had found these and could not change anything; this one could).**
+  From the read-only review: **(1) fixed:** "Use your mosque's board" refused Dhuhr 11:58 a.m. against a board's 12:05
+  (and Isha 11:50 p.m. against 12:05 a.m.), because Material's 12 hour dial keeps a.m. or p.m. when the hand passes 12;
+  measured on the emulator before and after, `AdjustmentFit` takes the nearer half of the day (§5.17, lesson 165, one
+  new test). **(4) fixed:** two stale comments (`CityLookup` said nothing leaves the app; the manifest still called
+  the widget receivers' `exported="false"` an assumption). **(5) fixed:** PROJECT_BRIEF's "Next step" still said the 8
+  Oct branch audit was pending. **Listing:** the English 1.5.0 Qibla line now starts "Qibla direction:" for that
+  search phrase, 3987 of 4000 by script (LISTING.md "1.5.0 listing, FINAL"). **Emulator checks (§10, top entry):** the 12 hour clock
+  (above); the watch tile measured 18 to 33 seconds late at each minute against the watch app (item 3 confirmed,
+  lesson 166, **not fixed**, below); changing the watch's own language, Urdu, Arabic and back, the tile followed
+  each time (lesson 167); the place from the phone's location **not run on Android 12** because `sajda12` no longer
+  starts, run on Android 16 instead (London from a real fix, Birmingham named in Urdu). Gate: 407 unit tests, 0
+  failed, lint 0 errors, both bundles signed. Items 2 (the limit note can land below the fold and may not announce
+  when it first appears) and 3 were not to be fixed in this brief (3 was measured, above) and are left as they were.
+- **Open after the evening, none blocks 1.5.0:** (a) **the tile's half-minute lag** (lesson 166): the owner's call.
+  Claude's recommendation is to leave it: the error is under a minute, always in the same direction, and the 1.5.0
+  watch note ("updates every minute") stays true; moving every entry earlier would trade it for showing one minute
+  less instead. (b) **`sajda12` hangs at start** (§10): the 21 Dec job's Android 12 step now gives up after 5
+  minutes and says so; if it is wanted again, the next try is a new AVD from the same image (`avdmanager create
+  avd`), not more start options. (c) Item 2 of the read-only review (the limit note's position and first
+  announcement), unmeasured. (d) **The watch tile keeps the old time zone's prayer time after a zone change**
+  (§10 top entry) until the app is opened or the tile's own refresh, up to an hour; the countdown stays right.
+  A small fix (redraw the tile on the time zone change broadcast, which apps may still receive) is Claude's
+  recommendation; the owner's call whether it goes into 1.5.0. Not built.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
@@ -9818,3 +9888,29 @@ matters more than the stable hashes, that is the trade being made.
     after boot, and the class passed alone twice. The test now repeats the cancel until it holds, for up to 30
     seconds, and checks the same claim (21 of 21 straight after a third cold boot). The app's behaviour is right:
     re-arming at boot is the point.
+165. **Material's 12 hour clock dial keeps a.m. or p.m. when the hand passes 12.** Opened on 11:58 p.m. (Asr for
+    Mountain View, shown in London time),
+    tapping 12 and then 05 gave "12:05 p.m." (Android 16 emulator, 12 hour mode, Material3 1.4.0, 19 Oct 2026),
+    which is noon, half a day from Asr, so the board time was refused. Found by reading in a read-only review,
+    then measured before the fix was trusted. `AdjustmentFit` now takes whichever half of the day is nearer. Any
+    future clock input that compares against a known time has the same trap; a 24 hour test never shows it.
+166. **The Wear tile renderer switches timeline entries late, by up to about half a minute.** Sampled through
+    `uiautomator dump` every 2 to 3 seconds (the tile's text is in the dump) across four minute changes on the
+    watch emulator, 19 Oct 2026: each change came 18 to 33 seconds after the minute, while the watch app,
+    which ticks every second, changed within the 2 second sampling step. So for that part of each minute the
+    tile shows one minute more than the watch app. The entries are right (`TileFormatTest`); the delay is the
+    system's. Not fixed: it is under a minute and the owner has not been asked (§11).
+167. **A Wear emulator's own language cannot be changed in its Settings, but it can be changed at runtime from
+    the shell.** Its Language screen says the watch follows the phone. The same call Wear OS makes when the
+    paired phone's language changes (`ActivityManager.getService().updatePersistentConfiguration` with
+    `userSetLocale`) can be run as the shell user: a 15 line Java class compiled with `javac` against
+    `android.jar`, turned into a dex with `d8`, pushed to `/data/local/tmp`, then `adb shell
+    CLASSPATH=/data/local/tmp/setlocale.dex app_process / SetLocale ur-PK`. The watch restarts its tile
+    renderer and the app's process goes, so the tile is drawn again by a new service. Delete the dex after.
+168. **On an emulator, a coarse location app sees a new position at most every 10 minutes, and `geo fix` only
+    lands while something asks for GPS.** The first `adb emu geo fix` after boot reached Android; later ones did
+    not, because nothing had GPS running. `cmd location providers add-test-provider network` and
+    `set-test-provider-location network --location LAT,LNG` (after `appops set com.android.shell
+    android:mock_location allow`) always land, but a second move within 10 minutes was ignored: Android keeps
+    a coarse only app's last known location for 10 minutes. Real users never move that fast; tests must wait,
+    or remove the test provider and use the city box. (19 Oct 2026.)
