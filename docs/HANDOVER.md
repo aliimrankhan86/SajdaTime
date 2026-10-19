@@ -5515,7 +5515,18 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   announcement), unmeasured. (d) **The watch tile keeps the old time zone's prayer time after a zone change**
   (§10 top entry) until the app is opened or the tile's own refresh, up to an hour; the countdown stays right.
   A small fix (redraw the tile on the time zone change broadcast, which apps may still receive) is Claude's
-  recommendation; the owner's call whether it goes into 1.5.0. Not built.
+  recommendation; the owner's call whether it goes into 1.5.0. **Built later the same day, next bullet.**
+- **Last, 19 Oct 2026 (cloud session; the owner: "test what you can on emulators and fix them then close it all",
+  after being told the fix was recommended): (d) built.** `wear/.../ClockChangeReceiver.kt`, declared in the watch
+  manifest for `TIMEZONE_CHANGED` and `TIME_SET`, calls the existing `refreshTile`, so the tile is drawn again at
+  once. Both broadcasts are on Android's list that a manifest receiver still gets from Android 8 on, and Android
+  resets each running process's default zone as it sends it, and the tile request comes later, so the tile request that follows computes in
+  the new zone. Same pattern as the phone's `SystemEventReceiver`; `ClockChangeActionsTest` (2 tests) holds the
+  manifest and the code's action lists together, as `SystemEventActionsTest` does on the phone. No permission,
+  no data, no copy change. **Verified:** the full gate on the cloud container, 409 unit tests (app 261, core 130 with 1 skipped, wear 18), 0 failed, lint 0 errors in all three, both bundles built (unsigned there: the key is only on his Mac, so signing is checked on 21 Dec). An independent review of the diff found no code defect; its two wording fixes and its emulator tip (turn automatic time zone off first) are in.
+  **Not verified:** on the watch emulator: the cloud container has no KVM, so no emulator can run there. The
+  21 Dec job does it (RELEASE-1.5.0.md step 1, item "tile after a time zone change"). (a), (b), (c) and the
+  smaller items stay open and parked until after 1.5.0 or release day; nothing else was started.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 

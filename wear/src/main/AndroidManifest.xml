@@ -47,6 +47,16 @@
                 android:resource="@drawable/tile_preview" />
         </service>
 
+        <!-- Time zone or clock changed: redraw the tile, which has the prayer time written in. -->
+        <receiver
+            android:name=".ClockChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".SettingsSyncService"
             android:exported="true"

@@ -64,10 +64,9 @@ time zone moved from Europe/Istanbul to Europe/London by itself during the run, 
 
 1. **Tile half a minute late** each minute. Claude's advice: leave it. The error is under a minute, and the watch
    note "updates every minute" stays true.
-2. **Tile keeps the old time zone's prayer time** after a zone change (7:32 pm instead of 5:32 pm) until the app
-   is opened or the tile's own refresh, up to an hour. The countdown stays right. Found by the independent
-   review in the samples. Small fix possible (redraw on the time zone change broadcast); Claude recommends it.
-   Owner's call whether it goes into 1.5.0. Not built.
+2. **Tile keeps the old time zone's prayer time** after a zone change: **built later on 19 Oct 2026** (owner's yes),
+   `ClockChangeReceiver` redraws the tile on a time zone or clock change. Gate passed in the cloud; the watch
+   emulator check is the 21 Dec job's (RELEASE-1.5.0.md step 1). HANDOVER §11 STATE OF PLAY, last bullet.
 3. **`sajda12`:** if Android 12 checks are wanted again, make a new AVD from the same image rather than retrying.
 4. Unchanged from before: review item 2 (the limit note's position), Turkey's Maghrib against Diyanet, the
    "Tap to read" line, the short description needs his yes on release day.
