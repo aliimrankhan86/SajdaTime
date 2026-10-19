@@ -195,6 +195,8 @@ Mon 8 Feb 2027).
    alarm set-timezone Europe/Istanbul`; if the watch refuses that command, its Settings, Date and time), and check the tile shows the new zone's time within a few
    seconds without opening the app; then put the zone back and turn automatic time zone on again. Record the result in HANDOVER §10. The gate after that
    change: 409 unit tests (app 261, core 130, wear 18), so the job's expected count moves from 407 to 409: its prompt on the Mac may still say 407, and 409 is correct, not a fault.
+   **DONE, PASS, 19 Oct 2026, 22:00 UK, both the Ramadan check and the widget theme check below (HANDOVER §10,
+   top entry; screenshots sent to him). Do not repeat them.** What was asked, for the record:
    **Also, once, for the Ramadan change of 19 Oct 2026 late (built in a cloud session, no emulator):** on the
    phone emulator with automatic date off, set the date to 4 February 2027 (4 days before Ramadan 1448): no
    Ramadan notice on Times, no "Ramadan card" or "Suhoor reminder" in Settings. Then 5 February (3 days before):

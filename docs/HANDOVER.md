@@ -2217,6 +2217,37 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**The Ramadan window and the widgets following the app's Theme, phone emulator (19 Oct 2026, 22:00 UK, Mac
+session; the cloud to Mac hand-off in §11, RELEASE-1.5.0.md step 1).** `sajda` (Android 16) started
+`-read-only`, debug build and device tests of `8ceb8f4` installed after removing the old debug copy (the
+sideload 1.4.0 copy left alone), `appwidget grantbind` OK, `ScreenSeedDeviceTest` run to skip the first run
+screens. **PASS throughout.** Screenshots sent to the owner as a private page
+(claude.ai/artifact/7XivbixECckb9AnMQYDXYG).
+- **Widget theme, the device test:** `WidgetDeviceTest#the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system`
+  OK twice. Its first run's `widget-today-theme-system` render showed the icons with no names or times: the
+  picture was taken mid redraw (the test waits for Dhuhr's colour only, and the System layout is a different
+  layout id, re-inflated); the second run's six renders are all complete. The test's verdict is unaffected.
+- **Widget theme, by hand on the Pixel launcher:** both widgets placed with the widget list's Add button (the
+  Today widget landed on the second home page). Settings, Theme: **Dark**, both widgets dark; **Light**, both
+  light; **Follow phone** on a light emulator, both light; then `cmd uimode night yes`, both dark. Put back:
+  Follow phone, night mode off.
+- **Ramadan, clock set in Europe/London, `TIME_SET` sent each time:** **4 Feb 2027 12:00:** no notice on Times,
+  no "Ramadan card" or "Suhoor reminder" anywhere in Settings (UI dumps while scrolling to the end). **5 Feb
+  12:00:** the notice "Ramadan on this calendar begins Mon 8 Feb" with the new line "From the first day, the
+  Ramadan card shows suhoor and iftar times here. You can turn it off in Settings.", both rows in Settings.
+  The same notice in Urdu and in Arabic (right to left, the new line present in each) and in English at
+  `font_scale` 2.0 (whole words, nothing cut, readable after one scroll). **7 Feb 21:00 (the eve):** notice
+  still shown, rows present; both widgets' next prayer "Tomorrow · Suhoor ends", Fajr 5:34 am. **8 Feb 10:00
+  (day 1):** the Ramadan card "Day 1 of 29" on Times, no notice; the Today widget's Fajr "Suhoor ends" and
+  Maghrib "Iftar". **8 Mar 12:00 (day 29 of 29):** card, both rows, the widget words. **9 Mar 12:00 (1 Shawwal):**
+  the Eid greeting, no rows, no widget words. Put back: `auto_time` 1, `auto_time_zone` 1, font 1.0, app
+  language cleared, emulator shut down (read only, so nothing kept).
+- **Seen, not new, not fixed:** the launcher's widget list shows the previews with icons and no text, because
+  `previewLayout` is the real layout without data; `bcdba63` (1.4.0, live) has the same `previewLayout`, so it is
+  not from this change (§11, open after 1.5.0).
+- **Not run:** a real launcher other than Pixel's (One UI, HyperOS) on a theme change; Android 7 to 11; the unit
+  test gate on the Mac (the cloud's 416 stands until the preparation job runs it).
+
 **The tile after a time zone change, `ClockChangeReceiver` (`742389f`), watch emulator (19 Oct 2026, late, Mac
 session; owner: "run ONE check only, the watch tile time zone check").** `sajdawear` (Wear OS 4), 1002 / 1.5.0
 debug of `742389f` installed with `adb install -r`; the manifest receiver is registered for `TIMEZONE_CHANGED` and
@@ -5426,8 +5457,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 also carries everything the unmerged 8 Oct branch had, audited, approved by the owner and retested. Nothing is
 waiting before release day (around 4 Jan 2027). Start nothing else on your own.** *(Updated late on 19 Oct:
 1.5.0 moves to November, date not chosen; and two changes made in the cloud that evening, the Ramadan window
-and the widgets following the app's Theme, are not yet seen on an emulator. The next Mac session runs
-RELEASE-1.5.0.md step 1 for both before anything else. The last bullets of this block say so in full.)*
+and the widgets following the app's Theme, were then checked on the Mac's emulator at 22:00 and PASSED. Waiting
+only on his November date. The last bullets of this block say so in full.)*
 
 **Cloud to Mac hand-off, 19 Oct 2026, 20:00 UK (the owner: "Make sure my local claude has access to everything
 and you dont leave anything behind").** The cloud session is closed; everything it did is in git, nothing is kept
@@ -5658,6 +5689,14 @@ Not committed on purpose: the cloud's Robolectric render harness (lesson 132 say
   So the order is: the next Mac session runs RELEASE-1.5.0.md step 1 (Ramadan and widget theme) and sends
   him the screenshots; he picks the November date; then the release day steps. GBrain: this cloud session has
   none; the next Mac session syncs it from this block without being asked (CLAUDE.md).
+- **Done on the Mac, 19 Oct 2026, 22:00 UK (the hand-off's steps 1 and 2; the owner: "pick up SajdaTime"):**
+  `claude/quiet-glass` fast forwarded to `8ceb8f4`; GBrain `projects/sajdatime` brought up to date from this
+  block (November, the Ramadan window, the widget theme, 416 tests, the order of work). **The final emulator
+  check passed** (§10, top entry): the widgets follow Dark, Light and Follow phone on the home screen and the
+  device test is OK; the Ramadan notice from 5 Feb with the new line (also Urdu, Arabic, 2.0 text), the rows only
+  from 5 Feb to 8 Mar, the eve and day 1 widget words, all gone on 9 Mar. The screenshots were sent to him as a
+  private page (claude.ai/artifact/7XivbixECckb9AnMQYDXYG). **Next: he picks the November date** (step 3), then
+  the jobs move. New, small, after 1.5.0: the widget list's previews show icons without text (as in 1.4.0).
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
