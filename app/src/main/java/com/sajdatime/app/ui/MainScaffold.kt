@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui
 
+import androidx.annotation.VisibleForTesting
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -32,6 +33,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.sajdatime.app.ui.components.LocalBottomBarClearance
+import com.sajdatime.app.ui.components.WholeWords
+import com.sajdatime.app.ui.components.scaledLineHeight
 import com.sajdatime.app.ui.theme.GlassBarAlpha
 import com.sajdatime.app.ui.theme.LocalDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -253,7 +256,8 @@ fun MainScaffold(
  * screen reader says "selected". A light tick of haptic feedback on change, nothing more.
  */
 @Composable
-private fun GlassTabBar(
+@VisibleForTesting
+internal fun GlassTabBar(
     current: Destination,
     onSelect: (Destination) -> Unit,
     modifier: Modifier = Modifier,
@@ -310,9 +314,10 @@ private fun GlassTabBar(
                     text = stringResource(item.labelRes),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                    ),
+                    ).scaledLineHeight(),
                     color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
+                    autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize),
                 )
             }
         }

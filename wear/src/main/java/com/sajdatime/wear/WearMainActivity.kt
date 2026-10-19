@@ -40,5 +40,7 @@ class WearMainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshLocation()
+        // Coming back after the watch's language changed: the tile follows now, not within the hour.
+        refreshTile(this)
     }
 }

@@ -184,10 +184,9 @@ Mon 8 Feb 2027).
 1. **Claude:** run `docs/release-tools/release-1.5.0.sh` again and expect every line PASS or TAKEN
    (phone SKIPPED is his choice). The 21 Dec preparation job does this (its prompt was rewritten on
    18 Oct 2026 late to use this script, never set the versions again, and stop before any merge, pull
-   request, submit or Console step). On 19 Oct 2026 the run gave 400 unit tests (app 259, core 129, wear 12),
-   0 failed, and a device suite of 20 of 20; the job's prompt now says so, and also re-runs
-   `LanguageAndDndDeviceTest` on the Android 12 emulator `sajda12` (6 of 6 on 19 Oct), because the script
-   runs on Android 16 only and the language code below 13 is new.
+   request, submit or Console step). The last run, 19 Oct 2026 after the emulator checks and their fixes, gave
+   406 unit tests (app 261, core 129, wear 16), 0 failed, lint 0 errors, a device suite of 25 of 25 straight after a cold boot, both bundles 9 / 1.5.0 and 1002 / 1.5.0 signed CN=Ali Imran Khan, 22 of 24 lines PASS or TAKEN (tree CHECK, the uncommitted work, and phone SKIPPED); the job's prompt says so, and also re-runs `LanguageAndDndDeviceTest` on the Android 12 emulator
+   `sajda12` (7 of 7 on 19 Oct), because the script runs on Android 16 only and the language code below 13 is new.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging
@@ -198,18 +197,23 @@ Mon 8 Feb 2027).
 5. **Ali in the Play Console, with Claude walking him through it one screen at a time:**
    - upload both bundles: production phone `app-release.aab` (9 / 1.5.0), Wear OS track
      `wear-release.aab` (1002 / 1.5.0);
-   - paste the five What's new texts (English, Urdu, Turkish, Indonesian, Arabic), the watch note and the
-     checked description (`docs/store/LISTING.md`), and check the listing still says "Wear OS";
+   - paste the five What's new texts (English, Urdu, Turkish, Indonesian, Arabic), and from `docs/store/LISTING.md`
+     "1.5.0 listing, FINAL" (19 Oct 2026): the watch note, the full description and, **with his yes**, the new
+     short description (then save, reload and search the page for "price or promotion", as LISTING.md says); check
+     the listing still says "Wear OS";
+   - add the eight translated listings (Arabic, Urdu, Turkish, Indonesian, Malay, Bengali, French, Hindi) from
+     `docs/store/LISTING-LOCALES.md`, "1.5.0" (Grow, Store presence, Store listings, Add translations; title, short
+     and full description each; the screenshots are shared). This also settles which language a user sees the
+     What's new in, because each of the app's four other languages then has its own listing;
    - replace the phone screenshots with the six new ones in `docs/store/upload/phone/`, in filename order
      (the old `03-times-dark` goes; the two Wear OS screenshots stay);
    - confirm the Data safety answers (expected unchanged);
-   - check whether Play shows the translated release notes when only the English listing exists; if not,
-     his choice: add translated listings (`docs/store/LISTING-LOCALES.md`) or ship the English note only;
    - then **he presses Send for review himself**.
 6. **After it is live** (watch Play's "Updated on" date move; Play sends no email):
    - Claude drafts the reply to the Arabic reviewer who asked for Arabic and Ali posts it (never ask
      for stars);
-   - in January, add the Ramadan lines to the store listing (`docs/store/LISTING.md`);
+   - (the January Ramadan lines are no longer a separate step: the 1.5.0 description and the translations carry
+     Ramadan, so pasting them on release day does it);
    - Ali deletes the spare copy of the signing values in `~/.gradle` (he gets a reminder);
    - record the release in `docs/HANDOVER.md` §11 and `docs/PROJECT_BRIEF.md`;
    - **Claude re-baselines the daily health check** (`trig_0129FQnWihf8XG6rKLCB4oFr`) to 1.5.0: until then it
@@ -219,6 +223,14 @@ Mon 8 Feb 2027).
      looks for.
 
 ## Open items, none of which blocks 1.5.0
+
+- **Found on the emulator on 19 Oct 2026, small, after 1.5.0 if he agrees:** a typed place in Urdu or Arabic is
+  joined with a Latin comma ("کراچی, پاکستان"; the language's own "،" would need the two look ups and the widget's town
+  split changed together); on Google's Pixel sound picker, once another sound is chosen there is no "Default" card to
+  go back to the phone's usual tone (only that tone by name), so an app row "Your phone's usual tone" would help; the
+  watch tile keeps its old language after a per-app language switch until its service is made again (a change of the
+  watch's own language was not run). Accepted, not to be "fixed": "Reset all" in Match your mosque lets TalkBack read
+  each row that changed.
 
 - **Turkey:** against Diyanet's own Istanbul page (18 to 24 Oct 2026) Maghrib is 1 minute early on 7 of 7
   days. Check other Turkish cities after 1.5.0 before changing anything (a blind +1 moves every Turkish
@@ -242,16 +254,19 @@ fact here changes, change the job too: nothing updates it automatically.
 | SajdaTime review replies, `sajdatime-review-replies` | local task, daily 12:40 | Drafts replies to new reviews (he posts them); the Arabic reply and spare signing file reminders | **Added:** a one time notice when the new description is live (file `build/review-replies/description-live.txt` in `~/Developer/SajdaTime`), one notice on 26 Oct 2026 only if it is still not live; after 1.5.0 replies may mention "Phone language" and "Use your mosque's board" |
 | SajdaTime monthly numbers, `trig_01AzcQUNWSkgGmdJmNXkaQoD` | routine run in his Chrome, days 2 to 9 at 11:51 UK | Play numbers into the "SajdaTime monthly numbers" Claude Doc | Nothing: it does not depend on a version |
 | Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, Sun 20 Dec 2026 18:00 | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct |
-| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11 |
+| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11. **Later on 19 Oct:** counts updated to the final run (406 unit tests, device suite 25, `LanguageAndDndDeviceTest` 7) |
 | SajdaTime: submit 1.5.0 today, `trig_01VexqUd1cJz8jfD5QFT874W` | cloud routine, once, Mon 4 Jan 2027 09:00 | Push reminder of the submit day and the 25 Jan limit | **New.** Replies with fixed text only (Read tool only; the account's default connectors got attached and are unused) |
 
 ## Not verified yet (say so, do not assume)
 
-From the 19 Oct 2026 work (HANDOVER §10): TalkBack on the new controls (the welcome globe button, "Use your
-mosque's board", "Which prayer?", the clock, the limit note's button); Turkish and Indonesian at 2.0 text (English,
-Urdu and Arabic were seen); the clock in landscape and on a 320dp wide phone; the watch tile after a language change
-(read, not run); the place lookups and notification channel names in a chosen language below Android 13 (read, not
-run). A real phone is not needed (the owner, 17 Oct 2026: emulator testing is the standard).
+**Done on 19 Oct 2026, later the same day (HANDOVER §10, top entry):** TalkBack on every new control (heard through
+its log), Turkish and Indonesian at 2.0 text, the clock in landscape and at 320dp, the place look up and channel names
+in Urdu on Android 12, the watch tile in Urdu and Arabic, the large Today widget in Urdu and Arabic, the sound picker's
+"Default" card. Six faults found and fixed on the way (TalkBack silent on plus and minus; words split at large text;
+wrapped button labels off centre; the clock in landscape; "Prayer alarm" left in English below 13; the tile's frozen
+countdown). Still not run from that list: the look up from the phone's location below 13 (no GPS fix on the headless
+emulator) and a change of the watch's own language. A real phone is not needed (the owner, 17 Oct 2026: emulator
+testing is the standard).
 
 A real phone (not needed, above); Android 7 to 11 (his choice; Android 12 was run on an emulator on 19 Oct 2026 for the
 language list, its right to left switching and the PDFs only); the phone sound picker's "Default" row; Google's review card

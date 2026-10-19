@@ -231,8 +231,20 @@ class WidgetDeviceTest {
         // badge is on (the default). This test is about widgets, so the badge is off for it, and any
         // alarm the badge left is cleared through the same path the app uses.
         runBlocking { SettingsRepository(context).setOngoingBadge(false) }
-        runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
-        assertEquals("an alarm is set with no widget placed", 0, DeviceSupport.alarmTimes(pkg, action).size)
+        // Right after a cold boot the app's own boot handling (SystemEventReceiver) can still be running
+        // with the badge on, and lays the alarm down again just after this cancel: the release script,
+        // which starts the emulator and runs this at once, failed here on 19 Oct 2026 and the same suite
+        // passed minutes later. So the cancel is repeated until it holds; the claim checked is unchanged.
+        val settled = SystemClock.uptimeMillis() + 30_000
+        do {
+            runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
+            val left = DeviceSupport.alarmTimes(pkg, action).size
+            if (left == 0 || SystemClock.uptimeMillis() > settled) {
+                assertEquals("an alarm is set with no widget placed", 0, left)
+                break
+            }
+            SystemClock.sleep(500)
+        } while (true)
 
         val (id, view) = bindOrFail(NextPrayerWidgetProvider::class.java)
         waitFor("the first draw") { view.textOf("widget_name")?.text?.isNotEmpty() == true }

@@ -46,6 +46,50 @@ class TileFormatTest {
         )
     }
 
+    @Test
+    fun `a long wait refreshes when the hour of countdown runs out`() {
+        assertEquals(Duration.ofMinutes(60), TileFormat.freshness(Duration.ofHours(5)))
+    }
+
+    /**
+     * The timeline floors like the watch app and the phone: each entry's minutes are what is
+     * left a second after it starts, and still a second before the next one starts.
+     */
+    @Test
+    fun `each countdown entry shows the floored minutes for its whole window`() {
+        val at = Instant.parse("2026-10-19T12:45:00Z")
+        for (now in listOf("2026-10-19T12:04:30Z", "2026-10-19T12:04:00Z", "2026-10-19T12:44:59Z")) {
+            val steps = TileFormat.countdownSteps(Instant.parse(now), at)
+            steps.forEachIndexed { i, (start, shown) ->
+                val end = steps.getOrNull(i + 1)?.first ?: at
+                for (moment in listOf(start.plusSeconds(1), end.minusSeconds(1)).filter { !it.isBefore(start) }) {
+                    assertEquals("$now, entry $i at $moment", Duration.between(moment, at).toMinutes(), shown.toMinutes())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `the countdown steps fall on the minute boundaries before the prayer`() {
+        val now = Instant.parse("2026-10-19T12:04:30Z")
+        val at = Instant.parse("2026-10-19T12:45:00Z")
+        val steps = TileFormat.countdownSteps(now, at)
+        assertEquals(now to Duration.ofMinutes(40), steps.first())
+        assertEquals(Instant.parse("2026-10-19T12:05:00Z") to Duration.ofMinutes(39), steps[1])
+        assertEquals(Instant.parse("2026-10-19T12:44:00Z") to Duration.ZERO, steps.last())
+        assertEquals(41, steps.size)
+    }
+
+    @Test
+    fun `a long wait gets an hour of steps and a passed prayer gets one`() {
+        val now = Instant.parse("2026-10-19T01:00:30Z")
+        val long = TileFormat.countdownSteps(now, now.plus(Duration.ofHours(5)))
+        assertEquals(TileFormat.TIMELINE_MINUTES + 1, long.size)
+        // The last entry starts no earlier than the hourly refresh, so no minute is left stale before it.
+        assertTrue(!long.last().first.isBefore(now.plus(TileFormat.freshness(Duration.ofHours(5)))))
+        assertEquals(listOf(now to Duration.ZERO), TileFormat.countdownSteps(now, now.minusSeconds(5)))
+    }
+
     /**
      * The one that matters: a stale or passed time must not ask the system to refresh
      * immediately, or the tile re-renders in a loop and drains the watch.

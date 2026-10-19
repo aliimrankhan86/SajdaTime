@@ -12,7 +12,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -87,6 +86,8 @@ import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.components.BottomBarClearance
 import com.sajdatime.app.ui.components.ScreenTitle
+import com.sajdatime.app.ui.components.WholeWords
+import com.sajdatime.app.ui.components.scaledLineHeight
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 import kotlin.math.roundToInt
@@ -353,27 +354,35 @@ private fun ThemeSelector(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit)
     val inset = 4.dp
     val insetPx = with(LocalDensity.current) { inset.roundToPx() }
     val haptics = LocalHapticFeedback.current
-    val pill = RoundedCornerShape(50)
+    // Fixed radii, equal to a full pill at the normal 48dp option and 56dp track. A 50% radius
+    // grew with the height, so when large text wrapped a label onto two lines the rounded ends
+    // cut the first letters off ("ollow" at 2.0 on a 320dp phone, 19 Oct 2026).
+    val pill = RoundedCornerShape(24.dp)
+    val track = RoundedCornerShape(24.dp + inset)
     Box(
         Modifier
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .clip(pill)
+            .clip(track)
             .background(scheme.surfaceContainerHigh)
             .onSizeChanged { width = it.width }
             .padding(inset)
             .selectableGroup(),
     ) {
         val step = (width - 2 * insetPx) / options.size.toFloat()
-        Box(
-            Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(1f / options.size)
-                // offset {} follows the layout direction: in right to left the thumb slides left.
-                .offset { IntOffset((step * position).roundToInt(), 0) }
-                .sajdaSurface(pill, scheme.surface),
-        )
-        Row(Modifier.fillMaxWidth()) {
+        // The thumb takes the row's height from matchParentSize, not from IntrinsicSize.Min: an
+        // intrinsic height is measured before WholeWords shrinks a label, so at large text the
+        // track came out twice as tall as its labels (emulator, 19 Oct 2026).
+        Box(Modifier.matchParentSize()) {
+            Box(
+                Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth(1f / options.size)
+                    // offset {} follows the layout direction: in right to left the thumb slides left.
+                    .offset { IntOffset((step * position).roundToInt(), 0) }
+                    .sajdaSurface(pill, scheme.surface),
+            )
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             options.forEach { choice ->
                 val selected = choice == current
                 Box(
@@ -394,9 +403,10 @@ private fun ThemeSelector(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit)
                         text = stringResource(labels.getValue(choice)),
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                        ),
+                        ).scaledLineHeight(),
                         color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
+                        autoSize = WholeWords(MaterialTheme.typography.labelLarge.fontSize),
                     )
                 }
             }

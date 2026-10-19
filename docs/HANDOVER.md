@@ -2193,6 +2193,60 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**The emulator checks left from the 8 Oct merge, and the store copy (19 Oct 2026, later the same day; owner:
+"whatever is left to test in the emulator ... needs to be done. Do it now ... do it all autonomously and get it
+reviewed independently").** Emulators `sajda` (Android 16), `sajda12` (Android 12) and `sajdawear`, all started
+`-read-only`. Each item below was the "Not run" list of the entry after this one.
+- **TalkBack on the new controls, heard, not read** (TalkBack's own log, lesson 162): the welcome globe "Language.
+  English. Button"; the language list "Selected. English. Radio button. 2 of 6" and each language by its own name;
+  "Use your mosque's board. Button"; "Which prayer?" as a heading and each prayer "Not selected. Fajr. 5:40 am. Radio
+  button"; the clock "Select hour. 7 o'clock", "Select minutes. 44 minutes", "a.m.", each hour "8 of 12", "Set time.
+  Button"; the limit note is announced by itself when it appears, then "Choose a calculation method. Button", which
+  opens the method list ("1 of 12"). **Found:** plus and minus in Match your mosque changed the number and said
+  nothing. **Fixed** (the value is a polite live region, "Dhuhr, +1 min", "Dhuhr, No changes"), heard after the fix.
+- **Turkish and Indonesian at 2.0 text** (Android 16): the welcome screen, the usage question, the Language list,
+  Match your mosque, "Which prayer?", the 24 hour clock, the limit note and its button, the Times screen and Settings.
+  **Found:** Turkish "Telefona uy" (theme) and Indonesian "Pengaturan" (tab bar) split inside the word; wrapped button
+  labels sat at the start edge. **Fixed** (`WholeWords`, centred labels; DESIGN_SYSTEM §3) and seen fixed.
+- **The clock in landscape and on a 320dp phone** (`wm density 540`): 320dp fits. **Landscape was broken** (the dial
+  covered the minutes and hid a.m./p.m.); **fixed** (always the upright layout; the dialog scrolls), and an hour picked
+  and set in landscape. 320dp at 2.0 also split English: "Setting" over "s", "Follo / w / phon / e"; fixed by the same
+  `WholeWords`, then the theme pill's ends cut the "F" (fixed radii) and its height doubled (`matchParentSize`), both
+  fixed and seen.
+- **Below 13, in a language chosen in the app** (Android 12, Urdu): a typed "Karachi" came back "کراچی, پاکستان" (Urdu
+  names; the Latin comma is a small cosmetic item, see RELEASE-1.5.0.md open items); **the channel names were three
+  Urdu and "Prayer alarm" English** (lesson 160), fixed, then all four Urdu in the phone's own Settings. The look up
+  from the phone's location was **not run**: the headless emulator never got a fix (`emu geo fix` left "last
+  location=null").
+- **The watch tile after a language change** (`sajdawear`): a tile drawn by a new process is right in Urdu and in Arabic
+  (right to left, Western digits). **Found:** the tile's countdown never moved ("in 41m" from 13:04 to 13:08); **fixed**
+  with a timeline (lesson 161), seen moving 35, 34, 32, and floored like the watch app after the review. A per-app
+  language switch while the tile service is bound keeps the old language until the service is made again (seen; the
+  app now asks for a redraw when opened and after settings change). A change of the watch's own language: not run.
+- **Also from the not verified list:** the large Today widget in Urdu and Arabic on the Pixel Launcher (the date and the
+  Hijri date whole, no "…"); the phone sound picker is handed the notification default ("Default (Pixie Dust)", not the
+  ringtone), but on Pixel's picker the "Default" card shows only while the default is the current choice, so going back
+  to the phone's tone after choosing another is not possible there except by its name (open item).
+- **Store copy:** the 1.5.0 English listing rewritten with every feature and the search words (LISTING.md "1.5.0
+  listing, FINAL"), reviewed independently against the code (five corrections); eight translated listings rebuilt from
+  it (LISTING-LOCALES.md), reviewed independently. Store screenshots unchanged: at the normal text size the theme
+  selector and tab bar match `05-settings.png`.
+- **Independent code review** (two passes, a subagent, read only): first pass 1 must fix (the tile's minutes one too
+  high), 5 should fix (alarm channel renamed only at the next alert; the usage question's links centred by the new button
+  style; several rows announced on Reset all, accepted; shrunk labels kept their full line height; tests that would not
+  fail), all fixed or recorded; second pass 1 must fix (labels grew at the Small text size), fixed, and nits taken.
+  Every new test was run against the old code once and failed: tile minutes (2 of 16), the channel names, the three
+  large text and TalkBack checks (3 of 3), the Small text size width (139 pixels against 121).
+- **Release script, three runs:** the first found `WidgetDeviceTest` failing straight after a cold boot (lesson 164,
+  fixed in the test); the third, on the final code (cold boot): 22 of
+  24 lines PASS or TAKEN, the other two tree CHECK (this work, then uncommitted) and phone SKIPPED (his choice); gate PASS
+  (406 unit tests: app 261, core 129, wear 16; 0 failed; lint 0 errors in all three); phone bundle 9 / 1.5.0, 9,581,256
+  bytes, watch bundle 1002 / 1.5.0, 3,657,978 bytes, both signed CN=Ali Imran Khan; languages ()(ar)(in)(tr)(ur); the
+  same 11 and 3 permissions; device suite 25 of 25; suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed
+  1; screens in five languages taken and looked at. On `sajda12` (Android 12): `LanguageAndDndDeviceTest` 7 of 7 and
+  `LargeTextAndTalkBackDeviceTest` 4 of 4. Watch unit tests 16 of 16; `tools/wear-verify.sh` was not re-run (no watch
+  screen changed, only the tile and when it redraws).
+
 **The 8 Oct branch brought into 1.5.0 (19 Oct 2026, owner's Mac, `claude/quiet-glass`).** Emulators: a new
 `sajda12` (Pixel 5, Android 12, made for this), `sajda` (Android 16), `sajdastore`, `sajdawear`; every one except
 `sajda12` started `-read-only`. **Android 12:** `LanguageAndDndDeviceTest` 6 of 6 (both language routes); the
@@ -5376,6 +5430,22 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   and the description check; the daily review replies job tells him once when the description is live; and a
   **new submit day reminder** fires Mon 4 Jan 2027 09:00. (3) After 1.5.0 is live, Claude re-baselines the
   health check again (RELEASE-1.5.0.md step 6).
+- **Later still on 19 Oct 2026 (the owner: test whatever is left on the emulator, write the release copy with every
+  feature and the search words, do it autonomously, get it reviewed independently):** every item on the "Not verified"
+  list above that an emulator can reach was run (§10, top entry), and **six faults were found and fixed**: TalkBack said
+  nothing for Match your mosque's plus and minus; words split across lines at large text (tab bar, theme selector;
+  `WholeWords`, DESIGN_SYSTEM §3); wrapped button labels sat off centre; the board clock in landscape covered its own
+  minutes; "Prayer alarm" stayed English below 13 with another language chosen (lesson 160); and the watch tile's
+  countdown never moved between refreshes (a timeline now, lesson 161). Each fix was seen on the emulator before and
+  after, every new test was run once against the old code and failed, and two independent code reviews found three
+  more faults in the fixes themselves (the tile a minute ahead, the channel rename only at the next alert, labels
+  growing at the Small text size), all fixed. **Store copy:** a new 1.5.0 English listing names every feature with the
+  search words (LISTING.md "1.5.0 listing, FINAL": full description 3976 of 4000, a new short description with "adhan"
+  and "Wear OS" that needs his yes on the day, a watch note); an independent review checked it against the code and
+  five corrections were made; the eight translated listings were rebuilt from it and reviewed (LISTING-LOCALES.md
+  "1.5.0"). The store screenshots did not change. Release day now also adds the eight translations; the separate
+  January Ramadan listing step is gone (the description carries Ramadan). Results of the last `release-1.5.0.sh` run
+  are in §10.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
@@ -9703,3 +9773,48 @@ matters more than the stable hashes, that is the trade being made.
     phone's back on dispose (`TimeEntryDialog`). Plain "ar" on Android 16 happened to give Western digits, so
     an Arabic in-app choice looked fine and only the regional phone locale showed it: test with ar-EG, and
     suspect any new Material component that shows a number.
+159. **Android splits a word that is wider than its line, so test short labels at 2.0 on a 320dp phone.**
+    On 19 Oct 2026 the tab bar read "Setting" over "s" and the theme selector "Follo / w / phon / e" on a
+    1080 pixel emulator set to `adb shell wm density 540` (320dp wide) at `font_scale 2.0`, and Turkish
+    "Telefona uy" and Indonesian "Pengaturan" split on an ordinary phone at 2.0. Earlier checks at 2.0 ran
+    in English on a 411dp phone, where every word happened to fit. `WholeWords` (DESIGN_SYSTEM §3) shrinks a
+    label only while a break falls inside a word. Two traps came with it: a 50% corner radius grows with the
+    height and cut the first letters off a wrapped label, and `IntrinsicSize.Min` measures text before an
+    auto size shrinks it, so the selector came out twice as tall. Put `wm density reset` back afterwards.
+160. **"Create the channel if it is missing" freezes its name in the language it was made in.** On the
+    Android 12 emulator with Urdu chosen in the app, three channel names were Urdu and "Prayer alarm" stayed
+    English (19 Oct 2026), because `ensureAlarmChannel` returned early for an existing channel and named a new
+    one from the caller's context. Creating an existing channel again changes only its name, description and
+    (with Do Not Disturb access and no user edits) its bypass flag, so it is now created every time, named
+    through `AppLocale.wrap`. Read the names in the phone's own Settings, not `dumpsys` (it cuts them to three
+    letters). `LanguageAndDndDeviceTest` now fails on the old code (run once to prove it).
+161. **A Wear tile is a snapshot until its own refresh, so a countdown on it must be a timeline.** The tile
+    said "in 41m" at 13:04 and still "in 41m" at 13:08 (watch emulator, 19 Oct 2026), because it asked to be
+    refreshed only a minute after the prayer: hours, after Isha. It now hands the watch one entry per minute
+    for up to an hour, and the text moved 35, 34, 32 on screen. The first version labelled each minute one
+    too high, a minute ahead of the watch app and the phone, which both floor: the independent review caught
+    it, and `TileFormatTest` now checks every entry's minutes a second into its window. Also seen: a per-app language switch while
+    the tile service is bound keeps the old language until the service is created again
+    (`applicationContext` is worse, it ignored the app's language), so the app asks for a redraw when it is
+    opened and after every settings write. On this emulator `add-tile` works, `show-tile` and `clear-tiles`
+    do not, and a swipe from the watch face's middle to the left opens the tiles (an edge swipe changes the
+    watch face).
+162. **TalkBack on an emulator: injected taps bypass it, the keyboard does not, and its log says what it
+    speaks.** `adb shell input tap` activates a control even with TalkBack on (it does not focus it), which
+    changed the language on the first try. Move TalkBack's focus with `input keyevent KEYCODE_TAB` and press
+    with `KEYCODE_ENTER`; set TalkBack, Advanced settings, Developer settings, Log output level to VERBOSE, and
+    each spoken phrase is a `talkback` logcat line `Actors: act() ... action=SPEAK text="..."`. Do not run
+    `uiautomator dump` while listening: it turns TalkBack off and on. Found this way: Match your mosque's plus
+    and minus changed the number and said nothing.
+163. **A test widget host does not switch a size mapped widget by measuring it.** Rendering the Today widget
+    in `WidgetDeviceTest` at 250 by 380dp still drew the ordinary card, and telling the host the size with
+    `updateAppWidgetSize` did not switch it either (tried and reverted, 19 Oct 2026). The large card was read
+    on the real Pixel Launcher instead (widget picker, the preview, Add), in Urdu and Arabic.
+164. **A device test that runs straight after a cold boot races the app's own boot handling.** In
+    `release-1.5.0.sh` on 19 Oct 2026 `WidgetDeviceTest` failed "an alarm is set with no widget placed": the
+    script boots the emulator and runs the suite at once, and `SystemEventReceiver` (boot, package replaced)
+    was still running with the badge on, so it laid the redraw alarm down again just after the test turned the
+    badge off and cancelled it. Reproduced by a second cold boot; the same suite passed 21 of 21 a few minutes
+    after boot, and the class passed alone twice. The test now repeats the cancel until it holds, for up to 30
+    seconds, and checks the same claim (21 of 21 straight after a third cold boot). The app's behaviour is right:
+    re-arming at boot is the point.

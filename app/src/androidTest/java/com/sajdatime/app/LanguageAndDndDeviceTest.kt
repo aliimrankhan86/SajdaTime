@@ -195,6 +195,34 @@ class LanguageAndDndDeviceTest {
         assertEquals(null, notifications.getNotificationChannel(after))
     }
 
+    /**
+     * Below Android 13 a language chosen in the app reaches the channel names only through
+     * AppLocale.wrap. The alarm channel used to be named once and never again, so with Urdu chosen
+     * the phone's settings listed "Prayer alarm" in English beside three Urdu names (19 Oct 2026).
+     * Both routes are checked: the alert's own path, and ensureChannels (what a recreated screen and
+     * every post run), which renames a channel that already exists.
+     */
+    @Test
+    fun the_alarm_channel_name_follows_the_language_chosen_in_the_app() {
+        assumeTrue(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !perAppLanguage)
+        fun alarmName(id: String) = notifications.getNotificationChannel(id)!!.name.toString()
+
+        AppLanguage.apply(context, AppLanguage.ENGLISH)
+        val english = AppLocale.wrap(context).getString(R.string.channel_alarm)
+        val id = Notifications.ensureAlarmChannel(context, soundUri = "")
+        assertEquals(english, alarmName(id))
+
+        AppLanguage.apply(context, AppLanguage.URDU)
+        val urdu = AppLocale.wrap(context).getString(R.string.channel_alarm)
+        assertTrue("Urdu has its own word for the alarm channel", urdu != english)
+        Notifications.ensureChannels(context)
+        assertEquals("ensureChannels left the alarm channel's old name", urdu, alarmName(id))
+
+        AppLanguage.apply(context, AppLanguage.ENGLISH)
+        Notifications.ensureAlarmChannel(context, soundUri = "")
+        assertEquals("the alarm's own path left the channel's old name", english, alarmName(id))
+    }
+
     private fun shell(command: String) {
         // Read the output to the end: the command has not finished until the pipe closes.
         instrumentation.uiAutomation.executeShellCommand(command).use { fd ->

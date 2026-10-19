@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.settings
 
+import androidx.annotation.VisibleForTesting
 import com.sajdatime.app.ui.components.ctaIconButtonColors
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
@@ -124,6 +125,7 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerLayoutType
 import androidx.compose.material3.ExperimentalMaterial3Api
 import android.text.format.DateFormat
 
@@ -1543,8 +1545,13 @@ private fun TimeEntryDialog(
                 ) {
                     // The stock dial draws the chosen a.m./p.m. in the tertiary (amber) family, and
                     // amber means a warning in this app (DESIGN_SYSTEM §1), so it uses the green roles.
+                    // Always the upright layout. Left to choose, Material picks its sideways layout
+                    // in landscape, which needs about 520dp of width; the dialog has about 320, so
+                    // the dial covered the minutes and hid a.m./p.m. (emulator, 19 Oct 2026). Upright
+                    // it is taller than a landscape screen, which this Column already scrolls.
                     TimePicker(
                         state = state,
+                        layoutType = TimePickerLayoutType.Vertical,
                         colors = TimePickerDefaults.colors(
                             periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -1566,9 +1573,16 @@ private fun TimeEntryDialog(
  *
  * The value carries the whole row's accessibility label because a screen reader landing on
  * a bare "+5 min" between two icon buttons has no way to know which prayer it belongs to.
+ * It is a polite live region, so pressing plus or minus is answered with the new value
+ * ("Dhuhr, +2 min", with the language's own comma). Until 19 Oct 2026 this comment said so
+ * and the code did neither: with TalkBack, a press changed the number and said nothing
+ * (emulator, 19 Oct 2026). The dash that means no change is read as the words, not as
+ * "em dash". "Reset all" may announce several rows at once; each is true, and it follows a
+ * tap, so that is accepted (independent review, 19 Oct 2026).
  */
 @Composable
-private fun StepperRow(
+@VisibleForTesting
+internal fun StepperRow(
     label: String,
     value: String,
     canDecrease: Boolean,
@@ -1593,13 +1607,25 @@ private fun StepperRow(
                 contentDescription = stringResource(R.string.action_decrease, label),
             )
         }
+        // The language's own list comma: "، " in Urdu and Arabic.
+        val separator = stringResource(R.string.list_separator)
+        val spoken = if (value == stringResource(R.string.adjustment_none)) {
+            stringResource(R.string.settings_adjustments_none)
+        } else {
+            value
+        }
         Text(
             text = value,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             // Wide enough for "-30 min" so the plus button does not shuffle sideways as
             // the number grows a digit or loses its sign.
-            modifier = Modifier.width(64.dp),
+            modifier = Modifier
+                .width(64.dp)
+                .semantics {
+                    contentDescription = label + separator + spoken
+                    liveRegion = LiveRegionMode.Polite
+                },
         )
         FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
             Icon(

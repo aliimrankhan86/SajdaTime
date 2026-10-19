@@ -70,4 +70,32 @@ internal object TileFormat {
      */
     fun freshness(remaining: Duration): Duration =
         remaining.plusMinutes(1).coerceAtLeast(Duration.ofMinutes(1))
+            // Never more than the timeline covers, so a long wait is handed over an hour at a time.
+            .coerceAtMost(Duration.ofMinutes(TIMELINE_MINUTES.toLong()))
+
+    /** How far ahead the tile's countdown timeline reaches, one entry a minute. */
+    const val TIMELINE_MINUTES = 60
+
+    /**
+     * The tile's countdown as a timeline: when each text starts, and the minutes it shows. The
+     * minutes are floored, as on the watch app and the phone: "in 40m" from 40 minutes 59 seconds
+     * before the prayer down to 40 minutes exactly, then "in 39m". So the entry that starts k
+     * minutes before the prayer shows k minus 1, and the first entry, from [now], shows the floor
+     * of what is left just after now. At most [TIMELINE_MINUTES] plus one entries, so the last
+     * starts at or after the hourly refresh and a long wait never shows a stale minute.
+     *
+     * Why a timeline. A tile is a snapshot the watch keeps until it asks again, and it asked
+     * again only a minute after the prayer, so the tile went on saying "in 41m" for 41 minutes
+     * (watch emulator, 19 Oct 2026). Handed one entry per minute, the watch swaps the text on
+     * the minute itself without waking the app. The first version labelled each minute one too
+     * high, a minute ahead of the watch app (independent review, 19 Oct 2026).
+     */
+    fun countdownSteps(now: Instant, at: Instant): List<Pair<Instant, Duration>> {
+        // Less a nanosecond, so a wait of exactly 41 minutes shows 40 for the minute that follows.
+        val first = Duration.between(now, at).minusNanos(1).toMinutes().coerceAtLeast(0)
+        val later = (first downTo 1)
+            .map { k -> at.minus(Duration.ofMinutes(k)) to Duration.ofMinutes(k - 1) }
+            .filter { (start, _) -> start.isAfter(now) }
+        return (listOf(now to Duration.ofMinutes(first)) + later).take(TIMELINE_MINUTES + 1)
+    }
 }

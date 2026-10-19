@@ -286,6 +286,14 @@ jitter as they change width.
 > becomes live again the moment a translation into a language with its own digits ships:
 > `displayLarge` on the next-prayer card is the first thing to re-measure.
 
+**A word is never split across two lines** (19 Oct 2026). Android breaks a word that is wider than
+its line, and short labels in fixed width slots hit that at large text: "Settings" in the tab bar
+became "Setting" over "s" on a 320dp phone at 2.0, and Turkish "Telefona uy" and Indonesian
+"Pengaturan" split on an ordinary phone at 2.0. Such labels (today the tab bar and the theme
+selector) use `WholeWords`, which shrinks the text only while a break falls inside a word, to no
+less than 60% of its size; at normal sizes nothing changes. Wrapping between words stays. A button
+label that wraps is centred (`actionLabelStyle`), never left hugging the start edge.
+
 Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp.
 
 > They are **not** uppercased in code. `String.uppercase()` on a translated string is a
@@ -888,6 +896,17 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   Turkish and Indonesian (Urdu has no case). Written that way in the strings, never cased in
   code.
 
+- **19 Oct 2026, the emulator checks left from the 8 Oct merge** (owner: test whatever is left, do it
+  autonomously). Found and fixed, each seen before and after on the emulator: words split at large
+  text (`WholeWords`, §3); the theme selector's ends cut the first letters once a label wrapped (fixed
+  24dp and 28dp radii, the same pill at normal size) and its height was measured before the shrink
+  (`matchParentSize`); wrapped button labels sat at the start edge (centred); the board time clock in
+  landscape covered its own minutes (always the upright layout, the dialog scrolls); Match your mosque's
+  plus and minus said nothing to TalkBack (the value is a polite live region, "Dhuhr, +2 min").
+  Rejected: shorter Turkish and Indonesian words (English splits too on a 320dp phone, so the cause is
+  the layout, not the language); capping the font size (the clock's 1.3 cap is for fixed size boxes;
+  these labels can shrink a little instead); one line labels ("Follow phone" would need well under
+  half size on a 320dp phone at 2.0; reasoned, not run).
 - **17 Oct 2026, research pass (FINDINGS.md):** granted permissions show nothing on Settings;
   every card is 24dp, notices included; dialog section labels speak in the Settings section
   voice. Kept against the research: the iOS style chevron (the owner asked for an iPhone feel).

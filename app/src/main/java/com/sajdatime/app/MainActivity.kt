@@ -45,6 +45,7 @@ import com.sajdatime.core.AppLocale
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.MainScaffold
@@ -132,6 +133,9 @@ class MainActivity : ComponentActivity() {
         // right to left after choosing "Phone language" from Urdu, which CLAUDE.md forbids. A fresh
         // launch was always right. HANDOVER §15 lesson 152.
         window.decorView.layoutDirection = resources.configuration.layoutDirection
+        // Here as well as in the ViewModel: a language change recreates this screen but keeps the
+        // ViewModel, so this is where the channel names in the phone's settings catch up with it.
+        Notifications.ensureChannels(this)
         enableEdgeToEdge()
 
         setContent {

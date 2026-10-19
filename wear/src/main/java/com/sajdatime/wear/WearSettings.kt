@@ -3,6 +3,7 @@ package com.sajdatime.wear
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.datastore.preferences.core.edit
@@ -84,7 +85,7 @@ class WearSettingsStore(private val context: Context) {
         adjustments: String? = null,
         hijriOffsetDays: Int = 0,
     ) {
-        context.dataStore.edit { prefs ->
+        write { prefs ->
             sect?.let { prefs[Keys.SECT] = it }
             madhab?.let { prefs[Keys.MADHAB] = it }
             method?.let { prefs[Keys.METHOD] = it }
@@ -101,7 +102,7 @@ class WearSettingsStore(private val context: Context) {
     }
 
     suspend fun setLocation(coordinates: Coordinates, cityName: String) {
-        context.dataStore.edit { prefs ->
+        write { prefs ->
             prefs[Keys.LATITUDE] = coordinates.latitude
             prefs[Keys.LONGITUDE] = coordinates.longitude
             prefs[Keys.CITY] = cityName
@@ -109,7 +110,7 @@ class WearSettingsStore(private val context: Context) {
     }
 
     suspend fun setSect(sect: Sect) {
-        context.dataStore.edit {
+        write {
             it[Keys.SECT] = sect.name
             // The phone's setter has done this since the first release and the watch's never
             // did: a method synced from the phone (say Karachi) stayed put when the wearer
@@ -123,7 +124,13 @@ class WearSettingsStore(private val context: Context) {
     }
 
     suspend fun setMadhab(madhab: Madhab) {
-        context.dataStore.edit { it[Keys.MADHAB] = madhab.name }
+        write { it[Keys.MADHAB] = madhab.name }
+    }
+
+    /** Every write goes through here, so the tile redraws with the new settings at once. */
+    private suspend fun write(change: suspend (MutablePreferences) -> Unit) {
+        context.dataStore.edit(change)
+        refreshTile(context)
     }
 
     private object Keys {

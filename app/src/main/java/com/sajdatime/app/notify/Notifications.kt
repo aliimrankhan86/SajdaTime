@@ -115,6 +115,20 @@ object Notifications {
                 setShowBadge(false)
             },
         )
+
+        // The channels made for a chosen sound keep the name they were first given, so they are
+        // renamed here too, in the app's language: on the Android 12 emulator with Urdu chosen,
+        // "Prayer alarm" stayed English beside three Urdu names (19 Oct 2026). The system's own
+        // object goes back, so its importance, sound and Do Not Disturb flag stay exactly as they are.
+        manager.notificationChannels
+            .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) || it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }
+            .forEach { channel ->
+                val alarm = channel.id.startsWith(CHANNEL_ALARM_PREFIX)
+                channel.name = context.getString(if (alarm) R.string.channel_alarm else R.string.channel_prayers)
+                channel.description =
+                    context.getString(if (alarm) R.string.channel_alarm_desc else R.string.channel_prayers_desc)
+                manager.createNotificationChannel(channel)
+            }
     }
 
     /**
@@ -136,30 +150,35 @@ object Notifications {
         CHANNEL_ALARM_PREFIX + soundUri.hashCode().toUInt().toString(16) + if (bypassesDnd) "_dnd" else ""
 
     /**
-     * Creates (or reuses) the alarm channel for [soundUri] and returns its id. Stale
+     * Creates the alarm channel for [soundUri], or renames it, and returns its id. Stale
      * channels from previously chosen sounds, or from before Do Not Disturb access was
      * granted or withdrawn, are deleted so the system Settings list does not fill up with
      * dead entries.
+     *
+     * Created again on every call, never skipped when it exists: for an existing channel Android
+     * takes only the name and description from that (and the bypass flag, which is the same as
+     * at creation), so the name follows the app's language. It used to return early, and on
+     * Android 12 with Urdu chosen in the app "Prayer alarm" stayed English in the phone's
+     * settings beside three Urdu names (emulator, 19 Oct 2026).
      */
     fun ensureAlarmChannel(context: Context, soundUri: String): String {
         val id = alarmChannelId(soundUri, bypassesDnd = hasDndAccess(context))
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
 
         val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+        val named = AppLocale.wrap(context)
 
         manager.notificationChannels
             .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) && it.id != id }
             .forEach { manager.deleteNotificationChannel(it.id) }
 
-        if (manager.getNotificationChannel(id) != null) return id
-
         manager.createNotificationChannel(
             NotificationChannel(
                 id,
-                context.getString(R.string.channel_alarm),
+                named.getString(R.string.channel_alarm),
                 NotificationManager.IMPORTANCE_HIGH,
             ).apply {
-                description = context.getString(R.string.channel_alarm_desc)
+                description = named.getString(R.string.channel_alarm_desc)
                 enableVibration(true)
                 vibrationPattern = PRAYER_VIBRATION
                 setSound(
@@ -223,25 +242,26 @@ object Notifications {
         val id = notificationChannelId(soundUri)
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
         val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+        // Named in the app's language and created again every time, as the alarm channel is.
+        val named = AppLocale.wrap(context)
 
         manager.notificationChannels
             .filter { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) && it.id != id }
             .forEach { manager.deleteNotificationChannel(it.id) }
 
         if (id == CHANNEL_PRAYERS) {
-            createPrayersChannel(context, manager)
+            createPrayersChannel(named, manager)
             return id
         }
         manager.deleteNotificationChannel(CHANNEL_PRAYERS)
-        if (manager.getNotificationChannel(id) != null) return id
 
         manager.createNotificationChannel(
             NotificationChannel(
                 id,
-                context.getString(R.string.channel_prayers),
+                named.getString(R.string.channel_prayers),
                 NotificationManager.IMPORTANCE_HIGH,
             ).apply {
-                description = context.getString(R.string.channel_prayers_desc)
+                description = named.getString(R.string.channel_prayers_desc)
                 enableVibration(true)
                 vibrationPattern = PRAYER_VIBRATION
                 setSound(

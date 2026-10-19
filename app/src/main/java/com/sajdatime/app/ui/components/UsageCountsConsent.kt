@@ -1,6 +1,7 @@
 package com.sajdatime.app.ui.components
 
 import android.content.Intent
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.Alignment
@@ -113,7 +114,9 @@ private fun InfoLink(text: String, onClick: () -> Unit, modifier: Modifier = Mod
     ) {
         Text(
             text = text,
-            style = actionLabelStyle().copy(textDecoration = TextDecoration.Underline),
+            // Start aligned (DESIGN_SYSTEM §4.1, kind F): the shared button style is centred since
+            // 19 Oct 2026, which suits a button, not a link under a paragraph.
+            style = actionLabelStyle().copy(textDecoration = TextDecoration.Underline, textAlign = TextAlign.Start),
             color = MaterialTheme.colorScheme.primary,
         )
     }

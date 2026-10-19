@@ -13,6 +13,7 @@ import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.ui.theme.DarkCta
@@ -73,9 +74,12 @@ private val CompactPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
  * The one label style for every solid button in the app, green or amber: labelLarge (SemiBold)
  * at 16sp. Notice and permission buttons used Material's 14sp default until 18 Oct 2026, so
  * three sizes of button text sat side by side. docs/DESIGN_SYSTEM.md 4.1 has the full spec.
+ * Centred, so a label that wraps at large text or in a longer language stays centred on the
+ * button instead of hugging its start edge (Turkish and Indonesian at 2.0, 19 Oct 2026).
  */
 @Composable
-fun actionLabelStyle(): TextStyle = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp)
+fun actionLabelStyle(): TextStyle =
+    MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp, textAlign = TextAlign.Center)
 
 /** The call to action colours, for the few places that need a Material Button directly. */
 @Composable
