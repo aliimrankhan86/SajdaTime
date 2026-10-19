@@ -6,6 +6,10 @@ A dated record of one session's work on `claude/quiet-glass`. It is a snapshot, 
 - **Branch:** `claude/quiet-glass`, pushed. The work is commit `eb3caa3` (on top of `12b8d3a`); this file is the
   commit after it. `main` was not touched. Nothing was merged, submitted or changed in the Play Console.
 - **Live on Play (unchanged):** phone 1.4.0, watch 1.2.0. 1.5.0 is still for release day, around 4 Jan 2027.
+- **Added later, 19 Oct 2026 late (Mac session, one check only):** the cloud commit `742389f`
+  (`ClockChangeReceiver`) was fast forwarded in and its watch emulator check run. **PASS:** with the watch app
+  never opened, a zone change from Istanbul to London moved the tile from Fajr 5:38 am to 3:38 am within about
+  2 seconds, countdown unchanged; zone put back. Details: HANDOVER §10 top entry. Nothing else was changed.
 
 ## The brief
 
@@ -66,7 +70,7 @@ time zone moved from Europe/Istanbul to Europe/London by itself during the run, 
    note "updates every minute" stays true.
 2. **Tile keeps the old time zone's prayer time** after a zone change: **built later on 19 Oct 2026** (owner's yes),
    `ClockChangeReceiver` redraws the tile on a time zone or clock change. Gate passed in the cloud; the watch
-   emulator check is the 21 Dec job's (RELEASE-1.5.0.md step 1). HANDOVER §11 STATE OF PLAY, last bullet.
+   emulator check **passed later the same night** (above). Closed. HANDOVER §11 STATE OF PLAY, last bullet.
 3. **`sajda12`:** if Android 12 checks are wanted again, make a new AVD from the same image rather than retrying.
 4. Unchanged from before: review item 2 (the limit note's position), Turkey's Maghrib against Diyanet, the
    "Tap to read" line, the short description needs his yes on release day.

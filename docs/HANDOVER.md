@@ -2197,6 +2197,21 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**The tile after a time zone change, `ClockChangeReceiver` (`742389f`), watch emulator (19 Oct 2026, late, Mac
+session; owner: "run ONE check only, the watch tile time zone check").** `sajdawear` (Wear OS 4), 1002 / 1.5.0
+debug of `742389f` installed with `adb install -r`; the manifest receiver is registered for `TIMEZONE_CHANGED` and
+`TIME_SET` (`dumpsys package`). The tile was added with `add-tile` and the watch app was **never opened**. Found
+on the watch: zone Europe/Istanbul, automatic time zone already off (`auto_time_zone` 0). Tile before: "NEXT
+PRAYER / Fajr / 5:38 am · in 9h 6m". `adb shell cmd alarm set-timezone Europe/London` (the emulator accepted it):
+the system sent `TIMEZONE_CHANGED` at 18:31:39.868 and SysUI logged "Tile update requested for
+...NextPrayerTileService" at 18:31:40.014, 0.15 s later. Screenshots each second: the first, taken as the command
+ran, still said 5:38 am; the next, about 2 s later, said **"Fajr / 3:38 am · in 9h 6m"**, the same prayer two
+hours earlier on the clock with the countdown unchanged, and it stayed so for the 8 s sampled. Put back: zone set
+to Europe/Istanbul (the tile went back to 5:38 am within 3 s, "in 9h 5m"), automatic time zone left off as it
+was found, "stay awake" set back to 0, emulator shut down without saving a snapshot. The tile stays added (the
+watch had it on earlier runs; `clear-tiles` does not work here, lesson 161). Not run: `TIME_SET` (a manual clock
+change or the 12/24 switch) on the watch; the same receiver handles it, held by `ClockChangeActionsTest`.
+
 **The last four items from the read-only review, and the emulator checks still open (19 Oct 2026, evening;
 owner: "apply items 1, 4, 5 and the listing count edit, run the full gate, the 12 hour clock, the tile, the
 place from the phone's location on Android 12 and changing the watch language, review, commit, push").**
@@ -5524,8 +5539,11 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   the new zone. Same pattern as the phone's `SystemEventReceiver`; `ClockChangeActionsTest` (2 tests) holds the
   manifest and the code's action lists together, as `SystemEventActionsTest` does on the phone. No permission,
   no data, no copy change. **Verified:** the full gate on the cloud container, 409 unit tests (app 261, core 130 with 1 skipped, wear 18), 0 failed, lint 0 errors in all three, both bundles built (unsigned there: the key is only on his Mac, so signing is checked on 21 Dec). An independent review of the diff found no code defect; its two wording fixes and its emulator tip (turn automatic time zone off first) are in.
-  **Not verified:** on the watch emulator: the cloud container has no KVM, so no emulator can run there. The
-  21 Dec job does it (RELEASE-1.5.0.md step 1, item "tile after a time zone change"). (a), (b), (c) and the
+  **Then verified on the watch emulator, 19 Oct 2026 late (Mac session, `742389f`):** with the watch app never
+  opened, changing the watch from Europe/Istanbul to Europe/London moved the tile from "Fajr 5:38 am · in 9h 6m"
+  to "Fajr 3:38 am · in 9h 6m" within about 2 seconds, and back on the way back (§10, top entry). **PASS.**
+  Not run on the watch: `TIME_SET` (a manual clock change, the 12/24 switch). RELEASE-1.5.0.md step 1 still
+  lists the check, so the 21 Dec job may run it again; that is harmless. (a), (b), (c) and the
   smaller items stay open and parked until after 1.5.0 or release day; nothing else was started.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
