@@ -294,7 +294,14 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-### For the live 1.4.0, to paste into the Console now (owner's choice 19 Oct 2026; 3925 characters)
+### For the live 1.4.0, SUBMITTED 19 Oct 2026 (owner's choice; 3924 characters in the Console)
+
+**In the Console, 19 Oct 2026:** Claude, at the owner's word ("do it for you"), set this text in the default listing
+(English, United Kingdom) through Claude in Chrome, checked it matched this block exactly (3924 characters: the Console
+holds it without the final line break; checksum compared), left the AI asset declaration as it was ("Don't label
+assets") and pressed Save, which only stages the change. Publishing overview then showed one change, "Change full
+description", and **the owner pressed "Submit 1 change for review" himself**. Managed publishing is off, so it goes live
+on approval; Play sends no email, so confirm on the public page. Nothing else in the listing was changed.
 
 The owner chose "two steps" on 19 Oct 2026: the live description is replaced now with text that is true of 1.4.0, and the
 1.5.0 description, What's new and six screenshots go up with the 1.5.0 build on release day. This is block 1 below
