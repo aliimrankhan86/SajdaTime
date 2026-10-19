@@ -5427,7 +5427,18 @@ also carries everything the unmerged 8 Oct branch had, audited, approved by the 
 waiting before release day (around 4 Jan 2027). Start nothing else on your own.** *(Updated late on 19 Oct:
 1.5.0 moves to November, date not chosen; and two changes made in the cloud that evening, the Ramadan window
 and the widgets following the app's Theme, are not yet seen on an emulator. The next Mac session runs
-RELEASE-1.5.0.md step 1 for both before anything else. The last bullets of this block say so in full.)* Never merge
+RELEASE-1.5.0.md step 1 for both before anything else. The last bullets of this block say so in full.)*
+
+**Cloud to Mac hand-off, 19 Oct 2026, 20:00 UK (the owner: "Make sure my local claude has access to everything
+and you dont leave anything behind").** The cloud session is closed; everything it did is in git, nothing is kept
+anywhere else. On the Mac, before anything: `git fetch origin`, then check out `claude/quiet-glass` and pull it;
+it must be at `ca5b1d5` or later (the last cloud commit; `main` stays at `bcdba63` until release day). Then, in
+this order: (1) bring GBrain `projects/sajdatime` up to date from this 19 Oct block (CLAUDE.md, Memory; never ask
+him to); (2) RELEASE-1.5.0.md step 1, the Ramadan and widget theme checks on the emulator, and send him the
+screenshots; (3) ask him for the November date and move the scheduled jobs (RELEASE-1.5.0.md, the jobs table).
+Outside git and so not carried by it: the cloud routine `trig_01VexqUd1cJz8jfD5QFT874W` (submit reminder, his
+account, only he or a Mac session can edit it) and the Mac's own scheduled tasks in `~/.claude/scheduled-tasks/`.
+Not committed on purpose: the cloud's Robolectric render harness (lesson 132 says how to rebuild it). Never merge
 `claude/analytics-default-on-1-4-0`; neither old branch is to be deleted (both stay on GitHub as the record).
 
 - **Done on 19 Oct 2026 (Claude Code on his Mac, worktree `~/Developer/SajdaTime-settings-preview`):** the
