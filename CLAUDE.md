@@ -5,7 +5,7 @@ This file is loaded automatically. It is deliberately short. **The full handover
 
 ---
 
-> **Memory:** every session also reads and updates the shared GBrain page `projects/sajdatime` (`recall` it at the start; write what is done and what remains at the end). It carries the owner's standing decisions and rules between sessions; `docs/HANDOVER.md` stays the source of truth for the repo.
+> **Memory:** every session also reads and updates the shared GBrain page `projects/sajdatime` (`recall` it at the start; write what is done and what remains at the end). It carries the owner's standing decisions and rules between sessions; `docs/HANDOVER.md` stays the source of truth for the repo. **Keeping GBrain current is Claude's job, never the owner's** (his words, 19 Oct 2026: "You are responsible to keep gbrain up to date not me"). A cloud session has no GBrain connection, so it writes everything into `docs/HANDOVER.md` §11 and pushes; **the first session with GBrain afterwards compares GBrain with the §11 STATE OF PLAY and brings GBrain up to date itself, without being asked.** Never hand him a prompt whose only job is to update GBrain.
 
 ---
 
