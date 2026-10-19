@@ -5365,6 +5365,17 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   read" line, the private claude.ai copy of the checklist). The Android 12 emulator `sajda12` and its system
   image (about 1.5 GB) stay on the Mac for the next below 13 check; delete with `avdmanager delete avd -n
   sajda12` if space is wanted.
+- **Later on 19 Oct 2026, the same session:** (1) the description for the live 1.4.0 was set in the Console and
+  **the owner pressed Submit**; it is in review (`docs/store/LISTING.md`, commits `c1f02e1` and `6d53b48`; the 1.5.0
+  description, What's new and screenshots still go up on release day, his "two steps" choice). (2) **All six
+  scheduled jobs were checked against this state and brought up to date** (table: RELEASE-1.5.0.md "Scheduled
+  jobs"): the daily health check had never been re-baselined after 1.4.0 (the carry-over in the 17 Oct evening
+  block) and reported 1.4.0 as an unknown release on 18 Oct, so it is on 1.4.0 now, knows the description in
+  review, expects 1.5.0 and warns on 18 and 22 Jan 2027 if 1.5.0 is not live; the 20 Dec reminder said the job
+  "opens the pull request" (corrected); the 21 Dec job gained the 19 Oct counts, the Android 12 language test
+  and the description check; the daily review replies job tells him once when the description is live; and a
+  **new submit day reminder** fires Mon 4 Jan 2027 09:00. (3) After 1.5.0 is live, Claude re-baselines the
+  health check again (RELEASE-1.5.0.md step 6).
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
@@ -5603,7 +5614,7 @@ then decided: "if you test it emulator then no need to test it on real phone". E
 for 1.5.0, adhan and alarms included. Do not ask him to plug in a phone, and do not add a phone step to any job.
 
 **Claude's carry-overs.** Re baseline the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr` for 1.4.0
-live. Post the drafted Arabic review reply only once 1.5.0 (Arabic) is live; the owner posts it.
+live (**done 19 Oct 2026**, two days late: it reported 1.4.0 as unknown on 18 Oct). Post the drafted Arabic review reply only once 1.5.0 (Arabic) is live; the owner posts it.
 
 ### 📍 Built-in adhans (Sunni and Shia) and "Play on silent", 17 Oct 2026 late (same branch, NOT merged, ships in 1.5.0)
 

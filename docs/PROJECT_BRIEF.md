@@ -48,7 +48,8 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Store screenshots:** six new phone screenshots taken from 1.5.0 on 18 Oct 2026 (Times, Qibla, Ramadan in dark, madhab, Settings, and the widgets, which Ali added), Settings retaken on 19 Oct 2026 for the new language line; the watch ones did not change. They replace the phone ones on release day.
 - **Timeline:**
   - Sun 20 Dec 2026, 18:00 UK time: a phone reminder to leave the Mac on.
-  - Mon 21 Dec 2026, 10:00: the preparation job runs on the Mac. Since 18 Oct 2026 (late) it re-runs `release-1.5.0.sh`, never sets the versions again, and stops before any merge, pull request, submit or Play Console step.
+  - Mon 21 Dec 2026, 10:00: the preparation job runs on the Mac. Since 18 Oct 2026 (late) it re-runs `release-1.5.0.sh`, never sets the versions again, and stops before any merge, pull request, submit or Play Console step. Since 19 Oct 2026 it also re-runs the language test on the Android 12 emulator and checks the new store description went live.
+  - Mon 4 Jan 2027, 09:00: a phone reminder that today is the day to submit (added 19 Oct 2026).
   - Around 4 Jan 2027: Ali merges and submits.
   - Mid January: live.
   - Latest acceptable date: 25 Jan 2027, two weeks before Ramadan.
@@ -83,9 +84,9 @@ Ali decided on 16 Oct 2026:
 - It adds no new usage counts.
 
 ## Automatic jobs on Ali's Mac (they need the Mac on)
-- **Daily, around 12:50:** drafts replies to new Play reviews into `build/review-replies/DRAFTS.md` and notifies Ali, who posts them himself. It also refreshes this brief when a new version goes live.
+- **Daily, around 12:40:** drafts replies to new Play reviews into `build/review-replies/DRAFTS.md` and notifies Ali, who posts them himself. It also reminds him to post the Arabic reply and to delete the spare signing file once 1.5.0 is live, and tells him once when the store description submitted on 19 Oct 2026 is live. (It does not update this brief; a Claude session does that after a release.)
 - **Monthly, days 2 to 9:** Play numbers go into the "SajdaTime monthly numbers" Claude Doc.
-- **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page.
+- **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page. Set to 1.4.0 on 19 Oct 2026; it reports 1.5.0 when it goes live, and on 18 and 22 Jan 2027 only it warns if 1.5.0 is still not live.
 - **One reply waiting:** to the Arabic reviewer who asked for Arabic. Post it once 1.5.0 is live. It must not ask for stars.
 
 ## Known gaps (documented, accepted)

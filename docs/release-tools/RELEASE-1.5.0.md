@@ -172,14 +172,22 @@ app 252, wear 12); the description 3969 characters and containing "Wear OS"; the
 
 ## Still to do, in order
 
-Dates: a reminder on Sun 20 Dec 2026 (18:00), the preparation job on Mon 21 Dec 2026 (10:00), submit
-around **4 Jan 2027**, live by mid January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins
+Dates: a reminder on Sun 20 Dec 2026 (18:00), the preparation job on Mon 21 Dec 2026 (10:00), a submit day
+reminder on Mon 4 Jan 2027 (09:00), submit around **4 Jan 2027**, live by mid January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins
 Mon 8 Feb 2027).
 
+0. **Waiting on Google (19 Oct 2026):** the description for the live 1.4.0 was submitted (`docs/store/LISTING.md`,
+   "For the live 1.4.0, SUBMITTED 19 Oct 2026"). Live when the public page's description says "In English, Urdu,
+   Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
+   job tells him once when it sees it, and the 21 Dec job checks it too. **Claude:** then change that heading to
+   LIVE with the date, and update GBrain.
 1. **Claude:** run `docs/release-tools/release-1.5.0.sh` again and expect every line PASS or TAKEN
    (phone SKIPPED is his choice). The 21 Dec preparation job does this (its prompt was rewritten on
    18 Oct 2026 late to use this script, never set the versions again, and stop before any merge, pull
-   request, submit or Console step).
+   request, submit or Console step). On 19 Oct 2026 the run gave 400 unit tests (app 259, core 129, wear 12),
+   0 failed, and a device suite of 20 of 20; the job's prompt now says so, and also re-runs
+   `LanguageAndDndDeviceTest` on the Android 12 emulator `sajda12` (6 of 6 on 19 Oct), because the script
+   runs on Android 16 only and the language code below 13 is new.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging
@@ -203,7 +211,12 @@ Mon 8 Feb 2027).
      for stars);
    - in January, add the Ramadan lines to the store listing (`docs/store/LISTING.md`);
    - Ali deletes the spare copy of the signing values in `~/.gradle` (he gets a reminder);
-   - record the release in `docs/HANDOVER.md` §11 and `docs/PROJECT_BRIEF.md`.
+   - record the release in `docs/HANDOVER.md` §11 and `docs/PROJECT_BRIEF.md`;
+   - **Claude re-baselines the daily health check** (`trig_0129FQnWihf8XG6rKLCB4oFr`) to 1.5.0: until then it
+     reports "1.5.0 is live" every day, on purpose. The new baseline is the 1.5.0 "Updated on", What's new,
+     the six new phone screenshot IDs (the two watch ones stay), the privacy policy's new date, and the 1.5.0
+     description, which no longer has the words "chosen automatically for your school" that its check 3
+     looks for.
 
 ## Open items, none of which blocks 1.5.0
 
@@ -217,9 +230,30 @@ Mon 8 Feb 2027).
 - **A private claude.ai page:** the cloud session accidentally published a copy of this file as a private
   page (claude.ai/artifact/GxU35nSJAfxqedU7DYa35L). Only Ali can see it; he can delete it if he wants.
 
+## Scheduled jobs (all six checked and brought up to date on 19 Oct 2026)
+
+None of these is in the repository: the local tasks' prompts are in `~/.claude/scheduled-tasks/<id>/SKILL.md` on
+his Mac (they need the Mac on and the Claude app open), the routines are at https://claude.ai/code/routines. If a
+fact here changes, change the job too: nothing updates it automatically.
+
+| Job | Kind and time | What it does | Changed on 19 Oct 2026 |
+|---|---|---|---|
+| SajdaTime app health check, `trig_0129FQnWihf8XG6rKLCB4oFr` | cloud routine, daily 12:00 UTC | Watches the public store page; silent unless something changed | **Re-baselined to 1.4.0.** It still had 1.3.2 and on 18 Oct reported 1.4.0 as a release it did not know about. Now it also knows the description change in review (either text is fine), expects 1.5.0 in January and says so as good news, and on 18 and 22 Jan 2027 only warns if 1.5.0 is still not live |
+| SajdaTime review replies, `sajdatime-review-replies` | local task, daily 12:40 | Drafts replies to new reviews (he posts them); the Arabic reply and spare signing file reminders | **Added:** a one time notice when the new description is live (file `build/review-replies/description-live.txt` in `~/Developer/SajdaTime`), one notice on 26 Oct 2026 only if it is still not live; after 1.5.0 replies may mention "Phone language" and "Use your mosque's board" |
+| SajdaTime monthly numbers, `trig_01AzcQUNWSkgGmdJmNXkaQoD` | routine run in his Chrome, days 2 to 9 at 11:51 UK | Play numbers into the "SajdaTime monthly numbers" Claude Doc | Nothing: it does not depend on a version |
+| Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, Sun 20 Dec 2026 18:00 | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct |
+| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11 |
+| SajdaTime: submit 1.5.0 today, `trig_01VexqUd1cJz8jfD5QFT874W` | cloud routine, once, Mon 4 Jan 2027 09:00 | Push reminder of the submit day and the 25 Jan limit | **New.** Replies with fixed text only (Read tool only; the account's default connectors got attached and are unused) |
+
 ## Not verified yet (say so, do not assume)
 
-A real phone; Android 7 to 11 (his choice; Android 12 was run on an emulator on 19 Oct 2026 for the
+From the 19 Oct 2026 work (HANDOVER §10): TalkBack on the new controls (the welcome globe button, "Use your
+mosque's board", "Which prayer?", the clock, the limit note's button); Turkish and Indonesian at 2.0 text (English,
+Urdu and Arabic were seen); the clock in landscape and on a 320dp wide phone; the watch tile after a language change
+(read, not run); the place lookups and notification channel names in a chosen language below Android 13 (read, not
+run). A real phone is not needed (the owner, 17 Oct 2026: emulator testing is the standard).
+
+A real phone (not needed, above); Android 7 to 11 (his choice; Android 12 was run on an emulator on 19 Oct 2026 for the
 language list, its right to left switching and the PDFs only); the phone sound picker's "Default" row; Google's review card
 (it only appears on a copy installed from Play); whether Play shows the translated What's new without
 translated listings (his choice if not); Turkish cities other than Istanbul; what opening the notification
