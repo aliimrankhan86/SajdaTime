@@ -200,7 +200,11 @@ Mon 8 Feb 2027).
    Ramadan notice on Times, no "Ramadan card" or "Suhoor reminder" in Settings. Then 5 February (3 days before):
    the notice shows with the new line "From the first day, the Ramadan card shows suhoor and iftar times here.
    You can turn it off in Settings." and both rows are in Settings. Then 8 March (the last day): rows there;
-   9 March (1 Shawwal): rows gone. Look at the notice in Urdu and Arabic and at 2.0 text. Put the date and
+   9 March (1 Shawwal): rows gone. Look at the notice in Urdu and Arabic and at 2.0 text. **The widgets too (the
+   owner, 19 Oct 2026: "Also widget should be there"):** place both widgets on the home screen and screenshot them
+   on each of those dates plus the evening of 7 February (the eve: the next prayer, tomorrow's Fajr, says "Suhoor
+   ends") and day 1 (Fajr "Suhoor ends", Maghrib "Iftar"); on 9 March the words are gone. Send him the widget and
+   notice screenshots. Put the date and
    automatic date back. Record in HANDOVER §10. Unit tests after that change: **410** (app 261, core 131, wear 18).
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
