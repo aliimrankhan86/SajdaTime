@@ -39,7 +39,7 @@
       The same colours again under fixed names, for a widget whose theme is chosen in the app: Light
       or Dark in Settings, Theme (owner's request, 19 Oct 2026). The names above resolve under the
       PHONE's dark mode and serve "System". These do not change with the phone, so the renderer can
-      pin them. WidgetColorsTest fails the build if either set drifts from the names above.
+      pin them. WidgetThemeTest fails the build if either set drifts from the names above.
     -->
     <color name="widget_light_surface">#FDFCFB</color>
     <color name="widget_light_on_surface">#1B211E</color>

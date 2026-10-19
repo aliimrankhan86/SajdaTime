@@ -421,13 +421,13 @@ internal object WidgetRenderer {
     )
 
     /** The three inks the layouts use, each to its fixed light and dark value (values/colors.xml). */
-    private val FIXED_COLOURS = mapOf(
+    internal val FIXED_COLOURS = mapOf(
         R.color.widget_on_surface to (R.color.widget_light_on_surface to R.color.widget_dark_on_surface),
         R.color.widget_on_surface_variant to (R.color.widget_light_on_surface_variant to R.color.widget_dark_on_surface_variant),
         R.color.widget_primary to (R.color.widget_light_primary to R.color.widget_dark_primary),
     )
 
-    private val FIXED_DRAWABLES = mapOf(
+    internal val FIXED_DRAWABLES = mapOf(
         R.drawable.widget_background to (R.drawable.widget_background_light to R.drawable.widget_background_dark),
         R.drawable.widget_hero_background to (R.drawable.widget_hero_background_light to R.drawable.widget_hero_background_dark),
         R.drawable.widget_chip to (R.drawable.widget_chip_light to R.drawable.widget_chip_dark),

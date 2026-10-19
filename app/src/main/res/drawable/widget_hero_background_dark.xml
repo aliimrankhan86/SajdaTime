@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- A copy of widget_hero_background.xml with each colour fixed to its dark value, for a widget whose theme
-     is chosen in the app (Settings, Theme). WidgetColorsTest fails the build if the two drift. -->
+     is chosen in the app (Settings, Theme). WidgetThemeTest fails the build if the two drift. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape android:shape="rectangle">

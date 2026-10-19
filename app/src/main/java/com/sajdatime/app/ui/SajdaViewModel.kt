@@ -455,6 +455,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
             _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
+            // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
+            withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
         }
 

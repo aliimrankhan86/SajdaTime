@@ -86,6 +86,40 @@ class WidgetThemeTest {
         }
     }
 
+    /**
+     * The renderer's two lookups, by name. A colour or drawable missing from them would throw (the widget
+     * then stops updating under Light or Dark) or quietly keep following the phone, and a swapped pair
+     * would draw the wrong theme; none of that fails to compile. Added after the independent review.
+     */
+    @Test
+    fun `the renderer maps every pinned colour and drawable to its own light and dark copy`() {
+        val pinned = WidgetRenderer.PAINTS.values.flatten()
+        val colours = pinned.filter { it.ink == Ink.TEXT || it.ink == Ink.TINT }.map { colourNames.getValue(it.resource) }.toSet()
+        val fixedColours = WidgetRenderer.FIXED_COLOURS.map { (k, v) ->
+            colourNames.getValue(k) to (colourNames.getValue(v.first) to colourNames.getValue(v.second))
+        }.toMap()
+        assertEquals(colours, fixedColours.keys)
+        for ((name, pair) in fixedColours) {
+            val base = name.removePrefix("widget_")
+            assertEquals(name, "widget_light_$base" to "widget_dark_$base", pair)
+        }
+
+        val drawables = pinned.filter { it.ink == Ink.BACKGROUND || it.ink == Ink.IMAGE }.map { drawableNames.getValue(it.resource) } +
+            // Switched by the renderer after the paint, not declared once per layout: the highlighted row
+            // and the three states of a day bar.
+            listOf("widget_row_highlight", "widget_seg_done", "widget_seg_next", "widget_seg_todo")
+        val themed = drawables.filter { hasCopies(it) }.toSet()
+        val fixedDrawables = WidgetRenderer.FIXED_DRAWABLES.map { (k, v) ->
+            drawableNames.getValue(k) to (drawableNames.getValue(v.first) to drawableNames.getValue(v.second))
+        }.toMap()
+        assertEquals(themed, fixedDrawables.keys)
+        for ((name, pair) in fixedDrawables) assertEquals(name, "${name}_light" to "${name}_dark", pair)
+        // A drawable without copies must carry no widget colour, or it would keep following the phone.
+        for (name in drawables.toSet() - themed) {
+            assertTrue("$name has a widget colour but no fixed copies", !read("drawable/$name.xml").contains("@color/widget_"))
+        }
+    }
+
     @Test
     fun `every layout has its fixed twin, which is that layout in a frame and nothing else`() {
         for (name in layouts.keys) {

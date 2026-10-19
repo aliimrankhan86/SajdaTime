@@ -216,8 +216,8 @@ Mon 8 Feb 2027).
    app, Settings, Theme, Dark: both widgets turn dark when you go back to the home screen; Light: light; Follow
    phone: light; now switch the emulator to dark mode: the widgets follow it. Screenshot each and **send him the
    widget screenshots** (he asked to see them). Then put Theme back to Follow phone and the emulator back to
-   light. Record in HANDOVER §10. Unit tests after this change: **415** (app 266, core 131, wear 18); the
-   preparation job's expected count moves from 410 to 415, and 415 is correct, not a fault.
+   light. Record in HANDOVER §10. Unit tests after this change: **416** (app 267, core 131, wear 18); the
+   preparation job's expected count moves from 410 to 416, and 416 is correct, not a fault.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging

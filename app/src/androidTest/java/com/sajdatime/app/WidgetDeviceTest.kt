@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -227,10 +228,11 @@ class WidgetDeviceTest {
 
     /**
      * Owner's request, 19 Oct 2026: a widget is dark when Dark is chosen in the app and light when Light
-     * is, whatever the phone is set to, and follows the phone again under System. Dark, Light, then
-     * System, in that order, because the step back to System is the one a launcher could get wrong: it
-     * must inflate afresh (a new layout id) or the pinned colours would survive. The renders are the
-     * screenshots for the owner.
+     * is, whatever the phone is set to, and follows the phone again under System. The step back to
+     * System is the one a launcher could get wrong: it must inflate afresh (a new layout id) or the
+     * pinned colours would survive. So the theme just before System is the OPPOSITE of the phone's mode,
+     * read here, or a surviving pinned colour would equal the System one and the check could not see it
+     * (found by the independent review, 19 Oct 2026). The renders are the screenshots for the owner.
      */
     @Test
     fun the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system() {
@@ -239,11 +241,15 @@ class WidgetDeviceTest {
             val (_, today) = bindOrFail(TodayWidgetProvider::class.java)
             val (_, next) = bindOrFail(NextPrayerWidgetProvider::class.java)
             waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
-            for ((choice, ink) in listOf(
-                ThemeChoice.DARK to R.color.widget_dark_on_surface,
-                ThemeChoice.LIGHT to R.color.widget_light_on_surface,
-                ThemeChoice.SYSTEM to R.color.widget_on_surface,
-            )) {
+            val phoneDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            val light = ThemeChoice.LIGHT to R.color.widget_light_on_surface
+            val dark = ThemeChoice.DARK to R.color.widget_dark_on_surface
+            val opposite = if (phoneDark) light else dark
+            assertTrue(
+                "the theme before System must differ from the phone's, or the check below proves nothing",
+                context.getColor(opposite.second) != context.getColor(R.color.widget_on_surface),
+            )
+            for ((choice, ink) in listOf(if (phoneDark) dark else light, opposite, ThemeChoice.SYSTEM to R.color.widget_on_surface)) {
                 runBlocking {
                     settings.setThemeChoice(choice)
                     WidgetUpdater.refreshAll(context)
@@ -256,7 +262,10 @@ class WidgetDeviceTest {
                 save("widget-next-$tag", layoutAt(next, 180, 110))
             }
         } finally {
-            runBlocking { settings.setThemeChoice(ThemeChoice.SYSTEM) }
+            runBlocking {
+                settings.setThemeChoice(ThemeChoice.SYSTEM)
+                WidgetUpdater.refreshAll(context)
+            }
         }
     }
 

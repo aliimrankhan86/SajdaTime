@@ -1373,7 +1373,9 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    `WidgetThemeTest` fails the build if a coloured view in a layout is missing from the renderer's list
    (`WidgetRenderer.PAINTS`), or a fixed colour or drawable differs from the phone resolved one. Rejected:
    pinning colours under System too (the widget would stop following the phone until the next redraw,
-   lesson 130); and reusing the same layout id (lesson 169).
+   lesson 130); and reusing the same layout id (lesson 169). Known and accepted: the widget picker's
+   preview (`previewLayout`, Android 12 and later) and the moment before a new widget's first update use
+   the base layouts, so they follow the phone; the first update, a second later, applies the app's theme.
 4. **The countdown.** The Next prayer widget shows a `Chronometer` countdown only when exact alarms
    are allowed, because an inexact refresh could leave one running past zero. Otherwise it shows the
    time only. The Chronometer's digits follow the phone's language and not the app's picker
@@ -2178,7 +2180,7 @@ below, and it takes a second.
 | `RamadanWordingTest` | app | 12 | 57 Ramadan, suhoor, Eid and widget strings: the info note, no ruling words, "imsak" in one sentence only, placeholders match across languages, no dash or semicolon (1.4.0) |
 | `WidgetStateTest` | app | 21 | The pure widget state: Ramadan days, the eve, the last day, Shawwal, switch off, shift, the word table (1.4.0); the app's Theme choice is carried, with and without a location (19 Oct 2026) |
 | `WidgetColorsTest` | app | 7 | Every widget colour equals its `Color.kt` twin in both themes, the contrast pairs and the gloss sheen (1.4.0, 1.5.0) |
-| `WidgetThemeTest` | app | 4 | The widgets under a theme chosen in the app (19 Oct 2026): the renderer pins exactly the colours each layout declares, each layout has its `_fixed` twin, the fixed colours equal the phone resolved ones, each fixed drawable is its source with the colours renamed. Proven by deleting one entry from the renderer's list and watching it fail |
+| `WidgetThemeTest` | app | 5 | The widgets under a theme chosen in the app (19 Oct 2026): the renderer pins exactly the colours each layout declares, its lookups map every pinned colour and drawable to its own light and dark copy, each layout has its `_fixed` twin, the fixed colours equal the phone resolved ones, each fixed drawable is its source with the colours renamed. Proven by deleting one entry from the renderer's list, and one from its drawable lookup, and watching each fail |
 | `WidgetResourcesTest` | app | 12 | No `android:text`, children hidden from TalkBack, alignment, ids, `updatePeriodMillis` 0, previews under 30 KB (1.4.0) |
 | `WidgetManifestTest` | app | 4 | Both providers are declared with their provider files, the redraw receiver is declared, listens for its own action only and is not exported, the picker labels, and the merged permissions are those of 1.3.2 and no others (1.4.0) |
 | `WidgetRefreshSchedulerTest` | app | 8 | Boundary plus 2 seconds, midnight after Isha, local not UTC, a zone that skips midnight, and a sweep of six zones over a year proving the answer is always in the future and under 26 hours (1.4.0) |
@@ -5621,14 +5623,30 @@ RELEASE-1.5.0.md step 1 for both before anything else. The last bullets of this 
   Built as §5.20 point 3 says: System unchanged (follows the phone), Light and Dark pinned on a second layout
   id (lesson 169). The picker descriptions lost "Follows your phone's dark mode" in all five languages
   (nothing replaces it; matching the app needs no warning). **Verified (cloud container):** the full gate
-  (counts in the commit message) and `WidgetThemeTest` proven to fail when one view is dropped from the
+  on the final code: 416 unit tests (app 267, core 131 with 1 skipped,
+  wear 18), 0 failed, lint 0 errors, both bundles built (unsigned here), device tests compiled; and `WidgetThemeTest` proven to fail when one view is dropped from the
   renderer's list. **Not verified, and cannot be here (no emulator, lesson above):** the widgets drawn under
   Light and Dark. A new device test, `WidgetDeviceTest.the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system`,
-  binds both widgets, sets Dark, Light, then System, checks the text colour each time (System last, the step
-  a launcher could get wrong) and saves six renders; it runs in `release-1.5.0.sh` 6b with the rest of the
+  binds both widgets, sets the theme matching the phone, then the opposite one, then System, checks the text
+  colour each time (System last, the step a launcher could get wrong, straight after the theme that differs
+  from the phone so a surviving colour would show) and saves six renders; it runs in `release-1.5.0.sh` 6b with the rest of the
   suite. **The next Mac session runs it first, with the Ramadan check, and sends him the six renders**
   (RELEASE-1.5.0.md step 1). Also not verified: a real launcher (One UI, HyperOS) re-inflating on the switch,
   and the `<include>` frame on Android 7 to 11 (the framework inflater handles it; not seen).
+- **Then, the same session:** an independent review of the widget diff found nothing blocking and six smaller
+  things, all fixed: the device test now puts the theme opposite to the phone's just before System (with
+  Dark, Light, System on a light emulator a surviving colour would have passed unseen); `WidgetThemeTest`
+  gained a fifth test on the renderer's two lookups (proven to fail with one drawable entry removed); the
+  fixed drawables' comments name `WidgetThemeTest`; a Theme change now redraws the "set your location"
+  widget too; the picker preview following the phone is written down in §5.20; the device test redraws
+  after putting System back. **The owner asked (19 Oct 2026) whether this is merged into `main`. Answer
+  given: no, and not until release day.** "Merged" today means `claude/quiet-glass` holds everything (it is
+  fast forwarded with each commit). `main` waits because merging publishes `docs/`, the 1.5.0 privacy policy
+  included, and RELEASE-1.5.0.md has it merged the same day as submission. **His plan, in his words:** "we
+  will do one final test on emulator and if it works then we will roll it out the new release and update."
+  So the order is: the next Mac session runs RELEASE-1.5.0.md step 1 (Ramadan and widget theme) and sends
+  him the screenshots; he picks the November date; then the release day steps. GBrain: this cloud session has
+  none; the next Mac session syncs it from this block without being asked (CLAUDE.md).
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
@@ -10034,4 +10052,5 @@ matters more than the stable hashes, that is the trade being made.
     id would leave a widget dark after the user went back to System, until the launcher next inflated it. The
     fix is a different layout id for the pinned path (`*_fixed.xml`, the same layout inside a `FrameLayout`
     with `<include>`), which forces a fresh inflate on every switch. Found by reading the framework, before
-    building, 19 Oct 2026; the device test checks the System step last for that reason. Not seen on a device.
+    building, 19 Oct 2026; the device test checks the System step last for that reason, straight after the theme
+    opposite to the phone's (with the matching one before it, a surviving colour would equal System's and pass). Not seen on a device.
