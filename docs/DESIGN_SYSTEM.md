@@ -386,6 +386,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Screen | Label | Kind | Height, width | File |
 |---|---|---|---|---|
 | Setup, welcome | Begin | A | 56, full | `OnboardingScreen.kt` |
+| Setup, welcome | Globe and the language's own name ("English", "اردو"), top end corner, 16dp in; opens the language list | A, compact | 40 drawn, 48 target, wraps | `OnboardingScreen.kt` |
 | Setup, location | Allow location (pin icon) | A | 56, full | `OnboardingScreen.kt` |
 | Setup, location | How your location is used (info icon) | A | 52, full | `OnboardingScreen.kt` |
 | Setup, location | Find place (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
@@ -397,7 +398,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Setup, confirm | Finish | A | 56, full | `OnboardingScreen.kt` |
 | Usage question (setup, and the Settings switch) | See exactly what is sent / Hide, 16dp under the text | F | 48 target, wraps | `UsageCountsConsent.kt` |
 | Usage question | Read the privacy policy, straight under it | F | 48 target, wraps | `UsageCountsConsent.kt` |
-| Usage question | Yes, share usage counts; No thanks, 24dp under the links | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
+| Usage question | Yes, share usage counts; No thanks, 24dp under the links (under "The full privacy policy is in English." when the app is not in English, since 19 Oct 2026) | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
 | First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
 | Times | Save as PDF (PDF icon), end of the Today heading; 16dp under the card above, 8dp over the list it saves | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
@@ -411,6 +412,9 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Settings, Match your mosque | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
+| Settings, the clock ("Isha: the time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
 | Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
@@ -715,6 +719,23 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **19 Oct 2026, "Match your mosque" can be set from the mosque's board: one button at the top.**
+  From the 8 Oct 2026 branch, whose version made the minutes number an underlined, tappable link (now
+  banned, §4.1). Three solid button versions were drawn on the emulator in light and dark, and the
+  owner chose with AskUserQuestion: **one full width "Use your mosque's board" above the list**, which
+  opens "Which prayer?" (each prayer with the time it shows now) and then the clock. The minutes are
+  worked out (`AdjustmentFit`); a board time more than 30 minutes away is refused and explained under
+  that prayer with "Choose a calculation method" (§5.17 of HANDOVER: a gap that size is a method or a
+  congregation board). Rejected: a time button under each prayer ("5:53 am") and "Shows 5:53 am" with
+  "Set time" under each prayer: both added six green buttons to a calm dialog. The clock's chosen a.m.
+  or p.m. is drawn in `primaryContainer`, not the stock amber, because amber means a warning here.
+- **19 Oct 2026, the welcome screen offers the language list.** From the 8 Oct branch (a bare globe
+  icon). The owner chose from screenshots: **a compact solid button in the top end corner with a globe
+  and the current language's own name**, so someone who cannot read English sees a way out before the
+  first question. Rejected: the bare globe icon (easy to miss, and a seventh kind of control) and a
+  "Language" button under Begin (the word itself is English). The Settings Language row stays under
+  Theme, as before: only its subtitle changed ("Phone language · English" until a language is chosen).
 
 - **18 Oct 2026 (Mac release check), the tab bar made 97% solid.** Found on the emulator while
   retaking the store screenshots: at 90% the text and buttons scrolling under the floating bar were

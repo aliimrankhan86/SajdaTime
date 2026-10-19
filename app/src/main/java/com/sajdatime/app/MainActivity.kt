@@ -125,6 +125,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The window's direction must come from the app's language (AppLocale.wrap above), not be
+        // left to the platform. Below Android 13 a language picked in the app restarts this screen
+        // with recreate(), and on the Android 12 emulator (19 Oct 2026) the new screen kept the old
+        // one's direction: Urdu words laid out left to right after choosing Urdu, and English words
+        // right to left after choosing "Phone language" from Urdu, which CLAUDE.md forbids. A fresh
+        // launch was always right. HANDOVER §15 lesson 152.
+        window.decorView.layoutDirection = resources.configuration.layoutDirection
         enableEdgeToEdge()
 
         setContent {

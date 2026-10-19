@@ -1,4 +1,4 @@
-# SajdaTime: project brief (snapshot 18 Oct 2026 late, Play "Updated on" 17 Oct 2026)
+# SajdaTime: project brief (snapshot 19 Oct 2026, Play "Updated on" 17 Oct 2026)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
@@ -43,8 +43,9 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - **Even spacing on every phone screen** (18 Oct 2026, approved by Ali from screenshots): the gaps between text and buttons follow the design system's spacing scale, and the build fails if a hand-picked gap is added. Not covered: the watch app.
   - **Security hardening** (17 Oct 2026): every library checksum-verified at build time, the two known library vulnerabilities fixed (0 known in the 204 shipped libraries), task hijacking blocked, network trust locked to the system's certificates. Firebase key restricted to the app and GitHub protections on (18 Oct). Passkeys on GitHub and Google. Signing values moved to ~/.gradle and proven (18 Oct); a spare copy is kept in ~/.gradle until 1.5.0 is live, then Ali deletes it (he gets a reminder).
   - The habit tracker is not in 1.5.0 (Ali, 18 Oct 2026: "leave it out").
+  - **Everything from the old 8 Oct branch (19 Oct 2026, Ali approved all ten items after an audit):** "Phone language" is the first and default choice in the language list; the list now works on Android 7 to 12 too (before, the Language row was missing there) and is on the welcome screen (a globe with the language's name in the corner, Ali's choice); Match your mosque can take the time from the mosque's board (one "Use your mosque's board" button, Ali's choice), and a gap over 30 minutes is explained with a button to the calculation method; the PDF timetable reads right to left in Urdu and Arabic; the translated usage question says the privacy policy is in English; translation fixes in Urdu, Turkish, Indonesian and Arabic (alarms that are quiet were called silent); automatic translation checks; the translation reviews and the method finder research kept as records (the finder stays not built). Ali left out an About line saying the translation was made with AI help. A bug the old branch saw once (English laid out right to left after choosing "Phone language" on Android 12) was reproduced and fixed, with four related fixes found while testing.
   - **Two fixes from the Mac check (18 Oct 2026, Ali's choice from screenshots):** the floating tab bar is a little more solid (97%, was 90%), because words scrolling under it ran into its labels, most in dark; and the big Today widget's Hijri date shrinks slightly to fit instead of being cut ("2 Rabi al-Awwal 14…" on home screens with five columns).
-- **Store screenshots:** six new phone screenshots taken from 1.5.0 on 18 Oct 2026 (Times, Qibla, Ramadan in dark, madhab, Settings, and the widgets, which Ali added); the watch ones did not change. They replace the phone ones on release day.
+- **Store screenshots:** six new phone screenshots taken from 1.5.0 on 18 Oct 2026 (Times, Qibla, Ramadan in dark, madhab, Settings, and the widgets, which Ali added), Settings retaken on 19 Oct 2026 for the new language line; the watch ones did not change. They replace the phone ones on release day.
 - **Timeline:**
   - Sun 20 Dec 2026, 18:00 UK time: a phone reminder to leave the Mac on.
   - Mon 21 Dec 2026, 10:00: the preparation job runs on the Mac. Since 18 Oct 2026 (late) it re-runs `release-1.5.0.sh`, never sets the versions again, and stops before any merge, pull request, submit or Play Console step.
@@ -59,7 +60,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   4. Ali builds both bundles fresh from `main`.
   5. Ali in the Play Console, with Claude walking him through one screen at a time: both bundles, the five What's new texts, the watch note, the checked description, the six screenshots, Data safety (expected unchanged), whether the translated notes show; then Ali presses Send for review.
   6. After it is live: Claude drafts the Arabic reviewer reply and Ali posts it; the January Ramadan listing lines; Ali deletes the spare signing file; record the release.
-- **Not verified:** a real phone; Android 7 to 13 (Ali's choice); the phone sound picker's "Default" row; Google's review card (only on a copy installed from Play); whether Play shows the translated What's new without translated listings.
+- **Not verified:** a real phone; Android 7 to 11 (Ali's choice; the language changes were run on an Android 12 emulator); the phone sound picker's "Default" row; Google's review card (only on a copy installed from Play); whether Play shows the translated What's new without translated listings.
 
 ## Decisions still open (Ali's)
 - **January store listing.** Add the Ramadan lines (already written in `docs/store/LISTING.md`) in January.

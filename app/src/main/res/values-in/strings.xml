@@ -95,7 +95,7 @@
     <string name="mosque_diff_follow">Jika masih ada perbedaan, ikutilah masjid Anda.</string>
     <string name="polar_notice_title">Waktu perkiraan</string>
     <string name="polar_notice_body">Sejauh ini dari khatulistiwa, matahari tidak selalu terbit atau terbenam, jadi tidak ada Subuh atau Isya yang sebenarnya untuk dihitung. Waktu ini dihitung dari lintang %1$d° sebagai gantinya. Masjid di sini menanganinya dengan cara berbeda, jadi tanyakan kepada masjid Anda apa yang diikutinya.</string>
-    <string name="polar_notice_alarm">Pada hari-hari ini alarm Anda datang sebagai notifikasi senyap, bukan berbunyi, karena aplikasi tidak bisa menjamin menit yang tepat. Aktifkan “Bunyikan pada hari perkiraan” di Pengaturan jika Anda tetap ingin dibangunkan.</string>
+    <string name="polar_notice_alarm">Pada hari-hari ini alarm Anda datang sebagai notifikasi biasa, bukan berbunyi, karena aplikasi tidak bisa menjamin menit yang tepat. Aktifkan “Bunyikan pada hari perkiraan” di Pengaturan jika Anda tetap ingin dibangunkan.</string>
     <string name="home_no_location">Atur lokasi Anda untuk melihat waktu salat.</string>
     <string name="home_countdown_a11y">%1$s dalam %2$s</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
@@ -199,7 +199,7 @@
     <string name="action_allow">Izinkan</string>
     <string name="settings_exact_alarms_desc">Tanpa izin ini, pengingat salat bisa terlambat satu jam atau lebih, dan di beberapa ponsel pengingat Subuh bisa tidak muncul sama sekali.</string>
     <string name="confirm_exact_alarm_title">Satu hal terakhir</string>
-    <string name="confirm_exact_alarm_body">Android tidak mengizinkan aplikasi memasang pengingat pada menit yang tepat kecuali Anda mengizinkannya. Tanpa izin itu, ponsel Anda bisa menunda pengingat salat hingga satu jam atau lebih, dan di beberapa ponsel pengingat malam hari seperti Subuh bisa tidak muncul sama sekali. Anda juga bisa melakukannya nanti dari Pengaturan.</string>
+    <string name="confirm_exact_alarm_body">Android tidak mengizinkan aplikasi memasang pengingat pada menit yang tepat kecuali Anda mengizinkannya. Tanpa izin itu, ponsel Anda bisa menunda pengingat salat satu jam atau lebih, dan di beberapa ponsel pengingat dini hari seperti Subuh bisa tidak muncul sama sekali. Anda juga bisa melakukannya nanti dari Pengaturan.</string>
     <string name="action_close">Tutup</string>
 
     <string name="about_version">Versi</string>
@@ -214,6 +214,7 @@
     <string name="settings_language_title">Bahasa</string>
     <string name="settings_language_desc">Pilih bahasa aplikasi</string>
     <string name="language_unavailable">Tidak tersedia di ponsel ini</string>
+    <string name="language_phone">Bahasa ponsel</string>
     <string name="permission_allowed">Diizinkan</string>
     <string name="state_expanded">Diperluas</string>
     <string name="state_collapsed">Diciutkan</string>
@@ -226,6 +227,7 @@
     <string name="consent_yes">Ya, bagikan data penggunaan</string>
     <string name="consent_no">Tidak, terima kasih</string>
     <string name="consent_read_policy">Baca kebijakan privasi</string>
+    <string name="consent_policy_english">Kebijakan privasi lengkap ditulis dalam bahasa Inggris.</string>
     <string name="about_feedback">Kirim masukan</string>
     <string name="about_feedback_desc">Beri tahu pengembang apa yang membantu atau apa yang salah. Membuka aplikasi email Anda.</string>
     <string name="feedback_subject">Masukan SajdaTime</string>
@@ -280,7 +282,13 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Sesuaikan dengan masjid</string>
     <string name="settings_adjustments_none">Tidak ada perubahan</string>
-    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit.</string>
+    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini, atau setel ke waktu di papan jadwal masjid. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit.</string>
+    <string name="adjustment_use_board">Pakai waktu di papan masjid</string>
+    <string name="adjustment_which_prayer">Salat yang mana?</string>
+    <string name="action_set_time">Setel waktu</string>
+    <string name="adjustment_pick_time_title">%1$s: waktu di papan jadwal masjid Anda</string>
+    <string name="adjustment_limit_note">Selisih %1$d menit atau lebih biasanya disebabkan oleh metode perhitungan yang berbeda, atau papan jadwal masjid yang menampilkan waktu salat berjamaah, yang sedikit lebih lambat. Coba metodenya terlebih dahulu.</string>
+    <string name="adjustment_choose_method">Pilih metode perhitungan</string>
     <string name="settings_adjustments_reset">Atur ulang semua</string>
     <string name="settings_hijri_offset">Tanggal Hijriah</string>
     <string name="settings_hijri_offset_label">Geser tanggal</string>
@@ -299,7 +307,7 @@
     <string name="action_increase">Tambah %1$s</string>
     <string name="notif_approximate">Waktu perkiraan</string>
     <string name="settings_alarm_on_approximate">Bunyikan pada hari perkiraan</string>
-    <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tetap senyap pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
+    <string name="settings_alarm_on_approximate_desc">Saat matahari tidak terbit atau terbenam, waktu dihitung dari lintang yang lebih rendah. Alarm tidak berbunyi pada hari-hari itu kecuali Anda mengaktifkan ini.</string>
 
     <!-- Ramadan -->
     <string name="ramadan_card_label">Ramadan</string>

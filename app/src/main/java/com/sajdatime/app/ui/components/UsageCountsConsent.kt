@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.core.AppLocale
 
 /**
  * The one consent text for optional usage counts, used by both the setup screen and the
@@ -77,6 +78,16 @@ fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {
         text = stringResource(R.string.consent_read_policy),
         onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, policyUrl.toUri())) } },
     )
+    // The policy page is in English. Said in the reader's language, right under the link, only
+    // when they are not reading English: a translated consent must not imply a translated policy.
+    // (8 Oct 2026 branch, brought into 1.5.0 on 19 Oct 2026.)
+    if (AppLocale.of(context).language != "en") {
+        Text(
+            text = stringResource(R.string.consent_policy_english),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
     Spacer(Modifier.height(Space.Section))
     // Equal weight on purpose: the same solid CtaButton each, same size, so neither answer is
     // steered (and neither is easy to miss).

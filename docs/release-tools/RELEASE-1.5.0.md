@@ -106,6 +106,22 @@ memory (GBrain `projects/sajdatime`); `recall` it first and do not redo work it 
 
 ## FIRST, before release day: bring the unmerged 8 Oct work into 1.5.0 (owner's decision, 18 Oct 2026 late)
 
+> **DONE, 19 Oct 2026, by a Claude Code session on his Mac.** Audited feature by feature and shown to Ali
+> before anything changed; he approved all ten missing items and left out the About row "made with help from
+> AI". Brought in: "Phone language" first and the default; a language list on Android 7 to 12
+> (`AppLocale.setOverride`); the language list on the welcome screen; Match your mosque from the mosque's
+> board ("Use your mosque's board", then the prayer, then a clock; a time over 30 minutes is refused and
+> explained); the PDF right to left in Urdu and Arabic; the watch tile's language; "The full privacy policy
+> is in English." under the translated usage question; the missing translation fixes in Urdu, Turkish,
+> Indonesian and the same ones in Arabic; `TranslationIntegrityTest` and `tools/check-translation.py` with
+> Arabic; and the records (translation reviews, the method finder sweep and its decision, the old listing
+> drafts marked as history). **The "Phone language" bug was reproduced on a new Android 12 emulator
+> (`sajda12`) and fixed** (HANDOVER §15 lesson 152), and running it found four more of the same family, all
+> fixed (lessons 153 and 157). Ali chose both new looks from screenshots (DESIGN_SYSTEM §9). What's new
+> (five languages) and one description line now mention the mosque board (LISTING.md); store screenshot 05
+> retaken. Results, what was and was not verified: HANDOVER §11, STATE OF PLAY 19 Oct 2026. Neither old
+> branch was deleted; `claude/analytics-default-on-1-4-0` was not merged.
+
 **Why.** After the Mac check (`5143282`), the cloud session compared every remote branch with
 `claude/quiet-glass` and `main`. All 31 of its own commits are in the release. Two older branches are
 not, and the owner said: "I don't want anything to be lost in any branch ... all merged then that gets
@@ -203,7 +219,8 @@ Mon 8 Feb 2027).
 
 ## Not verified yet (say so, do not assume)
 
-A real phone; Android 7 to 13 (his choice); the phone sound picker's "Default" row; Google's review card
+A real phone; Android 7 to 11 (his choice; Android 12 was run on an emulator on 19 Oct 2026 for the
+language list, its right to left switching and the PDFs only); the phone sound picker's "Default" row; Google's review card
 (it only appears on a copy installed from Play); whether Play shows the translated What's new without
 translated listings (his choice if not); Turkish cities other than Istanbul; what opening the notification
 panel does to an Alarm; the watch spacing (not converted to the scale, on purpose); the large Today

@@ -157,7 +157,10 @@ session inherits it instead of relearning it.
   (java.time and `String.format` disagree otherwise). A phone set to any language we have no
   words for stays English and left-to-right — English laid out right-to-left is genuinely
   wrong, and the owner has ruled it out. Two tests in `LocaleDisciplineTest` fail the build if
-  either half slips. See `docs/HANDOVER.md` §5.16.
+  either half slips. Since 1.5.0 the user can also pick a language in the app on every Android
+  version ("Phone language" first and the default; below 13 through `AppLocale.setOverride`), so
+  anything that names the language must go through `AppLocale.wrap` at the moment of use. See
+  `docs/HANDOVER.md` §5.16 and §15 lessons 152 and 153.
 - **Never call the Aladhan API — or any network — from the shipped app to calculate times.**
   Verifying against it during development is correct and encouraged. Calling it at runtime is
   not, and the reasons are in `docs/HANDOVER.md` §2. The owner was asked directly and said no.

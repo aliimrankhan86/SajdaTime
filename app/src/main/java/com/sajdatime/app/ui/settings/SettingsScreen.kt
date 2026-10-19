@@ -43,7 +43,6 @@ import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.outlined.MoreTime
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.NightsStay
@@ -108,6 +107,25 @@ import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.LocalDate
+import java.util.Locale
+import com.sajdatime.core.AppLocale
+import androidx.compose.runtime.DisposableEffect
+import android.os.LocaleList
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.CompositionLocalProvider
+import java.time.ZoneId
+import java.time.LocalTime
+import java.time.Instant
+import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.core.AdjustmentFit
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import android.text.format.DateFormat
 
 /**
  * Which chooser is currently open, if any. Only one can be at a time.
@@ -258,17 +276,20 @@ fun SettingsScreen(
                     onSelect = onSetThemeChoice,
                 ),
             )
-            if (AppLanguage.supported) {
-                add(
-                    SettingsItem.Link(
-                        key = "language",
-                        icon = Icons.Outlined.Language,
-                        title = stringResource(R.string.settings_language_title),
-                        subtitle = AppLanguage.current(context).nativeName,
-                        onClick = { open = SettingsChooser.LANGUAGE },
+            // Every Android version since 1.5.0: below 13 the choice is kept by AppLocale.setOverride.
+            add(
+                SettingsItem.Link(
+                    key = "language",
+                    icon = Icons.Outlined.Language,
+                    title = stringResource(R.string.settings_language_title),
+                    subtitle = AppLanguage.chosen(context)?.nativeName ?: stringResource(
+                        R.string.settings_value_pair,
+                        stringResource(R.string.language_phone),
+                        AppLanguage.showing(context).nativeName,
                     ),
-                )
-            }
+                    onClick = { open = SettingsChooser.LANGUAGE },
+                ),
+            )
         },
     )
 
@@ -481,14 +502,27 @@ fun SettingsScreen(
     when (open) {
         null -> Unit
 
-        SettingsChooser.ADJUSTMENTS -> AdjustmentsDialog(
-            adjustments = settings.adjustments,
-            hijriOffsetDays = settings.hijriOffsetDays,
-            onSetAdjustment = onSetAdjustment,
-            onSetHijriOffset = onSetHijriOffset,
-            onReset = onResetAdjustments,
-            onDismiss = { open = null },
-        )
+        SettingsChooser.ADJUSTMENTS -> {
+            // Today's times as the engine produces them *before* any correction. A board time is
+            // fitted against these, because the stored correction is relative to them; fitting
+            // against the corrected times would count the old correction twice.
+            val uncorrected = settings.calculationPrefs.copy(adjustments = emptyMap())
+            val calculated = remember(settings.coordinates, uncorrected) {
+                settings.coordinates?.let { PrayerEngine.compute(it, LocalDate.now(), uncorrected).times }
+            }
+            AdjustmentsDialog(
+                adjustments = settings.adjustments,
+                hijriOffsetDays = settings.hijriOffsetDays,
+                calculated = calculated,
+                onSetAdjustment = onSetAdjustment,
+                onSetHijriOffset = onSetHijriOffset,
+                onReset = onResetAdjustments,
+                // One state variable holds the open chooser, so this closes this dialog as it
+                // opens the method list: the user is moved on, not stacked.
+                onChooseMethod = { open = SettingsChooser.METHOD },
+                onDismiss = { open = null },
+            )
+        }
 
         SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
@@ -555,48 +589,7 @@ fun SettingsScreen(
             onSearchCity = onSearchCity,
         )
 
-        SettingsChooser.LANGUAGE -> {
-            val current = AppLanguage.current(context)
-            ChooserDialog(title = stringResource(R.string.settings_language_title), onDismiss = { open = null }) {
-                Column(Modifier.selectableGroup()) {
-                    AppLanguage.entries.forEach { language ->
-                        val available = language.isAvailable(context)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp)
-                                .selectable(
-                                    selected = language == current,
-                                    enabled = available,
-                                    role = Role.RadioButton,
-                                    onClick = {
-                                        AppLanguage.apply(context, language)
-                                        open = null
-                                    },
-                                ),
-                        ) {
-                            RadioButton(selected = language == current, onClick = null, enabled = available)
-                            Spacer(Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    language.nativeName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = if (available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                if (!available) {
-                                    Text(
-                                        stringResource(R.string.language_unavailable),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        SettingsChooser.LANGUAGE -> LanguageChooserDialog(onDismiss = { open = null })
 
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
@@ -1136,7 +1129,7 @@ private fun AlertChoiceRow(
  * and a raised system font size makes even the short ones taller than a phone.
  */
 @Composable
-private fun ChooserDialog(
+internal fun ChooserDialog(
     title: String,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit,
@@ -1346,12 +1339,21 @@ private fun rememberRingtoneTitle(uri: String): String? {
 private fun AdjustmentsDialog(
     adjustments: Map<PrayerSlot, Int>,
     hijriOffsetDays: Int,
+    /** Today's uncorrected times, or null before there is a location to calculate for. */
+    calculated: Map<PrayerSlot, Instant>?,
     onSetAdjustment: (PrayerSlot, Int) -> Unit,
     onSetHijriOffset: (Int) -> Unit,
     onReset: () -> Unit,
+    onChooseMethod: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    // Which prayer's time dial is open, and which prayer's board time was too far away.
+    // Saveable so rotating the phone mid-entry does not throw the user back to the list.
+    var picking by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+    var tooFar by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+    var choosingPrayer by rememberSaveable { mutableStateOf(false) }
     ChooserDialog(title = stringResource(R.string.settings_adjustments), onDismiss = onDismiss) {
         Text(
             text = stringResource(R.string.settings_adjustments_help),
@@ -1359,17 +1361,38 @@ private fun AdjustmentsDialog(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = Space.Group),
         )
+        // One button for the whole list, not one per prayer: the owner chose this from screenshots
+        // on 19 Oct 2026 over a time button under each prayer (six more green buttons on a calm
+        // dialog). It opens "Which prayer?", then the clock (DESIGN_SYSTEM §9).
+        if (calculated != null) {
+            CtaButton(onClick = { choosingPrayer = true }, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Outlined.Schedule, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(Space.Related))
+                Text(stringResource(R.string.adjustment_use_board))
+            }
+            Spacer(Modifier.height(Space.Group))
+        }
 
         PrayerSlot.entries.forEach { slot ->
             val minutes = adjustments[slot] ?: 0
+            val label = slot.label(context)
             StepperRow(
-                label = slot.label(context),
+                label = label,
                 value = minuteLabel(minutes),
                 canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
                 canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
-                onDecrease = { onSetAdjustment(slot, minutes - 1) },
-                onIncrease = { onSetAdjustment(slot, minutes + 1) },
+                onDecrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes - 1)
+                },
+                onIncrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes + 1)
+                },
             )
+            if (abs(minutes) >= CalculationPrefs.MAX_ADJUSTMENT_MINUTES || tooFar == slot) {
+                LimitNote(onChooseMethod)
+            }
         }
 
         HorizontalDivider(Modifier.padding(vertical = Space.Related))
@@ -1405,6 +1428,137 @@ private fun AdjustmentsDialog(
             }
         }
     }
+
+    if (choosingPrayer && calculated != null) {
+        // Each prayer with the time it shows now, so the user can compare it with the board.
+        ChooserDialog(title = stringResource(R.string.adjustment_which_prayer), onDismiss = { choosingPrayer = false }) {
+            PrayerSlot.entries.forEach { slot ->
+                val at = calculated[slot] ?: return@forEach
+                RadioRow(
+                    label = slot.label(context),
+                    supporting = TimeFormat.clock(context, at.plusSeconds(60L * (adjustments[slot] ?: 0)), zone),
+                    selected = false,
+                    onSelect = {
+                        choosingPrayer = false
+                        picking = slot
+                    },
+                )
+            }
+        }
+    }
+
+    val pickingSlot = picking
+    val pickingBase = pickingSlot?.let { calculated?.get(it) }
+    if (pickingSlot != null && pickingBase != null) {
+        TimeEntryDialog(
+            title = stringResource(R.string.adjustment_pick_time_title, pickingSlot.label(context)),
+            // Opens on what the screen shows now, so a small change is a small move on the dial.
+            initial = pickingBase.plusSeconds(60L * (adjustments[pickingSlot] ?: 0)).atZone(zone).toLocalTime(),
+            // Same rule as every clock in the app: the device's 12/24 setting (TimeFormat.clock).
+            is24Hour = DateFormat.is24HourFormat(context.applicationContext),
+            onConfirm = { time ->
+                picking = null
+                when (val fit = AdjustmentFit.fit(pickingBase, time, zone)) {
+                    is AdjustmentFit.Result.Within -> {
+                        tooFar = null
+                        onSetAdjustment(pickingSlot, fit.minutes)
+                    }
+                    // Nothing is stored. The note under the row says why and where to go next.
+                    AdjustmentFit.Result.TooFar -> tooFar = pickingSlot
+                }
+            },
+            onDismiss = { picking = null },
+        )
+    }
+}
+
+/**
+ * Shown under a prayer that has reached the limit, or whose board time was past it.
+ *
+ * Visible without a tap on purpose: a disabled button receives no taps, so an explanation
+ * that waited for one would never appear. Announced politely to a screen reader because
+ * "nothing happened" is the worst thing to leave someone with when they cannot see that the
+ * button went grey. It names no method and declares no time right or wrong, per §5.17: it says
+ * what a gap this size usually is and offers the one door that deals with it.
+ */
+@Composable
+private fun LimitNote(onChooseMethod: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = Space.Related)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+    ) {
+        Text(
+            text = stringResource(R.string.adjustment_limit_note, CalculationPrefs.MAX_ADJUSTMENT_MINUTES),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Related))
+        // Alone on its line, so full width (DESIGN_SYSTEM 4.1).
+        CtaButton(onClick = onChooseMethod, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.adjustment_choose_method))
+        }
+    }
+}
+
+/**
+ * The time dial for "the time on your mosque's board". A dial, not a text field, so "12:45"
+ * can never be typed into a box that wants "5". Scrollable, because the dial is tall and a
+ * raised system font size makes the dialog taller than a phone in landscape.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeEntryDialog(
+    title: String,
+    initial: LocalTime,
+    is24Hour: Boolean,
+    onConfirm: (LocalTime) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    // Material's clock formats its numbers with the JVM's default locale and takes none of ours
+    // (Material3 1.4.0, `toLocalString`, read in its bytecode on 19 Oct 2026), so on a phone set to
+    // ar-EG it drew Eastern Arabic digits in an app whose digits are Western on every other screen
+    // (AppLocale, CLAUDE.md). Measured on the emulator, then fixed: while the clock is open the
+    // default is the app's own language, and it is put back when the clock closes. The phone's
+    // locale is read from LocaleList, which holds the same value.
+    val appLocale = AppLocale.of(LocalContext.current)
+    val phoneLocale = remember { LocaleList.getDefault()[0].also { Locale.setDefault(appLocale) } }
+    DisposableEffect(Unit) { onDispose { Locale.setDefault(phoneLocale) } }
+    val state = rememberTimePickerState(initial.hour, initial.minute, is24Hour)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(title, onDismiss) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // The dial's text sits in boxes of a fixed size, so at 2.0 text "a.m." was cut to "a."
+                // (emulator, 19 Oct 2026). Its text is capped at 1.3 times, still large; the title and
+                // the button above and below it keep the user's full size.
+                val density = LocalDensity.current
+                CompositionLocalProvider(
+                    LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f)),
+                ) {
+                    // The stock dial draws the chosen a.m./p.m. in the tertiary (amber) family, and
+                    // amber means a warning in this app (DESIGN_SYSTEM §1), so it uses the green roles.
+                    TimePicker(
+                        state = state,
+                        colors = TimePickerDefaults.colors(
+                            periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_set_time))
+            }
+        },
+    )
 }
 
 /**

@@ -113,7 +113,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val settingsRepository = SettingsRepository(application)
     private val locationRepository = LocationRepository(application)
     private val cityLookup = CityLookup(application)
-    private val exporter = PrayerPdfExporter(application)
     private val compassRepository = CompassRepository(application)
 
     /**
@@ -373,7 +372,11 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         }
         viewModelScope.launch {
             val event = runCatching {
-                exporter.export(
+                // A new exporter each time, not one held by this ViewModel: it pins its language when
+                // it is made, and the ViewModel outlives a language change (the screen restarts, the
+                // ViewModel does not). Held once, an Arabic PDF came out in Urdu after switching from
+                // Urdu (Android 12 emulator, 19 Oct 2026).
+                PrayerPdfExporter(getApplication()).export(
                     range = range,
                     coordinates = coordinates,
                     cityName = settings.placeName(com.sajdatime.core.AppLocale.wrap(getApplication())),

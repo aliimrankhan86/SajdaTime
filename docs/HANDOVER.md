@@ -1139,6 +1139,37 @@ there is a translation to make it coherent, not before. See `CityLookup.kt`.
 Evidence for the whole of this section — eleven surfaces on a phone and a watch both set to
 `ar-EG` — is in §10, "The app on a phone that is actually set to Arabic".
 
+**19 Oct 2026: "Phone language" first, and a language list on every Android version** (built on the
+8 Oct 2026 branch `claude/customer-review-pain-points-9d35kl`, brought into 1.5.0 at the owner's word,
+`docs/release-tools/RELEASE-1.5.0.md` "FIRST, before release day").
+- **The default is "Phone language"**, ticked until the user picks a language (`AppLanguage.chosen` is
+  null). Before 1.5.0 the list showed English ticked whenever nothing was chosen, so a Turkish phone running
+  the app in Turkish read "English". The Settings subtitle says "Phone language · Türkçe" in that case.
+- **Below Android 13 the Language row did not exist at all before 1.5.0** (the system has no per-app
+  language there). Now the choice is stored by `AppLocale.setOverride` (one key in the preference file
+  `sajda_language`, on the phone only, used below 13 only) and applied in `AppLocale.wrap`. `AppLocale.of`
+  still reads the language from the resources, so the rule above holds: the app's language is the language
+  its words resolved to, never the stored tag.
+- **Everything that names the language must go through `AppLocale.wrap`**, or below 13 it answers with the
+  phone's language. Fixed on 19 Oct 2026: the typed place lookup and the GPS place label (`CityLookup`,
+  `LocationRepository`, read in the code, not run), the notification channel names
+  (`Notifications.ensureChannels`, read, not run), the PDF exporter (now made per export: held by the
+  ViewModel, an Arabic PDF came out in Urdu after switching from Urdu on Android 12; measured fixed) and the
+  watch tile (wrapped once per tile request and passed down; read, not run). Lesson 153.
+- **`MainActivity.onCreate` sets the window's layout direction from the wrapped configuration.** Below 13
+  the language change restarts the screen with `recreate()`, and on the Android 12 emulator the new screen
+  kept the old one's direction both ways (Urdu words left to right; English words right to left after
+  "Phone language", the 8 Oct branch's unreproduced observation). Lesson 152.
+- **The welcome screen opens the same list** (a compact solid button in the top corner with a globe and the
+  language's own name; the owner's choice from screenshots, DESIGN_SYSTEM §9), so someone who cannot read
+  English can switch before the first question.
+- **Rejected:** restarting the whole task instead of `recreate()` (also works, but drops the user back on
+  Times and is a bigger change; the one line direction fix measured correct on every language); flags; an
+  About row saying the translation was made with AI help (the owner, 19 Oct 2026: leave it out; it was in
+  the 8 Oct branch's plan).
+- **The privacy policy needs no change:** the stored choice never leaves the phone, and the policy already
+  says the typed place lookup sends "the language the app is set to", which is now true below 13 as well.
+
 ### 5.17 The method is asked, visibly, of everyone — and never chosen for them (15 Aug 2026)
 
 The owner brought a problem, with a proposed solution written by another AI: users still
@@ -1199,6 +1230,21 @@ where it is used only where that is the publisher's own country or has been veri
 real timetables; keep "some" and "many"; never sell a method as *the* method for a country
 that has several. Aladhan marks its Dubai and Diyanet entries *experimental*, so those two
 descriptions claim nothing about officialness.
+
+**5 Oct 2026 additions to this rule (8 Oct branch), brought into 1.5.0 on 19 Oct 2026 in the Quiet Glass
+form.** (1) The 30 minute limit explains itself where the user is stuck: under a prayer at the limit, or
+whose board time was too far, a note says a gap that size is usually a different calculation method or a
+board that shows the congregation, with a "Choose a calculation method" button, announced politely to a
+screen reader. It names no method and calls no time right or wrong. (2) "Use your mosque's board" (one
+button above the list, the owner's choice from screenshots on 19 Oct 2026, DESIGN_SYSTEM §9), then "Which
+prayer?" with each prayer's current time, then a clock: `AdjustmentFit` stores the minutes, compared from
+the *truncated* calculated time because the screen truncates, the short way round midnight, and a gap past
+30 is refused, never clamped. Stored values are unchanged: whole minutes, ±30, synced to the watch. (The 8
+Oct branch made the minutes number an underlined link instead; that style is banned since 18 Oct 2026.) (3)
+For any future method finder the wording rules are fixed: 'gives the same times as your mosque today',
+never 'you follow X' or 'your school'; school means Asr only; Moonsighting Committee is a twilight rule; two
+prayers (Isha and Asr) are mandatory; no method plus offset fallback; never auto applied. **The finder
+itself is NOT built** (8 Oct sweep, §10: it failed its own bars).
 
 ### 5.18 The place label is the town, never the county (15 Aug 2026)
 
@@ -2146,6 +2192,26 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**The 8 Oct branch brought into 1.5.0 (19 Oct 2026, owner's Mac, `claude/quiet-glass`).** Emulators: a new
+`sajda12` (Pixel 5, Android 12, made for this), `sajda` (Android 16), `sajdastore`, `sajdawear`; every one except
+`sajda12` started `-read-only`. **Android 12:** `LanguageAndDndDeviceTest` 6 of 6 (both language routes); the
+"Phone language" bug reproduced twice before the fix and 4 of 4 cycles plus every language in turn correct after
+it (title on the right in Urdu and Arabic, on the left otherwise); the choice survives a force stop; the welcome
+screen switches to Urdu and back; the Urdu and Arabic 7 day PDFs pulled and rendered with `sips` (right to left,
+columns mirrored; times "5:03 PM" in Urdu and "5:03 م" in Arabic, as on screen) after two fixes found this way
+(lessons 153 and 157). **Android 16:** `LanguageAndDndDeviceTest` 6 of 6; Match your mosque (Isha 7:48 pm set to
+8:00 gives +12; 11 pm refused, the note and its button shown), seen with "Which prayer?" and the clock in English
+light, Urdu light, Arabic dark and English dark at 2.0 text; the welcome button in English light, English 2.0 and
+Arabic dark (Urdu on Android 12); the usage question's policy line in Arabic dark; the Settings Language row in
+English and Urdu. Not every screen in every combination. At 2.0 the clock's "a.m." was cut until its text was capped at 1.3; **on an ar-EG phone the
+clock drew Eastern Arabic digits** until it was given the app's locale (lesson 158), then Western. **Watch**
+(`sajdawear`, Urdu): the new Hanafi line sits inside the circle on two lines (the last word wraps). **Store:**
+`05-settings.png` retaken on `sajdastore` (the Language subtitle changed). **Not run:** a real phone; Android 7 to
+11; TalkBack on the new controls; the clock in landscape or on a 320dp wide phone (Material's dial needs about
+280dp); the watch tile after a language change; the place lookups and channel names in a chosen language below
+13; Turkish and Indonesian at 2.0 text. Results of `release-1.5.0.sh` on the final code: §11, STATE OF PLAY
+19 Oct 2026.
 
 **1.5.0 release check on the owner's Mac (18 Oct 2026, late; `claude/quiet-glass`).** Emulators `sajda`
 (Pixel 7, Android 16), `sajdastore` (Pixel 2 profile, 1080 by 1920), `sajdawear` and `sajdawear_large`,
@@ -5024,6 +5090,45 @@ alarm was watched firing on it; only the scheduling was read. The watch was **no
 with it — that remains item 7 in §11. Nothing was tested on One UI's own battery-optimisation
 screens, so Samsung's background policy is still the open OEM question §11 records.
 
+### 8 Oct 2026 — step 2, the method finder sweep: DID NOT PASS, the finder is NOT built (`:core` test, no device needed)
+
+> From the 8 Oct branch, merged into this record on 19 Oct 2026 with its test and report (`MethodFinderSweepTest`, still opt in). **The figures below are the 8 Oct engine's (1.3.x).** Re-run on 19 Oct 2026 against the 1.5.0 engine, report kept as `docs/reviews/method-finder-sweep-2026-10-19.txt`: Turkey now carries Diyanet's minutes, so **Muslim World League and Turkey are no longer twins** (22 groups from 22 candidates); the narrow design is definite on 89.0% of exact boards and still never wrong (0); on out of model boards it is definite 5.8% of the time (bar 2%) and those keep matching on 80.9% of days (bar 90%), 19.9% of them under 60%. **P2 and P3 still fail, so the decision stands.**
+
+**Decision this records:** the "find the method my mosque follows" feature (§11, 5 Oct decision 2b) is **not built**. Do not rebuild it from the old description. Evidence: `core/src/test/java/com/sajdatime/core/MethodFinderSweepTest.kt` (opt in: `SAJDA_SWEEP=1 ./gradlew :core:testDebugUnitTest --tests '*MethodFinderSweepTest*' --rerun-tasks`, 8 seconds, writes `core/build/method-finder-sweep.txt`); the full report from this run is kept in `docs/reviews/method-finder-sweep-2026-10-08.txt`.
+
+**Grid:** 11 Sunni methods x 2 Asr schools = 22 candidates, latitudes 0 to 60 in steps of 5, longitudes 0, 70 and -100, every 7th day of 2026 (52 dates), tolerances 1, 2, 3 and 5 minutes. Days where a candidate has no usable sun (the projected polar days) are skipped for it. Bars were written down **after** seeing the first table but **before** the narrow design was measured, and are: a design must (P1) give at most 3 candidates for at least 90% of exact boards; (P2) give a list for at most 10% of boards that follow no listed method (the confident wrong match); (P3) when a wrong candidate matches today, still agree (within the design's tolerance) on at least 90% of the year, with at most 10% of such cases off by more than 5 minutes on 20% or more of days.
+
+**Results.**
+- *Single prayers cannot work.* Asr alone only separates the two schools (10 or 11 of 22 candidates fit). Isha alone, median 4 to 12 candidates. Fajr alone, median 12 to 14. The earlier note that two prayers are mandatory is confirmed, and two are not enough.
+- *Original design (Asr + Isha, unranked list): fails.* P1 passes only at 1 minute (3 or fewer candidates for 96.1% of exact boards; 64.4% at 2 minutes, 43.0% at 3, 29.2% at 5). **P2 fails:** a board that is one candidate with Isha moved by a precaution still gets a non-empty list 10.4% of the time at 1 minute and 14.9% at 2 (committee tables with a few offsets), and 40% when the shift is only 3 minutes. **P3 fails badly where most users live:** between 25 and 40 degrees north a wrong candidate that matches today agrees on only 54 to 70% of the year, and 23 to 46% of such cases are more than 5 minutes off on at least a fifth of the days. A mosque that rounds its board up to the next 5 minutes is found only 37% of the time at 2 minutes.
+- *Which pairs coincide only at certain times of year:* Karachi with Moonsighting Committee, Karachi with Qatar, Moonsighting with Kuwait, Qatar with Turkey and with Muslim World League. All involve a fixed interval rule (Qatar and Umm al-Qura: Isha = Maghrib + 90) or the seasonal Moonsighting rule meeting a fixed angle rule at some dates. This is why "same times today" is not "same method".
+- *Adding Fajr (three times from the same timetable) fixes the false matches but not the drift.* Fajr + Asr + Isha at 1 minute: boards following no method get a list 0.7% of the time (2.1% at 2 minutes), so P2 passes; but drift in the 20 to 45 degree band is 35 to 54% of today-matching wrong candidates, so P3 fails.
+- *Narrow design (Fajr + Asr + Isha, 1 minute, speak only when every fitting candidate is one group of identical rules; the only twins are Muslim World League = Diyanet in this engine, both are 18/17):* 88.3% of exact boards get a definite answer (78% to 100% by latitude) and it was never wrong (0 of 75,000+). On boards that follow a committee's own constant offsets (8 offset patterns, many of them only a few minutes) 6.3% still get a definite answer (bar: 2%) and those keep matching the committee's table on 82.3% of days on average (bar: 90%), with 17.6% of them under 60% of days. **P2 and P3 fail narrowly.**
+
+**Why not ship the narrow design anyway.** It would be right for mosques that print an exact method, and it would say "gives the same times as your mosque today" truthfully, but about one in sixteen committee-table boards would get a confident answer that is wrong for a fifth of the year, the user cannot tell which kind of mosque they have, and the evidence of demand is one unlocated complaint. The wording of that complaint (Isha or Asr 15 to 30 minutes off) is already served by the existing method list ("Followed by some mosques in Britain"), the 30 minute explanation from step 1 and the "Different from your mosque?" explainer. Cost on the other side: three time entries per use, a new screen to translate into four languages, and a feature that tells a religious-timing story with a measured error rate. Not worth it on this evidence.
+
+**Rejected, with reasons.** The Asr + Isha unranked list (fails P2 and P3). Raising tolerance to 3 or 5 minutes to find rounded boards (list size median 4 to 6, most of it noise). A "method plus offset" fallback (already rejected 5 Oct; this sweep is the quantified version of why). Two dates three months apart (would fix drift and false matches, but six time entries is not a mass-market flow). Ranking the list (no honest ranking exists: all listed candidates fit equally). The congregation-time hint in the finder (it existed only inside the finder; dropped with it).
+
+**What would reopen it.** Three separate users asking for it (§11 evidence rule), or a design that needs no more than the same three entries and passes P2 and P3 in this test unchanged. If revisited, start by re-running this test: it is the gate.
+
+**Not tested.** The sweep uses this engine's own candidates as truth. It cannot say how real mosque boards behave; it measures the worst a finder can do, not how often real boards are exact.
+
+### 7 Oct 2026 — banner actions are real buttons (built, unit tested and linted in a cloud container, no device)
+
+> **HISTORY. Superseded by the Quiet Glass notices (18 Oct 2026, §11): `Notice` with a solid button and a lone close X. Nothing of this section's `NoticeCard` came into 1.5.0.** "Lesson 127" below is the 8 Oct branch's number; it is lesson 156 in §15 now.
+
+Owner report: the call to action on the amber cards looked like a notification. Cause found by reading the code: `NoticeCard` (Times) and `WarningRow` (Settings) were clickable as a whole, with "Tap to allow." in the body and nothing pressable drawn. Fix: one shared `NoticeCard` in `ui/components/Common.kt` with a full-width filled `tertiary` button (labels "Allow in Settings", "Set my location", "See why"), card no longer clickable, "Tap to..." removed from four strings. Polar and compass notices have no action and are unchanged. Rationale and rejected options are in `docs/DESIGN_SYSTEM.md` section 4. Verified: `:app:testDebugUnitTest` and `:app:lintDebug` green. **Not tested (first pass, superseded by the emulator pass below):** nothing seen on a device or emulator.
+
+**Emulator pass, same day (7 Oct 2026, Android 14 x86_64 emulator running inside the cloud container with no hardware acceleration, see lesson 127).** Seen and working: the amber card on Times and Settings with its filled button (light and dark); "Allow in Settings" opens Android's own Alarms and reminders page for the app and the card disappears once the permission is on; Settings banner has no close X (permanent, as designed); at 2.0 font scale the card text wraps to eight lines, nothing clips, and the button is fully visible after one scroll; on a 1080x2400 screen all five prayers and the "Different from your mosque?" door fit after a short scroll with the taller card showing; `installRtl` build: the card mirrors correctly (icon right, close left, text right aligned, button unchanged) and the bottom navigation order reverses. Step 1 (Match your mosque) seen working: nudging Fajr by +2 shows "Shows 5:48 am", tapping the number opens the time dial, picking 2:00 pm (far beyond 30 minutes) is refused, stays at +2 and the limit note with "Choose a calculation method" appears. **A real defect found by running it:** with no correction each prayer showed an underlined em dash, which rendered as an equals sign and did not read as tappable. Fixed: the zero is now "0 min" (`adjustment_zero_minutes`), underlined like every other value; the Islamic date row keeps the plain dash because it is not tappable. **Minor, left alone:** the a.m./p.m. selector in the stock Material time dial draws its selected half in the amber `tertiaryContainer`, the same family the warning cards use. It is a stock control and not a warning, so it was not touched; if amber must mean only 'something is withheld', give `TimePickerDefaults.colors` a secondary container for the period selector. **Still not tested:** a real phone, TalkBack, landscape, `docs/store/screenshots/` not retaken (the emulator is 1080x2400, the store set is 1080x1920, and the store images are made by `tools/build-store-assets.sh`, so retake on a 1080x1920 device or crop deliberately), and the finish gate `clean test lint :app:bundleRelease :wear:bundleRelease` has not been re-run since this change (only `:app:testDebugUnitTest`, `:core:testDebugUnitTest` and `:app:lintDebug`).
+
+**Language selector placement (recommended 7 Oct, NOT built, awaiting the owner's OK).** One row in Settings, first in the Appearance group above Theme, with a globe icon, labelled "Language", showing the current language in its own script; tapping opens a list of every language in its own script with the current one ticked and "Phone language" first; no flags. Plus a small globe button in the corner of the Welcome screen, shown only when two or more languages ship. No extra onboarding step. Android 13 and newer also get the system per-app language page through `android:localeConfig`, but the Settings row is the only route on Android 12 and below. Rejected: a menu on Times or Home (clutter on the daily screens), a language screen for every first run (costs everyone to help a few), a flag dropdown, putting it under About (nobody looks there).
+
+### 5 Oct 2026 — step 1 of the mosque work, built and unit tested in a cloud container (no device)
+
+> HISTORY. Brought into 1.5.0 on 19 Oct 2026 in a different form (one "Use your mosque's board" button, §5.17); `AdjustmentFit` and its 8 tests came over unchanged.
+
+Baseline before any change: `:core:testDebugUnitTest` and `:app:testDebugUnitTest`, 151 tests, 0 failures, 0 errors. After: the same plus `AdjustmentFitTest` (8 tests) all green, `:app:compileDebugKotlin` clean. **Proved the tests can fail:** replacing the truncation with rounding turned two tests red (the seconds case and the round trip) and removing the midnight handling turned the midnight test red; source restored and green. The cases that matter: 21:58:50 calculated and a 22:15 board is +17 (rounding gives +16 and the screen then reads 22:14); 23:58 to 00:05 is +7, not a day away; a 78 minute gap (Slough on the default method) is refused rather than stored as +30; a clock change day still counts real minutes. Then `test lint` (171 tests, 0 failures; lint 0 errors in all three modules) and `:app:bundleRelease :wear:bundleRelease` both succeeded in the container: `app-release.aab` 5,820,292 bytes and `wear-release.aab` 3,639,017 bytes, **unsigned** (no `keystore.properties` here, so these are not uploadable and must never be uploaded; rebuild from a checkout that has the key). The first bundle attempt failed on a Maven Central 429 (`compose-group-mapping`), not on the code; a serial re-run passed. `clean` was not run, so this is the gate minus `clean`. **Not tested:** any screen on a device or emulator, TalkBack, right to left, large text, the watch. See the 5 Oct block in §11.
+
 ### 3–4 Oct 2026 — Usage counts verification (owner's Redmi Note 13 Pro, `sajda` emulator, release build)
 
 Run from `docs/ANALYTICS_DEVICE_CHECK.md` on the owner's Mac, branch `claude/app-analytics-strategy-e826p5`. Everything
@@ -5180,7 +5285,88 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 18 Oct 2026 late (read this first; the 17 Oct evening block below still holds for everything not named here)
+### 📍 STATE OF PLAY, 19 Oct 2026 (read this first; the 18 Oct late block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`) and now
+also carries everything the unmerged 8 Oct branch had, audited, approved by the owner and retested. Nothing is
+waiting before release day (around 4 Jan 2027). Start nothing else on your own.** Never merge
+`claude/analytics-default-on-1-4-0`; neither old branch is to be deleted (both stay on GitHub as the record).
+
+- **Done on 19 Oct 2026 (Claude Code on his Mac, worktree `~/Developer/SajdaTime-settings-preview`):** the
+  "FIRST, before release day" brief in `docs/release-tools/RELEASE-1.5.0.md`. The branch
+  `claude/customer-review-pain-points-9d35kl` was audited feature by feature against 1.5.0 by behaviour, not
+  by name, and the list shown to the owner before any change. **His answers (AskUserQuestion):** bring in all
+  ten missing items; leave out the About row "This translation was made with help from AI"; for Match your
+  mosque, one "Use your mosque's board" button above the list (chosen from three drawn options, light and
+  dark); for the welcome screen, a globe with the language's own name in the top corner (from three).
+- **Brought in:** "Phone language" first and the default (§5.16); the language list on Android 7 to 12
+  (`AppLocale.setOverride`; before this the Language row did not exist below 13); the list on the welcome
+  screen; Match your mosque from the mosque's board, with the 30 minute limit explained in place and a
+  "Choose a calculation method" button (§5.17; `AdjustmentFit` and its 8 tests unchanged); the PDF right to
+  left in Urdu and Arabic; the watch tile re-reads its language; "The full privacy policy is in English."
+  under the usage question when the app is not in English; translation fixes still missing from 1.5.0 (the
+  "quiet" alarms translated "silent" in Urdu, Turkish and Indonesian, and the same in one Arabic string; Urdu
+  disclaimer, consent, Asr hedge and Muslim World League line, the same Muslim World League ambiguity fixed in
+  Arabic; Turkish "keep the first option", the adjusted count and the watch sentence; Indonesian exact alarm
+  hedge; the Urdu watch Hanafi line); `TranslationIntegrityTest` (7 tests, Arabic added) and
+  `tools/check-translation.py` (0 errors in all four languages); the records: `docs/translation/` (16
+  files), the method finder sweep (`MethodFinderSweepTest`, opt in, re-run against 1.5.0, still runs) and
+  its NOT BUILT decision (§10), `docs/store/LISTING-ID-TR-UR.md` marked as history, the 5 and 8 Oct state
+  blocks and decisions in their dated places, lessons 154 to 156.
+- **Already in 1.5.0 or replaced on purpose, so not brought in:** the branch's amber card buttons (replaced
+  by the Quiet Glass `Notice`, 18 Oct); the watch translations (shipped in 1.3.2, later wording); Indonesian
+  "Kakbah"/"Mekah" (1.5.0 made phone and watch agree as "Ka'bah"/"Makkah"); fixes to strings whose English
+  was since rewritten; its CLAUDE.md native speaker wording and `TranslationScopeTest` (rejected: it allowed
+  only Urdu, Turkish and Indonesian as an owner waiver, so it would fail on Arabic, and the owner's 9 Oct rule
+  replaced the waiver; `TranslationIntegrityTest` and `LanguagePickerTest` already tie every folder to the list); "0 min" (only needed for its tappable number, which is not used); the
+  About AI note (the owner's no).
+- **The "Phone language" bug, fixed:** reproduced on the first try on a new Android 12 emulator (`sajda12`,
+  made for this, left on disk): `recreate()` kept the old screen's layout direction in both directions. Fix
+  in `MainActivity.onCreate` (lesson 152), then 4 of 4 cycles and every language in turn correct. **Running
+  it found four more of the same family, all fixed:** the PDF exporter held by the ViewModel printed an
+  Arabic PDF in Urdu after a switch; the place lookups and the notification channel names read the language
+  from the bare application context, which ignores the in-app choice below 13 (lesson 153); and the
+  branch's PDF bidi mark printed Urdu times as "PM 5:03" (lesson 157). One more from the emulator at 2.0
+  text: the clock's "a.m./p.m." was cut to "a."/"p.", so the clock's own text is capped at 1.3 times. And from
+  the independent review, measured on an ar-EG emulator: the clock drew Eastern Arabic digits because Material
+  formats them with the JVM's default locale; it now gets the app's locale while it is open (lesson 158).
+- **Verified, 19 Oct 2026:** Android 12 emulator: the language device tests 6 of 6 (both routes), every
+  language picked in turn lands the right way round, the choice survives a force stop, the welcome screen
+  switches to Urdu and back, the Urdu and Arabic 7 day PDFs pulled and rendered (right to left, columns
+  mirrored, times as on screen). Android 16 emulator: the language device tests 6 of 6; Match your mosque
+  (Isha 7:48 set to 8:00 gives +12; 11 pm refused with the note), "Which prayer?", the clock, the welcome
+  screen, the usage question's new line and the Settings Language row, across light, dark, Urdu,
+  Arabic and 2.0 text (not every screen in every combination; §10 lists which). The watch (small round, Urdu): the new Hanafi line fits inside the circle on two lines.
+  `release-1.5.0.sh` run on the final code: 22 of its 24 lines PASS or TAKEN, the other two tree CHECK (this commit's work, then uncommitted) and phone SKIPPED (his choice): gate PASS (400 unit tests: app 259, core 129, wear 12, 0 failed; lint 0 errors in all three), phone bundle 9 / 1.5.0, 9,573,098 bytes, and watch bundle 1002 / 1.5.0, 3,651,329 bytes, both signed CN=Ali Imran Khan; the same languages, the same 11 and 3 permissions, size PASS; device suite 20 of 20 (one new language test); suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1; timetable sheet opened; right to left and screens TAKEN. (Run 1, before the review fixes, had 19 of 20: the new test compared strings too early on Android 16; the test was corrected, not the app.). Store screenshot 05 retaken (the Language row's subtitle changed); the
+  other five and the watch ones are unchanged. Description 3987 of 4000, still "Wear OS" (its Match your mosque line says "within 30 minutes"); What's new 492,
+  459, 491, 486, 355 of 500. An independent review of the whole diff (a subagent, read only) found 5 must fix, 13 should fix and 19
+  notes. **Fixed:** the clock's digits (above); this block was referred to before it existed; the sweep section
+  showed 8 Oct figures as current (re-run, `docs/reviews/method-finder-sweep-2026-10-19.txt`, §10); a test comment
+  claimed a check that does not exist; "Choose a calculation method" made full width (alone on its line, §4.1);
+  an unused string and import; the description line says "within 30 minutes"; the limit note says "30 minutes or
+  more" and "the congregation time" in all five languages (the Turkish relative clause fixed); a stale lesson
+  number; `TranslationScopeTest`'s rejection recorded; the §10 entry and its not run list; the old listing drafts'
+  false coordinates line flagged; the watch tile wraps once per request; history notes on the 15 translation
+  files. **Not a defect:** "the translation test's inputs are undeclared" (the `values-*` glob at the top of the
+  test task covers every module). **Left as notes:** "Which prayer?" lists Sunrise, as the dialog itself does; two
+  prayers at the limit show two buttons; a choice stored below 13 is not carried over if the phone later moves to
+  13 (it falls back to Phone language); the ongoing notification and the stored place label keep the old language
+  until their next refresh (already true from 13).
+- **Not verified:** a real phone; Android 7 to 11; TalkBack on the new controls; the watch tile's language
+  change (read, not run); the place lookups and channel names in a chosen language below 13 (read, not run);
+  Turkish and Indonesian screens at 2.0 text (Urdu, Arabic and English were seen); the clock in landscape and on
+  a 320dp wide phone.
+- **Release day is unchanged** (RELEASE-1.5.0.md "Still to do"): Claude runs `release-1.5.0.sh` again (the
+  21 Dec job does); Claude re-dates `docs/privacy.html` on the day (no wording change was needed for this
+  work: the language choice never leaves the phone); Ali merges, builds both bundles from `main`, and in the
+  Console uploads them, pastes the five What's new texts, the watch note and the description, replaces the
+  six phone screenshots, confirms Data safety and presses Send for review.
+- **Open, none blocks 1.5.0:** as in the 18 Oct late block (Turkey's Maghrib against Diyanet, the "Tap to
+  read" line, the private claude.ai copy of the checklist). The Android 12 emulator `sajda12` and its system
+  image (about 1.5 GB) stay on the Mac for the next below 13 check; delete with `avdmanager delete avd -n
+  sajda12` if space is wanted.
+
+### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`).
 BEFORE release day, one owner decision is waiting to be done (18 Oct 2026 late): audit the unmerged
@@ -5693,6 +5879,35 @@ I. **Not a task, a standing direction:** the owner's monetisation and data visio
 
 **How the 1.3.2 release was actually done from a cloud session (11 Oct 2026), so the next one does not rediscover it:** code, unit tests, lint, bundletool and Robolectric checks in the cloud; commits handed to his repo as a git bundle; one command on his Mac (`docs/release-tools/release-1.3.2.sh`, run from `build/release-1.3.2/run.sh`) pushed the branch, ran the full gate, built and verified the signed bundle and ran the on-device suite on an Android 16 emulator; he merged the pull request on GitHub; the Production release was created by the Claude in Chrome extension from a prompt he pasted; he pressed submit. Google approved the release and the listing change together two days later, on 13 Oct 2026, with no rejection or question. Lessons 127 to 129.
 
+### 📍 STATE OF PLAY — 8 Oct 2026, evening (what is live, and what the cloud branch `claude/customer-review-pain-points-9d35kl` adds on top)
+
+**HISTORY (the 8 Oct branch's own state block, merged into this record on 19 Oct 2026). Its work came into 1.5.0 that day, its open observation was reproduced and fixed, and the 19 Oct STATE OF PLAY at the top of §11 says what became of each item. Its lesson numbers (125 to 127) are 154 to 156 in §15 now.**
+
+**Live and in review (unchanged by anything below).** 1.3.1 (versionCode 6) is on `main`, submitted, In review (the public listing read "Updated on 8 Oct 2026" with languages and the new buttons in What's new when checked). It already contains the Urdu, Turkish and Indonesian text that one model produced in a single pass and nobody reviewed. **Nothing in this block is live.** There is no pull request for this branch; the owner asks for one and merges it. Merging it publishes `docs/privacy.html` on Pages at once (it is unchanged by this branch, but check the diff first).
+
+**What the branch adds to 1.3.1** (all merged with `main` at f1213d1, all pushed):
+1. Step 1 mosque work finished and run on an emulator: type the time your mosque shows, amber cards with a real button (`NoticeCard`, `PermissionCard`: the action is a button, never the card), and "0 min" instead of an underlined dash.
+2. A language selector in the right places: first row of Appearance in Settings, and a globe on the first welcome screen. "Phone language" is the first option and the default. Below Android 13 the choice is stored (`AppLocale.setOverride`) and the activity recreated; from 13 the system keeps it (`LocaleManager`).
+3. Translations: the shipped set kept as the base plus 15 reviewed strings, **the nine "quiet is not silent" corrections**, and the **independent review of the whole shipped set** (three reviewer models, back translating before reading the English: `docs/translation/review-shipped-{in,tr,ur}.md`, no blockers) with its clear findings applied: stale "tap" sentences on the amber cards, the missing "tap a number to type your mosque's time" sentence, `language_unavailable`, softened hedges ("up to", "all", "simply"), the Turkish "bırakın" ambiguity, Indonesian Kakbah and Mekah spelt the same as on the watch, and more (see the commit). Wear has its own reviewed Indonesian, Turkish and Urdu strings (main has none).
+4. The Urdu PDF export mirrors properly (checked by rendering a real Urdu PDF).
+5. Guards: `TranslationIntegrityTest`, `TranslationScopeTest`, `LanguagePickerTest`, `tools/check-translation.py`, `LocaleDisciplineTest` tightened.
+
+**Step 2, the method finder, is NOT built, and that is the decision.** The sweep (`docs/reviews/method-finder-sweep-2026-10-08.txt`) shows the original design (Asr plus Isha) cannot meet the bars, and the narrow design (Fajr, Asr and Isha within 1 minute, one answer only) is 88.3% definite on exact boards with no wrong answer, but gives a definite answer on 6.3% of mosque boards that follow no listed method (bar: 2%) and keeps matching for only 82.3% of the year (bar: 90%). Do not build it without a new design that clears those bars.
+
+**Verified on emulators:** Android 14, Urdu first run, disclaimer, Times, Settings, picker, live switching to Indonesian and Turkish, Qibla (dial not mirrored), PDF. Android 12 (software emulator, slow): globe and picker open, Urdu chosen, language and right to left layout applied, survives a force stop, and "Phone language" clears the stored choice (`sajda_language.xml` empty).
+
+**ONE OPEN OBSERVATION, UNRESOLVED, check it first on any phone below Android 13.** On that emulator, choosing "Phone language" while the app was in Urdu produced a screen of English words laid out right to left (globe top left, stranded full stop), i.e. the exact state the right to left rule forbids. It was seen once, 45 seconds after the tap, minutes before that emulator's system server started failing (black screenshots, "Activity does not exist", package service errors), so it may be an emulator race. It was **not reproduced**: three attempts to rebuild a stable Android 12 emulator in the cloud failed. I did not change code on an unreproduced symptom (measure, do not guess). If it is real, the likely area is the `recreate()` in `AppLanguage.apply` (below 13) racing the window's layout direction; a candidate fix is to relaunch the activity (start a fresh `MainActivity`, then `finish()`) instead of `recreate()`. A fresh start after force stop is the state to compare against: it is expected to be left to right, but that frame was not captured either. Repro: Android 12 or lower, Settings or the welcome globe, pick Urdu, then pick Phone language on an English phone, screenshot after the activity settles.
+
+**Not verified (do not claim):** a real phone (Redmi and S23 Ultra); TalkBack; large font and dark theme in the new languages; the watch screens in the new languages (`tools/wear-verify.sh` needed; the Urdu countdown is longer than the tile's roughly 8 characters, so measure before release); the alarm test T1 to T6 (real device); no native speaker has read any of the three languages (the owner accepted that on 5 and 8 Oct; he reads Urdu and should read the six flagged Urdu strings); store screenshots not retaken; the final gate `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` was not run on the merged tree (tests and lint were, and pass).
+
+**Open questions for a native reader, deliberately not changed** (details in the three `review-shipped-*.md`): Turkish "Sabah" versus "İmsak" for Fajr; "aliran" (Indonesian) and "mezhep" (Turkish) for the Sunni and Shia question; Urdu "مسلک" versus "مکتبِ فکر"; the Turkish name of the Egyptian authority; the Karachi method naming (the library's method is the University of Islamic Sciences, Karachi, so check the English first); whether Diyanet's angles (18 and 17) match Diyanet's own timetable (its published times may add a margin; unverifiable from the cloud).
+
+**A fault in the English listing, owner's to fix in the Console and not during review:** the English description line "chosen automatically for your region" contradicts rule 5.17 (the app never claims a method belongs to a place).
+
+**Next, in order, if the owner wants a follow up release (his call; it would be 1.3.2, versionCode 7 or later):** (1) the Mac session takes this branch, retakes store screenshots (the `sajdastore` 1080x1920 AVD), runs `tools/wear-verify.sh` in the three languages, builds the signed bundle and the owner uploads it after 1.3.1 is approved; (2) the alarm test on the Redmi; (3) re-baseline the health check routine after the release. Draft store listings for the three languages are in `docs/store/LISTING-ID-TR-UR.md` and are unpublished (an assistant never publishes them).
+
+**gbrain.** This cloud session cannot write the owner's gbrain (a Mac side MCP). The Mac session should record: the branch name and the commit list above, the sweep decision, the review result, and the open questions.
+
 ### ⬛ SUPERSEDED — 3 Oct 2026 decision record (kept for history; the STATE OF PLAY of 4 Oct below is the truth). Default-on was later built and REVERSED; the branch named here, `claude/analytics-default-on-1-4-0`, is obsolete (its existing-user question was carried into `claude/app-analytics-strategy-e826p5`). Do not use it.
 
 The owner asked for usage counts to be **on by default** (opt out), so the app can be improved. This
@@ -5746,6 +5961,29 @@ The docs disagreed about the Play Console account. Settled by the owner: **the P
 Consent text rewritten (controller named, 14 month retention, install referrer stated, false "only way" claim and "how many people" removed, lists behind "See exactly what is sent"); "school of thought" is now "prayer calculation setting", with `UsageCountsTest` proving by reflection that the API cannot take a setting; `docs/privacy.html` dated 7 Oct 2026 (**live on merge, before 1.3.1 ships: it already describes the referrer, which 1.3.0 also sends**). Exact-alarm and Do Not Disturb rows are real 48dp buttons with an Allowed state (`PermissionAction.kt`). Settings has a language picker (Android 13+ only; `AppLanguage.kt`, `locales_config.xml`): Urdu, Turkish and Indonesian are listed but disabled until a native-speaker-reviewed `values-<tag>/` exists, so no machine translation shipped and `NoTranslationsYetTest` is unchanged. **Verified 8 Oct 2026 on emulators (API 36):** consent dialog and its expander, the exact-alarm button and its Allowed tick after returning from system settings, Settings Allowed card, the language picker (English selectable; Urdu, Turkish, Indonesian listed and held back) and `installRtl` mirroring of the consent dialog. `05-settings.png` retaken (it now leads with the Allowed card); the other captures are unchanged by this release. **Signed phone bundle built** (`./gradlew :app:bundleRelease` with `keystore.properties` linked in and removed again; the key was never opened; `jarsigner -verify` passes): `app/build/outputs/bundle/release/app-release.aab`, 5,755,757 bytes, sha256 `2ee2be8bb60f88edc779573f9d5540f0d6daba451cefd8bc262044af4bbeb56c`. **Do not upload the watch bundle.** Not verified: a real phone, Urdu or other translated layouts (none exist), large-font Settings, and the Do Not Disturb card on screen (unit-tested only). The Alpha pause is untouched. One-off "isn't responding" dialogs appeared on a cold, swapping emulator (load 16, 39% I/O wait) during first-run onboarding and did not recur after a restart with more memory; watch for them on a real first install.
 
 **Languages (8 Oct 2026, owner's decision, same release):** Urdu (right to left), Turkish and Indonesian translated by Claude and NOT reviewed by a native speaker; the owner accepted that explicitly (recorded in gbrain and CLAUDE.md). Files: `app` and `core` `values-ur`, `values-tr`, `values-in` (Indonesian is `values-in`, not `values-id`: the framework matches the legacy code, found by running it, see AppLocale). `NoTranslationsYetTest` deleted in the same change. Verified on an emulator in all three: Times, Settings and the picker; Urdu mirrors right to left. Wear strings are NOT translated (the watch stays 1.2.0), so a watch built from this tree on a Urdu, Turkish or Indonesian phone would mix core (translated) and wear (English) text: fix before the next watch release. Strings a native speaker should check first: prayer names, method names, `about_credits_desc`, `settings_ongoing_badge`, the consent and disclaimer text.
+
+### 📍 STATE OF PLAY — 5 Oct 2026 (pain point and competitor research done; decisions taken; step 1 of the mosque work BUILT on a branch, NOT merged)
+
+**HISTORY (from the 8 Oct branch, merged into this record on 19 Oct 2026). Its decisions on the finder, the congregation reminder and the alarm test stand; its "one line in About: translated with AI help" was dropped by the owner on 19 Oct 2026; its native review waiver was replaced by his 9 Oct rule (CLAUDE.md).** Nothing here changes what is live. 1.3.0 was still In review on 5 Oct (public listing still read 'Updated on 1 Sept 2026'). The work below is on branch `claude/customer-review-pain-points-9d35kl`, no pull request, nothing uploaded to Play.
+
+**The evidence base is thin, and that is the first fact.** SajdaTime has **no public ratings or reviews** (listing shows none on 5 Oct; Play shows the install band '100+', the repo's last hard figure is 26 lifetime installs on 7 Sept, so use the Console, not the band). The only real user evidence is the closed test feedback, one unlocated complaint of Isha or Asr being 15 to 30 minutes off a mosque, and the owner's own devices. An AI summary of the listing that the owner pasted on 5 Oct was wrong on three of four points: it asked for manual calibration (already built, 2 Aug), for background alert stability (already done with `setAlarmClock`, measured on a Redmi and an S23 Ultra) and for streaks on a 'Habits and Duas Tracker' that does not exist anywhere in the code or listing. **Treat any AI summary of the listing as unverified until checked against this repo** (lesson 154; it was 125 on the 8 Oct branch).
+
+**Competitors, read from their Play pages on 5 Oct (ratings, install bands, dated review text; a few search-summary claims are marked unverified).** Muslim Pro 3.8 stars (1.92m reviews, 100m+, ads, may share location and 7 other data types); Athan by IslamicFinder 4.8 (333k, 10m+, ads); Athan Pro 4.6 (98k, 1m+, ads, may share location); iPray 4.3 (13k, 1m+, no ads); Pillars 4.4 (4.4k, 500k+, no ads, no data collected, Android version exists); MAWAQIT 4.8 (172k, 5m+, no ads, takes timetables and iqamah times from mosques over the network); Athan+ 4.0 (611). What hurts them, in their own reviews: intrusive ads, ads returning after paying, restore-purchase failures, a consent wall (Muslim Pro, March 2025), bloat, no way to lower the adhan with the volume keys (iPray, April 2022 with 434 helpful, and April and August 2026). **No competitor found that infers the calculation method from a time the user types** (my sources were limited: 'not found', not 'does not exist'). Unverified here: Pew population figures and Muslim Pro's language list (search summaries only; pewresearch.org and several review sites are blocked from the cloud container).
+
+**Decisions taken by the owner on 5 Oct, and the reasoning (do not reopen without new evidence).**
+1. **The top three, in order:** (1) the mosque work below; (2) two or three extra languages; (3) an alarm control test. A home screen widget is the runner up: it is the only verified feature gap (none exists; competitor reviewers ask for it) but nobody who uses this app has asked.
+2. **Mosque work, three pieces.** (a) **Step 1, BUILT**: the 30 minute limit now explains itself and points at the method list, the number is tappable to enter the time the mosque's board shows (`AdjustmentFit`), each prayer shows the time it now displays, and the store description gets a 'Match your mosque' line (pending, see `docs/store/LISTING.md`). (b) **The finder, NOT built**: the user enters the mosque's **Isha and Asr** times (two prayers are mandatory: Asr says nothing about the method, Fajr alone cannot separate MWL, Karachi and Turkey, Isha alone leaves Karachi 4 to 6 minutes from MWL); a pure function in `:core` tries every Sunni `CalcMethod` x Asr school; matches are listed unranked, within about 1 to 3 minutes, with before and after times; wording is 'gives the same times as your mosque today', **never 'you follow X' and never 'your school'** (the method is a twilight rule, not a school; school means Asr only; and 5.17 forbids claims about a named authority). **No 'method plus offset' fallback**: it was shown to produce a confident false match (Diamond Road prints only its congregation time, 22:45; the default method's Isha that day was 23:17; 23:17 minus 30 is 22:47). If nothing fits and the entered Isha sits 10 to 50 minutes after a candidate, say 'This looks like a congregation time. Enter the time it begins.' Hidden when there is no location or the day uses projected polar times. Never auto-applied, with a 'Put back' undo. **It does not ship until a `:core` sweep passes**: 11 Sunni methods x 2 schools, latitudes 0 to 60 step 5, every 7th day, cluster size at 1, 2, 3 and 5 minutes tolerance, for single prayers and for Isha plus Asr. The owner suggested a pop-up saying the times look like Moonsighting Committee's; the finder is that idea with the wording and placement rules above. (c) **Congregation reminder: DEFERRED.** The owner first approved it, then asked whether it adds value or complication for a mass audience that does not know begin time from congregation. Decision: it is more complication than value on thin evidence (two mosques, one day each: JMIC Isha begins 21:58, congregation 22:15; Reading 22:02 and 22:20). The disclaimer and the 'Different from your mosque?' explainer already cover the confusion. **Revisit only on evidence**: three separate users ask for it (feedback email or reviews), or two of the 5 to 8 task-test users get stuck on exactly this point (small thresholds, judged for a tiny user base). If it returns: behind 'Different from your mosque?', off by default, never in onboarding. This is the A18 deferral, confirmed.
+3. **Languages.** Urdu plus one left-to-right language, chosen after the owner sends the Play Console figure (Statistics, installs by country and language); Indonesian is as easy as Turkish to build (same pipeline), so the figure decides, and both are added if the demand is there. One left-to-right language ships first to prove the pipeline, then Urdu (right to left). **The owner has waived the native-speaker review for these languages** (he can read Urdu; nobody can check the rest) and asked that the assistant do the translations. Recorded safeguards, all approved: Urdu spot-checked by the owner on the six highest-risk strings (disclaimer, dua line, method descriptions, prayer names, Hijri months, consent text); Turkish prayer labels taken from the labels Diyanet's own timetable prints (could not be fetched from the cloud, confirm first); method names stay untranslated (organisation names, per the translator note in `core/values/strings.xml`); one line in About in each language: translated with AI help, may contain mistakes, tell us with Send feedback; tests (disclaimer test per language with the dua last and once, placeholder parity, no 'follow' or 'school' words in method result strings); the six other assistant-drafted store listings in `docs/store/LISTING-LOCALES.md` stay unpublished and are stale (see the banner there). **`CLAUDE.md` still says 'never machine-translate' and is NOT edited yet:** edit it, dated and scoped to these languages, in the same commit as the first translation. Mechanics, verified by an independent review of the code: system picker on Android 13 and up through `android:localeConfig` (en plus the shipped languages only); below 13 an in-app language row that applies the stored tag in `attachBaseContext` and calls `recreate()`; `AppLocale.of()` keeps reading the resources and must never read a stored tag; the watch follows its own system language (the sync carries no language key); `NextPrayerTileService.localised` is a `by lazy` and would go stale on a language change. **Right to left must be done properly, not previewed:** the Qibla dial is not mirrored and must stay so; 'Turn left' and 'Turn right' stay physical; the PDF export draws at a fixed left margin with columns in fixed order (`PrayerPdfExporter.kt`) and needs mirrored columns and right-aligned text for Urdu; Hijri month names are app strings and must be translated with the date; do not 'fix' `AM 2:54` (lesson in §10); check on a real phone with real Urdu text at 1.3 and 2.0 font scale, because Urdu script rendering and line height are untested here. **AM/PM decision (assistant's, owner delegated):** follow the phone's own 12 or 24 hour setting as `TimeFormat.clock` already does, leave the marker and its position to the platform, keep each time in its own cell, and if a sentence containing a time reads badly on a real Urdu screen, restructure the sentence, never the marker.
+4. **Privacy policy in other languages:** English stays the default and the policy page. A translated consent text links the English policy and says so in plain words; add a short summary in the other languages if it is easy. A translated consent that does not agree with `privacy.html` breaks the rule in `CLAUDE.md`. Not legal advice; Firebase's language field is the device language whatever the app language.
+5. **Alarm control is a test, not a feature, until it has results.** From code: the alarm is a notification on a `USAGE_ALARM` channel, no `MediaPlayer`, no foreground service (`Notifications.kt` 108 to 120). Whether the volume keys adjust it while it plays, whether swiping stops a long tone, and whether sound reaches Bluetooth or a car speaker are platform behaviours that only a device can answer. Protocol (Redmi, then S23 Ultra, `installSideload`, Stay awake on, a three minute audio file as the alarm sound): T1 volume keys during playback (pass: the alarm slider appears and moves); T2 swipe the notification (pass: sound stops within a second); T3 ringer on vibrate with 'respect silent' off (pass: it sounds); T4 Bluetooth earbuds (record where it plays); T5 car or Bluetooth speaker; T6 locked, Do Not Disturb on. Build a fix only for what fails.
+
+**Rejected on 5 Oct, with reasons.** Raising the 30 minute limit (a gap that big is the method or the congregation, and a bigger offset would let 'Isha begins' be dragged onto the congregation time, so the notification and the Now marker would say something false; it also does not reduce effort). A slider or typed minutes (cannot land on an exact minute; needs validation and a keyboard). A silent best fit (5.17). A mosque directory or MAWAQIT style feed (needs a network call or a server of our own). Scanning the printed timetable (new dependency, error prone, not for the masses). Any wording that tells a user which school or authority they follow. A prayer tracker or streaks (the design system leaves them out on purpose and streaks clash with the ask-once rule). Publishing the assistant-drafted listings for six languages.
+
+**What step 1 changed (files).** `core/.../AdjustmentFit.kt` and `AdjustmentFitTest.kt` (8 tests; proved by mutation: rounding instead of truncating, and removing the midnight handling, each turn tests red); `ui/settings/SettingsScreen.kt` (`AdjustmentsDialog`, `LimitNote`, `TimeEntryDialog`, `StepperRow`); `res/values/strings.xml` (limit note, choose method, 'Shows %1$s', time dial strings, `action_set`, `action_cancel`, and one added sentence in the help text). Stored values are unchanged: still whole minutes, still clamped at 30, still synced to the watch. No data handling change, so `docs/privacy.html` is untouched.
+
+**Not tested.** On a real device or emulator: none of the new screens has been run (the cloud container has no emulator); the time dial in dark theme, at 1.3 and 2.0 font scale, in landscape and right to left; TalkBack on the tappable number and the limit note; the store screenshots are not retaken (the dialog is not one of the five store images, but check). The sweep, the finder, languages, the alarm test, and everything on the watch are not started.
+
+**Next, in this order.** (1) Owner runs the step 1 build on the Redmi or S23 (`./gradlew installSideload` with `ANDROID_SERIAL`) and says what he sees; (2) the owner sends the Console figure so the second language is chosen; (3) the `:core` sweep; (4) language infrastructure plus the first left-to-right language; (5) the alarm test; (6) the finder only if the sweep passes; (7) Urdu with the right to left work above. Merge to `main` only by the owner, through a pull request he asks for.
 
 ### 📍 STATE OF PLAY — 4 Oct 2026, 13:00 (HISTORY: usage counts shipped in 1.3.0; for current release status read the 1.3.1 block above, 1.3.1 is live)
 
@@ -7298,6 +7536,11 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   marker say something false. If this is ever wanted it is a second time per prayer, an
   "also remind me at" — a separate setting with its own wording. Not built; not a defect.
 
+  **Confirmed deferred, 5 Oct 2026, with triggers** (8 Oct branch, merged into this record 19 Oct 2026).
+  More complication than value for users who do not know begin from congregation, on two data points.
+  Revisit on three separate user requests or two of the 5 to 8 task-test users stuck on it; behind
+  'Different from your mosque?', off by default, never in onboarding.
+
 - **A4 — Whether `HighLatitudeRule` should be a user setting.** It is inert for Moonsighting
   (§10) but decisive for the plain angle methods, where the three options are three different
   religious approximations. Wifaqul Ulama's own published deliberation declined to name a
@@ -7878,6 +8121,10 @@ Every one of these cost real time. Read before building.
 | **The emulator compass freezes mid-experiment** | Injected `magnetic-field` values are accepted (`emu sensor get` reads them back) but the heading on screen stops changing, so a sensor sweep silently reports the same value every step | The screen went to sleep, and the compass flow is lifecycle-scoped — it unsubscribes, and the last heading stays painted. Nothing is wrong with the app; the reading on screen is simply stale. `adb -s <emu> shell svc power stayon true` before any sensor sweep, and treat an unchanging heading as suspect rather than as data. |
 | **Counting vibrations by counting lines under-reports them** | `dumpsys vibrator_manager \| grep -c <package>` stays flat while the device is plainly buzzing | The aggregated history is capped, so new entries push old ones out and the total stops rising. **Compare timestamps, not counts** — `grep <package>` and read the newest entry. A count that has stopped moving is the tell that the buffer is full, not that the vibrations stopped. Cost a wrong conclusion on 16 Aug 2026 before the timestamps were read. |
 | **The watch app will not launch from `monkey`** | `monkey -p com.sajdatime.app -c android.intent.category.LAUNCHER 1` returns without error and the watch stays on whatever it was showing | Launch the activity explicitly: `adb -s emulator-5556 shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity`. Note the class is **`WearMainActivity`**, not `MainActivity` — which is also the string that tells you which module is installed under the shared `applicationId` (see the rows above). |
+
+### Building and unit testing in a cloud container (learned 5 Oct 2026)
+
+A Claude Code cloud session has a JDK and Gradle but **no Android SDK and no emulator**. It can compile, run unit tests and lint; it cannot run the app, so layout and device checks still need the owner's Mac or phones. Recipe that worked: download `commandlinetools-linux-*_latest.zip` from `dl.google.com/android/repository`, unzip to `cmdline-tools/latest`, `yes | sdkmanager --licenses`, then install **`platforms;android-37.0`** (the package is named `android-37.0`, not `android-37`, because `compileSdk = 37`), `build-tools;36.1.0` and `platform-tools`, and write `sdk.dir=...` into `local.properties` (gitignored). Maven Central answers **429 Too Many Requests** when Gradle downloads in parallel: run with `--max-workers=1 -Dorg.gradle.parallel=false` and simply re-run, the cache keeps what arrived. One transient 'plugin not found' on the first run cleared on a retry. The module is an Android library, so single tests run as `./gradlew :core:testDebugUnitTest --tests "com.sajdatime.core.AdjustmentFitTest"` (there is no `:core:test --tests`).
 
 ### Getting the app onto an emulator when the assistant has no device access
 
@@ -9409,3 +9656,39 @@ matters more than the stable hashes, that is the trade being made.
     with macOS bash 3.2; the 1.4.0 form `grep x >/dev/null` failed 0 of 300). Use
     `grep -q x <<< "$big"`. The false message is the dangerous part: it points an unattended session at
     the signing values.
+152. **Below Android 13, `recreate()` after a language change keeps the old screen's layout direction.** On
+    the Android 12 emulator (19 Oct 2026, the AVD `sajda12`, made for this) choosing Urdu in the app gave Urdu
+    words laid out left to right, and choosing "Phone language" from Urdu gave English words right to left:
+    the 8 Oct branch's unreproduced observation, reproduced twice on the first try. A force stop and a fresh
+    launch was always right, so the words and the configuration were right and only the window's direction
+    was stale. The fix is one line in `MainActivity.onCreate`:
+    `window.decorView.layoutDirection = resources.configuration.layoutDirection`. Measured 4 of 4 cycles
+    correct, then every language in turn. Android 13 and newer never reach it (the system restarts the
+    activity itself), which is why no test on the usual emulator could have found it: keep an image below 13.
+153. **Anything made once with a wrapped context keeps the language it was made in, and a bare application
+    context ignores the in-app choice below 13.** The PDF exporter was a ViewModel field, and the ViewModel
+    outlives a language change, so after switching from Urdu to Arabic the PDF came out in Urdu with an
+    Arabic place name (Android 12 emulator, 19 Oct 2026). The watch tile's `by lazy` context had the same
+    shape (found by the 8 Oct branch, read, not run). And `AppLocale.of(applicationContext)` answers with
+    the phone's language below 13, because the choice lives only in `AppLocale.wrap`: the place lookups and
+    the channel names had that. Rule: wrap at the moment of use, and grep `AppLocale.of(` for unwrapped
+    callers whenever the language route changes.
+154. **An AI summary of the Play listing is not evidence about the app.** On 5 Oct 2026 a Google-generated 'insights' roadmap, pasted by the owner, was wrong on three of its four points: it asked for manual calibration (shipped 2 Aug as 'Match your mosque'), for background alert stability (done and measured on two phones) and for streaks on a 'Habits and Duas Tracker' that exists nowhere in the code or the listing. It also names a different app called 'Sajda' at times. Check every claim against this repo before it becomes a task, and with no reviews to summarise, a confident roadmap is a guess.
+155. **A disabled control with no explanation at the moment of failure is a defect, not a limit.** The 30 minute bound was right and recorded with its reason, and the plus button simply went grey while the reason sat in static text above the list. A user who hits a bound needs the reason and the next door where they are standing. Show it without waiting for a tap, because a disabled button receives none.
+156. **The cloud container could run an Android emulator on 7 Oct 2026, and it found things reading could not** (from the 8 Oct branch, its lesson 127; lesson 129 above says a cloud session cannot run an emulator, which was true of the 11 Oct session: check what the container in front of you has before relying on either). Verified 7 Oct 2026: the container has the SDK at `/opt/android-sdk` but no emulator and no `/dev/kvm`, and `dl.google.com` is reachable, so `sdkmanager "emulator" "system-images;android-34;default;x86_64"` (about 2.5 GB), `avdmanager create avd -n sajda -k ... -d pixel_6`, then `emulator -avd sajda -no-accel -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -memory 3072 -cores 3 &` works. It is slow (about 4.5 minutes to boot, 15 to 30 seconds per screen) but it shows real pixels via `adb exec-out screencap -p`. Traps, all hit once: (a) `sys.boot_completed` flips before the package manager is up, so poll `adb shell service check package`; (b) the AOSP image's Bluetooth stack crash loops and eats the CPU, so `adb shell pm disable-user --user 0 com.android.bluetooth`; (c) a cold first launch gets ANR killed, so set `settings put global hide_error_dialogs 1` and pre-compile with `adb shell cmd package compile -m speed -f <package>`; (d) screenshots taken mid transition are black or blank, so retake until the file is over about 60 KB; (e) the default location is Mountain View and the zone is UTC, so prayer times look hours wrong; `adb shell service call alarm 3 s16 America/Los_Angeles` fixes the clock and is not an app bug; (f) `appops set <pkg> SCHEDULE_EXACT_ALARM deny` must be `appops set --uid`, and it kills the app, so relaunch after it settles; (g) `input swipe` needs a duration of about 1200 ms or it is read as a tap; (h) `uiautomator dump` gives exact tap coordinates and the real text on screen; (i) to skip onboarding in the `.rtl` or `.sideload` build, copy `files/datastore/sajdatime.preferences_pb` across with `run-as ... tar`. What it caught the first time it was used: an underlined em dash that read as an equals sign (never visible in code or tests). Still cannot reproduce a real phone: OEM battery policy, real GPS, real fonts.
+157. **A bidi mark in front of every PDF cell turns "5:03 PM" into "PM 5:03".** The 8 Oct branch put U+200F
+    before every string it drew on a right to left page, which is right for Urdu text with Latin inside it
+    and wrong for a cell that is only Latin and digits: the mark makes the paragraph right to left, so the
+    number and the meridiem swap sides (the Urdu PDF on the Android 12 emulator, 19 Oct 2026, pulled and
+    rendered with `sips`). Compose gives each `Text` the direction of its first strong letter, so the screen
+    showed "5:03 PM". The PDF now adds the mark only when the text contains a right to left letter, and the
+    Arabic times ("5:03 م") still read correctly. Render the real file; reading the drawing code passed both.
+158. **A stock Material component can format numbers with the JVM's default locale, whatever the app says.**
+    Material3 1.4.0's `TimePicker` draws its hour, minute and dial numbers through `toLocalString`, whose
+    locale parameter defaults to `Locale.getDefault()` and is never passed (read in its bytecode, 19 Oct 2026).
+    On an emulator set to ar-EG the new "the time on your mosque's board" clock showed ٤ : ٠٠ and ١٢ ١ ٢, in an
+    app whose digits are Western on every screen (AppLocale, the `ar-u-nu-latn` tag). `CompositionLocal`s
+    cannot reach it. The fix pins the default to `AppLocale.of(context)` while the clock is open and puts the
+    phone's back on dispose (`TimeEntryDialog`). Plain "ar" on Android 16 happened to give Western digits, so
+    an Arabic in-app choice looked fine and only the regional phone locale showed it: test with ar-EG, and
+    suspect any new Material component that shows a number.

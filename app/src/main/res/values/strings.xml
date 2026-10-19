@@ -377,6 +377,7 @@
     <string name="settings_language_title">Language</string>
     <string name="settings_language_desc">Choose the language of the app</string>
     <string name="language_unavailable">Not available on this phone</string>
+    <string name="language_phone">Phone language</string>
     <string name="permission_allowed">Allowed</string>
     <string name="state_expanded">Expanded</string>
     <string name="state_collapsed">Collapsed</string>
@@ -389,6 +390,7 @@
     <string name="consent_yes">Yes, share usage counts</string>
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>
+    <string name="consent_policy_english">The full privacy policy is in English.</string>
     <string name="about_feedback">Send feedback</string>
     <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email.</string>
     <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>
@@ -456,7 +458,13 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Match your mosque</string>
     <string name="settings_adjustments_none">No changes</string>
-    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here, or set the time its board shows. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <string name="adjustment_use_board">Use your mosque\'s board</string>
+    <string name="adjustment_which_prayer">Which prayer?</string>
+    <string name="action_set_time">Set time</string>
+    <string name="adjustment_pick_time_title">%1$s: the time on your mosque\'s board</string>
+    <string name="adjustment_limit_note">A gap of %1$d minutes or more is usually a different calculation method, or a mosque board that shows the congregation time, which is a little later. Try the method first.</string>
+    <string name="adjustment_choose_method">Choose a calculation method</string>
     <string name="settings_adjustments_reset">Reset all</string>
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>

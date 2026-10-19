@@ -36,7 +36,7 @@
 
     <!-- Religious content: keep the hedges ("many", "some", "common"). No angles, no degrees. -->
     <string name="method_auto_desc">لست متأكدًا؟ أبقِ هذا الخيار. أوقات رابطة العالم الإسلامي، أو الجعفري للشيعة. قريبة من الممارسة المحلية في كثير من أنحاء العالم. ويكون الاختلاف الأكبر في أقصى الشمال.</string>
-    <string name="method_muslim_world_league_desc">طريقة عامة متعارف عليها تُستعمل في دول كثيرة. وهي المعتمدة هنا.</string>
+    <string name="method_muslim_world_league_desc">طريقة عامة متعارف عليها تُستعمل في دول كثيرة. وهي الطريقة الافتراضية في هذا التطبيق.</string>
     <string name="method_egyptian_desc">الطريقة الرسمية في مصر.</string>
     <string name="method_karachi_desc">شائعة في باكستان وجنوب آسيا.</string>
     <string name="method_umm_al_qura_desc">الطريقة الرسمية في المملكة العربية السعودية. يُحدَّد العشاء بوقت ثابت بعد المغرب.</string>

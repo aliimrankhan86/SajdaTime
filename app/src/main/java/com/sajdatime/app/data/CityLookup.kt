@@ -53,7 +53,9 @@ class CityLookup(private val context: Context) {
             // is already off the main thread, so one code path covers every version.
             // AppLocale, matching the language= parameter the Open-Meteo fallback below
             // sends, so both halves of this lookup name a place the same way.
-            Geocoder(context, AppLocale.of(context))
+            // Wrapped: below Android 13 a language picked in the app lives only in AppLocale.wrap
+            // (19 Oct 2026); the bare application context would answer with the phone's language.
+            Geocoder(context, AppLocale.of(AppLocale.wrap(context)))
                 .getFromLocationName(query, 1)
                 ?.firstOrNull()
                 ?.let { address ->
@@ -70,7 +72,9 @@ class CityLookup(private val context: Context) {
         // language= was hardcoded to "en" while the platform geocoder above used the
         // device locale, so the same search returned "Cairo" or "القاهرة" depending only
         // on which of the two happened to answer. Both follow AppLocale now.
-        val language = AppLocale.of(context).language
+        // Wrapped: below Android 13 a language picked in the app lives only in AppLocale.wrap
+        // (19 Oct 2026); the bare application context would answer with the phone's language.
+        val language = AppLocale.of(AppLocale.wrap(context)).language
         val url = URL(
             "https://geocoding-api.open-meteo.com/v1/search" +
                 "?name=$encoded&count=1&language=$language&format=json",

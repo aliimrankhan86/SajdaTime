@@ -227,9 +227,9 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate; CHECKED on the Mac 18 Oct 2026; 3969 characters)
+### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate; CHECKED on the Mac 18 Oct 2026, one line updated 19 Oct 2026; 3987 characters)
 
-**Checked line by line on the Mac, 18 Oct 2026**, against the 1.5.0 debug build on the emulator and `docs/privacy.html`. Two lines were not true and were changed: "Cloud backup is switched off, so nothing is copied off your phone" (the watch sync, the town lookup and opted in usage counts all leave the phone; the privacy policy says backup, so it now says "to a backup server"), and "Only one thing is ever asked in return" became "I ask only one thing in return" (Google's rating card can now appear; the owner chose this wording with AskUserQuestion). Everything else was seen on screen or in code: Hijri date beside the date, widgets with countdown and town, Qibla from true north (`GeomagneticField`), Off, Notification or Alarm per prayer, "Adhan" in the sound picker, the 5 to 30 minute reminder, the Ramadan card and timetable, the PDF for today, 7 days, the month and Ramadan, the watch tile, the five languages, the three themes, four madhabs, Jafari's Maghrib angle, the methods list, Automatic resolving to MWL or Jafari, Match your mosque (up to 30 minutes, up to 2 days), backup off in both manifests, no crash reporting library.
+**19 Oct 2026:** the Match your mosque line now says the app can be set from the mosque's board ("nudge any prayer time by a few minutes" became "set any prayer to your mosque's board, within 30 minutes": a bigger gap is refused, so the limit is said), because that feature came into 1.5.0 from the 8 Oct branch (`docs/release-tools/RELEASE-1.5.0.md`, "FIRST, before release day"). Every other line is unchanged. **Checked line by line on the Mac, 18 Oct 2026**, against the 1.5.0 debug build on the emulator and `docs/privacy.html`. Two lines were not true and were changed: "Cloud backup is switched off, so nothing is copied off your phone" (the watch sync, the town lookup and opted in usage counts all leave the phone; the privacy policy says backup, so it now says "to a backup server"), and "Only one thing is ever asked in return" became "I ask only one thing in return" (Google's rating card can now appear; the owner chose this wording with AskUserQuestion). Everything else was seen on screen or in code: Hijri date beside the date, widgets with countdown and town, Qibla from true north (`GeomagneticField`), Off, Notification or Alarm per prayer, "Adhan" in the sound picker, the 5 to 30 minute reminder, the Ramadan card and timetable, the PDF for today, 7 days, the month and Ramadan, the watch tile, the five languages, the three themes, four madhabs, Jafari's Maghrib angle, the methods list, Automatic resolving to MWL or Jafari, Match your mosque (up to 30 minutes, up to 2 days), backup off in both manifests, no crash reporting library.
 
 Written after the Mac readiness check found the live description out of date. **It also corrects a false line in the live text:** "without sending your location anywhere" and "Your coordinates never leave your device" are not true, because the town name is looked up by the phone's geocoder, usually Google (CLAUDE.md forbids that wording; `docs/privacy.html` says it in full). New in it: the redesigned widgets, the built-in adhan and phone sounds for alerts and alarms, the reminder before prayer, Ramadan, Match your mosque, Diyanet (Turkey), and the language list. "type a city name" becomes "type where you are", the app's own words. Still contains "Wear OS" (the Wear review checks the live listing for it). Paste on release day, once approved; the Ramadan lines are in it because 1.5.0 ships in January.
 
@@ -264,7 +264,7 @@ Sunni and Shia conventions are both supported properly, not as an afterthought.
 • Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
 • Calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Singapore, Diyanet (Turkey), Moonsighting Committee and more
 • The method is chosen for your school (Muslim World League for Sunni, Jafari for Shia), and you can change it
-• Match your mosque: nudge any prayer time by a few minutes, or shift the Islamic date by a day
+• Match your mosque: set any prayer to your mosque's board, within 30 minutes, or shift the Islamic date by a day
 • Sensible Fajr and Isha times in the far north, where the sun never fully sets in summer
 
 YOUR PRIVACY IS NOT THE PRICE
@@ -459,36 +459,36 @@ In early January, as a listing edit if no bundle ships, or as the release note o
 Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a Ramadan timetable to view or save as a PDF, and an optional suhoor reminder before Fajr. Two home screen widgets show the next prayer and today's times. Where your mosque's timetable differs, follow your mosque.
 ```
 
-**At the 1.5.0 release (January 2027): FINAL, 18 Oct 2026.** The owner: "it should include widgets and their styles, we agreed everything should be there". So the note names everything 1.5.0 brings, not only Ramadan: the Ramadan pack (built in 1.4.0, shown from the eve of Ramadan), the redesigned widgets (big countdown and the town's name), the built-in adhan for Sunni and Shia or any phone sound for alarms and notifications, Arabic, the cleaner look, and "follow your mosque". The old draft's widgets sentence described the 1.4.0 widgets as new, so it was replaced. **Turkey line in English and Turkish only** (where Turkish users read it): their times now include Diyanet's precaution minutes, and anyone who added them by hand in Match your mosque should remove them, or they count twice (HANDOVER §5.26). Counted with Python's `len`; all five under 500. Check the Console's own counter when pasting.
+**At the 1.5.0 release (January 2027): FINAL, 18 Oct 2026.** The owner: "it should include widgets and their styles, we agreed everything should be there". So the note names everything 1.5.0 brings, not only Ramadan: the Ramadan pack (built in 1.4.0, shown from the eve of Ramadan), the redesigned widgets (big countdown and the town's name), the built-in adhan for Sunni and Shia or any phone sound for alarms and notifications, Arabic, the cleaner look, and "follow your mosque". The old draft's widgets sentence described the 1.4.0 widgets as new, so it was replaced. **Turkey line in English and Turkish only** (where Turkish users read it): their times now include Diyanet's precaution minutes, and anyone who added them by hand in Match your mosque should remove them, or they count twice (HANDOVER §5.26). Counted with Python's `len`; all five under 500. Check the Console's own counter when pasting. **19 Oct 2026:** each now has one sentence saying Match your mosque can take the time from the mosque's board (brought in from the 8 Oct branch); to keep English under 500, "for alarms and notifications" became "for alerts", "to view or save as a PDF" became "to save as a PDF", and the Turkey line says "remove any you added yourself" (Turkish the same idea). Nothing that was true became false.
 
-1.5.0, English (495):
-
-```
-Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a timetable to view or save as a PDF, and an optional suhoor reminder. Redesigned widgets with a big countdown and your town. Built-in adhan for Sunni and Shia, or any phone sound, for alarms and notifications. Now in Arabic, with a cleaner look. Turkey: times now include Diyanet's precaution minutes; if you added them in Match your mosque, remove them. Where your mosque differs, follow your mosque.
-```
-
-1.5.0, Urdu (394):
+1.5.0, English (492):
 
 ```
-رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے نقشہ، اور سحری کی اختیاری یاددہانی۔ نئے ویجٹ، بڑی الٹی گنتی اور آپ کے شہر کے نام کے ساتھ۔ سنی اور شیعہ کے لیے اذان، یا فون کی کوئی بھی آواز، الارم اور اطلاعات دونوں کے لیے۔ اب عربی میں بھی، نئی صاف ستھری شکل کے ساتھ۔ جہاں آپ کی مسجد کا وقت مختلف ہو، اپنی مسجد کی پیروی کریں۔
+Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a timetable to save as a PDF, and an optional suhoor reminder. Redesigned widgets with a big countdown and your town. Built-in adhan for Sunni and Shia, or any phone sound, for alerts. Now in Arabic, with a cleaner look. Match your mosque: set times from its board. Turkey: times now include Diyanet's precaution minutes; remove any you added yourself. Where your mosque differs, follow your mosque.
 ```
 
-1.5.0, Turkish (490):
+1.5.0, Urdu (459):
 
 ```
-Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, PDF olarak da kaydedilebilen imsakiye ve isteğe bağlı sahur uyarısı. Büyük geri sayımlı ve şehrinizin adını gösteren yeni widget'lar. Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki bir ses, alarm ve bildirimler için. Türkiye vakitleri artık Diyanet'in temkin sürelerini içeriyor; bunları Camiye göre ayarla'da eklediyseniz kaldırın. Arapça desteği ve daha sade görünüm. Caminizin vakti farklıysa caminize uyun.
+رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے نقشہ، اور سحری کی اختیاری یاددہانی۔ نئے ویجٹ، بڑی الٹی گنتی اور آپ کے شہر کے نام کے ساتھ۔ سنی اور شیعہ کے لیے اذان، یا فون کی کوئی بھی آواز، الارم اور اطلاعات دونوں کے لیے۔ اب عربی میں بھی، نئی صاف ستھری شکل کے ساتھ۔ «اپنی مسجد سے ملائیں» میں اب وقت مسجد کے بورڈ سے لیا جا سکتا ہے۔ جہاں آپ کی مسجد کا وقت مختلف ہو، اپنی مسجد کی پیروی کریں۔
 ```
 
-1.5.0, Indonesian (421):
+1.5.0, Turkish (491):
 
 ```
-Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional. Widget baru dengan hitung mundur besar dan nama kota Anda. Azan bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda, untuk alarm dan notifikasi. Kini dalam bahasa Arab, dengan tampilan lebih bersih. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
+Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, PDF'e kaydedilebilen imsakiye ve isteğe bağlı sahur uyarısı. Büyük geri sayımlı ve şehrinizin adını gösteren yeni widget'lar. Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki bir ses, uyarılar için. Camiye göre ayarla artık pano saatini alıyor. Türkiye vakitleri artık Diyanet'in temkin sürelerini içeriyor; elle eklediyseniz kaldırın. Arapça desteği ve daha sade görünüm. Caminizin vakti farklıysa caminize uyun.
 ```
 
-1.5.0, Arabic (311):
+1.5.0, Indonesian (486):
 
 ```
-رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
+Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional. Widget baru dengan hitung mundur besar dan nama kota Anda. Azan bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda, untuk alarm dan notifikasi. Kini dalam bahasa Arab, dengan tampilan lebih bersih. Sesuaikan dengan masjid kini bisa memakai waktu di papan masjid. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
+```
+
+1.5.0, Arabic (355):
+
+```
+رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. ويمكن الآن ضبط «طابِق مسجدك» من لوحة مسجدك. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
 ```
 
 **Watch 1.5.0 note** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):
@@ -776,7 +776,7 @@ filename order.
 | `02-qibla.png` | Qibla, facing 60° | The second core feature. Free maths check: Qibla 118°, "Turn right 58°" |
 | `03-ramadan-dark.png` | Times, dark, 15 Ramadan 1448 (22 Feb 2027) | Dark theme and the Ramadan card (suhoor, iftar, length of the fast, timetable). Replaces the old `03-times-dark.png`, which was the same view as `01` |
 | `04-school-of-thought.png` | Setup, madhab step | Evidence for "built for your school of thought" |
-| `05-settings.png` | Settings | Location, school, method, Match your mosque, theme, language |
+| `05-settings.png` | Settings | Location, school, method, Match your mosque, theme, language. **Retaken 19 Oct 2026** the same way (`sajdastore`, read only, Manchester typed, 15 Aug 2026 15:00, demo status bar), because the Language row now reads "Phone language · English" (it read "English"); nothing else on it changed |
 | `06-widgets.png` | Home screen, the Today widget at its default 4 × 4 | The redesigned widgets that What's new leads with (owner's choice, 18 Oct 2026) |
 
 The "Does this match your mosque?" notice (Manchester in August is far enough north for it) was closed

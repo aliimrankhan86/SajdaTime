@@ -15,6 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.ui.settings.AppLanguage
+import com.sajdatime.core.AppLocale
 import java.util.Locale
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -52,19 +53,23 @@ class LanguageAndDndDeviceTest {
     private val notifications = context.getSystemService(NotificationManager::class.java)
 
     private var languageBefore: LocaleList? = null
+    private var overrideBefore: String? = null
+    private val perAppLanguage = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     private var dndAccessBefore = false
 
     @Before
     fun remember() {
-        if (AppLanguage.supported) {
+        if (perAppLanguage) {
             languageBefore = context.getSystemService(LocaleManager::class.java).applicationLocales
         }
+        overrideBefore = AppLocale.override(context)
         dndAccessBefore = Notifications.hasDndAccess(context)
     }
 
     @After
     fun restore() {
         languageBefore?.let { context.getSystemService(LocaleManager::class.java).applicationLocales = it }
+        if (!perAppLanguage) AppLocale.setOverride(context, overrideBefore)
         shell(if (dndAccessBefore) "cmd notification allow_dnd ${context.packageName}" else "cmd notification disallow_dnd ${context.packageName}")
     }
 
@@ -79,27 +84,56 @@ class LanguageAndDndDeviceTest {
 
     @Test
     fun choosing_each_language_switches_the_app_and_the_picker_ticks_it() {
-        assumeTrue("Per-app language needs Android 13", AppLanguage.supported)
         for (language in AppLanguage.entries) {
             AppLanguage.apply(context, language)
             // The system stores the choice asynchronously on some builds.
             val deadline = SystemClock.uptimeMillis() + 5_000
-            while (AppLanguage.current(context) != language && SystemClock.uptimeMillis() < deadline) {
+            while (AppLanguage.chosen(context) != language && SystemClock.uptimeMillis() < deadline) {
                 SystemClock.sleep(100)
             }
             // Indonesian is the one that used to fail: Android reports it as "in".
-            assertEquals("Settings would tick the wrong language", language, AppLanguage.current(context))
+            assertEquals("Settings would tick the wrong language", language, AppLanguage.chosen(context))
 
-            // And the words the app then shows really are in that language.
-            val chosen = context.getSystemService(LocaleManager::class.java).applicationLocales
-            val config = android.content.res.Configuration(context.resources.configuration).apply { setLocales(chosen) }
-            val shown = context.createConfigurationContext(config)
-                .getString(com.sajdatime.core.R.string.app_language_tag)
+            // And the words the app then shows really are in that language. Below Android 13
+            // the choice reaches the words through AppLocale.wrap, the route every screen uses.
+            val shown = if (perAppLanguage) {
+                val chosen = context.getSystemService(LocaleManager::class.java).applicationLocales
+                val config = android.content.res.Configuration(context.resources.configuration).apply { setLocales(chosen) }
+                context.createConfigurationContext(config).getString(com.sajdatime.core.R.string.app_language_tag)
+            } else {
+                AppLocale.wrap(context).getString(com.sajdatime.core.R.string.app_language_tag)
+            }
             assertEquals(
                 "app words are not in ${language.tag}",
                 AppLanguage.normalise(Locale.forLanguageTag(language.tag).language),
                 AppLanguage.normalise(Locale.forLanguageTag(shown).language),
             )
+        }
+    }
+
+    @Test
+    fun phone_language_clears_the_choice_and_the_app_follows_the_phone_again() {
+        AppLanguage.apply(context, AppLanguage.URDU)
+        AppLanguage.apply(context, null)
+        val deadline = SystemClock.uptimeMillis() + 5_000
+        while (AppLanguage.chosen(context) != null && SystemClock.uptimeMillis() < deadline) {
+            SystemClock.sleep(100)
+        }
+        assertEquals("Phone language must leave nothing chosen", null, AppLanguage.chosen(context))
+        if (perAppLanguage) {
+            // From 13 the system holds the choice; an empty list is "follow the phone". (Comparing
+            // strings here failed on Android 16: the application context takes the system's change a
+            // moment later, so it still read Urdu. Release run, 19 Oct 2026.)
+            assertTrue(
+                "the system still holds a language for the app",
+                context.getSystemService(LocaleManager::class.java).applicationLocales.isEmpty,
+            )
+        } else {
+            // Below 13 the application context never sees the in-app choice, so it is the phone's
+            // language, and with nothing stored the wrapped words must match it again, not Urdu.
+            val shown = AppLocale.wrap(context).getString(com.sajdatime.core.R.string.app_language_tag)
+            val plain = context.getString(com.sajdatime.core.R.string.app_language_tag)
+            assertEquals("the app did not go back to the phone's language", plain, shown)
         }
     }
 

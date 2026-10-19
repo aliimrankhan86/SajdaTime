@@ -1,0 +1,177 @@
+candidates=22 lats=13 lons=3 dates=52 computed in 483 ms
+
+== 1 and 2. Candidates that fit an exact board (the board IS one candidate). Lower is better.
+   subset            tol  size1%  size<=2%  size<=3%  size<=4%  median  max
+   Asr only           1    0.0   18.2   18.2   18.2       9    9
+   Asr only           2    0.0   18.2   18.2   18.2       9    9
+   Asr only           3    0.0    9.1    9.1    9.1      10   11
+   Asr only           5    0.0    0.0    0.0    0.0      11   11
+   Isha only          1    0.0   15.8   15.8   67.0       4   14
+   Isha only          2    0.0   13.0   13.0   42.6       6   16
+   Isha only          3    0.0   11.9   11.9   32.5       8   20
+   Isha only          5    0.0   10.6   10.6   24.4      12   20
+   Fajr only          1    0.0   36.9   36.9   41.4      12   16
+   Fajr only          2    0.0   22.6   22.6   35.4      12   16
+   Fajr only          3    0.0   15.2   15.2   32.3      14   16
+   Fajr only          5    0.0   10.8   10.8   24.9      14   18
+   Fajr+Isha          1    0.0   61.9   61.9   86.2       2   10
+   Fajr+Isha          2    0.0   38.1   38.1   69.6       4   12
+   Fajr+Isha          3    0.0   24.0   24.0   58.1       4   16
+   Fajr+Isha          5    0.0   15.0   15.0   45.7       6   18
+   Asr+Isha           1   40.5   82.5   97.0   99.4       2    7
+   Asr+Isha           2   35.4   64.9   75.1   81.0       2    7
+   Asr+Isha           3   22.9   40.2   56.9   60.4       3    9
+   Asr+Isha           5   10.6   24.4   29.2   36.4       6   10
+   Fajr+Asr+Isha      1   89.0   99.4  100.0  100.0       1    4
+   Fajr+Asr+Isha      2   64.6   86.6   96.5   99.8       1    5
+   Fajr+Asr+Isha      3   35.0   71.5   78.7   92.7       2    7
+   Fajr+Asr+Isha      5   15.0   45.7   59.2   63.0       3    9
+
+== 1b. Candidate pairs that give the same Asr+Isha (within 1 min) in at least 90% of cases:
+   EGYPTIAN/S ~ KUWAIT/S: 100%
+   EGYPTIAN/H ~ KUWAIT/H: 100%
+   KARACHI/S ~ SINGAPORE/S: 100%
+   KARACHI/H ~ SINGAPORE/H: 100%
+   UMM_AL_QURA/S ~ QATAR/S: 92%
+   UMM_AL_QURA/H ~ QATAR/H: 92%
+
+== 1c. Asr+Isha, tolerance 2 min, by latitude (share of cases with exactly 1 / at most 3 candidates; median size):
+   lat  0: usable= 3432  size1= 29.6%  size<=3= 57.6%  median=3  max=6
+   lat  5: usable= 3432  size1= 29.1%  size<=3= 59.5%  median=3  max=6
+   lat 10: usable= 3432  size1= 29.8%  size<=3= 62.1%  median=3  max=6
+   lat 15: usable= 3432  size1= 29.5%  size<=3= 55.8%  median=3  max=6
+   lat 20: usable= 3432  size1= 32.3%  size<=3= 68.2%  median=2  max=6
+   lat 25: usable= 3432  size1= 34.1%  size<=3= 69.9%  median=2  max=6
+   lat 30: usable= 3432  size1= 30.7%  size<=3= 69.5%  median=2  max=6
+   lat 35: usable= 3432  size1= 36.9%  size<=3= 67.5%  median=2  max=7
+   lat 40: usable= 3432  size1= 36.8%  size<=3= 72.3%  median=2  max=6
+   lat 45: usable= 3432  size1= 38.6%  size<=3= 97.0%  median=2  max=4
+   lat 50: usable= 3432  size1= 41.8%  size<=3= 99.9%  median=2  max=4
+   lat 55: usable= 3432  size1= 45.2%  size<=3= 99.8%  median=2  max=5
+   lat 60: usable= 3432  size1= 45.0%  size<=3= 96.8%  median=2  max=6
+
+== 3. A real board is not exact. Board = true times then perturbed; tolerance 2 min, Asr+Isha.
+   perturbation                          found%  size<=3%  median  max
+   none                                 100.0   75.1       2    7
+   +1 min on both                       100.0   69.3       2    8
+   -1 min on both                       100.0   71.4       2    8
+   +2 min on both                       100.0   59.4       3    8
+   Isha +2, Asr 0                       100.0   75.2       2    7
+   round up to 5 min (clock)             36.9   50.2       1    8
+   round to nearest 5 (clock)           100.0   70.7       2    8
+
+== 4. Boards that follow NO listed method (a committee's own table): the true times of a candidate with each
+   entered prayer moved by a precaution. Share that still gets a non-empty list = rate of a confident wrong match.
+   Offsets tried: Fajr -8,-4,+4,+8; Asr -3,0,+3; Isha -10,-5,+5,+10,+15 (Cartesian product, only the entered prayers move).
+   design             tol  non-empty%   (target: at most 10%)
+   Asr+Isha            1    12.9
+   Asr+Isha            2    19.3
+   Fajr+Asr+Isha       1     0.8
+   Fajr+Asr+Isha       2     2.4
+   By how far Isha alone is moved, Asr 0, Fajr 0 (the simplest precaution), non-empty%:
+   design             tol   +3     +5     +10    +15    +30
+   Asr+Isha            1   31.3  23.6  14.4  14.5   4.5
+   Asr+Isha            2   37.8  33.7  19.9  22.2   6.3
+   Fajr+Asr+Isha       1   19.7  18.5   4.3   5.4   0.6
+   Fajr+Asr+Isha       2   28.8  25.2   8.6   8.5   1.2
+
+== 5. Candidates that agree TODAY: how often do they agree on the rest of the year? (lon 0, tolerance = the design's)
+   mean-agree = average share of sampled days a today-matching WRONG candidate still agrees; drift = share of such
+   (today, wrong candidate) cases that are off by more than 5 min on at least 20% of the days. Targets: 90%+ and at most 10%.
+   -- Asr+Isha, tol 1:   lat   cases   mean-agree%   drift%
+                            0    1024    98.6          0.0
+                            5    1024    98.6          0.0
+                           10    1056    87.4          0.0
+                           15    1016    80.5          0.0
+                           20     916    83.4         28.8
+                           25     932    77.4         34.8
+                           30    1024    67.3         40.6
+                           35    1108    62.4         45.1
+                           40    1108    61.6         45.1
+                           45     696    86.3         12.6
+                           50     744    83.3         18.3
+                           55     672    88.9          9.5
+                           60     680    87.8         10.6
+   -- Asr+Isha, tol 2:   lat   cases   mean-agree%   drift%
+                            0    2600    96.3          0.0
+                            5    2560    94.9          0.0
+                           10    2396    89.3          0.0
+                           15    2428    87.1          0.0
+                           20    2000    74.8         13.6
+                           25    1900    67.2         28.0
+                           30    1972    59.1         35.9
+                           35    1884    51.8         44.4
+                           40    1680    51.9         47.6
+                           45     948    67.6         23.2
+                           50     780    81.3         22.1
+                           55     704    85.4         13.6
+                           60     800    75.7         19.0
+   -- Fajr+Asr+Isha, tol 1:   lat   cases   mean-agree%   drift%
+                            0     208   100.0          0.0
+                            5     208   100.0          0.0
+                           10     224    73.7          0.0
+                           15     232    51.6          0.0
+                           20     160    53.6         82.5
+                           25     156    40.8        100.0
+                           30     176    25.6        100.0
+                           35     204    19.9        100.0
+                           40     140    18.7        100.0
+                           45       0     n/a          n/a
+                           50       0     n/a          n/a
+                           55       0     n/a          n/a
+                           60      16     4.8        100.0
+   -- Fajr+Asr+Isha, tol 2:   lat   cases   mean-agree%   drift%
+                            0    1144    92.1          0.0
+                            5    1136    91.5          0.0
+                           10    1040    84.2          0.0
+                           15    1052    77.8          0.0
+                           20     832    63.0         16.3
+                           25     740    52.5         36.2
+                           30     680    41.6         44.1
+                           35     624    28.0         59.0
+                           40     504    24.5         71.4
+                           45      80     9.6         40.0
+                           50       4     1.9        100.0
+                           55       0     n/a          n/a
+                           60      80     4.8         65.0
+
+== 6. Which (true, wrong) pairs drift? Fajr+Asr+Isha, tol 1, latitudes 25..40, lon 0. Pairs ordered by drift cases.
+   true KARACHI/S  vs wrong MOON_SIGHTING/S: matched-today cases=56, drifting=56
+   true MOON_SIGHTING/H  vs wrong KARACHI/H: matched-today cases=56, drifting=56
+   true KARACHI/H  vs wrong MOON_SIGHTING/H: matched-today cases=56, drifting=56
+   true MOON_SIGHTING/S  vs wrong KARACHI/S: matched-today cases=56, drifting=56
+   true KARACHI/S  vs wrong QATAR/S: matched-today cases=31, drifting=31
+   true QATAR/H  vs wrong KARACHI/H: matched-today cases=31, drifting=31
+   true KARACHI/H  vs wrong QATAR/H: matched-today cases=31, drifting=31
+   true QATAR/S  vs wrong KARACHI/S: matched-today cases=31, drifting=31
+   true MOON_SIGHTING/S  vs wrong KUWAIT/S: matched-today cases=26, drifting=26
+   true KUWAIT/H  vs wrong MOON_SIGHTING/H: matched-today cases=26, drifting=26
+   true MOON_SIGHTING/H  vs wrong KUWAIT/H: matched-today cases=26, drifting=26
+   true KUWAIT/S  vs wrong MOON_SIGHTING/S: matched-today cases=26, drifting=26
+   true MUSLIM_WORLD_LEAGUE/S  vs wrong QATAR/S: matched-today cases=18, drifting=18
+   true QATAR/H  vs wrong MUSLIM_WORLD_LEAGUE/H: matched-today cases=18, drifting=18
+
+== 7. Twin groups on Fajr+Asr+Isha (1 min, 99% of cases): 22 groups from 22 candidates
+
+   Exact boards, Fajr+Asr+Isha tol 1: share where the answer is ONE group (a definite answer), by latitude:
+   lat  0: definite  81.8% of 3432
+   lat  5: definite  81.8% of 3432
+   lat 10: definite  81.0% of 3432
+   lat 15: definite  80.7% of 3432
+   lat 20: definite  86.4% of 3432
+   lat 25: definite  86.7% of 3432
+   lat 30: definite  84.9% of 3432
+   lat 35: definite  85.9% of 3432
+   lat 40: definite  89.3% of 3432
+   lat 45: definite  99.9% of 3432
+   lat 50: definite 100.0% of 3432
+   lat 55: definite 100.0% of 3432
+   lat 60: definite  98.7% of 3432
+   overall definite:  89.0%   definite-but-wrong (must be 0): 0
+
+== 8. Out-of-model boards (constant precaution on the committee's table), narrow design:
+   a definite answer is given for what share of such boards, and over the year (lon 0) how long does it keep matching
+   the committee's own table (all three prayers within 2 min)? Targets: definite at most 2%, persistence 90%+.
+   boards tried: 118976   definite answers: 6896 =   5.8%   persistence (mean)  80.9%   of those, persisting under 60% of days:  19.9%
+
+done in 20425 ms

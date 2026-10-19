@@ -242,6 +242,8 @@ tasks.withType<Test>().configureEach {
                 "app/src/main/res/xml/widget_*.xml",
                 "app/src/main/res/drawable-nodpi/widget_preview_*.png",
                 "wear/src/main/res/values/strings.xml",
+                // TranslationIntegrityTest compares every translation with all three English sources.
+                "core/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",
                 "docs/store/LISTING.md",

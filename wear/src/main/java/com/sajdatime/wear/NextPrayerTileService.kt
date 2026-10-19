@@ -45,8 +45,13 @@ class NextPrayerTileService : TileService() {
      * the countdown is formatted in the app's own language and not the watch's. Without it
      * the tile read "in ٢h ١٤m" on an Arabic watch, in a layout sized for Latin digits.
      * See AppLocale.kt.
+     *
+     * Made once per tile request, not held: the system keeps this service process alive between
+     * requests, so a context made once (it was `by lazy`) would go on showing the old language
+     * after the watch's language changed. (8 Oct 2026 branch, brought into 1.5.0 on 19 Oct 2026;
+     * read, not run.)
      */
-    private val localised: Context by lazy { AppLocale.wrap(this) }
+    private fun localised(): Context = AppLocale.wrap(this)
 
     override fun onTileRequest(
         requestParams: RequestBuilders.TileRequest,
@@ -54,6 +59,7 @@ class NextPrayerTileService : TileService() {
         val settings = WearSettingsStore(applicationContext).settings.first()
         val coordinates = settings.coordinates
         val now = Instant.now()
+        val localised = localised()
 
         val (headline, detail, refreshAfter) = if (coordinates == null) {
             Triple(
@@ -106,6 +112,7 @@ class NextPrayerTileService : TileService() {
                                             headline = headline,
                                             detail = detail,
                                             device = requestParams.deviceConfiguration,
+                                            localised = localised,
                                         ),
                                     )
                                     .build(),
@@ -132,6 +139,7 @@ class NextPrayerTileService : TileService() {
         headline: String,
         detail: String,
         @Suppress("UNUSED_PARAMETER") device: DeviceParameters,
+        localised: Context,
     ): LayoutElementBuilders.LayoutElement =
         LayoutElementBuilders.Box.Builder()
             .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())

@@ -1,6 +1,9 @@
 package com.sajdatime.app.ui.onboarding
 
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.settings.LanguageChooserDialog
+import com.sajdatime.app.ui.settings.AppLanguage
+import androidx.compose.material.icons.outlined.Language
 import com.sajdatime.app.data.placeName
 import android.content.pm.PackageManager
 import android.Manifest
@@ -306,47 +309,70 @@ private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
     val bismillahSpoken = stringResource(R.string.bismillah_a11y)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(R.string.bismillah_arabic),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center,
-            // Screen readers should announce the meaning, not attempt the Arabic glyphs
-            // in the user's own locale voice.
-            modifier = Modifier.clearAndSetSemantics {
-                contentDescription = bismillahSpoken
-            },
-        )
-        Spacer(Modifier.height(Space.Section))
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(Space.Paragraph))
-        Text(
-            text = stringResource(R.string.welcome_tagline),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(Space.Section))
-        CtaButton(
-            onClick = onNext,
+    val context = LocalContext.current
+    var pickingLanguage by rememberSaveable { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(stringResource(R.string.action_begin))
+            Text(
+                text = stringResource(R.string.bismillah_arabic),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+                // Screen readers should announce the meaning, not attempt the Arabic glyphs
+                // in the user's own locale voice.
+                modifier = Modifier.clearAndSetSemantics {
+                    contentDescription = bismillahSpoken
+                },
+            )
+            Spacer(Modifier.height(Space.Section))
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Space.Paragraph))
+            Text(
+                text = stringResource(R.string.welcome_tagline),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Space.Section))
+            CtaButton(
+                onClick = onNext,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_begin))
+            }
+        }
+        // A person who cannot read this screen must be able to change it before the first question,
+        // not after (8 Oct 2026 branch). The owner chose this look from screenshots on 19 Oct 2026:
+        // a globe with the language's own name, in the top corner, out of the way of Begin. Rejected:
+        // a bare globe icon (easy to miss, a new kind of control) and a "Language" button under Begin
+        // (the word is in English). The globe carries the spoken label for screen readers.
+        CtaButton(
+            onClick = { pickingLanguage = true },
+            compact = true,
+            modifier = Modifier.align(Alignment.TopEnd).padding(Space.Group),
+        ) {
+            Icon(
+                Icons.Outlined.Language,
+                contentDescription = stringResource(R.string.settings_language_title),
+                modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(Space.Related))
+            Text(AppLanguage.showing(context).nativeName)
         }
     }
+    if (pickingLanguage) LanguageChooserDialog(onDismiss = { pickingLanguage = false })
 }
 
 @Composable

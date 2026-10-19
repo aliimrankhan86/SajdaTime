@@ -76,8 +76,12 @@ object Notifications {
     /** Two firm pulses: noticeable in a pocket, not startling in a quiet room. */
     private val PRAYER_VIBRATION = longArrayOf(0, 350, 250, 350)
 
-    fun ensureChannels(context: Context) {
+    fun ensureChannels(base: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        // Wrapped, so the channel names in the phone's settings are in the app's language. Below
+        // Android 13 a language picked in the app lives only in AppLocale.wrap, and the callers
+        // pass a bare application context too, so the names would flip with each caller (19 Oct 2026).
+        val context = AppLocale.wrap(base)
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
 
         // Not while a chosen sound's channel stands in for it: two "Prayer times" entries in the
