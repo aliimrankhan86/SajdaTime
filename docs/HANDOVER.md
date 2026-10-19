@@ -5457,8 +5457,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 also carries everything the unmerged 8 Oct branch had, audited, approved by the owner and retested. Nothing is
 waiting before release day (around 4 Jan 2027). Start nothing else on your own.** *(Updated late on 19 Oct:
 1.5.0 moves to November, date not chosen; and two changes made in the cloud that evening, the Ramadan window
-and the widgets following the app's Theme, were then checked on the Mac's emulator at 22:00 and PASSED. Waiting
-only on his November date. The last bullets of this block say so in full.)*
+and the widgets following the app's Theme, were then checked on the Mac's emulator at 22:00 and PASSED. **He then picked the date: submit on MONDAY 9
+NOVEMBER 2026**, preparation job Mon 2 Nov. The last bullets of this block say so in full.)*
 
 **Cloud to Mac hand-off, 19 Oct 2026, 20:00 UK (the owner: "Make sure my local claude has access to everything
 and you dont leave anything behind").** The cloud session is closed; everything it did is in git, nothing is kept
@@ -5697,6 +5697,18 @@ Not committed on purpose: the cloud's Robolectric render harness (lesson 132 say
   from 5 Feb to 8 Mar, the eve and day 1 widget words, all gone on 9 Mar. The screenshots were sent to him as a
   private page (claude.ai/artifact/7XivbixECckb9AnMQYDXYG). **Next: he picks the November date** (step 3), then
   the jobs move. New, small, after 1.5.0: the widget list's previews show icons without text (as in 1.4.0).
+- **The date, 19 Oct 2026, 22:30 UK (the hand-off's step 3; AskUserQuestion, he chose Claude's recommendation):
+  submit on MONDAY 9 NOVEMBER 2026** (three weeks after 1.4.0 went live, more than the two weeks advised, and time
+  for the 1.4.0 description to clear review). Moved the same night (RELEASE-1.5.0.md "Scheduled jobs"): the "leave
+  the Mac on" reminder to Sun 1 Nov 18:00 and the submit reminder to Mon 9 Nov 09:00 (both cloud routines, text
+  changed to the new days; the submit reminder, which a cloud session could not edit, was edited from here); the
+  health check now expects 1.5.0 from 9 Nov and warns only on 16 Nov, 23 Nov 2026 and 18 Jan 2027 if it is not
+  live; the preparation job's prompt names 9 Nov, expects 416 unit tests and a device suite of 26, and skips the
+  checks done tonight. **Not moved: the preparation job's own time** (still Mon 21 Dec 10:00). The Claude app holds
+  local task times in memory and writes them back, so an edit to its `scheduled-tasks.json` would be lost; it moves
+  only from the app's Scheduled screen or a session inside the app. Asked of him once, in one line. If it is still
+  21 Dec when the 9 Nov session starts, that session runs `release-1.5.0.sh` first and turns the 21 Dec run off.
+  PROJECT_BRIEF's timeline updated. Release day steps unchanged.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 

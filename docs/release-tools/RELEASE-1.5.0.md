@@ -4,8 +4,8 @@ Written 18 Oct 2026, when the owner asked for everything to be ready for 1.5.0 a
 `claude/quiet-glass` is the release branch and holds everything. The plan's dates (PROJECT_BRIEF):
 a preparation run on his Mac on Mon 21 Dec 2026, he merges and submits around 4 Jan 2027, live by mid
 January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027). **Changed 19 Oct 2026: he will
-submit in NOVEMBER, date not yet chosen** (HANDOVER §11, STATE OF PLAY). When he picks it, move the preparation
-run to the week before and the reminders to match ("Scheduled jobs" below), then update this file.
+submit in NOVEMBER, and that night he chose MONDAY 9 NOVEMBER 2026** (HANDOVER §11, STATE OF PLAY). The preparation
+run moves to Mon 2 Nov 2026 and the reminders to match ("Scheduled jobs" below).
 
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
 is done by touching the signing key, and **he presses every submit, publish and consent button**.
@@ -174,17 +174,17 @@ app 252, wear 12); the description 3969 characters and containing "Wear OS"; the
 
 ## Still to do, in order
 
-Dates: a reminder on Sun 20 Dec 2026 (18:00), the preparation job on Mon 21 Dec 2026 (10:00), a submit day
-reminder on Mon 4 Jan 2027 (09:00), submit around **4 Jan 2027**, live by mid January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins
-Mon 8 Feb 2027).
+Dates (his choice, 19 Oct 2026 late): a reminder on Sun 1 Nov 2026 (18:00), the preparation job on Mon 2 Nov 2026
+(10:00), a submit day reminder on Mon 9 Nov 2026 (09:00), submit on **Mon 9 Nov 2026**, **latest acceptable 25 Jan
+2027** (Ramadan 1448 begins Mon 8 Feb 2027). The January plan (20 Dec, 21 Dec, 4 Jan) is replaced.
 
 0. **Waiting on Google (19 Oct 2026):** the description for the live 1.4.0 was submitted (`docs/store/LISTING.md`,
    "For the live 1.4.0, SUBMITTED 19 Oct 2026"). Live when the public page's description says "In English, Urdu,
    Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
-   job tells him once when it sees it, and the 21 Dec job checks it too. **Claude:** then change that heading to
+   job tells him once when it sees it, and the preparation job (Mon 2 Nov) checks it too. **Claude:** then change that heading to
    LIVE with the date, and update GBrain.
 1. **Claude:** run `docs/release-tools/release-1.5.0.sh` again and expect every line PASS or TAKEN
-   (phone SKIPPED is his choice). The 21 Dec preparation job does this (its prompt was rewritten on
+   (phone SKIPPED is his choice). The preparation job (Mon 2 Nov 2026, was 21 Dec) does this (its prompt was rewritten on
    18 Oct 2026 late to use this script, never set the versions again, and stop before any merge, pull
    request, submit or Console step). The last run, 19 Oct 2026 after the emulator checks and their fixes, gave
    406 unit tests (app 261, core 129, wear 16; 407 with core 130 since the evening's `AdjustmentFit` test, gate only), 0 failed, lint 0 errors, a device suite of 25 of 25 straight after a cold boot, both bundles 9 / 1.5.0 and 1002 / 1.5.0 signed CN=Ali Imran Khan, 22 of 24 lines PASS or TAKEN (tree CHECK, the uncommitted work, and phone SKIPPED); the job's prompt says so, and also re-runs `LanguageAndDndDeviceTest` on the Android 12 emulator
@@ -283,12 +283,12 @@ fact here changes, change the job too: nothing updates it automatically.
 
 | Job | Kind and time | What it does | Changed on 19 Oct 2026 |
 |---|---|---|---|
-| SajdaTime app health check, `trig_0129FQnWihf8XG6rKLCB4oFr` | cloud routine, daily 12:00 UTC | Watches the public store page; silent unless something changed | **Re-baselined to 1.4.0.** It still had 1.3.2 and on 18 Oct reported 1.4.0 as a release it did not know about. Now it also knows the description change in review (either text is fine), expects 1.5.0 in January and says so as good news, and on 18 and 22 Jan 2027 only warns if 1.5.0 is still not live |
+| SajdaTime app health check, `trig_0129FQnWihf8XG6rKLCB4oFr` | cloud routine, daily 12:00 UTC | Watches the public store page; silent unless something changed | **Re-baselined to 1.4.0.** It still had 1.3.2 and on 18 Oct reported 1.4.0 as a release it did not know about. Now it also knows the description change in review (either text is fine), expects 1.5.0 in January and says so as good news, and on 18 and 22 Jan 2027 only warns if 1.5.0 is still not live. **Moved, 19 Oct late:** it expects 1.5.0 from Mon 9 Nov 2026, and warns only on 16 Nov, 23 Nov 2026 and 18 Jan 2027 if it is still not live |
 | SajdaTime review replies, `sajdatime-review-replies` | local task, daily 12:40 | Drafts replies to new reviews (he posts them); the Arabic reply and spare signing file reminders | **Added:** a one time notice when the new description is live (file `build/review-replies/description-live.txt` in `~/Developer/SajdaTime`), one notice on 26 Oct 2026 only if it is still not live; after 1.5.0 replies may mention "Phone language" and "Use your mosque's board" |
 | SajdaTime monthly numbers, `trig_01AzcQUNWSkgGmdJmNXkaQoD` | routine run in his Chrome, days 2 to 9 at 11:51 UK | Play numbers into the "SajdaTime monthly numbers" Claude Doc | Nothing: it does not depend on a version |
-| Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, Sun 20 Dec 2026 18:00 | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct |
-| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, Mon 21 Dec 2026 10:00 | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11. **Later on 19 Oct:** counts updated to the final run (406 unit tests, device suite 25, `LanguageAndDndDeviceTest` 7). **Evening, 19 Oct:** its Android 12 step gives up after 5 minutes if `sajda12` does not boot (it hung at start that evening, HANDOVER §10); the unit test count is now 407. **Late, 19 Oct:** the expected unit test count is now 409 (app 261, core 130, wear 18), and it says the watch tile time zone check is done (PASS, `d07a2d9`) and not to run it again |
-| SajdaTime: submit 1.5.0 today, `trig_01VexqUd1cJz8jfD5QFT874W` | cloud routine, once, Mon 4 Jan 2027 09:00 | Push reminder of the submit day and the 25 Jan limit | **New.** Replies with fixed text only (Read tool only; the account's default connectors got attached and are unused) |
+| Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, **Sun 1 Nov 2026 18:00** (was 20 Dec) | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct. **Moved, 19 Oct late:** to 1 Nov, text now names Mon 2 Nov and the 9 Nov submit |
+| SajdaTime 1.5.0: prepare the release, `sajdatime-1-5-0-reminder` | local task, once, **to move to Mon 2 Nov 2026 10:00** (still Mon 21 Dec 2026 10:00 on 19 Oct: see the last column) | Re-runs `release-1.5.0.sh` and `tools/wear-verify.sh`, fixes and records, stops before any merge or Console step | **Added:** the 19 Oct expected counts, `LanguageAndDndDeviceTest` on `sajda12`, the description check; its "never raise Android 7 to 13" line now says 7 to 11. **Later on 19 Oct:** counts updated to the final run (406 unit tests, device suite 25, `LanguageAndDndDeviceTest` 7). **Evening, 19 Oct:** its Android 12 step gives up after 5 minutes if `sajda12` does not boot (it hung at start that evening, HANDOVER §10); the unit test count is now 407. **Late, 19 Oct:** the expected unit test count is now 409 (app 261, core 130, wear 18), and it says the watch tile time zone check is done (PASS, `d07a2d9`) and not to run it again. **19 Oct, 22:30:** its prompt now names the 9 Nov submit, expects 416 unit tests (app 267, core 131, wear 18) and a device suite of 26, and says the Ramadan and widget theme checks are done (PASS, `79af839`). **Its time could not be moved from a terminal session:** the Claude app keeps local task times in memory and writes them back (`persistToDisk`), so editing its `scheduled-tasks.json` would be lost; only the app's own Scheduled screen, or a session inside the app (it has `update_scheduled_task`), can move it. If it still says 21 Dec when the 9 Nov session starts, that session runs `release-1.5.0.sh` first and the 21 Dec run is turned off |
+| SajdaTime: submit 1.5.0 today, `trig_01VexqUd1cJz8jfD5QFT874W` | cloud routine, once, **Mon 9 Nov 2026 09:00** (was 4 Jan 2027) | Push reminder of the submit day and the 25 Jan limit | **New.** Replies with fixed text only (Read tool only; the account's default connectors got attached and are unused). **Moved, 19 Oct late:** to 9 Nov, from a Mac session (a cloud session could not edit it), text now says Monday 9 November |
 
 ## Not verified yet (say so, do not assume)
 
