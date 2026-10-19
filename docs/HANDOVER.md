@@ -5542,9 +5542,17 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   **Then verified on the watch emulator, 19 Oct 2026 late (Mac session, `742389f`):** with the watch app never
   opened, changing the watch from Europe/Istanbul to Europe/London moved the tile from "Fajr 5:38 am · in 9h 6m"
   to "Fajr 3:38 am · in 9h 6m" within about 2 seconds, and back on the way back (§10, top entry). **PASS.**
-  Not run on the watch: `TIME_SET` (a manual clock change, the 12/24 switch). RELEASE-1.5.0.md step 1 still
-  lists the check, so the 21 Dec job may run it again; that is harmless. (a), (b), (c) and the
+  Not run on the watch: `TIME_SET` (a manual clock change, the 12/24 switch). (a), (b), (c) and the
   smaller items stay open and parked until after 1.5.0 or release day; nothing else was started.
+- **PARKED, 19 Oct 2026, 19:00 UK, at `123b8e6` on `claude/quiet-glass` (the owner: "all done then lets park").**
+  One branch holds everything (the cloud work branch `ccr-23a38578-c5vz7d` is the same commit); `main` is
+  `bcdba63`, untouched until submit day; both old branches kept, analytics never merged. RELEASE-1.5.0.md step 1
+  marks the tile check DONE, and the 21 Dec job's prompt on the Mac now expects 409 unit tests and skips it
+  (`ee80877`, `123b8e6`). The owner asked whether to merge into `main` early: Claude advised no (it would publish
+  the 1.5.0 privacy policy for an app still on 1.4.0, the date is set on the day, and nothing is gained), and he
+  agreed. The submit day reminder (`trig_01VexqUd1cJz8jfD5QFT874W`) could not be edited from a cloud session
+  (made outside an agent); its text already names the day's steps, so it stays. **Next: the 20 Dec reminder, the
+  21 Dec job, submit around 4 Jan 2027 (latest 25 Jan). Start nothing before then.**
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
