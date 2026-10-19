@@ -61,7 +61,7 @@ Rejected, and why:
 |---|---|
 | `… No ads, no accounts, no tracking.` (73) | Safe, but leaves seven characters unused and says nothing a dozen other apps do not |
 | `… for Sunni and Shia. Private by design.` (77) | "Private by design" is marketing abstraction. `CLAUDE.md` requires this app to work for someone who has never changed a setting and may not read English well; "no ads, no tracking" is concrete and survives translation, "private by design" does not |
-| Adding *Adhan* for search volume | Rejected while the app played only a user-chosen sound. **Since 1.5.0 a built-in adhan ships for Sunni users**, so the word is now accurate; whether to add it is the owner's decision |
+| Adding *Adhan* for search volume | Rejected while the app played only a user-chosen sound. **Since 1.5.0 a built-in adhan ships for Sunni and Shia users** (one recording per school), so the word is now accurate. 19 Oct 2026: it is in the 1.5.0 short description below, which goes up only with 1.5.0 and only with the owner's yes at paste time |
 | Adding *Namaz* / *Salah* for search volume | ~~Keyword stuffing in an English sentence, and Play flags that separately~~ — **this was later reversed for `namaz` only.** See "Why *namaz* went in after all" below |
 
 `no accounts` was the item dropped from the trust triad — it is the least sharp of the
@@ -227,7 +227,99 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 full description (APPROVED 18 Oct 2026 on condition it is accurate; CHECKED on the Mac 18 Oct 2026, one line updated 19 Oct 2026; 3987 characters)
+### 1.5.0 listing, FINAL 19 Oct 2026: paste on release day (short description, full description, watch note)
+
+**Why it changed again.** The owner, 19 Oct 2026: "mention all the features of this app to make it stand out ... Any
+keyword or something which could make our reach better. Do it all autonomously and get it reviewed independently." So the
+approved 18 Oct text below was rewritten to name every 1.5.0 feature a user would choose the app for, with the search words
+from `VISIBILITY-KEYWORDS.md` used naturally. An independent review (a separate agent, 19 Oct 2026) checked every claim
+against the code and `docs/privacy.html`, and five corrections were made: the privacy line had said the approximate
+location is never in the usage counts, which is false (they carry an approximate area; it now says coordinates, as the
+approved text did); "it works offline" became "prayer times work offline" (a typed place needs the internet once); the
+widget line no longer promises the Hijri date (only the large Today card on Android 12 and newer shows it); the typed place
+line now says it is looked up once online; and the Islamic date shift is "a day or two" (the code allows 2). The HONEST and
+FREE sections are byte for byte the approved 18 Oct block (diffed by the review), including its semicolon, which the 1.4.0
+text in review changed to a full stop: matching that is the owner's call. No competitor is named. "athan" was left out on
+purpose (it is also a competitor's brand name).
+
+**Short description** `79 / 80`. Paste only with 1.5.0 (the adhan ships in it), only with the owner's yes, and with the
+Console check from the top of this file: paste, save, reload, search the page for "may not be promoted" and "price or
+promotion", and go back to the live line if the notice appears. It keeps every word of the live line except "compass" and
+"No accounts" (both still in the full description) and adds "adhan" and "Wear OS" (the thin field in VISIBILITY-KEYWORDS.md,
+about 13 apps for "prayer times wear os"). "Qibla compass" and "adhan" cannot both fit (82).
+
+```
+Offline prayer times (namaz), adhan and Qibla for Sunni and Shia, with Wear OS.
+```
+
+**Full description** `3976 / 4000` (Python `len`, newlines counted, no final newline). Contains "Wear OS" twice. Ramadan
+is in it, so the separate "January Ramadan lines" step in RELEASE-1.5.0.md is done by pasting this.
+
+```
+SajdaTime gives you prayer times, adhan alerts and a Qibla compass for Sunni and Shia Muslims, on your Android phone and Wear OS watch. No ads, no account, and prayer times work offline.
+
+Whether you call them namaz, salah or salat, the five daily prayer times are worked out on your own phone, so SajdaTime keeps working on a plane, in a basement, or with no signal at all.
+
+WHAT YOU GET
+
+• Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha for wherever you are, with a live countdown to the next prayer
+• The Hijri date (Islamic calendar) beside today's date
+• A Qibla compass corrected to true north that buzzes once when you face the Kaaba
+• Alerts for each prayer, even when the app is closed: none, a notification, or an alarm loud enough for Fajr
+• A built-in adhan (azan) for Sunni and Shia users, or any sound on your phone
+• An optional reminder 5 to 30 minutes before the prayers you choose
+• Home screen widgets: a big countdown to the next prayer, and today's prayer times
+• Ramadan built in: suhoor (sehri) and iftar times, a countdown, how long each fast is, a Ramadan timetable and an optional suhoor reminder
+• Printable PDF prayer timetables for today, 7 days, the month or Ramadan
+• A Wear OS app and tile that work on their own, with or without your phone
+• English, Arabic, Urdu, Turkish and Indonesian, chosen in the app or following your phone
+• Light and dark themes. Works with large text and screen readers
+
+BUILT FOR YOUR SCHOOL OF THOUGHT
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
+• Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
+• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapore), Diyanet (Turkey), Moonsighting Committee, Jafari and Tehran
+• The method is chosen for your school (Muslim World League for Sunni, Jafari for Shia), and you can change it
+• Match your mosque: set any prayer to your mosque's board, within 30 minutes, or shift the Islamic date by a day or two
+• Sensible Fajr and Isha in the far north in summer
+
+YOUR PRIVACY IS NOT THE PRICE
+
+Most free prayer apps are funded by advertising, which means you pay with your data. This one is not paid for at all.
+
+• No adverts and nothing to buy
+• No accounts, no sign-in, no email address
+• Optional usage counts that you control in Settings, off unless you say yes. No crash reporting
+• Approximate location only, read while the app is open. Your coordinates never go to the developer or the usage counts
+• Your town's name is looked up by your phone's own place service, usually Google. The privacy policy explains exactly what that means
+• Cloud backup is switched off, so nothing is copied to a backup server
+
+Rather not allow location? Type where you are instead. It is looked up once online, then the app works the same.
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+**Watch 1.5.0 note** `194 / 500` (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
+19 Oct 2026 tile timeline):
+
+```
+Now in Urdu, Turkish, Indonesian and Arabic. The tile's countdown now updates every minute. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
+```
+
+The translated listings for the same release are in `LISTING-LOCALES.md`, "1.5.0".
+
+### 1.5.0 full description, SUPERSEDED 19 Oct 2026 by the block above (was: APPROVED 18 Oct 2026 on condition it is accurate; CHECKED on the Mac 18 Oct 2026, one line updated 19 Oct 2026; 3987 characters)
 
 **19 Oct 2026:** the Match your mosque line now says the app can be set from the mosque's board ("nudge any prayer time by a few minutes" became "set any prayer to your mosque's board, within 30 minutes": a bigger gap is refused, so the limit is said), because that feature came into 1.5.0 from the 8 Oct branch (`docs/release-tools/RELEASE-1.5.0.md`, "FIRST, before release day"). Every other line is unchanged. **Checked line by line on the Mac, 18 Oct 2026**, against the 1.5.0 debug build on the emulator and `docs/privacy.html`. Two lines were not true and were changed: "Cloud backup is switched off, so nothing is copied off your phone" (the watch sync, the town lookup and opted in usage counts all leave the phone; the privacy policy says backup, so it now says "to a backup server"), and "Only one thing is ever asked in return" became "I ask only one thing in return" (Google's rating card can now appear; the owner chose this wording with AskUserQuestion). Everything else was seen on screen or in code: Hijri date beside the date, widgets with countdown and town, Qibla from true north (`GeomagneticField`), Off, Notification or Alarm per prayer, "Adhan" in the sound picker, the 5 to 30 minute reminder, the Ramadan card and timetable, the PDF for today, 7 days, the month and Ramadan, the watch tile, the five languages, the three themes, four madhabs, Jafari's Maghrib angle, the methods list, Automatic resolving to MWL or Jafari, Match your mosque (up to 30 minutes, up to 2 days), backup off in both manifests, no crash reporting library.
 
@@ -569,7 +661,7 @@ Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa,
 رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. ويمكن الآن ضبط «طابِق مسجدك» من لوحة مسجدك. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
 ```
 
-**Watch 1.5.0 note** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):
+**Watch 1.5.0 note, SUPERSEDED 19 Oct 2026 by the note in "1.5.0 listing, FINAL" above** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):
 
 Corrected on the Mac, 18 Oct 2026: it said "The disclaimer no longer runs under the clock at large text", which is false on the small (192dp) round watch at 1.3 text, where the first line still meets the clock at the end of the scroll (`tools/wear-verify.sh`, 24 of 24 bezel checks pass, read by eye). It is clear on the 227dp watch, so "reads more easily" is the true claim.
 

@@ -33,6 +33,585 @@ feature graphic are reused automatically unless you upload language-specific one
 
 ---
 
+## 1.5.0 listings, FINAL 19 Oct 2026: paste on release day
+
+Rebuilt on 19 Oct 2026 from the 1.5.0 English listing (`LISTING.md`, "1.5.0 listing, FINAL"), at the owner's request to
+name every feature and use the words each market searches for. Translated by Claude (the owner's rule of 9 Oct 2026, no
+native speaker review), each language then **reviewed independently** by a separate agent that back translated it first and
+compared it with the English sentence by sentence: no meaning error, no softened disclaimer and no policy breach was found;
+their wording fixes were applied (for example the Indonesian and Malay "do not rely on it alone", the Bengali "loud enough
+for Fajr", the Arabic "اتجاه القبلة" search phrase, French grammar). The back translations, the translators' notes and the
+review outcome are in `docs/translation/store-listing-1.5.0.md` (the back translations predate those small fixes).
+
+Rules every block keeps: no price or promotion word in a title or short description (the Console flags them; "free" and "no
+ads" stay in the full descriptions as facts); "Wear OS" in Latin in every full description; all four disclaimer points
+unsoftened; the dua in the first person; the location claim as CLAUDE.md requires. Every count is Python `len` of the block,
+newlines counted, which matches Play's counter for these scripts. Malay, Bengali, French and Hindi say plainly that the app
+itself is in English, Arabic, Urdu, Turkish and Indonesian. Indonesian, Malay and French leave out the far north bullet for
+length (4000 is Play's hard limit). **The 1.4.0 era drafts further down are superseded by this section.**
+
+How to add them: Play Console, Grow users, Store presence, Store listings, Manage translations, Add your own translations;
+pick the language, paste title, short and full description, save. The screenshots and feature graphic are shared.
+
+### Arabic (ar), 1.5.0
+
+Search phrases this listing targets: مواقيت الصلاة · اوقات الصلاة · اتجاه القبلة · تطبيق مواقيت الصلاة بدون نت
+
+**Title** `30 / 30`
+```
+SajdaTime: مواقيت الصلاة، قبلة
+```
+
+**Short description** `64 / 80`
+```
+أوقات الصلاة والأذان والقبلة بدون نت، للسنة والشيعة، مع Wear OS.
+```
+
+**Full description** `3459 / 4000`
+```
+يمنحك SajdaTime مواقيت الصلاة وتنبيهات الأذان وبوصلة تحدد اتجاه القبلة، للمسلمين من السنة والشيعة، على هاتف أندرويد وساعة Wear OS. بلا إعلانات، وبلا حساب، وتعمل مواقيت الصلاة بدون إنترنت.
+
+تُحسب مواقيت الصلوات الخمس على هاتفك نفسه، لذا يظل SajdaTime يعمل في الطائرة، أو في القبو، أو حيث لا توجد تغطية إطلاقًا.
+
+ما الذي تحصل عليه
+
+• الفجر والشروق والظهر والعصر والمغرب والعشاء أينما كنت، مع عدّ تنازلي مباشر حتى الصلاة التالية
+• التاريخ الهجري (التقويم الإسلامي) بجانب تاريخ اليوم
+• بوصلة القبلة مصحّحة إلى الشمال الحقيقي، وتهتز مرة واحدة حين تتجه نحو الكعبة
+• تنبيهات لكل صلاة حتى والتطبيق مغلق: إيقاف، أو إشعار، أو منبّه عالٍ بما يكفي لصلاة الفجر
+• أذان مدمج للسنة وللشيعة، أو أي صوت على هاتفك
+• تذكير اختياري قبل الصلوات التي تختارها، من 5 إلى 30 دقيقة
+• تطبيقات مصغّرة للشاشة الرئيسية: عدّ تنازلي كبير حتى الصلاة التالية، ومواقيت صلاة اليوم
+• ميزات رمضان مدمجة: وقتا السحور والإفطار، وعدّ تنازلي، ومدة صيام كل يوم، وإمساكية رمضان، وتذكير اختياري بالسحور
+• جداول مواقيت قابلة للطباعة بصيغة PDF: لليوم، أو 7 أيام، أو الشهر، أو رمضان
+• تطبيق Wear OS وبطاقة للساعة يعملان وحدهما، مع هاتفك أو بدونه
+• الإنجليزية والعربية والأردية والتركية والإندونيسية، تختار اللغة في التطبيق أو يتبع لغة هاتفك
+• مظهر فاتح وآخر داكن. ويعمل مع الخط الكبير وقارئات الشاشة
+
+مصمَّم وفق مذهبك
+
+• السنة: الحنفي والشافعي والمالكي والحنبلي، مع قاعدة العصر الصحيحة لكل منها
+• الشيعة: الجعفري / الاثنا عشري، بما في ذلك قاعدة المغرب الصحيحة
+• 13 طريقة حساب: رابطة العالم الإسلامي، ISNA، أم القرى، الهيئة المصرية، كراتشي، دبي، الكويت، قطر، Kemenag/MUIS (إندونيسيا وسنغافورة)، ديانت (تركيا)، لجنة رؤية الهلال، الجعفري وطهران
+• تُختار الطريقة بحسب مذهبك (رابطة العالم الإسلامي للسنّة، والجعفري للشيعة)، ويمكنك تغييرها
+• «طابِق مسجدك»: اضبط أي صلاة على لوحة مسجدك في حدود 30 دقيقة، أو قدّم التاريخ الهجري أو أخّره يومًا أو يومين
+• فجر وعشاء معقولان في أقصى الشمال صيفًا
+
+خصوصيتك ليست هي الثمن
+
+معظم تطبيقات الصلاة المجانية تموّلها الإعلانات، أي أنك تدفع الثمن من بياناتك. أما هذا التطبيق فلا تدفع ثمنه بأي شيء.
+
+• لا إعلانات، ولا شيء تشتريه
+• لا حسابات، ولا تسجيل دخول، ولا بريد إلكتروني
+• إحصاءات استخدام اختيارية تتحكم بها من الإعدادات، وتبقى متوقفة ما لم توافق. ولا تقارير أعطال
+• موقع تقريبي فقط، يُقرأ والتطبيق مفتوح. ولا تصل إحداثياتك أبدًا إلى المطوّر ولا إلى إحصاءات الاستخدام
+• يُبحث عن اسم بلدتك عبر خدمة البحث عن الأماكن في هاتفك نفسه، وهي Google في الغالب. وتشرح سياسة الخصوصية ما يعنيه ذلك بالضبط
+• النسخ الاحتياطي السحابي متوقف، فلا يُنسخ أي شيء إلى خادم للنسخ الاحتياطي
+
+تفضّل ألا تسمح بالموقع؟ اكتب اسم المكان الذي أنت فيه بدلًا من ذلك. يُبحث عنه مرة واحدة عبر الإنترنت، ثم يعمل التطبيق بالطريقة نفسها.
+
+بصراحة: ما هو هذا التطبيق
+
+تطبيق SajdaTime مساعد، وليس مرجعًا دينيًا. يحسب هاتفك هذه الأوقات من موقع الشمس باستخدام طرق حساب منشورة، ولا يقدّمها أي مسجد أو عالم أو جهة. التطبيق من عمل شخص واحد، بمساعدة الذكاء الاصطناعي، وقد يقع فيه الخطأ. وحيث يختلف SajdaTime ومسجدك، فاتبع مسجدك. وإن بدا لك يومًا وقت أو اتجاه غير صحيح، أو لم تكن متأكدًا، فالرجاء أن تسألهم أو تسأل شخصًا آخر مؤهلًا لينصحك.
+
+تُحسب مواقيت الصلاة بمكتبة adhan-java من Batoul Apps، وهي مكتبة مفتوحة المصدر واسعة الاستخدام، وتُقارَن المواقيت بجداول مرجعية مستقلة قبل كل إصدار. ومع ذلك يُقدَّم التطبيق مجانًا وكما هو، دون أي ضمان ودون أي وعد بالدقة، فحيث تهمّك الدقة التامة، فالرجاء ألا تعتمد عليه وحده.
+
+مجاني، وسيبقى مجانيًا
+
+لا نسخة مدفوعة، ولا اشتراك، ولا شيء مقفل. يُقدَّم SajdaTime مجانًا صدقةً جاريةً للأمة.
+
+لا أطلب في المقابل إلا شيئًا واحدًا: أرجو أن تذكرني وعائلتي ووالديّ في دعائك. جزاكم الله خيرًا.
+```
+
+### Urdu (ur), 1.5.0
+
+Search phrases this listing targets: نماز کے اوقات · نماز کا وقت · قبلہ رخ · نماز کا وقت حنفی · اوقات نماز
+
+**Title** `30 / 30`
+```
+SajdaTime: نماز کے اوقات، قبلہ
+```
+
+**Short description** `65 / 80`
+```
+سنی و شیعہ کے لیے آف لائن اوقات نماز، اذان، قبلہ اور Wear OS ایپ۔
+```
+
+**Full description** `3980 / 4000`
+```
+آپ کے اینڈرائیڈ فون اور Wear OS گھڑی پر SajdaTime سنی اور شیعہ مسلمانوں کو نماز کے اوقات، اذان کے الرٹ اور قبلہ نما دیتی ہے۔ نہ اشتہارات، نہ اکاؤنٹ، اور نماز کے اوقات آف لائن کام کرتے ہیں۔
+
+آپ نماز کہیں یا صلوٰۃ، پانچوں نمازوں کے اوقات آپ کے اپنے فون پر ہی نکالے جاتے ہیں، اس لیے SajdaTime ہوائی جہاز میں، تہہ خانے میں، یا سگنل بالکل نہ ہونے پر بھی کام کرتی رہتی ہے۔
+
+آپ کو کیا ملتا ہے
+
+• فجر، طلوع آفتاب، ظہر، عصر، مغرب اور عشاء، آپ جہاں بھی ہوں، اور اگلی نماز تک لمحہ بہ لمحہ الٹی گنتی
+• آج کی تاریخ کے ساتھ ہجری تاریخ (اسلامی کیلنڈر)
+• اصل شمال کے مطابق درست قبلہ نما، جو قبلہ رخ ہوتے ہی ایک بار وائبریٹ کرتا ہے
+• ہر نماز کا وقت ہونے پر الرٹ، چاہے ایپ بند ہو: کچھ نہیں، اطلاع، یا فجر کے لیے کافی تیز الارم
+• سنی اور شیعہ صارفین کے لیے ایپ میں شامل اذان، یا آپ کے فون کی کوئی بھی آواز
+• آپ کی چنی ہوئی نمازوں سے 5 سے 30 منٹ پہلے اختیاری یاددہانی
+• ہوم اسکرین ویجٹ: اگلی نماز تک بڑی الٹی گنتی، اور آج کے نماز کے اوقات
+• رمضان ایپ میں ہی شامل: سحری اور افطار کے اوقات، الٹی گنتی، ہر روزے کا دورانیہ، رمضان کا نقشہ (رمضان کیلنڈر) اور سحری کی اختیاری یاددہانی
+• آج، 7 دن، مہینے یا رمضان کے لیے پرنٹ کے قابل PDF نظام الاوقات
+• گھڑی کے لیے Wear OS ایپ اور ٹائل جو خود چلتی ہیں، فون کے ساتھ یا اس کے بغیر
+• انگریزی، عربی، اردو، ترکی اور انڈونیشی، ایپ میں منتخب کریں یا فون کی زبان کے مطابق
+• روشن اور گہرا تھیم۔ بڑے حروف اور اسکرین ریڈر کے ساتھ کام کرتی ہے
+
+آپ کے مسلک کے مطابق
+
+• سنی: حنفی، شافعی، مالکی اور حنبلی، ہر ایک کے لیے عصر کا درست اصول
+• شیعہ: جعفری / اثنا عشری، مغرب کے درست اصول سمیت
+• حساب کے 13 طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، Kemenag/MUIS (انڈونیشیا، سنگاپور)، دیانت (ترکی)، مون سائٹنگ کمیٹی، جعفری اور تہران
+• طریقہ آپ کے مسلک کے مطابق چنا جاتا ہے (سنی کے لیے مسلم ورلڈ لیگ، شیعہ کے لیے جعفری)، اور آپ اسے بدل سکتے ہیں
+• «اپنی مسجد سے ملائیں»: کسی بھی نماز کو 30 منٹ کے اندر اپنی مسجد کے بورڈ کے مطابق کر لیں، یا اسلامی تاریخ ایک دو دن آگے پیچھے کریں
+• دور شمال میں گرمیوں کے دوران فجر اور عشاء کے معقول اوقات
+
+آپ کی پرائیویسی اس کی قیمت نہیں
+
+زیادہ تر مفت نماز ایپس اشتہارات سے چلتی ہیں، یعنی آپ قیمت اپنے ڈیٹا سے چکاتے ہیں۔ یہاں آپ سے کسی بھی صورت میں کوئی قیمت نہیں لی جاتی۔
+
+• نہ کوئی اشتہار، نہ خریدنے کو کچھ
+• نہ اکاؤنٹ، نہ سائن اِن، نہ ای میل پتہ
+• استعمال کے اختیاری اعداد و شمار، جن کا اختیار ترتیبات میں آپ کے پاس ہے، اور جب تک آپ ہاں نہ کہیں بند رہتے ہیں۔ کوئی کریش رپورٹنگ نہیں
+• صرف اندازاً مقام، جو ایپ کھلی ہونے پر ہی دیکھا جاتا ہے۔ آپ کے کوآرڈینیٹس نہ کبھی ڈویلپر کو جاتے ہیں نہ استعمال کے اعداد و شمار میں
+• آپ کے شہر کا نام آپ کے فون کی اپنی مقام تلاش سروس سے معلوم کیا جاتا ہے، جو عموماً گوگل ہوتی ہے۔ پرائیویسی پالیسی ٹھیک ٹھیک بتاتی ہے کہ اس کا کیا مطلب ہے
+• کلاؤڈ بیک اپ بند ہے، اس لیے کچھ بھی کسی بیک اپ سرور پر نقل نہیں ہوتا
+
+مقام کی اجازت نہیں دینا چاہتے؟ اس کے بجائے لکھ دیں کہ آپ کہاں ہیں۔ یہ ایک بار آن لائن تلاش کیا جاتا ہے، پھر ایپ بالکل ویسے ہی کام کرتی ہے۔
+
+یہ ایپ کیا ہے، سچ سچ
+
+یاد رہے کہ SajdaTime ایک مددگار ہے، کوئی دینی اتھارٹی نہیں۔ آپ کا فون یہ اوقات سورج کی پوزیشن سے، شائع شدہ حسابی طریقوں کے ذریعے نکالتا ہے، اور یہ کسی مسجد، عالم یا اتھارٹی کے فراہم کردہ نہیں۔ یہ ایپ ایک شخص نے مصنوعی ذہانت کی مدد سے بنائی ہے، اور اس میں غلطی ہو سکتی ہے۔ جہاں SajdaTime اور آپ کی مسجد میں اختلاف ہو، وہاں اپنی مسجد کی پیروی کریں۔ اگر کبھی کوئی وقت یا سمت درست نہ لگے، یا آپ کو یقین نہ ہو، تو براہِ کرم اپنی مسجد سے یا کسی اور اہل شخص سے پوچھ لیں جو آپ کی رہنمائی کر سکے۔
+
+نماز کے اوقات Batoul Apps کی adhan-java سے نکالے جاتے ہیں، جو وسیع پیمانے پر استعمال ہونے والی اوپن سورس لائبریری ہے، اور ہر نئے ورژن سے پہلے انہیں آزاد حوالہ جاتی نقشوں سے جانچا جاتا ہے۔ پھر بھی یہ ایپ مفت اور جیسی ہے ویسی ہی دی جاتی ہے، کسی ضمانت اور درستگی کے کسی وعدے کے بغیر، اس لیے جہاں بالکل درست ہونا آپ کے لیے اہم ہو، وہاں براہِ کرم صرف اسی پر بھروسہ نہ کریں۔
+
+مفت، اور مفت ہی رہے گی
+
+نہ کوئی پیڈ ورژن، نہ سبسکرپشن، نہ کوئی چیز تالے میں بند۔ SajdaTime امت کے لیے صدقۂ جاریہ کے طور پر مفت دی گئی ہے۔
+
+بدلے میں میری بس ایک گزارش ہے: براہِ کرم مجھے، میرے گھر والوں اور میرے والدین کو اپنی دعاؤں میں یاد رکھیں۔ جزاک اللہ خیر۔
+```
+
+### Turkish (tr-TR), 1.5.0
+
+Search phrases this listing targets: namaz vakitleri · ezan vakti · kıble · namaz uygulaması internetsiz · imsakiye
+
+**Title** `26 / 30`
+```
+SajdaTime: Namaz Vakitleri
+```
+
+**Short description** `75 / 80`
+```
+İnternetsiz namaz vakitleri, ezan ve kıble. Sünni ve Şii için, Wear OS ile.
+```
+
+**Full description** `3975 / 4000`
+```
+SajdaTime, Sünni ve Şii Müslümanlara Android telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan vakti uyarıları ve kıble pusulası sunar. Reklam yok, hesap yok, namaz vakitleri internetsiz çalışır.
+
+İster namaz deyin ister salat, beş vaktin saatleri kendi telefonunuzda hesaplanır. Bu yüzden SajdaTime uçakta, bodrumda ya da hiç sinyal yokken de çalışır.
+
+NELER SUNAR
+
+• Bulunduğunuz yere göre Sabah, Güneş, Öğle, İkindi, Akşam ve Yatsı, sıradaki namaza canlı geri sayımla
+• Bugünün tarihinin yanında Hicri tarih (İslami takvim)
+• Gerçek kuzeye göre düzeltilmiş, Kâbe'ye döndüğünüzde bir kez titreyen kıble pusulası
+• Her namaz için uyarı, uygulama kapalıyken bile: yok, bildirim ya da Sabah namazına kaldıracak kadar yüksek bir alarm
+• Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki herhangi bir ses
+• Seçtiğiniz namazlardan 5 ila 30 dakika önce isteğe bağlı hatırlatma
+• Ana ekran widget'ları: sıradaki namaza büyük geri sayım ve bugünün namaz vakitleri
+• Ramazan da hazır: imsak ve iftar vakitleri, geri sayım, her orucun süresi, Ramazan imsakiyesi ve isteğe bağlı sahur hatırlatıcısı
+• Bugün, 7 gün, tüm ay ya da Ramazan için yazdırılabilir PDF vakit çizelgeleri
+• Telefonla ya da telefonsuz, kendi başına çalışan Wear OS uygulaması ve saat kartı
+• Türkçe, İngilizce, Arapça, Urduca ve Endonezce. Dil uygulamadan seçilir ya da telefonun dilini izler
+• Açık ve koyu tema. Büyük yazı ve ekran okuyucularla uyumlu
+
+MEZHEBİNİZE GÖRE HAZIRLANDI
+
+• Sünni: Hanefi, Şafii, Maliki ve Hanbeli, her biri için doğru İkindi kuralıyla
+• Şii: Caferi (İsna Aşeriyye), doğru Akşam kuralı dahil
+• 13 hesaplama yöntemi: Dünya İslam Birliği, ISNA, Ümmülkura, Mısır, Karaçi, Dubai, Kuveyt, Katar, Kemenag ve MUIS (Endonezya, Singapur), Diyanet (Türkiye), Moonsighting Committee, Caferi ve Tahran
+• Yöntem mezhebinize göre seçilir (Sünni için Dünya İslam Birliği, Şii için Caferi) ve değiştirilebilir
+• Camiye göre ayarla: herhangi bir vakti 30 dakikaya kadar cami panosundaki saate eşitleyin ya da Hicri tarihi bir iki gün kaydırın
+• Yazın uzak kuzeyde makul Sabah ve Yatsı vakitleri
+
+BEDELİ GİZLİLİĞİNİZ DEĞİL
+
+Ücretsiz namaz uygulamalarının çoğu reklamla finanse edilir, yani bedelini verinizle ödersiniz. Bunun ise hiçbir bedeli yok.
+
+• Reklam yok, satın alma yok
+• Hesap yok, giriş yok, e-posta adresi yok
+• Ayarlar'dan yönettiğiniz isteğe bağlı kullanım sayımları, siz evet demedikçe kapalı. Çökme raporu yok
+• Yalnızca yaklaşık konum, uygulama açıkken okunur. Koordinatlarınız ne geliştiriciye ne de kullanım sayımlarına gider
+• Şehrinizin adını telefonunuzun kendi yer arama hizmeti (genellikle Google) bulur. Bunun tam olarak ne demek olduğunu gizlilik politikası açıklar
+• Bulut yedekleme kapalı, hiçbir şey bir yedekleme sunucusuna kopyalanmaz
+
+Konum izni vermek istemiyor musunuz? Nerede olduğunuzu yazın. Bir kez internetten aranır, sonra uygulama aynen çalışır.
+
+NE OLDUĞU KONUSUNDA DÜRÜST
+
+SajdaTime bir yardımcıdır, dinî bir otorite değildir. Telefonunuz bu vakitleri güneşin konumundan, yayımlanmış hesaplama yöntemleriyle hesaplar. Bu vakitleri hiçbir cami, âlim ya da otorite vermez. Uygulama tek bir kişi tarafından yapay zekâ yardımıyla yazıldı ve hata yapabilir. SajdaTime ile caminiz farklı söylüyorsa caminize uyun. Bir vakit ya da yön size yanlış görünürse veya emin değilseniz, lütfen onlara ya da size yol gösterebilecek ehil başka birine danışın.
+
+Vakitler, Batoul Apps'in yaygın olarak kullanılan açık kaynaklı kütüphanesi adhan-java ile hesaplanır ve her sürümden önce bağımsız referans çizelgelerle karşılaştırılır. Yine de uygulama ücretsiz ve olduğu gibi, hiçbir garanti ve doğruluk vaadi olmadan sunulur. Bu yüzden kesinlik sizin için önemliyse lütfen yalnızca uygulamaya güvenmeyin.
+
+ÜCRETSİZ VE ÜCRETSİZ KALACAK
+
+Ücretli sürüm yok, abonelik yok, kilitli hiçbir şey yok. SajdaTime, ümmet için sadaka-i câriye olarak karşılıksız sunulur.
+
+Karşılığında tek bir şey istiyorum: lütfen beni, ailemi ve anne babamı dualarınızda anın. Allah razı olsun.
+```
+
+### Indonesian (id-ID), 1.5.0
+
+Search phrases this listing targets: jadwal sholat · waktu sholat · arah kiblat · adzan · jadwal imsakiyah
+
+**Title** `24 / 30`
+```
+SajdaTime: Jadwal Sholat
+```
+
+**Short description** `76 / 80`
+```
+Jadwal sholat offline, adzan dan arah kiblat. Sunni dan Syiah, juga Wear OS.
+```
+
+**Full description** `3996 / 4000`
+```
+SajdaTime menyajikan jadwal sholat, pengingat adzan, dan kompas arah kiblat bagi Muslim Sunni dan Syiah di ponsel Android dan jam tangan Wear OS. Tanpa iklan, tanpa akun, dan jadwal sholat bisa offline.
+
+Sholat, salat, atau namaz: kelima waktunya dihitung di ponsel Anda sendiri, jadi SajdaTime tetap jalan di pesawat, ruang bawah tanah, atau tanpa sinyal sama sekali.
+
+YANG ANDA DAPAT
+
+• Subuh, Terbit, Zuhur, Asar, Magrib, dan Isya di lokasi Anda, dengan hitung mundur langsung ke sholat berikutnya
+• Tanggal Hijriah (kalender Islam) di samping tanggal hari ini
+• Kompas kiblat berpatokan utara sejati, bergetar sekali saat menghadap Ka'bah
+• Pengingat tiap waktu sholat, bahkan saat aplikasi ditutup: mati, notifikasi, atau alarm yang cukup keras untuk Subuh
+• Adzan (azan) bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda
+• Pengingat opsional 5 sampai 30 menit sebelum sholat yang Anda pilih
+• Widget layar utama: hitung mundur besar ke sholat berikutnya dan jadwal hari ini
+• Fitur Ramadan: akhir sahur dan buka puasa, hitung mundur, lama tiap puasa, jadwal imsakiyah, dan pengingat sahur opsional
+• Jadwal sholat PDF siap cetak: hari ini, 7 hari, sebulan, atau Ramadan
+• Aplikasi dan tile Wear OS yang berjalan sendiri, dengan atau tanpa ponsel
+• Bahasa Indonesia, Inggris, Arab, Urdu, dan Turki, dipilih di aplikasi atau ikut bahasa ponsel
+• Tema terang dan gelap. Mendukung teks besar dan pembaca layar
+
+SESUAI MAZHAB ANDA
+
+• Sunni: Hanafi, Syafi'i, Maliki, dan Hanbali, dengan aturan Asar yang tepat untuk tiap mazhab
+• Syiah: Jafari (Itsna Asyariyah), termasuk aturan Magrib yang benar
+• 13 metode perhitungan: Liga Muslim Dunia, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapura), Diyanet (Turki), Moonsighting Committee, Jafari, dan Teheran
+• Metode dipilih sesuai aliran Anda (Liga Muslim Dunia untuk Sunni, Jafari untuk Syiah) dan bisa diubah
+• Sesuaikan dengan masjid: samakan tiap waktu dengan papan masjid, hingga 30 menit, atau geser tanggal Hijriah satu dua hari
+
+PRIVASI ANDA BUKAN HARGANYA
+
+Kebanyakan aplikasi sholat gratis dibiayai iklan, jadi Anda membayar dengan data. Yang ini tidak dibayar sama sekali.
+
+• Tanpa iklan, tanpa pembelian
+• Tanpa akun, tanpa login, tanpa alamat email
+• Data penggunaan opsional yang Anda atur di Pengaturan, mati kecuali Anda setuju. Tanpa laporan crash
+• Hanya perkiraan lokasi, dibaca saat aplikasi terbuka. Koordinat Anda tidak pernah dikirim ke pengembang atau ke data penggunaan
+• Nama kota Anda dicari oleh layanan pencarian tempat bawaan ponsel, biasanya Google. Kebijakan privasi menjelaskan persis artinya
+• Pencadangan cloud mati, jadi tidak ada yang disalin ke server cadangan
+
+Tidak mau izinkan lokasi? Ketik saja tempat Anda. Tempat itu dicari sekali secara online, lalu aplikasi bekerja sama saja.
+
+JUJUR TENTANG APA ADANYA
+
+SajdaTime adalah alat bantu, bukan otoritas agama. Ponsel Anda menghitung waktu ini dari posisi matahari dengan metode perhitungan yang diterbitkan. Waktu ini tidak diberikan oleh masjid, ulama, atau otoritas mana pun. Aplikasi ini ditulis oleh satu orang dengan bantuan kecerdasan buatan, dan bisa keliru. Jika SajdaTime dan masjid Anda berbeda, ikutilah masjid Anda. Jika suatu waktu atau arah tampak tidak tepat, atau Anda ragu, mohon tanyakan kepada mereka atau orang lain yang berwenang memberi nasihat.
+
+Waktu sholat dihitung dengan adhan-java dari Batoul Apps, pustaka sumber terbuka yang banyak dipakai, dan diperiksa terhadap jadwal rujukan independen sebelum setiap rilis. Meski begitu, aplikasi ini diberikan gratis dan apa adanya, tanpa jaminan dan tanpa janji ketepatan, jadi bila ketepatan penting bagi Anda, mohon jangan hanya mengandalkan aplikasi ini.
+
+GRATIS, DAN TETAP GRATIS
+
+Tidak ada versi berbayar, langganan, atau fitur yang dikunci. SajdaTime diberikan tanpa biaya sebagai sedekah jariah untuk umat.
+
+Saya hanya minta satu hal sebagai balasan: mohon doakan saya, keluarga saya, dan orang tua saya. Jazakallahu khairan.
+```
+
+### Malay (ms-MY), 1.5.0
+
+Search phrases this listing targets: waktu solat · arah kiblat · jadual waktu solat · azan
+
+**Title** `30 / 30`
+```
+SajdaTime: Waktu Solat, Kiblat
+```
+
+**Short description** `73 / 80`
+```
+Waktu solat, azan dan arah kiblat untuk Sunni dan Syiah, juga di Wear OS.
+```
+
+**Full description** `3998 / 4000`
+```
+SajdaTime memberi waktu solat, peringatan azan dan kompas arah kiblat untuk Muslim Sunni dan Syiah di telefon Android dan jam tangan Wear OS. Tiada iklan, tiada akaun, dan waktu solat berfungsi luar talian.
+
+Solat, salat atau namaz: lima waktunya dikira di telefon anda sendiri, jadi SajdaTime tetap berfungsi dalam kapal terbang, di bawah tanah atau langsung tanpa isyarat.
+
+APA YANG ADA
+
+• Subuh, Syuruk, Zohor, Asar, Maghrib dan Isyak di lokasi anda, dengan kiraan detik langsung ke solat seterusnya
+• Tarikh Hijrah (kalendar Islam) di sebelah tarikh hari ini
+• Kompas kiblat berpandukan utara benar, bergetar sekali apabila anda menghadap Kaabah
+• Peringatan setiap solat walaupun aplikasi ditutup: tiada, pemberitahuan atau penggera cukup kuat untuk Subuh
+• Azan terbina dalam untuk Sunni dan Syiah, atau sebarang bunyi di telefon anda
+• Peringatan pilihan 5 hingga 30 minit sebelum solat yang anda pilih
+• Widget skrin utama: kiraan detik besar ke solat seterusnya, dan waktu hari ini
+• Untuk Ramadan: waktu sahur dan berbuka, kiraan detik, tempoh setiap puasa, jadual Ramadan dan peringatan sahur pilihan
+• Jadual waktu solat PDF untuk dicetak: hari ini, 7 hari, sebulan atau Ramadan
+• Aplikasi dan tile Wear OS yang berfungsi sendiri, dengan atau tanpa telefon
+• Bahasa aplikasi: Inggeris, Arab, Urdu, Turki dan Indonesia (tiada Melayu), pilih dalam aplikasi atau ikut telefon
+• Tema cerah dan gelap. Menyokong teks besar dan pembaca skrin
+
+MENGIKUT MAZHAB ANDA
+
+• Sunni: Hanafi, Syafie, Maliki dan Hanbali, dengan kaedah Asar yang betul bagi tiap satu
+• Syiah: Jafari / Ithna Asyari, termasuk kaedah Maghrib yang betul
+• 13 kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapura), Diyanet (Turki), Moonsighting Committee, Jafari dan Tehran
+• Kaedah dipilih mengikut aliran anda (Muslim World League untuk Sunni, Jafari untuk Syiah) dan boleh ditukar
+• Match your mosque: selaraskan sebarang solat dengan papan masjid, hingga 30 minit, atau anjak tarikh Hijrah sehari dua
+
+PRIVASI ANDA BUKAN HARGANYA
+
+Kebanyakan aplikasi solat percuma dibiayai iklan, maknanya anda membayar dengan data. Yang ini langsung tidak dibayar.
+
+• Tiada iklan, tiada pembelian
+• Tiada akaun, tiada log masuk, tiada alamat e-mel
+• Kiraan penggunaan pilihan yang anda kawal dalam Tetapan, mati kecuali anda setuju. Tiada laporan ranap
+• Lokasi anggaran sahaja, dibaca semasa aplikasi dibuka. Koordinat anda tidak pernah dihantar kepada pembangun atau kiraan penggunaan
+• Nama bandar anda dicari oleh perkhidmatan tempat telefon anda sendiri, biasanya Google. Dasar privasi menerangkannya dengan tepat
+• Sandaran awan dimatikan, jadi tiada yang disalin ke pelayan sandaran
+
+Tidak mahu benarkan lokasi? Taip nama tempat anda. Ia dicari sekali dalam talian, kemudian aplikasi berfungsi sama.
+
+JUJUR TENTANG APA ADANYA
+
+SajdaTime ialah pembantu, bukan pihak berkuasa agama. Waktu ini dikira oleh telefon anda dari kedudukan matahari dengan kaedah pengiraan yang diterbitkan, dan tidak dibekalkan oleh sebarang masjid, ulama atau pihak berkuasa. Aplikasi ini ditulis oleh seorang individu dengan bantuan kecerdasan buatan, dan boleh tersilap. Jika SajdaTime dan masjid anda berbeza, ikutlah masjid anda. Jika sesuatu waktu atau arah nampak tidak kena, atau anda tidak pasti, sila tanya mereka atau orang lain yang layak menasihati anda.
+
+Waktu solat dikira dengan adhan-java oleh Batoul Apps, pustaka sumber terbuka yang meluas digunakan, dan disemak dengan jadual rujukan bebas sebelum setiap keluaran. Namun, aplikasi ini diberi percuma dan seadanya, tanpa waranti dan tanpa janji ketepatan, jadi jika ketepatan penting bagi anda, sila jangan hanya bergantung padanya.
+
+PERCUMA, DAN KEKAL PERCUMA
+
+Tiada versi berbayar, tiada langganan dan tiada yang dikunci. SajdaTime diberi percuma sebagai sedekah jariah untuk ummah.
+
+Saya hanya minta satu perkara sebagai balasan: sudilah doakan saya, keluarga saya dan ibu bapa saya. Jazakallahu khairan.
+```
+
+### Bengali (bn-BD), 1.5.0
+
+Search phrases this listing targets: নামাজের সময়সূচি · নামাজের সময় · কিবলা কম্পাস · আজান
+
+**Title** `27 / 30`
+```
+SajdaTime: নামাজের সময়সূচি
+```
+
+**Short description** `64 / 80`
+```
+অফলাইন নামাজের সময়, আজান, কিবলা কম্পাস, সুন্নি ও শিয়া, Wear OS
+```
+
+**Full description** `3994 / 4000`
+```
+SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের সময়সূচি, আজানের অ্যালার্ট ও কিবলা কম্পাস নিয়ে আসে, আপনার Android ফোন ও Wear OS ঘড়িতে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না, আর নামাজের সময় অফলাইনেও পাওয়া যায়।
+
+নামাজ, সালাহ বা সালাত, যে নামেই ডাকুন, পাঁচ ওয়াক্তের সময় আপনার নিজের ফোনেই হিসাব হয়। তাই বিমানে, বেসমেন্টে বা একেবারে নেটওয়ার্ক না থাকলেও SajdaTime চলতে থাকে।
+
+আপনি যা পাবেন
+
+• ফজর, সূর্যোদয়, যোহর, আসর, মাগরিব ও এশা, যেখানেই থাকুন, পরের নামাজ পর্যন্ত লাইভ কাউন্টডাউনসহ
+• আজকের তারিখের পাশে হিজরি তারিখ (ইসলামি ক্যালেন্ডার)
+• প্রকৃত উত্তর অনুযায়ী ঠিক করা কিবলা কম্পাস, কাবার দিকে মুখ করলে একবার ভাইব্রেট করে
+• প্রতি ওয়াক্তের অ্যালার্ট, অ্যাপ বন্ধ থাকলেও: কিছুই না, নোটিফিকেশন, অথবা ফজরের জন্য যথেষ্ট জোরালো অ্যালার্ম
+• সুন্নি ও শিয়াদের জন্য অ্যাপেই আজান (আযান), অথবা ফোনের যেকোনো শব্দ
+• বেছে নেওয়া নামাজের ৫ থেকে ৩০ মিনিট আগে ঐচ্ছিক রিমাইন্ডার
+• হোম স্ক্রিন উইজেট: পরের নামাজের বড় কাউন্টডাউন, আর আজকের নামাজের সময়
+• রমজানও অ্যাপেই: সাহরি (সেহরি) ও ইফতারের সময়, কাউন্টডাউন, প্রতিটি রোজা কতক্ষণের, রমজানের সময়সূচি ও ঐচ্ছিক সাহরির রিমাইন্ডার
+• আজ, ৭ দিন, পুরো মাস বা রমজানের নামাজের সময়সূচি, প্রিন্ট করার মতো PDF
+• Wear OS অ্যাপ ও টাইল, ফোন সঙ্গে থাকুক বা না থাকুক, নিজেই চলে
+• অ্যাপটি নিজে ইংরেজি, আরবি, উর্দু, তুর্কি ও ইন্দোনেশীয় ভাষায়, বাংলায় নয়। ভাষা অ্যাপে বেছে নিন, বা ফোনের সেটিং অনুযায়ী রাখুন
+• লাইট ও ডার্ক থিম। বড় লেখা ও স্ক্রিন রিডারের সঙ্গে কাজ করে
+
+আপনার মাযহাব অনুযায়ী তৈরি
+
+• সুন্নি: হানাফি, শাফেয়ি, মালেকি ও হাম্বলি, প্রতিটির জন্য আসরের সঠিক নিয়ম
+• শিয়া: জাফরি / ইসনা আশারি, মাগরিবের সঠিক নিয়মসহ
+• ১৩টি গণনা পদ্ধতি: মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, মিশরীয়, করাচি, দুবাই, কুয়েত, কাতার, Kemenag/MUIS (ইন্দোনেশিয়া, সিঙ্গাপুর), দিয়ানেত (তুরস্ক), মুনসাইটিং কমিটি, জাফরি ও তেহরান
+• পদ্ধতিটি আপনার মাযহাব অনুযায়ী ঠিক হয় (সুন্নির জন্য মুসলিম ওয়ার্ল্ড লীগ, শিয়ার জন্য জাফরি), চাইলে বদলাতে পারেন
+• মসজিদের সঙ্গে মেলান: যেকোনো নামাজ মসজিদের বোর্ডের সময়ে মিলিয়ে নিন, ৩০ মিনিটের মধ্যে, অথবা ইসলামি তারিখ এক বা দুই দিন সরিয়ে নিন
+• গ্রীষ্মকালে সুদূর উত্তরেও ফজর ও এশার যুক্তিসঙ্গত সময়
+
+এর দাম আপনার গোপনীয়তা নয়
+
+বেশিরভাগ বিনামূল্যের নামাজের অ্যাপ চলে বিজ্ঞাপনের টাকায়, অর্থাৎ দাম দেন আপনার তথ্য দিয়ে। এই অ্যাপের কোনো দামই নেই, কোনোভাবেই।
+
+• কোনো বিজ্ঞাপন নেই, কেনার কিছু নেই
+• কোনো অ্যাকাউন্ট, সাইন ইন বা ইমেইল ঠিকানা লাগে না
+• ঐচ্ছিক ব্যবহারের গণনা, সেটিংসে আপনার নিয়ন্ত্রণে, রাজি না হলে বন্ধ থাকে। কোনো ক্র্যাশ রিপোর্টিং নেই
+• শুধু আনুমানিক অবস্থান, শুধু অ্যাপ খোলা থাকার সময় পড়া হয়। আপনার স্থানাঙ্ক কখনও ডেভেলপারের কাছে বা ব্যবহারের গণনায় যায় না
+• শহরের নাম খুঁজে দেয় ফোনের নিজস্ব স্থান সেবা, সাধারণত Google। এর ঠিক কী মানে, তা গোপনীয়তা নীতিতে ব্যাখ্যা আছে
+• ক্লাউড ব্যাকআপ বন্ধ, তাই কোনো ব্যাকআপ সার্ভারে কিছুই কপি হয় না
+
+অবস্থানের অনুমতি দিতে চান না? তাহলে জায়গার নাম লিখে দিন। সেটি একবার অনলাইনে খোঁজা হয়, তারপর অ্যাপ একইভাবে চলে।
+
+এটি আসলে কী, সৎভাবে বলি
+
+SajdaTime একটি সহায়ক, কোনো ধর্মীয় কর্তৃপক্ষ নয়। আপনার ফোন প্রকাশিত গণনা পদ্ধতি অনুযায়ী সূর্যের অবস্থান থেকে এই সময়গুলো হিসাব করে। এগুলো কোনো মসজিদ, আলেম বা কর্তৃপক্ষের দেওয়া নয়। অ্যাপটি একজন ব্যক্তি লিখেছেন, কৃত্রিম বুদ্ধিমত্তার সাহায্য নিয়ে, এবং এতে ভুল হতে পারে। SajdaTime আর আপনার মসজিদের মধ্যে অমিল হলে আপনার মসজিদকেই অনুসরণ করুন। কোনো সময় বা দিক কখনও ঠিক মনে না হলে, বা আপনি নিশ্চিত না হলে, অনুগ্রহ করে মসজিদে অথবা পরামর্শ দেওয়ার যোগ্য অন্য কাউকে জিজ্ঞেস করুন।
+
+নামাজের সময় হিসাব করা হয় Batoul Apps নির্মিত adhan-java দিয়ে, যা বহুল ব্যবহৃত একটি ওপেন সোর্স লাইব্রেরি, এবং প্রতিটি রিলিজের আগে স্বতন্ত্র রেফারেন্স সময়সূচির সঙ্গে মিলিয়ে দেখা হয়। তবুও অ্যাপটি বিনামূল্যে এবং যেমন আছে তেমনভাবে দেওয়া হয়, কোনো ওয়ারেন্টি বা নির্ভুলতার প্রতিশ্রুতি ছাড়া, তাই আপনার কাছে যেখানে নির্ভুল হওয়া গুরুত্বপূর্ণ, সেখানে অনুগ্রহ করে শুধু এর ওপর নির্ভর করবেন না।
+
+বিনামূল্যে, এবং বিনামূল্যেই থাকবে
+
+কোনো পেইড সংস্করণ নেই, সাবস্ক্রিপশন নেই, কিছুই তালাবদ্ধ নেই। SajdaTime উম্মাহর জন্য সদকায়ে জারিয়া হিসেবে বিনামূল্যে দেওয়া হয়েছে।
+
+বিনিময়ে আমার একটাই অনুরোধ: অনুগ্রহ করে আপনার দোয়ায় আমাকে, আমার পরিবারকে ও আমার মা বাবাকে রাখবেন। জাযাকাল্লাহু খাইরান।
+```
+
+### French (fr-FR), 1.5.0
+
+Search phrases this listing targets: horaires de prière · heures de prière · heure de prière · qibla · adhan · azan · application prière islam sans pub
+
+**Title** `29 / 30`
+```
+SajdaTime: Horaires de prière
+```
+
+**Short description** `78 / 80`
+```
+Heures de prière hors ligne, adhan et Qibla, sunnites et chiites, avec Wear OS
+```
+
+**Full description** `3994 / 4000`
+```
+SajdaTime : horaires de prière, alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone Android et montre Wear OS. Sans pub ni compte, et les horaires marchent hors ligne.
+
+Namaz, salah ou salat : les heures des cinq prières sont calculées sur votre téléphone. SajdaTime marche donc en avion, dans une cave ou sans réseau.
+
+CE QUE VOUS OBTENEZ
+
+• Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha où que vous soyez, et compte à rebours en direct vers la prochaine prière
+• Date hégirienne (calendrier islamique) près de celle du jour
+• Boussole Qibla calée sur le nord géographique, qui vibre une fois face à la Kaaba
+• Alerte à chaque prière, même l'appli fermée : aucune, notification ou alarme assez forte pour le Fajr
+• Adhan (azan) intégré pour sunnites et chiites, ou tout son du téléphone
+• Rappel facultatif 5 à 30 minutes avant les prières choisies
+• Widgets d'accueil : grand compte à rebours vers la prochaine prière, et horaires du jour
+• Ramadan intégré : suhoor (s'hour) et iftar, compte à rebours, durée du jeûne, calendrier du Ramadan, rappel facultatif du suhoor
+• Horaires de prière en PDF à imprimer : jour, 7 jours, mois ou Ramadan
+• Appli et tuile Wear OS autonomes, avec ou sans votre téléphone
+• L'appli est en anglais, arabe, ourdou, turc et indonésien (pas en français), au choix ou selon le téléphone
+• Thèmes clair et sombre. Compatible avec texte agrandi et lecteurs d'écran
+
+ADAPTÉ À VOTRE ÉCOLE
+
+• Sunnite : hanafite, chaféite, malikite, hanbalite, chacune avec sa bonne règle d'Asr
+• Chiite : jafarite / duodécimain, avec la bonne règle du Maghrib
+• 13 méthodes : Ligue islamique mondiale, ISNA, Umm al Qura, Égypte, Karachi, Dubaï, Koweït, Qatar, Kemenag/MUIS (Indonésie, Singapour), Diyanet (Turquie), Moonsighting Committee, Jafari et Téhéran
+• Méthode selon votre école (Ligue islamique mondiale si sunnite, Jafari si chiite), modifiable
+• Suivre votre mosquée : calez chaque prière sur son affichage (30 minutes d'écart au plus) ou décalez la date hégirienne d'un ou deux jours
+
+VOTRE VIE PRIVÉE N'EST PAS LE PRIX
+
+La plupart des applis de prière gratuites vivent de la pub, donc de vos données. Ici, rien à payer, d'aucune façon.
+
+• Aucune pub, rien à acheter
+• Ni compte, ni connexion, ni adresse mail
+• Compteurs d'usage facultatifs, gérés dans les paramètres, désactivés par défaut. Aucun rapport de plantage
+• Position approximative seulement, lue quand l'appli est ouverte. Vos coordonnées ne vont jamais au développeur ni dans les compteurs
+• Le nom de la ville vient du service de localisation du téléphone, en général Google. La politique de confidentialité l'explique en détail
+• Sauvegarde cloud désactivée : rien n'est copié sur un serveur de sauvegarde
+
+Sans localisation ? Saisissez votre lieu : il est cherché une fois en ligne, puis tout marche pareil.
+
+EN TOUTE HONNÊTETÉ
+
+SajdaTime est une aide, pas une autorité religieuse. Votre téléphone calcule ces heures d'après la position du soleil, selon des méthodes publiées ; aucune mosquée, aucun savant ni aucune autorité ne les fournit. L'appli a été écrite par une seule personne, aidée de l'intelligence artificielle, et peut se tromper. Si SajdaTime et votre mosquée diffèrent, suivez votre mosquée. Si une heure ou une direction vous semble fausse, ou en cas de doute, merci de demander à votre mosquée ou à une autre personne qualifiée pour vous conseiller.
+
+Les heures sont calculées avec adhan-java de Batoul Apps, bibliothèque open source très utilisée, et comparées avant chaque version à des calendriers de référence indépendants. Malgré tout, l'appli est offerte gratuitement et telle quelle, sans garantie ni promesse d'exactitude : si l'exactitude compte pour vous, merci de ne pas vous fier à elle seule.
+
+GRATUIT, ET ÇA LE RESTERA
+
+Ni version payante, ni abonnement, rien de verrouillé. SajdaTime est offert en sadaqa jariya pour la Oumma.
+
+Je ne demande qu'une chose en retour : pensez à moi, à ma famille et à mes parents dans vos douas. Jazak Allah khayr.
+```
+
+### Hindi (hi-IN), 1.5.0
+
+Search phrases this listing targets: नमाज़ का समय · नमाज का टाइम · किबला · अज़ान · नमाज का टाइम टेबल
+
+**Title** `23 / 30`
+```
+SajdaTime: नमाज़ का समय
+```
+
+**Short description** `61 / 80`
+```
+ऑफ़लाइन नमाज़ का समय, अज़ान और किबला, सुन्नी और शिया, Wear OS
+```
+
+**Full description** `3991 / 4000`
+```
+SajdaTime सुन्नी और शिया मुसलमानों के लिए नमाज़ का समय, अज़ान अलर्ट और क़िबला कम्पास देता है, आपके Android फ़ोन और Wear OS घड़ी पर। कोई विज्ञापन नहीं, कोई खाता नहीं, और नमाज़ के समय ऑफ़लाइन मिलते हैं।
+
+चाहे आप नमाज़ कहें या सलात, पाँचों वक़्त की नमाज़ का टाइम आपके अपने फ़ोन पर ही निकलता है, इसलिए SajdaTime हवाई जहाज़ में, तहख़ाने में या बिना किसी सिग्नल के भी चलता रहता है।
+
+आपको क्या मिलता है
+
+• फ़ज्र, सूर्योदय, ज़ुहर, अस्र, मग़रिब और इशा, आप जहाँ भी हों, अगली नमाज़ तक लाइव काउंटडाउन के साथ
+• आज की तारीख़ के साथ हिजरी तारीख़ (इस्लामी कैलेंडर)
+• असली उत्तर के हिसाब से ठीक किया गया क़िबला कम्पास, जो काबा की तरफ़ मुँह होते ही एक बार वाइब्रेट करता है
+• हर नमाज़ के लिए अलर्ट, ऐप बंद होने पर भी: कुछ नहीं, नोटिफ़िकेशन, या फ़ज्र के लिए काफ़ी तेज़ अलार्म
+• सुन्नी और शिया दोनों के लिए ऐप में ही अज़ान (azan), या फ़ोन की कोई भी आवाज़
+• चुनी हुई नमाज़ों से 5 से 30 मिनट पहले वैकल्पिक रिमाइंडर
+• होम स्क्रीन विजेट: अगली नमाज़ का बड़ा काउंटडाउन, और आज के नमाज़ के समय
+• रमज़ान ऐप में ही: सहरी और इफ़्तार का समय, काउंटडाउन, हर रोज़े की अवधि, रमज़ान का टाइम टेबल और सहरी का वैकल्पिक रिमाइंडर
+• आज, 7 दिन, पूरे महीने या रमज़ान का प्रिंट करने लायक़ PDF नमाज़ टाइम टेबल
+• Wear OS ऐप और टाइल, फ़ोन के साथ या बिना, अपने आप चलते हैं
+• ऐप ख़ुद अंग्रेज़ी, अरबी, उर्दू, तुर्की और इंडोनेशियाई में है, हिंदी में नहीं। भाषा ऐप में चुनें या फ़ोन के हिसाब से
+• लाइट और डार्क थीम। बड़े अक्षरों और स्क्रीन रीडर के साथ काम करता है
+
+आपके मसलक के लिए बना
+
+• सुन्नी: हनफ़ी, शाफ़ई, मालिकी और हंबली, हर एक के लिए अस्र का सही नियम
+• शिया: जाफ़री / इसना अशरी, मग़रिब के सही नियम के साथ
+• हिसाब के 13 तरीक़े: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल क़ुरा, मिस्र, कराची, दुबई, कुवैत, क़तर, Kemenag/MUIS (इंडोनेशिया, सिंगापुर), दियानत (तुर्की), मूनसाइटिंग कमेटी, जाफ़री और तेहरान
+• तरीक़ा आपके मसलक से तय होता है (सुन्नी के लिए मुस्लिम वर्ल्ड लीग, शिया के लिए जाफ़री), जिसे आप बदल सकते हैं
+• अपनी मस्जिद से मिलाएँ: कोई भी नमाज़ मस्जिद के बोर्ड के समय पर सेट करें, 30 मिनट के अंदर, या इस्लामी तारीख़ एक या दो दिन आगे पीछे करें
+• गर्मियों में सुदूर उत्तर में भी फ़ज्र और इशा के मुनासिब समय
+
+आपकी निजता इसकी क़ीमत नहीं
+
+ज़्यादातर मुफ़्त नमाज़ ऐप विज्ञापनों से चलते हैं, यानी क़ीमत आप अपने डेटा से चुकाते हैं। इसकी कोई क़ीमत है ही नहीं, किसी भी रूप में।
+
+• कोई विज्ञापन नहीं, ख़रीदने को कुछ नहीं
+• न खाता, न साइन इन, न ईमेल पता
+• वैकल्पिक उपयोग आँकड़े, सेटिंग्स में आपके नियंत्रण में, आपकी हाँ के बिना बंद। कोई क्रैश रिपोर्टिंग नहीं
+• सिर्फ़ अनुमानित लोकेशन, ऐप खुला होने पर ही पढ़ी जाती है। आपके कोऑर्डिनेट्स कभी डेवलपर तक या उपयोग आँकड़ों में नहीं जाते
+• शहर का नाम फ़ोन की अपनी जगह खोजने वाली सेवा ढूँढती है, आम तौर पर Google। इसका ठीक क्या मतलब है, यह प्राइवेसी पॉलिसी में बताया गया है
+• क्लाउड बैकअप बंद है, इसलिए किसी बैकअप सर्वर पर कुछ भी कॉपी नहीं होता
+
+लोकेशन की अनुमति नहीं देना चाहते? तो अपनी जगह लिख दीजिए। उसे एक बार ऑनलाइन ढूँढा जाता है, फिर ऐप वैसे ही काम करता है।
+
+यह क्या है, ईमानदारी से
+
+SajdaTime एक मददगार है, कोई दीनी अथॉरिटी नहीं। आपका फ़ोन ये समय सूरज की स्थिति से, प्रकाशित गणना विधियों के ज़रिए निकालता है। ये किसी मस्जिद, आलिम या अथॉरिटी की ओर से नहीं दिए जाते। यह ऐप एक व्यक्ति ने आर्टिफ़िशियल इंटेलिजेंस की मदद से लिखा है, और इससे ग़लती हो सकती है। जहाँ SajdaTime और आपकी मस्जिद में अंतर हो, वहाँ अपनी मस्जिद के अनुसार चलें। अगर कभी कोई समय या दिशा ठीक न लगे, या आपको यक़ीन न हो, तो कृपया अपनी मस्जिद से या सलाह देने के योग्य किसी और व्यक्ति से पूछ लें।
+
+नमाज़ के समय Batoul Apps की adhan-java से निकाले जाते हैं, जो बहुत इस्तेमाल होने वाली एक ओपन सोर्स लाइब्रेरी है, और हर रिलीज़ से पहले स्वतंत्र संदर्भ टाइम टेबल से मिलाकर जाँचे जाते हैं। फिर भी यह ऐप मुफ़्त और जैसा है वैसा ही दिया गया है, बिना किसी वारंटी और बिना सटीकता के किसी वादे के, इसलिए जहाँ बिल्कुल सही होना आपके लिए मायने रखता है, वहाँ कृपया सिर्फ़ इसी पर भरोसा न करें।
+
+मुफ़्त, और मुफ़्त ही रहेगा
+
+न पेड वर्ज़न, न सब्सक्रिप्शन, और कुछ भी लॉक नहीं। SajdaTime उम्मत के लिए सदक़ा जारिया के तौर पर मुफ़्त दिया गया है।
+
+बदले में मैं बस एक ही चीज़ माँगता हूँ: कृपया मुझे, मेरे परिवार को और मेरे माँ बाप को अपनी दुआओं में याद रखें। जज़ाकल्लाह ख़ैर।
+```
+
+---
+
 ## Why these eight
 
 | Language | Locale | Reaches | Search term that matters |

@@ -44,7 +44,7 @@ Where a row says "reasoning", that is this analyst's inference, not data.
 | Phrase | Market | Where | Evidence or reasoning |
 |---|---|---|---|
 | salah times, salat | English, UK, South Africa | Line 4 of the body | Suggestions GB: "salah times london/leicester/durban" |
-| azan / adhan / athan | English, Gulf, South Asia | Alarm bullet, "azan (adhan)" | Play US "azan": Athan, Muslim Pro, Prayer Now, Azan Time Pro. The app does not bundle a recitation, so the bullet says the honest thing: it plays a file already on the phone |
+| azan / adhan / athan | English, Gulf, South Asia | Alarm bullet, "azan (adhan)"; from 1.5.0 the short description and line 1 | Play US "azan": Athan, Muslim Pro, Prayer Now, Azan Time Pro. Until 1.5.0 the app bundled no recitation, so the bullet said it plays a file already on the phone. **1.5.0 ships a built-in adhan for Sunni and Shia (19 Oct 2026 note)**, so the 1.5.0 listing says adhan plainly. "athan" is not used: it is also a competitor's brand |
 | hijri date, islamic calendar | English, worldwide | Hijri bullet, "(Islamic calendar)" | Suggestions: "hijri date today", "islamic calendar 2026". Play GB "hijri calendar" is dominated by calendar-only apps, so this is a secondary match, not a target |
 | prayer times widget | English | Widgets bullet | Play GB: competitive (ZeeDev, zero_, Muslim Pro). Reasoning: carry the word, do not chase it |
 | hanafi prayer times | UK, South Asia, diaspora | School section | Suggestions GB: "hanafi prayer times sydney/toronto/london". Reasoning: the madhab names in the body already match |
@@ -59,7 +59,7 @@ Where a row says "reasoning", that is this analyst's inference, not data.
 | Phrase | Why not |
 |---|---|
 | free, no ads, ad free, best, #1, new | Price, promotion or ranking words. Google's metadata policy bans them in the title and the Console flagged "Free" and "No ads" in this listing's short description (docs/store/LISTING.md). They stay in the body as facts |
-| adhan (bare, in title or short) | Over-promises a bundled recitation |
+| adhan (bare, in title or short) | Over-promised a bundled recitation until 1.5.0. **Superseded 19 Oct 2026:** 1.5.0 has one, so the 1.5.0 short description carries "adhan" (LISTING.md, "1.5.0 listing, FINAL") |
 | prayer tracker, salah tracker | Planned, not shipped. Not to be mentioned anywhere |
 | Ramadan, suhoor, iftar (new lines) | Owner's decision: out of the listing until January 2027. The one sehri/iftar bullet that has been live since August stays |
 | quran, dua, azkar, tasbih | The app does not have them. Muslim Pro, Athan and Sajda rank on them and SajdaTime cannot honestly match |
