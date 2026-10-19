@@ -144,11 +144,12 @@ class HijriCalendarTest {
     }
 
     @Test
-    fun `the notice window runs from 7 days before to day 2 and nothing else`() {
+    fun `the notice window runs from 3 days before to day 2 and nothing else`() {
         val first = ramadan1448
         fun shows(today: LocalDate) = HijriCalendar.ramadan(today, 0)!!.showsNotice(today)
-        assertFalse("8 days before", shows(first.minusDays(8)))
-        assertTrue("7 days before", shows(first.minusDays(7)))
+        assertFalse("7 days before, the old window", shows(first.minusDays(7)))
+        assertFalse("4 days before", shows(first.minusDays(4)))
+        assertTrue("3 days before", shows(first.minusDays(3)))
         assertTrue("the eve", shows(first.minusDays(1)))
         assertTrue("day 1", shows(first))
         assertTrue("day 2", shows(first.plusDays(1)))
@@ -166,10 +167,29 @@ class HijriCalendarTest {
         // earlier too. The app must not keep a second, unshifted idea of the start.
         val first = LocalDate.of(2027, 2, 7)
         fun shows(today: LocalDate) = HijriCalendar.ramadan(today, 1)!!.showsNotice(today)
-        assertFalse(shows(first.minusDays(8)))
-        assertTrue(shows(first.minusDays(7)))
+        assertFalse(shows(first.minusDays(4)))
+        assertTrue(shows(first.minusDays(3)))
         assertTrue(shows(first.plusDays(1)))
         assertFalse(shows(first.plusDays(2)))
+    }
+
+    @Test
+    fun `the Settings rows show from 3 days before until the last day, and not the rest of the year`() {
+        val first = ramadan1448
+        fun shows(today: LocalDate) = HijriCalendar.ramadan(today, 0)!!.showsSettings(today)
+        assertFalse("4 days before", shows(first.minusDays(4)))
+        assertTrue("3 days before, the day the notice starts", shows(first.minusDays(3)))
+        assertTrue("day 1", shows(first))
+        assertTrue("day 15", shows(first.plusDays(14)))
+        assertTrue("the last day", shows(LocalDate.of(2027, 3, 8)))
+        assertFalse("1 Shawwal", shows(LocalDate.of(2027, 3, 9)))
+        assertFalse("July", shows(LocalDate.of(2027, 7, 1)))
+        assertFalse("October", shows(LocalDate.of(2026, 10, 19)))
+        // With a shift the rows move with the user's own first day, as the notice does.
+        val shifted = LocalDate.of(2027, 2, 7)
+        fun showsShifted(today: LocalDate) = HijriCalendar.ramadan(today, 1)!!.showsSettings(today)
+        assertFalse(showsShifted(shifted.minusDays(4)))
+        assertTrue(showsShifted(shifted.minusDays(3)))
     }
 
     @Test

@@ -389,7 +389,7 @@
     <string name="ramadan_info_date">يتبع التاريخ الهجري هنا تقويم أم القرى. إن بدأ مسجدك رمضان في يوم مختلف، فقدّم التاريخ الهجري أو أخّره في الإعدادات. وهذا يغيّر أيضًا عدّ الأيام وتذكير السحور وقاعدة العشاء في أم القرى.</string>
     <string name="ramadan_info_hide">إخفاء هذه البطاقة</string>
     <string name="ramadan_info_hide_note">يمكنك إظهارها مجددًا من الإعدادات.</string>
-    <!-- %1$s is a date such as "Mon 8 Feb". Shown from a week before day 1. -->
+    <!-- %1$s is a date such as "Mon 8 Feb". Shown from 3 days before day 1. -->
     <string name="ramadan_eve_title_before">يبدأ رمضان في هذا التقويم %1$s</string>
     <string name="ramadan_eve_body">تعلن مساجد كثيرة بدايتها بعد رؤية الهلال، وغالبًا ما يكون ذلك بعد يوم. إن اختلف مسجدك، فعدّل التاريخ الهجري. وهذا يغيّر أيضًا تذكير السحور وقاعدة العشاء في أم القرى.</string>
     <!-- Under the card on days 1 and 2 only, in place of the notice. -->
@@ -460,6 +460,7 @@
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">اعرف السبب</string>
     <string name="ramadan_eve_brief">قد يبدأ مسجدك بعد يوم.</string>
+    <string name="ramadan_eve_card_on">من اليوم الأول تعرض بطاقة رمضان هنا وقتي السحور والإفطار. يمكنك إيقافها من الإعدادات.</string>
     <string name="polar_notice_brief">يُحسب الفجر والعشاء هنا من خط العرض %1$d°.</string>
     <string name="action_set_location">تحديد الموقع</string>
     <string name="city_lookup_offline">لا يوجد اتصال بالإنترنت. اتصل مرة واحدة للبحث عن مكان، أو استخدم موقعك.</string>

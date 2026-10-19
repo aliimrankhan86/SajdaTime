@@ -186,7 +186,7 @@ fun HomeScreen(
         PolarBanner(state)
         // Below the two banners that say the times may be for the wrong place or approximate,
         // so a card of suhoor and iftar times is never the first thing read about a doubtful
-        // number. Present only inside Ramadan and the week before it. During the month the
+        // number. Present only inside Ramadan and the 3 days before it. During the month the
         // column scrolls on a short phone: for that month this card is the second most read
         // thing on the screen, and the height budget above is spent on it knowingly.
         // The Eid greeting takes the same slot. It cannot meet the Ramadan card: Ramadan has

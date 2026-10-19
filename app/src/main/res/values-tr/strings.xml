@@ -394,6 +394,7 @@
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">Nedenini gör</string>
     <string name="ramadan_eve_brief">Caminiz bir gün sonra başlayabilir.</string>
+    <string name="ramadan_eve_card_on">İlk günden itibaren Ramazan kartı burada imsak ve iftar vakitlerini gösterir. Ayarlar\'dan kapatabilirsiniz.</string>
     <string name="polar_notice_brief">Burada Sabah ve Yatsı %1$d° enlemine göre hesaplanır.</string>
     <string name="action_set_location">Konumu ayarla</string>
     <string name="city_lookup_offline">İnternet bağlantısı yok. Bir yer aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>

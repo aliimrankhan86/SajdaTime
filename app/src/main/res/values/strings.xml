@@ -539,7 +539,7 @@
     <string name="ramadan_info_date">The Islamic date here follows the Umm al-Qura calendar. If your mosque began Ramadan on a different day, shift the Islamic date in Settings. That also moves the day count, the suhoor reminder and the Umm al-Qura Isha rule.</string>
     <string name="ramadan_info_hide">Hide this card</string>
     <string name="ramadan_info_hide_note">You can show it again in Settings.</string>
-    <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from a week before day 1. -->
+    <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from 3 days before day 1 (a week until 19 Oct 2026). -->
     <string name="ramadan_eve_title_before">Ramadan on this calendar begins %1$s</string>
     <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
     <!-- Under the card on days 1 and 2 only, in place of the notice. -->
@@ -613,6 +613,7 @@
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">See why</string>
     <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
+    <string name="ramadan_eve_card_on">From the first day, the Ramadan card shows suhoor and iftar times here. You can turn it off in Settings.</string>
     <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
     <string name="action_set_location">Set location</string>
     <string name="city_lookup_offline">No internet connection. Connect once to look up a place, or use your location.</string>

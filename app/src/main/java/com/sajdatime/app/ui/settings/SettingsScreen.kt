@@ -88,6 +88,7 @@ import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
@@ -316,6 +317,11 @@ fun SettingsScreen(
         onSetRespectsSilent = onSetAlarmRespectsSilent,
     )
 
+    // The user's own calendar, shift included, on the date the Times screen is showing.
+    val ramadanToday = state.today?.date ?: LocalDate.now()
+    val ramadanSeason = HijriCalendar.ramadan(ramadanToday, settings.hijriOffsetDays)
+        ?.showsSettings(ramadanToday) == true
+
     val reminders = SettingsSection(
         SettingsSectionId.REMINDERS,
         stringResource(R.string.settings_group_reminders),
@@ -366,13 +372,15 @@ fun SettingsScreen(
             // Off until chosen. A reminder before Fajr on the days of Ramadan only, on the Islamic
             // date the user has set, through the same alarm ladder and silent mode rules as a
             // prayer alert. The row says nothing about dates: the help line inside does.
+            // Shown only from 3 days before Ramadan to its last day, like the card's row below
+            // (owner, 19 Oct 2026: a Ramadan setting the rest of the year confuses people).
             SettingsItem.Link(
                 key = "suhoor",
                 icon = Icons.Outlined.Alarm,
                 title = stringResource(R.string.settings_suhoor),
                 subtitle = suhoorSummary(settings.suhoorReminderMinutes, settings.suhoorReminderStyle),
                 onClick = { open = SettingsChooser.SUHOOR },
-            ),
+            ).takeIf { ramadanSeason },
             // On by default and removable here, because not everyone fasts and the card is
             // daily for a month.
             SettingsItem.Toggle(
@@ -382,7 +390,7 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_ramadan_card_desc),
                 checked = settings.ramadanCardEnabled,
                 onCheckedChange = onSetRamadanCard,
-            ),
+            ).takeIf { ramadanSeason },
         ),
     )
 

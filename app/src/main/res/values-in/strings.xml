@@ -389,6 +389,7 @@
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">Lihat sebabnya</string>
     <string name="ramadan_eve_brief">Masjid Anda mungkin mulai sehari kemudian.</string>
+    <string name="ramadan_eve_card_on">Mulai hari pertama, kartu Ramadan menampilkan waktu sahur dan buka puasa di sini. Anda dapat mematikannya di Pengaturan.</string>
     <string name="polar_notice_brief">Subuh dan Isya di sini dihitung dari lintang %1$d°.</string>
     <string name="action_set_location">Atur lokasi</string>
     <string name="city_lookup_offline">Tidak ada koneksi internet. Sambungkan sekali untuk mencari tempat, atau gunakan lokasi Anda.</string>

@@ -57,7 +57,7 @@ import kotlin.math.abs
 
 /**
  * What the Times screen shows about Ramadan today, if anything: the card inside Ramadan, a quiet
- * notice in the week before it, or nothing at all.
+ * notice in the 3 days before it, or nothing at all.
  *
  * All the timing lives in [com.sajdatime.core.RamadanInfo] (`isRamadan`, `showsNotice`) and the
  * state is null outside those windows, so this function only decides between the two shapes and
@@ -351,7 +351,7 @@ private fun FastLine(ramadan: RamadanState) {
 }
 
 /**
- * The week before day 1, one quiet card: when Ramadan begins on the calendar the app is set to, and
+ * The 3 days before day 1, one quiet card: when Ramadan begins on the calendar the app is set to, and
  * that mosques announce their own start. Neutral, not amber. It carries no warning, and the other
  * notices on this screen use amber for "something is wrong", which this is not.
  *
@@ -369,6 +369,10 @@ private fun RamadanNotice(ramadan: RamadanState, onShiftDate: () -> Unit, onDism
         title = stringResource(R.string.ramadan_eve_title_before, TimeFormat.date(context, ramadan.info.firstDay)),
         brief = stringResource(R.string.ramadan_eve_brief),
         details = stringResource(R.string.ramadan_eve_body),
+        // Always visible: the card is on for everyone, so the user is told so before day 1 and
+        // where to turn it off (owner, 19 Oct 2026). True whenever this notice shows, because the
+        // whole section is skipped once the card is turned off.
+        footnote = stringResource(R.string.ramadan_eve_card_on),
         actionLabel = stringResource(R.string.settings_hijri_offset_label),
         onAction = onShiftDate,
         onDismiss = onDismiss,

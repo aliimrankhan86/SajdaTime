@@ -400,6 +400,7 @@
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">وجہ دیکھیں</string>
     <string name="ramadan_eve_brief">آپ کی مسجد ایک دن بعد شروع کر سکتی ہے۔</string>
+    <string name="ramadan_eve_card_on">پہلے دن سے رمضان کارڈ یہاں سحری اور افطار کے اوقات دکھائے گا۔ آپ اسے ترتیبات میں بند کر سکتے ہیں۔</string>
     <string name="polar_notice_brief">یہاں فجر اور عشاء عرض بلد %1$d° کے حساب سے نکالے جاتے ہیں۔</string>
     <string name="action_set_location">مقام طے کریں</string>
     <string name="city_lookup_offline">انٹرنیٹ کنکشن نہیں ہے۔ جگہ تلاش کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، یا اپنا مقام استعمال کریں۔</string>

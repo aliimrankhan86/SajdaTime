@@ -95,7 +95,7 @@ data class UiState(
     val qiblaBearing: Double? = null,
     val qiblaDistanceKm: Double? = null,
     /**
-     * Present only while the user's own calendar is inside Ramadan or in the week before it
+     * Present only while the user's own calendar is inside Ramadan or in the 3 days before it
      * ([com.sajdatime.core.RamadanInfo.showsNotice]). Null the rest of the year, so nothing
      * about Ramadan reaches the Times screen then.
      */

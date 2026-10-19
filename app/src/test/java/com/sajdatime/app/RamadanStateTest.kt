@@ -117,12 +117,14 @@ class RamadanStateTest {
     }
 
     @Test
-    fun `the state exists from 7 days before to the last day and not otherwise`() {
+    fun `the state exists from 3 days before to the last day and not otherwise`() {
+        // 3 days since 19 Oct 2026 (the owner's change; it was 7).
         assertNull("19 days before", build("2027-01-20"))
-        assertNull("8 days before", build("2027-01-31"))
-        val week = build("2027-02-01")
-        assertNotNull("7 days before", week)
-        assertFalse(week!!.info.isRamadan)
+        assertNull("7 days before, the old window", build("2027-02-01"))
+        assertNull("4 days before", build("2027-02-04"))
+        val eve = build("2027-02-05")
+        assertNotNull("3 days before", eve)
+        assertFalse(eve!!.info.isRamadan)
         assertNotNull("the eve", build("2027-02-07"))
         assertEquals(1, build("2027-02-08")!!.info.dayNumber)
         assertEquals(3, build("2027-02-10")!!.info.dayNumber)
@@ -134,9 +136,9 @@ class RamadanStateTest {
     @Test
     fun `the users date shift moves the window and the day number`() {
         val shifted = prefs.copy(hijriOffsetDays = 1)
-        // Plus one makes 7 February day 1, so 31 January is the first day of the notice week.
-        assertNotNull(build("2027-01-31", p = shifted))
-        assertNull(build("2027-01-30", p = shifted))
+        // Plus one makes 7 February day 1, so 4 February is the first day of the notice.
+        assertNotNull(build("2027-02-04", p = shifted))
+        assertNull(build("2027-02-03", p = shifted))
         assertEquals(1, build("2027-02-07", p = shifted)!!.info.dayNumber)
         // The last day is a day earlier too, and 8 March is already Shawwal for this user.
         assertEquals(29, build("2027-03-07", p = shifted)!!.info.dayNumber)

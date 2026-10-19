@@ -524,9 +524,13 @@ The rules and the reasons are in §5.19.
   (Maghrib), a countdown to whichever is next, today's fast length and its change from yesterday,
   tomorrow's two times, the day number and the expected last day, and an info dialog that says
   what the app does and does not decide. "Show Ramadan card" in Settings (default on) removes it.
-- **Eve notice, 7 days before day 1 through day 2.** One quiet, dismissible notice with the start
-  date on the user's calendar, the sighting note, and a way to preview the timetable. Dismissal is
-  stored per Hijri year.
+- **Eve notice, 3 days before day 1 through day 2** (7 days until 19 Oct 2026, owner's change for
+  1.5.0). One quiet, dismissible notice with the start date on the user's calendar, the sighting
+  note, and, always visible, "From the first day, the Ramadan card shows suhoor and iftar times
+  here. You can turn it off in Settings." Dismissal is stored per Hijri year.
+- **The Ramadan rows in Settings** ("Ramadan card", "Suhoor reminder") show only from the day the
+  notice starts to the last day of Ramadan (`RamadanInfo.showsSettings`, 1.5.0, owner 19 Oct 2026:
+  a Ramadan setting the rest of the year confuses people). The choice is kept while hidden.
 - **Ramadan timetable sheet and PDF.** Every day of the month with the six times, suhoor and iftar
   in bold. The PDF (`PrayerTimes_Ramadan1448.pdf`) is offered in the export sheet from 30 days
   before day 1 to the last day. Every PDF range also got more space between the wordmark, the
@@ -2146,10 +2150,10 @@ below, and it takes a second.
 | `UsageCountsTest` | app | 21 | The closed event set, the consent text against the privacy policy, and by reflection that the API cannot take a setting (§8) |
 | `DndAccessTest` | app | 2 | The manifest declares `ACCESS_NOTIFICATION_POLICY` and the alarm channel id changes on grant and not otherwise (1.3.2) |
 | `LanguagePickerTest` | app | 6 | The language split stays off, Indonesian's legacy code, no "review" wording (1.3.2) |
-| `HijriCalendarTest` | core | 13 | First day and length of Ramadan 1447 and 1448 on the Umm al-Qura calendar, the eve, the date shift from minus 2 to plus 2, day numbers, the eve notice window (7 days before to day 2), the timetable window (30 days before to the last day), a date outside the calendar's range gives null and not a throw (1.4.0) |
+| `HijriCalendarTest` | core | 14 | First day and length of Ramadan 1447 and 1448 on the Umm al-Qura calendar, the eve, the date shift from minus 2 to plus 2, day numbers, the eve notice window (3 days before to day 2 since 19 Oct 2026), the Settings rows window (3 days before to the last day), the timetable window (30 days before to the last day), a date outside the calendar's range gives null and not a throw (1.4.0) |
 | `RamadanGoldenTest` | core | 8 | The engine against pinned Aladhan values for ten setups: Fajr and Maghrib to the minute, the rest within one, Makkah Isha by the offset table, London's clock change, Tromsø's projected ranges (1.4.0) |
 | `EidTest` | core | 10 | Eid al-Fitr and al-Adha for 2026 to 2029 found on their day and no other, the code (Hijri year x 100 + month), shown until closed and then never again, the date shift, out of range gives null (1.4.0) |
-| `RamadanStateTest` | app | 11 | The pure card state: London day 15 is a 12h18m fast and 4 minutes longer than yesterday, suhoor end and iftar are the day's own Fajr and Maghrib rows, the phase follows the clock, tomorrow, Sydney and Tromsø trends, a clock change day shows plus 5 and not plus 65, the 7 day window, the date shift, "Match your mosque" (1.4.0) |
+| `RamadanStateTest` | app | 11 | The pure card state: London day 15 is a 12h18m fast and 4 minutes longer than yesterday, suhoor end and iftar are the day's own Fajr and Maghrib rows, the phase follows the clock, tomorrow, Sydney and Tromsø trends, a clock change day shows plus 5 and not plus 65, the 3 day window (7 until 19 Oct 2026), the date shift, "Match your mosque" (1.4.0) |
 | `RamadanTimetableTest` | app | 7 | London pinned to the spec on days 1, 15 and 29 (1.4.0) |
 | `RamadanPdfRangeTest` | app | 8 | The PDF range, its span, its file name and its column widths (1.4.0) |
 | `RamadanSettingsDefaultsTest` | app | 2 | A new install shows the card and has dismissed nothing, and no real Eid code or Hijri year equals the "nothing dismissed" value (1.4.0) |
@@ -5552,7 +5556,37 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   the 1.5.0 privacy policy for an app still on 1.4.0, the date is set on the day, and nothing is gained), and he
   agreed. The submit day reminder (`trig_01VexqUd1cJz8jfD5QFT874W`) could not be edited from a cloud session
   (made outside an agent); its text already names the day's steps, so it stays. **Next: the 20 Dec reminder, the
-  21 Dec job, submit around 4 Jan 2027 (latest 25 Jan). Start nothing before then.**
+  21 Dec job, submit around 4 Jan 2027 (latest 25 Jan). Start nothing before then.** (Superseded the same
+  evening, next bullet.)
+- **Later on 19 Oct 2026 (cloud session): 1.5.0 moves to NOVEMBER, and the Ramadan pack changes.**
+  (1) **Timing, the owner: "Lets do it in november - date yet to be decided."** Claude's advice, which he
+  took: nothing technical holds 1.5.0 back, and a fault is better found in November than weeks before
+  Ramadan; but give 1.4.0 (live 17 Oct, it changed the alarm system) about two weeks alone first, so its
+  problems are not mixed with 1.5.0's, and let the 1.4.0 description finish review (still the old text on
+  19 Oct). **The date is his to pick.** When he does, a session on his Mac moves the scheduled jobs (the
+  20 Dec reminder, the 21 Dec preparation job to the week before, the 4 Jan submit reminder, and the
+  health check's January warnings), updates RELEASE-1.5.0.md and PROJECT_BRIEF, then GBrain. Until then
+  the jobs stay as they are, which is safe: they only remind and check. (2) **Ramadan, the owner:** start
+  "1 or 2 days before ramadan and inform the user this feature is on by default unless they want to switch
+  it off ... Ramadan option should be visible just before ramadan or it could confuse the users." Asked with
+  AskUserQuestion, he chose: **the notice from 3 days before** (Claude's advice over 1 or 2: two evenings to
+  set the suhoor reminder before the first suhoor and to check the date with the mosque); **a new always
+  visible line on the notice**, "From the first day, the Ramadan card shows suhoor and iftar times here. You
+  can turn it off in Settings." (`ramadan_eve_card_on`, five languages, `check-translation.py` 0 errors in
+  each); **the two Ramadan rows in Settings hidden outside 3 days before to the last day**
+  (`RamadanInfo.showsSettings`); **the timetable PDF stays at 30 days before** (behind a tap, people print
+  early). Already true and unchanged: the card is on by default and switches itself on and off by the
+  calendar; the suhoor reminder stays off by default (an unasked alarm before Fajr is intrusive). Store
+  text: nothing in the 1.5.0 listing or What's new names the window, so nothing changes; the Settings
+  screenshot does not show the Ramadan rows. Known and accepted: the What's new and description say "Ramadan
+  is built in ... and an optional suhoor reminder", and outside the window that row is hidden; the sentence
+  is about Ramadan, so it was left. Also known: a suhoor reminder set to Alarm keeps the "Alarm sound" row in
+  Settings all year (harmless). **Verified (cloud container):** full gate, 410 unit tests (app 261, core 131
+  with 1 skipped, wear 18), 0 failed, lint 0 errors, both bundles built (unsigned there); `RamadanStateTest`'s
+  two window tests and `HijriCalendarTest` were changed to the 3 day window and a new `showsSettings` test
+  added. An independent review found no code defect; its fixes (two tests, four stale "a week" comments, test
+  counts) are in. **Not verified:** on an emulator (none in the cloud): RELEASE-1.5.0.md step 1 says what to
+  run. The preparation job's expected unit test count is now **410**, not 409.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 

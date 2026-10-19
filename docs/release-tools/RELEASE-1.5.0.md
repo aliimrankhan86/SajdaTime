@@ -3,7 +3,9 @@
 Written 18 Oct 2026, when the owner asked for everything to be ready for 1.5.0 and the work parked.
 `claude/quiet-glass` is the release branch and holds everything. The plan's dates (PROJECT_BRIEF):
 a preparation run on his Mac on Mon 21 Dec 2026, he merges and submits around 4 Jan 2027, live by mid
-January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027).
+January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027). **Changed 19 Oct 2026: he will
+submit in NOVEMBER, date not yet chosen** (HANDOVER §11, STATE OF PLAY). When he picks it, move the preparation
+run to the week before and the reminders to match ("Scheduled jobs" below), then update this file.
 
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
 is done by touching the signing key, and **he presses every submit, publish and consent button**.
@@ -193,6 +195,13 @@ Mon 8 Feb 2027).
    alarm set-timezone Europe/Istanbul`; if the watch refuses that command, its Settings, Date and time), and check the tile shows the new zone's time within a few
    seconds without opening the app; then put the zone back and turn automatic time zone on again. Record the result in HANDOVER §10. The gate after that
    change: 409 unit tests (app 261, core 130, wear 18), so the job's expected count moves from 407 to 409: its prompt on the Mac may still say 407, and 409 is correct, not a fault.
+   **Also, once, for the Ramadan change of 19 Oct 2026 late (built in a cloud session, no emulator):** on the
+   phone emulator with automatic date off, set the date to 4 February 2027 (4 days before Ramadan 1448): no
+   Ramadan notice on Times, no "Ramadan card" or "Suhoor reminder" in Settings. Then 5 February (3 days before):
+   the notice shows with the new line "From the first day, the Ramadan card shows suhoor and iftar times here.
+   You can turn it off in Settings." and both rows are in Settings. Then 8 March (the last day): rows there;
+   9 March (1 Shawwal): rows gone. Look at the notice in Urdu and Arabic and at 2.0 text. Put the date and
+   automatic date back. Record in HANDOVER §10. Unit tests after that change: **410** (app 261, core 131, wear 18).
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging
