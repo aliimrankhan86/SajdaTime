@@ -5,14 +5,15 @@
 
     <!--
       Home screen widget colours. These repeat Color.kt on purpose: a RemoteView is inflated by the
-      launcher, which cannot reach Compose, and it resolves these under the PHONE's dark mode, not the
-      app's Theme row (said so in the widget descriptions). WidgetColorsTest fails the build if any of
-      them drifts from its Kotlin twin or falls below WCAG AA against what it sits on.
+      launcher, which cannot reach Compose, and it resolves these under the PHONE's dark mode. That is
+      what the app's Theme row "System" means. Light and Dark pin the fixed copies at the end of this
+      file instead (19 Oct 2026). WidgetColorsTest fails the build if any of them drifts from its Kotlin
+      twin or falls below WCAG AA against what it sits on.
 
       No "on highlight" colour: a highlighted row keeps the ordinary text colours, which clear AA on it
       in both themes. A colour chosen per row while drawing would be baked in at that moment and stay
       wrong after the phone switched theme, until the next refresh. Colours in the layout files are
-      resolved by the launcher each time it draws, so the widget follows the phone at once.
+      resolved by the launcher each time it draws, so under "System" the widget follows the phone at once.
     -->
     <color name="widget_surface">#FDFCFB</color>
     <color name="widget_on_surface">#1B211E</color>
@@ -33,4 +34,33 @@
     <color name="widget_highlight_top">#E6F3EC</color>
     <color name="widget_sheen">#00FFFFFF</color>
     <color name="widget_edge">#FFC9CFC9</color>
+
+    <!--
+      The same colours again under fixed names, for a widget whose theme is chosen in the app: Light
+      or Dark in Settings, Theme (owner's request, 19 Oct 2026). The names above resolve under the
+      PHONE's dark mode and serve "System". These do not change with the phone, so the renderer can
+      pin them. WidgetColorsTest fails the build if either set drifts from the names above.
+    -->
+    <color name="widget_light_surface">#FDFCFB</color>
+    <color name="widget_light_on_surface">#1B211E</color>
+    <color name="widget_light_on_surface_variant">#5A605C</color>
+    <color name="widget_light_highlight">#D7EAE0</color>
+    <color name="widget_light_primary">#0B5A43</color>
+    <color name="widget_light_outline_variant">#C9CFC9</color>
+    <color name="widget_light_surface_top">#FFFFFF</color>
+    <color name="widget_light_surface_bottom">#EEF1EC</color>
+    <color name="widget_light_highlight_top">#E6F3EC</color>
+    <color name="widget_light_sheen">#00FFFFFF</color>
+    <color name="widget_light_edge">#FFC9CFC9</color>
+    <color name="widget_dark_surface">#171B1A</color>
+    <color name="widget_dark_on_surface">#E7EAE8</color>
+    <color name="widget_dark_on_surface_variant">#A9B2AE</color>
+    <color name="widget_dark_highlight">#143028</color>
+    <color name="widget_dark_primary">#4FC48F</color>
+    <color name="widget_dark_outline_variant">#2A312E</color>
+    <color name="widget_dark_surface_top">#252C29</color>
+    <color name="widget_dark_surface_bottom">#121514</color>
+    <color name="widget_dark_highlight_top">#18382D</color>
+    <color name="widget_dark_sheen">#12FFFFFF</color>
+    <color name="widget_dark_edge">#29FFFFFF</color>
 </resources>

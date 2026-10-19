@@ -19,6 +19,7 @@ import androidx.core.text.layoutDirection
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.R
 import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.widget.WidgetState.RamadanWord
 import com.sajdatime.app.widget.WidgetState.Segment
 import com.sajdatime.core.AppLocale
@@ -40,10 +41,13 @@ import java.time.Instant
  *     may re-apply a new set of actions to the views it already has instead of inflating again, so a
  *     value set last time (a hidden countdown, a highlighted row, a four line message) survives
  *     unless it is explicitly put back.
- *  3. **Colours are not set here.** A colour chosen while drawing is baked in at that moment and is
- *     wrong after the phone changes theme until the next refresh. The layouts' own colours are
- *     resolved by the launcher at each draw. Only resource ids are switched: the row background, the
- *     glyph (drawn white, tinted by its ImageView) and the day's bars.
+ *  3. **Under the app's Theme "System", colours are not set here.** A colour chosen while drawing is
+ *     baked in at that moment and is wrong after the phone changes theme until the next refresh. The
+ *     layouts' own colours are resolved by the launcher at each draw. Only resource ids are switched:
+ *     the row background, the glyph (drawn white, tinted by its ImageView) and the day's bars.
+ *     **Under Light or Dark** (owner's request, 19 Oct 2026) the widget must not follow the phone, so
+ *     every colour is pinned from the fixed set ([PAINTS], [paint]) on a second layout id, the
+ *     `_fixed` layout, which is the same layout inside a frame. Why a second id: see that file.
  *
  * **Two layouts per widget since 18 Oct 2026 (the hero countdown design).** On Android 12 and later the
  * launcher is handed both and picks by the widget's size without waking the app ([NEXT_SIZES],
@@ -107,7 +111,7 @@ internal object WidgetRenderer {
         }
 
     private fun nextViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int): RemoteViews {
-        val views = RemoteViews(context.packageName, layout)
+        val views = themedViews(context, state, layout)
         val wide = layout == R.layout.widget_next_prayer_wide
         applyDirection(context, views)
         applyTap(context, views)
@@ -141,7 +145,7 @@ internal object WidgetRenderer {
     }
 
     private fun todayViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int): RemoteViews {
-        val views = RemoteViews(context.packageName, layout)
+        val views = themedViews(context, state, layout)
         val large = layout == R.layout.widget_today_large
         applyDirection(context, views)
         applyTap(context, views)
@@ -248,11 +252,14 @@ internal object WidgetRenderer {
             views.setInt(
                 id,
                 "setBackgroundResource",
-                when (segment) {
-                    Segment.DONE -> R.drawable.widget_seg_done
-                    Segment.NEXT -> R.drawable.widget_seg_next
-                    Segment.TODO -> R.drawable.widget_seg_todo
-                },
+                skin(
+                    state,
+                    when (segment) {
+                        Segment.DONE -> R.drawable.widget_seg_done
+                        Segment.NEXT -> R.drawable.widget_seg_next
+                        Segment.TODO -> R.drawable.widget_seg_todo
+                    },
+                ),
             )
         }
     }
@@ -272,7 +279,7 @@ internal object WidgetRenderer {
             views.setInt(
                 ids.row,
                 "setBackgroundResource",
-                if (highlighted) R.drawable.widget_row_highlight else R.drawable.widget_row_plain,
+                skin(state, if (highlighted) R.drawable.widget_row_highlight else R.drawable.widget_row_plain),
             )
             views.setImageViewResource(ids.glyph, glyph(slot))
             views.setTextViewText(ids.name, if (highlighted) bold(name) else name)
@@ -361,6 +368,134 @@ internal object WidgetRenderer {
         PrayerSlot.ASR to RowIds(R.id.widget_row_asr, R.id.widget_glyph_asr, R.id.widget_name_asr, R.id.widget_label_asr, R.id.widget_time_asr),
         PrayerSlot.MAGHRIB to RowIds(R.id.widget_row_maghrib, R.id.widget_glyph_maghrib, R.id.widget_name_maghrib, R.id.widget_label_maghrib, R.id.widget_time_maghrib),
         PrayerSlot.ISHA to RowIds(R.id.widget_row_isha, R.id.widget_glyph_isha, R.id.widget_name_isha, R.id.widget_label_isha, R.id.widget_time_isha),
+    )
+
+    // --- a theme chosen in the app ---------------------------------------------------------
+
+    /** Light or Dark from the app's Theme row, or null for System, where the phone decides. */
+    private fun chosenDark(state: WidgetState): Boolean? = when (state.theme) {
+        ThemeChoice.SYSTEM -> null
+        ThemeChoice.LIGHT -> false
+        ThemeChoice.DARK -> true
+    }
+
+    /** The layout itself under System; under a chosen theme the same layout in a frame, a new id. */
+    private fun themedViews(context: Context, state: WidgetState, @LayoutRes layout: Int): RemoteViews {
+        val dark = chosenDark(state) ?: return RemoteViews(context.packageName, layout)
+        return RemoteViews(context.packageName, FIXED_LAYOUTS.getValue(layout)).also { paint(context, it, layout, dark) }
+    }
+
+    /**
+     * Pins every colour [layout] declares to its fixed light or dark value. Written first, so the
+     * backgrounds the renderer switches afterwards (a highlighted row, the day's bars) come after it
+     * and win. A tint is pinned with a colour filter, which an ImageView draws in place of its
+     * layout tint: setImageTintList cannot be sent to a launcher below Android 12.
+     */
+    private fun paint(context: Context, views: RemoteViews, @LayoutRes layout: Int, dark: Boolean) {
+        for (p in PAINTS.getValue(layout)) {
+            when (p.ink) {
+                Ink.TEXT -> views.setTextColor(p.view, context.getColor(fixedColour(p.resource, dark)))
+                Ink.TINT -> views.setInt(p.view, "setColorFilter", context.getColor(fixedColour(p.resource, dark)))
+                Ink.BACKGROUND -> views.setInt(p.view, "setBackgroundResource", fixedDrawable(p.resource, dark))
+                Ink.IMAGE -> views.setImageViewResource(p.view, fixedDrawable(p.resource, dark))
+            }
+        }
+    }
+
+    /** [drawable] as the layout names it under System, its fixed copy under a chosen theme. */
+    @DrawableRes
+    private fun skin(state: WidgetState, @DrawableRes drawable: Int): Int =
+        chosenDark(state)?.let { fixedDrawable(drawable, it) } ?: drawable
+
+    private fun fixedColour(colour: Int, dark: Boolean): Int = FIXED_COLOURS.getValue(colour).let { if (dark) it.second else it.first }
+
+    /** A drawable with no colour of its own (the plain row is transparent) has no copies and is itself. */
+    private fun fixedDrawable(drawable: Int, dark: Boolean): Int =
+        FIXED_DRAWABLES[drawable]?.let { if (dark) it.second else it.first } ?: drawable
+
+    private val FIXED_LAYOUTS = mapOf(
+        R.layout.widget_next_prayer to R.layout.widget_next_prayer_fixed,
+        R.layout.widget_next_prayer_wide to R.layout.widget_next_prayer_wide_fixed,
+        R.layout.widget_today to R.layout.widget_today_fixed,
+        R.layout.widget_today_large to R.layout.widget_today_large_fixed,
+    )
+
+    /** The three inks the layouts use, each to its fixed light and dark value (values/colors.xml). */
+    private val FIXED_COLOURS = mapOf(
+        R.color.widget_on_surface to (R.color.widget_light_on_surface to R.color.widget_dark_on_surface),
+        R.color.widget_on_surface_variant to (R.color.widget_light_on_surface_variant to R.color.widget_dark_on_surface_variant),
+        R.color.widget_primary to (R.color.widget_light_primary to R.color.widget_dark_primary),
+    )
+
+    private val FIXED_DRAWABLES = mapOf(
+        R.drawable.widget_background to (R.drawable.widget_background_light to R.drawable.widget_background_dark),
+        R.drawable.widget_hero_background to (R.drawable.widget_hero_background_light to R.drawable.widget_hero_background_dark),
+        R.drawable.widget_chip to (R.drawable.widget_chip_light to R.drawable.widget_chip_dark),
+        R.drawable.widget_divider to (R.drawable.widget_divider_light to R.drawable.widget_divider_dark),
+        R.drawable.widget_row_highlight to (R.drawable.widget_row_highlight_light to R.drawable.widget_row_highlight_dark),
+        R.drawable.widget_seg_done to (R.drawable.widget_seg_done_light to R.drawable.widget_seg_done_dark),
+        R.drawable.widget_seg_next to (R.drawable.widget_seg_next_light to R.drawable.widget_seg_next_dark),
+        R.drawable.widget_seg_todo to (R.drawable.widget_seg_todo_light to R.drawable.widget_seg_todo_dark),
+    )
+
+    internal enum class Ink { TEXT, TINT, BACKGROUND, IMAGE }
+
+    /** One coloured property of one view, named by the resource the layout gives it. */
+    internal data class Paint(val view: Int, val ink: Ink, val resource: Int)
+
+    private val CHIP_PAINTS = listOf(
+        Paint(R.id.widget_place_chip, Ink.BACKGROUND, R.drawable.widget_chip),
+        Paint(R.id.widget_place_pin, Ink.TINT, R.color.widget_primary),
+        Paint(R.id.widget_place, Ink.TEXT, R.color.widget_primary),
+        Paint(R.id.widget_place_update, Ink.TINT, R.color.widget_primary),
+    )
+
+    /** The countdown block. The large Today card names the prayer in green and its time in full ink. */
+    private fun heroPaints(name: Int, time: Int) = listOf(
+        Paint(R.id.widget_glyph, Ink.TINT, R.color.widget_primary),
+        Paint(R.id.widget_name, Ink.TEXT, name),
+        Paint(R.id.widget_time, Ink.TEXT, time),
+        Paint(R.id.widget_sublabel, Ink.TEXT, R.color.widget_on_surface_variant),
+        Paint(R.id.widget_countdown, Ink.TEXT, R.color.widget_on_surface),
+        Paint(R.id.widget_hero_time, Ink.TEXT, R.color.widget_on_surface),
+    ) + SEGMENTS.map { Paint(it, Ink.BACKGROUND, R.drawable.widget_seg_todo) }
+
+    /** The six rows. Sunrise is dimmed, as on the Times screen. */
+    private val ROW_PAINTS = ROWS.flatMap { (slot, ids) ->
+        val ink = if (slot == PrayerSlot.SUNRISE) R.color.widget_on_surface_variant else R.color.widget_on_surface
+        listOf(
+            Paint(ids.row, Ink.BACKGROUND, R.drawable.widget_row_plain),
+            Paint(ids.glyph, Ink.TINT, R.color.widget_on_surface_variant),
+            Paint(ids.name, Ink.TEXT, ink),
+            Paint(ids.label, Ink.TEXT, R.color.widget_on_surface_variant),
+            Paint(ids.time, Ink.TEXT, ink),
+        )
+    }
+
+    private val ROOT_PAINT = Paint(R.id.widget_root, Ink.BACKGROUND, R.drawable.widget_background)
+
+    /**
+     * Every colour each layout declares, as the layout declares it. WidgetThemeTest reads the layout
+     * files and fails the build if a coloured view is missing here, so a colour added to a layout
+     * cannot be left following the phone under a chosen theme.
+     */
+    internal val PAINTS: Map<Int, List<Paint>> = mapOf(
+        R.layout.widget_next_prayer to listOf(ROOT_PAINT) + heroPaints(R.color.widget_on_surface, R.color.widget_on_surface_variant) + CHIP_PAINTS,
+        R.layout.widget_next_prayer_wide to listOf(ROOT_PAINT, Paint(R.id.widget_divider, Ink.IMAGE, R.drawable.widget_divider)) +
+            heroPaints(R.color.widget_on_surface, R.color.widget_on_surface_variant) + CHIP_PAINTS + ROW_PAINTS,
+        R.layout.widget_today to listOf(
+            ROOT_PAINT,
+            Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
+            Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
+        ) + ROW_PAINTS + CHIP_PAINTS,
+        R.layout.widget_today_large to listOf(
+            ROOT_PAINT,
+            Paint(R.id.widget_date, Ink.TEXT, R.color.widget_on_surface),
+            Paint(R.id.widget_hijri, Ink.TEXT, R.color.widget_on_surface_variant),
+            Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
+            Paint(R.id.widget_hero, Ink.BACKGROUND, R.drawable.widget_hero_background),
+            Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
+        ) + heroPaints(R.color.widget_primary, R.color.widget_on_surface) + ROW_PAINTS + CHIP_PAINTS,
     )
 
     /** Where the sun is at each time. The meanings are in docs/plans/2026-10-widget-redesign/RESEARCH.md. */

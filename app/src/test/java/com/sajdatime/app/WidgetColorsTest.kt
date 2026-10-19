@@ -36,6 +36,8 @@ class WidgetColorsTest {
         assertTrue("Expected to find ${file.path}", file.isFile)
         return Regex("""<color name="(widget_[a-z_]+)">#([0-9A-Fa-f]{6})</color>""")
             .findAll(file.readText())
+            // The fixed light and dark copies for a theme chosen in the app; WidgetThemeTest holds them equal.
+            .filterNot { it.groupValues[1].startsWith("widget_light_") || it.groupValues[1].startsWith("widget_dark_") }
             .associate { it.groupValues[1] to (0xFF000000.toInt() or it.groupValues[2].toInt(16)) }
     }
 

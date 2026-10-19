@@ -17,10 +17,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.sajdatime.app.data.SettingsRepository
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.widget.NextPrayerWidgetProvider
 import com.sajdatime.app.widget.TodayWidgetProvider
 import com.sajdatime.app.widget.WidgetRefreshScheduler
 import com.sajdatime.app.widget.WidgetState
+import com.sajdatime.app.widget.WidgetUpdater
 import com.sajdatime.core.AppLocale
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.PrayerSlot
@@ -219,6 +221,43 @@ class WidgetDeviceTest {
             state.countdownAllowed,
             view.textOf("widget_countdown")!!.visibility == View.VISIBLE,
         )
+    }
+
+    // ---- The app's Theme row ---------------------------------------------------------------------
+
+    /**
+     * Owner's request, 19 Oct 2026: a widget is dark when Dark is chosen in the app and light when Light
+     * is, whatever the phone is set to, and follows the phone again under System. Dark, Light, then
+     * System, in that order, because the step back to System is the one a launcher could get wrong: it
+     * must inflate afresh (a new layout id) or the pinned colours would survive. The renders are the
+     * screenshots for the owner.
+     */
+    @Test
+    fun the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system() {
+        val settings = SettingsRepository(context)
+        try {
+            val (_, today) = bindOrFail(TodayWidgetProvider::class.java)
+            val (_, next) = bindOrFail(NextPrayerWidgetProvider::class.java)
+            waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
+            for ((choice, ink) in listOf(
+                ThemeChoice.DARK to R.color.widget_dark_on_surface,
+                ThemeChoice.LIGHT to R.color.widget_light_on_surface,
+                ThemeChoice.SYSTEM to R.color.widget_on_surface,
+            )) {
+                runBlocking {
+                    settings.setThemeChoice(choice)
+                    WidgetUpdater.refreshAll(context)
+                }
+                val expected = context.getColor(ink)
+                waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected }
+                waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected }
+                val tag = "theme-${choice.name.lowercase()}"
+                save("widget-today-$tag", layoutAt(today, 250, 180))
+                save("widget-next-$tag", layoutAt(next, 180, 110))
+            }
+        } finally {
+            runBlocking { settings.setThemeChoice(ThemeChoice.SYSTEM) }
+        }
     }
 
     // ---- The redraw alarm ----------------------------------------------------------------------

@@ -380,8 +380,8 @@
     <!-- Ana ekran widget\'ları -->
     <string name="widget_next_label">SajdaTime: sonraki namaz</string>
     <string name="widget_today_label">SajdaTime: bugünün namazları</string>
-    <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla. Telefonunuzun koyu temasına uyar.</string>
-    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli. Telefonunuzun koyu temasına uyar.</string>
+    <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla.</string>
+    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli.</string>
     <string name="widget_tomorrow">Yarın</string>
     <string name="widget_no_location">Konumunuzu ayarlamak için SajdaTime\'ı açın</string>
     <string name="widget_a11y_next">Sonraki namaz %1$s, saat %2$s, %3$s sonra</string>

@@ -1,6 +1,7 @@
 package com.sajdatime.app
 
 import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.widget.WidgetState
 import com.sajdatime.app.widget.WidgetState.RamadanWord
 import com.sajdatime.app.widget.WidgetState.Segment
@@ -88,6 +89,15 @@ class WidgetStateTest {
             assertTrue("$lit rows at $moment", lit <= 1)
             moment = moment.plusSeconds(60)
         }
+    }
+
+    @Test
+    fun `the widget carries the app's Theme choice, with or without a location`() {
+        for (choice in ThemeChoice.entries) {
+            assertEquals(choice, build("2027-02-22", "04:00", settings().copy(themeChoice = choice)).theme)
+            assertEquals(choice, build("2027-02-22", "04:00", settings(where = null).copy(themeChoice = choice)).theme)
+        }
+        assertEquals(ThemeChoice.SYSTEM, build("2027-02-22", "04:00").theme)
     }
 
     @Test

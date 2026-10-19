@@ -99,9 +99,11 @@ class RamadanWordingTest {
     }
 
     @Test
-    fun `the widget descriptions say they follow the phone's dark mode`() {
+    fun `the widget descriptions no longer say they follow the phone's dark mode`() {
+        // True until 19 Oct 2026. The widgets now follow the app's Theme row (WidgetThemeTest), as the
+        // app does, so the sentence that warned of the difference was removed in every language.
         for (key in listOf("widget_next_desc", "widget_today_desc")) {
-            assertTrue("$key", english.getValue(key).contains("dark mode", ignoreCase = true))
+            assertFalse("$key", english.getValue(key).contains("dark mode", ignoreCase = true))
         }
     }
 

@@ -12,7 +12,8 @@
   the launcher would resolve it in the PHONE's language; only classes a RemoteViews may inflate (no plain
   View, so hairlines and progress bars are ImageViews with a drawable); every text view hidden from
   TalkBack, the root carries one spoken sentence; every colour a resource, resolved by the launcher at
-  each draw so the widget follows the phone's dark mode. Glyphs are drawn white and tinted here, for the
+  each draw so the widget follows the phone's dark mode
+  under the app's Theme "System" (Light and Dark pin them: the _fixed layout). Glyphs are drawn white and tinted here, for the
   same reason (lesson 130).
 
   The countdown is set in the light weight, Apple Clock style, and its size is written from
@@ -132,6 +133,7 @@
                 android:paddingBottom="3dp"
                 android:visibility="gone">
                 <ImageView
+                    android:id="@+id/widget_place_pin"
                     android:layout_width="12dp"
                     android:layout_height="12dp"
                     android:importantForAccessibility="no"
@@ -151,6 +153,7 @@
                     android:textSize="12sp"
                     android:textStyle="bold" />
                 <ImageView
+                    android:id="@+id/widget_place_update"
                     android:layout_width="11dp"
                     android:layout_height="11dp"
                     android:layout_marginStart="5dp"

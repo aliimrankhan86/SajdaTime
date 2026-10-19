@@ -206,6 +206,18 @@ Mon 8 Feb 2027).
    ends") and day 1 (Fajr "Suhoor ends", Maghrib "Iftar"); on 9 March the words are gone. Send him the widget and
    notice screenshots. Put the date and
    automatic date back. Record in HANDOVER §10. Unit tests after that change: **410** (app 261, core 131, wear 18).
+   **And once for the widget theme, also built in the cloud on 19 Oct 2026 late (the owner: "If the user
+   selected dark then widget should be dark, if user choose light then the widget should be light"):** run
+   `adb shell appwidget grantbind --package com.sajdatime.app --user 0`, then
+   `adb shell am instrument -w -e class 'com.sajdatime.app.WidgetDeviceTest#the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system' com.sajdatime.app.test/androidx.test.runner.AndroidJUnitRunner`
+   (debug build installed; it must print OK). Pull the six renders from
+   `/sdcard/Android/data/com.sajdatime.app/files/device-renders/` (`widget-today-theme-*` and
+   `widget-next-theme-*`). Then by hand with both widgets on the home screen, the emulator in light mode: in the
+   app, Settings, Theme, Dark: both widgets turn dark when you go back to the home screen; Light: light; Follow
+   phone: light; now switch the emulator to dark mode: the widgets follow it. Screenshot each and **send him the
+   widget screenshots** (he asked to see them). Then put Theme back to Follow phone and the emulator back to
+   light. Record in HANDOVER §10. Unit tests after this change: **415** (app 266, core 131, wear 18); the
+   preparation job's expected count moves from 410 to 415, and 415 is correct, not a fault.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging

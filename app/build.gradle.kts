@@ -239,6 +239,7 @@ tasks.withType<Test>().configureEach {
                 "app/src/main/res/values*/strings.xml",
                 "app/src/main/res/values*/colors.xml",
                 "app/src/main/res/layout/widget_*.xml",
+                "app/src/main/res/drawable/widget_*.xml",
                 "app/src/main/res/xml/widget_*.xml",
                 "app/src/main/res/drawable-nodpi/widget_preview_*.png",
                 "wear/src/main/res/values/strings.xml",

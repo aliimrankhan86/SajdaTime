@@ -5,7 +5,7 @@ A dated record of one session's work on `claude/quiet-glass`. It is a snapshot, 
 
 - **Branch:** `claude/quiet-glass`, pushed. The work is commit `eb3caa3` (on top of `12b8d3a`); this file is the
   commit after it. `main` was not touched. Nothing was merged, submitted or changed in the Play Console.
-- **Live on Play (unchanged):** phone 1.4.0, watch 1.2.0. 1.5.0 is still for release day, around 4 Jan 2027.
+- **Live on Play (unchanged):** phone 1.4.0, watch 1.2.0. 1.5.0 moves to November, date not yet chosen (HANDOVER §11, 19 Oct 2026 late).
 - **Added later, 19 Oct 2026 late (Mac session, one check only):** the cloud commit `742389f`
   (`ClockChangeReceiver`) was fast forwarded in and its watch emulator check run. **PASS:** with the watch app
   never opened, a zone change from Istanbul to London moved the tile from Fajr 5:38 am to 3:38 am within about

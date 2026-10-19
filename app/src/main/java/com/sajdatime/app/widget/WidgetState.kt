@@ -1,6 +1,7 @@
 package com.sajdatime.app.widget
 
 import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.HijriDay
@@ -71,6 +72,13 @@ data class WidgetState(
      */
     val cityName: String = "",
     val usingDefaultLocation: Boolean = false,
+    /**
+     * The app's Theme row. System keeps the widget on the phone's dark mode; Light and Dark hold the
+     * widget to that theme whatever the phone does, as the app itself is held (owner's request,
+     * 19 Oct 2026: "If the user selected dark then widget should be dark"). Until then the widget
+     * always followed the phone and its description said so.
+     */
+    val theme: ThemeChoice = ThemeChoice.SYSTEM,
 ) {
     /** The Times screen's rule: the next prayer, and only if it is still today. Sunrise is never next. */
     fun isHighlighted(slot: PrayerSlot): Boolean = next != null && slot == next.slot && !next.isTomorrow
@@ -120,6 +128,7 @@ data class WidgetState(
                     hijri = hijri,
                     cityName = settings.cityName,
                     usingDefaultLocation = settings.usingDefaultLocation,
+                    theme = settings.themeChoice,
                 )
             val prefs = settings.calculationPrefs
             val today = PrayerEngine.compute(coordinates, todayDate, prefs)
@@ -139,6 +148,7 @@ data class WidgetState(
                 hijri = hijri,
                 cityName = settings.cityName,
                 usingDefaultLocation = settings.usingDefaultLocation,
+                theme = settings.themeChoice,
             )
         }
 
