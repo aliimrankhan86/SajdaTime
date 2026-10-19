@@ -294,7 +294,78 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-### Release A (1.4.0): the text to paste, and the January text
+### For the live 1.4.0, to paste into the Console now (owner's choice 19 Oct 2026; 3925 characters)
+
+The owner chose "two steps" on 19 Oct 2026: the live description is replaced now with text that is true of 1.4.0, and the
+1.5.0 description, What's new and six screenshots go up with the 1.5.0 build on release day. This is block 1 below
+(written 16 Oct 2026, never pasted) with three changes, each checked against `main` (versionCode 8): Arabic removed from
+the languages line (1.4.0 has no `values-ar`) and "chosen in Settings" limited to Android 13 and newer (1.4.0 shows the
+Language row only there); the backup line says "nothing is copied to a backup server", the correction the Mac check made
+for 1.5.0 (the watch sync, the town lookup and opted in usage counts do leave the phone); and a stray line break joined.
+It removes the live text's false line "Your coordinates never leave your device". Contains "Wear OS". The short
+description and the screenshots are not changed by this step.
+
+```
+SajdaTime is an offline prayer times and Qibla compass app for your phone and Wear OS watch.
+It tells you when to pray and which way to face. That is all it does, and it does it without ads, without an account, and without us ever receiving your location.
+
+Prayer times are calculated on your own phone, so the app keeps working on a plane, in a basement, or with no signal at all.
+
+Whether you call them namaz, salah or salat, these are the same five daily prayers.
+
+WHAT YOU GET
+
+• The five daily prayers plus sunrise, worked out for wherever you are
+• The Hijri date (Islamic calendar) alongside the ordinary date
+• A live countdown to the next prayer
+• A Qibla compass corrected to true north, not magnetic north
+• Notifications at each prayer time, even when the app is closed
+• An optional alarm mode using any tone or azan (adhan) already on your phone, loud enough for Fajr
+• A printable PDF timetable for today, the next seven days, or the whole month
+• Two home screen widgets: the next prayer with a countdown, and all of today's times
+• During Ramadan it doubles as a sehri and iftar timetable: Fajr ends sehri, Maghrib opens your fast
+• A Wear OS app and watch tile that work on their own, with or without your phone
+• Light and dark themes, following your phone or set by hand
+• In English, Urdu, Turkish and Indonesian, following your phone, or chosen in Settings on Android 13 and newer
+
+BUILT FOR YOUR SCHOOL OF THOUGHT
+
+Sunni and Shia conventions are both supported properly, not as an afterthought.
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
+• Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
+• Calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Singapore, Turkey, Moonsighting Committee and more
+• The method is chosen automatically for your school (Muslim World League for Sunni, Jafari for Shia), and you can override it
+• A high-latitude rule for northern countries where the sun never fully sets in summer
+• With the Umm al-Qura method, its Ramadan Isha adjustment is applied automatically
+
+YOUR PRIVACY IS NOT THE PRICE
+
+Most free prayer apps are funded by advertising, which means you pay with your data. This one is not.
+
+• No adverts, ever
+• No accounts, no sign-in, no email address
+• Optional usage counts that you control in Settings. No crash reporting
+• Approximate location only, read while the app is open, never in the background
+• Times are worked out on your phone and we never receive your location. Your town name is looked up through Android, which on most phones asks Google
+• Cloud backup is switched off, so nothing is copied to a backup server
+
+If you would rather not share your location, you can type a city name instead, and the app works the same.
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods. They are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+Only one thing is ever asked in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+
+```
+
 
 Written 16 Oct 2026 by the 1.4.0 build, from `docs/plans/2026-10-widget-ramadan-tracker/WORDING-AND-LISTING.md` section C1 and audit
 items L5, L6 and L7. **Nothing here is live and nothing is pasted until the owner decides the rollout date and says go.** The
