@@ -187,12 +187,12 @@ Mon 8 Feb 2027).
    request, submit or Console step). The last run, 19 Oct 2026 after the emulator checks and their fixes, gave
    406 unit tests (app 261, core 129, wear 16; 407 with core 130 since the evening's `AdjustmentFit` test, gate only), 0 failed, lint 0 errors, a device suite of 25 of 25 straight after a cold boot, both bundles 9 / 1.5.0 and 1002 / 1.5.0 signed CN=Ali Imran Khan, 22 of 24 lines PASS or TAKEN (tree CHECK, the uncommitted work, and phone SKIPPED); the job's prompt says so, and also re-runs `LanguageAndDndDeviceTest` on the Android 12 emulator
    `sajda12` (7 of 7 on 19 Oct), because the script runs on Android 16 only and the language code below 13 is new.
-   **Also, once, on the watch emulator (added 19 Oct 2026 late, `ClockChangeReceiver`, built in a cloud session with
-   no emulator):** add the tile, note the prayer time it shows, turn automatic time zone off (`adb shell settings put
+   **DONE, PASS, 19 Oct 2026 (`d07a2d9`, HANDOVER §10): the tile showed the new zone's time about 2 seconds after the
+   change, without opening the app. Do not repeat it.** What was run, for the record (`ClockChangeReceiver`): add the tile, note the prayer time it shows, turn automatic time zone off (`adb shell settings put
    global auto_time_zone 0`, or it can put the zone straight back), change the watch's time zone (`adb shell cmd
    alarm set-timezone Europe/Istanbul`; if the watch refuses that command, its Settings, Date and time), and check the tile shows the new zone's time within a few
    seconds without opening the app; then put the zone back and turn automatic time zone on again. Record the result in HANDOVER §10. The gate after that
-   change: 409 unit tests (app 261, core 130, wear 18), so the job's expected count moves from 407 to 409.
+   change: 409 unit tests (app 261, core 130, wear 18), so the job's expected count moves from 407 to 409: its prompt on the Mac may still say 407, and 409 is correct, not a fault.
 2. **Claude, on the day:** set "Last updated" in `docs/privacy.html` to that day, then commit and push to
    `claude/quiet-glass`.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging
