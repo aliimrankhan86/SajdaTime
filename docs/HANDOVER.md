@@ -5587,6 +5587,17 @@ waiting before release day (around 4 Jan 2027). Start nothing else on your own.*
   added. An independent review found no code defect; its fixes (two tests, four stale "a week" comments, test
   counts) are in. **Not verified:** on an emulator (none in the cloud): RELEASE-1.5.0.md step 1 says what to
   run. The preparation job's expected unit test count is now **410**, not 409.
+- **Same evening: the owner asked this cloud session to run the emulator check itself ("You run and test it, I
+  am away from computer").** It could not. This container has no `/dev/kvm`, and Android 8 and newer emulator
+  images refuse to start without hardware acceleration. An Android 7 x86 image was installed and started with
+  `-accel off`; after about 25 minutes it was still offline, never booted, and the owner rightly asked why
+  Android 7 (it is the newest image that even tries without acceleration, not a choice of target). It was
+  stopped and deleted. **Lesson: a cloud session cannot run any Android emulator here; do not try again, hand
+  the emulator check to the Mac.** The owner also asked that the app and widget be shown working: the widget
+  code (`app/.../widget`) is unchanged since the last device suite on 19 Oct (widgets 4 of 4, 2.0 text 4 of 4),
+  and the 1.5.0 store screenshots `06-widgets.png` and `03-ramadan-dark.png` were sent to him as they are.
+  **So the Ramadan change of 19 Oct late is still not seen on an emulator**; the next session on his Mac runs
+  RELEASE-1.5.0.md step 1 "for the Ramadan change" before anything else, then syncs GBrain.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
