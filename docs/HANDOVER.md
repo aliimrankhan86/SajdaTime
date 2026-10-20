@@ -5458,7 +5458,7 @@ also carries everything the unmerged 8 Oct branch had, audited, approved by the 
 waiting before release day (around 4 Jan 2027). Start nothing else on your own.** *(Updated late on 19 Oct:
 1.5.0 moves to November, date not chosen; and two changes made in the cloud that evening, the Ramadan window
 and the widgets following the app's Theme, were then checked on the Mac's emulator at 22:00 and PASSED. **He then picked the date: submit on MONDAY 9
-NOVEMBER 2026**, preparation job Mon 2 Nov. The last bullets of this block say so in full.)*
+NOVEMBER 2026**, preparation job Mon 2 Nov at 12:00 noon (moved by him in the app on 20 Oct). The last bullets of this block say so in full.)*
 
 **Cloud to Mac hand-off, 19 Oct 2026, 20:00 UK (the owner: "Make sure my local claude has access to everything
 and you dont leave anything behind").** The cloud session is closed; everything it did is in git, nothing is kept
@@ -5709,6 +5709,11 @@ Not committed on purpose: the cloud's Robolectric render harness (lesson 132 say
   only from the app's Scheduled screen or a session inside the app. Asked of him once, in one line. If it is still
   21 Dec when the 9 Nov session starts, that session runs `release-1.5.0.sh` first and turns the 21 Dec run off.
   PROJECT_BRIEF's timeline updated. Release day steps unchanged.
+- **Prep job moved, 20 Oct 2026 morning.** He moved it in the Claude app; read back from `scheduled-tasks.json`:
+  Mon 2 Nov 2026 12:00 noon UK (fireAt 1793620800000), on, once, instructions unchanged. Noon, not the 10:00 asked:
+  it works as well, so the records were matched to it, and the Sun 1 Nov reminder
+  (`trig_01Bpzq4t8wJCQZwABsC53ys8`) now says noon and to leave the Mac on until the job finishes (read back).
+  The 21 Dec fallback is no longer needed.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
