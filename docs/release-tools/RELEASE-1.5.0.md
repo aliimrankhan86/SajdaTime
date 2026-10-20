@@ -183,6 +183,13 @@ Dates (his choice, 19 Oct 2026 late): a reminder on Sun 1 Nov 2026 (18:00), the 
    Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
    job tells him once when it sees it, and the preparation job (Mon 2 Nov) checks it too. **Claude:** then change that heading to
    LIVE with the date, and update GBrain.
+0b. **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app"). The six
+   phone screenshots were taken on 18 Oct and the morning of 19 Oct, before that evening's Ramadan window and widget
+   theme changes. **The preparation job (Mon 2 Nov) compares each one, and the "1.5.0 listing, FINAL" description
+   and What's new texts in `docs/store/LISTING.md`, with the final build;** it retakes any screenshot that no longer
+   matches, exactly as LISTING.md "What the six phone screenshots show" says, and corrects any wrong fact. Wording
+   beyond a fact correction goes in as PROPOSED, for his yes. On release day Claude shows him the six screenshots and
+   any changed text before he uploads them.
 1. **Claude:** run `docs/release-tools/release-1.5.0.sh` again and expect every line PASS or TAKEN
    (phone SKIPPED is his choice). The preparation job (Mon 2 Nov 2026, was 21 Dec) does this (its prompt was rewritten on
    18 Oct 2026 late to use this script, never set the versions again, and stop before any merge, pull
@@ -238,7 +245,8 @@ Dates (his choice, 19 Oct 2026 late): a reminder on Sun 1 Nov 2026 (18:00), the 
      `docs/store/LISTING-LOCALES.md`, "1.5.0" (Grow, Store presence, Store listings, Add translations; title, short
      and full description each; the screenshots are shared). This also settles which language a user sees the
      What's new in, because each of the app's four other languages then has its own listing;
-   - replace the phone screenshots with the six new ones in `docs/store/upload/phone/`, in filename order
+   - replace the phone screenshots with the six new ones in `docs/store/upload/phone/` (checked, or retaken, by the
+     2 Nov job, step 0b; show him them first), in filename order
      (the old `03-times-dark` goes; the two Wear OS screenshots stay);
    - confirm the Data safety answers (expected unchanged);
    - then **he presses Send for review himself**.
@@ -283,7 +291,7 @@ fact here changes, change the job too: nothing updates it automatically.
 
 | Job | Kind and time | What it does | Changed on 19 Oct 2026 |
 |---|---|---|---|
-| SajdaTime app health check, `trig_0129FQnWihf8XG6rKLCB4oFr` | cloud routine, daily 12:00 UTC | Watches the public store page; silent unless something changed | **Re-baselined to 1.4.0.** It still had 1.3.2 and on 18 Oct reported 1.4.0 as a release it did not know about. Now it also knows the description change in review (either text is fine), expects 1.5.0 in January and says so as good news, and on 18 and 22 Jan 2027 only warns if 1.5.0 is still not live. **Moved, 19 Oct late:** it expects 1.5.0 from Mon 9 Nov 2026, and warns only on 16 Nov, 23 Nov 2026 and 18 Jan 2027 if it is still not live |
+| SajdaTime app health check, `trig_0129FQnWihf8XG6rKLCB4oFr` | cloud routine, daily 12:00 UTC | Watches the public store page; silent unless something changed | **Re-baselined to 1.4.0.** It still had 1.3.2 and on 18 Oct reported 1.4.0 as a release it did not know about. Now it also knows the description change in review (either text is fine), expects 1.5.0 in January and says so as good news, and on 18 and 22 Jan 2027 only warns if 1.5.0 is still not live. **Moved, 19 Oct late:** it expects 1.5.0 from Mon 9 Nov 2026, and warns only on 16 Nov, 23 Nov 2026 and 18 Jan 2027 if it is still not live **20 Oct:** its reminder on those three dates now allows for 1.5.0 being in Google's review (owner: by 23 Nov "it should be gone live or in the process of it"): if he sent it, look at Publishing overview; if not, ask Claude to help submit. It cannot see the Console, so it never says which. Read back exactly |
 | SajdaTime review replies, `sajdatime-review-replies` | local task, daily 12:40 | Drafts replies to new reviews (he posts them); the Arabic reply and spare signing file reminders | **Added:** a one time notice when the new description is live (file `build/review-replies/description-live.txt` in `~/Developer/SajdaTime`), one notice on 26 Oct 2026 only if it is still not live; after 1.5.0 replies may mention "Phone language" and "Use your mosque's board" |
 | SajdaTime monthly numbers, `trig_01AzcQUNWSkgGmdJmNXkaQoD` | routine run in his Chrome, days 2 to 9 at 11:51 UK | Play numbers into the "SajdaTime monthly numbers" Claude Doc | Nothing: it does not depend on a version |
 | Leave the Mac on, `trig_01Bpzq4t8wJCQZwABsC53ys8` | cloud routine, once, **Sun 1 Nov 2026 18:00** (was 20 Dec) | Push reminder | **Corrected:** it said the job "opens the pull request"; it has not done that since 18 Oct. **Moved, 19 Oct late:** to 1 Nov, text now names Mon 2 Nov and the 9 Nov submit |

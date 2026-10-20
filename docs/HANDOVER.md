@@ -5714,6 +5714,16 @@ Not committed on purpose: the cloud's Robolectric render harness (lesson 132 say
   it works as well, so the records were matched to it, and the Sun 1 Nov reminder
   (`trig_01Bpzq4t8wJCQZwABsC53ys8`) now says noon and to leave the Mac on until the job finishes (read back).
   The 21 Dec fallback is no longer needed.
+- **Health check reminder reworded, 20 Oct 2026.** The owner: by 23 Nov 1.5.0 "should be gone live or in the process
+  of it". The 16 Nov, 23 Nov and 18 Jan reminder said "ask Claude to help you submit", which is wrong if it is in
+  Google's review. It now says: if you sent it, look at Publishing overview in the Play Console; if not, ask Claude
+  to help you submit. The routine sees only the public page, so it never claims which. Read back: exact match.
+- **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app").
+  Already planned for release day, but the six phone screenshots date from 18 Oct and the morning of 19 Oct, before
+  the evening's Ramadan window and widget theme changes. The 2 Nov preparation job's prompt now compares each
+  screenshot and the 1.5.0 description and What's new with the final build, retakes what no longer matches and
+  corrects facts (new wording as PROPOSED); release day shows him the six before upload. RELEASE-1.5.0.md step 0b.
+  Looked at today: `05-settings` and `06-widgets` still match what the app shows; the rest are for the job.
 
 ### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
 
