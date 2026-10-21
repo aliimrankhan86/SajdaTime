@@ -53,17 +53,18 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Widgets follow the app's theme (Ali, 19 Oct 2026):** "If the user selected dark then widget should be dark, if user choose light then the widget should be light." Built: with Theme set to Light or Dark in the app, both widgets stay that way whatever the phone does; with "Follow phone" they follow the phone as before. Tested by automated checks in the cloud, then on the emulator on 19 Oct 2026 (with the Ramadan changes): everything passed, and Ali was sent the screenshots.
 - **Suhoor reminder on by default (Ali, 21 Oct 2026):** "Suhoor Reminder to be enabled - 60 mins before suhoor ends by default unless the user switches it off - Only during ramadan then off itself automatically." Built: 60 minutes before Fajr, only on days of Ramadan, as a quiet notification with the phone's usual tone. It never plays the adhan unless the user picks the adhan for the reminder itself (Ali: "Never the adhan but if the user wants to choose it then they should be able to select adhaan"). The Ramadan notice, from 3 days before, now says a reminder comes 60 minutes before suhoor ends and that both can be turned off in Settings. Checked on the emulator on 21 Oct 2026: it fired on time, with the right sound, and the adhan only when chosen. The Ramadan card was already on by default.
 - **Store listing rewritten (Ali, 21 Oct 2026: "written properly ... Do not [miss] features like widget"):** the 1.5.0 description is grouped by what people look for and names every feature, including the widgets with your town and theme, the silent next prayer notification, Play on silent, the Eid greeting and the suhoor reminder. 3971 of 4000 characters. The five What's new texts and the eight translated listings were updated to match.
-- **Timeline (Ali's choice on 21 Oct 2026: submit Mon 2 Nov; it replaces the 9 Nov plan):**
+- **Release day NOT FIXED (Ali, 21 Oct 2026, later: "the date is not confirmed").** 2 Nov was the plan; it may be earlier or later. Nothing in the app or store text carries the date. The only published date that moves is the privacy policy's "Last updated", and on the day Claude sets it with one command, `docs/release-tools/set-release-date.sh` (today's date by default). When Ali says "Release 1.5.0 today", release day starts.
+- **Timeline:**
   - Thu 29 Oct 2026, 18:00 UK time: a phone reminder to leave the Mac on.
   - Fri 30 Oct 2026, 12:00 noon: the final check job runs on the Mac (RELEASE-1.5.0.md, "Scheduled jobs"). Since 18 Oct 2026 (late) it re-runs `release-1.5.0.sh`, never sets the versions again, and stops before any merge, pull request, submit or Play Console step. Since 19 Oct 2026 it also re-runs the language test on the Android 12 emulator and checks the new store description went live. Since 20 Oct 2026 it also checks the store screenshots and the 1.5.0 description against the final app and retakes any screenshot that changed (Ali: they must match the app's features).
-  - Mon 2 Nov 2026, 09:00: a phone reminder that today is the day to submit.
-  - **Mon 2 Nov 2026: Ali merges and submits.**
-  - Usually live a few days later. The daily health check warns on 9 and 16 Nov 2026 if it is not.
+  - Mon 2 Nov 2026, 09:00: a phone reminder that 1.5.0 is ready and the day is his to pick (no longer "today is the day").
+  - **The day Ali chooses: Ali merges and submits.**
+  - Usually live a few days later. The daily health check warns on 1 Dec 2026, 4 Jan 2027 and 18 Jan 2027 if it is not (it was 9 and 16 Nov, which would have been false with no fixed date).
   - Latest acceptable date: 25 Jan 2027, two weeks before Ramadan.
 - **Ramadan 1448** begins on Monday 8 Feb 2027.
 - **Release day, in order** (exact list in `docs/release-tools/RELEASE-1.5.0.md`):
   1. Claude runs `release-1.5.0.sh` again (the 30 Oct job does this).
-  2. Claude, on the day, sets "Last updated" in the privacy policy to that day and pushes.
+  2. Claude, on the day, runs `docs/release-tools/set-release-date.sh` (privacy policy "Last updated" set to that day) and pushes.
   3. Ali merges `claude/quiet-glass` into `main` that same day, not before (merging publishes the privacy policy).
   4. Ali builds both bundles fresh from `main`.
   5. Ali in the Play Console, with Claude walking him through one screen at a time: both bundles, the five What's new texts, the watch note, the new description and (with his yes) the new short description, the eight translated listings, the six screenshots, Data safety (expected unchanged); then Ali presses Send for review.

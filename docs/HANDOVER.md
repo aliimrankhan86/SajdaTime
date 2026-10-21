@@ -5494,8 +5494,20 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 ### 📍 STATE OF PLAY, 21 Oct 2026 (read this first; the 19 Oct block below still holds for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is ready on `claude/quiet-glass` (pushed, not merged), now with the suhoor
-reminder on by default and a rewritten store listing. He submits on MONDAY 2 NOVEMBER 2026 (his choice, 21 Oct;
-it was 9 Nov). A final check runs by itself on Fri 30 Oct at noon. Start nothing else.**
+reminder on by default and a rewritten store listing. THE RELEASE DAY IS NOT FIXED (owner, 21 Oct, later: "the date
+is not confirmed"; 2 Nov was the plan). A final check runs by itself on Fri 30 Oct at noon. Start nothing else.**
+
+- **Date not fixed, so nothing carries it (21 Oct 2026, later).** Searched every tracked public page and the app's
+  strings: the only published date that must move on release day is `docs/privacy.html` "Last updated" (still 17 Oct
+  2026, correct until the merge). `docs/release-tools/set-release-date.sh ["2 November 2026"]` sets it (today by
+  default), refuses a malformed date and checks the page changed; run, then commit and push, then he merges the same
+  day (lesson 137). Tested on a copy of the date and put back. The jobs were made date-free and read back: the 2 Nov
+  09:00 routine `trig_01VexqUd1cJz8jfD5QFT874W` is now "1.5.0 is ready, pick the release day"; the 29 Oct reminder no
+  longer names 2 Nov; the 30 Oct final check's prompt, description and title (saved through the app's own
+  `update_scheduled_task`) name no submit day; the health check's dated "not live yet" warnings moved from 9 and 16
+  Nov to **1 Dec 2026, 4 Jan 2027 and 18 Jan 2027**, its prompt otherwise identical (compared by script).
+  **Rejected:** deleting the 2 Nov reminder (a nudge is still useful with the 25 Jan limit); dating the privacy page
+  now (it would publish a wrong date the day he merges).
 
 - **The owner, 21 Oct 2026:** "make it completely ready for the release because I could do it earlier", "Ramadan
   option should be enabled", "Suhoor Reminder to be enabled - 60 mins before suhoor ends by default unless the user
