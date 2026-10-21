@@ -227,7 +227,19 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 listing, FINAL 19 Oct 2026: paste on release day (short description, full description, watch note)
+### 1.5.0 listing, FINAL 21 Oct 2026: paste on release day (short description, full description, watch note)
+
+**Rewritten 21 Oct 2026** (the owner: "the playstore descriptions, features, screenshots and other should be written
+properly. Do not [miss] features like widget and other things"). The 19 Oct text below this note was regrouped under what a
+user looks for (prayer times and Qibla; alerts and adhan; Ramadan and Eid; widgets and Wear OS; for everyone), and it now
+names five things the 19 Oct text left out, each checked in the code: the silent next prayer notification with its countdown
+(`ongoingBadge`, on by default), "Play on silent" (`alarmRespectsSilent`), the Eid greeting, the widgets' town and their
+following the app's theme, and **the suhoor reminder an hour before suhoor ends, on by default** (the owner's decision of
+21 Oct 2026; it was "an optional suhoor reminder"). To fit 4000: the separate Ramadan timetable bullet was folded into the
+PDF one, the "most free prayer apps are funded by advertising" sentence went, and the method line lost its brackets (still
+"set for your school", never "region"). The HONEST and FREE sections are byte for byte the approved text, and "not supplied
+by any mosque, scholar or authority" (the health check's phrase) and "Wear OS" (twice) are still there. Measured by Python
+`len`: **3971 / 4000**.
 
 **Why it changed again.** The owner, 19 Oct 2026: "mention all the features of this app to make it stand out ... Any
 keyword or something which could make our reach better. Do it all autonomously and get it reviewed independently." So the
@@ -252,7 +264,7 @@ about 13 apps for "prayer times wear os"). "Qibla compass" and "adhan" cannot bo
 Offline prayer times (namaz), adhan and Qibla for Sunni and Shia, with Wear OS.
 ```
 
-**Full description** `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
+**Full description** `3971 / 4000` (21 Oct 2026). The 19 Oct notes that follow are history; it was `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
 after the Qibla line below). Contains "Wear OS" twice. Ramadan is in it, so the separate "January Ramadan lines" step in
 RELEASE-1.5.0.md is done by pasting this. **One line changed after the review (19 Oct 2026, later):** "A Qibla compass
 corrected…" became "Qibla direction: a compass corrected…", so the description carries the search phrase "qibla direction"
@@ -263,20 +275,36 @@ already targets its own (Arabic اتجاه القبلة, Urdu قبلہ رخ, Ind
 ```
 SajdaTime gives you prayer times, adhan alerts and a Qibla compass for Sunni and Shia Muslims, on your Android phone and Wear OS watch. No ads, no account, and prayer times work offline.
 
-Whether you call them namaz, salah or salat, the five daily prayer times are worked out on your own phone, so SajdaTime keeps working on a plane, in a basement, or with no signal at all.
+Namaz, salah or salat: the times are worked out on your own phone, so they work with no signal at all.
 
-WHAT YOU GET
+PRAYER TIMES AND QIBLA
 
 • Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha for wherever you are, with a live countdown to the next prayer
 • The Hijri date (Islamic calendar) beside today's date
 • Qibla direction: a compass corrected to true north that buzzes once when you face the Kaaba
-• Alerts for each prayer, even when the app is closed: none, a notification, or an alarm loud enough for Fajr
+• PDF timetables to save or print: today, 7 days, the month or Ramadan
+
+ALERTS AND ADHAN
+
+• For each prayer: off, a notification, or an alarm loud enough for Fajr, even when the app is closed
 • A built-in adhan (azan) for Sunni and Shia users, or any sound on your phone
 • An optional reminder 5 to 30 minutes before the prayers you choose
-• Home screen widgets: a big countdown to the next prayer, and today's prayer times
-• Ramadan built in: suhoor (sehri) and iftar times, a countdown, how long each fast is, a Ramadan timetable and an optional suhoor reminder
-• Printable PDF prayer timetables for today, 7 days, the month or Ramadan
-• A Wear OS app and tile that work on their own, with or without your phone
+• A silent notification with the next prayer and its countdown
+• Play on silent: let an alarm sound when your phone is on silent
+
+RAMADAN AND EID
+
+• Suhoor (sehri) and iftar times for your location, a countdown, and how long each fast is
+• A suhoor reminder an hour before suhoor ends, on unless you turn it off
+• An Eid greeting on Eid al-Fitr and Eid al-Adha
+
+WIDGETS AND WEAR OS
+
+• Home screen widgets: a big countdown to the next prayer and today's times, with your town, matching the app's theme
+• A Wear OS app and tile that work with or without your phone
+
+FOR EVERYONE
+
 • English, Arabic, Urdu, Turkish and Indonesian, chosen in the app or following your phone
 • Light and dark themes. Works with large text and screen readers
 
@@ -285,22 +313,20 @@ BUILT FOR YOUR SCHOOL OF THOUGHT
 • Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
 • Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
 • 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapore), Diyanet (Turkey), Moonsighting Committee, Jafari and Tehran
-• The method is chosen for your school (Muslim World League for Sunni, Jafari for Shia), and you can change it
+• The method is set for your school, and you can change it
 • Match your mosque: set any prayer to your mosque's board, within 30 minutes, or shift the Islamic date by a day or two
 • Sensible Fajr and Isha in the far north in summer
 
 YOUR PRIVACY IS NOT THE PRICE
 
-Most free prayer apps are funded by advertising, which means you pay with your data. This one is not paid for at all.
-
 • No adverts and nothing to buy
 • No accounts, no sign-in, no email address
 • Optional usage counts that you control in Settings, off unless you say yes. No crash reporting
 • Approximate location only, read while the app is open. Your coordinates never go to the developer or the usage counts
-• Your town's name is looked up by your phone's own place service, usually Google. The privacy policy explains exactly what that means
-• Cloud backup is switched off, so nothing is copied to a backup server
+• Your town's name comes from your phone's own place service, usually Google. The privacy policy explains what that means
+• Cloud backup is off, so nothing is copied to a server
 
-Rather not allow location? Type where you are instead. It is looked up once online, then the app works the same.
+Rather not share your location? Type your town instead. It is looked up once online.
 
 HONEST ABOUT WHAT IT IS
 
@@ -636,34 +662,34 @@ Ramadan is built in: suhoor (sehri) end and iftar for your location, the length 
 
 **At the 1.5.0 release (January 2027): FINAL, 18 Oct 2026.** The owner: "it should include widgets and their styles, we agreed everything should be there". So the note names everything 1.5.0 brings, not only Ramadan: the Ramadan pack (built in 1.4.0, shown from the eve of Ramadan), the redesigned widgets (big countdown and the town's name), the built-in adhan for Sunni and Shia or any phone sound for alarms and notifications, Arabic, the cleaner look, and "follow your mosque". The old draft's widgets sentence described the 1.4.0 widgets as new, so it was replaced. **Turkey line in English and Turkish only** (where Turkish users read it): their times now include Diyanet's precaution minutes, and anyone who added them by hand in Match your mosque should remove them, or they count twice (HANDOVER §5.26). Counted with Python's `len`; all five under 500. Check the Console's own counter when pasting. **19 Oct 2026:** each now has one sentence saying Match your mosque can take the time from the mosque's board (brought in from the 8 Oct branch); to keep English under 500, "for alarms and notifications" became "for alerts", "to view or save as a PDF" became "to save as a PDF", and the Turkey line says "remove any you added yourself" (Turkish the same idea). Nothing that was true became false.
 
-1.5.0, English (492):
+1.5.0, English (483, 21 Oct 2026: the suhoor reminder is on by default, and the Turkey line has a full stop for its semicolon):
 
 ```
-Ramadan is built in: suhoor (sehri) end and iftar for your location, the length of the fast, a timetable to save as a PDF, and an optional suhoor reminder. Redesigned widgets with a big countdown and your town. Built-in adhan for Sunni and Shia, or any phone sound, for alerts. Now in Arabic, with a cleaner look. Match your mosque: set times from its board. Turkey: times now include Diyanet's precaution minutes; remove any you added yourself. Where your mosque differs, follow your mosque.
+Ramadan is built in: suhoor (sehri) and iftar for your location, a PDF timetable, and a suhoor reminder an hour before suhoor ends, on unless you turn it off. Redesigned widgets with a big countdown and your town. Built-in adhan for Sunni and Shia, or any phone sound. Now in Arabic, with a cleaner look. Match your mosque: set times from its board. Turkey: times now include Diyanet's precaution minutes. Remove any you added yourself. Where your mosque differs, follow your mosque.
 ```
 
-1.5.0, Urdu (459):
+1.5.0, Urdu (487, 21 Oct 2026: suhoor reminder on by default):
 
 ```
-رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، دیکھنے یا PDF میں محفوظ کرنے کے لیے نقشہ، اور سحری کی اختیاری یاددہانی۔ نئے ویجٹ، بڑی الٹی گنتی اور آپ کے شہر کے نام کے ساتھ۔ سنی اور شیعہ کے لیے اذان، یا فون کی کوئی بھی آواز، الارم اور اطلاعات دونوں کے لیے۔ اب عربی میں بھی، نئی صاف ستھری شکل کے ساتھ۔ «اپنی مسجد سے ملائیں» میں اب وقت مسجد کے بورڈ سے لیا جا سکتا ہے۔ جہاں آپ کی مسجد کا وقت مختلف ہو، اپنی مسجد کی پیروی کریں۔
+رمضان ایپ میں شامل ہے: آپ کے مقام کے لیے سحری کا اختتام اور افطار، روزے کا دورانیہ، PDF میں محفوظ ہونے والا نقشہ، اور سحری ختم ہونے سے ایک گھنٹہ پہلے یاددہانی، جسے آپ بند کر سکتے ہیں۔ نئے ویجٹ، بڑی الٹی گنتی اور آپ کے شہر کے نام کے ساتھ۔ سنی اور شیعہ کے لیے اذان، یا فون کی کوئی بھی آواز، الارم اور اطلاعات دونوں کے لیے۔ اب عربی میں بھی، نئی صاف ستھری شکل کے ساتھ۔ «اپنی مسجد سے ملائیں» میں اب وقت مسجد کے بورڈ سے لیا جا سکتا ہے۔ جہاں آپ کی مسجد کا وقت مختلف ہو، اپنی مسجد کی پیروی کریں۔
 ```
 
-1.5.0, Turkish (491):
+1.5.0, Turkish (488, 21 Oct 2026: suhoor reminder on by default):
 
 ```
-Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, PDF'e kaydedilebilen imsakiye ve isteğe bağlı sahur uyarısı. Büyük geri sayımlı ve şehrinizin adını gösteren yeni widget'lar. Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki bir ses, uyarılar için. Camiye göre ayarla artık pano saatini alıyor. Türkiye vakitleri artık Diyanet'in temkin sürelerini içeriyor; elle eklediyseniz kaldırın. Arapça desteği ve daha sade görünüm. Caminizin vakti farklıysa caminize uyun.
+Ramazan uygulamada: bulunduğunuz yer için imsak ve iftar, orucun süresi, PDF imsakiye ve imsaktan bir saat önce, kapatabileceğiniz sahur uyarısı. Büyük geri sayımlı ve şehrinizin adını gösteren yeni widget'lar. Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki bir ses. Camiye göre ayarla artık pano saatini alıyor. Türkiye vakitleri artık Diyanet'in temkin sürelerini içeriyor. Elle eklediyseniz kaldırın. Arapça desteği ve daha sade görünüm. Caminizin vakti farklıysa caminize uyun.
 ```
 
-1.5.0, Indonesian (486):
+1.5.0, Indonesian (461, 21 Oct 2026: suhoor reminder on by default):
 
 ```
-Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal untuk dilihat atau disimpan sebagai PDF, dan pengingat sahur opsional. Widget baru dengan hitung mundur besar dan nama kota Anda. Azan bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda, untuk alarm dan notifikasi. Kini dalam bahasa Arab, dengan tampilan lebih bersih. Sesuaikan dengan masjid kini bisa memakai waktu di papan masjid. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
+Ramadan kini tersedia: akhir sahur dan buka puasa untuk lokasi Anda, lama puasa, jadwal PDF, dan pengingat sahur satu jam sebelum sahur berakhir, bisa dimatikan. Widget baru dengan hitung mundur besar dan nama kota Anda. Azan bawaan untuk Sunni dan Syiah, atau suara apa pun di ponsel Anda. Kini dalam bahasa Arab, dengan tampilan lebih bersih. Sesuaikan dengan masjid kini bisa memakai waktu di papan masjid. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.
 ```
 
-1.5.0, Arabic (355):
+1.5.0, Arabic (379, 21 Oct 2026: suhoor reminder on by default):
 
 ```
-رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير اختياري بالسحور. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. ويمكن الآن ضبط «طابِق مسجدك» من لوحة مسجدك. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
+رمضان في التطبيق: نهاية السحور وموعد الإفطار لموقعك، ومدة الصيام، وإمساكية للعرض أو الحفظ بصيغة PDF، وتذكير بالسحور قبل انتهائه بساعة، يمكنك إيقافه. ودجات جديدة بعدٍّ تنازلي كبير واسم مدينتك. أذان مدمج للسنّة والشيعة، أو أي صوت على هاتفك، للمنبّهات والإشعارات. التطبيق الآن بالعربية، بمظهر أنظف. ويمكن الآن ضبط «طابِق مسجدك» من لوحة مسجدك. وإذا اختلفت مواقيت مسجدك، فاتّبع مسجدك.
 ```
 
 **Watch 1.5.0 note, SUPERSEDED 19 Oct 2026 by the note in "1.5.0 listing, FINAL" above** (the watch ships in the same release, because it shares the Turkey change; English, then the same idea in each language Play shows):

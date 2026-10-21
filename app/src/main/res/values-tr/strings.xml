@@ -356,7 +356,7 @@
     <string name="pdf_ramadan_note">İmsak Sabah vaktidir. İftar Akşam vaktidir. Caminizin imsakiyesi farklıysa caminize uyun.</string>
     <string name="ramadan_row_a11y">%1$d. gün, %2$s. İmsak %3$s. İftar %4$s. Oruç %5$s.</string>
     <string name="settings_suhoor">Sahur hatırlatıcısı</string>
-    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Alarm olarak namaz uyarılarınızla aynı sesi kullanır.</string>
+    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Burada ezanı seçmediğiniz sürece telefonunuzun kendi sesini kullanır.</string>
     <string name="suhoor_off">Kapalı</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">Sabah vaktinden %d dakika önce</item>
@@ -395,6 +395,7 @@
     <string name="action_see_why">Nedenini gör</string>
     <string name="ramadan_eve_brief">Caminiz bir gün sonra başlayabilir.</string>
     <string name="ramadan_eve_card_on">İlk günden itibaren Ramazan kartı burada imsak ve iftar vakitlerini gösterir. Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="ramadan_eve_card_on_reminder">İlk günden itibaren Ramazan kartı burada imsak ve iftar vakitlerini gösterir ve imsaktan %1$d dakika önce bir hatırlatma gelir. İkisini de Ayarlar\'dan kapatabilirsiniz.</string>
     <string name="polar_notice_brief">Burada Sabah ve Yatsı %1$d° enlemine göre hesaplanır.</string>
     <string name="action_set_location">Konumu ayarla</string>
     <string name="city_lookup_offline">İnternet bağlantısı yok. Bir yer aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>

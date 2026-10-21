@@ -1,3 +1,5 @@
+> **History, 21 Oct 2026:** the eight 1.5.0 full descriptions were rebuilt that day from the regrouped English (suhoor reminder on by default, five more features named); the back-translations below describe the 19 Oct texts. The current texts are in `docs/store/LISTING-LOCALES.md`, "1.5.0".
+
 # Store listing 1.5.0: back translations, translators' notes and the review (19 Oct 2026)
 
 The paste-ready text is in `docs/store/LISTING-LOCALES.md`, "1.5.0 listings, FINAL". This file is the record of how it was

@@ -46,6 +46,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.ui.RamadanState
 import com.sajdatime.app.ui.UiState
@@ -100,6 +101,7 @@ internal fun RamadanSection(
     } else if (noticeDay) {
         RamadanNotice(
             ramadan = ramadan,
+            suhoorMinutes = settings.suhoorReminderMinutes,
             onShiftDate = onShiftDate,
             onDismiss = { onDismissNotice(info.hijriYear) },
         )
@@ -359,7 +361,7 @@ private fun FastLine(ramadan: RamadanState) {
  * do about it. Closing it hides it for this Hijri year and it comes back next year without a reset.
  */
 @Composable
-private fun RamadanNotice(ramadan: RamadanState, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
+private fun RamadanNotice(ramadan: RamadanState, suhoorMinutes: Int, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
     // A quiet Notice (17 Oct 2026): the date and one line up front, the moon sighting reasoning
     // folded, and the date shift as the action rather than the whole card.
@@ -371,8 +373,15 @@ private fun RamadanNotice(ramadan: RamadanState, onShiftDate: () -> Unit, onDism
         details = stringResource(R.string.ramadan_eve_body),
         // Always visible: the card is on for everyone, so the user is told so before day 1 and
         // where to turn it off (owner, 19 Oct 2026). True whenever this notice shows, because the
-        // whole section is skipped once the card is turned off.
-        footnote = stringResource(R.string.ramadan_eve_card_on),
+        // whole section is skipped once the card is turned off. The suhoor reminder is on by default
+        // too (owner, 21 Oct 2026), so the same line names it with the person's own minutes, and only
+        // while it is on: a line saying "60 minutes" to someone who chose 30 or Off would be untrue.
+        // ...and only if notifications can be shown at all: with them refused, no reminder ever arrives.
+        footnote = if (suhoorMinutes > 0 && Notifications.canPost(context)) {
+            stringResource(R.string.ramadan_eve_card_on_reminder, suhoorMinutes)
+        } else {
+            stringResource(R.string.ramadan_eve_card_on)
+        },
         actionLabel = stringResource(R.string.settings_hijri_offset_label),
         onAction = onShiftDate,
         onDismiss = onDismiss,

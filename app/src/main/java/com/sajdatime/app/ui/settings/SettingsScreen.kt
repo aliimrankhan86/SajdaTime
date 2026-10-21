@@ -163,6 +163,7 @@ fun SettingsScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
+    onSetSuhoorAdhan: (Boolean) -> Unit,
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
@@ -299,7 +300,8 @@ fun SettingsScreen(
     // The two sounds, each a row of its own under Prayer alerts (owner, 18 Oct 2026). The alarm sound
     // used to sit at the foot of the Prayer alerts dialog, below a fold with nothing showing there was
     // more, so he never found "From your phone". A row says what is chosen without opening anything.
-    // Each appears only while some prayer (or suhoor) uses that style, like the alarm sound did.
+    // Each appears only while some prayer uses that style. Not the suhoor reminder since 21 Oct 2026: it
+    // has its own sound, and its "Play on silent" is repeated inside its own dialog.
     val notificationSound = SoundChoice(
         sect = settings.sect,
         uri = settings.notificationSoundUri,
@@ -350,7 +352,7 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_alarm_sound),
                 subtitle = soundSummary(alarmSound),
                 onClick = { open = SettingsChooser.ALARM_SOUND },
-            ).takeIf { settings.usesAlarm },
+            ).takeIf { settings.prayersUseAlarm },
             // Off until chosen (1.5.0): a quiet heads up a few minutes before the prayers picked.
             SettingsItem.Link(
                 key = "prayer_reminder",
@@ -369,9 +371,9 @@ fun SettingsScreen(
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
             ),
-            // Off until chosen. A reminder before Fajr on the days of Ramadan only, on the Islamic
-            // date the user has set, through the same alarm ladder and silent mode rules as a
-            // prayer alert. The row says nothing about dates: the help line inside does.
+            // On by default since 1.5.0, 60 minutes (owner, 21 Oct 2026; HANDOVER 5.19 item 8). A reminder
+            // before Fajr on the days of Ramadan only, on the Islamic date the user has set, through the
+            // same alarm ladder and silent mode rules as a prayer alert, on its own channel and sound. The row says nothing about dates: the help line inside does.
             // Shown only from 3 days before Ramadan to its last day, like the card's row below
             // (owner, 19 Oct 2026: a Ramadan setting the rest of the year confuses people).
             SettingsItem.Link(
@@ -587,8 +589,12 @@ fun SettingsScreen(
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
+            adhan = settings.suhoorUsesAdhan,
+            respectsSilent = settings.alarmRespectsSilent,
             onSetMinutes = onSetSuhoorMinutes,
             onSetStyle = onSetSuhoorStyle,
+            onSetAdhan = onSetSuhoorAdhan,
+            onSetRespectsSilent = onSetAlarmRespectsSilent,
             onDismiss = { open = null },
         )
 
@@ -1007,15 +1013,21 @@ private fun PlayOnSilentRow(respectsSilent: Boolean, onSetRespectsSilent: (Boole
  * The suhoor reminder: off, or 15, 30, 45 or 60 minutes before Fajr, and how it announces itself.
  *
  * It is a second heads up and not a ruling: suhoor ends at Fajr, and the reminder is simply earlier
- * than that by the amount the person picked. Its sound is the Notification sound or Alarm sound row,
- * which appears in Settings as soon as the style here is chosen (18 Oct 2026: one place for each sound).
+ * than that by the amount the person picked. Its sound is chosen here, not on the Notification sound or
+ * Alarm sound row: the phone's usual tone, or the school's adhan only if the person picks it (owner,
+ * 21 Oct 2026). Until then it used those rows, so a person with the adhan for prayers heard the adhan an
+ * hour before Fajr.
  */
 @Composable
 private fun SuhoorDialog(
     minutes: Int,
     style: AlertStyle,
+    adhan: Boolean,
+    respectsSilent: Boolean,
     onSetMinutes: (Int) -> Unit,
     onSetStyle: (AlertStyle) -> Unit,
+    onSetAdhan: (Boolean) -> Unit,
+    onSetRespectsSilent: (Boolean) -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_suhoor), onDismiss = onDismiss) {
@@ -1052,6 +1064,31 @@ private fun SuhoorDialog(
                     onClick = { onSetStyle(AlertStyle.ALARM) },
                 )
             }
+            Spacer(Modifier.height(Space.Related))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Space.Related),
+                verticalArrangement = Arrangement.spacedBy(Space.Related),
+                modifier = Modifier.selectableGroup(),
+            ) {
+                // The phone's own sound for the style chosen: its alarm sound for an Alarm (the channel
+                // plays resolveAlarmSound("")), its notification tone otherwise.
+                ChoiceChip(
+                    label = stringResource(
+                        if (style == AlertStyle.ALARM) R.string.settings_alarm_sound_default else R.string.settings_notification_sound_default,
+                    ),
+                    selected = !adhan,
+                    onClick = { onSetAdhan(false) },
+                )
+                ChoiceChip(
+                    label = stringResource(R.string.adhan_builtin),
+                    selected = adhan,
+                    onClick = { onSetAdhan(true) },
+                )
+            }
+            // The same "Play on silent" as the Alarm sound row's, here too, because that row only shows
+            // while a prayer is an Alarm: without this, a person whose only alarm is the suhoor reminder
+            // could never turn it on (independent review, 21 Oct 2026).
+            if (style == AlertStyle.ALARM) PlayOnSilentRow(respectsSilent, onSetRespectsSilent)
         }
     }
 }

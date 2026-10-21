@@ -187,18 +187,32 @@ data class AppSettings(
      */
     val eidGreetingDismissedCode: Int = 0,
     /**
-     * Minutes before Fajr at which the optional suhoor reminder fires during Ramadan, or 0 for off.
-     * **Off by default**: it is an alert, and nothing here makes noise until asked. Read through
-     * [SUHOOR_CHOICES], so a stored value that is not one of the five choices (a corrupt store, an
-     * older or newer build) reads as off rather than as some odd number of minutes.
+     * Minutes before Fajr at which the suhoor reminder fires during Ramadan, or 0 for off.
+     * **60 by default** (owner, 21 Oct 2026: "60 mins before suhoor ends by default unless the user
+     * switches it off - Only during ramadan then off itself automatically"). This reverses the 1.4.0
+     * rule "off by default, nothing makes noise until asked", on purpose: a person who never opens
+     * Settings should still be woken for suhoor. It stays polite because the default style is a
+     * quiet Notification on the phone's usual tone, it only exists on days of Ramadan
+     * ([com.sajdatime.app.notify.SuhoorReminderPlan]), and the Ramadan notice says so from 3 days
+     * before. An unset key reads as 60, so 1.4.0 users who never chose get it too; anyone who chose
+     * Off has 0 stored and keeps it. Read through [SUHOOR_CHOICES], so a stored value that is not
+     * one of the five choices (a corrupt store, an older or newer build) reads as off.
      */
-    val suhoorReminderMinutes: Int = 0,
+    val suhoorReminderMinutes: Int = SUHOOR_DEFAULT_MINUTES,
     /**
      * How the reminder announces itself. The same two styles as a prayer alert, and it goes through
      * the same [com.sajdatime.app.notify.effectiveAlertStyle], so the silent phone switch, the
      * polar approximate day downgrade and the Do Not Disturb handling apply to it unchanged.
      */
     val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
+    /**
+     * Whether the suhoor reminder plays the built-in adhan of the user's school. **False by default,
+     * and the reminder never borrows the prayer sounds** (owner, 21 Oct 2026: "Never the adhan but if
+     * the user wants to choose it then they should be able to select adhaan"): an adhan an hour before
+     * Fajr announces a prayer that has not come. False is the phone's usual tone, on the suhoor
+     * reminder's own channel ([com.sajdatime.app.notify.Notifications.ensureSuhoorChannel]).
+     */
+    val suhoorUsesAdhan: Boolean = false,
     /**
      * Minutes before each chosen prayer at which a quiet heads up arrives, or 0 for off. **Off by
      * default** (owner, 17 Oct 2026, from the competitor review: "prenotifications" was the feature a
@@ -233,14 +247,23 @@ data class AppSettings(
         get() = alertFor.containsValue(AlertStyle.ALARM) ||
             (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.ALARM)
 
-    /** True when any prayer or the suhoor reminder is a notification, so the notification sound applies. */
+    /**
+     * True when any prayer is a notification, so the Notification sound row applies. The suhoor
+     * reminder does not count since 21 Oct 2026: it has its own sound choice and never uses this one.
+     */
     val usesNotification: Boolean
-        get() = alertFor.containsValue(AlertStyle.NOTIFICATION) ||
-            (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.NOTIFICATION)
+        get() = alertFor.containsValue(AlertStyle.NOTIFICATION)
+
+    /** True when any prayer is an alarm, so the Alarm sound row applies (not the suhoor reminder, as above). */
+    val prayersUseAlarm: Boolean
+        get() = alertFor.containsValue(AlertStyle.ALARM)
 
     companion object {
         /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
         val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
+
+        /** The reminder a person gets without choosing: an hour before Fajr (owner, 21 Oct 2026). */
+        const val SUHOOR_DEFAULT_MINUTES = 60
 
         /** Minutes before a prayer. 0 is off. Kept short: this is "get ready", not a second alarm. */
         val PRAYER_REMINDER_CHOICES: List<Int> = listOf(0, 5, 10, 15, 20, 30)
@@ -413,6 +436,8 @@ class SettingsRepository(private val context: Context) {
         it[Keys.SUHOOR_STYLE] = style.name
     }
 
+    suspend fun setSuhoorUsesAdhan(adhan: Boolean) = edit { it[Keys.SUHOOR_ADHAN] = adhan }
+
     /** Anything that is not one of [AppSettings.PRAYER_REMINDER_CHOICES] is stored as 0, off. */
     suspend fun setPrayerReminderMinutes(minutes: Int) = edit {
         it[Keys.PRAYER_REMINDER_MINUTES] = minutes.takeIf { m -> m in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0
@@ -505,6 +530,7 @@ class SettingsRepository(private val context: Context) {
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
         val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
         val SUHOOR_STYLE = stringPreferencesKey("suhoor_reminder_style")
+        val SUHOOR_ADHAN = booleanPreferencesKey("suhoor_reminder_adhan")
         val PRAYER_REMINDER_MINUTES = intPreferencesKey("prayer_reminder_minutes")
         val PRAYER_REMINDER_FOR = stringPreferencesKey("prayer_reminder_for")
     }
@@ -550,9 +576,10 @@ class SettingsRepository(private val context: Context) {
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
             eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
-            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: 0)
+            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: AppSettings.SUHOOR_DEFAULT_MINUTES)
                 .takeIf { it in AppSettings.SUHOOR_CHOICES } ?: 0,
             suhoorReminderStyle = enumOr(this[Keys.SUHOOR_STYLE], AlertStyle.NOTIFICATION),
+            suhoorUsesAdhan = this[Keys.SUHOOR_ADHAN] ?: false,
             prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
                 .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),

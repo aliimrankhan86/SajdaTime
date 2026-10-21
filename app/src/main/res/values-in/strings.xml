@@ -353,7 +353,7 @@
     <string name="pdf_ramadan_note">Sahur berakhir pada Subuh. Buka puasa pada Magrib. Jika jadwal masjid Anda berbeda, ikuti masjid Anda.</string>
     <string name="ramadan_row_a11y">Hari ke-%1$d, %2$s. Sahur berakhir %3$s. Buka puasa %4$s. Puasa %5$s.</string>
     <string name="settings_suhoor">Pengingat sahur</string>
-    <string name="settings_suhoor_help">Pengingat sebelum Subuh pada hari-hari Ramadan, menurut kalender yang diatur di SajdaTime. Sebagai alarm, suaranya sama dengan notifikasi salat Anda.</string>
+    <string name="settings_suhoor_help">Pengingat sebelum Subuh pada hari-hari Ramadan, menurut kalender yang diatur di SajdaTime. Pengingat ini memakai suara ponsel Anda sendiri, kecuali Anda memilih azan di sini.</string>
     <string name="suhoor_off">Nonaktif</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="other">%d menit sebelum Subuh</item>
@@ -390,6 +390,7 @@
     <string name="action_see_why">Lihat sebabnya</string>
     <string name="ramadan_eve_brief">Masjid Anda mungkin mulai sehari kemudian.</string>
     <string name="ramadan_eve_card_on">Mulai hari pertama, kartu Ramadan menampilkan waktu sahur dan buka puasa di sini. Anda dapat mematikannya di Pengaturan.</string>
+    <string name="ramadan_eve_card_on_reminder">Mulai hari pertama, kartu Ramadan menampilkan waktu sahur dan buka puasa di sini, dan pengingat datang %1$d menit sebelum waktu sahur berakhir. Anda dapat mematikan keduanya di Pengaturan.</string>
     <string name="polar_notice_brief">Subuh dan Isya di sini dihitung dari lintang %1$d°.</string>
     <string name="action_set_location">Atur lokasi</string>
     <string name="city_lookup_offline">Tidak ada koneksi internet. Sambungkan sekali untuk mencari tempat, atau gunakan lokasi Anda.</string>

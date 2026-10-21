@@ -34,7 +34,7 @@ object PrayerAlarmScheduler {
     const val EXTRA_AT_MILLIS = "at"
 
     /**
-     * The optional suhoor reminder rides the same receiver, the same alarm ladder and the same
+     * The suhoor reminder (on by default since 1.5.0, 60 minutes before Fajr) rides the same receiver, the same alarm ladder and the same
      * four reschedule triggers as the prayer alerts, with its own action so a prayer alarm and a
      * reminder can never be mistaken for one another. The extras carry the Fajr it precedes and the
      * Ramadan date it is for, which the receiver checks against the settings of the moment it fires.

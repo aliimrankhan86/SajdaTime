@@ -562,7 +562,7 @@
     <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
     <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
     <string name="settings_suhoor">Suhoor reminder</string>
-    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. As an alarm it uses the same sound as your prayer alerts.</string>
+    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. It uses your phone\'s own sound unless you choose the adhan here.</string>
     <string name="suhoor_off">Off</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">%d minute before Fajr</item>
@@ -615,6 +615,7 @@
     <string name="action_see_why">See why</string>
     <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
     <string name="ramadan_eve_card_on">From the first day, the Ramadan card shows suhoor and iftar times here. You can turn it off in Settings.</string>
+    <string name="ramadan_eve_card_on_reminder">From the first day, the Ramadan card shows suhoor and iftar times here, and a reminder comes %1$d minutes before suhoor ends. You can turn either off in Settings.</string>
     <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
     <string name="action_set_location">Set location</string>
     <string name="city_lookup_offline">No internet connection. Connect once to look up a place, or use your location.</string>

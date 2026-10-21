@@ -333,7 +333,7 @@ battery cost for information already visible in the app.
 
 Two more alarm families share the manager, kept apart by action and request code because
 `PendingIntent` identity ignores extras. Prayers use codes up to 3,669 and `ACTION_PRAYER`. The
-optional suhoor reminder (Ramadan days only, 15 to 60 minutes before Fajr) uses
+suhoor reminder (Ramadan days only, 15 to 60 minutes before Fajr; 60 and on by default since 1.5.0) uses
 `ACTION_SUHOOR_REMINDER` and codes 10,001 to 10,366 and the same three rung ladder. The widgets use
 one non waking `RTC` alarm, code 20,000, set for the earlier of the next prayer and local midnight
 plus 2 seconds (exact when the phone allows exact alarms, inexact otherwise), and every redraw lays

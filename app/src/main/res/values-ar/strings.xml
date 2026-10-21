@@ -411,7 +411,7 @@
     <string name="pdf_ramadan_note">ينتهي السحور عند الفجر. والإفطار عند المغرب. اتبع مسجدك حيث يختلف جدوله.</string>
     <string name="ramadan_row_a11y">اليوم %1$d، %2$s. ينتهي السحور %3$s. الإفطار %4$s. الصيام %5$s.</string>
     <string name="settings_suhoor">تذكير السحور</string>
-    <string name="settings_suhoor_help">تذكير قبل الفجر في أيام رمضان، بحسب التقويم المضبوط عليه SajdaTime. وكمنبّه يستخدم الصوت نفسه الذي تستخدمه تنبيهات صلاتك.</string>
+    <string name="settings_suhoor_help">تذكير قبل الفجر في أيام رمضان، بحسب التقويم المضبوط عليه SajdaTime. يستخدم صوت هاتفك نفسه ما لم تختر الأذان هنا.</string>
     <string name="suhoor_off">إيقاف</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="zero">قبل الفجر بـ %d دقيقة</item>
@@ -461,6 +461,7 @@
     <string name="action_see_why">اعرف السبب</string>
     <string name="ramadan_eve_brief">قد يبدأ مسجدك بعد يوم.</string>
     <string name="ramadan_eve_card_on">من اليوم الأول تعرض بطاقة رمضان هنا وقتي السحور والإفطار. يمكنك إيقافها من الإعدادات.</string>
+    <string name="ramadan_eve_card_on_reminder">من اليوم الأول تعرض بطاقة رمضان هنا وقتي السحور والإفطار، ويصلك تذكير قبل انتهاء السحور بـ %1$d دقيقة. يمكنك إيقاف أيٍّ منهما من الإعدادات.</string>
     <string name="polar_notice_brief">يُحسب الفجر والعشاء هنا من خط العرض %1$d°.</string>
     <string name="action_set_location">تحديد الموقع</string>
     <string name="city_lookup_offline">لا يوجد اتصال بالإنترنت. اتصل مرة واحدة للبحث عن مكان، أو استخدم موقعك.</string>

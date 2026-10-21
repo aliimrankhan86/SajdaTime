@@ -362,7 +362,7 @@
     <string name="pdf_ramadan_note">سحری فجر پر ختم ہوتی ہے۔ افطار مغرب پر۔ جہاں آپ کی مسجد کا نقشہ مختلف ہو، اپنی مسجد کی پیروی کریں۔</string>
     <string name="ramadan_row_a11y">دن %1$d، %2$s۔ سحری ختم %3$s۔ افطار %4$s۔ روزہ %5$s۔</string>
     <string name="settings_suhoor">سحری کی یاددہانی</string>
-    <string name="settings_suhoor_help">رمضان کے دنوں میں فجر سے پہلے ایک یاددہانی، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔ الارم کے طور پر یہ وہی آواز استعمال کرتی ہے جو آپ کے نماز کے الرٹس کی ہے۔</string>
+    <string name="settings_suhoor_help">رمضان کے دنوں میں فجر سے پہلے ایک یاددہانی، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔ یہ آپ کے فون کی اپنی آواز استعمال کرتی ہے، جب تک آپ یہاں اذان نہ چنیں۔</string>
     <string name="suhoor_off">بند</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">فجر سے %d منٹ پہلے</item>
@@ -401,6 +401,7 @@
     <string name="action_see_why">وجہ دیکھیں</string>
     <string name="ramadan_eve_brief">آپ کی مسجد ایک دن بعد شروع کر سکتی ہے۔</string>
     <string name="ramadan_eve_card_on">پہلے دن سے رمضان کارڈ یہاں سحری اور افطار کے اوقات دکھائے گا۔ آپ اسے ترتیبات میں بند کر سکتے ہیں۔</string>
+    <string name="ramadan_eve_card_on_reminder">پہلے دن سے رمضان کارڈ یہاں سحری اور افطار کے اوقات دکھائے گا، اور سحری ختم ہونے سے %1$d منٹ پہلے ایک یاددہانی آئے گی۔ آپ ان میں سے کسی کو بھی ترتیبات میں بند کر سکتے ہیں۔</string>
     <string name="polar_notice_brief">یہاں فجر اور عشاء عرض بلد %1$d° کے حساب سے نکالے جاتے ہیں۔</string>
     <string name="action_set_location">مقام طے کریں</string>
     <string name="city_lookup_offline">انٹرنیٹ کنکشن نہیں ہے۔ جگہ تلاش کرنے کے لیے ایک بار انٹرنیٹ سے جڑیں، یا اپنا مقام استعمال کریں۔</string>

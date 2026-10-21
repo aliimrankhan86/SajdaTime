@@ -7,6 +7,13 @@ January, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027).
 submit in NOVEMBER, and that night he chose MONDAY 9 NOVEMBER 2026** (HANDOVER §11, STATE OF PLAY). The preparation
 run moves to Mon 2 Nov 2026 and the reminders to match ("Scheduled jobs" below).
 
+**Changed 21 Oct 2026: SUBMIT ON MONDAY 2 NOVEMBER 2026** (his choice; it was 9 Nov). The final check job runs on
+**Fri 30 Oct 2026 at 12:00 noon UK**, the "leave the Mac on" reminder comes Thu 29 Oct 18:00, the submit reminder Mon 2 Nov
+09:00. Also on 21 Oct: **the suhoor reminder is on by default, 60 minutes before Fajr, a Notification on the phone's usual
+tone, the adhan only if chosen for it** (HANDOVER §5.19 item 8), and **the store listing was rewritten** to name every
+feature (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026"; the eight translations rebuilt). Gate 421 unit tests, independent review done and acted on. HANDOVER §11
+STATE OF PLAY 21 Oct has the rest.
+
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
 is done by touching the signing key, and **he presses every submit, publish and consent button**.
 
@@ -174,16 +181,17 @@ app 252, wear 12); the description 3969 characters and containing "Wear OS"; the
 
 ## Still to do, in order
 
-Dates (his choice, 19 Oct 2026 late): a reminder on Sun 1 Nov 2026 (18:00), the preparation job on Mon 2 Nov 2026
-(12:00 noon), a submit day reminder on Mon 9 Nov 2026 (09:00), submit on **Mon 9 Nov 2026**, **latest acceptable 25 Jan
-2027** (Ramadan 1448 begins Mon 8 Feb 2027). The January plan (20 Dec, 21 Dec, 4 Jan) is replaced.
+Dates (his choice, **21 Oct 2026**): a reminder on Thu 29 Oct 2026 (18:00), the final check job on **Fri 30 Oct 2026
+(12:00 noon)**, a submit day reminder on Mon 2 Nov 2026 (09:00), submit on **Mon 2 Nov 2026**, **latest acceptable 25 Jan
+2027** (Ramadan 1448 begins Mon 8 Feb 2027). Replaced: the 19 Oct plan (1 Nov, 2 Nov, 9 Nov) and the January plan.
 
 0. **Waiting on Google (19 Oct 2026):** the description for the live 1.4.0 was submitted (`docs/store/LISTING.md`,
    "For the live 1.4.0, SUBMITTED 19 Oct 2026"). Live when the public page's description says "In English, Urdu,
    Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
    job tells him once when it sees it, and the preparation job (Mon 2 Nov) checks it too. **Claude:** then change that heading to
    LIVE with the date, and update GBrain.
-0b. **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app"). The six
+0b. **DONE for the text, 21 Oct 2026. The six screenshots were read against the 21 Oct change: none shows anything it touched (`05-settings` shows only Location to Language; the Ramadan notice and the sound rows are in none of them), so none was retaken. The 30 Oct job still compares all six by measurement, as below.**
+   **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app"). The six
    phone screenshots were taken on 18 Oct and the morning of 19 Oct, before that evening's Ramadan window and widget
    theme changes. **The preparation job (Mon 2 Nov) compares each one, and the "1.5.0 listing, FINAL" description
    and What's new texts in `docs/store/LISTING.md`, with the final build;** it retakes any screenshot that no longer
@@ -284,6 +292,13 @@ Dates (his choice, 19 Oct 2026 late): a reminder on Sun 1 Nov 2026 (18:00), the 
   page (claude.ai/artifact/GxU35nSJAfxqedU7DYa35L). Only Ali can see it; he can delete it if he wants.
 
 ## Scheduled jobs (all six checked and brought up to date on 19 Oct 2026)
+
+**21 Oct 2026, for the 2 Nov submit (each read back after the change):** `sajdatime-1-5-0-reminder` moved to **Fri 30 Oct
+2026 12:00 UK** and its prompt rewritten for the 2 Nov submit, the 420 unit test count and the 21 Oct listing;
+`trig_01Bpzq4t8wJCQZwABsC53ys8` to **Thu 29 Oct 18:00** (text names Fri 30 Oct and Mon 2 Nov); `trig_01VexqUd1cJz8jfD5QFT874W`
+to **Mon 2 Nov 09:00**; the health check `trig_0129FQnWihf8XG6rKLCB4oFr` expects 1.5.0 from 2 Nov and warns only on **9 Nov,
+16 Nov 2026 and 18 Jan 2027** (its prompt otherwise byte for byte unchanged, compared by script). The table below is the
+19 Oct record.
 
 None of these is in the repository: the local tasks' prompts are in `~/.claude/scheduled-tasks/<id>/SKILL.md` on
 his Mac (they need the Mac on and the Claude app open), the routines are at https://claude.ai/code/routines. If a

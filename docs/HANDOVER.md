@@ -1338,6 +1338,25 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    not measured, only a town whose page did load; the offsets are a property of Diyanet's method, not of
    the town. Not changed: the plan makes any change to the method an owner decision (§11). Details in
    `RAMADAN-LOCATION-SPEC.md` section 9.4. **Superseded 18 Oct 2026: the offsets are now applied, §5.26.**
+8. **The suhoor reminder is ON by default, 60 minutes before Fajr, from 1.5.0** (owner, 21 Oct 2026: "Suhoor
+   Reminder to be enabled - 60 mins before suhoor ends by default unless the user switches it off - Only during
+   ramadan then off itself automatically"). **This reverses the 1.4.0 rule "off by default, nothing makes noise
+   until asked", deliberately; do not put it back.** What keeps it polite, all chosen by him the same day with
+   AskUserQuestion: the default style is a **Notification** (follows silent and Do Not Disturb), not an Alarm
+   (rejected: it would ring at about 3 to 4 am for people who are not fasting); it plays **the phone's usual
+   tone, never the prayer sounds**, and the adhan only if the person picks it for the suhoor reminder itself
+   (rejected: borrowing the prayer sound, which made a person with the adhan for prayers hear an adhan an hour
+   before Fajr, announcing a prayer that has not come); and the Ramadan notice, from 3 days before, says so in
+   one line with the person's own minutes ("...and a reminder comes 60 minutes before suhoor ends. You can turn
+   either off in Settings."). It only ever exists on days of Ramadan on the user's calendar
+   (`SuhoorReminderPlan`), so it switches itself off after the last day with nothing to reset. An unset setting
+   reads 60, so a 1.4.0 user who never opened it gets it too; one who chose Off has 0 stored and keeps Off.
+   **Its own channel family, `suhoor_v…`** (`Notifications.ensureSuhoorChannel`): the prayer channels keep only
+   one of each kind alive, so a reminder with a different sound on a shared channel would delete and restore the
+   prayer channel at every reminder (§15 lesson 170). The Notification sound and Alarm sound rows no longer
+   appear because of the suhoor reminder (`usesNotification`, `prayersUseAlarm`), since their sound no longer
+   applies to it; `usesAlarm` still counts it, for the Do Not Disturb card and the approximate day switch.
+   Settings for it, in the Suhoor reminder dialog: Off/15/30/45/60, Notification/Alarm, phone's usual tone/Adhan.
 
 ### 5.20 Widgets: drawn from saved data and moved on by one weak alarm (built 16 Oct 2026 for 1.4.0)
 
@@ -2216,6 +2235,27 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**The suhoor reminder on by default, phone emulator (21 Oct 2026, Mac session; §5.19 item 8, §11 STATE OF PLAY 21 Oct).**
+`sajda` (Android 16) started `-read-only`, the debug build of the uncommitted change installed, app data cleared, `POST_NOTIFICATIONS`
+granted, `ScreenSeedDeviceTest` OK (London), automatic time and zone off, zone Europe/London. **PASS.**
+- **Default:** Settings shows "60 minutes before Fajr · Notification"; the dialog shows 60 ticked, Notification and "Your phone's usual
+  tone" selected, Adhan offered.
+- **Notice:** Sat 6 Feb 2027 (29 Shaban 1448): "Ramadan on this calendar begins Mon 8 Feb" with "...and a reminder comes 60 minutes
+  before suhoor ends. You can turn either off in Settings." `dumpsys alarm`: no `SUHOOR_REMINDER` on 6 Feb (none of 5 to 7 Feb is
+  Ramadan), correct.
+- **Booked:** Sun 7 Feb 12:00: one `SUHOOR_REMINDER` for 2027-02-08 04:34 (Fajr 05:34). Without exact alarm access its window was
+  +1h, the same as every prayer alert (the "Allow exact alarms" notice was showing); with access granted by `appops`, window 0.
+- **Fired:** 8 Feb 04:34:03, id 3000, "Suhoor ends at 5:34 am / Fajr begins in 1h 0m", channel `suhoor_vn0` ("Suhoor reminder",
+  importance high, sound `content://settings/system/notification_sound`, `USAGE_NOTIFICATION`, `mBypassDnd=false`, the prayer
+  vibration). The `SILENT` flag on it and on the prayer alerts is Android 16's notification cooldown after several alerts fired at
+  once by the clock jumps (as recorded for 18 Oct); the app sets silent only on the next prayer badge.
+- **Adhan chosen in the dialog:** 10 Feb 04:31:01 posted on `suhoor_vn772d62db`, sound `android.resource://com.sajdatime.app/raw/adhan`;
+  `suhoor_vn0` `mDeleted=true`. **Back to the phone tone:** 11 Feb 04:29:02 on `suhoor_vn0`, "Suhoor ends at 5:29 am", the adhan
+  channel `mDeleted=true`. So the phone's settings list one "Suhoor reminder" at a time.
+- **One miss:** 9 Feb (adhan chosen) did not post after the clock was set by hand to 04:32:55 for an 04:33:00 alarm; the alarm was gone
+  and the next day's was booked. Most likely a re-plan from the clock change in the same second (lesson 171); not reproduced on the two
+  clean runs. Not run: the Alarm style for the reminder, Android 7 to 12, a real phone.
 
 **The Ramadan window and the widgets following the app's Theme, phone emulator (19 Oct 2026, 22:00 UK, Mac
 session; the cloud to Mac hand-off in §11, RELEASE-1.5.0.md step 1).** `sajda` (Android 16) started
@@ -5451,7 +5491,73 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 19 Oct 2026 (read this first; the 18 Oct late block below still holds for everything not named here)
+### 📍 STATE OF PLAY, 21 Oct 2026 (read this first; the 19 Oct block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is ready on `claude/quiet-glass` (pushed, not merged), now with the suhoor
+reminder on by default and a rewritten store listing. He submits on MONDAY 2 NOVEMBER 2026 (his choice, 21 Oct;
+it was 9 Nov). A final check runs by itself on Fri 30 Oct at noon. Start nothing else.**
+
+- **The owner, 21 Oct 2026:** "make it completely ready for the release because I could do it earlier", "Ramadan
+  option should be enabled", "Suhoor Reminder to be enabled - 60 mins before suhoor ends by default unless the user
+  switches it off - Only during ramadan then off itself automatically", and later "the playstore descriptions,
+  features, screenshots and other should be written properly. Do not [miss] features like widget and other things.
+  If required use [the Fable skill] for better output and keep everything ready."
+- **His answers (one AskUserQuestion):** default style Notification (not Alarm); the reminder never plays the adhan
+  unless the person chooses it for the reminder ("Never the adhan but if the user wants to choose it then they should
+  be able to select adhaan"); one combined notice line; submit Mon 2 Nov (Claude's recommendation: 1.4.0 has then had
+  two weeks alone and its description review has time to finish).
+- **Ramadan option:** already on by default (`ramadanCardEnabled = true` since 1.4.0); nothing to change.
+- **Built:** §5.19 item 8 (the rule and every rejected option). Code: `SettingsRepository` (default 60,
+  `suhoorUsesAdhan`, `prayersUseAlarm`), `SuhoorReminderPlan.kt` (`suhoorSoundUri`), `Notifications`
+  (`ensureSuhoorChannel`, `suhoorChannelId`), `PrayerAlarmReceiver`, the Suhoor dialog's sound chips,
+  `RamadanCard` (the notice line with the person's minutes). Strings `settings_suhoor_help` and the new
+  `ramadan_eve_card_on_reminder` in en, ur, tr, in, ar (`check-translation.py` 0 errors in each). Four new unit
+  tests in `RamadanSettingsDefaultsTest`; `NotificationSoundTest` changed for the row rule (the suhoor reminder no
+  longer brings up the Notification sound row). `privacy.html` (the suhoor line, no date change: release day sets
+  it), README, ARCHITECTURE.
+- **Gate:** `clean test lint :app:bundleRelease :wear:bundleRelease`, after the review fixes: **421 unit tests** (app
+  272, core 131 with 1 opt-in skip, wear 18), 0 failed, lint 0 errors, both bundles built (9,608,552 and 3,658,445 bytes).
+- **Independent review (a subagent, the whole diff), fixed:** (must) a person whose only alarm is the suhoor reminder
+  could no longer reach "Play on silent", which lives in the Alarm sound row that now shows only for prayer alarms: the
+  switch is repeated in the suhoor dialog when its style is Alarm (new unit test); (should) the sound chip now reads "Your
+  phone's default alarm" when the style is Alarm, and the help says "your phone's own sound" (five languages, 0 errors);
+  the suhoor channel is renamed with the app's language in `ensureChannels` like the prayer channels; the notice names the
+  reminder only if notifications can be shown at all (`canPost`); two stale comments; a bracket in LISTING.md. **Told
+  to the owner, not changed (his call):** someone who muted SajdaTime's "Prayer times" channel in the phone's own
+  settings will still get the suhoor reminder, because it is a new channel at high importance; and someone who turned
+  every prayer alert off in the app gets it too. Notes left as they are: switching the reminder between Notification and
+  Alarm deletes and recreates its channel (one "Suhoor reminder" in the list either way, Android restores its settings);
+  the defaults test reads source text (the store reader is private); the two chip rows have no heading for TalkBack.
+  Checked by the review and fine: defaults and reading, channel ids, the below-O sound path, `suhoorSoundUri` following
+  the school, the gating, the device tests, the four translations, every listing claim, the eight translated listings
+  (French and Hindi line by line). The notice window never runs ahead of the Settings rows (`showsSettings` covers
+  `showsNotice`), so "turn either off in Settings" is true whenever it shows.
+- **Emulator (`sajda`, Android 16, read only, debug build, data cleared then `ScreenSeedDeviceTest`, London), §10
+  top entry:** PASS. Settings row "60 minutes before Fajr · Notification"; 6 Feb 2027 the notice line with "60
+  minutes"; no reminder booked before Ramadan; on the eve one for 8 Feb 04:34 (Fajr 05:34); it posted at 04:34 on
+  `suhoor_vn0` with the phone's notification sound, `USAGE_NOTIFICATION`, no DND bypass; Adhan chosen: 10 Feb posted
+  on `suhoor_vn772d62db` with `raw/adhan` and the old channel deleted; back to the tone: 11 Feb on `suhoor_vn0`, the
+  adhan channel deleted. One run (9 Feb) did not post: the clock had just been moved by hand, and most likely a re-plan
+  in the same second dropped the reminder as past (lesson 171; reasoned, its log was not kept); the clean runs either side posted. Clock and automatic time put
+  back; emulator shut down.
+- **Store listing rewritten (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026", 3971 / 4000):** regrouped by what a user
+  looks for, and five things the 19 Oct text left out are now named (silent next prayer notification, Play on silent,
+  Eid greeting, widgets' town and theme, the suhoor reminder on by default). The five What's new texts changed for
+  the reminder (en 483, ur 487, tr 488, in 461, ar 379). The eight translated listings rebuilt from the new English
+  by a separate agent (Fable model) and measured (all under 4000; Indonesian, Malay and French leave out the far north
+  bullet to fit, as on 19 Oct); disclaimer and FREE sections byte for byte unchanged. Short description unchanged
+  (still needs his yes on release day).
+- **Store screenshots:** read against this change, none shows anything it touched (`05-settings` shows only Location to
+  Language; the notice and the sound rows appear in none of the six), so none was retaken. The 30 Oct job still
+  compares all six by measurement (RELEASE-1.5.0.md step 0b).
+- **Scheduled jobs moved for the 2 Nov submit (all read back):** final check job `sajdatime-1-5-0-reminder` Fri 30 Oct
+  2026 12:00 UK (was Mon 2 Nov), its prompt updated; "leave the Mac on" `trig_01Bpzq4t8wJCQZwABsC53ys8` Thu 29 Oct
+  18:00 (was Sun 1 Nov); submit reminder `trig_01VexqUd1cJz8jfD5QFT874W` Mon 2 Nov 09:00 (was 9 Nov); daily health
+  check `trig_0129FQnWihf8XG6rKLCB4oFr` expects 1.5.0 from 2 Nov and warns only on 9 Nov, 16 Nov 2026 and 18 Jan 2027.
+- **Not verified:** a real phone (his standing choice); Android 7 to 12 for the new channel (the below-O path is read,
+  not run); the Alarm style for the suhoor reminder on the emulator (unit tested and read; same code path as the
+  Notification run with a different usage); TalkBack on the two new chips (they are the same `ChoiceChip` as the
+  style chips beside them).
 
 **In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`) and now
 also carries everything the unmerged 8 Oct branch had, audited, approved by the owner and retested. Nothing is
@@ -10131,3 +10237,15 @@ matters more than the stable hashes, that is the trade being made.
     with `<include>`), which forces a fresh inflate on every switch. Found by reading the framework, before
     building, 19 Oct 2026; the device test checks the System step last for that reason, straight after the theme
     opposite to the phone's (with the matching one before it, a surviving colour would equal System's and pass). Not seen on a device.
+170. **A second alert with its own sound must not share a channel family that keeps only one channel alive.** The
+    prayer notification channels are kept to one at a time (`ensureNotificationChannel` deletes the others), which is
+    right while every prayer shares one sound. When the suhoor reminder got a sound of its own (21 Oct 2026), posting
+    it through the same family would have deleted the prayer channel at 4 am and restored it at Fajr, every day of
+    Ramadan, and deleting a channel also cancels whatever is showing on it. The fix is a family of its own
+    (`suhoor_v…`) that tidies only itself. Found by reading before building.
+171. **Moving an emulator's clock by hand can swallow an exact alarm.** Every `date` change sends `TIME_SET`, the app
+    re-plans, and a re-plan that lands in the same second as an alarm sees it as past and drops it (the plan keeps only
+    future times, on purpose). On 21 Oct 2026 one of three suhoor runs did not post, most likely for this reason (the
+    log of that run was cleared before it was read, so the cause is reasoned, not seen); the two clean runs either
+    side posted on the second. Set the clock 10 or more seconds before the alarm and change nothing until it fires; a run
+    that did not post after a hand-moved clock is not a defect until it repeats on a clean run.

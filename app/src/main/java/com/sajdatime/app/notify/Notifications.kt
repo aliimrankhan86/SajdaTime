@@ -61,6 +61,14 @@ object Notifications {
      */
     private const val CHANNEL_NOTIFICATION_PREFIX = "prayer_notif_v"
 
+    /**
+     * The suhoor reminder's own channel (21 Oct 2026). It used to share the prayer channels, but it no
+     * longer shares their sound (it is the phone's usual tone unless the person picks the adhan for it),
+     * and the prayer channels keep only one of each kind alive, so sharing would delete and restore the
+     * prayer channel at every reminder. See [ensureSuhoorChannel].
+     */
+    private const val CHANNEL_SUHOOR_PREFIX = "suhoor_v"
+
     const val ID_ONGOING = 1000
     private const val ID_PRAYER_BASE = 2000
 
@@ -127,6 +135,13 @@ object Notifications {
                 channel.name = context.getString(if (alarm) R.string.channel_alarm else R.string.channel_prayers)
                 channel.description =
                     context.getString(if (alarm) R.string.channel_alarm_desc else R.string.channel_prayers_desc)
+                manager.createNotificationChannel(channel)
+            }
+        // The suhoor reminder's channel too, or its name would wait a year for the next Ramadan.
+        manager.notificationChannels
+            .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) }
+            .forEach { channel ->
+                channel.name = context.getString(R.string.settings_suhoor)
                 manager.createNotificationChannel(channel)
             }
     }
@@ -281,6 +296,57 @@ object Notifications {
             ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) ==
             PackageManager.PERMISSION_GRANTED
 
+    internal fun suhoorChannelId(style: AlertStyle, soundUri: String, bypassesDnd: Boolean): String {
+        val alarm = style == AlertStyle.ALARM
+        return CHANNEL_SUHOOR_PREFIX + (if (alarm) "a" else "n") + soundUri.hashCode().toUInt().toString(16) +
+            if (alarm && bypassesDnd) "_dnd" else ""
+    }
+
+    /**
+     * Creates the suhoor reminder's channel for [style] and [soundUri] (blank is the phone's usual tone)
+     * and deletes the one before it, so the phone's settings list a single "Suhoor reminder". An Alarm
+     * plays on the alarm volume and, with Do Not Disturb access, bypasses it, exactly as a prayer alarm
+     * does ([ensureAlarmChannel] says why the id changes with access); a Notification follows the phone.
+     */
+    fun ensureSuhoorChannel(context: Context, style: AlertStyle, soundUri: String): String {
+        val alarm = style == AlertStyle.ALARM
+        val id = suhoorChannelId(style, soundUri, bypassesDnd = alarm && hasDndAccess(context))
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+        val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+        val named = AppLocale.wrap(context)
+
+        manager.notificationChannels
+            .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) && it.id != id }
+            .forEach { manager.deleteNotificationChannel(it.id) }
+
+        manager.createNotificationChannel(
+            // No description: the in-app help says "choose the adhan here", untrue in the phone's settings.
+            NotificationChannel(id, named.getString(R.string.settings_suhoor), NotificationManager.IMPORTANCE_HIGH).apply {
+                enableVibration(true)
+                vibrationPattern = PRAYER_VIBRATION
+                if (alarm) {
+                    setSound(
+                        resolveAlarmSound(soundUri),
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build(),
+                    )
+                    setBypassDnd(true)
+                } else if (soundUri.isNotBlank()) {
+                    setSound(
+                        soundUri.toUri(),
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build(),
+                    )
+                }
+            },
+        )
+        return id
+    }
+
     /**
      * Opens the system list where the user gives SajdaTime Do Not Disturb access, and the
      * app's own notification settings on the rare phone that has no such list.
@@ -384,13 +450,13 @@ object Notifications {
     }
 
     /**
-     * The optional suhoor reminder: "Suhoor ends at 05:10 / Fajr begins in 30m", a little before Fajr
+     * The suhoor reminder (on by default since 1.5.0): "Suhoor ends at 05:10 / Fajr begins in 30m", a little before Fajr
      * on the days of Ramadan.
      *
      * It goes through exactly the same style rules as a prayer alert ([effectiveAlertStyle]: a silent
-     * phone, a projected polar time) and the same two channels, so a person who has already chosen
-     * how loud their alerts are gets no surprise, and there is no third channel to explain in system
-     * settings. The shade entry clears itself at Fajr, because "Fajr begins in 30m" left on the screen
+     * phone, a projected polar time), on its own channel with its own sound ([ensureSuhoorChannel]):
+     * [soundUri] is blank for the phone's usual tone or the school's adhan when the person picked it,
+     * never the prayer sounds (owner, 21 Oct 2026). The shade entry clears itself at Fajr, because "Fajr begins in 30m" left on the screen
      * after Fajr is a statement that has stopped being true.
      *
      * The countdown in the body is rounded to the nearest minute from [now]. An alarm delivered a few
@@ -401,11 +467,10 @@ object Notifications {
         fajrAt: Instant,
         now: Instant,
         style: AlertStyle,
-        alarmSoundUri: String,
+        soundUri: String,
         respectSilent: Boolean,
         approximate: Boolean = false,
         alarmOnApproximate: Boolean = false,
-        notificationSoundUri: String = "",
     ) {
         val context = AppLocale.wrap(base)
         if (!canPost(context)) return
@@ -420,7 +485,7 @@ object Notifications {
         )
 
         val shownFrom = fajrAt.minusSeconds(60L * suhoorMinutesLeft(now, fajrAt))
-        val builder = NotificationCompat.Builder(context, alertChannelId(context, effectiveStyle, alarmSoundUri, notificationSoundUri))
+        val builder = NotificationCompat.Builder(context, ensureSuhoorChannel(context, effectiveStyle, soundUri))
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.notif_suhoor_title, TimeFormat.clock(context, fajrAt)))
             .setContentText(
@@ -435,7 +500,7 @@ object Notifications {
             .setTimeoutAfter(Duration.between(now, fajrAt).toMillis().coerceAtLeast(1L))
             .setContentIntent(openAppIntent(context))
             .markIfApproximate(context, approximate)
-            .applyStyle(effectiveStyle, alarmSoundUri, notificationSoundUri)
+            .applyStyle(effectiveStyle, soundUri, soundUri)
 
         post(context, ID_SUHOOR, builder.build())
     }

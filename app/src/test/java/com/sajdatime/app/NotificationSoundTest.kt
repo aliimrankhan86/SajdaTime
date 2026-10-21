@@ -56,7 +56,8 @@ class NotificationSoundTest {
     fun `the notification sound row shows only while something is a notification`() {
         val allAlarm = AppSettings(alertFor = PrayerSlot.entries.filter { it.isPrayer }.associateWith { AlertStyle.ALARM })
         assertFalse(allAlarm.usesNotification)
-        assertTrue(allAlarm.copy(suhoorReminderMinutes = 30, suhoorReminderStyle = AlertStyle.NOTIFICATION).usesNotification)
+        // The suhoor reminder has its own sound since 21 Oct 2026, so it no longer brings this row up.
+        assertFalse(allAlarm.copy(suhoorReminderMinutes = 30, suhoorReminderStyle = AlertStyle.NOTIFICATION).usesNotification)
         assertTrue(AppSettings(alertFor = mapOf(PrayerSlot.FAJR to AlertStyle.NOTIFICATION)).usesNotification)
         assertFalse(AppSettings(alertFor = emptyMap()).usesNotification)
     }
