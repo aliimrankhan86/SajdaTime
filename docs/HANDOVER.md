@@ -5547,6 +5547,20 @@ it was 9 Nov). A final check runs by itself on Fri 30 Oct at noon. Start nothing
   by a separate agent (Fable model) and measured (all under 4000; Indonesian, Malay and French leave out the far north
   bullet to fit, as on 19 Oct); disclaimer and FREE sections byte for byte unchanged. Short description unchanged
   (still needs his yes on release day).
+- **`release-1.5.0.sh`, four runs on 21 Oct 2026; the last, on `bab51ab`, is clean: 23 of 24 lines PASS or TAKEN,
+  phone SKIPPED (his choice).** Gate 421 unit tests (app 272, core 131, wear 18), 0 failed, lint 0 in all three;
+  phone bundle 9 / 1.5.0, 9,608,652 bytes, watch 1002 / 1.5.0, 3,658,445 bytes, both signed CN=Ali Imran Khan and
+  copied to `~/Developer/SajdaTime/SajdaTime-1.5.0/`; English only phone gets ar, in, tr, ur; the same 11 and 3
+  permissions; device suite 26 of 26; suhoor alarms 1, Ramadan 4, widgets 5, widgets at 2.0 text 5, PDF 2, seed 1;
+  timetable sheet opened; screens TAKEN. **What the first three runs found, all in the tests' timing, none in what a
+  user sees:** run 1 (`baae663`) and run 2 (`f6cfafe`): `SuhoorReminderDeviceTest` raced the app's own reschedules
+  after the clock jump into Ramadan, now that the reminder is on by default (lesson 171; the test now reschedules
+  until the app settles, commits `f6cfafe` and `a3f9f91`). Run 3 (`a3f9f91`): `LanguageAndDndDeviceTest` found the
+  withdrawn Do Not Disturb channel brought back by the channel rename pass running at the same moment (lesson 172; a
+  real, rare race in the app, fixed by one lock over every channel write, `bab51ab`, independently reviewed, then the
+  class 10 of 10 and the whole run clean). In the script's run the eve notice shows the line without the reminder:
+  that emulator never grants notification permission, and the line names the reminder only when notifications can
+  show (it did, with permission granted, in the by-hand check of §10).
 - **Store screenshots:** read against this change, none shows anything it touched (`05-settings` shows only Location to
   Language; the notice and the sound rows appear in none of the six), so none was retaken. The 30 Oct job still
   compares all six by measurement (RELEASE-1.5.0.md step 0b).
@@ -10248,4 +10262,16 @@ matters more than the stable hashes, that is the trade being made.
     future times, on purpose). On 21 Oct 2026 one of three suhoor runs did not post, most likely for this reason (the
     log of that run was cleared before it was read, so the cause is reasoned, not seen); the two clean runs either
     side posted on the second. Set the clock 10 or more seconds before the alarm and change nothing until it fires; a run
-    that did not post after a hand-moved clock is not a defect until it repeats on a clean run.
+    that did not post after a hand-moved clock is not a defect until it repeats on a clean run. **The same race hit the
+    device tests** once the reminder was on by default: `release-1.5.0.sh` moves the clock from October into Ramadan,
+    which fires the overdue prayer alarms, the time change receiver and the daily worker, each rescheduling on its own
+    thread with settings read a moment earlier, so `SuhoorReminderDeviceTest` saw a reminder laid down after it had
+    switched it off, then a prayer list read mid-rewrite. The test now reschedules until the app settles before each
+    assertion; a real fault survives every reschedule and still fails.
+172. **Re-creating channels from a list read a moment earlier can bring back one just deleted.** The rename pass in
+    `ensureChannels` (lesson 160) re-creates each channel it listed; if `ensureAlarmChannel` deletes the Do Not
+    Disturb channel between the listing and the re-create, it comes back. `LanguageAndDndDeviceTest` caught it twice
+    in about ten runs on 21 Oct 2026, the rename set off by the language tests just before it. Fixed with one lock
+    held by every function that lists, creates or deletes a channel (`Notifications.channelLock`). Still open, older
+    than the lock and rare: an id chosen under the lock is posted to after release, so an alert posted in the same
+    instant access is withdrawn could land on a channel just deleted.

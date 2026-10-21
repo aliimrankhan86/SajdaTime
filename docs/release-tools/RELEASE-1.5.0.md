@@ -11,7 +11,7 @@ run moves to Mon 2 Nov 2026 and the reminders to match ("Scheduled jobs" below).
 **Fri 30 Oct 2026 at 12:00 noon UK**, the "leave the Mac on" reminder comes Thu 29 Oct 18:00, the submit reminder Mon 2 Nov
 09:00. Also on 21 Oct: **the suhoor reminder is on by default, 60 minutes before Fajr, a Notification on the phone's usual
 tone, the adhan only if chosen for it** (HANDOVER §5.19 item 8), and **the store listing was rewritten** to name every
-feature (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026"; the eight translations rebuilt). Gate 421 unit tests, independent review done and acted on. HANDOVER §11
+feature (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026"; the eight translations rebuilt). Gate 421 unit tests, independent review done and acted on, and `release-1.5.0.sh` clean on `bab51ab` (23 of 24, phone SKIPPED; device suite 26 of 26). HANDOVER §11
 STATE OF PLAY 21 Oct has the rest.
 
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
