@@ -78,6 +78,26 @@ class SuhoorReminderDeviceTest {
      * fault survives every reschedule and still fails. In the app the same race is harmless, because the
      * receiver checks the setting again when the reminder fires (shouldPostReminder).
      */
+    /**
+     * The prayer alarms once the app has stopped rewriting them: reschedule and read until two readings in a
+     * row agree (up to 10 seconds), and, given [expected], until they equal it. The second release-1.5.0.sh run
+     * of 21 Oct 2026 read 3 of 22 Feb's 5 prayer alarms while one of the app's own reschedules was between its
+     * cancel and its writes, then all 5 a moment later. Concurrent reschedules always end with the full set
+     * (same request codes, the last write wins), so only a reading taken mid-flight is wrong. A suhoor reminder
+     * that really moved a prayer alarm does so on every reschedule and still fails.
+     */
+    private fun settledPrayers(pkg: String, expected: List<java.time.LocalDateTime>? = null): List<java.time.LocalDateTime> {
+        var last = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+        repeat(20) {
+            Thread.sleep(500)
+            reschedule()
+            val now = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+            if (now == last && now.isNotEmpty() && (expected == null || now == expected)) return now
+            last = now
+        }
+        return last
+    }
+
     private fun settledReminders(pkg: String, count: Int): List<java.time.LocalDateTime> {
         var found = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
         repeat(20) {
@@ -105,7 +125,7 @@ class SuhoorReminderDeviceTest {
         val pkg = context.packageName
         runBlocking { repository.setSuhoorReminderMinutes(0) }
         reschedule()
-        val prayersBefore = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+        val prayersBefore = settledPrayers(pkg)
         assertTrue("no prayer alarms to compare against", prayersBefore.isNotEmpty())
         assertEquals("a reminder exists while it is switched off", 0, settledReminders(pkg, 0).size)
 
@@ -118,11 +138,11 @@ class SuhoorReminderDeviceTest {
             expected.map { it.at.atZone(zone).toLocalDateTime().withNano(0) },
             reminders,
         )
-        assertEquals("a prayer alarm moved or went", prayersBefore, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER))
+        assertEquals("a prayer alarm moved or went", prayersBefore, settledPrayers(pkg, prayersBefore))
 
         runBlocking { repository.setSuhoorReminderMinutes(0) }
         reschedule()
         assertEquals("switching it off left a reminder behind", 0, settledReminders(pkg, 0).size)
-        assertEquals("a prayer alarm moved or went", prayersBefore, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER))
+        assertEquals("a prayer alarm moved or went", prayersBefore, settledPrayers(pkg, prayersBefore))
     }
 }
