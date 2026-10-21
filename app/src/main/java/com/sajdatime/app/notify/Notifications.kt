@@ -81,69 +81,83 @@ object Notifications {
     /** One short buzz for the heads up before a prayer: a nudge, not an alert. */
     private val REMINDER_VIBRATION = longArrayOf(0, 200)
 
+    /**
+     * One writer of SajdaTime's notification channels at a time (21 Oct 2026). The renaming pass in
+     * [ensureChannels] re-creates every channel from a list read a moment earlier, so if it ran beside
+     * [ensureAlarmChannel] deleting the Do Not Disturb channel after access was taken away, it brought that
+     * channel back: `LanguageAndDndDeviceTest` failed that way twice in about ten runs on 21 Oct, the
+     * rename set off by the language tests just before it. The same would hold for the suhoor channel.
+     * Everything that lists, creates or deletes a channel holds this lock; JVM locks are re-entrant, so
+     * a caller that already holds it cannot deadlock. ponytail: one lock for all channels, which is
+     * plenty for a handful of channel writes a day.
+     */
+    private val channelLock = Any()
+
     /** Two firm pulses: noticeable in a pocket, not startling in a quiet room. */
     private val PRAYER_VIBRATION = longArrayOf(0, 350, 250, 350)
 
     fun ensureChannels(base: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        // Wrapped, so the channel names in the phone's settings are in the app's language. Below
-        // Android 13 a language picked in the app lives only in AppLocale.wrap, and the callers
-        // pass a bare application context too, so the names would flip with each caller (19 Oct 2026).
-        val context = AppLocale.wrap(base)
-        val manager = context.getSystemService(NotificationManager::class.java) ?: return
+        synchronized(channelLock) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+            // Wrapped, so the channel names in the phone's settings are in the app's language. Below
+            // Android 13 a language picked in the app lives only in AppLocale.wrap, and the callers
+            // pass a bare application context too, so the names would flip with each caller (19 Oct 2026).
+            val context = AppLocale.wrap(base)
+            val manager = context.getSystemService(NotificationManager::class.java) ?: return
 
-        // Not while a chosen sound's channel stands in for it: two "Prayer times" entries in the
-        // phone's settings, one doing nothing, would let someone turn off the wrong one.
-        if (manager.notificationChannels.none { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }) {
-            createPrayersChannel(context, manager)
+            // Not while a chosen sound's channel stands in for it: two "Prayer times" entries in the
+            // phone's settings, one doing nothing, would let someone turn off the wrong one.
+            if (manager.notificationChannels.none { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }) {
+                createPrayersChannel(context, manager)
+            }
+
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    CHANNEL_REMINDERS,
+                    context.getString(R.string.settings_prayer_reminder),
+                    // DEFAULT, not HIGH: it lands in the shade without popping over what is on screen.
+                    NotificationManager.IMPORTANCE_DEFAULT,
+                ).apply {
+                    description = context.getString(R.string.settings_prayer_reminder_help)
+                    setSound(null, null)
+                    enableVibration(true)
+                    vibrationPattern = REMINDER_VIBRATION
+                },
+            )
+
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    CHANNEL_ONGOING,
+                    context.getString(R.string.channel_ongoing),
+                    // LOW keeps the badge silent — it is a glanceable status, not an alert.
+                    NotificationManager.IMPORTANCE_LOW,
+                ).apply {
+                    description = context.getString(R.string.channel_ongoing_desc)
+                    setShowBadge(false)
+                },
+            )
+
+            // The channels made for a chosen sound keep the name they were first given, so they are
+            // renamed here too, in the app's language: on the Android 12 emulator with Urdu chosen,
+            // "Prayer alarm" stayed English beside three Urdu names (19 Oct 2026). The system's own
+            // object goes back, so its importance, sound and Do Not Disturb flag stay exactly as they are.
+            manager.notificationChannels
+                .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) || it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }
+                .forEach { channel ->
+                    val alarm = channel.id.startsWith(CHANNEL_ALARM_PREFIX)
+                    channel.name = context.getString(if (alarm) R.string.channel_alarm else R.string.channel_prayers)
+                    channel.description =
+                        context.getString(if (alarm) R.string.channel_alarm_desc else R.string.channel_prayers_desc)
+                    manager.createNotificationChannel(channel)
+                }
+            // The suhoor reminder's channel too, or its name would wait a year for the next Ramadan.
+            manager.notificationChannels
+                .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) }
+                .forEach { channel ->
+                    channel.name = context.getString(R.string.settings_suhoor)
+                    manager.createNotificationChannel(channel)
+                }
         }
-
-        manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_REMINDERS,
-                context.getString(R.string.settings_prayer_reminder),
-                // DEFAULT, not HIGH: it lands in the shade without popping over what is on screen.
-                NotificationManager.IMPORTANCE_DEFAULT,
-            ).apply {
-                description = context.getString(R.string.settings_prayer_reminder_help)
-                setSound(null, null)
-                enableVibration(true)
-                vibrationPattern = REMINDER_VIBRATION
-            },
-        )
-
-        manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_ONGOING,
-                context.getString(R.string.channel_ongoing),
-                // LOW keeps the badge silent — it is a glanceable status, not an alert.
-                NotificationManager.IMPORTANCE_LOW,
-            ).apply {
-                description = context.getString(R.string.channel_ongoing_desc)
-                setShowBadge(false)
-            },
-        )
-
-        // The channels made for a chosen sound keep the name they were first given, so they are
-        // renamed here too, in the app's language: on the Android 12 emulator with Urdu chosen,
-        // "Prayer alarm" stayed English beside three Urdu names (19 Oct 2026). The system's own
-        // object goes back, so its importance, sound and Do Not Disturb flag stay exactly as they are.
-        manager.notificationChannels
-            .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) || it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) }
-            .forEach { channel ->
-                val alarm = channel.id.startsWith(CHANNEL_ALARM_PREFIX)
-                channel.name = context.getString(if (alarm) R.string.channel_alarm else R.string.channel_prayers)
-                channel.description =
-                    context.getString(if (alarm) R.string.channel_alarm_desc else R.string.channel_prayers_desc)
-                manager.createNotificationChannel(channel)
-            }
-        // The suhoor reminder's channel too, or its name would wait a year for the next Ramadan.
-        manager.notificationChannels
-            .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) }
-            .forEach { channel ->
-                channel.name = context.getString(R.string.settings_suhoor)
-                manager.createNotificationChannel(channel)
-            }
     }
 
     /**
@@ -177,49 +191,51 @@ object Notifications {
      * settings beside three Urdu names (emulator, 19 Oct 2026).
      */
     fun ensureAlarmChannel(context: Context, soundUri: String): String {
-        val id = alarmChannelId(soundUri, bypassesDnd = hasDndAccess(context))
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+        synchronized(channelLock) {
+            val id = alarmChannelId(soundUri, bypassesDnd = hasDndAccess(context))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
 
-        val manager = context.getSystemService(NotificationManager::class.java) ?: return id
-        val named = AppLocale.wrap(context)
+            val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+            val named = AppLocale.wrap(context)
 
-        manager.notificationChannels
-            .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) && it.id != id }
-            .forEach { manager.deleteNotificationChannel(it.id) }
+            manager.notificationChannels
+                .filter { it.id.startsWith(CHANNEL_ALARM_PREFIX) && it.id != id }
+                .forEach { manager.deleteNotificationChannel(it.id) }
 
-        manager.createNotificationChannel(
-            NotificationChannel(
-                id,
-                named.getString(R.string.channel_alarm),
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                description = named.getString(R.string.channel_alarm_desc)
-                enableVibration(true)
-                vibrationPattern = PRAYER_VIBRATION
-                setSound(
-                    resolveAlarmSound(soundUri),
-                    AudioAttributes.Builder()
-                        // USAGE_ALARM is what actually carries this through Do Not Disturb,
-                        // together with CATEGORY_ALARM on the notification itself. DND
-                        // allows alarms by default, so this needs no special permission.
-                        // Verified on an API 36 emulator under ZEN_MODE_IMPORTANT_
-                        // INTERRUPTIONS: the prayer alarm posted with mIntercept=false
-                        // while the silent next-prayer badge was correctly intercepted.
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build(),
-                )
-                // The second, stronger mechanism, and the one the Settings button asks for.
-                // USAGE_ALARM above passes Do Not Disturb only while the user's DND rules
-                // allow alarms; a bypassing channel passes even when they do not. Android
-                // honours this only if the user has given SajdaTime Do Not Disturb access
-                // (ACCESS_NOTIFICATION_POLICY in the manifest puts the app on that list);
-                // without access the channel reads back mBypassDnd=false, which is why the id
-                // changes once access is granted (alarmChannelId).
-                setBypassDnd(true)
-            },
-        )
-        return id
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    id,
+                    named.getString(R.string.channel_alarm),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    description = named.getString(R.string.channel_alarm_desc)
+                    enableVibration(true)
+                    vibrationPattern = PRAYER_VIBRATION
+                    setSound(
+                        resolveAlarmSound(soundUri),
+                        AudioAttributes.Builder()
+                            // USAGE_ALARM is what actually carries this through Do Not Disturb,
+                            // together with CATEGORY_ALARM on the notification itself. DND
+                            // allows alarms by default, so this needs no special permission.
+                            // Verified on an API 36 emulator under ZEN_MODE_IMPORTANT_
+                            // INTERRUPTIONS: the prayer alarm posted with mIntercept=false
+                            // while the silent next-prayer badge was correctly intercepted.
+                            .setUsage(AudioAttributes.USAGE_ALARM)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build(),
+                    )
+                    // The second, stronger mechanism, and the one the Settings button asks for.
+                    // USAGE_ALARM above passes Do Not Disturb only while the user's DND rules
+                    // allow alarms; a bypassing channel passes even when they do not. Android
+                    // honours this only if the user has given SajdaTime Do Not Disturb access
+                    // (ACCESS_NOTIFICATION_POLICY in the manifest puts the app on that list);
+                    // without access the channel reads back mBypassDnd=false, which is why the id
+                    // changes once access is granted (alarmChannelId).
+                    setBypassDnd(true)
+                },
+            )
+            return id
+        }
     }
 
     /** The original prayer notification channel, the phone's usual tone. */
@@ -254,41 +270,43 @@ object Notifications {
      * NotificationManager.deleteNotificationChannel), so going back to the usual tone loses nothing.
      */
     fun ensureNotificationChannel(context: Context, soundUri: String): String {
-        val id = notificationChannelId(soundUri)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
-        val manager = context.getSystemService(NotificationManager::class.java) ?: return id
-        // Named in the app's language and created again every time, as the alarm channel is.
-        val named = AppLocale.wrap(context)
+        synchronized(channelLock) {
+            val id = notificationChannelId(soundUri)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+            val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+            // Named in the app's language and created again every time, as the alarm channel is.
+            val named = AppLocale.wrap(context)
 
-        manager.notificationChannels
-            .filter { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) && it.id != id }
-            .forEach { manager.deleteNotificationChannel(it.id) }
+            manager.notificationChannels
+                .filter { it.id.startsWith(CHANNEL_NOTIFICATION_PREFIX) && it.id != id }
+                .forEach { manager.deleteNotificationChannel(it.id) }
 
-        if (id == CHANNEL_PRAYERS) {
-            createPrayersChannel(named, manager)
+            if (id == CHANNEL_PRAYERS) {
+                createPrayersChannel(named, manager)
+                return id
+            }
+            manager.deleteNotificationChannel(CHANNEL_PRAYERS)
+
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    id,
+                    named.getString(R.string.channel_prayers),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    description = named.getString(R.string.channel_prayers_desc)
+                    enableVibration(true)
+                    vibrationPattern = PRAYER_VIBRATION
+                    setSound(
+                        soundUri.toUri(),
+                        AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build(),
+                    )
+                },
+            )
             return id
         }
-        manager.deleteNotificationChannel(CHANNEL_PRAYERS)
-
-        manager.createNotificationChannel(
-            NotificationChannel(
-                id,
-                named.getString(R.string.channel_prayers),
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                description = named.getString(R.string.channel_prayers_desc)
-                enableVibration(true)
-                vibrationPattern = PRAYER_VIBRATION
-                setSound(
-                    soundUri.toUri(),
-                    AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build(),
-                )
-            },
-        )
-        return id
     }
 
     fun canPost(context: Context): Boolean =
@@ -309,42 +327,44 @@ object Notifications {
      * does ([ensureAlarmChannel] says why the id changes with access); a Notification follows the phone.
      */
     fun ensureSuhoorChannel(context: Context, style: AlertStyle, soundUri: String): String {
-        val alarm = style == AlertStyle.ALARM
-        val id = suhoorChannelId(style, soundUri, bypassesDnd = alarm && hasDndAccess(context))
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
-        val manager = context.getSystemService(NotificationManager::class.java) ?: return id
-        val named = AppLocale.wrap(context)
+        synchronized(channelLock) {
+            val alarm = style == AlertStyle.ALARM
+            val id = suhoorChannelId(style, soundUri, bypassesDnd = alarm && hasDndAccess(context))
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return id
+            val manager = context.getSystemService(NotificationManager::class.java) ?: return id
+            val named = AppLocale.wrap(context)
 
-        manager.notificationChannels
-            .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) && it.id != id }
-            .forEach { manager.deleteNotificationChannel(it.id) }
+            manager.notificationChannels
+                .filter { it.id.startsWith(CHANNEL_SUHOOR_PREFIX) && it.id != id }
+                .forEach { manager.deleteNotificationChannel(it.id) }
 
-        manager.createNotificationChannel(
-            // No description: the in-app help says "choose the adhan here", untrue in the phone's settings.
-            NotificationChannel(id, named.getString(R.string.settings_suhoor), NotificationManager.IMPORTANCE_HIGH).apply {
-                enableVibration(true)
-                vibrationPattern = PRAYER_VIBRATION
-                if (alarm) {
-                    setSound(
-                        resolveAlarmSound(soundUri),
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_ALARM)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build(),
-                    )
-                    setBypassDnd(true)
-                } else if (soundUri.isNotBlank()) {
-                    setSound(
-                        soundUri.toUri(),
-                        AudioAttributes.Builder()
-                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                            .build(),
-                    )
-                }
-            },
-        )
-        return id
+            manager.createNotificationChannel(
+                // No description: the in-app help says "choose the adhan here", untrue in the phone's settings.
+                NotificationChannel(id, named.getString(R.string.settings_suhoor), NotificationManager.IMPORTANCE_HIGH).apply {
+                    enableVibration(true)
+                    vibrationPattern = PRAYER_VIBRATION
+                    if (alarm) {
+                        setSound(
+                            resolveAlarmSound(soundUri),
+                            AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_ALARM)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .build(),
+                        )
+                        setBypassDnd(true)
+                    } else if (soundUri.isNotBlank()) {
+                        setSound(
+                            soundUri.toUri(),
+                            AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .build(),
+                        )
+                    }
+                },
+            )
+            return id
+        }
     }
 
     /**
