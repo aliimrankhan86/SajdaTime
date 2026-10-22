@@ -5599,9 +5599,20 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 22 Oct 2026 (read this first; the 21 Oct block below still holds for everything not named here)
 
-**In one line: 1.4.0 is live; 1.5.0 now also lets the watch show and change its location. That fix is on branch
-`ccr-5bc4a235-0hmiy4`, cut from `claude/quiet-glass` at 8274843 and pushed; it must be merged into `claude/quiet-glass`
-before the Fri 30 Oct final check runs, or that check tests 1.5.0 without it. Release day is still not fixed.**
+**In one line: 1.4.0 is live; 1.5.0 now also lets the watch show and change its location, and that work is IN
+`claude/quiet-glass` (the cloud session fast forwarded the branch on 22 Oct 2026 with the owner's yes; it was built on
+`ccr-5bc4a235-0hmiy4`, which now points at the same commits). Release day is still not fixed.**
+
+**▶ NEXT LOCAL SESSION ON THE MAC, START HERE (the owner asked, 22 Oct 2026: "make sure my local session reads this work
+in the next session"):**
+1. `git fetch origin`, check out `claude/quiet-glass`, `git pull`. `git log --oneline -3` must show "Watch: show which
+   place the times are for, and let the wearer change it" and the handover commit after it. If it does not, the pull
+   did not happen: stop and do it, because everything below depends on it.
+2. Read this block, then §5.27 (the rules) and the §10 top entry (what was and was not verified).
+3. Bring GBrain `projects/sajdatime` up to date from this block (the cloud session had no GBrain tool).
+4. Run RELEASE-1.5.0.md step 0c on the watch emulator (it is also folded into the Fri 30 Oct final check, so if that job
+   has already run, read its results instead). Fix anything it shows. **Never ask the owner to test the watch.**
+5. Then tell the owner in two lines what the emulator showed, and carry on with the 21 Oct block.
 
 - **The owner, 22 Oct 2026:** "on the wearable the user cant select or change their location. It should be fixed and
   tested and completed for the release." Confirmed in the code, and worse than reported: the watch's own GPS replaced a
@@ -5620,10 +5631,9 @@ before the Fri 30 Oct final check runs, or that check tests 1.5.0 without it. Re
   permission dialog itself, the Data Layer path end to end, TalkBack. The 30 Oct job's `release-1.5.0.sh` and
   `tools/wear-verify.sh` run cover the first two; RELEASE-1.5.0.md step 0c says what to look at. **Never ask the owner to
   test the watch** (CLAUDE.md): if the Mac's emulator shows a fault, Claude fixes it.
-- **Left to do, and whose job:** **Owner (or a Mac session with his yes):** merge `ccr-5bc4a235-0hmiy4` into
-  `claude/quiet-glass` (a fast forward: nothing else has moved on that branch since 8274843), before Fri 30 Oct.
-  **Claude, Mac session:** run step 0c and update GBrain `projects/sajdatime` from this block (this cloud session had no
-  GBrain tool, so it is not updated yet). Everything else is as in the 21 Oct block.
+- **Left to do, and whose job:** **Claude, the next Mac session:** the five steps at the top of this block. **Owner:**
+  nothing new; the merge he would otherwise have done was the fast forward above. Everything else is as in the 21 Oct
+  block.
 
 ### 📍 STATE OF PLAY, 21 Oct 2026 (read this first; the 19 Oct block below still holds for everything not named here)
 

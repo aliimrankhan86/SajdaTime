@@ -189,8 +189,8 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
 (not fixed)**, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027). Where a line below says
 "the preparation job (Mon 2 Nov)" or "the 2 Nov job", read the final check job of Fri 30 Oct. Replaced: the 19 Oct plan (1 Nov, 2 Nov, 9 Nov) and the January plan.
 
-0c. **Watch Location screen (added 22 Oct 2026, HANDOVER §5.27, §10 top entry). First merge `ccr-5bc4a235-0hmiy4` into
-   `claude/quiet-glass`** (a fast forward from 8274843; the owner, or a Mac session with his yes). Then, in the 30 Oct run:
+0c. **Watch Location screen (added 22 Oct 2026, HANDOVER §5.27, §10 top entry). Already in `claude/quiet-glass`**
+   (fast forwarded by the cloud session with the owner's yes; pull first). In the 30 Oct run, or in the next Mac session:
    `tools/wear-verify.sh` on both round sizes and both font scales, and look at the times list scrolled to the place
    button and to the end (the school button must still sit clear of the clock exactly as before), and at the Location
    screen; open it, choose This watch, Same as phone and Makkah in turn and check the place button follows. It was
