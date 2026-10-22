@@ -3,6 +3,7 @@ package com.sajdatime.wear
 import android.content.Context
 import android.os.SystemClock
 import android.text.format.DateFormat
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,6 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
@@ -55,10 +57,12 @@ import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.Text
 import com.sajdatime.core.AppLocale
+import com.sajdatime.core.Coordinates
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
@@ -117,37 +121,63 @@ private fun roundListPadding(fromScaffold: PaddingValues): PaddingValues = Paddi
     bottom = (LocalConfiguration.current.screenHeightDp * 0.20f).dp,
 )
 
+/** The two settings screens opened from the times list. */
+private enum class SettingsPage { NONE, SCHOOL, LOCATION }
+
 @Composable
-fun WearApp(viewModel: WearViewModel) {
+fun WearApp(viewModel: WearViewModel, onRequestLocationPermission: () -> Unit = {}) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     // Two pages, swiped left and right. On a small round screen this beats a menu.
     val pager = rememberPagerState(pageCount = { 2 })
-    var choosingSchool by rememberSaveable { mutableStateOf(false) }
+    var settingsPage by rememberSaveable { mutableStateOf(SettingsPage.NONE) }
 
     LaunchedEffect(pager.currentPage) {
         viewModel.setQiblaVisible(pager.currentPage == PAGE_QIBLA)
     }
 
+    // Back from a settings screen returns to the times rather than closing the app.
+    BackHandler(enabled = settingsPage != SettingsPage.NONE) { settingsPage = SettingsPage.NONE }
+
     AppScaffold {
-        if (choosingSchool) {
-            // A full screen rather than a third pager page. Two pages are already the most
-            // a user will discover by swiping; a setting they touch once does not deserve
-            // to sit permanently between the times and the Qibla.
-            SchoolPage(
-                sect = state.settings.sect,
-                madhab = state.settings.madhab,
-                onSelectSect = viewModel::setSect,
-                onSelectMadhab = viewModel::setMadhab,
-                onDone = { choosingSchool = false },
-            )
-            return@AppScaffold
+        // Full screens rather than more pager pages. Two pages are already the most a user
+        // will discover by swiping; a setting they touch once does not deserve to sit
+        // permanently between the times and the Qibla.
+        when (settingsPage) {
+            SettingsPage.SCHOOL -> {
+                SchoolPage(
+                    sect = state.settings.sect,
+                    madhab = state.settings.madhab,
+                    onSelectSect = viewModel::setSect,
+                    onSelectMadhab = viewModel::setMadhab,
+                    onDone = { settingsPage = SettingsPage.NONE },
+                )
+                return@AppScaffold
+            }
+
+            SettingsPage.LOCATION -> {
+                LocationPage(
+                    state = state,
+                    onChoose = { source ->
+                        // Asked here, on the tap, so the question appears as the answer to it.
+                        if (source == LocationSource.WATCH && !viewModel.watchLocationAllowed()) {
+                            onRequestLocationPermission()
+                        }
+                        viewModel.chooseLocation(source)
+                    },
+                    onDone = { settingsPage = SettingsPage.NONE },
+                )
+                return@AppScaffold
+            }
+
+            SettingsPage.NONE -> Unit
         }
         HorizontalPager(state = pager, modifier = Modifier.fillMaxSize()) { page ->
             when (page) {
                 PAGE_TIMES -> TimesPage(
                     state = state,
                     onUseDefaultLocation = viewModel::useDefaultLocation,
-                    onChooseSchool = { choosingSchool = true },
+                    onChooseLocation = { settingsPage = SettingsPage.LOCATION },
+                    onChooseSchool = { settingsPage = SettingsPage.SCHOOL },
                 )
 
                 else -> QiblaPage(state)
@@ -160,6 +190,7 @@ fun WearApp(viewModel: WearViewModel) {
 private fun TimesPage(
     state: WearUiState,
     onUseDefaultLocation: () -> Unit,
+    onChooseLocation: () -> Unit,
     onChooseSchool: () -> Unit,
 ) {
     // initialCenterItemIndex = 0, not the default 1: ScalingLazyColumn otherwise opens
@@ -289,6 +320,54 @@ private fun TimesPage(
                             },
                         )
                     }
+                }
+
+                // The place these times are for, and the way to change it. Until 1.5.0 the watch
+                // never said, and nothing on it could change it (see LocationSource).
+                //
+                // Here, between the times and the disclaimer, and not at the foot of the list. The
+                // foot is the school button's, for the reasons given above it: at the end of the
+                // scroll the last item rests on the bottom inset and the one before it rises into
+                // the cap of the circle, under the clock, which is what the disclaimer is there to
+                // absorb. A second button at the foot would be that item. In the middle it passes
+                // through the centre of the screen on the way down, which is where a round list is
+                // meant to be tapped, and the first screen and the end of the scroll are as they were.
+                item {
+                    Button(
+                        onClick = onChooseLocation,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_place),
+                                // The secondary label says "Location", so the pin needs no words.
+                                contentDescription = null,
+                            )
+                        },
+                        secondaryLabel = {
+                            Text(
+                                text = stringResource(R.string.wear_location),
+                                style = MaterialTheme.typography.labelSmall,
+                            )
+                        },
+                        label = {
+                            Text(
+                                text = placeText(
+                                    state.settings.coordinates,
+                                    state.settings.cityName,
+                                    unnamed = if (state.settings.coordinates == state.settings.phoneCoordinates) {
+                                        R.string.wear_place_phone
+                                    } else {
+                                        R.string.wear_place_watch
+                                    },
+                                ),
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        },
+                    )
                 }
 
                 item {
@@ -427,12 +506,124 @@ private fun SchoolPage(
     }
 }
 
+/** A place in words: the city, Makkah in the watch's language, or what kind of place it is. */
+@Composable
+private fun placeText(
+    coordinates: Coordinates?,
+    name: String,
+    unnamed: Int = R.string.wear_place_watch,
+): String = when (val label = placeLabel(coordinates, name)) {
+    null -> stringResource(R.string.wear_no_location_title)
+    PlaceLabel.Makkah -> stringResource(R.string.wear_place_makkah)
+    is PlaceLabel.Named -> label.name
+    PlaceLabel.Unnamed -> stringResource(unnamed)
+}
+
+/**
+ * Where the times come from, chosen on the watch: the phone's place, this watch's own, or Makkah.
+ * Same shape as [SchoolPage]. A city is chosen on the phone, not here (see [LocationSource] for why).
+ */
+@Composable
+private fun LocationPage(
+    state: WearUiState,
+    onChoose: (LocationSource) -> Unit,
+    onDone: () -> Unit,
+) {
+    val settings = state.settings
+    val shown = shownSource(settings)
+    val listState = rememberScalingLazyListState()
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        ScalingLazyColumn(
+            state = listState,
+            autoCentering = null,
+            contentPadding = roundListPadding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            item {
+                Text(
+                    text = stringResource(R.string.wear_location),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(top = 44.dp, bottom = 4.dp),
+                )
+            }
+            item {
+                // Offered only once the phone has sent a place, because before that there is
+                // nothing for it to mean. Disabled rather than hidden, so a watch without the
+                // phone app still learns where a city can be chosen.
+                val phone = settings.phoneCoordinates
+                ChoiceChip(
+                    label = stringResource(R.string.wear_location_phone),
+                    secondaryLabel = if (phone == null) {
+                        stringResource(R.string.wear_location_phone_missing)
+                    } else {
+                        placeText(phone, settings.phoneCityName, unnamed = R.string.wear_place_phone)
+                    },
+                    isSelected = shown == LocationSource.PHONE,
+                    enabled = phone != null,
+                    onClick = { onChoose(LocationSource.PHONE) },
+                )
+            }
+            item {
+                ChoiceChip(
+                    label = stringResource(R.string.wear_location_watch),
+                    secondaryLabel = if (shown == LocationSource.WATCH && state.findingWatchFix) {
+                        stringResource(R.string.wear_locating)
+                    } else {
+                        null
+                    },
+                    isSelected = shown == LocationSource.WATCH,
+                    onClick = { onChoose(LocationSource.WATCH) },
+                )
+            }
+            if (shown == LocationSource.WATCH && state.watchLocationUnavailable) {
+                item {
+                    // The times stay on the last place meanwhile, so this says what to do rather
+                    // than leaving "This watch" selected over a place it did not find.
+                    Text(
+                        text = stringResource(R.string.wear_location_watch_unavailable),
+                        style = MaterialTheme.typography.bodyExtraSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+            }
+            item {
+                ChoiceChip(
+                    label = stringResource(R.string.wear_place_makkah),
+                    isSelected = shown == LocationSource.MAKKAH,
+                    onClick = { onChoose(LocationSource.MAKKAH) },
+                )
+            }
+            item {
+                Button(
+                    onClick = onDone,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+                    label = {
+                        Text(
+                            text = stringResource(android.R.string.ok),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    },
+                )
+            }
+        }
+    }
+}
+
 /**
  * A full-width selectable row. Wear has no radio button worth using at 192dp, so the
  * selected option is carried by the filled versus outlined treatment instead.
  */
 @Composable
-private fun ChoiceChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
+private fun ChoiceChip(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    secondaryLabel: String? = null,
+    enabled: Boolean = true,
+) {
     val colours = if (isSelected) {
         ButtonDefaults.buttonColors()
     } else {
@@ -440,17 +631,28 @@ private fun ChoiceChip(label: String, isSelected: Boolean, onClick: () -> Unit) 
     }
     Button(
         onClick = onClick,
+        enabled = enabled,
         colors = colours,
         // Without the border the unselected options render as bare text on black and stop
         // looking tappable at all, which on a 192dp screen is the difference between an
         // option and a label.
-        border = if (isSelected) null else ButtonDefaults.outlinedButtonBorder(enabled = true),
+        border = if (isSelected) null else ButtonDefaults.outlinedButtonBorder(enabled = enabled),
         // Filled versus outlined is the only visual cue, so the selected state has to be
         // stated outright for a screen reader rather than left to the colours.
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 2.dp)
             .semantics { selected = isSelected },
+        secondaryLabel = secondaryLabel?.let { text ->
+            {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelSmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
+        },
         label = {
             Text(
                 text = label,

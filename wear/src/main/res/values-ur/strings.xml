@@ -10,6 +10,14 @@
     <string name="wear_no_location_title">ابھی مقام نہیں</string>
     <string name="wear_no_location_body">فون پر SajdaTime کھولیں، یا فی الحال مکہ استعمال کریں۔</string>
     <string name="wear_use_makkah">مکہ استعمال کریں</string>
+    <string name="wear_location">مقام</string>
+    <string name="wear_location_phone">فون کے مطابق</string>
+    <string name="wear_location_phone_missing">فون پر SajdaTime کھولیں</string>
+    <string name="wear_location_watch">یہ گھڑی</string>
+    <string name="wear_location_watch_unavailable">یہ گھڑی اپنا مقام نہیں ڈھونڈ پا رہی۔ گھڑی کی سیٹنگز میں مقام آن کریں اور SajdaTime کو اجازت دیں۔</string>
+    <string name="wear_place_makkah">مکہ</string>
+    <string name="wear_place_watch">اس گھڑی کا مقام</string>
+    <string name="wear_place_phone">آپ کے فون کا مقام</string>
     <string name="wear_disclaimer">حسابی اوقات ہیں، فتویٰ نہیں۔ اپنی مسجد کی پیروی کریں۔</string>
     <string name="wear_polar_notice">تخمینی۔ یہاں آج سورج نہ طلوع ہوتا ہے نہ غروب، اس لیے یہ %1$d° سے لیے گئے ہیں۔ اپنی مسجد سے پوچھیں۔</string>
     <string name="wear_school">مکتبِ فکر</string>

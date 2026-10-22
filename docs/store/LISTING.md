@@ -341,11 +341,12 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-**Watch 1.5.0 note** `194 / 500` (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
-19 Oct 2026 tile timeline):
+**Watch 1.5.0 note** `295 / 500` (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
+19 Oct 2026 tile timeline; the location sentence added 22 Oct 2026 with the watch's Location screen, HANDOVER §5.27,
+measured by Python `len`; it was `194 / 500`):
 
 ```
-Now in Urdu, Turkish, Indonesian and Arabic. The tile's countdown now updates every minute. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
+Now in Urdu, Turkish, Indonesian and Arabic. You can now see and change the watch's location: the same as your phone, the watch's own, or Makkah. The tile's countdown now updates every minute. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
 ```
 
 The translated listings for the same release are in `LISTING-LOCALES.md`, "1.5.0".

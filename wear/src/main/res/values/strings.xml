@@ -14,6 +14,20 @@
     <string name="wear_no_location_title">No location yet</string>
     <string name="wear_no_location_body">Open SajdaTime on your phone, or use Makkah for now.</string>
     <string name="wear_use_makkah">Use Makkah</string>
+    <!--
+      The place, chosen on the watch (added 22 Oct 2026, 1.5.0). Before this the watch never said
+      which place its times were for and nothing on it could change it. See LocationSource in
+      WearLocation.kt. The place button sits in the middle of the times list, so its label may take
+      two lines without touching the end of the scroll. A city is chosen on the phone, never typed here.
+    -->
+    <string name="wear_location">Location</string>
+    <string name="wear_location_phone">Same as phone</string>
+    <string name="wear_location_phone_missing">Open SajdaTime on your phone</string>
+    <string name="wear_location_watch">This watch</string>
+    <string name="wear_location_watch_unavailable">This watch cannot find its location. In the watch\'s settings, turn location on and allow it for SajdaTime.</string>
+    <string name="wear_place_makkah">Makkah</string>
+    <string name="wear_place_watch">This watch\'s location</string>
+    <string name="wear_place_phone">Your phone\'s location</string>
 
     <!--
       The watch had no disclaimer at all, so a user who only ever glanced at their wrist

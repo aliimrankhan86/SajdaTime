@@ -15,6 +15,14 @@
     <string name="wear_no_location_title">لا يوجد موقع بعد</string>
     <string name="wear_no_location_body">افتح SajdaTime على هاتفك، أو استخدم مكة الآن.</string>
     <string name="wear_use_makkah">استخدم مكة</string>
+    <string name="wear_location">الموقع</string>
+    <string name="wear_location_phone">مطابق للهاتف</string>
+    <string name="wear_location_phone_missing">افتح SajdaTime على هاتفك</string>
+    <string name="wear_location_watch">هذه الساعة</string>
+    <string name="wear_location_watch_unavailable">لا تستطيع هذه الساعة تحديد موقعها. شغّل الموقع في إعدادات الساعة واسمح به لتطبيق SajdaTime.</string>
+    <string name="wear_place_makkah">مكة</string>
+    <string name="wear_place_watch">موقع هذه الساعة</string>
+    <string name="wear_place_phone">موقع هاتفك</string>
     <string name="wear_disclaimer">مساعد، وليس مرجعًا دينيًا. الأوقات محسوبة. اتبع مسجدك.</string>
     <string name="wear_polar_notice">تقريبية. لا تشرق الشمس هنا أو تغرب اليوم، لذا تُحسب من خط العرض %1$d°. اسأل مسجدك.</string>
     <string name="wear_school">الانتماء المذهبي</string>

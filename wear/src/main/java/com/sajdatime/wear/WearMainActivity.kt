@@ -28,7 +28,14 @@ class WearMainActivity : ComponentActivity() {
 
         setContent {
             SajdaWearTheme {
-                WearApp(viewModel)
+                WearApp(
+                    viewModel = viewModel,
+                    // Choosing "This watch" after a "Don't allow" asks again. If the watch no longer
+                    // shows the question at all, the Location screen says where to allow it.
+                    onRequestLocationPermission = {
+                        locationPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    },
+                )
             }
         }
 

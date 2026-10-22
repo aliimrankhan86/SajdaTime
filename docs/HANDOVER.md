@@ -511,6 +511,10 @@ Because that sync is unverified and a watch may have no phone app at all, the ti
 ends in a button showing the school the times were calculated with, which opens a sect and
 madhab picker. See item 7 under "Not done" for why that is not optional.
 
+**From 1.5.0 the times list also shows the place** (a pin button between the times and the disclaimer) and opens a
+Location screen: Same as phone, This watch, or Makkah. Automatic, the default, follows the phone once it has sent a place.
+Rules, placement and rejected options: §5.27.
+
 The times list opens with `initialCenterItemIndex = 0`. The default is 1, which centred
 the second item and slid the countdown card up until the watch face clock sat on top of
 the prayer name — the one thing the app exists to show.
@@ -1852,6 +1856,68 @@ signed with the same key, on the paired phone); secret scanning with push protec
    the owner did not object.** It stops most third party apps reaching Gmail and Drive, which would cut off his Claude
    connectors and n8n. With passkeys in place, the extra protection is small.
 
+### 5.27 The watch's location: shown, and chosen on the wrist (owner's report 22 Oct 2026, ships in 1.5.0)
+
+**The report:** "on the wearable the user cant select or change their location". True, and worse than it sounds. Before
+this the watch had no rule at all for its place: whichever wrote last won. (1) The phone's sync wrote it. (2) The watch's
+own fix overwrote it **every time the app opened** (`onResume` called `refreshLocation`, which adopted any cached fix). So
+a person who chose Lahore on the phone saw Lahore's times on the wrist only until they next raised it, then the watch's
+own position, with nothing on screen saying which. (3) "Use Makkah" on the "No location yet" screen was the only control,
+and once used, a watch with no fix and no phone app had no way to leave it. The watch never named its place anywhere.
+
+**The rule now (`wear/.../WearLocation.kt`, `WearSettings.kt`):**
+1. A stored `location_source`: absent means **automatic**, or PHONE, WATCH, MAKKAH. Automatic is the default for everyone,
+   including every watch upgrading from 1.2.0.
+2. **Automatic follows the phone once the phone has sent a real place, and uses the watch's own fix only while it never
+   has** (`acceptsPhoneLocation`, `acceptsWatchFix`). Reason: the phone is where a city is chosen, and two devices from one
+   app showing two sets of times is this project's worst bug class (§10, "What running both emulators side by side
+   caught"). **"Real" excludes the phone's own Makkah fallback** (`isRealPlace`): the phone sends Makkah like any place
+   when it has no location, and following it would pin a watch with working GPS to Makkah's times. In automatic, a phone
+   Makkah is taken only when the watch has no real place of its own (found by the independent review, 22 Oct 2026).
+2a. **Upgrade:** a 1.2.0 watch has only the old `latitude`, `longitude`, `city` keys. The old watch wrote its own fix with
+   no name and its fallback as "Makkah", so a named place there that is not Makkah can only have come from the phone, and
+   is treated as the phone's place from the first open (`phonePlace`), then copied into the phone keys on the first write.
+   Without this the old bug would have lasted until the phone app next ran (found by the review).
+3. The phone's last place is **always** kept in its own keys (`phone_latitude`, `phone_longitude`, `phone_city`), even
+   while the watch uses another, so "Same as phone" can be chosen at any time and names the place it means.
+4. The watch's fix is accepted or dropped **inside the DataStore write**, against what is stored at that moment, so a fix
+   that lands after a choice or a sync cannot undo it (`adoptWatchFix`).
+5. "Use Makkah" on "No location yet" is still a **fallback**, not a choice: it leaves the source alone, so the first real
+   fix or phone place replaces it, as before. Choosing Makkah on the Location screen is deliberate and sticks.
+6. A phone payload with no coordinates no longer blanks the watch's place name (it used to write the empty city alone).
+   Coordinates are now range checked when written as well as when read.
+7. In automatic with a phone place, and in PHONE or MAKKAH, the watch does not ask its GPS at all (`refreshLocation` reads
+   the store first): no wasted fix, no battery.
+
+**On screen (`WearApp.kt`):** a place button in the times list (pin, the place name, "Location" under it) opens a Location
+screen shaped like the School screen: **Same as phone** (with the phone's place under it; disabled with "Open SajdaTime on
+your phone" until the phone has sent one), **This watch** (asks for location access on the tap if it is not allowed; shows
+"Finding your location" while a fix is on its way; if none comes, a line says to turn location on and allow it), and
+**Makkah**, then OK. A place with no name (a watch fix) reads "This watch's location"; Makkah is recognised by its
+coordinates and shown in the watch's language. Back from either settings screen now returns to the times (`BackHandler`)
+instead of leaving the app (the back button; whether a swipe right on Wear OS goes through it is not checked, and before
+this a swipe on the School screen closed the app, so it is no worse). Strings in en, ur, tr, in, ar (`check-translation.py` 0 errors in each).
+
+**Where the button sits, and why:** between the times and the disclaimer, not at the foot. The foot belongs to the school
+button (see its comment and `roundListPadding`): at the end of the scroll the item before the last rises under the clock,
+which is what the disclaimer is there to absorb, so a second button at the foot would be the one buried. In the middle it
+passes through the centre of the screen, where a round list is tapped. The first screen and the end of the scroll are
+unchanged (checked in captures, §10).
+
+**Rejected, with reasons:**
+- **City search on the watch.** Typing on a watch is poor, and a name needs a geocoder, which on Wear OS is missing or
+  answered by Google over the network: a new data flow, a new `INTERNET` permission on the watch and a privacy policy change,
+  for something the phone already does. A city is chosen on the phone and "Same as phone" carries it. An offline city list
+  stays the owner's open decision (§5.21 item 6).
+- **Naming the watch's own fix with the watch's geocoder.** Same reason: it would send the watch's position to Google.
+- **Watch's own fix wins in automatic (the old behaviour).** It silently overrode a city chosen on the phone.
+- **A second button at the foot of the list, or a combined "Settings" button.** The first buries a control under the clock at
+  the end of the scroll; the second costs the school picker an extra tap and hides which school is in use.
+- **Reading the phone's existing Data Layer item at watch start-up.** It would fill "Same as phone" a little sooner after the
+  upgrade, but the phone publishes on every recalculation anyway, and it is one more path that cannot be run here.
+
+**Privacy:** no change. Nothing new leaves the watch; the phone to watch transfer `docs/privacy.html` describes is unchanged.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -2235,6 +2301,46 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**The watch's Location screen (22 Oct 2026, cloud session, no emulator; §5.27).** A cloud container has no KVM, so no
+emulator: everything below ran on Robolectric 4.17 (Android 15 framework, native graphics) in a scratch copy that was
+**not committed** (lesson 132), driving the **real** `WearMainActivity`, `WearViewModel` and DataStore, with Robolectric's
+`LocationManager` standing in for the watch's GPS. **15 of 15 scenarios PASS:**
+- **The owner's bug, reproduced first:** phone sent Lahore, the watch's own GPS says Manchester, location allowed, open the
+  app. **On the untouched 1.5.0 code (`origin/claude/quiet-glass` at 8274843) the store held Manchester afterwards (FAIL,
+  "expected Lahore but was 53.4808, -2.2426")**; on the fixed code it holds Lahore.
+- Tap the place button, the Location screen opens with "Same as phone · Lahore" selected; This watch adopts Manchester with
+  no name; a phone sync of Karachi while This watch is chosen is stored aside and does not move the watch; Same as phone
+  moves to Karachi; Makkah sticks through a later phone sync of Lahore; OK returns to the times, which read Makkah.
+- No phone, location not allowed: "No location yet", Use Makkah, then the Location screen shows Same as phone disabled with
+  "Open SajdaTime on your phone"; This watch asks for location access again on the tap (the request was recorded) and shows
+  "This watch cannot find its location..."; allowing it and resuming adopts Manchester and the line goes.
+- The "No location yet" Makkah is still a fallback: the first real fix replaces it.
+- **Review finding 1:** the phone's own Makkah fallback with the watch's GPS working: the watch keeps Manchester through
+  two phone sends of Makkah, then follows the phone's real Lahore.
+- **Review finding 2:** a 1.2.0 store with Lahore only in the old keys: the first open keeps Lahore, Same as phone shows it,
+  This watch moves to Manchester and Lahore stays on offer (migrated to the phone keys), Same as phone brings it back.
+- Back from the Location screen returns to the times with the activity still resumed (`onBackPressedDispatcher`).
+- **Captures, 192dp and 227dp round, watch mode, font 1.0 and 1.3, English, Arabic, Urdu, Turkish, Indonesian** (the
+  times list at the top, at the place button, at the end; the Location screen top and end): the first screen is unchanged
+  (the button is below the fold on both sizes); at the end of the scroll the disclaimer and school button sit as before,
+  the place button passed on the way; the Location screen fits at 192dp and 1.3 ("Same as phone" wraps to two lines);
+  Arabic and Urdu mirror correctly (pin on the right, scroll bar on the left). **`tools/wear-round-check.py` fails every
+  one of these captures, the unchanged first screen included,** because Robolectric's software renderer does not apply
+  the list's edge fading (lesson 174), so it is no evidence either way; they were judged by eye.
+- **Gate in the cloud:** `clean test lint :app:bundleRelease :wear:bundleRelease`: **430 unit tests (app 272, core 131 with
+  1 opt in skip, wear 27), 0 failed**, lint 0 errors in all three, both bundles built (unsigned here: 9,596,951 and
+  3,704,164 bytes). `check-translation.py` 0 errors in ur, tr, in, ar.
+- **Independent review** (a subagent, the whole diff, read only): no must fix; three should fix, all fixed and each then
+  run in the harness (the two above, and a tappable flash of "No location yet" on the first fix); notes fixed: a stale
+  in-flight fix cancelled before a cached one is adopted, the unnamed label follows the place in use, a stale comment.
+  Left as notes: the "cannot find" line can show for a moment behind the permission dialog; quick taps can start a fix the
+  store then drops (no visible effect).
+- **Not verified:** a real watch or a Wear emulator (the Mac's `release-1.5.0.sh` and `tools/wear-verify.sh` cover it on
+  the next run, which is also where the bezel check means something); a swipe right on the Location screen (system
+  swipe to dismiss, see §5.27); the permission dialog itself (Robolectric records the request, it draws no dialog); the
+  phone to watch Data Layer (the store call the sync service makes was driven directly, the service is unchanged);
+  TalkBack on the new controls (the chips keep `selected` semantics, the pin has no description because "Location" is read).
 
 **The suhoor reminder on by default, phone emulator (21 Oct 2026, Mac session; §5.19 item 8, §11 STATE OF PLAY 21 Oct).**
 `sajda` (Android 16) started `-read-only`, the debug build of the uncommitted change installed, app data cleared, `POST_NOTIFICATIONS`
@@ -5491,6 +5597,34 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 22 Oct 2026 (read this first; the 21 Oct block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 now also lets the watch show and change its location. That fix is on branch
+`ccr-5bc4a235-0hmiy4`, cut from `claude/quiet-glass` at 8274843 and pushed; it must be merged into `claude/quiet-glass`
+before the Fri 30 Oct final check runs, or that check tests 1.5.0 without it. Release day is still not fixed.**
+
+- **The owner, 22 Oct 2026:** "on the wearable the user cant select or change their location. It should be fixed and
+  tested and completed for the release." Confirmed in the code, and worse than reported: the watch's own GPS replaced a
+  city chosen on the phone every time the watch app opened, and the watch never said which place its times were for.
+- **Built (§5.27, the rules and every rejected option):** a place button in the watch's times list and a Location screen
+  (Same as phone, This watch, Makkah); automatic by default, following the phone once it has sent a real place; the
+  phone's own Makkah fallback never pins a watch that can find itself; an upgraded watch keeps the phone's city from the
+  first open; back returns to the times. Strings in all five languages. No new permission, no network, no privacy change.
+  The watch note in `docs/store/LISTING.md` gains one sentence (295 / 500). No store screenshot changes (`w1` is the first
+  screen, which is unchanged).
+- **Verified (§10 top entry):** 15 of 15 harness scenarios on the real activity, view model and store (Robolectric, no
+  emulator in the cloud), with the owner's scenario first shown failing on the old code; captures at both round sizes, two
+  font scales and five languages, judged by eye; gate 430 unit tests (app 272, core 131, wear 27), 0 failed, lint 0
+  errors, both bundles built; independent review: no must fix, three should fix, all fixed and re-run.
+- **Not verified:** a real watch or a Wear emulator, the bezel check on real captures, the swipe right gesture, the
+  permission dialog itself, the Data Layer path end to end, TalkBack. The 30 Oct job's `release-1.5.0.sh` and
+  `tools/wear-verify.sh` run cover the first two; RELEASE-1.5.0.md step 0c says what to look at. **Never ask the owner to
+  test the watch** (CLAUDE.md): if the Mac's emulator shows a fault, Claude fixes it.
+- **Left to do, and whose job:** **Owner (or a Mac session with his yes):** merge `ccr-5bc4a235-0hmiy4` into
+  `claude/quiet-glass` (a fast forward: nothing else has moved on that branch since 8274843), before Fri 30 Oct.
+  **Claude, Mac session:** run step 0c and update GBrain `projects/sajdatime` from this block (this cloud session had no
+  GBrain tool, so it is not updated yet). Everything else is as in the 21 Oct block.
+
 ### 📍 STATE OF PLAY, 21 Oct 2026 (read this first; the 19 Oct block below still holds for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is ready on `claude/quiet-glass` (pushed, not merged), now with the suhoor
@@ -8491,6 +8625,10 @@ Any other analytics, event, parameter or user property is still a non-goal until
 and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
 coordinates, or anything whose shape reveals them.**
 
+**A city search, or a geocoder, on the watch (decided 22 Oct 2026, §5.27).** The watch has no network permission and
+must not gain one for this: a city is chosen on the phone and the watch's Location screen offers "Same as phone". The watch
+names its own fix "This watch's location" rather than look the name up. Do not add `INTERNET` to the watch to "improve" it.
+
 **Exception recorded 3 Oct 2026: the consent screen for usage counts.** The next paragraph forbids
 asking the user for things. A privacy consent is not a growth ask, it is required before data can
 be sent, so it is allowed, **once**, at setup and from Settings. It must never appear in or after
@@ -10287,3 +10425,16 @@ matters more than the stable hashes, that is the trade being made.
     held by every function that lists, creates or deletes a channel (`Notifications.channelLock`). Still open, older
     than the lock and rare: an id chosen under the lock is posted to after release, so an alert posted in the same
     instant access is withdrawn could land on a channel just deleted.
+173. **"Last writer wins" is not a rule, and a value with three writers needs one.** The watch's place had three
+    writers (phone sync, the watch's own fix on every open, the Makkah fallback) and no rule between them, so the
+    watch's GPS quietly replaced a city chosen on the phone each time the app opened, and nothing on the watch could
+    show or change it (§5.27). Every module was "correct"; the fault was that nobody owned the decision. When a stored
+    value gains a second writer, write down which one wins and decide it inside the write, against what is stored then.
+174. **In a Robolectric harness, a DataStore write started from the main thread never finishes unless the main looper is
+    turned.** DataStore runs the `edit` transform back in the caller's context, which is the paused main looper, so a
+    harness that waits with `rule.waitUntil` sees the write "not happen" and blames the app. Call
+    `shadowOf(Looper.getMainLooper()).idle()` inside the wait. Also: `captureToImage` times out there (draw the
+    `window.decorView` into a bitmap instead), the qualifiers need `-round-watch-` or Robolectric draws a phone title
+    bar, the `preferencesDataStore` singleton and `ShadowLocationManager` keep state across tests (clear both in
+    `@Before`), and the software renderer skips the list's edge fading, so `tools/wear-round-check.py` fails every
+    capture of a list, changed or not. Judge those captures by eye, and only against the same render of the old code.

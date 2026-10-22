@@ -10,6 +10,14 @@
     <string name="wear_no_location_title">Henüz konum yok</string>
     <string name="wear_no_location_body">Telefonunuzda SajdaTime\'ı açın ya da şimdilik Mekke\'yi kullanın.</string>
     <string name="wear_use_makkah">Mekke\'yi kullan</string>
+    <string name="wear_location">Konum</string>
+    <string name="wear_location_phone">Telefonla aynı</string>
+    <string name="wear_location_phone_missing">Telefonunuzda SajdaTime\'ı açın</string>
+    <string name="wear_location_watch">Bu saat</string>
+    <string name="wear_location_watch_unavailable">Bu saat konumunu bulamıyor. Saatin ayarlarında konumu açın ve SajdaTime\'a izin verin.</string>
+    <string name="wear_place_makkah">Mekke</string>
+    <string name="wear_place_watch">Bu saatin konumu</string>
+    <string name="wear_place_phone">Telefonunuzun konumu</string>
     <string name="wear_disclaimer">Bir yardımcı, dinî bir otorite değil. Vakitler hesaplanır. Caminize uyun.</string>
     <string name="wear_polar_notice">Yaklaşık. Burada bugün güneş doğmuyor ya da batmıyor, bu yüzden vakitler %1$d° enleminden alınır. Caminize sorun.</string>
     <string name="wear_school">Mezhep</string>
