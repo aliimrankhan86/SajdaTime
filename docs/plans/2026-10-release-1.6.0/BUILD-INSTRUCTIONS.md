@@ -63,7 +63,7 @@ ease of use, Usability, information to display aspect should be done by fable." 
 |---|---|---|---|---|
 | P | no (done) | main | none | yes |
 | 0 Foundations | no | `implementer` (`Motion.kt`, moving `tween` literals, the `DesignRulesTest` bans) | count `tween(` and `rememberInfiniteTransition` | yes |
-| 1 My prayers tab | **yes**: tab content order, off, paused and first day states, ring a11y wording | main (tracker data, `tracker_started`, review prompt exclusion); `implementer` for strings and tests | string parity, §4.1 counts | yes |
+| 1 My prayers tab | **yes**: tab content order, off, paused and first day states, ring a11y wording | main (tracker data, `tracker_started`, review prompt exclusion, every string in five languages); `implementer` wires the keys, layout and tests. The tab sends no screen event, so `privacy.html:125` stays at three screens | string parity, §4.1 counts | yes |
 | 2 Dates sheet, 2a Shia dates | **yes**: plain names, nothing celebratory on Ashura or Arbaeen | main (each date from a named Shia source) | none | yes, sources checked |
 | 3 Bell with Undo | **yes**: bell states, Undo message wording | main (alert restore logic, permission) | string parity | yes |
 | 4 Timetable | **yes**: day card content, Today marking, PDF sheet | `implementer` for the sheet; main for the PDF ranges | none | yes |
@@ -71,7 +71,7 @@ ease of use, Usability, information to display aspect should be done by fable." 
 | 6 Qibla | **yes**: direction sentence first, Details contents | `implementer` (`MeasurementSystem.kt`, layout) | none | yes |
 | 7 Jama'ah | **yes**: the out of window wording | main (codec v2, zone guard) | none | yes |
 | 8 Widgets | **yes**: the 4 by 1 strip content at each width | main (refresh scheduling); `implementer` for layouts and XML | resource and string parity | yes |
-| 9 Disclaimer move | **yes**: About row wording and order | `implementer` | find every use of removed keys | yes, plus the CLAUDE.md rule text |
+| 9 Disclaimer move | **yes**: About row wording and order | main (the strings and the CLAUDE.md rule text: a hard rule and religious wording); `implementer` moves the row and removes the first run screen | find every use of removed keys | yes, plus the CLAUDE.md rule text |
 | 10 Languages | **yes**: Language row subtitle | main (translations) | string parity in five languages | yes, religious terms |
 | 11 Release | **yes**: "What's new" and listing copy | main | counts for the release script | yes, full diff since 1.5.0 |
 
@@ -252,14 +252,14 @@ step starts only after his yes. Section numbers refer to `DETAILED-PLAN.md`.
 **Release checklist for step 11** (added 23 Oct 2026 from what 1.5.0's release day taught; none of it is new
 scope):
 - **Copy `release-1.5.0.sh` to `release-1.6.0.sh`** and change the counts (unit tests, device suite, screenshots,
-  `versionCode 10`). `set-release-date.sh` already moves both the privacy page date and the date pinned in
-  `UsageCountsTest`; on 1.5.0's day the test failed because only the page moved (HANDOVER §11, 23 Oct evening).
+  `versionCode 10`). `set-release-date.sh` moves both the privacy page date and the date pinned in
+  `UsageCountsTest` (on `main`; here once `main` is merged in, before step 0); on 1.5.0's day the test failed because only the page moved (`main`'s HANDOVER §11, 23 Oct evening block).
 - **Watch:** unchanged, so no new watch bundle. Leave the 1.5.0 watch release (1002) where it is in the Wear
   track, and say so in the Console walk through so nobody uploads the old bundle again.
 - **Data safety:** the tracker is kept on the phone only, so Play's form should not change (data that never
   leaves the device is not "collected" in Play's terms). Check the current answers against `docs/privacy.html`
   in the Console walk through; do not change them without Ali.
-- **Store listing:** the line "Coming soon to Chrome and Edge browsers" is in all nine languages. Update it if the
+- **Store listing:** the line "Coming soon to Chrome and Edge browsers" is in all nine languages (`docs/store/LISTING.md` for English, `LISTING-LOCALES.md` for the other eight). Update it if the
   extension has shipped, or take it out if it has slipped. The short description is Q24 (check with Ali).
 - **After it is live:** re-baseline the daily health check to 1.6.0, record "live on <date>" in HANDOVER §11 and
   PROJECT_BRIEF, and close the 1.6 progress list in §0.

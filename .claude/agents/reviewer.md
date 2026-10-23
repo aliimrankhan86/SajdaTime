@@ -19,3 +19,5 @@ Read `CLAUDE.md` first. Then review the diff you are given (`git diff` against t
 
 You may run read only commands and tests. Do not edit files. Output: findings ranked by severity with file and
 line and the concrete failure, then what you checked and found sound, then what you could not check.
+
+Use Bash for read only commands and tests only. Never write, move or delete a file, and never commit or push.

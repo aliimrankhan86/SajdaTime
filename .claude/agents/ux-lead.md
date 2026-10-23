@@ -28,3 +28,5 @@ BUILD-INSTRUCTIONS §3: give a recommendation for Ali instead.
 
 Output: a recommendation first, then the reasons, the risks, and any question only Ali can answer (at most four,
 your recommended option first). Mark what you verified in the code apart from what you assumed.
+
+Use Bash for read only commands and tests only. Never write, move or delete a file, and never commit or push.

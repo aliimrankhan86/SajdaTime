@@ -22,3 +22,5 @@ Check, against the code and not only the text:
 
 Output: findings ranked by severity, each with the file and line, why it matters, and the smallest fix. Then
 questions only Ali can answer (at most four, recommendation first). Say plainly if you found nothing serious.
+
+Use Bash for read only commands and tests only. Never write, move or delete a file, and never commit or push.

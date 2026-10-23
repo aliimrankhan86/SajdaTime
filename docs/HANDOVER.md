@@ -1954,7 +1954,8 @@ session (religious terms, CLAUDE.md), and the `reviewer` checks them.
 
 **Not tested:** the agent files were written in a cloud session on 23 Oct 2026. Their frontmatter parses as
 YAML, but no agent was run from them in that session. The first session that uses one should confirm it starts on
-the named model (the session's model list shows it) and record that in §10.
+the named model (the session's model list shows it) and record that in §10. If `fable` is not accepted as an
+alias, use the undated ID `claude-fable-5-1`.
 
 ## 6. Notification and alarm architecture
 
@@ -5709,6 +5710,7 @@ ordered build table, animation, development and testing guidance, and (§0.1) wh
 - **Do not show screenshots of that build to Ali as the new design.**
 - **The owner changed one hard rule:** the disclaimer will live in Settings, About, first row, and not be shown
   at first launch. CLAUDE.md is rewritten in the commit that builds it.
+- **The 23 Oct STATE OF PLAY just below predates PR #15's merge;** `main`'s 23 Oct evening block replaces its 1.5.0 lines (draft PR, "nothing until the 30 Oct job").
 - **1.5.0 is still first.** Its release day was 23 Oct 2026; it is live only when Play's "Updated on" moves from 17 Oct 2026.
 
 ### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
