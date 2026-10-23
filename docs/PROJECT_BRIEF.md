@@ -126,6 +126,9 @@ Ali decided on 16 Oct 2026:
     The same goes for the code (Ali: "useful for decision making now so when we develop ios app then things are
     still smooth"): where two choices cost the same, the one that carries over to iPhone wins, and every plan says
     in one line what it means for an iPhone version.
+  - **Fable works from what you already gave it:** the design system, the Pillars study, the UX notes, the ten
+    journeys, your 27 answers and the designs you picked before, and it uses the design skills already installed
+    when they help. Anything new to install is suggested to you first.
   - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
     routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
   - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and

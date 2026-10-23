@@ -95,6 +95,10 @@ Change taught you something (platform trap, wrong assumption, bug class reading 
   - **Fable does all thinking for what users see + verifies plans:** `ux-lead` does planning + brainstorming, user journeys, UX + UI, right icons, ease of use, premium look, what info screen shows, wording, every state (Ali, 23 Oct 2026: "I want Fable to do all the brain thinking"); main session writes down + builds what it decides. `plan-verifier` checks every plan or scope change, before work starts and before Ali sees it.
   - **Fable finds ready-made assets before anything drawn** (Ali, 23 Oct 2026): icons from Material Symbols first, then free licensed artwork, bundled, never AI generated (Play AI declaration = "Don't label assets"). Fable recommends, Ali approves each; source + licence go in `docs/ASSETS.md`.
   - **Keep road to iPhone smooth** in every design + code decision: see iPhone hard rule above. Fable checks designs, `plan-verifier` checks each plan's one-line iPhone effect, `reviewer` checks code.
+  - **Fable builds on what Ali already gave and uses skills** (Ali, 23 Oct 2026): `ux-lead.md` lists the design
+    system, the 1.6 references (Pillars study, UX.md, the ten journeys, his 27 answers), the designs he chose before,
+    and the installed design skills it may call (`Skill` is in its tools). DESIGN_SYSTEM and his decisions beat any
+    skill. A tool or skill not yet installed is recommended to Ali, never added without him.
   - **Opus checks everything:** `reviewer` reviews every diff + every piece of work from cheaper agent before commit or "done". Main session (talks to Ali, commits) should itself run on Opus.
   - **Cheaper models do routine work:** `implementer` (Sonnet) builds step with spec already decided; `mechanic` (Haiku) does searching, counting, other mechanical checkable work.
   - Never hand cheaper model a decision, alarm or data logic, translations, or anything user facing without written spec; never skip `reviewer` to save tokens. Visual decisions stay Ali's, from screenshots.

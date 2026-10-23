@@ -1959,6 +1959,19 @@ because App Store Review Guideline 4 (Design) and 4.3 (look-alike apps in a crow
 rejection reasons. Android only features (widgets, Wear OS, exact alarms) are labelled as such in each spec. In
 code: keep calculation and rules logic free of Android imports where it costs nothing; no refactor for it now.
 
+**References and skills, same day.** Ali: "Fable also knows if it feels there's an appropriate skill or tool which
+it can use to provide better designs, then we can use it, or look into the skills we have already ... we have already
+defined the design system and everything, and I've provided all the references as well. That should be stored so
+Fable can use it." So `ux-lead.md` now opens with what Ali has already decided (DESIGN_SYSTEM.md, PILLARS-STUDY,
+UX.md, FABLE-REVIEW, DETAILED-PLAN §6 journeys, BUILD-INSTRUCTIONS §3 answers, the 1.6 `screens/`, the widget
+redesign and Times gloss pictures he chose, the store screenshots, the feature research) and a list of installed
+skills that fit (sovereign-ui, make-interfaces-feel-better, ui-ux-pro-max, impeccable, high-end-visual-design,
+apple-design, liquid-glass-design, wear-compose-m3, accessibility, the design: skills, designlang:extract). `Skill` was added
+to its tools: with an explicit tools list a subagent cannot call skills otherwise (Claude Code sub-agents docs,
+checked 23 Oct 2026). The design system and Ali's decisions outrank any skill; web output is advice, not code;
+anything not installed is a recommendation for Ali. **Not yet run:** the first use must confirm `ux-lead` can call
+a skill, along with its model (§10).
+
 **Widened to every decision, same day.** Ali: "I informed you so that we can take into consideration for any
 development even though we are not developing for the iphone right now but its useful for decision making now so
 when we develop ios app then things are still smooth for us." So the rule is now a `CLAUDE.md` hard rule covering
