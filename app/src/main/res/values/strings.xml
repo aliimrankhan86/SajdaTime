@@ -630,4 +630,50 @@
     <string name="about_share_message">SajdaTime: free prayer times and a Qibla compass, with no ads and no accounts. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">Makkah</string>
+    <!-- My prayers, the private prayer tracker (1.6.0). Never "missed", "excused" or "qada" (TrackerWordingTest). -->
+    <string name="settings_group_tracker">My prayers</string>
+    <string name="settings_tracker">My prayers</string>
+    <string name="settings_tracker_desc">Tick each prayer you pray. Only you can see it.</string>
+    <string name="settings_tracker_streak">Show streak</string>
+    <string name="settings_tracker_streak_desc">Show how many days in a row you have ticked all five.</string>
+    <string name="settings_tracker_pause">Pause tracking</string>
+    <string name="settings_tracker_pause_desc">Your streak waits until you resume.</string>
+    <string name="settings_tracker_resume">Resume tracking</string>
+    <string name="settings_tracker_resume_desc">Tracking is paused.</string>
+    <string name="tracker_pause_title">Pause from</string>
+    <string name="tracker_pause_today">Today</string>
+    <string name="tracker_pause_yesterday">Yesterday</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_resume">Resume</string>
+    <string name="settings_tracker_save">Save to a file</string>
+    <string name="settings_tracker_save_desc">A personal record of your prayers. Keep the file private.</string>
+    <string name="settings_tracker_load">Load from a file</string>
+    <string name="settings_tracker_load_desc">Bring back a record you saved, on this phone or a new one.</string>
+    <string name="settings_tracker_delete">Delete my prayer record</string>
+    <string name="tracker_delete_title">Delete your prayer record?</string>
+    <string name="tracker_delete_body">This removes every tick from this phone. It cannot be undone.</string>
+    <string name="action_delete">Delete</string>
+    <plurals name="tracker_streak">
+        <item quantity="one">%d day in a row</item>
+        <item quantity="other">%d days in a row</item>
+    </plurals>
+    <string name="tracker_open_history">Last 30 days</string>
+    <string name="tracker_paused_line">Tracking is paused</string>
+    <string name="tracker_history_title">Last 30 days</string>
+    <string name="tracker_paused_day">Paused</string>
+    <string name="tracker_newer_version">This record is from a newer version of SajdaTime. Update the app to change it.</string>
+    <!-- %1$s is the file name. -->
+    <string name="tracker_saved">Saved to %1$s.</string>
+    <plurals name="tracker_loaded">
+        <item quantity="one">%d day added.</item>
+        <item quantity="other">%d days added.</item>
+    </plurals>
+    <string name="tracker_save_failed">The file could not be saved.</string>
+    <string name="tracker_load_failed_format">This file could not be read. Choose a file saved by SajdaTime.</string>
+    <string name="tracker_load_failed_newer">This file needs a newer version of SajdaTime.</string>
+    <!-- Spoken only. %1$s is a prayer, %2$s one of the three states below: "Fajr, prayed". -->
+    <string name="tracker_tick_a11y">%1$s, %2$s</string>
+    <string name="tracker_state_prayed">prayed</string>
+    <string name="tracker_state_not_ticked">not ticked</string>
+    <string name="tracker_state_not_due">not due yet</string>
 </resources>

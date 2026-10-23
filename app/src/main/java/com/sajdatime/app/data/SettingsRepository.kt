@@ -225,6 +225,14 @@ data class AppSettings(
      * while [prayerReminderMinutes] is 0.
      */
     val prayerReminderFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
+    /**
+     * "My prayers", the private tracker (1.6.0). **Off by default**: nothing new appears on the Times
+     * screen unless the user puts it there. Switching it off keeps the record; only Delete clears it.
+     * The record itself lives in [TrackerRepository], never here and never in the usage counts.
+     */
+    val trackerEnabled: Boolean = false,
+    /** Whether the "days in a row" line shows. Off by default (Ali, 16 Oct 2026): a streak is opt in. */
+    val trackerShowStreak: Boolean = false,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -450,6 +458,10 @@ class SettingsRepository(private val context: Context) {
         prefs[Keys.PRAYER_REMINDER_FOR] = updated.sortedBy { it.ordinal }.joinToString(",") { it.name }
     }
 
+    suspend fun setTrackerEnabled(enabled: Boolean) = edit { it[Keys.TRACKER_ENABLED] = enabled }
+
+    suspend fun setTrackerShowStreak(show: Boolean) = edit { it[Keys.TRACKER_STREAK] = show }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -533,6 +545,8 @@ class SettingsRepository(private val context: Context) {
         val SUHOOR_ADHAN = booleanPreferencesKey("suhoor_reminder_adhan")
         val PRAYER_REMINDER_MINUTES = intPreferencesKey("prayer_reminder_minutes")
         val PRAYER_REMINDER_FOR = stringPreferencesKey("prayer_reminder_for")
+        val TRACKER_ENABLED = booleanPreferencesKey("tracker_enabled")
+        val TRACKER_STREAK = booleanPreferencesKey("tracker_show_streak")
     }
 
     private companion object {
@@ -583,6 +597,8 @@ class SettingsRepository(private val context: Context) {
             prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
                 .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
+            trackerEnabled = this[Keys.TRACKER_ENABLED] ?: false,
+            trackerShowStreak = this[Keys.TRACKER_STREAK] ?: false,
         )
     }
 

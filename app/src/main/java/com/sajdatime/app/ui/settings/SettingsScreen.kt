@@ -101,7 +101,15 @@ import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.ui.TrackerActions
 import com.sajdatime.app.ui.UiState
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.FileUpload
+import androidx.compose.material.icons.outlined.PauseCircleOutline
+import androidx.compose.material.icons.outlined.PlayCircleOutline
+import androidx.compose.material.icons.outlined.TaskAlt
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
 import com.sajdatime.app.ui.components.RadioRow
@@ -176,12 +184,14 @@ fun SettingsScreen(
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
+    tracker: TrackerActions,
 ) {
     val context = LocalContext.current
     var open by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
     // Turning usage counts ON never flips the switch directly: it opens the full consent text
     // and only a Yes there records the choice. Turning it OFF is a single tap.
     var askingUsageConsent by rememberSaveable { mutableStateOf(false) }
+    var trackerDialog by rememberSaveable { mutableStateOf<TrackerDialog?>(null) }
     val settings = state.settings
 
     // Keyed on the request, so a second identical request after the first was closed still
@@ -396,6 +406,88 @@ fun SettingsScreen(
         ),
     )
 
+    // "My prayers" (1.6.0), between Reminders and About. Off by default, one tap to switch on, and
+    // nothing else appears until it is. With the switch off but a record kept, only Delete stays, so
+    // the record can always be removed.
+    val paused = state.tracker?.paused == true
+    val myPrayers = SettingsSection(
+        SettingsSectionId.TRACKER,
+        stringResource(R.string.settings_group_tracker),
+        buildList {
+            add(
+                SettingsItem.Toggle(
+                    key = "tracker",
+                    icon = Icons.Outlined.TaskAlt,
+                    title = stringResource(R.string.settings_tracker),
+                    subtitle = stringResource(R.string.settings_tracker_desc),
+                    checked = settings.trackerEnabled,
+                    onCheckedChange = tracker::setEnabled,
+                ),
+            )
+            if (settings.trackerEnabled) {
+                add(
+                    SettingsItem.Toggle(
+                        key = "tracker_streak",
+                        icon = Icons.Outlined.CalendarMonth,
+                        title = stringResource(R.string.settings_tracker_streak),
+                        subtitle = stringResource(R.string.settings_tracker_streak_desc),
+                        checked = settings.trackerShowStreak,
+                        onCheckedChange = tracker::setShowStreak,
+                    ),
+                )
+                add(
+                    if (paused) {
+                        SettingsItem.Link(
+                            key = "tracker_resume",
+                            icon = Icons.Outlined.PlayCircleOutline,
+                            title = stringResource(R.string.settings_tracker_resume),
+                            subtitle = stringResource(R.string.settings_tracker_resume_desc),
+                            onClick = tracker::resume,
+                        )
+                    } else {
+                        SettingsItem.Link(
+                            key = "tracker_pause",
+                            icon = Icons.Outlined.PauseCircleOutline,
+                            title = stringResource(R.string.settings_tracker_pause),
+                            subtitle = stringResource(R.string.settings_tracker_pause_desc),
+                            onClick = { trackerDialog = TrackerDialog.PAUSE },
+                        )
+                    },
+                )
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_save",
+                        icon = Icons.Outlined.FileDownload,
+                        title = stringResource(R.string.settings_tracker_save),
+                        // The warning is the subtitle, not a dialog before the save: one tap fewer, and
+                        // it is read every time (sign-off, 23 Oct 2026).
+                        subtitle = stringResource(R.string.settings_tracker_save_desc),
+                        onClick = tracker::save,
+                    ),
+                )
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_load",
+                        icon = Icons.Outlined.FileUpload,
+                        title = stringResource(R.string.settings_tracker_load),
+                        subtitle = stringResource(R.string.settings_tracker_load_desc),
+                        onClick = tracker::load,
+                    ),
+                )
+            }
+            if (settings.trackerEnabled || state.trackerHasData) {
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_delete",
+                        icon = Icons.Outlined.DeleteOutline,
+                        title = stringResource(R.string.settings_tracker_delete),
+                        onClick = { trackerDialog = TrackerDialog.DELETE },
+                    ),
+                )
+            }
+        },
+    )
+
     // Play requires a privacy policy reachable from inside the app, not only from
     // the Console field. Opening the hosted policy satisfies that.
     val privacyUrl = stringResource(R.string.privacy_policy_url)
@@ -497,9 +589,27 @@ fun SettingsScreen(
         ),
     )
 
-    val sections = listOf(prayerTimes, appearance, reminders, about)
+    val sections = listOf(prayerTimes, appearance, reminders, myPrayers, about)
     val title = stringResource(R.string.title_settings)
     SettingsList(title, banners, sections)
+
+    when (trackerDialog) {
+        null -> Unit
+        TrackerDialog.PAUSE -> PauseDialog(
+            onPause = { fromYesterday ->
+                trackerDialog = null
+                tracker.pause(fromYesterday)
+            },
+            onDismiss = { trackerDialog = null },
+        )
+        TrackerDialog.DELETE -> DeleteTrackerDialog(
+            onDelete = {
+                trackerDialog = null
+                tracker.delete()
+            },
+            onDismiss = { trackerDialog = null },
+        )
+    }
 
     if (askingUsageConsent) {
         UsageCountsConsentDialog(
@@ -671,7 +781,52 @@ private const val ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:Beauti
 private const val SHIA_ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:AzaanMaahur.ogg"
 private const val CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
 
-internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
+internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, TRACKER, ABOUT }
+
+private enum class TrackerDialog { PAUSE, DELETE }
+
+/**
+ * "Pause from": today or yesterday, nothing further back (Ali, 16 Oct 2026). No reason is asked or
+ * stored, so the same Pause serves a period, illness and travel and says nothing about which.
+ */
+@Composable
+private fun PauseDialog(onPause: (fromYesterday: Boolean) -> Unit, onDismiss: () -> Unit) {
+    var yesterday by rememberSaveable { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(stringResource(R.string.tracker_pause_title), onDismiss) },
+        text = {
+            Column(Modifier.selectableGroup()) {
+                RadioRow(label = stringResource(R.string.tracker_pause_today), selected = !yesterday, onSelect = { yesterday = false })
+                RadioRow(label = stringResource(R.string.tracker_pause_yesterday), selected = yesterday, onSelect = { yesterday = true })
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = { onPause(yesterday) }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_pause))
+            }
+        },
+    )
+}
+
+/**
+ * The only destructive action in the app, behind one confirmation that says it cannot be undone.
+ * A solid button like every other action here (DESIGN_SYSTEM 4.1: only Close may be a text link), not
+ * a red one: the design system has no error colour role, and the words carry the warning.
+ */
+@Composable
+private fun DeleteTrackerDialog(onDelete: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(stringResource(R.string.tracker_delete_title), onDismiss) },
+        text = { Text(stringResource(R.string.tracker_delete_body)) },
+        confirmButton = {
+            CtaButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_delete))
+            }
+        },
+    )
+}
 
 internal class SettingsSection(
     val id: SettingsSectionId,

@@ -416,4 +416,47 @@
     <string name="about_share_message">SajdaTime: نماز کے مفت اوقات اور قبلہ نما، بغیر اشتہارات اور بغیر اکاؤنٹ کے۔ https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">مکہ</string>
+    <string name="settings_group_tracker">میری نمازیں</string>
+    <string name="settings_tracker">میری نمازیں</string>
+    <string name="settings_tracker_desc">جو نماز پڑھیں اس پر نشان لگائیں۔ اسے صرف آپ دیکھ سکتے ہیں۔</string>
+    <string name="settings_tracker_streak">لگاتار دن دکھائیں</string>
+    <string name="settings_tracker_streak_desc">دکھائیں کہ آپ نے کتنے دن لگاتار پانچوں نمازوں پر نشان لگایا۔</string>
+    <string name="settings_tracker_pause">ٹریکنگ روکیں</string>
+    <string name="settings_tracker_pause_desc">دوبارہ شروع کرنے تک آپ کے لگاتار دن رکے رہیں گے۔</string>
+    <string name="settings_tracker_resume">ٹریکنگ دوبارہ شروع کریں</string>
+    <string name="settings_tracker_resume_desc">ٹریکنگ رکی ہوئی ہے۔</string>
+    <string name="tracker_pause_title">کب سے روکیں</string>
+    <string name="tracker_pause_today">آج</string>
+    <string name="tracker_pause_yesterday">گزشتہ کل</string>
+    <string name="action_pause">روکیں</string>
+    <string name="action_resume">دوبارہ شروع کریں</string>
+    <string name="settings_tracker_save">فائل میں محفوظ کریں</string>
+    <string name="settings_tracker_save_desc">آپ کی نمازوں کا ذاتی ریکارڈ۔ فائل کو نجی رکھیں۔</string>
+    <string name="settings_tracker_load">فائل سے لائیں</string>
+    <string name="settings_tracker_load_desc">محفوظ کیا ہوا ریکارڈ واپس لائیں، اسی فون پر یا نئے فون پر۔</string>
+    <string name="settings_tracker_delete">میری نمازوں کا ریکارڈ حذف کریں</string>
+    <string name="tracker_delete_title">نمازوں کا ریکارڈ حذف کریں؟</string>
+    <string name="tracker_delete_body">اس سے اس فون سے تمام نشان ہٹ جائیں گے۔ اسے واپس نہیں لایا جا سکتا۔</string>
+    <string name="action_delete">حذف کریں</string>
+    <plurals name="tracker_streak">
+        <item quantity="one">%d دن لگاتار</item>
+        <item quantity="other">%d دن لگاتار</item>
+    </plurals>
+    <string name="tracker_open_history">پچھلے 30 دن</string>
+    <string name="tracker_paused_line">ٹریکنگ رکی ہوئی ہے</string>
+    <string name="tracker_history_title">پچھلے 30 دن</string>
+    <string name="tracker_paused_day">رکا ہوا</string>
+    <string name="tracker_newer_version">یہ ریکارڈ SajdaTime کے نئے ورژن کا ہے۔ اسے بدلنے کے لیے ایپ اپ ڈیٹ کریں۔</string>
+    <string name="tracker_saved">%1$s میں محفوظ ہو گیا۔</string>
+    <plurals name="tracker_loaded">
+        <item quantity="one">%d دن شامل ہوا۔</item>
+        <item quantity="other">%d دن شامل ہوئے۔</item>
+    </plurals>
+    <string name="tracker_save_failed">فائل محفوظ نہیں ہو سکی۔</string>
+    <string name="tracker_load_failed_format">یہ فائل پڑھی نہیں جا سکی۔ SajdaTime کی محفوظ کی ہوئی فائل منتخب کریں۔</string>
+    <string name="tracker_load_failed_newer">اس فائل کے لیے SajdaTime کا نیا ورژن درکار ہے۔</string>
+    <string name="tracker_tick_a11y">%1$s، %2$s</string>
+    <string name="tracker_state_prayed">پڑھ لی</string>
+    <string name="tracker_state_not_ticked">نشان نہیں</string>
+    <string name="tracker_state_not_due">ابھی وقت نہیں ہوا</string>
 </resources>

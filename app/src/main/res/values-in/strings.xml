@@ -405,4 +405,45 @@
     <string name="about_share_message">SajdaTime: waktu salat dan kompas kiblat gratis, tanpa iklan dan tanpa akun. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">Makkah</string>
+    <string name="settings_group_tracker">Salat saya</string>
+    <string name="settings_tracker">Salat saya</string>
+    <string name="settings_tracker_desc">Tandai setiap salat yang Anda kerjakan. Hanya Anda yang dapat melihatnya.</string>
+    <string name="settings_tracker_streak">Tampilkan hari beruntun</string>
+    <string name="settings_tracker_streak_desc">Tampilkan berapa hari beruntun Anda menandai kelima salat.</string>
+    <string name="settings_tracker_pause">Jeda pencatatan</string>
+    <string name="settings_tracker_pause_desc">Hitungan hari Anda menunggu sampai Anda melanjutkan.</string>
+    <string name="settings_tracker_resume">Lanjutkan pencatatan</string>
+    <string name="settings_tracker_resume_desc">Pencatatan sedang dijeda.</string>
+    <string name="tracker_pause_title">Jeda mulai</string>
+    <string name="tracker_pause_today">Hari ini</string>
+    <string name="tracker_pause_yesterday">Kemarin</string>
+    <string name="action_pause">Jeda</string>
+    <string name="action_resume">Lanjutkan</string>
+    <string name="settings_tracker_save">Simpan ke file</string>
+    <string name="settings_tracker_save_desc">Catatan pribadi salat Anda. Jaga kerahasiaan file ini.</string>
+    <string name="settings_tracker_load">Muat dari file</string>
+    <string name="settings_tracker_load_desc">Kembalikan catatan yang Anda simpan, di ponsel ini atau ponsel baru.</string>
+    <string name="settings_tracker_delete">Hapus catatan salat saya</string>
+    <string name="tracker_delete_title">Hapus catatan salat Anda?</string>
+    <string name="tracker_delete_body">Ini menghapus semua tanda dari ponsel ini. Tidak dapat dibatalkan.</string>
+    <string name="action_delete">Hapus</string>
+    <plurals name="tracker_streak">
+        <item quantity="other">%d hari beruntun</item>
+    </plurals>
+    <string name="tracker_open_history">30 hari terakhir</string>
+    <string name="tracker_paused_line">Pencatatan dijeda</string>
+    <string name="tracker_history_title">30 hari terakhir</string>
+    <string name="tracker_paused_day">Dijeda</string>
+    <string name="tracker_newer_version">Catatan ini dari versi SajdaTime yang lebih baru. Perbarui aplikasi untuk mengubahnya.</string>
+    <string name="tracker_saved">Disimpan ke %1$s.</string>
+    <plurals name="tracker_loaded">
+        <item quantity="other">%d hari ditambahkan.</item>
+    </plurals>
+    <string name="tracker_save_failed">File tidak dapat disimpan.</string>
+    <string name="tracker_load_failed_format">File ini tidak dapat dibaca. Pilih file yang disimpan oleh SajdaTime.</string>
+    <string name="tracker_load_failed_newer">File ini memerlukan versi SajdaTime yang lebih baru.</string>
+    <string name="tracker_tick_a11y">%1$s, %2$s</string>
+    <string name="tracker_state_prayed">sudah salat</string>
+    <string name="tracker_state_not_ticked">belum ditandai</string>
+    <string name="tracker_state_not_due">belum masuk waktu</string>
 </resources>

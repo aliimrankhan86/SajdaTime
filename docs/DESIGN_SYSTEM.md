@@ -426,6 +426,12 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
+| Times, My prayers (1.6.0) | The tick at the end of each prayer row, after the time; Sunrise keeps the same 48dp empty | Tick (`Tick.kt`), a toggle, not a button | 24 drawn, 48 target | `HomeScreen.kt`, `Tick.kt` |
+| Times, My prayers | Last 30 days, at the end of the line under the list (the streak at its start) | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
+| Times, My prayers, while paused | Resume, in place of Last 30 days, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
+| Last 30 days sheet | Five ticks under each date, evenly spaced under the prayer names | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Settings, Delete your prayer record? | Delete; the X. Solid green like every action: there is no error role, the words carry the warning | A; D | 52, full | `SettingsScreen.kt` |
 
 Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row
 is the target, with a chevron), switches, radio rows, the tab bar, and the city name with its caret

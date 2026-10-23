@@ -30,6 +30,11 @@ import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.data.SettingsRepository
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.data.TrackerData
+import com.sajdatime.app.data.TrackerFileCodec
+import com.sajdatime.app.data.TrackerRepository
+import com.sajdatime.core.TickState
+import com.sajdatime.core.TrackerLogic
 import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.R
 import com.sajdatime.app.data.WatchSync
@@ -67,6 +72,54 @@ enum class LocationProblem {
  * [Failed] exists because the previous version swallowed every export error: the user
  * tapped "Save timetable as PDF", chose a range, and absolutely nothing happened.
  */
+/**
+ * What happened to a save or load of the prayer record, shown once as a message and then cleared,
+ * the same way as [ExportEvent].
+ */
+sealed interface TrackerEvent {
+    data class Saved(val fileName: String) : TrackerEvent
+    data class Loaded(val days: Int) : TrackerEvent
+    data object SaveFailed : TrackerEvent
+    data class LoadFailed(val tooNew: Boolean) : TrackerEvent
+}
+
+/**
+ * The prayer record as the Times screen and the history sheet draw it. Present only while the
+ * tracker is on, so nothing about it reaches the Times screen otherwise.
+ */
+data class TrackerState(
+    val data: TrackerData,
+    val today: LocalDate,
+    val streak: Int,
+) {
+    val paused: Boolean get() = TrackerLogic.isPaused(today, data.pauses)
+
+    fun state(date: LocalDate, slot: PrayerSlot, due: Boolean): TickState =
+        TrackerLogic.tickState(data.records[date], slot, due, TrackerLogic.isPaused(date, data.pauses))
+
+    fun isPaused(date: LocalDate): Boolean = TrackerLogic.isPaused(date, data.pauses)
+
+    companion object {
+        fun build(data: TrackerData, today: LocalDate) =
+            TrackerState(data, today, TrackerLogic.streak(data.records, data.pauses, today))
+    }
+}
+
+/**
+ * What the tracker's controls do, as one parameter rather than eight threaded through every screen.
+ * MainActivity binds it to this ViewModel and to the system's save and open dialogs.
+ */
+interface TrackerActions {
+    fun setEnabled(on: Boolean)
+    fun setShowStreak(on: Boolean)
+    fun tick(date: LocalDate, slot: PrayerSlot, ticked: Boolean)
+    fun pause(fromYesterday: Boolean)
+    fun resume()
+    fun save()
+    fun load()
+    fun delete()
+}
+
 sealed interface ExportEvent {
     data class Saved(val fileName: String) : ExportEvent
     data class Share(val uri: Uri) : ExportEvent
@@ -106,6 +159,11 @@ data class UiState(
      * the header cannot disagree.
      */
     val eid: EidDay? = null,
+    /** The prayer record, while "My prayers" is on. See [TrackerState]. */
+    val tracker: TrackerState? = null,
+    /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
+    val trackerHasData: Boolean = false,
+    val trackerEvent: TrackerEvent? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -114,6 +172,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val locationRepository = LocationRepository(application)
     private val cityLookup = CityLookup(application)
     private val compassRepository = CompassRepository(application)
+    private val trackerRepository = TrackerRepository(application)
 
     /**
      * Optional usage counts. [UsageCounts.apply] is the only thing that ever switches
@@ -136,6 +195,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             var first = true
             settingsRepository.settings.collect { settings ->
                 _state.update { it.copy(settings = settings, loading = false) }
+                publishTracker()
                 // Re-applies the saved choice on every launch. A user who never opted in
                 // causes no Firebase call here at all.
                 usage.apply(settings.analyticsEnabled)
@@ -148,6 +208,14 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 // after being backgrounded once. So the first load does the refresh itself.
                 if (first && settings.coordinates != null) refreshLocation()
                 first = false
+            }
+        }
+        viewModelScope.launch {
+            // The record is read whether or not the tracker is on, so Settings knows there is
+            // something to delete; it is only handed to the Times screen while the tracker is on.
+            trackerRepository.data.collect { data ->
+                trackerData = data
+                publishTracker()
             }
         }
         startClock()
@@ -403,6 +471,71 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun consumeExportEvent() = _state.update { it.copy(exportEvent = null) }
 
+    // --- my prayers (the tracker) ----------------------------------------------------
+
+    private var trackerData = TrackerData()
+
+    /** Rebuilds the tracker state from the record in hand. Called when the record, the switch or the day changes. */
+    private fun publishTracker() {
+        val today = LocalDate.now(ZoneId.systemDefault())
+        _state.update {
+            it.copy(
+                tracker = if (it.settings.trackerEnabled) TrackerState.build(trackerData, today) else null,
+                trackerHasData = !trackerData.isEmpty,
+            )
+        }
+    }
+
+    fun setTrackerEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setTrackerEnabled(enabled) }
+
+    fun setTrackerShowStreak(show: Boolean) =
+        viewModelScope.launch { settingsRepository.setTrackerShowStreak(show) }
+
+    fun tick(date: LocalDate, slot: PrayerSlot, ticked: Boolean) =
+        viewModelScope.launch { trackerRepository.setTicked(date, slot, ticked) }
+
+    /** Today, or yesterday for someone who notices a day late. Nothing further back (Ali, 16 Oct 2026). */
+    fun pauseTracker(fromYesterday: Boolean) = viewModelScope.launch {
+        val today = LocalDate.now(ZoneId.systemDefault())
+        trackerRepository.pause(if (fromYesterday) today.minusDays(1) else today)
+    }
+
+    fun resumeTracker() =
+        viewModelScope.launch { trackerRepository.resume(LocalDate.now(ZoneId.systemDefault())) }
+
+    fun deleteTracker() = viewModelScope.launch { trackerRepository.deleteAll() }
+
+    fun trackerFileName(): String = TrackerFileCodec.fileName(LocalDate.now(ZoneId.systemDefault()))
+
+    /** Writes the record to the file the person chose in the system's save dialog. */
+    fun saveTrackerTo(uri: Uri) = viewModelScope.launch {
+        val app = getApplication<Application>()
+        val event = runCatching {
+            withContext(Dispatchers.IO) {
+                val text = TrackerFileCodec.encode(trackerRepository.current(), LocalDate.now(ZoneId.systemDefault()))
+                app.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(text.toByteArray()) }
+            }
+            TrackerEvent.Saved(uri.lastPathSegment?.substringAfterLast('/') ?: trackerFileName())
+        }.getOrDefault(TrackerEvent.SaveFailed)
+        _state.update { it.copy(trackerEvent = event) }
+    }
+
+    /** Reads a saved file and adds it to the record. Never removes anything already here. */
+    fun loadTrackerFrom(uri: Uri) = viewModelScope.launch {
+        val app = getApplication<Application>()
+        val event = runCatching {
+            val text = withContext(Dispatchers.IO) {
+                app.contentResolver.openInputStream(uri)!!.use { String(it.readNBytesCompat(MAX_TRACKER_FILE_BYTES)) }
+            }
+            val result = trackerRepository.merge(TrackerFileCodec.decode(text))
+            TrackerEvent.Loaded(result.daysAdded + result.daysUpdated)
+        }.getOrElse { e -> TrackerEvent.LoadFailed(tooNew = (e as? TrackerFileCodec.Unreadable)?.tooNew == true) }
+        _state.update { it.copy(trackerEvent = event) }
+    }
+
+    fun consumeTrackerEvent() = _state.update { it.copy(trackerEvent = null) }
+
     // --- qibla -----------------------------------------------------------------------
 
     /**
@@ -479,6 +612,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             Computed(today, next, current, ramadan, eid)
         }
 
+        publishTracker()
         _state.update {
             it.copy(
                 today = computed.today,
@@ -511,6 +645,21 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             WidgetUpdater.refreshAll(getApplication<Application>(), _state.value.settings)
         }
     }
+}
+
+/** Ten years of ticks is under 100 KB; anything far larger is not a SajdaTime file. */
+private const val MAX_TRACKER_FILE_BYTES = 2 * 1024 * 1024
+
+/** InputStream.readNBytes is API 33; this reads at most [max] bytes on every version. */
+private fun java.io.InputStream.readNBytesCompat(max: Int): ByteArray {
+    val out = java.io.ByteArrayOutputStream()
+    val buffer = ByteArray(8192)
+    while (out.size() < max) {
+        val n = read(buffer, 0, minOf(buffer.size, max - out.size()))
+        if (n < 0) break
+        out.write(buffer, 0, n)
+    }
+    return out.toByteArray()
 }
 
 /** One recalculation's results, carried out of the background block together. */

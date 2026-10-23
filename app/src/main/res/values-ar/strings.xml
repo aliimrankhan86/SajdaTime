@@ -476,4 +476,55 @@
     <string name="about_share_message">SajdaTime: مواقيت صلاة مجانية وبوصلة للقبلة، بلا إعلانات ولا حسابات. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">مكة</string>
+    <string name="settings_group_tracker">صلواتي</string>
+    <string name="settings_tracker">صلواتي</string>
+    <string name="settings_tracker_desc">ضع علامة على كل صلاة تصليها. لا يراها أحد غيرك.</string>
+    <string name="settings_tracker_streak">إظهار الأيام المتتالية</string>
+    <string name="settings_tracker_streak_desc">إظهار عدد الأيام المتتالية التي وضعت فيها علامة على الصلوات الخمس كلها.</string>
+    <string name="settings_tracker_pause">إيقاف التتبع مؤقتًا</string>
+    <string name="settings_tracker_pause_desc">يبقى عدّ أيامك كما هو حتى تستأنف.</string>
+    <string name="settings_tracker_resume">استئناف التتبع</string>
+    <string name="settings_tracker_resume_desc">التتبع متوقف مؤقتًا.</string>
+    <string name="tracker_pause_title">الإيقاف ابتداءً من</string>
+    <string name="tracker_pause_today">اليوم</string>
+    <string name="tracker_pause_yesterday">أمس</string>
+    <string name="action_pause">إيقاف مؤقت</string>
+    <string name="action_resume">استئناف</string>
+    <string name="settings_tracker_save">حفظ في ملف</string>
+    <string name="settings_tracker_save_desc">سجل شخصي لصلواتك. احتفظ بالملف لنفسك.</string>
+    <string name="settings_tracker_load">تحميل من ملف</string>
+    <string name="settings_tracker_load_desc">استعد سجلًا حفظته، على هذا الهاتف أو على هاتف جديد.</string>
+    <string name="settings_tracker_delete">حذف سجل صلواتي</string>
+    <string name="tracker_delete_title">حذف سجل صلواتك؟</string>
+    <string name="tracker_delete_body">يحذف هذا كل العلامات من هذا الهاتف. لا يمكن التراجع عن ذلك.</string>
+    <string name="action_delete">حذف</string>
+    <plurals name="tracker_streak">
+        <item quantity="zero">%d يوم على التوالي</item>
+        <item quantity="one">%d يوم على التوالي</item>
+        <item quantity="two">%d يوم على التوالي</item>
+        <item quantity="few">%d أيام على التوالي</item>
+        <item quantity="many">%d يومًا على التوالي</item>
+        <item quantity="other">%d يوم على التوالي</item>
+    </plurals>
+    <string name="tracker_open_history">آخر 30 يومًا</string>
+    <string name="tracker_paused_line">التتبع متوقف مؤقتًا</string>
+    <string name="tracker_history_title">آخر 30 يومًا</string>
+    <string name="tracker_paused_day">متوقف مؤقتًا</string>
+    <string name="tracker_newer_version">هذا السجل من إصدار أحدث من SajdaTime. حدّث التطبيق لتعديله.</string>
+    <string name="tracker_saved">تم الحفظ في %1$s.</string>
+    <plurals name="tracker_loaded">
+        <item quantity="zero">أُضيف %d يوم.</item>
+        <item quantity="one">أُضيف %d يوم.</item>
+        <item quantity="two">أُضيف %d يوم.</item>
+        <item quantity="few">أُضيفت %d أيام.</item>
+        <item quantity="many">أُضيف %d يومًا.</item>
+        <item quantity="other">أُضيف %d يوم.</item>
+    </plurals>
+    <string name="tracker_save_failed">تعذّر حفظ الملف.</string>
+    <string name="tracker_load_failed_format">تعذّرت قراءة هذا الملف. اختر ملفًا حفظه SajdaTime.</string>
+    <string name="tracker_load_failed_newer">يحتاج هذا الملف إلى إصدار أحدث من SajdaTime.</string>
+    <string name="tracker_tick_a11y">%1$s، %2$s</string>
+    <string name="tracker_state_prayed">صُلّيت</string>
+    <string name="tracker_state_not_ticked">بلا علامة</string>
+    <string name="tracker_state_not_due">لم يحن وقتها</string>
 </resources>

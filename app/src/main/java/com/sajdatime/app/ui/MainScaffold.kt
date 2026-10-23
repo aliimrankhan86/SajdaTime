@@ -124,6 +124,7 @@ fun MainScaffold(
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
+    tracker: TrackerActions,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -200,6 +201,7 @@ fun MainScaffold(
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
+                        tracker = tracker,
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)
@@ -232,6 +234,7 @@ fun MainScaffold(
                         onSearchCity = onSearchCity,
                         onSetThemeChoice = onSetThemeChoice,
                         onSetAnalytics = onSetAnalytics,
+                        tracker = tracker,
                     )
                 }
             }

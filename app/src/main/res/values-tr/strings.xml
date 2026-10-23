@@ -410,4 +410,47 @@
     <string name="about_share_message">SajdaTime: ücretsiz namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">Mekke</string>
+    <string name="settings_group_tracker">Namazlarım</string>
+    <string name="settings_tracker">Namazlarım</string>
+    <string name="settings_tracker_desc">Kıldığınız her namazı işaretleyin. Bunu yalnızca siz görebilirsiniz.</string>
+    <string name="settings_tracker_streak">Seriyi göster</string>
+    <string name="settings_tracker_streak_desc">Beş vaktin hepsini kaç gün üst üste işaretlediğinizi gösterir.</string>
+    <string name="settings_tracker_pause">Takibi duraklat</string>
+    <string name="settings_tracker_pause_desc">Devam edene kadar seriniz bekler.</string>
+    <string name="settings_tracker_resume">Takibe devam et</string>
+    <string name="settings_tracker_resume_desc">Takip duraklatıldı.</string>
+    <string name="tracker_pause_title">Duraklatma başlangıcı</string>
+    <string name="tracker_pause_today">Bugün</string>
+    <string name="tracker_pause_yesterday">Dün</string>
+    <string name="action_pause">Duraklat</string>
+    <string name="action_resume">Devam et</string>
+    <string name="settings_tracker_save">Dosyaya kaydet</string>
+    <string name="settings_tracker_save_desc">Namazlarınızın kişisel kaydı. Dosyayı gizli tutun.</string>
+    <string name="settings_tracker_load">Dosyadan yükle</string>
+    <string name="settings_tracker_load_desc">Kaydettiğiniz bir kaydı bu telefona veya yeni bir telefona geri getirin.</string>
+    <string name="settings_tracker_delete">Namaz kaydımı sil</string>
+    <string name="tracker_delete_title">Namaz kaydınız silinsin mi?</string>
+    <string name="tracker_delete_body">Bu, bu telefondaki tüm işaretleri siler. Geri alınamaz.</string>
+    <string name="action_delete">Sil</string>
+    <plurals name="tracker_streak">
+        <item quantity="one">%d gün üst üste</item>
+        <item quantity="other">%d gün üst üste</item>
+    </plurals>
+    <string name="tracker_open_history">Son 30 gün</string>
+    <string name="tracker_paused_line">Takip duraklatıldı</string>
+    <string name="tracker_history_title">Son 30 gün</string>
+    <string name="tracker_paused_day">Duraklatıldı</string>
+    <string name="tracker_newer_version">Bu kayıt SajdaTime\'ın daha yeni bir sürümüne ait. Değiştirmek için uygulamayı güncelleyin.</string>
+    <string name="tracker_saved">%1$s dosyasına kaydedildi.</string>
+    <plurals name="tracker_loaded">
+        <item quantity="one">%d gün eklendi.</item>
+        <item quantity="other">%d gün eklendi.</item>
+    </plurals>
+    <string name="tracker_save_failed">Dosya kaydedilemedi.</string>
+    <string name="tracker_load_failed_format">Bu dosya okunamadı. SajdaTime ile kaydedilmiş bir dosya seçin.</string>
+    <string name="tracker_load_failed_newer">Bu dosya için SajdaTime\'ın daha yeni bir sürümü gerekiyor.</string>
+    <string name="tracker_tick_a11y">%1$s, %2$s</string>
+    <string name="tracker_state_prayed">kılındı</string>
+    <string name="tracker_state_not_ticked">işaretlenmedi</string>
+    <string name="tracker_state_not_due">vakti gelmedi</string>
 </resources>

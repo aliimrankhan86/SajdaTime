@@ -256,6 +256,9 @@ tasks.withType<Test>().configureEach {
                 "app/build.gradle.kts",
                 "app/src/**/res/values/bools.xml",
                 "app/src/**/res/values/firebase_config.xml",
+                // TrackerPrivacyTest: the backup exclusion the prayer record relies on, and the usage counts.
+                "app/src/main/res/xml/data_extraction_rules.xml",
+                "app/src/main/java/com/sajdatime/app/data/UsageCounts.kt",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

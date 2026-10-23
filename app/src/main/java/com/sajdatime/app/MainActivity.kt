@@ -48,6 +48,8 @@ import com.sajdatime.app.data.SetupStep
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
+import com.sajdatime.app.ui.TrackerActions
+import com.sajdatime.app.ui.TrackerEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
 import com.sajdatime.app.ui.onboarding.OnboardingScreen
@@ -124,6 +126,36 @@ class MainActivity : ComponentActivity() {
         viewModel.setNotificationSound(storedSound(uri, RingtoneManager.TYPE_NOTIFICATION))
     }
 
+    /**
+     * The prayer record's save and load (1.6.0): the system's own save and open dialogs. They hand back
+     * a content:// address with access granted for this one write or read, so the app needs no storage
+     * permission, keeps nothing afterwards and sends nothing anywhere.
+     */
+    private val trackerSave = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let(viewModel::saveTrackerTo)
+    }
+
+    /** Several types, because some pickers label a .json file as plain or unknown; the codec checks the content. */
+    private val trackerLoad = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::loadTrackerFrom)
+    }
+
+    private val trackerActions = object : TrackerActions {
+        override fun setEnabled(on: Boolean) { viewModel.setTrackerEnabled(on) }
+        override fun setShowStreak(on: Boolean) { viewModel.setTrackerShowStreak(on) }
+        override fun tick(date: java.time.LocalDate, slot: com.sajdatime.core.PrayerSlot, ticked: Boolean) {
+            viewModel.tick(date, slot, ticked)
+        }
+        override fun pause(fromYesterday: Boolean) { viewModel.pauseTracker(fromYesterday) }
+        override fun resume() { viewModel.resumeTracker() }
+        override fun save() = runCatching { trackerSave.launch(viewModel.trackerFileName()) }
+            .getOrElse { toast(getString(R.string.tracker_save_failed)) }
+        override fun load() = runCatching {
+            trackerLoad.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }.getOrElse { toast(getString(R.string.tracker_load_failed_format)) }
+        override fun delete() { viewModel.deleteTracker() }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // The window's direction must come from the app's language (AppLocale.wrap above), not be
@@ -155,6 +187,19 @@ class MainActivity : ComponentActivity() {
                         ExportEvent.Failed -> toast(getString(R.string.export_failed))
                     }
                     if (state.exportEvent != null) viewModel.consumeExportEvent()
+                }
+
+                LaunchedEffect(state.trackerEvent) {
+                    when (val event = state.trackerEvent) {
+                        null -> Unit
+                        is TrackerEvent.Saved -> toast(getString(R.string.tracker_saved, event.fileName))
+                        is TrackerEvent.Loaded -> toast(resources.getQuantityString(R.plurals.tracker_loaded, event.days, event.days))
+                        TrackerEvent.SaveFailed -> toast(getString(R.string.tracker_save_failed))
+                        is TrackerEvent.LoadFailed -> toast(
+                            getString(if (event.tooNew) R.string.tracker_load_failed_newer else R.string.tracker_load_failed_format),
+                        )
+                    }
+                    if (state.trackerEvent != null) viewModel.consumeTrackerEvent()
                 }
 
                 PreviewBuildFrame {
@@ -225,6 +270,7 @@ class MainActivity : ComponentActivity() {
                                 onSetPrayerReminder = viewModel::setPrayerReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
+                                tracker = trackerActions,
                             )
 
                             // Shown once, immediately after setup, never after an update (the flag is
