@@ -91,6 +91,33 @@ One set of gates. It replaces both sets in PLAN.md (§0 said submit about 15 Dec
 Not checked by the reviewer: Play review turnaround (the project's record says one to two days, leave a week), and the
 823dp and 360dp fit, which stay estimates until measured.
 
+## Tasbih counter: explicit verdict (Fable 5.1, 23 Oct 2026, asked for by Ali)
+
+**Not signed off for 1.6.0 or 1.6.1, and not promised for any release.** A later candidate only, after 1.6.1 is
+live, if Ali still wants it then.
+
+- **Rank by value: fifth**, behind the tracker, dates, jama'ah and adhan choice. The research has no figure for a
+  tasbih counter. The 27-source forum tally has no entry for tasbih or dhikr (iqamah about 8, calendar about 7,
+  tracker about 5). Only indirect "Quran, duas" themes (Sadiq duas 6 of its sample). Every phone already has a
+  counter app, and it brings nobody to the store.
+- **Why not 1.6.0:** a fourth piece in a release with a hard pre-Ramadan deadline. **Why not 1.6.1:** that release is
+  the scheduler change and stays small so a reminder fault is easy to find.
+- **Effort low, religious risk medium:** the order differs by sect. Sunni: SubhanAllah 33, Alhamdulillah 33,
+  Allahu Akbar 34. Shia, Tasbih of Fatimah: Allahu Akbar 34, Alhamdulillah 33, SubhanAllah 33. **UX.md's tasbih
+  design draws only the Sunni order and would show a Shia user the wrong sequence**, and its "May Allah accept it"
+  line goes. Technical risk low: nothing on the Times screen.
+
+**If it is ever built, the simplest version:**
+- One row in Settings, in the My prayers group: "Tasbih". No switch, nothing on Times, no notification.
+- One screen: the phrase in Arabic, transliteration and meaning, one large count. The whole screen is the tap target.
+  One button, "Start again". Light haptic each tap, stronger when a phrase completes, screen stays on while open.
+- Order taken from the sect chosen at setup, never asked again. Shia title "Tasbih of Fatimah".
+- Nothing stored: the count is gone when the screen closes. Never shown: a total, history, streak, goal, reward,
+  hadith, reminder, share or rating.
+- Words in full: "Tasbih", "Glory be to Allah", "All praise is for Allah", "Allah is the Greatest", "17 of 33",
+  "Start again", "Done."
+- TalkBack announces only when a phrase completes. Phone only (the watch needs a watch release and a sync key).
+
 ## Sign-off, in the reviewer's words to Ali
 
 Ali, the plan is sound and I am signing it off with changes. Build 1.6.0 as three pieces in this order: your prayer
@@ -101,3 +128,8 @@ usage counts, no rate or share prompt, no change to Do Not Disturb, and the disc
 matters is 1.5.0 going live: if it is not live by the end of November, let all of 1.6.0 go after Eid and do not try to
 squeeze it in. The only real design question for you is whether the mosque door stays on the Times screen when
 jama'ah times are set. My advice is that it stays.
+
+On tasbih, in the reviewer's words: the tasbih counter is not signed off for 1.6.0 or 1.6.1. The research shows no
+measured demand for it, every phone already has a counter, and it would be the fifth feature in a release that
+already has a hard deadline before Ramadan. If you still want it after 1.6.1 is live it can be a small later addition
+on the terms above. If you want it anyway, say so and it goes on the list after 1.6.1, not before.
