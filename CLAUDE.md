@@ -109,17 +109,27 @@ session inherits it instead of relearning it.
 
 ## Hard rules — these are not preferences
 
-- **An iPhone version is planned, so every design must also suit Apple.** Ali, 23 Oct 2026: "I do have
-  aspiration later to make it this app for iOS as well ... So it doesn't look like a design mess, as Apple has often
-  objection about the design aspect of the apps." From 1.6 on, every screen, icon and asset is checked against
-  Apple's Human Interface Guidelines as well as `docs/DESIGN_SYSTEM.md`, because App Store Review Guideline 4
-  (Design) and 4.3 (look-alike apps in a crowded category) are how Apple rejects apps like this one. Only patterns
-  both platforms share (no floating action button, no navigation drawer, a visible back or close on every screen),
-  an SF Symbol named beside each Material icon, 48dp targets (meets Apple's 44pt), text that scales, a distinct look
-  of our own, and assets licensed for both stores; label Android only features (widgets, Wear OS, exact alarms) in
-  each spec. Fable (`ux-lead`) owns this check. No iOS work and no cross platform framework until he decides; keep
-  calculation and rules logic free of Android imports where that costs nothing. Full rule: `docs/HANDOVER.md` §5.28
-  and `.claude/agents/ux-lead.md` on `claude/1-6-0`.
+- **An iPhone version is planned, so every decision now must keep that road smooth.** Ali, 23 Oct 2026: "I do
+  have aspiration later to make it this app for iOS as well ... So it doesn't look like a design mess, as Apple has
+  often objection about the design aspect of the apps", and then: "take into consideration for any development even
+  though we are not developing for the iphone right now ... so when we develop ios app then things are still smooth
+  for us." Nothing is built for iOS yet, and no cost or complexity is added for it now. But:
+  - **Design:** every screen, icon and asset also fits Apple's Human Interface Guidelines, because App Store Review
+    Guideline 4 (Design) and 4.3 (look-alike apps in a crowded category) are how Apple rejects apps like this one.
+    Only patterns both platforms share (no floating action button, no navigation drawer, a visible back or close on
+    every screen), an SF Symbol named beside each Material icon, 48dp targets (meets Apple's 44pt), text that
+    scales, a distinct look of our own, assets licensed for both stores. Fable (`ux-lead`) owns this check.
+  - **Code and data:** when two options cost about the same, take the one that carries over to iPhone. New rules
+    and calculations (tracker, dates, jama'ah, fasts) go in `:core` as plain Kotlin with no `android.*` import;
+    stored data uses simple formats (plain values or JSON), not Android only ones; no new Android only library
+    where a portable one does the same job. No Kotlin Multiplatform move or iOS code until Ali decides.
+  - **Every plan says its iPhone effect in one line** (none, carries over, or Android only and why), and Android
+    only features (widgets, Wear OS, exact alarms) are labelled as such. `plan-verifier` and `reviewer` check it.
+  - **Known gaps today, recorded not fixed** (23 Oct 2026): `:core` is plain Kotlin except `AppLocale.kt` and
+    `PrayerLabels.kt` (Android `Context`); it uses `java.time` including `HijrahDate`, and the Java `adhan`
+    library, none of which run on iPhone as they are. An iPhone version would swap these; it does not block now.
+  Full rule: `docs/HANDOVER.md` §5.28 and `.claude/agents/ux-lead.md` on `claude/1-6-0`.
+
 - **Watch testing is finished. Never ask him to test the watch.** He tested it himself on
   1 September 2026, the Qibla included, reported it fine, and asked explicitly that it not be
   raised again. The times half was proved separately on 31 Aug, when his own paired watch and
