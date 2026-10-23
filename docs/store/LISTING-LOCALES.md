@@ -35,6 +35,13 @@ feature graphic are reused automatically unless you upload language-specific one
 
 ## 1.5.0 listings, FINAL 19 Oct 2026, full descriptions rebuilt 21 Oct 2026 from the regrouped English: paste on release day
 
+**23 Oct 2026, every full description:** the Wear line now names the watch's Qibla, Arabic and Bengali also name the 15 to 60
+minute suhoor setting, and a "coming soon to Chrome and Edge" line follows the Wear line (the owner: "we are going to be on
+chrome and edge very soon"; the extension is designed, not built). To fit 4000, seven languages dropped their "the method is
+set for your school and can be changed" line (Arabic had room and kept it). Measured by Python `len` after the change:
+ar 3527, ur 3961, tr 3974, id 3976, ms 3976, bn 3965, fr 3982, hi 3978. Change or remove the Chrome and Edge line in the same
+edit as the English one (LISTING.md says when).
+
 **Rebuilt 21 Oct 2026 from the regrouped English.** The English full description was regrouped on 21 Oct 2026 (five feature
 headings, new bullets for the silent next prayer notification, Play on silent, the Eid greeting and the widgets' town and theme,
 the suhoor reminder now on by default an hour before suhoor ends, the Ramadan timetable folded into the PDF bullet, the
@@ -108,6 +115,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 
 • تطبيقات مصغّرة للشاشة الرئيسية: عدّ تنازلي كبير حتى الصلاة التالية ومواقيت اليوم، مع اسم بلدتك، وبمظهر التطبيق نفسه
 • تطبيق Wear OS وبطاقة للساعة والقبلة، تتبع هاتفك أو تعمل وحدها
+• قريبًا على متصفحي Chrome وEdge
 
 للجميع
 
@@ -192,6 +200,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 
 • ہوم اسکرین ویجٹ: اگلی نماز تک بڑی الٹی گنتی اور آج کے اوقات، آپ کے شہر کے نام کے ساتھ، ایپ کے تھیم میں
 • Wear OS ایپ، ٹائل اور قبلہ جو فون کے ساتھ یا بغیر چلتی ہیں
+• جلد ہی Chrome اور Edge براؤزر پر بھی
 
 سب کے لیے
 
@@ -203,7 +212,6 @@ SajdaTime: نماز کے اوقات، قبلہ
 • سنی: حنفی، شافعی، مالکی اور حنبلی، ہر ایک کے لیے عصر کا درست اصول
 • شیعہ: جعفری / اثنا عشری، مغرب کے درست اصول سمیت
 • حساب کے 13 طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، Kemenag/MUIS (انڈونیشیا، سنگاپور)، دیانت (ترکی)، مون سائٹنگ کمیٹی، جعفری اور تہران
-• طریقہ آپ کے مسلک کے مطابق چنا جاتا ہے، اور آپ اسے بدل سکتے ہیں
 • «اپنی مسجد سے ملائیں»: کسی بھی نماز کو 30 منٹ کے اندر اپنی مسجد کے بورڈ کے مطابق کر لیں، یا اسلامی تاریخ ایک دو دن آگے پیچھے کریں
 • دور شمال میں گرمیوں کے دوران فجر اور عشاء کے معقول اوقات
 
@@ -276,6 +284,7 @@ WIDGET'LAR VE WEAR OS
 
 • Ana ekran widget'ları: sıradaki namaza büyük geri sayım ve bugünün vakitleri, şehrinizin adıyla, uygulama temasında
 • Telefonla ya da telefonsuz çalışan Wear OS uygulaması, saat kartı ve kıble
+• Yakında Chrome ve Edge tarayıcılarında
 
 HERKES İÇİN
 
@@ -287,7 +296,6 @@ MEZHEBİNİZE GÖRE HAZIRLANDI
 • Sünni: Hanefi, Şafii, Maliki ve Hanbeli, her biri için doğru İkindi kuralıyla
 • Şii: Caferi (İsna Aşeriyye), doğru Akşam kuralı dahil
 • 13 hesaplama yöntemi: Dünya İslam Birliği, ISNA, Ümmülkura, Mısır, Karaçi, Dubai, Kuveyt, Katar, Kemenag ve MUIS (Endonezya, Singapur), Diyanet (Türkiye), Moonsighting Committee, Caferi ve Tahran
-• Yöntem mezhebinize göre seçilir ve değiştirilebilir
 • Camiye göre ayarla: herhangi bir vakti 30 dakikaya kadar cami panosundaki saate eşitleyin ya da Hicri tarihi bir iki gün kaydırın
 • Yazın uzak kuzeyde makul Sabah ve Yatsı vakitleri
 
@@ -360,6 +368,7 @@ WIDGET DAN WEAR OS
 
 • Widget layar utama: hitung mundur besar ke sholat berikutnya dan jadwal hari ini, dengan nama kota, sesuai tema aplikasi
 • Aplikasi, tile, kiblat Wear OS, dengan atau tanpa ponsel
+• Segera hadir di browser Chrome dan Edge
 
 UNTUK SEMUA
 
@@ -371,7 +380,6 @@ SESUAI MAZHAB ANDA
 • Sunni: Hanafi, Syafi'i, Maliki, dan Hanbali, dengan aturan Asar yang tepat untuk tiap mazhab
 • Syiah: Jafari (Itsna Asyariyah), termasuk aturan Magrib yang benar
 • 13 metode perhitungan: Liga Muslim Dunia, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapura), Diyanet (Turki), Moonsighting Committee, Jafari, dan Teheran
-• Metode dipilih sesuai aliran Anda dan bisa diubah
 • Sesuaikan dengan masjid: samakan tiap waktu dengan papan masjid, hingga 30 menit, atau geser tanggal Hijriah sehari dua
 
 PRIVASI ANDA BUKAN HARGANYA
@@ -443,6 +451,7 @@ WIDGET DAN WEAR OS
 
 • Widget skrin utama: kiraan detik besar ke solat seterusnya dan waktu hari ini, dengan nama bandar, ikut tema aplikasi
 • Aplikasi, tile, kiblat Wear OS, dengan atau tanpa telefon
+• Akan datang ke pelayar Chrome dan Edge
 
 UNTUK SEMUA
 
@@ -454,7 +463,6 @@ MENGIKUT MAZHAB ANDA
 • Sunni: Hanafi, Syafie, Maliki dan Hanbali, dengan kaedah Asar yang betul bagi tiap satu
 • Syiah: Jafari / Ithna Asyari, termasuk kaedah Maghrib yang betul
 • 13 kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapura), Diyanet (Turki), Moonsighting Committee, Jafari dan Tehran
-• Kaedah dipilih mengikut aliran anda dan boleh ditukar
 • Ikut masjid anda: selaraskan sebarang solat dengan papan masjid, hingga 30 minit, atau anjak tarikh Hijrah sehari dua
 
 PRIVASI ANDA BUKAN HARGANYA
@@ -526,6 +534,7 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 
 • হোম স্ক্রিন উইজেট: পরের নামাজের বড় কাউন্টডাউন আর আজকের সময়, আপনার শহরের নামসহ, অ্যাপের থিমে
 • Wear OS অ্যাপ, টাইল ও কিবলা, ফোনের অবস্থান মেনে বা নিজে নিজে
+• শিগগিরই Chrome ও Edge ব্রাউজারে
 
 সবার জন্য
 
@@ -537,7 +546,6 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 • সুন্নি: হানাফি, শাফেয়ি, মালেকি ও হাম্বলি, প্রতিটির জন্য আসরের সঠিক নিয়ম
 • শিয়া: জাফরি / ইসনা আশারি, মাগরিবের সঠিক নিয়মসহ
 • ১৩টি গণনা পদ্ধতি: মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, মিশরীয়, করাচি, দুবাই, কুয়েত, কাতার, Kemenag/MUIS (ইন্দোনেশিয়া, সিঙ্গাপুর), দিয়ানেত (তুরস্ক), মুনসাইটিং কমিটি, জাফরি ও তেহরান
-• পদ্ধতিটি আপনার মাযহাব অনুযায়ী ঠিক হয়, চাইলে বদলাতে পারেন
 • মসজিদের সঙ্গে মেলান: যেকোনো নামাজ মসজিদের বোর্ডের সময়ে মিলিয়ে নিন, ৩০ মিনিটের মধ্যে, অথবা ইসলামি তারিখ এক বা দুই দিন সরিয়ে নিন
 • গ্রীষ্মকালে সুদূর উত্তরেও ফজর ও এশার যুক্তিসঙ্গত সময়
 
@@ -610,6 +618,7 @@ WIDGETS ET WEAR OS
 
 • Widgets d'accueil : grand compte à rebours vers la prochaine prière, horaires du jour, votre ville, au thème de l'appli
 • Appli, tuile et Qibla Wear OS, avec ou sans téléphone
+• Bientôt sur Chrome et Edge
 
 POUR TOUS
 
@@ -621,7 +630,6 @@ ADAPTÉ À VOTRE ÉCOLE
 • Sunnite : hanafite, chaféite, malikite, hanbalite, chacune avec sa bonne règle d'Asr
 • Chiite : jafarite / duodécimain, avec la bonne règle du Maghrib
 • 13 méthodes : Ligue islamique mondiale, ISNA, Umm al Qura, Égypte, Karachi, Dubaï, Koweït, Qatar, Kemenag/MUIS (Indonésie, Singapour), Diyanet (Turquie), Moonsighting Committee, Jafari et Téhéran
-• Méthode selon votre école, modifiable
 • Suivre votre mosquée : calez chaque prière sur son affichage (30 minutes au plus) ou décalez la date hégirienne d'un ou deux jours
 
 VOTRE VIE PRIVÉE N'EST PAS LE PRIX
@@ -693,6 +701,7 @@ SajdaTime सुन्नी और शिया मुसलमानों क
 
 • होम स्क्रीन विजेट: अगली नमाज़ का बड़ा काउंटडाउन और आज के समय, आपके शहर के नाम के साथ, ऐप की थीम में
 • Wear OS ऐप, टाइल और क़िबला, फ़ोन के अनुसार या अपने आप
+• जल्द ही Chrome और Edge ब्राउज़र पर भी
 
 सबके लिए
 
@@ -704,7 +713,6 @@ SajdaTime सुन्नी और शिया मुसलमानों क
 • सुन्नी: हनफ़ी, शाफ़ई, मालिकी और हंबली, हर एक के लिए अस्र का सही नियम
 • शिया: जाफ़री / इसना अशरी, मग़रिब के सही नियम के साथ
 • हिसाब के 13 तरीक़े: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल क़ुरा, मिस्र, कराची, दुबई, कुवैत, क़तर, Kemenag/MUIS (इंडोनेशिया, सिंगापुर), दियानत (तुर्की), मूनसाइटिंग कमेटी, जाफ़री और तेहरान
-• तरीक़ा आपके मसलक से तय होता है, जिसे आप बदल सकते हैं
 • अपनी मस्जिद से मिलाएँ: कोई भी नमाज़ मस्जिद के बोर्ड के समय पर सेट करें, 30 मिनट के अंदर, या इस्लामी तारीख़ एक या दो दिन आगे पीछे करें
 • गर्मियों में सुदूर उत्तर में भी फ़ज्र और इशा के मुनासिब समय
 

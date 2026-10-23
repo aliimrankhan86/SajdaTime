@@ -10,8 +10,8 @@ Play Console → **Grow users → Store presence → Store listings → Default 
 |---|---|---|---|
 | `app-icon/` | App icon | `icon-512.png` | 512 × 512 |
 | `feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
-| `phone/` | Phone screenshots | 6 files, upload all, in filename order | 1080 × 1920 |
-| `wear-os/` | Wear OS screenshots | 2 files | 454 × 454 |
+| `phone/` | Phone screenshots | 8 files, upload all, in filename order | 1080 × 1920 |
+| `wear-os/` | Wear OS screenshots | 4 files, in filename order | 454 × 454 |
 | `tablet-7in/` | 7-inch tablet screenshots | **empty on purpose** | — |
 | `tablet-10in/` | 10-inch tablet screenshots | **empty on purpose** | — |
 | `chromebook/` | Chromebook screenshots | **empty on purpose** | — |

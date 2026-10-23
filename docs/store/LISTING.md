@@ -264,7 +264,7 @@ about 13 apps for "prayer times wear os"). "Qibla compass" and "adhan" cannot bo
 Offline prayer times (namaz), adhan and Qibla for Sunni and Shia, with Wear OS.
 ```
 
-**Full description** `3987 / 4000` (23 Oct 2026: two lines changed, see the note below this block). Before that `3971 / 4000` (21 Oct 2026). The 19 Oct notes that follow are history; it was `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
+**Full description** `3991 / 4000` (23 Oct 2026: two lines changed, then the Chrome and Edge line, see the notes below this block). It was `3987 / 4000` before the Chrome and Edge line. Before that `3971 / 4000` (21 Oct 2026). The 19 Oct notes that follow are history; it was `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
 after the Qibla line below). Contains "Wear OS" twice. Ramadan is in it, so the separate "January Ramadan lines" step in
 RELEASE-1.5.0.md is done by pasting this. **One line changed after the review (19 Oct 2026, later):** "A Qibla compass
 corrected…" became "Qibla direction: a compass corrected…", so the description carries the search phrase "qibla direction"
@@ -302,6 +302,7 @@ WIDGETS AND WEAR OS
 
 • Home screen widgets: a big countdown to the next prayer and today's times, with your town, matching the app's theme
 • A Wear OS app, tile and Qibla that follow your phone or work alone
+• Coming soon to Chrome and Edge browsers
 
 FOR EVERYONE
 
@@ -312,8 +313,7 @@ BUILT FOR YOUR SCHOOL OF THOUGHT
 
 • Sunni: Hanafi, Shafi'i, Maliki and Hanbali, with the correct Asr rule for each
 • Shia: Jafari / Ithna Ashari, including the correct Maghrib rule
-• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapore), Diyanet (Turkey), Moonsighting Committee, Jafari and Tehran
-• The method is set for your school, and you can change it
+• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS (Indonesia, Singapore), Diyanet (Turkey), Moonsighting Committee, Jafari and Tehran, set for your school
 • Match your mosque: set any prayer to your mosque's board, within 30 minutes, or shift the Islamic date by a day or two
 • Sensible Fajr and Isha in the far north in summer
 
@@ -346,6 +346,13 @@ wearable app, ramadan settings"). The suhoor line now names the setting's range,
 is 0, 15, 30, 45, 60; the default is still 60, on), and keeps "on unless you turn it off". The Wear OS line now names the
 watch's Qibla and that it follows the phone or works alone (`WearSettingsStore.adoptWatchFix`, HANDOVER §5.27). Rejected:
 naming alarm or adhan for suhoor and "an hour" together, which went to 4016 and 4033. Still "Wear OS" twice; HONEST and FREE untouched.
+
+**23 Oct 2026, later: "Coming soon to Chrome and Edge browsers".** The owner: "for the feature you can add, we are
+going to be on chrome and edge very soon". The browser extension is planned and designed (GBrain `projects/sajdatime-extension`)
+but not built, so the line says "coming soon" and nothing more: no store link, no feature promised. To make room, the method line
+"The method is set for your school, and you can change it" was folded into the 13 methods line as "set for your school" (still
+"school", never "region"). **When the extension is published, change the line to say where to get it, and if it slips far, take
+the line out: a "coming soon" left standing for months reads as a broken promise.** The translated listings carry it too.
 
 **Watch 1.5.0 note** `330 / 500` (23 Oct 2026: says the watch uses the phone's location by default, the owner's point that day; was `295 / 500`) (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
 19 Oct 2026 tile timeline; the location sentence added 22 Oct 2026 with the watch's Location screen, HANDOVER §5.27,
@@ -948,8 +955,8 @@ the capture recipe, are in [`upload/README.md`](upload/README.md).
 |---|---|---|---|
 | `upload/app-icon/` | App icon | `icon-512.png` | 512 × 512 |
 | `upload/feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
-| `upload/phone/` | Phone screenshots | 6, upload all in filename order | 1080 × 1920 |
-| `upload/wear-os/` | Wear OS screenshots | `w1-times`, `w2-qibla` | 454 × 454 |
+| `upload/phone/` | Phone screenshots | 8, upload all in filename order | 1080 × 1920 |
+| `upload/wear-os/` | Wear OS screenshots | `w1-times`, `w2-qibla`, `w3-tile`, `w4-location`, in that order | 454 × 454 |
 | `upload/tablet-7in/`, `tablet-10in/`, `chromebook/` | those boxes | **empty on purpose** | — |
 
 The three empty folders are a decision, not an omission: there is no tablet layout yet, and
@@ -971,12 +978,14 @@ automatically rejected.
 They are now captured **natively at 1080 × 1920** on a Pixel 2 profile AVD and copied
 through untouched — no scaling, no reframing, no invented pixels.
 
-### What the six phone screenshots show (retaken from the 1.5.0 build, 18 Oct 2026)
+### What the eight phone screenshots show (retaken from the 1.5.0 build, 18 Oct 2026; 07 and 08 added 23 Oct 2026)
 
 Captured on the `sajdastore` AVD (1080 × 1920, started `-read-only` so the AVD itself is unchanged) from
 the 1.5.0 debug build, Manchester typed into the location sheet (the emulator's own place lookup gave
-no name), the clock set and the status bar in demo mode as in `upload/README.md`. Upload all six in
-filename order.
+no name), the clock set and the status bar in demo mode as in `upload/README.md`. Upload all eight in
+filename order (Play's limit is eight). `07` and `08` were taken the same way on 23 Oct 2026 (`sajdastore`, read only,
+Manchester chosen in setup, demo status bar at 3:00), `07` with the clock at 15 Aug 2026 15:00 and `08` at 22 Feb 2027
+15:00, the day `03` shows.
 
 | File | Screen | Why it earns a slot |
 |---|---|---|
@@ -986,12 +995,19 @@ filename order.
 | `04-school-of-thought.png` | Setup, madhab step | Evidence for "built for your school of thought" |
 | `05-settings.png` | Settings | Location, school, method, Match your mosque, theme, language. **Retaken 19 Oct 2026** the same way (`sajdastore`, read only, Manchester typed, 15 Aug 2026 15:00, demo status bar), because the Language row now reads "Phone language · English" (it read "English"); nothing else on it changed |
 | `06-widgets.png` | Home screen, the Today widget at its default 4 × 4 | The redesigned widgets that What's new leads with (owner's choice, 18 Oct 2026) |
+| `07-alerts-and-adhan.png` | Settings, Reminders: Fajr as an alarm and the others as notifications ("All five · Mixed"), Alarm sound "Adhan", a reminder 15 minutes before, the silent next prayer notification on | The built-in adhan and per prayer alerts, which the listing's ALERTS AND ADHAN section names and no other screenshot showed. **Added 23 Oct 2026** |
+| `08-ramadan-suhoor-reminder.png` | The Suhoor reminder dialog on 15 Ramadan 1448, at its defaults (60 minutes before Fajr, Notification, your phone's usual tone), with every choice visible (Off, 15 to 60 minutes, Alarm, Adhan) | The Ramadan settings, at the owner's request (23 Oct 2026: "mention all the features including widget, wearable app, ramadan settings"). **Added 23 Oct 2026** |
 
 The "Does this match your mosque?" notice (Manchester in August is far enough north for it) was closed
 before `01`, as a user would. In `01` and `03` the last row sits under the floating tab bar; that is
 the app as it is at 9:16, not a capture fault. The watch screenshots (`w1-times`, `w2-qibla`) were not
 retaken: on the 1.5.0 build the watch Times screen lays out exactly as in `w1` (checked on
-`sajdawear_large`), and nothing in 1.5.0 changed the Qibla page.
+`sajdawear_large`), and nothing in 1.5.0 changed the Qibla page. **Two watch screenshots were added on 23 Oct 2026**, on
+`sajdawear_large` (read only, London time zone, 15 Aug 2026 15:03, Manchester): `w3-tile`, the tile beside the watch face
+("Asr, 5:13 pm · in 2h 9m", the same moment as `w1`), and `w4-location`, the 1.5.0 Location screen with "Same as phone ·
+Manchester" chosen. An emulator pair cannot sync, so the phone's place was handed to the watch by
+`WearScreenSeedDeviceTest` (`-e seed true`), the same call the phone's sync makes; the screen is otherwise exactly as a paired
+watch shows it.
 
 > **History.** The 1.4.0 set had `03-times-dark.png`, the same view as `01` in dark. The note that used
 > to stand here asked for `03` to become genuinely different when the set was recaptured; it now is.

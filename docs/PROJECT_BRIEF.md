@@ -68,7 +68,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   2. Claude, on the day, runs `docs/release-tools/set-release-date.sh` (privacy policy "Last updated" set to that day) and pushes.
   3. Ali merges `claude/quiet-glass` into `main` that same day, not before (merging publishes the privacy policy).
   4. Ali builds both bundles fresh from `main`.
-  5. Ali in the Play Console, with Claude walking him through one screen at a time: both bundles, the five What's new texts, the watch note, the new description and (with his yes) the new short description, the eight translated listings, the six screenshots, Data safety (expected unchanged); then Ali presses Send for review.
+  5. Ali in the Play Console, with Claude walking him through one screen at a time: both bundles, the five What's new texts, the watch note, the new description and (with his yes) the new short description, the eight translated listings, the eight phone and four watch screenshots (`docs/store/upload/`), Data safety (expected unchanged); then Ali presses Send for review.
   6. After it is live: Claude drafts the Arabic reviewer reply and Ali posts it; Ali deletes the spare signing file; record the release. (The January Ramadan lines are no longer a separate step: the new description carries Ramadan.)
 - **Not verified:** a real phone; Android 7 to 11 (Ali's choice; the language changes were run on an Android 12 emulator); Google's review card (only on a copy installed from Play); the place name from the phone's own location on Android 12 and older (it works on Android 16, seen on 19 Oct 2026 in English and Urdu; the Android 12 test emulator stopped starting that evening).
 

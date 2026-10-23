@@ -110,6 +110,9 @@ memory (GBrain `projects/sajdatime`); `recall` it first and do not redo work it 
       one as `03` and a widgets one as `06` (owner's choice); the watch ones did not change and stay
       (`docs/store/LISTING.md`, "What the six phone screenshots show"). Was: retake the five phone
       screenshots from the 1.5.0 build plus the planned Ramadan one, and the watch ones if they changed.
+- [x] **Four more screenshots (23 Oct 2026, owner: show the widget, wearable, Ramadan settings and the rest):** phone
+      `07-alerts-and-adhan` and `08-ramadan-suhoor-reminder`, watch `w3-tile` and `w4-location`. Upload eight phone and four
+      watch screenshots in filename order (`docs/store/LISTING.md`, "What the eight phone screenshots show").
 - **Data safety:** the check's reading is that no answer changes (the language sent with a typed place
   name is already in the policy). The answers are his to confirm in the Console.
 - **Release notes languages:** check in the Console whether Play shows the Urdu, Turkish, Indonesian and
@@ -189,13 +192,16 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
 (not fixed)**, **latest acceptable 25 Jan 2027** (Ramadan 1448 begins Mon 8 Feb 2027). Where a line below says
 "the preparation job (Mon 2 Nov)" or "the 2 Nov job", read the final check job of Fri 30 Oct. Replaced: the 19 Oct plan (1 Nov, 2 Nov, 9 Nov) and the January plan.
 
+0c. **DONE on the Mac, 23 Oct 2026 (HANDOVER §11 STATE OF PLAY 23 Oct):** `wear-verify.sh` 24 of 24 PASS, the school button clear
+   of the clock at both sizes and both font scales; Makkah, This watch and Back driven by adb on `sajdawear`; Same as phone proved
+   on the watch by `WearSettingsDeviceTest` (OK). Watch note now 330 / 500.
 0c. **Watch Location screen (added 22 Oct 2026, HANDOVER §5.27, §10 top entry). Already in `claude/quiet-glass`**
    (fast forwarded by the cloud session with the owner's yes; pull first). In the 30 Oct run, or in the next Mac session:
    `tools/wear-verify.sh` on both round sizes and both font scales, and look at the times list scrolled to the place
    button and to the end (the school button must still sit clear of the clock exactly as before), and at the Location
    screen; open it, choose This watch, Same as phone and Makkah in turn and check the place button follows. It was
    verified in the cloud on Robolectric only, which cannot judge the bezel. Claude fixes anything it shows; **never ask
-   the owner to test the watch.** Paste the watch note from `docs/store/LISTING.md` (now 295 / 500, it names this).
+   the owner to test the watch.** Paste the watch note from `docs/store/LISTING.md` (now 330 / 500, it names this).
 0. **Waiting on Google (19 Oct 2026):** the description for the live 1.4.0 was submitted (`docs/store/LISTING.md`,
    "For the live 1.4.0, SUBMITTED 19 Oct 2026"). Live when the public page's description says "In English, Urdu,
    Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
