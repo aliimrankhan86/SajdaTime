@@ -34,6 +34,9 @@ import com.sajdatime.app.data.TrackerData
 import com.sajdatime.app.data.TrackerFileCodec
 import com.sajdatime.app.data.TrackerRepository
 import com.sajdatime.core.TickState
+import com.sajdatime.core.JamaahPlan
+import com.sajdatime.core.JamaahResult
+import com.sajdatime.core.JamaahRule
 import com.sajdatime.core.TrackerLogic
 import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.R
@@ -120,6 +123,13 @@ interface TrackerActions {
     fun delete()
 }
 
+/** What the Jama'ah times screen changes. Bound to this ViewModel by MainActivity. */
+interface JamaahActions {
+    /** null clears that prayer. */
+    fun setRule(slot: PrayerSlot, rule: JamaahRule?)
+    fun setJumuah(time: java.time.LocalTime?)
+}
+
 sealed interface ExportEvent {
     data class Saved(val fileName: String) : ExportEvent
     data class Share(val uri: Uri) : ExportEvent
@@ -159,6 +169,11 @@ data class UiState(
      * the header cannot disagree.
      */
     val eid: EidDay? = null,
+    /**
+     * Today's jama'ah for each prayer that has one set, already checked against its window
+     * ([JamaahPlan]). Empty for everyone who has set none.
+     */
+    val jamaah: Map<PrayerSlot, JamaahResult> = emptyMap(),
     /** The prayer record, while "My prayers" is on. See [TrackerState]. */
     val tracker: TrackerState? = null,
     /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
@@ -416,6 +431,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) =
         viewModelScope.launch { settingsRepository.setBuiltInNotificationAdhan(adhan) }
 
+    fun setJamaahRule(slot: PrayerSlot, rule: JamaahRule?) =
+        viewModelScope.launch { settingsRepository.setJamaahRule(slot, rule) }
+
+    fun setJumuah(time: java.time.LocalTime?) =
+        viewModelScope.launch { settingsRepository.setJumuah(time) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 
@@ -590,7 +611,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap()) }
             // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
             withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
@@ -609,7 +630,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             // midnight. No new timer.
             val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
             val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
-            Computed(today, next, current, ramadan, eid)
+            val jamaah = JamaahPlan.on(today, zone, settings.jamaah)
+            Computed(today, next, current, ramadan, eid, jamaah)
         }
 
         publishTracker()
@@ -620,6 +642,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 current = computed.current,
                 ramadan = computed.ramadan,
                 eid = computed.eid,
+                jamaah = computed.jamaah,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -669,4 +692,5 @@ private data class Computed(
     val current: PrayerSlot?,
     val ramadan: RamadanState?,
     val eid: EidDay?,
+    val jamaah: Map<PrayerSlot, JamaahResult>,
 )

@@ -125,6 +125,7 @@ fun MainScaffold(
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
     tracker: TrackerActions,
+    jamaah: JamaahActions,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -235,6 +236,7 @@ fun MainScaffold(
                         onSetThemeChoice = onSetThemeChoice,
                         onSetAnalytics = onSetAnalytics,
                         tracker = tracker,
+                        jamaah = jamaah,
                     )
                 }
             }

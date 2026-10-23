@@ -285,7 +285,7 @@
     <string name="adjustment_use_board">Cami panosundaki saati girin</string>
     <string name="adjustment_which_prayer">Hangi vakit?</string>
     <string name="action_set_time">Saati ayarla</string>
-    <string name="adjustment_pick_time_title">%1$s: caminizin panosundaki saat</string>
+    <string name="adjustment_pick_time_title">%1$s: caminizin panosundaki giriş vakti</string>
     <string name="adjustment_limit_note">%1$d dakika ya da daha fazla bir fark genellikle farklı bir hesaplama yönteminden ya da biraz daha geç olan cemaat saatini gösteren bir cami panosundan kaynaklanır. Önce yöntemi deneyin.</string>
     <string name="adjustment_choose_method">Bir hesaplama yöntemi seçin</string>
     <string name="settings_adjustments_reset">Tümünü sıfırla</string>
@@ -469,4 +469,25 @@
     <string name="dates_header_a11y">İslami tarihler. Bugün %1$s</string>
     <string name="settings_islamic_dates">İslami tarihler</string>
     <string name="settings_islamic_dates_desc">Ramazan, iki bayram ve diğer önemli günler</string>
+    <string name="settings_jamaah">Cemaat vakitleri</string>
+    <plurals name="settings_jamaah_count">
+        <item quantity="one">%d vakit ayarlı</item>
+        <item quantity="other">%d vakit ayarlı</item>
+    </plurals>
+    <string name="settings_jamaah_off">Kapalı</string>
+    <string name="jumuah">Cuma</string>
+    <string name="jamaah_rule_fixed">Sabit saat</string>
+    <string name="jamaah_rule_after">Vakit girdikten sonra dakika</string>
+    <string name="jamaah_rule_after_help">Caminiz vakitlerini mevsime göre değiştiriyorsa en iyisi budur.</string>
+    <plurals name="jamaah_after_minutes">
+        <item quantity="one">Vakit girdikten %d dakika sonra</item>
+        <item quantity="other">Vakit girdikten %d dakika sonra</item>
+    </plurals>
+    <string name="jamaah_today">Bugün %1$s</string>
+    <string name="jamaah_line">Cemaat %1$s</string>
+    <string name="jumuah_line">Cuma %1$s</string>
+    <string name="jamaah_check">Cemaat vaktinizi kontrol edin</string>
+    <string name="jamaah_out_of_window">%1$s cemaat vaktiniz bugün %1$s vaktinin dışında. Caminizin vakitlerini kontrol edin.</string>
+    <string name="jamaah_pick_time_title">%1$s: caminizin panosundaki cemaat saati</string>
+    <string name="mosque_diff_add_jamaah">Caminizin cemaat vakitlerini ekleyin</string>
 </resources>

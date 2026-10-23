@@ -49,6 +49,7 @@ import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.TrackerActions
+import com.sajdatime.app.ui.JamaahActions
 import com.sajdatime.app.ui.TrackerEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
@@ -154,6 +155,13 @@ class MainActivity : ComponentActivity() {
             trackerLoad.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
         }.getOrElse { toast(getString(R.string.tracker_load_failed_format)) }
         override fun delete() { viewModel.deleteTracker() }
+    }
+
+    private val jamaahActions = object : JamaahActions {
+        override fun setRule(slot: com.sajdatime.core.PrayerSlot, rule: com.sajdatime.core.JamaahRule?) {
+            viewModel.setJamaahRule(slot, rule)
+        }
+        override fun setJumuah(time: java.time.LocalTime?) { viewModel.setJumuah(time) }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -271,6 +279,7 @@ class MainActivity : ComponentActivity() {
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                                 tracker = trackerActions,
+                                jamaah = jamaahActions,
                             )
 
                             // Shown once, immediately after setup, never after an update (the flag is

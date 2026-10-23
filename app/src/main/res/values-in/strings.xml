@@ -286,7 +286,7 @@
     <string name="adjustment_use_board">Pakai waktu di papan masjid</string>
     <string name="adjustment_which_prayer">Salat yang mana?</string>
     <string name="action_set_time">Setel waktu</string>
-    <string name="adjustment_pick_time_title">%1$s: waktu di papan jadwal masjid Anda</string>
+    <string name="adjustment_pick_time_title">%1$s: waktu masuk di papan jadwal masjid Anda</string>
     <string name="adjustment_limit_note">Selisih %1$d menit atau lebih biasanya disebabkan oleh metode perhitungan yang berbeda, atau papan jadwal masjid yang menampilkan waktu salat berjamaah, yang sedikit lebih lambat. Coba metodenya terlebih dahulu.</string>
     <string name="adjustment_choose_method">Pilih metode perhitungan</string>
     <string name="settings_adjustments_reset">Atur ulang semua</string>
@@ -461,4 +461,23 @@
     <string name="dates_header_a11y">Tanggal Islam. Hari ini %1$s</string>
     <string name="settings_islamic_dates">Tanggal Islam</string>
     <string name="settings_islamic_dates_desc">Ramadan, dua hari raya, dan tanggal penting lainnya</string>
+    <string name="settings_jamaah">Waktu salat berjamaah</string>
+    <plurals name="settings_jamaah_count">
+        <item quantity="other">%d salat diatur</item>
+    </plurals>
+    <string name="settings_jamaah_off">Nonaktif</string>
+    <string name="jumuah">Jumat</string>
+    <string name="jamaah_rule_fixed">Waktu tetap</string>
+    <string name="jamaah_rule_after">Menit setelah waktu masuk</string>
+    <string name="jamaah_rule_after_help">Paling cocok jika masjid Anda mengubah waktunya sesuai musim.</string>
+    <plurals name="jamaah_after_minutes">
+        <item quantity="other">%d menit setelah waktu masuk</item>
+    </plurals>
+    <string name="jamaah_today">Hari ini %1$s</string>
+    <string name="jamaah_line">Berjamaah %1$s</string>
+    <string name="jumuah_line">Jumat %1$s</string>
+    <string name="jamaah_check">Periksa waktu berjamaah Anda</string>
+    <string name="jamaah_out_of_window">Waktu berjamaah %1$s Anda di luar waktu %1$s hari ini. Periksa jadwal masjid Anda.</string>
+    <string name="jamaah_pick_time_title">%1$s: waktu berjamaah di papan jadwal masjid Anda</string>
+    <string name="mosque_diff_add_jamaah">Tambahkan waktu berjamaah masjid Anda</string>
 </resources>

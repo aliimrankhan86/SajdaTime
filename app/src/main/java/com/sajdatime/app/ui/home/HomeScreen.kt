@@ -81,6 +81,7 @@ import com.sajdatime.app.R
 import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.HijriCalendar
+import com.sajdatime.core.JamaahResult
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
@@ -659,6 +660,10 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 ExplainerParagraph(stringResource(R.string.mosque_diff_congregation), first = true)
+                // 1.6.0: the congregation time itself, the most direct answer to "the board says 1:30".
+                ExplainerAction(stringResource(R.string.mosque_diff_add_jamaah)) {
+                    onOpen(SettingsChooser.JAMAAH)
+                }
                 ExplainerParagraph(stringResource(R.string.mosque_diff_twilight))
                 ExplainerAction(stringResource(R.string.settings_method)) {
                     onOpen(SettingsChooser.METHOD)
@@ -914,12 +919,15 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit, onTick: (java.ti
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
                 isNext = next != null && slot == next.slot && !next.isTomorrow,
                 isCurrent = slot == state.current,
-                note = when {
-                    !inRamadan -> null
-                    slot == PrayerSlot.FAJR -> suhoorLabel
-                    slot == PrayerSlot.MAGHRIB -> iftarLabel
-                    else -> null
-                },
+                note = rowNote(
+                    ramadan = when {
+                        !inRamadan -> null
+                        slot == PrayerSlot.FAJR -> suhoorLabel
+                        slot == PrayerSlot.MAGHRIB -> iftarLabel
+                        else -> null
+                    },
+                    jamaah = state.jamaah[slot],
+                ),
                 trailing = tracker?.let { t ->
                     {
                         if (slot.isPrayer) {
@@ -941,6 +949,28 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit, onTick: (java.ti
                 HorizontalDivider(color = scheme.outlineVariant)
             }
         }
+    }
+}
+
+/**
+ * The second line under a prayer: the Ramadan word, the jama'ah time, or both on one line
+ * ("Suhoor ends · Jama'ah 5:45 am"), never two lines (UX.md). A jama'ah time outside its prayer's
+ * window is never shown as a time: the line says "Check your jama'ah time" in the same height.
+ */
+@Composable
+private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
+    val context = LocalContext.current
+    val jamaahText = when (jamaah) {
+        null -> null
+        is JamaahResult.Shown -> stringResource(
+            if (jamaah.isJumuah) R.string.jumuah_line else R.string.jamaah_line,
+            TimeFormat.clock(context, jamaah.at),
+        )
+        JamaahResult.OutOfWindow -> stringResource(R.string.jamaah_check)
+    }
+    return when {
+        ramadan != null && jamaahText != null -> stringResource(R.string.settings_value_pair, ramadan, jamaahText)
+        else -> ramadan ?: jamaahText
     }
 }
 
@@ -1017,7 +1047,9 @@ private fun PrayerRow(
             // height: 12dp above and below a 48dp target made every row 72dp and pushed Isha under
             // the tab bar on the 823dp S23 Ultra frame (emulator, 23 Oct 2026). The text rows of a
             // Ramadan day are shorter than the target, so they do not grow either.
-            .padding(vertical = if (trailing != null) 1.dp else 12.dp),
+            // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
+            // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
+            .padding(vertical = if (trailing != null) 1.dp else if (note != null) 6.dp else 12.dp),
     ) {
         Icon(
             imageVector = slotIcon(slot),

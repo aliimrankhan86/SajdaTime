@@ -15,6 +15,9 @@ import com.sajdatime.core.AdjustmentCodec
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
+import com.sajdatime.core.JamaahCodec
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.JamaahTimes
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
@@ -233,6 +236,12 @@ data class AppSettings(
     val trackerEnabled: Boolean = false,
     /** Whether the "days in a row" line shows. Off by default (Ali, 16 Oct 2026): a streak is opt in. */
     val trackerShowStreak: Boolean = false,
+    /**
+     * The user's own mosque's jama'ah and Jumu'ah times (1.6.0), typed in by them. Empty for everyone
+     * until set. Shown on Times only, never synced to the watch or the widgets in 1.6.0, and never
+     * part of the usage counts.
+     */
+    val jamaah: JamaahTimes = JamaahTimes(),
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -462,6 +471,17 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setTrackerShowStreak(show: Boolean) = edit { it[Keys.TRACKER_STREAK] = show }
 
+    /** [rule] of null clears that prayer's jama'ah time. */
+    suspend fun setJamaahRule(slot: PrayerSlot, rule: JamaahRule?) = edit { prefs ->
+        val current = JamaahCodec.decode(prefs[Keys.JAMAAH])
+        val rules = if (rule == null) current.rules - slot else current.rules + (slot to rule)
+        prefs[Keys.JAMAAH] = JamaahCodec.encode(current.copy(rules = rules))
+    }
+
+    suspend fun setJumuah(time: java.time.LocalTime?) = edit { prefs ->
+        prefs[Keys.JAMAAH] = JamaahCodec.encode(JamaahCodec.decode(prefs[Keys.JAMAAH]).copy(jumuah = time))
+    }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -547,6 +567,7 @@ class SettingsRepository(private val context: Context) {
         val PRAYER_REMINDER_FOR = stringPreferencesKey("prayer_reminder_for")
         val TRACKER_ENABLED = booleanPreferencesKey("tracker_enabled")
         val TRACKER_STREAK = booleanPreferencesKey("tracker_show_streak")
+        val JAMAAH = stringPreferencesKey("jamaah_times")
     }
 
     private companion object {
@@ -599,6 +620,7 @@ class SettingsRepository(private val context: Context) {
             prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
             trackerEnabled = this[Keys.TRACKER_ENABLED] ?: false,
             trackerShowStreak = this[Keys.TRACKER_STREAK] ?: false,
+            jamaah = JamaahCodec.decode(this[Keys.JAMAAH]),
         )
     }
 

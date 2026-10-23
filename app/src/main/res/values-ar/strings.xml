@@ -312,7 +312,7 @@
     <string name="adjustment_use_board">استخدم وقت لوحة مسجدك</string>
     <string name="adjustment_which_prayer">أي صلاة؟</string>
     <string name="action_set_time">اضبط الوقت</string>
-    <string name="adjustment_pick_time_title">%1$s: الوقت على لوحة مسجدك</string>
+    <string name="adjustment_pick_time_title">%1$s: وقت الدخول على لوحة مسجدك</string>
     <string name="adjustment_limit_note">الفرق الذي يبلغ %1$d دقيقة أو أكثر يعني عادةً طريقة حساب مختلفة، أو لوحة مسجد تعرض وقت الجماعة، وهو بعد ذلك بقليل. جرّب الطريقة أولًا.</string>
     <string name="adjustment_choose_method">اختر طريقة الحساب</string>
     <string name="settings_adjustments_reset">إعادة ضبط الكل</string>
@@ -547,4 +547,33 @@
     <string name="dates_header_a11y">التواريخ الإسلامية. اليوم %1$s</string>
     <string name="settings_islamic_dates">التواريخ الإسلامية</string>
     <string name="settings_islamic_dates_desc">رمضان والعيدان وتواريخ مهمة أخرى</string>
+    <string name="settings_jamaah">أوقات الجماعة</string>
+    <plurals name="settings_jamaah_count">
+        <item quantity="zero">%d صلاة محددة</item>
+        <item quantity="one">%d صلاة محددة</item>
+        <item quantity="two">%d صلاة محددة</item>
+        <item quantity="few">%d صلوات محددة</item>
+        <item quantity="many">%d صلاة محددة</item>
+        <item quantity="other">%d صلاة محددة</item>
+    </plurals>
+    <string name="settings_jamaah_off">إيقاف</string>
+    <string name="jumuah">الجمعة</string>
+    <string name="jamaah_rule_fixed">وقت ثابت</string>
+    <string name="jamaah_rule_after">دقائق بعد دخول الوقت</string>
+    <string name="jamaah_rule_after_help">الأنسب إذا كان مسجدك يغيّر أوقاته مع الفصول.</string>
+    <plurals name="jamaah_after_minutes">
+        <item quantity="zero">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="one">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="two">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="few">بعد دخول الوقت بـ%d دقائق</item>
+        <item quantity="many">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="other">بعد دخول الوقت بـ%d دقيقة</item>
+    </plurals>
+    <string name="jamaah_today">اليوم %1$s</string>
+    <string name="jamaah_line">الجماعة %1$s</string>
+    <string name="jumuah_line">الجمعة %1$s</string>
+    <string name="jamaah_check">تحقق من وقت الجماعة</string>
+    <string name="jamaah_out_of_window">وقت جماعة %1$s الذي أدخلته خارج وقت %1$s اليوم. تحقق من أوقات مسجدك.</string>
+    <string name="jamaah_pick_time_title">%1$s: وقت الجماعة على لوحة مسجدك</string>
+    <string name="mosque_diff_add_jamaah">أضف أوقات الجماعة في مسجدك</string>
 </resources>

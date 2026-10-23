@@ -290,7 +290,7 @@
     <string name="adjustment_use_board">مسجد کے بورڈ سے وقت لیں</string>
     <string name="adjustment_which_prayer">کون سی نماز؟</string>
     <string name="action_set_time">وقت مقرر کریں</string>
-    <string name="adjustment_pick_time_title">%1$s: آپ کی مسجد کے بورڈ پر وقت</string>
+    <string name="adjustment_pick_time_title">%1$s: آپ کی مسجد کے بورڈ پر شروع ہونے کا وقت</string>
     <string name="adjustment_limit_note">%1$d منٹ یا اس سے زیادہ کا فرق عموماً حساب کے مختلف طریقے کی وجہ سے ہوتا ہے، یا اس لیے کہ مسجد کا بورڈ جماعت کا وقت دکھاتا ہے، جو تھوڑا بعد میں ہوتا ہے۔ پہلے طریقہ آزمائیں۔</string>
     <string name="adjustment_choose_method">حساب کا طریقہ چنیں</string>
     <string name="settings_adjustments_reset">سب ری سیٹ کریں</string>
@@ -475,4 +475,25 @@
     <string name="dates_header_a11y">اسلامی تاریخیں۔ آج %1$s ہے</string>
     <string name="settings_islamic_dates">اسلامی تاریخیں</string>
     <string name="settings_islamic_dates_desc">رمضان، دونوں عیدیں اور دیگر اہم تاریخیں</string>
+    <string name="settings_jamaah">جماعت کے اوقات</string>
+    <plurals name="settings_jamaah_count">
+        <item quantity="one">%d نماز مقرر</item>
+        <item quantity="other">%d نمازیں مقرر</item>
+    </plurals>
+    <string name="settings_jamaah_off">بند</string>
+    <string name="jumuah">جمعہ</string>
+    <string name="jamaah_rule_fixed">مقررہ وقت</string>
+    <string name="jamaah_rule_after">وقت شروع ہونے کے بعد منٹ</string>
+    <string name="jamaah_rule_after_help">اگر آپ کی مسجد موسم کے ساتھ اوقات بدلتی ہے تو یہی بہتر ہے۔</string>
+    <plurals name="jamaah_after_minutes">
+        <item quantity="one">وقت شروع ہونے کے %d منٹ بعد</item>
+        <item quantity="other">وقت شروع ہونے کے %d منٹ بعد</item>
+    </plurals>
+    <string name="jamaah_today">آج %1$s</string>
+    <string name="jamaah_line">جماعت %1$s</string>
+    <string name="jumuah_line">جمعہ %1$s</string>
+    <string name="jamaah_check">جماعت کا وقت چیک کریں</string>
+    <string name="jamaah_out_of_window">آپ کا %1$s کی جماعت کا وقت آج %1$s کے وقت سے باہر ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <string name="jamaah_pick_time_title">%1$s: آپ کی مسجد کے بورڈ پر جماعت کا وقت</string>
+    <string name="mosque_diff_add_jamaah">اپنی مسجد کی جماعت کے اوقات شامل کریں</string>
 </resources>

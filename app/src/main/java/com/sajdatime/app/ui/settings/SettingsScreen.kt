@@ -102,6 +102,15 @@ import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.TrackerActions
+import com.sajdatime.app.ui.JamaahActions
+import com.sajdatime.app.ui.components.Notice
+import androidx.compose.material.icons.outlined.Groups
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.JamaahPlan
+import com.sajdatime.core.JamaahResult
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.JamaahTimes
+import com.sajdatime.core.TRACKED_SLOTS
 import com.sajdatime.app.ui.UiState
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.DeleteOutline
@@ -149,7 +158,7 @@ import android.text.format.DateFormat
  * See [SettingsScreen]'s `request` parameter.
  */
 enum class SettingsChooser {
-    SCHOOL, METHOD, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
 }
 
 @Composable
@@ -187,6 +196,7 @@ fun SettingsScreen(
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     tracker: TrackerActions,
+    jamaah: JamaahActions,
 ) {
     val context = LocalContext.current
     var open by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
@@ -266,6 +276,19 @@ fun SettingsScreen(
                     stringResource(settings.method.labelRes)
                 },
                 onClick = { open = SettingsChooser.METHOD },
+            ),
+            // 1.6.0, directly above Match your mosque: the congregation time is the other number on a
+            // mosque board, and the two rows side by side say which is which.
+            SettingsItem.Link(
+                key = "jamaah",
+                icon = Icons.Outlined.Groups,
+                title = stringResource(R.string.settings_jamaah),
+                subtitle = if (settings.jamaah.isEmpty) {
+                    stringResource(R.string.settings_jamaah_off)
+                } else {
+                    pluralStringResource(R.plurals.settings_jamaah_count, settings.jamaah.count, settings.jamaah.count)
+                },
+                onClick = { open = SettingsChooser.JAMAAH },
             ),
             // Last in this group on purpose. The method and school rows above explain the
             // two divergences that have a reason; this one is the catch-all for whatever is
@@ -657,6 +680,13 @@ fun SettingsScreen(
             )
         }
 
+        SettingsChooser.JAMAAH -> JamaahDialog(
+            jamaah = settings.jamaah,
+            today = state.today,
+            actions = jamaah,
+            onDismiss = { open = null },
+        )
+
         SettingsChooser.ISLAMIC_DATES -> IslamicDatesSheet(
             today = state.today?.date ?: LocalDate.now(),
             offsetDays = settings.calculationPrefs.hijriOffset,
@@ -753,6 +783,158 @@ fun SettingsScreen(
         )
     }
 }
+
+/**
+ * "Jama'ah times": each prayer's congregation time at the user's own mosque, and Jumu'ah (1.6.0).
+ *
+ * Each row says its rule and what it gives today, so the person can check it against the board. A
+ * time outside its prayer (before it begins, or after the next one begins) is flagged in amber under
+ * the row and is never shown on Times as a time. No paragraph at the top (sign-off, 23 Oct 2026): the
+ * one piece of advice, when to choose minutes after, sits where that choice is made.
+ */
+@Composable
+private fun JamaahDialog(jamaah: JamaahTimes, today: DayPrayerTimes?, actions: JamaahActions, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    // A slot's name, or JUMUAH, for the rule being edited; and which one's clock is open.
+    var editing by rememberSaveable { mutableStateOf<String?>(null) }
+    var picking by rememberSaveable { mutableStateOf<String?>(null) }
+    ChooserDialog(title = stringResource(R.string.settings_jamaah), onDismiss = onDismiss) {
+        val rows = TRACKED_SLOTS.map { it.name to it.label(context) } + (JUMUAH to stringResource(R.string.jumuah))
+        rows.forEachIndexed { i, (key, label) ->
+            if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            val slot = TRACKED_SLOTS.firstOrNull { it.name == key }
+            val rule = slot?.let { jamaah.rules[it] }
+            val jumuahTime = if (slot == null) jamaah.jumuah else null
+            val result = today?.let { day ->
+                when {
+                    rule != null -> JamaahPlan.result(day, zone, slot, rule)
+                    jumuahTime != null -> JamaahPlan.jumuah(day, zone, jumuahTime)
+                    else -> null
+                }
+            }
+            val ruleText = when {
+                rule is JamaahRule.After -> pluralStringResource(R.plurals.jamaah_after_minutes, rule.minutes, rule.minutes)
+                rule is JamaahRule.Fixed -> TimeFormat.clock(context, rule.time)
+                jumuahTime != null -> TimeFormat.clock(context, jumuahTime)
+                else -> stringResource(R.string.settings_jamaah_off)
+            }
+            val shownToday = (result as? JamaahResult.Shown)?.let {
+                stringResource(R.string.jamaah_today, TimeFormat.clock(context, it.at, zone))
+            }
+            SettingRow(
+                title = label,
+                subtitle = if (shownToday != null && rule is JamaahRule.After) {
+                    stringResource(R.string.settings_value_pair, ruleText, shownToday)
+                } else {
+                    ruleText
+                },
+                horizontalPadding = 0.dp,
+                onClick = { editing = key },
+            )
+            if (result == JamaahResult.OutOfWindow) {
+                Notice(
+                    brief = stringResource(R.string.jamaah_out_of_window, label),
+                    modifier = Modifier.padding(bottom = Space.Related),
+                )
+            }
+        }
+    }
+
+    val editKey = editing
+    if (editKey != null) {
+        val slot = TRACKED_SLOTS.firstOrNull { it.name == editKey }
+        val label = slot?.label(context) ?: stringResource(R.string.jumuah)
+        JamaahRuleDialog(
+            title = label,
+            current = if (slot != null) jamaah.rules[slot] else jamaah.jumuah?.let { JamaahRule.Fixed(it) },
+            // Jumu'ah is a fixed time only: it is not counted from the start of Dhuhr.
+            allowAfter = slot != null,
+            onOff = {
+                if (slot != null) actions.setRule(slot, null) else actions.setJumuah(null)
+                editing = null
+            },
+            onAfter = { minutes -> if (slot != null) actions.setRule(slot, JamaahRule.After(minutes)) },
+            onPickTime = {
+                editing = null
+                picking = editKey
+            },
+            onDismiss = { editing = null },
+        )
+    }
+
+    val pickKey = picking
+    if (pickKey != null) {
+        val slot = TRACKED_SLOTS.firstOrNull { it.name == pickKey }
+        val label = slot?.label(context) ?: stringResource(R.string.jumuah)
+        val existing = if (slot != null) (jamaah.rules[slot] as? JamaahRule.Fixed)?.time else jamaah.jumuah
+        TimeEntryDialog(
+            title = stringResource(R.string.jamaah_pick_time_title, label),
+            // Opens on the time already set, or on the prayer's start today, so a small change is a small move.
+            initial = existing
+                ?: today?.let { (slot ?: PrayerSlot.DHUHR).let { s -> it[s].atZone(zone).toLocalTime().withSecond(0).withNano(0) } }
+                ?: LocalTime.of(13, 0),
+            is24Hour = DateFormat.is24HourFormat(context.applicationContext),
+            onConfirm = { time ->
+                if (slot != null) actions.setRule(slot, JamaahRule.Fixed(time)) else actions.setJumuah(time)
+                picking = null
+            },
+            onDismiss = { picking = null },
+        )
+    }
+}
+
+private const val JUMUAH = "JUMUAH"
+
+/** Off, a fixed time, or minutes after it begins (0 to 60 in fives, with the minus and plus steppers). */
+@Composable
+private fun JamaahRuleDialog(
+    title: String,
+    current: JamaahRule?,
+    allowAfter: Boolean,
+    onOff: () -> Unit,
+    onAfter: (Int) -> Unit,
+    onPickTime: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            RadioRow(label = stringResource(R.string.settings_jamaah_off), selected = current == null, onSelect = onOff)
+            RadioRow(
+                label = stringResource(R.string.jamaah_rule_fixed),
+                supporting = (current as? JamaahRule.Fixed)?.let { TimeFormat.clock(context, it.time) },
+                selected = current is JamaahRule.Fixed,
+                onSelect = onPickTime,
+            )
+            if (allowAfter) {
+                RadioRow(
+                    label = stringResource(R.string.jamaah_rule_after),
+                    supporting = stringResource(R.string.jamaah_rule_after_help),
+                    selected = current is JamaahRule.After,
+                    onSelect = { if (current !is JamaahRule.After) onAfter(DEFAULT_AFTER_MINUTES) },
+                )
+            }
+        }
+        if (current is JamaahRule.After) {
+            val choices = JamaahRule.AFTER_CHOICES
+            val i = choices.indexOf(current.minutes).coerceAtLeast(0)
+            StepperRow(
+                label = stringResource(R.string.jamaah_rule_after),
+                // The number alone: the label beside it already says what it counts, and the
+                // full phrase wrapped to four lines in the stepper's 64dp (emulator, 23 Oct 2026).
+                value = current.minutes.toString(),
+                canDecrease = i > 0,
+                canIncrease = i < choices.lastIndex,
+                onDecrease = { onAfter(choices[i - 1]) },
+                onIncrease = { onAfter(choices[i + 1]) },
+            )
+        }
+    }
+}
+
+/** Where "minutes after" starts when first chosen: a common gap, one tap either way to change. */
+private const val DEFAULT_AFTER_MINUTES = 15
 
 // --- what the screen shows, kept apart from how it is drawn ------------------------------
 

@@ -42,6 +42,12 @@ object TimeFormat {
             .format(instant.atZone(zone))
     }
 
+    /** The same, for a clock time with no day (a jama'ah time as typed). */
+    fun clock(context: Context, time: java.time.LocalTime): String {
+        val pattern = if (DateFormat.is24HourFormat(context.applicationContext)) "HH:mm" else "h:mm a"
+        return DateTimeFormatter.ofPattern(pattern, AppLocale.of(context)).format(time)
+    }
+
     /**
      * Calendar date without the year, e.g. "Thu 31 Jul".
      *
