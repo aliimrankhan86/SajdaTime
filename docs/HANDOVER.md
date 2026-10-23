@@ -5798,10 +5798,10 @@ ordered build table, animation, development and testing guidance, and (§0.1) wh
   design exists, then `plan-verifier`, then prototype pictures for Ali's yes. **Step 1 (My prayers tab) built 23 Oct 2026, night** on
   `claude/1-6-0-step1-proto` and merged here: Ali approved from pictures ("B: calendar grid", "Yes, build it");
   Opus reviewed it twice, Fable judged the pictures and decided four follow ups; §5.29 has the rules, §10 the
-  evidence. **Finished screenshots sent to Ali 23 Oct, about 23:35; his yes is awaited before step 2 is built.** Step 2 is
+  evidence. **Ali approved step 1's finished screenshots on 23 Oct night ("Yes, it's right (Recommended)"). Step 1 is done.** Step 2 is
   designed (`STEP-2-DESIGN.md`, by Fable, checked by `plan-verifier`, `ad41a39` and the next commit): the shared
-  dates sheet unchanged; five Shia only dates with named sources; two questions for Ali (the Ramadan nights,
-  recommended out; the honorific, recommended "Birth of the Prophet ﷺ", Imams plain). Steps 3 to 11 not started. The five agents ran for the first time and each runs on its
+  dates sheet unchanged; five Shia only dates with named sources; Ali's answers: the Ramadan nights stay out of 1.6;
+  "Birth of the Prophet ﷺ", Imams plain. **Next: build step 2** (start with STEP-2-DESIGN §7a and §8). Steps 3 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
   start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).

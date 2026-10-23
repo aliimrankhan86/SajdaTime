@@ -84,6 +84,16 @@ Out of range: the existing "not available" line. The date shift applies to every
 2. Honorifics: **"Birth of the Prophet ﷺ" with Imams plain (recommended)**, or no honorific anywhere, or "(a)" after
    each Imam as Shia sites write?
 
+## 7a. Ali's answers (23 Oct 2026, night, AskUserQuestion)
+
+1. Ramadan nights: **"Leave out of 1.6 (Recommended)".**
+2. Honorific: **"Prophet ﷺ, Imams plain (Recommended)":** "Birth of the Prophet ﷺ", "Birth of Imam Ali", "Birth of
+   Imam al-Mahdi".
+
+Ali also approved step 1's finished screenshots the same moment ("Yes, it's right (Recommended)"), so step 2 may be
+built. **Ready to build:** plan-verifier's §8 below first; then fetch Aladhan Umm al-Qura values for the five dates
+(1448, 1449); translations by the main session; pictures with the sect set to Shia (§8.1).
+
 ## 8. Corrections from `plan-verifier` (23 Oct 2026, night). These win over §1 to §7
 
 Nothing serious; Q20 and Q21 checked as written and consistent (Q20 removed Mawlid, Isra and Mi'raj and 15 Sha'ban
