@@ -5661,7 +5661,40 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (read this first; the block below still holds for everything not named here)
+### 📍 STATE OF PLAY, 23 Oct 2026, 17:45: 1.5.0 SUBMITTED, IN GOOGLE'S REVIEW (read this first; the blocks below are history for everything they say about release day)
+
+**In one line: 1.4.0 is live; 1.5.0 is submitted and in review. Nothing is left for Claude or Ali until the Play Console
+shows it live.**
+
+- **Done on 23 Oct 2026:**
+  - PR #15 merged to `main` (12c3af5).
+  - Bundles built from `main` and uploaded.
+  - Store listing filled through Claude in Chrome: English short and full description, eight translated listings,
+    8 phone and 4 watch screenshots, the five What's new texts and the watch note.
+  - **Ali pressed "Submit 14 changes for review".** The Publishing overview showed all 14 under "Changes in review", with
+    no errors; at 17:35 it was unchanged and "Last published on" was still 17 October 2026.
+- **The store listing had NOT been updated before that** (lesson 176). The live page had no translations and the old text.
+- **Live, by Ali's rule (23 Oct 2026),** means the Play Console shows it, not the public page alone:
+  - "Last published on" later than 17 Oct;
+  - no 1.5.0 under "Changes in review";
+  - 9 (1.5.0) "Available on Google Play".
+  - The public page's "Updated on" is a second signal.
+  - `sajdatime-1-5-0-live-check` reads the Console every 2 hours, 8:00 to 22:00.
+- **Done the same day, at Ali's word:**
+  - The spare signing copy `~/.gradle/sajdatime-keystore.properties.backup` was moved to the Bin, not erased. First,
+    a script printing only "match" or "differs" confirmed its four values equal the live `sajdatime.*` entries in
+    `~/.gradle/gradle.properties`, and that the key file they name exists.
+  - The three scheduled jobs written for an unreleased 1.5.0 were disabled (RELEASE-1.5.0.md "Scheduled jobs").
+  - GBrain was tidied: 50 done or superseded facts were expired, and START HERE is fact 2736.
+- **Once live:**
+  - **Ali:** he says "Reply to the Arabic review now"; Claude pastes the `DRAFTS.md` reply in Chrome, and Ali presses
+    Post. That is his only step.
+  - **Claude:** disable the live check, re-baseline the health check, and write "live on <date>" here, in §10,
+    PROJECT_BRIEF and the LISTING.md heading. Mark RELEASE-1.5.0.md step 6 done. Commit to `claude/1-5-0-submitted`
+    and mark its draft PR ready, so Ali merges one PR for both. Then replace GBrain fact 2736.
+- **Then 1.6:** branch `claude/1-6-0`, GBrain `projects/sajdatime-release-1-6`.
+
+### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (history now; read the block above first; the block below still holds for everything not named here)
 
 **Ali said on 23 Oct 2026: "Now let's start with release 1.5 and try to get it released on the play store". So the release
 day is 23 Oct 2026.** Done by Claude that day: `release-1.5.0.sh` on `63ae275`, **23 of 24 lines PASS or TAKEN** (push, tree,
@@ -10575,3 +10608,13 @@ matters more than the stable hashes, that is the trade being made.
     .AndroidJUnitRunner`. `androidx.test.ext:junit` alone does not bring the runner; the phone gets it through
     `espresso-core`, so the watch now does the same. And two Wear emulators with Gradle running starve each other
     (load average about 20, "failed to complete startup" ANRs): run one at a time when a test must start a process.
+176. **What the Play Console shows as live can differ from what the repo calls "done".** On release day (23 Oct 2026) Ali was
+    sure the translations and new text were already on the store; the Console's default listing still had the old English
+    text and none of the eight languages, and the 19 Oct description edit had never gone live. Read the Console's own store
+    listing pages before trusting any note that says the listing is updated. Practical traps found the same day: the
+    `main-store-listing` URL redirects to the app home (use `store-listings/default/edit`); filling a Console field from
+    script needs the native value setter plus `input`, `change` and `blur` events, or Save stays grey; and the character
+    counters update a moment later, so a 0 read straight after filling is not a failure.
+177. **Retire the scheduled jobs written for "before release" as soon as the release is submitted, not when it is live.**
+    On 23 Oct 2026 three jobs still planned to tell Ali to leave his Mac on and to "pick the release day", days after he had
+    submitted. Disable (do not delete) them in the same session as the submit, and record it in RELEASE-1.5.0.md.

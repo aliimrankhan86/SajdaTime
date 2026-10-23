@@ -329,6 +329,14 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
 
 ## Scheduled jobs (all six checked and brought up to date on 19 Oct 2026)
 
+**23 Oct 2026, after the submit (Ali: "Retire the three outdated 1.5.0 reminders now ... so I don't get confusing
+messages"):** `sajdatime-1-5-0-reminder` (Fri 30 Oct), `trig_01Bpzq4t8wJCQZwABsC53ys8` (Thu 29 Oct) and
+`trig_01VexqUd1cJz8jfD5QFT874W` (Mon 2 Nov) are **disabled, not deleted**, each read back as `enabled: false`. Every one
+was written for an unreleased 1.5.0 ("leave the Mac on", "pick the release day"), so after the submit they could only
+mislead. New: `sajdatime-1-5-0-live-check` reads the Play Console in Chrome every 2 hours, 8:00 to 22:00, and turns itself
+off once 1.5.0 is live. Still on: `sajdatime-review-replies` (its step 4b falls silent now the spare file is gone) and the
+health check `trig_0129FQnWihf8XG6rKLCB4oFr`, which is re-baselined to 1.5.0 once it is live (step 6).
+
 **21 Oct 2026, for the 2 Nov submit (each read back after the change):** `sajdatime-1-5-0-reminder` moved to **Fri 30 Oct
 2026 12:00 UK** and its prompt rewritten for the 2 Nov submit, the 420 unit test count and the 21 Oct listing;
 `trig_01Bpzq4t8wJCQZwABsC53ys8` to **Thu 29 Oct 18:00** (text names Fri 30 Oct and Mon 2 Nov); `trig_01VexqUd1cJz8jfD5QFT874W`
