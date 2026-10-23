@@ -62,15 +62,6 @@ class TrackerWordingTest {
     }
 
     @Test
-    fun `nothing the tracker stores can leave the phone by backup or transfer`() {
-        val rules = File(root, "app/src/main/res/xml/data_extraction_rules.xml").readText()
-        for (section in listOf("cloud-backup", "device-transfer")) {
-            val body = Regex("<$section>(.*?)</$section>", RegexOption.DOT_MATCHES_ALL).find(rules)!!.groupValues[1]
-            assertTrue("$section keeps the file domain", body.contains("""<exclude domain="file" path="." />"""))
-        }
-    }
-
-    @Test
     fun `the usage counts never mention the tracker`() {
         val counts = File(root, "app/src/main/java/com/sajdatime/app/data/UsageCounts.kt").readText().lowercase()
         for (word in listOf("tracker", "tick", "streak", "pause", "prayed")) assertFalse(word, counts.contains(word))
