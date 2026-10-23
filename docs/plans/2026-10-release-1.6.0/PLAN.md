@@ -149,6 +149,13 @@ references.
 - **One-tap bell on each prayer row** turns that prayer's alert on or off. No long press. Sounds stay in
   Settings.
 - **Labelled chips with a gap** for the tracker's actions, never icon buttons side by side.
+- **Qibla restyle.**
+  - The direction sentence comes first, and the place name is optional and small.
+  - Distance and bearing sit behind a labelled details button, in km or miles by the phone's region.
+  - The key stays.
+- **Timetable (PDF) placement: open.** Today it is "Save as PDF" on the Today line of Times, which opens a
+  Today, 7 days or month sheet, plus the Ramadan timetable sheet. The new layout needs a place for it.
+  Ali to choose from screenshots.
 
 **Animation (Ali, 23 Oct 2026: "some animation like Pillars, where required").**
 
