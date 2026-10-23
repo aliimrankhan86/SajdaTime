@@ -55,9 +55,13 @@ object TrackerLogic {
     /** The pause that is still on, if any. */
     fun openPause(pauses: List<PauseRange>): PauseRange? = pauses.firstOrNull { it.end == null }
 
+    /**
+     * A prayer ticked before the pause stays ticked (Fable, 23 Oct 2026): pausing means "do not count
+     * what is still to come", never "forget what I prayed". The screen still disables it while paused.
+     */
     fun tickState(record: DayRecord?, slot: PrayerSlot, due: Boolean, paused: Boolean): TickState = when {
-        paused -> TickState.PAUSED
         record?.ticked?.contains(slot) == true -> TickState.TICKED
+        paused -> TickState.PAUSED
         !due -> TickState.NOT_DUE_YET
         else -> TickState.NOT_TICKED
     }

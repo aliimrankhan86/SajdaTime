@@ -107,7 +107,8 @@ class TrackerLogicTest {
         assertEquals(TickState.NOT_DUE_YET, TrackerLogic.tickState(null, PrayerSlot.ISHA, due = false, paused = false))
         assertEquals(TickState.NOT_TICKED, TrackerLogic.tickState(null, PrayerSlot.ISHA, due = true, paused = false))
         assertEquals(TickState.TICKED, TrackerLogic.tickState(fajrOnly, PrayerSlot.FAJR, due = true, paused = false))
-        assertEquals(TickState.PAUSED, TrackerLogic.tickState(fajrOnly, PrayerSlot.FAJR, due = true, paused = true))
+        assertEquals(TickState.TICKED, TrackerLogic.tickState(fajrOnly, PrayerSlot.FAJR, due = true, paused = true))
+        assertEquals(TickState.PAUSED, TrackerLogic.tickState(fajrOnly, PrayerSlot.DHUHR, due = true, paused = true))
     }
 
     @Test fun `every mask round trips and bits above four are ignored`() {

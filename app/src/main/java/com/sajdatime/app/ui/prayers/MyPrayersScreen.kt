@@ -263,7 +263,7 @@ private fun TodayCard(state: UiState, t: TrackerState, tracker: TrackerActions, 
                 Tick(
                     state = t.state(yesterday, PrayerSlot.ISHA, due = true),
                     label = name,
-                    readOnly = t.data.readOnly,
+                    readOnly = t.data.readOnly || t.paused, // paused: ticks shown, not changed
                     onChange = { on -> tracker.tick(yesterday, PrayerSlot.ISHA, on) },
                 )
             }
@@ -282,7 +282,7 @@ private fun TodayCard(state: UiState, t: TrackerState, tracker: TrackerActions, 
                     // No times: nothing is "not due yet", every ring is tickable.
                     state = t.state(t.today, slot, due = at == null || !state.now.isBefore(at)),
                     label = name,
-                    readOnly = t.data.readOnly,
+                    readOnly = t.data.readOnly || t.paused, // paused: ticks shown, not changed
                     onChange = { on -> tracker.tick(t.today, slot, on) },
                 )
             }

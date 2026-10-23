@@ -99,7 +99,9 @@ internal fun TrackerHistorySheet(
     val scheme = MaterialTheme.colorScheme
     val first = WeekFields.of(locale).firstDayOfWeek
     val windowStart = tracker.today.minusDays((TrackerLogic.HISTORY_DAYS - 1).toLong())
-    val firstCell = windowStart.with(TemporalAdjusters.previousOrSame(first))
+    // Weeks wholly before tracking began are dropped (Fable, 23 Oct 2026): rows of empty numbers read as
+    // "you missed a lot", which Q4 forbids. The week holding the start stays, with its blanks.
+    val firstCell = maxOf(windowStart, tracker.started).with(TemporalAdjusters.previousOrSame(first))
     val weeks = generateSequence(firstCell) { it.plusDays(7) }.takeWhile { !it.isAfter(tracker.today) }.toList()
     val weekdays = (0L..6L).map { first.plus(it) }
     val measurer = rememberTextMeasurer()
