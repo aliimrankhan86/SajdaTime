@@ -344,7 +344,7 @@ in light and dark, so nobody has to guess what is tappable. The only text links 
 two bold links on the usage question** (kind F below). Decided by the owner on 18 Oct 2026, after
 outlined and then tonal buttons were both too easy to miss (§0.1).
 
-#### The six kinds of control that act, and nothing else
+#### The seven kinds of control that act, and nothing else
 
 | Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
 |---|---|---|---|---|---|
@@ -354,6 +354,7 @@ outlined and then tonal buttons were both too easy to miss (§0.1).
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
 | **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
+| **G. Snackbar action** | Material's own `SnackbarHost` action, written with `showSnackbar(actionLabel = ...)` in `MainScaffold.kt`, so no `TextButton` appears in our source | none | none | platform (`inversePrimary` on `inverseSurface`) | **Only** "Undo" in the message at the bottom ("Paused from today"), above the tab bar, on every tab. Added with step 1 of 1.6.0 |
 
 Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
 row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
@@ -458,10 +459,14 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
-| Times, My prayers (1.6.0) | The tick at the end of each prayer row, after the time; Sunrise keeps the same 48dp empty | Tick (`Tick.kt`), a toggle, not a button | 24 drawn, 48 target | `HomeScreen.kt`, `Tick.kt` |
-| Times, My prayers | Last 30 days, at the end of the line under the list (the streak at its start) | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
-| Times, My prayers, while paused | Resume, in place of Last 30 days, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
-| Last 30 days sheet | Five ticks under each date, evenly spaced under the prayer names | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
+| My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, tracking off | the switch row; not a button | Switch | 56 row | `MyPrayersScreen.kt` |
+| My prayers tab, no location | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
+| Last 30 days sheet | the X, alone at the top end | D | 48 | `MyPrayers.kt` |
+| Last 30 days sheet | each day cell is `selectable`, not a button; the chosen day's five ticks under the grid | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | G, new | platform | `MainScaffold.kt` |
 | Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
 | Times, mosque dialog (1.6.0) | Add your mosque's jama'ah times, first, under the congregation paragraph | A | 52, full | `HomeScreen.kt` |
 | Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row | Row | 56 | `SettingsScreen.kt` |

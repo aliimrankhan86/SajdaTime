@@ -177,7 +177,7 @@ private fun SettingsItem.isFoldable() =
     this is SettingsItem.Link && onClick == null && key in setOf("charity", "credits", "data", "adhan")
 
 @Composable
-private fun SettingsItemRow(item: SettingsItem) {
+internal fun SettingsItemRow(item: SettingsItem) {
     val scheme = MaterialTheme.colorScheme
     val leading: @Composable () -> Unit = {
         Box(

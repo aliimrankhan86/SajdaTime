@@ -102,6 +102,15 @@ data class TrackerState(
 
     fun isPaused(date: LocalDate): Boolean = TrackerLogic.isPaused(date, data.pauses)
 
+    /**
+     * The first day the record covers: days before it are "before tracking began" (no ring, not
+     * selectable). Ponytail, prototype only: derived as the earliest stored tick or pause, or today
+     * when there is none, instead of the stored `tracker_started` the build instructions plan. The
+     * difference: unticking the earliest day moves it later.
+     */
+    val started: LocalDate
+        get() = (data.records.keys + data.pauses.map { it.start } + today).min()
+
     companion object {
         fun build(data: TrackerData, today: LocalDate) =
             TrackerState(data, today, TrackerLogic.streak(data.records, data.pauses, today))

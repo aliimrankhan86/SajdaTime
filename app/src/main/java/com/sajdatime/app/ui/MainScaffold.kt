@@ -41,21 +41,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -73,13 +80,15 @@ import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.home.HomeScreen
+import com.sajdatime.app.ui.prayers.MyPrayersScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.settings.SettingsScreen
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.theme.ThemeChoice
+import kotlinx.coroutines.launch
 
-/** Top-level destinations. Three is comfortably inside the five-item guidance. */
+/** Top-level destinations. Four is inside the five-item guidance. */
 enum class Destination(
     val labelRes: Int,
     val selectedIcon: ImageVector,
@@ -87,6 +96,7 @@ enum class Destination(
 ) {
     TIMES(R.string.nav_times, Icons.Rounded.Schedule, Icons.Outlined.Schedule),
     QIBLA(R.string.nav_qibla, Icons.Rounded.Explore, Icons.Outlined.Explore),
+    PRAYERS(R.string.nav_tracker, Icons.Rounded.CheckCircle, Icons.Outlined.CheckCircle),
     SETTINGS(R.string.nav_settings, Icons.Rounded.Settings, Icons.Outlined.Settings),
 }
 
@@ -154,15 +164,31 @@ fun MainScaffold(
     }
 
     // Usage counts (opt-in only; a no-op otherwise): one fixed word per main tab, sent only
-    // when the tab changes. Never anything about what is on the screen.
+    // when the tab changes. Never anything about what is on the screen. My prayers has no word: opening
+    // it is never counted (owner's rule for the tracker; UsageCountsTest pins the three screens).
     LaunchedEffect(destination) {
-        onScreenViewed(
-            when (destination) {
-                Destination.TIMES -> Screen.TIMES
-                Destination.QIBLA -> Screen.QIBLA
-                Destination.SETTINGS -> Screen.SETTINGS
-            },
-        )
+        when (destination) {
+            Destination.TIMES -> Screen.TIMES
+            Destination.QIBLA -> Screen.QIBLA
+            Destination.PRAYERS -> null
+            Destination.SETTINGS -> Screen.SETTINGS
+        }?.let(onScreenViewed)
+    }
+
+    // The one snackbar host, above the glass bar, so a message can follow the user to any tab. Its only
+    // message today is "Paused from today" with Undo, and Undo is resume (a pause started and ended on
+    // the same day leaves nothing behind, TrackerLogic.resume).
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val pausedMessage = stringResource(R.string.tracker_paused_from_today)
+    val undoLabel = stringResource(R.string.action_undo)
+    val pauseToday: () -> Unit = {
+        tracker.pause(false)
+        scope.launch {
+            snackbar.currentSnackbarData?.dismiss()
+            val result = snackbar.showSnackbar(pausedMessage, actionLabel = undoLabel, duration = SnackbarDuration.Short)
+            if (result == SnackbarResult.ActionPerformed) tracker.resume()
+        }
     }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
@@ -202,10 +228,17 @@ fun MainScaffold(
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
-                        tracker = tracker,
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)
+
+                    Destination.PRAYERS -> MyPrayersScreen(
+                        state = state,
+                        tracker = tracker,
+                        onPause = pauseToday,
+                        onUseGps = onRefreshLocation,
+                        onSearchCity = onSearchCity,
+                    )
 
                     Destination.SETTINGS -> SettingsScreen(
                         state = state,
@@ -248,6 +281,7 @@ fun MainScaffold(
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { barHeight = with(density) { it.height.toDp() } },
             )
+            SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(bottom = barHeight))
         }
     }
 }

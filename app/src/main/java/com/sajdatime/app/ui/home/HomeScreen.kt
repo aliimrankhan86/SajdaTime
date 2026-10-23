@@ -89,9 +89,7 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.review.ReviewPrompt
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
-import com.sajdatime.app.ui.TrackerActions
 import com.sajdatime.app.ui.UiState
-import com.sajdatime.app.ui.components.Tick
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.rememberRemainingText
 import com.sajdatime.app.ui.settings.SettingsChooser
@@ -116,14 +114,12 @@ fun HomeScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
-    tracker: TrackerActions,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
     var explaining by rememberSaveable { mutableStateOf(false) }
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
     var ramadanTimetable by rememberSaveable { mutableStateOf(false) }
-    var trackerHistory by rememberSaveable { mutableStateOf(false) }
     var islamicDates by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
@@ -135,9 +131,9 @@ fun HomeScreen(
     val activity = androidx.activity.compose.LocalActivity.current
     val exactWarning = !PrayerAlarmScheduler.canScheduleExact(LocalContext.current) &&
         !state.settings.exactAlarmNoticeDismissed
-    // A tick is never a trigger for the rating card (sign-off, 23 Oct 2026): the card waits for a
-    // settled screen, and the history sheet open is not one.
-    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !trackerHistory && !islamicDates &&
+    // The card's calm timer lives only here: this screen is not composed while another tab shows,
+    // so a tick on My prayers can never start it (sign-off, 23 Oct 2026, SIGNOFF.md:52).
+    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
         state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
     val times = state.today?.times
     LaunchedEffect(calm, times) {
@@ -212,10 +208,7 @@ fun HomeScreen(
         )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         Spacer(Modifier.height(Space.Group))
-        TodayTimeline(state, onExport = { exportSheet = true }, onTick = tracker::tick)
-        state.tracker?.let {
-            TrackerLine(it, state.settings.trackerShowStreak, tracker, onOpenHistory = { trackerHistory = true })
-        }
+        TodayTimeline(state, onExport = { exportSheet = true })
         MosqueDifferenceDoor(
             state = state,
             onOpen = { explaining = true },
@@ -276,17 +269,6 @@ fun HomeScreen(
                 onOpenSetting(SettingsChooser.ADJUSTMENTS)
             },
             onDismiss = { islamicDates = false },
-        )
-    }
-
-    val trackerState = state.tracker
-    if (trackerHistory && trackerState != null) {
-        TrackerHistorySheet(
-            tracker = trackerState,
-            today = state.today,
-            now = state.now,
-            actions = tracker,
-            onDismiss = { trackerHistory = false },
         )
     }
 
@@ -864,7 +846,7 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun TodayTimeline(state: UiState, onExport: () -> Unit, onTick: (java.time.LocalDate, PrayerSlot, Boolean) -> Unit) {
+private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     val today = state.today ?: return
     val context = LocalContext.current
     val next = state.next
@@ -904,9 +886,6 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit, onTick: (java.ti
     val inRamadan = state.ramadan?.info?.isRamadan == true && state.settings.ramadanCardEnabled
     val suhoorLabel = stringResource(R.string.ramadan_suhoor_ends)
     val iftarLabel = stringResource(R.string.ramadan_iftar)
-    // "My prayers": a tick at the end of each prayer row while the tracker is on and not paused.
-    // The day is the one this list shows, so a tick can never land on another date.
-    val tracker = state.tracker?.takeIf { !it.paused }
 
     Column(
         modifier = Modifier
@@ -928,22 +907,6 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit, onTick: (java.ti
                     },
                     jamaah = state.jamaah[slot],
                 ),
-                trailing = tracker?.let { t ->
-                    {
-                        if (slot.isPrayer) {
-                            val at = today.times.getValue(slot)
-                            Tick(
-                                state = t.state(today.date, slot, due = !state.now.isBefore(at)),
-                                label = stringResource(slot.labelRes),
-                                readOnly = t.data.readOnly,
-                                onChange = { on -> onTick(today.date, slot, on) },
-                            )
-                        } else {
-                            // Sunrise has no tick; the space keeps its time in line with the others.
-                            Spacer(Modifier.width(48.dp))
-                        }
-                    }
-                },
             )
             if (index != slots.lastIndex) {
                 HorizontalDivider(color = scheme.outlineVariant)
@@ -1000,8 +963,6 @@ private fun PrayerRow(
     isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
-    /** The tracker's tick, after the time. Its 48dp target takes the row's end padding. */
-    trailing: (@Composable () -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
     val dimmed = !slot.isPrayer && !isNext
@@ -1040,16 +1001,9 @@ private fun PrayerRow(
             // the list clear the navigation bar (see the budget note in HomeScreen). Still
             // above the 48dp touch-target minimum, though these rows are not tappable.
             .heightIn(min = 50.dp)
-            // With a tick, its 48dp target overlaps the 18dp end padding: the mark itself sits where
-            // the time used to end, so the row is no wider (UX.md, 360dp row width).
-            .padding(start = 18.dp, end = if (trailing != null) 6.dp else 18.dp)
-            // With a tick, the 48dp target fills the row's 50dp floor itself, so the row keeps its
-            // height: 12dp above and below a 48dp target made every row 72dp and pushed Isha under
-            // the tab bar on the 823dp S23 Ultra frame (emulator, 23 Oct 2026). The text rows of a
-            // Ramadan day are shorter than the target, so they do not grow either.
             // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
             // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
-            .padding(vertical = if (trailing != null) 1.dp else if (note != null) 6.dp else 12.dp),
+            .padding(horizontal = 18.dp, vertical = if (note != null) 6.dp else 12.dp),
     ) {
         Icon(
             imageVector = slotIcon(slot),
@@ -1117,7 +1071,6 @@ private fun PrayerRow(
             style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
             color = contentColor,
         )
-        trailing?.invoke()
     }
 }
 

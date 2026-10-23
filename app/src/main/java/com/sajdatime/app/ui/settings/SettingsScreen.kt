@@ -113,12 +113,12 @@ import com.sajdatime.core.JamaahTimes
 import com.sajdatime.core.TRACKED_SLOTS
 import com.sajdatime.app.ui.UiState
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.PauseCircleOutline
 import androidx.compose.material.icons.outlined.PlayCircleOutline
-import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material.icons.outlined.Event
 import com.sajdatime.app.ui.home.IslamicDatesSheet
 import com.sajdatime.app.ui.components.LocationSheet
@@ -451,7 +451,7 @@ fun SettingsScreen(
             add(
                 SettingsItem.Toggle(
                     key = "tracker",
-                    icon = Icons.Outlined.TaskAlt,
+                    icon = Icons.Outlined.CheckCircle,
                     title = stringResource(R.string.settings_tracker),
                     subtitle = stringResource(R.string.settings_tracker_desc),
                     checked = settings.trackerEnabled,
