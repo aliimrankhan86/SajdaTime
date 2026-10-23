@@ -527,6 +527,33 @@
     <string name="tracker_state_prayed">صُلّيت</string>
     <string name="tracker_state_not_ticked">بلا علامة</string>
     <string name="tracker_state_not_due">لم يحن وقتها</string>
+    <!-- My prayers tab (1.6.0, step 1). Translated by Claude, 23 Oct 2026. -->
+    <string name="nav_tracker">صلواتي</string>
+    <string name="tracker_state_paused">متوقف مؤقتًا</string>
+    <string name="tracker_off_line">لا يُسجَّل شيء حتى تشغّل هذا الخيار.</string>
+    <string name="tracker_paused_from_today">متوقف مؤقتًا من اليوم</string>
+    <string name="action_undo">تراجع</string>
+    <string name="tracker_last_night_isha">العشاء، الليلة الماضية</string>
+    <string name="tracker_week_title">هذا الأسبوع</string>
+    <plurals name="tracker_ring_a11y">
+        <item quantity="zero">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="one">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="two">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="few">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="many">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="other">%1$s، %2$d من 5 صُلّيت</item>
+    </plurals>
+    <plurals name="tracker_ring_today_a11y">
+        <item quantity="zero">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="one">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="two">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="few">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="many">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="other">اليوم، %1$d من 5 حتى الآن</item>
+    </plurals>
+    <string name="tracker_ring_paused_a11y">%1$s، متوقف مؤقتًا</string>
+    <string name="tracker_ring_future_a11y">%1$s، لم يأتِ بعد</string>
+    <string name="tracker_ring_before_a11y">%1$s، قبل بدء التتبع</string>
     <string name="dates_title">التواريخ الإسلامية</string>
     <string name="dates_today_is">اليوم %1$s</string>
     <string name="date_ashura">عاشوراء</string>

@@ -37,6 +37,7 @@ import com.sajdatime.core.TickState
 import com.sajdatime.core.JamaahPlan
 import com.sajdatime.core.JamaahResult
 import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.DayKind
 import com.sajdatime.core.TrackerLogic
 import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.R
@@ -94,6 +95,12 @@ data class TrackerState(
     val data: TrackerData,
     val today: LocalDate,
     val streak: Int,
+    /**
+     * The first day the record covers: days before it are "before tracking began" (no ring, not
+     * selectable). Worked out once here, not in a getter: up to 49 rings ask for it on every
+     * recomposition, and the screen recomposes each second for the clock (review, 23 Oct 2026).
+     */
+    val started: LocalDate = today,
 ) {
     val paused: Boolean get() = TrackerLogic.isPaused(today, data.pauses)
 
@@ -102,18 +109,14 @@ data class TrackerState(
 
     fun isPaused(date: LocalDate): Boolean = TrackerLogic.isPaused(date, data.pauses)
 
-    /**
-     * The first day the record covers: days before it are "before tracking began" (no ring, not
-     * selectable). Ponytail, prototype only: derived as the earliest stored tick or pause, or today
-     * when there is none, instead of the stored `tracker_started` the build instructions plan. The
-     * difference: unticking the earliest day moves it later.
-     */
-    val started: LocalDate
-        get() = (data.records.keys + data.pauses.map { it.start } + today).min()
+    /** What a day's ring shows in the week card and the grid (a rule, so it lives in :core). */
+    fun dayKind(date: LocalDate): DayKind = TrackerLogic.dayKind(date, today, started, data.pauses)
 
     companion object {
-        fun build(data: TrackerData, today: LocalDate) =
-            TrackerState(data, today, TrackerLogic.streak(data.records, data.pauses, today))
+        fun build(data: TrackerData, today: LocalDate) = TrackerState(
+            data, today, TrackerLogic.streak(data.records, data.pauses, today),
+            TrackerLogic.started(data.startedOn, data.records, data.pauses, today),
+        )
     }
 }
 
@@ -187,6 +190,11 @@ data class UiState(
     val tracker: TrackerState? = null,
     /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
     val trackerHasData: Boolean = false,
+    /**
+     * The record has been read once. Until then My prayers draws nothing: drawn from the empty
+     * record first, every ring would animate up when the real one arrived (no entrance animation).
+     */
+    val trackerLoaded: Boolean = false,
     val trackerEvent: TrackerEvent? = null,
 )
 
@@ -210,6 +218,13 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     /** Sensor collection runs only while the Qibla screen is on-screen. */
     private var compassJob: Job? = null
+
+    /**
+     * Declared before `init`: Kotlin runs property initialisers and `init` blocks in file order, and the
+     * settings collector in `init` can deliver at once (Main.immediate), calling publishTracker() while a
+     * field declared further down is still null. That crashed cold starts on 23 Oct 2026 (HANDOVER §15, 179).
+     */
+    private var trackerData = TrackerData()
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -239,6 +254,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             // something to delete; it is only handed to the Times screen while the tracker is on.
             trackerRepository.data.collect { data ->
                 trackerData = data
+                _state.update { it.copy(trackerLoaded = true) }
                 publishTracker()
             }
         }
@@ -274,6 +290,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                     snapshot.today?.times?.get(PrayerSlot.SUNRISE)
                         ?.let { !now.isBefore(it) } == true
                 if (prayerPassed || dayChanged || sunrisePassed) recalculate()
+                // My prayers keeps its own day, because with no saved place there is no `today` above
+                // and nothing else would roll it over: ticks after midnight went to yesterday (review).
+                else if (snapshot.tracker?.let { it.today != LocalDate.now(ZoneId.systemDefault()) } == true) publishTracker()
                 delay(1_000)
             }
         }
@@ -509,8 +528,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     // --- my prayers (the tracker) ----------------------------------------------------
 
-    private var trackerData = TrackerData()
-
     /** Rebuilds the tracker state from the record in hand. Called when the record, the switch or the day changes. */
     private fun publishTracker() {
         val today = LocalDate.now(ZoneId.systemDefault())
@@ -523,7 +540,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun setTrackerEnabled(enabled: Boolean) =
-        viewModelScope.launch { settingsRepository.setTrackerEnabled(enabled) }
+        viewModelScope.launch {
+            if (enabled) trackerRepository.markStarted(LocalDate.now(ZoneId.systemDefault()))
+            settingsRepository.setTrackerEnabled(enabled)
+        }
 
     fun setTrackerShowStreak(show: Boolean) =
         viewModelScope.launch { settingsRepository.setTrackerShowStreak(show) }

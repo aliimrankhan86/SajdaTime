@@ -446,6 +446,23 @@
     <string name="tracker_state_prayed">sudah salat</string>
     <string name="tracker_state_not_ticked">belum ditandai</string>
     <string name="tracker_state_not_due">belum masuk waktu</string>
+    <!-- My prayers tab (1.6.0, step 1). Translated by Claude, 23 Oct 2026. -->
+    <string name="nav_tracker">Salat saya</string>
+    <string name="tracker_state_paused">dijeda</string>
+    <string name="tracker_off_line">Tidak ada yang dicatat sampai Anda menyalakan ini.</string>
+    <string name="tracker_paused_from_today">Dijeda mulai hari ini</string>
+    <string name="action_undo">Urungkan</string>
+    <string name="tracker_last_night_isha">Isya semalam</string>
+    <string name="tracker_week_title">Minggu ini</string>
+    <plurals name="tracker_ring_a11y">
+        <item quantity="other">%1$s, %2$d dari 5 salat</item>
+    </plurals>
+    <plurals name="tracker_ring_today_a11y">
+        <item quantity="other">Hari ini, %1$d dari 5 sejauh ini</item>
+    </plurals>
+    <string name="tracker_ring_paused_a11y">%1$s, dijeda</string>
+    <string name="tracker_ring_future_a11y">%1$s, belum tiba</string>
+    <string name="tracker_ring_before_a11y">%1$s, sebelum pencatatan dimulai</string>
     <string name="dates_title">Tanggal Islam</string>
     <string name="dates_today_is">Hari ini %1$s</string>
     <string name="date_ashura">Asyura</string>

@@ -24,6 +24,9 @@ import java.util.Locale
 /** What a day's ring shows. A day before tracking began has no ring at all, so it is not a case here. */
 enum class RingKind { SHARE, PAUSED, FUTURE }
 
+/** 36dp rings, or 32dp when seven of them plus 4dp gaps (Space.Tight) do not fit [innerWidthDp]. */
+internal fun weekRingDp(innerWidthDp: Float): Float = if (innerWidthDp >= 36f * 7 + 4f * 6) 36f else 32f
+
 /**
  * One day as a ring (STEP-1-DESIGN 3a and 3c): a 3dp track in `outlineVariant` and an arc in `primary`
  * from 12 o'clock, clockwise in both reading directions (deliberate, BUILD-INSTRUCTIONS section 6),
@@ -85,38 +88,5 @@ fun DayRing(
             RingKind.PAUSED -> drawPauseBars(scheme.outline, markStroke, half = radius * 0.4f, gap = radius * 0.3f)
             RingKind.FUTURE -> Unit
         }
-    }
-}
-
-/**
- * Day names by measurement, not by language (STEP-1-DESIGN 9.3): CLDR's short name in Arabic and Urdu is
- * the whole word, which does not fit a column on a 320dp phone. All seven are measured; if one is too
- * wide, all seven use the narrow form, never a mix. A screen reader always gets the full name.
- */
-object WeekdayNames {
-    /** SHORT if all seven fit [widthPx], else NARROW for all seven. */
-    fun pick(
-        measurer: TextMeasurer,
-        days: List<DayOfWeek>,
-        locale: Locale,
-        textStyle: androidx.compose.ui.text.TextStyle,
-        widthPx: Float,
-    ): TextStyle = if (fits(measurer, days, TextStyle.SHORT, locale, textStyle, widthPx)) TextStyle.SHORT else TextStyle.NARROW
-
-    private fun fits(
-        measurer: TextMeasurer,
-        days: List<DayOfWeek>,
-        style: TextStyle,
-        locale: Locale,
-        textStyle: androidx.compose.ui.text.TextStyle,
-        widthPx: Float,
-    ): Boolean = days.all {
-        // Measured at SemiBold, the widest weight a name takes (today's).
-        measurer.measure(
-            it.getDisplayName(style, locale),
-            textStyle.copy(fontWeight = FontWeight.SemiBold),
-            maxLines = 1,
-            softWrap = false,
-        ).size.width <= widthPx
     }
 }

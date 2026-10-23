@@ -53,12 +53,13 @@ import com.sajdatime.app.ui.components.DialogTitle
 import com.sajdatime.app.ui.components.Notice
 import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RingKind
+import com.sajdatime.app.ui.prayers.DayName
 import com.sajdatime.app.ui.components.Tick
-import com.sajdatime.app.ui.components.WeekdayNames
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.sajdaSurface
 import com.sajdatime.core.AppLocale
 import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.DayKind
 import com.sajdatime.core.TRACKED_SLOTS
 import com.sajdatime.core.TrackerLogic
 import com.sajdatime.core.labelRes
@@ -66,7 +67,6 @@ import java.text.NumberFormat
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.LocalDate
-import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 
 /**
@@ -99,12 +99,9 @@ internal fun TrackerHistorySheet(
     val scheme = MaterialTheme.colorScheme
     val first = WeekFields.of(locale).firstDayOfWeek
     val windowStart = tracker.today.minusDays((TrackerLogic.HISTORY_DAYS - 1).toLong())
-    // Weeks wholly before tracking began are dropped (Fable, 23 Oct 2026): rows of empty numbers read as
-    // "you missed a lot", which Q4 forbids. The week holding the start stays, with its blanks.
-    val firstCell = maxOf(windowStart, tracker.started).with(TemporalAdjusters.previousOrSame(first))
-    val weeks = generateSequence(firstCell) { it.plusDays(7) }.takeWhile { !it.isAfter(tracker.today) }.toList()
+    // Weeks wholly before tracking began are dropped (Q4 forbids rows that read as "you missed a lot").
+    val weeks = TrackerLogic.gridWeeks(tracker.today, tracker.started, first)
     val weekdays = (0L..6L).map { first.plus(it) }
-    val measurer = rememberTextMeasurer()
     var chosenDay by rememberSaveable { mutableLongStateOf(tracker.today.toEpochDay()) }
     val chosen = LocalDate.ofEpochDay(chosenDay)
 
@@ -120,24 +117,10 @@ internal fun TrackerHistorySheet(
                 }
             }
             Spacer(Modifier.height(Space.Group))
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val names = WeekdayNames.pick(
-                    measurer, weekdays, locale, MaterialTheme.typography.labelMedium,
-                    with(LocalDensity.current) { (maxWidth / 7).toPx() },
-                )
+            Box(Modifier.fillMaxWidth()) {
                 Column(Modifier.fillMaxWidth().selectableGroup()) {
                     Row(Modifier.fillMaxWidth()) {
-                        weekdays.forEach { day ->
-                            Text(
-                                text = day.getDisplayName(names, locale),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = scheme.onSurfaceVariant,
-                                textAlign = TextAlign.Center,
-                                maxLines = 1,
-                                softWrap = false,
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
+                        weekdays.forEach { day -> Box(Modifier.weight(1f)) { DayName(day, locale) } }
                     }
                     Spacer(Modifier.height(Space.Tight))
                     weeks.forEach { weekStart ->
@@ -174,8 +157,9 @@ private fun RowScope.DayCell(tracker: TrackerState, date: LocalDate, inWindow: B
     val locale = AppLocale.of(context)
     val scheme = MaterialTheme.colorScheme
     val isToday = date == tracker.today
-    val before = date.isBefore(tracker.started)
-    val kind = if (tracker.isPaused(date)) RingKind.PAUSED else RingKind.SHARE
+    val dayKind = tracker.dayKind(date)
+    val before = dayKind == DayKind.BEFORE_START
+    val kind = if (dayKind == DayKind.PAUSED) RingKind.PAUSED else RingKind.SHARE
     val count = tracker.data.records[date]?.ticked?.size ?: 0
     val name = TimeFormat.date(context, date)
     val spoken = when {
@@ -216,14 +200,18 @@ private fun ChosenDay(tracker: TrackerState, date: LocalDate, today: DayPrayerTi
             .padding(vertical = Space.Related),
     ) {
         Text(dateText, style = MaterialTheme.typography.titleSmall, modifier = Modifier.padding(horizontal = 16.dp))
-        if (tracker.isPaused(date)) {
+        val paused = tracker.isPaused(date)
+        // A paused day counts nothing, but what was ticked before the pause is still shown, disabled,
+        // under the word "Paused" (Fable, 23 Oct 2026): pausing never hides what someone prayed.
+        if (paused) {
             Text(
                 text = stringResource(R.string.tracker_paused_day),
                 style = MaterialTheme.typography.bodyMedium,
                 color = scheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp).heightIn(min = 48.dp).padding(top = Space.Paragraph),
+                modifier = Modifier.padding(horizontal = 16.dp).padding(top = Space.Tight),
             )
-        } else {
+        }
+        run {
             // The prayer names once, over the five columns, so a row of ticks reads without them.
             Row(Modifier.fillMaxWidth()) {
                 TRACKED_SLOTS.forEach { slot ->
@@ -246,7 +234,7 @@ private fun ChosenDay(tracker: TrackerState, date: LocalDate, today: DayPrayerTi
                         Tick(
                             state = tracker.state(date, slot, due),
                             label = dateText + separator + stringResource(slot.labelRes),
-                            readOnly = tracker.data.readOnly,
+                            readOnly = tracker.data.readOnly || paused,
                             onChange = { on -> actions.tick(date, slot, on) },
                         )
                     }

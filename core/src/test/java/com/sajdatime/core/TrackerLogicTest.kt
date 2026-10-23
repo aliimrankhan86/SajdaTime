@@ -134,4 +134,37 @@ class TrackerLogicTest {
         assertEquals(listOf(closed("2027-02-08", "2027-02-12")), PauseCodec.decode("2027-02-08..2027-02-12,rubbish,2027-02-20..2027-02-01"))
         assertEquals(emptyList<PauseRange>(), PauseCodec.decode(null))
     }
+
+    @Test fun `the rings begin where tracking was last switched on`() {
+        val today = d("2027-03-10")
+        // Nothing stored, nothing recorded: today.
+        assertEquals(today, TrackerLogic.started(null, emptyMap(), emptyList(), today))
+        // Stored on switch on: that day, even with older ticks (they stay in the record, not drawn as blanks).
+        assertEquals(d("2027-03-03"), TrackerLogic.started(d("2027-03-03"), records("2027-01-01" to fajrOnly), emptyList(), today))
+        // Nothing stored (a record from before the key): the earliest tick or pause.
+        assertEquals(d("2027-02-01"), TrackerLogic.started(null, records("2027-02-01" to fajrOnly), emptyList(), today))
+        assertEquals(d("2027-01-20"), TrackerLogic.started(null, emptyMap(), listOf(closed("2027-01-20", "2027-01-25")), today))
+        // An emptied day does not count as a record.
+        assertEquals(today, TrackerLogic.started(null, records("2027-02-01" to DayRecord()), emptyList(), today))
+    }
+
+    @Test fun `switching on again starts afresh unless something was ticked in the last thirty days`() {
+        val today = d("2027-10-23")
+        // Tracked 1 to 3 Jan, off since: start again today, so ten months are not drawn as blanks.
+        assertEquals(today, TrackerLogic.startOnSwitchOn(records("2027-01-01" to fajrOnly, "2027-01-03" to fajrOnly), today))
+        // A tick inside the window keeps the start there.
+        assertEquals(d("2027-10-10"), TrackerLogic.startOnSwitchOn(records("2027-01-01" to fajrOnly, "2027-10-10" to fajrOnly), today))
+        // The window's first day counts; the day before it does not.
+        assertEquals(d("2027-09-24"), TrackerLogic.startOnSwitchOn(records("2027-09-24" to fajrOnly), today))
+        assertEquals(today, TrackerLogic.startOnSwitchOn(records("2027-09-23" to fajrOnly), today))
+    }
+
+    @Test fun `a day to come is never shown paused, and days before the start have no ring`() {
+        val today = d("2027-03-10")
+        val open = listOf(PauseRange(d("2027-03-09"), null))
+        assertEquals(DayKind.FUTURE, TrackerLogic.dayKind(d("2027-03-11"), today, d("2027-03-01"), open))
+        assertEquals(DayKind.PAUSED, TrackerLogic.dayKind(today, today, d("2027-03-01"), open))
+        assertEquals(DayKind.BEFORE_START, TrackerLogic.dayKind(d("2027-02-28"), today, d("2027-03-01"), open))
+        assertEquals(DayKind.SHARE, TrackerLogic.dayKind(d("2027-03-05"), today, d("2027-03-01"), open))
+    }
 }

@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.prayers
 
+import androidx.compose.foundation.text.TextAutoSize
+import com.sajdatime.app.ui.components.WholeWords
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -64,12 +66,12 @@ import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.BottomBarClearance
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.components.DayRing
+import com.sajdatime.app.ui.components.weekRingDp
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
 import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RingKind
 import com.sajdatime.app.ui.components.ScreenTitle
-import com.sajdatime.app.ui.components.WeekdayNames
 import com.sajdatime.app.ui.components.Tick
 import com.sajdatime.app.ui.home.TrackerHistorySheet
 import com.sajdatime.app.ui.settings.SettingsItem
@@ -82,10 +84,11 @@ import com.sajdatime.core.AppLocale
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.TRACKED_SLOTS
+import com.sajdatime.core.DayKind
+import com.sajdatime.core.TrackerLogic
 import com.sajdatime.core.labelRes
 import java.time.LocalDate
 import java.time.format.TextStyle
-import java.time.temporal.TemporalAdjusters
 import java.time.temporal.WeekFields
 
 /**
@@ -109,7 +112,7 @@ fun MyPrayersScreen(
         ScreenTitle(stringResource(R.string.nav_tracker))
         // Nothing is drawn until the settings have loaded, so the switch card never flashes for
         // someone who has tracking on.
-        if (!state.loading) {
+        if (!state.loading && state.trackerLoaded) {
             // Row 12: switching on crossfades the one row card into the checklist (Standard in, Quick
             // out). The Switch gives its own haptic.
             AnimatedContent(
@@ -263,7 +266,8 @@ private fun TodayCard(state: UiState, t: TrackerState, tracker: TrackerActions, 
                 Tick(
                     state = t.state(yesterday, PrayerSlot.ISHA, due = true),
                     label = name,
-                    readOnly = t.data.readOnly || t.paused, // paused: ticks shown, not changed
+                    // Yesterday's own pause decides, not today's (review, 23 Oct 2026).
+                    readOnly = t.data.readOnly || t.isPaused(yesterday),
                     onChange = { on -> tracker.tick(yesterday, PrayerSlot.ISHA, on) },
                 )
             }
@@ -301,29 +305,42 @@ private fun PrayerCheckRow(name: String, time: String?, isNow: Boolean, tick: @C
     ) {
         tick()
         Spacer(Modifier.width(Space.Related))
-        // The tick already says which prayer ("Fajr, prayed"); the visible name is not read again.
-        Text(
-            text = name,
-            style = MaterialTheme.typography.bodyLarge,
-            color = scheme.onSurface,
-            modifier = Modifier.weight(1f).clearAndSetSemantics {},
-        )
-        if (isNow) {
-            val nowLabel = stringResource(R.string.home_now_marker_a11y)
-            Text(
-                text = stringResource(R.string.home_now_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSecondaryContainer,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(scheme.secondaryContainer)
-                    .padding(horizontal = 9.dp, vertical = 3.dp)
-                    .semantics { contentDescription = nowLabel },
-            )
-            Spacer(Modifier.width(10.dp))
-        }
-        if (time != null) {
-            Text(text = time, style = PrayerTimeTextStyle.copy(fontSize = MaterialTheme.typography.bodyLarge.fontSize), color = scheme.onSurfaceVariant)
+        // Two nested FlowRows wrap by measured width, never by a number: the time drops under the name
+        // first, then the Now pill under the name, so a name always has the row's full width before it
+        // would be split (emulator, 320dp at 2.0 text, 23 Oct 2026: "D h u h r" one letter a line, then
+        // "Maghr" cut). WholeWords is the last guard: it shrinks a name rather than break inside it.
+        FlowRow(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            itemVerticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.weight(1f).padding(vertical = Space.Tight),
+        ) {
+            FlowRow(itemVerticalAlignment = Alignment.CenterVertically) {
+                // The tick already says which prayer ("Fajr, prayed"); the visible name is not read again.
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = scheme.onSurface,
+                    autoSize = WholeWords(MaterialTheme.typography.bodyLarge.fontSize),
+                    modifier = Modifier.padding(end = 10.dp).clearAndSetSemantics {},
+                )
+                if (isNow) {
+                    val nowLabel = stringResource(R.string.home_now_marker_a11y)
+                    Text(
+                        text = stringResource(R.string.home_now_marker),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = scheme.onSecondaryContainer,
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(scheme.secondaryContainer)
+                            .padding(horizontal = 9.dp, vertical = 3.dp)
+                            .semantics { contentDescription = nowLabel },
+                    )
+                }
+            }
+            if (time != null) {
+                Text(text = time, style = PrayerTimeTextStyle.copy(fontSize = MaterialTheme.typography.bodyLarge.fontSize), color = scheme.onSurfaceVariant)
+            }
         }
     }
 }
@@ -357,10 +374,13 @@ private fun ButtonRow(t: TrackerState, onPause: () -> Unit, onResume: () -> Unit
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.align(Alignment.CenterVertically),
                 )
-                CtaButton(onClick = onResume, compact = true) {
-                    Icon(Icons.Rounded.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(Space.Related))
-                    Text(stringResource(R.string.action_resume))
+                // A record from a newer version cannot be changed, so Resume would do nothing: hidden.
+                if (!t.data.readOnly) {
+                    CtaButton(onClick = onResume, compact = true) {
+                        Icon(Icons.Rounded.PlayArrow, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(Space.Related))
+                        Text(stringResource(R.string.action_resume))
+                    }
                 }
             } else {
                 if (!t.data.readOnly) {
@@ -390,10 +410,7 @@ private fun WeekCard(t: TrackerState, showStreak: Boolean) {
     val scheme = MaterialTheme.colorScheme
     val locale = AppLocale.of(LocalContext.current)
     val first = WeekFields.of(locale).firstDayOfWeek
-    val start = t.today.with(TemporalAdjusters.previousOrSame(first))
-    val days = (0L..6L).map { start.plusDays(it) }
-    val labelStyle = MaterialTheme.typography.labelMedium
-    val measurer = rememberTextMeasurer()
+    val days = TrackerLogic.weekOf(t.today, first)
 
     Column(Modifier.fillMaxWidth().sajdaSurface(RoundedCornerShape(24.dp)).padding(16.dp)) {
         Text(
@@ -404,11 +421,10 @@ private fun WeekCard(t: TrackerState, showStreak: Boolean) {
         )
         Spacer(Modifier.height(Space.Related))
         BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val ring = if (maxWidth >= 36.dp * 7 + Space.Tight * 6) 36.dp else 32.dp
-            val slot = ring + (maxWidth - ring * 7) / 6
-            val style = WeekdayNames.pick(measurer, days.map { it.dayOfWeek }, locale, labelStyle, with(LocalDensity.current) { slot.toPx() })
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                days.forEach { day -> WeekDay(t, day, ring, style, locale) }
+            val ring = weekRingDp(maxWidth.value).dp
+            // Seven equal cells, so each day name has its cell's width, not only the ring's.
+            Row(Modifier.fillMaxWidth()) {
+                days.forEach { day -> WeekDay(t, day, ring, locale, Modifier.weight(1f)) }
             }
         }
         if (showStreak && t.streak > 0) {
@@ -423,14 +439,14 @@ private fun WeekCard(t: TrackerState, showStreak: Boolean) {
 }
 
 @Composable
-private fun WeekDay(t: TrackerState, day: LocalDate, ring: Dp, names: TextStyle, locale: java.util.Locale) {
+private fun WeekDay(t: TrackerState, day: LocalDate, ring: Dp, locale: java.util.Locale, modifier: Modifier) {
     val scheme = MaterialTheme.colorScheme
     val isToday = day == t.today
-    val before = day.isBefore(t.started)
-    val kind = when {
-        // A pause still on has no end date, so it would cover every day to come: future first.
-        day.isAfter(t.today) -> RingKind.FUTURE
-        t.isPaused(day) -> RingKind.PAUSED
+    val dayKind = t.dayKind(day)
+    val before = dayKind == DayKind.BEFORE_START
+    val kind = when (dayKind) {
+        DayKind.FUTURE -> RingKind.FUTURE
+        DayKind.PAUSED -> RingKind.PAUSED
         else -> RingKind.SHARE
     }
     val count = t.data.records[day]?.ticked?.size ?: 0
@@ -444,18 +460,34 @@ private fun WeekDay(t: TrackerState, day: LocalDate, ring: Dp, names: TextStyle,
     }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(ring).clearAndSetSemantics { contentDescription = spoken },
+        modifier = modifier.clearAndSetSemantics { contentDescription = spoken },
     ) {
         // Before tracking began there is no ring, only the name: no empty circle to read as a miss.
         if (before) Spacer(Modifier.size(ring)) else DayRing(ticked = count, kind = kind, size = ring, halo = isToday)
         Spacer(Modifier.height(Space.Tight))
-        Text(
-            text = day.dayOfWeek.getDisplayName(names, locale),
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = if (isToday) FontWeight.SemiBold else FontWeight.Normal),
-            color = if (isToday) scheme.primary else scheme.onSurfaceVariant,
-            maxLines = 1,
-            softWrap = false,
-            modifier = Modifier.wrapContentWidth(unbounded = true),
-        )
+        DayName(day.dayOfWeek, locale, today = isToday)
     }
+}
+
+/**
+ * A weekday's SHORT name under its ring or over its grid column (Fable, 23 Oct 2026). Never the
+ * NARROW single letters: "T T" and "S S" are ambiguous, and Urdu's are Latin letters. Where SHORT is a
+ * whole word (Urdu جمعرات) and the cell is narrow, it shrinks to no less than 70 percent on one line;
+ * past that it ends with an ellipsis rather than being clipped or split. TalkBack reads the full name.
+ */
+@Composable
+internal fun DayName(day: java.time.DayOfWeek, locale: java.util.Locale, today: Boolean = false) {
+    val style = MaterialTheme.typography.labelMedium
+    Text(
+        text = day.getDisplayName(TextStyle.SHORT, locale),
+        style = style.copy(fontWeight = if (today) FontWeight.SemiBold else FontWeight.Normal),
+        color = if (today) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        // One line: a weekday name is one word, so a second line could only split it (emulator, 320dp at
+        // 2.0 text: "Cum" over "m"). It shrinks to 70 percent, then ends in an ellipsis, never clipped.
+        maxLines = 1,
+        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        autoSize = TextAutoSize.StepBased(minFontSize = style.fontSize * 0.7f, maxFontSize = style.fontSize),
+        modifier = Modifier.fillMaxWidth(),
+    )
 }

@@ -265,6 +265,10 @@ scope):
 - **Copy `release-1.5.0.sh` to `release-1.6.0.sh`** and change the counts (unit tests, device suite, screenshots,
   `versionCode 10`). `set-release-date.sh` moves both the privacy page date and the date pinned in
   `UsageCountsTest` (on `main`; here once `main` is merged in, before step 0); on 1.5.0's day the test failed because only the page moved (`main`'s HANDOVER §11, 23 Oct evening block).
+- **Exclude the tracker seed from the device suite.** `release-1.6.0.sh` must leave out
+  `com.sajdatime.app.TrackerSeedDeviceTest` with `-e notClass`, as `release-1.5.0.sh` line 242 does for the
+  seed: `instrument device-suite -e notClass com.sajdatime.app.SuhoorReminderDeviceTest,com.sajdatime.app.ScreenSeedDeviceTest`.
+  It is a seed, not a check.
 - **Watch:** unchanged, so no new watch bundle. Leave the 1.5.0 watch release (1002) where it is in the Wear
   track, and say so in the Console walk through so nobody uploads the old bundle again.
 - **Data safety:** the tracker is kept on the phone only, so Play's form should not change (data that never

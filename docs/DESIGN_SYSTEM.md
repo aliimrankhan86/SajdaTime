@@ -777,6 +777,22 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **23 Oct 2026 (night), the My prayers tab (step 1, Fable's design, Ali approved from pictures).** Ali chose
+  "B: calendar grid" and then "Yes, build it". Detail: `docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md`
+  (section 9 wins where it differs).
+  * **Chosen.** A fourth tab, with the tick at the start of each prayer row, a week card of seven rings, and
+    Last 30 days as a calendar grid in weeks of seven, replacing the old list of day cards (Ali chose B).
+    Weeks wholly before tracking began are dropped, so there are no rows of empty numbers to read as misses; the
+    week holding the start day stays. Pausing keeps the ticks already given: it means "do not count what is
+    still to come", never "forget what I prayed". The tab icon is `CheckCircle`. Day names are `SHORT`, falling
+    back to `NARROW` for all seven if any one does not fit, decided by measuring, not by language. Grid cells are
+    about 45.7dp wide at 320dp because the sheet's side padding is dropped for the grid, which meets Apple's 44pt.
+  * **Rejected.** A list of 30 day cards: long to scroll, and it reads newest first, against every calendar.
+    `TaskAlt` for the tab icon: it has no filled twin for the selected state. `NARROW` day names everywhere:
+    "T T" and "S S" are ambiguous.
+  * **Exempt from contrast, on purpose.** The 38 percent ring for days to come and prayers not due yet is a
+    disabled control (WCAG 1.4.11), so `ColorContrastTest` has no pair for it.
+
 - **23 Oct 2026 (night), motion rules for 1.6 (Fable; Ali approved).** Written down before any animation
   is built, so the eight new animations of 1.6 (BUILD-INSTRUCTIONS §6 rows 1 to 4 and 6 to 9) feel like one app. Detail: §2 Motion and
   `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` §6.

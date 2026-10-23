@@ -1,5 +1,6 @@
 package com.sajdatime.core
 
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 /**
@@ -44,6 +45,9 @@ data class DayRecord(val ticked: Set<PrayerSlot> = emptySet()) {
 data class PauseRange(val start: LocalDate, val end: LocalDate?) {
     fun contains(date: LocalDate): Boolean = !date.isBefore(start) && (end == null || !date.isAfter(end))
 }
+
+/** What a day's ring shows in the week card and the 30 day grid. */
+enum class DayKind { BEFORE_START, FUTURE, PAUSED, SHARE }
 
 /** What one tick shows. Never "missed": an unticked past prayer is a plain empty circle. */
 enum class TickState { TICKED, NOT_TICKED, NOT_DUE_YET, PAUSED }
@@ -130,6 +134,58 @@ object TrackerLogic {
         (0 until days).map { today.minusDays(it.toLong()) }
 
     const val HISTORY_DAYS = 30
+
+    /**
+     * A day's ring: before tracking began, to come, paused, or its share of five. A day to come is never
+     * shown paused, even though a pause still on has no end date and so covers it.
+     */
+    fun dayKind(date: LocalDate, today: LocalDate, started: LocalDate, pauses: List<PauseRange>): DayKind = when {
+        date.isBefore(started) -> DayKind.BEFORE_START
+        date.isAfter(today) -> DayKind.FUTURE
+        isPaused(date, pauses) -> DayKind.PAUSED
+        else -> DayKind.SHARE
+    }
+
+    /** The date on or before [date] that falls on [firstDay]. */
+    private fun weekStart(date: LocalDate, firstDay: DayOfWeek): LocalDate =
+        date.minusDays(((date.dayOfWeek.value - firstDay.value + 7) % 7).toLong())
+
+    /** The seven dates of the week holding [today], from the locale's [firstDay] (the week card). */
+    fun weekOf(today: LocalDate, firstDay: DayOfWeek): List<LocalDate> =
+        weekStart(today, firstDay).let { start -> (0L..6L).map { start.plusDays(it) } }
+
+    /**
+     * The first date of each week row of the Last 30 days grid, oldest first, the last row holding
+     * today. The window is the [days] ending today; weeks wholly before [started] are dropped (Fable,
+     * 23 Oct 2026: rows of empty numbers read as "you missed a lot"), the week holding it stays.
+     */
+    fun gridWeeks(today: LocalDate, started: LocalDate, firstDay: DayOfWeek, days: Int = HISTORY_DAYS): List<LocalDate> {
+        val windowStart = today.minusDays((days - 1).toLong())
+        return generateSequence(weekStart(maxOf(windowStart, started), firstDay)) { it.plusDays(7) }
+            .takeWhile { !it.isAfter(today) }.toList()
+    }
+
+    /**
+     * The first day the record covers (DETAILED-PLAN 9.11, as decided by Fable on 23 Oct 2026). Days
+     * before it get no ring and cannot be chosen (Ali, Q4). [stored] is written each time tracking is
+     * switched on ([startOnSwitchOn]) and moved earlier when a saved file brings older days ([TrackerRepository.merge]).
+     * Nothing stored (a record from before the key existed): the earliest tick or pause. Today when nothing is known.
+     */
+    fun started(stored: LocalDate?, records: Map<LocalDate, DayRecord>, pauses: List<PauseRange>, today: LocalDate): LocalDate =
+        stored?.let { minOf(it, today) }
+            ?: (listOf(today) + records.filterValues { it.ticked.isNotEmpty() }.keys + pauses.map { it.start }).min()
+
+    /**
+     * The start to store when tracking is switched on (Fable, 23 Oct 2026). Someone who switched off and
+     * on again is starting again, so the screen looks like a first day, not a month of blanks: today,
+     * unless a tick exists inside the last [HISTORY_DAYS] days, then the oldest such day. Older ticks are
+     * kept untouched (the file, the streak); only where the rings begin moves.
+     */
+    fun startOnSwitchOn(records: Map<LocalDate, DayRecord>, today: LocalDate): LocalDate {
+        val windowStart = today.minusDays((HISTORY_DAYS - 1).toLong())
+        return records.filter { (d, r) -> r.ticked.isNotEmpty() && !d.isBefore(windowStart) && !d.isAfter(today) }
+            .keys.minOrNull() ?: today
+    }
 }
 
 /**
