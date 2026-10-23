@@ -597,7 +597,7 @@ other 1.6 code** (the tracker data shipped in `e98b2a6` without it).
 - The `tween(` literal ban exempts `ui/theme/Motion.kt` and `QiblaScreen.kt`'s dial (8.9).
 - The usage-count `when` maps PRAYERS to nothing.
 
-**9.11 `tracker_started`** lives in the tracker DataStore (`TrackerRepository`), so Delete clears it with the record. It is the earlier of the switch-on date and the earliest stored record. It is re-derived
+**9.11 `tracker_started`** (superseded by STEP-1-DESIGN 13: reset on each switch on unless ticks in the last 30 days, moved back by an earlier tick or a loaded file) lives in the tracker DataStore (`TrackerRepository`), so Delete clears it with the record. It is the earlier of the switch-on date and the earliest stored record. It is re-derived
 after Load and cleared by Delete. Tested by the tracker codec test.
 
 **9.12 Jama'ah time zone guard. AMENDED by Ali's answer (BUILD-INSTRUCTIONS §3 Q13):** while the phone's zone

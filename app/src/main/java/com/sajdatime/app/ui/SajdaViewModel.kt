@@ -542,6 +542,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setTrackerEnabled(enabled: Boolean) =
         viewModelScope.launch {
             if (enabled) trackerRepository.markStarted(LocalDate.now(ZoneId.systemDefault()))
+            else trackerRepository.clearStartIfEmpty()
             settingsRepository.setTrackerEnabled(enabled)
         }
 

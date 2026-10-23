@@ -468,7 +468,7 @@
     <string name="tracker_last_night_isha">گزشتہ رات کی عشاء</string>
     <string name="tracker_week_title">اس ہفتے</string>
     <plurals name="tracker_ring_a11y">
-        <item quantity="one">%1$s، 5 میں سے %2$d ادا کی گئیں</item>
+        <item quantity="one">%1$s، 5 میں سے %2$d ادا کی گئی</item>
         <item quantity="other">%1$s، 5 میں سے %2$d ادا کی گئیں</item>
     </plurals>
     <plurals name="tracker_ring_today_a11y">

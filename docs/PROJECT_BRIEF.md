@@ -88,7 +88,10 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Quran reader, duas, dhikr: no.** They are outside the app's one job.
 - **Ads, paywalls and a double adhan after the clock change** are where competitors fail. SajdaTime has no ads and nothing to buy, and its alarms replace rather than duplicate.
 
-## Habit tracker (not started)
+## My prayers, the private tracker (1.6, being built)
+**23 Oct 2026:** Ali approved the design from pictures. Ticks leave the Times screen and get their own fourth tab, "My
+prayers": today's five prayers, Pause and Last 30 days buttons, this week's rings, and Last 30 days as a calendar
+grid (Ali chose the grid over a list of day cards). Built on branch `claude/1-6-0`; not released.
 Ali decided on 16 Oct 2026:
 - The streak is hidden until the user switches it on.
 - A neutral Pause freezes the streak instead of counting excused days.

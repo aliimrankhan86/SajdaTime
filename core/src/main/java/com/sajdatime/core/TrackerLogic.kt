@@ -181,6 +181,15 @@ object TrackerLogic {
      * unless a tick exists inside the last [HISTORY_DAYS] days, then the oldest such day. Older ticks are
      * kept untouched (the file, the streak); only where the rings begin moves.
      */
+    /**
+     * The stored start after something is recorded on [date] (a tick, or a loaded file's oldest day):
+     * moved back if [date] is earlier, so that day is drawn and can be changed. Last night's Isha ticked
+     * on the first night is the case that needs it (review, 23 Oct 2026). Null stays null: nothing stored
+     * means the start is worked out from the record anyway.
+     */
+    fun startAfterRecording(stored: LocalDate?, date: LocalDate): LocalDate? =
+        stored?.let { if (date.isBefore(it)) date else it }
+
     fun startOnSwitchOn(records: Map<LocalDate, DayRecord>, today: LocalDate): LocalDate {
         val windowStart = today.minusDays((HISTORY_DAYS - 1).toLong())
         return records.filter { (d, r) -> r.ticked.isNotEmpty() && !d.isBefore(windowStart) && !d.isAfter(today) }

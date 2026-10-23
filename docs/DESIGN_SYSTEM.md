@@ -784,12 +784,18 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     Last 30 days as a calendar grid in weeks of seven, replacing the old list of day cards (Ali chose B).
     Weeks wholly before tracking began are dropped, so there are no rows of empty numbers to read as misses; the
     week holding the start day stays. Pausing keeps the ticks already given: it means "do not count what is
-    still to come", never "forget what I prayed". The tab icon is `CheckCircle`. Day names are `SHORT`, falling
-    back to `NARROW` for all seven if any one does not fit, decided by measuring, not by language. Grid cells are
+    still to come", never "forget what I prayed". The tab icon is `CheckCircle`. Day names are always `SHORT`, on one
+    line, shrinking to 70 percent and then ending in an ellipsis where a cell is too narrow (Urdu at 320dp and 2.0
+    text); never `NARROW` (Fable, after the review showed NARROW gives Latin letters on an Urdu screen). Switching
+    tracking on again starts the rings afresh unless something was ticked in the last 30 days. A paused day's ring
+    shows only the pause mark; the sheet's row for that day shows its earlier ticks, disabled, under "Paused".
+    Known and accepted: at 320dp and 2.0 text the Turkish tab label "Namazlarım" wraps inside the word (rare; the
+    icon carries it; revisit only if seen on a real phone). Grid cells are
     about 45.7dp wide at 320dp because the sheet's side padding is dropped for the grid, which meets Apple's 44pt.
   * **Rejected.** A list of 30 day cards: long to scroll, and it reads newest first, against every calendar.
-    `TaskAlt` for the tab icon: it has no filled twin for the selected state. `NARROW` day names everywhere:
-    "T T" and "S S" are ambiguous.
+    `TaskAlt` for the tab icon: it has no filled twin for the selected state. `NARROW` day names, anywhere:
+    "T T" and "S S" are ambiguous, and Urdu's are Latin letters. Per language two letter abbreviations of our own:
+    invented words in Urdu and Arabic are a religious wording risk for no gain.
   * **Exempt from contrast, on purpose.** The 38 percent ring for days to come and prayers not due yet is a
     disabled control (WCAG 1.4.11), so `ColorContrastTest` has no pair for it.
 

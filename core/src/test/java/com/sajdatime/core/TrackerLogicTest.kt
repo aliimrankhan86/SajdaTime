@@ -167,4 +167,11 @@ class TrackerLogicTest {
         assertEquals(DayKind.BEFORE_START, TrackerLogic.dayKind(d("2027-02-28"), today, d("2027-03-01"), open))
         assertEquals(DayKind.SHARE, TrackerLogic.dayKind(d("2027-03-05"), today, d("2027-03-01"), open))
     }
+
+    @Test fun `recording an earlier day moves the start back, never forward`() {
+        // Tracking switched on after midnight, last night's Isha ticked: yesterday must be drawn.
+        assertEquals(d("2027-03-09"), TrackerLogic.startAfterRecording(d("2027-03-10"), d("2027-03-09")))
+        assertEquals(d("2027-03-10"), TrackerLogic.startAfterRecording(d("2027-03-10"), d("2027-03-12")))
+        assertEquals(null, TrackerLogic.startAfterRecording(null, d("2027-03-09")))
+    }
 }
