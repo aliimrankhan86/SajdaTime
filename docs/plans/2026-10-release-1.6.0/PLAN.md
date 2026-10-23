@@ -173,6 +173,14 @@ references.
 6. **Missed fasts.** Research how Pillars' fasting tracker works before deciding between count only and
    reasons, and between before and after Ramadan.
 
+**Widgets (Ali, 23 Oct 2026).** Similar to Pillars in UX: a wide strip of the five prayers with the current
+one marked, and a sky-style current-prayer widget with the time left. Complemented with our own features
+(jama'ah times, Ramadan suhoor and iftar, Hijri date) and better UX. Nothing in a widget animates
+(RemoteViews), and widgets must stay readable at large text and in RTL.
+
+**Ali, 23 Oct 2026: UI and UX decide this app's scope.** Ease of use, being easy to understand, and a modern
+look and feel are extremely important. Every 1.6 choice is judged on that first.
+
 **Ali, 23 Oct 2026: plan every detail meticulously before any development starts.** Development waits for
 a complete plan and his go.
 
