@@ -1931,11 +1931,16 @@ tells every session to use them.
 
 | Agent | Model | Does | Never does |
 |---|---|---|---|
-| `ux-lead` | Fable | UX decisions, ease of use, usability, what a screen shows and in what order, wording, every state, DESIGN_SYSTEM §10 questions | Edit files; decide an OPEN §11 item or a "screenshot" question (it recommends, Ali decides) |
+| `ux-lead` | Fable | All the thinking for what users see: planning and brainstorming, user journeys, UX and UI, icons, ease of use, the premium look, what a screen shows and in what order, wording, every state, DESIGN_SYSTEM §10 questions | Edit files; decide an OPEN §11 item or a "screenshot" question (it recommends, Ali decides) |
 | `plan-verifier` | Fable | Verifies every plan, build instruction or scope change against the code, before work starts and before Ali sees it | Defend or write the plan |
 | `reviewer` | Opus | Checks every diff and every output of a cheaper agent before commit or "done" | Edit files |
 | `implementer` | Sonnet | Builds a step whose spec is already written and verified | UX, plans, alarm or data logic, anything without a spec; commit |
 | `mechanic` | Haiku | Search, counts (§4.1 checks, string parity), file and line lookups, collecting test output | Decisions, code logic, translations, user facing words |
+
+**Widened the same day.** Ali: "I want the user experience, user journey, user interface to be thoughtful. So hence
+I prefer Fable to do all the planning, brainstorming, including the correct icons, ease to use, and to look good on a
+premium style or design for the app. So for that, I want Fable to do all the brain thinking." So `ux-lead` no longer
+only reviews: it thinks the feature through first and hands the main session the spec to write down and build.
 
 **The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
 Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.

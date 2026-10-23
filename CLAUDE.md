@@ -200,8 +200,11 @@ session inherits it instead of relearning it.
 
 - **Use the right model for each job, and the cheapest one that can do it well** (Ali, 23 Oct 2026). The
   agents are defined in `.claude/agents/`, each with its model fixed; the reasons are in `docs/HANDOVER.md` §5.28.
-  - **Fable decides UX and verifies plans:** `ux-lead` (ease of use, usability, what information a screen shows,
-    wording, every state) and `plan-verifier` (every plan or scope change, before work starts and before Ali sees it).
+  - **Fable does all the thinking for what users see, and verifies plans:** `ux-lead` does the planning and
+    brainstorming, user journeys, UX and UI, the right icons, ease of use and a premium look, what information a
+    screen shows, wording and every state (Ali, 23 Oct 2026: "I want Fable to do all the brain thinking"); the main
+    session writes down and builds what it decides. `plan-verifier` checks every plan or scope change, before work
+    starts and before Ali sees it.
   - **Opus checks everything:** `reviewer` reviews every diff and every piece of work from a cheaper agent before
     it is committed or called done. The main session, which talks to Ali and commits, should itself run on Opus.
   - **Cheaper models do the routine work:** `implementer` (Sonnet) builds a step whose spec is already decided;

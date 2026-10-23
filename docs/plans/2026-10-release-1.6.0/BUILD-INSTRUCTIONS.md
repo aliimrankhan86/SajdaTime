@@ -52,9 +52,12 @@ ease of use, Usability, information to display aspect should be done by fable." 
   logic, translates, commits and pushes.
 - **Fable (`plan-verifier`) verifies every plan change** before work starts and before Ali sees it. That
   includes a change to this file or any 1.6 plan file.
-- **Fable (`ux-lead`) owns UX:** ease of use, usability, what information each screen shows and in what order,
-  wording and every state. It reviews each step's spec before the build and its screenshots before they go to
-  Ali. Ali still decides visual questions from screenshots.
+- **Fable (`ux-lead`) does all the thinking for what users see** (Ali, 23 Oct 2026: "I prefer Fable to do all the
+  planning, brainstorming, including the correct icons, ease to use, and to look good on a premium style or design
+  for the app. So for that, I want Fable to do all the brain thinking."): planning and brainstorming, user journeys,
+  UX and UI, icons, ease of use, the premium look, what information each screen shows and in what order, wording
+  and every state. It shapes each step's spec before the build and judges its screenshots before they go to Ali.
+  The main session writes the spec down and builds it; Ali still decides visual questions from screenshots.
 - **Sonnet (`implementer`) builds routine parts** once the spec is fixed. **Haiku (`mechanic`)** does counts
   and lookups.
 - **Opus (`reviewer`) checks everything** before commit, including everything Sonnet and Haiku produced.
@@ -62,7 +65,7 @@ ease of use, Usability, information to display aspect should be done by fable." 
 | Step | Fable `ux-lead` before build | Built by | Haiku `mechanic` | Opus `reviewer` |
 |---|---|---|---|---|
 | P | no (done) | main | none | yes |
-| 0 Foundations | no | `implementer` (`Motion.kt`, moving `tween` literals, the `DesignRulesTest` bans) | count `tween(` and `rememberInfiniteTransition` | yes |
+| 0 Foundations | **yes**: how motion should feel (speeds, easing, what moves and what never does) | `implementer` (`Motion.kt`, moving `tween` literals, the `DesignRulesTest` bans) | count `tween(` and `rememberInfiniteTransition` | yes |
 | 1 My prayers tab | **yes**: tab content order, off, paused and first day states, ring a11y wording | main (tracker data, `tracker_started`, review prompt exclusion, every string in five languages); `implementer` wires the keys, layout and tests. The tab sends no screen event, so `privacy.html:125` stays at three screens | string parity, §4.1 counts | yes |
 | 2 Dates sheet, 2a Shia dates | **yes**: plain names, nothing celebratory on Ashura or Arbaeen | main (each date from a named Shia source) | none | yes, sources checked |
 | 3 Bell with Undo | **yes**: bell states, Undo message wording | main (alert restore logic, permission) | string parity | yes |
