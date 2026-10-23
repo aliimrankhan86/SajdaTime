@@ -205,6 +205,9 @@ session inherits it instead of relearning it.
     screen shows, wording and every state (Ali, 23 Oct 2026: "I want Fable to do all the brain thinking"); the main
     session writes down and builds what it decides. `plan-verifier` checks every plan or scope change, before work
     starts and before Ali sees it.
+  - **Fable finds ready-made assets before anything is drawn** (Ali, 23 Oct 2026): icons from Material Symbols
+    first, then free licensed artwork, bundled, never AI generated (the Play AI declaration is "Don't label
+    assets"). Fable recommends, Ali approves each, and its source and licence go in `docs/ASSETS.md`.
   - **Opus checks everything:** `reviewer` reviews every diff and every piece of work from a cheaper agent before
     it is committed or called done. The main session, which talks to Ali and commits, should itself run on Opus.
   - **Cheaper models do the routine work:** `implementer` (Sonnet) builds a step whose spec is already decided;

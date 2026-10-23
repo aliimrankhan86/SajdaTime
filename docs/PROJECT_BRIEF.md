@@ -111,7 +111,19 @@ Ali decided on 16 Oct 2026:
   - the disclaimer moved to Settings
 
   The plan is checked twice, Ali answered all 27 questions and said go on 23 Oct 2026. The privacy page step is done; the rest waits until 1.5.0 is uploaded. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`.
-- **Which model does what** (Ali, 23 Oct 2026): Fable checks every plan and makes the UX decisions (ease of use, what each screen shows, the wording), Opus checks all work before it is saved, and cheaper models do routine and mechanical jobs to save tokens. Set up in `.claude/agents/`; details in HANDOVER §5.28.
+- **How 1.6 is designed and built** (Ali, 23 Oct 2026; HANDOVER §5.28 on `claude/1-6-0`, GBrain facts 3129 to 3131):
+  - **Fable does all the thinking for what users see:** planning and brainstorming, user journeys, UX and UI, the
+    right icons, ease of use and a premium look, what each screen shows, the wording. Ali: "I want Fable to do all
+    the brain thinking." The main session (Opus) writes down and builds what Fable decides.
+  - **Fable finds ready-made assets before anything is drawn:** Material Symbols icons first, then free licensed
+    artwork (CC0, Apache, MIT, OFL), bundled in the app, never AI generated (the Play AI declaration says "Don't
+    label assets"), never another app's. Fable recommends, Ali approves each, its source and licence go in
+    `docs/ASSETS.md`.
+  - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
+    routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
+  - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and
+    `DETAILED-PLAN.md` §6 (ten journeys, first launch to adding a widget, with every word on screen), §6.2 (the
+    wording) and §7 (languages). Every step is checked against its journey before Ali sees screenshots.
 
 ## Known gaps (documented, accepted)
 - On a small round watch (192dp) at large text, the disclaimer's top line touches the clock at the very end of the scroll.
