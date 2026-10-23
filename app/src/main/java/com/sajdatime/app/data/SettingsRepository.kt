@@ -15,6 +15,7 @@ import com.sajdatime.core.AdjustmentCodec
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
+import com.sajdatime.core.FastKind
 import com.sajdatime.core.JamaahCodec
 import com.sajdatime.core.JamaahRule
 import com.sajdatime.core.JamaahTimes
@@ -242,6 +243,17 @@ data class AppSettings(
      * part of the usage counts.
      */
     val jamaah: JamaahTimes = JamaahTimes(),
+    /**
+     * Minutes before each jama'ah at which a quiet heads up arrives (1.6.1), or 0 for off. Off by
+     * default, read through [PRAYER_REMINDER_CHOICES] like the prayer reminder. A notification only,
+     * never the alarm or the adhan, and never a change to Do Not Disturb.
+     */
+    val jamaahReminderMinutes: Int = 0,
+    /**
+     * Which Sunnah fasts get a reminder the evening before (1.6.1). Empty, so off, by default, and
+     * only ever acted on for Sunni users ([com.sajdatime.core.FastingDays]).
+     */
+    val fastReminders: Set<FastKind> = emptySet(),
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -482,6 +494,16 @@ class SettingsRepository(private val context: Context) {
         prefs[Keys.JAMAAH] = JamaahCodec.encode(JamaahCodec.decode(prefs[Keys.JAMAAH]).copy(jumuah = time))
     }
 
+    suspend fun setJamaahReminderMinutes(minutes: Int) = edit {
+        it[Keys.JAMAAH_REMINDER] = minutes.takeIf { m -> m in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0
+    }
+
+    suspend fun setFastReminder(kind: FastKind, on: Boolean) = edit { prefs ->
+        val current = decodeFastKinds(prefs[Keys.FAST_REMINDERS])
+        val updated = if (on) current + kind else current - kind
+        prefs[Keys.FAST_REMINDERS] = updated.sortedBy { it.ordinal }.joinToString(",") { it.name }
+    }
+
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
@@ -568,6 +590,8 @@ class SettingsRepository(private val context: Context) {
         val TRACKER_ENABLED = booleanPreferencesKey("tracker_enabled")
         val TRACKER_STREAK = booleanPreferencesKey("tracker_show_streak")
         val JAMAAH = stringPreferencesKey("jamaah_times")
+        val JAMAAH_REMINDER = intPreferencesKey("jamaah_reminder_minutes")
+        val FAST_REMINDERS = stringPreferencesKey("fast_reminders")
     }
 
     private companion object {
@@ -621,6 +645,8 @@ class SettingsRepository(private val context: Context) {
             trackerEnabled = this[Keys.TRACKER_ENABLED] ?: false,
             trackerShowStreak = this[Keys.TRACKER_STREAK] ?: false,
             jamaah = JamaahCodec.decode(this[Keys.JAMAAH]),
+            jamaahReminderMinutes = (this[Keys.JAMAAH_REMINDER] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
+            fastReminders = decodeFastKinds(this[Keys.FAST_REMINDERS]),
         )
     }
 
@@ -638,6 +664,10 @@ internal fun decodeSlots(raw: String?): Set<PrayerSlot> {
     if (raw == null) return prayers.toSet()
     return raw.split(",").mapNotNull { name -> prayers.firstOrNull { it.name == name } }.toSet()
 }
+
+/** "MONDAY_THURSDAY,SPECIAL"; unknown names dropped, absent or blank is none. */
+internal fun decodeFastKinds(raw: String?): Set<FastKind> =
+    raw.orEmpty().split(",").mapNotNull { name -> FastKind.entries.firstOrNull { it.name == name } }.toSet()
 
 /**
  * The place name to show. The Makkah fallback is stored under a fixed English name, so it is

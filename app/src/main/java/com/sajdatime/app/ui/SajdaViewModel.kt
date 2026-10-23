@@ -437,6 +437,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setJumuah(time: java.time.LocalTime?) =
         viewModelScope.launch { settingsRepository.setJumuah(time) }
 
+    fun setJamaahReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setJamaahReminderMinutes(minutes) }
+
+    fun setFastReminder(kind: com.sajdatime.core.FastKind, on: Boolean) =
+        viewModelScope.launch { settingsRepository.setFastReminder(kind, on) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 
