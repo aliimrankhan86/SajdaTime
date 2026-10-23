@@ -2388,6 +2388,15 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**The five agents' first use (23 Oct 2026, night, Mac session; §5.28).** Each agent was asked to state the model in
+its own system prompt, and reported (their word, matching each file's frontmatter): `ux-lead` Fable 5.1 (`claude-fable-5-1`), `plan-verifier` Fable 5.1, `reviewer` Opus 5.5
+(`claude-opus-5-5`), `implementer` Sonnet 5.5 (`claude-sonnet-5-5`), `mechanic` Haiku 5.5 (`claude-haiku-5-5`), so the
+`fable`, `opus`, `sonnet` and `haiku` aliases in the frontmatter work. `ux-lead` called the `make-interfaces-feel-better`
+skill through its `Skill` tool and the call loaded with no error. **Trap found first:** the session had been started in
+`~/Developer/SajdaTime` (the 1.5.0 checkout, which has no `.claude/agents/`), and every agent type was "not found".
+Agents are read from the session's own folder, so **a 1.6 session must start in `~/Developer/SajdaTime-1-6-0`** (§15
+lesson 178). Not checked: whether an agent obeys its read only line (none was asked to write).
+
 **1.5.0 release day run (23 Oct 2026, Mac session; §11 STATE OF PLAY 23 Oct evening).** `release-1.5.0.sh` on `63ae275`,
 emulator `sajda` (its leftover 1440x3088 size override reset first): 23 of 24 PASS or TAKEN, phone SKIPPED by Ali's choice.
 430 unit tests (app 272, core 131, wear 27), 0 failed; lint 0 errors; device suite 26 of 26; suhoor 1, Ramadan calendar 4,
@@ -5753,7 +5762,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 "go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
 `SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's answers to all 27 questions, the
 ordered build table, animation, development and testing guidance, and (§0.1) which model does which job.
-- **Progress (23 Oct 2026, evening):** step P done (`55ef229`); steps 0 to 11 not started.
+- **Progress (23 Oct 2026, night):** step P done (`55ef229`). Step 0: Fable's motion spec is written into
+  BUILD-INSTRUCTIONS §5 row 0 and §6 and checked by `plan-verifier` (its 12 small findings fixed); **waiting for
+  Ali's yes before building.** Steps 1 to 11 not started. The five agents ran for the first time and each runs on its
+  named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
   start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).
   - The only conflict was this §11 heading. The code merged cleanly, so the earlier trial's conflicts in
@@ -10692,3 +10704,8 @@ matters more than the stable hashes, that is the trade being made.
     .AndroidJUnitRunner`. `androidx.test.ext:junit` alone does not bring the runner; the phone gets it through
     `espresso-core`, so the watch now does the same. And two Wear emulators with Gradle running starve each other
     (load average about 20, "failed to complete startup" ANRs): run one at a time when a test must start a process.
+178. **Project agents load from the folder the session started in, not from the branch you work on.** (176 and 177
+    are on `claude/1-5-0-submitted`, PR #16, and arrive here when `main` is merged in again.) On 23 Oct 2026 a 1.6
+    session started in `~/Developer/SajdaTime` (the 1.5.0 checkout) and worked on the `SajdaTime-1-6-0` worktree by
+    absolute path; every `.claude/agents/` type was "not found", because that checkout has no agent files. Moving the
+    session's folder fixed it from the next turn. Start every 1.6 session in `~/Developer/SajdaTime-1-6-0`.

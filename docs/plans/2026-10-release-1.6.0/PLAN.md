@@ -194,7 +194,7 @@ it"). Where it is more specific than anything above, it wins. In short:
   - Wording avoids "missed", so `TrackerWordingTest` needs no exception.
   - One sentence in privacy.html.
   - No usage-count event.
-- **Animation: `ui/theme/Motion.kt`,** four named durations (Quick 150, Standard 250, Reveal 300,
+- **Animation: `ui/theme/Motion.kt`,** (superseded by BUILD-INSTRUCTIONS §6: three durations) four named durations (Quick 150, Standard 250, Reveal 300,
   Draw 400 ms) and one easing.
   - `DesignRulesTest` bans `rememberInfiniteTransition` and number literals in `tween(`.
   - No new library (no Lottie, Rive or Haze).

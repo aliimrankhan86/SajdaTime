@@ -110,7 +110,7 @@ Ali decided on 16 Oct 2026:
   - a Timetable button
   - the disclaimer moved to Settings
 
-  The plan is checked twice, Ali answered all 27 questions and said go on 23 Oct 2026. The privacy page step is done; the rest waits until 1.5.0 is uploaded. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`.
+  The plan is checked twice, Ali answered all 27 questions and said go on 23 Oct 2026. The privacy page step is done. **23 Oct 2026, night:** 1.5.0 is submitted, so the build has started: step 0 (how animation behaves) is designed by Fable and checked, waiting for Ali's yes. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`.
 - **How 1.6 is designed and built** (Ali, 23 Oct 2026; HANDOVER §5.28 on `claude/1-6-0`, GBrain facts 3129 to 3131):
   - **Fable does all the thinking for what users see:** planning and brainstorming, user journeys, UX and UI, the
     right icons, ease of use and a premium look, what each screen shows, the wording. Ali: "I want Fable to do all

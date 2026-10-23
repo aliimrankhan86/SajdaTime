@@ -41,7 +41,7 @@ Read only. Verified against `claude/1-6-0` at 9d815bf and the resolved libraries
 
 **Libraries.** Lottie: no (PLAN.md:185 already rejects). Rive: no, same reason plus a runtime and a designer file format. Haze (backdrop blur): no; DESIGN_SYSTEM.md:691-694 already decided 97 percent opacity without blur and says add it only if Ali asks for more glass. Nothing here needs a dependency; the ponytail rule holds.
 
-**Motion spec, one file `ui/theme/Motion.kt`** (next to `Spacing.kt`):
+**Motion spec, one file `ui/theme/Motion.kt`** (superseded by BUILD-INSTRUCTIONS §5 row 0 and §6: three durations, `Reveal` dropped, every `tween` outside `Motion.kt` banned) (next to `Spacing.kt`):
 
 ```
 object Motion {
@@ -113,7 +113,7 @@ Row states: plain, current (`surfaceContainerHigh`, Now pill), next (fill, bar, 
 
 No-location state: the card shows "Set your location" as today (HomeScreen.kt:481-487); the sky still draws by the clock's period from Makkah times (the fallback already used), so the header never looks broken.
 
-**Tracker tab.** `ScreenTitle` "My prayers". Tracking off: one `sajdaSurface` card with the switch row ("My prayers", the existing sentence) and nothing else; no illustration, no sales text. Tracking on: today's date line (same style as Times); five rows in one card, each with the ring tick at the start (48dp, Tick.kt), name, time at the end; a day already past with no tick shows a plain outline, never red or counted. Below, 16dp, one row: compact solid "Pause" (pause icon) at the start and compact solid "Last 30 days" at the end. Below, 24dp, the week strip: seven 36dp rings, in the app language's first-day order (superseded by 8.6), each ring's arc the share of five, with "3 of 5" as the content description and the day letter under it; the paused day shows the pause glyph in the ring; today's ring has an `outline` border. Paused state: the button row becomes "Tracking is paused" with compact "Resume" at the end, same height (MyPrayers.kt:56-60); the rings keep drawing. Animations: 1 tick (updateTransition, `Motion.Reveal`, haptic), 2 rings (Animatable, `Motion.Draw`, on open and on change), 5 pause row (`Motion.Reveal`). The strip wraps into two rows (four and three) by measured width, not by font scale (superseded by 9.9). RTL: rings Sun to Mon from the right as the locale says; the Canvas arcs mirrored.
+**Tracker tab.** (Animation superseded by BUILD-INSTRUCTIONS §6: `Reveal` dropped, no ring animation on open.) `ScreenTitle` "My prayers". Tracking off: one `sajdaSurface` card with the switch row ("My prayers", the existing sentence) and nothing else; no illustration, no sales text. Tracking on: today's date line (same style as Times); five rows in one card, each with the ring tick at the start (48dp, Tick.kt), name, time at the end; a day already past with no tick shows a plain outline, never red or counted. Below, 16dp, one row: compact solid "Pause" (pause icon) at the start and compact solid "Last 30 days" at the end. Below, 24dp, the week strip: seven 36dp rings, in the app language's first-day order (superseded by 8.6), each ring's arc the share of five, with "3 of 5" as the content description and the day letter under it; the paused day shows the pause glyph in the ring; today's ring has an `outline` border. Paused state: the button row becomes "Tracking is paused" with compact "Resume" at the end, same height (MyPrayers.kt:56-60); the rings keep drawing. Animations: 1 tick (updateTransition, `Motion.Reveal`, haptic), 2 rings (Animatable, `Motion.Draw`, on open and on change), 5 pause row (`Motion.Reveal`). The strip wraps into two rows (four and three) by measured width, not by font scale (superseded by 9.9). RTL: rings Sun to Mon from the right as the locale says; the Canvas arcs mirrored.
 
 **Last 30 days sheet.** Grid of 30 rings, six rows of five, newest first, each with its day number and the "3 of 5" description; tapping a ring opens that day's five ticks under the grid (the existing per-day row, last-30-days.png); paused days with the glyph; nothing counts blanks. This replaces the long card list, which is 30 cards tall.
 
@@ -406,7 +406,7 @@ or `fastReminders`. [Ali to confirm] `RequestCodeTest` covers the 30,000 band no
   Tested by `SkyPeriodTest`.
 - **Edge to edge** is verified. The known cold-start light frame now shows before a dark sky; that is
   accepted and noted in DESIGN_SYSTEM §5.
-- **Existing tween literals.** `SettingsList.kt:277,352` and `Notice.kt:117` move to `Motion.Standard`.
+- **Existing tween literals.** `SettingsList.kt:277,352` and `Notice.kt:117` move to `Motion.Standard`. (Superseded: BUILD-INSTRUCTIONS §5 row 0, the chevrons go to `Quick`.)
   `QiblaScreen.kt:209` (120 ms, which follows the compass) is exempt by name in `DesignRulesTest`, with a
   comment.
 - **The day path** draws in once per process, not on every tab return. [Ali to confirm]

@@ -22,10 +22,10 @@ than repeating it.
     (`12c3af5`). The Play Console upload was not finished that day, so 1.5.0 is **not live yet**: Play's
     "Updated on" still read 17 Oct 2026. Check that date before believing anyone's "it is live".
   - Never merge into `main`. Never push to `main`.
-  - **This branch has not had `main` merged in since 1.5.0 was finished.** A trial merge on 23 Oct 2026
-    conflicted in `MainActivity.kt`, `data/SettingsRepository.kt` and `docs/store/LISTING.md`. Merge `main` in
-    (never rebase) as the first job of the next build session, before step 0, so 1.6 is built on the code that
-    actually shipped as 1.5.0. Keep both sides' behaviour; ask Ali only if both changed the same logic.
+  - **`main` (1.5.0 as submitted, `12c3af5`) was merged in on 23 Oct 2026, evening** (`ceb2504`, full gate
+    green: 512 unit tests, 0 failed). The earlier trial's conflicts in `MainActivity.kt`, `SettingsRepository.kt`
+    and LISTING did not arise. Still to come: merge `main` once more after Ali merges the docs-only PR #16, the
+    same way (merge, never rebase; on a `CLAUDE.md` conflict take this branch's version, a superset).
   - Never merge `claude/analytics-default-on-1-4-0`.
 - **Already on the branch, built before the design pause, and reworked by this plan** (`DETAILED-PLAN.md` 8.1):
   - `e98b2a6` tracker: ticks on the Times rows, the tracker line under the list. Both move to a tab.
@@ -38,8 +38,9 @@ than repeating it.
   changed at the end. The 1.6 plan is recorded there too.
 - **Progress, kept current here** (update this list in every commit that finishes a step):
   - Step P: **done**, `55ef229` (privacy page section and `TrackerPrivacyTest`; full gate not run).
-  - Steps 0 to 11: not started.
-  - Before step 0: merge `main` in (above).
+  - Steps 1 to 11: not started.
+  - Before step 0: merge `main` in. **Done**, `ceb2504`.
+  - Step 0: motion spec by Fable (`ux-lead`) on 23 Oct 2026 night, written into §5 row 0 and §6; build not started.
 
 ## 0.1 Which model does what (Ali, 23 Oct 2026)
 
@@ -244,7 +245,7 @@ step starts only after his yes. Section numbers refer to `DETAILED-PLAN.md`.
 | # | Step | Main files | Strings (5 languages each) | Tests | Docs | Ends with |
 |---|---|---|---|---|---|---|
 | P | **Privacy first** (9.2). **Done, `55ef229`** | `docs/privacy.html` | none | new `TrackerPrivacyTest` (moves the backup check from `TrackerWordingTest.kt:65`) | privacy page | test green |
-| 0 | **Foundations** (§1, 8.9, 9.10) | new `ui/theme/Motion.kt`; existing `tween` literals moved (`SettingsList.kt:277,352`, `Notice.kt:117`) | none | `DesignRulesTest` (ban `rememberInfiniteTransition`; ban number literals in `tween(` except `Motion.kt` and the Qibla dial); `RequestCodeTest` adds the 30,000 band; new `InertReminderSettingsTest` (app unit test: no file under `ui/` reads `jamaahReminderMinutes` or `fastReminders`, 8.8) | DESIGN_SYSTEM §2 (a "Motion" subsection beside the gaps) | tests green |
+| 0 | **Foundations** (§1, 8.9, 9.10) | new `ui/theme/Motion.kt` (three durations, §6); existing `tween` literals moved: the two fold chevrons (`SettingsList.kt:277`, `Notice.kt:117`, 200 ms) to `Quick`, the theme thumb (`SettingsList.kt:352`, 240 ms) to `Standard`; the unused imports in `PermissionAction.kt` removed (lines 30-39, the `ArrowForward` import too; the build's lint and the reviewer confirm none is used), and the `tween` imports at `SettingsList.kt:9` and `Notice.kt:13` once their calls use `Motion`. Compose's own default specs (tab fade `MainScaffold.kt:186`, tab pill colour `MainScaffold.kt:290`, the `AnimatedVisibility` folds, `OnboardingScreen.kt:161`) and the tab bar's shipped `SegmentTick` haptic (`MainScaffold.kt:300`) are left alone: approved screens. **`Motion.kt` shape** (in `:app` beside `Spacing.kt`, since it imports Compose): `object Motion { const val QUICK = 150; const val STANDARD = 250; const val DRAW = 400; fun <T> quick() = tween<T>(QUICK, easing = FastOutSlowInEasing); fun <T> standard() = …; fun <T> draw() = … }`; no exit helper (a call site passes the shorter spec itself). **Visible to Ali:** two fold arrows turn 50 ms faster and the theme thumb slides 10 ms slower; nothing to screenshot, tell him in one line | none | `DesignRulesTest` (ban `rememberInfiniteTransition` and `\bspring\s*\(`; ban **every** `\btween\b` under `app/src/main/java` except `ui/theme/Motion.kt` and `QiblaScreen.kt` (the dial), so a call site can only say `Motion.quick()` and the easing comes with it. Word bounded because a plain `tween(` also matches `Duration.between(`. **Mutation proof:** put `tween(200)` back in `Notice.kt`, see the test fail, take it out. It scans only the phone app; the watch has no animation today and that is stated, not claimed as covered); `RequestCodeTest` adds the 30,000 band; new `InertReminderSettingsTest` (app unit test: no file under `ui/` reads `jamaahReminderMinutes` or `fastReminders`, and no file under `app/src/main` except `notify/ExtraReminderPlans.kt` names `JamaahReminderPlan` or `FastReminderPlan` (the two objects that file declares; the file name itself appears nowhere in code), so the 1.6.1 planners cannot go live through the scheduler either. **Mutation proof:** reference one from `PrayerAlarmScheduler.kt`, see it fail, take it out. 8.8) | DESIGN_SYSTEM §2 (a "Motion" subsection beside the gaps) and a dated §9 entry (three tokens, `Reveal` dropped, no entrance animation, the haptics rule, M3 `MotionScheme` considered and not used) | tests green; one line to Ali, no screenshots |
 | 1 | **My prayers tab** (2.4, 8.6, 9.7, 9.9, 9.10, 9.11) | `MainScaffold.kt` (`Destination.PRAYERS`, `TaskAlt` icons, no usage word, `SnackbarHost`); new `ui/prayers/MyPrayersScreen.kt`; ticks and tracker line out of `HomeScreen.kt` (`:907-946`, `:216-218`); `Tick.kt` (PAUSED); `ui/home/MyPrayers.kt` (30-day grid); `TrackerRepository.kt` (`tracker_started`, in the tracker DataStore so Delete clears one store); `review/ReviewPrompt.kt` (the tab never counts as a calm screen) | `nav_tracker`, `tracker_off_line`, `tracker_paused_from_today`, `tracker_ring_a11y` (plurals), `tracker_ring_paused_a11y`, `tracker_ring_today_a11y`, `tracker_state_paused` (and `tracker_tick_a11y` gains the paused state), `tracker_last_night_isha`, `action_undo`; reuse `action_pause` and `action_resume` | `WeekStripTest` (core unit test: share of five, wrap by width, first day), tracker codec test (`tracker_started`), `UsageCountsTest` (3 screens), `TrackerWordingTest` (wider prefixes), `DesignRulesTest` inventory, `LargeTextAndTalkBackDeviceTest` (rings and animation on device) | DESIGN_SYSTEM §4.1 inventory: rewrite rows 429-432 (Times placement) and add `MyPrayersScreen.kt`; §9; HANDOVER | screenshots to Ali |
 | 2 | **Islamic dates sheet** (built) | check only | none | existing | none | screenshots |
 | 3 | **Bell with Undo** (8.4, 9.4) | `HomeScreen.kt` `PrayerRow` (own `toggleable`, `Role.Switch`); `SettingsRepository.kt` (`lastAlertStyle`, `bell_removed_reminder`); `MainScaffold.kt` snackbar; `MainActivity.kt` permission request | `bell_on_a11y`, `bell_alarm_a11y`, `bell_off_a11y`, `bell_blocked_a11y`, `bell_off_message`, `bell_off_reminder_message`, `bell_off_message_fajr_ramadan` | `AlertRestoreTest`, `ColorContrastTest` (inverse pairs, `outline` on 3 row backgrounds), `SettingsCorruptionTest`, `DesignRulesTest` (kind G) | DESIGN_SYSTEM §4.1 kind G | screenshots |
@@ -282,29 +283,46 @@ scope):
 ## 6. Animation: the one table
 
 Tools: Compose only (`DETAILED-PLAN.md` §1).
-- **Durations** come from `ui/theme/Motion.kt`: `Quick` 150, `Standard` 250, `Reveal` 300 and `Draw` 400 ms,
-  with easing `FastOutSlowInEasing`. No other numbers.
-- **Haptics** go through `LocalHapticFeedback` only.
+- **Durations** come from `ui/theme/Motion.kt`: `Quick` 150, `Standard` 250 and `Draw` 400 ms, with easing
+  `FastOutSlowInEasing`. No other numbers. (Fable, 23 Oct 2026: three, not four. `Reveal` 300 was dropped
+  because 50 ms from `Standard` is below what anyone notices, so the choice would drift by mood the way gaps did
+  before `Space`. Pick by what moves: an icon or arrow swaps or turns (`Quick`: the bell, the fold chevrons); a shape, colour,
+  position or block of text changes in place (`Standard`: the tick, the theme thumb, the pause row, Now and Next); a
+  drawing runs across the screen (`Draw`: rings, sky, day path). Nothing above 400 ms, so a dropped frame on an old phone never reads as lag.)
+- **Exits** use the same easing and the token one step shorter than the enter (a `Standard` enter leaves at
+  `Quick`; a `Quick` enter also leaves at `Quick`). Reversing the same animation (an untick) counts as an exit.
+- **Nothing moves unless the user touched it, a sensor reading changed (the Qibla dial), or a real event
+  happened** (a prayer time passed, the sky period changed). No entrance animation when a screen opens, no shimmer, no attention pulse. The one exception is the
+  day path drawing in once per app open (Q11), built as once per process (the cheaper reading of "app open").
+- **Haptics** go through `LocalHapticFeedback` only, and only on the user's own tap that changes something
+  stored: `ToggleOn`/`ToggleOff` (tick, bell, switches) and `SegmentTick` (pickers). Two shipped exceptions stay,
+  named so nobody "fixes" them: `SegmentTick` on a tab change (`MainScaffold.kt:300`) and `LongPress` when the
+  Qibla aligns (`QiblaScreen.kt`, a sensor event). Never on a prayer passing, a sky change, Undo, a snackbar or a ring filling. One pulse per tap.
 - **Remove animations.** Compose (Animation 1.2+) honours the system animator scale, so with "Remove
   animations" every item jumps to its end state. Verify once on the emulator with
   `adb shell settings get global animator_duration_scale`.
-- **Banned:** `rememberInfiniteTransition`, springs (they have no fixed duration), and any animation on a
+- **Banned:** `rememberInfiniteTransition`, a written `spring(` (springs have no fixed duration; Compose's own
+  default specs on approved screens are kept, row 11), and any animation on a
   widget or the watch.
-- **Never animated:** prayer times, the countdown digits, notice text and the disclaimer.
+- **Never animated:** prayer times, the countdown digits, notice text, the disclaimer, the city title and
+  Hijri date, the glass bar's position, any dialog or sheet text. Letters never move or morph on their own (no per-letter or typewriter
+  effects, which break Arabic and Urdu joining); a whole block of text may fade (rows 3 and 5).
+- **iPhone effect:** carries over unchanged (`FastOutSlowInEasing` is the cubic curve 0.4, 0, 0.2, 1, so SwiftUI
+  `.timingCurve(0.4, 0, 0.2, 1, duration: 0.15)` for `Quick`, 0.25 and 0.40 for the others; Remove animations = `accessibilityReduceMotion`; haptics = `.sensoryFeedback`).
 
 | # | Screen | Trigger | What moves | API | Motion | Haptic | Step |
 |---|---|---|---|---|---|---|---|
-| 1 | My prayers | Tick tapped or untapped | The ring fills and the tick draws in (reversed on untick) | `updateTransition` + Canvas `PathMeasure` | Reveal | ToggleOn / ToggleOff | 1 |
-| 2 | My prayers | Screen opens, or a tick changes | Week rings grow to their share of five | `Animatable` in `LaunchedEffect` keyed on entry | Draw | none | 1 |
-| 3 | My prayers | Pause or Resume | The button row crossfades to "Tracking is paused", same height | `AnimatedContent`, `sizeTransform = null` | Reveal | none | 1 |
+| 1 | My prayers | Tick tapped or untapped | The ring fills and the tick draws in (reversed on untick) | `updateTransition` + Canvas `PathMeasure` | Standard | ToggleOn / ToggleOff | 1 |
+| 2 | My prayers | A tick changes (on open the rings are drawn at their value, no animation: the no-entrance rule) | That day's week ring grows to its new share of five | `Animatable` in `LaunchedEffect` keyed on the count | Draw | none | 1 |
+| 3 | My prayers | Pause or Resume | The button row crossfades to "Tracking is paused", same height | `AnimatedContent`, `sizeTransform = null` | Standard | none | 1 |
 | 4 | Times | Bell tapped | The bell crossfades to the crossed-out bell (shape, not only colour); Undo snaps back with no animation | `animateFloatAsState` in `graphicsLayer` | Quick | ToggleOn / ToggleOff | 3 |
 | 5 | Times, My prayers | Undo message | Material snackbar | platform | platform | none | 1, 3 |
-| 6 | Times | The sky period changes (at most four times a day), or opens in a new period | The gradient crossfades as one `drawBehind` lerp; the card does not move | `animateFloatAsState` | Draw | none | 5 |
-| 7 | Times | Screen opens (once per process, Q12) | The day path draws from Fajr to now; after that the dot moves on the minute only | `Animatable` + `PathMeasure`, `derivedStateOf` per minute | Draw | none | 5 |
-| 8 | Times | A prayer time passes | The Now and Next fill and bar move to the next row | `animateColorAsState` in `drawBehind` | Reveal | none | 5 |
+| 6 | Times | The sky period changes while on screen (at most four times a day); on open the sky is drawn at the current period with no animation | The gradient crossfades as one `drawBehind` lerp; the card does not move | `animateFloatAsState` | Draw | none | 5 |
+| 7 | Times | Screen opens (once per process, Q11) | The day path draws from Fajr to now; after that the dot moves on the minute only | `Animatable` + `PathMeasure`, `derivedStateOf` per minute | Draw | none | 5 |
+| 8 | Times | A prayer time passes | The Now and Next fill and bar move to the next row | `animateColorAsState` in `drawBehind` | Standard | none | 5 |
 | 9 | Qibla | Alignment becomes true | The face fill and rim colour change; the existing LongPress haptic stays | `animateColorAsState` | Standard | existing | 6 |
 | 10 | Qibla | Heading changes | The existing dial tween, input-driven (exempt from the literal ban) | existing | 120 ms | none | exists |
-| 11 | All | Tab change, sheets, folds | Existing behaviour | existing | Standard | none | exists |
+| 11 | All | Tab change, sheets, folds | Existing behaviour | existing | platform default (left as approved); fold chevrons `Quick` | none | exists |
 
 RTL: mirror the Canvas x axis under `LocalLayoutDirection` for the day path. Ring arcs sweep clockwise in both
 directions; that is a deliberate choice. Read animated values inside `drawBehind` or `graphicsLayer` lambdas, so
@@ -388,9 +406,9 @@ a frame does not recompose the row. Give every animation a `label`.
 | Topic | File and section |
 |---|---|
 | Ali's words and decisions | `PLAN.md` §0.1 |
-| Animation toolkit, `Motion.kt` code | `DETAILED-PLAN.md` §1 |
+| Animation toolkit | `DETAILED-PLAN.md` §1 (its `Motion.kt` sketch has four durations; §6 here has three and wins) |
 | Height budget at 823dp, sky options, sky colour stops | `DETAILED-PLAN.md` §2.1 to §2.3 |
-| Per-screen specs | `DETAILED-PLAN.md` §2.4, as corrected by §8 and §9 |
+| Per-screen specs | `DETAILED-PLAN.md` §2.4, as corrected by §8 and §9; all animation as §6 here |
 | Missed-fasts research | `DETAILED-PLAN.md` §3 |
 | Widgets | `DETAILED-PLAN.md` §5, 8.11 |
 | User journeys and every string | `DETAILED-PLAN.md` §6, 8.13 |
