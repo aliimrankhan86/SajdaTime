@@ -1,5 +1,7 @@
 # SajdaTime 1.6.0: UX guidance (Fable 5, independent, 23 Oct 2026)
 
+> **Signed off 23 Oct 2026 (Fable 5.1): read `SIGNOFF.md` first. It overrides this file.** Final order: 1 prayer tracker, 2 Islamic dates sheet, 3 jama'ah times on the Times screen (cut first if short of time). Reminders in 1.6.1. Submit by 15 Dec 2026, or all of 1.6.0 goes after Eid if 1.5.0 is not live by 27 Nov. The tasbih section near the end is a record only, not for building.
+
 > **Read with `PLAN.md` section 0, which overrides this file where they differ:**
 > - The row is called **"Jama'ah times"**, not "Mosque times".
 > - The jama'ah reminder and the fasting reminders move to **1.6.1**, after Eid.

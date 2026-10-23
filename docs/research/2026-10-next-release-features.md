@@ -1,5 +1,7 @@
 # Next release after 1.5.0: what to build to grow — research, 23 Oct 2026
 
+> **Superseded order, 23 Oct 2026:** the signed-off order is in `docs/plans/2026-10-release-1.6.0/SIGNOFF.md` (tracker, then Islamic dates, then jama'ah times). The "Prayed" button on the notification named below is **not** agreed (Ali, 16 Oct 2026).
+
 Research only. Nothing here is planned or approved. For the release **after** 1.5.0.
 
 ## Answer: the top 3 (final, after the independent Fable 5 review)

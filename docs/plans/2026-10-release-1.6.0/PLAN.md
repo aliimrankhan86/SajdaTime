@@ -1,5 +1,7 @@
 # Release 1.6.0 plan: the three features after 1.5.0 (draft, 23 Oct 2026)
 
+> **Signed off 23 Oct 2026 (Fable 5.1): read `SIGNOFF.md` first. It overrides this file, including §0.** Final order: 1 prayer tracker, 2 Islamic dates sheet, 3 jama'ah times on the Times screen (cut first if short of time). Reminders in 1.6.1. Submit by 15 Dec 2026, or all of 1.6.0 goes after Eid if 1.5.0 is not live by 27 Nov.
+
 Status: **draft for Ali's yes, nothing built.** The research behind it is
 `docs/research/2026-10-next-release-features.md`. This plan builds on the tracker plan Ali already approved in
 `docs/plans/2026-10-widget-ramadan-tracker/` (on the `claude/quiet-glass` branch, section 7, B0 to B8) and does not
