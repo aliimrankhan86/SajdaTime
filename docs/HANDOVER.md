@@ -5696,6 +5696,8 @@ shows it live.**
   branch in HANDOVER §5.28 and `.claude/agents/ux-lead.md`: Fable does all the thinking for what users see (journeys,
   UX, UI, icons, premium look) and finds ready-made, free licensed, never AI generated assets for Ali to approve;
   Opus checks every change. The user journeys are in `docs/plans/2026-10-release-1.6.0/DETAILED-PLAN.md` §6.
+  Every design must also suit a future iPhone version (Ali, 23 Oct 2026: he plans iOS later and Apple rejects apps on
+  design): no iOS work in 1.6, but Fable checks each design against Apple's guidelines too (§5.28 on that branch).
 
 ### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (history now; read the block above first; the block below still holds for everything not named here)
 

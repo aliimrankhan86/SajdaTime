@@ -111,6 +111,10 @@ Ali decided on 16 Oct 2026:
     artwork (CC0, Apache, MIT, OFL), bundled in the app, never AI generated (the Play AI declaration says "Don't
     label assets"), never another app's. Fable recommends, Ali approves each, its source and licence go in
     `docs/ASSETS.md`.
+  - **Designed so it can come to iPhone later** (Ali, 23 Oct 2026: he plans an iOS version, and Apple often rejects
+    apps on design): no iOS work in 1.6, but Fable checks every design also fits Apple's rules, with patterns both
+    phones share, an Apple icon named beside each Android one, and a distinct look of our own so it never reads as a
+    copy of other prayer apps.
   - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
     routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
   - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and
