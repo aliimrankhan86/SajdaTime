@@ -117,7 +117,7 @@ No-location state: the card shows "Set your location" as today (HomeScreen.kt:48
 
 **Last 30 days sheet.** Grid of 30 rings, six rows of five, newest first, each with its day number and the "3 of 5" description; tapping a ring opens that day's five ticks under the grid (the existing per-day row, last-30-days.png); paused days with the glyph; nothing counts blanks. This replaces the long card list, which is 30 cards tall.
 
-**Qibla.** Title. "Turn right 58°" in `headlineMedium` on one line; "Facing 60°" under it in `bodyLarge`. The dial, radius as today (QiblaScreen.kt:190 keeps room below), with a thicker soft rim and a rounder needle (DESIGN_SYSTEM §9). Key. Place name small in `onSurfaceVariant` under the key, shown only when the label exists. A compact solid "Details" with a chevron under the place name; expanded, two lines: "About 5024 km from here" (or miles: superseded by 9.4) and "118° from north". Aligned: existing fill, rim, wording and haptic; animation 13 (`animateColorAsState`, `Motion.Standard`). No compass and no location: the existing amber notices above the dial.
+**Qibla.** Title. "Turn right 58°" in `headlineMedium` on one line; "Facing 60°" under it in `bodyLarge`. The dial, radius as today (QiblaScreen.kt:190 keeps room below), with a thicker soft rim and a rounder needle (DESIGN_SYSTEM §9). Key. Place name small in `onSurfaceVariant` under the key, shown only when the label exists. A compact solid "Details" with a chevron under the place name; expanded, two lines: "About 5024 km from here" (or miles: superseded by 9.5) and "118° from north". Aligned: existing fill, rim, wording and haptic; animation 13 (`animateColorAsState`, `Motion.Standard`). No compass and no location: the existing amber notices above the dial.
 
 **Settings.** No new rows beyond the signed-off ones. Prayer alerts keeps the per-prayer chooser and mirrors the bells (DESIGN_SYSTEM.md:764).
 
@@ -141,6 +141,8 @@ Sources: [thepillarsapp.com](https://thepillarsapp.com/), [Pillars feature board
 - Why after Ramadan: the number is set after the month, and 1.6.0's deadline is the reason to keep it out (SIGNOFF.md:38). Why count only: it removes the one part of the Pillars feature that is both unloved in their reviews and dangerous in ours.
 
 ## 4. Build sequence for 1.6
+
+> **Superseded by `BUILD-INSTRUCTIONS.md` §5** (the one ordered table and its checkpoints). Kept for the reasoning behind the cut order.
 
 Gates stay as signed off: 1.5.0 live by 27 Nov or everything moves after Eid; PR by 11 Dec, submit by 15 Dec (SIGNOFF.md:31-35). Each step is its own droppable set of commits with screenshots for Ali before the next starts.
 
@@ -216,7 +218,7 @@ Words in quotes are on screen. "Exists" means the string is in `values/strings.x
 
 **D. Tracking off, then on.** Tracker tab with tracking off: title "My prayers", one card: a switch row "My prayers", "Tick each prayer you pray. Only you can see it." (exists), and under it one line "Nothing is tracked until you switch this on." Flip the switch: the card is replaced by today's five rows, no snackbar (the user is already looking at the result; the UX.md:90 snackbar belonged to the Times placement and goes). Flip it off in Settings: the tab returns to the switch; the record stays, and the Delete row stays in Settings (UX.md:68).
 
-**E. Pausing for a period.** Tracker tab, "Pause": the button row becomes "Tracking is paused" with "Resume"; today's rings dim; a message "Paused from today" with "Undo" (and "Yesterday" stays in Settings for the woman who forgot to pause yesterday). The week strip marks each paused day with the pause glyph. "Resume": rows come back for today; paused days keep the glyph and count nothing. No reason is ever asked, no word for why.
+**E. Pausing for a period.** Tracker tab, "Pause": the button row becomes "Tracking is paused" with "Resume"; today's rings show the pause glyph, disabled at full contrast (superseded by 9.7); a message "Paused from today" with "Undo" (and "Yesterday" stays in Settings for the woman who forgot to pause yesterday). The week strip marks each paused day with the pause glyph. "Resume": rows come back for today; paused days keep the glyph and count nothing. No reason is ever asked, no word for why.
 
 **F. A Ramadan day.** Three days before: the quiet notice "Ramadan begins on Monday" (exists) with "Shift the date". Day 1: the card appears under the notice slot: "Ramadan", "Day 1 of 29", "Suhoor ends 5:17 am", "Iftar 5:33 pm", "Iftar in 02:32:51", the fast line, tomorrow's line, "Get the full Ramadan timetable". The Today line's "Timetable" opens the same sheet. The suhoor reminder arrives 60 minutes before Fajr unless changed in Settings. The Tracker tab is unchanged. Times scrolls a little at 823dp (known).
 
@@ -356,7 +358,7 @@ already names it. Release day changes the privacy date with `set-release-date.sh
   - It is written with `showSnackbar(actionLabel = ...)`, so no `TextButton` appears in our source.
   - Recorded as control kind G in §4.1.
   - `ColorContrastTest` adds `inverseSurface` / `inverseOnSurface` / `inversePrimary` in both themes.
-- **Semantics.** The bell is its own `toggleable` node with `Role.Switch` (as `Tick.kt:64-69`), outside the
+- **Semantics.** The bell is its own `toggleable` node with `Role.Switch` (the same pattern as `Tick.kt:64-69`, which uses `Role.Checkbox` for a tick), outside the
   row's merged description (`HomeScreen.kt:1029`).
 - **Contrast.** `outline` against `primaryContainer`, `surfaceContainerHigh` and `surface` at 3:1 in both
   themes.
@@ -385,7 +387,7 @@ and §11 gains a row).
   two rows (4 and 3). Rings in the strip are not tappable; the grid's are, with 48dp cells.
 - **First day of the week.** `WeekFields.of(appLocale)` from the app's language (`AppLocale`), with day
   letters from `DayOfWeek.getDisplayName(TextStyle.NARROW, appLocale)`. [Ali to confirm]
-- **Usage counts.** The TRACKER destination maps to no event in the scaffold's `when`. `UsageCountsTest`
+- **Usage counts.** The PRAYERS destination (9.10) maps to no event in the scaffold's `when`. `UsageCountsTest`
   pins `Screen.entries.size == 3`.
 
 **8.7 Jama'ah.**
@@ -470,7 +472,7 @@ stays full width.
   `WidgetManifestTest`, `WidgetResourcesTest`, `WidgetThemeTest`, `WidgetStateTest`,
   `WidgetRefreshSchedulerTest`, `TrackerWordingTest`, `DisclaimerContentTest`, `RequestCodeTest`,
   `UsageCountsTest`, `TranslationIntegrityTest`.
-- **New:** `TrackerPrivacyTest`, `SkyPeriodTest`, `WeekStripTest`, `AlertRestoreTest`,
+- **New:** `InertReminderSettingsTest`, `TrackerPrivacyTest`, `SkyPeriodTest`, `WeekStripTest`, `AlertRestoreTest`,
   `MeasurementSystemTest`.
 - **Device checks:**
   - animator scale 0
@@ -595,8 +597,8 @@ other 1.6 code** (the tracker data shipped in `e98b2a6` without it).
 - The `tween(` literal ban exempts `ui/theme/Motion.kt` and `QiblaScreen.kt`'s dial (8.9).
 - The usage-count `when` maps PRAYERS to nothing.
 
-**9.11 `tracker_started`** is the earlier of the switch-on date and the earliest stored record. It is re-derived
-after Load and cleared by Delete. `SettingsCorruptionTest` case.
+**9.11 `tracker_started`** lives in the tracker DataStore (`TrackerRepository`), so Delete clears it with the record. It is the earlier of the switch-on date and the earliest stored record. It is re-derived
+after Load and cleared by Delete. Tested by the tracker codec test.
 
 **9.12 Jama'ah time zone guard.**
 - Store the zone id with the jama'ah rules: one more key, codec v2, and v1 still reads.
@@ -613,7 +615,7 @@ after Load and cleared by Delete. `SettingsCorruptionTest` case.
 - **Tablets.** The 600dp cap (8.15) is a visible change for tablet users: question 20.
 - **The 1.6.0 release script** asserts phone `versionCode 10 / 1.6.0` and the watch unchanged at `1002 / 1.5.0`.
 - **Tests added to 8.16:**
-  - `SettingsCorruptionTest` cases for `lastAlertStyle`, `bell_removed_reminder` and `tracker_started`
+  - `SettingsCorruptionTest` cases for `lastAlertStyle` and `bell_removed_reminder`; a tracker codec case for `tracker_started`
   - `RamadanPdfDeviceTest` and `ScreenSeedDeviceTest`, which find "Save as PDF" by label
   - `SettingsSemanticsDeviceTest` if it pins rows
 - **Docs:** `PROJECT_BRIEF.md` changes in every commit that changes what is live or next.
