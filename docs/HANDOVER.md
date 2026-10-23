@@ -2004,6 +2004,27 @@ YAML, but no agent was run from them in that session. The first session that use
 the named model (the session's model list shows it) and record that in §10. If `fable` is not accepted as an
 alias, use the undated ID `claude-fable-5-1`.
 
+### 5.29 My prayers, the tab (1.6.0 step 1, Ali approved 23 Oct 2026)
+
+Ali chose from pictures on 23 Oct 2026: "B: calendar grid" and "Yes, build it". Design by Fable:
+`docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md` (its §9 and 13 win). The rules, each tested in `:core`
+(`TrackerLogicTest`, `WeekStripTest`) unless marked:
+- **Where.** A fourth tab: Times, Qibla, My prayers, Settings. Times has no ticks any more. The tab sends no usage
+  count (`Destination.PRAYERS -> null`; `UsageCountsTest` pins the three counted screens).
+- **Where the rings begin (`tracker_started`, in the tracker store).** Set on each switch on: today, unless a tick
+  exists in the last 30 days, then the oldest such day (`startOnSwitchOn`). Moved back by an earlier tick or a loaded
+  file (`startAfterRecording`); removed on switching off with nothing recorded; cleared by Delete. Not in the save
+  file: the oldest loaded day sets it. Days before it: no ring, not selectable (Ali, Q4).
+- **A day's ring** (`dayKind`): before the start, to come (never shown paused, though an open pause has no end),
+  paused (pause mark only), or its share of five.
+- **Pausing keeps what was ticked:** `tickState` tests ticked before paused; ticks are disabled while paused.
+- **No location** means no coordinates or the Makkah fallback: rows show no times and no Now pill, every ring is
+  tickable, no "Last night's Isha" row. Ticking is safe: the record stores days, never times.
+- **Last night's Isha** (Isha still current after midnight) ticks yesterday and follows yesterday's pause.
+- **Nothing is drawn until the record has loaded** (`trackerLoaded`), so no ring animates in on open.
+- **The tab keeps its own day:** with no saved place the clock loop republishes it after midnight (not tested; read
+  from code, review 23 Oct 2026).
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -2387,6 +2408,15 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.6.0 step 1, the My prayers tab (23 Oct 2026, night, Mac session).** Phone emulator `sajda` (API 36), seeded by
+`TrackerSeedDeviceTest` and `ScreenSeedDeviceTest`, clock set to Fri 23 Oct 14:30 (`adb root`, `auto_time 0`).
+Screens taken in light and dark at 823dp (1440x3088, density 600) and at 320dp (720x1280, density 360), at text
+1.0, 1.5 and 2.0, in English, Urdu (right to left), Arabic and Turkish. Found and fixed on the emulator, each seen
+before and after: a cold start crash (§15, 179); future week days drawn paused; prayer names split one letter a line
+at 320dp and 2.0 ("D h u h r"), then cut ("Maghr"); weekday names split ("Cum" over "m"). Accepted and recorded: the
+Turkish tab label wraps inside the word at 320dp and 2.0. Not checked: TalkBack by ear, a real launcher or phone,
+the watch (untouched).
 
 **The five agents' first use (23 Oct 2026, night, Mac session; §5.28).** Each agent was asked to state the model in
 its own system prompt, and reported (their word, matching each file's frontmatter): `ux-lead` Fable 5.1 (`claude-fable-5-1`), `plan-verifier` Fable 5.1, `reviewer` Opus 5.5
@@ -5765,7 +5795,10 @@ ordered build table, animation, development and testing guidance, and (§0.1) wh
 - **Progress (23 Oct 2026, night):** step P done (`55ef229`). **Step 0 done** (Ali: "Yes, build it"):
   `Motion.kt` and its tests, full gate green (518 unit tests: app 301, core 190 with 1 skipped, wear 27; lint
   clean; both bundles), installed and launched on the phone emulator. **Next: step 1, the My prayers tab:** Fable's
-  design exists, then `plan-verifier`, then prototype pictures for Ali's yes. Steps 2 to 11 not started. The five agents ran for the first time and each runs on its
+  design exists, then `plan-verifier`, then prototype pictures for Ali's yes. **Step 1 (My prayers tab) built 23 Oct 2026, night** on
+  `claude/1-6-0-step1-proto` and merged here: Ali approved from pictures ("B: calendar grid", "Yes, build it");
+  Opus reviewed it twice, Fable judged the pictures and decided four follow ups; §5.29 has the rules, §10 the
+  evidence. **Next: show Ali the finished screenshots for his yes, then step 2.** Steps 2 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
   start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).
@@ -10710,3 +10743,14 @@ matters more than the stable hashes, that is the trade being made.
     session started in `~/Developer/SajdaTime` (the 1.5.0 checkout) and worked on the `SajdaTime-1-6-0` worktree by
     absolute path; every `.claude/agents/` type was "not found", because that checkout has no agent files. Moving the
     session's folder fixed it from the next turn. Start every 1.6 session in `~/Developer/SajdaTime-1-6-0`.
+179. **Kotlin runs property initialisers and `init` blocks in file order, so a field declared below `init` can be
+    null inside it.** `SajdaViewModel`'s `init` starts a settings collector that can deliver at once on
+    `Main.immediate`, and it called `publishTracker()`, which read `trackerData`, declared 300 lines further down.
+    On a cold start in Urdu on 23 Oct 2026 the app crashed ("Parameter specified as non-null is null"). It was
+    already on `claude/1-6-0` from `e98b2a6` and had passed every unit test, because no test builds the ViewModel.
+    Fixed by declaring the field above `init`. Any field a collector started in `init` touches goes above it.
+180. **A test that builds its allowed list from the enum it guards cannot catch a new entry.** `UsageCountsTest`
+    took its allowed screen words from `Screen.entries`, so adding a fourth counted screen would have passed. The
+    Opus review found it on 23 Oct 2026; the test now pins the exact set and checks `Destination.PRAYERS -> null`
+    in the source. When a test guards a closed list, write the list out.
+

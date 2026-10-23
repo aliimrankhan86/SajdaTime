@@ -137,6 +137,9 @@ class ColorContrastTest {
     )
 
     /** Icons, dividers and focus outlines only need 3:1 under WCAG 1.4.11. */
+    // Not listed here on purpose: the My prayers ring for days to come and for prayers not due yet is
+    // drawn at 38 percent. It is a disabled control, which WCAG 1.4.11 exempts from the 3:1 contrast
+    // rule (STEP-1-DESIGN 3c). The tick and the ring in use are primary, covered by the pairs above.
     private val nonTextPairs = listOf(
         Pair("light outline/surface", LightOutline, LightSurface, 3.0),
         Pair("light outline/background", LightOutline, LightBackground, 3.0),

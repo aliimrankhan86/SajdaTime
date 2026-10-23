@@ -41,7 +41,7 @@ than repeating it.
   - Steps 1 to 11: not started.
   - Before step 0: merge `main` in. **Done**, `ceb2504`.
   - Step 0: **done**, 23 Oct 2026 night (Ali approved the plan: "Yes, build it"). `Motion.kt`, the three literals moved, `DesignRulesTest` motion bans, `RequestCodeTest` 30,000 band, `InertReminderSettingsTest`, DESIGN_SYSTEM §2 Motion and §9. Full gate green (518 unit tests, 0 failed).
-  - Step 1: Fable's design written (23 Oct night); next is plan-verifier, then prototype pictures for Ali.
+  - Step 1: **built**, 23 Oct 2026 night (Ali approved from pictures: "B: calendar grid", "Yes, build it"). Waiting for his yes on the finished screenshots. `STEP-1-DESIGN.md` §9 and 13, HANDOVER §5.29.
 
 ## 0.1 Which model does what (Ali, 23 Oct 2026)
 
@@ -265,6 +265,10 @@ scope):
 - **Copy `release-1.5.0.sh` to `release-1.6.0.sh`** and change the counts (unit tests, device suite, screenshots,
   `versionCode 10`). `set-release-date.sh` moves both the privacy page date and the date pinned in
   `UsageCountsTest` (on `main`; here once `main` is merged in, before step 0); on 1.5.0's day the test failed because only the page moved (`main`'s HANDOVER §11, 23 Oct evening block).
+- **Exclude the tracker seed from the device suite.** `release-1.6.0.sh` must leave out
+  `com.sajdatime.app.TrackerSeedDeviceTest` with `-e notClass`, as `release-1.5.0.sh` line 242 does for the
+  seed: `instrument device-suite -e notClass com.sajdatime.app.SuhoorReminderDeviceTest,com.sajdatime.app.ScreenSeedDeviceTest`.
+  It is a seed, not a check.
 - **Watch:** unchanged, so no new watch bundle. Leave the 1.5.0 watch release (1002) where it is in the Wear
   track, and say so in the Console walk through so nobody uploads the old bundle again.
 - **Data safety:** the tracker is kept on the phone only, so Play's form should not change (data that never

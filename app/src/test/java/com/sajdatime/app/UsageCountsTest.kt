@@ -150,6 +150,18 @@ class UsageCountsTest {
         assertEquals(1, sink.events.count { it.first == "setup_step" })
     }
 
+    /**
+     * The counted screens are exactly these three, and the My prayers tab is never one of them (1.6,
+     * privacy.html "Opening My prayers is never counted"). The test below builds its allowed words from
+     * Screen.entries, so a fourth entry would have passed it; this one pins the list (review, 23 Oct 2026).
+     */
+    @Test
+    fun `the counted screens are times, qibla and settings, and my prayers is never one`() {
+        assertEquals(setOf("times", "qibla", "settings"), Screen.entries.map { it.wire }.toSet())
+        val scaffold = File(File("..").canonicalFile, "app/src/main/java/com/sajdatime/app/ui/MainScaffold.kt").readText()
+        assertTrue("MainScaffold must map the My prayers tab to no usage screen", Regex("""Destination\.PRAYERS\s*->\s*null""").containsMatchIn(scaffold))
+    }
+
     @Test
     fun `only the three approved event names and their parameters can ever be sent`() {
         val (sink, usage) = counts()

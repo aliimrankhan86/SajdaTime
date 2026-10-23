@@ -16,6 +16,7 @@
     <string name="nav_times">Times</string>
     <string name="nav_qibla">Qibla</string>
     <string name="nav_settings">Settings</string>
+    <string name="nav_tracker">My prayers</string>
 
     <!-- Onboarding -->
     <string name="bismillah_arabic">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</string>
@@ -676,6 +677,25 @@
     <string name="tracker_state_prayed">prayed</string>
     <string name="tracker_state_not_ticked">not ticked</string>
     <string name="tracker_state_not_due">not due yet</string>
+    <string name="tracker_state_paused">paused</string>
+    <!-- My prayers tab (1.6.0, step 1). Never "missed", "late" or "owed" (TrackerWordingTest). -->
+    <string name="tracker_off_line">Nothing is tracked until you switch this on.</string>
+    <string name="tracker_paused_from_today">Paused from today</string>
+    <string name="action_undo">Undo</string>
+    <string name="tracker_last_night_isha">Last night\'s Isha</string>
+    <string name="tracker_week_title">This week</string>
+    <!-- Spoken only, on a day's ring. %1$s is the day, "Wednesday", %2$d how many of the five were ticked. -->
+    <plurals name="tracker_ring_a11y">
+        <item quantity="one">%1$s, %2$d of 5 prayed</item>
+        <item quantity="other">%1$s, %2$d of 5 prayed</item>
+    </plurals>
+    <plurals name="tracker_ring_today_a11y">
+        <item quantity="one">Today, %1$d of 5 so far</item>
+        <item quantity="other">Today, %1$d of 5 so far</item>
+    </plurals>
+    <string name="tracker_ring_paused_a11y">%1$s, paused</string>
+    <string name="tracker_ring_future_a11y">%1$s, to come</string>
+    <string name="tracker_ring_before_a11y">%1$s, before tracking began</string>
     <!-- Islamic dates sheet (1.6.0). Plain names, no ruling, days both Sunni and Shia mark (SIGNOFF.md). -->
     <string name="dates_title">Islamic dates</string>
     <!-- %1$s is today's Hijri date, "12 Jumada al-Ula 1448". -->

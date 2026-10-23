@@ -28,7 +28,9 @@ class TrackerWordingTest {
     }
 
     private fun trackerKeys(map: Map<String, String>) =
-        map.filterKeys { it.startsWith("tracker_") || it.startsWith("settings_tracker") || it == "settings_group_tracker" }
+        map.filterKeys { it.startsWith("tracker_") || it.startsWith("settings_tracker") || it == "settings_group_tracker" ||
+                it == "nav_tracker" || it == "action_undo"
+        }
 
     @Test
     fun `every language has every tracker string`() {

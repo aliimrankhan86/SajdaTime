@@ -39,6 +39,11 @@ data class TrackerData(
     val pauses: List<PauseRange> = emptyList(),
     /** Written by a newer version of the app: shown, never changed (TrackerFileCodec says the same). */
     val readOnly: Boolean = false,
+    /**
+     * Where the rings begin: set on each switch on ([TrackerLogic.startOnSwitchOn]), moved back by an
+     * earlier tick or a loaded file. In this store, so Delete clears it with the record.
+     */
+    val startedOn: LocalDate? = null,
 ) {
     val isEmpty: Boolean get() = records.values.all { it.ticked.isEmpty() } && pauses.isEmpty()
 }
@@ -56,6 +61,20 @@ class TrackerRepository(private val context: Context) {
         val old = DayRecord.fromMask(prefs[key] ?: 0)
         val new = DayRecord(if (ticked) old.ticked + slot else old.ticked - slot)
         if (new.ticked.isEmpty()) prefs.remove(key) else prefs[key] = new.toMask()
+        if (ticked) prefs.moveStartBackTo(date)
+    }
+
+    /** Records where the rings begin, each time tracking is switched on ([TrackerLogic.startOnSwitchOn]). */
+    suspend fun markStarted(today: LocalDate) = edit { prefs ->
+        prefs[STARTED] = TrackerLogic.startOnSwitchOn(prefs.toTrackerData().records, today).toString()
+    }
+
+    /**
+     * Switched off with nothing ticked or paused: the start date is the only thing stored, and the
+     * Delete row is hidden when there is no record, so it is removed here rather than left behind.
+     */
+    suspend fun clearStartIfEmpty() = edit { prefs ->
+        if (prefs.toTrackerData().copy(startedOn = null).isEmpty) prefs.remove(STARTED)
     }
 
     suspend fun pause(from: LocalDate) = edit { prefs ->
@@ -87,6 +106,9 @@ class TrackerRepository(private val context: Context) {
                 prefs[key] = joined
             }
             prefs[PAUSES] = PauseCodec.encode(PauseCodec.decode(prefs[PAUSES]) + incoming.pauses)
+            // A file with older days moves the start back, so those days show (9.11).
+            (incoming.records.filterValues { it.ticked.isNotEmpty() }.keys + incoming.pauses.map { it.start })
+                .minOrNull()?.let { prefs.moveStartBackTo(it) }
         }
         return MergeResult(added, updated)
     }
@@ -94,6 +116,11 @@ class TrackerRepository(private val context: Context) {
     /** Clears the whole record. The only destructive action in the app, behind one confirmation. */
     suspend fun deleteAll() {
         context.trackerStore.edit { it.clear() }
+    }
+
+    private fun MutablePreferences.moveStartBackTo(date: LocalDate) {
+        val stored = this[STARTED]?.let { runCatching { LocalDate.parse(it) }.getOrNull() }
+        TrackerLogic.startAfterRecording(stored, date)?.let { this[STARTED] = it.toString() }
     }
 
     /** Refuses to write over a record from a newer version, so a downgrade cannot damage it. */
@@ -115,6 +142,7 @@ class TrackerRepository(private val context: Context) {
         }.toMap(),
         pauses = PauseCodec.decode(this[PAUSES]),
         readOnly = (this[VERSION_KEY] ?: VERSION) > VERSION,
+        startedOn = this[STARTED]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
     )
 
     private companion object {
@@ -122,6 +150,8 @@ class TrackerRepository(private val context: Context) {
         const val DAY_PREFIX = "d:"
         val VERSION_KEY = intPreferencesKey("tracker_version")
         val PAUSES = stringPreferencesKey("pauses")
+        // A plain ISO date, not a "d:" day key, so toTrackerData never reads it as a day of ticks.
+        val STARTED = stringPreferencesKey("tracker_started")
         fun dayKey(date: LocalDate) = intPreferencesKey(DAY_PREFIX + date)
     }
 }

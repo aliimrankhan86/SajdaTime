@@ -75,6 +75,8 @@ class LargeTextAndTalkBackDeviceTest {
     fun the_tab_labels_never_split_a_word_at_the_largest_text() {
         atText(2f) { GlassTabBar(current = Destination.SETTINGS, onSelect = {}) }
         assertWhole(word(R.string.nav_settings))
+        // The fourth tab (1.6.0): its label must be there and whole at the same text size.
+        assertWhole(word(R.string.nav_tracker))
     }
 
     /**

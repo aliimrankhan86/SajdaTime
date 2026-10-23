@@ -453,6 +453,25 @@
     <string name="tracker_state_prayed">kılındı</string>
     <string name="tracker_state_not_ticked">işaretlenmedi</string>
     <string name="tracker_state_not_due">vakti gelmedi</string>
+    <!-- My prayers tab (1.6.0, step 1). Translated by Claude, 23 Oct 2026. -->
+    <string name="nav_tracker">Namazlarım</string>
+    <string name="tracker_state_paused">duraklatıldı</string>
+    <string name="tracker_off_line">Bunu açana kadar hiçbir şey kaydedilmez.</string>
+    <string name="tracker_paused_from_today">Bugünden itibaren duraklatıldı</string>
+    <string name="action_undo">Geri al</string>
+    <string name="tracker_last_night_isha">Dün geceki yatsı</string>
+    <string name="tracker_week_title">Bu hafta</string>
+    <plurals name="tracker_ring_a11y">
+        <item quantity="one">%1$s, 5 vakitten %2$d kılındı</item>
+        <item quantity="other">%1$s, 5 vakitten %2$d kılındı</item>
+    </plurals>
+    <plurals name="tracker_ring_today_a11y">
+        <item quantity="one">Bugün, şu ana kadar 5 vakitten %1$d</item>
+        <item quantity="other">Bugün, şu ana kadar 5 vakitten %1$d</item>
+    </plurals>
+    <string name="tracker_ring_paused_a11y">%1$s, duraklatıldı</string>
+    <string name="tracker_ring_future_a11y">%1$s, henüz gelmedi</string>
+    <string name="tracker_ring_before_a11y">%1$s, takip başlamadan önce</string>
     <string name="dates_title">İslami tarihler</string>
     <string name="dates_today_is">Bugün %1$s</string>
     <string name="date_ashura">Aşure</string>

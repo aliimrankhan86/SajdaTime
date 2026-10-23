@@ -344,7 +344,7 @@ in light and dark, so nobody has to guess what is tappable. The only text links 
 two bold links on the usage question** (kind F below). Decided by the owner on 18 Oct 2026, after
 outlined and then tonal buttons were both too easy to miss (§0.1).
 
-#### The six kinds of control that act, and nothing else
+#### The seven kinds of control that act, and nothing else
 
 | Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
 |---|---|---|---|---|---|
@@ -354,6 +354,7 @@ outlined and then tonal buttons were both too easy to miss (§0.1).
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
 | **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
+| **G. Snackbar action** | Material's own `SnackbarHost` action, written with `showSnackbar(actionLabel = ...)` in `MainScaffold.kt`, so no `TextButton` appears in our source | none | none | platform (`inversePrimary` on `inverseSurface`) | **Only** "Undo" in the message at the bottom ("Paused from today"), above the tab bar, on every tab. Added with step 1 of 1.6.0 |
 
 Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
 row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
@@ -458,10 +459,14 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
-| Times, My prayers (1.6.0) | The tick at the end of each prayer row, after the time; Sunrise keeps the same 48dp empty | Tick (`Tick.kt`), a toggle, not a button | 24 drawn, 48 target | `HomeScreen.kt`, `Tick.kt` |
-| Times, My prayers | Last 30 days, at the end of the line under the list (the streak at its start) | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
-| Times, My prayers, while paused | Resume, in place of Last 30 days, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
-| Last 30 days sheet | Five ticks under each date, evenly spaced under the prayer names | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
+| My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, tracking off | the switch row; not a button | Switch | 56 row | `MyPrayersScreen.kt` |
+| My prayers tab, no location | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
+| Last 30 days sheet | the X, alone at the top end | D | 48 | `MyPrayers.kt` |
+| Last 30 days sheet | each day cell is `selectable`, not a button; the chosen day's five ticks under the grid | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | G, new | platform | `MainScaffold.kt` |
 | Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
 | Times, mosque dialog (1.6.0) | Add your mosque's jama'ah times, first, under the congregation paragraph | A | 52, full | `HomeScreen.kt` |
 | Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row | Row | 56 | `SettingsScreen.kt` |
@@ -771,6 +776,28 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **23 Oct 2026 (night), the My prayers tab (step 1, Fable's design, Ali approved from pictures).** Ali chose
+  "B: calendar grid" and then "Yes, build it". Detail: `docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md`
+  (section 9 wins where it differs).
+  * **Chosen.** A fourth tab, with the tick at the start of each prayer row, a week card of seven rings, and
+    Last 30 days as a calendar grid in weeks of seven, replacing the old list of day cards (Ali chose B).
+    Weeks wholly before tracking began are dropped, so there are no rows of empty numbers to read as misses; the
+    week holding the start day stays. Pausing keeps the ticks already given: it means "do not count what is
+    still to come", never "forget what I prayed". The tab icon is `CheckCircle`. Day names are always `SHORT`, on one
+    line, shrinking to 70 percent and then ending in an ellipsis where a cell is too narrow (Urdu at 320dp and 2.0
+    text); never `NARROW` (Fable, after the review showed NARROW gives Latin letters on an Urdu screen). Switching
+    tracking on again starts the rings afresh unless something was ticked in the last 30 days. A paused day's ring
+    shows only the pause mark; the sheet's row for that day shows its earlier ticks, disabled, under "Paused".
+    Known and accepted: at 320dp and 2.0 text the Turkish tab label "Namazlarım" wraps inside the word (rare; the
+    icon carries it; revisit only if seen on a real phone). Grid cells are
+    about 45.7dp wide at 320dp because the sheet's side padding is dropped for the grid, which meets Apple's 44pt.
+  * **Rejected.** A list of 30 day cards: long to scroll, and it reads newest first, against every calendar.
+    `TaskAlt` for the tab icon: it has no filled twin for the selected state. `NARROW` day names, anywhere:
+    "T T" and "S S" are ambiguous, and Urdu's are Latin letters. Per language two letter abbreviations of our own:
+    invented words in Urdu and Arabic are a religious wording risk for no gain.
+  * **Exempt from contrast, on purpose.** The 38 percent ring for days to come and prayers not due yet is a
+    disabled control (WCAG 1.4.11), so `ColorContrastTest` has no pair for it.
 
 - **23 Oct 2026 (night), motion rules for 1.6 (Fable; Ali approved).** Written down before any animation
   is built, so the eight new animations of 1.6 (BUILD-INSTRUCTIONS §6 rows 1 to 4 and 6 to 9) feel like one app. Detail: §2 Motion and

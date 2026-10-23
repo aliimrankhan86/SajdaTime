@@ -213,12 +213,12 @@ opened from this tab; `Icons.Outlined.CheckCircle` exists (the Rounded twin is u
    - Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | **G, new** | platform | `MainScaffold.kt`
 
    Kind G enters the §4.1 kinds table in step 1, not step 3: step 1 ships the first snackbar.
-3. **Day names by measurement, not by language.** `TextStyle.SHORT` first; CLDR's short name in Arabic and Urdu
+3. **(Superseded by 13 below.)** **Day names by measurement, not by language.** `TextStyle.SHORT` first; CLDR's short name in Arabic and Urdu
    is the full word (الأربعاء), which does not fit a 36dp column at 320dp. Measure all seven with
    `rememberTextMeasurer` at labelMedium against the column width; if any one does not fit, use `NARROW` for all
    seven. TalkBack always speaks the full name.
 4. **The week strip never wraps.** DETAILED-PLAN 9.9's two row wrap is dropped: seven 32dp rings take 224dp of the
-   256dp inside the card at 320dp. `WeekStripTest` covers 36 or 32dp by width, the share of five and the first day.
+   256dp inside the card at 320dp. `WeekStripTest` covers the week's seven dates and the grid rows (first day, start, window); `WeekRingSizeTest` covers 36 or 32dp by width.
 5. **The button row wraps by measured width,** never by a width or font scale number:
    `FlowRow(horizontalArrangement = Arrangement.SpaceBetween, verticalArrangement = Arrangement.spacedBy(Space.Related))`
    for both the Pause and Last 30 days row and the "Tracking is paused" and Resume row, so both stack alike. With
@@ -260,3 +260,16 @@ opened from this tab; `Icons.Outlined.CheckCircle` exists (the Rounded twin is u
    - **No haptic on Pause, Resume or Undo**; the tick and the switch keep theirs. **Untick exits at `Quick`.**
    - With `FlowRow`, Pause stays first in reading order, so a stacked pair puts Pause on top. The `NARROW` fallback
      applies to all seven names at once, never mixed.
+13. **Decided after the build, from the Opus review and the emulator (Fable, 23 Oct 2026, night).** These win over
+   1 to 12:
+   - **Off periods.** Switching tracking on stores where the rings begin (`TrackerLogic.startOnSwitchOn`): today,
+     unless something was ticked in the last 30 days, then the oldest such day. Ticking an earlier day (last night's
+     Isha on the first night) or loading a file with older days moves it back (`startAfterRecording`). Switching off
+     with nothing recorded removes it. Older ticks are kept; only where the rings begin moves.
+   - **Day names:** always `SHORT`, one line, shrinking to 70 percent, then an ellipsis. Never `NARROW` (Latin
+     letters on an Urdu screen, "T T" and "S S" elsewhere). Item 3 is withdrawn.
+   - **A paused day:** the ring and grid cell show only the pause mark (a paused day counts nothing); the sheet's row
+     for it shows its earlier ticks, disabled, under "Paused".
+   - **Read only record:** Resume is hidden as well as Pause.
+   - **Turkish tab label** "Namazlarım" wraps inside the word at 320dp and 2.0 text: accepted and recorded.
+
