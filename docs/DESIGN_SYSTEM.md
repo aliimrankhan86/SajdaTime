@@ -664,7 +664,8 @@ applied in the "dark design system" and "light design system" commits. What was 
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
-and it should stay that way. (The Ramadan card and the widgets reuse these tokens and add none; the
+and it should stay that way. (Reversed by the owner on 23 Oct 2026 for 1.6: a one-tap bell on each row,
+and a tracker. See §9.) (The Ramadan card and the widgets reuse these tokens and add none; the
 widget glyphs and the mark are drawings, not colours. A prayer tracker, if it is ever built, is its own design pass.)
 
 One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
@@ -738,6 +739,33 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **23 Oct 2026, the 1.6 design direction (Pillars as a reference for thinking, our green kept).** The
+  owner answered three questions in chat. **Decided, not built.** Each choice is shown to him on screenshots
+  before it ships (§10). The reference study is in `docs/plans/2026-10-release-1.6.0/PLAN.md` §0.1.
+  1. **Four fixed skies, with an animated change between them.** Dawn, day, evening and night. Each one is
+     a fixed gradient, so `ColorContrastTest` checks every ink against every stop of all four, the way it
+     checks the hero gradient today (§1). The change between skies is animated. The sky has drawn
+     artwork (sun, moon, stars, the day path with the "now" dot) that shows which prayer time it is, as well
+     as the words.
+     - **The prayer name and the time left keep a prominent, readable place on the sky.** The owner made
+       this point himself: "I used the gradient to have a prominent space for the reader to read and
+       understand the time of which prayer is current." The artwork never sits behind those words.
+     - **Rejected:** a sky that changes colour continuously through the day, because contrast cannot be
+       asserted on a moving background; keeping the single gradient with only the path moving, because the
+       owner wants the time of day shown in pictures; weather in the sky, because it needs the network.
+  2. **A bell on each prayer row: one tap turns that prayer's alert on or off.** This reverses §7's
+     "no per-row mute", which was a choice made when the app first took its design from Claude Design. It
+     was not a rule. The owner's reason: the user gets the feature with nothing added, and the screen
+     stays uncluttered.
+     - **One tap and nothing else.** No long press and no per-row sound sheet. Sounds stay in Settings.
+     - The bell shows its state by shape (filled or crossed out) as well as colour.
+     - It has a 48dp target and a content description saying the prayer and the state.
+     - Settings keeps the same choice too, so both places show the same setting.
+  3. **No icon buttons side by side.** Where the tracker needs more than one action at the top (pause,
+     missed fasts), each is a **labelled chip with its icon**, with a clear gap between them and a 48dp target.
+     - **Rejected:** Pillars' two unlabelled round icons, because they are easy to mis-tap and unclear (the
+       §10 review question "Is any icon button sitting next to another?").
 
 - **19 Oct 2026, "Match your mosque" can be set from the mosque's board: one button at the top.**
   From the 8 Oct 2026 branch, whose version made the minutes number an underlined, tappable link (now
@@ -974,4 +1002,6 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| (none) | Nothing decided is waiting to be built. D5 was approved from screenshots on 18 Oct 2026 (§9). | |
+| 1.6-sky | Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
+| 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | Same: wait for "go", then screenshots |
+| 1.6-chips | Labelled chips with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |

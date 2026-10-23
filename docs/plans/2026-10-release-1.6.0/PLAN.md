@@ -143,6 +143,13 @@ references.
      build and review time allow, and 1.6.1 otherwise. The prayer tracker still comes first.
    - Pillars lists this as "coming soon" (Play listing, 23 Oct 2026).
 
+**Design decisions (Ali, 23 Oct 2026, recorded in `DESIGN_SYSTEM.md` §9):**
+- **Four fixed skies (dawn, day, evening, night), with an animated change.** The artwork shows the time of
+  day. The prayer name and the time left keep a prominent readable place, contrast-tested on every sky.
+- **One-tap bell on each prayer row** turns that prayer's alert on or off. No long press. Sounds stay in
+  Settings.
+- **Labelled chips with a gap** for the tracker's actions, never icon buttons side by side.
+
 **Animation (Ali, 23 Oct 2026: "some animation like Pillars, where required").**
 
 *Tool.* Use Compose's own animation APIs: `animate*AsState`, `AnimatedContent`, `AnimatedVisibility`,
