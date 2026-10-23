@@ -60,6 +60,10 @@ ease of use, Usability, information to display aspect should be done by fable." 
   The main session writes the spec down and builds it; Ali still decides visual questions from screenshots.
   Fable also looks for ready-made assets before anything is drawn (icons, sky artwork for step 5, illustrations),
   free licensed, bundled, never AI generated; Ali approves each, and its source and licence go in `docs/ASSETS.md`.
+  Every design must also suit a future iPhone version (Ali, 23 Oct 2026: "I do have aspiration later to make it
+  this app for iOS as well ... So it doesn't look like a design mess, as Apple has often objection about the design
+  aspect of the apps."): patterns both platforms share, an SF Symbol named beside each Material icon, a distinct
+  look of our own. No iOS work in 1.6; rules in `.claude/agents/ux-lead.md`.
 - **Sonnet (`implementer`) builds routine parts** once the spec is fixed. **Haiku (`mechanic`)** does counts
   and lookups.
 - **Opus (`reviewer`) checks everything** before commit, including everything Sonnet and Haiku produced.

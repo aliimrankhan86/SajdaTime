@@ -1950,6 +1950,15 @@ store (CC0, Apache, MIT, OFL), bundled not fetched, **no generative AI images** 
 recommends; Ali approves each one, then the main session downloads it and records source and licence in
 `docs/ASSETS.md` (created with the first asset).
 
+**iPhone later, so design for it now.** Also 23 Oct 2026, Ali: "I do have aspiration later to make it this app for iOS as well ... So the design and everything is also put into consideration. So it doesn't look like a design mess, as Apple has often objection about the design aspect of the apps." Decision: no iOS work in 1.6 and no
+cross platform framework chosen (that is a later, separate decision), but `ux-lead` checks every design against
+Apple's Human Interface Guidelines as well as Quiet Glass: shared patterns only (no floating action button or
+navigation drawer, a visible back or close on every screen), an SF Symbol named beside each Material icon, 48dp
+targets (meets Apple's 44pt), scalable text, assets licensed for both stores, and a distinct look of our own,
+because App Store Review Guideline 4 (Design) and 4.3 (look-alike apps in a crowded category) are the usual
+rejection reasons. Android only features (widgets, Wear OS, exact alarms) are labelled as such in each spec. In
+code: keep calculation and rules logic free of Android imports where it costs nothing; no refactor for it now.
+
 **The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
 Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.
 The main session talks to Ali, commits and pushes, and should run on Opus. Translations stay with the main

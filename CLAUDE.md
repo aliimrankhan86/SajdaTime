@@ -208,6 +208,12 @@ session inherits it instead of relearning it.
   - **Fable finds ready-made assets before anything is drawn** (Ali, 23 Oct 2026): icons from Material Symbols
     first, then free licensed artwork, bundled, never AI generated (the Play AI declaration is "Don't label
     assets"). Fable recommends, Ali approves each, and its source and licence go in `docs/ASSETS.md`.
+  - **Design for iPhone later too** (Ali, 23 Oct 2026: he plans an iOS version, and Apple rejects apps on design).
+    No iOS work in 1.6, but Fable checks every design also fits Apple's Human Interface Guidelines: patterns both
+    platforms share, an SF Symbol named beside each Material icon, 44pt/48dp targets, scalable text, a distinct look
+    of our own (App Store Guideline 4.3 rejects look-alike apps). Rules in `.claude/agents/ux-lead.md`. In code, keep
+    calculation and rules logic free of Android imports where that costs nothing, so an iPhone version could reuse
+    it; no refactor for this in 1.6.
   - **Opus checks everything:** `reviewer` reviews every diff and every piece of work from a cheaper agent before
     it is committed or called done. The main session, which talks to Ali and commits, should itself run on Opus.
   - **Cheaper models do the routine work:** `implementer` (Sonnet) builds a step whose spec is already decided;

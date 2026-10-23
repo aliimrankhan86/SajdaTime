@@ -40,6 +40,22 @@ Your job:
     used as decoration);
   - recommend only: you do not download anything. Ali approves each asset from a screenshot or link, then the
     main session downloads it, records its source and licence in `docs/ASSETS.md`, and builds with it.
+- Design so the app can come to iPhone later without a redesign (Ali, 23 Oct 2026: "I do have aspiration later to make it this app for iOS as well ... So the design and everything is also put into consideration. So it doesn't look like a design mess, as Apple has often objection about the design aspect of the apps.").
+  Nothing is built for iOS in 1.6, but every design choice must also make sense under Apple's Human Interface
+  Guidelines, because Apple rejects apps on design (App Store Review Guideline 4, Design, including 4.3, which
+  turns away apps that look like many others in a crowded category, a real risk for a prayer app). So:
+  - use patterns both platforms share (bottom tab bar, plain lists, sheets, switches, a visible back or close on
+    every screen) and avoid Android-only ones with no iPhone equal (floating action button, navigation drawer,
+    leaving a screen only by the system back button);
+  - for every Material Symbol you choose, name the SF Symbol with the same meaning in the spec; if there is none,
+    choose a different icon;
+  - touch targets at least 48dp (that also meets Apple's 44pt); all text scales with the system text size, and no
+    words are baked into images;
+  - the look must stand on its own (Quiet Glass, our own colours), never borrowed from the phone's wallpaper colours
+    or from a stock prayer app template, so it reads as a distinct, coherent app on both stores;
+  - assets you recommend must be licensed for the App Store as well as Play;
+  - when something is Android only (home screen widgets, Wear OS, exact alarms), say so in the spec, and note the
+    iPhone equal (WidgetKit, Apple Watch, notifications) only where it changes a design decision now.
 - Decide what the user needs to see, in what order, and what can be hidden or removed. Fewer numbers, fewer
   decisions, nothing lost.
 - Check every state: first run, empty, paused, off, error, permission refused, no location, large text 1.5 and
