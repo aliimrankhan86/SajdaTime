@@ -2,7 +2,7 @@
 
 Written by the independent Fable 5.1 reviewer at Ali's request, after his answers in PLAN.md section 0.1.
 **Ali accepted it on 23 Oct 2026 ("that is fine - incorporate it").** PLAN.md section 0.1 records what that
-changes. Sections 6 (journeys and wording) and 7 (languages) follow below when written. The whole plan then
+changes. Sections 6 (journeys and wording) and 7 (languages) follow below. The whole plan then
 gets an independent gap review before any development.
 
 ---
@@ -182,3 +182,113 @@ Resize: `resizeMode="horizontal|vertical"` as now; the launcher picks the layout
 **Where it fits.** Step 8, after the phone skies exist so the widget gradients are the same stops; cut second if time runs short, because the current widgets are already live and liked, and the store screenshot 06 must be retaken whenever they change.
 
 Not verified: any dp figure marked as a pixel reading; whether the activity is edge to edge; whether `WidgetState.next` includes sunrise; the exact fallback behaviour of `HapticFeedbackType.ToggleOn` below API 34; and the "Remove animations" to animator-scale mapping, which one emulator check settles.
+
+---
+
+
+Same rules: read only, verified against `claude/1-6-0`, guesses marked.
+
+## 6. User journeys and wording
+
+### 6.0 The disclaimer moves to Settings (Ali, 23 Oct 2026)
+
+Where it sits so it is never buried: **the first row of the About group**, above Version (today it is second, SettingsScreen.kt:543-546 after `version` at 520-521). Row: icon Info tile, title **"Disclaimer"** (`about_disclaimer`, exists), subtitle **"A helper, not a religious authority. Please read this once."** (`about_disclaimer_short`, reworded: "Tap to read" is banned "Tap" wording, DESIGN_SYSTEM.md:361). It opens the existing full dialog (SettingsScreen.kt:769-780) with the dua last. The About group itself stays the last group, which is where every Android user looks for "about"; nothing else changes.
+
+What must change when built:
+- `MainActivity.kt:294-295` stops showing `FirstRunDisclaimer`; `disclaimerSeen` and `markDisclaimerSeen` go, with a one-line note in the repository saying why the key is retired (a stored flag nobody reads is a trap for the next reader).
+- `DisclaimerContentTest`: the test at line 72 ("the short disclaimer after setup ...") is removed with `disclaimer_brief` and `disclaimer_read_full`; the test at line 57 on `disclaimer_body` stays, and a new assertion holds `about_disclaimer_short` to "not a religious authority", so the row's own words still carry point 1 and cannot drift to a blank "Disclaimer".
+- HANDOVER §1 (lines 77-96): "once after onboarding as a dialog" becomes "in full in Settings, About, Disclaimer, the first row of that group"; the 18 Oct "short form after setup" block (1032-1042) is marked superseded, with Ali's words quoted. §5.15's four-copies table drops the "Setup dialog, short form" row; three copies remain (in-app full text, watch, `privacy.html#disclaimer`), all unchanged in content. The rule "shown once, not merely available" is explicitly reversed by the owner and recorded in §9 of DESIGN_SYSTEM.md and §11 of HANDOVER with the date.
+- CLAUDE.md hard rule: "The religious disclaimer must never be removed, softened, or buried" stays word for word; add "It lives in Settings, About, first row, and is not shown at first launch (owner, 23 Oct 2026)". The dua rule is untouched: still asked once, in the full text, nowhere else.
+- Store listings: the full descriptions carry the four points (LISTING-LOCALES.md), so nothing there changes.
+- Not religious content, but worth saying to Ali in plain words: the four points still reach every user who opens About, the watch and the policy page, and no longer reach the user who never opens Settings. That is the trade he has chosen.
+
+### 6.1 Journeys
+
+Words in quotes are on screen. "Exists" means the string is in `values/strings.xml` today.
+
+**A. First launch and setup.** Welcome: the mark, "SajdaTime", "Your private prayer companion. Free, always." (exists), the language button top end with the current language's own name, **"Begin"**. Location: "Allow location" (exists), the privacy line, "Or type where you are", "Skip for now and use Makkah" at the foot. School of thought, madhab (Sunni only), calculation method, the usage question, confirm with "Finish". Then Times opens with the sky for the current period, the card counting down, six rows with bells on (the default alert on all five), the Tracker tab visible beside Times. No pop-up. First thing read: the city and the countdown.
+
+**B. A normal day.** Open: the sky says morning, the card says "Next prayer", "Dhuhr 12:46 pm", the countdown, the Now pill on Fajr's row until sunrise, Next on Dhuhr. Glance: done. Bell: tap Dhuhr's bell, it crosses out, a short buzz, the message "Dhuhr alert off" with "Undo" for four seconds; tap it again later and it fills with no message. Tick: tap Tracker, today's five rows, tap Dhuhr's ring, it fills and the tick draws, a short buzz, the week ring for today grows a fifth. Nothing else happens; no streak message unless Show streak is on, and then only a number.
+
+**C. Travelling to a new place.** On opening the app the location updates (foreground only); the town changes, the sky and times with it. If the town name is wrong, tap the city, "Your location" sheet (exists), "Use my current location" or type. Jama'ah lines (if set at home) keep showing: the 25 km hide was cut from 1.6.0 (SIGNOFF.md:74-75), so the user may see a home mosque time abroad; the row says "Jama'ah 1:30 pm" and the user knows where that came from. Guess: acceptable for 1.6.0, revisit with 1.6.1.
+
+**D. Tracking off, then on.** Tracker tab with tracking off: title "My prayers", one card: a switch row "My prayers", "Tick each prayer you pray. Only you can see it." (exists), and under it one line "Nothing is tracked until you switch this on." Flip the switch: the card is replaced by today's five rows, no snackbar (the user is already looking at the result; the UX.md:90 snackbar belonged to the Times placement and goes). Flip it off in Settings: the tab returns to the switch; the record stays, and the Delete row stays in Settings (UX.md:68).
+
+**E. Pausing for a period.** Tracker tab, "Pause": the button row becomes "Tracking is paused" with "Resume"; today's rings dim; a message "Paused from today" with "Undo" (and "Yesterday" stays in Settings for the woman who forgot to pause yesterday). The week strip marks each paused day with the pause glyph. "Resume": rows come back for today; paused days keep the glyph and count nothing. No reason is ever asked, no word for why.
+
+**F. A Ramadan day.** Three days before: the quiet notice "Ramadan begins on Monday" (exists) with "Shift the date". Day 1: the card appears under the notice slot: "Ramadan", "Day 1 of 29", "Suhoor ends 5:17 am", "Iftar 5:33 pm", "Iftar in 02:32:51", the fast line, tomorrow's line, "Get the full Ramadan timetable". The Today line's "Timetable" opens the same sheet. The suhoor reminder arrives 60 minutes before Fajr unless changed in Settings. The Tracker tab is unchanged. Times scrolls a little at 823dp (known).
+
+**G. Eid.** The card is gone; the Eid notice: "Eid al-Fitr Mubarak", the body (exists), the footnote "This date is our calculation ... Please follow your mosque." (exists), the X. Nothing animates in.
+
+**H. Qibla, first use.** No location: "Set your location to find the Qibla." (exists) above an empty dial. With location, with a compass: "Turn right 58°", "Facing 60°", the dial turning, the arc shrinking; aligned: "You are now facing the Kaaba" (exists), the dial fills green, one buzz. Calibration: the amber notice "The compass needs calibrating. Hold your phone and move it in a figure of eight a few times." (exists). No compass: "This phone has no compass, so we can give you the angle but cannot point the way." (exists), the needle held at the bearing. "Details" under the key: "About 5024 km from here" and "118° from north".
+
+**I. Saving or viewing the timetable.** Times, "Timetable": the sheet, "Timetable" with "Save as PDF" beside it, the month's rows, today highlighted. Save as PDF: the existing export sheet's choice (Today only, 7 days, This month, Ramadan when offered) collapses to the month on screen plus one button; the file saves and the system share sheet opens as today. In Ramadan the sheet opens on the Ramadan table.
+
+**J. Adding a widget.** Long press the home screen, Widgets, SajdaTime: three previews, "Next prayer" ("The next prayer and its time, with a countdown.", exists), "Today" (exists) and the new **"Today strip"** ("All five prayers in one row, the next one marked."). Placed: the widget shows the sky and times at once (the first update a second later applies the theme, HANDOVER 1399-1401). Tap the town chip: the app opens and refreshes the location.
+
+### 6.2 Wording pass: every new or changed string for 1.6
+
+Tone rules applied: short, warm, no "Tap", no "missed", no reward talk, sentence case, religious names unchanged. Existing 1.6.0 strings on the branch are not repeated.
+
+| Key | English | Where | Care |
+|---|---|---|---|
+| `nav_tracker` | My prayers | Tab label; `WholeWords` shrink applies (DESIGN_SYSTEM.md:289-295). "Tracker" is colder and does not translate cleanly into Urdu | |
+| `tracker_off_line` | Nothing is tracked until you switch this on. | Tracker tab, off | |
+| `tracker_pause` | Pause | Tracker tab button | |
+| `tracker_resume` | Resume | exists as `settings_tracker_resume`? Reuse `tracker_resume` if present on the branch | |
+| `tracker_paused_from_today` | Paused from today | Snackbar | |
+| `tracker_ring_a11y` | %1$s, %2$d of 5 prayed | Week ring and month grid, TalkBack | |
+| `tracker_ring_paused_a11y` | %1$s, paused | | |
+| `tracker_ring_today_a11y` | Today, %1$d of 5 so far | | |
+| `action_undo` | Undo | Snackbar action | |
+| `bell_on_a11y` | %1$s alert on, notification | Bell content description | |
+| `bell_alarm_a11y` | %1$s alert on, alarm | | |
+| `bell_off_a11y` | %1$s alert off | | |
+| `bell_off_message` | %1$s alert off | Snackbar | |
+| `bell_off_message_fajr_ramadan` | Fajr alert off. Suhoor reminder stays on. | Snackbar, Ramadan only | Religious: suhoor is a word every user knows; keep it |
+| `action_timetable` | Timetable | Today line button (replaces `action_save_pdf` there; `action_save_pdf` stays for the sheet) | |
+| `timetable_title` | Timetable | Sheet | |
+| `timetable_month_a11y` | Prayer times for %1$s | Sheet, TalkBack | |
+| `qibla_details` | Details | Button | |
+| `qibla_distance_km` | About %1$d km from here | | |
+| `qibla_distance_miles` | About %1$d miles from here | | |
+| `qibla_bearing` | %1$d° from north | | |
+| `qibla_subtitle` | (removed from the top; its two facts move to the three strings above) | | |
+| `home_sky_a11y` | %1$s period | Sky, decorative otherwise; the dot's description "Now, between %1$s and %2$s" | |
+| `about_disclaimer_short` | A helper, not a religious authority. Please read this once. | Settings | Religious: point 1 must stay in these words (test) |
+| `widget_strip_desc` | All five prayers in one row, the next one marked. | Widget picker | |
+| `widget_strip_name` | Today strip | | |
+| `fasts_to_make_up` (1.6.1) | Fasts to make up | Settings row | Religious: never "missed", "owed", "qada" |
+| `fasts_to_make_up_desc` | Add one for each fast you still have to make up. Take one off when you make it up. | | |
+| `fasts_line` (plural) | %1$d fast to make up / %1$d fasts to make up | Tracker tab | |
+| `fasts_made_up_one` | Made up one | Button | |
+
+Changed existing strings: `action_save_pdf` stays "Save as PDF" (sheet only). `settings_tracker_pause_desc` "Your streak waits until you resume." stays. Nothing in `disclaimer_body` changes.
+
+Religious care flags: "My prayers" as a tab name is fine in all five languages (Urdu "میری نمازیں", Turkish "Namazlarım", Indonesian "Salatku", Arabic "صلواتي"; guesses to be checked at translation). "Suhoor" and "Iftar" keep their established local forms (Turkish "sahur", "iftar"; Indonesian "sahur", "buka puasa" is more natural than "iftar", a choice for the translation pass). No string anywhere says a prayer was missed, late or owed.
+
+## 7. Languages as a strength
+
+**What ships.** `values`, `values-ar`, `values-ur`, `values-tr`, `values-in` (five languages; Arabic ships with 1.5.0, PLAN.md:71), every one packaged in the app (CLAUDE.md, lesson 125), the app formats numbers and dates in its own language (HANDOVER §5.11), and goes RTL only when it has the words (§5.16). Pillars ships English and Turkish (PILLARS-STUDY.md:62). That is a real difference for Urdu and Arabic readers, and the store already sells it in eight listing languages (LISTING-LOCALES.md).
+
+**Make it visible in the app.**
+- The welcome screen's language button (DESIGN_SYSTEM.md:789-794) already shows the language's own name; keep it. Add nothing to Times: the app being in your language is the message.
+- Settings, Language row: subtitle lists the five names in their own scripts when "Phone language" is selected ("English · العربية · اردو · Türkçe · Bahasa Indonesia"), so a user browsing Settings sees the choice exists. One string, no code change beyond the subtitle.
+- The Play listing's first screenshot per language shows Times in that language (today the eight screenshots are English only, `docs/store/screenshots/raw/phone`). Retake 01 (Times), 02 (Qibla) and the new Tracker screenshot in Arabic, Urdu, Turkish and Indonesian; the rest reuse English. Play lets each listing language carry its own screenshots; that is the place a Karachi user decides.
+
+**RTL quality of every new piece.**
+- Sky and day path: the path runs Fajr at the start edge to Isha at the end edge, so in Arabic and Urdu it runs right to left; mirror the Canvas x axis under `LocalLayoutDirection`, and the sun and moon sit in the header's trailing half, which is the left in RTL. Test in `installRtl` and judge the mirroring, not the prose (CLAUDE.md).
+- Rings: the week strip follows the locale's first day and reads from the start edge; arcs sweep clockwise in both directions (a filling clock is not a reading direction), which is a deliberate choice to record.
+- Bell: trailing end of the row, so the left in RTL, where the tick sat (UX.md:127).
+- Chips and the Undo snackbar: Material mirrors them.
+- The Qibla "Turn right 58°" is already mirrored in meaning, not layout: right is right whichever way the text runs; `AutoMirrored` icons only for arrows that mean "next" (three uses today).
+- Digits: Arabic and Urdu use their own digit sets through `AppLocale` (§5.11), and the countdown on the card is the first thing to re-measure in Arabic (DESIGN_SYSTEM.md:283-287). The Chronometer on widgets follows the phone's language (lesson 131), accepted.
+- Hijri month names come from `hijri_months` arrays per language (values-ur/strings.xml:266-269); the dates sheet and the widget header reuse them; nothing new to translate except the six dated rows (SIGNOFF.md:58).
+
+**Wording that does not translate well, decided now so the translation pass does not improvise.** "Streak" (Urdu and Arabic have no idiom; the plural `tracker_streak` "12 days in a row" already avoids the word, keep that). "Timetable" (Urdu "اوقات نامہ", Turkish "vakit çizelgesi", Indonesian "jadwal"; all are everyday words, fine). "Details" (fine). "Make up" for fasts: Arabic and Urdu have the exact word (qada, قضا), and the English avoids it on purpose; the translations may use it, because in those languages it is the plain term, not a label of guilt. Record this in the translation notes so the five do not drift apart in tone.
+
+**Process.** As CLAUDE.md says: Claude translates, Claude checks, each language's new strings are rendered at 1.5 text on the 320dp frame (Indonesian and Turkish are the longest, UX.md:293), and no screen ever says a translation awaits review.
+
+---
+
+That closes the independent review. Nothing was written to the repo; everything above is for the coordinator to carry into `PLAN.md` §0.1, `DESIGN_SYSTEM.md` §9 and §11, and `HANDOVER.md` when Ali says go. Items still not verified by anyone: the pixel-read dp figures, edge-to-edge drawing, the sunrise widget refresh boundary, the sub-API-34 haptic fallback, and the Remove-animations mapping, each settled by one emulator check.
