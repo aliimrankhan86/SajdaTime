@@ -102,7 +102,20 @@ Ali decided on 16 Oct 2026:
 - **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page. Set to 1.4.0 on 19 Oct 2026; it reports 1.5.0 when it goes live, and on 18 and 22 Jan 2027 only it warns if 1.5.0 is still not live.
 - **One reply waiting:** to the 1 star Arabic reviewer who asked for Arabic. Post it once 1.5.0 is live (draft in `build/review-replies/DRAFTS.md`). It invites them to update their review if they are happy (Ali, 23 Oct 2026), and never asks for a higher rating or offers anything, as Google requires.
 - **On release day:** the date is written everywhere it belongs; the list is in `docs/release-tools/RELEASE-1.5.0.md` step 2 (Ali, 23 Oct 2026).
-- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders. Plan, UX and research on branch `claude/1-6-0-plan`. Not before 1.5.0 is uploaded.
+- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: a "My prayers" tab (private prayer tracker), an Islamic dates sheet (with Shia dates for Shia users), a one-tap bell on each prayer, a Timetable button with PDF, four skies behind the green card, a Qibla restyle, mosque jama'ah times, a one-row widget, the disclaimer moved to Settings, About; 1.6.1 after Eid: the jama'ah and fasting reminders and "Fasts to make up". Ali answered all 27 questions and said go. Everything is on branch `claude/1-6-0` (start at `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md`; GBrain `projects/sajdatime-release-1-6`). First job once 1.5.0 is live and this PR is merged: merge `main` into `claude/1-6-0` once more.
+- **How 1.6 is designed and built** (Ali, 23 Oct 2026; HANDOVER §5.28 on `claude/1-6-0`, GBrain facts 3129 to 3131):
+  - **Fable does all the thinking for what users see:** planning and brainstorming, user journeys, UX and UI, the
+    right icons, ease of use and a premium look, what each screen shows, the wording. Ali: "I want Fable to do all
+    the brain thinking." The main session (Opus) writes down and builds what Fable decides.
+  - **Fable finds ready-made assets before anything is drawn:** Material Symbols icons first, then free licensed
+    artwork (CC0, Apache, MIT, OFL), bundled in the app, never AI generated (the Play AI declaration says "Don't
+    label assets"), never another app's. Fable recommends, Ali approves each, its source and licence go in
+    `docs/ASSETS.md`.
+  - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
+    routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
+  - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and
+    `DETAILED-PLAN.md` §6 (ten journeys, first launch to adding a widget, with every word on screen), §6.2 (the
+    wording) and §7 (languages). Every step is checked against its journey before Ali sees screenshots.
 
 ## Known gaps (documented, accepted)
 - On a small round watch (192dp) at large text, the disclaimer's top line touches the clock at the very end of the scroll.
