@@ -2,6 +2,9 @@
 
 > **Signed off 23 Oct 2026 (Fable 5.1): read `SIGNOFF.md` first. It overrides this file, including §0.** Final order: 1 prayer tracker, 2 Islamic dates sheet, 3 jama'ah times on the Times screen (cut first if short of time). Reminders in 1.6.1. Submit by 15 Dec 2026, or all of 1.6.0 goes after Eid if 1.5.0 is not live by 27 Nov.
 
+> **Added 23 Oct 2026 (Ali): five items from the Pillars review, and a design pause.** See §0.1. Nothing in
+> §0.1 is built, and no UI change is made until Ali says go.
+
 Status: **draft for Ali's yes, nothing built.** The research behind it is
 `docs/research/2026-10-next-release-features.md`. This plan builds on the tracker plan Ali already approved in
 `docs/plans/2026-10-widget-ramadan-tracker/` (on the `claude/quiet-glass` branch, section 7, B0 to B8) and does not
@@ -84,6 +87,66 @@ gains the word "start" so the two are not confused.
 
 **UX:** `UX.md` in this folder is the screen-by-screen guidance. It too was written before this section,
 so read its "Mosque times" as "Jama'ah times", and its reminders as 1.6.1.
+
+## 0.1 Design direction and five additions (Ali, 23 Oct 2026)
+
+**Design direction.** Ali shared screenshots of The Pillars app (thepillarsapp.com and its Play listing,
+`com.pillars.pillars`) as a reference for *thinking*, not for colours. SajdaTime keeps its green theme and
+`docs/DESIGN_SYSTEM.md`. What to take from Pillars:
+- Calm screens with lots of space, large type and one accent colour.
+- Every part of the screen has a job.
+- Icons carry functions that used to need a menu: a bell on each prayer row, and the pause on the tracker.
+- Past, now and next can be read at a glance.
+- Each feature has its own tab: Prayer, Qibla, Tracker, Settings.
+- The tick animates as a prayer is marked.
+
+What not to copy:
+- Unlabelled icons. Every icon has a content description, and a visible word wherever its meaning is not
+  obvious.
+- Faded rows that fail WCAG AA.
+- Dead space, such as the gap on their tracker between Isha and the week row.
+- "Featured in" logos, and any gamification beyond the quiet streak.
+
+Every animation stops when the phone's "remove animations" setting is on. Every screen is checked RTL and
+at font scale 1.5.
+
+**Not done until Ali says go:** moving the tracker to its own tab, and the home layout. Ali is still sending
+references.
+
+**The five additions, all approved by Ali for the 1.6 plan:**
+
+1. **Week rings that fill partly.** A day with 3 of 5 prayers shows three fifths of a ring, so a half-done
+   day reads differently from an empty one. The data already exists (`DayRecord` mask). Each ring also needs
+   a text equivalent ("3 of 5") for screen readers, not colour and arc alone.
+2. **Paused days look different from prayed days.** Their second most helpful review complains that paused
+   days look the same as prayed days in the trends. Ours mark a paused day with a pause icon or pattern, not
+   colour alone.
+3. **A view longer than one week.** The same reviewer asks for months and the year. We keep `HISTORY_DAYS = 30`,
+   so a month view is nearly free. **A year view needs longer storage. Decide that separately**, because it
+   grows the export file and what the privacy page describes.
+4. **A one-tap pause icon on the tracker screen, with a label,** in place of the pause living further away.
+   Same `pause`/`resume` logic, no rule change.
+5. **Missed-fast (qada) tracker. New scope.**
+   - Record a missed fast on a day, optionally with a reason: travel, illness, period, pregnancy or other.
+   - Show "N days to make up", and tick a made-up fast against the count.
+   - Works for Sunni and Shia users alike, because making up missed Ramadan fasts is common to both. Unlike
+     the 1.6.1 Sunnah fast reminders, it is not Sunni only.
+   - **Privacy is the hard part.** Period and pregnancy are health data:
+     - Kept on the phone only, the way the prayer tracker is.
+     - Included in the export file, and removed by the existing delete.
+     - Nothing sent to anyone, and no usage-count event.
+     - The reason is optional, and the count works without one.
+     - `docs/privacy.html` needs a new section saying all this, in the same commit, still undated.
+   - **Not linked to the prayer-tracker pause.** Inferring a missed fast from a paused day would be the app
+     guessing about a woman's body. The user records it herself.
+   - **Release:** most useful from Ramadan 1448 (8 Feb 2027), when the missed fasts happen. So 1.6.0 if the
+     build and review time allow, and 1.6.1 otherwise. The prayer tracker still comes first.
+   - Pillars lists this as "coming soon" (Play listing, 23 Oct 2026).
+
+**Later, not 1.6:**
+- A moon-age number beside the Hijri date.
+- More widget sizes (a reviewer asked for a one-row widget).
+- A short explanation of each calculation method, if Settings does not already give one.
 
 ## 1. What is in 1.6.0, and what is not
 
