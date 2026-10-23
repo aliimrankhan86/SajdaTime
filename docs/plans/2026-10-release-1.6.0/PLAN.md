@@ -187,6 +187,23 @@ look and feel are extremely important. Every 1.6 choice is judged on that first.
 - Five languages (Pillars has two) should make SajdaTime stand out.
 - When the plan is complete, it gets a second independent review for gaps before development.
 
+**Disclaimer at first launch (Ali, 23 Oct 2026). Decided, not built.**
+- Ali: "My hard rules have evolved - as based on the user behaviour and more data we are improving and
+  making changes."
+- **Change:** the disclaimer is no longer shown at first launch, so new users are not overwhelmed. It
+  lives in Settings, About, Disclaimer.
+- **What still holds:** it is never removed or softened, and stays easy to find (a visible row, not three
+  levels deep). The four points and the four published places (HANDOVER §5.15) are unchanged. The watch line
+  and `docs/privacy.html#disclaimer` stay.
+- **Consequences Ali accepts:**
+  - The short form `disclaimer_brief` and the setup dialog go.
+  - The dua request is read only by users who open the disclaimer.
+  - `DisclaimerContentTest` changes to match.
+- **When this is built,** CLAUDE.md's hard rule and HANDOVER §1 and §5.15 are rewritten in the same commit,
+  with this reason and the old rule recorded as reversed.
+- **Rejected:** keeping the once-shown dialog (Ali's call on overwhelm). The gentler option of folding it
+  into the last setup step was offered on 23 Oct and not chosen.
+
 **Ali, 23 Oct 2026: plan every detail meticulously before any development starts.** Development waits for
 a complete plan and his go.
 
