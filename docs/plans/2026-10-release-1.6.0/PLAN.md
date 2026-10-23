@@ -160,6 +160,22 @@ references.
   - Claude's recommendation: a Timetable button under the list that opens a sheet showing the month on
     screen, with Save as PDF inside. During Ramadan the same sheet opens on the Ramadan timetable.
 
+**Ali's answers to Fable's six questions (23 Oct 2026, FABLE-REVIEW.md section E):**
+1. **Dark mode skies.** Ali has no firm view. He suggests the same sky images in dark mode, since dark mode
+   is for users who find it easier on the eyes. To be shown to him as screenshots before it is decided.
+2. **The sky does not replace the green card.** "We have to keep it consistent": the green card (dark) and
+   the light card stay as the place for the current prayer and the time left. The sky must work with the
+   card, and still fit 823dp.
+3. **Skies and the Qibla restyle are in 1.6, if possible.** Fable's "after Eid" split is not accepted as the
+   default. Build order still puts the signed-off features first.
+4. **Undo when a bell is turned off: yes.** A small message with an Undo option.
+5. **The Tracker tab is always visible: yes.** When tracking is off, the tab shows the switch to turn it on.
+6. **Missed fasts.** Research how Pillars' fasting tracker works before deciding between count only and
+   reasons, and between before and after Ramadan.
+
+**Ali, 23 Oct 2026: plan every detail meticulously before any development starts.** Development waits for
+a complete plan and his go.
+
 **Animation (Ali, 23 Oct 2026: "some animation like Pillars, where required").**
 
 *Tool.* Use Compose's own animation APIs: `animate*AsState`, `AnimatedContent`, `AnimatedVisibility`,
