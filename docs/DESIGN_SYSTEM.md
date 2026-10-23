@@ -763,18 +763,18 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
      - It has a 48dp target and a content description saying the prayer and the state.
      - Settings keeps the same choice too, so both places show the same setting.
   3. **No icon buttons side by side.** Where the tracker needs more than one action at the top (pause,
-     missed fasts), each is a **labelled chip with its icon**, with a clear gap between them and a 48dp target.
+     Last 30 days), each is a **labelled compact solid button with its icon** (§4.1 kind; not a new chip component), with a clear gap between them and a 48dp target.
      - **Rejected:** Pillars' two unlabelled round icons, because they are easy to mis-tap and unclear (the
        §10 review question "Is any icon button sitting next to another?").
   4. **Qibla: modern look in our theme** (Pillars' Qibla screen as the reference).
-     - **The direction is the message.** One large line: "Turn right 58°", then "You're facing the Qibla"
-       on alignment.
+     - **The direction is the message.** One large line: "Turn right 58°", then "You are now facing the Kaaba"
+       on alignment (the shipped `qibla_facing`).
      - **The place name is optional,** and small when shown.
      - **Distance and bearing move behind a labelled details button,** never a bare "i".
      - **Distance is in km or miles, by the phone's region.** Today it is km only (`qibla_subtitle`).
      - **The key (Kaaba and needle) stays on screen,** because it is what helps a first-time user.
      - **These stay:** the green turn arc, the alignment vibration and the calibration warnings.
-     - The dial grows larger, with a thicker soft rim and a rounder needle.
+     - The dial stays its current size (room for the instruction under it), with a thicker soft rim and a rounder needle.
 
 - **19 Oct 2026, "Match your mosque" can be set from the mosque's board: one button at the top.**
   From the 8 Oct 2026 branch, whose version made the minutes number an underlined, tappable link (now
@@ -1011,7 +1011,7 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| 1.6-sky | Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
+| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
 | 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | Same: wait for "go", then screenshots |
-| 1.6-chips | Labelled chips with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
+| 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
 | 1.6-qibla | Qibla restyle: direction line first, labelled details button, km or miles, key kept (§9, 23 Oct 2026) | Same |

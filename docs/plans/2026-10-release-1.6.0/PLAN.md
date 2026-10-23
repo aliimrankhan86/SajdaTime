@@ -5,7 +5,7 @@
 > **Added 23 Oct 2026 (Ali): five items from the Pillars review, and a design pause.** See §0.1. Nothing in
 > §0.1 is built, and no UI change is made until Ali says go.
 
-Status: **draft for Ali's yes, nothing built.** The research behind it is
+Status: **planning. Four commits predate the 23 Oct design pause** (tracker, dates sheet, jama'ah lines, 1.6.1 planners), built to the old placement. They are the base to rework (DETAILED-PLAN.md 8.1). No design work is built. The research behind it is
 `docs/research/2026-10-next-release-features.md`. This plan builds on the tracker plan Ali already approved in
 `docs/plans/2026-10-widget-ramadan-tracker/` (on the `claude/quiet-glass` branch, section 7, B0 to B8) and does not
 redo it.
@@ -49,7 +49,7 @@ gains the word "start" so the two are not confused.
 **Jama'ah guard and travel:**
 - Fajr's window ends at sunrise.
 - Jumu'ah must fall between Dhuhr and Asr.
-- Typed times are hidden, not deleted, when the user is more than about 25 km from where they were set
+- ~~Typed times are hidden, not deleted, when the user is more than about 25 km from where they were set~~ **Cut (SIGNOFF.md, DETAILED-PLAN.md 8.7).**
   (the `PlaceLabelPolicy` pattern).
 
 **Fasting rules (moon-sighting buffer):**
@@ -153,7 +153,7 @@ references.
   - The direction sentence comes first, and the place name is optional and small.
   - Distance and bearing sit behind a labelled details button, in km or miles by the phone's region.
   - The key stays.
-- **Timetable (PDF) placement: open.** Today it is "Save as PDF" on the Today line of Times, which opens a
+- **Timetable (PDF) placement: decided 23 Oct (DETAILED-PLAN.md 8.5): the renamed button stays on the Today line.** History: Today it is "Save as PDF" on the Today line of Times, which opens a
   Today, 7 days or month sheet, plus the Ramadan timetable sheet. The new layout needs a place for it.
   Ali to choose from screenshots. His requirement: the button must be **easy on the eyes and easy to
   understand**.
@@ -172,6 +172,8 @@ references.
 5. **The Tracker tab is always visible: yes.** When tracking is off, the tab shows the switch to turn it on.
 6. **Missed fasts.** Research how Pillars' fasting tracker works before deciding between count only and
    reasons, and between before and after Ramadan.
+
+**Gap review 1 (`GAP-REVIEW-1.md`) is resolved in DETAILED-PLAN.md section 8; its 15 questions for Ali are in 8.18 with recommended defaults.**
 
 **The detailed plan, `DETAILED-PLAN.md`, was accepted by Ali on 23 Oct 2026** ("that is fine - incorporate
 it"). Where it is more specific than anything above, it wins. In short:
@@ -262,7 +264,7 @@ the tab pill).
 3. **The day path on the home screen.** It draws in once when the screen opens. After that the "now" dot
    moves only when the time updates. **No endless animation**, to save battery.
 4. **The current prayer.** When a prayer time arrives, the highlight moves to the next row.
-5. **Changing day.** Content slides left or right with the arrow tapped, mirrored in RTL.
+5. ~~**Changing day.**~~ **Struck: there is no day stepper (DESIGN_SYSTEM §7; DETAILED-PLAN.md 8.9).**
 6. **Time of day.** The header shifts its tone between morning, day, evening and night, using
    `DESIGN_SYSTEM.md` colours.
 7. **Qibla.** A gentle confirmation, with a haptic, when the phone is lined up.

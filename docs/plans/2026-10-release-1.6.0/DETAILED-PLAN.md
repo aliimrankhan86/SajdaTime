@@ -292,3 +292,214 @@ Religious care flags: "My prayers" as a tab name is fine in all five languages (
 ---
 
 That closes the independent review. Nothing was written to the repo; everything above is for the coordinator to carry into `PLAN.md` §0.1, `DESIGN_SYSTEM.md` §9 and §11, and `HANDOVER.md` when Ali says go. Items still not verified by anyone: the pixel-read dp figures, edge-to-edge drawing, the sunrise widget refresh boundary, the sub-API-34 haptic fallback, and the Remove-animations mapping, each settled by one emulator check.
+
+---
+
+## 8. Gap review 1: resolutions (23 Oct 2026)
+
+`GAP-REVIEW-1.md` is the independent review. Its code claims were spot-checked by Claude Code and hold:
+- `MainActivity.kt:179` `enableEdgeToEdge()`
+- `WidgetState.kt:83` "Sunrise is never next"
+- `PrayerAlarmScheduler.kt:94-107`, where the reminder has its own `prayerReminderFor` set
+- `strings.xml:87` `disclaimer_title`
+- no `SnackbarHost` in `MainScaffold.kt`
+
+Each gap is resolved below. Where the answer is Ali's, the **recommended default** is written, marked
+**[Ali to confirm]**, and listed in 8.18. Builders use the default only after Ali confirms.
+
+**8.1 What is already on the branch.** Four commits predate §0.1. Ali said "Lets do all the decided features
+for 1.6" before the design pause:
+- `e98b2a6` tracker, with the ticks on the Times rows and the tracker line under the list
+- `9cc78bf` Islamic dates sheet
+- `9e9102e` jama'ah lines
+- `762e622` the 1.6.1 reminder planners, pure logic with no UI
+
+They build the old placement. **They are the base, and are reworked to this plan.** Step 1 becomes: move
+the ticks and the tracker line out of `HomeScreen.kt` (`:907-946`, `:216-218`) into the new tab. **No
+screenshot from the current build is shown to Ali as the new design.** [Ali to confirm: keep as base.]
+
+**8.2 Privacy page in the first commit that ships tracker data.** Add a "Your prayer record" section to
+`docs/privacy.html`, undated until release day:
+- what is stored on the phone: the ticks, the pauses, the jama'ah times typed in
+- that the save file goes wherever the user puts it
+- that Delete removes the record
+- that no usage count is sent for the My prayers tab, and that the counted screens stay three
+
+Also fix `privacy.html:124-126` so the "three main screens" sentence is still true: the counted screens stay
+three. Add `TrackerPrivacyTest`, which reads `privacy.html` for those phrases. `TrackerRepository.kt:26`
+already names it. Release day changes the privacy date with `set-release-date.sh`.
+
+**8.3 Disclaimer move: the full checklist, one commit.**
+- In addition to 6.0:
+  - remove the `DesignRulesTest.kt:123` exemption
+  - change the inventory rows at `DESIGN_SYSTEM.md:410-411` and the sentence at `:546`
+  - retitle `disclaimer_title` to "Disclaimer" in five languages
+  - change the `privacy.html:247` comment and the `DisclaimerContentTest.kt:149-150,172-173` messages
+  - delete `disclaimer_brief` and `disclaimer_read_full` from all five `values*/strings.xml`
+- HANDOVER §5.15 line 1046 justified the watch's two points by "shown once at setup on the phone". Rewrite
+  it: the watch keeps two points because of its 88-character budget, and the phone's full text is in
+  About.
+- Ali has accepted this trade in principle. Confirm the retitle in 8.18.
+
+**8.4 Bell.**
+- **Reminder.** Tapping the bell off also removes that prayer from `prayerReminderFor`. The message
+  says "Dhuhr alert and reminder off". Tapping it on restores both. [Ali to confirm]
+- **Restore.** A new `lastAlertStyle` map (prayer to NOTIFY or ALARM, default NOTIFY), with its codec and a
+  `SettingsCorruptionTest` case. `alertFor` drops the entry on off (`SettingsRepository.kt:399-401`).
+- **Notifications blocked by the phone.** If `POST_NOTIFICATIONS` is denied, tapping a bell on asks for the
+  permission (`MainActivity.kt:86-95`). While it stays denied, the bell's description adds "notifications
+  are off on this phone" (`bell_blocked_a11y`).
+- **Undo snackbar.**
+  - One `SnackbarHost` in `MainScaffold`, above the glass bar.
+  - It is written with `showSnackbar(actionLabel = ...)`, so no `TextButton` appears in our source.
+  - Recorded as control kind G in §4.1.
+  - `ColorContrastTest` adds `inverseSurface` / `inverseOnSurface` / `inversePrimary` in both themes.
+- **Semantics.** The bell is its own `toggleable` node with `Role.Switch` (as `Tick.kt:64-69`), outside the
+  row's merged description (`HomeScreen.kt:1029`).
+- **Contrast.** `outline` against `primaryContainer`, `surfaceContainerHigh` and `surface` at 3:1 in both
+  themes.
+
+**8.5 Timetable.** Decided: the renamed button stays on the Today line (PLAN.md 0.1 is updated to say so,
+and §11 gains a row).
+- **Layout.** One card per day, not a table: the date on the first line, then the six times in a
+  three-by-two grid with prayer names. This fits 320dp, 2.0 text and Urdu digits.
+- **Today.** Today's card uses `primaryContainer` plus the word "Today". It does not use
+  `surfaceContainerHigh`, which is the sheet's own colour.
+- **PDF ranges.** Today only, 7 days and This month are all kept as choices under "Save as PDF".
+  [Ali to confirm]
+- **Ramadan.** The sheet opens on the Ramadan days, which are cards with suhoor and iftar, while
+  `offersTimetable` is true.
+
+**8.6 Tracker tab states.**
+- **Isha after midnight.** While `state.current == ISHA` and now is before today's Fajr, the today card's
+  first row is "Last night's Isha" (`tracker_last_night_isha`), ticking yesterday's record.
+- **No location.** The rings stay tickable with no times shown, and the notice "Set your location to see
+  prayer times" sits above them.
+- **Read-only record from a newer version.** The tab shows the read-only notice and disables the rings.
+- **Loading.** Nothing is drawn until `state.loading` is false. The switch card never flashes.
+- **Before tracking began.** A new `tracker_started` date key. The 30-day grid draws no ring for days
+  before it. [Ali to confirm]
+- **Week strip.** Rings are 36dp, or 32dp when the width is under 340dp. At 2.0 text the strip wraps into
+  two rows (4 and 3). Rings in the strip are not tappable; the grid's are, with 48dp cells.
+- **First day of the week.** `WeekFields.of(appLocale)` from the app's language (`AppLocale`), with day
+  letters from `DayOfWeek.getDisplayName(TextStyle.NARROW, appLocale)`. [Ali to confirm]
+- **Usage counts.** The TRACKER destination maps to no event in the scaffold's `when`. `UsageCountsTest`
+  pins `Screen.entries.size == 3`.
+
+**8.7 Jama'ah.**
+- The 25 km hide is cut. PLAN.md §0 is annotated.
+- Jama'ah stays off the widgets in 1.6, as signed off; DETAILED-PLAN 5's large-widget jama'ah line is
+  struck. [Ali to confirm]
+- `jamaah_out_of_window` becomes the signed-off sentence: "Your Asr jama'ah time is before Asr begins.
+  Check your mosque's times." There is a matching after-the-window form, and five languages.
+
+**8.8 1.6.1 code on the branch.** Kept, inert. A test asserts that no composable reads `jamaahReminderMinutes`
+or `fastReminders`. [Ali to confirm] `RequestCodeTest` covers the 30,000 band now, in step 0.
+
+**8.9 Sky.**
+- **Period** is a pure function of `state.current`: FAJR is dawn; null or DHUHR is day; ASR or MAGHRIB is
+  evening; ISHA is night. It uses the ViewModel's existing sunrise trigger (`SajdaViewModel.kt:257-267`).
+  Tested by `SkyPeriodTest`.
+- **Edge to edge** is verified. The known cold-start light frame now shows before a dark sky; that is
+  accepted and noted in DESIGN_SYSTEM §5.
+- **Existing tween literals.** `SettingsList.kt:277,352` and `Notice.kt:117` move to `Motion.Standard`.
+  `QiblaScreen.kt:209` (120 ms, which follows the compass) is exempt by name in `DesignRulesTest`, with a
+  comment.
+- **The day path** draws in once per process, not on every tab return. [Ali to confirm]
+- **Struck:** "Changing day" animation (PLAN.md 0.1 item 5). There is no day stepper.
+- **Dark sky variants stay OPEN** until Ali sees four pairs. DESIGN_SYSTEM §11 is corrected.
+
+**8.10 Qibla.**
+- The dial size stays as today. DESIGN_SYSTEM §9 is corrected; it said "grows".
+- Alignment keeps the shipped `qibla_facing` "You are now facing the Kaaba".
+- No location keeps today's single sentence, with no dial.
+- "Details" adds a `QiblaScreen.kt` row to the §4.1 inventory.
+- **Miles.** Use `LocaleData.getMeasurementSystem(ULocale.forLocale(phoneRegionLocale))` on API 28+.
+  On 24 to 27 the fallback is the country list US, LR, MM and GB. The number goes through the app's digit
+  formatting (§5.11). Tested by `MeasurementSystemTest`. [Ali to confirm: phone's region]
+- Remove `qibla_subtitle` from all five languages.
+
+**8.11 Widgets.**
+- `WidgetRefreshScheduler.nextRefreshAt` gains a sunrise boundary, tested in `WidgetRefreshSchedulerTest`.
+- **The new strip provider needs:**
+  - a manifest receiver
+  - `widget_today_strip_info.xml` with `previewLayout`
+  - `WidgetManifestTest` raised to three providers
+  - `WidgetResourcesTest` and `WidgetThemeTest` cases
+- Sky stops are in `Color.kt`, `colors.xml` and `values-night/colors.xml`, with Kotlin twins for
+  `WidgetColorsTest`.
+- At 130% text and above, the strip hides the glyph row. At 160% it hides the prayer names and keeps the
+  times, with the names in the content description.
+
+**8.12 Font scale.** Check every changed screen at 1.5 **and 2.0**, on 320dp and 823dp.
+
+**8.13 Wording additions.**
+- **New keys:**
+  - the period names `sky_dawn`, `sky_day`, `sky_evening`, `sky_night`
+  - `sky_now_a11y` ("Now, between %1$s and %2$s")
+  - `tracker_last_night_isha`
+  - `widget_strip_label` and `widget_strip_desc`
+  - `bell_blocked_a11y`
+  - `timetable_month_heading`
+  - `settings_language_all`, which is `translatable="false"`, bidi-isolated with `Bidi.kt`
+- **Fixes:**
+  - Use `action_resume` (it exists), not `tracker_resume`.
+  - `tracker_ring_a11y` becomes `<plurals>`.
+  - `TrackerWordingTest` widens its prefixes to `nav_tracker`, `bell_`, `tracker_` and `fasts_`.
+  - `bell_off_message_fajr_ramadan` shows only in the Ramadan season with `suhoorReminderMinutes > 0`.
+- **Religious terms fixed now** (translation notes, kept with the translations):
+  - Jama'ah: Arabic الجماعة, Urdu جماعت, Turkish cemaat, Indonesian berjamaah
+  - Jumu'ah: Arabic الجمعة, Urdu جمعہ, Turkish Cuma, Indonesian Jumat
+  - Suhoor: Arabic السحور, Urdu سحری, Turkish sahur, Indonesian sahur
+  - Iftar: Arabic الإفطار, Urdu افطار, Turkish iftar, Indonesian buka puasa
+  - Undo: Arabic تراجع, Urdu واپس, Turkish Geri al, Indonesian Urungkan
+  - Timetable: Arabic جدول المواقيت, Urdu اوقات نامہ, Turkish Vakit çizelgesi, Indonesian Jadwal
+
+**8.14 Accessibility.**
+- The sky artwork and the now-dot use `clearAndSetSemantics {}`, because the card already speaks the period.
+- `LargeTextAndTalkBackDeviceTest` gains the My prayers tab, a bell and Qibla Details.
+
+**8.15 Tablets and landscape.** No tablet layout in 1.6. Content is capped at 600dp wide and centred; the sky
+stays full width.
+
+**8.16 Tests and gate, consolidated.**
+- **Changed:** `DesignRulesTest` (inventory rows, infinite-transition ban, `tween` literal ban with the
+  one exemption), `ColorContrastTest` (skies 72 plus 24, inverse pairs, bell), `WidgetColorsTest`,
+  `WidgetManifestTest`, `WidgetResourcesTest`, `WidgetThemeTest`, `WidgetStateTest`,
+  `WidgetRefreshSchedulerTest`, `TrackerWordingTest`, `DisclaimerContentTest`, `RequestCodeTest`,
+  `UsageCountsTest`, `TranslationIntegrityTest`.
+- **New:** `TrackerPrivacyTest`, `SkyPeriodTest`, `WeekStripTest`, `AlertRestoreTest`,
+  `MeasurementSystemTest`.
+- **Device checks:**
+  - animator scale 0
+  - the strip on a real launcher in light, dark, Urdu and 130%
+  - the My prayers tab at 2.0
+  - `LargeTextAndTalkBackDeviceTest`
+  - the on-device suite run with `am instrument` after `appwidget grantbind`
+- **Gate:** `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease`, then both emulators.
+- **Store screenshots (about 20):**
+  - 01, 02, a new My prayers shot and 06, in English
+  - 01, 02 and My prayers in Arabic, Urdu, Turkish and Indonesian
+- **Release:** `release-1.6.0.sh` with the new counts, and `set-release-date.sh`.
+
+**8.17 Delivery rule.** Anything Ali has not approved from screenshots by **4 Dec 2026** ships after Eid, so
+the Ramadan build is the approved subset. 1.5.0 must be live by 27 Nov (SIGNOFF.md), or all of 1.6.0 moves
+after Eid. Underestimated, so start them early: the widgets (verified on a real launcher), the month sheet,
+and the screenshot rounds. [Ali to confirm]
+
+**8.18 Questions for Ali, with the recommended default.**
+1. Keep the four built commits as the base and rework them: **yes**.
+2. The bell off also turns off that prayer's "N minutes before" reminder: **yes**.
+3. Dark skies: four dark variants, **decided from four screenshot pairs**.
+4. Keep Today, 7 days and Month as PDF choices inside the Timetable sheet: **yes**.
+5. Jama'ah on widgets: **out of 1.6**.
+6. Tab name: **"My prayers"**.
+7. Miles by the phone's region (US, UK, Liberia, Myanmar), km elsewhere, no setting: **yes**.
+8. Retitle the disclaimer dialog "Disclaimer", accepting that watch-only readers see two points: **yes**.
+9. The 30-day grid draws nothing for days before tracking began: **yes**.
+10. The 1.6.1 rules stay on the branch switched off: **yes**.
+11. Check every screen at 2.0 text as well as 1.5: **yes**.
+12. The day path draws once per app open: **yes**.
+13. The week starts by the app's language: **yes**.
+14. "What's new" in all nine listing languages: **yes**.
+15. Hard cut on 4 Dec for anything not approved: **yes**.
