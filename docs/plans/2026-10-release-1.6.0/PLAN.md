@@ -1,5 +1,7 @@
 # Release 1.6.0 plan: the three features after 1.5.0 (draft, 23 Oct 2026)
 
+> **READING ORDER (23 Oct 2026, the same line in every 1.6 plan file). Start with `BUILD-INSTRUCTIONS.md`. Where files disagree, the earlier one in this list wins: `BUILD-INSTRUCTIONS.md`, then `DETAILED-PLAN.md` §9, §8, then §1 to §7, then `PLAN.md` §0.1, then `SIGNOFF.md`, then `PLAN.md` §0 and §1 to §9, then `UX.md`, then `FABLE-REVIEW.md`. `PILLARS-STUDY.md`, `GAP-REVIEW-1.md` and `GAP-REVIEW-2.md` are records, not instructions.**
+
 > **Signed off 23 Oct 2026 (Fable 5.1): read `SIGNOFF.md` first. It overrides this file, including §0.** Final order: 1 prayer tracker, 2 Islamic dates sheet, 3 jama'ah times on the Times screen (cut first if short of time). Reminders in 1.6.1. Submit by 15 Dec 2026, or all of 1.6.0 goes after Eid if 1.5.0 is not live by 27 Nov.
 
 > **Added 23 Oct 2026 (Ali): five items from the Pillars review, and a design pause.** See §0.1. Nothing in
@@ -108,7 +110,7 @@ What not to copy:
 - "Featured in" logos, and any gamification beyond the quiet streak.
 
 Every animation stops when the phone's "remove animations" setting is on. Every screen is checked RTL and
-at font scale 1.5.
+at font scale 1.5 and 2.0 (DETAILED-PLAN 8.12).
 
 **Not done until Ali says go:** moving the tracker to its own tab, and the home layout. Ali is still sending
 references.

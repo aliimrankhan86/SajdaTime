@@ -1,7 +1,8 @@
 # Release 1.6: independent sign-off (Fable 5.1, 23 Oct 2026)
 
-**This file is the final word on the order and scope of 1.6. Where `PLAN.md` (any section, including §0), `UX.md`
-or the research file disagree with it, this file wins.** Asked for by Ali on 23 Oct 2026: review the plan again with
+> **READING ORDER (23 Oct 2026, the same line in every 1.6 plan file). Start with `BUILD-INSTRUCTIONS.md`. Where files disagree, the earlier one in this list wins: `BUILD-INSTRUCTIONS.md`, then `DETAILED-PLAN.md` §9, §8, then §1 to §7, then `PLAN.md` §0.1, then `SIGNOFF.md`, then `PLAN.md` §0 and §1 to §9, then `UX.md`, then `FABLE-REVIEW.md`. `PILLARS-STUDY.md`, `GAP-REVIEW-1.md` and `GAP-REVIEW-2.md` are records, not instructions.**
+
+~~This file is the final word on the order and scope of 1.6.~~ **Superseded on 23 Oct 2026 by the reading order above: SIGNOFF wins over PLAN §0 and §1-9, UX.md and the research file, but not over BUILD-INSTRUCTIONS, DETAILED-PLAN or PLAN §0.1.** In particular its ticks on Times, the tracker line under the rows and "the disclaimer is untouched" are superseded. Asked for by Ali on 23 Oct 2026: review the plan again with
 Fable 5.1 against the research, rank the features by value, say how they are delivered and how the UX can be simpler,
 and sign it off. Nothing is built. 1.5.0 comes first.
 

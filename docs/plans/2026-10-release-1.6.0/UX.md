@@ -1,5 +1,9 @@
 # SajdaTime 1.6.0: UX guidance (Fable 5, independent, 23 Oct 2026)
 
+> **READING ORDER (23 Oct 2026, the same line in every 1.6 plan file). Start with `BUILD-INSTRUCTIONS.md`. Where files disagree, the earlier one in this list wins: `BUILD-INSTRUCTIONS.md`, then `DETAILED-PLAN.md` §9, §8, then §1 to §7, then `PLAN.md` §0.1, then `SIGNOFF.md`, then `PLAN.md` §0 and §1 to §9, then `UX.md`, then `FABLE-REVIEW.md`. `PILLARS-STUDY.md`, `GAP-REVIEW-1.md` and `GAP-REVIEW-2.md` are records, not instructions.**
+
+> **SUPERSEDED IN PART (23 Oct 2026, after the design pause):** the tracker is now its own tab "My prayers" (not ticks on Times, not "no new tab"); each prayer row gains a one-tap bell; the timetable button is renamed "Timetable" and opens a month sheet; the disclaimer is no longer shown at first launch. See BUILD-INSTRUCTIONS.md.
+
 > **Signed off 23 Oct 2026 (Fable 5.1): read `SIGNOFF.md` first. It overrides this file.** Final order: 1 prayer tracker, 2 Islamic dates sheet, 3 jama'ah times on the Times screen (cut first if short of time). Reminders in 1.6.1. Submit by 15 Dec 2026, or all of 1.6.0 goes after Eid if 1.5.0 is not live by 27 Nov. The tasbih section near the end is a record only, not for building.
 
 > **Read with `PLAN.md` section 0, which overrides this file where they differ:**

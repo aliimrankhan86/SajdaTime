@@ -100,7 +100,16 @@ Ali decided on 16 Oct 2026:
 - **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page. Set to 1.4.0 on 19 Oct 2026; it reports 1.5.0 when it goes live, and on 18 and 22 Jan 2027 only it warns if 1.5.0 is still not live.
 - **One reply waiting:** to the 1 star Arabic reviewer who asked for Arabic. Post it once 1.5.0 is live (draft in `build/review-replies/DRAFTS.md`). It invites them to update their review if they are happy (Ali, 23 Oct 2026), and never asks for a higher rating or offers anything, as Google requires.
 - **On release day:** the date is written everywhere it belongs; the list is in `docs/release-tools/RELEASE-1.5.0.md` step 2 (Ali, 23 Oct 2026).
-- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders. Plan, UX and research on branch `claude/1-6-0-plan`. Not before 1.5.0 is uploaded.
+- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders. **Updated 23 Oct 2026:** Ali chose a calmer, more modern look for 1.6:
+  - a "My prayers" tab
+  - a one-tap bell on each prayer
+  - four skies behind the green card
+  - a Qibla restyle
+  - a one-row widget
+  - a Timetable button
+  - the disclaimer moved to Settings
+
+  The plan is checked twice and ready, and nothing is built until he says go. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`. Not before 1.5.0 is uploaded.
 
 ## Known gaps (documented, accepted)
 - On a small round watch (192dp) at large text, the disclaimer's top line touches the clock at the very end of the scroll.

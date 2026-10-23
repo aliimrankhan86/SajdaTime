@@ -5655,6 +5655,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): read with the STATE OF PLAY below
+
+**The 1.6 plan is complete and checked by two independent reviews. Nothing in it may be built until Ali says
+"go".** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
+`SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's 20 open questions with defaults, the
+ordered build table, animation, and development and testing guidance.
+- **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`
+  tracker (ticks on Times), `9cc78bf` dates sheet, `9e9102e` jama'ah lines, `762e622` 1.6.1 planners.
+- **Do not show screenshots of that build to Ali as the new design.**
+- **The owner changed one hard rule:** the disclaimer will live in Settings, About, first row, and not be shown
+  at first launch. CLAUDE.md is rewritten in the commit that builds it.
+- **1.5.0 is still first.**
+
 ### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is READY on `claude/quiet-glass`, now checked on the Wear emulators too, with eight

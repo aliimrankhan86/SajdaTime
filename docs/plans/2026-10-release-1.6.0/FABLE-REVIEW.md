@@ -1,5 +1,7 @@
 # Fable 5.1 independent design review of the 1.6 direction (23 Oct 2026)
 
+> **READING ORDER (23 Oct 2026, the same line in every 1.6 plan file). Start with `BUILD-INSTRUCTIONS.md`. Where files disagree, the earlier one in this list wins: `BUILD-INSTRUCTIONS.md`, then `DETAILED-PLAN.md` §9, §8, then §1 to §7, then `PLAN.md` §0.1, then `SIGNOFF.md`, then `PLAN.md` §0 and §1 to §9, then `UX.md`, then `FABLE-REVIEW.md`. `PILLARS-STUDY.md`, `GAP-REVIEW-1.md` and `GAP-REVIEW-2.md` are records, not instructions.**
+
 Read only, written by a separate Fable 5.1 agent from PLAN.md 0.1, PILLARS-STUDY.md, DESIGN_SYSTEM.md, the code and Ali's reference screenshots. Claude Code spot-checked RamadanState.kt:32-34, MainScaffold.kt:156 and HomeScreen.kt:196-201 against it. **These are recommendations, not decisions: Ali decides from screenshots.**
 
 ---

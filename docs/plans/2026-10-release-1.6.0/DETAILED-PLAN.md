@@ -1,5 +1,7 @@
 # 1.6 detailed plan (Fable 5.1, 23 Oct 2026)
 
+> **READING ORDER (23 Oct 2026, the same line in every 1.6 plan file). Start with `BUILD-INSTRUCTIONS.md`. Where files disagree, the earlier one in this list wins: `BUILD-INSTRUCTIONS.md`, then `DETAILED-PLAN.md` §9, §8, then §1 to §7, then `PLAN.md` §0.1, then `SIGNOFF.md`, then `PLAN.md` §0 and §1 to §9, then `UX.md`, then `FABLE-REVIEW.md`. `PILLARS-STUDY.md`, `GAP-REVIEW-1.md` and `GAP-REVIEW-2.md` are records, not instructions.**
+
 Written by the independent Fable 5.1 reviewer at Ali's request, after his answers in PLAN.md section 0.1.
 **Ali accepted it on 23 Oct 2026 ("that is fine - incorporate it").** PLAN.md section 0.1 records what that
 changes. Sections 6 (journeys and wording) and 7 (languages) follow below. The whole plan then
@@ -111,11 +113,11 @@ Row states: plain, current (`surfaceContainerHigh`, Now pill), next (fill, bar, 
 
 No-location state: the card shows "Set your location" as today (HomeScreen.kt:481-487); the sky still draws by the clock's period from Makkah times (the fallback already used), so the header never looks broken.
 
-**Tracker tab.** `ScreenTitle` "My prayers". Tracking off: one `sajdaSurface` card with the switch row ("My prayers", the existing sentence) and nothing else; no illustration, no sales text. Tracking on: today's date line (same style as Times); five rows in one card, each with the ring tick at the start (48dp, Tick.kt), name, time at the end; a day already past with no tick shows a plain outline, never red or counted. Below, 16dp, one row: compact solid "Pause" (pause icon) at the start and compact solid "Last 30 days" at the end. Below, 24dp, the week strip: seven 36dp rings, Mon to Sun in the phone's first-day order, each ring's arc the share of five, with "3 of 5" as the content description and the day letter under it; the paused day shows the pause glyph in the ring; today's ring has an `outline` border. Paused state: the button row becomes "Tracking is paused" with compact "Resume" at the end, same height (MyPrayers.kt:56-60); the rings keep drawing. Animations: 1 tick (updateTransition, `Motion.Reveal`, haptic), 2 rings (Animatable, `Motion.Draw`, on open and on change), 5 pause row (`Motion.Reveal`). Font scale 1.5: the strip wraps to two rows of four and three. RTL: rings Sun to Mon from the right as the locale says; the Canvas arcs mirrored.
+**Tracker tab.** `ScreenTitle` "My prayers". Tracking off: one `sajdaSurface` card with the switch row ("My prayers", the existing sentence) and nothing else; no illustration, no sales text. Tracking on: today's date line (same style as Times); five rows in one card, each with the ring tick at the start (48dp, Tick.kt), name, time at the end; a day already past with no tick shows a plain outline, never red or counted. Below, 16dp, one row: compact solid "Pause" (pause icon) at the start and compact solid "Last 30 days" at the end. Below, 24dp, the week strip: seven 36dp rings, in the app language's first-day order (superseded by 8.6), each ring's arc the share of five, with "3 of 5" as the content description and the day letter under it; the paused day shows the pause glyph in the ring; today's ring has an `outline` border. Paused state: the button row becomes "Tracking is paused" with compact "Resume" at the end, same height (MyPrayers.kt:56-60); the rings keep drawing. Animations: 1 tick (updateTransition, `Motion.Reveal`, haptic), 2 rings (Animatable, `Motion.Draw`, on open and on change), 5 pause row (`Motion.Reveal`). The strip wraps into two rows (four and three) by measured width, not by font scale (superseded by 9.9). RTL: rings Sun to Mon from the right as the locale says; the Canvas arcs mirrored.
 
 **Last 30 days sheet.** Grid of 30 rings, six rows of five, newest first, each with its day number and the "3 of 5" description; tapping a ring opens that day's five ticks under the grid (the existing per-day row, last-30-days.png); paused days with the glyph; nothing counts blanks. This replaces the long card list, which is 30 cards tall.
 
-**Qibla.** Title. "Turn right 58°" in `headlineMedium` on one line; "Facing 60°" under it in `bodyLarge`. The dial, radius as today (QiblaScreen.kt:190 keeps room below). Key. Place name small in `onSurfaceVariant` under the key, shown only when the label exists. A compact solid "Details" with a chevron under the place name; expanded, two lines: "About 5024 km from here" (or miles by `LocaleData`/the locale's measurement system) and "118° from north". Aligned: existing fill, rim, wording and haptic; animation 13 (`animateColorAsState`, `Motion.Standard`). No compass and no location: the existing amber notices above the dial.
+**Qibla.** Title. "Turn right 58°" in `headlineMedium` on one line; "Facing 60°" under it in `bodyLarge`. The dial, radius as today (QiblaScreen.kt:190 keeps room below), with a thicker soft rim and a rounder needle (DESIGN_SYSTEM §9). Key. Place name small in `onSurfaceVariant` under the key, shown only when the label exists. A compact solid "Details" with a chevron under the place name; expanded, two lines: "About 5024 km from here" (or miles: superseded by 9.4) and "118° from north". Aligned: existing fill, rim, wording and haptic; animation 13 (`animateColorAsState`, `Motion.Standard`). No compass and no location: the existing amber notices above the dial.
 
 **Settings.** No new rows beyond the signed-off ones. Prayer alerts keeps the per-prayer chooser and mirrors the bells (DESIGN_SYSTEM.md:764).
 
@@ -145,7 +147,7 @@ Gates stay as signed off: 1.5.0 live by 27 Nov or everything moves after Eid; PR
 | # | Step | Depends on | Cut order if short |
 |---|---|---|---|
 | 0 | `Motion.kt`, `DesignRulesTest` additions (infinite transition ban, tween literals), `ColorContrastTest` sky assertions scaffold | nothing | never |
-| 1 | Tracker tab: fourth destination (no usage-count word for it), ticks and tracker line leave Times, today card, Pause and Last 30 days buttons, week rings with partial fill and pause glyph, 30-day grid | signed-off tracker code on `claude/quiet-glass` | never |
+| 1 | Tracker tab: fourth destination (no usage-count word for it), ticks and tracker line leave Times, today card, Pause and Last 30 days buttons, week rings with partial fill and pause glyph, 30-day grid | the tracker code already on `claude/1-6-0` (`e98b2a6`), reworked (8.1) | never |
 | 2 | Islamic dates sheet | nothing | never |
 | 3 | Bell on each row with Undo; Prayer alerts mirror | nothing | last |
 | 4 | Timetable rename, month on screen, Ramadan merge | nothing | 6th |
@@ -169,7 +171,7 @@ Checkpoints: 20 Nov (steps 1 to 3 on the emulator in light, dark, Urdu, 1.5), 4 
 |---|---|---|---|---|---|
 | **Next prayer** (exists, gains the sky) | small 3 by 2, wide from 270 by 150 | Sky background for the period; glyph, name, time; countdown; five bars; town chip. Wide adds the six rows | "Suhoor ends" / "Iftar" word by the name (exists) | "Set your location" line, bars hidden (exists, WidgetRenderer.kt:123-133) | Nothing; the widget never shows alert state (no change) |
 | **Today strip** (new) | 4 by 1 minimum (250 by 60dp), 5 by 1 | Five columns Fajr to Isha: glyph over name over time; the next column in the highlight pill with bold time; passed columns' glyphs in `onSurfaceVariant`; the town in a 12sp line only at 5 by 1 | Fajr and Maghrib columns show "Suhoor" / "Iftar" instead of the name (the time matters more than the word, and both words fit a column at 12sp; the name is in the content description) | One line "Set your location" | No change |
-| **Today** (exists) | compact 4 by 3, large 4 by 4 | As now; large adds jama'ah as a 12sp second line under a prayer that has one | As now | As now | No change |
+| **Today** (exists) | compact 4 by 3, large 4 by 4 | As now (~~large adds jama'ah~~ struck by 8.7: no jama'ah on widgets in 1.6) | As now | As now | No change |
 
 Resize: `resizeMode="horizontal|vertical"` as now; the launcher picks the layout by `SizeF` with no app wake (WidgetRenderer.kt:106-108). Below Android 12 each widget keeps its first layout. RTL: the strip's columns run Isha to Fajr from the left, which `AppLocale` layout direction already forces for widgets (HANDOVER lesson 131). Large text: the strip's name and time are sp; at 130 percent or more the strip hides the glyph row, the way the second layouts are dropped today (HANDOVER 1410-1411). Dark and light: `values-night` twins plus the fixed Light and Dark sets, unchanged mechanism; launcher dark mode is the same `values-night` path.
 
@@ -503,3 +505,128 @@ and the screenshot rounds. [Ali to confirm]
 13. The week starts by the app's language: **yes**.
 14. "What's new" in all nine listing languages: **yes**.
 15. Hard cut on 4 Dec for anything not approved: **yes**.
+
+---
+
+## 9. Gap review 2: resolutions (23 Oct 2026)
+
+`GAP-REVIEW-2.md` checked section 8 and found new gaps. Gaps 1 and 2 (the reading order and one ordered
+build table) are fixed by the READING ORDER line at the top of every plan file and by `BUILD-INSTRUCTIONS.md`.
+The rest are resolved here. Questions for Ali are added to 8.18 as 16 to 20.
+
+**9.1 The branch state is in the cold-start documents.** HANDOVER §11 STATE OF PLAY and `PROJECT_BRIEF.md` each
+gain a dated line naming `claude/1-6-0`, its four feature commits and `BUILD-INSTRUCTIONS.md` (done in the same
+commit as this section).
+
+**9.2 Privacy text, fixed now** (8.2 gave only headings). The new section in `docs/privacy.html`, "Your prayer
+record", undated until release day, says exactly:
+- "If you switch on My prayers, the prayers you tick, the days you pause and any jama'ah times you type in are
+  kept on this phone only. Nothing about them is sent to us or to anyone."
+- "If you save your prayer record, the file goes wherever you choose. It contains your ticks and any paused
+  days. Anyone you give it to can read them."
+- "Delete my prayer record in Settings removes it from this phone."
+- "The My prayers screen is never counted, even if you have said yes to usage counts."
+
+`TrackerPrivacyTest` (new) finds the four phrases "kept on this phone only", "goes wherever you choose",
+"removes it from this phone" and "never counted". Move the backup rule check from `TrackerWordingTest.kt:65`
+into it, so `TrackerRepository.kt:26`'s pointer is true. **It is the next commit on the branch, before any
+other 1.6 code** (the tracker data shipped in `e98b2a6` without it).
+
+**9.3 Disclaimer checklist additions** (to 8.3):
+- `README.md:162` ("shown in the app on first run")
+- `HANDOVER.md:456` ("shown once automatically")
+- delete `action_understood` from all five languages if no other use remains (grep first)
+- delete the `FirstRunDisclaimer` composable (`MainActivity.kt:442`)
+- **reword `about_disclaimer_short`** to "A helper, not a religious authority. Worth reading." ("Please read
+  this once" reads as a one-off on a permanent row). `DisclaimerContentTest` holds "not a religious authority".
+
+**9.4 Bell and reminder, corrected** (replaces the reminder line in 8.4).
+- New key `bell_removed_reminder: Set<PrayerSlot>`, with a codec and a `SettingsCorruptionTest` case.
+- **Bell off.** If that prayer is in `prayerReminderFor`, remove it and add it to `bell_removed_reminder`.
+- **Bell on.** Restore the reminder only if the prayer is in `bell_removed_reminder`, then clear it from there.
+- **Messages:** `bell_off_message` "%1$s alert off" when no reminder changed, and `bell_off_reminder_message`
+  "%1$s alert and reminder off" when one did. The Ramadan Fajr form is kept as in 8.13.
+- **The Reminder dialog** reads `prayerReminderFor`, so it always shows the true state. Changing the reminder
+  there clears that prayer from `bell_removed_reminder`.
+- `AlertRestoreTest` covers: reminder already off before the bell; reminder on; style ALARM restored; a
+  restore after the dialog changed it.
+
+**9.5 Phone region for miles** (replaces the region source in 8.10).
+- `MeasurementSystem.kt`, one function:
+  `Resources.getSystem().configuration.locales[0].country`. That is the phone's own region, unwrapped by
+  `AppLocale`. `Locale.getDefault()` is banned by `LocaleDisciplineTest.kt:163`.
+- **Rule.** API 28+ uses `LocaleData.getMeasurementSystem(ULocale("und", country))`. Below 28, the fallback is
+  the country in {US, GB, LR, MM}.
+- **Distance only:** GB counts as miles.
+- `MeasurementSystemTest` covers US, GB, LR, MM, PK and an empty country (km).
+
+**9.6 The sky has one voice** (replaces 8.14's first bullet).
+- The header artwork is one spoken node, `sky_now_a11y`: "Now %1$s, between %2$s and %3$s", with the period
+  name from `sky_dawn` / `sky_day` / `sky_evening` / `sky_night`.
+- The dots, path, sun and moon inside it are `clearAndSetSemantics {}`.
+- `home_sky_a11y` is deleted.
+
+**9.7 A paused prayer looks and sounds paused.**
+- `Tick.kt` draws `TickState.PAUSED` as the pause glyph inside a disabled ring at full contrast. Pausing is
+  not a failure, so it does not fade.
+- New `tracker_state_paused` "paused" in the tick's state description.
+- The today card's rings are disabled while paused.
+- `WeekStripTest` and the device test cover it.
+
+**9.8 Timetable sheet, completed** (to 8.5).
+- **(a) Ramadan cards.** The approved Ramadan table becoming cards is a visible change: question 17. Until it
+  is answered, the Ramadan view keeps its approved table (`RamadanTimetableSheet.kt:131-140`).
+- **(b) "Month"** is the calendar month that contains today, the same as the PDF's `THIS_MONTH`. The sheet
+  opens scrolled to today.
+- **(c) No jama'ah lines** in the cards.
+- **(d) Records.** DESIGN_SYSTEM §11 gains row 1.6-timetable. The §4.1 inventory row 412 ("Save as PDF, Today
+  line") becomes "Timetable, Today line", with a new row "Save as PDF, Timetable sheet header".
+
+**9.9 Week strip wrap.** The strip wraps by measured width: if seven rings at 36dp plus 8dp gaps do not fit, use
+32dp; if that does not fit, two rows of four and three. Font scale is not the trigger.
+
+**9.10 The tab, written down.**
+- Order: Times, Qibla, **My prayers**, Settings.
+- `Destination.PRAYERS(R.string.nav_tracker, Icons.Rounded.TaskAlt, Icons.Outlined.TaskAlt)`.
+- New screen file `ui/prayers/MyPrayersScreen.kt` (added to the §4.1 inventory), keeping `ui/home/MyPrayers.kt`
+  for the shared row and sheet.
+- The `SnackbarHost` sits in `MainScaffold`'s `Box` with bottom padding `LocalBottomBarClearance`, above the
+  glass bar.
+- The `tween(` literal ban exempts `ui/theme/Motion.kt` and `QiblaScreen.kt`'s dial (8.9).
+- The usage-count `when` maps PRAYERS to nothing.
+
+**9.11 `tracker_started`** is the earlier of the switch-on date and the earliest stored record. It is re-derived
+after Load and cleared by Delete. `SettingsCorruptionTest` case.
+
+**9.12 Jama'ah time zone guard.**
+- Store the zone id with the jama'ah rules: one more key, codec v2, and v1 still reads.
+- When the phone's zone differs from it, every fixed jama'ah line shows `jamaah_check` instead of the time.
+- No coordinates are stored, which is why the 25 km hide was cut.
+- Question 16.
+
+**9.13 Small items.**
+- Use the existing `action_pause` (not `tracker_pause`).
+- The day path recomposes per minute (`derivedStateOf { now.epochSecond / 60 }`), not per second.
+- **Store shots:** retake 03 (Ramadan, gains the sky) and 05 (Settings) too.
+- **The Language subtitle** (§7) replaces one Ali chose on 19 Oct (DESIGN_SYSTEM:794): question 18.
+- **The mosque door**, signed off as "the one real design question", is in 8.18 as question 19.
+- **Tablets.** The 600dp cap (8.15) is a visible change for tablet users: question 20.
+- **The 1.6.0 release script** asserts phone `versionCode 10 / 1.6.0` and the watch unchanged at `1002 / 1.5.0`.
+- **Tests added to 8.16:**
+  - `SettingsCorruptionTest` cases for `lastAlertStyle`, `bell_removed_reminder` and `tracker_started`
+  - `RamadanPdfDeviceTest` and `ScreenSeedDeviceTest`, which find "Save as PDF" by label
+  - `SettingsSemanticsDeviceTest` if it pins rows
+- **Docs:** `PROJECT_BRIEF.md` changes in every commit that changes what is live or next.
+- **CLAUDE.md.** Edit the 1.6 change on this branch's copy, which already differs from `main`, and merge over
+  `main` after 1.5.0.
+
+**8.18 additions, questions 16 to 20:**
+16. Show "Check your jama'ah time" instead of a typed time when the phone is in a different time zone from
+    where it was typed: **yes**.
+17. The Ramadan timetable becomes day cards like the month view (easier on a small phone), replacing the table
+    you approved: **yes, from a screenshot**.
+18. The Language row's subtitle lists the five languages in their own scripts, replacing "Phone language ·
+    English": **yes, from a screenshot**.
+19. "Different from your mosque?" button under the times: keep as is (**recommended**), with jama'ah times
+    reached from each prayer row.
+20. On tablets, cap the content at 600dp wide and centre it: **yes, from a screenshot**.
