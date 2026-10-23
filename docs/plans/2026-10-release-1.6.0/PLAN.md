@@ -155,7 +155,10 @@ references.
   - The key stays.
 - **Timetable (PDF) placement: open.** Today it is "Save as PDF" on the Today line of Times, which opens a
   Today, 7 days or month sheet, plus the Ramadan timetable sheet. The new layout needs a place for it.
-  Ali to choose from screenshots.
+  Ali to choose from screenshots. His requirement: the button must be **easy on the eyes and easy to
+  understand**.
+  - Claude's recommendation: a Timetable button under the list that opens a sheet showing the month on
+    screen, with Save as PDF inside. During Ramadan the same sheet opens on the Ramadan timetable.
 
 **Animation (Ali, 23 Oct 2026: "some animation like Pillars, where required").**
 
