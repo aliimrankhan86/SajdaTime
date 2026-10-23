@@ -42,6 +42,7 @@ than repeating it.
   - Before step 0: merge `main` in. **Done**, `ceb2504`.
   - Step 0: **done**, 23 Oct 2026 night (Ali approved the plan: "Yes, build it"). `Motion.kt`, the three literals moved, `DesignRulesTest` motion bans, `RequestCodeTest` 30,000 band, `InertReminderSettingsTest`, DESIGN_SYSTEM §2 Motion and §9. Full gate green (518 unit tests, 0 failed).
   - Step 1: **built**, 23 Oct 2026 night (Ali approved from pictures: "B: calendar grid", "Yes, build it"). Waiting for his yes on the finished screenshots. `STEP-1-DESIGN.md` §9 and 13, HANDOVER §5.29.
+  - Step 2: designed and verified (`STEP-2-DESIGN.md`, 23 Oct night); not built; Ali's two questions in its §7.
 
 ## 0.1 Which model does what (Ali, 23 Oct 2026)
 

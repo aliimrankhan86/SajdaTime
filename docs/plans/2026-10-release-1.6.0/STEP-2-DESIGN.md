@@ -83,3 +83,20 @@ Out of range: the existing "not available" line. The date shift applies to every
    by the day each night leads into?
 2. Honorifics: **"Birth of the Prophet ﷺ" with Imams plain (recommended)**, or no honorific anywhere, or "(a)" after
    each Imam as Shia sites write?
+
+## 8. Corrections from `plan-verifier` (23 Oct 2026, night). These win over §1 to §7
+
+Nothing serious; Q20 and Q21 checked as written and consistent (Q20 removed Mawlid, Isra and Mi'raj and 15 Sha'ban
+from the shared list; Q21 names 17 Rabi al-Awwal and 15 Sha'ban as Shia only, in Ali's words; 12 Rabi al-Awwal
+stays out for everyone). Before building:
+1. **Pictures.** Step 2a changes what a Shia user sees, so it ends with the full set (light, dark, Urdu, 1.5 and 2.0,
+   823dp and 320dp) with the sect set to Shia, plus one Sunni shot proving six rows.
+2. **Two comments to rewrite** citing Q20 and Q21: `core/.../IslamicDates.kt:9-14` ("contested observances ...
+   taking a side") and `ui/home/IslamicDatesSheet.kt:44-46` ("the same for every sect").
+3. **`IslamicDatesGoldenTest.kt:65-77`'s 400 day agreement loop runs for both `Sect` values,** so the five new rows
+   are checked against the header too.
+4. **KDocs cite only the five fetched I.M.A.M. pages;** the unopened al-Islam.org links stay in this file.
+5. **`upcoming(today, offsetDays, sect)` has no default for `sect`,** so both call sites must pass it
+   (`HomeScreen.kt:264` reads `state.settings.sect`; `SettingsScreen.kt:690`) and cannot silently show six rows.
+6. Golden values come from Aladhan Umm al-Qura, not from I.M.A.M.'s own calendar (its 17 Rabi al-Awwal 1446 is a day
+   off Umm al-Qura); the sheet's footer already says local sighting may differ.
