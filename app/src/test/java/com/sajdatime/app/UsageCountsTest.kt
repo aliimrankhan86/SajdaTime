@@ -365,7 +365,8 @@ class UsageCountsTest {
         // Bumped to 10 October 2026 in 1.3.2 for the Do Not Disturb permission (DndAccessTest), and to
         // 17 October 2026 in 1.4.0 (published at the 1.4.0 merge) for the sentence about the widgets and the suhoor reminder. If the
         // branch is merged on a later day, move this date and the policy's date line together.
-        assertTrue(policy.contains("Last updated: 17 October 2026"))
+        // 23 October 2026: 1.5.0 release day; docs/release-tools/set-release-date.sh now moves both.
+        assertTrue(policy.contains("Last updated: 23 October 2026"))
         assertTrue("policy must list every permission", policy.contains("ACCESS_NOTIFICATION_POLICY"))
     }
 

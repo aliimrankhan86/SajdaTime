@@ -252,7 +252,7 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
    widget screenshots** (he asked to see them). Then put Theme back to Follow phone and the emulator back to
    light. Record in HANDOVER §10. Unit tests after this change: **416** (app 267, core 131, wear 18); the
    preparation job's expected count moves from 410 to 416, and 416 is correct, not a fault.
-2. **Claude, on the day:** run `docs/release-tools/set-release-date.sh` (sets "Last updated" in `docs/privacy.html`
+2. **DONE 23 Oct 2026 (release day; Ali: "Now let's start with release 1.5"; HANDOVER §11 STATE OF PLAY 23 Oct evening).** **Claude, on the day:** run `docs/release-tools/set-release-date.sh` (sets "Last updated" in `docs/privacy.html`
    to today, or to the date given as `"2 November 2026"`; it is the only date in the repo that moves), then commit
    and push to `claude/quiet-glass`.
    **Then write the release date everywhere it belongs (Ali, 23 Oct 2026: "the day we release it, write it
