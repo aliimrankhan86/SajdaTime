@@ -5658,8 +5658,9 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 ### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is READY on `claude/quiet-glass`, now checked on the Wear emulators too, with eight
-phone and four watch store screenshots and a listing that names every feature. A pull request into main is open for Ali
-(do not merge it before the release day: the privacy page date goes in first). The release day is still not fixed.**
+phone and four watch store screenshots and a listing that names every feature. Draft pull request #15 into main is open for Ali
+(https://github.com/aliimrankhan86/SajdaTime/pull/15; a draft so it cannot be merged before the release day: the privacy page
+date goes in first, then Claude marks it ready). The release day is still not fixed.**
 
 - **Ali, 23 Oct 2026:**
   - "merge everything and keep the release ready first ... test it in every possible way ... add / edit description
@@ -5677,6 +5678,9 @@ phone and four watch store screenshots and a listing that names every feature. A
     NOT merged; its one commit is the same patch as 8a39b2b, which is already on main and opt in.
   - main is an ancestor, so the merge is a clean fast forward (`git merge-tree` checked by the review).
   - The pull request is Ali's to merge on the release day, after `set-release-date.sh` (lesson 137).
+  - **Gate on the final code (0374915, `--no-build-cache clean test lint` and both bundles): 430 unit tests, 0 failed,
+    BUILD SUCCESSFUL.** That commit changed two watch declarations from private to internal; the full release script
+    ran on 6be39c7, and the 30 Oct job runs it again on the head.
 - **Store (LISTING.md, LISTING-LOCALES.md):**
   - English description 3991 / 4000. It now names the suhoor reminder's 15 to 60 minute choice, the watch Qibla, the
     watch following the phone, and "Coming soon to Chrome and Edge browsers".
