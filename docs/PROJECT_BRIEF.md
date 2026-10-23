@@ -98,7 +98,9 @@ Ali decided on 16 Oct 2026:
 - **Daily, around 12:40:** drafts replies to new Play reviews into `build/review-replies/DRAFTS.md` and notifies Ali, who posts them himself. It also reminds him to post the Arabic reply and to delete the spare signing file once 1.5.0 is live, and tells him once when the store description submitted on 19 Oct 2026 is live. (It does not update this brief; a Claude session does that after a release.)
 - **Monthly, days 2 to 9:** Play numbers go into the "SajdaTime monthly numbers" Claude Doc.
 - **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page. Set to 1.4.0 on 19 Oct 2026; it reports 1.5.0 when it goes live, and on 18 and 22 Jan 2027 only it warns if 1.5.0 is still not live.
-- **One reply waiting:** to the Arabic reviewer who asked for Arabic. Post it once 1.5.0 is live. It must not ask for stars.
+- **One reply waiting:** to the 1 star Arabic reviewer who asked for Arabic. Post it once 1.5.0 is live (draft in `build/review-replies/DRAFTS.md`). It invites them to update their review if they are happy (Ali, 23 Oct 2026), and never asks for a higher rating or offers anything, as Google requires.
+- **On release day:** the date is written everywhere it belongs; the list is in `docs/release-tools/RELEASE-1.5.0.md` step 2 (Ali, 23 Oct 2026).
+- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders. Plan, UX and research on branch `claude/1-6-0-plan`. Not before 1.5.0 is uploaded.
 
 ## Known gaps (documented, accepted)
 - On a small round watch (192dp) at large text, the disclaimer's top line touches the clock at the very end of the scroll.

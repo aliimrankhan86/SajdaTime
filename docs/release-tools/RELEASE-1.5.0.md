@@ -255,6 +255,19 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
 2. **Claude, on the day:** run `docs/release-tools/set-release-date.sh` (sets "Last updated" in `docs/privacy.html`
    to today, or to the date given as `"2 November 2026"`; it is the only date in the repo that moves), then commit
    and push to `claude/quiet-glass`.
+   **Then write the release date everywhere it belongs (Ali, 23 Oct 2026: "the day we release it, write it
+   wherever it needs to be written"), in the same push where it is in the repo:**
+   - `docs/privacy.html` "Last updated" (the script above);
+   - `docs/HANDOVER.md` §11 STATE OF PLAY: "1.5.0 submitted on <date>" (and, once live, "live on <date>"), plus a
+     §10 entry;
+   - `docs/PROJECT_BRIEF.md` "What is live" and "Next release" (1.5.0 submitted/live on <date>; next is the 1.6
+     plan on branch `claude/1-6-0-plan`);
+   - `docs/store/LISTING.md`: the heading "1.5.0 listing, FINAL ... paste on release day" becomes "LIVE <date>";
+   - this file: "Still to do" steps 2 to 6 marked DONE with the date;
+   - GBrain `projects/sajdatime` (page section 1 and a new START HERE fact; expire fact 2587) and claude-mem
+     (`sajdatime-1.5.0-release` closed, `sajdatime-1.6-plan` gate dates updated);
+   - the scheduled jobs: delete or disable `sajdatime-1-5-0-reminder` if it has not run, and re-baseline the
+     health check in step 6.
 3. **Ali:** merge `claude/quiet-glass` into `main` **that same day, not before**, because merging
    publishes `docs/`, including the privacy policy, through GitHub Pages (HANDOVER §15 lessons 124
    and 137).
@@ -278,8 +291,12 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
    - confirm the Data safety answers (expected unchanged);
    - then **he presses Send for review himself**.
 6. **After it is live** (watch Play's "Updated on" date move; Play sends no email):
-   - Claude drafts the reply to the Arabic reviewer who asked for Arabic and Ali posts it (never ask
-     for stars);
+   - Ali posts the reply to the 1 star Arabic reviewer who asked for Arabic (drafted, in his own 17 Oct words,
+     in `build/review-replies/DRAFTS.md`; the daily review job reminds him with the text the day Arabic is
+     live). It thanks them, says Arabic was added because of their request, and ends "if you are happy with
+     it we would be glad if you updated your review". Ali asked on 23 Oct 2026 to invite a better review in
+     whatever words Google permits: Google's policy (checked 23 Oct 2026) allows inviting an honest update
+     but says "don't ask for a higher rating" and forbids any reward, so the draft stays as it is;
    - (the January Ramadan lines are no longer a separate step: the 1.5.0 description and the translations carry
      Ramadan, so pasting them on release day does it);
    - Ali deletes the spare copy of the signing values in `~/.gradle` (he gets a reminder);
