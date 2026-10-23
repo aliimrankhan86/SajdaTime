@@ -5657,8 +5657,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): read with the STATE OF PLAY below
 
-**The 1.6 plan is complete and checked by two independent reviews. Nothing in it may be built until Ali says
-"go".** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
+**The 1.6 plan is complete and checked by two independent reviews. Ali answered all 27 open questions and said
+"go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
 `SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's 20 open questions with defaults, the
 ordered build table, animation, and development and testing guidance.
 - **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`

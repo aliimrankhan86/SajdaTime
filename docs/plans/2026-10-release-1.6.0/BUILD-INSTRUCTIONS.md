@@ -15,8 +15,8 @@ than repeating it.
 
 ## 0. Before anything: the status and the one rule
 
-- **Nothing in this plan may be built until Ali says "go".** He said: plan every detail meticulously first.
-  When he says go, follow §5 in order.
+- **Ali said "go" on 23 Oct 2026,** after the plan, two gap reviews, a final check and his answers to 27
+  questions. Build in §5 order, with screenshots to him after each step.
 - **Where everything is.** Branch `claude/1-6-0`, worktree `/Users/aliimrankhan/Developer/SajdaTime-1-6-0`.
   - 1.5.0 is **not released yet**; it is on `claude/quiet-glass` (PR #15), and Ali picks its day.
   - Never merge into `main`. Never push to `main`.
@@ -26,8 +26,8 @@ than repeating it.
   - `9cc78bf` Islamic dates sheet: kept.
   - `9e9102e` jama'ah lines: kept, with the wording fix in 8.7 and the zone guard in 9.12.
   - `762e622` 1.6.1 reminder planners: pure, inert, kept switched off (8.8).
-- **Ali's open answers.** 20 questions are listed in §3 with recommended defaults. **A step that depends on an
-  unanswered question stops at that point and asks him.** Silence is never a yes (DESIGN_SYSTEM §0.2).
+- **Ali's answers.** All 27 questions were answered on 23 Oct 2026 (§3). Four are decided from screenshots at
+  their step. **A step whose screenshot decision is pending stops there and shows him.** Silence is never a yes (DESIGN_SYSTEM §0.2).
 - **Memory.** Every session reads GBrain `projects/sajdatime` first (`recall` or `context_pack`) and writes what
   changed at the end. The 1.6 plan is recorded there too.
 
@@ -49,6 +49,16 @@ show. The release has to be before Ramadan 1448 (about 8 Feb 2027).
    - "Last 30 days" opens a 30-day ring grid.
    - When tracking is off, the tab shows the switch to turn it on. The tab is always visible.
 2. **Islamic dates sheet,** opened from the Hijri date. It is built already.
+   2a. **Shia dates, for Shia users only** (Ali, 23 Oct 2026, Q21).
+   - **Candidate dates,** each included only if the named source lists it: Eid al-Ghadir (18 Dhul Hijjah), Arbaeen (20 Safar), the births of the Prophet ﷺ
+     (17 Rabi al-Awwal in Shia practice) and Imam Ali (13 Rajab), the 15th of Sha'ban (the birth of
+     Imam al-Mahdi, kept by Shia users), and the nights of the 19th, 21st and 23rd of Ramadan.
+   - **Each one** must come from a named Shia source cited in the code and the commit, for example the
+     official calendar of a major marja's office or al-Islam.org.
+   - **Wording:** plain names only. Nothing celebratory on Ashura or Arbaeen.
+   - **Sunni users** never see them.
+   - **Test:** extend `IslamicDatesGoldenTest`.
+   - **Records:** the decision lives in §3 Q21; `PLAN.md` §0 asked for exactly this "named Shia source" (D5).
 3. **A one-tap bell on each prayer row,** with an Undo message.
 4. **"Timetable" button** on the Today line. It opens a month sheet of day cards, with Save as PDF inside, and
    shows the Ramadan timetable while Ramadan is offered.
@@ -91,8 +101,8 @@ show. The release has to be before Ramadan 1448 (about 8 Feb 2027).
 
 **Cut order if time runs short** (from `DETAILED-PLAN.md` §4, last cut first): the Fasts count (already
 1.6.1), then widgets, then jama'ah lines, then the skies, then the Qibla restyle, then the Timetable, and the
-bell last. The tab, the dates and step 0 are never cut. **Anything Ali has not approved from screenshots by 4 Dec
-2026 ships after Eid** (8.17). If 1.5.0 is not live by 27 Nov, all of 1.6.0 ships after Eid.
+bell last. The tab, the dates and step 0 are never cut. **Ali allows a late approval** (Q25). Aim to show everything by 4 Dec. Something approved later can still go in,
+but the 15 Dec submission and Ramadan stay the real limits. If 1.5.0 is not live by 27 Nov, all of 1.6.0 ships after Eid.
 
 ## 3. Decisions, and the questions still open
 
@@ -114,29 +124,38 @@ bell last. The tab, the dates and step 0 are never cut. **Anything Ali has not a
 | Widgets follow Pillars' UX with our features | Ali, 23 Oct |
 | Plan meticulously first, then two independent gap reviews | Ali, 23 Oct |
 
-**Open: ask Ali, from screenshots where visual.** The recommended default is in bold. Full text is in
-`DETAILED-PLAN.md` 8.18 and §9.
-1. Keep the four built commits as the base and rework them: **yes**.
-2. The bell off also turns off that prayer's "minutes before" reminder (restored exactly on): **yes**.
-3. Dark skies: dark variants of all four (his lean was the same images), **decided from four screenshot pairs**.
-4. Keep Today, 7 days and Month as PDF choices: **yes**.
-5. Jama'ah on widgets: **out of 1.6**.
-6. Tab name: **"My prayers"**.
-7. Miles for the US, UK, Liberia and Myanmar by the phone's region: **yes**.
-8. Retitle the disclaimer dialog "Disclaimer"; watch-only readers see two points: **yes**.
-9. No rings for days before tracking began: **yes**.
-10. The 1.6.1 rules stay on the branch, switched off: **yes**.
-11. Check every screen at text size 2.0 as well as 1.5: **yes**.
-12. The day path draws once per app open: **yes**.
-13. The week starts by the app's language: **yes**.
-14. "What's new" in all nine listing languages: **yes**.
-15. A hard cut on 4 Dec: **yes**.
-16. The jama'ah time-zone guard: **yes**.
-17. The Ramadan timetable becomes day cards: **from a screenshot**.
-18. The Language row subtitle lists five scripts: **from a screenshot**.
-19. Keep "Different from your mosque?" as is: **yes**.
-20. Tablet content capped at 600dp: **from a screenshot**.
+**Answered by Ali on 23 Oct 2026** (27 questions compiled by Fable, asked with options in chat). These are
+decisions now. Items marked *screenshot* are decided by Ali from screenshots at that step.
 
+| # | Question | Ali's answer |
+|---|---|---|
+| 1 | The built commits | Keep and rework |
+| 2 | The 1.6.1 rules on the branch | Keep, switched off, with `InertReminderSettingsTest` |
+| 3 | Tab name | **My prayers** |
+| 4 | Days before tracking began, in the 30-day grid | Not drawn |
+| 5 | First day of the week | By the app's language |
+| 6 | Bell off | Alert **and** that prayer's "minutes before" reminder both go off; on restores exactly (9.4) |
+| 7 | PDF ranges | Keep Today, 7 days and This month |
+| 8 | Ramadan timetable as cards | *Screenshot* (table and cards side by side, light and dark) |
+| 9 | The Ramadan card's own timetable button | Keep both doors |
+| 10 | Dark skies | *Screenshot* (four light and dark pairs) |
+| 11 | Day path draw-in | Once per app open |
+| 12 | Qibla distance | Miles by phone region (US, GB, LR, MM), km elsewhere, no setting |
+| 13 | Jama'ah when travelling | **Ali's own answer:** "If they are travelling then we get the timing of their location based on their school of thought and calculation method then we will show it as per their location. Hence knowing their location is important." The prayer times always follow the current location (they already do). **Typed jama'ah times belong to the home mosque, so they are hidden while the phone is in a different time zone from where they were typed, and come back at home.** No "check" line and no stored coordinates (9.12, as amended) |
+| 14 | Jama'ah on widgets | Off in 1.6 |
+| 15 | "Different from your mosque?" button | *Screenshot* (with and without) |
+| 16 | Disclaimer | Accept: Settings, About, first row, retitled "Disclaimer"; the watch keeps its two-point line |
+| 17 | Language row subtitle in five scripts | *Screenshot* |
+| 18 | Tablets | **Yes, centre it:** content capped at 600dp and centred, the sky full width |
+| 19 | Text sizes | Check at 1.5 and 2.0 |
+| 20 | Mawlid, Isra and Mi'raj, 15 Sha'ban | Left out of the dates sheet |
+| 21 | Shia-specific dates (Ghadir, Arbaeen and others) | **Add in 1.6.0, for Shia users.** See §2 item 2a |
+| 22 | Tasbih counter | Dropped for now |
+| 23 | "What's new" | All nine listing languages |
+| 24 | Play short description | "Offline prayer times, adhan, Qibla and a private salah tracker, with Wear OS." on release day |
+| 25 | The 4 Dec cut | **Allow a late approval.** Something approved after 4 Dec can still go in. The 15 Dec submission and Ramadan stay the real limits. If a late approval would push the submission past 15 Dec, ask Ali which matters more |
+| 26 | 1.5.0 release day | Ali will pick a day this week. Ask him for the day; release work follows `RELEASE-1.5.0.md` |
+| 27 | Start building | **Yes, go** (23 Oct 2026). Build in §5 order, with screenshots after each step |
 ## 4. Hard rules that never bend (from `CLAUDE.md`; read it in full)
 
 - **Network and accounts.**
@@ -188,7 +207,7 @@ step starts only after his yes. Section numbers refer to `DETAILED-PLAN.md`.
 
 **Checkpoints:**
 - **20 Nov:** steps P, 0, 1 and 3 on the emulator.
-- **4 Dec:** steps 4 to 8 shown to Ali. Anything not approved ships after Eid.
+- **4 Dec:** steps 4 to 8 shown to Ali (target; late approval allowed, Q25).
 - **11 Dec:** PR.
 - **15 Dec:** submit.
 

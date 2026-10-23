@@ -486,12 +486,12 @@ stays full width.
   - 01, 02 and My prayers in Arabic, Urdu, Turkish and Indonesian
 - **Release:** `release-1.6.0.sh` with the new counts, and `set-release-date.sh`.
 
-**8.17 Delivery rule.** Anything Ali has not approved from screenshots by **4 Dec 2026** ships after Eid, so
+**8.17 Delivery rule. AMENDED by Ali (Q25): late approval allowed; see BUILD-INSTRUCTIONS §2.** Original: Anything Ali has not approved from screenshots by **4 Dec 2026** ships after Eid, so
 the Ramadan build is the approved subset. 1.5.0 must be live by 27 Nov (SIGNOFF.md), or all of 1.6.0 moves
 after Eid. Underestimated, so start them early: the widgets (verified on a real launcher), the month sheet,
 and the screenshot rounds. [Ali to confirm]
 
-**8.18 Questions for Ali, with the recommended default.**
+**8.18 Questions for Ali. ANSWERED on 23 Oct 2026: see BUILD-INSTRUCTIONS §3 for the answers, which win.**
 1. Keep the four built commits as the base and rework them: **yes**.
 2. The bell off also turns off that prayer's "N minutes before" reminder: **yes**.
 3. Dark skies: four dark variants, **decided from four screenshot pairs**.
@@ -600,7 +600,9 @@ other 1.6 code** (the tracker data shipped in `e98b2a6` without it).
 **9.11 `tracker_started`** lives in the tracker DataStore (`TrackerRepository`), so Delete clears it with the record. It is the earlier of the switch-on date and the earliest stored record. It is re-derived
 after Load and cleared by Delete. Tested by the tracker codec test.
 
-**9.12 Jama'ah time zone guard.**
+**9.12 Jama'ah time zone guard. AMENDED by Ali's answer (BUILD-INSTRUCTIONS §3 Q13):** while the phone's zone
+differs, the typed jama'ah lines are **hidden** (not replaced by a "check" line), and the prayer times shown are
+the current location's, as always. Original text:
 - Store the zone id with the jama'ah rules: one more key, codec v2, and v1 still reads.
 - When the phone's zone differs from it, every fixed jama'ah line shows `jamaah_check` instead of the time.
 - No coordinates are stored, which is why the 25 km hide was cut.

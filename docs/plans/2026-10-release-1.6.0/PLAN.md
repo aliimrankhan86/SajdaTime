@@ -175,6 +175,8 @@ references.
 6. **Missed fasts.** Research how Pillars' fasting tracker works before deciding between count only and
    reasons, and between before and after Ramadan.
 
+**Ali answered all 27 open questions and said "go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).**
+
 **Gap review 1 (`GAP-REVIEW-1.md`) is resolved in DETAILED-PLAN.md section 8; its 15 questions for Ali are in 8.18 with recommended defaults.**
 
 **The detailed plan, `DETAILED-PLAN.md`, was accepted by Ali on 23 Oct 2026** ("that is fine - incorporate

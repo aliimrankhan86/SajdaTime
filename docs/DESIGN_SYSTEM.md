@@ -1005,7 +1005,10 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
-| (none) | | Nothing is waiting for the owner on 18 Oct 2026. | | |
+| 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | OPEN: screenshots at step 5 |
+| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | OPEN: screenshots at step 4 |
+| 1.6-mosque-door | 23 Oct 2026 | Keep "Different from your mosque?" under the times? | Keep | OPEN: screenshots at step 7 |
+| 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
 
 **Decided, work not yet done** (do not report these as done):
 
@@ -1014,4 +1017,5 @@ the date and his words, and delete it here.
 | 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
 | 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | Same: wait for "go", then screenshots |
 | 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
+| 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Build in step 5 |
 | 1.6-qibla | Qibla restyle: direction line first, labelled details button, km or miles, key kept (§9, 23 Oct 2026) | Same |
