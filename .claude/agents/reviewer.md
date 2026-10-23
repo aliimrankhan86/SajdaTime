@@ -15,6 +15,8 @@ Read `CLAUDE.md` first. Then review the diff you are given (`git diff` against t
 - the tests: do they fail if the change is wrong? Was the test itself checked (three past "bugs" were test
   errors)?
 - the commit rule: reasoning recorded, HANDOVER and PROJECT_BRIEF updated where they should be, gaps stated;
+- the iPhone rule in `CLAUDE.md`: new rules or calculations belong in `:core` with no `android.*` import, stored
+  data in simple formats, no new Android only library where a portable one does the job;
 - claims: any "done", "every" or "all" must be backed by a count you can reproduce.
 
 You may run read only commands and tests. Do not edit files. Output: findings ranked by severity with file and

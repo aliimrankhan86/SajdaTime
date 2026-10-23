@@ -1959,6 +1959,18 @@ because App Store Review Guideline 4 (Design) and 4.3 (look-alike apps in a crow
 rejection reasons. Android only features (widgets, Wear OS, exact alarms) are labelled as such in each spec. In
 code: keep calculation and rules logic free of Android imports where it costs nothing; no refactor for it now.
 
+**Widened to every decision, same day.** Ali: "I informed you so that we can take into consideration for any
+development even though we are not developing for the iphone right now but its useful for decision making now so
+when we develop ios app then things are still smooth for us." So the rule is now a `CLAUDE.md` hard rule covering
+code and data as well as design: when two options cost about the same, take the portable one; new rules and
+calculations go in `:core` as plain Kotlin; stored data in simple formats; no new Android only library where a
+portable one does the job; every plan states its iPhone effect in one line, checked by `plan-verifier`, and
+`reviewer` checks diffs for it. Still no iOS code and no Kotlin Multiplatform move until Ali decides.
+**Checked 23 Oct 2026, the starting point:** `:core` (15 Kotlin files) is plain Kotlin except `AppLocale.kt` and
+`PrayerLabels.kt`, which take an Android `Context`; it uses `java.time` (including `HijrahDate`) and the Java
+`adhan` 1.2.1 library. None of those run on iPhone unchanged, so an iPhone version would replace them. Recorded,
+not fixed: it costs nothing to leave them now.
+
 **The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
 Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.
 The main session talks to Ali, commits and pushes, and should run on Opus. Translations stay with the main

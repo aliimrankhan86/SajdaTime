@@ -7,9 +7,11 @@ plugins {
 /**
  * Shared calculation module. Phone and watch both depend on it.
  *
- * Nothing in here imports anything from the android.* namespace. It is an Android library
- * only so that AGP's built-in Kotlin support and core library desugaring apply; the code
- * itself is plain Kotlin and lifts straight into a Kotlin Multiplatform or iOS target.
+ * Almost nothing in here imports from the android.* namespace: only AppLocale.kt and
+ * PrayerLabels.kt take a Context (checked 23 Oct 2026). It is an Android library so that AGP's
+ * built-in Kotlin support and core library desugaring apply. For a future iPhone version
+ * (CLAUDE.md, the iPhone hard rule) those two files, java.time and the Java adhan library
+ * would need replacing; keep new code here free of android.* so the list does not grow.
  */
 android {
     namespace = "com.sajdatime.core"

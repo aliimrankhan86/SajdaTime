@@ -123,6 +123,9 @@ Ali decided on 16 Oct 2026:
     apps on design): no iOS work in 1.6, but Fable checks every design also fits Apple's rules, with patterns both
     phones share, an Apple icon named beside each Android one, and a distinct look of our own so it never reads as a
     copy of other prayer apps.
+    The same goes for the code (Ali: "useful for decision making now so when we develop ios app then things are
+    still smooth"): where two choices cost the same, the one that carries over to iPhone wins, and every plan says
+    in one line what it means for an iPhone version.
   - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
     routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
   - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and

@@ -18,7 +18,9 @@ Check, against the code and not only the text:
   every new button is in the DESIGN_SYSTEM §4.1 inventory;
 - each step has a test that would fail if the step were wrong, and a way to see it on the emulator;
 - the files do not contradict each other, and nothing decided by Ali is reopened;
-- the timing fits the dates in the plan.
+- the timing fits the dates in the plan;
+- the plan states its iPhone effect in one line (none, carries over, or Android only and why), and does not pick
+  an Android only option where a portable one costs about the same (`CLAUDE.md`, the iPhone hard rule).
 
 Output: findings ranked by severity, each with the file and line, why it matters, and the smallest fix. Then
 questions only Ali can answer (at most four, recommendation first). Say plainly if you found nothing serious.
