@@ -676,4 +676,23 @@
     <string name="tracker_state_prayed">prayed</string>
     <string name="tracker_state_not_ticked">not ticked</string>
     <string name="tracker_state_not_due">not due yet</string>
+    <!-- Islamic dates sheet (1.6.0). Plain names, no ruling, days both Sunni and Shia mark (SIGNOFF.md). -->
+    <string name="dates_title">Islamic dates</string>
+    <!-- %1$s is today's Hijri date, "12 Jumada al-Ula 1448". -->
+    <string name="dates_today_is">Today is %1$s</string>
+    <string name="date_ashura">Ashura</string>
+    <string name="date_ramadan_1">Ramadan begins</string>
+    <string name="date_eid_fitr">Eid al-Fitr</string>
+    <string name="date_arafah">Day of Arafah</string>
+    <string name="date_eid_adha">Eid al-Adha</string>
+    <plurals name="dates_in_days">
+        <item quantity="one">in %d day</item>
+        <item quantity="other">in %d days</item>
+    </plurals>
+    <string name="dates_footer">Umm al-Qura calendar, with your date shift. Local moon sighting may differ by a day.</string>
+    <string name="dates_unavailable">Islamic dates are not available for this year.</string>
+    <!-- Spoken only, for the date under the city on Times. %1$s is today's Hijri date. -->
+    <string name="dates_header_a11y">Islamic dates. Today is %1$s</string>
+    <string name="settings_islamic_dates">Islamic dates</string>
+    <string name="settings_islamic_dates_desc">Ramadan, the two Eids and other key dates</string>
 </resources>

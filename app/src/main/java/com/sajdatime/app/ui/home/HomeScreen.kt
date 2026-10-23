@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -122,6 +123,7 @@ fun HomeScreen(
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
     var ramadanTimetable by rememberSaveable { mutableStateOf(false) }
     var trackerHistory by rememberSaveable { mutableStateOf(false) }
+    var islamicDates by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
     val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -134,7 +136,7 @@ fun HomeScreen(
         !state.settings.exactAlarmNoticeDismissed
     // A tick is never a trigger for the rating card (sign-off, 23 Oct 2026): the card waits for a
     // settled screen, and the history sheet open is not one.
-    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !trackerHistory &&
+    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !trackerHistory && !islamicDates &&
         state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
     val times = state.today?.times
     LaunchedEffect(calm, times) {
@@ -185,8 +187,10 @@ fun HomeScreen(
         // room than a modest one. If this list grows again, measure on the *short* device,
         // and note that the column stays `verticalScroll` on purpose so that a screen
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
-        LocationHeader(state = state, now = state.now, onClick = { locationSheet = true })
-        Spacer(Modifier.height(Space.Group))
+        LocationHeader(state = state, now = state.now, onClick = { locationSheet = true }, onOpenDates = { islamicDates = true })
+        // Tight, not Group, since 1.6.0: the date line's 48dp target already leaves about 14dp of
+        // its own under the text, so the card still sits a Group's distance from the words.
+        Spacer(Modifier.height(Space.Tight))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
@@ -262,6 +266,18 @@ fun HomeScreen(
         )
     }
 
+    if (islamicDates) {
+        IslamicDatesSheet(
+            today = state.today?.date ?: state.now.atZone(ZoneId.systemDefault()).toLocalDate(),
+            offsetDays = state.settings.calculationPrefs.hijriOffset,
+            onShiftDate = {
+                islamicDates = false
+                onOpenSetting(SettingsChooser.ADJUSTMENTS)
+            },
+            onDismiss = { islamicDates = false },
+        )
+    }
+
     val trackerState = state.tracker
     if (trackerHistory && trackerState != null) {
         TrackerHistorySheet(
@@ -309,7 +325,7 @@ fun HomeScreen(
  * traveller needs, and burying it in Settings makes them hunt for it.
  */
 @Composable
-private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
+private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, onOpenDates: () -> Unit) {
     val city = state.settings.placeName(LocalContext.current).ifBlank {
         stringResource(R.string.location_set_generic)
     }
@@ -330,42 +346,99 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
     // the three tabs open the same way. Here the title is the city, because the city is what
     // decides every time on this screen. 4dp in from the column's 16dp, so it sits on the same
     // 20dp line as the other titles.
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = Space.Tight)
-            .clip(RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 6.dp)
-            .semantics { contentDescription = spokenLocation },
-    ) {
-        Column(Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = city,
-                    style = MaterialTheme.typography.headlineMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false),
-                )
-                Spacer(Modifier.width(2.dp))
-                // A name alone reads as a label. The green caret is what says "you can change
-                // this", which is the single most common thing a traveller needs.
-                Icon(
-                    Icons.Rounded.ArrowDropDown,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp),
-                )
-            }
+    //
+    // Two targets since 1.6.0, not one: the city opens the location sheet as before, and the date
+    // line under it opens the Islamic dates sheet (sign-off, 23 Oct 2026: the Hijri half in primary,
+    // green meaning tappable, and no extra caret). The 6dp the whole row used to have above and
+    // below is split between them, so the header is no taller than the date line's own target.
+    Column(Modifier.fillMaxWidth().padding(top = Space.Tight)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .clickable(role = Role.Button, onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .semantics { contentDescription = spokenLocation },
+        ) {
             Text(
-                text = dateLine(now, state.settings.hijriOffsetDays),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = city,
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            Spacer(Modifier.width(2.dp))
+            // A name alone reads as a label. The green caret is what says "you can change
+            // this", which is the single most common thing a traveller needs.
+            Icon(
+                Icons.Rounded.ArrowDropDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp),
             )
         }
+        DateLine(now, state.settings.hijriOffsetDays, onOpenDates)
     }
+}
+
+/**
+ * The header's date line, e.g. "Thu 31 Jul · 16 Safar 1448", and the door to the Islamic dates sheet.
+ *
+ * Both dates, and no setting to choose between them. This screen used to show the Hijri
+ * date alone, which is the one date the phone's own clock cannot give a Muslim user — but
+ * it left everyone who reads a Gregorian date with nothing on the screen to anchor to,
+ * since the only other reference was the word "Today". Showing both costs one line.
+ *
+ * A toggle was considered and rejected. `CLAUDE.md` requires this app to work for someone
+ * who has never opened Settings, and a preference only helps the people who go looking for
+ * it; the ones most likely to be confused by an unfamiliar calendar are exactly the ones
+ * who never will. Two dates on one line is not clutter that needs an escape hatch.
+ *
+ * Falls back to the ordinary date alone if the Hijri date cannot be produced, rather than
+ * showing nothing — and then it is not tappable, because the sheet would have nothing to list.
+ */
+@Composable
+private fun DateLine(now: Instant, hijriOffsetDays: Int, onOpenDates: () -> Unit) {
+    val context = LocalContext.current
+    // Keyed on the calendar date for the same reason hijriToday is: this header sits
+    // beside a live countdown and recomposes about once a second, and building a
+    // DateTimeFormatter that often to render a string that changes at midnight is waste.
+    val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
+    val gregorian = remember(context, date) { TimeFormat.date(context, date) }
+    val hijri = hijriToday(now, hijriOffsetDays)
+    val scheme = MaterialTheme.colorScheme
+    if (hijri.isBlank()) {
+        Text(
+            text = gregorian,
+            style = MaterialTheme.typography.bodyMedium,
+            color = scheme.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = 4.dp),
+        )
+        return
+    }
+    val line = stringResource(R.string.home_date_line, gregorian, hijri)
+    val spoken = stringResource(R.string.dates_header_a11y, hijri)
+    val styled = remember(line, hijri, scheme.primary) {
+        androidx.compose.ui.text.buildAnnotatedString {
+            append(line)
+            val at = line.indexOf(hijri)
+            if (at >= 0) addStyle(androidx.compose.ui.text.SpanStyle(color = scheme.primary), at, at + hijri.length)
+        }
+    }
+    Text(
+        text = styled,
+        style = MaterialTheme.typography.bodyMedium,
+        color = scheme.onSurfaceVariant,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(role = Role.Button, onClick = onOpenDates)
+            .semantics { contentDescription = spoken }
+            // 48dp, the touch target minimum, with the text centred in it.
+            .heightIn(min = 48.dp)
+            .wrapContentHeight()
+            .padding(horizontal = 4.dp),
+    )
 }
 
 @Composable
@@ -1023,35 +1096,6 @@ private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
     PrayerSlot.ASR -> Icons.Rounded.Brightness5
     PrayerSlot.MAGHRIB -> Icons.Rounded.Brightness6
     PrayerSlot.ISHA -> Icons.Rounded.NightsStay
-}
-
-/**
- * The header's date line, e.g. "Thu 31 Jul · 16 Safar 1448".
- *
- * Both dates, and no setting to choose between them. This screen used to show the Hijri
- * date alone, which is the one date the phone's own clock cannot give a Muslim user — but
- * it left everyone who reads a Gregorian date with nothing on the screen to anchor to,
- * since the only other reference was the word "Today". Showing both costs one line.
- *
- * A toggle was considered and rejected. `CLAUDE.md` requires this app to work for someone
- * who has never opened Settings, and a preference only helps the people who go looking for
- * it; the ones most likely to be confused by an unfamiliar calendar are exactly the ones
- * who never will. Two dates on one line is not clutter that needs an escape hatch.
- *
- * Falls back to the ordinary date alone if the Hijri date cannot be produced, rather than
- * showing nothing — which is what the old code did on the same failure.
- */
-@Composable
-private fun dateLine(now: Instant, hijriOffsetDays: Int): String {
-    val context = LocalContext.current
-    // Keyed on the calendar date for the same reason hijriToday is: this header sits
-    // beside a live countdown and recomposes about once a second, and building a
-    // DateTimeFormatter that often to render a string that changes at midnight is waste.
-    val date = now.atZone(ZoneId.systemDefault()).toLocalDate()
-    val gregorian = remember(context, date) { TimeFormat.date(context, date) }
-    val hijri = hijriToday(now, hijriOffsetDays)
-    return if (hijri.isBlank()) gregorian
-    else stringResource(R.string.home_date_line, gregorian, hijri)
 }
 
 /**

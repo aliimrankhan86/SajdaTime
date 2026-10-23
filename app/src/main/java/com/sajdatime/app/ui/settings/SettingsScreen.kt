@@ -110,6 +110,8 @@ import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.PauseCircleOutline
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.TaskAlt
+import androidx.compose.material.icons.outlined.Event
+import com.sajdatime.app.ui.home.IslamicDatesSheet
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
 import com.sajdatime.app.ui.components.RadioRow
@@ -147,7 +149,7 @@ import android.text.format.DateFormat
  * See [SettingsScreen]'s `request` parameter.
  */
 enum class SettingsChooser {
-    SCHOOL, METHOD, ADJUSTMENTS, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+    SCHOOL, METHOD, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
 }
 
 @Composable
@@ -275,6 +277,15 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_adjustments),
                 subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
+            ),
+            // 1.6.0: the same sheet the date under the city opens, here for anyone who looks in
+            // Settings first. One place for every sect (sign-off, 23 Oct 2026).
+            SettingsItem.Link(
+                key = "islamic_dates",
+                icon = Icons.Outlined.Event,
+                title = stringResource(R.string.settings_islamic_dates),
+                subtitle = stringResource(R.string.settings_islamic_dates_desc),
+                onClick = { open = SettingsChooser.ISLAMIC_DATES },
             ),
         ),
     )
@@ -645,6 +656,14 @@ fun SettingsScreen(
                 onDismiss = { open = null },
             )
         }
+
+        SettingsChooser.ISLAMIC_DATES -> IslamicDatesSheet(
+            today = state.today?.date ?: LocalDate.now(),
+            offsetDays = settings.calculationPrefs.hijriOffset,
+            // One chooser open at a time: the sheet makes way for the date shift.
+            onShiftDate = { open = SettingsChooser.ADJUSTMENTS },
+            onDismiss = { open = null },
+        )
 
         SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,

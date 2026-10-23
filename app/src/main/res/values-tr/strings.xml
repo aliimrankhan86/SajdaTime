@@ -453,4 +453,20 @@
     <string name="tracker_state_prayed">kılındı</string>
     <string name="tracker_state_not_ticked">işaretlenmedi</string>
     <string name="tracker_state_not_due">vakti gelmedi</string>
+    <string name="dates_title">İslami tarihler</string>
+    <string name="dates_today_is">Bugün %1$s</string>
+    <string name="date_ashura">Aşure</string>
+    <string name="date_ramadan_1">Ramazan başlangıcı</string>
+    <string name="date_eid_fitr">Ramazan Bayramı</string>
+    <string name="date_arafah">Arefe günü</string>
+    <string name="date_eid_adha">Kurban Bayramı</string>
+    <plurals name="dates_in_days">
+        <item quantity="one">%d gün sonra</item>
+        <item quantity="other">%d gün sonra</item>
+    </plurals>
+    <string name="dates_footer">Ümmü\'l Kurâ takvimi, tarih kaydırmanızla. Yerel hilal gözlemi bir gün farklı olabilir.</string>
+    <string name="dates_unavailable">Bu yıl için İslami tarihler gösterilemiyor.</string>
+    <string name="dates_header_a11y">İslami tarihler. Bugün %1$s</string>
+    <string name="settings_islamic_dates">İslami tarihler</string>
+    <string name="settings_islamic_dates_desc">Ramazan, iki bayram ve diğer önemli günler</string>
 </resources>

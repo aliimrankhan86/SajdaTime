@@ -446,4 +446,19 @@
     <string name="tracker_state_prayed">sudah salat</string>
     <string name="tracker_state_not_ticked">belum ditandai</string>
     <string name="tracker_state_not_due">belum masuk waktu</string>
+    <string name="dates_title">Tanggal Islam</string>
+    <string name="dates_today_is">Hari ini %1$s</string>
+    <string name="date_ashura">Asyura</string>
+    <string name="date_ramadan_1">Awal Ramadan</string>
+    <string name="date_eid_fitr">Idulfitri</string>
+    <string name="date_arafah">Hari Arafah</string>
+    <string name="date_eid_adha">Iduladha</string>
+    <plurals name="dates_in_days">
+        <item quantity="other">%d hari lagi</item>
+    </plurals>
+    <string name="dates_footer">Kalender Umm al Qura, dengan penggeseran tanggal Anda. Rukyat hilal setempat bisa berbeda satu hari.</string>
+    <string name="dates_unavailable">Tanggal Islam tidak tersedia untuk tahun ini.</string>
+    <string name="dates_header_a11y">Tanggal Islam. Hari ini %1$s</string>
+    <string name="settings_islamic_dates">Tanggal Islam</string>
+    <string name="settings_islamic_dates_desc">Ramadan, dua hari raya, dan tanggal penting lainnya</string>
 </resources>

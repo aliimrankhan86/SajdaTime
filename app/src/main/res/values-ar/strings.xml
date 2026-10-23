@@ -527,4 +527,24 @@
     <string name="tracker_state_prayed">صُلّيت</string>
     <string name="tracker_state_not_ticked">بلا علامة</string>
     <string name="tracker_state_not_due">لم يحن وقتها</string>
+    <string name="dates_title">التواريخ الإسلامية</string>
+    <string name="dates_today_is">اليوم %1$s</string>
+    <string name="date_ashura">عاشوراء</string>
+    <string name="date_ramadan_1">بداية رمضان</string>
+    <string name="date_eid_fitr">عيد الفطر</string>
+    <string name="date_arafah">يوم عرفة</string>
+    <string name="date_eid_adha">عيد الأضحى</string>
+    <plurals name="dates_in_days">
+        <item quantity="zero">بعد %d يوم</item>
+        <item quantity="one">بعد %d يوم</item>
+        <item quantity="two">بعد %d يوم</item>
+        <item quantity="few">بعد %d أيام</item>
+        <item quantity="many">بعد %d يومًا</item>
+        <item quantity="other">بعد %d يوم</item>
+    </plurals>
+    <string name="dates_footer">تقويم أم القرى مع تعديل التاريخ الخاص بك. قد تختلف رؤية الهلال في بلدك بيوم.</string>
+    <string name="dates_unavailable">التواريخ الإسلامية غير متاحة لهذه السنة.</string>
+    <string name="dates_header_a11y">التواريخ الإسلامية. اليوم %1$s</string>
+    <string name="settings_islamic_dates">التواريخ الإسلامية</string>
+    <string name="settings_islamic_dates_desc">رمضان والعيدان وتواريخ مهمة أخرى</string>
 </resources>

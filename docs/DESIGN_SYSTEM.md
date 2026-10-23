@@ -431,6 +431,8 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Times, My prayers, while paused | Resume, in place of Last 30 days, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayers.kt` |
 | Last 30 days sheet | Five ticks under each date, evenly spaced under the prayer names | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
 | Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Times, header (1.6.0) | The date line under the city, Hijri half in primary; opens Islamic dates. A 48dp text target, not a button, and no caret | Text target | 48 target | `HomeScreen.kt` |
+| Islamic dates sheet | Shift the date, alone under the footer | A | 52, full | `IslamicDatesSheet.kt` |
 | Settings, Delete your prayer record? | Delete; the X. Solid green like every action: there is no error role, the words carry the warning | A; D | 52, full | `SettingsScreen.kt` |
 
 Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row

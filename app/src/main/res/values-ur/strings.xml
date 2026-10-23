@@ -459,4 +459,20 @@
     <string name="tracker_state_prayed">پڑھ لی</string>
     <string name="tracker_state_not_ticked">نشان نہیں</string>
     <string name="tracker_state_not_due">ابھی وقت نہیں ہوا</string>
+    <string name="dates_title">اسلامی تاریخیں</string>
+    <string name="dates_today_is">آج %1$s ہے</string>
+    <string name="date_ashura">عاشورہ</string>
+    <string name="date_ramadan_1">رمضان کا آغاز</string>
+    <string name="date_eid_fitr">عید الفطر</string>
+    <string name="date_arafah">یوم عرفہ</string>
+    <string name="date_eid_adha">عید الاضحیٰ</string>
+    <plurals name="dates_in_days">
+        <item quantity="one">%d دن میں</item>
+        <item quantity="other">%d دن میں</item>
+    </plurals>
+    <string name="dates_footer">ام القریٰ کیلنڈر، آپ کی تاریخ کی تبدیلی کے ساتھ۔ مقامی رؤیت ہلال میں ایک دن کا فرق ہو سکتا ہے۔</string>
+    <string name="dates_unavailable">اس سال کی اسلامی تاریخیں دستیاب نہیں ہیں۔</string>
+    <string name="dates_header_a11y">اسلامی تاریخیں۔ آج %1$s ہے</string>
+    <string name="settings_islamic_dates">اسلامی تاریخیں</string>
+    <string name="settings_islamic_dates_desc">رمضان، دونوں عیدیں اور دیگر اہم تاریخیں</string>
 </resources>
