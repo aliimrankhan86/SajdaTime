@@ -101,13 +101,13 @@ SajdaTime: مواقيت الصلاة، قبلة
 رمضان والعيد
 
 • وقتا السحور والإفطار لموقعك، وعدّ تنازلي، ومدة صيام كل يوم
-• تذكير بالسحور قبل انتهاء وقته بساعة، مفعّل ما لم توقفه
+• تذكير بالسحور قبل انتهاء وقته بـ 15 إلى 60 دقيقة، مفعّل ما لم توقفه
 • تهنئة بالعيد في عيد الفطر وعيد الأضحى
 
 التطبيقات المصغّرة وساعة Wear OS
 
 • تطبيقات مصغّرة للشاشة الرئيسية: عدّ تنازلي كبير حتى الصلاة التالية ومواقيت اليوم، مع اسم بلدتك، وبمظهر التطبيق نفسه
-• تطبيق Wear OS وبطاقة للساعة يعملان مع هاتفك أو بدونه
+• تطبيق Wear OS وبطاقة للساعة والقبلة، تتبع هاتفك أو تعمل وحدها
 
 للجميع
 
@@ -191,7 +191,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 ویجٹ اور Wear OS
 
 • ہوم اسکرین ویجٹ: اگلی نماز تک بڑی الٹی گنتی اور آج کے اوقات، آپ کے شہر کے نام کے ساتھ، ایپ کے تھیم میں
-• Wear OS ایپ اور ٹائل جو فون کے ساتھ یا اس کے بغیر چلتی ہیں
+• Wear OS ایپ، ٹائل اور قبلہ جو فون کے ساتھ یا بغیر چلتی ہیں
 
 سب کے لیے
 
@@ -275,7 +275,7 @@ RAMAZAN VE BAYRAM
 WIDGET'LAR VE WEAR OS
 
 • Ana ekran widget'ları: sıradaki namaza büyük geri sayım ve bugünün vakitleri, şehrinizin adıyla, uygulama temasında
-• Telefonla ya da telefonsuz çalışan Wear OS uygulaması ve saat kartı
+• Telefonla ya da telefonsuz çalışan Wear OS uygulaması, saat kartı ve kıble
 
 HERKES İÇİN
 
@@ -359,7 +359,7 @@ RAMADAN DAN HARI RAYA
 WIDGET DAN WEAR OS
 
 • Widget layar utama: hitung mundur besar ke sholat berikutnya dan jadwal hari ini, dengan nama kota, sesuai tema aplikasi
-• Aplikasi dan tile Wear OS, dengan atau tanpa ponsel
+• Aplikasi, tile, kiblat Wear OS, dengan atau tanpa ponsel
 
 UNTUK SEMUA
 
@@ -442,7 +442,7 @@ RAMADAN DAN HARI RAYA
 WIDGET DAN WEAR OS
 
 • Widget skrin utama: kiraan detik besar ke solat seterusnya dan waktu hari ini, dengan nama bandar, ikut tema aplikasi
-• Aplikasi dan tile Wear OS, dengan atau tanpa telefon
+• Aplikasi, tile, kiblat Wear OS, dengan atau tanpa telefon
 
 UNTUK SEMUA
 
@@ -519,13 +519,13 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 রমজান ও ঈদ
 
 • আপনার অবস্থানের সাহরি (সেহরি) ও ইফতারের সময়, কাউন্টডাউন, আর প্রতিটি রোজা কতক্ষণের
-• সাহরি শেষের এক ঘণ্টা আগে সাহরির রিমাইন্ডার, বন্ধ না করলে চালু থাকে
+• সাহরি শেষের ১৫ থেকে ৬০ মিনিট আগে সাহরির রিমাইন্ডার, বন্ধ না করলে চালু থাকে
 • ঈদুল ফিতর ও ঈদুল আজহায় ঈদের শুভেচ্ছা
 
 উইজেট ও Wear OS
 
 • হোম স্ক্রিন উইজেট: পরের নামাজের বড় কাউন্টডাউন আর আজকের সময়, আপনার শহরের নামসহ, অ্যাপের থিমে
-• Wear OS অ্যাপ ও টাইল, ফোন সঙ্গে থাকুক বা না থাকুক
+• Wear OS অ্যাপ, টাইল ও কিবলা, ফোনের অবস্থান মেনে বা নিজে নিজে
 
 সবার জন্য
 
@@ -609,7 +609,7 @@ RAMADAN ET AÏD
 WIDGETS ET WEAR OS
 
 • Widgets d'accueil : grand compte à rebours vers la prochaine prière, horaires du jour, votre ville, au thème de l'appli
-• Appli et tuile Wear OS, avec ou sans téléphone
+• Appli, tuile et Qibla Wear OS, avec ou sans téléphone
 
 POUR TOUS
 
@@ -692,7 +692,7 @@ SajdaTime सुन्नी और शिया मुसलमानों क
 विजेट और Wear OS
 
 • होम स्क्रीन विजेट: अगली नमाज़ का बड़ा काउंटडाउन और आज के समय, आपके शहर के नाम के साथ, ऐप की थीम में
-• Wear OS ऐप और टाइल, फ़ोन के साथ या बिना
+• Wear OS ऐप, टाइल और क़िबला, फ़ोन के अनुसार या अपने आप
 
 सबके लिए
 

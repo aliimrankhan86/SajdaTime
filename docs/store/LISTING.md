@@ -264,7 +264,7 @@ about 13 apps for "prayer times wear os"). "Qibla compass" and "adhan" cannot bo
 Offline prayer times (namaz), adhan and Qibla for Sunni and Shia, with Wear OS.
 ```
 
-**Full description** `3971 / 4000` (21 Oct 2026). The 19 Oct notes that follow are history; it was `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
+**Full description** `3987 / 4000` (23 Oct 2026: two lines changed, see the note below this block). Before that `3971 / 4000` (21 Oct 2026). The 19 Oct notes that follow are history; it was `3987 / 4000` (Python `len`, newlines counted, no final newline; re-measured by script 19 Oct 2026
 after the Qibla line below). Contains "Wear OS" twice. Ramadan is in it, so the separate "January Ramadan lines" step in
 RELEASE-1.5.0.md is done by pasting this. **One line changed after the review (19 Oct 2026, later):** "A Qibla compass
 corrected…" became "Qibla direction: a compass corrected…", so the description carries the search phrase "qibla direction"
@@ -295,13 +295,13 @@ ALERTS AND ADHAN
 RAMADAN AND EID
 
 • Suhoor (sehri) and iftar times for your location, a countdown, and how long each fast is
-• A suhoor reminder an hour before suhoor ends, on unless you turn it off
+• A suhoor reminder 15 to 60 minutes before suhoor ends, on unless you turn it off
 • An Eid greeting on Eid al-Fitr and Eid al-Adha
 
 WIDGETS AND WEAR OS
 
 • Home screen widgets: a big countdown to the next prayer and today's times, with your town, matching the app's theme
-• A Wear OS app and tile that work with or without your phone
+• A Wear OS app, tile and Qibla that follow your phone or work alone
 
 FOR EVERYONE
 
@@ -341,12 +341,18 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-**Watch 1.5.0 note** `295 / 500` (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
+**23 Oct 2026, two full description lines changed** (the owner: "We should mention all the features including widget,
+wearable app, ramadan settings"). The suhoor line now names the setting's range, 15 to 60 minutes (`AppSettings.SUHOOR_CHOICES`
+is 0, 15, 30, 45, 60; the default is still 60, on), and keeps "on unless you turn it off". The Wear OS line now names the
+watch's Qibla and that it follows the phone or works alone (`WearSettingsStore.adoptWatchFix`, HANDOVER §5.27). Rejected:
+naming alarm or adhan for suhoor and "an hour" together, which went to 4016 and 4033. Still "Wear OS" twice; HONEST and FREE untouched.
+
+**Watch 1.5.0 note** `330 / 500` (23 Oct 2026: says the watch uses the phone's location by default, the owner's point that day; was `295 / 500`) (replaces the one under "At the 1.5.0 release" below; the tile line is true from the
 19 Oct 2026 tile timeline; the location sentence added 22 Oct 2026 with the watch's Location screen, HANDOVER §5.27,
 measured by Python `len`; it was `194 / 500`):
 
 ```
-Now in Urdu, Turkish, Indonesian and Arabic. You can now see and change the watch's location: the same as your phone, the watch's own, or Makkah. The tile's countdown now updates every minute. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
+Now in Urdu, Turkish, Indonesian and Arabic. The watch now uses your phone's location by default, and you can see and change it: the same as your phone, the watch's own, or Makkah. The tile's countdown now updates every minute. Turkey times now include Diyanet's precaution minutes. The disclaimer reads more easily at large text.
 ```
 
 The translated listings for the same release are in `LISTING-LOCALES.md`, "1.5.0".

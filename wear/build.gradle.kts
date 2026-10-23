@@ -38,6 +38,7 @@ android {
         // https://developer.android.com/training/wearables/packaging. Bump freely; the two
         // sequences can never collide. Version codes can never be reused or decreased.
         versionCode = 1002
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Normally kept in step with the phone's versionName so one release never shows two
         // version numbers to the same user. **Deliberate exception for phone 1.3.0 (3 Oct
         // 2026):** that release adds optional usage counts to the phone app only and changes
@@ -143,4 +144,8 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
+    // One on-watch test of the real settings store (WearSettingsDeviceTest). Run with am instrument.
+    androidTestImplementation(libs.androidx.junit)
+    // Brings androidx.test.runner, as it does for the phone; ext.junit alone does not.
+    androidTestImplementation(libs.androidx.espresso.core)
 }
