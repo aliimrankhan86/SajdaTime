@@ -173,6 +173,45 @@ references.
 6. **Missed fasts.** Research how Pillars' fasting tracker works before deciding between count only and
    reasons, and between before and after Ramadan.
 
+**The detailed plan, `DETAILED-PLAN.md`, was accepted by Ali on 23 Oct 2026** ("that is fine - incorporate
+it"). Where it is more specific than anything above, it wins. In short:
+- **Sky: option D.** The sky is a full-bleed backdrop behind the city, the date and the card. The green or
+  light card stays exactly as it is. Artwork (sun or moon, a five-dot path) sits in the header's trailing
+  half and hides when the town name is long.
+  - The boundaries come from the day's own times: Fajr, sunrise, Asr, Isha.
+  - Dark mode uses the same artwork on dark colour variants.
+  - Candidate colour stops are in DETAILED-PLAN.md 2.3, for `ColorContrastTest` to accept or reject.
+  - It fits 823dp because the ticks and the tracker line move to the Tracker tab.
+- **Missed fasts become "Fasts to make up": one count, no reasons, no dates, in 1.6.1.** This replaces
+  addition 5's reason chips above. The research shows users value the number and clearing it. Their
+  complaints are lost records and having to log fasts one at a time. Reasons would make it health data.
+  - Wording avoids "missed", so `TrackerWordingTest` needs no exception.
+  - One sentence in privacy.html.
+  - No usage-count event.
+- **Animation: `ui/theme/Motion.kt`,** four named durations (Quick 150, Standard 250, Reveal 300,
+  Draw 400 ms) and one easing.
+  - `DesignRulesTest` bans `rememberInfiniteTransition` and number literals in `tween(`.
+  - No new library (no Lottie, Rive or Haze).
+  - Compose honours the animator scale (Compose Animation 1.2+). One emulator check confirms that "Remove
+    animations" sets it to 0.
+- **Bell.** Rounded NotificationsActive or Alarm in `primary`, Outlined NotificationsOff in `outline`.
+  Turning it back on restores the prayer's last style. The Undo snackbar lasts 4 seconds, and the action is
+  recorded as a new control kind G in DESIGN_SYSTEM §4.1.
+- **Tracker tab.**
+  - It sends no usage-count word.
+  - Tracking off shows only the switch card.
+  - "Pause" and "Last 30 days" are compact solid buttons.
+  - The week rings are 36dp with partial fill and a pause glyph.
+  - The 30-day view becomes a grid of rings.
+- **Timetable.** The renamed button stays on the Today line and opens one sheet. It shows the month on
+  screen with Save as PDF, and the Ramadan table while `offersTimetable` is true.
+- **Build order:** DETAILED-PLAN.md section 4, with the cut order.
+- **Widgets:** DETAILED-PLAN.md section 5.
+  - A new 4 by 1 Today strip.
+  - The four skies as fixed gradient drawables chosen at each refresh.
+  - No "now" dot and no animation.
+  - `WidgetColorsTest` extended.
+
 **Widgets (Ali, 23 Oct 2026).** Similar to Pillars in UX: a wide strip of the five prayers with the current
 one marked, and a sky-style current-prayer widget with the time left. Complemented with our own features
 (jama'ah times, Ramadan suhoor and iftar, Hijri date) and better UX. Nothing in a widget animates
