@@ -227,7 +227,7 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 listing, FINAL 21 Oct 2026: paste on release day (short description, full description, watch note)
+### 1.5.0 listing, FINAL 21 Oct 2026: release day 23 Oct 2026, paste now (mark LIVE with the date once Play shows it) (short description, full description, watch note)
 
 **Rewritten 21 Oct 2026** (the owner: "the playstore descriptions, features, screenshots and other should be written
 properly. Do not [miss] features like widget and other things"). The 19 Oct text below this note was regrouped under what a

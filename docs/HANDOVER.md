@@ -2341,6 +2341,12 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**1.5.0 release day run (23 Oct 2026, Mac session; §11 STATE OF PLAY 23 Oct evening).** `release-1.5.0.sh` on `63ae275`,
+emulator `sajda` (its leftover 1440x3088 size override reset first): 23 of 24 PASS or TAKEN, phone SKIPPED by Ali's choice.
+430 unit tests (app 272, core 131, wear 27), 0 failed; lint 0 errors; device suite 26 of 26; suhoor 1, Ramadan calendar 4,
+widgets Ramadan 5, widgets at 2.0 text 5, PDF 2, seed 1, all OK; Ramadan timetable sheet opened; RTL and screens TAKEN.
+Not verified that day: a real phone (skipped by choice).
+
 **The watch's Location screen on the Wear emulators, and 1.5.0 end to end (23 Oct 2026, Mac session; §5.27, §11
 STATE OF PLAY 23 Oct).**
 - `tools/wear-verify.sh`, `sajdawear` (192dp) and `sajdawear_large` (227dp), font 1.0 and 1.3, English: **24 of 24
@@ -5700,9 +5706,21 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 "go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
 `SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's answers to all 27 questions, the
 ordered build table, animation, development and testing guidance, and (§0.1) which model does which job.
-- **Progress (23 Oct 2026, evening):** step P done (`55ef229`); steps 0 to 11 not started. **First job of the next
-  build session:** merge `main` into `claude/1-6-0` (a trial merge conflicts in `MainActivity.kt`,
-  `SettingsRepository.kt` and `docs/store/LISTING.md`), so 1.6 sits on the code that shipped as 1.5.0.
+- **Progress (23 Oct 2026, evening):** step P done (`55ef229`); steps 0 to 11 not started.
+- **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
+  start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).
+  - The only conflict was this §11 heading. The code merged cleanly, so the earlier trial's conflicts in
+    `MainActivity.kt`, `SettingsRepository.kt` and LISTING no longer arise.
+  - **Full gate on the merge:** `clean test lint :app:bundleRelease :wear:bundleRelease`, BUILD SUCCESSFUL. 512 unit
+    tests, 0 failed, 1 skipped (the opt in one); lint passed; both bundles built. Emulators not run: the merge brought only
+    1.5.0's release-day docs, the privacy date and its pinned test.
+  - Branches checked the same day:
+    - `claude/focused-newton-btyrzf` is the same commit as this branch, so there was nothing to merge.
+    - `claude/1-6-0-plan` is already contained.
+    - `claude/customer-review-pain-points-9d35kl` is deliberately NOT merged: it was rebuilt into 1.5.0 on 19 Oct,
+      and merging it would bring old code back.
+    - `claude/analytics-default-on-1-4-0` is never merged.
+  - Still to come: once 1.5.0 is live, merge `main` again for the docs-only PR #16. It is small.
 - **Which model does what** (Ali, 23 Oct 2026): §5.28 and `.claude/agents/`. Fable verifies plans and owns UX,
   Opus checks everything, Sonnet and Haiku do routine and mechanical work.
 - **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`
@@ -5711,9 +5729,25 @@ ordered build table, animation, development and testing guidance, and (§0.1) wh
 - **The owner changed one hard rule:** the disclaimer will live in Settings, About, first row, and not be shown
   at first launch. CLAUDE.md is rewritten in the commit that builds it.
 - **The 23 Oct STATE OF PLAY just below predates PR #15's merge;** `main`'s 23 Oct evening block replaces its 1.5.0 lines (draft PR, "nothing until the 30 Oct job").
-- **1.5.0 is still first.** Its release day was 23 Oct 2026; it is live only when Play's "Updated on" moves from 17 Oct 2026.
+- **1.5.0 was submitted to Google on 23 Oct 2026** and is in review. It counts as live only when the Play Console shows it live (Ali's rule).
 
-### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
+### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (read this first; the block below still holds for everything not named here)
+
+**Ali said on 23 Oct 2026: "Now let's start with release 1.5 and try to get it released on the play store". So the release
+day is 23 Oct 2026.** Done by Claude that day: `release-1.5.0.sh` on `63ae275`, **23 of 24 lines PASS or TAKEN** (push, tree,
+gate: app 272, core 131, wear 27 tests, 0 failed, lint 0 errors in all three; phone bundle 9 / 1.5.0, 9,608,652 bytes and watch
+bundle 1002 / 1.5.0, 3,712,198 bytes, both signed CN=Ali Imran Khan; languages `()(ar)(in)(tr)(ur)`; permissions 11 and 3; device
+suite 26 of 26 and every Ramadan and widget suite OK; phone SKIPPED by his choice); `set-release-date.sh "23 October 2026"`
+dated `docs/privacy.html`; this block, §10, PROJECT_BRIEF, LISTING and RELEASE-1.5.0.md carry the date; pull request #15 marked
+ready. **Caught after dating:** `UsageCountsTest` pins the policy's "Last updated" date, so the dated page failed it (1 of 272); the test was moved to 23 October 2026 and `set-release-date.sh` now moves both, then 272 of 272 passed on a forced rerun. Only docs and that test changed after the full run, so the bundles are unaffected. **Still to do, in order (RELEASE-1.5.0.md steps 3 to 6):** Ali merges PR #15 today; Ali builds both bundles fresh from
+`main`; Claude walks him through the Play Console one screen at a time; **he presses Send for review**. Then watch Play's
+"Updated on" move from 17 Oct 2026, and do step 6 (Arabic review reply, re-baseline the health check, delete the spare signing
+copy, record "live on <date>"). Noticed the same day: the live 1.4.0 description still says "Your coordinates never leave your
+device" (the 19 Oct description edit never went live, or was never sent); pasting the 1.5.0 description replaces it anyway, so
+check in the Console whether a listing change is still pending before pasting. 1.6 work is paused until the submit is done
+(plan and progress: GBrain `projects/sajdatime-release-1-6`, branch `claude/1-6-0`).
+
+### 📍 STATE OF PLAY, 23 Oct 2026 (the release day block above replaces its "not released" lines; the 22 and 21 Oct blocks below still hold for everything not named here)
 
 **In one line: 1.4.0 is live; 1.5.0 is READY on `claude/quiet-glass`, now checked on the Wear emulators too, with eight
 phone and four watch store screenshots and a listing that names every feature. Draft pull request #15 into main is open for Ali

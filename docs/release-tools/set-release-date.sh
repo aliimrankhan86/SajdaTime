@@ -12,5 +12,9 @@ day="${1:-$(LC_ALL=C date '+%-d %B %Y')}"
   || { echo "Date must look like '2 November 2026', got '$day'"; exit 1; }
 sed -i '' -E "s/(<p class=\"updated\">Last updated: )[^·]+ ·/\1$day ·/" docs/privacy.html
 grep -q "Last updated: $day ·" docs/privacy.html || { echo "FAIL: privacy.html not changed"; exit 1; }
-echo "privacy.html now says: Last updated: $day"
+# UsageCountsTest pins the same date (found 23 Oct 2026: the script moved only the page and the test failed).
+T=app/src/test/java/com/sajdatime/app/UsageCountsTest.kt
+sed -i '' -E "s/(policy\.contains\(\"Last updated: )[^\"]+\"/\1$day\"/" "$T"
+grep -q "Last updated: $day\"" "$T" || { echo "FAIL: $T not changed"; exit 1; }
+echo "privacy.html and UsageCountsTest now say: Last updated: $day"
 echo "Next: git commit -am \"Privacy page dated $day, the day 1.5.0 is merged and sent\" && git push"
