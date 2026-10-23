@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetHostView
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -17,10 +18,12 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.sajdatime.app.data.SettingsRepository
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.widget.NextPrayerWidgetProvider
 import com.sajdatime.app.widget.TodayWidgetProvider
 import com.sajdatime.app.widget.WidgetRefreshScheduler
 import com.sajdatime.app.widget.WidgetState
+import com.sajdatime.app.widget.WidgetUpdater
 import com.sajdatime.core.AppLocale
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.PrayerSlot
@@ -221,13 +224,75 @@ class WidgetDeviceTest {
         )
     }
 
+    // ---- The app's Theme row ---------------------------------------------------------------------
+
+    /**
+     * Owner's request, 19 Oct 2026: a widget is dark when Dark is chosen in the app and light when Light
+     * is, whatever the phone is set to, and follows the phone again under System. The step back to
+     * System is the one a launcher could get wrong: it must inflate afresh (a new layout id) or the
+     * pinned colours would survive. So the theme just before System is the OPPOSITE of the phone's mode,
+     * read here, or a surviving pinned colour would equal the System one and the check could not see it
+     * (found by the independent review, 19 Oct 2026). The renders are the screenshots for the owner.
+     */
+    @Test
+    fun the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system() {
+        val settings = SettingsRepository(context)
+        try {
+            val (_, today) = bindOrFail(TodayWidgetProvider::class.java)
+            val (_, next) = bindOrFail(NextPrayerWidgetProvider::class.java)
+            waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
+            val phoneDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
+            val light = ThemeChoice.LIGHT to R.color.widget_light_on_surface
+            val dark = ThemeChoice.DARK to R.color.widget_dark_on_surface
+            val opposite = if (phoneDark) light else dark
+            assertTrue(
+                "the theme before System must differ from the phone's, or the check below proves nothing",
+                context.getColor(opposite.second) != context.getColor(R.color.widget_on_surface),
+            )
+            for ((choice, ink) in listOf(if (phoneDark) dark else light, opposite, ThemeChoice.SYSTEM to R.color.widget_on_surface)) {
+                runBlocking {
+                    settings.setThemeChoice(choice)
+                    WidgetUpdater.refreshAll(context)
+                }
+                val expected = context.getColor(ink)
+                waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected }
+                waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected }
+                val tag = "theme-${choice.name.lowercase()}"
+                save("widget-today-$tag", layoutAt(today, 250, 180))
+                save("widget-next-$tag", layoutAt(next, 180, 110))
+            }
+        } finally {
+            runBlocking {
+                settings.setThemeChoice(ThemeChoice.SYSTEM)
+                WidgetUpdater.refreshAll(context)
+            }
+        }
+    }
+
     // ---- The redraw alarm ----------------------------------------------------------------------
 
     @Test
     fun the_redraw_alarm_exists_only_while_a_widget_does_and_is_set_for_the_right_moment() {
         val pkg = context.packageName
         val action = WidgetRefreshScheduler.ACTION_REFRESH
-        assertEquals("an alarm is set with no widget placed", 0, DeviceSupport.alarmTimes(pkg, action).size)
+        // Since 17 Oct 2026 the same alarm also reposts the next prayer badge, so it stays while the
+        // badge is on (the default). This test is about widgets, so the badge is off for it, and any
+        // alarm the badge left is cleared through the same path the app uses.
+        runBlocking { SettingsRepository(context).setOngoingBadge(false) }
+        // Right after a cold boot the app's own boot handling (SystemEventReceiver) can still be running
+        // with the badge on, and lays the alarm down again just after this cancel: the release script,
+        // which starts the emulator and runs this at once, failed here on 19 Oct 2026 and the same suite
+        // passed minutes later. So the cancel is repeated until it holds; the claim checked is unchanged.
+        val settled = SystemClock.uptimeMillis() + 30_000
+        do {
+            runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
+            val left = DeviceSupport.alarmTimes(pkg, action).size
+            if (left == 0 || SystemClock.uptimeMillis() > settled) {
+                assertEquals("an alarm is set with no widget placed", 0, left)
+                break
+            }
+            SystemClock.sleep(500)
+        } while (true)
 
         val (id, view) = bindOrFail(NextPrayerWidgetProvider::class.java)
         waitFor("the first draw") { view.textOf("widget_name")?.text?.isNotEmpty() == true }
@@ -248,6 +313,16 @@ class WidgetDeviceTest {
         waitFor("the alarm to be cancelled with the last widget", timeoutMs = 20_000) {
             DeviceSupport.alarmTimes(pkg, action).isEmpty()
         }
+        runBlocking { SettingsRepository(context).setOngoingBadge(true) }
+    }
+
+    @Test
+    fun the_redraw_alarm_stays_for_the_badge_when_no_widget_is_placed() {
+        val pkg = context.packageName
+        val action = WidgetRefreshScheduler.ACTION_REFRESH
+        runBlocking { SettingsRepository(context).setOngoingBadge(true) }
+        runBlocking { com.sajdatime.app.widget.WidgetUpdater.refreshAll(context) }
+        waitFor("the badge's repost alarm with no widget placed") { DeviceSupport.alarmTimes(pkg, action).size == 1 }
     }
 
     private fun tag(): String = if (context.resources.configuration.fontScale > 1.0f) "font${context.resources.configuration.fontScale}" else "normal"

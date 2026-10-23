@@ -496,6 +496,8 @@ Fajr 04:47 Maghrib 19:28, change plus 3.
 
 ### 9.4 Cross check method and tolerance
 
+> **18 Oct 2026:** the Turkey method now applies Diyanet's precaution minutes (HANDOVER §5.26), so the plain angle Istanbul figures below are history.
+
 The project's rule: verify against an independent reference, not against reasoning
 (`CLAUDE.md`, "Verify against an independent reference"). The reference is the Aladhan API during
 development, never at runtime.

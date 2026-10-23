@@ -27,7 +27,7 @@
     <string name="method_tehran">انسٹی ٹیوٹ آف جیو فزکس، تہران</string>
 
     <string name="method_auto_desc">یقین نہیں؟ اسے رہنے دیں۔ مسلم ورلڈ لیگ کے اوقات، یا شیعہ کے لیے جعفری۔ دنیا کے بڑے حصے میں مقامی رواج کے قریب۔ سب سے زیادہ فرق دور شمال میں ہوتا ہے۔</string>
-    <string name="method_muslim_world_league_desc">ایک عمومی طریقہ جو کئی ممالک میں استعمال ہوتا ہے۔ یہاں یہی معیاری ہے۔</string>
+    <string name="method_muslim_world_league_desc">ایک عمومی طریقہ جو کئی ممالک میں استعمال ہوتا ہے۔ اس ایپ میں یہی بطورِ ڈیفالٹ ہے۔</string>
     <string name="method_egyptian_desc">مصر کا سرکاری طریقہ۔</string>
     <string name="method_karachi_desc">پاکستان اور جنوبی ایشیا میں عام۔</string>
     <string name="method_umm_al_qura_desc">سعودی عرب کا سرکاری طریقہ۔ عشاء کا وقت مغرب کے بعد ایک مقررہ وقفے پر رکھا جاتا ہے۔</string>
@@ -37,7 +37,7 @@
     <string name="method_kuwait_desc">کویت میں استعمال ہونے والا طریقہ۔</string>
     <string name="method_qatar_desc">قطر میں استعمال ہونے والا طریقہ۔</string>
     <string name="method_singapore_desc">انڈونیشیا اور سنگاپور کے سرکاری ادارے۔</string>
-    <string name="method_turkey_desc">ترکی کی صدارتِ امورِ دینیہ (دیانت)۔</string>
+    <string name="method_turkey_desc">ترکی کی صدارتِ امورِ دینیہ (دیانت)، احتیاطی منٹوں کے ساتھ۔</string>
     <string name="method_jafari_desc">عام شیعہ طریقہ۔ مغرب غروبِ آفتاب کے کچھ دیر بعد ہوتی ہے، جب آسمان سے سرخی ختم ہو جائے۔</string>
     <string name="method_tehran_desc">تہران یونیورسٹی، جس کے کیلنڈر کے مطابق ایران کے سرکاری اوقات طے ہوتے ہیں۔</string>
 

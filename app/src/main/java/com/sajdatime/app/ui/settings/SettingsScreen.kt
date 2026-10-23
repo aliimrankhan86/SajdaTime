@@ -1,10 +1,20 @@
 package com.sajdatime.app.ui.settings
 
+import androidx.annotation.VisibleForTesting
+import com.sajdatime.app.ui.components.ctaIconButtonColors
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.data.placeName
+import com.sajdatime.app.ui.components.DialogTitle
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.foundation.selection.toggleable
+import com.sajdatime.app.review.ReviewPrompt
+import androidx.compose.ui.text.font.FontWeight
 import android.content.Intent
 import android.os.Build
 import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.app.ui.components.rememberGranted
 import android.media.RingtoneManager
+import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,12 +44,13 @@ import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material3.RadioButton
 import androidx.compose.material.icons.outlined.MoreTime
+import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.PushPin
 import androidx.compose.material.icons.outlined.Schedule
+import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
@@ -49,7 +60,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,9 +84,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
@@ -83,6 +96,7 @@ import com.sajdatime.core.Sect
 import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
@@ -95,6 +109,26 @@ import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.LocalDate
+import java.util.Locale
+import com.sajdatime.core.AppLocale
+import androidx.compose.runtime.DisposableEffect
+import android.os.LocaleList
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.CompositionLocalProvider
+import java.time.ZoneId
+import java.time.LocalTime
+import java.time.Instant
+import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.core.AdjustmentFit
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerLayoutType
+import androidx.compose.material3.ExperimentalMaterial3Api
+import android.text.format.DateFormat
 
 /**
  * Which chooser is currently open, if any. Only one can be at a time.
@@ -104,7 +138,9 @@ import java.time.LocalDate
  * chooser that answers them, rather than to the top of Settings with the row left to find.
  * See [SettingsScreen]'s `request` parameter.
  */
-enum class SettingsChooser { SCHOOL, METHOD, ADJUSTMENTS, ALERTS, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER }
+enum class SettingsChooser {
+    SCHOOL, METHOD, ADJUSTMENTS, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+}
 
 @Composable
 fun SettingsScreen(
@@ -127,9 +163,15 @@ fun SettingsScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
-    onSetAlarmRespectsSilent: (Boolean) -> Unit,
+    onSetSuhoorAdhan: (Boolean) -> Unit,
+    onSetPrayerReminderMinutes: (Int) -> Unit,
+    onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
+    onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
+    onPickNotificationSound: () -> Unit,
+    onPickBuiltInNotificationAdhan: (BuiltInAdhan) -> Unit,
+    onSetAlarmRespectsSilent: (Boolean) -> Unit,
     onRefreshLocation: () -> Unit,
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
@@ -151,30 +193,18 @@ fun SettingsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(bottom = 40.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.title_settings),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .padding(start = 20.dp, top = 8.dp, bottom = 4.dp)
-                .semantics { heading() },
-        )
-
-        // Anything the system is withholding goes at the very top, above the settings
-        // themselves. These are not preferences, they are problems, and burying them
-        // inside the group they belong to meant nobody found them.
-        val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
-        val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    // Anything the system is withholding goes at the very top, above the settings
+    // themselves. These are not preferences, they are problems, and burying them
+    // inside the group they belong to meant nobody found them.
+    val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
+    val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    val banners: @Composable () -> Unit = {
         // Before Android 12 there is no exact-alarm permission to ask for, so no row.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
-                body = stringResource(R.string.settings_exact_alarms_desc),
+                body = stringResource(R.string.settings_exact_alarms_brief),
+                details = stringResource(R.string.settings_exact_alarms_desc),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
@@ -189,23 +219,30 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
             )
         }
+    }
 
-        Group(stringResource(R.string.settings_group_prayer_times)) {
-            SettingRow(
+    val prayerTimes = SettingsSection(
+        SettingsSectionId.PRAYER_TIMES,
+        stringResource(R.string.settings_group_prayer_times),
+        listOf(
+            SettingsItem.Link(
+                key = "location",
                 icon = Icons.Outlined.LocationOn,
                 title = stringResource(R.string.settings_location),
-                subtitle = settings.cityName.ifBlank {
+                subtitle = settings.placeName(LocalContext.current).ifBlank {
                     stringResource(R.string.location_set_generic)
                 },
                 onClick = { open = SettingsChooser.LOCATION },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "school",
                 icon = Icons.Outlined.Schedule,
                 title = stringResource(R.string.settings_school),
                 subtitle = schoolSummary(settings.sect, settings.madhab),
                 onClick = { open = SettingsChooser.SCHOOL },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "method",
                 icon = Icons.Outlined.Tune,
                 title = stringResource(R.string.settings_method),
                 subtitle = if (settings.method == CalcMethod.AUTO) {
@@ -217,85 +254,173 @@ fun SettingsScreen(
                     stringResource(settings.method.labelRes)
                 },
                 onClick = { open = SettingsChooser.METHOD },
-            )
+            ),
             // Last in this group on purpose. The method and school rows above explain the
             // two divergences that have a reason; this one is the catch-all for whatever is
             // left, and offering it first would invite someone to nudge a number when the
             // honest fix was to pick the convention their mosque actually follows.
-            SettingRow(
+            SettingsItem.Link(
+                key = "adjustments",
                 icon = Icons.Outlined.MoreTime,
                 title = stringResource(R.string.settings_adjustments),
                 subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
-            )
-        }
+            ),
+        ),
+    )
 
-        Group(stringResource(R.string.settings_group_appearance)) {
-            ThemeRow(current = settings.themeChoice, onSelect = onSetThemeChoice)
-            if (AppLanguage.supported) {
-                SettingRow(
+    val appearance = SettingsSection(
+        SettingsSectionId.APPEARANCE,
+        stringResource(R.string.settings_group_appearance),
+        buildList {
+            add(
+                SettingsItem.Theme(
+                    title = stringResource(R.string.settings_theme),
+                    current = settings.themeChoice,
+                    onSelect = onSetThemeChoice,
+                ),
+            )
+            // Every Android version since 1.5.0: below 13 the choice is kept by AppLocale.setOverride.
+            add(
+                SettingsItem.Link(
+                    key = "language",
                     icon = Icons.Outlined.Language,
                     title = stringResource(R.string.settings_language_title),
-                    subtitle = AppLanguage.current(context).nativeName,
+                    subtitle = AppLanguage.chosen(context)?.nativeName ?: stringResource(
+                        R.string.settings_value_pair,
+                        stringResource(R.string.language_phone),
+                        AppLanguage.showing(context).nativeName,
+                    ),
                     onClick = { open = SettingsChooser.LANGUAGE },
-                )
-            }
-        }
+                ),
+            )
+        },
+    )
 
-        Group(stringResource(R.string.settings_group_reminders)) {
+    // The two sounds, each a row of its own under Prayer alerts (owner, 18 Oct 2026). The alarm sound
+    // used to sit at the foot of the Prayer alerts dialog, below a fold with nothing showing there was
+    // more, so he never found "From your phone". A row says what is chosen without opening anything.
+    // Each appears only while some prayer uses that style. Not the suhoor reminder since 21 Oct 2026: it
+    // has its own sound, and its "Play on silent" is repeated inside its own dialog.
+    val notificationSound = SoundChoice(
+        sect = settings.sect,
+        uri = settings.notificationSoundUri,
+        defaultLabel = R.string.settings_notification_sound_default,
+        onPickPhone = onPickNotificationSound,
+        onPickBuiltIn = onPickBuiltInNotificationAdhan,
+    )
+    val alarmSound = SoundChoice(
+        sect = settings.sect,
+        uri = settings.alarmSoundUri,
+        defaultLabel = R.string.settings_alarm_sound_default,
+        onPickPhone = onPickAlarmSound,
+        onPickBuiltIn = onPickBuiltInAdhan,
+        respectsSilent = settings.alarmRespectsSilent,
+        onSetRespectsSilent = onSetAlarmRespectsSilent,
+    )
+
+    // The user's own calendar, shift included, on the date the Times screen is showing.
+    val ramadanToday = state.today?.date ?: LocalDate.now()
+    val ramadanSeason = HijriCalendar.ramadan(ramadanToday, settings.hijriOffsetDays)
+        ?.showsSettings(ramadanToday) == true
+
+    val reminders = SettingsSection(
+        SettingsSectionId.REMINDERS,
+        stringResource(R.string.settings_group_reminders),
+        listOfNotNull(
             // One row, not two. "Which prayers" and "How you are told" were separate
             // choosers answering halves of the same question, and between them they could
             // not express "wake me for Fajr, a quiet notification for the rest" — which is
             // what a tester asked for. Off is now simply having no style.
-            SettingRow(
+            SettingsItem.Link(
+                key = "alerts",
                 icon = Icons.Outlined.NotificationsActive,
                 title = stringResource(R.string.settings_alerts),
                 subtitle = alertSummary(settings.alertFor),
                 onClick = { open = SettingsChooser.ALERTS },
-            )
+            ),
+            SettingsItem.Link(
+                key = "notification_sound",
+                icon = Icons.Outlined.MusicNote,
+                title = stringResource(R.string.settings_notification_sound),
+                subtitle = soundSummary(notificationSound),
+                onClick = { open = SettingsChooser.NOTIFICATION_SOUND },
+            ).takeIf { settings.usesNotification },
+            SettingsItem.Link(
+                key = "alarm_sound",
+                icon = Icons.Outlined.MusicNote,
+                title = stringResource(R.string.settings_alarm_sound),
+                subtitle = soundSummary(alarmSound),
+                onClick = { open = SettingsChooser.ALARM_SOUND },
+            ).takeIf { settings.prayersUseAlarm },
+            // Off until chosen (1.5.0): a quiet heads up a few minutes before the prayers picked.
+            SettingsItem.Link(
+                key = "prayer_reminder",
+                icon = Icons.Outlined.Timer,
+                title = stringResource(R.string.settings_prayer_reminder),
+                subtitle = prayerReminderSummary(settings.prayerReminderMinutes, settings.prayerReminderFor),
+                onClick = { open = SettingsChooser.PRAYER_REMINDER },
+            ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
-            SwitchRow(
+            SettingsItem.Toggle(
+                key = "ongoing_badge",
                 icon = Icons.Outlined.PushPin,
                 title = stringResource(R.string.settings_ongoing_badge),
                 subtitle = stringResource(R.string.settings_ongoing_badge_desc),
                 checked = settings.ongoingBadge,
                 onCheckedChange = onSetOngoingBadge,
-            )
-            // Off until chosen. A reminder before Fajr on the days of Ramadan only, on the Islamic
-            // date the user has set, through the same alarm ladder and silent mode rules as a
-            // prayer alert. The row says nothing about dates: the help line inside does.
-            SettingRow(
+            ),
+            // On by default since 1.5.0, 60 minutes (owner, 21 Oct 2026; HANDOVER 5.19 item 8). A reminder
+            // before Fajr on the days of Ramadan only, on the Islamic date the user has set, through the
+            // same alarm ladder and silent mode rules as a prayer alert, on its own channel and sound. The row says nothing about dates: the help line inside does.
+            // Shown only from 3 days before Ramadan to its last day, like the card's row below
+            // (owner, 19 Oct 2026: a Ramadan setting the rest of the year confuses people).
+            SettingsItem.Link(
+                key = "suhoor",
                 icon = Icons.Outlined.Alarm,
                 title = stringResource(R.string.settings_suhoor),
                 subtitle = suhoorSummary(settings.suhoorReminderMinutes, settings.suhoorReminderStyle),
                 onClick = { open = SettingsChooser.SUHOOR },
-            )
+            ).takeIf { ramadanSeason },
             // On by default and removable here, because not everyone fasts and the card is
             // daily for a month.
-            SwitchRow(
+            SettingsItem.Toggle(
+                key = "ramadan_card",
                 icon = Icons.Outlined.NightsStay,
                 title = stringResource(R.string.settings_ramadan_card),
                 subtitle = stringResource(R.string.settings_ramadan_card_desc),
                 checked = settings.ramadanCardEnabled,
                 onCheckedChange = onSetRamadanCard,
-            )
-        }
+            ).takeIf { ramadanSeason },
+        ),
+    )
 
-        Group(stringResource(R.string.settings_group_about)) {
-            SettingRow(
+    // Play requires a privacy policy reachable from inside the app, not only from
+    // the Console field. Opening the hosted policy satisfies that.
+    val privacyUrl = stringResource(R.string.privacy_policy_url)
+    // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
+    // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
+    val feedbackEmail = stringResource(R.string.feedback_email)
+    val feedbackSubject = stringResource(R.string.feedback_subject)
+    val shareMessage = stringResource(R.string.about_share_message)
+    val about = SettingsSection(
+        SettingsSectionId.ABOUT,
+        stringResource(R.string.settings_group_about),
+        listOf(
+            SettingsItem.Link(
+                key = "version",
                 title = stringResource(R.string.about_version),
                 subtitle = versionName(context),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "disclaimer",
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
                 onClick = { open = SettingsChooser.DISCLAIMER },
-            )
-            // Play requires a privacy policy reachable from inside the app, not only from
-            // the Console field. Opening the hosted policy satisfies that.
-            val privacyUrl = stringResource(R.string.privacy_policy_url)
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "privacy",
                 title = stringResource(R.string.about_privacy),
                 subtitle = stringResource(R.string.about_privacy_desc),
                 onClick = {
@@ -303,12 +428,9 @@ fun SettingsScreen(
                         context.startActivity(Intent(Intent.ACTION_VIEW, privacyUrl.toUri()))
                     }
                 },
-            )
-            // Not a prompt: a row the user chooses to open. It hands over to their own email app, so
-            // nothing is stored or sent by SajdaTime, and nothing is attached to the message.
-            val feedbackEmail = stringResource(R.string.feedback_email)
-            val feedbackSubject = stringResource(R.string.feedback_subject)
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "feedback",
                 title = stringResource(R.string.about_feedback),
                 subtitle = stringResource(R.string.about_feedback_desc),
                 onClick = {
@@ -319,29 +441,65 @@ fun SettingsScreen(
                         )
                     }
                 },
-            )
-            SwitchRow(
+            ),
+            // A door, never an ask: the user chooses to go. Opens the store page, not the
+            // In-App Review card, because Google says that card must not sit behind a button
+            // (it may silently not show once the quota is spent). See review/ReviewPrompt.kt.
+            SettingsItem.Link(
+                key = "rate",
+                title = stringResource(R.string.about_rate),
+                subtitle = stringResource(R.string.about_rate_desc),
+                onClick = { ReviewPrompt.openStorePage(context) },
+            ),
+            SettingsItem.Link(
+                key = "share",
+                title = stringResource(R.string.about_share),
+                subtitle = stringResource(R.string.about_share_desc),
+                onClick = { ReviewPrompt.shareApp(context, shareMessage) },
+            ),
+            SettingsItem.Toggle(
+                key = "usage_counts",
                 title = stringResource(R.string.settings_usage_counts),
                 subtitle = stringResource(R.string.settings_usage_counts_desc),
                 checked = settings.analyticsEnabled,
                 onCheckedChange = { wanted ->
                     if (wanted) askingUsageConsent = true else onSetAnalytics(false)
                 },
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "charity",
                 title = stringResource(R.string.about_charity),
                 subtitle = stringResource(R.string.about_charity_desc),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "credits",
                 title = stringResource(R.string.about_credits),
                 subtitle = stringResource(R.string.about_credits_desc),
-            )
-            SettingRow(
+            ),
+            SettingsItem.Link(
+                key = "data",
                 title = stringResource(R.string.about_data),
                 subtitle = stringResource(R.string.about_data_desc),
-            )
-        }
-    }
+            ),
+            // A licence obligation, like the row above: the Shia adhan is CC BY-SA 4.0, which requires
+            // the credit and a link to the licence. The Sunni one is CC0 and credited anyway. Shown to
+            // every user, because both files ship in every copy of the app.
+            SettingsItem.Link(
+                key = "adhan",
+                title = stringResource(R.string.about_adhan),
+                subtitle = stringResource(R.string.about_adhan_desc),
+                links = listOf(
+                    stringResource(R.string.about_adhan_link_source) to ADHAN_SOURCE,
+                    stringResource(R.string.about_adhan_link_shia) to SHIA_ADHAN_SOURCE,
+                    stringResource(R.string.about_adhan_link_licence) to CC_BY_SA_4,
+                ),
+            ),
+        ),
+    )
+
+    val sections = listOf(prayerTimes, appearance, reminders, about)
+    val title = stringResource(R.string.title_settings)
+    SettingsList(title, banners, sections)
 
     if (askingUsageConsent) {
         UsageCountsConsentDialog(
@@ -356,14 +514,27 @@ fun SettingsScreen(
     when (open) {
         null -> Unit
 
-        SettingsChooser.ADJUSTMENTS -> AdjustmentsDialog(
-            adjustments = settings.adjustments,
-            hijriOffsetDays = settings.hijriOffsetDays,
-            onSetAdjustment = onSetAdjustment,
-            onSetHijriOffset = onSetHijriOffset,
-            onReset = onResetAdjustments,
-            onDismiss = { open = null },
-        )
+        SettingsChooser.ADJUSTMENTS -> {
+            // Today's times as the engine produces them *before* any correction. A board time is
+            // fitted against these, because the stored correction is relative to them; fitting
+            // against the corrected times would count the old correction twice.
+            val uncorrected = settings.calculationPrefs.copy(adjustments = emptyMap())
+            val calculated = remember(settings.coordinates, uncorrected) {
+                settings.coordinates?.let { PrayerEngine.compute(it, LocalDate.now(), uncorrected).times }
+            }
+            AdjustmentsDialog(
+                adjustments = settings.adjustments,
+                hijriOffsetDays = settings.hijriOffsetDays,
+                calculated = calculated,
+                onSetAdjustment = onSetAdjustment,
+                onSetHijriOffset = onSetHijriOffset,
+                onReset = onResetAdjustments,
+                // One state variable holds the open chooser, so this closes this dialog as it
+                // opens the method list: the user is moved on, not stacked.
+                onChooseMethod = { open = SettingsChooser.METHOD },
+                onDismiss = { open = null },
+            )
+        }
 
         SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
@@ -386,26 +557,44 @@ fun SettingsScreen(
         SettingsChooser.ALERTS -> AlertsDialog(
             alertFor = settings.alertFor,
             showAlarmOptions = settings.usesAlarm,
-            alarmSoundUri = settings.alarmSoundUri,
-            respectsSilent = settings.alarmRespectsSilent,
             alarmOnApproximate = settings.alarmOnApproximateDays,
             hasApproximateDays = rememberHasApproximateDays(settings),
             onSetAlert = onSetAlert,
-            onSetRespectsSilent = onSetAlarmRespectsSilent,
             onSetAlarmOnApproximate = onSetAlarmOnApproximateDays,
-            onPickAlarmSound = onPickAlarmSound,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.NOTIFICATION_SOUND -> SoundDialog(
+            title = stringResource(R.string.settings_notification_sound),
+            help = stringResource(R.string.settings_notification_sound_help),
+            sound = notificationSound,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.ALARM_SOUND -> SoundDialog(
+            title = stringResource(R.string.settings_alarm_sound),
+            help = stringResource(R.string.settings_alarm_sound_help),
+            sound = alarmSound,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.PRAYER_REMINDER -> PrayerReminderDialog(
+            minutes = settings.prayerReminderMinutes,
+            slots = settings.prayerReminderFor,
+            onSetMinutes = onSetPrayerReminderMinutes,
+            onSetSlot = onSetPrayerReminder,
             onDismiss = { open = null },
         )
 
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
-            alarmSoundUri = settings.alarmSoundUri,
+            adhan = settings.suhoorUsesAdhan,
             respectsSilent = settings.alarmRespectsSilent,
             onSetMinutes = onSetSuhoorMinutes,
             onSetStyle = onSetSuhoorStyle,
+            onSetAdhan = onSetSuhoorAdhan,
             onSetRespectsSilent = onSetAlarmRespectsSilent,
-            onPickAlarmSound = onPickAlarmSound,
             onDismiss = { open = null },
         )
 
@@ -416,48 +605,7 @@ fun SettingsScreen(
             onSearchCity = onSearchCity,
         )
 
-        SettingsChooser.LANGUAGE -> {
-            val current = AppLanguage.current(context)
-            ChooserDialog(title = stringResource(R.string.settings_language_title), onDismiss = { open = null }) {
-                Column(Modifier.selectableGroup()) {
-                    AppLanguage.entries.forEach { language ->
-                        val available = language.isAvailable(context)
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(min = 56.dp)
-                                .selectable(
-                                    selected = language == current,
-                                    enabled = available,
-                                    role = Role.RadioButton,
-                                    onClick = {
-                                        AppLanguage.apply(context, language)
-                                        open = null
-                                    },
-                                ),
-                        ) {
-                            RadioButton(selected = language == current, onClick = null, enabled = available)
-                            Spacer(Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    language.nativeName,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = if (available) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                if (!available) {
-                                    Text(
-                                        stringResource(R.string.language_unavailable),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        SettingsChooser.LANGUAGE -> LanguageChooserDialog(onDismiss = { open = null })
 
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
@@ -466,7 +614,7 @@ fun SettingsScreen(
                     Text(stringResource(R.string.action_got_it))
                 }
             },
-            title = { Text(stringResource(R.string.disclaimer_title)) },
+            title = { DialogTitle(stringResource(R.string.disclaimer_title)) { open = null } },
             // Scrollable for the same reason every chooser on this screen is.
             text = {
                 Column(Modifier.verticalScroll(rememberScrollState())) {
@@ -476,6 +624,60 @@ fun SettingsScreen(
         )
     }
 }
+
+// --- what the screen shows, kept apart from how it is drawn ------------------------------
+
+/**
+ * One row of the Settings screen as data. The screen builds these and a renderer draws
+ * them, so a different look can be drawn from exactly the same rows, the same strings and
+ * the same handlers. `key` names the row for a renderer that treats one specially (the
+ * version line, say); it never changes what the row does.
+ */
+internal sealed interface SettingsItem {
+    val key: String
+    val title: String
+
+    /** A row that opens something, or, with no [onClick], a line of information. */
+    data class Link(
+        override val key: String,
+        override val title: String,
+        val subtitle: String? = null,
+        val icon: ImageVector? = null,
+        val onClick: (() -> Unit)? = null,
+        /** Web links shown under a folded row's text, as (label, address). */
+        val links: List<Pair<String, String>> = emptyList(),
+    ) : SettingsItem
+
+    data class Toggle(
+        override val key: String,
+        override val title: String,
+        val subtitle: String?,
+        val checked: Boolean,
+        val onCheckedChange: (Boolean) -> Unit,
+        val icon: ImageVector? = null,
+    ) : SettingsItem
+
+    data class Theme(
+        override val title: String,
+        val current: ThemeChoice,
+        val onSelect: (ThemeChoice) -> Unit,
+    ) : SettingsItem {
+        override val key: String get() = "theme"
+    }
+}
+
+// The built-in adhans' sources and licence (docs/licences/ADHAN.md). Not translatable, so not strings.
+private const val ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:Beautiful_adhan.ogg"
+private const val SHIA_ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:AzaanMaahur.ogg"
+private const val CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
+
+internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
+
+internal class SettingsSection(
+    val id: SettingsSectionId,
+    val title: String,
+    val items: List<SettingsItem>,
+)
 
 // --- summaries shown under each row ------------------------------------------------------
 
@@ -509,6 +711,26 @@ private fun alertSummary(alertFor: Map<PrayerSlot, AlertStyle>): String {
     )
     return stringResource(R.string.settings_value_pair, count, style)
 }
+
+/** "10 minutes before · All five", "10 minutes before · 2 of 5", or just "Off". */
+@Composable
+private fun prayerReminderSummary(minutes: Int, slots: Set<PrayerSlot>): String {
+    if (minutes <= 0 || slots.isEmpty()) return stringResource(R.string.suhoor_off)
+    val which = if (slots.size == 5) {
+        stringResource(R.string.settings_which_prayers_all)
+    } else {
+        stringResource(R.string.settings_which_prayers_some, slots.size)
+    }
+    return stringResource(R.string.settings_value_pair, prayerReminderChoiceLabel(minutes), which)
+}
+
+@Composable
+private fun prayerReminderChoiceLabel(minutes: Int): String =
+    if (minutes <= 0) {
+        stringResource(R.string.suhoor_off)
+    } else {
+        pluralStringResource(R.plurals.prayer_reminder_minutes_before, minutes, minutes)
+    }
 
 /** "30 minutes before Fajr · Notification", or just "Off". Plain words, no date logic. */
 @Composable
@@ -560,7 +782,7 @@ private fun SchoolDialog(
         }
 
         if (sect == Sect.SUNNI) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             SectionLabel(stringResource(R.string.settings_madhab))
             Column(Modifier.selectableGroup()) {
                 Madhab.entries.forEach { entry ->
@@ -596,7 +818,7 @@ private fun MethodPickerDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(Space.Group))
         MethodChoiceList(sect = sect, current = current, onSelect = onSelect)
     }
 }
@@ -606,22 +828,18 @@ private fun MethodPickerDialog(
  * alarm — chosen per prayer, because "wake me for Fajr, do not shout at me for Dhuhr" is
  * the request this screen exists to answer.
  *
- * The alarm sound and the silent-mode switch appear only once at least one prayer is set
- * to Alarm, rather than sitting greyed out for the majority who never leave the default.
+ * The sounds are not here: since 18 Oct 2026 each is its own Settings row (see the rows above), because
+ * at the foot of this dialog the alarm sound sat below a fold and the owner never found it.
  */
 @Composable
 private fun AlertsDialog(
     alertFor: Map<PrayerSlot, AlertStyle>,
-    /** True when any prayer or the suhoor reminder is an alarm, so the sound and silent rows apply. */
+    /** True when any prayer or the suhoor reminder is an alarm, so the approximate days switch applies. */
     showAlarmOptions: Boolean,
-    alarmSoundUri: String,
-    respectsSilent: Boolean,
     alarmOnApproximate: Boolean,
     hasApproximateDays: Boolean,
     onSetAlert: (PrayerSlot, AlertStyle?) -> Unit,
-    onSetRespectsSilent: (Boolean) -> Unit,
     onSetAlarmOnApproximate: (Boolean) -> Unit,
-    onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_alerts), onDismiss = onDismiss) {
@@ -630,7 +848,7 @@ private fun AlertsDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
 
         PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
             AlertChoiceRow(
@@ -640,34 +858,58 @@ private fun AlertsDialog(
             )
         }
 
-        if (showAlarmOptions) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
-            SettingRow(
-                title = stringResource(R.string.settings_alarm_sound),
-                // Naming the chosen tone is the only confirmation the user gets that the
-                // pick stuck. The generic hint stays until something is chosen.
-                subtitle = rememberRingtoneTitle(alarmSoundUri)
-                    ?: stringResource(R.string.settings_alarm_sound_desc),
-                onClick = onPickAlarmSound,
-                horizontalPadding = 0.dp,
-            )
+        // Only for the few thousand people on earth this can ever apply to. Everyone
+        // below the polar circles has no approximated days, so the switch would be a
+        // question about astronomy they will never meet — and this app is used by
+        // people who have never opened a settings screen. See rememberHasApproximateDays.
+        if (showAlarmOptions && hasApproximateDays) {
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             SwitchRow(
-                title = stringResource(R.string.settings_alarm_respect_silent),
-                subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
-                checked = respectsSilent,
-                onCheckedChange = onSetRespectsSilent,
+                title = stringResource(R.string.settings_alarm_on_approximate),
+                subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
+                checked = alarmOnApproximate,
+                onCheckedChange = onSetAlarmOnApproximate,
                 horizontalPadding = 0.dp,
             )
-            // Only for the few thousand people on earth this can ever apply to. Everyone
-            // below the polar circles has no approximated days, so the switch would be a
-            // question about astronomy they will never meet — and this app is used by
-            // people who have never opened a settings screen. See rememberHasApproximateDays.
-            if (hasApproximateDays) {
+        }
+    }
+}
+
+/**
+ * The heads up before a prayer: how long before, then which prayers. Always a quiet notification,
+ * so there is no style or sound here; the prayer alerts keep those.
+ */
+@Composable
+private fun PrayerReminderDialog(
+    minutes: Int,
+    slots: Set<PrayerSlot>,
+    onSetMinutes: (Int) -> Unit,
+    onSetSlot: (PrayerSlot, Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_prayer_reminder), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_prayer_reminder_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Group))
+        Column(Modifier.selectableGroup()) {
+            AppSettings.PRAYER_REMINDER_CHOICES.forEach { choice ->
+                RadioRow(
+                    label = prayerReminderChoiceLabel(choice),
+                    selected = minutes == choice,
+                    onSelect = { onSetMinutes(choice) },
+                )
+            }
+        }
+        if (minutes > 0) {
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
+            PrayerSlot.entries.filter { it.isPrayer }.forEach { slot ->
                 SwitchRow(
-                    title = stringResource(R.string.settings_alarm_on_approximate),
-                    subtitle = stringResource(R.string.settings_alarm_on_approximate_desc),
-                    checked = alarmOnApproximate,
-                    onCheckedChange = onSetAlarmOnApproximate,
+                    title = stringResource(slot.labelRes),
+                    checked = slot in slots,
+                    onCheckedChange = { onSetSlot(slot, it) },
                     horizontalPadding = 0.dp,
                 )
             }
@@ -676,23 +918,116 @@ private fun AlertsDialog(
 }
 
 /**
+ * What a sound chooser needs, for the notification sound or the alarm sound: the school decides which
+ * built-in adhan is offered. Only the alarm carries "Play on silent" ([onSetRespectsSilent] non null):
+ * a notification always follows the phone's silent and Do Not Disturb settings (owner, 18 Oct 2026).
+ */
+private class SoundChoice(
+    val sect: Sect,
+    val uri: String,
+    @StringRes val defaultLabel: Int,
+    val onPickPhone: () -> Unit,
+    val onPickBuiltIn: (BuiltInAdhan) -> Unit,
+    val respectsSilent: Boolean = true,
+    val onSetRespectsSilent: ((Boolean) -> Unit)? = null,
+)
+
+/** What a sound row says is chosen: "Adhan", the phone sound's own name, or the phone's default. */
+@Composable
+private fun soundSummary(sound: SoundChoice): String {
+    val builtIn = BuiltInAdhan.of(sound.uri)
+    val title = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
+    return when {
+        builtIn != null -> stringResource(builtIn.labelRes)
+        else -> title ?: stringResource(sound.defaultLabel)
+    }
+}
+
+/** One sound: a line on when it plays, then the choices. */
+@Composable
+private fun SoundDialog(title: String, help: String, sound: SoundChoice, onDismiss: () -> Unit) {
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Text(
+            text = help,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Group))
+        SoundChoices(sound)
+    }
+}
+
+/**
+ * A sound, for notifications or alarms: the built-in adhan for the
+ * user's school (1.5.0; Sunni and Shia each have their own, data/BuiltInAdhan.kt), then "From your
+ * phone" (the system picker: alarms, ringtones and any audio the user has added), as one radio group.
+ * Under the phone row, the tone chosen there, because naming it is the only confirmation the pick
+ * stuck. Then, for the alarm only, "Play on silent".
+ *
+ * The 1.5.0 "No Shia adhan yet" notice that stood here was removed the same day, when a Shia adhan
+ * with a clean licence was found, as its own rule required.
+ */
+@Composable
+private fun SoundChoices(sound: SoundChoice) {
+    val builtIn = BuiltInAdhan.of(sound.uri)
+    val phoneTitle = rememberRingtoneTitle(sound.uri.takeIf { builtIn == null }.orEmpty())
+        ?: stringResource(sound.defaultLabel)
+    Column(Modifier.selectableGroup()) {
+        BuiltInAdhan.forSect(sound.sect).forEach { adhan ->
+            RadioRow(
+                label = stringResource(adhan.labelRes),
+                // Any built-in adhan counts as this row: each school has one, and a stored adhan from the
+                // other school (not reachable today, setSect moves it) must not leave the group unticked.
+                selected = builtIn != null,
+                onSelect = { sound.onPickBuiltIn(adhan) },
+            )
+        }
+        RadioRow(
+            label = stringResource(R.string.settings_alarm_sound_phone),
+            supporting = phoneTitle.takeIf { builtIn == null },
+            selected = builtIn == null,
+            onSelect = sound.onPickPhone,
+        )
+    }
+    sound.onSetRespectsSilent?.let { PlayOnSilentRow(sound.respectsSilent, it) }
+}
+
+/**
+ * "Play on silent", off by default: a phone on silent, vibrate or Do Not Disturb gets the notification
+ * and vibration only, unless the user turns this on. Positive wording over the old "Stay quiet when your
+ * phone is silent", which read as a double negative beside an Alarm choice (owner, 17 Oct 2026). Stored
+ * inverted, as `alarmRespectsSilent`, so every existing user keeps the choice they made.
+ */
+@Composable
+private fun PlayOnSilentRow(respectsSilent: Boolean, onSetRespectsSilent: (Boolean) -> Unit) {
+    SwitchRow(
+        title = stringResource(R.string.settings_alarm_play_on_silent),
+        subtitle = stringResource(R.string.settings_alarm_play_on_silent_desc),
+        checked = !respectsSilent,
+        onCheckedChange = { onSetRespectsSilent(!it) },
+        horizontalPadding = 0.dp,
+    )
+}
+
+/**
  * The suhoor reminder: off, or 15, 30, 45 or 60 minutes before Fajr, and how it announces itself.
  *
  * It is a second heads up and not a ruling: suhoor ends at Fajr, and the reminder is simply earlier
- * than that by the amount the person picked. When it is an alarm, the sound and the silent phone
- * switch are the same two settings the prayer alerts use, shown here too so a person who only wants
- * the reminder never has to go and find them elsewhere.
+ * than that by the amount the person picked. Its sound is chosen here, not on the Notification sound or
+ * Alarm sound row: the phone's usual tone, or the school's adhan only if the person picks it (owner,
+ * 21 Oct 2026). Until then it used those rows, so a person with the adhan for prayers heard the adhan an
+ * hour before Fajr.
  */
 @Composable
 private fun SuhoorDialog(
     minutes: Int,
     style: AlertStyle,
-    alarmSoundUri: String,
+    adhan: Boolean,
     respectsSilent: Boolean,
     onSetMinutes: (Int) -> Unit,
     onSetStyle: (AlertStyle) -> Unit,
+    onSetAdhan: (Boolean) -> Unit,
     onSetRespectsSilent: (Boolean) -> Unit,
-    onPickAlarmSound: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     ChooserDialog(title = stringResource(R.string.settings_suhoor), onDismiss = onDismiss) {
@@ -701,7 +1036,7 @@ private fun SuhoorDialog(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Group))
         Column(Modifier.selectableGroup()) {
             AppSettings.SUHOOR_CHOICES.forEach { choice ->
                 RadioRow(
@@ -712,10 +1047,10 @@ private fun SuhoorDialog(
             }
         }
         if (minutes > 0) {
-            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(Modifier.padding(vertical = Space.Related))
             FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(Space.Related),
+                verticalArrangement = Arrangement.spacedBy(Space.Related),
                 modifier = Modifier.selectableGroup(),
             ) {
                 ChoiceChip(
@@ -729,23 +1064,31 @@ private fun SuhoorDialog(
                     onClick = { onSetStyle(AlertStyle.ALARM) },
                 )
             }
-            if (style == AlertStyle.ALARM) {
-                Spacer(Modifier.height(8.dp))
-                SettingRow(
-                    title = stringResource(R.string.settings_alarm_sound),
-                    subtitle = rememberRingtoneTitle(alarmSoundUri)
-                        ?: stringResource(R.string.settings_alarm_sound_desc),
-                    onClick = onPickAlarmSound,
-                    horizontalPadding = 0.dp,
+            Spacer(Modifier.height(Space.Related))
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(Space.Related),
+                verticalArrangement = Arrangement.spacedBy(Space.Related),
+                modifier = Modifier.selectableGroup(),
+            ) {
+                // The phone's own sound for the style chosen: its alarm sound for an Alarm (the channel
+                // plays resolveAlarmSound("")), its notification tone otherwise.
+                ChoiceChip(
+                    label = stringResource(
+                        if (style == AlertStyle.ALARM) R.string.settings_alarm_sound_default else R.string.settings_notification_sound_default,
+                    ),
+                    selected = !adhan,
+                    onClick = { onSetAdhan(false) },
                 )
-                SwitchRow(
-                    title = stringResource(R.string.settings_alarm_respect_silent),
-                    subtitle = stringResource(R.string.settings_alarm_respect_silent_desc),
-                    checked = respectsSilent,
-                    onCheckedChange = onSetRespectsSilent,
-                    horizontalPadding = 0.dp,
+                ChoiceChip(
+                    label = stringResource(R.string.adhan_builtin),
+                    selected = adhan,
+                    onClick = { onSetAdhan(true) },
                 )
             }
+            // The same "Play on silent" as the Alarm sound row's, here too, because that row only shows
+            // while a prayer is an Alarm: without this, a person whose only alarm is the suhoor reminder
+            // could never turn it on (independent review, 21 Oct 2026).
+            if (style == AlertStyle.ALARM) PlayOnSilentRow(respectsSilent, onSetRespectsSilent)
         }
     }
 }
@@ -798,26 +1141,29 @@ private fun AlertChoiceRow(
     selected: AlertStyle?,
     onSelect: (AlertStyle?) -> Unit,
 ) {
-    Column(Modifier.padding(vertical = 10.dp)) {
+    Column(Modifier.padding(vertical = Space.Related)) {
         Text(text = label, style = MaterialTheme.typography.bodyLarge)
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(Space.Related),
+            verticalArrangement = Arrangement.spacedBy(Space.Related),
             modifier = Modifier.selectableGroup(),
         ) {
             ChoiceChip(
                 label = stringResource(R.string.alert_style_off),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_off), label),
                 selected = selected == null,
                 onClick = { onSelect(null) },
             )
             ChoiceChip(
                 label = stringResource(R.string.alert_style_notification),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_notification), label),
                 selected = selected == AlertStyle.NOTIFICATION,
                 onClick = { onSelect(AlertStyle.NOTIFICATION) },
             )
             ChoiceChip(
                 label = stringResource(R.string.alert_style_alarm),
+                spokenAs = stringResource(R.string.alert_choice_a11y, stringResource(R.string.alert_style_alarm), label),
                 selected = selected == AlertStyle.ALARM,
                 onClick = { onSelect(AlertStyle.ALARM) },
             )
@@ -830,7 +1176,7 @@ private fun AlertChoiceRow(
  * and a raised system font size makes even the short ones taller than a phone.
  */
 @Composable
-private fun ChooserDialog(
+internal fun ChooserDialog(
     title: String,
     onDismiss: () -> Unit,
     content: @Composable () -> Unit,
@@ -840,119 +1186,35 @@ private fun ChooserDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(title) },
+        title = { DialogTitle(title, onDismiss) },
         text = { Column(Modifier.verticalScroll(rememberScrollState())) { content() } },
     )
 }
 
 // --- small building blocks -------------------------------------------------------------
 
-/**
- * A titled group of rows, drawn as one bounded card.
- *
- * The rows used to run edge to edge under a coloured heading, which left the screen as a
- * single unbroken column and made "where does Prayer times end and Reminders begin"
- * something you worked out by reading. A border is faster than reading.
- */
-@Composable
-private fun Group(title: String, content: @Composable () -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    Spacer(Modifier.height(24.dp))
-    Text(
-        text = title,
-        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
-        color = scheme.primary,
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 8.dp)
-            .semantics { heading() },
-    )
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(20.dp)),
-    ) {
-        content()
-    }
-}
-
 @Composable
 private fun SectionLabel(title: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.4.sp),
-        color = MaterialTheme.colorScheme.primary,
+        // Same voice as the Settings section titles (SettingsList): Quiet Glass retired the
+        // letterspaced green label, and two dialogs still had it (research F22).
+        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier
-            .padding(vertical = 8.dp)
+            .padding(vertical = Space.Related)
             .semantics { heading() },
     )
 }
 
 /**
- * Light, dark, or follow the phone.
- *
- * Three chips rather than a chooser dialog, because unlike every other setting on this
- * screen the result is visible the instant it is tapped — sending the user into a dialog
- * to see a change that happens behind the dialog would be perverse.
- *
- * "Follow the phone" is first and is the default. On a device that expresses no dark
- * preference it resolves to light, which is what the plain-English label promises.
- */
-@Composable
-private fun ThemeRow(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit) {
-    val scheme = MaterialTheme.colorScheme
-    val labels = mapOf(
-        ThemeChoice.SYSTEM to R.string.theme_system,
-        ThemeChoice.LIGHT to R.string.theme_light,
-        ThemeChoice.DARK to R.string.theme_dark,
-    )
-
-    Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                Icons.Outlined.Contrast,
-                contentDescription = null,
-                tint = scheme.onSurfaceVariant,
-                modifier = Modifier.size(22.dp),
-            )
-            Spacer(Modifier.width(16.dp))
-            Text(
-                text = stringResource(R.string.settings_theme),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.semantics { heading() },
-            )
-        }
-        Spacer(Modifier.height(10.dp))
-        // A FlowRow, not a Row: at a large font size three chips no longer fit across a
-        // phone, and a fixed Row would clip the third one — which is "Dark", the whole
-        // reason anyone opens this.
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(start = 38.dp)
-                .selectableGroup(),
-        ) {
-            ThemeChoice.entries.forEach { choice ->
-                ChoiceChip(
-                    label = stringResource(labels.getValue(choice)),
-                    selected = current == choice,
-                    onClick = { onSelect(choice) },
-                )
-            }
-        }
-    }
-}
-
-/**
- * One option in a small horizontal set. Used by the theme picker and by the per-prayer
- * alert picker, which is the only reason it is not still inlined in the theme row.
+ * One option in a small horizontal set: the per-prayer alert picker and the suhoor style.
  *
  * `selectable`, not `clickable`: a screen reader should announce "selected" on the active
  * chip, and a set of chips is one choice rather than three independent buttons.
  */
 @Composable
-private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
+private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit, spokenAs: String? = null) {
     val scheme = MaterialTheme.colorScheme
     Text(
         text = label,
@@ -972,6 +1234,9 @@ private fun ChoiceChip(label: String, selected: Boolean, onClick: () -> Unit) {
                 shape = RoundedCornerShape(50),
             )
             .selectable(selected = selected, role = Role.RadioButton, onClick = onClick)
+            // Five rows of "Notification, radio button" were indistinguishable by ear; this
+            // says "Alarm for Fajr" (research D4).
+            .then(if (spokenAs != null) Modifier.semantics { contentDescription = spokenAs } else Modifier)
             .padding(horizontal = 14.dp, vertical = 8.dp),
     )
 }
@@ -1046,7 +1311,8 @@ private fun SwitchRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.Switch) { onCheckedChange(!checked) }
+            // toggleable so a screen reader hears "on" or "off" (research D3).
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
             .heightIn(min = 56.dp)
             .padding(horizontal = horizontalPadding, vertical = 8.dp),
     ) {
@@ -1120,39 +1386,69 @@ private fun rememberRingtoneTitle(uri: String): String? {
 private fun AdjustmentsDialog(
     adjustments: Map<PrayerSlot, Int>,
     hijriOffsetDays: Int,
+    /** Today's uncorrected times, or null before there is a location to calculate for. */
+    calculated: Map<PrayerSlot, Instant>?,
     onSetAdjustment: (PrayerSlot, Int) -> Unit,
     onSetHijriOffset: (Int) -> Unit,
     onReset: () -> Unit,
+    onChooseMethod: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    // Which prayer's time dial is open, and which prayer's board time was too far away.
+    // Saveable so rotating the phone mid-entry does not throw the user back to the list.
+    var picking by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+    var tooFar by rememberSaveable { mutableStateOf<PrayerSlot?>(null) }
+    var choosingPrayer by rememberSaveable { mutableStateOf(false) }
     ChooserDialog(title = stringResource(R.string.settings_adjustments), onDismiss = onDismiss) {
         Text(
             text = stringResource(R.string.settings_adjustments_help),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp),
+            modifier = Modifier.padding(bottom = Space.Group),
         )
+        // One button for the whole list, not one per prayer: the owner chose this from screenshots
+        // on 19 Oct 2026 over a time button under each prayer (six more green buttons on a calm
+        // dialog). It opens "Which prayer?", then the clock (DESIGN_SYSTEM §9).
+        if (calculated != null) {
+            CtaButton(onClick = { choosingPrayer = true }, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Outlined.Schedule, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(Space.Related))
+                Text(stringResource(R.string.adjustment_use_board))
+            }
+            Spacer(Modifier.height(Space.Group))
+        }
 
         PrayerSlot.entries.forEach { slot ->
             val minutes = adjustments[slot] ?: 0
+            val label = slot.label(context)
             StepperRow(
-                label = slot.label(context),
+                label = label,
                 value = minuteLabel(minutes),
                 canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
                 canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
-                onDecrease = { onSetAdjustment(slot, minutes - 1) },
-                onIncrease = { onSetAdjustment(slot, minutes + 1) },
+                onDecrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes - 1)
+                },
+                onIncrease = {
+                    tooFar = null
+                    onSetAdjustment(slot, minutes + 1)
+                },
             )
+            if (abs(minutes) >= CalculationPrefs.MAX_ADJUSTMENT_MINUTES || tooFar == slot) {
+                LimitNote(onChooseMethod)
+            }
         }
 
-        HorizontalDivider(Modifier.padding(vertical = 8.dp))
+        HorizontalDivider(Modifier.padding(vertical = Space.Related))
         SectionLabel(stringResource(R.string.settings_hijri_offset))
         Text(
             text = stringResource(R.string.settings_hijri_offset_help),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 4.dp),
+            modifier = Modifier.padding(bottom = Space.Group),
         )
         StepperRow(
             label = stringResource(R.string.settings_hijri_offset_label),
@@ -1164,16 +1460,157 @@ private fun AdjustmentsDialog(
         )
 
         if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
-            TextButton(
+            // Its own row, full width (so centred), a Section below the steppers it resets: the
+            // owner asked for it wider and easier to press (18 Oct 2026). Full width is also the
+            // DESIGN_SYSTEM 4.1 rule for a button alone on its line.
+            Spacer(Modifier.height(Space.Section))
+            CtaButton(
                 onClick = {
                     onReset()
                     onSetHijriOffset(0)
                 },
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_adjustments_reset))
             }
         }
     }
+
+    if (choosingPrayer && calculated != null) {
+        // Each prayer with the time it shows now, so the user can compare it with the board.
+        ChooserDialog(title = stringResource(R.string.adjustment_which_prayer), onDismiss = { choosingPrayer = false }) {
+            PrayerSlot.entries.forEach { slot ->
+                val at = calculated[slot] ?: return@forEach
+                RadioRow(
+                    label = slot.label(context),
+                    supporting = TimeFormat.clock(context, at.plusSeconds(60L * (adjustments[slot] ?: 0)), zone),
+                    selected = false,
+                    onSelect = {
+                        choosingPrayer = false
+                        picking = slot
+                    },
+                )
+            }
+        }
+    }
+
+    val pickingSlot = picking
+    val pickingBase = pickingSlot?.let { calculated?.get(it) }
+    if (pickingSlot != null && pickingBase != null) {
+        TimeEntryDialog(
+            title = stringResource(R.string.adjustment_pick_time_title, pickingSlot.label(context)),
+            // Opens on what the screen shows now, so a small change is a small move on the dial.
+            initial = pickingBase.plusSeconds(60L * (adjustments[pickingSlot] ?: 0)).atZone(zone).toLocalTime(),
+            // Same rule as every clock in the app: the device's 12/24 setting (TimeFormat.clock).
+            is24Hour = DateFormat.is24HourFormat(context.applicationContext),
+            onConfirm = { time ->
+                picking = null
+                when (val fit = AdjustmentFit.fit(pickingBase, time, zone)) {
+                    is AdjustmentFit.Result.Within -> {
+                        tooFar = null
+                        onSetAdjustment(pickingSlot, fit.minutes)
+                    }
+                    // Nothing is stored. The note under the row says why and where to go next.
+                    AdjustmentFit.Result.TooFar -> tooFar = pickingSlot
+                }
+            },
+            onDismiss = { picking = null },
+        )
+    }
+}
+
+/**
+ * Shown under a prayer that has reached the limit, or whose board time was past it.
+ *
+ * Visible without a tap on purpose: a disabled button receives no taps, so an explanation
+ * that waited for one would never appear. Announced politely to a screen reader because
+ * "nothing happened" is the worst thing to leave someone with when they cannot see that the
+ * button went grey. It names no method and declares no time right or wrong, per §5.17: it says
+ * what a gap this size usually is and offers the one door that deals with it.
+ */
+@Composable
+private fun LimitNote(onChooseMethod: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = Space.Related)
+            .semantics { liveRegion = LiveRegionMode.Polite },
+    ) {
+        Text(
+            text = stringResource(R.string.adjustment_limit_note, CalculationPrefs.MAX_ADJUSTMENT_MINUTES),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Related))
+        // Alone on its line, so full width (DESIGN_SYSTEM 4.1).
+        CtaButton(onClick = onChooseMethod, modifier = Modifier.fillMaxWidth()) {
+            Text(stringResource(R.string.adjustment_choose_method))
+        }
+    }
+}
+
+/**
+ * The time dial for "the time on your mosque's board". A dial, not a text field, so "12:45"
+ * can never be typed into a box that wants "5". Scrollable, because the dial is tall and a
+ * raised system font size makes the dialog taller than a phone in landscape.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeEntryDialog(
+    title: String,
+    initial: LocalTime,
+    is24Hour: Boolean,
+    onConfirm: (LocalTime) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    // Material's clock formats its numbers with the JVM's default locale and takes none of ours
+    // (Material3 1.4.0, `toLocalString`, read in its bytecode on 19 Oct 2026), so on a phone set to
+    // ar-EG it drew Eastern Arabic digits in an app whose digits are Western on every other screen
+    // (AppLocale, CLAUDE.md). Measured on the emulator, then fixed: while the clock is open the
+    // default is the app's own language, and it is put back when the clock closes. The phone's
+    // locale is read from LocaleList, which holds the same value.
+    val appLocale = AppLocale.of(LocalContext.current)
+    val phoneLocale = remember { LocaleList.getDefault()[0].also { Locale.setDefault(appLocale) } }
+    DisposableEffect(Unit) { onDispose { Locale.setDefault(phoneLocale) } }
+    val state = rememberTimePickerState(initial.hour, initial.minute, is24Hour)
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(title, onDismiss) },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                // The dial's text sits in boxes of a fixed size, so at 2.0 text "a.m." was cut to "a."
+                // (emulator, 19 Oct 2026). Its text is capped at 1.3 times, still large; the title and
+                // the button above and below it keep the user's full size.
+                val density = LocalDensity.current
+                CompositionLocalProvider(
+                    LocalDensity provides Density(density.density, density.fontScale.coerceAtMost(1.3f)),
+                ) {
+                    // The stock dial draws the chosen a.m./p.m. in the tertiary (amber) family, and
+                    // amber means a warning in this app (DESIGN_SYSTEM §1), so it uses the green roles.
+                    // Always the upright layout. Left to choose, Material picks its sideways layout
+                    // in landscape, which needs about 520dp of width; the dialog has about 320, so
+                    // the dial covered the minutes and hid a.m./p.m. (emulator, 19 Oct 2026). Upright
+                    // it is taller than a landscape screen, which this Column already scrolls.
+                    TimePicker(
+                        state = state,
+                        layoutType = TimePickerLayoutType.Vertical,
+                        colors = TimePickerDefaults.colors(
+                            periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                            periodSelectorSelectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = { onConfirm(LocalTime.of(state.hour, state.minute)) }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_set_time))
+            }
+        },
+    )
 }
 
 /**
@@ -1181,9 +1618,16 @@ private fun AdjustmentsDialog(
  *
  * The value carries the whole row's accessibility label because a screen reader landing on
  * a bare "+5 min" between two icon buttons has no way to know which prayer it belongs to.
+ * It is a polite live region, so pressing plus or minus is answered with the new value
+ * ("Dhuhr, +2 min", with the language's own comma). Until 19 Oct 2026 this comment said so
+ * and the code did neither: with TalkBack, a press changed the number and said nothing
+ * (emulator, 19 Oct 2026). The dash that means no change is read as the words, not as
+ * "em dash". "Reset all" may announce several rows at once; each is true, and it follows a
+ * tap, so that is accepted (independent review, 19 Oct 2026).
  */
 @Composable
-private fun StepperRow(
+@VisibleForTesting
+internal fun StepperRow(
     label: String,
     value: String,
     canDecrease: Boolean,
@@ -1195,18 +1639,25 @@ private fun StepperRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp),
+            .padding(vertical = Space.Tight),
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
         )
-        FilledTonalIconButton(onClick = onDecrease, enabled = canDecrease) {
+        FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
             Icon(
                 Icons.Outlined.Remove,
                 contentDescription = stringResource(R.string.action_decrease, label),
             )
+        }
+        // The language's own list comma: "، " in Urdu and Arabic.
+        val separator = stringResource(R.string.list_separator)
+        val spoken = if (value == stringResource(R.string.adjustment_none)) {
+            stringResource(R.string.settings_adjustments_none)
+        } else {
+            value
         }
         Text(
             text = value,
@@ -1214,9 +1665,14 @@ private fun StepperRow(
             textAlign = TextAlign.Center,
             // Wide enough for "-30 min" so the plus button does not shuffle sideways as
             // the number grows a digit or loses its sign.
-            modifier = Modifier.width(64.dp),
+            modifier = Modifier
+                .width(64.dp)
+                .semantics {
+                    contentDescription = label + separator + spoken
+                    liveRegion = LiveRegionMode.Polite
+                },
         )
-        FilledTonalIconButton(onClick = onIncrease, enabled = canIncrease) {
+        FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
             Icon(
                 Icons.Outlined.Add,
                 contentDescription = stringResource(R.string.action_increase, label),

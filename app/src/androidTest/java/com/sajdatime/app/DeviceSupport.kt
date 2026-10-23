@@ -37,7 +37,7 @@ internal object DeviceSupport {
      *
      * The dump has more than one place that mentions an action (the pending alarms and the statistics at
      * the end), so counting matching lines would count one alarm twice. This walks the entries that start
-     * with `Alarm{` and keeps those that belong to this package and carry the action, and reads the
+     * with `Alarm{` and keeps those owned by exactly this package and carrying the action, and reads the
      * `origWhen=` the entry prints in local time. Format as recorded in docs/HANDOVER.md section 10:
      * `origWhen=2026-08-02 02:51:00.000`.
      */
@@ -49,7 +49,9 @@ internal object DeviceSupport {
         }
         val stamp = Regex("""origWhen=(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})""")
         return blocks
-            .filter { block -> block.any { it.contains(packageName) } && block.any { it.contains(action) } }
+            // The owner is the last word of the `Alarm{… com.sajdatime.app}` line, matched exactly: a contains()
+            // also matched the sideload copy (`…app.sideload}`, same action names) and failed WidgetDeviceTest.
+            .filter { block -> block.first().trimEnd().endsWith(" $packageName}") && block.any { it.contains(action) } }
             .mapNotNull { block ->
                 block.firstNotNullOfOrNull { stamp.find(it) }?.let { LocalDateTime.parse("${it.groupValues[1]}T${it.groupValues[2]}") }
             }

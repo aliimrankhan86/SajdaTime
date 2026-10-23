@@ -4,6 +4,7 @@ import com.batoulapps.adhan.CalculationMethod as AdhanMethod
 import com.batoulapps.adhan.CalculationParameters
 import com.batoulapps.adhan.Coordinates as AdhanCoordinates
 import com.batoulapps.adhan.Madhab as AdhanMadhab
+import com.batoulapps.adhan.PrayerAdjustments
 import com.batoulapps.adhan.PrayerTimes as AdhanPrayerTimes
 import com.batoulapps.adhan.HighLatitudeRule
 import com.batoulapps.adhan.data.DateComponents
@@ -392,8 +393,15 @@ object PrayerEngine {
             CalcMethod.KUWAIT -> AdhanMethod.KUWAIT.parameters
             CalcMethod.QATAR -> AdhanMethod.QATAR.parameters
             CalcMethod.SINGAPORE -> AdhanMethod.SINGAPORE.parameters
-            // Diyanet is not bundled in adhan; its published angles are Fajr 18 / Isha 17.
+            // Diyanet is not bundled in adhan-java; its published angles are Fajr 18 / Isha 17, plus
+            // its precaution minutes (temkin): Sunrise -7, Dhuhr +5, Asr +4, Maghrib +7, the same
+            // constants adhan-kotlin and adhan-js ship for Turkey. Without them iftar showed 7 to 8
+            // minutes before Diyanet's ezan (measured against Diyanet's own table, HANDOVER 5.19
+            // item 7), and early is the dangerous direction for a fast. Every change is later or
+            // more cautious; Fajr (end of suhoor) and Isha are unchanged. Decided 18 Oct 2026 at the
+            // owner's request, with an independent review (HANDOVER 5.26).
             CalcMethod.TURKEY -> CalculationParameters(18.0, 17.0, AdhanMethod.OTHER)
+                .withMethodAdjustments(PrayerAdjustments(0, -7, 5, 4, 7, 0))
             CalcMethod.JAFARI -> CalculationParameters(16.0, 14.0, AdhanMethod.OTHER)
             CalcMethod.TEHRAN -> CalculationParameters(17.7, 14.0, AdhanMethod.OTHER)
         }

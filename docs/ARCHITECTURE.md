@@ -308,13 +308,9 @@ for Fajr, a quiet notification for the rest* — cannot be expressed by a single
 Five full alarms a day, unasked for, is the sort of thing that gets an app uninstalled, so
 alarm mode is opt-in. When the user chooses it, they pick their own tone through the system
 ringtone picker, which already lists every alarm, ringtone and audio file on the device.
-No adhan recording is bundled: it would raise licensing questions and inflate the download
-of a charity app for a sound many users already have.
+Since 1.5.0 users can instead pick the built-in adhan for their school (`data/BuiltInAdhan.kt`: a CC0 Sunni recording and a CC BY-SA Shia recording from Wikimedia Commons, credited in About, sources and hashes in `docs/licences/ADHAN.md`). Opt in, never the default. The choice is stored as an ordinary sound address, so the alarm channel works exactly as it does for a phone sound (HANDOVER §5.23).
 
-**An alarm stays quiet while the phone is silenced**, unless the user turns that off. Android
-deliberately does not mute the alarm stream with the ringer, which is right for a one-off
-wake-up alarm and wrong for a recurring alert; the notification still arrives on time and
-only the sound is dropped. Vibrate counts as silenced.
+**An alarm stays quiet while the phone is on silent, vibrate or Do Not Disturb**, unless the user turns on "Play on silent" (1.5.0 wording of the same setting, off by default). Android deliberately does not mute the alarm stream with the ringer, which is right for a one-off wake-up alarm and wrong for a recurring alert; the notification still arrives on time and only the sound is dropped.
 
 Sound is bound to the channel, not to the notification, and a channel's sound cannot be
 changed after creation. Choosing a new tone therefore creates a new channel id and deletes
@@ -337,7 +333,7 @@ battery cost for information already visible in the app.
 
 Two more alarm families share the manager, kept apart by action and request code because
 `PendingIntent` identity ignores extras. Prayers use codes up to 3,669 and `ACTION_PRAYER`. The
-optional suhoor reminder (Ramadan days only, 15 to 60 minutes before Fajr) uses
+suhoor reminder (Ramadan days only, 15 to 60 minutes before Fajr; 60 and on by default since 1.5.0) uses
 `ACTION_SUHOOR_REMINDER` and codes 10,001 to 10,366 and the same three rung ladder. The widgets use
 one non waking `RTC` alarm, code 20,000, set for the earlier of the next prayer and local midnight
 plus 2 seconds (exact when the phone allows exact alarms, inexact otherwise), and every redraw lays

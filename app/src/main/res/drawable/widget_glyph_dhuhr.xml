@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Dhuhr: the sun at its height over an upright post, the shortest shadow of the day. Drawn white and tinted by the ImageView in the layout, so the launcher resolves the colour at
+     each draw and the glyph follows the phone's dark mode (lesson 130). Shared by both widgets. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:autoMirrored="false"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15,6.5A3,3 0,1 1,9,6.5A3,3 0,1 1,15,6.5ZM4,21H20M12,21V15"
+        android:strokeWidth="1.8"
+        android:strokeAlpha="1"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

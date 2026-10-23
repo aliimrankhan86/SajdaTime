@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Modern Standard Arabic. Translated by Claude on 17 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. -->
+<resources>
+
+    <!-- BCP-47 tag of this file's language. Read back by AppLocale; LocaleDisciplineTest checks it. -->
+    <!-- ar-u-nu-latn, not plain ar: Western digits everywhere in Arabic. Times are formatted with
+         java.time, which always prints Western digits, while String.format follows the Android
+         version (Arabic-Indic on Android 14, Western on 16), so plain ar mixed both styles on one
+         screen (seen on the watch, 17 Oct 2026). Pinning Latin makes every number match, on every
+         version, and matches what current Android picks for Arabic itself. -->
+    <string name="app_language_tag">ar-u-nu-latn</string>
+
+    <!-- In Arabic the prayer names are the native words themselves, with the article. -->
+    <string name="prayer_fajr">الفجر</string>
+    <string name="prayer_sunrise">الشروق</string>
+    <string name="prayer_dhuhr">الظهر</string>
+    <string name="prayer_asr">العصر</string>
+    <string name="prayer_maghrib">المغرب</string>
+    <string name="prayer_isha">العشاء</string>
+
+    <string name="method_auto">تلقائي</string>
+    <string name="method_muslim_world_league">رابطة العالم الإسلامي</string>
+    <string name="method_egyptian">الهيئة المصرية العامة للمساحة</string>
+    <string name="method_karachi">جامعة كراتشي</string>
+    <string name="method_umm_al_qura">أم القرى، مكة</string>
+    <string name="method_dubai">دبي</string>
+    <string name="method_moon_sighting">لجنة رؤية الهلال</string>
+    <string name="method_north_america">ISNA، أمريكا الشمالية</string>
+    <string name="method_kuwait">الكويت</string>
+    <string name="method_qatar">قطر</string>
+    <!-- Malaysia is deliberately NOT named here. See the note in values/strings.xml. -->
+    <string name="method_singapore">Kemenag &amp; MUIS، إندونيسيا وسنغافورة</string>
+    <string name="method_turkey">ديانت، تركيا</string>
+    <string name="method_jafari">الجعفري (الاثنا عشري)</string>
+    <string name="method_tehran">معهد الجيوفيزياء، طهران</string>
+
+    <!-- Religious content: keep the hedges ("many", "some", "common"). No angles, no degrees. -->
+    <string name="method_auto_desc">لست متأكدًا؟ أبقِ هذا الخيار. أوقات رابطة العالم الإسلامي، أو الجعفري للشيعة. قريبة من الممارسة المحلية في كثير من أنحاء العالم. ويكون الاختلاف الأكبر في أقصى الشمال.</string>
+    <string name="method_muslim_world_league_desc">طريقة عامة متعارف عليها تُستعمل في دول كثيرة. وهي الطريقة الافتراضية في هذا التطبيق.</string>
+    <string name="method_egyptian_desc">الطريقة الرسمية في مصر.</string>
+    <string name="method_karachi_desc">شائعة في باكستان وجنوب آسيا.</string>
+    <string name="method_umm_al_qura_desc">الطريقة الرسمية في المملكة العربية السعودية. يُحدَّد العشاء بوقت ثابت بعد المغرب.</string>
+    <string name="method_dubai_desc">طريقة متعارف عليها تُستعمل في الخليج.</string>
+    <string name="method_moon_sighting_desc">قاعدة موسمية وُضعت للبلدان البعيدة عن خط الاستواء. تتبعها بعض المساجد في بريطانيا.</string>
+    <string name="method_north_america_desc">الجمعية الإسلامية لأمريكا الشمالية. تستعملها مساجد كثيرة في الولايات المتحدة وكندا.</string>
+    <string name="method_kuwait_desc">الطريقة المتعارف عليها في الكويت.</string>
+    <string name="method_qatar_desc">الطريقة المتعارف عليها في قطر.</string>
+    <string name="method_singapore_desc">الجهات الرسمية في إندونيسيا وسنغافورة.</string>
+    <string name="method_turkey_desc">رئاسة الشؤون الدينية في تركيا، مع دقائق الاحتياط (التمكين).</string>
+    <string name="method_jafari_desc">الطريقة الشيعية المعتادة. يكون المغرب بعد غروب الشمس بقليل، حين تزول الحمرة من السماء.</string>
+    <string name="method_tehran_desc">جامعة طهران، وعلى تقويمها تقوم الأوقات الرسمية في إيران.</string>
+
+</resources>

@@ -32,7 +32,14 @@ import androidx.compose.ui.graphics.Color
 //  - Its `warning` (#B4740B) is listed at 4.6:1 and is actually **3.76:1** on surface,
 //    with white on it at 3.86:1. #9A6208 is the nearest value on the same hue that clears
 //    4.5:1 both ways.
-val LightPrimary = Color(0xFF0E6B4F)
+// #0B5A43 since 17 Oct 2026 (Quiet Glass), was #0E6B4F. A deeper emerald: 7.5:1 on the page
+// rather than 6.0:1, and it reads richer next to the warm sand. Green stays the identity on
+// purpose: it is the colour of Paradise in the Qur'an (18:31, 76:21), so it is used with intent,
+// for the next prayer, the Qibla and anything you can tap, and never as decoration.
+// The widgets moved with it (widget_primary, held equal by WidgetColorsTest). Deliberately NOT
+// moved: the launcher icon and the PDF logo keep #0E6B4F. The icon is the Play listing's face;
+// the two greens are one step apart. Move both together in an icon refresh, not as a side effect.
+val LightPrimary = Color(0xFF0B5A43)
 val LightOnPrimary = Color(0xFFFFFFFF)
 // #D7EAE0 rather than the design's #DDEDE4: at 1.18:1 against the surface behind it, that
 // value is below the floor ColorContrastTest sets for "the highlighted row must be
@@ -97,9 +104,8 @@ val LightInversePrimary = Color(0xFF4FC48F)
 
 // --- The light hero gradient -----------------------------------------------------------
 //
-// Mint at the top, sand at the bottom. **Light theme only** — in dark the same card is a
-// flat surface with a hairline border, and that asymmetry is the design's, not an
-// oversight.
+// Mint at the top, sand at the bottom, in light. Dark has its own fixed green gradient below
+// (flat until 18 Oct 2026, when the owner asked for the widgets' glossy look on this card).
 //
 // This is not the old time-of-day gradient, and the difference is the whole point. That
 // one changed colour with the prayer slot, so the contrast ratio under the countdown was
@@ -111,6 +117,30 @@ val LightHeroEnd = Color(0xFFE4D2B4)
 val LightOnHero = Color(0xFF0A2419)
 val LightOnHeroLabel = Color(0xFF2C4A3C)
 val LightOnHeroSecondary = Color(0xFF3E5C4C)
+
+// The gloss (owner, 18 Oct 2026, "apple style premium look", matching the widgets). A white
+// sheen over the top half that fades out by the middle, a white rim brightest at the top, and a
+// soft green shadow. The sheen only ever lightens the mint stop, so it can only raise the
+// contrast of the dark inks on it; ColorContrastTest checks the composite anyway.
+// The call to action fill and its text (owner, 18 Oct 2026: solid, white text, hard to miss).
+// Light is primary; dark is its own green because dark primary (#4FC48F) cannot carry white text.
+val LightCta = Color(0xFF0B5A43)
+val DarkCta = Color(0xFF17805A)
+val OnCta = Color(0xFFFFFFFF)
+
+val LightHeroSheen = Color(0x99FFFFFF)
+val LightHeroRim = Color(0xCCFFFFFF)
+val LightHeroRimBottom = Color(0x33FFFFFF)
+val LightHeroGlow = Color(0x590B5A43)
+
+// The dark card, in the widgets' countdown card colours (values-night/colors.xml
+// widget_highlight_top and widget_highlight; the bottom is one step deeper). The sheen is the
+// widgets' sheen, which lightens the top stop, so the composite is what ColorContrastTest checks.
+val DarkHeroTop = Color(0xFF18382D)
+val DarkHeroBottom = Color(0xFF0F241D)
+val DarkHeroSheen = Color(0x12FFFFFF)
+val DarkHeroRim = Color(0x29FFFFFF)
+val DarkHeroRimBottom = Color(0x0AFFFFFF)
 
 // --- Dark ----------------------------------------------------------------------------
 //
@@ -177,4 +207,19 @@ val DarkInverseSurface = Color(0xFFE7EAE8)
 val DarkInverseOnSurface = Color(0xFF171B1A)
 // The inverse roles are each other's primary, so these two move together with the palette.
 // This one was missed when light changed and sat on the old #14624B for a commit.
-val DarkInversePrimary = Color(0xFF0E6B4F)
+val DarkInversePrimary = Color(0xFF0B5A43)
+
+/**
+ * How opaque the floating tab bar is (Quiet Glass, 17 Oct 2026). Content scrolls under it and
+ * shows through faintly, which is the glass. ColorContrastTest composites the bar over pure black
+ * and pure white and checks every label colour on both.
+ *
+ * 97% since 18 Oct 2026 (owner's choice from screenshots). At 90% the words and buttons scrolling
+ * underneath were readable through the bar and ran into its labels, worst in dark (a notice's
+ * "See why" behind "Times", measured +19 shades over the bar; +4 at 97%). Do not lower it.
+ *
+ * ponytail: translucency without blur, on every Android version. Real backdrop blur needs
+ * Android 12 and a library (Haze). Add it when the owner asks for more glass, and keep this value
+ * as the fallback for Android 7 to 11.
+ */
+const val GlassBarAlpha = 0.97f

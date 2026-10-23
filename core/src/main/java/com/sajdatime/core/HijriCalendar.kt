@@ -34,14 +34,24 @@ data class RamadanInfo(
      * Whether the quiet "Ramadan begins on ..." notice belongs on the Times screen today: from
      * [NOTICE_LEAD_DAYS] days before day 1 until day [NOTICE_LAST_DAY_NUMBER] of the month.
      *
-     * A week, not two. Surveys put the biggest group of people starting their preparations one to
-     * two weeks before, but this notice has three jobs (set the suhoor reminder before the first
-     * night, check the date with the mosque, preview the timetable) and a week is enough for all
-     * three. A window that is too short can be lengthened in an update; one that annoys people
-     * cannot be taken back. The evidence and its limits are in the plan README, Amendment 1.
+     * Three days, the owner's choice on 19 Oct 2026 ("start 1 or 2 days before ... or it could
+     * confuse the users"). It was a week until then. Three, not his one or two, on Claude's advice
+     * and his yes: the notice still has to leave two evenings to set the suhoor reminder before the
+     * first suhoor and to check the date with the mosque, which often starts a day later than this
+     * calendar. One day before is too late for that on a phone opened once that week. The Settings
+     * rows for Ramadan appear on the same day ([showsSettings]); the timetable stays at 30 days.
      */
     fun showsNotice(today: LocalDate): Boolean =
         daysUntilStart(today) in -(NOTICE_LAST_DAY_NUMBER - 1L)..NOTICE_LEAD_DAYS
+
+    /**
+     * Whether Settings shows the Ramadan rows ("Ramadan card", "Suhoor reminder"): from the day the
+     * notice starts until the last day of Ramadan. Hidden the rest of the year so a Ramadan setting
+     * in, say, August does not confuse anyone (owner, 19 Oct 2026). A choice made is kept while the
+     * rows are hidden and is there again next year; the suhoor reminder only ever fires in Ramadan.
+     */
+    fun showsSettings(today: LocalDate): Boolean =
+        contains(today) || daysUntilStart(today) in 1L..NOTICE_LEAD_DAYS
 
     /**
      * Whether the Ramadan timetable is offered in the export sheet: from [EXPORT_LEAD_DAYS] days
@@ -53,7 +63,7 @@ data class RamadanInfo(
         isRamadan || daysUntilStart(today) in 1L..EXPORT_LEAD_DAYS
 
     companion object {
-        const val NOTICE_LEAD_DAYS = 7L
+        const val NOTICE_LEAD_DAYS = 3L
         const val NOTICE_LAST_DAY_NUMBER = 2
         const val EXPORT_LEAD_DAYS = 30L
     }

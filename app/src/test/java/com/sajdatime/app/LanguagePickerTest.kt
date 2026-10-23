@@ -24,8 +24,8 @@ class LanguagePickerTest {
     private fun read(path: String) = File("..", path).readText()
 
     @Test
-    fun `the picker offers English first, then Urdu, Turkish and Indonesian`() {
-        assertEquals(listOf("en", "ur", "tr", "id"), AppLanguage.entries.map { it.tag })
+    fun `the picker offers English first, then Urdu, Turkish, Indonesian and Arabic`() {
+        assertEquals(listOf("en", "ur", "tr", "id", "ar"), AppLanguage.entries.map { it.tag })
     }
 
     @Test
@@ -47,7 +47,8 @@ class LanguagePickerTest {
             assertTrue("${language.tag}: missing $core", core.isFile)
             assertTrue(
                 "${language.tag}: core must declare app_language_tag \"${language.tag}\"",
-                core.readText().contains("""name="app_language_tag">${language.tag}<"""),
+                // The tag or a variant of it: Arabic is ar-u-nu-latn, to pin Western digits.
+                Regex("""name="app_language_tag">${language.tag}(-[^<]*)?<""").containsMatchIn(core.readText()),
             )
         }
     }

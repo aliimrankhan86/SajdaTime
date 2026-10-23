@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.data.placeName
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +47,7 @@ import com.sajdatime.app.ui.RamadanRow
 import com.sajdatime.app.ui.RamadanTimetable
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.core.bidiIsolated
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -102,10 +104,10 @@ internal fun RamadanTimetableSheet(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.semantics { heading() },
                     )
-                    Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(Space.Tight))
                     Text(
                         // isBlank is checked before isolating, so the fallback still fires.
-                        text = state.settings.cityName.bidiIsolated().ifBlank {
+                        text = state.settings.placeName(LocalContext.current).bidiIsolated().ifBlank {
                             stringResource(R.string.pdf_place_unknown)
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -116,20 +118,20 @@ internal fun RamadanTimetableSheet(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                TextButton(onClick = onExport) {
+                CtaButton(onClick = onExport, compact = true) {
                     Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.width(Space.Related))
                     Text(stringResource(R.string.action_save_pdf))
                 }
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Paragraph))
             HeaderRow()
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             LazyColumn(
                 state = listState,
                 modifier = Modifier.weight(1f, fill = false),
-                contentPadding = PaddingValues(bottom = 24.dp),
+                contentPadding = PaddingValues(bottom = Space.Section),
             ) {
                 items(rows, key = { it.dayNumber }) { row ->
                     TimetableRow(row = row, isToday = row.date == todayDate)
@@ -239,7 +241,7 @@ private fun TimeCell(
 private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(Space.Related),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 24.dp, vertical = 16.dp),
@@ -256,7 +258,8 @@ private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
                 color = scheme.onSurfaceVariant,
             )
         }
-        TextButton(onClick = onShiftDate) {
+        // Alone on its line, so full width (DESIGN_SYSTEM 4.1).
+        CtaButton(onClick = onShiftDate, modifier = Modifier.fillMaxWidth()) {
             Text(stringResource(R.string.settings_hijri_offset_label))
         }
     }

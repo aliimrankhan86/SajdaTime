@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The built-in adhans are referenced only by name, in the sound address stored in settings
+     (data/BuiltInAdhan.kt), which resource shrinking cannot see. Without this the release build
+     would strip them and a chosen adhan would fall silent. -->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/adhan,@raw/adhan_shia" />

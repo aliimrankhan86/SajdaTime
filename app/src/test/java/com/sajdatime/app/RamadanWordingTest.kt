@@ -22,7 +22,7 @@ import java.io.File
 class RamadanWordingTest {
 
     private val root = File("..").canonicalFile
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in")
+    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
 
     private fun strings(folder: String): Map<String, String> {
         val file = File(root, "app/src/main/res/$folder/strings.xml")
@@ -50,7 +50,8 @@ class RamadanWordingTest {
     @Test
     fun `the set is the size it should be, so a renamed prefix cannot make the checks vacuous`() {
         assertTrue("only ${keys.size} keys matched", keys.size >= 55)
-        assertEquals(12, keys.count { it.startsWith("widget_") })
+        // 13 since 18 Oct 2026: widget_update_location, the location chip's spoken label.
+        assertEquals(13, keys.count { it.startsWith("widget_") })
     }
 
     @Test
@@ -98,9 +99,11 @@ class RamadanWordingTest {
     }
 
     @Test
-    fun `the widget descriptions say they follow the phone's dark mode`() {
+    fun `the widget descriptions no longer say they follow the phone's dark mode`() {
+        // True until 19 Oct 2026. The widgets now follow the app's Theme row (WidgetThemeTest), as the
+        // app does, so the sentence that warned of the difference was removed in every language.
         for (key in listOf("widget_next_desc", "widget_today_desc")) {
-            assertTrue("$key", english.getValue(key).contains("dark mode", ignoreCase = true))
+            assertFalse("$key", english.getValue(key).contains("dark mode", ignoreCase = true))
         }
     }
 

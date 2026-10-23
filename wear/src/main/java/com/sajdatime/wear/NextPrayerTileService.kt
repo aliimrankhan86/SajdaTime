@@ -32,9 +32,11 @@ import java.time.ZoneId
  * The tile the user swipes to from the watch face: next prayer, its time, and how long
  * is left.
  *
- * Tiles are static snapshots, not live views. Rather than push updates every second, the
- * tile asks to be refreshed shortly after the next prayer starts, so it is correct
- * whenever the user actually looks at it and costs nothing in between.
+ * Tiles are static snapshots, not live views, and the watch keeps one until it asks again.
+ * So the countdown is handed over as a timeline, one entry per minute for up to an hour
+ * (TileFormat.countdownSteps), and the watch swaps the text on the minute without waking
+ * the app. It asks again a minute after the prayer, or after the hour, whichever is first.
+ * Until 19 Oct 2026 there was one entry, and the tile said "in 41m" for 41 minutes.
  */
 class NextPrayerTileService : TileService() {
 
@@ -45,8 +47,20 @@ class NextPrayerTileService : TileService() {
      * the countdown is formatted in the app's own language and not the watch's. Without it
      * the tile read "in ٢h ١٤m" on an Arabic watch, in a layout sized for Latin digits.
      * See AppLocale.kt.
+     *
+     * Made once per tile request, not held: the system keeps this service process alive between
+     * requests, so a context made once (it was `by lazy`) would go on showing the old language
+     * after the watch's language changed. (8 Oct 2026 branch, brought into 1.5.0 on 19 Oct 2026.)
+     *
+     * Run on the watch emulator, 19 Oct 2026: a tile drawn by a new process is in the app's
+     * language (Urdu, and Arabic right to left with Western digits). A per-app language switch
+     * while this service is still bound leaves its own context in the old language until the
+     * service is created again; `applicationContext` was tried and is worse (it ignored the
+     * app's language altogether), so it stays `this`. A change of the watch's own language was
+     * run on the evening of 19 Oct 2026 (English to Urdu to Arabic and back, HANDOVER lesson 167):
+     * the watch restarts its tile renderer, and the tile came back in the new language each time.
      */
-    private val localised: Context by lazy { AppLocale.wrap(this) }
+    private fun localised(): Context = AppLocale.wrap(this)
 
     override fun onTileRequest(
         requestParams: RequestBuilders.TileRequest,
@@ -54,11 +68,13 @@ class NextPrayerTileService : TileService() {
         val settings = WearSettingsStore(applicationContext).settings.first()
         val coordinates = settings.coordinates
         val now = Instant.now()
+        val localised = localised()
 
-        val (headline, detail, refreshAfter) = if (coordinates == null) {
+        // Each detail line with the moment it becomes true; the first is now.
+        val (headline, details, refreshAfter) = if (coordinates == null) {
             Triple(
                 localised.getString(R.string.tile_label),
-                localised.getString(R.string.tile_needs_setup),
+                listOf(now to localised.getString(R.string.tile_needs_setup)),
                 Duration.ofHours(1),
             )
         } else {
@@ -81,39 +97,44 @@ class NextPrayerTileService : TileService() {
                     settings.calculationPrefs,
                 ).approximatedFrom != null
             }.getOrDefault(false)
+            val clock = TileFormat.clock(localised, next.at)
             Triple(
                 next.slot.label(localised),
-                localised.getString(
-                    if (approximate) R.string.wear_tile_detail_approx else R.string.wear_tile_detail,
-                    TileFormat.clock(localised, next.at),
-                    TileFormat.humanise(localised, remaining),
-                ),
+                TileFormat.countdownSteps(now, next.at).map { (start, shown) ->
+                    start to localised.getString(
+                        if (approximate) R.string.wear_tile_detail_approx else R.string.wear_tile_detail,
+                        clock,
+                        TileFormat.humanise(localised, shown),
+                    )
+                },
                 TileFormat.freshness(remaining),
             )
+        }
+
+        val timeline = TimelineBuilders.Timeline.Builder()
+        details.forEachIndexed { index, (start, detail) ->
+            val entry = TimelineBuilders.TimelineEntry.Builder().setLayout(
+                LayoutElementBuilders.Layout.Builder()
+                    .setRoot(layout(headline, detail, requestParams.deviceConfiguration, localised))
+                    .build(),
+            )
+            // Each entry runs until the next one starts. The last has no window, which makes it
+            // the one the watch shows once the others have run out.
+            details.getOrNull(index + 1)?.let { (end, _) ->
+                entry.setValidity(
+                    TimelineBuilders.TimeInterval.Builder()
+                        .setStartMillis(start.toEpochMilli())
+                        .setEndMillis(end.toEpochMilli())
+                        .build(),
+                )
+            }
+            timeline.addTimelineEntry(entry.build())
         }
 
         TileBuilders.Tile.Builder()
             .setResourcesVersion(RESOURCES_VERSION)
             .setFreshnessIntervalMillis(refreshAfter.toMillis())
-            .setTileTimeline(
-                TimelineBuilders.Timeline.Builder()
-                    .addTimelineEntry(
-                        TimelineBuilders.TimelineEntry.Builder()
-                            .setLayout(
-                                LayoutElementBuilders.Layout.Builder()
-                                    .setRoot(
-                                        layout(
-                                            headline = headline,
-                                            detail = detail,
-                                            device = requestParams.deviceConfiguration,
-                                        ),
-                                    )
-                                    .build(),
-                            )
-                            .build(),
-                    )
-                    .build(),
-            )
+            .setTileTimeline(timeline.build())
             .build()
     }
 
@@ -132,6 +153,7 @@ class NextPrayerTileService : TileService() {
         headline: String,
         detail: String,
         @Suppress("UNUSED_PARAMETER") device: DeviceParameters,
+        localised: Context,
     ): LayoutElementBuilders.LayoutElement =
         LayoutElementBuilders.Box.Builder()
             .setWidth(androidx.wear.protolayout.DimensionBuilders.expand())
@@ -204,4 +226,14 @@ class NextPrayerTileService : TileService() {
         const val COLOUR_ON_SURFACE = 0xFFE8EEEA.toInt()
         const val COLOUR_MUTED = 0xFFB3C2BA.toInt()
     }
+}
+
+/**
+ * Asks the watch to draw the tile again now. Otherwise it keeps its last drawing until its own
+ * refresh, up to an hour away, so new settings from the phone or the wrist, or a language
+ * changed before the app was opened, would wait for it (watch emulator, 19 Oct 2026).
+ */
+internal fun refreshTile(context: Context) {
+    // The application context: the updater binds with the context it is given and unbinds later.
+    TileService.getUpdater(context.applicationContext).requestUpdate(NextPrayerTileService::class.java)
 }

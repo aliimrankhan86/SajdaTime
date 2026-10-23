@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A copy of widget_hero_background.xml with each colour fixed to its dark value, for a widget whose theme
+     is chosen in the app (Settings, Theme). WidgetThemeTest fails the build if the two drift. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:endColor="@color/widget_dark_highlight"
+                android:startColor="@color/widget_dark_highlight_top"
+                android:type="linear" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="@android:color/transparent"
+                android:centerY="0.5"
+                android:endColor="@android:color/transparent"
+                android:startColor="@color/widget_dark_sheen"
+                android:type="linear" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+</layer-list>

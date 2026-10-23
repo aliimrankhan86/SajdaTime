@@ -26,24 +26,29 @@
     <string name="action_begin">Begin</string>
 
     <string name="permission_title">Where are you praying?</string>
-    <string name="permission_body">SajdaTime needs a rough idea of where you are to work out your prayer times and the direction of the Qibla. Tap the info icon to see exactly what that means.</string>
-    <string name="permission_why_title">Why we need your location</string>
+    <string name="permission_body">SajdaTime works out your prayer times and the Qibla from a rough idea of where you are.</string>
     <string name="permission_why_body">To work out the right prayer times and Qibla direction for where you are.\n\nWe only check your approximate location while the app is open. The times are worked out on your phone and we never receive your location. To show your town\'s name, the app asks your phone\'s own place lookup, which on most phones is answered over the internet by Google.</string>
     <string name="action_allow_location">Allow location</string>
+    <string name="action_how_location_used">How your location is used</string>
     <string name="action_got_it">Got it</string>
     <string name="action_understood">I understand</string>
     <string name="action_continue">Continue</string>
     <string name="location_set_generic">Your location</string>
     <string name="location_finding">Finding your location…</string>
     <string name="location_looking_up">Looking up that place…</string>
-    <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type your city below.</string>
+    <string name="location_no_fix">We could not get a fix. Check that location is turned on, or type where you are below.</string>
 
-    <string name="city_fallback_body">Type your city instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
-    <string name="city_field_label">City</string>
-    <string name="city_field_helper">For example: Manchester, Lahore, Cairo</string>
-    <string name="city_not_found">We could not find that place. Try adding the country.</string>
-    <string name="action_find_city">Find city</string>
+    <string name="city_fallback_body">Type where you are instead. The name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+
+    <string name="city_lookup_note">The name you type is looked up over the internet. After that, everything is worked out on your phone.</string>
+
+    <string name="city_lookup_detail">If you type a place instead, the name is looked up by your phone\'s own place lookup, which on most phones asks Google over the internet. If that cannot answer, just the name you typed is sent once to a free lookup service. After that, everything is worked out on your phone.</string>
+    <string name="city_field_label">Town, city or village</string>
+    <string name="city_field_helper">For example: Karachi, London, Makkah, New York</string>
+    <string name="city_not_found">We could not find that place. Try adding the country, or type the nearest town.</string>
+    <string name="action_find_city">Find place</string>
     <string name="action_use_makkah">Skip for now and use Makkah</string>
+    <string name="setup_makkah_note">Prayer times will be for Makkah until you set your location.</string>
 
     <string name="sect_title">Which school do you follow?</string>
     <string name="sect_body">This sets how your prayer times are worked out. You can change it whenever you like.</string>
@@ -53,7 +58,7 @@
     <string name="sect_shia_desc">Jafari (Ithna Ashari) times</string>
 
     <string name="madhab_title">Select your madhab</string>
-    <string name="madhab_body">Optional. This only changes the Asr time. Skip it and you will get the standard timing.</string>
+    <string name="madhab_body">This only changes the Asr time. Hanafi mosques begin Asr later. Shafi\'i, Maliki and Hanbali use the standard time. Not sure? Keep Shafi\'i for the standard time. You can change it later in Settings.</string>
     <string name="madhab_hanafi">Hanafi</string>
     <string name="madhab_shafii">Shafi\'i</string>
     <string name="madhab_maliki">Maliki</string>
@@ -120,9 +125,13 @@
       substance dressed as an edit, and the fourth is the owner's own request.
     -->
     <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
+         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
+    <string name="disclaimer_brief">SajdaTime is a helper, not a religious authority.\n\nNo mosque or scholar supplies these times. Your phone calculates them from the position of the sun. I am not a Mufti or Aalim, and the app was built with the help of artificial intelligence, so a software fault, a wrong location or a wrong clock can make a time wrong.\n\nWhere SajdaTime and your mosque disagree, follow your mosque. The app is free and given as it is, with no warranty.</string>
+    <string name="disclaimer_read_full">Read in full</string>
 
     <!-- Home -->
-    <string name="home_next_prayer">NEXT PRAYER</string>
+    <string name="home_next_prayer">Next prayer</string>
     <string name="home_until">until it begins</string>
     <string name="home_today">Today</string>
     <string name="home_next_marker">Next</string>
@@ -139,6 +148,8 @@
     <!-- Screen-reader label for the row carrying that pill. -->
     <string name="home_now_marker_a11y">Current prayer</string>
     <string name="notice_dismiss">Dismiss</string>
+    <string name="notice_show_details">Details</string>
+    <string name="notice_hide_details">Hide details</string>
     <!-- The far-north form of the "Different from your mosque?" door under the timetable
          (HomeScreen.MosqueDifferenceDoor). Shown only above ~45° of latitude, only while the
          method is still AUTO, and only until dismissed; everywhere else the door is a plain
@@ -159,7 +170,7 @@
          emulator, a third line is exactly what the navigation bar clips. "Here" means at
          this latitude; the dialog behind it says why (twilight) and offers the chooser. -->
     <string name="method_notice_title">Does this match your mosque?</string>
-    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here. Tap to see why.</string>
+    <string name="method_notice_body">Fajr and Isha can differ by an hour or more here.</string>
     <!--
       The plain, permanent form of the door under the timetable — what everyone below 45°
       sees, and what everyone sees once the loud form above is dismissed or a method is
@@ -204,8 +215,8 @@
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Showing times for Makkah</string>
-    <string name="home_default_location_body">We could not work out where you are. Tap to set your location.</string>
+    <string name="home_default_location_title">Times for Makkah</string>
+    <string name="home_default_location_body">Your location is not set yet, so these times are for Makkah.</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -216,9 +227,9 @@
          latitude moves every prayer by at most 2 minutes, in midsummer, midwinter and
          between. See HANDOVER §10. Shown only when the user opens this sheet — the app
          does not volunteer it, and it is not a second disclaimer. -->
-    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little: ten miles is about a minute. If the name looks wrong to you, type your city below.</string>
+    <string name="location_sheet_body">Prayer times and the Qibla both depend on where you are. Update this whenever you travel.\n\nTo protect your privacy the app only ever asks for your approximate position, so it may name a nearby town or the wider area rather than yours. That changes the times very little: ten miles is about a minute. If the name looks wrong to you, type where you are below.</string>
     <string name="action_use_my_location">Use my current location</string>
-    <string name="location_sheet_search_heading">Or type a city</string>
+    <string name="location_sheet_search_heading">Or type where you are</string>
 
     <!-- Export -->
     <string name="action_save_timetable">Save timetable as PDF</string>
@@ -288,14 +299,14 @@
       without opening anything.
     -->
     <string name="title_settings">Settings</string>
-    <string name="settings_group_prayer_times">PRAYER TIMES</string>
-    <string name="settings_group_appearance">APPEARANCE</string>
+    <string name="settings_group_prayer_times">Prayer times</string>
+    <string name="settings_group_appearance">Appearance</string>
     <string name="settings_theme">Theme</string>
     <string name="theme_system">Follow phone</string>
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
-    <string name="settings_group_reminders">REMINDERS</string>
-    <string name="settings_group_about">ABOUT</string>
+    <string name="settings_group_reminders">Reminders</string>
+    <string name="settings_group_about">About</string>
 
     <string name="settings_location">Location</string>
     <string name="settings_school">School of thought</string>
@@ -310,22 +321,33 @@
     <string name="settings_method_auto">Automatic · %1$s</string>
     <string name="settings_method_help">Mosques measure the twilight differently, and that mainly moves Fajr and Isha. The further north you live, the bigger the gap. If these times do not match your mosque, ask them which method they use and pick it here.</string>
 
-    <string name="settings_alerts_help">Choose this for each prayer. A notification is quiet and vibrates. An alarm plays the sound you pick, loudly, the way a wake-up alarm does.</string>
+    <string name="settings_alerts_help">Notification: plays the notification sound and vibrates. Alarm: plays the alarm sound at alarm volume and vibrates. Choose each sound in Settings, just below Prayer alerts.</string>
     <string name="alert_style_off">Off</string>
     <string name="alert_style_notification">Notification</string>
     <string name="alert_style_alarm">Alarm</string>
     <!-- Shown under "Prayer alerts" when the five prayers do not all use the same style. -->
     <string name="alert_style_mixed">Mixed</string>
     <string name="settings_alarm_sound">Alarm sound</string>
-    <string name="settings_alarm_sound_desc">Pick any tone or adhan already on your phone</string>
-    <string name="settings_alarm_respect_silent">Stay quiet when your phone is silent</string>
-    <string name="settings_alarm_respect_silent_desc">On: you still get the notification on time, without the sound. Off: the alarm sounds even when the phone is silenced, the way a wake-up alarm does.</string>
+    <string name="settings_alarm_sound_default">Your phone\'s default alarm</string>
+    <!-- 1.5.0 built-in adhans, one per school (data/BuiltInAdhan.kt). -->
+    <string name="settings_alarm_sound_phone">From your phone</string>
+    <string name="settings_notification_sound">Notification sound</string>
+    <string name="settings_notification_sound_default">Your phone\'s usual tone</string>
+    <string name="settings_notification_sound_help">Plays when a prayer notification arrives, at your notification volume. Your phone\'s silent, vibrate and Do Not Disturb settings still apply. Pulling down your notifications or swiping the notification away stops the sound.</string>
+    <string name="settings_alarm_sound_help">Plays for prayers set to Alarm, at your alarm volume.</string>
+    <string name="settings_alarm_play_on_silent">Play on silent</string>
+    <string name="settings_alarm_play_on_silent_desc">Plays even when your phone is on silent or Do Not Disturb. Off: notification and vibration only.</string>
+    <string name="adhan_builtin">Adhan</string>
     <string name="settings_dnd_title">Allow sound during Do Not Disturb</string>
-    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb. Tap to allow.</string>
+    <string name="settings_dnd_desc">Without this, your alarm stays silent when the phone is on Do Not Disturb.</string>
 
-    <string name="settings_ongoing_badge">Keep the next prayer in the shade</string>
-    <string name="settings_ongoing_badge_desc">A silent notification showing what is next and how long you have</string>
+    <string name="settings_ongoing_badge">Next prayer in notifications</string>
+    <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and the time left</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
+    <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
+    <string name="settings_exact_alarms_brief">Prayer alerts can arrive an hour late.</string>
+    <!-- The action on a permission notice. It opens the phone's own settings screen. -->
+    <string name="action_allow">Allow</string>
     <!-- These two said only "and deliver them late", with no number, because Android
          documents no upper bound and "a few minutes" was a promise we could not keep.
          That was right while we were reasoning; it is wrong now that we have measured.
@@ -336,7 +358,7 @@
          that silently costs them Fajr, so both strings now name the measured floor and
          the overnight case. Fajr is named because it is the one that matters and the one
          that fails. Evidence in HANDOVER section 10. -->
-    <string name="settings_exact_alarms_desc">Without this your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. Tap to allow.</string>
+    <string name="settings_exact_alarms_desc">Without it, prayer alerts can arrive an hour or more late, and on some phones Fajr may not arrive at all.</string>
     <string name="confirm_exact_alarm_title">One last thing</string>
     <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>
     <string name="action_close">Close</string>
@@ -345,7 +367,7 @@
     <string name="about_disclaimer">Disclaimer</string>
     <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
     <string name="about_privacy">Privacy</string>
-    <string name="about_privacy_desc">Times are worked out on this phone and we never receive your location. No accounts, no ads. Usage counts are optional and off unless you turn them on. Tap to read the full policy.</string>
+    <string name="about_privacy_desc">Times are worked out on this phone, and we never receive your location. No accounts and no ads. Usage counts stay off unless you turn them on.</string>
 
     <!-- Optional usage counts. Wording rules: docs/ANALYTICS_PLAN.md section 7.2. The consent text
          must state the material facts in full (who receives it, the random ID, what is and is not
@@ -355,6 +377,7 @@
     <string name="settings_language_title">Language</string>
     <string name="settings_language_desc">Choose the language of the app</string>
     <string name="language_unavailable">Not available on this phone</string>
+    <string name="language_phone">Phone language</string>
     <string name="permission_allowed">Allowed</string>
     <string name="state_expanded">Expanded</string>
     <string name="state_collapsed">Collapsed</string>
@@ -367,12 +390,13 @@
     <string name="consent_yes">Yes, share usage counts</string>
     <string name="consent_no">No thanks</string>
     <string name="consent_read_policy">Read the privacy policy</string>
+    <string name="consent_policy_english">The full privacy policy is in English.</string>
     <string name="about_feedback">Send feedback</string>
-    <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email app.</string>
+    <string name="about_feedback_desc">Tell the developer what helps or what is wrong. Opens your email.</string>
     <string name="feedback_email" translatable="false">aikstudies@gmail.com</string>
     <string name="feedback_subject">SajdaTime feedback</string>
     <string name="settings_usage_counts">Share usage counts</string>
-    <string name="settings_usage_counts_desc">Sent to Google, tied to a random ID. Off unless you turn it on. Turning it on shows exactly what is sent.</string>
+    <string name="settings_usage_counts_desc">Off unless you turn it on. Sent to Google with a random ID. Turning it on first shows exactly what is sent.</string>
     <string name="privacy_policy_url" translatable="false">https://aliimrankhan86.github.io/SajdaTime/privacy.html</string>
     <string name="about_charity">Free, forever</string>
     <string name="about_charity_desc">Made with love, free for the Ummah. A charity project, for the sake of Allah.</string>
@@ -382,6 +406,11 @@
          licence obligation, not a courtesy — do not remove it. -->
     <string name="about_data">Data and libraries</string>
     <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
+    <string name="about_adhan">Adhan recordings</string>
+    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons.</string>
+    <string name="about_adhan_link_source">Sunni source</string>
+    <string name="about_adhan_link_shia">Shia source</string>
+    <string name="about_adhan_link_licence">CC BY-SA 4.0 licence</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Prayer times</string>
@@ -393,7 +422,6 @@
     <string name="notif_prayer_title">Time for %1$s</string>
     <string name="notif_prayer_body">%1$s begins at %2$s</string>
     <string name="notif_next_title">%1$s at %2$s</string>
-    <string name="notif_next_body">In %1$s</string>
 
     <!--
       Hijri month names are listed here rather than left to the platform. Month name data
@@ -430,7 +458,13 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Match your mosque</string>
     <string name="settings_adjustments_none">No changes</string>
-    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <string name="settings_adjustments_help">If your mosque prints a different time, nudge it here, or set the time its board shows. Try the calculation method first. That is usually the real difference, and this is for the few minutes left over.</string>
+    <string name="adjustment_use_board">Use your mosque\'s board</string>
+    <string name="adjustment_which_prayer">Which prayer?</string>
+    <string name="action_set_time">Set time</string>
+    <string name="adjustment_pick_time_title">%1$s: the time on your mosque\'s board</string>
+    <string name="adjustment_limit_note">A gap of %1$d minutes or more is usually a different calculation method, or a mosque board that shows the congregation time, which is a little later. Try the method first.</string>
+    <string name="adjustment_choose_method">Choose a calculation method</string>
     <string name="settings_adjustments_reset">Reset all</string>
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>
@@ -505,16 +539,16 @@
     <string name="ramadan_info_date">The Islamic date here follows the Umm al-Qura calendar. If your mosque began Ramadan on a different day, shift the Islamic date in Settings. That also moves the day count, the suhoor reminder and the Umm al-Qura Isha rule.</string>
     <string name="ramadan_info_hide">Hide this card</string>
     <string name="ramadan_info_hide_note">You can show it again in Settings.</string>
-    <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from a week before day 1. -->
+    <!-- %1$s is a date such as "Mon 8 Feb" from TimeFormat.date. Shown from 3 days before day 1 (a week until 19 Oct 2026). -->
     <string name="ramadan_eve_title_before">Ramadan on this calendar begins %1$s</string>
-    <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, tap to shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
+    <string name="ramadan_eve_body">Many mosques announce their own start after sighting the moon, often a day later. If yours differs, shift the Islamic date. That also moves the suhoor reminder and the Umm al-Qura Isha rule.</string>
     <!-- Under the card on days 1 and 2 only, in place of the notice. -->
     <string name="ramadan_date_differs">Did your mosque begin Ramadan on a different day?</string>
     <string name="settings_ramadan_card">Ramadan card</string>
     <string name="settings_ramadan_card_desc">Shows suhoor and iftar times on the Times screen during Ramadan</string>
 
     <!-- Ramadan timetable: the sheet from the card, the export option and the PDF. -->
-    <string name="ramadan_open_timetable">Full timetable</string>
+    <string name="ramadan_open_timetable">Get the full Ramadan timetable</string>
     <string name="ramadan_timetable_title">Ramadan %1$d</string>
     <string name="ramadan_col_day">Day</string>
     <string name="ramadan_col_fast">Fast</string>
@@ -528,11 +562,17 @@
     <string name="pdf_ramadan_note">Suhoor ends at Fajr. Iftar at Maghrib. Follow your mosque where its timetable differs.</string>
     <string name="ramadan_row_a11y">Day %1$d, %2$s. Suhoor ends %3$s. Iftar %4$s. Fast %5$s.</string>
     <string name="settings_suhoor">Suhoor reminder</string>
-    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. It uses the same sound and silent mode rules as your prayer alerts.</string>
+    <string name="settings_suhoor_help">A reminder before Fajr on the days of Ramadan, on the calendar SajdaTime is set to. It uses your phone\'s own sound unless you choose the adhan here.</string>
     <string name="suhoor_off">Off</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">%d minute before Fajr</item>
         <item quantity="other">%d minutes before Fajr</item>
+    </plurals>
+    <string name="settings_prayer_reminder">Reminder before prayer</string>
+    <string name="settings_prayer_reminder_help">A quiet notification a few minutes before each prayer you choose, so you have time to get ready.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="one">%d minute before</item>
+        <item quantity="other">%d minutes before</item>
     </plurals>
     <string name="notif_suhoor_title">Suhoor ends at %1$s</string>
     <string name="notif_suhoor_body">%1$s begins in %2$s</string>
@@ -552,13 +592,14 @@
     <!--
       Home screen widgets. Never put android:text in the widget layouts: RemoteViews are inflated in
       the launcher with the phone's language, so every word is set from code through AppLocale.wrap.
-      The widgets follow the phone's dark mode, not the app's Theme row, and the descriptions say so.
-      No place name on a widget: the home screen is visible to other people.
+      The widgets follow the app's Theme row (System, Light, Dark) since 19 Oct 2026, owner's request;
+      until then they followed the phone's dark mode and these descriptions said so.
+      The widgets show the town the times are for, from the saved label (owner request, 18 Oct 2026).
     -->
     <string name="widget_next_label">SajdaTime: next prayer</string>
     <string name="widget_today_label">SajdaTime: today\'s prayers</string>
-    <string name="widget_next_desc">The next prayer and its time, with a countdown. Follows your phone\'s dark mode.</string>
-    <string name="widget_today_desc">All six times for today with the next one marked. Follows your phone\'s dark mode.</string>
+    <string name="widget_next_desc">The next prayer and its time, with a countdown.</string>
+    <string name="widget_today_desc">All six times for today with the next one marked.</string>
     <string name="widget_tomorrow">Tomorrow</string>
     <string name="widget_no_location">Open SajdaTime to set your location</string>
     <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining such as "1h 20m". -->
@@ -569,4 +610,24 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">Suhoor ends</string>
     <string name="widget_iftar">Iftar</string>
+    <string name="widget_update_location">Update location, %1$s</string>
+    <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
+    <string name="action_see_why">See why</string>
+    <string name="ramadan_eve_brief">Your mosque may start a day later.</string>
+    <string name="ramadan_eve_card_on">From the first day, the Ramadan card shows suhoor and iftar times here. You can turn it off in Settings.</string>
+    <string name="ramadan_eve_card_on_reminder">From the first day, the Ramadan card shows suhoor and iftar times here, and a reminder comes %1$d minutes before suhoor ends. You can turn either off in Settings.</string>
+    <string name="polar_notice_brief">Fajr and Isha here are worked out from latitude %1$d°.</string>
+    <string name="action_set_location">Set location</string>
+    <string name="city_lookup_offline">No internet connection. Connect once to look up a place, or use your location.</string>
+    <string name="about_rate">Rate SajdaTime on Google Play</string>
+    <string name="about_rate_desc">Opens the store page.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%1$s for %2$s</string>
+    <string name="location_permission_denied">Location was not allowed. Type where you are below, or tap Allow location to try again.</string>
+    <string name="confirm_notifications_hint">When you tap %1$s, Android will ask whether SajdaTime may send notifications. Say yes to get prayer alerts. You can change this later in your phone\'s settings.</string>
+    <string name="about_share">Share SajdaTime</string>
+    <string name="about_share_desc">Send the link to family and friends.</string>
+    <string name="about_share_message">SajdaTime: free prayer times and a Qibla compass, with no ads and no accounts. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
+    <!-- The fallback place, shown in the app's own language. -->
+    <string name="location_makkah">Makkah</string>
 </resources>

@@ -4,7 +4,7 @@ Leave this Play Console box **blank**.
 
 The field is marked with an asterisk, but the error text under it reads *"Upload at least
 2 phone or tablet screenshots"* — one requirement shared across phone, tablet and
-Chromebook. The five files in `../phone/` already satisfy it.
+Chromebook. The six files in `../phone/` already satisfy it.
 
 It is empty because **SajdaTime has no large-screen layout yet**. Putting phone captures
 here would show a stretched phone UI and advertise a 7-inch tablet experience that does not

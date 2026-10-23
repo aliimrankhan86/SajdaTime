@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui
 
+import com.sajdatime.app.data.placeName
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
@@ -17,6 +18,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
@@ -55,6 +57,8 @@ enum class LocationProblem {
     PERMISSION_DENIED,
     NO_FIX,
     CITY_NOT_FOUND,
+    /** City search failed and the phone has no network: "not found" would be untrue. */
+    OFFLINE,
 }
 
 /**
@@ -91,7 +95,7 @@ data class UiState(
     val qiblaBearing: Double? = null,
     val qiblaDistanceKm: Double? = null,
     /**
-     * Present only while the user's own calendar is inside Ramadan or in the week before it
+     * Present only while the user's own calendar is inside Ramadan or in the 3 days before it
      * ([com.sajdatime.core.RamadanInfo.showsNotice]). Null the rest of the year, so nothing
      * about Ramadan reaches the Times screen then.
      */
@@ -109,7 +113,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val settingsRepository = SettingsRepository(application)
     private val locationRepository = LocationRepository(application)
     private val cityLookup = CityLookup(application)
-    private val exporter = PrayerPdfExporter(application)
     private val compassRepository = CompassRepository(application)
 
     /**
@@ -224,15 +227,27 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             _state.update { it.copy(resolvingLocation = true, problem = null) }
             val result = cityLookup.search(query)
             if (result == null) {
-                _state.update {
-                    it.copy(resolvingLocation = false, problem = LocationProblem.CITY_NOT_FOUND)
-                }
+                // A null from the lookup means "not found" or "no network", and the second
+                // told a user with no data that Lahore does not exist (research F10).
+                val problem = if (isOnline()) LocationProblem.CITY_NOT_FOUND else LocationProblem.OFFLINE
+                _state.update { it.copy(resolvingLocation = false, problem = problem) }
                 return@launch
             }
             settingsRepository.setLocation(result.coordinates, result.city)
             _state.update { it.copy(resolvingLocation = false, problem = null) }
         }
     }
+
+    /**
+     * ACCESS_NETWORK_STATE comes in through Firebase's manifest, not ours: WidgetManifestTest
+     * pins our own permission list, and the merged one already has it. If it ever goes, this
+     * answers "online" and the message falls back to "not found", as before.
+     */
+    private fun isOnline(): Boolean = runCatching {
+        val cm = getApplication<Application>().getSystemService(android.net.ConnectivityManager::class.java)
+        @Suppress("DEPRECATION") // activeNetworkInfo is the one call that works back to API 24.
+        cm?.activeNetworkInfo?.isConnected == true
+    }.getOrDefault(true)
 
     // --- settings --------------------------------------------------------------------
 
@@ -243,6 +258,11 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun setAnalyticsEnabled(enabled: Boolean) {
         usage.apply(enabled)
+        // The setup location answer came before the consent step (moved there 17 Oct 2026), so it
+        // was held and goes now, once, after a yes. ponytail: held in memory only, so a process
+        // death between the two loses that one count; nothing else depends on it.
+        if (enabled) heldSetupLocation?.let { usage.permission(Permission.LOCATION, it) }
+        heldSetupLocation = null
         viewModelScope.launch { settingsRepository.setAnalyticsEnabled(enabled) }
     }
 
@@ -251,8 +271,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun recordSetupStep(step: SetupStep) = usage.setupStep(step)
 
-    fun recordPermission(permission: Permission, granted: Boolean) =
+    fun recordPermission(permission: Permission, granted: Boolean) {
+        if (permission == Permission.LOCATION && !_state.value.settings.analyticsEnabled) heldSetupLocation = granted
         usage.permission(permission, granted)
+    }
+
+    private var heldSetupLocation: Boolean? = null
 
     fun setSect(sect: Sect) = viewModelScope.launch { settingsRepository.setSect(sect) }
 
@@ -275,8 +299,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setOngoingBadge(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setOngoingBadge(enabled) }
 
-    fun setAlarmRespectsSilent(respects: Boolean) =
-        viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
 
     fun setAlarmOnApproximateDays(allowed: Boolean) =
         viewModelScope.launch { settingsRepository.setAlarmOnApproximateDays(allowed) }
@@ -299,11 +321,32 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setSuhoorReminderStyle(style: AlertStyle) =
         viewModelScope.launch { settingsRepository.setSuhoorReminderStyle(style) }
 
+    fun setSuhoorUsesAdhan(adhan: Boolean) =
+        viewModelScope.launch { settingsRepository.setSuhoorUsesAdhan(adhan) }
+
+    fun setPrayerReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setPrayerReminderMinutes(minutes) }
+
+    fun setPrayerReminder(slot: PrayerSlot, on: Boolean) =
+        viewModelScope.launch { settingsRepository.setPrayerReminder(slot, on) }
+
     fun dismissEidGreeting(code: Int) =
         viewModelScope.launch { settingsRepository.dismissEidGreeting(code) }
 
+    fun setAlarmRespectsSilent(respects: Boolean) =
+        viewModelScope.launch { settingsRepository.setAlarmRespectsSilent(respects) }
+
     fun setAlarmSound(uri: String) =
         viewModelScope.launch { settingsRepository.setAlarmSound(uri) }
+
+    fun setBuiltInAdhan(adhan: BuiltInAdhan) =
+        viewModelScope.launch { settingsRepository.setBuiltInAdhan(adhan) }
+
+    fun setNotificationSound(uri: String) =
+        viewModelScope.launch { settingsRepository.setNotificationSound(uri) }
+
+    fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) =
+        viewModelScope.launch { settingsRepository.setBuiltInNotificationAdhan(adhan) }
 
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
@@ -332,10 +375,14 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         }
         viewModelScope.launch {
             val event = runCatching {
-                exporter.export(
+                // A new exporter each time, not one held by this ViewModel: it pins its language when
+                // it is made, and the ViewModel outlives a language change (the screen restarts, the
+                // ViewModel does not). Held once, an Arabic PDF came out in Urdu after switching from
+                // Urdu (Android 12 emulator, 19 Oct 2026).
+                PrayerPdfExporter(getApplication()).export(
                     range = range,
                     coordinates = coordinates,
-                    cityName = settings.cityName,
+                    cityName = settings.placeName(com.sajdatime.core.AppLocale.wrap(getApplication())),
                     prefs = settings.calculationPrefs,
                 )
             }.fold(
@@ -411,6 +458,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
             _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
+            // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
+            withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
         }
 

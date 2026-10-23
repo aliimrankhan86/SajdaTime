@@ -2,6 +2,7 @@ package com.sajdatime.core
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import java.util.Locale
 
 /**
@@ -45,12 +46,13 @@ import java.util.Locale
  * is what he asked for in the same breath.** Both follow from one rule: the app's language
  * is whichever language its resources resolved to. A phone set to Arabic gets English and
  * left-to-right, because English is all the app has words in; the day a reviewed
- * `values-ar/` ships, that same phone gets Arabic, Arabic-Indic digits and an RTL layout,
+ * `values-ar/` ships, that same phone gets Arabic and an RTL layout (with Western digits since
+ * 17 Oct 2026: Arabic's tag is ar-u-nu-latn, see values-ar/strings.xml),
  * and nothing here changes. `LocaleDisciplineTest` fails the build if either half slips.
  * Verified on an `ar-EG` phone and watch rather than argued — HANDOVER §5.16 and §10.
  *
  * To see what a right-to-left translation will look like before one exists, run
- * `./gradlew installRtl`. That build type overrides `app_language_tag` with `ur` — a real
+ * `./gradlew :app:installRtl`. That build type overrides `app_language_tag` with `ur` — a real
  * right-to-left locale, on both phone and watch — which is enough to flip the entire app,
  * because everything below follows this one string. Read what it shows you as a check on
  * *layout*, not on prose: the words are still English, and English in a right-to-left
@@ -90,9 +92,49 @@ object AppLocale {
      * in.
      */
     fun wrap(context: Context): Context {
-        val config = Configuration(context.resources.configuration)
+        // Below Android 13 the system has no per-app language, so a language the user picked
+        // inside the app is applied here, to the configuration the resources are resolved
+        // from. That is all it does: the language the app is *in* is still whatever the
+        // resources then resolve app_language_tag to, read back by [of] on the next line.
+        // Nothing reads the stored tag as the answer, which is what keeps the rule above
+        // true ("the app's language is the language of its words").
+        val chosen = override(context)?.let { tag ->
+            val picked = Configuration(context.resources.configuration)
+            picked.setLocale(Locale.forLanguageTag(tag))
+            context.createConfigurationContext(picked)
+        } ?: context
+        val config = Configuration(chosen.resources.configuration)
         // setLocale also sets the layout direction from the locale, which is the point.
-        config.setLocale(of(context))
-        return context.createConfigurationContext(config)
+        config.setLocale(of(chosen))
+        return chosen.createConfigurationContext(config)
     }
+
+    /**
+     * The language the user picked inside the app, as a BCP-47 tag, or null when they have
+     * not (the app then follows the phone). Only ever non-null below Android 13: from 13 on
+     * the system keeps the choice itself (`LocaleManager`), and this deliberately ignores
+     * anything stored here so the two cannot disagree. Built on the 8 Oct 2026 branch,
+     * brought into 1.5.0 on 19 Oct 2026 (HANDOVER §5.16).
+     */
+    fun override(context: Context): String? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            null
+        } else {
+            context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(KEY, null)
+        }
+
+    /**
+     * Stores the in-app choice (below Android 13 only; a no-op from 13). Null = follow the phone.
+     * `commit`, not `apply`: the caller restarts the screen straight after, and the new screen
+     * must read the new value, not race a background write.
+     */
+    fun setOverride(context: Context, tag: String?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().apply {
+            if (tag == null) remove(KEY) else putString(KEY, tag)
+        }.commit()
+    }
+
+    private const val PREFS = "sajda_language"
+    private const val KEY = "tag"
 }

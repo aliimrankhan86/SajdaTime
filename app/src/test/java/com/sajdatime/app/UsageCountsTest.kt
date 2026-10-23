@@ -7,6 +7,7 @@ import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.data.UsageSink
 import com.sajdatime.app.ui.onboarding.Step
 import com.sajdatime.app.ui.onboarding.setupStep
+import com.sajdatime.app.ui.onboarding.stepsBeforeConsent
 import java.io.File
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -68,6 +69,32 @@ class UsageCountsTest {
         usage.apply(true)
         usage.setupStep(SetupStep.PERMISSION)
         assertEquals(listOf("collection=true", "event:setup_step"), sink.calls)
+    }
+
+    // The Yes on the consent step, as OnboardingScreen does it since 17 Oct 2026: the steps
+    // already passed were silent no-ops, then apply(true), then the replay, then All set live.
+    @Test
+    fun `a late yes sends the steps already passed once each, then the rest live`() {
+        val (sink, usage) = counts()
+        stepsBeforeConsent.forEach(usage::setupStep)
+        assertEquals(emptyList<String>(), sink.calls)
+        usage.apply(true)
+        stepsBeforeConsent.forEach(usage::setupStep)
+        stepsBeforeConsent.forEach(usage::setupStep)
+        usage.setupStep(SetupStep.CONFIRM)
+        assertEquals(
+            listOf("collection=true") + List(stepsBeforeConsent.size + 1) { "event:setup_step" },
+            sink.calls,
+        )
+    }
+
+    @Test
+    fun `a late no sends nothing at all`() {
+        val (sink, usage) = counts()
+        stepsBeforeConsent.forEach(usage::setupStep)
+        usage.apply(false)
+        usage.setupStep(SetupStep.CONFIRM)
+        assertEquals(emptyList<String>(), sink.calls)
     }
 
     @Test
@@ -161,15 +188,25 @@ class UsageCountsTest {
 
     @Test
     fun `the reported path is identical for a Sunni and a Shia user`() {
-        val sunni = listOf(Step.WELCOME, Step.CONSENT, Step.PERMISSION, Step.SECT, Step.MADHAB, Step.METHOD, Step.CONFIRM)
+        val sunni = Step.entries.toList()
         val shia = sunni - Step.MADHAB
         assertEquals(sunni.mapNotNull { it.setupStep() }, shia.mapNotNull { it.setupStep() })
     }
 
     @Test
-    fun `nothing before consent is reported`() {
+    fun `welcome and consent themselves are never reported`() {
         assertEquals(null, Step.WELCOME.setupStep())
         assertEquals(null, Step.CONSENT.setupStep())
+    }
+
+    // Consent moved after METHOD on 17 Oct 2026. The steps passed before it are replayed after a
+    // Yes, so the replay must be exactly what the live path reports, for either sect.
+    @Test
+    fun `the replay after consent is the live path up to consent, for both sects`() {
+        val beforeConsent = Step.entries.takeWhile { it != Step.CONSENT }
+        assertEquals(beforeConsent.mapNotNull { it.setupStep() }, stepsBeforeConsent)
+        assertEquals((beforeConsent - Step.MADHAB).mapNotNull { it.setupStep() }, stepsBeforeConsent)
+        assertEquals(Step.CONFIRM, Step.entries.last())
     }
 
     // ---- the manifest and resources, read from disk ----------------------------------
@@ -328,7 +365,8 @@ class UsageCountsTest {
         // Bumped to 10 October 2026 in 1.3.2 for the Do Not Disturb permission (DndAccessTest), and to
         // 17 October 2026 in 1.4.0 (published at the 1.4.0 merge) for the sentence about the widgets and the suhoor reminder. If the
         // branch is merged on a later day, move this date and the policy's date line together.
-        assertTrue(policy.contains("Last updated: 17 October 2026"))
+        // 23 October 2026: 1.5.0 release day; docs/release-tools/set-release-date.sh now moves both.
+        assertTrue(policy.contains("Last updated: 23 October 2026"))
         assertTrue("policy must list every permission", policy.contains("ACCESS_NOTIFICATION_POLICY"))
     }
 

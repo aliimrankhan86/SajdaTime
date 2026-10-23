@@ -18,12 +18,15 @@ import java.net.URLEncoder
  * location permission.
  *
  * Two sources, in order:
- *  1. The phone's own geocoder. Nothing leaves the app, and most phones have it.
+ *  1. The phone's own geocoder, which most phones have. Android documents it as possibly
+ *     network backed, and on phones with Google Play services Google answers it, so the
+ *     typed name may reach Google. Until 19 Oct 2026 this line said nothing left the app,
+ *     the same false claim found on 16 Oct 2026 and corrected in docs/privacy.html.
  *  2. Open-Meteo's free geocoding API, for phones with no geocoder backend.
  *
- * Only the place name is ever sent, and only when the first source comes up empty. No
- * device identifier, no coordinates, no history. Once resolved the coordinates are stored
- * locally and every prayer calculation from then on is offline.
+ * Open-Meteo is sent the place name and the app's language, and only when the first source
+ * comes up empty. No device identifier, no coordinates, no history. Once resolved the
+ * coordinates are stored locally and every prayer calculation from then on is offline.
  *
  * This previously read the coordinates out of Aladhan's timingsByAddress response. That
  * endpoint now returns a fixed placeholder (8.8889, 7.7778) for every address, so every
@@ -53,7 +56,9 @@ class CityLookup(private val context: Context) {
             // is already off the main thread, so one code path covers every version.
             // AppLocale, matching the language= parameter the Open-Meteo fallback below
             // sends, so both halves of this lookup name a place the same way.
-            Geocoder(context, AppLocale.of(context))
+            // Wrapped: below Android 13 a language picked in the app lives only in AppLocale.wrap
+            // (19 Oct 2026); the bare application context would answer with the phone's language.
+            Geocoder(context, AppLocale.of(AppLocale.wrap(context)))
                 .getFromLocationName(query, 1)
                 ?.firstOrNull()
                 ?.let { address ->
@@ -70,7 +75,9 @@ class CityLookup(private val context: Context) {
         // language= was hardcoded to "en" while the platform geocoder above used the
         // device locale, so the same search returned "Cairo" or "القاهرة" depending only
         // on which of the two happened to answer. Both follow AppLocale now.
-        val language = AppLocale.of(context).language
+        // Wrapped: below Android 13 a language picked in the app lives only in AppLocale.wrap
+        // (19 Oct 2026); the bare application context would answer with the phone's language.
+        val language = AppLocale.of(AppLocale.wrap(context)).language
         val url = URL(
             "https://geocoding-api.open-meteo.com/v1/search" +
                 "?name=$encoded&count=1&language=$language&format=json",
@@ -92,6 +99,11 @@ class CityLookup(private val context: Context) {
             // One fixed HTTPS host. A redirect is not expected, so one is treated as a
             // failure rather than followed to somewhere the app never chose.
             connection.instanceFollowRedirects = false
+            // A plain name instead of Android's default User-Agent, which carries the phone model and
+            // Android version ("Dalvik/2.1.0 (Linux; U; Android 14; SM-S918B ...)"). privacy.html promises
+            // Open-Meteo gets the place name and the app's language and no device information
+            // (independent security review, 17 Oct 2026, HANDOVER §5.24).
+            connection.setRequestProperty("User-Agent", "SajdaTime")
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 throw IOException("HTTP ${connection.responseCode}")
             }

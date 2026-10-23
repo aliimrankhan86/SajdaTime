@@ -10,4 +10,12 @@
     <color name="widget_highlight">#143028</color>
     <color name="widget_primary">#4FC48F</color>
     <color name="widget_outline_variant">#2A312E</color>
+
+    <!-- The glossy finish, dark: lighter at the top, a 7 percent white sheen, a 16 percent white rim
+         that reads as the edge of a glass pane. See values/colors.xml. -->
+    <color name="widget_surface_top">#252C29</color>
+    <color name="widget_surface_bottom">#121514</color>
+    <color name="widget_highlight_top">#18382D</color>
+    <color name="widget_sheen">#12FFFFFF</color>
+    <color name="widget_edge">#29FFFFFF</color>
 </resources>

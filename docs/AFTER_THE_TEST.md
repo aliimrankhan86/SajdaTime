@@ -747,7 +747,7 @@ In order. Nothing here needs a decision from you except where it says so.
 1. Run the full gate: `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease`.
 2. Bump `versionCode` and `versionName` — see [`RELEASING.md`](RELEASING.md). The phone and
    watch bundles share an application ID, so their version codes must not collide.
-3. Run both emulators and compare them. Run `./gradlew installRtl` for anything visual.
+3. Run both emulators and compare them. Run `./gradlew :app:installRtl` for anything visual.
 4. Confirm the release is signed with **your** key. No agent has it and none ever will.
 
 **In the Console**
@@ -845,7 +845,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew clean test lint :a
 Then, because compiling is not working:
 
 - Run it on the phone **and** watch emulators and compare them.
-- `./gradlew installRtl` — check every changed screen right-to-left before it ships.
+- `./gradlew :app:installRtl` — check every changed screen right-to-left before it ships.
 - Re-verify times against Aladhan, and **on two dates, December and June**, not one. See the
   open question below.
 - Retake `docs/store/screenshots/` if anything visual changed.

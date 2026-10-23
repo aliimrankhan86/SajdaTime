@@ -1,5 +1,8 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.foundation.layout.offset
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,13 +20,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -43,10 +44,33 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import java.time.Duration
 import java.time.Instant
+
+/**
+ * A dialog's title with a close X at the top right (owner, 18 Oct 2026). The X is the one
+ * place every phone user looks for "get me out"; the text button at the bottom stays for
+ * people who read to the end. The X is a 48dp IconButton, drawn up and out so its glyph
+ * sits on the dialog's own margin; the title still wraps clear of its 48dp.
+ */
+@Composable
+fun DialogTitle(text: String, onClose: () -> Unit) {
+    Row(verticalAlignment = Alignment.Top) {
+        Text(
+            text = text,
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = Space.Tight)
+                .semantics { heading() },
+        )
+        IconButton(onClick = onClose, modifier = Modifier.offset(x = 12.dp, y = (-8).dp)) {
+            Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.action_close))
+        }
+    }
+}
 
 @Composable
 fun SectionHeading(text: String, modifier: Modifier = Modifier) {
@@ -153,52 +177,52 @@ fun LocationSheet(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
+                .padding(bottom = Space.Section),
         ) {
             Text(
                 text = stringResource(R.string.location_sheet_title),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.semantics { heading() },
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.location_sheet_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
-            Spacer(Modifier.height(20.dp))
-            Button(
+            // Gaps by relationship (DESIGN_SYSTEM 2): text block to its button Group, field to
+            // its button Related, section to section Section.
+            Spacer(Modifier.height(Space.Group))
+            CtaButton(
                 onClick = onUseGps,
                 enabled = !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 52.dp),
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(Icons.Outlined.MyLocation, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
+                Spacer(Modifier.width(Space.Related))
                 Text(stringResource(R.string.action_use_my_location))
             }
 
             if (state.resolvingLocation && !searching) {
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_finding))
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(Space.Section))
             Text(
                 text = stringResource(R.string.location_sheet_search_heading),
                 style = MaterialTheme.typography.titleMedium,
             )
-            Spacer(Modifier.height(4.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.city_fallback_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Group))
 
-            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND
+            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -206,7 +230,7 @@ fun LocationSheet(
                 supportingText = {
                     Text(
                         stringResource(
-                            if (notFound) R.string.city_not_found else R.string.city_field_helper,
+                            if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
                         ),
                     )
                 },
@@ -216,20 +240,22 @@ fun LocationSheet(
                 keyboardActions = KeyboardActions(onSearch = { if (query.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(10.dp))
-            OutlinedButton(
-                onClick = findCity,
-                enabled = query.isNotBlank() && !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            ) {
-                Icon(Icons.Outlined.Search, contentDescription = null)
-                Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.action_find_city))
+            // Shown once there is something to find, never as a grey placeholder (DESIGN_SYSTEM
+            // 4.1), the same as the setup screen.
+            if (query.isNotBlank()) {
+                Spacer(Modifier.height(Space.Related))
+                CtaButton(
+                    onClick = findCity,
+                    enabled = !state.resolvingLocation,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                    Spacer(Modifier.width(Space.Related))
+                    Text(stringResource(R.string.action_find_city))
+                }
             }
             if (searching) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
         }

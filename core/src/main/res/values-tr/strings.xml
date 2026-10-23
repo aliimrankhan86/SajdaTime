@@ -37,7 +37,7 @@
     <string name="method_kuwait_desc">Kuveyt\'te kullanılan yöntem.</string>
     <string name="method_qatar_desc">Katar\'da kullanılan yöntem.</string>
     <string name="method_singapore_desc">Endonezya ve Singapur\'un resmî kurumları.</string>
-    <string name="method_turkey_desc">Türkiye Cumhuriyeti Diyanet İşleri Başkanlığı.</string>
+    <string name="method_turkey_desc">Türkiye Cumhuriyeti Diyanet İşleri Başkanlığı, temkin süreleriyle.</string>
     <string name="method_jafari_desc">Şiilerin yaygın olarak kullandığı yöntem. Akşam, güneş battıktan biraz sonra, gökyüzündeki kızıllık kaybolunca başlar.</string>
     <string name="method_tehran_desc">Tahran Üniversitesi. İran\'ın resmî vakitleri bu kurumun takvimini esas alır.</string>
 

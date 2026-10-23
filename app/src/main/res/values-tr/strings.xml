@@ -16,24 +16,29 @@
     <string name="action_begin">Başla</string>
 
     <string name="permission_title">Nerede namaz kılıyorsunuz?</string>
-    <string name="permission_body">SajdaTime, namaz vakitlerinizi ve kıble yönünü hesaplamak için nerede olduğunuzu kabaca bilmelidir. Bunun tam olarak ne anlama geldiğini görmek için bilgi simgesine dokunun.</string>
-    <string name="permission_why_title">Konumunuza neden ihtiyacımız var</string>
+    <string name="permission_body">SajdaTime, namaz vakitlerinizi ve kıble yönünü nerede olduğunuzu kabaca bilerek hesaplar.</string>
     <string name="permission_why_body">Bulunduğunuz yer için doğru namaz vakitlerini ve kıble yönünü hesaplamak için.\n\nYaklaşık konumunuza yalnızca uygulama açıkken bakarız. Vakitler telefonunuzda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Şehrinizin adını göstermek için uygulama telefonunuzun kendi yer arama hizmetine sorar. Çoğu telefonda bu hizmete internet üzerinden Google yanıt verir.</string>
     <string name="action_allow_location">Konuma izin ver</string>
+    <string name="action_how_location_used">Konumunuz nasıl kullanılır</string>
     <string name="action_got_it">Anladım</string>
     <string name="action_understood">Anlıyorum</string>
     <string name="action_continue">Devam</string>
     <string name="location_set_generic">Konumunuz</string>
     <string name="location_finding">Konumunuz bulunuyor…</string>
     <string name="location_looking_up">Bu yer aranıyor…</string>
-    <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da şehrinizi aşağıya yazın.</string>
+    <string name="location_no_fix">Konum alınamadı. Konumun açık olduğunu kontrol edin ya da nerede olduğunuzu aşağıya yazın.</string>
 
-    <string name="city_fallback_body">Bunun yerine şehrinizi yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
-    <string name="city_field_label">Şehir</string>
-    <string name="city_field_helper">Örneğin: İstanbul, Lahor, Kahire</string>
-    <string name="city_not_found">Bu yer bulunamadı. Ülke adını da eklemeyi deneyin.</string>
-    <string name="action_find_city">Şehri bul</string>
+    <string name="city_fallback_body">Bunun yerine nerede olduğunuzu yazın. Ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+
+    <string name="city_lookup_note">Yazdığınız ad internet üzerinden aranır. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+
+    <string name="city_lookup_detail">Bunun yerine bir yer adı yazarsanız, ad önce telefonunuzun kendi yer arama hizmetine sorulur. Çoğu telefonda bu hizmet internet üzerinden Google\'a başvurur. Yanıt veremezse, yalnızca yazdığınız ad bir kez ücretsiz bir arama hizmetine gönderilir. Bundan sonra her şey telefonunuzda hesaplanır.</string>
+    <string name="city_field_label">Şehir, kasaba ya da köy</string>
+    <string name="city_field_helper">Örneğin: Karaçi, Londra, Mekke, New York</string>
+    <string name="city_not_found">Bu yer bulunamadı. Ülke adını eklemeyi ya da en yakın kasabayı yazmayı deneyin.</string>
+    <string name="action_find_city">Yeri bul</string>
     <string name="action_use_makkah">Şimdilik geç, Mekke\'yi kullan</string>
+    <string name="setup_makkah_note">Konumunuzu ayarlayana kadar namaz vakitleri Mekke için olacak.</string>
 
     <string name="sect_title">Hangi mezhebe uyuyorsunuz?</string>
     <string name="sect_body">Bu seçim, namaz vakitlerinizin nasıl hesaplanacağını belirler. İstediğiniz zaman değiştirebilirsiniz.</string>
@@ -43,7 +48,7 @@
     <string name="sect_shia_desc">Caferi (İsna Aşeriyye) vakitleri</string>
 
     <string name="madhab_title">Fıkıh mezhebinizi seçin</string>
-    <string name="madhab_body">İsteğe bağlı. Bu yalnızca İkindi vaktini değiştirir. Atlarsanız standart vakit kullanılır.</string>
+    <string name="madhab_body">Bu yalnızca İkindi vaktini değiştirir. Hanefi camilerinde İkindi daha geç başlar. Şafii, Maliki ve Hanbeli standart vakti kullanır. Emin değil misiniz? Standart vakit için Şafii seçili kalsın. Bunu daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="madhab_hanafi">Hanefi</string>
     <string name="madhab_shafii">Şafii</string>
     <string name="madhab_maliki">Maliki</string>
@@ -51,7 +56,7 @@
     <string name="madhab_hanafi_desc">Daha geç İkindi: gölge, cismin boyunun iki katı olduğunda</string>
     <string name="madhab_standard_desc">Standart İkindi: gölge, cismin boyuna eşit olduğunda</string>
     <string name="method_step_title">Hesaplama yöntemi</string>
-    <string name="method_step_body">Camiler tan ve akşam alacakaranlığını farklı ölçer. Bu yüzden Sabah ve Yatsı vakitleri bir yöntemden diğerine birkaç dakika, uzak kuzeyde ise bir saatten fazla farklı olabilir. Caminizin vakitleri uygulamadakinden farklıysa, genellikle çözüm caminizin yöntemini burada seçmektir. Emin değil misiniz? İlk seçeneği bırakın. Bunu istediğiniz zaman Ayarlar bölümünden değiştirebilirsiniz.</string>
+    <string name="method_step_body">Camiler tan ve akşam alacakaranlığını farklı ölçer. Bu yüzden Sabah ve Yatsı vakitleri bir yöntemden diğerine birkaç dakika, uzak kuzeyde ise bir saatten fazla farklı olabilir. Caminizin vakitleri uygulamadakinden farklıysa, genellikle çözüm caminizin yöntemini burada seçmektir. Emin değil misiniz? İlk seçenek seçili kalsın. Bunu istediğiniz zaman Ayarlar bölümünden değiştirebilirsiniz.</string>
     <string name="action_back">Geri</string>
 
     <string name="confirm_title">Hazır</string>
@@ -63,18 +68,24 @@
 
     <!-- Disclaimer -->
     <string name="disclaimer_title">Lütfen önce bunu okuyun</string>
-    <string name="disclaimer_body">SajdaTime bir yardımcıdır, dinî bir otorite değildir.\n\nBu vakitler bana bir cami, bir âlim ya da herhangi bir otorite tarafından verilmedi. Telefonunuz bunları güneşin konumundan hesaplar. Bunu yaparken İslami otoritelerin ve âlimlerin yayımladığı hesaplama yöntemlerini kullanır. Ben bir müftü, bir âlim ya da fıkıh uzmanı değilim. Bu uygulama yapay zekâ yardımıyla yapıldı. Yazılımda hata olabilir. Telefonda yanlış konum ya da yanlış saat kayıtlı olabilir. Pil tasarrufu yapan bir telefon bir uyarıyı geciktirebilir. Ben de düpedüz yanılıyor olabilirim.\n\nBu yüzden lütfen burada gördüklerinizi dinî bir hüküm olarak değil, bir hesaplama olarak kabul edin. SajdaTime ile caminiz farklı söylüyorsa caminize uyun. Bir vakit ya da yön size yanlış görünüyorsa veya emin değilseniz, caminize ya da size yol gösterebilecek ehil başka birine danışın. Uygulama ücretsizdir ve olduğu gibi sunulur. Hiçbir garanti ve doğruluk vaadi yoktur. Bu yüzden tam doğruluğun sizin için önemli olduğu durumlarda lütfen yalnızca uygulamaya güvenmeyin.\n\nAkıllı saati kullanıyorsanız, lütfen onu son söz olarak değil, bir kolaylık olarak görün. Akıllı saatin pusulası telefondan daha küçüktür ve gökyüzünü daha az iyi görür. Ayrıca telefonunuzun bir süre önce bulduğu bir konuma göre çalışıyor olabilir. Özellikle kıble için telefonunuz ikisinden daha doğru olanıdır. Önemli olduğunda telefonunuzdan kontrol edin.\n\nCamiler bir namazın ne zaman başladığı konusunda her zaman aynı görüşte değildir. En çok fark Yatsı vaktindedir. Britanya\'da ve daha kuzeyde bir yöntemle diğeri arasındaki fark bir saati aşabilir, çünkü âlimler alacakaranlığın kayboluşunu farklı ölçer. Bu konuyu ben çözemem, uygulama da çözmeye çalışmaz. Buradaki vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve Ayarlar bölümünde, Hesaplama yöntemi altında o yöntemi seçin. Bundan sonra da birkaç dakikalık fark kalırsa, Camiye göre ayarla bölümünde her vakti ve tarihi elle düzeltebilirsiniz. Bir fark yine kalırsa caminize uyun.\n\nBir şey daha. Bu uygulama bir namaz vaktinin ne zaman girdiğini gösterir. Caminiz ise cemaat için kendi saatini belirler ve bu genellikle biraz daha geçtir. Bu yüzden camideki vakit çizelgesi ile buradaki vakitler çoğu zaman farklı olur. İkisi de yanlış değildir.\n\nBir de ricam var, uygun görürseniz: lütfen beni, ailemi ve anne babamı dualarınızda anın.</string>
+    <string name="disclaimer_body">SajdaTime bir yardımcıdır, dinî bir otorite değildir.\n\nBu vakitler bana bir cami, bir âlim ya da herhangi bir otorite tarafından verilmedi. Telefonunuz bunları güneşin konumundan hesaplar. Bunu yaparken İslami otoritelerin ve âlimlerin yayımladığı hesaplama yöntemlerini kullanır. Ben bir müftü, bir âlim ya da fıkıh uzmanı değilim. Bu uygulama yapay zekâ yardımıyla yapıldı. Yazılımda hata olabilir. Telefonda yanlış konum ya da yanlış saat kayıtlı olabilir. Pil tasarrufu yapan bir telefon bir uyarıyı geciktirebilir. Ben de düpedüz yanılıyor olabilirim.\n\nBu yüzden lütfen burada gördüklerinizi dinî bir hüküm olarak değil, bir hesaplama olarak kabul edin. SajdaTime ile caminiz farklı söylüyorsa caminize uyun. Bir vakit ya da yön size yanlış görünüyorsa veya emin değilseniz, caminize ya da size yol gösterebilecek ehil başka birine danışın. Uygulama ücretsizdir ve olduğu gibi sunulur. Hiçbir garanti ya da doğruluk vaadi yoktur. Bu yüzden tam doğruluğun sizin için önemli olduğu durumlarda lütfen yalnızca uygulamaya güvenmeyin.\n\nAkıllı saati kullanıyorsanız, lütfen onu son söz olarak değil, bir kolaylık olarak görün. Akıllı saatin pusulası telefonunkinden küçüktür ve saat gökyüzünü telefon kadar iyi göremez. Ayrıca telefonunuzun bir süre önce bulduğu bir konuma göre çalışıyor olabilir. Özellikle kıble için telefonunuz ikisinden daha doğru olanıdır. Önemli olduğunda telefonunuzdan kontrol edin.\n\nCamiler bir namazın ne zaman başladığı konusunda her zaman aynı görüşte değildir. En çok fark Yatsı vaktindedir. Britanya\'da ve daha kuzeyde bir yöntemle diğeri arasındaki fark bir saati aşabilir, çünkü âlimler alacakaranlığın kayboluşunu farklı ölçer. Bu konuyu ben çözemem, uygulama da çözmeye çalışmaz. Buradaki vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve Ayarlar bölümünde, Hesaplama yöntemi altında o yöntemi seçin. Bundan sonra da birkaç dakikalık fark kalırsa, Camiye göre ayarla bölümünde her vakti ve tarihi elle düzeltebilirsiniz. Bir fark yine kalırsa caminize uyun.\n\nBir şey daha. Bu uygulama bir namaz vaktinin ne zaman girdiğini gösterir. Caminiz ise cemaat için kendi saatini belirler ve bu genellikle biraz daha geçtir. Bu yüzden camideki vakit çizelgesi ile buradaki vakitler çoğu zaman farklı olur. İkisi de yanlış değildir.\n\nBir de ricam var, uygun görürseniz: lütfen beni, ailemi ve anne babamı dualarınızda anın.</string>
+    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
+         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
+    <string name="disclaimer_brief">SajdaTime bir yardımcıdır, dinî bir otorite değildir.\n\nBu vakitleri bir cami ya da âlim vermedi. Telefonunuz bunları güneşin konumundan hesaplar. Ben bir müftü ya da âlim değilim ve bu uygulama yapay zekâ yardımıyla yapıldı. Bu yüzden bir yazılım hatası, yanlış konum ya da yanlış saat bir vakti yanlış gösterebilir.\n\nSajdaTime ile caminiz farklı söylüyorsa caminize uyun. Uygulama ücretsizdir ve olduğu gibi sunulur. Hiçbir garanti yoktur.</string>
+    <string name="disclaimer_read_full">Tamamını oku</string>
 
     <!-- Home -->
-    <string name="home_next_prayer">SIRADAKİ VAKİT</string>
+    <string name="home_next_prayer">Sıradaki vakit</string>
     <string name="home_until">başlamasına kalan</string>
     <string name="home_today">Bugün</string>
     <string name="home_next_marker">Sıradaki</string>
     <string name="home_now_marker">Şimdi</string>
     <string name="home_now_marker_a11y">Şu anki vakit</string>
     <string name="notice_dismiss">Kapat</string>
+    <string name="notice_show_details">Ayrıntılar</string>
+    <string name="notice_hide_details">Ayrıntıları gizle</string>
     <string name="method_notice_title">Caminizle uyuşuyor mu?</string>
-    <string name="method_notice_body">Burada Sabah ve Yatsı bir saat ya da daha fazla farklı olabilir. Nedenini görmek için dokunun.</string>
+    <string name="method_notice_body">Burada Sabah ve Yatsı bir saat ya da daha fazla farklı olabilir.</string>
     <string name="mosque_diff_link">Caminizden farklı mı?</string>
     <string name="mosque_diff_title">Caminizden farklı mı?</string>
     <string name="mosque_diff_congregation">Bu uygulama her namaz vaktinin ne zaman girdiğini gösterir. Caminiz cemaati genellikle biraz daha geç kılar. Bu yüzden camideki çizelge ile buradaki vakitler çoğu zaman birkaç dakika farklı olur. İkisi de yanlış değildir.</string>
@@ -84,19 +95,19 @@
     <string name="mosque_diff_follow">Fark kalırsa caminize uyun.</string>
     <string name="polar_notice_title">Yaklaşık vakitler</string>
     <string name="polar_notice_body">Ekvatordan bu kadar uzakta güneş her zaman doğmaz ya da batmaz. Bu yüzden hesaplanabilecek gerçek bir Sabah ya da Yatsı vakti yoktur. Bu vakitler bunun yerine %1$d° enlemi esas alınarak hesaplanır. Buradaki camiler bu durumu farklı şekillerde ele alır. Caminize hangi yolu izlediğini sorun.</string>
-    <string name="polar_notice_alarm">Bu günlerde alarmlarınız çalmak yerine sessiz bildirim olarak gelir, çünkü uygulama vaktin tam dakikasını garanti edemez. Yine de uyandırılmak istiyorsanız Ayarlar bölümünde “Yaklaşık vakitli günlerde çal” seçeneğini açın.</string>
+    <string name="polar_notice_alarm">Bu günlerde alarmlarınız çalmak yerine daha sessiz bir bildirim olarak gelir, çünkü uygulama vaktin tam dakikasını garanti edemez. Yine de uyandırılmak istiyorsanız Ayarlar bölümünde “Yaklaşık vakitli günlerde çal” seçeneğini açın.</string>
     <string name="home_no_location">Namaz vakitlerini görmek için konumunuzu belirleyin.</string>
     <string name="home_countdown_a11y">%1$s, %2$s sonra</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Mekke vakitleri gösteriliyor</string>
-    <string name="home_default_location_body">Nerede olduğunuzu bulamadık. Konumunuzu belirlemek için dokunun.</string>
+    <string name="home_default_location_title">Mekke vakitleri</string>
+    <string name="home_default_location_body">Konumunuz henüz ayarlanmadı, bu yüzden bu vakitler Mekke içindir.</string>
     <string name="action_change_location">Konumu değiştir</string>
 
     <!-- Location sheet -->
     <string name="location_sheet_title">Konumunuz</string>
-    <string name="location_sheet_body">Namaz vakitleri de kıble de nerede olduğunuza bağlıdır. Yolculuğa çıktığınızda bunu güncelleyin.\n\nGizliliğinizi korumak için uygulama yalnızca yaklaşık konumunuzu ister. Bu yüzden sizin yeriniz yerine yakındaki bir kasabanın ya da daha geniş bölgenin adını gösterebilir. Bu, vakitleri çok az değiştirir: 16 km yaklaşık bir dakikaya denk gelir. Ad size yanlış görünüyorsa şehrinizi aşağıya yazın.</string>
+    <string name="location_sheet_body">Namaz vakitleri de kıble de nerede olduğunuza bağlıdır. Yolculuğa çıktığınızda bunu güncelleyin.\n\nGizliliğinizi korumak için uygulama yalnızca yaklaşık konumunuzu ister. Bu yüzden sizin yeriniz yerine yakındaki bir kasabanın ya da daha geniş bölgenin adını gösterebilir. Bu, vakitleri çok az değiştirir: 16 km yaklaşık bir dakikaya denk gelir. Ad size yanlış görünüyorsa nerede olduğunuzu aşağıya yazın.</string>
     <string name="action_use_my_location">Şu anki konumumu kullan</string>
-    <string name="location_sheet_search_heading">Ya da bir şehir yazın</string>
+    <string name="location_sheet_search_heading">Ya da nerede olduğunuzu yazın</string>
 
     <!-- Export -->
     <string name="action_save_timetable">Vakit çizelgesini PDF olarak kaydet</string>
@@ -140,14 +151,14 @@
 
     <!-- Settings -->
     <string name="title_settings">Ayarlar</string>
-    <string name="settings_group_prayer_times">NAMAZ VAKİTLERİ</string>
-    <string name="settings_group_appearance">GÖRÜNÜM</string>
+    <string name="settings_group_prayer_times">Namaz vakitleri</string>
+    <string name="settings_group_appearance">Görünüm</string>
     <string name="settings_theme">Tema</string>
     <string name="theme_system">Telefona uy</string>
     <string name="theme_light">Açık</string>
     <string name="theme_dark">Koyu</string>
-    <string name="settings_group_reminders">HATIRLATICILAR</string>
-    <string name="settings_group_about">HAKKINDA</string>
+    <string name="settings_group_reminders">Hatırlatıcılar</string>
+    <string name="settings_group_about">Hakkında</string>
 
     <string name="settings_location">Konum</string>
     <string name="settings_school">Mezhep</string>
@@ -161,22 +172,32 @@
     <string name="settings_method_auto">Otomatik · %1$s</string>
     <string name="settings_method_help">Camiler alacakaranlığı farklı ölçer. Bu da en çok Sabah ve Yatsı vakitlerini etkiler. Ne kadar kuzeyde yaşarsanız fark o kadar büyür. Bu vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve burada o yöntemi seçin.</string>
 
-    <string name="settings_alerts_help">Bunu her vakit için ayrı seçin. Bildirim sessizdir ve titreşir. Alarm ise seçtiğiniz sesi, bir uyandırma alarmı gibi yüksek sesle çalar.</string>
+    <string name="settings_alerts_help">Bildirim: bildirim sesini çalar ve titreşir. Alarm: alarm sesini alarm ses düzeyinde çalar ve titreşir. Her iki sesi de Ayarlar\'da, Namaz uyarılarının hemen altında seçin.</string>
     <string name="alert_style_off">Kapalı</string>
     <string name="alert_style_notification">Bildirim</string>
     <string name="alert_style_alarm">Alarm</string>
     <string name="alert_style_mixed">Karışık</string>
     <string name="settings_alarm_sound">Alarm sesi</string>
-    <string name="settings_alarm_sound_desc">Telefonunuzdaki herhangi bir zil sesini ya da ezanı seçin</string>
-    <string name="settings_alarm_respect_silent">Telefon sessizdeyken sessiz kal</string>
-    <string name="settings_alarm_respect_silent_desc">Açık: bildirimi yine zamanında alırsınız, ama ses çalmaz. Kapalı: telefon sessizdeyken bile alarm, bir uyandırma alarmı gibi çalar.</string>
+    <string name="settings_alarm_sound_default">Telefonunuzun varsayılan alarmı</string>
+    <string name="settings_alarm_sound_phone">Telefonunuzdan</string>
+    <string name="settings_notification_sound">Bildirim sesi</string>
+    <string name="settings_notification_sound_default">Telefonunuzun olağan sesi</string>
+    <string name="settings_notification_sound_help">Namaz bildirimi geldiğinde bildirim ses düzeyinde çalar. Telefonunuzun sessiz, titreşim ve Rahatsız Etmeyin ayarları yine geçerlidir. Bildirimleri aşağı çekmek ya da bildirimi kaydırıp kapatmak sesi durdurur.</string>
+    <string name="settings_alarm_sound_help">Alarm seçilen namazlar için alarm ses düzeyinde çalar.</string>
+    <string name="settings_alarm_play_on_silent">Sessizdeyken de çal</string>
+    <string name="settings_alarm_play_on_silent_desc">Telefon sessizde veya Rahatsız Etmeyin modundayken de çalar. Kapalı: yalnızca bildirim ve titreşim.</string>
+    <string name="adhan_builtin">Ezan</string>
     <string name="settings_dnd_title">Rahatsız Etmeyin modunda sese izin ver</string>
-    <string name="settings_dnd_desc">Bu izin olmadan, telefon Rahatsız Etmeyin modundayken alarmınız sessiz kalır. İzin vermek için dokunun.</string>
+    <string name="settings_dnd_desc">Bu izin olmadan, telefon Rahatsız Etmeyin modundayken alarmınız sessiz kalır.</string>
 
-    <string name="settings_ongoing_badge">Sıradaki vakit bildirim panelinde kalsın</string>
+    <string name="settings_ongoing_badge">Bildirimlerde sıradaki vakit</string>
     <string name="settings_ongoing_badge_desc">Sıradaki vakti ve ne kadar süre kaldığını gösteren sessiz bir bildirim</string>
     <string name="settings_exact_alarms_title">Tam zamanlı alarmlara izin ver</string>
-    <string name="settings_exact_alarms_desc">Bu izin olmadan telefonunuz namaz uyarılarını bir saat ya da daha fazla geciktirebilir. Bazı telefonlarda Sabah gibi gece gelen bir uyarı hiç gelmeyebilir. İzin vermek için dokunun.</string>
+    <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
+    <string name="settings_exact_alarms_brief">Namaz uyarıları bir saat gecikebilir.</string>
+    <!-- The action on a permission notice. It opens the phone's own settings screen. -->
+    <string name="action_allow">İzin ver</string>
+    <string name="settings_exact_alarms_desc">Bu izin olmadan namaz uyarıları bir saat ya da daha geç gelebilir. Bazı telefonlarda Sabah uyarısı hiç gelmeyebilir.</string>
     <string name="confirm_exact_alarm_title">Son bir şey</string>
     <string name="confirm_exact_alarm_body">Siz izin vermedikçe Android, uygulamaların tam dakikasında uyarı kurmasına izin vermez. Bu izin olmadan telefonunuz namaz uyarılarını bir saat ya da daha fazla geciktirebilir. Bazı telefonlarda Sabah gibi gece gelen bir uyarı hiç gelmeyebilir. Bunu daha sonra Ayarlar bölümünden de yapabilirsiniz.</string>
     <string name="action_close">Kapat</string>
@@ -185,7 +206,7 @@
     <string name="about_disclaimer">Sorumluluk reddi</string>
     <string name="about_disclaimer_short">Bir yardımcı, dinî bir otorite değil. Okumak için dokunun.</string>
     <string name="about_privacy">Gizlilik</string>
-    <string name="about_privacy_desc">Vakitler bu telefonda hesaplanır ve konumunuzu biz hiçbir zaman almayız. Hesap yok, reklam yok. Kullanım sayımları isteğe bağlıdır ve siz açmadıkça kapalıdır. Politikanın tamamını okumak için dokunun.</string>
+    <string name="about_privacy_desc">Vakitler bu telefonda hesaplanır ve konumunuzu hiçbir zaman almayız. Hesap yok, reklam yok. Kullanım sayımları siz açmadıkça kapalı kalır.</string>
 
     <!-- Optional usage counts -->
     <string name="consent_title">SajdaTime\'ı geliştirmeye yardım eder misiniz?</string>
@@ -193,6 +214,7 @@
     <string name="settings_language_title">Dil</string>
     <string name="settings_language_desc">Uygulamanın dilini seçin</string>
     <string name="language_unavailable">Bu telefonda kullanılamıyor</string>
+    <string name="language_phone">Telefonun dili</string>
     <string name="permission_allowed">İzin verildi</string>
     <string name="state_expanded">Genişletildi</string>
     <string name="state_collapsed">Daraltıldı</string>
@@ -205,17 +227,23 @@
     <string name="consent_yes">Evet, kullanım sayımlarını paylaş</string>
     <string name="consent_no">Hayır, teşekkürler</string>
     <string name="consent_read_policy">Gizlilik politikasını okuyun</string>
+    <string name="consent_policy_english">Gizlilik politikasının tam metni İngilizcedir.</string>
     <string name="about_feedback">Geri bildirim gönder</string>
     <string name="about_feedback_desc">Geliştiriciye neyin işe yaradığını ya da neyin yanlış olduğunu söyleyin. E-posta uygulamanızı açar.</string>
     <string name="feedback_subject">SajdaTime geri bildirimi</string>
     <string name="settings_usage_counts">Kullanım sayımlarını paylaş</string>
-    <string name="settings_usage_counts_desc">Google\'a gönderilir ve rastgele bir kimliğe bağlıdır. Siz açmadıkça kapalıdır. Açtığınızda tam olarak neyin gönderildiği gösterilir.</string>
+    <string name="settings_usage_counts_desc">Siz açmadıkça kapalıdır. Rastgele bir kimlikle Google\'a gönderilir. Açmadan önce tam olarak neyin gönderildiği gösterilir.</string>
     <string name="about_charity">Her zaman ücretsiz</string>
     <string name="about_charity_desc">Sevgiyle yapıldı, ümmet için ücretsiz. Allah rızası için bir hayır projesi.</string>
     <string name="about_credits">Yapan</string>
     <string name="about_credits_desc">Ali Imran Khan, ümmet için bir sadaka-i câriye olarak</string>
     <string name="about_data">Veriler ve kütüphaneler</string>
     <string name="about_data_desc">Namaz vakitleri Batoul Apps tarafından geliştirilen adhan-java (MIT) ile hesaplanır. Şehir arama, CC BY 4.0 lisanslı Open-Meteo geocoding API\'sini kullanır.</string>
+    <string name="about_adhan">Ezan kayıtları</string>
+    <string name="about_adhan_desc">Sünni ezanı: Adam-synagda kaydı, CC0.\nŞii ezanı: Saeed Hatamzadeh-Varmazyar okudu, CC BY-SA 4.0.\nİkisi de Wikimedia Commons aracılığıyla.</string>
+    <string name="about_adhan_link_source">Sünni ezanının kaynağı</string>
+    <string name="about_adhan_link_shia">Şii ezanının kaynağı</string>
+    <string name="about_adhan_link_licence">CC BY-SA 4.0 lisansı</string>
 
     <!-- Notifications -->
     <string name="channel_prayers">Namaz vakitleri</string>
@@ -227,7 +255,6 @@
     <string name="notif_prayer_title">%1$s vakti</string>
     <string name="notif_prayer_body">%1$s vakti saat %2$s itibarıyla giriyor</string>
     <string name="notif_next_title">%1$s · %2$s</string>
-    <string name="notif_next_body">Kalan süre: %1$s</string>
 
     <string name="hijri_date_format">%1$d %2$s %3$d</string>
     <string name="home_date_line">%1$s · %2$s</string>
@@ -254,7 +281,13 @@
     <!-- "Match your mosque" -->
     <string name="settings_adjustments">Camiye göre ayarla</string>
     <string name="settings_adjustments_none">Değişiklik yok</string>
-    <string name="settings_adjustments_help">Caminiz farklı bir vakit yayımlıyorsa, burada biraz kaydırın. Önce hesaplama yöntemini deneyin. Asıl fark genellikle oradadır. Bu bölüm, geriye kalan birkaç dakika içindir.</string>
+    <string name="settings_adjustments_help">Caminiz farklı bir vakit yayımlıyorsa, burada biraz kaydırın ya da caminizin panosundaki saati ayarlayın. Önce hesaplama yöntemini deneyin. Asıl fark genellikle oradadır. Bu bölüm, geriye kalan birkaç dakika içindir.</string>
+    <string name="adjustment_use_board">Cami panosundaki saati girin</string>
+    <string name="adjustment_which_prayer">Hangi vakit?</string>
+    <string name="action_set_time">Saati ayarla</string>
+    <string name="adjustment_pick_time_title">%1$s: caminizin panosundaki saat</string>
+    <string name="adjustment_limit_note">%1$d dakika ya da daha fazla bir fark genellikle farklı bir hesaplama yönteminden ya da biraz daha geç olan cemaat saatini gösteren bir cami panosundan kaynaklanır. Önce yöntemi deneyin.</string>
+    <string name="adjustment_choose_method">Bir hesaplama yöntemi seçin</string>
     <string name="settings_adjustments_reset">Tümünü sıfırla</string>
     <string name="settings_hijri_offset">Hicri tarih</string>
     <string name="settings_hijri_offset_label">Tarihi kaydır</string>
@@ -266,8 +299,8 @@
         <item quantity="other">%+d gün</item>
     </plurals>
     <plurals name="adjustment_summary_times">
-        <item quantity="one">Ayarlanan vakit: %d</item>
-        <item quantity="other">Ayarlanan vakit: %d</item>
+        <item quantity="one">%d vakit ayarlandı</item>
+        <item quantity="other">%d vakit ayarlandı</item>
     </plurals>
     <string name="adjustment_summary_hijri">Tarih %1$s</string>
     <string name="list_separator">", "</string>
@@ -275,7 +308,7 @@
     <string name="action_increase">%1$s: artır</string>
     <string name="notif_approximate">Yaklaşık vakit</string>
     <string name="settings_alarm_on_approximate">Yaklaşık vakitli günlerde çal</string>
-    <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarmlar sessiz kalır.</string>
+    <string name="settings_alarm_on_approximate_desc">Güneş doğmadığında ya da batmadığında vakitler daha düşük bir enlem esas alınarak hesaplanır. Siz bunu açmadıkça o günlerde alarm çalmaz, yalnızca bildirim gelir.</string>
 
     <!-- Ramazan -->
     <string name="ramadan_card_label">Ramazan</string>
@@ -307,11 +340,11 @@
     <string name="ramadan_info_hide">Bu kartı gizle</string>
     <string name="ramadan_info_hide_note">Ayarlar\'dan yeniden gösterebilirsiniz.</string>
     <string name="ramadan_eve_title_before">Bu takvime göre Ramazan %1$s başlıyor</string>
-    <string name="ramadan_eve_body">Birçok cami başlangıcı hilali gördükten sonra, çoğu zaman bir gün sonra duyurur. Caminizinki farklıysa hicri tarihi kaydırmak için dokunun. Bu, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
+    <string name="ramadan_eve_body">Birçok cami başlangıcı hilali gördükten sonra, çoğu zaman bir gün sonra duyurur. Caminizinki farklıysa hicri tarihi kaydırın. Bu, sahur hatırlatıcısını ve Ümmülkura yatsı kuralını da değiştirir.</string>
     <string name="ramadan_date_differs">Caminiz Ramazan\'a başka bir gün mü başladı?</string>
     <string name="settings_ramadan_card">Ramazan kartı</string>
     <string name="settings_ramadan_card_desc">Ramazan boyunca Vakitler ekranında imsak ve iftar vakitlerini gösterir</string>
-    <string name="ramadan_open_timetable">Tam imsakiye</string>
+    <string name="ramadan_open_timetable">Tüm Ramazan imsakiyesini al</string>
     <string name="ramadan_timetable_title">Ramazan %1$d</string>
     <string name="ramadan_col_day">Gün</string>
     <string name="ramadan_col_fast">Oruç</string>
@@ -323,11 +356,17 @@
     <string name="pdf_ramadan_note">İmsak Sabah vaktidir. İftar Akşam vaktidir. Caminizin imsakiyesi farklıysa caminize uyun.</string>
     <string name="ramadan_row_a11y">%1$d. gün, %2$s. İmsak %3$s. İftar %4$s. Oruç %5$s.</string>
     <string name="settings_suhoor">Sahur hatırlatıcısı</string>
-    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Ses ve sessiz mod kuralları namaz uyarılarınızla aynıdır.</string>
+    <string name="settings_suhoor_help">Ramazan günlerinde, SajdaTime\'ın ayarlı olduğu takvime göre, Sabah vaktinden önce bir hatırlatma. Burada ezanı seçmediğiniz sürece telefonunuzun kendi sesini kullanır.</string>
     <string name="suhoor_off">Kapalı</string>
     <plurals name="suhoor_minutes_before">
         <item quantity="one">Sabah vaktinden %d dakika önce</item>
         <item quantity="other">Sabah vaktinden %d dakika önce</item>
+    </plurals>
+    <string name="settings_prayer_reminder">Namazdan önce hatırlatıcı</string>
+    <string name="settings_prayer_reminder_help">Seçtiğiniz her namazdan birkaç dakika önce sessiz bir bildirim gelir, böylece hazırlanmaya vaktiniz olur.</string>
+    <plurals name="prayer_reminder_minutes_before">
+        <item quantity="one">%d dakika önce</item>
+        <item quantity="other">%d dakika önce</item>
     </plurals>
     <string name="notif_suhoor_title">İmsak %1$s</string>
     <string name="notif_suhoor_body">%1$s vakti %2$s sonra</string>
@@ -341,8 +380,8 @@
     <!-- Ana ekran widget\'ları -->
     <string name="widget_next_label">SajdaTime: sonraki namaz</string>
     <string name="widget_today_label">SajdaTime: bugünün namazları</string>
-    <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla. Telefonunuzun koyu temasına uyar.</string>
-    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli. Telefonunuzun koyu temasına uyar.</string>
+    <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla.</string>
+    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli.</string>
     <string name="widget_tomorrow">Yarın</string>
     <string name="widget_no_location">Konumunuzu ayarlamak için SajdaTime\'ı açın</string>
     <string name="widget_a11y_next">Sonraki namaz %1$s, saat %2$s, %3$s sonra</string>
@@ -351,4 +390,24 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">İmsak</string>
     <string name="widget_iftar">İftar</string>
+    <string name="widget_update_location">Konumu güncelle, %1$s</string>
+    <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
+    <string name="action_see_why">Nedenini gör</string>
+    <string name="ramadan_eve_brief">Caminiz bir gün sonra başlayabilir.</string>
+    <string name="ramadan_eve_card_on">İlk günden itibaren Ramazan kartı burada imsak ve iftar vakitlerini gösterir. Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="ramadan_eve_card_on_reminder">İlk günden itibaren Ramazan kartı burada imsak ve iftar vakitlerini gösterir ve imsaktan %1$d dakika önce bir hatırlatma gelir. İkisini de Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="polar_notice_brief">Burada Sabah ve Yatsı %1$d° enlemine göre hesaplanır.</string>
+    <string name="action_set_location">Konumu ayarla</string>
+    <string name="city_lookup_offline">İnternet bağlantısı yok. Bir yer aramak için bir kez bağlanın ya da konumunuzu kullanın.</string>
+    <string name="about_rate">SajdaTime\'ı Google Play\'de puanlayın</string>
+    <string name="about_rate_desc">Mağaza sayfasını açar.</string>
+    <!-- Spoken only: one alert choice with its prayer, "Alarm for Fajr". -->
+    <string name="alert_choice_a11y">%2$s için %1$s</string>
+    <string name="location_permission_denied">Konum izni verilmedi. Nerede olduğunuzu aşağıya yazın ya da yeniden denemek için Konuma izin ver\'e dokunun.</string>
+    <string name="confirm_notifications_hint">%1$s düğmesine dokunduğunuzda Android, SajdaTime\'ın bildirim gönderip gönderemeyeceğini soracak. Namaz uyarılarını almak için izin verin. Bunu daha sonra telefonunuzun ayarlarından değiştirebilirsiniz.</string>
+    <string name="about_share">SajdaTime\'ı paylaş</string>
+    <string name="about_share_desc">Bağlantıyı ailenize ve arkadaşlarınıza gönderin.</string>
+    <string name="about_share_message">SajdaTime: ücretsiz namaz vakitleri ve kıble pusulası. Reklam yok, hesap yok. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
+    <!-- The fallback place, shown in the app's own language. -->
+    <string name="location_makkah">Mekke</string>
 </resources>

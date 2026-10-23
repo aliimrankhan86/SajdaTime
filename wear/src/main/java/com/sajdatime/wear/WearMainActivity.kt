@@ -28,7 +28,14 @@ class WearMainActivity : ComponentActivity() {
 
         setContent {
             SajdaWearTheme {
-                WearApp(viewModel)
+                WearApp(
+                    viewModel = viewModel,
+                    // Choosing "This watch" after a "Don't allow" asks again. If the watch no longer
+                    // shows the question at all, the Location screen says where to allow it.
+                    onRequestLocationPermission = {
+                        locationPermission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                    },
+                )
             }
         }
 
@@ -40,5 +47,7 @@ class WearMainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.refreshLocation()
+        // Coming back after the watch's language changed: the tile follows now, not within the hour.
+        refreshTile(this)
     }
 }

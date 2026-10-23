@@ -28,9 +28,11 @@ class WidgetResourcesTest {
         return file.readText()
     }
 
-    private val layouts = listOf("layout/widget_next_prayer.xml", "layout/widget_today.xml")
+    private val nextLayouts = listOf("layout/widget_next_prayer.xml", "layout/widget_next_prayer_wide.xml")
+    private val todayLayouts = listOf("layout/widget_today.xml", "layout/widget_today_large.xml")
+    private val layouts = nextLayouts + todayLayouts
     private val providers = listOf("xml/widget_next_prayer_info.xml", "xml/widget_today_info.xml")
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in")
+    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
 
     private fun withoutComments(xml: String) = xml.replace(Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL), "")
 
@@ -85,16 +87,36 @@ class WidgetResourcesTest {
 
     @Test
     fun `each layout has the ids the renderer sets`() {
-        val next = read("layout/widget_next_prayer.xml")
-        for (id in listOf("widget_root", "widget_name", "widget_time", "widget_sublabel", "widget_countdown")) {
-            assertTrue("next prayer lacks $id", next.contains("""@+id/$id""""))
+        val slots = listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
+        val rows = slots.flatMap { listOf("widget_row_$it", "widget_glyph_$it", "widget_name_$it", "widget_label_$it", "widget_time_$it") }
+        // The countdown block, in both Next layouts and in the large Today card (WidgetRenderer.fillHero).
+        val hero = listOf(
+            "widget_glyph", "widget_name", "widget_time", "widget_sublabel", "widget_countdown", "widget_hero_time", "widget_progress",
+        ) + (1..5).map { "widget_seg_$it" }
+        // The location chip, on every layout (owner's request, 18 Oct 2026).
+        val chip = listOf("widget_place_chip", "widget_place")
+        val expected = mapOf(
+            "layout/widget_next_prayer.xml" to hero + chip,
+            "layout/widget_next_prayer_wide.xml" to hero + rows + chip,
+            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + chip,
+            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows + chip,
+        )
+        for ((layout, ids) in expected) {
+            val xml = read(layout)
+            for (id in listOf("widget_root") + ids) assertTrue("$layout lacks $id", xml.contains("""@+id/$id""""))
         }
-        val today = read("layout/widget_today.xml")
-        val ids = mutableListOf("widget_root", "widget_message", "widget_footer")
-        for (slot in listOf("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")) {
-            ids += listOf("widget_row_$slot", "widget_name_$slot", "widget_label_$slot", "widget_time_$slot")
+    }
+
+    /**
+     * Glyphs are white drawables tinted by their ImageView. A tint set from code would be baked in at
+     * the update and go stale when the phone changes theme (lesson 130), so every one is in the layout.
+     */
+    @Test
+    fun `every glyph is tinted in the layout from a widget colour`() {
+        for (layout in layouts) {
+            val glyphs = Regex("""<ImageView\b[^>]*widget_glyph[^>]*>""", RegexOption.DOT_MATCHES_ALL).findAll(withoutComments(read(layout))).toList()
+            for (glyph in glyphs) assertTrue("$layout: ${glyph.value}", glyph.value.contains(Regex("""android:tint="@color/widget_[a-z_]+"""")))
         }
-        for (id in ids) assertTrue("today lacks $id", today.contains("""@+id/$id""""))
     }
 
     @Test
@@ -139,14 +161,19 @@ class WidgetResourcesTest {
         // Neither widget may be resized below the size its content was drawn for.
         assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minResizeHeight="110dp""""))
         val today = read("xml/widget_today_info.xml")
-        assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
+        // Placed at 4 by 4 so a new widget opens on the large layout (18 Oct 2026).
+        assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="4""""))
         // The Today widget must never be resizable below the height its six rows need.
         assertTrue(today.contains("""android:minResizeHeight="180dp""""))
     }
 
     @Test
     fun `every colour the widget files use is defined in both themes`() {
-        val files = layouts + listOf("drawable/widget_background.xml", "drawable/widget_row_highlight.xml", "drawable/widget_row_plain.xml")
+        val drawables = listOf(
+            "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
+            "widget_seg_done", "widget_seg_next", "widget_seg_todo",
+        )
+        val files = layouts + drawables.map { "drawable/$it.xml" }
         val used = files.flatMap { Regex("""@color/(widget_[a-z_]+)""").findAll(read(it)).map { m -> m.groupValues[1] }.toList() }.toSet()
         assertTrue(used.isNotEmpty())
         for (folder in listOf("values", "values-night")) {
@@ -158,7 +185,7 @@ class WidgetResourcesTest {
     @Test
     fun `every widget string exists in all four languages`() {
         val names = Regex("""<string name="(widget_[a-z0-9_]+)"""").findAll(read("values/strings.xml")).map { it.groupValues[1] }.toList()
-        assertEquals(12, names.size)
+        assertEquals(13, names.size)
         for (language in languages) {
             val strings = read("$language/strings.xml")
             for (name in names) assertTrue("$language lacks $name", strings.contains("""name="$name""""))

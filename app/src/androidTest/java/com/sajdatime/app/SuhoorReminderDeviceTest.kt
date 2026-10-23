@@ -66,6 +66,49 @@ class SuhoorReminderDeviceTest {
 
     private fun reschedule() = runBlocking { PrayerAlarmScheduler.reschedule(context, repository.current()) }
 
+    /**
+     * Reschedules until the reminder alarms number [count], for up to 10 seconds, and returns what is there.
+     *
+     * Since the reminder is on by default (1.5.0, 21 Oct 2026) the app's own reschedules can race this test:
+     * the release script moves the clock into Ramadan, which fires the overdue prayer alarms, the time change
+     * receiver and the daily worker, each rescheduling on its own thread with the settings it read a moment
+     * earlier (60 minutes). One that read 60 before this test wrote 0 can lay a reminder down after the
+     * test's cancel; release-1.5.0.sh hit exactly that on 21 Oct 2026. Every reschedule after the write reads
+     * the new value, so rescheduling again settles it. Not a weaker test: a real "off leaves a reminder"
+     * fault survives every reschedule and still fails. In the app the same race is harmless, because the
+     * receiver checks the setting again when the reminder fires (shouldPostReminder).
+     */
+    /**
+     * The prayer alarms once the app has stopped rewriting them: reschedule and read until two readings in a
+     * row agree (up to 10 seconds), and, given [expected], until they equal it. The second release-1.5.0.sh run
+     * of 21 Oct 2026 read 3 of 22 Feb's 5 prayer alarms while one of the app's own reschedules was between its
+     * cancel and its writes, then all 5 a moment later. Concurrent reschedules always end with the full set
+     * (same request codes, the last write wins), so only a reading taken mid-flight is wrong. A suhoor reminder
+     * that really moved a prayer alarm does so on every reschedule and still fails.
+     */
+    private fun settledPrayers(pkg: String, expected: List<java.time.LocalDateTime>? = null): List<java.time.LocalDateTime> {
+        var last = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+        repeat(20) {
+            Thread.sleep(500)
+            reschedule()
+            val now = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+            if (now == last && now.isNotEmpty() && (expected == null || now == expected)) return now
+            last = now
+        }
+        return last
+    }
+
+    private fun settledReminders(pkg: String, count: Int): List<java.time.LocalDateTime> {
+        var found = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
+        repeat(20) {
+            if (found.size == count) return found
+            Thread.sleep(500)
+            reschedule()
+            found = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
+        }
+        return found
+    }
+
     @Test
     fun the_reminder_is_one_alarm_at_the_planned_minute_and_leaves_every_prayer_alarm_alone() {
         val zone = ZoneId.systemDefault()
@@ -82,24 +125,24 @@ class SuhoorReminderDeviceTest {
         val pkg = context.packageName
         runBlocking { repository.setSuhoorReminderMinutes(0) }
         reschedule()
-        val prayersBefore = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER)
+        val prayersBefore = settledPrayers(pkg)
         assertTrue("no prayer alarms to compare against", prayersBefore.isNotEmpty())
-        assertEquals("a reminder exists while it is switched off", 0, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER).size)
+        assertEquals("a reminder exists while it is switched off", 0, settledReminders(pkg, 0).size)
 
         runBlocking { repository.setSuhoorReminderMinutes(30) }
         reschedule()
-        val reminders = DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER)
+        val reminders = settledReminders(pkg, expected.size)
         assertEquals("one reminder for each planned day", expected.size, reminders.size)
         assertEquals(
             "the reminder is not 30 minutes before Fajr",
             expected.map { it.at.atZone(zone).toLocalDateTime().withNano(0) },
             reminders,
         )
-        assertEquals("a prayer alarm moved or went", prayersBefore, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER))
+        assertEquals("a prayer alarm moved or went", prayersBefore, settledPrayers(pkg, prayersBefore))
 
         runBlocking { repository.setSuhoorReminderMinutes(0) }
         reschedule()
-        assertEquals("switching it off left a reminder behind", 0, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER).size)
-        assertEquals("a prayer alarm moved or went", prayersBefore, DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_PRAYER))
+        assertEquals("switching it off left a reminder behind", 0, settledReminders(pkg, 0).size)
+        assertEquals("a prayer alarm moved or went", prayersBefore, settledPrayers(pkg, prayersBefore))
     }
 }

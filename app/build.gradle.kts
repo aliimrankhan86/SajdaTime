@@ -59,8 +59,13 @@ android {
         // greeting) and two home screen widgets. Phone only again: the watch stays 1001 / 1.2.0.
         // Docs: docs/plans/2026-10-widget-ramadan-tracker/. When the Ramadan content goes live is the
         // owner's decision (README Amendment 1), not something this number settles.
-        versionCode = 8
-        versionName = "1.4.0"
+        //
+        // 9 / 1.5.0, set 18 Oct 2026 for the January release: Quiet Glass design, Arabic, redesigned
+        // widgets, built-in adhan and notification and alarm sounds, reminder before prayer, Turkey with
+        // Diyanet's minutes. **Phone and watch together this time**: the watch shares the core, so the
+        // Turkey change reaches it too, and its new translations ship (watch 1002 / 1.5.0).
+        versionCode = 9
+        versionName = "1.5.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -92,7 +97,7 @@ android {
             )
         }
 
-        // `./gradlew installRtl` — a debug build that runs entirely right-to-left, for
+        // `./gradlew :app:installRtl` (never bare: lesson 149) — a debug build that runs entirely right-to-left, for
         // previewing what a translation into Arabic or Urdu will actually look like before
         // one exists. See core/AppLocale.kt; docs/HANDOVER.md §10 has what it has caught.
         create("rtl") {
@@ -234,9 +239,12 @@ tasks.withType<Test>().configureEach {
                 "app/src/main/res/values*/strings.xml",
                 "app/src/main/res/values*/colors.xml",
                 "app/src/main/res/layout/widget_*.xml",
+                "app/src/main/res/drawable/widget_*.xml",
                 "app/src/main/res/xml/widget_*.xml",
                 "app/src/main/res/drawable-nodpi/widget_preview_*.png",
                 "wear/src/main/res/values/strings.xml",
+                // TranslationIntegrityTest compares every translation with all three English sources.
+                "core/src/main/res/values/strings.xml",
                 "docs/privacy.html",
                 "docs/index.html",
                 "docs/store/LISTING.md",
@@ -254,6 +262,16 @@ tasks.withType<Test>().configureEach {
 }
 
 dependencies {
+    // Security floor (HANDOVER §5.24). Guava arrives transitively at 31.x (Firebase on the phone,
+    // coroutines-guava on the watch), which carries CVE-2023-2976 (temp file permissions) and
+    // CVE-2020-8908 (Files.createTempDir), both fixed in 32.0.0. A constraint raises it without
+    // making Guava a direct dependency: Gradle picks the highest version asked for, so nothing in the
+    // graph can bring it back below this floor. A newer one from a library update is still allowed.
+    constraints {
+        implementation(libs.guava) {
+            because("CVE-2023-2976 and CVE-2020-8908, fixed in Guava 32.0.0")
+        }
+    }
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(libs.androidx.core.ktx)
@@ -273,6 +291,7 @@ dependencies {
     // app identifiers are plain string resources (res/values/firebase_config.xml).
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.play.review.ktx)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

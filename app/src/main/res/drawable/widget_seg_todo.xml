@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Day progress: a prayer still to come after the next one. A track, decorative: the hero and the
+     rows already say which prayer is next in words. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_outline_variant" />
+    <corners android:radius="3dp" />
+</shape>

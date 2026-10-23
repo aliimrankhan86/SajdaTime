@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A copy of widget_background.xml with each colour fixed to its light value, for a widget whose theme
+     is chosen in the app (Settings, Theme). WidgetThemeTest fails the build if the two drift. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="@color/widget_light_surface"
+                android:endColor="@color/widget_light_surface_bottom"
+                android:startColor="@color/widget_light_surface_top"
+                android:type="linear" />
+            <corners android:radius="@dimen/widget_corner_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="@android:color/transparent"
+                android:centerY="0.45"
+                android:endColor="@android:color/transparent"
+                android:startColor="@color/widget_light_sheen"
+                android:type="linear" />
+            <corners android:radius="@dimen/widget_corner_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke android:width="1dp" android:color="@color/widget_light_edge" />
+            <corners android:radius="@dimen/widget_corner_radius" />
+        </shape>
+    </item>
+</layer-list>

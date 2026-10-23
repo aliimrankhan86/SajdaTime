@@ -20,13 +20,13 @@ No accounts. No ads. Times are worked out on your phone and we never receive you
   later, older phones get a share sheet)
 - Two home screen widgets: the next prayer with a countdown, and all of today's times
 - During Ramadan, suhoor end and iftar for your location, the length of the fast, a full timetable
-  to view or save as a PDF, and an optional suhoor reminder before Fajr. Suhoor ends at Fajr and
+  to view or save as a PDF, and a suhoor reminder an hour before Fajr (on during Ramadan unless turned off). Suhoor ends at Fajr and
   iftar is at Maghrib, as calculated. No imsak margin is added, and where your mosque's timetable
   differs, follow your mosque
 - A Wear OS app and tile that work on their own, with or without the phone nearby
 - Light and dark themes, following your phone by default or set by hand, both verified
   against WCAG 2.1 AA contrast
-- In English, Urdu, Turkish and Indonesian, chosen in Settings on Android 13 and later. The
+- In English, Arabic, Urdu, Turkish and Indonesian, chosen in Settings on Android 13 and later. The
   translations were written with AI help by the developer and are corrected when users report
   mistakes. Clock times, dates and numbers follow the language the app is showing, not the
   phone's: see `docs/HANDOVER.md` §5.11 for why that is not the same thing.

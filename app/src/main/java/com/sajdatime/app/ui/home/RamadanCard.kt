@@ -1,5 +1,8 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +30,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material.icons.rounded.Brightness3
+import com.sajdatime.app.ui.components.NoticeTone
+import com.sajdatime.app.ui.components.Notice
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
@@ -39,6 +46,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.ui.RamadanState
 import com.sajdatime.app.ui.UiState
@@ -50,7 +58,7 @@ import kotlin.math.abs
 
 /**
  * What the Times screen shows about Ramadan today, if anything: the card inside Ramadan, a quiet
- * notice in the week before it, or nothing at all.
+ * notice in the 3 days before it, or nothing at all.
  *
  * All the timing lives in [com.sajdatime.core.RamadanInfo] (`isRamadan`, `showsNotice`) and the
  * state is null outside those windows, so this function only decides between the two shapes and
@@ -78,7 +86,7 @@ internal fun RamadanSection(
     val dismissed = settings.ramadanNoticeDismissedYear == info.hijriYear
     val noticeDay = info.showsNotice(ramadan.today.date) && !dismissed
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     if (info.isRamadan) {
         RamadanCard(
             ramadan = ramadan,
@@ -93,6 +101,7 @@ internal fun RamadanSection(
     } else if (noticeDay) {
         RamadanNotice(
             ramadan = ramadan,
+            suhoorMinutes = settings.suhoorReminderMinutes,
             onShiftDate = onShiftDate,
             onDismiss = { onDismissNotice(info.hijriYear) },
         )
@@ -145,7 +154,7 @@ private fun RamadanCard(
                 color = scheme.onSurfaceVariant,
             )
         }
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(Space.Paragraph))
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TimeColumn(
@@ -161,15 +170,15 @@ private fun RamadanCard(
                 modifier = Modifier.weight(1f),
             )
         }
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Paragraph))
 
         Countdown(ramadan = ramadan, now = now, phase = phase)
 
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(Space.Tight))
         FastLine(ramadan = ramadan)
 
         if (ramadan.tomorrowIsRamadan) {
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(
                     R.string.ramadan_tomorrow_line,
@@ -184,7 +193,7 @@ private fun RamadanCard(
         if (ramadan.today.approximated) {
             // The polar banner above names the latitude. This line keeps the marking on the card
             // itself, so a card that is looked at on its own is never taken for measured times.
-            Spacer(Modifier.height(2.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.notif_approximate),
                 style = MaterialTheme.typography.bodyMedium,
@@ -193,7 +202,7 @@ private fun RamadanCard(
         }
 
         if (showDateHint) {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.Related))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(R.string.ramadan_date_differs),
@@ -201,21 +210,28 @@ private fun RamadanCard(
                     color = scheme.onSurfaceVariant,
                     modifier = Modifier.weight(1f),
                 )
-                TextButton(onClick = onShiftDate) {
+                CtaButton(onClick = onShiftDate, compact = true) {
                     Text(stringResource(R.string.settings_hijri_offset_label))
                 }
             }
         }
 
+        // A section of its own, 24dp above and 24dp below (8dp here plus the card's 16dp), with the (i)
+        // centred beside it (owner, 18 Oct 2026: "spacing looks tight ... give it some spacing from top
+        // and bottom and i should be aligned to it"). It used to sit 4dp under "Shift the date".
+        Spacer(Modifier.height(Space.Section))
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(Space.Related),
             modifier = Modifier.fillMaxWidth(),
         ) {
-            // The whole month, on screen. A text button with words, not an icon: it is the one
+            // The whole month, on screen. A button with words, not an icon: it is the one
             // action on the card and the thing a person comes to it for in the second week.
-            TextButton(onClick = onOpenTimetable) {
-                Text(stringResource(R.string.ramadan_open_timetable))
+            // Solid, like every action, and filling its row beside the (i) with the full
+            // label "Get the full Ramadan timetable" (owner, 18 Oct 2026, from screenshots:
+            // "should be wider on its row").
+            CtaButton(onClick = onOpenTimetable, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.ramadan_open_timetable), textAlign = TextAlign.Center)
             }
             // 48dp target: this is the only way to the explanation, and it is small.
             IconButton(onClick = onOpenInfo, modifier = Modifier.size(48.dp)) {
@@ -226,6 +242,7 @@ private fun RamadanCard(
                 )
             }
         }
+        Spacer(Modifier.height(Space.Related))
     }
 }
 
@@ -259,7 +276,7 @@ private fun TimeColumn(label: String, time: String, isNext: Boolean, modifier: M
                 )
             }
         }
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(
             text = time,
             style = PrayerTimeTextStyle,
@@ -336,7 +353,7 @@ private fun FastLine(ramadan: RamadanState) {
 }
 
 /**
- * The week before day 1, one quiet card: when Ramadan begins on the calendar the app is set to, and
+ * The 3 days before day 1, one quiet card: when Ramadan begins on the calendar the app is set to, and
  * that mosques announce their own start. Neutral, not amber. It carries no warning, and the other
  * notices on this screen use amber for "something is wrong", which this is not.
  *
@@ -344,52 +361,31 @@ private fun FastLine(ramadan: RamadanState) {
  * do about it. Closing it hides it for this Hijri year and it comes back next year without a reset.
  */
 @Composable
-private fun RamadanNotice(ramadan: RamadanState, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
+private fun RamadanNotice(ramadan: RamadanState, suhoorMinutes: Int, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.secondaryContainer)
-            .clickable(role = Role.Button, onClick = onShiftDate)
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Filled.Brightness3,
-            contentDescription = null,
-            tint = scheme.onSecondaryContainer,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(
-                    R.string.ramadan_eve_title_before,
-                    TimeFormat.date(context, ramadan.info.firstDay),
-                ),
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onSecondaryContainer,
-            )
-            Text(
-                text = stringResource(R.string.ramadan_eve_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSecondaryContainer,
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        // Its own target inside a clickable row, 44dp, as NoticeCard does: opening the date
-        // shift and closing the card must never be the same gesture.
-        Icon(
-            imageVector = Icons.Outlined.Close,
-            contentDescription = stringResource(R.string.notice_dismiss),
-            tint = scheme.onSecondaryContainer,
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .clickable(role = Role.Button, onClick = onDismiss)
-                .padding(10.dp)
-                .size(24.dp),
-        )
-    }
+    // A quiet Notice (17 Oct 2026): the date and one line up front, the moon sighting reasoning
+    // folded, and the date shift as the action rather than the whole card.
+    Notice(
+        tone = NoticeTone.QUIET,
+        icon = Icons.Rounded.Brightness3,
+        title = stringResource(R.string.ramadan_eve_title_before, TimeFormat.date(context, ramadan.info.firstDay)),
+        brief = stringResource(R.string.ramadan_eve_brief),
+        details = stringResource(R.string.ramadan_eve_body),
+        // Always visible: the card is on for everyone, so the user is told so before day 1 and
+        // where to turn it off (owner, 19 Oct 2026). True whenever this notice shows, because the
+        // whole section is skipped once the card is turned off. The suhoor reminder is on by default
+        // too (owner, 21 Oct 2026), so the same line names it with the person's own minutes, and only
+        // while it is on: a line saying "60 minutes" to someone who chose 30 or Off would be untrue.
+        // ...and only if notifications can be shown at all: with them refused, no reminder ever arrives.
+        footnote = if (suhoorMinutes > 0 && Notifications.canPost(context)) {
+            stringResource(R.string.ramadan_eve_card_on_reminder, suhoorMinutes)
+        } else {
+            stringResource(R.string.ramadan_eve_card_on)
+        },
+        actionLabel = stringResource(R.string.settings_hijri_offset_label),
+        onAction = onShiftDate,
+        onDismiss = onDismiss,
+    )
 }
 
 /**
@@ -410,11 +406,11 @@ internal fun RamadanInfoDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(stringResource(R.string.ramadan_info_title)) },
+        title = { DialogTitle(stringResource(R.string.ramadan_info_title), onDismiss) },
         // Scrollable, like every long dialog here: AlertDialog will not scroll its body for you.
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ExplainerParagraph(stringResource(R.string.ramadan_info_calc))
+                ExplainerParagraph(stringResource(R.string.ramadan_info_calc), first = true)
                 ExplainerParagraph(stringResource(R.string.ramadan_info_margin))
                 ExplainerParagraph(stringResource(R.string.ramadan_info_mosque))
                 ExplainerParagraph(stringResource(R.string.ramadan_info_date))
@@ -426,7 +422,7 @@ internal fun RamadanInfoDialog(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = Space.Related),
                 )
             }
         },

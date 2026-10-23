@@ -38,6 +38,10 @@ sdk="${ANDROID_HOME:-$HOME/Library/Android/sdk}"
 adb="$sdk/platform-tools/adb"
 out="$root/build/wear-verify"
 scales=("${@:-}")
+# Optional: WEAR_LOCALE=ar ./tools/wear-verify.sh runs the watch app in that language (per app
+# language, API 33+), and names the captures after it. Added 17 Oct 2026 with the watch translations.
+loc="${WEAR_LOCALE:-}"
+tag="${loc:+$loc-}"
 [ -z "${scales[0]}" ] && scales=(1.0 1.3)
 
 # name:device-profile:edge-in-px. 320dpi both, so px/2 = dp: 384->192dp, 454->227dp.
@@ -45,8 +49,10 @@ avds=("sajdawear:wearos_small_round:384" "sajdawear_large:wearos_large_round:454
 image="system-images;android-34;android-wear;arm64-v8a"
 
 mkdir -p "$out"
-"$root/gradlew" -p "$root" :wear:assembleDebug -q
+"$root/gradlew" -p "$root" :wear:assembleDebug :wear:assembleDebugAndroidTest -q
 apk="$root/wear/build/outputs/apk/debug/wear-debug.apk"
+testApk="$root/wear/build/outputs/apk/androidTest/debug/wear-debug-androidTest.apk"
+storeTest=""
 
 boot() {  # name profile -> echoes the serial
   local name=$1 profile=$2
@@ -81,13 +87,14 @@ for entry in "${avds[@]}"; do
   echo "== $name ($((edge / 2))dp round) on $serial"
   "$adb" -s "$serial" install -r -t "$apk" >/dev/null
   "$adb" -s "$serial" shell pm grant com.sajdatime.app android.permission.ACCESS_COARSE_LOCATION || true
+  "$adb" -s "$serial" shell cmd locale set-app-locales com.sajdatime.app --locales "${loc:-en}" || true
 
   for fs in "${scales[@]}"; do
     "$adb" -s "$serial" shell settings put system font_scale "$fs"
     "$adb" -s "$serial" shell am force-stop com.sajdatime.app
     "$adb" -s "$serial" shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity >/dev/null
     sleep 8
-    grab() { sleep 2; "$adb" -s "$serial" exec-out screencap -p > "$out/$name-fs$fs-$1.png"; }
+    grab() { sleep 2; "$adb" -s "$serial" exec-out screencap -p > "$out/$tag$name-fs$fs-$1.png"; }
     grab times-top
     # Down to the very bottom. The scroll extreme is the interesting one: that is where
     # the list anchors from below and lifts whatever is second-to-last under the clock.
@@ -98,13 +105,29 @@ for entry in "${avds[@]}"; do
     "$adb" -s "$serial" shell am force-stop com.sajdatime.app
     "$adb" -s "$serial" shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity >/dev/null
     sleep 6
-    "$adb" -s "$serial" shell input swipe $((edge - 60)) $mid 60 $mid 300
+    # The pager mirrors in right to left, so the Qibla page is reached by swiping the other way.
+    case "$loc" in ar*|ur*|fa*|he*) "$adb" -s "$serial" shell input swipe 60 $mid $((edge - 60)) $mid 300 ;;
+      *) "$adb" -s "$serial" shell input swipe $((edge - 60)) $mid 60 $mid 300 ;; esac
     grab qibla
   done
   "$adb" -s "$serial" shell settings put system font_scale 1.0
+
+  # The place rules through the real store (WearSettingsDeviceTest): "Same as phone" cannot be reached by
+  # tapping, because an emulator pair cannot sync. Once, on the first watch. It clears the app's settings.
+  # Pushed and installed with pm: adb install of the test APK hung on these images (23 Oct 2026).
+  if [ -z "$storeTest" ]; then
+    "$adb" -s "$serial" push "$testApk" /data/local/tmp/sajda-test.apk >/dev/null
+    "$adb" -s "$serial" shell pm install -r -t /data/local/tmp/sajda-test.apk >/dev/null
+    storeTest="$("$adb" -s "$serial" shell am instrument -w -e class com.sajdatime.wear.WearSettingsDeviceTest \
+      com.sajdatime.app.test/androidx.test.runner.AndroidJUnitRunner | tr -d '\r' | grep -E '^OK|FAILURES|shortMsg' | head -1)"
+    "$adb" -s "$serial" shell pm clear com.sajdatime.app >/dev/null
+  fi
 done
 
 echo
-"$root/tools/wear-round-check.py" "$out"/*.png
+case "$storeTest" in OK*) echo "PASS  watch place rules on the real store: $storeTest" ;;
+  *) echo "FAIL  watch place rules on the real store: ${storeTest:-no result}" ;; esac
+echo
+"$root/tools/wear-round-check.py" "$out"/"$tag"*.png
 echo
 echo "Captures in $out — open them. The bezel check cannot see text drawn over text."

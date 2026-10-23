@@ -95,19 +95,23 @@ data class AppSettings(
     /** Chosen sound for [AlertStyle.ALARM]. Empty means the device's default alarm. */
     val alarmSoundUri: String = "",
     /**
-     * Whether an alarm-style alert falls back to a silent notification while the phone
-     * itself is silenced.
-     *
-     * On by default, and that is a real decision rather than a shrug. An alarm plays on
-     * the alarm stream, which Android deliberately does *not* mute with the ringer — that
-     * is right for a clock the user set for one morning, and wrong for a recurring alert
-     * five times a day from an app they installed yesterday. Making noise from a phone
-     * someone has visibly silenced is how a charity app earns an uninstall.
-     *
-     * The user who genuinely wants to be woken for Fajr regardless turns this off, and
-     * the switch says plainly what that means. Requested by a tester.
+     * Whether an Alarm falls back to a quiet notification while the phone is on silent, vibrate or
+     * Do Not Disturb. Shown inverted as "Play on silent" (off by default), so a phone on silent stays
+     * quiet unless the user asks otherwise, like other prayer apps. Existing users keep their choice.
      */
     val alarmRespectsSilent: Boolean = true,
+    /** The phone sound a built-in adhan replaced, so the phone's own picker can open on it. */
+    val phoneAlarmSoundUri: String = "",
+    /**
+     * Chosen sound for [AlertStyle.NOTIFICATION] (owner, 18 Oct 2026: "user can select adhan or another
+     * sound for an alarm or notification"). Empty means the phone's usual notification tone, which is
+     * what every notification played before this existed, so nobody's sound changes until they pick one.
+     * It plays on the notification volume, so silent, vibrate and Do Not Disturb treat it like any
+     * other notification.
+     */
+    val notificationSoundUri: String = "",
+    /** As [phoneAlarmSoundUri], for the notification sound. */
+    val phoneNotificationSoundUri: String = "",
     /**
      * Whether a prayer whose time had to be projected from another latitude may still ring
      * as a full alarm. **Off by default** — those days drop to a notification.
@@ -183,18 +187,44 @@ data class AppSettings(
      */
     val eidGreetingDismissedCode: Int = 0,
     /**
-     * Minutes before Fajr at which the optional suhoor reminder fires during Ramadan, or 0 for off.
-     * **Off by default**: it is an alert, and nothing here makes noise until asked. Read through
-     * [SUHOOR_CHOICES], so a stored value that is not one of the five choices (a corrupt store, an
-     * older or newer build) reads as off rather than as some odd number of minutes.
+     * Minutes before Fajr at which the suhoor reminder fires during Ramadan, or 0 for off.
+     * **60 by default** (owner, 21 Oct 2026: "60 mins before suhoor ends by default unless the user
+     * switches it off - Only during ramadan then off itself automatically"). This reverses the 1.4.0
+     * rule "off by default, nothing makes noise until asked", on purpose: a person who never opens
+     * Settings should still be woken for suhoor. It stays polite because the default style is a
+     * quiet Notification on the phone's usual tone, it only exists on days of Ramadan
+     * ([com.sajdatime.app.notify.SuhoorReminderPlan]), and the Ramadan notice says so from 3 days
+     * before. An unset key reads as 60, so 1.4.0 users who never chose get it too; anyone who chose
+     * Off has 0 stored and keeps it. Read through [SUHOOR_CHOICES], so a stored value that is not
+     * one of the five choices (a corrupt store, an older or newer build) reads as off.
      */
-    val suhoorReminderMinutes: Int = 0,
+    val suhoorReminderMinutes: Int = SUHOOR_DEFAULT_MINUTES,
     /**
      * How the reminder announces itself. The same two styles as a prayer alert, and it goes through
      * the same [com.sajdatime.app.notify.effectiveAlertStyle], so the silent phone switch, the
      * polar approximate day downgrade and the Do Not Disturb handling apply to it unchanged.
      */
     val suhoorReminderStyle: AlertStyle = AlertStyle.NOTIFICATION,
+    /**
+     * Whether the suhoor reminder plays the built-in adhan of the user's school. **False by default,
+     * and the reminder never borrows the prayer sounds** (owner, 21 Oct 2026: "Never the adhan but if
+     * the user wants to choose it then they should be able to select adhaan"): an adhan an hour before
+     * Fajr announces a prayer that has not come. False is the phone's usual tone, on the suhoor
+     * reminder's own channel ([com.sajdatime.app.notify.Notifications.ensureSuhoorChannel]).
+     */
+    val suhoorUsesAdhan: Boolean = false,
+    /**
+     * Minutes before each chosen prayer at which a quiet heads up arrives, or 0 for off. **Off by
+     * default** (owner, 17 Oct 2026, from the competitor review: "prenotifications" was the feature a
+     * Pillars user missed most). Read through [PRAYER_REMINDER_CHOICES], like the suhoor minutes.
+     * Always a notification, never an alarm: it is a nudge before the alert the person already chose.
+     */
+    val prayerReminderMinutes: Int = 0,
+    /**
+     * Which prayers get that heads up. All five until the person unticks some; it means nothing
+     * while [prayerReminderMinutes] is 0.
+     */
+    val prayerReminderFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -217,9 +247,26 @@ data class AppSettings(
         get() = alertFor.containsValue(AlertStyle.ALARM) ||
             (suhoorReminderMinutes > 0 && suhoorReminderStyle == AlertStyle.ALARM)
 
+    /**
+     * True when any prayer is a notification, so the Notification sound row applies. The suhoor
+     * reminder does not count since 21 Oct 2026: it has its own sound choice and never uses this one.
+     */
+    val usesNotification: Boolean
+        get() = alertFor.containsValue(AlertStyle.NOTIFICATION)
+
+    /** True when any prayer is an alarm, so the Alarm sound row applies (not the suhoor reminder, as above). */
+    val prayersUseAlarm: Boolean
+        get() = alertFor.containsValue(AlertStyle.ALARM)
+
     companion object {
         /** The reminder choices, in minutes before Fajr. 0 is off. All are well clear of Fajr itself. */
         val SUHOOR_CHOICES: List<Int> = listOf(0, 15, 30, 45, 60)
+
+        /** The reminder a person gets without choosing: an hour before Fajr (owner, 21 Oct 2026). */
+        const val SUHOOR_DEFAULT_MINUTES = 60
+
+        /** Minutes before a prayer. 0 is off. Kept short: this is "get ready", not a second alarm. */
+        val PRAYER_REMINDER_CHOICES: List<Int> = listOf(0, 5, 10, 15, 20, 30)
     }
 }
 
@@ -298,6 +345,14 @@ class SettingsRepository(private val context: Context) {
         // same definition of "offered" the list itself uses.
         val method = enumOr(it[Keys.METHOD], CalcMethod.AUTO)
         if (!method.offeredTo(sect)) it[Keys.METHOD] = CalcMethod.AUTO.name
+        // The same rule for the alarm sound: each school has its own built-in adhan, so a chosen
+        // adhan follows the school (alarmSoundForSect). Nothing else about the sound changes.
+        val sound = it[Keys.ALARM_SOUND] ?: ""
+        it[Keys.ALARM_SOUND] = alarmSoundForSect(sect, sound, it[Keys.PHONE_ALARM_SOUND] ?: "", context.packageName)
+        val notificationSound = it[Keys.NOTIFICATION_SOUND] ?: ""
+        it[Keys.NOTIFICATION_SOUND] = alarmSoundForSect(
+            sect, notificationSound, it[Keys.PHONE_NOTIFICATION_SOUND] ?: "", context.packageName,
+        )
     }
 
     suspend fun setMadhab(madhab: Madhab) = edit { it[Keys.MADHAB] = madhab.name }
@@ -341,10 +396,33 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setOngoingBadge(enabled: Boolean) = edit { it[Keys.ONGOING] = enabled }
 
+    /** A sound from the phone's own list, or "" for the phone's default alarm. */
     suspend fun setAlarmSound(uri: String) = edit { it[Keys.ALARM_SOUND] = uri }
 
     suspend fun setAlarmRespectsSilent(respects: Boolean) =
         edit { it[Keys.ALARM_RESPECTS_SILENT] = respects }
+
+    /**
+     * A built-in adhan. The sound it replaces, when that is a phone sound, is remembered in
+     * [Keys.PHONE_ALARM_SOUND], so the phone's own picker opens on it later (MainActivity).
+     * Copied here rather than when the phone sound is picked, so a sound chosen before 1.5.0, which
+     * never went through the new code, is remembered too (independent review, 17 Oct 2026).
+     */
+    suspend fun setBuiltInAdhan(adhan: BuiltInAdhan) = edit {
+        val current = it[Keys.ALARM_SOUND] ?: ""
+        if (BuiltInAdhan.of(current) == null) it[Keys.PHONE_ALARM_SOUND] = current
+        it[Keys.ALARM_SOUND] = adhan.uri(context.packageName)
+    }
+
+    /** A sound from the phone's own list, or "" for the phone's usual notification tone. */
+    suspend fun setNotificationSound(uri: String) = edit { it[Keys.NOTIFICATION_SOUND] = uri }
+
+    /** [setBuiltInAdhan], for the notification sound. */
+    suspend fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) = edit {
+        val current = it[Keys.NOTIFICATION_SOUND] ?: ""
+        if (BuiltInAdhan.of(current) == null) it[Keys.PHONE_NOTIFICATION_SOUND] = current
+        it[Keys.NOTIFICATION_SOUND] = adhan.uri(context.packageName)
+    }
 
     suspend fun setAlarmOnApproximateDays(allowed: Boolean) =
         edit { it[Keys.ALARM_ON_APPROXIMATE] = allowed }
@@ -356,6 +434,20 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setSuhoorReminderStyle(style: AlertStyle) = edit {
         it[Keys.SUHOOR_STYLE] = style.name
+    }
+
+    suspend fun setSuhoorUsesAdhan(adhan: Boolean) = edit { it[Keys.SUHOOR_ADHAN] = adhan }
+
+    /** Anything that is not one of [AppSettings.PRAYER_REMINDER_CHOICES] is stored as 0, off. */
+    suspend fun setPrayerReminderMinutes(minutes: Int) = edit {
+        it[Keys.PRAYER_REMINDER_MINUTES] = minutes.takeIf { m -> m in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0
+    }
+
+    suspend fun setPrayerReminder(slot: PrayerSlot, on: Boolean) = edit { prefs ->
+        val current = decodeSlots(prefs[Keys.PRAYER_REMINDER_FOR])
+        val updated = if (on) current + slot else current - slot
+        // Written in the enum's order, so the stored string is stable (see AlertCodec.encode).
+        prefs[Keys.PRAYER_REMINDER_FOR] = updated.sortedBy { it.ordinal }.joinToString(",") { it.name }
     }
 
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
@@ -411,6 +503,14 @@ class SettingsRepository(private val context: Context) {
         val ONGOING = booleanPreferencesKey("ongoing_badge")
         val ALARM_SOUND = stringPreferencesKey("alarm_sound")
         val ALARM_RESPECTS_SILENT = booleanPreferencesKey("alarm_respects_silent")
+
+        /**
+         * The phone sound (or "" for the default) in use when a built-in adhan replaced it (1.5.0).
+         * Absent until a built-in adhan is first chosen, and only read while one is.
+         */
+        val PHONE_ALARM_SOUND = stringPreferencesKey("phone_alarm_sound")
+        val NOTIFICATION_SOUND = stringPreferencesKey("notification_sound")
+        val PHONE_NOTIFICATION_SOUND = stringPreferencesKey("phone_notification_sound")
         val ALARM_ON_APPROXIMATE = booleanPreferencesKey("alarm_on_approximate_days")
 
         // Read but never written: the two keys ALERTS replaced. Kept so that an existing
@@ -430,6 +530,9 @@ class SettingsRepository(private val context: Context) {
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
         val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
         val SUHOOR_STYLE = stringPreferencesKey("suhoor_reminder_style")
+        val SUHOOR_ADHAN = booleanPreferencesKey("suhoor_reminder_adhan")
+        val PRAYER_REMINDER_MINUTES = intPreferencesKey("prayer_reminder_minutes")
+        val PRAYER_REMINDER_FOR = stringPreferencesKey("prayer_reminder_for")
     }
 
     private companion object {
@@ -459,6 +562,9 @@ class SettingsRepository(private val context: Context) {
             ongoingBadge = this[Keys.ONGOING] ?: true,
             alarmSoundUri = this[Keys.ALARM_SOUND] ?: "",
             alarmRespectsSilent = this[Keys.ALARM_RESPECTS_SILENT] ?: true,
+            phoneAlarmSoundUri = this[Keys.PHONE_ALARM_SOUND] ?: "",
+            notificationSoundUri = this[Keys.NOTIFICATION_SOUND] ?: "",
+            phoneNotificationSoundUri = this[Keys.PHONE_NOTIFICATION_SOUND] ?: "",
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
             disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             analyticsEnabled = this[Keys.ANALYTICS] ?: false,
@@ -470,9 +576,13 @@ class SettingsRepository(private val context: Context) {
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
             eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
-            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: 0)
+            suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: AppSettings.SUHOOR_DEFAULT_MINUTES)
                 .takeIf { it in AppSettings.SUHOOR_CHOICES } ?: 0,
             suhoorReminderStyle = enumOr(this[Keys.SUHOOR_STYLE], AlertStyle.NOTIFICATION),
+            suhoorUsesAdhan = this[Keys.SUHOOR_ADHAN] ?: false,
+            prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
+                .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
+            prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
         )
     }
 
@@ -480,3 +590,22 @@ class SettingsRepository(private val context: Context) {
     private inline fun <reified T : Enum<T>> enumOr(name: String?, fallback: T): T =
         enumValues<T>().firstOrNull { it.name == name } ?: fallback
 }
+
+/**
+ * The prayers named in a stored "FAJR,ASR" string. Absent means never touched, so all five; blank
+ * means the person unticked every one. Unknown names are dropped, as in [AlertCodec.decode].
+ */
+internal fun decodeSlots(raw: String?): Set<PrayerSlot> {
+    val prayers = PrayerSlot.entries.filter { it.isPrayer }
+    if (raw == null) return prayers.toSet()
+    return raw.split(",").mapNotNull { name -> prayers.firstOrNull { it.name == name } }.toSet()
+}
+
+/**
+ * The place name to show. The Makkah fallback is stored under a fixed English name, so it is
+ * shown in the app's own language instead ("مكة", "مکہ", "Mekke"); a real place keeps the name
+ * the phone or the lookup gave it. [context] must carry the app's language (AppLocale.wrap, or
+ * a Compose LocalContext, which already does). Added 17 Oct 2026 with the Arabic translation.
+ */
+fun AppSettings.placeName(context: android.content.Context): String =
+    if (usingDefaultLocation) context.getString(com.sajdatime.app.R.string.location_makkah) else cityName

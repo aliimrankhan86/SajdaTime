@@ -1,5 +1,7 @@
 package com.sajdatime.app.notify
 
+import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.HijriCalendar
@@ -51,3 +53,12 @@ object SuhoorReminderPlan {
         }
     }
 }
+
+/**
+ * The sound the suhoor reminder plays: blank, the phone's usual tone, unless the person picked the
+ * adhan for it, then their school's built-in adhan (it follows a change of school, as the alarm sound
+ * does). Never the prayer sounds (owner, 21 Oct 2026): a person with the adhan for prayers must not hear
+ * an adhan an hour before Fajr unless they asked for it here. Pure, so it is tested.
+ */
+internal fun suhoorSoundUri(settings: AppSettings, packageName: String): String =
+    if (settings.suhoorUsesAdhan) BuiltInAdhan.forSect(settings.sect).firstOrNull()?.uri(packageName).orEmpty() else ""

@@ -28,6 +28,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -43,8 +44,15 @@ data class WearUiState(
     val qiblaBearing: Double? = null,
     val heading: Double? = null,
     val needsLocation: Boolean = false,
-    /** A fix has been asked for and has not arrived yet. */
+    /** A fix has been asked for and has not arrived yet, and there is no place to show meanwhile. */
     val locating: Boolean = false,
+    /** A fix from this watch is on its way. Shown on the Location screen, which has a place to show. */
+    val findingWatchFix: Boolean = false,
+    /**
+     * The watch's own location was wanted and could not be had: not allowed, switched off, or no fix.
+     * The Location screen says so under "This watch", the one place it can be acted on.
+     */
+    val watchLocationUnavailable: Boolean = false,
 )
 
 class WearViewModel(application: Application) : AndroidViewModel(application) {
@@ -88,20 +96,43 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
      * paired phone. Either way it arrives through the platform LocationManager, so the
      * watch does not depend on the phone app being open.
      */
-    @SuppressLint("MissingPermission")
     fun refreshLocation() {
-        val context = getApplication<Application>()
-        val granted = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) == PackageManager.PERMISSION_GRANTED
+        // Read from the store, not from the state: on launch the state still holds the defaults,
+        // which would ask the hardware for a fix the stored choice is about to throw away.
+        viewModelScope.launch {
+            val settings = store.settings.first()
+            if (acceptsWatchFix(settings.locationSource, isRealPlace(settings.phoneCoordinates))) {
+                requestWatchFix()
+            } else {
+                // The place comes from the phone or is Makkah: no GPS, no battery, nothing to wait for.
+                currentFix?.cancel()
+                currentFix = null
+                _state.update {
+                    it.copy(
+                        locating = false,
+                        findingWatchFix = false,
+                        watchLocationUnavailable = false,
+                        needsLocation = settings.coordinates == null,
+                    )
+                }
+            }
+        }
+    }
 
-        if (!granted) {
+    /** True if location access is allowed. The Location screen asks for it before choosing this watch. */
+    fun watchLocationAllowed(): Boolean = ContextCompat.checkSelfPermission(
+        getApplication(),
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+    ) == PackageManager.PERMISSION_GRANTED
+
+    @SuppressLint("MissingPermission")
+    private fun requestWatchFix() {
+        val context = getApplication<Application>()
+
+        if (!watchLocationAllowed()) {
             // A synced location from the phone still works, so this is only a problem
             // when the watch has neither.
-            _state.update {
-                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
-            }
+            unavailable()
             return
         }
 
@@ -112,6 +143,10 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
             .maxByOrNull { it.time }
 
         if (cached != null) {
+            // An earlier request still running could otherwise answer null later and report the
+            // watch's location as unavailable after this one was adopted.
+            currentFix?.cancel()
+            currentFix = null
             adopt(cached)
             return
         }
@@ -121,13 +156,17 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         // hardware for one fix. Nothing is streamed and no listener is left registered.
         val provider = PROVIDERS.firstOrNull { runCatching { manager.isProviderEnabled(it) }.getOrDefault(false) }
         if (provider == null) {
-            _state.update {
-                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
-            }
+            unavailable()
             return
         }
 
-        _state.update { it.copy(locating = it.settings.coordinates == null) }
+        _state.update {
+            it.copy(
+                locating = it.settings.coordinates == null,
+                findingWatchFix = true,
+                watchLocationUnavailable = false,
+            )
+        }
         currentFix?.cancel()
         val signal = CancellationSignal()
         currentFix = signal
@@ -142,23 +181,41 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                 if (location != null) {
                     adopt(location)
                 } else {
-                    _state.update {
-                        it.copy(locating = false, needsLocation = it.settings.coordinates == null)
-                    }
+                    unavailable()
                 }
             }
         }.onFailure {
             currentFix = null
-            _state.update {
-                it.copy(locating = false, needsLocation = it.settings.coordinates == null)
-            }
+            unavailable()
+        }
+    }
+
+    private fun unavailable() {
+        _state.update {
+            it.copy(
+                locating = false,
+                findingWatchFix = false,
+                watchLocationUnavailable = true,
+                needsLocation = it.settings.coordinates == null,
+            )
         }
     }
 
     private fun adopt(fix: Location) {
-        _state.update { it.copy(locating = false, needsLocation = false) }
+        _state.update {
+            // needsLocation false at once, as before 1.5.0: otherwise "No location yet", with its
+            // tappable Use Makkah, flashes up between this and the store's write being read back.
+            it.copy(
+                locating = false,
+                findingWatchFix = false,
+                watchLocationUnavailable = false,
+                needsLocation = false,
+            )
+        }
         viewModelScope.launch {
-            store.setLocation(Coordinates(fix.latitude, fix.longitude), "")
+            // The store decides, against what is stored now. If the phone's place or a choice
+            // arrived while the fix was on its way, the fix is dropped and the times stay put.
+            store.adoptWatchFix(Coordinates(fix.latitude, fix.longitude))
         }
     }
 
@@ -169,9 +226,18 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
     fun useDefaultLocation() {
         currentFix?.cancel()
         currentFix = null
-        _state.update { it.copy(locating = false, needsLocation = false) }
+        _state.update { it.copy(locating = false, findingWatchFix = false, needsLocation = false) }
+        viewModelScope.launch { store.useMakkahUntilLocated() }
+    }
+
+    /**
+     * The wearer's choice on the Location screen. Choosing this watch asks for a fresh fix now, so
+     * the choice shows its result while the screen is still open; the other two need no hardware.
+     */
+    fun chooseLocation(source: LocationSource) {
         viewModelScope.launch {
-            store.setLocation(QiblaEngine.KAABA, "Makkah")
+            store.chooseLocation(source)
+            refreshLocation()
         }
     }
 

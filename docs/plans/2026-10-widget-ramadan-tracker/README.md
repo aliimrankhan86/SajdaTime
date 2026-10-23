@@ -88,6 +88,14 @@ Stated defaults that are not decisions: widget previews below Android 12 are two
 the emulator (the first raster assets in the app, under 30 KB each). The Times screen scrolls during
 Ramadan on short phones. The widget countdown's digits follow the phone's language.
 
+## Release B ships Quiet Glass (17 October 2026)
+
+The owner asked that the design system be applied to 1.5.0 as well, widgets included. Release B is now
+built from `claude/quiet-glass`, and `PLAN.md` section 7 specifies every tracker screen in Quiet Glass
+terms (SettingsList section, a `Tick` component, `Notice` for messages, the 823dp fit, the one time
+store screenshot retake). Where this README's older screen summary names pre redesign components,
+`PLAN.md` section 7 wins on looks and the decisions below still win on behaviour.
+
 ## Decisions on Release B (16 October 2026)
 
 The owner answered four questions about the tracker, then added the Pause idea and asked about analytics. They override `PLAN.md` section 7 (B1, B3, B4, B6),

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Stated rather than left to defaults (HANDOVER §5.24). The app makes HTTPS requests to two places:
+  the Open-Meteo city search and, only for users who opted in, Google Analytics.
+   - No cleartext anywhere, matching usesCleartextTraffic="false".
+   - Only the system's certificate authorities. Certificates a user or a device management profile
+     installed are not trusted, so a proxy on the phone cannot read the city search. (This is
+     Android's default for targetSdk 24 and above; written down so a library cannot change it.)
+  Certificate pinning was considered and rejected: Open-Meteo and Google rotate certificates, and a
+  stale pin would silently break city search for every user until an app update.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

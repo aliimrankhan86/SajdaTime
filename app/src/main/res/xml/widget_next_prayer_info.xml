@@ -2,7 +2,8 @@
 <!--
   Next prayer: 3 cells by 2. A 2 by 1 slot is 40dp high and cannot hold the prayer, its time and the
   countdown, and a 2 by 2 square clipped the countdown in the worst case (see the layout). The smallest
-  resize is the default size, so it cannot be shrunk into clipping. updatePeriodMillis is 0 on purpose: the system's own periodic update uses a waking alarm,
+  resize is the default size, so it cannot be shrunk into clipping. Since 18 Oct 2026 it has a second,
+  wide layout (countdown beside the day) that Android 12 and later switch to from 270 by 150dp. updatePeriodMillis is 0 on purpose: the system's own periodic update uses a waking alarm,
   which this app will not pay for a display. WidgetRefreshScheduler moves the widget on instead.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"

@@ -1,6 +1,7 @@
 package com.sajdatime.app.ui.components
 
-import androidx.compose.foundation.clickable
+import com.sajdatime.app.ui.theme.Space
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -72,9 +73,10 @@ fun RadioRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(role = Role.RadioButton, onClick = onSelect)
+            // selectable, not clickable: only selectable tells a screen reader which one is chosen.
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onSelect)
             .heightIn(min = 56.dp)
-            .padding(vertical = 8.dp),
+            .padding(vertical = Space.Related),
     ) {
         RadioButton(selected = selected, onClick = null)
         Spacer(Modifier.width(8.dp))

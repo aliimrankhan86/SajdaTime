@@ -28,6 +28,40 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         when (intent.action) {
             PrayerAlarmScheduler.ACTION_PRAYER -> onPrayer(context, intent)
             PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER -> onSuhoorReminder(context, intent)
+            PrayerAlarmScheduler.ACTION_PRAYER_REMINDER -> onPrayerReminder(context, intent)
+        }
+    }
+
+    private fun onPrayerReminder(context: Context, intent: Intent) {
+        val slot = intent.getStringExtra(PrayerAlarmScheduler.EXTRA_SLOT)
+            ?.let { name -> PrayerSlot.entries.firstOrNull { it.name == name } }
+            ?: return
+        if (!intent.hasExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS)) return
+        val prayerAt = Instant.ofEpochMilli(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS, 0L))
+
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val settings = SettingsRepository(appContext).current()
+                val now = Instant.now()
+                if (shouldPostPrayerReminder(settings, slot, prayerAt, now)) {
+                    Notifications.postPrayerReminder(
+                        base = appContext,
+                        slot = slot,
+                        prayerAt = prayerAt,
+                        now = now,
+                        approximate = settings.isApproximateOn(prayerAt),
+                    )
+                }
+                // Same chain as a prayer, so a person with every alert off still gets the next window.
+                PrayerAlarmScheduler.reschedule(appContext, settings)
+                OngoingBadge.refresh(appContext, settings)
+                WidgetUpdater.refreshAll(appContext, settings)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 
@@ -53,7 +87,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         fajrAt = fajrAt,
                         now = now,
                         style = settings.suhoorReminderStyle,
-                        alarmSoundUri = settings.alarmSoundUri,
+                        soundUri = suhoorSoundUri(settings, appContext.packageName),
                         respectSilent = settings.alarmRespectsSilent,
                         approximate = settings.isApproximateOn(fajrAt),
                         alarmOnApproximate = settings.alarmOnApproximateDays,
@@ -83,6 +117,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 val settings = SettingsRepository(appContext).current()
+                Notifications.clearPrayerReminder(appContext, slot)
                 settings.alertFor[slot]?.let { style ->
                     Notifications.postPrayerAlert(
                         base = appContext,
@@ -90,6 +125,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                         at = at,
                         style = style,
                         alarmSoundUri = settings.alarmSoundUri,
+                        notificationSoundUri = settings.notificationSoundUri,
                         respectSilent = settings.alarmRespectsSilent,
                         approximate = settings.isApproximateOn(at),
                         alarmOnApproximate = settings.alarmOnApproximateDays,
@@ -153,3 +189,22 @@ internal fun shouldPostReminder(
 }
 
 internal val REMINDER_GRACE: Duration = Duration.ofMinutes(5)
+
+/**
+ * Whether an arriving "prayer in N minutes" reminder should still be shown, on the settings of the
+ * moment it fires: off, or that prayer unticked, is silence; so is arriving after a long Doze when
+ * less than a minute is left, or more than [REMINDER_GRACE] late. Past either line the prayer alert
+ * itself (if any) is the next thing the person should see, not a heads up about it.
+ */
+internal fun shouldPostPrayerReminder(
+    settings: AppSettings,
+    slot: PrayerSlot,
+    prayerAt: Instant,
+    now: Instant,
+): Boolean {
+    val minutes = settings.prayerReminderMinutes
+    if (minutes <= 0 || slot !in settings.prayerReminderFor) return false
+    if (!now.isBefore(prayerAt.minusSeconds(60))) return false
+    val reminderAt = prayerAt.minusSeconds(60L * minutes)
+    return !now.isAfter(reminderAt.plus(REMINDER_GRACE))
+}

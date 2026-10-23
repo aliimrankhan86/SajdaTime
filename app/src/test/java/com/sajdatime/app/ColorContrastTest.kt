@@ -31,11 +31,19 @@ import com.sajdatime.app.ui.theme.DarkPrimary
 import com.sajdatime.app.ui.theme.DarkPrimaryContainer
 import com.sajdatime.app.ui.theme.DarkSecondary
 import com.sajdatime.app.ui.theme.DarkSurface
+import com.sajdatime.app.ui.theme.GlassBarAlpha
 import com.sajdatime.app.ui.theme.DarkSurfaceVariant
 import com.sajdatime.app.ui.theme.LightAccent
 import com.sajdatime.app.ui.theme.LightKiswah
 import com.sajdatime.app.ui.theme.DarkKiswah
+import com.sajdatime.app.ui.theme.DarkCta
+import com.sajdatime.app.ui.theme.DarkHeroBottom
+import com.sajdatime.app.ui.theme.LightCta
+import com.sajdatime.app.ui.theme.OnCta
+import com.sajdatime.app.ui.theme.DarkHeroSheen
+import com.sajdatime.app.ui.theme.DarkHeroTop
 import com.sajdatime.app.ui.theme.LightHeroEnd
+import com.sajdatime.app.ui.theme.LightHeroSheen
 import com.sajdatime.app.ui.theme.LightHeroMiddle
 import com.sajdatime.app.ui.theme.LightHeroStart
 import com.sajdatime.app.ui.theme.LightOnHero
@@ -189,6 +197,91 @@ class ColorContrastTest {
                 }
             },
         )
+    }
+
+    /**
+     * The call to action button (CtaButton): white text on the fill, AA in both themes, and the
+     * fill itself 3:1 against every surface it sits on, so the button's shape is seen, not only
+     * its words (WCAG 1.4.11).
+     */
+    @Test
+    fun `call to action buttons are readable and stand out`() {
+        assertAll(
+            listOf(
+                Pair("light CTA text", OnCta, LightCta, 4.5),
+                Pair("dark CTA text", OnCta, DarkCta, 4.5),
+                Pair("light CTA on surface", LightCta, LightSurface, 3.0),
+                Pair("light CTA on dialog", LightCta, LightSurfaceContainerHigh, 3.0),
+                Pair("dark CTA on background", DarkCta, DarkBackground, 3.0),
+                Pair("dark CTA on surface", DarkCta, DarkSurface, 3.0),
+                Pair("dark CTA on dialog", DarkCta, DarkSurfaceContainerHigh, 3.0),
+            ),
+        )
+    }
+
+    /**
+     * The gloss (18 Oct 2026). The sheen is white over the top half of each card, so the top
+     * stop is checked with the sheen composited on it, as well as every stop bare. In dark the
+     * sheen lightens the stop under light text, which is the direction that can fail.
+     */
+    @Test
+    fun `glossy hero cards are readable at every stop and under the sheen`() {
+        fun over(top: Color, under: Color) = Color(
+            red = top.red * top.alpha + under.red * (1 - top.alpha),
+            green = top.green * top.alpha + under.green * (1 - top.alpha),
+            blue = top.blue * top.alpha + under.blue * (1 - top.alpha),
+        )
+        val dark = listOf(
+            "top" to DarkHeroTop,
+            "middle" to DarkPrimaryContainer,
+            "bottom" to DarkHeroBottom,
+            "top under sheen" to over(DarkHeroSheen, DarkHeroTop),
+        )
+        val darkInks = listOf(
+            "countdown" to DarkOnSurface,
+            "label" to DarkOnPrimaryContainer,
+            "time" to DarkSecondary,
+        )
+        val light = listOf("start under sheen" to over(LightHeroSheen, LightHeroStart))
+        val lightInks = listOf(
+            "countdown" to LightOnHero,
+            "label" to LightOnHeroLabel,
+            "time" to LightOnHeroSecondary,
+        )
+        assertAll(
+            dark.flatMap { (stopName, stop) ->
+                darkInks.map { (inkName, ink) -> Pair("dark hero $inkName on $stopName", ink, stop, 4.5) }
+            } + light.flatMap { (stopName, stop) ->
+                lightInks.map { (inkName, ink) -> Pair("light hero $inkName on $stopName", ink, stop, 4.5) }
+            },
+        )
+    }
+
+    /**
+     * The floating tab bar is see-through (GlassBarAlpha), so what is behind its labels is
+     * whatever has scrolled underneath. Composited over the two extremes, pure black and pure
+     * white, every colour drawn straight on the bar must still hold AA. The selected pill is
+     * opaque secondaryContainer and is covered by the pair above.
+     */
+    @Test
+    fun `glass tab bar labels hold over the worst backdrop`() {
+        fun over(top: Color, alpha: Float, under: Color) = Color(
+            red = top.red * alpha + under.red * (1 - alpha),
+            green = top.green * alpha + under.green * (1 - alpha),
+            blue = top.blue * alpha + under.blue * (1 - alpha),
+        )
+        val pairs = listOf(Color.Black, Color.White).flatMap { under ->
+            val u = if (under == Color.Black) "black" else "white"
+            val light = over(LightSurface, GlassBarAlpha, under)
+            val dark = over(DarkSurface, GlassBarAlpha, under)
+            listOf(
+                Pair("light bar label over $u", LightOnSurfaceVariant, light, 4.5),
+                Pair("light bar selected label over $u", LightOnSurface, light, 4.5),
+                Pair("dark bar label over $u", DarkOnSurfaceVariant, dark, 4.5),
+                Pair("dark bar selected label over $u", DarkOnSurface, dark, 4.5),
+            )
+        }
+        assertAll(pairs)
     }
 
     /**

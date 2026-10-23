@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Watch strings. Same terms as the phone app's values-ur; the wear_disclaimer three line budget in values/strings.xml applies here too: check it with tools/wear-verify.sh. Claude's translation, 17 Oct 2026. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">ur</string>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">اگلی نماز</string>
+    <string name="tile_description">اگلی نماز اور اس میں باقی وقت</string>
+    <string name="tile_needs_setup">فون پر سیٹ اپ کریں</string>
+    <string name="wear_locating">آپ کا مقام تلاش کیا جا رہا ہے</string>
+    <string name="wear_no_location_title">ابھی مقام نہیں</string>
+    <string name="wear_no_location_body">فون پر SajdaTime کھولیں، یا فی الحال مکہ استعمال کریں۔</string>
+    <string name="wear_use_makkah">مکہ استعمال کریں</string>
+    <string name="wear_location">مقام</string>
+    <string name="wear_location_phone">فون کے مطابق</string>
+    <string name="wear_location_phone_missing">فون پر SajdaTime کھولیں</string>
+    <string name="wear_location_watch">یہ گھڑی</string>
+    <string name="wear_location_watch_unavailable">یہ گھڑی اپنا مقام نہیں ڈھونڈ پا رہی۔ گھڑی کی سیٹنگز میں مقام آن کریں اور SajdaTime کو اجازت دیں۔</string>
+    <string name="wear_place_makkah">مکہ</string>
+    <string name="wear_place_watch">اس گھڑی کا مقام</string>
+    <string name="wear_place_phone">آپ کے فون کا مقام</string>
+    <string name="wear_disclaimer">حسابی اوقات ہیں، فتویٰ نہیں۔ اپنی مسجد کی پیروی کریں۔</string>
+    <string name="wear_polar_notice">تخمینی۔ یہاں آج سورج نہ طلوع ہوتا ہے نہ غروب، اس لیے یہ %1$d° سے لیے گئے ہیں۔ اپنی مسجد سے پوچھیں۔</string>
+    <string name="wear_school">مکتبِ فکر</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">سنی</string>
+    <string name="wear_sect_shia">شیعہ</string>
+    <string name="wear_madhab_hanafi">حنفی</string>
+    <string name="wear_madhab_shafii">شافعی</string>
+    <string name="wear_madhab_maliki">مالکی</string>
+    <string name="wear_madhab_hanbali">حنبلی</string>
+    <string name="wear_madhab_note">صرف عصر بدلتی ہے۔ حنفی عصر بعد میں ہے۔</string>
+    <string name="wear_qibla_needs_location">قبلہ معلوم کرنے کے لیے اپنا مقام مقرر کریں</string>
+    <string name="wear_qibla_facing">رخ خانہ کعبہ کی طرف ہے</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">اصل شمال سے</string>
+    <string name="wear_duration_h_m">%1$d گھنٹے %2$d منٹ</string>
+    <string name="wear_duration_m">%1$d منٹ</string>
+    <string name="wear_in_h_m">%1$d گھنٹے %2$d منٹ میں</string>
+    <string name="wear_in_m">%1$d منٹ میں</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">تقریباً %1$s  ·  %2$s</string>
+</resources>

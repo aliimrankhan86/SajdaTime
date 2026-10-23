@@ -63,7 +63,9 @@ class LocationRepository(private val context: Context) {
             // two halves of the same feature disagreed. Reversible: if translations land
             // and someone would rather see their town in their own script regardless of
             // app language, this is the line to change.
-            Geocoder(context, AppLocale.of(context))
+            // Wrapped: below Android 13 a language picked in the app lives only in AppLocale.wrap
+            // (19 Oct 2026); the bare application context would answer with the phone's language.
+            Geocoder(context, AppLocale.of(AppLocale.wrap(context)))
                 .getFromLocation(coordinates.latitude, coordinates.longitude, 1)
                 ?.firstOrNull()
                 // Shared with CityLookup so a place found automatically and the same place

@@ -1,5 +1,22 @@
 package com.sajdatime.app.ui.onboarding
 
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.settings.LanguageChooserDialog
+import com.sajdatime.app.ui.settings.AppLanguage
+import androidx.compose.material.icons.outlined.Language
+import com.sajdatime.app.data.placeName
+import android.content.pm.PackageManager
+import android.Manifest
+import androidx.core.content.ContextCompat
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.selection.selectable
+import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
@@ -10,6 +27,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -32,13 +50,10 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -81,9 +96,20 @@ import com.sajdatime.app.ui.components.SectionHeading
 
 /**
  * Internal, not private, so a test can prove the mapping below never depends on the user's sect.
- * CONSENT sits straight after WELCOME so the usage counts (opt-in only) can see the later steps.
+ *
+ * CONSENT sits just before CONFIRM since 17 Oct 2026 (owner's decision, research F1). It used to
+ * be the second screen, so a new user met a privacy decision before seeing one prayer time. The
+ * steps passed before it are counted after a Yes instead ([stepsBeforeConsent]); the disclaimer
+ * still comes after CONFIRM, so consent never follows it. Order here is the order on screen.
  */
-internal enum class Step { WELCOME, CONSENT, PERMISSION, SECT, MADHAB, METHOD, CONFIRM }
+internal enum class Step { WELCOME, PERMISSION, SECT, MADHAB, METHOD, CONSENT, CONFIRM }
+
+/**
+ * The counted steps every path passes before CONSENT, in order, reported once the user says yes.
+ * Fixed rather than remembered: every path goes through all three, MADHAB counts as nothing on
+ * either path, so the list cannot reveal anything the live path would not have.
+ */
+internal val stepsBeforeConsent = listOf(Step.PERMISSION, Step.SECT, Step.METHOD).mapNotNull { it.setupStep() }
 
 /**
  * Which usage-count step, if any, an onboarding step reports. **MADHAB maps to nothing, on
@@ -114,6 +140,20 @@ fun OnboardingScreen(
 ) {
     var step by rememberSaveable { mutableStateOf(Step.WELCOME) }
 
+    // System Back steps back through setup instead of closing the app (research review, 17 Oct
+    // 2026). Welcome has nowhere to go back to, so there Back leaves as usual.
+    BackHandler(enabled = step != Step.WELCOME) {
+        step = when (step) {
+            Step.WELCOME, Step.PERMISSION -> Step.WELCOME
+            Step.SECT -> Step.PERMISSION
+            Step.MADHAB -> Step.SECT
+            Step.METHOD -> if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.SECT
+            Step.CONSENT -> Step.METHOD
+            // Consent is skipped going forward when the answer is already yes, so likewise back.
+            Step.CONFIRM -> if (state.settings.analyticsEnabled) Step.METHOD else Step.CONSENT
+        }
+    }
+
     // Usage counts, opt-in only (a no-op otherwise). Once per step per run: see UsageCounts.
     LaunchedEffect(step) { step.setupStep()?.let(onSetupStep) }
 
@@ -133,22 +173,7 @@ fun OnboardingScreen(
             when (current) {
                 // Skipped when the choice is already yes (for example after the process was
                 // killed mid-setup), so nobody is asked to consent twice.
-                Step.WELCOME -> WelcomeStep(
-                    onNext = {
-                        step = if (state.settings.analyticsEnabled) Step.PERMISSION else Step.CONSENT
-                    },
-                )
-
-                Step.CONSENT -> ConsentStep(
-                    onYes = {
-                        onSetAnalytics(true)
-                        step = Step.PERMISSION
-                    },
-                    onNo = {
-                        onSetAnalytics(false)
-                        step = Step.PERMISSION
-                    },
-                )
+                Step.WELCOME -> WelcomeStep(onNext = { step = Step.PERMISSION })
 
                 Step.PERMISSION -> PermissionStep(
                     state = state,
@@ -190,9 +215,25 @@ fun OnboardingScreen(
                     sect = state.settings.sect,
                     selected = state.settings.method,
                     onSelect = onSelectMethod,
-                    onNext = { step = Step.CONFIRM },
+                    // Skipped when the choice is already yes (for example after the process was
+                    // killed mid-setup), so nobody is asked to consent twice.
+                    onNext = { step = if (state.settings.analyticsEnabled) Step.CONFIRM else Step.CONSENT },
                     onBack = {
                         step = if (state.settings.sect == Sect.SUNNI) Step.MADHAB else Step.SECT
+                    },
+                )
+
+                Step.CONSENT -> ConsentStep(
+                    onYes = {
+                        // Collection is on before this returns (setAnalyticsEnabled), so the
+                        // replay below is sent; UsageCounts still sends each step once per run.
+                        onSetAnalytics(true)
+                        stepsBeforeConsent.forEach(onSetupStep)
+                        step = Step.CONFIRM
+                    },
+                    onNo = {
+                        onSetAnalytics(false)
+                        step = Step.CONFIRM
                     },
                 )
 
@@ -206,33 +247,52 @@ fun OnboardingScreen(
 private fun StepScaffold(
     title: String,
     body: String,
+    leading: (@Composable () -> Unit)? = null,
+    /**
+     * At the foot of the screen when there is room, and simply after the content when there is
+     * not (large text, or the keyboard up), so it never squeezes the step or covers the city box.
+     * Pinning it outside the scroll was tried first and took a quarter of the screen at 2x text.
+     */
+    footer: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            // imePadding *outside* verticalScroll, so the keyboard shrinks the scrolling
-            // viewport rather than being drawn over the end of it. The other order
-            // compiles, looks identical in a preview, and leaves the last control
-            // permanently under the keyboard. enableEdgeToEdge means adjustResize in the
-            // manifest no longer moves the window on its own, so without this the city
-            // field on the location step is typed into blind. See HANDOVER §15.
-            .imePadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-    ) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.height(12.dp))
-        // The consent step carries its own, longer text inside [content], so it passes none.
-        if (body.isNotEmpty()) {
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(28.dp))
+    // imePadding *outside* verticalScroll, so the keyboard shrinks the scrolling viewport
+    // rather than being drawn over the end of it. The other order compiles, looks identical in
+    // a preview, and leaves the last control permanently under the keyboard. enableEdgeToEdge
+    // means adjustResize in the manifest no longer moves the window on its own, so without this
+    // the city field on the location step is typed into blind. See HANDOVER §15.
+    BoxWithConstraints(Modifier.fillMaxSize().imePadding()) {
+        val viewport = maxHeight
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+            Column(
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .heightIn(min = viewport)
+                    .padding(horizontal = 24.dp, vertical = 32.dp),
+            ) {
+                Column {
+                    if (leading != null) {
+                        leading()
+                        Spacer(Modifier.height(Space.Group))
+                    }
+                    Text(text = title, style = MaterialTheme.typography.headlineMedium)
+                    Spacer(Modifier.height(Space.Paragraph))
+                    // The consent step carries its own, longer text inside [content], so it passes none.
+                    if (body.isNotEmpty()) {
+                        Text(
+                            text = body,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(Space.Section))
+                    }
+                    content()
+                }
+                if (footer != null) {
+                    Column(Modifier.padding(top = Space.Section)) { footer() }
+                }
+            }
         }
-        content()
     }
 }
 
@@ -249,47 +309,70 @@ private fun ConsentStep(onYes: () -> Unit, onNo: () -> Unit) {
 @Composable
 private fun WelcomeStep(onNext: () -> Unit) {
     val bismillahSpoken = stringResource(R.string.bismillah_a11y)
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            text = stringResource(R.string.bismillah_arabic),
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center,
-            // Screen readers should announce the meaning, not attempt the Arabic glyphs
-            // in the user's own locale voice.
-            modifier = Modifier.clearAndSetSemantics {
-                contentDescription = bismillahSpoken
-            },
-        )
-        Spacer(Modifier.height(32.dp))
-        Text(
-            text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = stringResource(R.string.welcome_tagline),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(48.dp))
-        Button(
-            onClick = onNext,
+    val context = LocalContext.current
+    var pickingLanguage by rememberSaveable { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text(stringResource(R.string.action_begin))
+            Text(
+                text = stringResource(R.string.bismillah_arabic),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center,
+                // Screen readers should announce the meaning, not attempt the Arabic glyphs
+                // in the user's own locale voice.
+                modifier = Modifier.clearAndSetSemantics {
+                    contentDescription = bismillahSpoken
+                },
+            )
+            Spacer(Modifier.height(Space.Section))
+            Text(
+                text = stringResource(R.string.app_name),
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Space.Paragraph))
+            Text(
+                text = stringResource(R.string.welcome_tagline),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+            Spacer(Modifier.height(Space.Section))
+            CtaButton(
+                onClick = onNext,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_begin))
+            }
+        }
+        // A person who cannot read this screen must be able to change it before the first question,
+        // not after (8 Oct 2026 branch). The owner chose this look from screenshots on 19 Oct 2026:
+        // a globe with the language's own name, in the top corner, out of the way of Begin. Rejected:
+        // a bare globe icon (easy to miss, a new kind of control) and a "Language" button under Begin
+        // (the word is in English). The globe carries the spoken label for screen readers.
+        CtaButton(
+            onClick = { pickingLanguage = true },
+            compact = true,
+            modifier = Modifier.align(Alignment.TopEnd).padding(Space.Group),
+        ) {
+            Icon(
+                Icons.Outlined.Language,
+                contentDescription = stringResource(R.string.settings_language_title),
+                modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(Space.Related))
+            Text(AppLanguage.showing(context).nativeName)
         }
     }
+    if (pickingLanguage) LanguageChooserDialog(onDismiss = { pickingLanguage = false })
 }
 
 @Composable
@@ -327,55 +410,95 @@ private fun PermissionStep(
                     Text(stringResource(R.string.action_got_it))
                 }
             },
-            title = { Text(stringResource(R.string.permission_why_title)) },
-            text = { Text(stringResource(R.string.permission_why_body)) },
+            title = { DialogTitle(stringResource(R.string.action_how_location_used)) { explaining = false } },
+            // The full detail for both routes, one tap away (owner, 18 Oct 2026: a short setup
+            // screen). The city box carries a one line summary of the second part, always visible.
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    Text(stringResource(R.string.permission_why_body))
+                    Spacer(Modifier.height(Space.Paragraph))
+                    Text(stringResource(R.string.city_lookup_detail))
+                }
+            },
         )
     }
 
+    // 18 Oct 2026, the owner did not like this screen. It opened on 66 words about the city
+    // lookup and two greyed out buttons, so the one choice it asks for was hard to see. Now:
+    // a pin, one line, one big Allow button, and the detail behind a second button. Find city appears
+    // once there is something to find, and Continue once there is somewhere to continue
+    // with, so nothing on the screen is ever a dead grey button.
     StepScaffold(
         title = stringResource(R.string.permission_title),
         body = stringResource(R.string.permission_body),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Button(
-                onClick = onAllow,
-                enabled = !state.resolvingLocation,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 56.dp),
-            ) {
-                Icon(Icons.Outlined.LocationOn, contentDescription = null)
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.action_allow_location))
-            }
-            Spacer(Modifier.width(8.dp))
-            IconButton(
-                onClick = { explaining = true },
-                modifier = Modifier.size(48.dp),
-            ) {
-                Icon(
-                    Icons.Outlined.Info,
-                    contentDescription = stringResource(R.string.permission_why_title),
+        leading = { LocationBadge() },
+        // Nobody should be stuck at setup. If neither route works, Makkah keeps the app usable
+        // and the main screen says clearly that this is what happened. At the foot of the
+        // screen, under a line saying what it means (owner, 18 Oct 2026, DESIGN_SYSTEM §9): as
+        // a solid button beside Allow it looked as good a choice as Allow, and a person in
+        // London who took it would get times hours out. It says "Skip", so it moves on; it used
+        // to tick Makkah and stay, leaving the user under the same Allow button (research F3).
+        footer = if (located) null else {
+            {
+                Text(
+                    text = stringResource(R.string.setup_makkah_note),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+                Spacer(Modifier.height(Space.Related))
+                CtaButton(
+                    onClick = {
+                        onUseDefaultLocation()
+                        onNext()
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.action_use_makkah))
+                }
             }
+        },
+    ) {
+        CtaButton(
+            onClick = onAllow,
+            enabled = !state.resolvingLocation,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp),
+        ) {
+            Icon(Icons.Outlined.LocationOn, contentDescription = null)
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.action_allow_location))
+        }
+        // Solid like every action (owner, 18 Oct 2026), Related below the button it explains.
+        Spacer(Modifier.height(Space.Related))
+        CtaButton(
+            onClick = { explaining = true },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(Icons.Outlined.Info, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.action_how_location_used))
         }
 
         // Without this the buttons simply grey out while a fix is awaited, which reads as
         // a frozen screen. Location can legitimately take several seconds indoors.
         if (state.resolvingLocation && !searchingCity) {
-            Spacer(Modifier.height(20.dp))
+            Spacer(Modifier.height(Space.Related))
             ProgressRow(stringResource(R.string.location_finding))
         }
 
         if (located && !state.resolvingLocation) {
-            Spacer(Modifier.height(20.dp))
-            LocatedRow(cityName = state.settings.cityName)
+            Spacer(Modifier.height(Space.Group))
+            LocatedRow(cityName = state.settings.placeName(LocalContext.current))
         }
 
-        if (state.problem == LocationProblem.NO_FIX) {
-            Spacer(Modifier.height(16.dp))
+        // Denying used to change nothing visible at all (research F7).
+        if (state.problem == LocationProblem.NO_FIX || state.problem == LocationProblem.PERMISSION_DENIED) {
+            Spacer(Modifier.height(Space.Group))
             Text(
-                text = stringResource(R.string.location_no_fix),
+                text = stringResource(
+                    if (state.problem == LocationProblem.NO_FIX) R.string.location_no_fix else R.string.location_permission_denied,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.error,
             )
@@ -395,26 +518,35 @@ private fun PermissionStep(
         // Showing it up front also answers T3's fourth point: manual entry was always
         // there and nobody could find it.
         if (!located) {
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(Space.Section))
             SectionHeading(stringResource(R.string.location_sheet_search_heading))
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = stringResource(R.string.city_fallback_body),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Spacer(Modifier.height(12.dp))
-            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND
+            Spacer(Modifier.height(Space.Related))
+            val notFound = state.problem == LocationProblem.CITY_NOT_FOUND || state.problem == LocationProblem.OFFLINE
             OutlinedTextField(
                 value = city,
                 onValueChange = { city = it },
                 label = { Text(stringResource(R.string.city_field_label)) },
                 supportingText = {
-                    Text(
-                        text = stringResource(
-                            if (notFound) R.string.city_not_found else R.string.city_field_helper,
-                        ),
-                    )
+                    Column {
+                        Text(
+                            text = stringResource(
+                                if (state.problem == LocationProblem.OFFLINE) R.string.city_lookup_offline else if (notFound) R.string.city_not_found else R.string.city_field_helper,
+                            ),
+                        )
+                        // What happens to a typed name, in one line, always on screen before anyone
+                        // can type, so nobody searches without being told (independent review,
+                        // 18 Oct 2026). Inside the field's own hint area so it lines up with the
+                        // example and is read with the field. The detail (the phone's place lookup,
+                        // usually Google, else once to a free service) is behind "How your location
+                        // is used". Rejected: the 66 word paragraph above the field (it buried the
+                        // screen's one choice) and showing it only once typing starts (text jumping
+                        // in under the cursor; the owner found it confusing). Its colour stays
+                        // neutral when the field shows an error, so it never reads as the error.
+                        Text(
+                            text = stringResource(R.string.city_lookup_note),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 },
                 isError = notFound,
                 singleLine = true,
@@ -424,46 +556,58 @@ private fun PermissionStep(
                 keyboardActions = KeyboardActions(onSearch = { if (city.isNotBlank()) findCity() }),
                 modifier = Modifier.fillMaxWidth(),
             )
-            Spacer(Modifier.height(8.dp))
-            OutlinedButton(
-                onClick = findCity,
-                enabled = city.isNotBlank() && !state.resolvingLocation,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 48.dp),
-            ) {
-                Text(stringResource(R.string.action_find_city))
+            if (city.isNotBlank()) {
+                Spacer(Modifier.height(Space.Related))
+                CtaButton(
+                    onClick = findCity,
+                    enabled = !state.resolvingLocation,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.Outlined.Search, contentDescription = null)
+                    Spacer(Modifier.width(Space.Related))
+                    Text(stringResource(R.string.action_find_city))
+                }
             }
 
             // Said next to the field it belongs to, and in its own words. The one spinner
             // this screen had said "Finding your location…" beside the GPS button, which
             // is the wrong sentence in the wrong place for a typed-in city.
             if (searchingCity && state.resolvingLocation) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
 
-            // Nobody should be stuck at setup. If neither route works, Makkah keeps the
-            // app usable and the main screen says clearly that this is what happened.
-            Spacer(Modifier.height(20.dp))
-            TextButton(
-                onClick = onUseDefaultLocation,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Text(stringResource(R.string.action_use_makkah))
-            }
         }
 
-        Spacer(Modifier.height(32.dp))
-        Button(
-            onClick = onNext,
-            enabled = located,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp),
-        ) {
-            Text(stringResource(R.string.action_continue))
+        if (located) {
+            Spacer(Modifier.height(Space.Section))
+            CtaButton(
+                onClick = onNext,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_continue))
+            }
         }
+    }
+}
+
+/** The setup location step's picture: a pin on a soft green disc. Decorative, so TalkBack skips it. */
+@Composable
+private fun LocationBadge() {
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            Icons.Outlined.LocationOn,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(32.dp),
+        )
     }
 }
 
@@ -500,9 +644,9 @@ private fun LocatedRow(cityName: String) {
  */
 @Composable
 private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(Space.Section))
     Row {
-        OutlinedButton(
+        CtaButton(
             onClick = onBack,
             modifier = Modifier
                 .weight(1f)
@@ -510,8 +654,9 @@ private fun StepButtons(onBack: () -> Unit, onNext: () -> Unit) {
         ) {
             Text(stringResource(R.string.action_back))
         }
-        Spacer(Modifier.width(12.dp))
-        Button(
+        // Two buttons side by side: Related (DESIGN_SYSTEM 2).
+        Spacer(Modifier.width(Space.Related))
+        CtaButton(
             onClick = onNext,
             modifier = Modifier
                 .weight(1f)
@@ -533,19 +678,21 @@ private fun SectStep(
         title = stringResource(R.string.sect_title),
         body = stringResource(R.string.sect_body),
     ) {
+        Column(Modifier.selectableGroup()) {
         ChoiceCard(
             title = stringResource(R.string.sect_sunni),
             subtitle = stringResource(R.string.sect_sunni_desc),
             selected = selected == Sect.SUNNI,
             onClick = { onSelect(Sect.SUNNI) },
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Paragraph))
         ChoiceCard(
             title = stringResource(R.string.sect_shia),
             subtitle = stringResource(R.string.sect_shia_desc),
             selected = selected == Sect.SHIA,
             onClick = { onSelect(Sect.SHIA) },
         )
+        }
         StepButtons(onBack = onBack, onNext = onNext)
     }
 }
@@ -561,7 +708,10 @@ private fun MadhabStep(
         title = stringResource(R.string.madhab_title),
         body = stringResource(R.string.madhab_body),
     ) {
-        Madhab.entries.forEach { madhab ->
+        Column(Modifier.selectableGroup()) {
+        Madhab.entries.forEachIndexed { i, madhab ->
+            // Between the cards only: after the last one, StepButtons brings its own section gap.
+            if (i > 0) Spacer(Modifier.height(Space.Paragraph))
             ChoiceCard(
                 title = madhabLabel(madhab),
                 subtitle = stringResource(
@@ -571,7 +721,7 @@ private fun MadhabStep(
                 selected = selected == madhab,
                 onClick = { onSelect(madhab) },
             )
-            Spacer(Modifier.height(12.dp))
+        }
         }
         // Skip used to sit here next to Back. It was removed rather than relabelled: one of
         // the four is always already selected, so Skip and Continue did the same thing while
@@ -622,11 +772,11 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
             Column(Modifier.padding(20.dp)) {
                 SummaryRow(
                     stringResource(R.string.label_location),
-                    state.settings.cityName.ifBlank {
+                    state.settings.placeName(LocalContext.current).ifBlank {
                         stringResource(R.string.location_set_generic)
                     },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Paragraph))
                 SummaryRow(
                     stringResource(R.string.label_school),
                     when (state.settings.sect) {
@@ -641,7 +791,7 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
                         Sect.SHIA -> stringResource(R.string.sect_shia)
                     },
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(Space.Paragraph))
                 SummaryRow(
                     stringResource(R.string.settings_method),
                     // Same wording as the Settings row, so "Automatic · Muslim World League"
@@ -667,25 +817,44 @@ private fun ConfirmStep(state: UiState, onFinish: () -> Unit) {
         //
         // Deliberately not a blocker: Finish is right underneath, unconditional, and the
         // app works without it. See HANDOVER §10.
-        run {
-            Spacer(Modifier.height(24.dp))
+        //
+        // Android 12 and later only: before that there is no such permission, and this block
+        // told a third of the installed base about a setting their phone does not have
+        // (research F5). Settings has carried the same gate since the start.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Spacer(Modifier.height(Space.Section))
             SectionHeading(stringResource(R.string.confirm_exact_alarm_title))
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(R.string.confirm_exact_alarm_body),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(Space.Related))
             PermissionButton(
                 label = stringResource(R.string.settings_exact_alarms_title),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
-        Spacer(Modifier.height(32.dp))
-        Button(
+        // Android 13+ asks about notifications the moment Finish is tapped, and every prayer
+        // alert depends on the answer. Said here, before the system box appears (research F6).
+        // Only when the system box will actually appear: not once notifications are already allowed.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Spacer(Modifier.height(Space.Section))
+            Text(
+                text = stringResource(R.string.confirm_notifications_hint, stringResource(R.string.action_finish)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+
+        Spacer(Modifier.height(Space.Section))
+        CtaButton(
             onClick = onFinish,
             modifier = Modifier
                 .fillMaxWidth()
@@ -704,7 +873,7 @@ private fun SummaryRow(label: String, value: String) {
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(text = value, style = MaterialTheme.typography.titleMedium)
     }
 }
@@ -717,7 +886,6 @@ private fun ChoiceCard(
     onClick: () -> Unit,
 ) {
     Card(
-        onClick = onClick,
         colors = CardDefaults.cardColors(
             containerColor = if (selected) {
                 MaterialTheme.colorScheme.primaryContainer
@@ -725,9 +893,12 @@ private fun ChoiceCard(
                 MaterialTheme.colorScheme.surfaceVariant
             },
         ),
+        // A radio choice, so a screen reader says "selected" as a state, once, instead of
+        // reading the word "Selected" out of the tick as part of the text (research D5).
         modifier = Modifier
             .fillMaxWidth()
-            .semantics { /* role and selection are conveyed by the check icon + text */ },
+            .clip(CardDefaults.shape)
+            .selectable(selected = selected, role = Role.RadioButton, onClick = onClick),
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
@@ -735,7 +906,7 @@ private fun ChoiceCard(
         ) {
             Column(Modifier.weight(1f)) {
                 Text(text = title, style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(4.dp))
+                Spacer(Modifier.height(Space.Tight))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,
@@ -745,7 +916,7 @@ private fun ChoiceCard(
             if (selected) {
                 Icon(
                     Icons.Filled.Check,
-                    contentDescription = stringResource(R.string.state_selected),
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }

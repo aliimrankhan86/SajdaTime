@@ -79,13 +79,15 @@ class RamadanGoldenTest {
             ),
         ),
         Setup(
-            "Istanbul, Diyanet (plain 18 and 17 degrees)",
+            "Istanbul, Diyanet (18 and 17 degrees, with Diyanet's precaution minutes)",
             Coordinates(41.0082, 28.9784), "Europe/Istanbul",
             CalculationPrefs(method = CalcMethod.TURKEY, madhab = Madhab.SHAFII),
             listOf(
-                "2027-02-08 06:34 08:08 13:18 16:06 18:29 19:57",
-                "2027-02-22 06:18 07:49 13:18 16:19 18:46 20:13",
-                "2027-03-08 05:57 07:28 13:15 16:30 19:03 20:29",
+                // The plain angle rows these replaced (verified earlier), plus Sunrise -7, Dhuhr +5,
+                // Asr +4, Maghrib +7 (18 Oct 2026). Fajr and Isha unchanged.
+                "2027-02-08 06:34 08:01 13:23 16:10 18:36 19:57",
+                "2027-02-22 06:18 07:42 13:23 16:23 18:53 20:13",
+                "2027-03-08 05:57 07:21 13:20 16:34 19:10 20:29",
             ),
         ),
         Setup(

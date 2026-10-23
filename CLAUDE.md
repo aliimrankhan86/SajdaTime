@@ -5,7 +5,7 @@ This file is loaded automatically. It is deliberately short. **The full handover
 
 ---
 
-> **Memory:** every session also reads and updates the shared GBrain page `projects/sajdatime` (`recall` it at the start; write what is done and what remains at the end). It carries the owner's standing decisions and rules between sessions; `docs/HANDOVER.md` stays the source of truth for the repo.
+> **Memory:** every session also reads and updates the shared GBrain page `projects/sajdatime` (`recall` it at the start; write what is done and what remains at the end). It carries the owner's standing decisions and rules between sessions; `docs/HANDOVER.md` stays the source of truth for the repo. **Keeping GBrain current is Claude's job, never the owner's** (his words, 19 Oct 2026: "You are responsible to keep gbrain up to date not me"). A cloud session has no GBrain connection, so it writes everything into `docs/HANDOVER.md` §11 and pushes; **the first session with GBrain afterwards compares GBrain with the §11 STATE OF PLAY and brings GBrain up to date itself, without being asked.** Never hand him a prompt whose only job is to update GBrain.
 
 ---
 
@@ -47,8 +47,8 @@ curl -sL -A "Mozilla/5.0" "https://play.google.com/store/search?q=SajdaTime&c=ap
 **Say the second half in the same breath or the question returns:** it is *available* to
 everyone but not yet *discoverable* — searching "prayer times" or "qibla" does not surface it,
 because Play ranks on installs and ratings and this app has few of one and none of the other.
-That is not a fault, not a setting, and **not work to invent**. §15 lesson 113, and the §11
-non-goal on rating prompts.
+That is not a fault, not a setting, and **not work to invent**. §15 lesson 113. (Since 17 Oct
+2026 the app may show Google's own rating card, at the owner's word; see the rule below.)
 
 **The owner should not have to tell you any of this, and has asked not to have to.** He does
 not want to paste a briefing at the start of a session. This file is loaded automatically so
@@ -125,8 +125,20 @@ session inherits it instead of relearning it.
 
 - **The religious disclaimer must never be removed, softened, or buried**, and the dua
   request in its final paragraph belongs there and *nowhere else* — the user is asked once
-  and never nagged. **That forbids an in-app "rate this app" or "share this app" prompt**,
-  however tempting the ranking argument gets. See the non-goal in `docs/HANDOVER.md` §11.
+  and never nagged, so no copy of ours ever asks for anything else.
+- **Rating: Google's card only, rarely, never in our words.** The owner reversed the old "no
+  rate prompt" rule on 17 Oct 2026 ("We need rate this app since we are trying to better ratings
+  and be promoted"). He asked for a weekly reminder "or other best practice"; research said no
+  to weekly (Google's quota swallows asks under a month apart, and Play policy names forced
+  rating pop ups). Built: `review/ReviewPrompt.kt`, Play In-App Review card after 14 days kept
+  and 3 days opened, only on a calm Times screen away from prayer times, at most every 120 days
+  and 3 times ever, plus a passive "Rate SajdaTime on Google Play" row in About. **No "do you
+  like it?" question, no button that calls the card, no usage counts event, no app copy asking
+  for a rating, no religious wording.** A passive "Share SajdaTime" row sits beside it (owner,
+  17 Oct 2026). Both are doors the user opens; nothing in the app ever suggests sharing or rating.
+- **Play reviews: the owner replies, Claude drafts.** Agreed 17 Oct 2026. When he sends a
+  screenshot of a review, draft a short, kind reply on the issue raised. Never ask for a higher
+  rating in a reply (Play policy).
 - **Translations: Claude translates and checks its own work; no native speaker review.** The
   owner decided this on 9 Oct 2026 (SajdaTime is a free utility he makes himself), superseding
   the old "never machine-translate" rule. Urdu, Turkish and Indonesian shipped in 1.3.1
@@ -139,12 +151,16 @@ session inherits it instead of relearning it.
   language splits, the in-app picker cannot switch to a language the phone itself is not set to
   (`docs/HANDOVER.md` §15 lesson 125).
 - **The app follows the phone's language, and goes right-to-left only when it has the
-  words to.** `AppLocale` reads the app's language out of the resources, so the day a
-  reviewed `values-ar/` ships, an Arabic phone gets Arabic, Arabic-Indic digits and an RTL
-  layout with no code change. Until that day the app stays English and left-to-right on
-  *every* phone, whatever the phone is set to — because English laid out right-to-left is
-  genuinely wrong, not merely unusual, and the owner has ruled it out. Two tests in
-  `LocaleDisciplineTest` fail the build if either half slips. See `docs/HANDOVER.md` §5.16.
+  words to.** `AppLocale` reads the app's language out of the resources. Urdu (1.3.1) and
+  Arabic (`values-ar`, 1.5.0, owner's request 17 Oct 2026) are right-to-left; Arabic's
+  `app_language_tag` is `ar-u-nu-latn`, so its digits stay Western on every Android version
+  (java.time and `String.format` disagree otherwise). A phone set to any language we have no
+  words for stays English and left-to-right — English laid out right-to-left is genuinely
+  wrong, and the owner has ruled it out. Two tests in `LocaleDisciplineTest` fail the build if
+  either half slips. Since 1.5.0 the user can also pick a language in the app on every Android
+  version ("Phone language" first and the default; below 13 through `AppLocale.setOverride`), so
+  anything that names the language must go through `AppLocale.wrap` at the moment of use. See
+  `docs/HANDOVER.md` §5.16 and §15 lessons 152 and 153.
 - **Never call the Aladhan API — or any network — from the shipped app to calculate times.**
   Verifying against it during development is correct and encouraged. Calling it at runtime is
   not, and the reasons are in `docs/HANDOVER.md` §2. The owner was asked directly and said no.
@@ -182,10 +198,38 @@ session inherits it instead of relearning it.
 
 ## How to work here
 
+- **The quality bar is the owner's, and it is not negotiable** (17 Oct 2026: "make sure its all done
+  to a good standard ... so nothing is done of bad standard and UX design, clean, easy to use and
+  read"). Nothing is finished until it meets `docs/DESIGN_SYSTEM.md` (Quiet Glass): its components and
+  Material roles only, even spacing, the one line height rule, short human accurate copy with no
+  hyphens or em dashes, checked on the emulator in light, dark, 2x text and Urdu right to left, the
+  full gate and device suite green, an independent review of the diff before commit, and every gap
+  written down. Answer the review questions in `DESIGN_SYSTEM.md` §10 for every screen you touch.
+
+- **Rules he has had to repeat, so never again: read `docs/DESIGN_SYSTEM.md` §0 before any visual
+  change.** It lists the mistakes that were repeated and why, and the rules that stop them:
+  - **Ask him first when you are not sure** (§0.2 lists exactly when), with `AskUserQuestion`, your
+    recommendation first, screenshots for anything visual. He asked for this on 18 Oct 2026 ("why
+    can't you ask me if you are not sure"). Guessing and then reporting it as done is the failure.
+  - **Never write "done", "every" or "all" until the §4.1 checks have run and you have pasted the
+    counts** (§0.3). Twice on 18 Oct 2026 a rule was reported as applied everywhere when it was not.
+  - **Every action is a solid button with white bold text, light and dark**; the only text links
+    are "Close" and "Got it" at the foot of a dialog, plus his one chosen exception: the usage
+    question's two bold underlined links ("See exactly what is sent", "Read the privacy policy"). The full spec, every button in the app and the
+    checks are §4.1; `DesignRulesTest` fails the build on a breach, including a button in a file the
+    inventory does not list.
+  - Gaps come from `Space` by relationship (§2). Since 18 Oct 2026 that holds for every `Spacer`, column
+    spacing and top or bottom padding in the phone app's screens, and `DesignRulesTest` fails the build on
+    one written as a number. **Not covered, so never claim them:** horizontal gaps inside a row, a
+    component's own padding (a row's height, a pill, a card's edge), and the watch app.
+  - No two icon buttons side by side; every dismissable dialog has the close X.
+  - **§11 lists the decisions still waiting for him.** Do not build an answer to an OPEN item.
+  - Before he tests on the emulator, give the install command and the commit he should see. Never
+    let him judge a change on a stale install.
 - **Compiling is not working. Run it.** The watch app once compiled and linted clean for an
   entire release while being unable to ever obtain a location.
 - **Before any layout change, check it right-to-left — and read the result as a *layout*
-  check.** `./gradlew installRtl` runs the whole app in RTL without a translation or a
+  check.** `./gradlew :app:installRtl` runs the whole app in RTL without a translation or a
   device setting. Roughly half the world's Muslims read right-to-left, and the first Arabic
   or Urdu translation should not be the moment anyone finds out whether the screens survive
   it. But it shows **English words in a right-to-left paragraph**, which always looks
@@ -263,7 +307,7 @@ Then run it on both emulators, and tell the owner what you verified and what you
 The on device suite includes widget tests. A shell can bind a widget only after
 `adb shell appwidget grantbind --package com.sajdatime.app --user 0`, and the suite is run with
 `am instrument`, because `connectedAndroidTest` uninstalls the app when it ends. If a widget test fails
-on a bind error, that is why. `docs/release-tools/release-1.4.0.sh` does both (`docs/HANDOVER.md` §15
+on a bind error, that is why. `docs/release-tools/release-1.5.0.sh` does both (`docs/HANDOVER.md` §15
 lesson 134).
 
 *Made with love, free for the Ummah.*

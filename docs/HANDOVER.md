@@ -77,7 +77,8 @@ descriptions live in `core` because both the phone and the watch show them.
 ### The religious disclaimer (non-negotiable)
 
 The user was explicit about this. The app states plainly — **once after onboarding as a
-dialog, and permanently in Settings → About → Disclaimer** — that:
+dialog (the short form since 18 Oct 2026, see §5.15), and permanently in full in Settings → About →
+Disclaimer** — that:
 
 - the author is **not a Mufti, Aalim, or an expert in Islam or fiqh**
 - it was **built with the help of artificial intelligence**
@@ -249,7 +250,7 @@ ANDROID_SERIAL=emulator-5554 ./gradlew :wear:installDebug
 | Theme | `ui/theme/Color.kt`, `Theme.kt`, `Type.kt` |
 | Export | `pdf/PrayerPdfExporter.kt` (`Range.RAMADAN` and the Ramadan columns since 1.4.0) |
 | Ramadan | `ui/RamadanState.kt` (pure `build`), `ui/RamadanTimetable.kt`, `ui/home/RamadanCard.kt` (card, eve notice, info dialog), `ui/home/RamadanTimetableSheet.kt`, `ui/home/EidCard.kt`, `notify/SuhoorReminderPlan.kt` (pure) |
-| Widgets | `widget/WidgetState.kt` (pure), `widget/WidgetRenderer.kt` (the `RemoteViews`), `widget/WidgetUpdater.kt` (`refreshAll`), `widget/WidgetRefreshScheduler.kt`, `widget/WidgetRefreshReceiver.kt`, `NextPrayerWidgetProvider.kt`, `TodayWidgetProvider.kt`, `res/layout/widget_*.xml`, `res/xml/widget_*_info.xml`, `res/drawable-nodpi/widget_preview_*.png` (drawn by `tools/make-widget-previews.py`, not captured) |
+| Widgets | `widget/WidgetState.kt` (pure), `widget/WidgetRenderer.kt` (the `RemoteViews`), `widget/WidgetUpdater.kt` (`refreshAll`), `widget/WidgetRefreshScheduler.kt`, `widget/WidgetRefreshReceiver.kt`, `NextPrayerWidgetProvider.kt`, `TodayWidgetProvider.kt`, `res/layout/widget_*.xml`, `res/xml/widget_*_info.xml`, `res/drawable/widget_glyph_*.xml` (prayer glyphs), `widget_mark.xml`, `widget_seg_*.xml`, `res/drawable-nodpi/widget_preview_*.png` (captured from the real renderer through the Robolectric harness of lesson 132, 18 Oct 2026; the old drawing script was removed because it drew the 1.4.0 design) |
 | On device tests | `src/androidTest/.../` `DeviceSupport`, `LanguageAndDndDeviceTest`, `WidgetDeviceTest`, `RamadanDeviceTest`, `SuhoorReminderDeviceTest`, `RamadanPdfDeviceTest`, `ScreenSeedDeviceTest`. Compiled, never yet run. The widget tests need `appwidget grantbind` first and are run with `am instrument` (lesson 134). `docs/release-tools/release-1.4.0.sh` runs them |
 | Manifest | `res/xml/data_extraction_rules.xml` — excludes everything from cloud backup and device transfer alike (both modules have one) |
 | Build types | `src/rtl/res/values/strings.xml` — the only content of the `rtl` build type, which is `debug` with `app_language_tag` overridden to `ur` (so `./gradlew installRtl` runs the whole app right-to-left), `app_name` set to "SajdaTime (RTL)", `applicationIdSuffix ".rtl"` so it installs beside the real app, and since 15 Aug 2026 `preview_build_notice` filled so a red "LAYOUT TEST BUILD" band sits on every screen. `:wear` has the same tag and must stay on it (§15 lesson 84). Never in `debug` or `release`, so it cannot ship; read the comment in the file before changing it. **Uninstall it when you are done** (`adb uninstall com.sajdatime.app.rtl`) — every time it has been left on an emulator the owner has seen it and, correctly, reported the app as broken |
@@ -288,7 +289,8 @@ data class AppSettings(
     val hijriOffsetDays: Int = 0,                          // clamped to +/-2 days
     val ongoingBadge: Boolean = true,      // silent, costs nothing, so on by default
     val alarmSoundUri: String = "",        // empty = device default alarm
-    val alarmRespectsSilent: Boolean = true,      // alarm -> quiet notification when silenced
+    val alarmRespectsSilent: Boolean = true,      // alarm -> quiet notification when silenced ("Play on silent" off)
+    val phoneAlarmSoundUri: String = "",   // phone sound a built-in adhan replaced (§5.23)
     val alarmOnApproximateDays: Boolean = false,  // §5.14 — projected days do not ring
     val disclaimerSeen: Boolean = false,
     val usingDefaultLocation: Boolean = false,  // true once Makkah was used as fallback
@@ -461,11 +463,9 @@ twice for the same thing is asking too often.
 - **The style is chosen per prayer, not once for the app.** Off, Notification or Alarm, for
   each of the five, in one chooser. A tester asked to be woken for Fajr and left alone for
   the rest, and a single global radio could not say that. See §5.12.
-- **Alarm mode is opt-in** and requires the user to pick their own tone. No adhan audio is
-  bundled (licensing + APK size).
-- **An alarm stays quiet while the phone is silenced**, unless the user turns that off. The
-  notification still arrives, on time, in the shade and as a heads-up — only the sound is
-  dropped. See §5.13.
+- **Alarm mode is opt-in.** The tone is the phone's default until the user picks one: a sound
+  from the phone, or (Sunni users, since 1.5.0) the built-in adhan. See §5.23.
+- **"Play on silent", off by default (1.5.0 wording, owner 17 Oct 2026).** Each prayer is Off, Notification or Alarm (the adhan or a chosen sound). When the phone is on silent, vibrate or Do Not Disturb, an Alarm arrives as the notification and vibration only, unless the user turns on "Play on silent" under the alarm sound. Same rule as before 1.5.0 (§5.13), positive wording; stored as `alarmRespectsSilent`, so existing users keep their choice. See §5.13.
 - **An alarm also stays quiet on a day whose times had to be projected from another latitude**,
   unless the user turns *that* off. Same treatment: it arrives on time, in the shade, and
   additionally carries the "Approximate time" marking. The switch appears only for users whose
@@ -511,6 +511,10 @@ Because that sync is unverified and a watch may have no phone app at all, the ti
 ends in a button showing the school the times were calculated with, which opens a sect and
 madhab picker. See item 7 under "Not done" for why that is not optional.
 
+**From 1.5.0 the times list also shows the place** (a pin button between the times and the disclaimer) and opens a
+Location screen: Same as phone, This watch, or Makkah. Automatic, the default, follows the phone once it has sent a place.
+Rules, placement and rejected options: §5.27.
+
 The times list opens with `initialCenterItemIndex = 0`. The default is 1, which centred
 the second item and slid the countdown card up until the watch face clock sat on top of
 the prayer name — the one thing the app exists to show.
@@ -524,9 +528,13 @@ The rules and the reasons are in §5.19.
   (Maghrib), a countdown to whichever is next, today's fast length and its change from yesterday,
   tomorrow's two times, the day number and the expected last day, and an info dialog that says
   what the app does and does not decide. "Show Ramadan card" in Settings (default on) removes it.
-- **Eve notice, 7 days before day 1 through day 2.** One quiet, dismissible notice with the start
-  date on the user's calendar, the sighting note, and a way to preview the timetable. Dismissal is
-  stored per Hijri year.
+- **Eve notice, 3 days before day 1 through day 2** (7 days until 19 Oct 2026, owner's change for
+  1.5.0). One quiet, dismissible notice with the start date on the user's calendar, the sighting
+  note, and, always visible, "From the first day, the Ramadan card shows suhoor and iftar times
+  here. You can turn it off in Settings." Dismissal is stored per Hijri year.
+- **The Ramadan rows in Settings** ("Ramadan card", "Suhoor reminder") show only from the day the
+  notice starts to the last day of Ramadan (`RamadanInfo.showsSettings`, 1.5.0, owner 19 Oct 2026:
+  a Ramadan setting the rest of the year confuses people). The choice is kept while hidden.
 - **Ramadan timetable sheet and PDF.** Every day of the month with the six times, suhoor and iftar
   in bold. The PDF (`PrayerTimes_Ramadan1448.pdf`) is offered in the export sheet from 30 days
   before day 1 to the last day. Every PDF range also got more space between the wordmark, the
@@ -903,6 +911,9 @@ same two-settings confusion and needs a rule for what happens when the two disag
 
 ### 5.13 An alarm stays quiet while the phone is silenced
 
+> **1.5.0: the switch is now labelled "Play on silent" (off by default), the same setting inverted.** On 17 Oct 2026 it was removed for an afternoon ("Alarm always out loud") and restored the same day: the owner wanted the user to choose, and a look at other prayer apps (Mawaqit plays through the notification sound, so silent stays silent; iPhone apps that sound on silent make it an opt in) showed that a silent phone staying quiet unless asked is what people expect. Measured on the Android 16 emulator: Do Not Disturb (priority) reads as silenced too, so it also gives the notification only, which the owner asked for.
+
+
 `alarmRespectsSilent`, **on by default**. When it is on and `AudioManager.getRingerMode()`
 is `RINGER_MODE_SILENT` or `RINGER_MODE_VIBRATE`, an Alarm-style alert is posted on the
 quiet channel instead. It still arrives on time, in the shade and as a heads-up — only the
@@ -995,7 +1006,8 @@ have to survive any rewording:
 
 | Where | What it carries | File |
 |---|---|---|
-| **In-app dialog** — once after setup, and any time from Settings → About → Disclaimer | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **In-app dialog** — any time from Settings → About → Disclaimer, and one press away ("Read in full") in the setup dialog | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
+| **Setup dialog, short form** — once after setup, never after an update (since 18 Oct 2026) | All four points in about 70 words, no dua, a "Read in full" button that shows `disclaimer_body` in the same dialog | `R.string.disclaimer_brief` (`FirstRunDisclaimer` in `MainActivity.kt`) |
 | **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
 | **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
 | **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
@@ -1017,9 +1029,21 @@ budget. Two things about it are deliberate:
   Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
   restoring it turns it green.
 
+**The short form after setup (owner, 18 Oct 2026).** He did not want a long message straight after
+installing; it was already shown only once, after setup, never after an update (the flag is stored).
+So the setup dialog shows `disclaimer_brief`: the same four points in three short paragraphs, under
+90 words, fitting one screen, with "Understood" and "Read in full". The full text stays canonical,
+unchanged, in Settings and one press away. `DisclaimerContentTest` holds the short form to all four
+points, no dua and under 90 words; proved by deleting "no warranty" from it and watching it go red.
+**Consequence the owner should know:** the dua request is now read at setup only by someone who
+presses "Read in full"; it is still asked once, in the full text, and nowhere else. Rejected: no
+dialog at all (the rule is that it is shown, not merely available); the short form without points 2
+and 4 (that is the watch's budget, not the phone's). Rendered in light, dark and Urdu (Robolectric
+Compose harness, not committed); not seen on a device.
+
 **Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
 does not have room for, and every watch owner also has the phone app, where all four are shown
-once, unavoidably, at setup. Points 1 and 3 are the two that change what someone *does*.
+once, unavoidably, at setup (in the short form since 18 Oct 2026, still all four). Points 1 and 3 are the two that change what someone *does*.
 
 **The watch string has a hard three-line budget**, and that is why it reads more bluntly than
 the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top
@@ -1123,6 +1147,37 @@ there is a translation to make it coherent, not before. See `CityLookup.kt`.
 Evidence for the whole of this section — eleven surfaces on a phone and a watch both set to
 `ar-EG` — is in §10, "The app on a phone that is actually set to Arabic".
 
+**19 Oct 2026: "Phone language" first, and a language list on every Android version** (built on the
+8 Oct 2026 branch `claude/customer-review-pain-points-9d35kl`, brought into 1.5.0 at the owner's word,
+`docs/release-tools/RELEASE-1.5.0.md` "FIRST, before release day").
+- **The default is "Phone language"**, ticked until the user picks a language (`AppLanguage.chosen` is
+  null). Before 1.5.0 the list showed English ticked whenever nothing was chosen, so a Turkish phone running
+  the app in Turkish read "English". The Settings subtitle says "Phone language · Türkçe" in that case.
+- **Below Android 13 the Language row did not exist at all before 1.5.0** (the system has no per-app
+  language there). Now the choice is stored by `AppLocale.setOverride` (one key in the preference file
+  `sajda_language`, on the phone only, used below 13 only) and applied in `AppLocale.wrap`. `AppLocale.of`
+  still reads the language from the resources, so the rule above holds: the app's language is the language
+  its words resolved to, never the stored tag.
+- **Everything that names the language must go through `AppLocale.wrap`**, or below 13 it answers with the
+  phone's language. Fixed on 19 Oct 2026: the typed place lookup and the GPS place label (`CityLookup`,
+  `LocationRepository`, read in the code, not run), the notification channel names
+  (`Notifications.ensureChannels`, read, not run), the PDF exporter (now made per export: held by the
+  ViewModel, an Arabic PDF came out in Urdu after switching from Urdu on Android 12; measured fixed) and the
+  watch tile (wrapped once per tile request and passed down; read, not run). Lesson 153.
+- **`MainActivity.onCreate` sets the window's layout direction from the wrapped configuration.** Below 13
+  the language change restarts the screen with `recreate()`, and on the Android 12 emulator the new screen
+  kept the old one's direction both ways (Urdu words left to right; English words right to left after
+  "Phone language", the 8 Oct branch's unreproduced observation). Lesson 152.
+- **The welcome screen opens the same list** (a compact solid button in the top corner with a globe and the
+  language's own name; the owner's choice from screenshots, DESIGN_SYSTEM §9), so someone who cannot read
+  English can switch before the first question.
+- **Rejected:** restarting the whole task instead of `recreate()` (also works, but drops the user back on
+  Times and is a bigger change; the one line direction fix measured correct on every language); flags; an
+  About row saying the translation was made with AI help (the owner, 19 Oct 2026: leave it out; it was in
+  the 8 Oct branch's plan).
+- **The privacy policy needs no change:** the stored choice never leaves the phone, and the policy already
+  says the typed place lookup sends "the language the app is set to", which is now true below 13 as well.
+
 ### 5.17 The method is asked, visibly, of everyone — and never chosen for them (15 Aug 2026)
 
 The owner brought a problem, with a proposed solution written by another AI: users still
@@ -1183,6 +1238,25 @@ where it is used only where that is the publisher's own country or has been veri
 real timetables; keep "some" and "many"; never sell a method as *the* method for a country
 that has several. Aladhan marks its Dubai and Diyanet entries *experimental*, so those two
 descriptions claim nothing about officialness.
+
+**5 Oct 2026 additions to this rule (8 Oct branch), brought into 1.5.0 on 19 Oct 2026 in the Quiet Glass
+form.** (1) The 30 minute limit explains itself where the user is stuck: under a prayer at the limit, or
+whose board time was too far, a note says a gap that size is usually a different calculation method or a
+board that shows the congregation, with a "Choose a calculation method" button, announced politely to a
+screen reader. It names no method and calls no time right or wrong. (2) "Use your mosque's board" (one
+button above the list, the owner's choice from screenshots on 19 Oct 2026, DESIGN_SYSTEM §9), then "Which
+prayer?" with each prayer's current time, then a clock: `AdjustmentFit` stores the minutes, compared from
+the *truncated* calculated time because the screen truncates, the short way round midnight, **either half of
+the day, whichever is nearer** (19 Oct 2026 evening: Material's 12 hour dial keeps a.m. or p.m. when the hand
+passes 12, so a prayer at 11:58 p.m. (Asr, for a test place shown in London time) moved to a board's 12:05 a.m. arrived as
+12:05 p.m. and was refused; measured on
+the emulator, lesson 165; a time 12 hours out can never be a real correction, and boards are often 12 hour
+too), and a gap past 30 is refused, never clamped. Stored values are unchanged: whole minutes, ±30, synced to the watch. (The 8
+Oct branch made the minutes number an underlined link instead; that style is banned since 18 Oct 2026.) (3)
+For any future method finder the wording rules are fixed: 'gives the same times as your mosque today',
+never 'you follow X' or 'your school'; school means Asr only; Moonsighting Committee is a twilight rule; two
+prayers (Isha and Asr) are mandatory; no method plus offset fallback; never auto applied. **The finder
+itself is NOT built** (8 Oct sweep, §10: it failed its own bars).
 
 ### 5.18 The place label is the town, never the county (15 Aug 2026)
 
@@ -1267,7 +1341,26 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    Istanbul page would not load from the cloud (two URLs, both a server error), so Istanbul itself is
    not measured, only a town whose page did load; the offsets are a property of Diyanet's method, not of
    the town. Not changed: the plan makes any change to the method an owner decision (§11). Details in
-   `RAMADAN-LOCATION-SPEC.md` section 9.4.
+   `RAMADAN-LOCATION-SPEC.md` section 9.4. **Superseded 18 Oct 2026: the offsets are now applied, §5.26.**
+8. **The suhoor reminder is ON by default, 60 minutes before Fajr, from 1.5.0** (owner, 21 Oct 2026: "Suhoor
+   Reminder to be enabled - 60 mins before suhoor ends by default unless the user switches it off - Only during
+   ramadan then off itself automatically"). **This reverses the 1.4.0 rule "off by default, nothing makes noise
+   until asked", deliberately; do not put it back.** What keeps it polite, all chosen by him the same day with
+   AskUserQuestion: the default style is a **Notification** (follows silent and Do Not Disturb), not an Alarm
+   (rejected: it would ring at about 3 to 4 am for people who are not fasting); it plays **the phone's usual
+   tone, never the prayer sounds**, and the adhan only if the person picks it for the suhoor reminder itself
+   (rejected: borrowing the prayer sound, which made a person with the adhan for prayers hear an adhan an hour
+   before Fajr, announcing a prayer that has not come); and the Ramadan notice, from 3 days before, says so in
+   one line with the person's own minutes ("...and a reminder comes 60 minutes before suhoor ends. You can turn
+   either off in Settings."). It only ever exists on days of Ramadan on the user's calendar
+   (`SuhoorReminderPlan`), so it switches itself off after the last day with nothing to reset. An unset setting
+   reads 60, so a 1.4.0 user who never opened it gets it too; one who chose Off has 0 stored and keeps Off.
+   **Its own channel family, `suhoor_v…`** (`Notifications.ensureSuhoorChannel`): the prayer channels keep only
+   one of each kind alive, so a reminder with a different sound on a shared channel would delete and restore the
+   prayer channel at every reminder (§15 lesson 170). The Notification sound and Alarm sound rows no longer
+   appear because of the suhoor reminder (`usesNotification`, `prayersUseAlarm`), since their sound no longer
+   applies to it; `usesAlarm` still counts it, for the Do Not Disturb card and the approximate day switch.
+   Settings for it, in the Suhoor reminder dialog: Off/15/30/45/60, Notification/Alarm, phone's usual tone/Adhan.
 
 ### 5.20 Widgets: drawn from saved data and moved on by one weak alarm (built 16 Oct 2026 for 1.4.0)
 
@@ -1291,16 +1384,62 @@ Design, golden values and every string: `docs/plans/2026-10-widget-ramadan-track
    code is baked in at the moment of the update and goes stale. That is why there is no
    "text on highlight" colour: the ordinary text colours clear 4.5:1 on the highlight in both themes
    (`WidgetColorsTest`). Layout direction comes from the app's language, not the host's.
+   **Since 19 Oct 2026 the widgets follow the app's Theme row** (owner: "If the user selected dark then
+   widget should be dark, if user choose light then the widget should be light"). Until then they always
+   followed the phone and their picker descriptions said so; that sentence is gone in all five languages.
+   *System* is unchanged: the layouts' own colours, resolved by the launcher, follow the phone at once.
+   *Light* or *Dark* use a second layout per widget, `*_fixed.xml` (the same layout inside a frame), and
+   the renderer pins every colour from fixed copies: `widget_light_*` and `widget_dark_*` in
+   `values/colors.xml`, `widget_*_light.xml` and `widget_*_dark.xml` drawables. A pinned colour cannot go
+   stale here, because under a chosen theme the phone's mode is meant to be ignored. Why a second layout
+   id: lesson 169. Tints are pinned with a colour filter (an ImageView tint cannot be sent below Android 12).
+   `WidgetThemeTest` fails the build if a coloured view in a layout is missing from the renderer's list
+   (`WidgetRenderer.PAINTS`), or a fixed colour or drawable differs from the phone resolved one. Rejected:
+   pinning colours under System too (the widget would stop following the phone until the next redraw,
+   lesson 130); and reusing the same layout id (lesson 169). Known and accepted: the widget picker's
+   preview (`previewLayout`, Android 12 and later) and the moment before a new widget's first update use
+   the base layouts, so they follow the phone; the first update, a second later, applies the app's theme.
 4. **The countdown.** The Next prayer widget shows a `Chronometer` countdown only when exact alarms
    are allowed, because an inexact refresh could leave one running past zero. Otherwise it shows the
    time only. The Chronometer's digits follow the phone's language and not the app's picker
    (lesson 131).
-5. **Sizes.** Next prayer is 3 by 2 (a 2 by 1 slot is 40 dp high and cannot hold three lines, a 2
-   by 2 square clipped the countdown), Today is 4 by 3 (six rows at 13sp need about 165 dp, a 4 by
-   2 slot is 110 dp). The smallest resize equals the default, so the widget cannot be shrunk into
-   clipping. The picker previews are two drawn PNGs (5,377 and 14,465 bytes) and not launcher
-   captures, so retake them from an emulator if a layout changes.
+5. **Sizes (hero countdown redesign, 18 Oct 2026).** Each widget has two layouts and, on Android 12
+   and later, hands the launcher both (`RemoteViews(Map<SizeF, RemoteViews>)`) so it picks by size
+   without waking the app. Next prayer: small from 180 by 110dp (placed 3 by 2), wide from 270 by
+   150dp. Today: compact from 250 by 180dp, large from 250 by 280dp (330dp in Urdu and Arabic, whose
+   script sits taller), placed 4 by 4. Below Android 12, and at 130 percent text or more, each widget
+   keeps its first layout, because the second stops showing the whole day at large text (rendered).
+   Rows sit at their natural height with weighted gaps between them, so a short widget clips its last
+   row instead of squashing rows on top of each other (lesson 142). The countdown is in dp, not sp.
+   The smallest resize equals the first layout's minimum. The picker previews (3,925 and 8,980 bytes)
+   are captured from the real renderer through the lesson 132 harness, light, an ordinary afternoon.
 6. **Rejected, with reasons:** see §2 "Deliberately NOT used".
+7. **What the widgets show since the redesign (18 Oct 2026; the owner chose "hero countdown" from three
+   drawn directions, research in `docs/plans/2026-10-widget-redesign/RESEARCH.md`, design rules in
+   `docs/DESIGN_SYSTEM.md` §4).** The countdown is the largest thing on every widget (light weight,
+   34 to 38dp). Each prayer has a glyph of where the sun is, drawn white and tinted in the layout
+   (never from code, rule 3). The five day bars (`WidgetState.progress`, Sunrise is not a prayer) are
+   DONE for a prayer whose time is not after now, NEXT for the highlighted prayer, TODO otherwise, and
+   all DONE after Isha until the midnight redraw; `WidgetStateTest` proves at every minute of a day
+   that they run done, next, to come and agree with the highlighted row. The large Today widget adds
+   the full date and the Hijri date with the person's own shift (`WidgetState.date`, `hijri`, built
+   the same way as the Times screen's header) and the mark. One Asr glyph for every madhab (the
+   shadow equals the post): recommended and not objected to, and the madhab never changes a widget's
+   look. No new string, no new colour, no new permission, no new dependency.
+   **The town the times are for is shown on every widget** (the owner asked, 18 Oct 2026, reversing the
+   1.4.0 choice of no place name on a home screen others can see): under the countdown on the small
+   Next widget (so at a large font it clips before the countdown does), under the time on the wide one, at the end of the large Today header, in the compact Today footer, and first in the spoken
+   description. Only the town part of the saved label (`WidgetState.town`, "London" from "London,
+   United Kingdom"), and the Makkah fallback in the app's language (as `AppSettings.placeName`).
+   Nothing new leaves the phone. `docs/privacy.html` says the widgets show it; **re-date the privacy
+   page on the day this reaches `main`**, because merging publishes it (lesson 137).
+   **Glossy finish and location chip (owner, 18 Oct 2026, the same day):** the surface and the
+   countdown card are a fixed gradient with a sheen and a rim (`widget_background.xml`,
+   `widget_hero_background.xml`, five new widget colours), and the town now sits in a chip with a pin
+   and an update arrow (`widget_place_chip`), its own tap (request code 2, same destination as the
+   root) and its own spoken label (`widget_update_location`, five languages, Claude's translations).
+   Pressing it opens the app; `MainActivity.onResume` already fetches the location and recalculates,
+   which redraws the widgets. That path was read, not run on a device.
 
 ---
 
@@ -1452,6 +1591,333 @@ user list has exactly one person; back up the upload key file in the password ma
 On GitHub: 2FA with a passkey, a ruleset on `main` that blocks force pushes and deletion, secret scanning with push
 protection, Dependabot alerts, and private vulnerability reporting (these four are Settings toggles on a public repo).
 
+### 5.23 Built-in adhan, one per school, opt in, never the default (owner, 17 Oct 2026, ships in 1.5.0)
+
+- **Two recordings ship**, unmodified, from Wikimedia Commons (sources, performers, hashes, checks:
+  `docs/licences/ADHAN.md`): Sunni `res/raw/adhan.ogg` ("Beautiful adhan.ogg", CC0, the owner listened and
+  approved it) and Shia `res/raw/adhan_shia.ogg` ("AzaanMaahur.ogg", CC BY-SA 4.0, sung by its uploader
+  Saeed Hatamzadeh-Varmazyar, transcribed to confirm a complete Shia adhan). Credited in Settings → About
+  → Adhan recordings, with both sources and the CC BY-SA licence linked (required by that licence).
+- **Each school sees only its own**, under the one label "Adhan". Opt in and never the default; no existing
+  user's sound changes on upgrade.
+- **The model, per prayer:** Off · Notification (a message with the phone's usual tone) · Alarm. The Alarm
+  sound is one setting for all alarms: "Adhan" or "From your phone" (the system picker, any sound). Under it,
+  **"Play on silent"**, off by default: on silent, vibrate or Do Not Disturb an Alarm gives the notification
+  and vibration only, unless that is on (§5.13).
+- **A chosen adhan follows the school**: moving Sunni to Shia (or back) switches it to the other school's
+  adhan, because the person chose "the adhan", not one school's recording (`alarmSoundForSect`, same place
+  and reason as the method reset in `SettingsRepository.setSect`). The phone sound an adhan replaced is
+  remembered as `phone_alarm_sound`, so the phone picker opens on it.
+- **Stored as an ordinary sound address**, `android.resource://<package>/raw/<name>`, in the same
+  `alarm_sound` setting. The alarm channel id is a hash of the address (§6 Channels), so an adhan is just
+  another channel: `USAGE_ALARM`, Do Not Disturb, "Play on silent", volume and dismissing behave exactly as
+  with a phone sound. By name, not resource id (ids move between builds); `res/raw/keep.xml` stops resource
+  shrinking from removing files referred to only by name.
+- **The 1.5.0 "No Shia adhan yet" notice was removed the same day** the Shia recording was found, as its own
+  rule required. Backing out of the phone's sound picker no longer resets the sound.
+- No network, no permission, no new usage counts event. The sect never leaves the phone. `privacy.html` and
+  the Data safety answers need no change: the audio is part of the app.
+- The listing's short and full descriptions are unchanged; any change is the owner's decision. The 1.5.0
+  What's new carries one line.
+
+### 5.26 Turkey (Diyanet) carries Diyanet's precaution minutes (decided 18 Oct 2026, ships in 1.5.0)
+
+- **The decision.** The owner delegated it ("Turkey iftar one you have make, use Fable to help you make
+  that decision"). Claude recommended adopting the offsets; an independent review on the Fable model
+  reached the same answer from its own sources. The TURKEY method is now Fajr 18, Isha 17, plus Sunrise
+  -7, Dhuhr +5, Asr +4, Maghrib +7 minutes (`PrayerEngine`, adhan's `withMethodAdjustments`).
+- **Why.** Measured on 16 Oct 2026 against Diyanet's own table (§5.19 item 7): without the minutes the app
+  put iftar 7 to 8 minutes before Diyanet's ezan, and early is the dangerous direction for a fast. The
+  same constants ship in adhan-kotlin and adhan-js for Turkey; Diyanet describes them as temkin, and Turkish
+  sources citing its 1981 ruling (Din İşleri Yüksek Kurulu) give no margin for imsak or Isha. The measured residual at Ayas
+  with the minutes is 0 to 1 minute.
+- **Every change is cautious:** suhoor end (Fajr) unchanged; the Fajr window ends 7 minutes earlier;
+  Dhuhr, Asr and Maghrib start later, so no alert fires before the time has surely come in.
+- **Rejected:** leaving it with "Match your mosque" as the remedy (every Turkish user would have had to
+  find it to avoid an early iftar); swapping adhan-java for adhan-kotlin to get a built in Turkey method
+  (a library swap for one line). Accepted counter argument, not decisive: temkin is a national average,
+  so Diyanet's own city tables stay the authority, which the disclaimer already says.
+- **Side effects.** Everything reads `PrayerEngine`, so Times, alerts, the badge, the suhoor reminder,
+  both widgets, the PDF, the Ramadan card and the **watch** move together. **Ship the phone and the watch
+  in the same release**, or a Turkish user's phone and watch disagree by 7 minutes. A Turkish user who had
+  already added +7 by hand in Match your mosque now gets +14 (late, not early); say it in the 1.5.0 What's
+  new for Turkey ("Turkey times now include Diyanet's precaution minutes; if you added these yourself in
+  Match your mosque, you can remove them"). The method's description says "with its precaution minutes"
+  in all five languages.
+- **Verified:** `RamadanGoldenTest` Istanbul rows moved by exactly the offsets and pass (the old rows now
+  fail, so the minutes really apply). **Compared on the Mac, 18 Oct 2026** (engine output printed by a
+  throwaway test, Istanbul 41.0082, 28.9784). Aladhan method 13 reports exactly these offsets in its
+  `meta` (Sunrise -7, Dhuhr 5, Asr 4, Maghrib 7, Fajr and Isha 0). On the three `RamadanGoldenTest`
+  dates Fajr, Sunrise, Dhuhr and Maghrib match to the minute and Isha within 1; **Asr is 2 minutes
+  later than Aladhan on 8 Feb and 8 Mar 2027** (1 on 22 Feb). That gap is the two libraries' Asr formula,
+  not the Turkey minutes: London MWL, with no offsets, shows the same 2 to 3 minutes (3 is outside the
+  ±2 the suite usually allows, and `RamadanGoldenTest` checks only Fajr and Maghrib against Aladhan, so
+  Asr against Aladhan is worth a look after 1.5.0 alongside the Turkish cities). Against
+  **Diyanet's own Istanbul page** (it loads from the Mac), 18 to 24 Oct 2026: Fajr and Dhuhr exact on
+  7 of 7 days, Sunrise exact or 1 later, **Maghrib 1 minute earlier on 7 of 7 days**, Asr and Isha 1 to 2
+  earlier. Left as it is for 1.5.0: inside the 1 minute the release check asked for and inside what
+  "follow your mosque" covers; the cause (Diyanet's reference point for Istanbul, or its rounding) is
+  not known, and a blind +1 would move every Turkish city. Worth a look with more Turkish cities after
+  1.5.0.
+- **Near the polar circle** (about 65.5°N at midsummer, a night under about 25 minutes), Maghrib +7 can
+  land after the twilight Isha, so the order check fails and the day is projected from the reference
+  latitude and marked approximate. Safe and honest; noted so it is not mistaken for a bug (found by the
+  independent review).
+
+### 5.25 Two sounds, each its own Settings row; notifications follow the phone (owner, 18 Oct 2026, 1.5.0)
+
+- **Notification sound and Alarm sound are rows under Prayer alerts**, each showing what is chosen ("Adhan",
+  the phone sound's name, or the phone's default), each opening Adhan / From your phone. A row appears only
+  while some prayer or the suhoor reminder uses that style. Why rows: at the foot of the Prayer alerts dialog
+  the alarm sound sat below a fold with nothing showing there was more, and the owner, looking for a way to
+  pick a phone sound, never found the "From your phone" that was already there. He chose rows (asked, three
+  options). Then he asked for the same choice for notifications: "user can select adhan or another sound
+  for an alarm or notification".
+- **Nobody's sound changes on upgrade.** `notification_sound` is empty by default, and empty keeps every
+  notification on the original `prayer_times` channel, untouched (anything the user changed on it in system
+  settings survives). A chosen sound gets a channel `prayer_notif_v<hash>`, created on first post, the same
+  versioning as the alarm (§6), with `USAGE_NOTIFICATION`, the two pulse vibration and **no Do Not Disturb
+  bypass**. A chosen adhan follows the school like the alarm's (`setSect`).
+- **Vibration, as he chose ("follow the phone"):** every prayer notification, alarm, suhoor reminder and
+  heads up vibrates (each channel `enableVibration(true)`). Ring mode: sound and buzz. Vibrate: buzz. Silent:
+  Android stops the buzz too, deliberately left alone (forcing it would override the person's mute). Do Not
+  Disturb: nothing, unless the alarm's "Play on silent" is on. `NotificationSoundTest` pins the no bypass and
+  the vibration in source.
+- **Fixed on the way: Android 7 notifications made no sound.** Below Android O there are no channels, and the
+  notification style set only a vibration, so on Android 7 a "Notification" buzzed silently although Prayer
+  alerts promised the phone's usual tone. It now sets the chosen sound or the default notification tone.
+  **Not verified on an Android 7 device or emulator**: reasoned from the platform, compiled and unit tested.
+- **One "Prayer times" channel at a time** (independent review, 18 Oct 2026): `prayer_times` and a
+  `prayer_notif_v…` channel used to coexist, two identical entries in the phone's settings, one of them dead.
+  Now `prayer_times` is deleted while a chosen sound is in use and `ensureChannels` does not recreate it.
+  Android's documented behaviour restores a deleted channel's settings when the id is created again.
+- **The phone picker's "Default" row** (same review): with `TYPE_ALL` it meant the default ringtone, so
+  "going back to default" put the ringtone on every prayer. `EXTRA_RINGTONE_DEFAULT_URI` now names the
+  default for the sound being chosen, and that pick is saved as blank (`MainActivity.storedSound`). Applies
+  to the alarm picker too; a sound saved before keeps its stored value until picked again.
+- **Known and accepted:** an Alarm that drops to a notification (polar approximated day) plays the
+  notification sound, whose row is hidden if every prayer is an Alarm; it is then the usual tone unless
+  one was chosen earlier. `docs/privacy.html` and `docs/store/LISTING.md` still say "type a city name":
+  wording only, nothing about data handling changed, left for the 1.5.0 privacy re-date.
+- **Verified on the emulator, 18 Oct 2026** (`sajda`, API 36, the sideload build of `1b4b2c2`, Dhuhr set
+  to Notification with the Adhan, the clock moved with `adb shell cmd alarm set-time` and put back on
+  automatic afterwards; evidence from logcat, `dumpsys notification` and `dumpsys audio`, screenshots
+  taken with adb and not committed):
+  - The alert posts at Dhuhr on `prayer_notif_vc4b36268` with sound
+    `android.resource://com.sajdatime.app.sideload/raw/adhan`, `USAGE_NOTIFICATION`, `mBypassDnd=false`.
+    `prayer_times` reads `mDeleted=true`, so the phone lists one "Prayer times" channel: the channel swap
+    works.
+  - SystemUI's `RingtonePlayer` plays it on the speaker. **Left alone it plays the whole recording**:
+    `player.start` 20:54:01.14, `onCompletion` 20:56:35.65, 154.5 s for a 154.0 s file. The notification
+    stays in the shade afterwards.
+  - **Swiping the heads up away stops it at once**: the notification is removed and the player released
+    in the same few milliseconds (20:54:06.39).
+  - **Opening the notification panel also stops it.** About 50 ms after the shade opened, SystemUI
+    stopped the sound while the notification stayed in the list. This is Android's behaviour, not the
+    app's: the system plays a notification sound and the system stopped it, and the app's process was
+    frozen at the time. Nothing on the channel or the notification changes it. Accepted as a natural "I
+    have seen it" gesture; an adhan that keeps playing with the panel open would be a different design
+    (the app playing the audio itself), not a setting. **The owner decided (18 Oct 2026): tell users in
+    brief, change nothing else for now** ("we should inform the users in brief and concise wording so
+    that they are aware ... we can't do anything else for now"). The Notification sound pop up ends:
+    "Pulling down your notifications or swiping the notification away stops the sound", in all five
+    languages. Not added to the Alarm sound pop up: what the panel does to an Alarm is untested.
+  - **Android 16 notification cooldown** ("polite notifications", on in this image with the setting
+    untouched) muted a third Dhuhr alert posted close behind two others from the app: it appeared, with no
+    sound and no error in the log. Proved by setting `notification_cooldown_enabled` to 0 for one run (the
+    adhan played) and deleting the key afterwards. A testing artefact of re-running the same prayer (lesson
+    148); one prayer alert hours after the last is not affected.
+  - Not heard: "plays" means the platform's own playback records, not listening.
+- **Still not verified:** the picker's Default row, a real phone, what opening the panel does to the
+  Alarm style, and whether a "Reminder before prayer" 5 minutes earlier (silent, but it vibrates) counts
+  towards the cooldown. Android 7 as above.
+- No network, no permission, no usage counts event, no privacy change: the sound choice stays on the phone.
+
+### 5.24 Security hardening (17 Oct 2026, owner: "improve the security ... apply the best possible solution", ships in 1.5.0)
+
+Builds on §5.21. Audit first, then only changes worth their cost. The app has no server, no account and no secret
+of its own, so the realistic threats are a tampered dependency or build tool, another app on the phone, and a
+network observer of the one city search.
+
+**What the audit found already right (left alone):** backup and device transfer off; cleartext off; every receiver,
+the FileProvider and the widget providers not exported; every PendingIntent `FLAG_IMMUTABLE`; the receiver
+validates its extras against the enum; no logging in any module; no advertising ID; R8 and resource shrinking on;
+the watch's Data Layer service filtered to `/sajdatime` paths (and Data Layer items can only come from this app,
+signed with the same key, on the paired phone); secret scanning with push protection on the repository.
+
+**Changed.**
+1. **Guava floor** (`libs.guava`, a dependency *constraint* in app and wear, not a direct dependency). Firebase pulled
+   Guava 31.1 into the phone and coroutines-guava pulled 31.0.1 into the watch; both carry CVE-2023-2976 and
+   CVE-2020-8908 (GHSA-7g45-4rm6-3mm3, GHSA-5mg8-w23w-74h3), fixed in 32.0.0. Now 33.7.2-android on both.
+2. **Every shipped library scanned against OSV** (osv.dev batch API, the resolved release runtime classpaths of app,
+   wear and core): **204 packages, 0 known vulnerabilities**. The scanner was proved by querying the old Guava,
+   which it flags with both advisories. Re-run the scan before each release (the script is short: resolve the three
+   classpaths with `:module:dependencies --configuration releaseRuntimeClasspath`, post group:artifact:version to
+   `https://api.osv.dev/v1/querybatch`).
+3. **Kotlin 2.4.21** (from 2.3.21; includes the CVE-2026-53914 build cache fix §5.21 deferred). Full gate green.
+4. **Dependency verification**, `gradle/verification-metadata.xml`: a SHA-256 for every one of the 608 components the
+   build downloads (libraries, plugins, AGP's tools). Gradle now refuses any artifact whose hash differs, so a
+   compromised mirror, a substituted library or a poisoned cache cannot reach the app or the signing step. §5.21
+   deferred this because AGP's `aapt2` is a different file per OS: it was generated on the Mac, and the Linux and
+   Windows `aapt2` jars were hashed from dl.google.com and added by hand (the Mac jar from the same URL matched the hash
+   Gradle generated). Sources and javadoc are trusted by pattern, for IDEs only. **Proved three ways:** the intact
+   build passes; with one hash changed the build stops with "Dependency verification failed ... activity-1.13.0.aar";
+   and the full gate (plus both test APKs) passed from an **empty Gradle home**, every file downloaded fresh and
+   checked. That clean-room run is not optional: the first one failed, because a warm cache had never needed
+   `guava-parent-33.7.2-android.pom`, so write mode never recorded it. It was added by hand after its hash matched
+   Maven Central's published `.sha256`, the download and Gradle's cache. **Always prove a regenerated file from an
+   empty `GRADLE_USER_HOME`** (`GRADLE_USER_HOME=<empty dir> ./gradlew --no-daemon clean test lint :app:bundleRelease
+   :wear:bundleRelease`).
+   **After any dependency, plugin, Kotlin, AGP or Gradle change**, regenerate on the Mac with
+   `./gradlew --write-verification-metadata sha256 :app:assemble :wear:assemble :app:assembleAndroidTest :wear:assembleAndroidTest :app:bundleRelease :wear:bundleRelease test lint help`,
+   re-add the linux and windows aapt2 hashes for the new AGP version, and review the diff. Never write `--` inside an
+   XML comment in that file: it stops Gradle reading it (found the hard way).
+5. **Network security config** (`res/xml/network_security_config.xml`): no cleartext, and only the system's certificate
+   authorities, so a user or device management certificate (a proxy on the phone) cannot read the city search. Android's
+   default for targetSdk 24+, now written down so a library's merged manifest cannot change it.
+6. **`android:taskAffinity=""` on `MainActivity`** (task hijacking, "StrandHogg"): with the default affinity another app
+   could put its own screen into SajdaTime's task, shown when the user opens SajdaTime from Recents. The watch app already
+   had it. §5.21 deferred it for a device check of notifications and widgets. **Checked on the Android 16 emulator:**
+   launched, sent Home, relaunched from the launcher, then replayed the notification's and the widgets' exact intent
+   (`NEW_TASK | CLEAR_TOP`, the flags in `Notifications.openAppIntent`, `WidgetRenderer.applyTap` and the alarm clock
+   show intent): every time the one existing task (#227) came forward with one `MainActivity`, never a second task.
+   (A real notification tap could not be done: the overloaded emulator's System UI kept showing "isn't responding";
+   the replayed intent is the same one the tap sends.)
+7. **The watch caps the synced city name at 80 characters**, like the phone's own lookup, and states
+   `usesCleartextTraffic="false"` like the phone (it makes no HTTP calls today).
+8. **From the independent security review of items 1 to 7 (no regressions found):**
+   - **A published privacy sentence was false.** `privacy.html` said Open-Meteo receives "no device information", but
+     `HttpURLConnection` sends Android's default User-Agent (phone model and Android version). `CityLookup` now sends
+     `User-Agent: SajdaTime`, and the policy also names the `language=` it sends.
+   - **The alarm sound picker accepted any address.** Any app can answer `ACTION_RINGTONE_PICKER`; a `file://` sound made
+     posting the alarm throw, which `post()` swallows, so the alert silently never appeared. Only `content://` and
+     `android.resource://` are kept now (`isAcceptedAlarmSound`, unit tested).
+   - **Old PDF exports piled up** in `cache/exports` below Android 10 (the share fallback). The folder is cleared before
+     each export.
+   - Caveats written down: with `verify-signatures=false` the hashes prove nothing changed since they were recorded, not
+     that the first download was authentic (it came over HTTPS from Google's Maven and Maven Central, and spot checks
+     matched their published checksums); and a debug build can no longer be inspected through a user-installed proxy
+     certificate (add a `debug-overrides` block if that is ever needed).
+
+**Considered and rejected, with the reason.**
+- **Certificate pinning** for Open-Meteo and Google: certificates rotate, and a stale pin silently breaks city search for
+  every user until an update. The system-CA-only config above gets most of the benefit.
+- **Encrypting the settings file** (DataStore with Tink): it holds a coarse location and preferences, inside the app's
+  private storage, on a phone whose storage is already encrypted; it would add a crypto dependency and a key that can be
+  lost (a wiped key reads as a first run). No secret to protect.
+- **Blocking touches when another window covers the app** (tapjacking): Android 12+ already blocks untrusted overlays, the
+  app has no money or account action, and it would break blue light filter and accessibility overlay users.
+- **Root detection, Play Integrity, obfuscation beyond R8:** there is no server, secret or paid feature to defend.
+- **Dependabot version updates / CI:** as §5.21, a pull request stream for a solo owner. Dependabot **alerts** (no pull
+  requests) are recommended instead, an owner step.
+
+**Owner steps (account settings, his to press; Claude can walk him through one screen at a time):**
+1. **DONE 18 Oct 2026. The Firebase API key is restricted.** It is the "Android key (auto created by Firebase)" in Google
+   Cloud (project `sajdatime-37a1b`, which the owner's *third* signed in Google account owns, `authuser=2`; the Play
+   developer account is on `authuser=0`). Claude did this in Chrome at the owner's request while he watched. It has the
+   Application restriction "Android apps", with `com.sajdatime.app` and three SHA-1s from Play Console → App signing:
+   - `9F:E8:5A:DB:9C:92:27:11:80:C4:D0:77:6A:07:71:99:AB:AE:FA:F9`: the **upload key**. This is proven: the 1.3.2 and
+     1.4.0 bundles Play accepted are signed with it. The other two are the current and previous Play app signing
+     keys.
+   - `02:D4:F8:A2:7E:52:E8:B5:36:01:07:E5:35:23:83:EE:99:9D:A4:EA`
+   - `46:73:3C:1E:5B:08:F5:94:78:37:1A:9E:B2:39:50:C6:D1:3C:E3:55`
+
+   **All three are needed.** One is the current app signing key. One is the previous app signing key: the key was
+   upgraded, and Play still signs for Android 12 and older with the old key. The third is the upload key. A missing
+   SHA-1 silently stops usage counts on those phones. The existing API restriction (the 25 APIs Firebase set) was left
+   as it was. The "Browser key (auto created by Firebase)" is unused by the app and not in the repo, so it was left
+   alone. The GitHub secret scanning alert #1 was resolved as "won't fix" with that reason: the key ships in every APK
+   by design. **Not verified:** that usage counts still arrive from release builds. Check Firebase Analytics a day or
+   two after 18 Oct; a sudden drop to zero means a SHA-1 is missing. The fix is to add it on the same page, or to set
+   Application restrictions back to None.
+2. **DONE 18 Oct 2026 (owner pressed, Claude confirmed through the API): GitHub repository.** Ruleset "Protect main" is
+   active on the default branch (restrict deletions, block force pushes, nothing else, no bypass). Dependency graph,
+   Dependabot alerts and private vulnerability reporting are on. Dependabot *security updates* stay **off**: their pull
+   requests can never pass dependency verification without new checksums. Act on an alert by hand, per the paragraphs
+   above. Secret scanning and push protection were already on. The GitHub account passkey was added the same day,
+   using the Mac's Touch ID.
+3. **Signing values: COPIED 18 Oct 2026.** The owner ran the copy himself in Terminal: a `sed` that writes the four
+   values into `~/.gradle/gradle.properties` with the `sajdatime.` prefix, mode 600. Claude never saw the values. It
+   was proved twice:
+   - first as a rehearsal, with a throwaway test key and a separate `GRADLE_USER_HOME`;
+   - then for real, from the worktree, which has no `keystore.properties`. `:app:bundleRelease` and
+     `:wear:bundleRelease` both came out signed with the upload key `9F:E8:…:FA:F9` ("jar verified"), the same key as
+     the 1.4.0 bundle.
+
+   `storeFile` is an absolute path, so it works from every worktree. The `.jks` itself was not moved and must not be.
+   The repo root `keystore.properties` is redundant now, because Gradle properties win (§5.21 item 7f). The owner moved
+   it out of the repo on 18 Oct. It went to the Bin first, but he might empty the Bin by accident, so at his request the
+   spare copy now lives at **`~/.gradle/sajdatime-keystore.properties.backup`** (mode 600, outside every project, not
+   iCloud synced). It goes once 1.5.0 is live and signed. The daily `sajdatime-review-replies` task (step 4b) reminds him EVERY day, with the
+   exact `rm` command, from the day Arabic (that is 1.5.0) is live until the file is gone (owner: a reminder "I cant miss"). Its `ls` is pre-allowed in `.claude/settings.local.json`. The owner deletes it himself. Claude never opens it and
+   never deletes it.
+4. **Passkeys DONE 18 Oct 2026.** The owner added a Touch ID passkey to GitHub and to both Google accounts: the Play
+   owner (`authuser=0`) and the Firebase owner (`authuser=2`). **Advanced Protection: skipped on Claude's advice, and
+   the owner did not object.** It stops most third party apps reaching Gmail and Drive, which would cut off his Claude
+   connectors and n8n. With passkeys in place, the extra protection is small.
+
+### 5.27 The watch's location: shown, and chosen on the wrist (owner's report 22 Oct 2026, ships in 1.5.0)
+
+**The report:** "on the wearable the user cant select or change their location". True, and worse than it sounds. Before
+this the watch had no rule at all for its place: whichever wrote last won. (1) The phone's sync wrote it. (2) The watch's
+own fix overwrote it **every time the app opened** (`onResume` called `refreshLocation`, which adopted any cached fix). So
+a person who chose Lahore on the phone saw Lahore's times on the wrist only until they next raised it, then the watch's
+own position, with nothing on screen saying which. (3) "Use Makkah" on the "No location yet" screen was the only control,
+and once used, a watch with no fix and no phone app had no way to leave it. The watch never named its place anywhere.
+
+**The rule now (`wear/.../WearLocation.kt`, `WearSettings.kt`):**
+1. A stored `location_source`: absent means **automatic**, or PHONE, WATCH, MAKKAH. Automatic is the default for everyone,
+   including every watch upgrading from 1.2.0.
+2. **Automatic follows the phone once the phone has sent a real place, and uses the watch's own fix only while it never
+   has** (`acceptsPhoneLocation`, `acceptsWatchFix`). Reason: the phone is where a city is chosen, and two devices from one
+   app showing two sets of times is this project's worst bug class (§10, "What running both emulators side by side
+   caught"). **"Real" excludes the phone's own Makkah fallback** (`isRealPlace`): the phone sends Makkah like any place
+   when it has no location, and following it would pin a watch with working GPS to Makkah's times. In automatic, a phone
+   Makkah is taken only when the watch has no real place of its own (found by the independent review, 22 Oct 2026).
+2a. **Upgrade:** a 1.2.0 watch has only the old `latitude`, `longitude`, `city` keys. The old watch wrote its own fix with
+   no name and its fallback as "Makkah", so a named place there that is not Makkah can only have come from the phone, and
+   is treated as the phone's place from the first open (`phonePlace`), then copied into the phone keys on the first write.
+   Without this the old bug would have lasted until the phone app next ran (found by the review).
+3. The phone's last place is **always** kept in its own keys (`phone_latitude`, `phone_longitude`, `phone_city`), even
+   while the watch uses another, so "Same as phone" can be chosen at any time and names the place it means.
+4. The watch's fix is accepted or dropped **inside the DataStore write**, against what is stored at that moment, so a fix
+   that lands after a choice or a sync cannot undo it (`adoptWatchFix`).
+5. "Use Makkah" on "No location yet" is still a **fallback**, not a choice: it leaves the source alone, so the first real
+   fix or phone place replaces it, as before. Choosing Makkah on the Location screen is deliberate and sticks.
+6. A phone payload with no coordinates no longer blanks the watch's place name (it used to write the empty city alone).
+   Coordinates are now range checked when written as well as when read.
+7. In automatic with a phone place, and in PHONE or MAKKAH, the watch does not ask its GPS at all (`refreshLocation` reads
+   the store first): no wasted fix, no battery.
+
+**On screen (`WearApp.kt`):** a place button in the times list (pin, the place name, "Location" under it) opens a Location
+screen shaped like the School screen: **Same as phone** (with the phone's place under it; disabled with "Open SajdaTime on
+your phone" until the phone has sent one), **This watch** (asks for location access on the tap if it is not allowed; shows
+"Finding your location" while a fix is on its way; if none comes, a line says to turn location on and allow it), and
+**Makkah**, then OK. A place with no name (a watch fix) reads "This watch's location"; Makkah is recognised by its
+coordinates and shown in the watch's language. Back from either settings screen now returns to the times (`BackHandler`)
+instead of leaving the app (the back button; whether a swipe right on Wear OS goes through it is not checked, and before
+this a swipe on the School screen closed the app, so it is no worse). Strings in en, ur, tr, in, ar (`check-translation.py` 0 errors in each).
+
+**Where the button sits, and why:** between the times and the disclaimer, not at the foot. The foot belongs to the school
+button (see its comment and `roundListPadding`): at the end of the scroll the item before the last rises under the clock,
+which is what the disclaimer is there to absorb, so a second button at the foot would be the one buried. In the middle it
+passes through the centre of the screen, where a round list is tapped. The first screen and the end of the scroll are
+unchanged (checked in captures, §10).
+
+**Rejected, with reasons:**
+- **City search on the watch.** Typing on a watch is poor, and a name needs a geocoder, which on Wear OS is missing or
+  answered by Google over the network: a new data flow, a new `INTERNET` permission on the watch and a privacy policy change,
+  for something the phone already does. A city is chosen on the phone and "Same as phone" carries it. An offline city list
+  stays the owner's open decision (§5.21 item 6).
+- **Naming the watch's own fix with the watch's geocoder.** Same reason: it would send the watch's position to Google.
+- **Watch's own fix wins in automatic (the old behaviour).** It silently overrode a city chosen on the phone.
+- **A second button at the foot of the list, or a combined "Settings" button.** The first buries a control under the clock at
+  the end of the scroll; the second costs the school picker an extra tap and hides which school is in use.
+- **Reading the phone's existing Data Layer item at watch start-up.** It would fill "Same as phone" a little sooner after the
+  upgrade, but the phone publishes on every recalculation anyway, and it is one more path that cannot be run here.
+
+**Privacy:** no change. Nothing new leaves the watch; the phone to watch transfer `docs/privacy.html` describes is unchanged.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -1565,9 +2031,13 @@ sound **cannot be changed after creation**. So:
 | Prayer times | `prayer_times` | HIGH |
 | Next prayer badge | `next_prayer_badge` | LOW, silent, no badge dot |
 | Prayer alarm | `prayer_alarm_v<hash-of-sound-uri>` | HIGH, `USAGE_ALARM`, `setBypassDnd(true)` |
+| Prayer times, chosen sound (1.5.0, §5.25) | `prayer_notif_v<hash-of-sound-uri>`, only while a notification sound is chosen; `prayer_times` is deleted meanwhile and restored with its old settings when the usual tone is chosen again | HIGH, `USAGE_NOTIFICATION`, never bypasses Do Not Disturb |
 
 `ensureAlarmChannel()` hashes the chosen sound URI into the id and **deletes stale
 `prayer_alarm_v*` channels**, so the system Settings list does not fill with dead entries.
+The built-in adhan (1.5.0) is just another URI here (`android.resource://…/raw/adhan`):
+measured on the emulator, the system plays it through its alarm player in full and stops it when
+the notification is dismissed.
 
 Vibration pattern: `longArrayOf(0, 350, 250, 350)` — two firm pulses, noticeable in a
 pocket, not startling in a quiet room.
@@ -1772,16 +2242,18 @@ below, and it takes a second.
 | `CityLookupParseTest` | app | 5 | Coordinates come from the response; resolved name is displayed, not typed text; missing coordinate is a miss |
 | `PlaceNameTest` | app | 18 | The town wins over the county; the postal town is parsed from the address line when `locality` is missing, using rows copied from real 15 Aug 2026 probes — the UK emulator sweep (Slough centre, the rugby-club coarse fix, Bradford/Manningham, London, Birmingham, partial and missing postcodes, an Arabic-comma line) and the owner's S23 Ultra in Türkiye (`07410 Alanya/Antalya` must yield "Alanya", not the province); a point of interest, the street, a house number and a state/province abbreviation never become the town; the district is still used when there is no town; blank fields skipped; the country is not repeated (§5.18) |
 | `AlertStyleDowngradeTest` | app | 9 | Both alert downgrades (§5.13, §5.14): an ordinary alarm rings, a projected time does not, an override brings it back, a silenced phone wins regardless; **all sixteen flag combinations prove a Notification is never upgraded to an Alarm**; the ringer is not read when the cheaper check already settles it; and the 366-day sweep reaches exactly the latitudes it applies to, from any starting month |
+| `BuiltInAdhanTest` | app | 5 | The built-in adhans (§5.23): never the default, the stored address names the raw file in any build variant, each school is offered exactly its own, a chosen adhan follows the school, anything else is left alone |
+| `BuiltInAdhanDeviceTest` | app, device | 3 | Both stored addresses open the exact files, the alarm channel carries an adhan with `USAGE_ALARM`, and a chosen adhan follows the school both ways while an upgraded user's phone sound stays remembered |
 | `DisclaimerContentTest` | app | 4 | The disclaimer still makes all four of its points (§5.15); the dua request is still the last paragraph and appears exactly once; the watch keeps its two points and its length budget; the privacy page, front page and Play listing have not drifted from it. Proven to fail: softening "no warranty" in `docs/privacy.html` turns it red |
 | `AlertCodecTest` | app | 8 | Per-prayer alert round-trip and stable ordering; rubbish dropped entry by entry rather than thrown; Sunrise refused; and the upgrade from the two keys it replaced — including the empty-string-versus-absent-key distinction that decides whether a user who silenced everything gets five alerts back (§3, persisted data model) |
 | `TileFormatTest` | wear | 8 | Countdown wording at boundaries; the refresh floor that stops a passed prayer looping the tile |
 | `UsageCountsTest` | app | 21 | The closed event set, the consent text against the privacy policy, and by reflection that the API cannot take a setting (§8) |
 | `DndAccessTest` | app | 2 | The manifest declares `ACCESS_NOTIFICATION_POLICY` and the alarm channel id changes on grant and not otherwise (1.3.2) |
 | `LanguagePickerTest` | app | 6 | The language split stays off, Indonesian's legacy code, no "review" wording (1.3.2) |
-| `HijriCalendarTest` | core | 13 | First day and length of Ramadan 1447 and 1448 on the Umm al-Qura calendar, the eve, the date shift from minus 2 to plus 2, day numbers, the eve notice window (7 days before to day 2), the timetable window (30 days before to the last day), a date outside the calendar's range gives null and not a throw (1.4.0) |
+| `HijriCalendarTest` | core | 14 | First day and length of Ramadan 1447 and 1448 on the Umm al-Qura calendar, the eve, the date shift from minus 2 to plus 2, day numbers, the eve notice window (3 days before to day 2 since 19 Oct 2026), the Settings rows window (3 days before to the last day), the timetable window (30 days before to the last day), a date outside the calendar's range gives null and not a throw (1.4.0) |
 | `RamadanGoldenTest` | core | 8 | The engine against pinned Aladhan values for ten setups: Fajr and Maghrib to the minute, the rest within one, Makkah Isha by the offset table, London's clock change, Tromsø's projected ranges (1.4.0) |
 | `EidTest` | core | 10 | Eid al-Fitr and al-Adha for 2026 to 2029 found on their day and no other, the code (Hijri year x 100 + month), shown until closed and then never again, the date shift, out of range gives null (1.4.0) |
-| `RamadanStateTest` | app | 11 | The pure card state: London day 15 is a 12h18m fast and 4 minutes longer than yesterday, suhoor end and iftar are the day's own Fajr and Maghrib rows, the phase follows the clock, tomorrow, Sydney and Tromsø trends, a clock change day shows plus 5 and not plus 65, the 7 day window, the date shift, "Match your mosque" (1.4.0) |
+| `RamadanStateTest` | app | 11 | The pure card state: London day 15 is a 12h18m fast and 4 minutes longer than yesterday, suhoor end and iftar are the day's own Fajr and Maghrib rows, the phase follows the clock, tomorrow, Sydney and Tromsø trends, a clock change day shows plus 5 and not plus 65, the 3 day window (7 until 19 Oct 2026), the date shift, "Match your mosque" (1.4.0) |
 | `RamadanTimetableTest` | app | 7 | London pinned to the spec on days 1, 15 and 29 (1.4.0) |
 | `RamadanPdfRangeTest` | app | 8 | The PDF range, its span, its file name and its column widths (1.4.0) |
 | `RamadanSettingsDefaultsTest` | app | 2 | A new install shows the card and has dismissed nothing, and no real Eid code or Hijri year equals the "nothing dismissed" value (1.4.0) |
@@ -1791,9 +2263,10 @@ below, and it takes a second.
 | `SystemEventActionsTest` | app | 3 | The system event filter in the manifest (now including `LOCALE_CHANGED`) and `HANDLED_ACTIONS` are the same set. Proven by deleting a manifest line and watching it fail (1.4.0) |
 | `EidWordingTest` | app | 5 | The greeting's shape in all four languages: a plain greeting, the fine print says our calculation and follow your mosque (1.4.0) |
 | `RamadanWordingTest` | app | 12 | 57 Ramadan, suhoor, Eid and widget strings: the info note, no ruling words, "imsak" in one sentence only, placeholders match across languages, no dash or semicolon (1.4.0) |
-| `WidgetStateTest` | app | 14 | The pure widget state: Ramadan days, the eve, the last day, Shawwal, switch off, shift, the word table (1.4.0) |
-| `WidgetColorsTest` | app | 5 | Every widget colour equals its `Color.kt` twin in both themes, and seven contrast pairs (1.4.0) |
-| `WidgetResourcesTest` | app | 11 | No `android:text`, children hidden from TalkBack, alignment, ids, `updatePeriodMillis` 0, previews under 30 KB (1.4.0) |
+| `WidgetStateTest` | app | 21 | The pure widget state: Ramadan days, the eve, the last day, Shawwal, switch off, shift, the word table (1.4.0); the app's Theme choice is carried, with and without a location (19 Oct 2026) |
+| `WidgetColorsTest` | app | 7 | Every widget colour equals its `Color.kt` twin in both themes, the contrast pairs and the gloss sheen (1.4.0, 1.5.0) |
+| `WidgetThemeTest` | app | 5 | The widgets under a theme chosen in the app (19 Oct 2026): the renderer pins exactly the colours each layout declares, its lookups map every pinned colour and drawable to its own light and dark copy, each layout has its `_fixed` twin, the fixed colours equal the phone resolved ones, each fixed drawable is its source with the colours renamed. Proven by deleting one entry from the renderer's list, and one from its drawable lookup, and watching each fail |
+| `WidgetResourcesTest` | app | 12 | No `android:text`, children hidden from TalkBack, alignment, ids, `updatePeriodMillis` 0, previews under 30 KB (1.4.0) |
 | `WidgetManifestTest` | app | 4 | Both providers are declared with their provider files, the redraw receiver is declared, listens for its own action only and is not exported, the picker labels, and the merged permissions are those of 1.3.2 and no others (1.4.0) |
 | `WidgetRefreshSchedulerTest` | app | 8 | Boundary plus 2 seconds, midnight after Isha, local not UTC, a zone that skips midnight, and a sweep of six zones over a year proving the answer is always in the future and under 26 hours (1.4.0) |
 | `WearSettingsTest` | wear | 4 | Synced settings reach the engine intact; unpaired watch still calculates; the wire-key contract |
@@ -1829,7 +2302,333 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**1.5.0 release day run (23 Oct 2026, Mac session; §11 STATE OF PLAY 23 Oct evening).** `release-1.5.0.sh` on `63ae275`,
+emulator `sajda` (its leftover 1440x3088 size override reset first): 23 of 24 PASS or TAKEN, phone SKIPPED by Ali's choice.
+430 unit tests (app 272, core 131, wear 27), 0 failed; lint 0 errors; device suite 26 of 26; suhoor 1, Ramadan calendar 4,
+widgets Ramadan 5, widgets at 2.0 text 5, PDF 2, seed 1, all OK; Ramadan timetable sheet opened; RTL and screens TAKEN.
+Not verified that day: a real phone (skipped by choice).
+
+**The watch's Location screen on the Wear emulators, and 1.5.0 end to end (23 Oct 2026, Mac session; §5.27, §11
+STATE OF PLAY 23 Oct).**
+- `tools/wear-verify.sh`, `sajdawear` (192dp) and `sajdawear_large` (227dp), font 1.0 and 1.3, English: **24 of 24
+  captures PASS** the bezel check. Read by eye: the place button sits between Isha and the disclaimer, and at the end of
+  the list the school button is clear of the clock at both sizes and both scales.
+- **Driven by adb on `sajdawear`** (unpaired, so automatic used the watch's own fix, and the button read "This watch's
+  location"): the Location screen showed Same as phone greyed with "Open SajdaTime on your phone", and This watch selected.
+  - Makkah, then OK: the button read "Makkah" and the times moved to Makkah's (Dhuhr 10:06 BST = 12:06 AST).
+  - This watch, then OK: back to "This watch's location".
+  - Back on the Location screen returned to the times without closing the app.
+- **Same as phone cannot be tapped into being** (an emulator pair cannot sync). So `WearSettingsDeviceTest`
+  (`wear/src/androidTest`, the watch's first on-device test) drives the real `WearSettingsStore` on the watch:
+  - the owner's scenario: the phone's place wins under automatic, and the watch's next fix no longer replaces it;
+  - This watch holds through a phone sync, with the phone's place kept aside;
+  - Same as phone switches back at once, and refuses a watch fix;
+  - Makkah holds through both a phone sync and a watch fix;
+  - the phone's own Makkah fallback does not pin a watch that can find itself;
+  - a watch updated from 1.2.0 (the phone's city only in the old keys) keeps it on its first fix.
+
+  **OK (3 tests) on `sajdawear`**, run by `wear-verify.sh`, which now does it every time.
+  - The first version had one test and passed the same way.
+  - The 1.2.0 and Makkah fallback tests were added after an independent review pointed out that only the cloud's
+    uncommitted Robolectric harness had covered them.
+  - `WearSettingsStore.Keys` and the `dataStore` property went from private to internal for that, and nothing else
+    changed.
+- **`release-1.5.0.sh` on `6be39c7`: every line PASS or TAKEN, phone SKIPPED** (Ali's choice).
+  - Gate: 430 unit tests (app 272, core 131 with 1 opt-in skip, wear 27), 0 failed, lint 0 errors.
+  - Bundles, both signed CN=Ali Imran Khan:
+    - phone 9 / 1.5.0, 9,608,652 bytes;
+    - watch 1002 / 1.5.0, 3,712,229 bytes.
+  - Languages, permissions (11 phone, 3 watch) and size all PASS.
+  - Device suite: 26 of 26.
+  - Suhoor reminder alarms 1, Ramadan calendar 4, widgets in Ramadan 5, widgets at font 2.0 5, Ramadan PDF 2: all OK.
+  - Ramadan timetable sheet and RTL first screen taken.
+  - Looked at by eye: the eve of Ramadan notice, Eid al-Fitr, Arabic first run and Urdu Ramadan.
+  - The amber exact alarm banner on those captures is the test emulator not granting the permission. It is not a fault.
+- **Four store screenshots added** (LISTING.md "What the eight phone screenshots show"):
+  - phone `07-alerts-and-adhan` and `08-ramadan-suhoor-reminder`, on `sajdastore`, read only, Manchester chosen in setup;
+  - watch `w3-tile` and `w4-location`, on `sajdawear_large`, the phone's place handed over by `WearScreenSeedDeviceTest`.
+- **Independent review** (a subagent, read only, the two commits and readiness as a whole): no code fault. Fixed:
+  - the docs that still said six and two screenshots;
+  - this block and the STATE OF PLAY being stale;
+  - the brief contradicting itself;
+  - the per-language length labels;
+  - the Arabic Wear line, which read as a Qibla tile;
+  - the Indonesian and Malay "dan";
+  - the widened watch test.
+
+  Kept against its advice: the Chrome and Edge line, which Ali asked for. The review rated the policy risk low.
+- **Not tested:**
+  - a real watch, which is never asked of Ali;
+  - TalkBack on the Location screen;
+  - the Location screen in Arabic and Urdu on an emulator (the cloud captured all five languages on Robolectric);
+  - the permission dialog itself;
+  - the Data Layer sync end to end;
+  - the Android 12 phone (the 19 Oct result stands);
+  - the Samsung phone.
+
+**The watch's Location screen (22 Oct 2026, cloud session, no emulator; §5.27).** A cloud container has no KVM, so no
+emulator: everything below ran on Robolectric 4.17 (Android 15 framework, native graphics) in a scratch copy that was
+**not committed** (lesson 132), driving the **real** `WearMainActivity`, `WearViewModel` and DataStore, with Robolectric's
+`LocationManager` standing in for the watch's GPS. **15 of 15 scenarios PASS:**
+- **The owner's bug, reproduced first:** phone sent Lahore, the watch's own GPS says Manchester, location allowed, open the
+  app. **On the untouched 1.5.0 code (`origin/claude/quiet-glass` at 8274843) the store held Manchester afterwards (FAIL,
+  "expected Lahore but was 53.4808, -2.2426")**; on the fixed code it holds Lahore.
+- Tap the place button, the Location screen opens with "Same as phone · Lahore" selected; This watch adopts Manchester with
+  no name; a phone sync of Karachi while This watch is chosen is stored aside and does not move the watch; Same as phone
+  moves to Karachi; Makkah sticks through a later phone sync of Lahore; OK returns to the times, which read Makkah.
+- No phone, location not allowed: "No location yet", Use Makkah, then the Location screen shows Same as phone disabled with
+  "Open SajdaTime on your phone"; This watch asks for location access again on the tap (the request was recorded) and shows
+  "This watch cannot find its location..."; allowing it and resuming adopts Manchester and the line goes.
+- The "No location yet" Makkah is still a fallback: the first real fix replaces it.
+- **Review finding 1:** the phone's own Makkah fallback with the watch's GPS working: the watch keeps Manchester through
+  two phone sends of Makkah, then follows the phone's real Lahore.
+- **Review finding 2:** a 1.2.0 store with Lahore only in the old keys: the first open keeps Lahore, Same as phone shows it,
+  This watch moves to Manchester and Lahore stays on offer (migrated to the phone keys), Same as phone brings it back.
+- Back from the Location screen returns to the times with the activity still resumed (`onBackPressedDispatcher`).
+- **Captures, 192dp and 227dp round, watch mode, font 1.0 and 1.3, English, Arabic, Urdu, Turkish, Indonesian** (the
+  times list at the top, at the place button, at the end; the Location screen top and end): the first screen is unchanged
+  (the button is below the fold on both sizes); at the end of the scroll the disclaimer and school button sit as before,
+  the place button passed on the way; the Location screen fits at 192dp and 1.3 ("Same as phone" wraps to two lines);
+  Arabic and Urdu mirror correctly (pin on the right, scroll bar on the left). **`tools/wear-round-check.py` fails every
+  one of these captures, the unchanged first screen included,** because Robolectric's software renderer does not apply
+  the list's edge fading (lesson 174), so it is no evidence either way; they were judged by eye.
+- **Gate in the cloud:** `clean test lint :app:bundleRelease :wear:bundleRelease`: **430 unit tests (app 272, core 131 with
+  1 opt in skip, wear 27), 0 failed**, lint 0 errors in all three, both bundles built (unsigned here: 9,596,951 and
+  3,704,164 bytes). `check-translation.py` 0 errors in ur, tr, in, ar.
+- **Independent review** (a subagent, the whole diff, read only): no must fix; three should fix, all fixed and each then
+  run in the harness (the two above, and a tappable flash of "No location yet" on the first fix); notes fixed: a stale
+  in-flight fix cancelled before a cached one is adopted, the unnamed label follows the place in use, a stale comment.
+  Left as notes: the "cannot find" line can show for a moment behind the permission dialog; quick taps can start a fix the
+  store then drops (no visible effect).
+- **Not verified:** a real watch or a Wear emulator (the Mac's `release-1.5.0.sh` and `tools/wear-verify.sh` cover it on
+  the next run, which is also where the bezel check means something); a swipe right on the Location screen (system
+  swipe to dismiss, see §5.27); the permission dialog itself (Robolectric records the request, it draws no dialog); the
+  phone to watch Data Layer (the store call the sync service makes was driven directly, the service is unchanged);
+  TalkBack on the new controls (the chips keep `selected` semantics, the pin has no description because "Location" is read).
+
+**The suhoor reminder on by default, phone emulator (21 Oct 2026, Mac session; §5.19 item 8, §11 STATE OF PLAY 21 Oct).**
+`sajda` (Android 16) started `-read-only`, the debug build of the uncommitted change installed, app data cleared, `POST_NOTIFICATIONS`
+granted, `ScreenSeedDeviceTest` OK (London), automatic time and zone off, zone Europe/London. **PASS.**
+- **Default:** Settings shows "60 minutes before Fajr · Notification"; the dialog shows 60 ticked, Notification and "Your phone's usual
+  tone" selected, Adhan offered.
+- **Notice:** Sat 6 Feb 2027 (29 Shaban 1448): "Ramadan on this calendar begins Mon 8 Feb" with "...and a reminder comes 60 minutes
+  before suhoor ends. You can turn either off in Settings." `dumpsys alarm`: no `SUHOOR_REMINDER` on 6 Feb (none of 5 to 7 Feb is
+  Ramadan), correct.
+- **Booked:** Sun 7 Feb 12:00: one `SUHOOR_REMINDER` for 2027-02-08 04:34 (Fajr 05:34). Without exact alarm access its window was
+  +1h, the same as every prayer alert (the "Allow exact alarms" notice was showing); with access granted by `appops`, window 0.
+- **Fired:** 8 Feb 04:34:03, id 3000, "Suhoor ends at 5:34 am / Fajr begins in 1h 0m", channel `suhoor_vn0` ("Suhoor reminder",
+  importance high, sound `content://settings/system/notification_sound`, `USAGE_NOTIFICATION`, `mBypassDnd=false`, the prayer
+  vibration). The `SILENT` flag on it and on the prayer alerts is Android 16's notification cooldown after several alerts fired at
+  once by the clock jumps (as recorded for 18 Oct); the app sets silent only on the next prayer badge.
+- **Adhan chosen in the dialog:** 10 Feb 04:31:01 posted on `suhoor_vn772d62db`, sound `android.resource://com.sajdatime.app/raw/adhan`;
+  `suhoor_vn0` `mDeleted=true`. **Back to the phone tone:** 11 Feb 04:29:02 on `suhoor_vn0`, "Suhoor ends at 5:29 am", the adhan
+  channel `mDeleted=true`. So the phone's settings list one "Suhoor reminder" at a time.
+- **One miss:** 9 Feb (adhan chosen) did not post after the clock was set by hand to 04:32:55 for an 04:33:00 alarm; the alarm was gone
+  and the next day's was booked. Most likely a re-plan from the clock change in the same second (lesson 171); not reproduced on the two
+  clean runs. Not run: the Alarm style for the reminder, Android 7 to 12, a real phone.
+
+**The Ramadan window and the widgets following the app's Theme, phone emulator (19 Oct 2026, 22:00 UK, Mac
+session; the cloud to Mac hand-off in §11, RELEASE-1.5.0.md step 1).** `sajda` (Android 16) started
+`-read-only`, debug build and device tests of `8ceb8f4` installed after removing the old debug copy (the
+sideload 1.4.0 copy left alone), `appwidget grantbind` OK, `ScreenSeedDeviceTest` run to skip the first run
+screens. **PASS throughout.** Screenshots sent to the owner as a private page
+(claude.ai/artifact/7XivbixECckb9AnMQYDXYG).
+- **Widget theme, the device test:** `WidgetDeviceTest#the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system`
+  OK twice. Its first run's `widget-today-theme-system` render showed the icons with no names or times: the
+  picture was taken mid redraw (the test waits for Dhuhr's colour only, and the System layout is a different
+  layout id, re-inflated); the second run's six renders are all complete. The test's verdict is unaffected.
+- **Widget theme, by hand on the Pixel launcher:** both widgets placed with the widget list's Add button (the
+  Today widget landed on the second home page). Settings, Theme: **Dark**, both widgets dark; **Light**, both
+  light; **Follow phone** on a light emulator, both light; then `cmd uimode night yes`, both dark. Put back:
+  Follow phone, night mode off.
+- **Ramadan, clock set in Europe/London, `TIME_SET` sent each time:** **4 Feb 2027 12:00:** no notice on Times,
+  no "Ramadan card" or "Suhoor reminder" anywhere in Settings (UI dumps while scrolling to the end). **5 Feb
+  12:00:** the notice "Ramadan on this calendar begins Mon 8 Feb" with the new line "From the first day, the
+  Ramadan card shows suhoor and iftar times here. You can turn it off in Settings.", both rows in Settings.
+  The same notice in Urdu and in Arabic (right to left, the new line present in each) and in English at
+  `font_scale` 2.0 (whole words, nothing cut, readable after one scroll). **7 Feb 21:00 (the eve):** notice
+  still shown, rows present; both widgets' next prayer "Tomorrow · Suhoor ends", Fajr 5:34 am. **8 Feb 10:00
+  (day 1):** the Ramadan card "Day 1 of 29" on Times, no notice; the Today widget's Fajr "Suhoor ends" and
+  Maghrib "Iftar". **8 Mar 12:00 (day 29 of 29):** card, both rows, the widget words. **9 Mar 12:00 (1 Shawwal):**
+  the Eid greeting, no rows, no widget words. Put back: `auto_time` 1, `auto_time_zone` 1, font 1.0, app
+  language cleared, emulator shut down (read only, so nothing kept).
+- **Seen, not new, not fixed:** the launcher's widget list shows the previews with icons and no text, because
+  `previewLayout` is the real layout without data; `bcdba63` (1.4.0, live) has the same `previewLayout`, so it is
+  not from this change (§11, open after 1.5.0).
+- **Not run:** a real launcher other than Pixel's (One UI, HyperOS) on a theme change; Android 7 to 11; the unit
+  test gate on the Mac (the cloud's 416 stands until the preparation job runs it).
+
+**The tile after a time zone change, `ClockChangeReceiver` (`742389f`), watch emulator (19 Oct 2026, late, Mac
+session; owner: "run ONE check only, the watch tile time zone check").** `sajdawear` (Wear OS 4), 1002 / 1.5.0
+debug of `742389f` installed with `adb install -r`; the manifest receiver is registered for `TIMEZONE_CHANGED` and
+`TIME_SET` (`dumpsys package`). The tile was added with `add-tile` and the watch app was **never opened**. Found
+on the watch: zone Europe/Istanbul, automatic time zone already off (`auto_time_zone` 0). Tile before: "NEXT
+PRAYER / Fajr / 5:38 am · in 9h 6m". `adb shell cmd alarm set-timezone Europe/London` (the emulator accepted it):
+the system sent `TIMEZONE_CHANGED` at 18:31:39.868 and SysUI logged "Tile update requested for
+...NextPrayerTileService" at 18:31:40.014, 0.15 s later. Screenshots each second: the first, taken as the command
+ran, still said 5:38 am; the next, about 2 s later, said **"Fajr / 3:38 am · in 9h 6m"**, the same prayer two
+hours earlier on the clock with the countdown unchanged, and it stayed so for the 8 s sampled. Put back: zone set
+to Europe/Istanbul (the tile went back to 5:38 am within 3 s, "in 9h 5m"), automatic time zone left off as it
+was found, "stay awake" set back to 0, emulator shut down without saving a snapshot. The tile stays added (the
+watch had it on earlier runs; `clear-tiles` does not work here, lesson 161). Not run: `TIME_SET` (a manual clock
+change or the 12/24 switch) on the watch; the same receiver handles it, held by `ClockChangeActionsTest`.
+
+**The last four items from the read-only review, and the emulator checks still open (19 Oct 2026, evening;
+owner: "apply items 1, 4, 5 and the listing count edit, run the full gate, the 12 hour clock, the tile, the
+place from the phone's location on Android 12 and changing the watch language, review, commit, push").**
+- **12 hour clock, before and after.** `AdjustmentFitTest`'s new test (Dhuhr 11:58 against 00:05 gives +7, Isha
+  23:50 against 12:05 gives +15, 13:17 against 2:15 still too far) was run against the old `AdjustmentFit` and
+  failed (1 of 9), then passed with the fix (9 of 9). Android 16 emulator, phone set to 12 hour
+  (`settings put system time_12_24 12`), sideload build of this commit, location Mountain View shown in London
+  time so Asr was 11:58 pm: "Use your mosque's board", Asr, the dial opened on 11:58 p.m.; tapping 12 then 05
+  showed **"12:05 p.m."** (screenshot; Material kept p.m., lesson 165), Set time stored **+7 min** and the Times
+  screen showed Asr **12:05 am**. Reopened on 12:05 a.m., 1:05 a.m. (67 minutes out) was still refused with the
+  limit note and the +7 kept. Put back: Reset all, `time_12_24` deleted (it was unset).
+- **Watch tile against the watch app** (watch emulator, Wear OS 4, 1002 / 1.5.0 debug of this commit): four
+  tile changes measured at 18 to 33 seconds after the minute (sampled every 2 to 3 seconds for 4 minutes); the
+  watch app's own countdown changed between 16:55:58 and 16:56:02, on the minute within the sampling step. Confirms the review's item 3 (lesson 166);
+  not fixed (§11). During the run the watch's time zone changed by itself from Europe/Istanbul (left from an
+  earlier check) to Europe/London, the Mac's zone; nothing in this work set it. **Found by it (the independent
+  review spotted it in the samples):** the countdown stayed right, but the tile went on saying "7:32 pm", Isha's
+  time in Istanbul, for the 4 minutes sampled, when the watch now said 5:32 pm; it showed 5:32 pm once the watch
+  app had been opened (which asks for a redraw). The watch module has no time zone change handling, so the tile
+  keeps the old zone's clock time until its own refresh, up to an hour. Seen, not tested further; §11.
+- **Changing the watch's own language** (lesson 167): with the tile on screen and its service bound, the
+  watch went en-US to ur-PK, to ar, and back to en-US at runtime. The tile followed every time: "اگلی نماز /
+  عشاء / 5:32 PM · 32 منٹ میں"; "الصلاة التالية / العشاء / 5:32 م · بعد 32 د" with Western digits; "NEXT PRAYER
+  / Isha / 5:32 pm · in 31m". The watch's tile renderer restarted with each change, so this proves a new
+  service draws in the new language; a language change with the same service kept alive was not seen, because
+  the watch never kept it. Put back: en-US, the helper deleted, "stay awake" off.
+- **Place from the phone's own location: NOT run on Android 12.** The `sajda12` emulator, which worked on the
+  morning of 19 Oct, hangs before its kernel starts ("QEMU2 main loop" not responding after about 18 seconds,
+  no kernel output with `-show-kernel`) under every start tried: from its snapshot, cold, `-read-only`,
+  software graphics without Vulkan, `-no-window`, with its data wiped, and alone on the Mac. Its system image
+  files read in full; the Android 16 and watch emulators start normally. **Run on Android 16 instead:** a
+  location fix (`geo fix`, the step that failed last time) gave "London, United Kingdom" and London's times;
+  with the app set to Urdu, a fix at Birmingham gave "Birmingham, سلطنت متحدہ" (country in Urdu, the city as
+  the geocoder has it) and Birmingham's times. The below 13 route (`AppLocale.setOverride`) is still read,
+  not run.
+- **Gate on this commit** (run twice, the second time after the review's fixes, on the final code):
+  `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` passed: 407 unit
+  tests (app 261, core 130 with the one opt in sweep skipped, wear 16), 0 failed, every test task executed (none
+  from cache); lint 0 errors in all three; phone bundle 9,583,601 bytes and watch bundle 3,657,983 bytes, both
+  signed CN=Ali Imran Khan. `release-1.5.0.sh` and the device suite were not re-run: this commit changes one
+  pure function (unit tested and run on the emulator) and comments.
+
+**The emulator checks left from the 8 Oct merge, and the store copy (19 Oct 2026, later the same day; owner:
+"whatever is left to test in the emulator ... needs to be done. Do it now ... do it all autonomously and get it
+reviewed independently").** Emulators `sajda` (Android 16), `sajda12` (Android 12) and `sajdawear`, all started
+`-read-only`. Each item below was the "Not run" list of the entry after this one.
+- **TalkBack on the new controls, heard, not read** (TalkBack's own log, lesson 162): the welcome globe "Language.
+  English. Button"; the language list "Selected. English. Radio button. 2 of 6" and each language by its own name;
+  "Use your mosque's board. Button"; "Which prayer?" as a heading and each prayer "Not selected. Fajr. 5:40 am. Radio
+  button"; the clock "Select hour. 7 o'clock", "Select minutes. 44 minutes", "a.m.", each hour "8 of 12", "Set time.
+  Button"; the limit note is announced by itself when it appears, then "Choose a calculation method. Button", which
+  opens the method list ("1 of 12"). **Found:** plus and minus in Match your mosque changed the number and said
+  nothing. **Fixed** (the value is a polite live region, "Dhuhr, +1 min", "Dhuhr, No changes"), heard after the fix.
+- **Turkish and Indonesian at 2.0 text** (Android 16): the welcome screen, the usage question, the Language list,
+  Match your mosque, "Which prayer?", the 24 hour clock, the limit note and its button, the Times screen and Settings.
+  **Found:** Turkish "Telefona uy" (theme) and Indonesian "Pengaturan" (tab bar) split inside the word; wrapped button
+  labels sat at the start edge. **Fixed** (`WholeWords`, centred labels; DESIGN_SYSTEM §3) and seen fixed.
+- **The clock in landscape and on a 320dp phone** (`wm density 540`): 320dp fits. **Landscape was broken** (the dial
+  covered the minutes and hid a.m./p.m.); **fixed** (always the upright layout; the dialog scrolls), and an hour picked
+  and set in landscape. 320dp at 2.0 also split English: "Setting" over "s", "Follo / w / phon / e"; fixed by the same
+  `WholeWords`, then the theme pill's ends cut the "F" (fixed radii) and its height doubled (`matchParentSize`), both
+  fixed and seen.
+- **Below 13, in a language chosen in the app** (Android 12, Urdu): a typed "Karachi" came back "کراچی, پاکستان" (Urdu
+  names; the Latin comma is a small cosmetic item, see RELEASE-1.5.0.md open items); **the channel names were three
+  Urdu and "Prayer alarm" English** (lesson 160), fixed, then all four Urdu in the phone's own Settings. The look up
+  from the phone's location was **not run**: the headless emulator never got a fix (`emu geo fix` left "last
+  location=null").
+- **The watch tile after a language change** (`sajdawear`): a tile drawn by a new process is right in Urdu and in Arabic
+  (right to left, Western digits). **Found:** the tile's countdown never moved ("in 41m" from 13:04 to 13:08); **fixed**
+  with a timeline (lesson 161), seen moving 35, 34, 32, and floored like the watch app after the review. A per-app
+  language switch while the tile service is bound keeps the old language until the service is made again (seen; the
+  app now asks for a redraw when opened and after settings change). A change of the watch's own language: not run.
+- **Also from the not verified list:** the large Today widget in Urdu and Arabic on the Pixel Launcher (the date and the
+  Hijri date whole, no "…"); the phone sound picker is handed the notification default ("Default (Pixie Dust)", not the
+  ringtone), but on Pixel's picker the "Default" card shows only while the default is the current choice, so going back
+  to the phone's tone after choosing another is not possible there except by its name (open item).
+- **Store copy:** the 1.5.0 English listing rewritten with every feature and the search words (LISTING.md "1.5.0
+  listing, FINAL"), reviewed independently against the code (five corrections); eight translated listings rebuilt from
+  it (LISTING-LOCALES.md), reviewed independently. Store screenshots unchanged: at the normal text size the theme
+  selector and tab bar match `05-settings.png`.
+- **Independent code review** (two passes, a subagent, read only): first pass 1 must fix (the tile's minutes one too
+  high), 5 should fix (alarm channel renamed only at the next alert; the usage question's links centred by the new button
+  style; several rows announced on Reset all, accepted; shrunk labels kept their full line height; tests that would not
+  fail), all fixed or recorded; second pass 1 must fix (labels grew at the Small text size), fixed, and nits taken.
+  Every new test was run against the old code once and failed: tile minutes (2 of 16), the channel names, the three
+  large text and TalkBack checks (3 of 3), the Small text size width (139 pixels against 121).
+- **Release script, three runs:** the first found `WidgetDeviceTest` failing straight after a cold boot (lesson 164,
+  fixed in the test); the third, on the final code (cold boot): 22 of
+  24 lines PASS or TAKEN, the other two tree CHECK (this work, then uncommitted) and phone SKIPPED (his choice); gate PASS
+  (406 unit tests: app 261, core 129, wear 16; 0 failed; lint 0 errors in all three); phone bundle 9 / 1.5.0, 9,581,256
+  bytes, watch bundle 1002 / 1.5.0, 3,657,978 bytes, both signed CN=Ali Imran Khan; languages ()(ar)(in)(tr)(ur); the
+  same 11 and 3 permissions; device suite 25 of 25; suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed
+  1; screens in five languages taken and looked at. On `sajda12` (Android 12): `LanguageAndDndDeviceTest` 7 of 7 and
+  `LargeTextAndTalkBackDeviceTest` 4 of 4. Watch unit tests 16 of 16; `tools/wear-verify.sh` was not re-run (no watch
+  screen changed, only the tile and when it redraws).
+
+**The 8 Oct branch brought into 1.5.0 (19 Oct 2026, owner's Mac, `claude/quiet-glass`).** Emulators: a new
+`sajda12` (Pixel 5, Android 12, made for this), `sajda` (Android 16), `sajdastore`, `sajdawear`; every one except
+`sajda12` started `-read-only`. **Android 12:** `LanguageAndDndDeviceTest` 6 of 6 (both language routes); the
+"Phone language" bug reproduced twice before the fix and 4 of 4 cycles plus every language in turn correct after
+it (title on the right in Urdu and Arabic, on the left otherwise); the choice survives a force stop; the welcome
+screen switches to Urdu and back; the Urdu and Arabic 7 day PDFs pulled and rendered with `sips` (right to left,
+columns mirrored; times "5:03 PM" in Urdu and "5:03 م" in Arabic, as on screen) after two fixes found this way
+(lessons 153 and 157). **Android 16:** `LanguageAndDndDeviceTest` 6 of 6; Match your mosque (Isha 7:48 pm set to
+8:00 gives +12; 11 pm refused, the note and its button shown), seen with "Which prayer?" and the clock in English
+light, Urdu light, Arabic dark and English dark at 2.0 text; the welcome button in English light, English 2.0 and
+Arabic dark (Urdu on Android 12); the usage question's policy line in Arabic dark; the Settings Language row in
+English and Urdu. Not every screen in every combination. At 2.0 the clock's "a.m." was cut until its text was capped at 1.3; **on an ar-EG phone the
+clock drew Eastern Arabic digits** until it was given the app's locale (lesson 158), then Western. **Watch**
+(`sajdawear`, Urdu): the new Hanafi line sits inside the circle on two lines (the last word wraps). **Store:**
+`05-settings.png` retaken on `sajdastore` (the Language subtitle changed). **Not run:** a real phone; Android 7 to
+11; TalkBack on the new controls; the clock in landscape or on a 320dp wide phone (Material's dial needs about
+280dp); the watch tile after a language change; the place lookups and channel names in a chosen language below
+13; Turkish and Indonesian at 2.0 text. Results of `release-1.5.0.sh` on the final code: §11, STATE OF PLAY
+19 Oct 2026.
+
+**1.5.0 release check on the owner's Mac (18 Oct 2026, late; `claude/quiet-glass`).** Emulators `sajda`
+(Pixel 7, Android 16), `sajdastore` (Pixel 2 profile, 1080 by 1920), `sajdawear` and `sajdawear_large`,
+every one started `-read-only`. Gate without the build cache: 384 unit tests, 0 failures, lint 0 errors,
+both bundles signed by the owner's certificate. `release-1.5.0.sh` ran four times; the gate in runs 1 and 2
+came before the last widget XML change (the independent review caught that "after the visual fixes" was
+not true of the final file); run 3 came after the attribute change but before a last comment edit, so
+only run 4 built the final code. Each run prints 24 summary
+lines: tree was CHECK every time (the uncommitted work), push FAIL in run 2 only (the cloud had pushed
+`deb0877`, since merged), phone SKIPPED (his choice), and the other lines PASS or TAKEN (run 4's exact
+summary is in §11 NEWEST). Device suite 19 of 19 through `am instrument` after `grantbind`, then on the
+Ramadan clock suhoor 1 of 1, Ramadan 4 of 4, widgets 4 of 4 and 4 of 4 at text 2.0, PDF 2 of 2, the
+timetable sheet opened, Do Not Disturb list shows SajdaTime, screens in five languages. Widgets added
+through the Pixel Launcher's own picker (first time on a real launcher): Next at 3 by 2 and Today at
+4 by 4 draw everything at their default size in light, dark and text 2.0 (at 2.0 a long town and the date
+are shortened with "…"); the location chip opens the app. The store emulator's own place lookup named
+nothing ("Your location"), so Manchester was typed into the location sheet. Watch: `tools/wear-verify.sh`
+at 1.0 and 1.3, 24 of 24 bezel checks pass; read by eye, the 192dp watch at 1.3 still has the
+disclaimer's first line under the clock at the end of the scroll. Istanbul against Aladhan method 13 and
+Diyanet: §5.26. **Not verified:** a real phone, Android 7 to 13, the review card.
+
+**Widget redesign, hero countdown (18 Oct 2026, cloud session, branch `ccr-23a38578-c5vz7d`).** Gate
+`clean test lint :app:bundleRelease :wear:bundleRelease` passed: unit tests core 120, app 235, wear 12, 0
+failures; lint 0 errors and no widget warning (three deliberate kinds suppressed on the layout roots, with
+the reason in the layout comment). Renders through the real `RemoteViews.apply` path (lesson 132, harness not
+committed) of all four layouts at their minimum and typical sizes, in light and dark, ordinary, Ramadan
+iftar and after Isha, no exact alarms, no location, text 1.3 and 2.0, English, Urdu, Arabic, Turkish and
+Indonesian; the showcase is `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png`. The renders run
+in the harness's UTC clock, so their times are not London's: that is the harness, not the app. **Not
+verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the on device suite.
+Glossy finish and location chip, same day: gate passed again (core 120, app 237, wear 12, 0 failures;
+lint 0 errors, no widget warning; both bundles); the new sheen contrast test failed the first dark card
+colour (4.30:1) and passed the corrected one; renders in light, dark, Ramadan, 1.3 and 2.0 text, Urdu,
+Turkish, no location.
+
 Two emulators were used: `sajda` (phone, API 36) and `sajdawear` (Wear OS, API 34).
+
+**Notification adhan, 18 Oct 2026 (Claude on the owner's Mac, adb to `sajda`, API 36).** Dhuhr as a
+Notification with the Adhan: posts on its own channel, plays the full 154 s recording, stops when the heads
+up is swiped away, and stops when the notification panel is opened (Android's behaviour). The evidence and
+what is still not verified are in §5.25; the cooldown trap met on the way is lesson 148.
 
 ### 16 Oct 2026, cloud build and checks of 1.4.0 (no device existed, so nothing here was seen on a phone)
 
@@ -2537,8 +3336,9 @@ for.
 
 ```bash
 # Run the whole app right-to-left, without touching a device setting or shipping
-# a translation. Phone and watch both have the build type.
-./gradlew installRtl
+# a translation. Phone and watch both have the build type; name the module, because a bare
+# installRtl puts the watch app over the phone app (§15 lesson 149). :wear:installRtl for the watch.
+./gradlew :app:installRtl
 ```
 
 ```bash
@@ -4666,6 +5466,45 @@ alarm was watched firing on it; only the scheduling was read. The watch was **no
 with it — that remains item 7 in §11. Nothing was tested on One UI's own battery-optimisation
 screens, so Samsung's background policy is still the open OEM question §11 records.
 
+### 8 Oct 2026 — step 2, the method finder sweep: DID NOT PASS, the finder is NOT built (`:core` test, no device needed)
+
+> From the 8 Oct branch, merged into this record on 19 Oct 2026 with its test and report (`MethodFinderSweepTest`, still opt in). **The figures below are the 8 Oct engine's (1.3.x).** Re-run on 19 Oct 2026 against the 1.5.0 engine, report kept as `docs/reviews/method-finder-sweep-2026-10-19.txt`: Turkey now carries Diyanet's minutes, so **Muslim World League and Turkey are no longer twins** (22 groups from 22 candidates); the narrow design is definite on 89.0% of exact boards and still never wrong (0); on out of model boards it is definite 5.8% of the time (bar 2%) and those keep matching on 80.9% of days (bar 90%), 19.9% of them under 60%. **P2 and P3 still fail, so the decision stands.**
+
+**Decision this records:** the "find the method my mosque follows" feature (§11, 5 Oct decision 2b) is **not built**. Do not rebuild it from the old description. Evidence: `core/src/test/java/com/sajdatime/core/MethodFinderSweepTest.kt` (opt in: `SAJDA_SWEEP=1 ./gradlew :core:testDebugUnitTest --tests '*MethodFinderSweepTest*' --rerun-tasks`, 8 seconds, writes `core/build/method-finder-sweep.txt`); the full report from this run is kept in `docs/reviews/method-finder-sweep-2026-10-08.txt`.
+
+**Grid:** 11 Sunni methods x 2 Asr schools = 22 candidates, latitudes 0 to 60 in steps of 5, longitudes 0, 70 and -100, every 7th day of 2026 (52 dates), tolerances 1, 2, 3 and 5 minutes. Days where a candidate has no usable sun (the projected polar days) are skipped for it. Bars were written down **after** seeing the first table but **before** the narrow design was measured, and are: a design must (P1) give at most 3 candidates for at least 90% of exact boards; (P2) give a list for at most 10% of boards that follow no listed method (the confident wrong match); (P3) when a wrong candidate matches today, still agree (within the design's tolerance) on at least 90% of the year, with at most 10% of such cases off by more than 5 minutes on 20% or more of days.
+
+**Results.**
+- *Single prayers cannot work.* Asr alone only separates the two schools (10 or 11 of 22 candidates fit). Isha alone, median 4 to 12 candidates. Fajr alone, median 12 to 14. The earlier note that two prayers are mandatory is confirmed, and two are not enough.
+- *Original design (Asr + Isha, unranked list): fails.* P1 passes only at 1 minute (3 or fewer candidates for 96.1% of exact boards; 64.4% at 2 minutes, 43.0% at 3, 29.2% at 5). **P2 fails:** a board that is one candidate with Isha moved by a precaution still gets a non-empty list 10.4% of the time at 1 minute and 14.9% at 2 (committee tables with a few offsets), and 40% when the shift is only 3 minutes. **P3 fails badly where most users live:** between 25 and 40 degrees north a wrong candidate that matches today agrees on only 54 to 70% of the year, and 23 to 46% of such cases are more than 5 minutes off on at least a fifth of the days. A mosque that rounds its board up to the next 5 minutes is found only 37% of the time at 2 minutes.
+- *Which pairs coincide only at certain times of year:* Karachi with Moonsighting Committee, Karachi with Qatar, Moonsighting with Kuwait, Qatar with Turkey and with Muslim World League. All involve a fixed interval rule (Qatar and Umm al-Qura: Isha = Maghrib + 90) or the seasonal Moonsighting rule meeting a fixed angle rule at some dates. This is why "same times today" is not "same method".
+- *Adding Fajr (three times from the same timetable) fixes the false matches but not the drift.* Fajr + Asr + Isha at 1 minute: boards following no method get a list 0.7% of the time (2.1% at 2 minutes), so P2 passes; but drift in the 20 to 45 degree band is 35 to 54% of today-matching wrong candidates, so P3 fails.
+- *Narrow design (Fajr + Asr + Isha, 1 minute, speak only when every fitting candidate is one group of identical rules; the only twins are Muslim World League = Diyanet in this engine, both are 18/17):* 88.3% of exact boards get a definite answer (78% to 100% by latitude) and it was never wrong (0 of 75,000+). On boards that follow a committee's own constant offsets (8 offset patterns, many of them only a few minutes) 6.3% still get a definite answer (bar: 2%) and those keep matching the committee's table on 82.3% of days on average (bar: 90%), with 17.6% of them under 60% of days. **P2 and P3 fail narrowly.**
+
+**Why not ship the narrow design anyway.** It would be right for mosques that print an exact method, and it would say "gives the same times as your mosque today" truthfully, but about one in sixteen committee-table boards would get a confident answer that is wrong for a fifth of the year, the user cannot tell which kind of mosque they have, and the evidence of demand is one unlocated complaint. The wording of that complaint (Isha or Asr 15 to 30 minutes off) is already served by the existing method list ("Followed by some mosques in Britain"), the 30 minute explanation from step 1 and the "Different from your mosque?" explainer. Cost on the other side: three time entries per use, a new screen to translate into four languages, and a feature that tells a religious-timing story with a measured error rate. Not worth it on this evidence.
+
+**Rejected, with reasons.** The Asr + Isha unranked list (fails P2 and P3). Raising tolerance to 3 or 5 minutes to find rounded boards (list size median 4 to 6, most of it noise). A "method plus offset" fallback (already rejected 5 Oct; this sweep is the quantified version of why). Two dates three months apart (would fix drift and false matches, but six time entries is not a mass-market flow). Ranking the list (no honest ranking exists: all listed candidates fit equally). The congregation-time hint in the finder (it existed only inside the finder; dropped with it).
+
+**What would reopen it.** Three separate users asking for it (§11 evidence rule), or a design that needs no more than the same three entries and passes P2 and P3 in this test unchanged. If revisited, start by re-running this test: it is the gate.
+
+**Not tested.** The sweep uses this engine's own candidates as truth. It cannot say how real mosque boards behave; it measures the worst a finder can do, not how often real boards are exact.
+
+### 7 Oct 2026 — banner actions are real buttons (built, unit tested and linted in a cloud container, no device)
+
+> **HISTORY. Superseded by the Quiet Glass notices (18 Oct 2026, §11): `Notice` with a solid button and a lone close X. Nothing of this section's `NoticeCard` came into 1.5.0.** "Lesson 127" below is the 8 Oct branch's number; it is lesson 156 in §15 now.
+
+Owner report: the call to action on the amber cards looked like a notification. Cause found by reading the code: `NoticeCard` (Times) and `WarningRow` (Settings) were clickable as a whole, with "Tap to allow." in the body and nothing pressable drawn. Fix: one shared `NoticeCard` in `ui/components/Common.kt` with a full-width filled `tertiary` button (labels "Allow in Settings", "Set my location", "See why"), card no longer clickable, "Tap to..." removed from four strings. Polar and compass notices have no action and are unchanged. Rationale and rejected options are in `docs/DESIGN_SYSTEM.md` section 4. Verified: `:app:testDebugUnitTest` and `:app:lintDebug` green. **Not tested (first pass, superseded by the emulator pass below):** nothing seen on a device or emulator.
+
+**Emulator pass, same day (7 Oct 2026, Android 14 x86_64 emulator running inside the cloud container with no hardware acceleration, see lesson 127).** Seen and working: the amber card on Times and Settings with its filled button (light and dark); "Allow in Settings" opens Android's own Alarms and reminders page for the app and the card disappears once the permission is on; Settings banner has no close X (permanent, as designed); at 2.0 font scale the card text wraps to eight lines, nothing clips, and the button is fully visible after one scroll; on a 1080x2400 screen all five prayers and the "Different from your mosque?" door fit after a short scroll with the taller card showing; `installRtl` build: the card mirrors correctly (icon right, close left, text right aligned, button unchanged) and the bottom navigation order reverses. Step 1 (Match your mosque) seen working: nudging Fajr by +2 shows "Shows 5:48 am", tapping the number opens the time dial, picking 2:00 pm (far beyond 30 minutes) is refused, stays at +2 and the limit note with "Choose a calculation method" appears. **A real defect found by running it:** with no correction each prayer showed an underlined em dash, which rendered as an equals sign and did not read as tappable. Fixed: the zero is now "0 min" (`adjustment_zero_minutes`), underlined like every other value; the Islamic date row keeps the plain dash because it is not tappable. **Minor, left alone:** the a.m./p.m. selector in the stock Material time dial draws its selected half in the amber `tertiaryContainer`, the same family the warning cards use. It is a stock control and not a warning, so it was not touched; if amber must mean only 'something is withheld', give `TimePickerDefaults.colors` a secondary container for the period selector. **Still not tested:** a real phone, TalkBack, landscape, `docs/store/screenshots/` not retaken (the emulator is 1080x2400, the store set is 1080x1920, and the store images are made by `tools/build-store-assets.sh`, so retake on a 1080x1920 device or crop deliberately), and the finish gate `clean test lint :app:bundleRelease :wear:bundleRelease` has not been re-run since this change (only `:app:testDebugUnitTest`, `:core:testDebugUnitTest` and `:app:lintDebug`).
+
+**Language selector placement (recommended 7 Oct, NOT built, awaiting the owner's OK).** One row in Settings, first in the Appearance group above Theme, with a globe icon, labelled "Language", showing the current language in its own script; tapping opens a list of every language in its own script with the current one ticked and "Phone language" first; no flags. Plus a small globe button in the corner of the Welcome screen, shown only when two or more languages ship. No extra onboarding step. Android 13 and newer also get the system per-app language page through `android:localeConfig`, but the Settings row is the only route on Android 12 and below. Rejected: a menu on Times or Home (clutter on the daily screens), a language screen for every first run (costs everyone to help a few), a flag dropdown, putting it under About (nobody looks there).
+
+### 5 Oct 2026 — step 1 of the mosque work, built and unit tested in a cloud container (no device)
+
+> HISTORY. Brought into 1.5.0 on 19 Oct 2026 in a different form (one "Use your mosque's board" button, §5.17); `AdjustmentFit` and its 8 tests came over unchanged.
+
+Baseline before any change: `:core:testDebugUnitTest` and `:app:testDebugUnitTest`, 151 tests, 0 failures, 0 errors. After: the same plus `AdjustmentFitTest` (8 tests) all green, `:app:compileDebugKotlin` clean. **Proved the tests can fail:** replacing the truncation with rounding turned two tests red (the seconds case and the round trip) and removing the midnight handling turned the midnight test red; source restored and green. The cases that matter: 21:58:50 calculated and a 22:15 board is +17 (rounding gives +16 and the screen then reads 22:14); 23:58 to 00:05 is +7, not a day away; a 78 minute gap (Slough on the default method) is refused rather than stored as +30; a clock change day still counts real minutes. Then `test lint` (171 tests, 0 failures; lint 0 errors in all three modules) and `:app:bundleRelease :wear:bundleRelease` both succeeded in the container: `app-release.aab` 5,820,292 bytes and `wear-release.aab` 3,639,017 bytes, **unsigned** (no `keystore.properties` here, so these are not uploadable and must never be uploaded; rebuild from a checkout that has the key). The first bundle attempt failed on a Maven Central 429 (`compose-group-mapping`), not on the code; a serial re-run passed. `clean` was not run, so this is the gate minus `clean`. **Not tested:** any screen on a device or emulator, TalkBack, right to left, large text, the watch. See the 5 Oct block in §11.
+
 ### 3–4 Oct 2026 — Usage counts verification (owner's Redmi Note 13 Pro, `sajda` emulator, release build)
 
 Run from `docs/ANALYTICS_DEVICE_CHECK.md` on the owner's Mac, branch `claude/app-analytics-strategy-e826p5`. Everything
@@ -4822,11 +5661,916 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (read this first; the block below still holds for everything not named here)
+
+**Ali said on 23 Oct 2026: "Now let's start with release 1.5 and try to get it released on the play store". So the release
+day is 23 Oct 2026.** Done by Claude that day: `release-1.5.0.sh` on `63ae275`, **23 of 24 lines PASS or TAKEN** (push, tree,
+gate: app 272, core 131, wear 27 tests, 0 failed, lint 0 errors in all three; phone bundle 9 / 1.5.0, 9,608,652 bytes and watch
+bundle 1002 / 1.5.0, 3,712,198 bytes, both signed CN=Ali Imran Khan; languages `()(ar)(in)(tr)(ur)`; permissions 11 and 3; device
+suite 26 of 26 and every Ramadan and widget suite OK; phone SKIPPED by his choice); `set-release-date.sh "23 October 2026"`
+dated `docs/privacy.html`; this block, §10, PROJECT_BRIEF, LISTING and RELEASE-1.5.0.md carry the date; pull request #15 marked
+ready. **Caught after dating:** `UsageCountsTest` pins the policy's "Last updated" date, so the dated page failed it (1 of 272); the test was moved to 23 October 2026 and `set-release-date.sh` now moves both, then 272 of 272 passed on a forced rerun. Only docs and that test changed after the full run, so the bundles are unaffected. **Still to do, in order (RELEASE-1.5.0.md steps 3 to 6):** Ali merges PR #15 today; Ali builds both bundles fresh from
+`main`; Claude walks him through the Play Console one screen at a time; **he presses Send for review**. Then watch Play's
+"Updated on" move from 17 Oct 2026, and do step 6 (Arabic review reply, re-baseline the health check, delete the spare signing
+copy, record "live on <date>"). Noticed the same day: the live 1.4.0 description still says "Your coordinates never leave your
+device" (the 19 Oct description edit never went live, or was never sent); pasting the 1.5.0 description replaces it anyway, so
+check in the Console whether a listing change is still pending before pasting. 1.6 work is paused until the submit is done
+(plan and progress: GBrain `projects/sajdatime-release-1-6`, branch `claude/1-6-0`).
+
+### 📍 STATE OF PLAY, 23 Oct 2026 (the release day block above replaces its "not released" lines; the 22 and 21 Oct blocks below still hold for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is READY on `claude/quiet-glass`, now checked on the Wear emulators too, with eight
+phone and four watch store screenshots and a listing that names every feature. Draft pull request #15 into main is open for Ali
+(https://github.com/aliimrankhan86/SajdaTime/pull/15; a draft so it cannot be merged before the release day: the privacy page
+date goes in first, then Claude marks it ready). The release day is still not fixed.**
+
+- **Ali, 23 Oct 2026:**
+  - "merge everything and keep the release ready first ... test it in every possible way ... add / edit description
+    features and create screenshots ... mention all the features including widget, wearable app, ramadan settings";
+  - "the timing should come from the phone for the location - this will be easier for the user";
+  - "we are going to be on chrome and edge very soon";
+  - "check again to make sure everything is ready".
+- **The 22 Oct block's five steps are DONE.**
+  - GBrain was brought up to date (facts 2476 to 2484).
+  - Step 0c ran: §10 top entry. Every check passed, nothing needed fixing.
+  - "From the phone": already the default, because automatic follows the phone once it has sent a real place (§5.27).
+    Now said in the watch note (330 / 500).
+- **Merging: there is nothing left to merge into 1.5.0.**
+  - Every branch's work is in `claude/quiet-glass`, except `claude/analytics-default-on-1-4-0`. That one is deliberately
+    NOT merged; its one commit is the same patch as 8a39b2b, which is already on main and opt in.
+  - main is an ancestor, so the merge is a clean fast forward (`git merge-tree` checked by the review).
+  - The pull request is Ali's to merge on the release day, after `set-release-date.sh` (lesson 137).
+  - **Gate on the final code (0374915, `--no-build-cache clean test lint` and both bundles): 430 unit tests, 0 failed,
+    BUILD SUCCESSFUL.** That commit changed two watch declarations from private to internal; the full release script
+    ran on 6be39c7, and the 30 Oct job runs it again on the head.
+- **Store (LISTING.md, LISTING-LOCALES.md):**
+  - English description 3991 / 4000. It now names the suhoor reminder's 15 to 60 minute choice, the watch Qibla, the
+    watch following the phone, and "Coming soon to Chrome and Edge browsers".
+  - To fit that line, the method line was folded into the methods list in English and dropped in seven translations.
+  - **Change the Chrome and Edge line when the extension ships, or take it out if it slips** (all nine languages).
+  - The independent review would drop it; Ali asked for it, so it stays, his call.
+  - Screenshots: 8 phone, 4 watch.
+  - Every claim was checked against the code by the review.
+- **Watch test:** `WearSettingsDeviceTest`, OK (3 tests), now run by `tools/wear-verify.sh` and so by the 30 Oct job.
+  That job's prompt was updated for the new counts (430 unit tests, device suite 26) and the eight and four screenshots.
+- **Left to do, and whose job:**
+  - **Claude:** nothing until the 30 Oct job (Fri 30 Oct 12:00) or Ali's "Release 1.5.0 today".
+  - **Ali:** pick the day. On it: Claude runs `set-release-date.sh` and pushes; Ali merges the pull request; then the
+    Play Console, walked one screen at a time (RELEASE-1.5.0.md "Still to do"), and Ali presses Send for review.
+
+### 📍 STATE OF PLAY, 22 Oct 2026 (read this first; the 21 Oct block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 now also lets the watch show and change its location, and that work is IN
+`claude/quiet-glass` (the cloud session fast forwarded the branch on 22 Oct 2026 with the owner's yes; it was built on
+`ccr-5bc4a235-0hmiy4`, which now points at the same commits). Release day is still not fixed.**
+
+**▶ NEXT LOCAL SESSION ON THE MAC, START HERE (the owner asked, 22 Oct 2026: "make sure my local session reads this work
+in the next session"):**
+1. `git fetch origin`, check out `claude/quiet-glass`, `git pull`. `git log --oneline -3` must show "Watch: show which
+   place the times are for, and let the wearer change it" and the handover commit after it. If it does not, the pull
+   did not happen: stop and do it, because everything below depends on it.
+2. Read this block, then §5.27 (the rules) and the §10 top entry (what was and was not verified).
+3. Bring GBrain `projects/sajdatime` up to date from this block (the cloud session had no GBrain tool).
+4. Run RELEASE-1.5.0.md step 0c on the watch emulator (it is also folded into the Fri 30 Oct final check, so if that job
+   has already run, read its results instead). Fix anything it shows. **Never ask the owner to test the watch.**
+5. Then tell the owner in two lines what the emulator showed, and carry on with the 21 Oct block.
+
+- **The owner, 22 Oct 2026:** "on the wearable the user cant select or change their location. It should be fixed and
+  tested and completed for the release." Confirmed in the code, and worse than reported: the watch's own GPS replaced a
+  city chosen on the phone every time the watch app opened, and the watch never said which place its times were for.
+- **Built (§5.27, the rules and every rejected option):** a place button in the watch's times list and a Location screen
+  (Same as phone, This watch, Makkah); automatic by default, following the phone once it has sent a real place; the
+  phone's own Makkah fallback never pins a watch that can find itself; an upgraded watch keeps the phone's city from the
+  first open; back returns to the times. Strings in all five languages. No new permission, no network, no privacy change.
+  The watch note in `docs/store/LISTING.md` gains one sentence (295 / 500). No store screenshot changes (`w1` is the first
+  screen, which is unchanged).
+- **Verified (§10 top entry):** 15 of 15 harness scenarios on the real activity, view model and store (Robolectric, no
+  emulator in the cloud), with the owner's scenario first shown failing on the old code; captures at both round sizes, two
+  font scales and five languages, judged by eye; gate 430 unit tests (app 272, core 131, wear 27), 0 failed, lint 0
+  errors, both bundles built; independent review: no must fix, three should fix, all fixed and re-run.
+- **Not verified:** a real watch or a Wear emulator, the bezel check on real captures, the swipe right gesture, the
+  permission dialog itself, the Data Layer path end to end, TalkBack. The 30 Oct job's `release-1.5.0.sh` and
+  `tools/wear-verify.sh` run cover the first two; RELEASE-1.5.0.md step 0c says what to look at. **Never ask the owner to
+  test the watch** (CLAUDE.md): if the Mac's emulator shows a fault, Claude fixes it.
+- **Left to do, and whose job:** **Claude, the next Mac session:** the five steps at the top of this block. **Owner:**
+  nothing new; the merge he would otherwise have done was the fast forward above. Everything else is as in the 21 Oct
+  block.
+
+### 📍 STATE OF PLAY, 21 Oct 2026 (read this first; the 19 Oct block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is ready on `claude/quiet-glass` (pushed, not merged), now with the suhoor
+reminder on by default and a rewritten store listing. THE RELEASE DAY IS NOT FIXED (owner, 21 Oct, later: "the date
+is not confirmed"; 2 Nov was the plan). A final check runs by itself on Fri 30 Oct at noon. Start nothing else.**
+
+- **Date not fixed, so nothing carries it (21 Oct 2026, later).** Searched every tracked public page and the app's
+  strings: the only published date that must move on release day is `docs/privacy.html` "Last updated" (still 17 Oct
+  2026, correct until the merge). `docs/release-tools/set-release-date.sh ["2 November 2026"]` sets it (today by
+  default), refuses a malformed date and checks the page changed; run, then commit and push, then he merges the same
+  day (lesson 137). Tested on a copy of the date and put back. The jobs were made date-free and read back: the 2 Nov
+  09:00 routine `trig_01VexqUd1cJz8jfD5QFT874W` is now "1.5.0 is ready, pick the release day"; the 29 Oct reminder no
+  longer names 2 Nov; the 30 Oct final check's prompt, description and title (saved through the app's own
+  `update_scheduled_task`) name no submit day; the health check's dated "not live yet" warnings moved from 9 and 16
+  Nov to **1 Dec 2026, 4 Jan 2027 and 18 Jan 2027**, its prompt otherwise identical (compared by script).
+  **Rejected:** deleting the 2 Nov reminder (a nudge is still useful with the 25 Jan limit); dating the privacy page
+  now (it would publish a wrong date the day he merges).
+
+- **The owner, 21 Oct 2026:** "make it completely ready for the release because I could do it earlier", "Ramadan
+  option should be enabled", "Suhoor Reminder to be enabled - 60 mins before suhoor ends by default unless the user
+  switches it off - Only during ramadan then off itself automatically", and later "the playstore descriptions,
+  features, screenshots and other should be written properly. Do not [miss] features like widget and other things.
+  If required use [the Fable skill] for better output and keep everything ready."
+- **His answers (one AskUserQuestion):** default style Notification (not Alarm); the reminder never plays the adhan
+  unless the person chooses it for the reminder ("Never the adhan but if the user wants to choose it then they should
+  be able to select adhaan"); one combined notice line; submit Mon 2 Nov (Claude's recommendation: 1.4.0 has then had
+  two weeks alone and its description review has time to finish).
+- **Ramadan option:** already on by default (`ramadanCardEnabled = true` since 1.4.0); nothing to change.
+- **Built:** §5.19 item 8 (the rule and every rejected option). Code: `SettingsRepository` (default 60,
+  `suhoorUsesAdhan`, `prayersUseAlarm`), `SuhoorReminderPlan.kt` (`suhoorSoundUri`), `Notifications`
+  (`ensureSuhoorChannel`, `suhoorChannelId`), `PrayerAlarmReceiver`, the Suhoor dialog's sound chips,
+  `RamadanCard` (the notice line with the person's minutes). Strings `settings_suhoor_help` and the new
+  `ramadan_eve_card_on_reminder` in en, ur, tr, in, ar (`check-translation.py` 0 errors in each). Four new unit
+  tests in `RamadanSettingsDefaultsTest`; `NotificationSoundTest` changed for the row rule (the suhoor reminder no
+  longer brings up the Notification sound row). `privacy.html` (the suhoor line, no date change: release day sets
+  it), README, ARCHITECTURE.
+- **Gate:** `clean test lint :app:bundleRelease :wear:bundleRelease`, after the review fixes: **421 unit tests** (app
+  272, core 131 with 1 opt-in skip, wear 18), 0 failed, lint 0 errors, both bundles built (9,608,552 and 3,658,445 bytes).
+- **Independent review (a subagent, the whole diff), fixed:** (must) a person whose only alarm is the suhoor reminder
+  could no longer reach "Play on silent", which lives in the Alarm sound row that now shows only for prayer alarms: the
+  switch is repeated in the suhoor dialog when its style is Alarm (new unit test); (should) the sound chip now reads "Your
+  phone's default alarm" when the style is Alarm, and the help says "your phone's own sound" (five languages, 0 errors);
+  the suhoor channel is renamed with the app's language in `ensureChannels` like the prayer channels; the notice names the
+  reminder only if notifications can be shown at all (`canPost`); two stale comments; a bracket in LISTING.md. **Told
+  to the owner, not changed (his call):** someone who muted SajdaTime's "Prayer times" channel in the phone's own
+  settings will still get the suhoor reminder, because it is a new channel at high importance; and someone who turned
+  every prayer alert off in the app gets it too. Notes left as they are: switching the reminder between Notification and
+  Alarm deletes and recreates its channel (one "Suhoor reminder" in the list either way, Android restores its settings);
+  the defaults test reads source text (the store reader is private); the two chip rows have no heading for TalkBack.
+  Checked by the review and fine: defaults and reading, channel ids, the below-O sound path, `suhoorSoundUri` following
+  the school, the gating, the device tests, the four translations, every listing claim, the eight translated listings
+  (French and Hindi line by line). The notice window never runs ahead of the Settings rows (`showsSettings` covers
+  `showsNotice`), so "turn either off in Settings" is true whenever it shows.
+- **Emulator (`sajda`, Android 16, read only, debug build, data cleared then `ScreenSeedDeviceTest`, London), §10
+  top entry:** PASS. Settings row "60 minutes before Fajr · Notification"; 6 Feb 2027 the notice line with "60
+  minutes"; no reminder booked before Ramadan; on the eve one for 8 Feb 04:34 (Fajr 05:34); it posted at 04:34 on
+  `suhoor_vn0` with the phone's notification sound, `USAGE_NOTIFICATION`, no DND bypass; Adhan chosen: 10 Feb posted
+  on `suhoor_vn772d62db` with `raw/adhan` and the old channel deleted; back to the tone: 11 Feb on `suhoor_vn0`, the
+  adhan channel deleted. One run (9 Feb) did not post: the clock had just been moved by hand, and most likely a re-plan
+  in the same second dropped the reminder as past (lesson 171; reasoned, its log was not kept); the clean runs either side posted. Clock and automatic time put
+  back; emulator shut down.
+- **Store listing rewritten (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026", 3971 / 4000):** regrouped by what a user
+  looks for, and five things the 19 Oct text left out are now named (silent next prayer notification, Play on silent,
+  Eid greeting, widgets' town and theme, the suhoor reminder on by default). The five What's new texts changed for
+  the reminder (en 483, ur 487, tr 488, in 461, ar 379). The eight translated listings rebuilt from the new English
+  by a separate agent (Fable model) and measured (all under 4000; Indonesian, Malay and French leave out the far north
+  bullet to fit, as on 19 Oct); disclaimer and FREE sections byte for byte unchanged. Short description unchanged
+  (still needs his yes on release day).
+- **`release-1.5.0.sh`, four runs on 21 Oct 2026; the last, on `bab51ab`, is clean: 23 of 24 lines PASS or TAKEN,
+  phone SKIPPED (his choice).** Gate 421 unit tests (app 272, core 131, wear 18), 0 failed, lint 0 in all three;
+  phone bundle 9 / 1.5.0, 9,608,652 bytes, watch 1002 / 1.5.0, 3,658,445 bytes, both signed CN=Ali Imran Khan and
+  copied to `~/Developer/SajdaTime/SajdaTime-1.5.0/`; English only phone gets ar, in, tr, ur; the same 11 and 3
+  permissions; device suite 26 of 26; suhoor alarms 1, Ramadan 4, widgets 5, widgets at 2.0 text 5, PDF 2, seed 1;
+  timetable sheet opened; screens TAKEN. **What the first three runs found, all in the tests' timing, none in what a
+  user sees:** run 1 (`baae663`) and run 2 (`f6cfafe`): `SuhoorReminderDeviceTest` raced the app's own reschedules
+  after the clock jump into Ramadan, now that the reminder is on by default (lesson 171; the test now reschedules
+  until the app settles, commits `f6cfafe` and `a3f9f91`). Run 3 (`a3f9f91`): `LanguageAndDndDeviceTest` found the
+  withdrawn Do Not Disturb channel brought back by the channel rename pass running at the same moment (lesson 172; a
+  real, rare race in the app, fixed by one lock over every channel write, `bab51ab`, independently reviewed, then the
+  class 10 of 10 and the whole run clean). In the script's run the eve notice shows the line without the reminder:
+  that emulator never grants notification permission, and the line names the reminder only when notifications can
+  show (it did, with permission granted, in the by-hand check of §10).
+- **Store screenshots:** read against this change, none shows anything it touched (`05-settings` shows only Location to
+  Language; the notice and the sound rows appear in none of the six), so none was retaken. The 30 Oct job still
+  compares all six by measurement (RELEASE-1.5.0.md step 0b).
+- **Scheduled jobs moved for the 2 Nov submit (all read back):** final check job `sajdatime-1-5-0-reminder` Fri 30 Oct
+  2026 12:00 UK (was Mon 2 Nov), its prompt updated; "leave the Mac on" `trig_01Bpzq4t8wJCQZwABsC53ys8` Thu 29 Oct
+  18:00 (was Sun 1 Nov); submit reminder `trig_01VexqUd1cJz8jfD5QFT874W` Mon 2 Nov 09:00 (was 9 Nov); daily health
+  check `trig_0129FQnWihf8XG6rKLCB4oFr` expects 1.5.0 from 2 Nov and warns only on 9 Nov, 16 Nov 2026 and 18 Jan 2027.
+- **Not verified:** a real phone (his standing choice); Android 7 to 12 for the new channel (the below-O path is read,
+  not run); the Alarm style for the suhoor reminder on the emulator (unit tested and read; same code path as the
+  Notification run with a different usage); TalkBack on the two new chips (they are the same `ChoiceChip` as the
+  style chips beside them).
+
+**In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`) and now
+also carries everything the unmerged 8 Oct branch had, audited, approved by the owner and retested. Nothing is
+waiting before release day (around 4 Jan 2027). Start nothing else on your own.** *(Updated late on 19 Oct:
+1.5.0 moves to November, date not chosen; and two changes made in the cloud that evening, the Ramadan window
+and the widgets following the app's Theme, were then checked on the Mac's emulator at 22:00 and PASSED. **He then picked the date: submit on MONDAY 9
+NOVEMBER 2026**, preparation job Mon 2 Nov at 12:00 noon (moved by him in the app on 20 Oct). The last bullets of this block say so in full.)*
+
+**Cloud to Mac hand-off, 19 Oct 2026, 20:00 UK (the owner: "Make sure my local claude has access to everything
+and you dont leave anything behind").** The cloud session is closed; everything it did is in git, nothing is kept
+anywhere else. On the Mac, before anything: `git fetch origin`, then check out `claude/quiet-glass` and pull it;
+it must be at `ca5b1d5` or later (the last cloud commit; `main` stays at `bcdba63` until release day). Then, in
+this order: (1) bring GBrain `projects/sajdatime` up to date from this 19 Oct block (CLAUDE.md, Memory; never ask
+him to); (2) RELEASE-1.5.0.md step 1, the Ramadan and widget theme checks on the emulator, and send him the
+screenshots; (3) ask him for the November date and move the scheduled jobs (RELEASE-1.5.0.md, the jobs table).
+Outside git and so not carried by it: the cloud routine `trig_01VexqUd1cJz8jfD5QFT874W` (submit reminder, his
+account, only he or a Mac session can edit it) and the Mac's own scheduled tasks in `~/.claude/scheduled-tasks/`.
+Not committed on purpose: the cloud's Robolectric render harness (lesson 132 says how to rebuild it). Never merge
+`claude/analytics-default-on-1-4-0`; neither old branch is to be deleted (both stay on GitHub as the record).
+
+- **Done on 19 Oct 2026 (Claude Code on his Mac, worktree `~/Developer/SajdaTime-settings-preview`):** the
+  "FIRST, before release day" brief in `docs/release-tools/RELEASE-1.5.0.md`. The branch
+  `claude/customer-review-pain-points-9d35kl` was audited feature by feature against 1.5.0 by behaviour, not
+  by name, and the list shown to the owner before any change. **His answers (AskUserQuestion):** bring in all
+  ten missing items; leave out the About row "This translation was made with help from AI"; for Match your
+  mosque, one "Use your mosque's board" button above the list (chosen from three drawn options, light and
+  dark); for the welcome screen, a globe with the language's own name in the top corner (from three).
+- **Brought in:** "Phone language" first and the default (§5.16); the language list on Android 7 to 12
+  (`AppLocale.setOverride`; before this the Language row did not exist below 13); the list on the welcome
+  screen; Match your mosque from the mosque's board, with the 30 minute limit explained in place and a
+  "Choose a calculation method" button (§5.17; `AdjustmentFit` and its 8 tests unchanged, then changed the same evening: the nearer half of the day, below); the PDF right to
+  left in Urdu and Arabic; the watch tile re-reads its language; "The full privacy policy is in English."
+  under the usage question when the app is not in English; translation fixes still missing from 1.5.0 (the
+  "quiet" alarms translated "silent" in Urdu, Turkish and Indonesian, and the same in one Arabic string; Urdu
+  disclaimer, consent, Asr hedge and Muslim World League line, the same Muslim World League ambiguity fixed in
+  Arabic; Turkish "keep the first option", the adjusted count and the watch sentence; Indonesian exact alarm
+  hedge; the Urdu watch Hanafi line); `TranslationIntegrityTest` (7 tests, Arabic added) and
+  `tools/check-translation.py` (0 errors in all four languages); the records: `docs/translation/` (16
+  files), the method finder sweep (`MethodFinderSweepTest`, opt in, re-run against 1.5.0, still runs) and
+  its NOT BUILT decision (§10), `docs/store/LISTING-ID-TR-UR.md` marked as history, the 5 and 8 Oct state
+  blocks and decisions in their dated places, lessons 154 to 156.
+- **Already in 1.5.0 or replaced on purpose, so not brought in:** the branch's amber card buttons (replaced
+  by the Quiet Glass `Notice`, 18 Oct); the watch translations (shipped in 1.3.2, later wording); Indonesian
+  "Kakbah"/"Mekah" (1.5.0 made phone and watch agree as "Ka'bah"/"Makkah"); fixes to strings whose English
+  was since rewritten; its CLAUDE.md native speaker wording and `TranslationScopeTest` (rejected: it allowed
+  only Urdu, Turkish and Indonesian as an owner waiver, so it would fail on Arabic, and the owner's 9 Oct rule
+  replaced the waiver; `TranslationIntegrityTest` and `LanguagePickerTest` already tie every folder to the list); "0 min" (only needed for its tappable number, which is not used); the
+  About AI note (the owner's no).
+- **The "Phone language" bug, fixed:** reproduced on the first try on a new Android 12 emulator (`sajda12`,
+  made for this, left on disk): `recreate()` kept the old screen's layout direction in both directions. Fix
+  in `MainActivity.onCreate` (lesson 152), then 4 of 4 cycles and every language in turn correct. **Running
+  it found four more of the same family, all fixed:** the PDF exporter held by the ViewModel printed an
+  Arabic PDF in Urdu after a switch; the place lookups and the notification channel names read the language
+  from the bare application context, which ignores the in-app choice below 13 (lesson 153); and the
+  branch's PDF bidi mark printed Urdu times as "PM 5:03" (lesson 157). One more from the emulator at 2.0
+  text: the clock's "a.m./p.m." was cut to "a."/"p.", so the clock's own text is capped at 1.3 times. And from
+  the independent review, measured on an ar-EG emulator: the clock drew Eastern Arabic digits because Material
+  formats them with the JVM's default locale; it now gets the app's locale while it is open (lesson 158).
+- **Verified, 19 Oct 2026:** Android 12 emulator: the language device tests 6 of 6 (both routes), every
+  language picked in turn lands the right way round, the choice survives a force stop, the welcome screen
+  switches to Urdu and back, the Urdu and Arabic 7 day PDFs pulled and rendered (right to left, columns
+  mirrored, times as on screen). Android 16 emulator: the language device tests 6 of 6; Match your mosque
+  (Isha 7:48 set to 8:00 gives +12; 11 pm refused with the note), "Which prayer?", the clock, the welcome
+  screen, the usage question's new line and the Settings Language row, across light, dark, Urdu,
+  Arabic and 2.0 text (not every screen in every combination; §10 lists which). The watch (small round, Urdu): the new Hanafi line fits inside the circle on two lines.
+  `release-1.5.0.sh` run on the final code: 22 of its 24 lines PASS or TAKEN, the other two tree CHECK (this commit's work, then uncommitted) and phone SKIPPED (his choice): gate PASS (400 unit tests: app 259, core 129, wear 12, 0 failed; lint 0 errors in all three), phone bundle 9 / 1.5.0, 9,573,098 bytes, and watch bundle 1002 / 1.5.0, 3,651,329 bytes, both signed CN=Ali Imran Khan; the same languages, the same 11 and 3 permissions, size PASS; device suite 20 of 20 (one new language test); suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1; timetable sheet opened; right to left and screens TAKEN. (Run 1, before the review fixes, had 19 of 20: the new test compared strings too early on Android 16; the test was corrected, not the app.). Store screenshot 05 retaken (the Language row's subtitle changed); the
+  other five and the watch ones are unchanged. Description 3987 of 4000, still "Wear OS" (its Match your mosque line says "within 30 minutes"); What's new 492,
+  459, 491, 486, 355 of 500. An independent review of the whole diff (a subagent, read only) found 5 must fix, 13 should fix and 19
+  notes. **Fixed:** the clock's digits (above); this block was referred to before it existed; the sweep section
+  showed 8 Oct figures as current (re-run, `docs/reviews/method-finder-sweep-2026-10-19.txt`, §10); a test comment
+  claimed a check that does not exist; "Choose a calculation method" made full width (alone on its line, §4.1);
+  an unused string and import; the description line says "within 30 minutes"; the limit note says "30 minutes or
+  more" and "the congregation time" in all five languages (the Turkish relative clause fixed); a stale lesson
+  number; `TranslationScopeTest`'s rejection recorded; the §10 entry and its not run list; the old listing drafts'
+  false coordinates line flagged; the watch tile wraps once per request; history notes on the 15 translation
+  files. **Not a defect:** "the translation test's inputs are undeclared" (the `values-*` glob at the top of the
+  test task covers every module). **Left as notes:** "Which prayer?" lists Sunrise, as the dialog itself does; two
+  prayers at the limit show two buttons; a choice stored below 13 is not carried over if the phone later moves to
+  13 (it falls back to Phone language); the ongoing notification and the stored place label keep the old language
+  until their next refresh (already true from 13).
+- **Not verified:** a real phone; Android 7 to 11; TalkBack on the new controls; the watch tile's language
+  change (read, not run); the place lookups and channel names in a chosen language below 13 (read, not run);
+  Turkish and Indonesian screens at 2.0 text (Urdu, Arabic and English were seen); the clock in landscape and on
+  a 320dp wide phone.
+- **Release day is unchanged** (RELEASE-1.5.0.md "Still to do"): Claude runs `release-1.5.0.sh` again (the
+  21 Dec job does); Claude re-dates `docs/privacy.html` on the day (no wording change was needed for this
+  work: the language choice never leaves the phone); Ali merges, builds both bundles from `main`, and in the
+  Console uploads them, pastes the five What's new texts, the watch note and the description, replaces the
+  six phone screenshots, confirms Data safety and presses Send for review.
+- **Open, none blocks 1.5.0:** as in the 18 Oct late block (Turkey's Maghrib against Diyanet, the "Tap to
+  read" line, the private claude.ai copy of the checklist). The Android 12 emulator `sajda12` and its system
+  image (about 1.5 GB) stay on the Mac for the next below 13 check; delete with `avdmanager delete avd -n
+  sajda12` if space is wanted.
+- **Later on 19 Oct 2026, the same session:** (1) the description for the live 1.4.0 was set in the Console and
+  **the owner pressed Submit**; it is in review (`docs/store/LISTING.md`, commits `c1f02e1` and `6d53b48`; the 1.5.0
+  description, What's new and screenshots still go up on release day, his "two steps" choice). (2) **All six
+  scheduled jobs were checked against this state and brought up to date** (table: RELEASE-1.5.0.md "Scheduled
+  jobs"): the daily health check had never been re-baselined after 1.4.0 (the carry-over in the 17 Oct evening
+  block) and reported 1.4.0 as an unknown release on 18 Oct, so it is on 1.4.0 now, knows the description in
+  review, expects 1.5.0 and warns on 18 and 22 Jan 2027 if 1.5.0 is not live; the 20 Dec reminder said the job
+  "opens the pull request" (corrected); the 21 Dec job gained the 19 Oct counts, the Android 12 language test
+  and the description check; the daily review replies job tells him once when the description is live; and a
+  **new submit day reminder** fires Mon 4 Jan 2027 09:00. (3) After 1.5.0 is live, Claude re-baselines the
+  health check again (RELEASE-1.5.0.md step 6).
+- **Later still on 19 Oct 2026 (the owner: test whatever is left on the emulator, write the release copy with every
+  feature and the search words, do it autonomously, get it reviewed independently):** every item on the "Not verified"
+  list above that an emulator can reach was run (§10, top entry), and **six faults were found and fixed**: TalkBack said
+  nothing for Match your mosque's plus and minus; words split across lines at large text (tab bar, theme selector;
+  `WholeWords`, DESIGN_SYSTEM §3); wrapped button labels sat off centre; the board clock in landscape covered its own
+  minutes; "Prayer alarm" stayed English below 13 with another language chosen (lesson 160); and the watch tile's
+  countdown never moved between refreshes (a timeline now, lesson 161). Each fix was seen on the emulator before and
+  after, every new test was run once against the old code and failed, and two independent code reviews found three
+  more faults in the fixes themselves (the tile a minute ahead, the channel rename only at the next alert, labels
+  growing at the Small text size), all fixed. **Store copy:** a new 1.5.0 English listing names every feature with the
+  search words (LISTING.md "1.5.0 listing, FINAL": full description 3976 of 4000, 3987 since its Qibla line changed the same evening, a new short description with "adhan"
+  and "Wear OS" that needs his yes on the day, a watch note); an independent review checked it against the code and
+  five corrections were made; the eight translated listings were rebuilt from it and reviewed (LISTING-LOCALES.md
+  "1.5.0"). The store screenshots did not change. Release day now also adds the eight translations; the separate
+  January Ramadan listing step is gone (the description carries Ramadan). Results of the last `release-1.5.0.sh` run
+  are in §10.
+- **Evening, 19 Oct 2026 (two read-only sessions had found these and could not change anything; this one could).**
+  From the read-only review: **(1) fixed:** "Use your mosque's board" refused Dhuhr 11:58 a.m. against a board's 12:05
+  (and Isha 11:50 p.m. against 12:05 a.m.), because Material's 12 hour dial keeps a.m. or p.m. when the hand passes 12;
+  measured on the emulator before and after, `AdjustmentFit` takes the nearer half of the day (§5.17, lesson 165, one
+  new test). **(4) fixed:** two stale comments (`CityLookup` said nothing leaves the app; the manifest still called
+  the widget receivers' `exported="false"` an assumption). **(5) fixed:** PROJECT_BRIEF's "Next step" still said the 8
+  Oct branch audit was pending. **Listing:** the English 1.5.0 Qibla line now starts "Qibla direction:" for that
+  search phrase, 3987 of 4000 by script (LISTING.md "1.5.0 listing, FINAL"). **Emulator checks (§10, top entry):** the 12 hour clock
+  (above); the watch tile measured 18 to 33 seconds late at each minute against the watch app (item 3 confirmed,
+  lesson 166, **not fixed**, below); changing the watch's own language, Urdu, Arabic and back, the tile followed
+  each time (lesson 167); the place from the phone's location **not run on Android 12** because `sajda12` no longer
+  starts, run on Android 16 instead (London from a real fix, Birmingham named in Urdu). Gate: 407 unit tests, 0
+  failed, lint 0 errors, both bundles signed. Items 2 (the limit note can land below the fold and may not announce
+  when it first appears) and 3 were not to be fixed in this brief (3 was measured, above) and are left as they were.
+- **Open after the evening, none blocks 1.5.0:** (a) **the tile's half-minute lag** (lesson 166): the owner's call.
+  Claude's recommendation is to leave it: the error is under a minute, always in the same direction, and the 1.5.0
+  watch note ("updates every minute") stays true; moving every entry earlier would trade it for showing one minute
+  less instead. (b) **`sajda12` hangs at start** (§10): the 21 Dec job's Android 12 step now gives up after 5
+  minutes and says so; if it is wanted again, the next try is a new AVD from the same image (`avdmanager create
+  avd`), not more start options. (c) Item 2 of the read-only review (the limit note's position and first
+  announcement), unmeasured. (d) **The watch tile keeps the old time zone's prayer time after a zone change**
+  (§10 top entry) until the app is opened or the tile's own refresh, up to an hour; the countdown stays right.
+  A small fix (redraw the tile on the time zone change broadcast, which apps may still receive) is Claude's
+  recommendation; the owner's call whether it goes into 1.5.0. **Built later the same day, next bullet.**
+- **Last, 19 Oct 2026 (cloud session; the owner: "test what you can on emulators and fix them then close it all",
+  after being told the fix was recommended): (d) built.** `wear/.../ClockChangeReceiver.kt`, declared in the watch
+  manifest for `TIMEZONE_CHANGED` and `TIME_SET`, calls the existing `refreshTile`, so the tile is drawn again at
+  once. Both broadcasts are on Android's list that a manifest receiver still gets from Android 8 on, and Android
+  resets each running process's default zone as it sends it, and the tile request comes later, so the tile request that follows computes in
+  the new zone. Same pattern as the phone's `SystemEventReceiver`; `ClockChangeActionsTest` (2 tests) holds the
+  manifest and the code's action lists together, as `SystemEventActionsTest` does on the phone. No permission,
+  no data, no copy change. **Verified:** the full gate on the cloud container, 409 unit tests (app 261, core 130 with 1 skipped, wear 18), 0 failed, lint 0 errors in all three, both bundles built (unsigned there: the key is only on his Mac, so signing is checked on 21 Dec). An independent review of the diff found no code defect; its two wording fixes and its emulator tip (turn automatic time zone off first) are in.
+  **Then verified on the watch emulator, 19 Oct 2026 late (Mac session, `742389f`):** with the watch app never
+  opened, changing the watch from Europe/Istanbul to Europe/London moved the tile from "Fajr 5:38 am · in 9h 6m"
+  to "Fajr 3:38 am · in 9h 6m" within about 2 seconds, and back on the way back (§10, top entry). **PASS.**
+  Not run on the watch: `TIME_SET` (a manual clock change, the 12/24 switch). (a), (b), (c) and the
+  smaller items stay open and parked until after 1.5.0 or release day; nothing else was started.
+- **PARKED, 19 Oct 2026, 19:00 UK, at `123b8e6` on `claude/quiet-glass` (the owner: "all done then lets park").**
+  One branch holds everything (the cloud work branch `ccr-23a38578-c5vz7d` is the same commit); `main` is
+  `bcdba63`, untouched until submit day; both old branches kept, analytics never merged. RELEASE-1.5.0.md step 1
+  marks the tile check DONE, and the 21 Dec job's prompt on the Mac now expects 409 unit tests and skips it
+  (`ee80877`, `123b8e6`). The owner asked whether to merge into `main` early: Claude advised no (it would publish
+  the 1.5.0 privacy policy for an app still on 1.4.0, the date is set on the day, and nothing is gained), and he
+  agreed. The submit day reminder (`trig_01VexqUd1cJz8jfD5QFT874W`) could not be edited from a cloud session
+  (made outside an agent); its text already names the day's steps, so it stays. **Next: the 20 Dec reminder, the
+  21 Dec job, submit around 4 Jan 2027 (latest 25 Jan). Start nothing before then.** (Superseded the same
+  evening, next bullet.)
+- **Later on 19 Oct 2026 (cloud session): 1.5.0 moves to NOVEMBER, and the Ramadan pack changes.**
+  (1) **Timing, the owner: "Lets do it in november - date yet to be decided."** Claude's advice, which he
+  took: nothing technical holds 1.5.0 back, and a fault is better found in November than weeks before
+  Ramadan; but give 1.4.0 (live 17 Oct, it changed the alarm system) about two weeks alone first, so its
+  problems are not mixed with 1.5.0's, and let the 1.4.0 description finish review (still the old text on
+  19 Oct). **The date is his to pick.** When he does, a session on his Mac moves the scheduled jobs (the
+  20 Dec reminder, the 21 Dec preparation job to the week before, the 4 Jan submit reminder, and the
+  health check's January warnings), updates RELEASE-1.5.0.md and PROJECT_BRIEF, then GBrain. Until then
+  the jobs stay as they are, which is safe: they only remind and check. (2) **Ramadan, the owner:** start
+  "1 or 2 days before ramadan and inform the user this feature is on by default unless they want to switch
+  it off ... Ramadan option should be visible just before ramadan or it could confuse the users." Asked with
+  AskUserQuestion, he chose: **the notice from 3 days before** (Claude's advice over 1 or 2: two evenings to
+  set the suhoor reminder before the first suhoor and to check the date with the mosque); **a new always
+  visible line on the notice**, "From the first day, the Ramadan card shows suhoor and iftar times here. You
+  can turn it off in Settings." (`ramadan_eve_card_on`, five languages, `check-translation.py` 0 errors in
+  each); **the two Ramadan rows in Settings hidden outside 3 days before to the last day**
+  (`RamadanInfo.showsSettings`); **the timetable PDF stays at 30 days before** (behind a tap, people print
+  early). Already true and unchanged: the card is on by default and switches itself on and off by the
+  calendar; the suhoor reminder stays off by default (an unasked alarm before Fajr is intrusive). Store
+  text: nothing in the 1.5.0 listing or What's new names the window, so nothing changes; the Settings
+  screenshot does not show the Ramadan rows. Known and accepted: the What's new and description say "Ramadan
+  is built in ... and an optional suhoor reminder", and outside the window that row is hidden; the sentence
+  is about Ramadan, so it was left. Also known: a suhoor reminder set to Alarm keeps the "Alarm sound" row in
+  Settings all year (harmless). **Verified (cloud container):** full gate, 410 unit tests (app 261, core 131
+  with 1 skipped, wear 18), 0 failed, lint 0 errors, both bundles built (unsigned there); `RamadanStateTest`'s
+  two window tests and `HijriCalendarTest` were changed to the 3 day window and a new `showsSettings` test
+  added. An independent review found no code defect; its fixes (two tests, four stale "a week" comments, test
+  counts) are in. **Not verified:** on an emulator (none in the cloud): RELEASE-1.5.0.md step 1 says what to
+  run. The preparation job's expected unit test count is now **410**, not 409.
+- **Same evening: the owner asked this cloud session to run the emulator check itself ("You run and test it, I
+  am away from computer").** It could not. This container has no `/dev/kvm`, and Android 8 and newer emulator
+  images refuse to start without hardware acceleration. An Android 7 x86 image was installed and started with
+  `-accel off`; after about 25 minutes it was still offline, never booted, and the owner rightly asked why
+  Android 7 (it is the newest image that even tries without acceleration, not a choice of target). It was
+  stopped and deleted. **Lesson: a cloud session cannot run any Android emulator here; do not try again, hand
+  the emulator check to the Mac.** The owner also asked that the app and widget be shown working: the widget
+  code (`app/.../widget`) is unchanged since the last device suite on 19 Oct (widgets 4 of 4, 2.0 text 4 of 4),
+  and the 1.5.0 store screenshots `06-widgets.png` and `03-ramadan-dark.png` were sent to him as they are.
+  **So the Ramadan change of 19 Oct late is still not seen on an emulator**; the next session on his Mac runs
+  RELEASE-1.5.0.md step 1 "for the Ramadan change" before anything else, then syncs GBrain.
+- **Last on 19 Oct 2026 (cloud session): the widgets follow the app's Theme row.** The owner, after seeing the
+  widget screenshots: "Widget looks good but it should match the theme on the app. If the user selected dark
+  then widget should be dark, if user choose light then the widget should be light. Lets do that and park it."
+  Built as §5.20 point 3 says: System unchanged (follows the phone), Light and Dark pinned on a second layout
+  id (lesson 169). The picker descriptions lost "Follows your phone's dark mode" in all five languages
+  (nothing replaces it; matching the app needs no warning). **Verified (cloud container):** the full gate
+  on the final code: 416 unit tests (app 267, core 131 with 1 skipped,
+  wear 18), 0 failed, lint 0 errors, both bundles built (unsigned here), device tests compiled; and `WidgetThemeTest` proven to fail when one view is dropped from the
+  renderer's list. **Not verified, and cannot be here (no emulator, lesson above):** the widgets drawn under
+  Light and Dark. A new device test, `WidgetDeviceTest.the_widgets_follow_the_apps_theme_and_return_to_the_phone_under_system`,
+  binds both widgets, sets the theme matching the phone, then the opposite one, then System, checks the text
+  colour each time (System last, the step a launcher could get wrong, straight after the theme that differs
+  from the phone so a surviving colour would show) and saves six renders; it runs in `release-1.5.0.sh` 6b with the rest of the
+  suite. **The next Mac session runs it first, with the Ramadan check, and sends him the six renders**
+  (RELEASE-1.5.0.md step 1). Also not verified: a real launcher (One UI, HyperOS) re-inflating on the switch,
+  and the `<include>` frame on Android 7 to 11 (the framework inflater handles it; not seen).
+- **Then, the same session:** an independent review of the widget diff found nothing blocking and six smaller
+  things, all fixed: the device test now puts the theme opposite to the phone's just before System (with
+  Dark, Light, System on a light emulator a surviving colour would have passed unseen); `WidgetThemeTest`
+  gained a fifth test on the renderer's two lookups (proven to fail with one drawable entry removed); the
+  fixed drawables' comments name `WidgetThemeTest`; a Theme change now redraws the "set your location"
+  widget too; the picker preview following the phone is written down in §5.20; the device test redraws
+  after putting System back. **The owner asked (19 Oct 2026) whether this is merged into `main`. Answer
+  given: no, and not until release day.** "Merged" today means `claude/quiet-glass` holds everything (it is
+  fast forwarded with each commit). `main` waits because merging publishes `docs/`, the 1.5.0 privacy policy
+  included, and RELEASE-1.5.0.md has it merged the same day as submission. **His plan, in his words:** "we
+  will do one final test on emulator and if it works then we will roll it out the new release and update."
+  So the order is: the next Mac session runs RELEASE-1.5.0.md step 1 (Ramadan and widget theme) and sends
+  him the screenshots; he picks the November date; then the release day steps. GBrain: this cloud session has
+  none; the next Mac session syncs it from this block without being asked (CLAUDE.md).
+- **Done on the Mac, 19 Oct 2026, 22:00 UK (the hand-off's steps 1 and 2; the owner: "pick up SajdaTime"):**
+  `claude/quiet-glass` fast forwarded to `8ceb8f4`; GBrain `projects/sajdatime` brought up to date from this
+  block (November, the Ramadan window, the widget theme, 416 tests, the order of work). **The final emulator
+  check passed** (§10, top entry): the widgets follow Dark, Light and Follow phone on the home screen and the
+  device test is OK; the Ramadan notice from 5 Feb with the new line (also Urdu, Arabic, 2.0 text), the rows only
+  from 5 Feb to 8 Mar, the eve and day 1 widget words, all gone on 9 Mar. The screenshots were sent to him as a
+  private page (claude.ai/artifact/7XivbixECckb9AnMQYDXYG). **Next: he picks the November date** (step 3), then
+  the jobs move. New, small, after 1.5.0: the widget list's previews show icons without text (as in 1.4.0).
+- **The date, 19 Oct 2026, 22:30 UK (the hand-off's step 3; AskUserQuestion, he chose Claude's recommendation):
+  submit on MONDAY 9 NOVEMBER 2026** (three weeks after 1.4.0 went live, more than the two weeks advised, and time
+  for the 1.4.0 description to clear review). Moved the same night (RELEASE-1.5.0.md "Scheduled jobs"): the "leave
+  the Mac on" reminder to Sun 1 Nov 18:00 and the submit reminder to Mon 9 Nov 09:00 (both cloud routines, text
+  changed to the new days; the submit reminder, which a cloud session could not edit, was edited from here); the
+  health check now expects 1.5.0 from 9 Nov and warns only on 16 Nov, 23 Nov 2026 and 18 Jan 2027 if it is not
+  live; the preparation job's prompt names 9 Nov, expects 416 unit tests and a device suite of 26, and skips the
+  checks done tonight. **Not moved: the preparation job's own time** (still Mon 21 Dec 10:00). The Claude app holds
+  local task times in memory and writes them back, so an edit to its `scheduled-tasks.json` would be lost; it moves
+  only from the app's Scheduled screen or a session inside the app. Asked of him once, in one line. If it is still
+  21 Dec when the 9 Nov session starts, that session runs `release-1.5.0.sh` first and turns the 21 Dec run off.
+  PROJECT_BRIEF's timeline updated. Release day steps unchanged.
+- **Prep job moved, 20 Oct 2026 morning.** He moved it in the Claude app; read back from `scheduled-tasks.json`:
+  Mon 2 Nov 2026 12:00 noon UK (fireAt 1793620800000), on, once, instructions unchanged. Noon, not the 10:00 asked:
+  it works as well, so the records were matched to it, and the Sun 1 Nov reminder
+  (`trig_01Bpzq4t8wJCQZwABsC53ys8`) now says noon and to leave the Mac on until the job finishes (read back).
+  The 21 Dec fallback is no longer needed.
+- **Health check reminder reworded, 20 Oct 2026.** The owner: by 23 Nov 1.5.0 "should be gone live or in the process
+  of it". The 16 Nov, 23 Nov and 18 Jan reminder said "ask Claude to help you submit", which is wrong if it is in
+  Google's review. It now says: if you sent it, look at Publishing overview in the Play Console; if not, ask Claude
+  to help you submit. The routine sees only the public page, so it never claims which. Read back: exact match.
+- **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app").
+  Already planned for release day, but the six phone screenshots date from 18 Oct and the morning of 19 Oct, before
+  the evening's Ramadan window and widget theme changes. The 2 Nov preparation job's prompt now compares each
+  screenshot and the 1.5.0 description and What's new with the final build, retakes what no longer matches and
+  corrects facts (new wording as PROPOSED); release day shows him the six before upload. RELEASE-1.5.0.md step 0b.
+  Looked at today: `05-settings` and `06-widgets` still match what the app shows; the rest are for the job.
+
+### 📍 STATE OF PLAY, 18 Oct 2026 late (read after the 19 Oct block above, which replaces its "one owner decision waiting"; the 17 Oct evening block below still holds for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is checked on `claude/quiet-glass` (pushed, not merged into `main`).
+BEFORE release day, one owner decision is waiting to be done (18 Oct 2026 late): audit the unmerged
+8 Oct branch `claude/customer-review-pain-points-9d35kl` feature by feature, show him the list, merge
+what is missing into `claude/quiet-glass`, fix its "Phone language" right to left bug, and retest
+1.5.0 fully. The exact brief is `docs/release-tools/RELEASE-1.5.0.md`, "FIRST, before release day".
+Never merge `claude/analytics-default-on-1-4-0` (his word). Then release day, around 4 Jan 2027.
+Start nothing else on your own.** The cloud session that built 1.5.0 is closed for good: never rely on it or ask
+him to go back to it. Everything it knew is in this file, `docs/release-tools/RELEASE-1.5.0.md` and
+`docs/PROJECT_BRIEF.md`; if a reason is missing, search those first, then ask him.
+
+- **Live on Play:** phone 1.4.0 (versionCode 8, "Updated on 17 Oct 2026"), watch 1.2.0 (1001). Read
+  "Updated on" before believing any claim that something else is live.
+- **Ready:** 1.5.0 on `claude/quiet-glass`: phone 9 / 1.5.0, watch 1002 / 1.5.0, both ship. What is in
+  it: PROJECT_BRIEF "Next release". Owner decisions that are settled (do not reopen without him):
+  vibration follows the phone; the adhan or a phone sound for both a notification and an alarm, each on
+  its own Settings row; one line saying that opening the notification panel stops the adhan; place
+  wording "Town, city or village" with Karachi, London, Makkah, New York; the Ramadan button "Get the
+  full Ramadan timetable", full row, 24dp above and below; spacing from the `Space` tokens; Turkey with
+  Diyanet's minutes; tab bar 97% solid; the Hijri date shrinks to fit; "I ask only one thing in return";
+  the description and What's new approved as long as they are accurate (checked, three lines fixed); the
+  widgets and their styles in What's new; the habit tracker out of 1.5.0; all remaining work on his Mac.
+- **Verified on his Mac, 18 Oct 2026 late** (detail in NEWEST below): the uncached gate, 384 unit tests
+  (core 120, app 252, wear 12), 0 failures, lint 0 errors, both bundles signed `CN=Ali Imran Khan` with
+  the right versions;
+  `release-1.5.0.sh` run 4 on the final code 22 of its 24 lines PASS or TAKEN, the other two tree CHECK (the uncommitted work this commit carries) and phone SKIPPED (his choice) (device suite 19 of 19, suhoor 1,
+  Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1, timetable sheet opened, languages,
+  the same 11 phone and 3 watch permissions, size); `DesignRulesTest` proved by breaking one rule; six new
+  phone store screenshots; both widgets on a real launcher.
+- **Open, none blocks 1.5.0** (RELEASE-1.5.0.md "Open items"): Turkey's Maghrib is 1 minute early against
+  Diyanet's Istanbul page on 7 of 7 days (check other Turkish cities after 1.5.0; Asr's 2 minutes against
+  Aladhan is the libraries, not Turkey, §5.26); the Settings line "A helper, not a religious authority.
+  Tap to read." breaks the no "Tap to" rule (live since 1.4.0, fix after 1.5.0 if he agrees); the cloud
+  accidentally published a private copy of RELEASE-1.5.0.md at claude.ai/artifact/GxU35nSJAfxqedU7DYa35L
+  (only he can see it; he can delete it).
+- **Not verified:** a real phone; Android 7 to 13 (his choice); the phone sound picker's "Default" row;
+  Google's review card (Play installs only); whether Play shows the translated What's new without
+  translated listings (his choice if not); Turkish cities other than Istanbul. Full list: RELEASE-1.5.0.md
+  "Not verified yet".
+- **Release day, in order** (RELEASE-1.5.0.md "Still to do" is the exact list): 1. Claude runs
+  `release-1.5.0.sh` again (the 21 Dec job does); 2. Claude, on the day, dates `docs/privacy.html` and
+  pushes; 3. Ali merges `claude/quiet-glass` into `main` that same day, not before (merging publishes the
+  privacy policy); 4. Ali builds both bundles fresh from `main`; 5. Ali in the Console, Claude walking
+  him through one screen at a time: both bundles, five What's new texts, the watch note, the checked
+  description, the six screenshots, Data safety (expected unchanged), whether the translated notes show,
+  then he presses Send for review; 6. after it is live: the Arabic reviewer reply (Claude drafts, Ali
+  posts), the January Ramadan listing lines, Ali deletes the spare signing file in `~/.gradle`, record
+  it here and in PROJECT_BRIEF.
+- **Dates and jobs:** reminder Sun 20 Dec 2026 18:00; the preparation job (local scheduled task
+  `sajdatime-1-5-0-reminder`) Mon 21 Dec 2026 10:00, its prompt rewritten 18 Oct 2026 late to run
+  `release-1.5.0.sh`, never set the versions again and stop before any merge, pull request, submit or
+  Console step; submit around 4 Jan 2027; latest acceptable 25 Jan 2027; Ramadan 1448 begins Mon 8 Feb
+  2027. The daily review replies job keeps running.
+
+
+**NEWEST, 18 Oct 2026 late: the Mac session checked the cloud's claims and did the Mac only items. 1.5.0 is ready for release day; PARKED again.** A Claude Code session on his Mac (worktree `~/Developer/SajdaTime-settings-preview`) followed the brief at the top of `docs/release-tools/RELEASE-1.5.0.md`. **Checked:** branch level with origin (at `9038d3a`, then `deb0877` which the cloud pushed during the session, docs only), clean, 63 commits ahead of `origin/main` before this commit; versions 9 / 1.5.0 and 1002 / 1.5.0 in the source and in both signed bundles (signed `CN=Ali Imran Khan`); the gate `--no-build-cache clean test lint :app:bundleRelease :wear:bundleRelease`: **384 unit tests (core 120, app 252, wear 12), 0 failures, lint 0 errors**; `DesignRulesTest` (7 tests) proved by breaking one rule (a `16.dp` Spacer in `EidCard.kt`: exactly 1 failure, then 7 of 7 after putting it back). **Turkey** against Aladhan method 13: same offsets, 5 of 6 times within a minute, Asr 2 later than Aladhan on two dates (the libraries' Asr formula, London MWL shows it too); against Diyanet's own Istanbul page, Maghrib 1 minute early on 7 of 7 days, left as is (§5.26). **Store text:** two lines of the description and one of the watch note were not true and were changed (`docs/store/LISTING.md`), all within limits (description 3969 of 4000 with "Wear OS"; What's new 495, 394, 490, 421, 311 of 500; watch note 147). **Done:** the device test fix (`DeviceSupport.alarmTimes`, exact package; old line 2 of 4 fail beside the sideload copy, fixed 4 of 4); `docs/release-tools/release-1.5.0.sh`, run four times, every line PASS or TAKEN apart from tree CHECK (uncommitted work) every time, push FAIL once (run 2, the cloud's `deb0877`) and phone SKIPPED (his choice) (device suite 19 of 19, suhoor 1, Ramadan 4, widgets 4 and 4 at 2.0 text, PDF 2, timetable sheet opened); it found that **a bare `./gradlew installRtl` installs the watch app over the phone app** (lesson 149, fixed in the script and CLAUDE.md); **six store screenshots** retaken from the 1.5.0 build (the watch ones did not change); both widgets **seen on a real launcher** for the first time (Pixel Launcher, Android 16, light, dark, 2.0 text; the chip opens the app). **Two visual fixes, each the owner's choice from screenshots with AskUserQuestion:** the floating tab bar is now 97% solid instead of 90% (text under it ran into its labels, worst in dark), and the large Today widget's Hijri date shrinks to fit one line instead of being cut ("2 Rabi al-Awwal 14…" on a 5 column home screen; wrapping it was offered first and withdrawn because it pushed Isha off at 4 by 3). DESIGN_SYSTEM §9 has both. **He also chose:** a sixth store screenshot of the widgets, and "I ask only one thing in return" for the description's last line. Emulators: every one was booted `-read-only` (lesson 150), so the AVDs are as they were. **Left for release day, in order (RELEASE-1.5.0.md "Still to do"):** Claude runs `release-1.5.0.sh` once more (the 21 Dec job can); Claude re-dates `docs/privacy.html` on the day; he merges into `main` that day; he builds both bundles from `main`; in the Console, with Claude walking him through, he uploads both bundles, pastes the What's new texts, the watch note and the checked description, replaces the phone screenshots with the six, confirms Data safety, checks whether Play shows the translated release notes without translated listings, and presses Send for review. **Seen, not changed:** the Settings row "A helper, not a religious authority. Tap to read." breaks the no "Tap to" copy rule but is already live in 1.4.0; the wide strip under the floating tab bar shows content fully (how a floating bar works). **Not verified:** a real phone, Android 7 to 13 (his choice), Turkish cities other than Istanbul, the review card (Play installs only), what Play does with translated release notes.
+
+**Then, the same Mac session, 18 Oct 2026 late: secured, reviewed, committed and pushed (the owner's finishing brief).** The cloud session is closed for good and pushed one last docs only commit, `1a9df4f` (step 0 of the RELEASE-1.5.0.md brief: secure the Mac session's work first); it was merged by fast forward, no force push, both sides' text kept. Other clones checked: `~/Developer/SajdaTime` (main, level with `origin/main`, clean) and its old worktree `kind-kirch-cf2a70` (clean, its branch already in `origin/main`); the one stash entry is the 1.4.0 planning copy, not this work. **The 21 Dec preparation job's prompt was rewritten** (`~/.claude/scheduled-tasks/sajdatime-1-5-0-reminder/SKILL.md`, outside the repo): it was written before the versions were set, so it bumped versionCode, built its own script, added the January listing lines and opened a pull request; now it runs `release-1.5.0.sh`, never sets the versions, and stops before any merge, pull request, submit or Console step. **The independent review** (a subagent, the whole diff) found five things to fix before commit, all done: a placeholder left in this section; the gate had not run on the final widget XML (run 4 did; run 3 differed from it only by an XML comment); the new files were untracked; "every line PASS or TAKEN" was an overclaim (push FAIL in run 2, tree CHECK, phone SKIPPED: now worded exactly here, in §10 and in RELEASE-1.5.0.md); and **a random false "no signed bundle" in the script** (`echo | grep -q` under pipefail, lesson 151). Also from it: the script no longer picks a running watch emulator, deletes an earlier run's bundles before checksumming, and says truthfully what it puts back; the live `installRtl` instructions (a test message, three code comments, NEW-SESSION, AFTER_THE_TEST and two recipes here) now say `:app:installRtl`; the store README "five files" notes say six; LISTING's "retake 03 in January" note is marked done; DESIGN_SYSTEM §9 records that 9sp is below the floor on purpose and that the autosize shrink can stay until the launcher redraws (cosmetic); §5.26 notes London's 3 minutes is outside the usual ±2. Seen by the review and left: a dirty tree still copies its bundles to `SajdaTime-1.5.0/` (the owner builds fresh from `main` on the day anyway); a hand deleted worktree folder would confuse the script's worktree lookup. **Run 4, on the final code:** push PASS; tree CHECK (`1a9df4f` plus this commit's changes); gate PASS (app 252, core 120, wear 12 tests, 0 failed; lint 0 errors in all three); phone bundle 9 / 1.5.0, 9,475,204 bytes, and watch bundle 1002 / 1.5.0, 3,652,192 bytes, both signed `CN=Ali Imran Khan`; languages `()(ar)(in)(tr)(ur)`; the same 11 and 3 permissions; size PASS; grantbind PASS; device suite 19 of 19; Do Not Disturb list; suhoor 1, Ramadan 4, widgets 4, widgets at 2.0 text 4, PDF 2, seed 1; timetable sheet opened; right to left and screens TAKEN; phone SKIPPED (his choice); restore PASS. **22 of 24 lines PASS or TAKEN**, the other two tree CHECK and phone SKIPPED. The phone emulator still had versionCode 9 afterwards. Open items and not verified: STATE OF PLAY above.
+
+**Before that, 18 Oct 2026 night: 1.5.0 is prepared and PARKED.** At the owner's word ("merge everything then make sure for the release 1.5 everything is ready to roll out"): everything below is merged into `claude/quiet-glass`; versions set (phone 9 / 1.5.0, watch 1002 / 1.5.0, both ship); What's new final in five languages plus a watch note (`docs/store/LISTING.md`), including the redesigned widgets at his request ("it should include widgets and their styles"); and **the release day checklist is `docs/release-tools/RELEASE-1.5.0.md`**: follow it, in order. **The Mac readiness check's results came in and are folded in** (18 Oct 2026): of its 15 items, Turkey, D5, the watch release, What's new and the version bump were already done; the rest are in `RELEASE-1.5.0.md` with who does each. Done here from it: a **1.5.0 store description draft** (`docs/store/LISTING.md`), which also removes a false line in the live description ("Your coordinates never leave your device"; the town name goes through the geocoder). **His answers (18 Oct 2026):** the description and What's new are approved "as long as they are accurate", so a Mac session checks every line against the 1.5.0 build before pasting; the habit tracker is out of 1.5.0; and **all remaining work is done in a Claude Code session on his Mac, not in the cloud**. **For a session on his Mac:** fix the one line device test the check found, write and run `release-1.5.0.sh` (the 1.4.0 script's version, size and watch checks are wrong for 1.5.0; the checklist says exactly how), retake the store screenshots, and check whether Play shows translated release notes without translated listings. **He is moving to his Mac** ("I want to merge it all so I can take it with my local computer session"): everything is on `claude/quiet-glass`. **The cloud session has handed over and stopped** (18 Oct 2026, his words: "handing over everything to local claude ... I will ask on a new session"). A new Mac session's brief is the section "Starting the Mac session" at the top of `docs/release-tools/RELEASE-1.5.0.md`: verify the cloud claims first, then the Mac only items, then report and wait.
+
+**Earlier the same night, two release items done at the owner's word.** (1) **D5, spacing on every phone screen** ("you should know the clean, spacing, and premium look"): every `Spacer`, every column's spacing and every top or bottom padding in the phone app's screens is a `Space` token by relationship, and `DesignRulesTest` fails on a literal one (mutation tested). Not covered: horizontal gaps in a row, a component's own padding, and the watch app. Rules and every visible change in DESIGN_SYSTEM §2 and §9; renders `docs/plans/2026-10-times-gloss/d5-*.png`. (2) **Turkey times now carry Diyanet's minutes** (§5.26), decided by Claude at his request with a Fable review. Both on `ccr-23a38578-c5vz7d`. **He approved the D5 screenshots** ("the screenshots look correct to me and I am happy to proceed further"). **His instruction for what happens next:** a Claude Code session on his Mac is running the release readiness check (the prompt asks it to report what is still needed for 1.5.0 and push only docs to `claude/quiet-glass`); when its results are in, act on them, then merge this work into `claude/quiet-glass`, commit, push, and park ("once claude code results are in then merge, commit and do everything required because I want to park it now"). Still for release day, in `docs/RELEASING.md` order: version bump (app and wear), What's new (include the Turkey line), store screenshots, privacy policy date, merge to `main` on the day of submitting, and he presses submit.
+
+**Before that, 18 Oct 2026 late night: PARKED. This round is approved, merged into `claude/quiet-glass` and ready for the 1.5.0 release.** The owner saw it on his emulator, approved it, and asked for one last line: the Notification sound pop up now tells users that pulling down the notifications or swiping the notification away stops the sound (§5.25). Then: "park it and ensure the local repository knows it is merged and all ready for the next release". **Nothing from this round is open.** When he comes back, the next agreed job is D5 (spacing on the remaining screens, one at a time with screenshots, DESIGN_SYSTEM §11); until he asks, do nothing.
+
+**Before parking, the round itself:** three fixes from his emulator screenshots, merged into `claude/quiet-glass` at his word ("merge it now") after he approved the screenshots.
+(1) "Save as PDF" was "too large and squashing": compact button size (40dp drawn, 48dp tap area, checked once
+by tapping outside the edge in the scratch render harness, not a committed test) for every button beside text, Times block gaps on the `Space`
+scale, and a `DesignRulesTest` rule that every `CtaButton` states its size. (2) Place wording: he asked for
+help; chosen "Or type where you are" / "Town, city or village" / his examples "Karachi, London, Makkah, New
+York", in all five languages (DESIGN_SYSTEM §9 has the reasoning and what was rejected). (3) Sounds: a
+Notification sound row and an Alarm sound row under Prayer alerts (§5.25), because "From your phone" was hidden
+below a fold. Asked with AskUserQuestion: rows chosen; vibration "follow the phone". Screenshots he was sent:
+`docs/plans/2026-10-times-gloss/round-times.png`, `round-sounds.png`, `round-place.png`,
+`round-settings.png`, `round-ramadan.png`. He replied "all good", with one change: the Ramadan card's button says "Get the full Ramadan timetable" and fills its row; then "spacing looks tight": 24dp above and below it, the (i) centred beside it (done, `round-ramadan.png` retaken). **Sound tested on his emulator by Claude over adb, at his request (18 Oct 2026, §5.25 has the evidence):** Dhuhr as a Notification with the Adhan posts on time, plays the full 154 s recording, and stops at once when swiped away. **Opening the notification panel also stops it: Android's behaviour, not the app's.** Android 16's notification cooldown muted a repeat alert during the test, a testing artefact (lesson 148). **Not verified on a device**: Android 7, a real phone, the picker's Default row. Next: his
+verdict on the emulator, then he wants to park the work (his words: "when I am happy then I want to park it"). **Done: approved and parked, see the top of this block.**
+
+**Earlier, 18 Oct 2026 night: merged into `claude/quiet-glass`; the owner continues on his Mac.**
+He asked to move from the cloud session to his own computer with everything merged and recorded.
+A session on his Mac starts here: this block, then `docs/DESIGN_SYSTEM.md` §0 (when to ask him) and
+§4.1 (every button). **Next, in this order:** (1) he installs the build and gives his verdict (commands
+in the PICK UP HERE note below; the commit to see is the newest on `claude/quiet-glass`); (2) do not
+start design work until he does; (3) then D5, spacing screen by screen with light and dark
+screenshots for each (DESIGN_SYSTEM §11). The GBrain `projects/sajdatime` entry is still to be
+written by a session that has GBrain (this cloud session did not); the text to record is this block
+and DESIGN_SYSTEM §0. Full gate on the merged tree: 377 tests, 0 failures, lint 0 errors, both
+bundles built. What was built, on `ccr-23a38578-c5vz7d` first: every remaining text link made a solid button (his choice when asked:
+all except "Close" and "Got it"; warnings stay amber; steppers solid green; screenshots first), one
+label style and height rule for every solid button, and `docs/DESIGN_SYSTEM.md` given §0 (when to ask
+him, and never "done" or "every" without the checks), §4.1 (the full button spec and an inventory a
+test enforces) and §11 (open decisions D1 to D5). Screenshots he was sent:
+`docs/plans/2026-10-times-gloss/solid-actions-1.png` to `-6.png` (retaken after the label size and
+height alignment; the location sheet in Times is not in them, it was not rendered). He then answered D1, D3, D4 and D5 (recorded in DESIGN_SYSTEM §9): Makkah skip at the foot of the
+setup screen under a line saying times will be for Makkah; "Reset all" full width on its own row;
+notices kept; spacing to be converted screen by screen after this merge (§11 "Decided, work not yet
+done"). **D2 decided the same night: B, bold links** ("See exactly what is sent", "Read the privacy
+policy" as bold underlined green links, `InfoLink`, the one allowed exception, test enforced). He
+approved the setup and Match your mosque screenshots ("happy with it"). DESIGN_SYSTEM §11 has nothing
+open; D5 (spacing, screen by screen) is decided work not yet done.
+
+**PICK UP HERE (end of 18 Oct 2026).** The owner is testing the latest 1.5.0 build on his own
+emulator. **Wait for his verdict; do not start new design work until he says he is happy or names
+what to change**, then work on the improvements together (his words: "Once I am happy then I will
+let you know so that we can work on the improvements together"). Everything below is merged into
+`claude/quiet-glass`.
+
+How he installs it on his Mac, one step at a time (lesson 144: a pulled branch changes nothing on
+the device until it is installed). **On his Mac `claude/quiet-glass` is checked out in the
+worktree `~/Developer/SajdaTime-settings-preview`, not in `~/Developer/SajdaTime`** (git refuses the
+same branch in two folders):
+
+```
+cd ~/Developer/SajdaTime-settings-preview && git pull origin claude/quiet-glass && git log --oneline -1
+${ANDROID_HOME:-$HOME/Library/Android/sdk}/emulator/emulator -avd sajda -no-snapshot-load -no-audio &
+cd ~/Developer/SajdaTime-settings-preview && export JAVA_HOME=$(/usr/libexec/java_home -v 21) && ./gradlew :app:installSideload
+```
+
+The sideload copy (`com.sajdatime.app.sideload`) sits beside any Play copy. Proof the new build is
+on: solid dark green buttons with white text (the mosque button has a mosque icon), an X alone in the corner of notices with "Allow" as a button and "Details"
+beside it, a glossy next prayer card. If an older sideload is already on the emulator, settings
+persist; to see setup again, uninstall it first (`adb uninstall com.sajdatime.app.sideload`).
+
+**Live is unchanged:** phone 1.4.0, watch 1.2.0 (the 17 Oct block). **1.5.0 gained four owner requests
+on 18 Oct 2026**, built on `ccr-23a38578-c5vz7d` and **merged into `claude/quiet-glass` the same day**
+at his word ("Do the merge"; merge commit, the merged tree identical to the tested tip).
+`claude/quiet-glass` is the 1.5.0 branch again; the working branch has nothing it lacks.
+
+1. **Widget redesign, "hero countdown"** (he called the 1.4.0 widgets "extremely bland" from his S23
+   Ultra). Chosen from three drawn directions on a private design canvas
+   (https://claude.ai/artifact/HM8N9XtmfHoSxZym8YxDRf) after desk research
+   (`docs/plans/2026-10-widget-redesign/RESEARCH.md`, desk only, no users). Big light countdown,
+   sun position glyphs, five day bars, date and Hijri date, two layouts per widget by size. §5.20
+   items 5 and 7.
+2. **The town on every widget**, reversing 1.4.0's "no place name on a home screen" (his call). The
+   privacy page says so; **re-date `docs/privacy.html` the day this reaches `main`** (lesson 137).
+3. **Glossy "Apple premium" finish and a location chip** (pin, town, update arrow; opens the app,
+   which refreshes the location on resume). Opaque, fixed gradient, contrast tested. It overrides the
+   17 Oct "no glossy finish" rejection for widgets only (DESIGN_SYSTEM §9).
+4. **Short disclaimer after setup**, full text in Settings and behind "Read in full" (§5.15). Still all
+   four points; the dua request is now only in the full text.
+5. **Glossy next prayer card on Times** (later on 18 Oct, approved from screenshots). Dark: the widgets'
+   countdown card colours, a fixed green gradient `#18382D` → `primaryContainer` → `#0F241D` with the
+   widgets' sheen and a light rim (it was a flat panel). Light: the mint to sand gradient kept, plus a
+   white sheen over the top half, a rim brightest at the top and a soft green shadow. Every stop and the
+   top stop under the sheen are in `ColorContrastTest` (dark worst case 5.75:1). DESIGN_SYSTEM §2 and §9.
+6. **Every call to action is a solid button** ("I don't want buttons to be easy to miss"). Every
+   `OutlinedButton` became `FilledTonalButton`: "Different from your mosque?" (now with a mosque icon),
+   the three buttons in its explainer, "Find city" in setup and in the location sheet, and "Back" in
+   setup. Kept as text on purpose: dialog "Close"/"Got it", "Skip for now and use Makkah" (an escape must
+   not compete with Allow) and "Save as PDF" (it sits in a heading). DESIGN_SYSTEM §8.
+7. **Setup location screen redesigned** (he did not like it): a pin badge, one line of text, a full
+   width "Allow location", a "How your location is used" link, the city field, then "Skip". The location
+   explanation moved, **word for word**, into the dialog behind the link, followed by the city lookup
+   detail (`city_lookup_detail`: the phone's place lookup, usually Google, else once to a free service).
+   Under the city box, in its own hint area and **always visible**, one line says what happens to a typed
+   name (`city_lookup_note`: "looked up over the internet, then everything is worked out on your phone"),
+   so nobody can search without being told (the independent review's point). Tried and dropped the same
+   day: the full paragraph popping in once typing started (the owner found it confusing). The location
+   sheet in Settings still shows `city_fallback_body` inline; it was not part of this request.
+   `docs/privacy.html` is unchanged. "Find city" appears once something
+   is typed and "Continue" once a location is found, so the screen never shows a dead grey button. The old "Tap the info icon" sentence is gone. New and changed strings in
+   all five languages, translated by Claude (`permission_body`, `action_how_location_used`).
+
+**Verified:** the full gate on the branch tip (core 120, app 238, wear 12, 0 failures; lint 0 errors;
+both release bundles); widgets and the setup dialog rendered through Robolectric (lesson 132, harness
+not committed) in light, dark, Ramadan, 1.3 and 2.0 text, English, Urdu, Arabic, Turkish, Indonesian.
+Screens: `docs/plans/2026-10-widget-redesign/widgets-hero-countdown.png` and `disclaimer-short-form.png`.
+**Not verified:** a real launcher or emulator (none in the cloud), Android 11 and older, the location
+chip's tap and the location refresh it relies on (read, not run), the on device suite.
+
+8. **Notices, dialogs and spacing restructured** (from his emulator screenshots, 18 Oct, "I
+   already told you this many many times"). Notice: the close X alone at the top right; the action
+   a solid button; "Details" with a down chevron as its own button beside it (the chevron used to
+   sit beside the X); title and brief 4dp apart, buttons 16dp under the text. Every dismissable
+   dialog has a close X at the top right (`DialogTitle`) plus its bottom button. Explainers pair
+   each paragraph with its button (8dp), groups 16dp apart. Gaps now come from `ui/theme/Spacing.kt`
+   by relationship. `DesignRulesTest` fails the build on an `OutlinedButton`, a dismissable dialog
+   without the X, or a stray gap in `Notice.kt`. The rules are in CLAUDE.md so no session misses
+   them. **Lesson 144.**
+9. **Every call to action is now a `CtaButton`** (his emulator screenshots, 18 Oct: "do you think
+   this button stands out? Make the text white"). Tonal buttons were Material's low emphasis style
+   and in dark read as green text on a dark green panel. Now solid green with white bold 16sp text
+   in both themes (light `#0B5A43`, dark `#17805A`), 52dp minimum: setup, Times, the mosque
+   explainer, the location sheet, the usage counts answers (both equal), the first run disclaimer,
+   green notice actions. Amber stays only for warnings. `DesignRulesTest` bans outlined, tonal and
+   bare Material buttons; `ColorContrastTest` checks white on both fills and each fill against every
+   surface. **Lesson 145.**
+
+**Items 5 to 7, verified:** the full gate again (core 120, app 239, wear 12, 0 failures; lint 0 errors;
+both release bundles); Times, the mosque explainer and every state of the setup location step (empty,
+typed, dialog, located) rendered through Robolectric in light, dark, Urdu right to left and 2.0 text
+(lesson 143); an independent review of the diff. Screens in `docs/plans/2026-10-times-gloss/`. **Not
+verified:** a real phone or emulator (the light card's shadow cannot be drawn by the renderer, so it
+has only been read), the permission prompt itself.
+
+**Next, in order:** (a) the December preparation job's emulator run covers the device suite; (b)
+retake store screenshots with 1.5.0 as already planned; (c) re-date `docs/privacy.html` when 1.5.0
+reaches `main`. Nothing else is waiting.
+
+**GBrain updated 18 Oct 2026 (late) by the Mac session:** the cloud session's 18 Oct decisions, the Mac
+check's results and the Turkey comparison are saved to `projects/sajdatime` (facts 1803 to 1805), so the
+entry that stood here is gone. Cowork memory `/areas/sajdatime.md` was not reachable from Claude Code and
+was not updated.
+
+### 📍 STATE OF PLAY, 17 Oct 2026 evening, security notes updated 18 Oct (read after the 18 Oct block above; it replaces the 16 Oct and 13 Oct blocks below, which are now history)
+
+**Live.** Phone **1.4.0** (versionCode 8), published 17 Oct 2026 (Play "Updated on 17 Oct 2026"), all
+178 countries: widgets, the Ramadan pack (dormant until the eve), the corrected privacy wording. Watch 1.2.0
+unchanged. The 16 Oct checklist (steps A to F) is done: privacy fix and PR #13 merged, bundle submitted and
+live. The short project brief is `docs/PROJECT_BRIEF.md`, read live from `main` by the owner's claude.ai
+project (PR #14).
+
+**Next: 1.5.0 on `claude/quiet-glass`, not merged.** Quiet Glass design, Arabic, watch translations, the
+review card, reminder before prayer, **built-in adhan for Sunni and Shia, and "Play on silent"** (block
+below). Owner submits around **4 Jan 2027**, live mid January, latest 25 Jan (two weeks before Ramadan
+1448, Mon 8 Feb 2027). A local reminder fires Sun 20 Dec 18:00 and the prep job runs Mon 21 Dec 10:00.
+Before merging, merge `main` into the branch.
+
+**Waiting on the owner.**
+1. ~~Listen to the Sunni adhan~~ **Done 17 Oct 2026: approved ("its fine to use").** The Shia adhan needs
+   no listening check: the owner said so on 17 Oct 2026 ("No need to test Shia adhan"). Do not raise it.
+2. Turkey iftar offsets (Diyanet), before Ramadan.
+3. January store listing: the Ramadan lines and the 1.5.0 What's new (`docs/store/LISTING.md`).
+
+**Security hardening done (17 Oct 2026, §5.24).** Gradle dependency verification is ON
+(`gradle/verification-metadata.xml`). If a build stops with "Dependency verification failed", do **not** regenerate the
+file to make it pass: find out which artifact changed and why, follow §5.24, and prove any regenerated file from an
+empty `GRADLE_USER_HOME`. On 18 Oct the Firebase key restriction and the GitHub protections were done (§5.24). Still
+open: nothing. Signing values are in `~/.gradle` and proven; the spare copy is `~/.gradle/sajdatime-keystore.properties.backup`, to be deleted by the owner once 1.5.0 is live (§5.24 item 3). Passkeys were added the same day, and Advanced
+Protection was skipped on purpose (§5.24 item 4). Check Firebase Analytics around 20 Oct to confirm counts still arrive after the key restriction.
+
+**Real phone: not needed (owner, 17 Oct 2026 evening).** He first asked to be reminded to plug in his phone,
+then decided: "if you test it emulator then no need to test it on real phone". Emulator testing is the standard
+for 1.5.0, adhan and alarms included. Do not ask him to plug in a phone, and do not add a phone step to any job.
+
+**Claude's carry-overs.** Re baseline the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr` for 1.4.0
+live (**done 19 Oct 2026**, two days late: it reported 1.4.0 as unknown on 18 Oct). Post the drafted Arabic review reply only once 1.5.0 (Arabic) is live; the owner posts it.
+
+### 📍 Built-in adhans (Sunni and Shia) and "Play on silent", 17 Oct 2026 late (same branch, NOT merged, ships in 1.5.0)
+
+**How it got here, in one evening, all owner decisions.** (1) Ship a free, licensed Sunni adhan and tell Shia
+users none exists yet. (2) "Keep it simple": per prayer Off, Notification or Alarm, one adhan, any phone sound.
+(3) "If the phone is silent, a notification; if they choose the adhan, it plays; let them choose", after a look
+at other apps: the old silent switch came back as "Play on silent", off by default (§5.13). (4) He listened to
+the Sunni adhan and approved it. (5) "Use the best possible, high quality and free to use adhans" and "if you can
+find a more authentic and better adhan for Sunnis, do it": every free source was searched, transcribed and
+measured; the Shia recording was found and added, the notice removed; no better Sunni one exists.
+
+**Built.**
+- `data/BuiltInAdhan.kt` (`ADHAN` Sunni, `SHIA_ADHAN` Shia, `forSect`), `res/raw/adhan.ogg`,
+  `res/raw/adhan_shia.ogg`, `res/raw/keep.xml`.
+- `AlarmSoundChoices` in `SettingsScreen.kt`: "Adhan" (the school's own) and "From your phone", one radio
+  group, then "Play on silent", in the Prayer alerts and Suhoor dialogs.
+- `alarmSoundForSect` (the adhan follows the school), `phone_alarm_sound`; backing out of the phone's picker
+  no longer resets the sound.
+- About → "Adhan recordings": three short credit lines and one line of inline links (Sunni source, Shia
+  source, CC BY-SA 4.0 licence) in the paragraph's type (`FoldRow` gained `links`).
+- Help line: "Notification: a message with your phone's usual tone. Alarm: plays the adhan or a sound you
+  choose." Five languages throughout. 1.5.0 What's new in five languages, all under 500. Review reply job
+  (`~/.claude/scheduled-tasks/sajdatime-review-replies/SKILL.md`, outside the repo) answers Shia users
+  before and after 1.5.0 is live.
+
+**How the recordings were checked (Claude cannot listen).** `whisper.cpp` (medium model, Arabic) transcribed
+each: the Shia one is complete and in order (Ali waliyyullah, hayya ala khayr al-amal twice, closing tahlil
+twice); a 42 s CC0 one was found to be a shortened adhan and rejected. `ffmpeg` measured peak, loudness and
+the voice's margin over the background in the quietest moments: Shia 62 dB (studio), approved Sunni 27 dB,
+`Azan.ogg` 25 dB, the ICR mosque recording 22 dB. Tools installed with Homebrew on the owner's Mac
+(`ffmpeg`, `whisper-cpp`); the 1.5 GB model sits in the session scratchpad, not the repo.
+
+**Independent reviews.** Two reviews of the earlier versions: an upgrade bug (an old phone sound not
+remembered, fixed, device test), `RadioRow` not telling a screen reader which radio was chosen (now
+`selectable`), credit wording, and stale text in strings and docs (fixed). The final per-school change was
+checked by the gate, the device suite and the emulator; see below.
+
+**Verified (emulator, Android 16, London).**
+- Gate green; device suite 21 of 21 (`BuiltInAdhanDeviceTest`: both stored addresses open the exact files,
+  the channel carries them with `USAGE_ALARM`, the adhan follows the school both ways, the old phone sound
+  stays remembered). `BuiltInAdhanTest` 5 tests; `AlertStyleDowngradeTest` as before 1.5.0.
+- Sunni adhan: plays in full (about 154 s for 2:34), stops when the notification is swiped away. Phone on
+  vibrate with "Play on silent" off: quiet notification, no sound; on: the adhan plays.
+- Switching the school to Shia moved the chosen adhan to `adhan_shia`, and a Maghrib alarm played it on its own
+  alarm channel.
+- Screens checked in light, dark, 2x text, Urdu and Arabic right to left during the build; the final pickers
+  are the same layout with one fewer element (the notice is gone).
+- Size: release APK 2,894,982 → 6,433,778 bytes, bundle 6,107,773 → 9,398,914 (+3.5 MB, the two files);
+  `aapt2` shows `raw/adhan` and `raw/adhan_shia` survive resource shrinking.
+
+**Not verified.** A real phone; Samsung and Xiaomi (how they report Do Not Disturb to the ringer check, and
+playing an `android.resource` channel sound); Android 7 to 13 (owner's standing choice). The Shia adhan was checked by
+transcription and measurement only, and **the owner decided no listening check is needed (17 Oct 2026, "No need to
+test Shia adhan"). Do not raise it again.**
+
+**Open items.** A Fajr adhan ("as-salatu khayrun min an-nawm") for each school, ideally recorded by a mosque
+with written permission.
+
+#### More adhan candidates found 17 Oct 2026 (AzaanMaahur now ships as the Shia adhan; the rest did not)
+
+**Outcome after transcription and measurement:** `AzaanMaahur.ogg` is a complete Shia adhan in studio quality
+and ships. The Sobhdel recording is 8 min 30 s (Qur'an and dhikr before, salawat after, a five minute adhan) and
+would need heavy cutting, so it was not used. `File:Adhan.ogg` (42 s, CC0) is a shortened adhan. `Azan.ogg` is a
+complete Sunni adhan followed by the spoken dua, transcribed unclearly, 25 dB over its background: not better
+than the approved one. Freesound: every adhan is a street or window recording except "Very Nice Athan Of
+Muslims" (CC0, no source or reciter named, the sonically_sound pattern), so none. Internet Archive: the
+"public domain" adhans are famous reciters re-uploaded by others (rejected class); one genuine exception is the
+**ICR mosque** account (aasfand@gmail.com), which publishes its own prayers, some as CC0: "ICR Friday Prayer
+1st Adhan, 17 May 2024, by Asim Javed" (CC0, lossless FLAC, 3 min 40 s, complete adhan then the dua) is
+authentic, but 22 dB over the hall noise and ends with someone speaking, so it is not better. Its other adhans
+carry no licence. **If more voices are wanted, ask ICR (or any mosque) for written permission**: they already
+publish openly, and their muezzins (Asim Javed, Shafkat Salam, Dr Mohammad Aminullah) are named.
+
+Original notes from before the checks:
+
+The owner approved the built-in adhan the same evening and asked for more free, high quality ones. Found by
+listing every audio file in Commons' Adhan categories and searches, then reading each file page. Only
+recordings the uploader made themselves, with a licence that allows use in an app, are listed. **Each needs
+the owner to listen, and a Shia candidate needs him to confirm it is a Shia adhan** ("ashhadu anna
+aliyyan waliyyullah", "hayya ala khayr al-amal").
+- **Possible Shia adhan:** `File:AzaanMaahur.ogg`, CC BY-SA 4.0, sung by the uploader himself, Saeed
+  Hatamzadeh-Varmazyar ("خوانده شده توسط من", read by me), Iranian, in the Mahur mode, 2 min 48 s,
+  about 109 kbps. The cleanest Shia lead found: performer and licensor are the same person.
+- **Possible Shia adhan, needs work:** `File:اذان حسین صبحدل.webm`, "Adhan of Master Hussein Sobhdel",
+  CC BY-SA 4.0 **with a Wikimedia VRT permission ticket** (2020110810007063, so the permission was
+  verified by Wikimedia). It is an 8 min 30 s video; the adhan would have to be cut out, and the cut file
+  would then be CC BY-SA too (fine for an app, credit and licence link required).
+- **Sunni, studio or unknown:** `File:Azan.ogg`, CC BY-SA 4.0, Andrewler, own work 2022, 3 min 3 s, about
+  64 kbps. `File:Adhan.ogg`, CC0, Aishatu98, own work July 2026, 42 s, about 64 kbps (short, may be
+  partial; the same uploader has `File:Iqamah.ogg`, CC0, 93 s).
+- **Sunni, field recordings (likely background noise, the class rejected below):** Wiki Loves Ramadan
+  2026 Ghana, `File:Athan during Ramadan 2.wav` (84 s) and `File:Athan in Ramadan.wav` (37 s), CC BY-SA
+  4.0, daSupremo; `File:Call to prayer.ogg` (Nigeria, 65 s, CC BY-SA 4.0); `File:Adhan in Istanbul.webm`
+  (CC0 video, 50 s).
+- **Not usable:** `File:Islamic call to worship.oga` (a talk about the adhan, not an adhan);
+  `File:Adhan wiki.oga` (a plain spoken reading); `File:Call to prayer by Sabah Fakhry.mp3` (marked public
+  domain but taken from YouTube); the Makkah and Madinah videos re-uploaded from YouTube (the uploader is
+  not the recorder); the 1885 Makkah recording (historic, too poor for an alarm).
+- No Fajr adhan ("as-salatu khayrun min an-nawm") with a clean licence was found. Freesound, Internet
+  Archive, Pixabay and assabile add nothing new: the free ones are the rejected entries below, Pixabay's
+  licence forbids distributing a sound on its own, and assabile states no licence.
+- **The most reliable route to more voices is still written permission:** a local mosque's muezzin
+  recording a clean adhan (and a Fajr one) for the app, with a one line licence (CC BY 4.0 or CC0).
+
+#### Adhan sources rejected (17 Oct 2026). Do not reuse them.
+- Freesound "Adhan/Call to Prayer" by sonically_sound: labelled CC0 but extracted from YouTube, so the
+  label cannot be trusted.
+- Internet Archive "Adhan Notifications" and "Adhan Recordings from Doha, Qatar": marked public domain but
+  contain famous reciters' recordings or name no recorder.
+- praytimes.org Abdul-Basit.mp3: famous reciter, no audio licence on the site; AlAdhan says such audio keeps
+  its own copyright.
+- Cambridge World Oral Literature Project, Cairo recordings: CC BY-NC-ND, cannot even be trimmed.
+- Freesound street recordings (Morocco, Indonesia, Hamtramck): fine licences, too much background noise
+  for an alert.
+- Shia: the Moazenzadeh 1955 adhan has no verifiable licence. The Freesound Mashhad CC0 recording was taken
+  in a room off a mosque loudspeaker and may copy someone else's recording. Nothing else found had
+  permission to reuse.
+
+### 📍 Reminder before prayer and the adhan hint, 17 Oct 2026 evening (same branch, NOT merged, ships in 1.5.0)
+
+**Why.** The owner ran a competitor review in his claude.ai project (6 apps, about 40 review excerpts, no Reddit). Every "gap" was checked against the code. Two were real: a heads up before each prayer (a Pillars user named "prenotifications" as the thing they missed) and saved places. Adhan voices were left out on purpose. The owner approved: "add the pre-prayer reminder (off by default, per prayer) and the adhan hint line under the sound picker to 1.5.0".
+
+**Built.**
+- Settings, Reminders, **Reminder before prayer**. It is off by default, and the choices are 5, 10, 15, 20 or 30 minutes.
+  - When it is turned on, a switch appears for each prayer, all five on to start.
+  - Stored as `prayer_reminder_minutes` and `prayer_reminder_for`. When `prayer_reminder_for` is absent, all five are on.
+- `PrayerReminderPlan` is pure, so it is unit tested. It is fed the scheduler's own upcoming list, so a reminder can only sit N minutes before a time the alerts themselves use.
+- Alarms use action `PRAYER_REMINDER` and codes `30,000 + prayer code`, and are cancelled in the same pass as prayers.
+- The receiver re-checks on arrival (`shouldPostPrayerReminder`). It shows nothing if the reminder is off, the prayer is unticked, it is more than 5 minutes late, or less than a minute is left. The notification clears itself at the prayer, and `onPrayer` also clears it for Android 7, which ignores `setTimeoutAfter`.
+- **Its own channel, `prayer_reminders`:** IMPORTANCE_DEFAULT, no sound, one 200 ms buzz, no pop up. It is always a notification, never an alarm.
+- **The alarm sound row is shared** (`AlarmSoundRow`, *replaced later the same day by `AlarmSoundChoices` and the built-in adhan, see the block above*). It shows the chosen tone, or "Your phone's default alarm". A hint under it says to save an adhan recording and add it from the sound list. On the Pixel picker the add option is My Sounds, then Add sound files. `settings_alarm_sound_desc` was removed.
+
+**Independent review, and what it changed.**
+1. **The reminder first shared the sounding prayer channel**, which made it a second alert, and "quiet" was untrue. It now has its own quiet channel.
+2. **`setAlarmClock` made reminders the phone's "next alarm"**, and could end a Do Not Disturb schedule early. Reminders now skip rung 1 of the ladder (`asAlarmClock = false`). Verified in `dumpsys alarm`: reminder flags 0x5, prayer alarm flags 0x3.
+3. **The Android 7 leftover text** is fixed by the clear in `onPrayer`, described above.
+4. **In Ramadan, a Fajr reminder at the same minute as the suhoor reminder is dropped**, because the suhoor one says more.
+5. **The adhan hint was reworded to "add it from the sound list"**, because a file in Downloads does not appear in the list by itself.
+
+Not changed: a narrow request code clash already shared with the prayer codes. Two Isha times can land on one calendar date only when Isha crosses midnight.
+
+**Verified.**
+- The gate passes, including 7 new tests in `PrayerReminderTest`.
+- The device suite passes, 18 of 18 on a clean install.
+- On the emulator (Android 16, London):
+  - the row says "Off" by default;
+  - with 10 minutes and Dhuhr unticked, `dumpsys alarm` shows reminders 10 minutes before every other prayer and none for Dhuhr;
+  - with the clock moved to 17:52:40, "Maghrib at 6:03 pm / Maghrib begins in 10m" arrived on `prayer_reminders` with no sound;
+  - light, dark at 2x text and Arabic RTL (plural forms right, Western digits) all look right, and the Arabic adhan line was checked too.
+
+**Not verified.** A real phone. Other makers' sound pickers (Samsung, Xiaomi): the hint says "add it from the sound list", which is true on the Pixel. Urdu, Turkish and Indonesian were not walked through on screen, only written and checked.
+
+### 📍 Research pass and fixes, 17 Oct 2026 (same branch `claude/quiet-glass`, NOT merged)
+
+**What happened.** Fable 5.1 did a full UX, wording and Play ratings research pass over every screen, string and screenshot, in two rounds (Claude sent it back once for thin sections, accessibility from code, simpler rating rules, and a fact check of every proposed string). The report is `build/ux-research-input/FINDINGS.md` on the Mac (gitignored); after screenshots are in `build/ux-research-input/after/`.
+
+**Built from it.**
+- Three untrue sentences fixed: the madhab step promised a Skip that does not exist (`madhab_body` now explains the Shafi'i preselection honestly); the Makkah notice told users who chose to skip "We could not work out where you are" (now "Your location is not set yet…", action "Set location"); All set told Android 7 to 11 users about an exact alarm permission they do not have (gated on API 31).
+- City search with no internet now says so (`LocationProblem.OFFLINE`, `city_lookup_offline`) instead of "not found". ACCESS_NETWORK_STATE comes from Firebase's merged manifest; `WidgetManifestTest` pins ours, so it is not declared, and the check falls back to "not found" if it is ever absent.
+- "Skip for now and use Makkah" now moves on; a denied location says so; All set warns, on Android 13+, that a notification question follows Finish.
+- Settings no longer shows a permanent "Allowed" card once a permission is granted (DESIGN_SYSTEM §4 "furniture"). Two dialog labels lost the old green letterspaced style.
+- The next prayer notification uses the system countdown (`setUsesChronometer`, count down, `setTimeoutAfter` at the prayer so it never goes negative when that prayer has no alert). Verified ticking on the emulator. Its digits follow the phone's locale, not the app's: a known trade.
+- Hero card says "Next prayer · Tomorrow" after Isha, on the label line (no height cost).
+- Screen reader: prayer rows merged into one stop; Settings switches use `toggleable` so on/off is spoken (with ToggleOn/Off haptics); alert chips say "Alarm for Fajr"; onboarding choices are radio buttons (verified checked state on the emulator).
+- Notices 24dp radius like every other card. Rating card and Rate row (see CLAUDE.md rule).
+
+**Deliberately not taken from the research, and why.** iOS chevron swap (the owner asked for an iPhone feel); location step and sheet copy rewrite (the privacy sentence must stay visible before a name is sent, gain was small); Qibla no location action (unreachable after setup, which always sets Makkah); Ramadan card de-duplication and motion tokens (P1/P2, not urgent before Ramadan); splash screen dependency; localised compass letters; alarm Stop action (needs the Redmi and S23 first).
+
+**Review replies are automated (17 Oct 2026).** Local scheduled task `sajdatime-review-replies` (daily about 12:53 UK time, on his Mac in his signed in Chrome, read only) reads Play Console reviews, drafts a reply for each new one under Play's 350 character limit in the reviewer's language, never asks for a higher rating, writes them to `build/review-replies/DRAFTS.md` and sends a push notification ("Low rating:" first for 1 or 2 stars). He posts every reply himself. **Working since 17 Oct 2026.** Runs start in "don't ask" mode, so the tools it needs are pre allowed in this repo's gitignored `.claude/settings.local.json`: the Claude in Chrome read and navigate tools, PushNotification, and Read/Write/Edit on `build/review-replies/` only (absolute paths need `//` in a permission rule; a single `/` is relative and silently matched nothing). Its fourth run read both reviews, skipped the one already answered, drafted an Arabic reply to the 1 star "Adding Arabic language" review of 11 Oct 2026, and saved it. The push is skipped while he is active in the app, by design of the tool. It could not click "Show original review", so drafts rest on Play's translation; he should glance at the original before posting.
+
+**1.4.0 submitted, 17 Oct 2026 about 13:10 UK time.** PR #13 merged by the owner (privacy page live, dated 17 Oct), production release 8 (1.4.0) prepared in Chrome by Claude and sent for review by him, 100%, all countries; managed publishing is off, so it goes live on approval. **1.5.0 timing, the owner's decision the same day: live at least two weeks before Ramadan 1448 (Mon 8 Feb 2027), so by 25 Jan 2027 at the latest.** This replaces the old "no release 18 Jan to 9 Mar" rule for 1.5.0. **Decided by the owner the same day: submit around 4 Jan 2027**, so it is live mid January with room for a fix before the eve notice shows on 1 Feb. A one-time reminder (local scheduled task `sajdatime-1-5-0-reminder`, 21 Dec 2026) starts the preparation. 1.5.0 is this branch (Quiet Glass, Arabic, rating card, watch translations) plus the tracker if it is built by then; merge `main` into it first (done 17 Oct after #13).
+
+**Watch translated, digits pinned, watch disclaimer fixed (17 Oct 2026, "fix it all and test it").** `wear` now has `values-ur`, `values-tr`, `values-in`, `values-ar` (same terms as the phone, each declaring `app_language_tag`), so a watch in any of the five languages no longer mixes translated prayer names with English. **Arabic's tag is `ar-u-nu-latn`** in app, core and wear: times come from java.time, which always prints Western digits, while `String.format` follows the Android version (Arabic-Indic on Android 14, Western on 16), so plain `ar` showed both styles on one watch screen. Pinning Latin makes every number match on every version, and matches current Android's own choice for Arabic. `LanguagePickerTest` accepts a tag variant. **The watch disclaimer ran under the clock at font scale 1.3, in English too, in the live app**: it wrapped to four lines and the list stacks upwards from the school button, so the first line rose into the cap. The list's bottom stop (`roundListPadding`) went from 26% to 20%: fully clear on the 227dp round, mostly on the 192dp; on the 192dp at 1.3 the top line still meets the clock at the very end of the scroll, but it reads in full on the way past and the school button stays clear, the trade the item order was designed for. Widening the text (8dp sides) was tried and rejected: it clipped against the round edge on the 227dp. The Urdu line was shortened, keeping its meaning, because Urdu script is wider. `tools/wear-verify.sh` takes `WEAR_LOCALE=<tag>` and mirrors its Qibla swipe in right to left. Rating card: the calm rule now excludes midnight to sunrise (covers an Isha after midnight far north), and its counters are read off the main thread. Verified: gate, phone device suite, watch captures in all five languages on both rounds at 1.0 and 1.3, read by eye. Real devices: not needed, the owner said emulator testing is fine for this work (17 Oct 2026); do not ask him to plug in a phone for it. **Android 7 to 13 are deliberately not tested (owner, 17 Oct 2026: "too far back ... if it works great else fallback"): no image download, minSdk stays 24, the app's fallbacks (no blur, inexact alarms, features that simply do not appear) carry those phones. Do not raise it again.**
+
+**Arabic added (17 Oct 2026), from the reviews.** Play had two reviews and a 2.33 rating from 3 ratings. The only pain point: a 1 star review on 11 Oct saying just "إضافة اللغة العربية" (add Arabic). So Arabic is the fifth language: `app` and `core` `values-ar` (Claude's translation, checked by Claude and by an independent review, as the owner decided for every language on 9 Oct 2026), `AppLanguage.ARABIC`, `locales_config.xml`, and every per language test list. Choosing it, or an Arabic phone, turns the app right to left. **Digits:** on this emulator (Android 16) Arabic formats numbers as Western digits (1:26, 17), not Arabic-Indic as older notes assumed; older Android versions may use Arabic-Indic, so the few numbers written into the text are spelled as words, which reads right either way. **The Makkah fallback is now shown in each language's own spelling** (`AppSettings.placeName`, string `location_makkah`); what is stored, sent to the watch and compared stays the fixed "Makkah". Sunni or Shia is «الانتماء المذهبي», madhab stays «المذهب». Verified: gate, device suite (18 run, 0 failed), the Arabic walk through on the emulator (setup, Times, About). Reply drafted to that reviewer for when Arabic is live (`build/review-replies/DRAFTS.md`). **Watch:** wear strings are still English only; a watch set to Arabic would mix Arabic prayer names from core with English in a right to left layout, which CLAUDE.md forbids, so translating wear (Arabic included) is due before the next watch release. Not verified: Android 7 to 12 digit style, a real phone.
+
+**Independent review of the day's diff (17 Oct 2026), and what it fixed.** (1) The badge's timeout at the prayer left it gone for hours when that prayer had no alert, because prayer alarms exist only for alerted prayers: the widget redraw alarm now also stays for the badge and reposts it (`WidgetUpdater`, `WidgetRefreshReceiver`; device test `the_redraw_alarm_stays_for_the_badge_when_no_widget_is_placed`). Android 7.0 and 7.1 ignore `setTimeoutAfter`, so there the count can dip below zero until that alarm lands. (2) The setup location answer was dropped once consent moved later: now held and sent after a Yes. (3) Back closed the app from any setup step: it now steps back. (4) "location sheet" jargon replaced; the notification hint shows only when Android will actually ask, and takes the Finish label as an argument. Tidy: Choice cards in selectable groups, the shortened badge title in all four languages. (Both later fixed the same day: the calm check now excludes midnight to sunrise, and the counters are read off the main thread.)
+
+**Checked after his "check what you haven't" (17 Oct 2026).** Consent Yes and No paths unit tested (`UsageCountsTest`, 24). Urdu, Turkish and Indonesian setup, Times and About walked on the emulator: all read right, Urdu mirrors (the Makkah fallback name stays Latin in Urdu, as before). Dark and 2x text: notices wrap, rows fit. Size: the whole research pass adds about 22 KB to the release bundle. Screen reader: TalkBack on this emulator logs no speech, so `SettingsSemanticsDeviceTest` asserts the tree TalkBack reads (switch row one toggleable stop, on and off). Still not checkable here: the Play card itself (internal test track), Android 7 to 11 (needs a system image download), a real phone.
+
+**Owner decisions, 17 Oct 2026 (all four agreed).** (1) The usage counts consent moved from the second screen to after Method, before All set; steps passed before it are sent after a Yes (ANALYTICS_PLAN item 9, UsageCountsTest). (2) A passive "Share SajdaTime" row in About, beside Rate; it opens the share sheet with the Play link and facts from the listing. (3) He replies to Play reviews, Claude drafts each reply from a screenshot. (4) Store screenshots are retaken once, when Quiet Glass ships. Built and checked on the emulator: setup order Welcome, location, school, madhab, method, consent, All set; Share opens the chooser with the message.
+
+**Verified.** Full gate green (343 unit tests incl. 9 new ReviewTimingTest, lint 0 errors); device suite on a clean install 16 run, 0 failed, 1 skipped by its own time-of-day assumption; emulator walk through onboarding (offline search, Skip, madhab radios, All set hint), Times with Makkah notice, Settings top and Rate row, live badge countdown, Urdu Settings.
+**Not verified.** That the Play card actually appears (only an internal test track install can show it; sideload and debug never do); review library size after R8; TalkBack spoken output on a device (semantics checked in the UI dump only); dark and 2x screenshots of these exact changes; Android 7 to 11; a real phone.
+
+### 📍 Quiet Glass redesign, 17 Oct 2026: built and tested on branch `claude/quiet-glass`, NOT merged, NOT for 1.4.0
+
+**Where it is.** Branch `claude/quiet-glass` (pushed), cut from `claude/settings-design-preview`, which is cut from `claude/security-and-visibility` at 64efdcc. The 1.4.0 branch and its signed bundle (sha256 395c4513…) are untouched. This ships in a release after 1.4.0, at the owner's word.
+
+**How it was chosen.** The owner asked for a modern Settings screen, preview first. Three Settings looks were built behind a debug switch and screenshotted (A Clean Minimal, B Modern Refined, C Premium Contemporary); he chose B. He then asked for the whole app to be consistent and more premium, "a bit glassy", with researched options. Three research tracks (Apple Liquid Glass and its critics, Android feasibility and icons, premium reference apps and colour) produced three app wide directions drawn as mockups (`build/design-system-research/index.html` on his Mac, gitignored); he chose **Option 2, Quiet Glass**. The research findings, the rejected options and why are in `docs/DESIGN_SYSTEM.md` §8 and §9; the learning loop is §10.
+
+**What changed in the app.**
+- Floating translucent tab bar (`MainScaffold.GlassTabBar`, 90% opaque `surface`, no blur; labels tested over pure black and white in `ColorContrastTest`). Screens scroll under it and end with `BottomBarClearance()` (the bar's measured height).
+- One header for every tab: large start aligned title (`ScreenTitle`); on Times the title is the city with a green caret.
+- Settings drawn by `ui/settings/SettingsList.kt` (option B): icon tiles, medium titles, hairlines, sentence case section titles, sliding theme selector, three information rows folded. The rows are still built as data in `SettingsScreen` (`SettingsItem`).
+- Primary `#0B5A43` (was `#0E6B4F`), widgets with it (`WidgetColorsTest`). Launcher icon and PDF logo deliberately not moved.
+- One line height rule (about 1.4x body, 1.3x titles); `labelLarge` SemiBold so every button and link reads as tappable.
+- **One `Notice` component for every notice** (`ui/components/Notice.kt`, DESIGN_SYSTEM §4): exact alarms, Do Not Disturb, no location, far north, mosque difference, compass accuracy, Ramadan eve, Eid. Closed: mark, title, one brief sentence, bold action link with arrow. Opened (chevron): the full explanation. The owner asked for this "applied systemically" after calling the full width amber button unclean. New strings in all four languages: `settings_exact_alarms_brief`, `action_allow`, `action_see_why`, `ramadan_eve_brief`, `polar_notice_brief`; "Tap to…" sentences removed from notice bodies because the action link says it.
+- Words: sentence case group titles and "Next prayer" (en, tr, in); "in the shade" became "in notifications"; "wake up alarm" became "alarm clock"; exact alarm, privacy, feedback and usage counts descriptions shortened in all four languages with every fact kept (privacy still matches `docs/privacy.html`; the dropped "Tap to read" is said by the chevron).
+
+**Verified on the emulator (sajda AVD, Android 16), 17 Oct 2026.** Times, Qibla, Settings in light and dark; font scale 2.0 (nothing clips, screens scroll, bar grows); Urdu right to left (everything mirrors, bar included); the owner's S23 Ultra size (1440x3088 at 600dpi, 823dp): all six times fit, the far north mosque notice needs a short scroll; 914dp: everything fits including the notice. Gate: `clean test lint :app:bundleRelease :wear:bundleRelease` passes (334 unit tests, 0 failures; lint 0 errors). Device suite: 17 of 17 pass on a clean install. **Lesson:** run `connectedDebugAndroidTest` on a clean install with `appwidget grantbind` done first; a run on top of an earlier one left a widget redraw alarm behind and failed `the_redraw_alarm_exists_only_while_a_widget_does…` for that reason alone (passed on clean install, twice).
+
+**Not verified.** A real phone; Android 7 to 11 (no image on this Mac; nothing here needs Android 12, the bar is translucent everywhere); TalkBack read through; Turkish and Indonesian layouts; the `rtl` build type; onboarding was not restyled.
+
+**Next, in order.** 1) The owner reviews the screenshots and says yes or what to change. 2) Optional follow ups, his call: Material Symbols Rounded icons as vector drawables (removes the unmaintained `material-icons-extended`, needs the icon files downloaded); real blur with the Haze library on Android 12+; onboarding and dialogs in the same style; store screenshots retaken. 3) Merge only after 1.4.0 is live. **Decided 17 Oct 2026: it ships as part of 1.5.0 (Release B), which is built from this branch;** see the plan README and PLAN.md section 7.
+
 ### 📍 17 Oct 2026, afternoon: 1.4.0 ready to submit, pull request #13 open
 
 Run 4 of the release script (on the owner's Mac, from a Claude Code session there, branch tip 64efdcc, app code identical to 53a5671) was clean: every line PASS or TAKEN. **Upload this signed bundle:** `~/Developer/SajdaTime/SajdaTime-1.4.0/app-release.aab`, sha256 `8daeb8d0c38016470f5507ecab3f494c48a2daedb5dfe96a596176bdc1e9ce5c` (it replaces run 3's file at the same path). Screens looked at: Ramadan day 15, Eid al-Fitr, the welcome screen. The listing text and What's new for 1.4.0 (below, `docs/store/LISTING.md`) were checked against what 1.4.0 contains: accurate, no Arabic (that is 1.5.0). Pull request https://github.com/aliimrankhan86/SajdaTime/pull/13 (`claude/security-and-visibility` into `main`) merges cleanly. **Owner's decision 1 is answered: roll out now** ("let's just roll out 1.4 for now"). Left, all his: press Merge on #13 (merge commit), then Play Console step E one screen at a time (upload, What's new, Data safety question, Submit). Then step F. 1.5.0 (Quiet Glass, Arabic, rating card, tracker plan) waits on `claude/quiet-glass` and is not in this release.
 
-### 📍 STATE OF PLAY, 16 Oct 2026 (read this block first, then the 13 Oct block below for the release facts)
+### 📍 STATE OF PLAY, 16 Oct 2026 (HISTORY: superseded by the 17 Oct 2026 evening block at the top of §11)
 
 **Live state is unchanged from 13 Oct 2026:** phone 1.3.2 (`versionCode` 7) and watch 1.2.0 (`versionCode` 1001), 178 countries. Nothing after 1.3.2 has been submitted to Google. The daily health check (12:00 UTC, `trig_0129FQnWihf8XG6rKLCB4oFr`) stays a silent regression alarm until 1.4.0 is live, and is re baselined then.
 
@@ -4859,7 +6603,7 @@ I. **Not a task, a standing direction:** the owner's monetisation and data visio
 **Owner decisions: 1 (rollout date) and 3 (Turkey iftar) are open, 2 (Release B) is decided:**
 1. **When 1.4.0 rolls out.** Ramadan 1448 begins on Monday 8 Feb 2027. Claude recommends shipping as soon as the device checks pass, with the Ramadan pack dormant until the eve notice window and the Ramadan store lines added in January, because the alarm scheduler change should be found faulty in November and not in the week Ramadan starts (reasons and evidence: plan README, Amendment 1). He asked to review the emulator captures of every Ramadan stage first and then decide. Nothing is submitted until he does.
 2. **Release B (tracker, 1.5.0)** is not started. He decided on 16 Oct 2026: streak hidden until switched on, excused days replaced by a neutral Pause that freezes the streak (his idea), no missed prayer counter, no new analytics, and Claude chooses the timing (start about two weeks after 1.4.0 is live and clean, aim live by mid December, no release 18 Jan to 9 Mar 2027, otherwise after Ramadan). Detail is in the plan README, "Decisions on Release B".
-3. **Turkey iftar (plan decision 3), found on 16 Oct 2026, to settle before Ramadan, not before the build.** Diyanet's own table puts Maghrib 7 to 8 minutes after the app's Turkey method (§5.19 item 7), so a Turkish user sees the card's iftar before the ezan. Claude recommends adding Diyanet's offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib plus 7) to the TURKEY method in a separate commit, because early is the dangerous direction for a fast. It moves every Turkish user's prayer alarms and the Istanbul golden rows, so it is his call and it is not in the 1.4.0 branch.
+3. **DECIDED 18 Oct 2026, see §5.26: the offsets are applied.** Turkey iftar (plan decision 3), found on 16 Oct 2026, to settle before Ramadan, not before the build. Diyanet's own table puts Maghrib 7 to 8 minutes after the app's Turkey method (§5.19 item 7), so a Turkish user sees the card's iftar before the ezan. Claude recommends adding Diyanet's offsets (Sunrise minus 7, Dhuhr plus 5, Asr plus 4, Maghrib plus 7) to the TURKEY method in a separate commit, because early is the dangerous direction for a fast. It moves every Turkish user's prayer alarms and the Istanbul golden rows, so it is his call and it is not in the 1.4.0 branch.
 
 **Left to do, and whose job:**
 - **Owner:** with an emulator (and optionally a phone) available, run `docs/release-tools/release-1.4.0.sh` on his Mac once. It pushes the branch, runs the full gate, builds and verifies the signed bundle, runs the device suite (widgets, the Ramadan card, the suhoor reminder in `dumpsys alarm`, the PDF), moves the emulator clock through the eve, day 1, the last day and both Eid days in four languages with screenshots, and puts the clock back. Review the screenshots. Decide the date. Merge the pull request only when he is ready to submit, because **merging publishes `docs/` through GitHub Pages**, including `privacy.html` (lesson 124 and 137). Press submit himself in Play Console. Step 2 of the script stashes `docs/HANDOVER.md` and `docs/plans/` if they are the uncommitted planning copies left on his `main` (it checks each is identical to commit 3140b96 on the branch, and stops untouched on any other change). The stash stays in `git stash list` and can be dropped once the branch is merged.
@@ -4890,6 +6634,35 @@ I. **Not a task, a standing direction:** the owner's monetisation and data visio
 **Standing decisions that govern any work here:** translations are written and checked by Claude with no native speaker review (9 Oct 2026); the ICO data protection fee is skipped (9 Oct 2026); 1.3.2 was not tested on his phone, by his choice, because the emulator check was enough (11 Oct 2026); watch testing is finished and never raised; the signing key is never generated, requested or viewed; the watch bundle never goes up with a phone release; he presses every submit, publish, merge or consent button himself. The same decisions, in his words, are in gbrain `projects/sajdatime`.
 
 **How the 1.3.2 release was actually done from a cloud session (11 Oct 2026), so the next one does not rediscover it:** code, unit tests, lint, bundletool and Robolectric checks in the cloud; commits handed to his repo as a git bundle; one command on his Mac (`docs/release-tools/release-1.3.2.sh`, run from `build/release-1.3.2/run.sh`) pushed the branch, ran the full gate, built and verified the signed bundle and ran the on-device suite on an Android 16 emulator; he merged the pull request on GitHub; the Production release was created by the Claude in Chrome extension from a prompt he pasted; he pressed submit. Google approved the release and the listing change together two days later, on 13 Oct 2026, with no rejection or question. Lessons 127 to 129.
+
+### 📍 STATE OF PLAY — 8 Oct 2026, evening (what is live, and what the cloud branch `claude/customer-review-pain-points-9d35kl` adds on top)
+
+**HISTORY (the 8 Oct branch's own state block, merged into this record on 19 Oct 2026). Its work came into 1.5.0 that day, its open observation was reproduced and fixed, and the 19 Oct STATE OF PLAY at the top of §11 says what became of each item. Its lesson numbers (125 to 127) are 154 to 156 in §15 now.**
+
+**Live and in review (unchanged by anything below).** 1.3.1 (versionCode 6) is on `main`, submitted, In review (the public listing read "Updated on 8 Oct 2026" with languages and the new buttons in What's new when checked). It already contains the Urdu, Turkish and Indonesian text that one model produced in a single pass and nobody reviewed. **Nothing in this block is live.** There is no pull request for this branch; the owner asks for one and merges it. Merging it publishes `docs/privacy.html` on Pages at once (it is unchanged by this branch, but check the diff first).
+
+**What the branch adds to 1.3.1** (all merged with `main` at f1213d1, all pushed):
+1. Step 1 mosque work finished and run on an emulator: type the time your mosque shows, amber cards with a real button (`NoticeCard`, `PermissionCard`: the action is a button, never the card), and "0 min" instead of an underlined dash.
+2. A language selector in the right places: first row of Appearance in Settings, and a globe on the first welcome screen. "Phone language" is the first option and the default. Below Android 13 the choice is stored (`AppLocale.setOverride`) and the activity recreated; from 13 the system keeps it (`LocaleManager`).
+3. Translations: the shipped set kept as the base plus 15 reviewed strings, **the nine "quiet is not silent" corrections**, and the **independent review of the whole shipped set** (three reviewer models, back translating before reading the English: `docs/translation/review-shipped-{in,tr,ur}.md`, no blockers) with its clear findings applied: stale "tap" sentences on the amber cards, the missing "tap a number to type your mosque's time" sentence, `language_unavailable`, softened hedges ("up to", "all", "simply"), the Turkish "bırakın" ambiguity, Indonesian Kakbah and Mekah spelt the same as on the watch, and more (see the commit). Wear has its own reviewed Indonesian, Turkish and Urdu strings (main has none).
+4. The Urdu PDF export mirrors properly (checked by rendering a real Urdu PDF).
+5. Guards: `TranslationIntegrityTest`, `TranslationScopeTest`, `LanguagePickerTest`, `tools/check-translation.py`, `LocaleDisciplineTest` tightened.
+
+**Step 2, the method finder, is NOT built, and that is the decision.** The sweep (`docs/reviews/method-finder-sweep-2026-10-08.txt`) shows the original design (Asr plus Isha) cannot meet the bars, and the narrow design (Fajr, Asr and Isha within 1 minute, one answer only) is 88.3% definite on exact boards with no wrong answer, but gives a definite answer on 6.3% of mosque boards that follow no listed method (bar: 2%) and keeps matching for only 82.3% of the year (bar: 90%). Do not build it without a new design that clears those bars.
+
+**Verified on emulators:** Android 14, Urdu first run, disclaimer, Times, Settings, picker, live switching to Indonesian and Turkish, Qibla (dial not mirrored), PDF. Android 12 (software emulator, slow): globe and picker open, Urdu chosen, language and right to left layout applied, survives a force stop, and "Phone language" clears the stored choice (`sajda_language.xml` empty).
+
+**ONE OPEN OBSERVATION, UNRESOLVED, check it first on any phone below Android 13.** On that emulator, choosing "Phone language" while the app was in Urdu produced a screen of English words laid out right to left (globe top left, stranded full stop), i.e. the exact state the right to left rule forbids. It was seen once, 45 seconds after the tap, minutes before that emulator's system server started failing (black screenshots, "Activity does not exist", package service errors), so it may be an emulator race. It was **not reproduced**: three attempts to rebuild a stable Android 12 emulator in the cloud failed. I did not change code on an unreproduced symptom (measure, do not guess). If it is real, the likely area is the `recreate()` in `AppLanguage.apply` (below 13) racing the window's layout direction; a candidate fix is to relaunch the activity (start a fresh `MainActivity`, then `finish()`) instead of `recreate()`. A fresh start after force stop is the state to compare against: it is expected to be left to right, but that frame was not captured either. Repro: Android 12 or lower, Settings or the welcome globe, pick Urdu, then pick Phone language on an English phone, screenshot after the activity settles.
+
+**Not verified (do not claim):** a real phone (Redmi and S23 Ultra); TalkBack; large font and dark theme in the new languages; the watch screens in the new languages (`tools/wear-verify.sh` needed; the Urdu countdown is longer than the tile's roughly 8 characters, so measure before release); the alarm test T1 to T6 (real device); no native speaker has read any of the three languages (the owner accepted that on 5 and 8 Oct; he reads Urdu and should read the six flagged Urdu strings); store screenshots not retaken; the final gate `./gradlew clean test lint :app:bundleRelease :wear:bundleRelease` was not run on the merged tree (tests and lint were, and pass).
+
+**Open questions for a native reader, deliberately not changed** (details in the three `review-shipped-*.md`): Turkish "Sabah" versus "İmsak" for Fajr; "aliran" (Indonesian) and "mezhep" (Turkish) for the Sunni and Shia question; Urdu "مسلک" versus "مکتبِ فکر"; the Turkish name of the Egyptian authority; the Karachi method naming (the library's method is the University of Islamic Sciences, Karachi, so check the English first); whether Diyanet's angles (18 and 17) match Diyanet's own timetable (its published times may add a margin; unverifiable from the cloud).
+
+**A fault in the English listing, owner's to fix in the Console and not during review:** the English description line "chosen automatically for your region" contradicts rule 5.17 (the app never claims a method belongs to a place).
+
+**Next, in order, if the owner wants a follow up release (his call; it would be 1.3.2, versionCode 7 or later):** (1) the Mac session takes this branch, retakes store screenshots (the `sajdastore` 1080x1920 AVD), runs `tools/wear-verify.sh` in the three languages, builds the signed bundle and the owner uploads it after 1.3.1 is approved; (2) the alarm test on the Redmi; (3) re-baseline the health check routine after the release. Draft store listings for the three languages are in `docs/store/LISTING-ID-TR-UR.md` and are unpublished (an assistant never publishes them).
+
+**gbrain.** This cloud session cannot write the owner's gbrain (a Mac side MCP). The Mac session should record: the branch name and the commit list above, the sweep decision, the review result, and the open questions.
 
 ### ⬛ SUPERSEDED — 3 Oct 2026 decision record (kept for history; the STATE OF PLAY of 4 Oct below is the truth). Default-on was later built and REVERSED; the branch named here, `claude/analytics-default-on-1-4-0`, is obsolete (its existing-user question was carried into `claude/app-analytics-strategy-e826p5`). Do not use it.
 
@@ -4944,6 +6717,29 @@ The docs disagreed about the Play Console account. Settled by the owner: **the P
 Consent text rewritten (controller named, 14 month retention, install referrer stated, false "only way" claim and "how many people" removed, lists behind "See exactly what is sent"); "school of thought" is now "prayer calculation setting", with `UsageCountsTest` proving by reflection that the API cannot take a setting; `docs/privacy.html` dated 7 Oct 2026 (**live on merge, before 1.3.1 ships: it already describes the referrer, which 1.3.0 also sends**). Exact-alarm and Do Not Disturb rows are real 48dp buttons with an Allowed state (`PermissionAction.kt`). Settings has a language picker (Android 13+ only; `AppLanguage.kt`, `locales_config.xml`): Urdu, Turkish and Indonesian are listed but disabled until a native-speaker-reviewed `values-<tag>/` exists, so no machine translation shipped and `NoTranslationsYetTest` is unchanged. **Verified 8 Oct 2026 on emulators (API 36):** consent dialog and its expander, the exact-alarm button and its Allowed tick after returning from system settings, Settings Allowed card, the language picker (English selectable; Urdu, Turkish, Indonesian listed and held back) and `installRtl` mirroring of the consent dialog. `05-settings.png` retaken (it now leads with the Allowed card); the other captures are unchanged by this release. **Signed phone bundle built** (`./gradlew :app:bundleRelease` with `keystore.properties` linked in and removed again; the key was never opened; `jarsigner -verify` passes): `app/build/outputs/bundle/release/app-release.aab`, 5,755,757 bytes, sha256 `2ee2be8bb60f88edc779573f9d5540f0d6daba451cefd8bc262044af4bbeb56c`. **Do not upload the watch bundle.** Not verified: a real phone, Urdu or other translated layouts (none exist), large-font Settings, and the Do Not Disturb card on screen (unit-tested only). The Alpha pause is untouched. One-off "isn't responding" dialogs appeared on a cold, swapping emulator (load 16, 39% I/O wait) during first-run onboarding and did not recur after a restart with more memory; watch for them on a real first install.
 
 **Languages (8 Oct 2026, owner's decision, same release):** Urdu (right to left), Turkish and Indonesian translated by Claude and NOT reviewed by a native speaker; the owner accepted that explicitly (recorded in gbrain and CLAUDE.md). Files: `app` and `core` `values-ur`, `values-tr`, `values-in` (Indonesian is `values-in`, not `values-id`: the framework matches the legacy code, found by running it, see AppLocale). `NoTranslationsYetTest` deleted in the same change. Verified on an emulator in all three: Times, Settings and the picker; Urdu mirrors right to left. Wear strings are NOT translated (the watch stays 1.2.0), so a watch built from this tree on a Urdu, Turkish or Indonesian phone would mix core (translated) and wear (English) text: fix before the next watch release. Strings a native speaker should check first: prayer names, method names, `about_credits_desc`, `settings_ongoing_badge`, the consent and disclaimer text.
+
+### 📍 STATE OF PLAY — 5 Oct 2026 (pain point and competitor research done; decisions taken; step 1 of the mosque work BUILT on a branch, NOT merged)
+
+**HISTORY (from the 8 Oct branch, merged into this record on 19 Oct 2026). Its decisions on the finder, the congregation reminder and the alarm test stand; its "one line in About: translated with AI help" was dropped by the owner on 19 Oct 2026; its native review waiver was replaced by his 9 Oct rule (CLAUDE.md).** Nothing here changes what is live. 1.3.0 was still In review on 5 Oct (public listing still read 'Updated on 1 Sept 2026'). The work below is on branch `claude/customer-review-pain-points-9d35kl`, no pull request, nothing uploaded to Play.
+
+**The evidence base is thin, and that is the first fact.** SajdaTime has **no public ratings or reviews** (listing shows none on 5 Oct; Play shows the install band '100+', the repo's last hard figure is 26 lifetime installs on 7 Sept, so use the Console, not the band). The only real user evidence is the closed test feedback, one unlocated complaint of Isha or Asr being 15 to 30 minutes off a mosque, and the owner's own devices. An AI summary of the listing that the owner pasted on 5 Oct was wrong on three of four points: it asked for manual calibration (already built, 2 Aug), for background alert stability (already done with `setAlarmClock`, measured on a Redmi and an S23 Ultra) and for streaks on a 'Habits and Duas Tracker' that does not exist anywhere in the code or listing. **Treat any AI summary of the listing as unverified until checked against this repo** (lesson 154; it was 125 on the 8 Oct branch).
+
+**Competitors, read from their Play pages on 5 Oct (ratings, install bands, dated review text; a few search-summary claims are marked unverified).** Muslim Pro 3.8 stars (1.92m reviews, 100m+, ads, may share location and 7 other data types); Athan by IslamicFinder 4.8 (333k, 10m+, ads); Athan Pro 4.6 (98k, 1m+, ads, may share location); iPray 4.3 (13k, 1m+, no ads); Pillars 4.4 (4.4k, 500k+, no ads, no data collected, Android version exists); MAWAQIT 4.8 (172k, 5m+, no ads, takes timetables and iqamah times from mosques over the network); Athan+ 4.0 (611). What hurts them, in their own reviews: intrusive ads, ads returning after paying, restore-purchase failures, a consent wall (Muslim Pro, March 2025), bloat, no way to lower the adhan with the volume keys (iPray, April 2022 with 434 helpful, and April and August 2026). **No competitor found that infers the calculation method from a time the user types** (my sources were limited: 'not found', not 'does not exist'). Unverified here: Pew population figures and Muslim Pro's language list (search summaries only; pewresearch.org and several review sites are blocked from the cloud container).
+
+**Decisions taken by the owner on 5 Oct, and the reasoning (do not reopen without new evidence).**
+1. **The top three, in order:** (1) the mosque work below; (2) two or three extra languages; (3) an alarm control test. A home screen widget is the runner up: it is the only verified feature gap (none exists; competitor reviewers ask for it) but nobody who uses this app has asked.
+2. **Mosque work, three pieces.** (a) **Step 1, BUILT**: the 30 minute limit now explains itself and points at the method list, the number is tappable to enter the time the mosque's board shows (`AdjustmentFit`), each prayer shows the time it now displays, and the store description gets a 'Match your mosque' line (pending, see `docs/store/LISTING.md`). (b) **The finder, NOT built**: the user enters the mosque's **Isha and Asr** times (two prayers are mandatory: Asr says nothing about the method, Fajr alone cannot separate MWL, Karachi and Turkey, Isha alone leaves Karachi 4 to 6 minutes from MWL); a pure function in `:core` tries every Sunni `CalcMethod` x Asr school; matches are listed unranked, within about 1 to 3 minutes, with before and after times; wording is 'gives the same times as your mosque today', **never 'you follow X' and never 'your school'** (the method is a twilight rule, not a school; school means Asr only; and 5.17 forbids claims about a named authority). **No 'method plus offset' fallback**: it was shown to produce a confident false match (Diamond Road prints only its congregation time, 22:45; the default method's Isha that day was 23:17; 23:17 minus 30 is 22:47). If nothing fits and the entered Isha sits 10 to 50 minutes after a candidate, say 'This looks like a congregation time. Enter the time it begins.' Hidden when there is no location or the day uses projected polar times. Never auto-applied, with a 'Put back' undo. **It does not ship until a `:core` sweep passes**: 11 Sunni methods x 2 schools, latitudes 0 to 60 step 5, every 7th day, cluster size at 1, 2, 3 and 5 minutes tolerance, for single prayers and for Isha plus Asr. The owner suggested a pop-up saying the times look like Moonsighting Committee's; the finder is that idea with the wording and placement rules above. (c) **Congregation reminder: DEFERRED.** The owner first approved it, then asked whether it adds value or complication for a mass audience that does not know begin time from congregation. Decision: it is more complication than value on thin evidence (two mosques, one day each: JMIC Isha begins 21:58, congregation 22:15; Reading 22:02 and 22:20). The disclaimer and the 'Different from your mosque?' explainer already cover the confusion. **Revisit only on evidence**: three separate users ask for it (feedback email or reviews), or two of the 5 to 8 task-test users get stuck on exactly this point (small thresholds, judged for a tiny user base). If it returns: behind 'Different from your mosque?', off by default, never in onboarding. This is the A18 deferral, confirmed.
+3. **Languages.** Urdu plus one left-to-right language, chosen after the owner sends the Play Console figure (Statistics, installs by country and language); Indonesian is as easy as Turkish to build (same pipeline), so the figure decides, and both are added if the demand is there. One left-to-right language ships first to prove the pipeline, then Urdu (right to left). **The owner has waived the native-speaker review for these languages** (he can read Urdu; nobody can check the rest) and asked that the assistant do the translations. Recorded safeguards, all approved: Urdu spot-checked by the owner on the six highest-risk strings (disclaimer, dua line, method descriptions, prayer names, Hijri months, consent text); Turkish prayer labels taken from the labels Diyanet's own timetable prints (could not be fetched from the cloud, confirm first); method names stay untranslated (organisation names, per the translator note in `core/values/strings.xml`); one line in About in each language: translated with AI help, may contain mistakes, tell us with Send feedback; tests (disclaimer test per language with the dua last and once, placeholder parity, no 'follow' or 'school' words in method result strings); the six other assistant-drafted store listings in `docs/store/LISTING-LOCALES.md` stay unpublished and are stale (see the banner there). **`CLAUDE.md` still says 'never machine-translate' and is NOT edited yet:** edit it, dated and scoped to these languages, in the same commit as the first translation. Mechanics, verified by an independent review of the code: system picker on Android 13 and up through `android:localeConfig` (en plus the shipped languages only); below 13 an in-app language row that applies the stored tag in `attachBaseContext` and calls `recreate()`; `AppLocale.of()` keeps reading the resources and must never read a stored tag; the watch follows its own system language (the sync carries no language key); `NextPrayerTileService.localised` is a `by lazy` and would go stale on a language change. **Right to left must be done properly, not previewed:** the Qibla dial is not mirrored and must stay so; 'Turn left' and 'Turn right' stay physical; the PDF export draws at a fixed left margin with columns in fixed order (`PrayerPdfExporter.kt`) and needs mirrored columns and right-aligned text for Urdu; Hijri month names are app strings and must be translated with the date; do not 'fix' `AM 2:54` (lesson in §10); check on a real phone with real Urdu text at 1.3 and 2.0 font scale, because Urdu script rendering and line height are untested here. **AM/PM decision (assistant's, owner delegated):** follow the phone's own 12 or 24 hour setting as `TimeFormat.clock` already does, leave the marker and its position to the platform, keep each time in its own cell, and if a sentence containing a time reads badly on a real Urdu screen, restructure the sentence, never the marker.
+4. **Privacy policy in other languages:** English stays the default and the policy page. A translated consent text links the English policy and says so in plain words; add a short summary in the other languages if it is easy. A translated consent that does not agree with `privacy.html` breaks the rule in `CLAUDE.md`. Not legal advice; Firebase's language field is the device language whatever the app language.
+5. **Alarm control is a test, not a feature, until it has results.** From code: the alarm is a notification on a `USAGE_ALARM` channel, no `MediaPlayer`, no foreground service (`Notifications.kt` 108 to 120). Whether the volume keys adjust it while it plays, whether swiping stops a long tone, and whether sound reaches Bluetooth or a car speaker are platform behaviours that only a device can answer. Protocol (Redmi, then S23 Ultra, `installSideload`, Stay awake on, a three minute audio file as the alarm sound): T1 volume keys during playback (pass: the alarm slider appears and moves); T2 swipe the notification (pass: sound stops within a second); T3 ringer on vibrate with 'respect silent' off (pass: it sounds); T4 Bluetooth earbuds (record where it plays); T5 car or Bluetooth speaker; T6 locked, Do Not Disturb on. Build a fix only for what fails.
+
+**Rejected on 5 Oct, with reasons.** Raising the 30 minute limit (a gap that big is the method or the congregation, and a bigger offset would let 'Isha begins' be dragged onto the congregation time, so the notification and the Now marker would say something false; it also does not reduce effort). A slider or typed minutes (cannot land on an exact minute; needs validation and a keyboard). A silent best fit (5.17). A mosque directory or MAWAQIT style feed (needs a network call or a server of our own). Scanning the printed timetable (new dependency, error prone, not for the masses). Any wording that tells a user which school or authority they follow. A prayer tracker or streaks (the design system leaves them out on purpose and streaks clash with the ask-once rule). Publishing the assistant-drafted listings for six languages.
+
+**What step 1 changed (files).** `core/.../AdjustmentFit.kt` and `AdjustmentFitTest.kt` (8 tests; proved by mutation: rounding instead of truncating, and removing the midnight handling, each turn tests red); `ui/settings/SettingsScreen.kt` (`AdjustmentsDialog`, `LimitNote`, `TimeEntryDialog`, `StepperRow`); `res/values/strings.xml` (limit note, choose method, 'Shows %1$s', time dial strings, `action_set`, `action_cancel`, and one added sentence in the help text). Stored values are unchanged: still whole minutes, still clamped at 30, still synced to the watch. No data handling change, so `docs/privacy.html` is untouched.
+
+**Not tested.** On a real device or emulator: none of the new screens has been run (the cloud container has no emulator); the time dial in dark theme, at 1.3 and 2.0 font scale, in landscape and right to left; TalkBack on the tappable number and the limit note; the store screenshots are not retaken (the dialog is not one of the five store images, but check). The sweep, the finder, languages, the alarm test, and everything on the watch are not started.
+
+**Next, in this order.** (1) Owner runs the step 1 build on the Redmi or S23 (`./gradlew installSideload` with `ANDROID_SERIAL`) and says what he sees; (2) the owner sends the Console figure so the second language is chosen; (3) the `:core` sweep; (4) language infrastructure plus the first left-to-right language; (5) the alarm test; (6) the finder only if the sweep passes; (7) Urdu with the right to left work above. Merge to `main` only by the owner, through a pull request he asks for.
 
 ### 📍 STATE OF PLAY — 4 Oct 2026, 13:00 (HISTORY: usage counts shipped in 1.3.0; for current release status read the 1.3.1 block above, 1.3.1 is live)
 
@@ -6496,6 +8292,11 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
   marker say something false. If this is ever wanted it is a second time per prayer, an
   "also remind me at" — a separate setting with its own wording. Not built; not a defect.
 
+  **Confirmed deferred, 5 Oct 2026, with triggers** (8 Oct branch, merged into this record 19 Oct 2026).
+  More complication than value for users who do not know begin from congregation, on two data points.
+  Revisit on three separate user requests or two of the 5 to 8 task-test users stuck on it; behind
+  'Different from your mosque?', off by default, never in onboarding.
+
 - **A4 — Whether `HighLatitudeRule` should be a user setting.** It is inert for Moonsighting
   (§10) but decisive for the plain angle methods, where the three options are three different
   religious approximations. Wifaqul Ulama's own published deliberation declined to name a
@@ -6838,7 +8639,7 @@ The measurements behind them are in §10 and are not in doubt; what to do about 
       only English listed would show a picker with one entry.
     - An in-app language row, for phones below Android 13, which have no system picker.
 
-    **Previewing RTL before a translation exists:** `./gradlew installRtl`. The `rtl` build
+    **Previewing RTL before a translation exists:** `./gradlew :app:installRtl`. The `rtl` build
     type is `debug` plus one file, `app|wear/src/rtl/res/values/strings.xml`, which
     overrides `app_language_tag` with **`ur`** (it was `ar-XB` until 2 Aug 2026 — see §15
     lesson 84; do not restore it). The whole app then runs right-to-left with
@@ -6955,10 +8756,16 @@ Any other analytics, event, parameter or user property is still a non-goal until
 and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
 coordinates, or anything whose shape reveals them.**
 
+**A city search, or a geocoder, on the watch (decided 22 Oct 2026, §5.27).** The watch has no network permission and
+must not gain one for this: a city is chosen on the phone and the watch's Location screen offers "Same as phone". The watch
+names its own fix "This watch's location" rather than look the name up. Do not add `INTERNET` to the watch to "improve" it.
+
 **Exception recorded 3 Oct 2026: the consent screen for usage counts.** The next paragraph forbids
 asking the user for things. A privacy consent is not a growth ask, it is required before data can
 be sent, so it is allowed, **once**, at setup and from Settings. It must never appear in or after
 the disclaimer, never mention the dua, and never be a nag. Do not delete it as a stray "second ask".
+
+**SUPERSEDED 17 Oct 2026 by the owner:** the app may now show Google Play's own rating card, under the rules in `review/ReviewPrompt.kt` and CLAUDE.md. The reasoning below still governs everything else: no copy of ours asks for a rating, nothing nags, the dua request stays the only ask in our words.
 
 **Also: no in-app prompt asking the user to rate, review or share the app. Added 7 Sept 2026.**
 This will look tempting, because the app is live with zero ratings and ratings are what would
@@ -7074,6 +8881,10 @@ Every one of these cost real time. Read before building.
 | **The emulator compass freezes mid-experiment** | Injected `magnetic-field` values are accepted (`emu sensor get` reads them back) but the heading on screen stops changing, so a sensor sweep silently reports the same value every step | The screen went to sleep, and the compass flow is lifecycle-scoped — it unsubscribes, and the last heading stays painted. Nothing is wrong with the app; the reading on screen is simply stale. `adb -s <emu> shell svc power stayon true` before any sensor sweep, and treat an unchanging heading as suspect rather than as data. |
 | **Counting vibrations by counting lines under-reports them** | `dumpsys vibrator_manager \| grep -c <package>` stays flat while the device is plainly buzzing | The aggregated history is capped, so new entries push old ones out and the total stops rising. **Compare timestamps, not counts** — `grep <package>` and read the newest entry. A count that has stopped moving is the tell that the buffer is full, not that the vibrations stopped. Cost a wrong conclusion on 16 Aug 2026 before the timestamps were read. |
 | **The watch app will not launch from `monkey`** | `monkey -p com.sajdatime.app -c android.intent.category.LAUNCHER 1` returns without error and the watch stays on whatever it was showing | Launch the activity explicitly: `adb -s emulator-5556 shell am start -n com.sajdatime.app/com.sajdatime.wear.WearMainActivity`. Note the class is **`WearMainActivity`**, not `MainActivity` — which is also the string that tells you which module is installed under the shared `applicationId` (see the rows above). |
+
+### Building and unit testing in a cloud container (learned 5 Oct 2026)
+
+A Claude Code cloud session has a JDK and Gradle but **no Android SDK and no emulator**. It can compile, run unit tests and lint; it cannot run the app, so layout and device checks still need the owner's Mac or phones. Recipe that worked: download `commandlinetools-linux-*_latest.zip` from `dl.google.com/android/repository`, unzip to `cmdline-tools/latest`, `yes | sdkmanager --licenses`, then install **`platforms;android-37.0`** (the package is named `android-37.0`, not `android-37`, because `compileSdk = 37`), `build-tools;36.1.0` and `platform-tools`, and write `sdk.dir=...` into `local.properties` (gitignored). Maven Central answers **429 Too Many Requests** when Gradle downloads in parallel: run with `--max-workers=1 -Dorg.gradle.parallel=false` and simply re-run, the cache keeps what arrived. One transient 'plugin not found' on the first run cleared on a retry. The module is an Android library, so single tests run as `./gradlew :core:testDebugUnitTest --tests "com.sajdatime.core.AdjustmentFitTest"` (there is no `:core:test --tests`).
 
 ### Getting the app onto an emulator when the assistant has no device access
 
@@ -8525,3 +10336,242 @@ matters more than the stable hashes, that is the trade being made.
     build. The pin was proved by letting the wrapper download Gradle into an empty Gradle home with the value set. Also: a
     wrapper jar committed on day one is not the jar of the Gradle version you run; regenerate it with `gradle wrapper` and compare
     it to the published wrapper checksum.
+
+142. **In a widget, weight the gaps, not the rows.** Rows given `layout_height="0dp"` and a weight fill a
+    tall widget nicely and, when the widget is too short (Urdu script, 2.0 text), squash every row to
+    less than its text height so the lines draw over each other. Rows at their natural height with
+    weighted empty gaps between them spread the same way when there is room and clip only the last row
+    when there is not. Found by rendering Urdu at the large Today widget's minimum (18 Oct 2026), not by
+    reading. Related: a launcher picks a responsive layout by size alone, never by font scale or
+    script, so the app has to choose which layouts to offer from both.
+143. **To screenshot a whole Compose screen in Robolectric, draw the window, do not capture the node.**
+    `onRoot().captureToImage()` timed out ("Condition still not satisfied after 2000 ms") on the full
+    Times screen and on dialogs. Drawing `activity.window.decorView` (or the dialog's, via
+    `ShadowDialog.getLatestDialog()`) into a Bitmap works with `@GraphicsMode(NATIVE)`. Wrap the screen in a
+    `Surface`, not a bare `Box`, or text that takes its colour from the surface draws black on dark; and
+    call `ShadowAlarmManager.setCanScheduleExactAlarms(true)` or the exact alarm banner appears. Shadows
+    (`Modifier.shadow`) do not draw at all, so a shadow is never verified by these renders (18 Oct 2026).
+144. **Check which build is on the emulator before the owner tests it.** On 18 Oct 2026 he pulled the
+    branch and started the emulator, but the install step had not been given yet, so he tested the
+    previous day's sideload and reported every new change as missing ("where is the dark glossy
+    effect?"). Pulling code changes nothing on a device. Hand over the install command together with
+    "now test", and say which visible change proves the new build is on (here: solid mint buttons).
+    The same day's other lesson: when the owner repeats a design complaint, turn it into a rule in
+    DESIGN_SYSTEM, a line in CLAUDE.md and a failing test, in that commit, not a promise.
+145. **"Prominent" means the strongest style, not a step up from the weakest.** Asked for buttons that
+    are hard to miss, this project went outlined, then tonal, each time picking Material's next quietest
+    option and calling it prominent, and each time the owner had to ask again. Tonal is documented by
+    Material as *low emphasis*. When the owner asks for emphasis, use the high emphasis component
+    (solid fill, white text) first and justify any step down, never the reverse. Also: his first
+    screenshot that day still showed the outlined mosque button with no icon, which is the previous
+    build; check which build he is looking at before changing anything (lesson 144).
+146. **A rule applied where you are looking is not a rule applied everywhere, and the design system
+    can be the thing that contradicts the owner.** On 18 Oct 2026 the reply said "every action button"
+    was solid while about 15 actions were still green text links, and an earlier reply said "every gap
+    comes from `Space`" when only one file did; the owner: "you always say it's done but nothing is
+    done". Worse, `DESIGN_SYSTEM.md` §8 itself listed text links as correct for "Skip", "Details" and
+    "Save as PDF", so following the document reproduced the mistake. Fixes: before writing "every" or
+    "done", run the inventory in DESIGN_SYSTEM §4.1 and paste the counts; when a rule and the owner
+    disagree, change the rule in the same commit; when not sure what he means, ask him with options
+    and screenshots (§0.2) rather than build a guess; keep undecided questions in §11, not in your
+    head. `DesignRulesTest` now fails when a file with a button is missing from the inventory, so a
+    new button cannot skip the spec.
+147. **A feature below a fold with no cue does not exist for the person looking for it.** On 18 Oct 2026
+    the owner asked for a way to pick a sound from his phone. It had been there since 1.3: "From your
+    phone", at the foot of the Prayer alerts dialog, under five rows of chips, in a scrolling box with no
+    sign it scrolled. His screenshot ended at "Adhan". Before saying "it already exists", render the screen
+    at a real phone height (411 by 891dp) and look at what shows without scrolling. A choice people must
+    find goes where it is seen first: here, its own Settings row with the current value under it.
+148. **Testing a sound by moving the clock back runs into Android 16's notification cooldown, and
+    looking at the shade stops the sound.** On 18 Oct 2026 the third Dhuhr test in a row posted with no
+    sound and nothing in the log to say why. Android 16 quietens, then mutes, alerts from the same app that
+    arrive close together, and setting the clock back to 20:53:50 each time lands every run on the same
+    20:54:00. Before calling a sound broken, look for `RingtonePlayer: playAsync` in logcat and
+    `mSoundNotificationKey` in `adb shell dumpsys notification`; to rule the cooldown out, run with
+    `adb shell settings put system notification_cooldown_enabled 0` and afterwards
+    `adb shell settings delete system notification_cooldown_enabled`. Also, opening the shade to look
+    (`adb shell cmd statusbar expand-notifications`) stops a notification sound, so read the playing state
+    from `dumpsys audio` first, and swipe the heads up rather than a card in the open shade.
+149. **A bare `./gradlew installRtl` installs the watch app over the phone app.** Both modules have an
+    `rtl` build type; the phone's has the `.rtl` suffix, the watch's has none, so the root task also
+    installs the watch's rtl build as `com.sajdatime.app` (versionCode 1002) on whatever phone emulator is
+    connected, replacing the debug app. Found 18 Oct 2026 when the phone emulator showed
+    `com.sajdatime.app versionCode:1002` after `release-1.5.0.sh` step 6h. It is also the unexplained
+    "something with version code 1001 was already installed" that failed a 1.4.0 run
+    (`release-1.4.0.sh` step 6a comment). Always `./gradlew :app:installRtl` (CLAUDE.md, the 1.5.0 script).
+150. **Leave an emulator as you found it by booting it `-read-only`, and check widgets on a real
+    launcher.** `emulator -avd <name> -read-only` runs on throwaway copies of the disk: installs, clock,
+    font and theme changes all vanish when it is killed, and the AVD's files are untouched (checked 18 Oct
+    2026: after a full session the next boot showed exactly the packages it started with). Separately,
+    `WidgetDeviceTest`'s renders force each widget to its exact minimum size (180 by 110, 250 by 180), so
+    they show clipping a launcher never produces at the default size; and a 5 column home screen (the
+    Pixel 2 profile) gives a 4 by 4 widget about 290dp, where the 4 column Pixel 7 gives about 360dp.
+    The large Today header's Hijri date was cut only on the narrow one. Add the widgets from the
+    launcher's own picker (long press, Widgets, search, Add) and look.
+151. **`echo "$big" | grep -q x` under `set -o pipefail` fails at random on long output.** `grep -q`
+    exits at the first match; once the text is over the 64 KB pipe buffer, `echo` is still writing, gets
+    SIGPIPE (141), and pipefail makes the whole test false. In `release-1.5.0.sh` that turned a good signed
+    bundle into "no signed bundle: are the sajdatime.* values in ~/.gradle/gradle.properties?" in 8 to 100
+    of 300 runs as the jarsigner output grew (found by the independent review, 18 Oct 2026, reproduced
+    with macOS bash 3.2; the 1.4.0 form `grep x >/dev/null` failed 0 of 300). Use
+    `grep -q x <<< "$big"`. The false message is the dangerous part: it points an unattended session at
+    the signing values.
+152. **Below Android 13, `recreate()` after a language change keeps the old screen's layout direction.** On
+    the Android 12 emulator (19 Oct 2026, the AVD `sajda12`, made for this) choosing Urdu in the app gave Urdu
+    words laid out left to right, and choosing "Phone language" from Urdu gave English words right to left:
+    the 8 Oct branch's unreproduced observation, reproduced twice on the first try. A force stop and a fresh
+    launch was always right, so the words and the configuration were right and only the window's direction
+    was stale. The fix is one line in `MainActivity.onCreate`:
+    `window.decorView.layoutDirection = resources.configuration.layoutDirection`. Measured 4 of 4 cycles
+    correct, then every language in turn. Android 13 and newer never reach it (the system restarts the
+    activity itself), which is why no test on the usual emulator could have found it: keep an image below 13.
+153. **Anything made once with a wrapped context keeps the language it was made in, and a bare application
+    context ignores the in-app choice below 13.** The PDF exporter was a ViewModel field, and the ViewModel
+    outlives a language change, so after switching from Urdu to Arabic the PDF came out in Urdu with an
+    Arabic place name (Android 12 emulator, 19 Oct 2026). The watch tile's `by lazy` context had the same
+    shape (found by the 8 Oct branch, read, not run). And `AppLocale.of(applicationContext)` answers with
+    the phone's language below 13, because the choice lives only in `AppLocale.wrap`: the place lookups and
+    the channel names had that. Rule: wrap at the moment of use, and grep `AppLocale.of(` for unwrapped
+    callers whenever the language route changes.
+154. **An AI summary of the Play listing is not evidence about the app.** On 5 Oct 2026 a Google-generated 'insights' roadmap, pasted by the owner, was wrong on three of its four points: it asked for manual calibration (shipped 2 Aug as 'Match your mosque'), for background alert stability (done and measured on two phones) and for streaks on a 'Habits and Duas Tracker' that exists nowhere in the code or the listing. It also names a different app called 'Sajda' at times. Check every claim against this repo before it becomes a task, and with no reviews to summarise, a confident roadmap is a guess.
+155. **A disabled control with no explanation at the moment of failure is a defect, not a limit.** The 30 minute bound was right and recorded with its reason, and the plus button simply went grey while the reason sat in static text above the list. A user who hits a bound needs the reason and the next door where they are standing. Show it without waiting for a tap, because a disabled button receives none.
+156. **The cloud container could run an Android emulator on 7 Oct 2026, and it found things reading could not** (from the 8 Oct branch, its lesson 127; lesson 129 above says a cloud session cannot run an emulator, which was true of the 11 Oct session: check what the container in front of you has before relying on either). Verified 7 Oct 2026: the container has the SDK at `/opt/android-sdk` but no emulator and no `/dev/kvm`, and `dl.google.com` is reachable, so `sdkmanager "emulator" "system-images;android-34;default;x86_64"` (about 2.5 GB), `avdmanager create avd -n sajda -k ... -d pixel_6`, then `emulator -avd sajda -no-accel -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect -memory 3072 -cores 3 &` works. It is slow (about 4.5 minutes to boot, 15 to 30 seconds per screen) but it shows real pixels via `adb exec-out screencap -p`. Traps, all hit once: (a) `sys.boot_completed` flips before the package manager is up, so poll `adb shell service check package`; (b) the AOSP image's Bluetooth stack crash loops and eats the CPU, so `adb shell pm disable-user --user 0 com.android.bluetooth`; (c) a cold first launch gets ANR killed, so set `settings put global hide_error_dialogs 1` and pre-compile with `adb shell cmd package compile -m speed -f <package>`; (d) screenshots taken mid transition are black or blank, so retake until the file is over about 60 KB; (e) the default location is Mountain View and the zone is UTC, so prayer times look hours wrong; `adb shell service call alarm 3 s16 America/Los_Angeles` fixes the clock and is not an app bug; (f) `appops set <pkg> SCHEDULE_EXACT_ALARM deny` must be `appops set --uid`, and it kills the app, so relaunch after it settles; (g) `input swipe` needs a duration of about 1200 ms or it is read as a tap; (h) `uiautomator dump` gives exact tap coordinates and the real text on screen; (i) to skip onboarding in the `.rtl` or `.sideload` build, copy `files/datastore/sajdatime.preferences_pb` across with `run-as ... tar`. What it caught the first time it was used: an underlined em dash that read as an equals sign (never visible in code or tests). Still cannot reproduce a real phone: OEM battery policy, real GPS, real fonts.
+157. **A bidi mark in front of every PDF cell turns "5:03 PM" into "PM 5:03".** The 8 Oct branch put U+200F
+    before every string it drew on a right to left page, which is right for Urdu text with Latin inside it
+    and wrong for a cell that is only Latin and digits: the mark makes the paragraph right to left, so the
+    number and the meridiem swap sides (the Urdu PDF on the Android 12 emulator, 19 Oct 2026, pulled and
+    rendered with `sips`). Compose gives each `Text` the direction of its first strong letter, so the screen
+    showed "5:03 PM". The PDF now adds the mark only when the text contains a right to left letter, and the
+    Arabic times ("5:03 م") still read correctly. Render the real file; reading the drawing code passed both.
+158. **A stock Material component can format numbers with the JVM's default locale, whatever the app says.**
+    Material3 1.4.0's `TimePicker` draws its hour, minute and dial numbers through `toLocalString`, whose
+    locale parameter defaults to `Locale.getDefault()` and is never passed (read in its bytecode, 19 Oct 2026).
+    On an emulator set to ar-EG the new "the time on your mosque's board" clock showed ٤ : ٠٠ and ١٢ ١ ٢, in an
+    app whose digits are Western on every screen (AppLocale, the `ar-u-nu-latn` tag). `CompositionLocal`s
+    cannot reach it. The fix pins the default to `AppLocale.of(context)` while the clock is open and puts the
+    phone's back on dispose (`TimeEntryDialog`). Plain "ar" on Android 16 happened to give Western digits, so
+    an Arabic in-app choice looked fine and only the regional phone locale showed it: test with ar-EG, and
+    suspect any new Material component that shows a number.
+159. **Android splits a word that is wider than its line, so test short labels at 2.0 on a 320dp phone.**
+    On 19 Oct 2026 the tab bar read "Setting" over "s" and the theme selector "Follo / w / phon / e" on a
+    1080 pixel emulator set to `adb shell wm density 540` (320dp wide) at `font_scale 2.0`, and Turkish
+    "Telefona uy" and Indonesian "Pengaturan" split on an ordinary phone at 2.0. Earlier checks at 2.0 ran
+    in English on a 411dp phone, where every word happened to fit. `WholeWords` (DESIGN_SYSTEM §3) shrinks a
+    label only while a break falls inside a word. Two traps came with it: a 50% corner radius grows with the
+    height and cut the first letters off a wrapped label, and `IntrinsicSize.Min` measures text before an
+    auto size shrinks it, so the selector came out twice as tall. Put `wm density reset` back afterwards.
+160. **"Create the channel if it is missing" freezes its name in the language it was made in.** On the
+    Android 12 emulator with Urdu chosen in the app, three channel names were Urdu and "Prayer alarm" stayed
+    English (19 Oct 2026), because `ensureAlarmChannel` returned early for an existing channel and named a new
+    one from the caller's context. Creating an existing channel again changes only its name, description and
+    (with Do Not Disturb access and no user edits) its bypass flag, so it is now created every time, named
+    through `AppLocale.wrap`. Read the names in the phone's own Settings, not `dumpsys` (it cuts them to three
+    letters). `LanguageAndDndDeviceTest` now fails on the old code (run once to prove it).
+161. **A Wear tile is a snapshot until its own refresh, so a countdown on it must be a timeline.** The tile
+    said "in 41m" at 13:04 and still "in 41m" at 13:08 (watch emulator, 19 Oct 2026), because it asked to be
+    refreshed only a minute after the prayer: hours, after Isha. It now hands the watch one entry per minute
+    for up to an hour, and the text moved 35, 34, 32 on screen. The first version labelled each minute one
+    too high, a minute ahead of the watch app and the phone, which both floor: the independent review caught
+    it, and `TileFormatTest` now checks every entry's minutes a second into its window. Also seen: a per-app language switch while
+    the tile service is bound keeps the old language until the service is created again
+    (`applicationContext` is worse, it ignored the app's language), so the app asks for a redraw when it is
+    opened and after every settings write. On this emulator `add-tile` works, `show-tile` and `clear-tiles`
+    do not, and a swipe from the watch face's middle to the left opens the tiles (an edge swipe changes the
+    watch face).
+162. **TalkBack on an emulator: injected taps bypass it, the keyboard does not, and its log says what it
+    speaks.** `adb shell input tap` activates a control even with TalkBack on (it does not focus it), which
+    changed the language on the first try. Move TalkBack's focus with `input keyevent KEYCODE_TAB` and press
+    with `KEYCODE_ENTER`; set TalkBack, Advanced settings, Developer settings, Log output level to VERBOSE, and
+    each spoken phrase is a `talkback` logcat line `Actors: act() ... action=SPEAK text="..."`. Do not run
+    `uiautomator dump` while listening: it turns TalkBack off and on. Found this way: Match your mosque's plus
+    and minus changed the number and said nothing.
+163. **A test widget host does not switch a size mapped widget by measuring it.** Rendering the Today widget
+    in `WidgetDeviceTest` at 250 by 380dp still drew the ordinary card, and telling the host the size with
+    `updateAppWidgetSize` did not switch it either (tried and reverted, 19 Oct 2026). The large card was read
+    on the real Pixel Launcher instead (widget picker, the preview, Add), in Urdu and Arabic.
+164. **A device test that runs straight after a cold boot races the app's own boot handling.** In
+    `release-1.5.0.sh` on 19 Oct 2026 `WidgetDeviceTest` failed "an alarm is set with no widget placed": the
+    script boots the emulator and runs the suite at once, and `SystemEventReceiver` (boot, package replaced)
+    was still running with the badge on, so it laid the redraw alarm down again just after the test turned the
+    badge off and cancelled it. Reproduced by a second cold boot; the same suite passed 21 of 21 a few minutes
+    after boot, and the class passed alone twice. The test now repeats the cancel until it holds, for up to 30
+    seconds, and checks the same claim (21 of 21 straight after a third cold boot). The app's behaviour is right:
+    re-arming at boot is the point.
+165. **Material's 12 hour clock dial keeps a.m. or p.m. when the hand passes 12.** Opened on 11:58 p.m. (Asr for
+    Mountain View, shown in London time),
+    tapping 12 and then 05 gave "12:05 p.m." (Android 16 emulator, 12 hour mode, Material3 1.4.0, 19 Oct 2026),
+    which is noon, half a day from Asr, so the board time was refused. Found by reading in a read-only review,
+    then measured before the fix was trusted. `AdjustmentFit` now takes whichever half of the day is nearer. Any
+    future clock input that compares against a known time has the same trap; a 24 hour test never shows it.
+166. **The Wear tile renderer switches timeline entries late, by up to about half a minute.** Sampled through
+    `uiautomator dump` every 2 to 3 seconds (the tile's text is in the dump) across four minute changes on the
+    watch emulator, 19 Oct 2026: each change came 18 to 33 seconds after the minute, while the watch app,
+    which ticks every second, changed within the 2 second sampling step. So for that part of each minute the
+    tile shows one minute more than the watch app. The entries are right (`TileFormatTest`); the delay is the
+    system's. Not fixed: it is under a minute and the owner has not been asked (§11).
+167. **A Wear emulator's own language cannot be changed in its Settings, but it can be changed at runtime from
+    the shell.** Its Language screen says the watch follows the phone. The same call Wear OS makes when the
+    paired phone's language changes (`ActivityManager.getService().updatePersistentConfiguration` with
+    `userSetLocale`) can be run as the shell user: a 15 line Java class compiled with `javac` against
+    `android.jar`, turned into a dex with `d8`, pushed to `/data/local/tmp`, then `adb shell
+    CLASSPATH=/data/local/tmp/setlocale.dex app_process / SetLocale ur-PK`. The watch restarts its tile
+    renderer and the app's process goes, so the tile is drawn again by a new service. Delete the dex after.
+168. **On an emulator, a coarse location app sees a new position at most every 10 minutes, and `geo fix` only
+    lands while something asks for GPS.** The first `adb emu geo fix` after boot reached Android; later ones did
+    not, because nothing had GPS running. `cmd location providers add-test-provider network` and
+    `set-test-provider-location network --location LAT,LNG` (after `appops set com.android.shell
+    android:mock_location allow`) always land, but a second move within 10 minutes was ignored: Android keeps
+    a coarse only app's last known location for 10 minutes. Real users never move that fast; tests must wait,
+    or remove the test provider and use the city box. (19 Oct 2026.)
+169. **A launcher re-applies a widget update to the views it already has when the layout id is the same, so a
+    colour pinned in one update survives an update that pins none.** `AppWidgetHostView` recycles its views when
+    the new `RemoteViews` has the same layout id, and runs only the new actions on them. So letting a widget
+    switch between "colours from the layout" (System) and "colours pinned in code" (Light, Dark) on one layout
+    id would leave a widget dark after the user went back to System, until the launcher next inflated it. The
+    fix is a different layout id for the pinned path (`*_fixed.xml`, the same layout inside a `FrameLayout`
+    with `<include>`), which forces a fresh inflate on every switch. Found by reading the framework, before
+    building, 19 Oct 2026; the device test checks the System step last for that reason, straight after the theme
+    opposite to the phone's (with the matching one before it, a surviving colour would equal System's and pass). Not seen on a device.
+170. **A second alert with its own sound must not share a channel family that keeps only one channel alive.** The
+    prayer notification channels are kept to one at a time (`ensureNotificationChannel` deletes the others), which is
+    right while every prayer shares one sound. When the suhoor reminder got a sound of its own (21 Oct 2026), posting
+    it through the same family would have deleted the prayer channel at 4 am and restored it at Fajr, every day of
+    Ramadan, and deleting a channel also cancels whatever is showing on it. The fix is a family of its own
+    (`suhoor_v…`) that tidies only itself. Found by reading before building.
+171. **Moving an emulator's clock by hand can swallow an exact alarm.** Every `date` change sends `TIME_SET`, the app
+    re-plans, and a re-plan that lands in the same second as an alarm sees it as past and drops it (the plan keeps only
+    future times, on purpose). On 21 Oct 2026 one of three suhoor runs did not post, most likely for this reason (the
+    log of that run was cleared before it was read, so the cause is reasoned, not seen); the two clean runs either
+    side posted on the second. Set the clock 10 or more seconds before the alarm and change nothing until it fires; a run
+    that did not post after a hand-moved clock is not a defect until it repeats on a clean run. **The same race hit the
+    device tests** once the reminder was on by default: `release-1.5.0.sh` moves the clock from October into Ramadan,
+    which fires the overdue prayer alarms, the time change receiver and the daily worker, each rescheduling on its own
+    thread with settings read a moment earlier, so `SuhoorReminderDeviceTest` saw a reminder laid down after it had
+    switched it off, then a prayer list read mid-rewrite. The test now reschedules until the app settles before each
+    assertion; a real fault survives every reschedule and still fails.
+172. **Re-creating channels from a list read a moment earlier can bring back one just deleted.** The rename pass in
+    `ensureChannels` (lesson 160) re-creates each channel it listed; if `ensureAlarmChannel` deletes the Do Not
+    Disturb channel between the listing and the re-create, it comes back. `LanguageAndDndDeviceTest` caught it twice
+    in about ten runs on 21 Oct 2026, the rename set off by the language tests just before it. Fixed with one lock
+    held by every function that lists, creates or deletes a channel (`Notifications.channelLock`). Still open, older
+    than the lock and rare: an id chosen under the lock is posted to after release, so an alert posted in the same
+    instant access is withdrawn could land on a channel just deleted.
+173. **"Last writer wins" is not a rule, and a value with three writers needs one.** The watch's place had three
+    writers (phone sync, the watch's own fix on every open, the Makkah fallback) and no rule between them, so the
+    watch's GPS quietly replaced a city chosen on the phone each time the app opened, and nothing on the watch could
+    show or change it (§5.27). Every module was "correct"; the fault was that nobody owned the decision. When a stored
+    value gains a second writer, write down which one wins and decide it inside the write, against what is stored then.
+174. **In a Robolectric harness, a DataStore write started from the main thread never finishes unless the main looper is
+    turned.** DataStore runs the `edit` transform back in the caller's context, which is the paused main looper, so a
+    harness that waits with `rule.waitUntil` sees the write "not happen" and blames the app. Call
+    `shadowOf(Looper.getMainLooper()).idle()` inside the wait. Also: `captureToImage` times out there (draw the
+    `window.decorView` into a bitmap instead), the qualifiers need `-round-watch-` or Robolectric draws a phone title
+    bar, the `preferencesDataStore` singleton and `ShadowLocationManager` keep state across tests (clear both in
+    `@Before`), and the software renderer skips the list's edge fading, so `tools/wear-round-check.py` fails every
+    capture of a list, changed or not. Judge those captures by eye, and only against the same render of the old code.
+175. **On the Wear OS 34 emulator images, `adb install` of a test APK can hang for minutes; push it and `pm install -t`
+    instead.** Seen 23 Oct 2026 with the watch's first androidTest APK, while the app APK installed fine. Also: an
+    instrumentation run that dies with "Process crashed" may be `ClassNotFoundException: androidx.test.runner
+    .AndroidJUnitRunner`. `androidx.test.ext:junit` alone does not bring the runner; the phone gets it through
+    `espresso-core`, so the watch now does the same. And two Wear emulators with Gradle running starve each other
+    (load average about 20, "failed to complete startup" ANRs): run one at a time when a test must start a process.

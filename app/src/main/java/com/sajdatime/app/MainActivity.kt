@@ -1,5 +1,6 @@
 package com.sajdatime.app
 
+import com.sajdatime.app.ui.components.CtaButton
 import android.Manifest
 import android.content.ClipData
 import android.content.Context
@@ -28,20 +29,23 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
+import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
 import com.sajdatime.app.ui.MainScaffold
@@ -88,20 +92,50 @@ class MainActivity : ComponentActivity() {
     }
 
     /**
-     * The system ringtone picker. It already lists alarms, ringtones and any audio the
-     * user has added themselves, so there is no need to bundle an adhan recording —
-     * which would also raise licensing questions and inflate a charity app's download.
+     * The system ringtone picker: alarms, ringtones and any audio the user has added. Since
+     * 1.5.0 Sunni users can also pick a built-in adhan in Settings (data/BuiltInAdhan.kt);
+     * this is "a sound from your phone", for everyone.
+     *
+     * Only an OK changes anything. Backing out used to arrive here with no data and reset the
+     * sound to the phone's default, which would also have thrown away a chosen built-in adhan.
      */
     private val alarmSoundPicker = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
         val uri = result.data
             ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-        viewModel.setAlarmSound(uri?.toString().orEmpty())
+        // Any app can answer the picker intent. Only a content:// or android.resource:// sound is
+        // kept: a file:// one makes posting the alarm throw, which post() catches, so the prayer alert
+        // would silently never appear (independent security review, 17 Oct 2026). Null is the
+        // phone's default, as before.
+        if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
+        viewModel.setAlarmSound(storedSound(uri, RingtoneManager.TYPE_ALARM))
+    }
+
+    /** The same, for the notification sound (18 Oct 2026). A launcher of its own, so no state says which. */
+    private val notificationSoundPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+        val uri = result.data
+            ?.getParcelableExtraCompat<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+        if (uri != null && !isAcceptedAlarmSound(uri.scheme)) return@registerForActivityResult
+        viewModel.setNotificationSound(storedSound(uri, RingtoneManager.TYPE_NOTIFICATION))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The window's direction must come from the app's language (AppLocale.wrap above), not be
+        // left to the platform. Below Android 13 a language picked in the app restarts this screen
+        // with recreate(), and on the Android 12 emulator (19 Oct 2026) the new screen kept the old
+        // one's direction: Urdu words laid out left to right after choosing Urdu, and English words
+        // right to left after choosing "Phone language" from Urdu, which CLAUDE.md forbids. A fresh
+        // launch was always right. HANDOVER §15 lesson 152.
+        window.decorView.layoutDirection = resources.configuration.layoutDirection
+        // Here as well as in the ViewModel: a language change recreates this screen but keeps the
+        // ViewModel, so this is where the channel names in the phone's settings catch up with it.
+        Notifications.ensureChannels(this)
         enableEdgeToEdge()
 
         setContent {
@@ -162,11 +196,19 @@ class MainActivity : ComponentActivity() {
                                 onSetHijriOffset = viewModel::setHijriOffsetDays,
                                 onResetAdjustments = viewModel::resetAdjustments,
                                 onSetOngoingBadge = viewModel::setOngoingBadge,
-                                onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                                 onSetAlarmOnApproximateDays = viewModel::setAlarmOnApproximateDays,
                                 onPickAlarmSound = {
-                                    openAlarmSoundPicker(state.settings.alarmSoundUri)
+                                    openAlarmSoundPicker(state.settings.alarmSoundUri, state.settings.phoneAlarmSoundUri)
                                 },
+                                onPickBuiltInAdhan = viewModel::setBuiltInAdhan,
+                                onPickNotificationSound = {
+                                    openNotificationSoundPicker(
+                                        state.settings.notificationSoundUri,
+                                        state.settings.phoneNotificationSoundUri,
+                                    )
+                                },
+                                onPickBuiltInNotificationAdhan = viewModel::setBuiltInNotificationAdhan,
+                                onSetAlarmRespectsSilent = viewModel::setAlarmRespectsSilent,
                                 onRefreshLocation = ::requestLocation,
                                 onSearchCity = viewModel::searchCity,
                                 onQiblaVisible = viewModel::setQiblaVisible,
@@ -178,49 +220,24 @@ class MainActivity : ComponentActivity() {
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
                                 onSetSuhoorMinutes = viewModel::setSuhoorReminderMinutes,
                                 onSetSuhoorStyle = viewModel::setSuhoorReminderStyle,
+                                onSetSuhoorAdhan = viewModel::setSuhoorUsesAdhan,
+                                onSetPrayerReminderMinutes = viewModel::setPrayerReminderMinutes,
+                                onSetPrayerReminder = viewModel::setPrayerReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                             )
 
-                            // Shown once, immediately after setup. The app is a convenience,
-                            // not a religious authority, and saying so should not be buried.
+                            // Shown once, immediately after setup, never after an update (the flag is
+                            // stored). The app is a convenience, not a religious authority, and saying
+                            // so should not be buried.
+                            //
+                            // Short form first, since 18 Oct 2026 (the owner: no long message straight
+                            // after installing). disclaimer_brief still makes all four points of
+                            // HANDOVER 5.15 (DisclaimerContentTest), and "Read in full" swaps in the
+                            // complete disclaimer_body, dua request last, in this same dialog. The
+                            // complete text is also always in Settings, About, Disclaimer.
                             if (!state.settings.disclaimerSeen) {
-                                AlertDialog(
-                                    onDismissRequest = { },
-                                    // A filled, full-width button, not a text link. This is the
-                                    // one control on the one screen every user must pass
-                                    // through, and as a small tinted word in the corner it did
-                                    // not read as pressable — a tester said so. 56dp clears the
-                                    // 48dp minimum touch target with room for shaky hands.
-                                    confirmButton = {
-                                        Button(
-                                            onClick = { viewModel.markDisclaimerSeen() },
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .heightIn(min = 56.dp),
-                                        ) {
-                                            Text(stringResource(R.string.action_understood))
-                                        }
-                                    },
-                                    title = { Text(stringResource(R.string.disclaimer_title)) },
-                                    // Scrollable. AlertDialog does not scroll its body for
-                                    // you, and this text is now seven paragraphs — at a large
-                                    // system font size the last of them, the dua request, is
-                                    // exactly what would fall off the bottom unread.
-                                    //
-                                    // Seven, not five, since the Isha and congregation-time
-                                    // paragraphs were added. Only four fit on a 1080x1920
-                                    // screen at default font, so the dua is three swipes down
-                                    // and the scroll is the only thing keeping it reachable.
-                                    // Verified by screenshot in RTL — see HANDOVER §10. Do not
-                                    // lengthen this further without re-checking that the dua
-                                    // still arrives, and do not remove the scroll.
-                                    text = {
-                                        Column(Modifier.verticalScroll(rememberScrollState())) {
-                                            Text(stringResource(R.string.disclaimer_body))
-                                        }
-                                    },
-                                )
+                                FirstRunDisclaimer(onUnderstood = viewModel::markDisclaimerSeen)
                             }
                         }
                     }
@@ -250,19 +267,46 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun openAlarmSoundPicker(current: String) {
-        val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
-            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(R.string.settings_alarm_sound))
-            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-            putExtra(
-                RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
-                current.takeIf { it.isNotBlank() }?.let(Uri::parse)
-                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM),
+    private fun openAlarmSoundPicker(current: String, phoneSound: String) =
+        runCatching {
+            alarmSoundPicker.launch(soundPickerIntent(current, phoneSound, R.string.settings_alarm_sound, RingtoneManager.TYPE_ALARM))
+        }
+
+    private fun openNotificationSoundPicker(current: String, phoneSound: String) =
+        runCatching {
+            notificationSoundPicker.launch(
+                soundPickerIntent(current, phoneSound, R.string.settings_notification_sound, RingtoneManager.TYPE_NOTIFICATION),
             )
         }
-        runCatching { alarmSoundPicker.launch(intent) }
+
+    /**
+     * The phone's own sound list. TYPE_ALL, so alarms, ringtones and notification tones are all offered
+     * whichever is being chosen; [defaultType] only decides where it opens when nothing is chosen yet.
+     */
+    private fun soundPickerIntent(current: String, phoneSound: String, title: Int, defaultType: Int): Intent {
+        // A built-in adhan is not in the phone's list, so the picker opens on the phone sound it replaced.
+        val existing = if (BuiltInAdhan.of(current) == null) current else phoneSound
+        return Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALL)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, getString(title))
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            // The picker's "Default" row. Without this, with TYPE_ALL, it meant the default *ringtone*,
+            // so a person going back to "default" got their ringtone on every prayer (review, 18 Oct 2026).
+            putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, RingtoneManager.getDefaultUri(defaultType))
+            putExtra(
+                RingtoneManager.EXTRA_RINGTONE_EXISTING_URI,
+                existing.takeIf { it.isNotBlank() }?.let(Uri::parse)
+                    ?: RingtoneManager.getDefaultUri(defaultType),
+            )
+        }
     }
+
+    /**
+     * What is saved for a pick: "" when it is the phone's default for [defaultType], which keeps a
+     * notification on its original channel and follows the phone if its default tone changes later.
+     */
+    private fun storedSound(uri: Uri?, defaultType: Int): String =
+        uri?.takeIf { it != RingtoneManager.getDefaultUri(defaultType) }?.toString().orEmpty()
 
     private fun toast(message: String) =
         android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
@@ -329,4 +373,61 @@ private fun PreviewBuildFrame(content: @Composable () -> Unit) {
                 .consumeWindowInsets(WindowInsets.statusBars),
         ) { content() }
     }
+}
+
+/** The sound address schemes the alarm channel can safely play: a media or settings provider, or an app's raw resource. */
+internal fun isAcceptedAlarmSound(scheme: String?): Boolean =
+    scheme == "content" || scheme == "android.resource"
+
+/**
+ * The disclaimer shown once after setup: the short form, a way to the full text, and Understood.
+ * A composable of its own so the render harness (HANDOVER lesson 132) draws exactly what ships.
+ */
+@Composable
+internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
+    var full by rememberSaveable { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = { },
+        // A filled, full-width button, not a text link. This is the
+        // one control on the one screen every user must pass
+        // through, and as a small tinted word in the corner it did
+        // not read as pressable — a tester said so. 56dp clears the
+        // 48dp minimum touch target with room for shaky hands.
+        confirmButton = {
+            CtaButton(
+                onClick = onUnderstood,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+            ) {
+                Text(stringResource(R.string.action_understood))
+            }
+        },
+        // The way to the full text, gone once it is showing. Solid,
+        // like every action in the app (owner, 18 Oct 2026); it was a
+        // text link, and he asked that no action look like one.
+        dismissButton = if (full) {
+            null
+        } else {
+            {
+                CtaButton(
+                    onClick = { full = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text(stringResource(R.string.disclaimer_read_full))
+                }
+            }
+        },
+        title = { Text(stringResource(R.string.disclaimer_title)) },
+        // Scrollable. AlertDialog does not scroll its body for you.
+        // The short form fits one screen at the default font; the
+        // full one is seven paragraphs, and at a large font the last
+        // of them, the dua request, is exactly what would fall off
+        // the bottom unread. Do not remove the scroll.
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                Text(stringResource(if (full) R.string.disclaimer_body else R.string.disclaimer_brief))
+            }
+        },
+    )
 }

@@ -1,5 +1,12 @@
 package com.sajdatime.app.ui.home
 
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.data.placeName
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.components.DialogTitle
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.shadow
+import androidx.compose.material.icons.rounded.Mosque
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,13 +25,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Brightness3
-import androidx.compose.material.icons.filled.Brightness5
-import androidx.compose.material.icons.filled.Brightness6
-import androidx.compose.material.icons.filled.NightsStay
-import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.filled.WbTwilight
+import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.Brightness3
+import androidx.compose.material.icons.rounded.Brightness5
+import androidx.compose.material.icons.rounded.Brightness6
+import androidx.compose.material.icons.rounded.NightsStay
+import androidx.compose.material.icons.rounded.WbSunny
+import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.PictureAsPdf
@@ -35,7 +42,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -49,6 +55,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.sajdatime.app.ui.components.Notice
+import androidx.compose.ui.text.font.FontWeight
+import com.sajdatime.app.ui.components.BottomBarClearance
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Size
@@ -74,6 +84,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.review.ReviewPrompt
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.ui.UiState
@@ -111,6 +122,27 @@ fun HomeScreen(
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
     val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
+    // Google's rating card, at most at a settled moment (review/ReviewPrompt.kt). Calm means
+    // nothing open on top and no warning on screen: a card must not land on a problem. Keyed on
+    // all of that, so opening a sheet inside the five seconds cancels the wait.
+    val activity = androidx.activity.compose.LocalActivity.current
+    val exactWarning = !PrayerAlarmScheduler.canScheduleExact(LocalContext.current) &&
+        !state.settings.exactAlarmNoticeDismissed
+    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable &&
+        state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
+    val times = state.today?.times
+    LaunchedEffect(calm, times) {
+        if (activity == null || times == null) return@LaunchedEffect
+        kotlinx.coroutines.delay(5_000)
+        ReviewPrompt.onTimesShown(
+            activity = activity,
+            calmScreen = calm,
+            todayTimes = times.values.toList(),
+            fajr = times[PrayerSlot.FAJR],
+            sunrise = times[PrayerSlot.SUNRISE],
+        )
+    }
+
     // The Ramadan option in the export sheet: offered from 30 days before day 1 to the last day,
     // on the user's own calendar (RamadanInfo.offersTimetable), so a family can print it ahead.
     // Keyed on the date and the shift, so it is not recomputed on the clock's every tick.
@@ -126,11 +158,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-            // 8dp, not 24: this sits below the last element, where the navigation bar is
-            // already providing the separation, and on a short screen it was 24dp of the
-            // 37dp that pushed the mosque door under the bar.
-            .padding(bottom = 8.dp),
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Order and heights are budgeted so that on a phone at the default font size the
@@ -152,13 +180,13 @@ fun HomeScreen(
         // and note that the column stays `verticalScroll` on purpose so that a screen
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
         LocationHeader(state = state, now = state.now, onClick = { locationSheet = true })
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Group))
         NextPrayerCard(state)
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
         // Below the two banners that say the times may be for the wrong place or approximate,
         // so a card of suhoor and iftar times is never the first thing read about a doubtful
-        // number. Present only inside Ramadan and the week before it. During the month the
+        // number. Present only inside Ramadan and the 3 days before it. During the month the
         // column scrolls on a short phone: for that month this card is the second most read
         // thing on the screen, and the height budget above is spent on it knowingly.
         // The Eid greeting takes the same slot. It cannot meet the Ramadan card: Ramadan has
@@ -172,13 +200,17 @@ fun HomeScreen(
             onDismissNotice = onDismissRamadanNotice,
         )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(Space.Group))
         TodayTimeline(state, onExport = { exportSheet = true })
         MosqueDifferenceDoor(
             state = state,
             onOpen = { explaining = true },
             onDismissNotice = onDismissMethodNotice,
         )
+        // The floating tab bar sits over the bottom of this column (Quiet Glass); this is the
+        // room to scroll the mosque button clear of it. Measured, so it grows with the bar.
+        Spacer(Modifier.height(Space.Related))
+        BottomBarClearance()
     }
 
     if (explaining) {
@@ -224,7 +256,7 @@ fun HomeScreen(
     if (exportSheet) {
         ExportSheet(
             sheetState = exportSheetState,
-            cityName = state.settings.cityName,
+            cityName = state.settings.placeName(LocalContext.current),
             ramadanYear = ramadanExportYear,
             onDismiss = { exportSheet = false },
             onPick = { range ->
@@ -258,7 +290,7 @@ fun HomeScreen(
  */
 @Composable
 private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
-    val city = state.settings.cityName.ifBlank {
+    val city = state.settings.placeName(LocalContext.current).ifBlank {
         stringResource(R.string.location_set_generic)
     }
     // Through a resource rather than "$city. $changeLabel": the full stop and the order of
@@ -274,39 +306,42 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit) {
         stringResource(R.string.action_change_location),
     )
 
+    // The same large, start aligned title as Qibla and Settings (Quiet Glass, 17 Oct 2026), so
+    // the three tabs open the same way. Here the title is the city, because the city is what
+    // decides every time on this screen. 4dp in from the column's 16dp, so it sits on the same
+    // 20dp line as the other titles.
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = Space.Tight)
+            .clip(RoundedCornerShape(16.dp))
             .clickable(role = Role.Button, onClick = onClick)
-            .padding(vertical = 10.dp)
+            .padding(horizontal = 4.dp, vertical = 6.dp)
             .semantics { contentDescription = spokenLocation },
     ) {
-        Icon(
-            Icons.Outlined.LocationOn,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(18.dp),
-        )
-        Spacer(Modifier.width(6.dp))
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = city, style = MaterialTheme.typography.titleMedium)
-                Spacer(Modifier.width(4.dp))
-                // A pin alone reads as a label. The caret is what says "you can change
-                // this", which is the single most common thing a traveller needs and was
-                // previously discoverable only by guessing the city name was a button.
+                Text(
+                    text = city,
+                    style = MaterialTheme.typography.headlineMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Spacer(Modifier.width(2.dp))
+                // A name alone reads as a label. The green caret is what says "you can change
+                // this", which is the single most common thing a traveller needs.
                 Icon(
-                    Icons.Filled.ArrowDropDown,
+                    Icons.Rounded.ArrowDropDown,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(28.dp),
                 )
             }
             Text(
                 text = dateLine(now, state.settings.hijriOffsetDays),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -324,11 +359,24 @@ private fun NextPrayerCard(state: UiState) {
     // so the contrast under the countdown was different at Isha than at Fajr and could not
     // be asserted. Every stop of this one is checked in ColorContrastTest.
     val hero = heroStyle()
+    val heroShape = RoundedCornerShape(24.dp)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(24.dp), hero.brush)
+            // The glossy finish (owner, 18 Oct 2026, matching the widgets): a soft green glow
+            // under the light card, then the fixed gradient, a sheen over the top half and a rim
+            // that is brightest at the top. Every colour is in HeroStyle and contrast tested.
+            .then(
+                if (hero.glow == Color.Transparent) {
+                    Modifier
+                } else {
+                    Modifier.shadow(12.dp, heroShape, clip = false, ambientColor = hero.glow, spotColor = hero.glow)
+                },
+            )
+            .sajdaSurface(heroShape, hero.brush)
+            .background(Brush.verticalGradient(0f to hero.sheen, 0.5f to Color.Transparent))
+            .border(1.dp, Brush.verticalGradient(listOf(hero.rim, hero.rimBottom)), heroShape)
             // 16dp, not 24: part of the height budget in HomeScreen, and the card is the
             // tallest single block on the screen so it is where height is cheapest to find.
             .padding(horizontal = 20.dp, vertical = 16.dp),
@@ -363,13 +411,25 @@ private fun NextPrayerCard(state: UiState) {
         // capitals, but String.uppercase() on a translated string is a trap — Turkish
         // dotted/dotless i, and scripts with no case at all. If a language wants capitals
         // its translator writes them into the string.
+        // After Isha the next prayer is tomorrow's Fajr, and the widget already says so; the
+        // card now does too, on the label line so the 823dp fit is untouched (research F13).
         Text(
-            text = stringResource(R.string.home_next_prayer),
-            style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.6.sp),
+            text = if (next.isTomorrow) {
+                stringResource(
+                    R.string.settings_value_pair,
+                    stringResource(R.string.home_next_prayer),
+                    stringResource(R.string.widget_tomorrow),
+                )
+            } else {
+                stringResource(R.string.home_next_prayer)
+            },
+            // Sentence case and medium weight since Quiet Glass (17 Oct 2026), matching the
+            // section titles in Settings; the letterspaced capitals read as dated.
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
             color = hero.label,
             textAlign = TextAlign.Center,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
 
         // Name and time share one optical line so the block reads as a single
         // centred unit rather than three stacked fragments.
@@ -391,7 +451,7 @@ private fun NextPrayerCard(state: UiState) {
             )
         }
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(Space.Related))
 
         // A per-second live region would interrupt a screen reader constantly, so
         // the digits are hidden and a readable summary is announced instead.
@@ -409,7 +469,7 @@ private fun NextPrayerCard(state: UiState) {
                 contentDescription = spokenCountdown
             },
         )
-        Spacer(Modifier.height(2.dp))
+        Spacer(Modifier.height(Space.Tight))
         Text(
             text = stringResource(R.string.home_until),
             style = MaterialTheme.typography.labelMedium,
@@ -427,10 +487,10 @@ private fun NextPrayerCard(state: UiState) {
  *
  * Two forms, one door:
  *
- *  - **Plain**, for everyone: an outlined button. A button and not a text link, since
- *    15 Aug 2026 — the owner asked for the calls to action to be findable, and a tinted
- *    word under a card did not read as one. Outlined and not filled, so it never competes
- *    with the next-prayer card, and it never goes away, so it must not nag.
+ *  - **Plain**, for everyone: a solid CtaButton (green, white text) with a mosque icon. A
+ *    button and not a text link since 15 Aug 2026; outlined until 18 Oct 2026, then tonal for
+ *    one day; the owner found both easy to miss and asked for white text on a solid button. It
+ *    never goes away, so it must still not nag: no motion, no badge, no colour that changes.
  *  - **Loud**, above 45° of latitude while the method is still AUTO and until dismissed:
  *    the amber notice card. That threshold is where the spread between methods crosses an
  *    hour (78 minutes on Isha in Slough against the mosques' Moonsighting convention).
@@ -459,21 +519,24 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
         state.settings.method == CalcMethod.AUTO &&
         latitude != null && abs(latitude) >= METHOD_NOTICE_LATITUDE
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     if (loud) {
-        NoticeCard(
+        Notice(
             title = stringResource(R.string.method_notice_title),
-            body = stringResource(R.string.method_notice_body),
-            onClick = onOpen,
+            brief = stringResource(R.string.method_notice_body),
+            actionLabel = stringResource(R.string.action_see_why),
+            onAction = onOpen,
             onDismiss = onDismissNotice,
         )
     } else {
-        OutlinedButton(
+        CtaButton(
             onClick = onOpen,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = 48.dp),
+                .heightIn(min = 52.dp),
         ) {
+            Icon(Icons.Rounded.Mosque, contentDescription = null, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
             Text(stringResource(R.string.mosque_diff_link))
         }
     }
@@ -497,12 +560,12 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_close)) }
         },
-        title = { Text(stringResource(R.string.mosque_diff_title)) },
+        title = { DialogTitle(stringResource(R.string.mosque_diff_title), onDismiss) },
         // Scrollable, like every long dialog here: AlertDialog will not scroll its body for
         // you, and at a raised font size the last paragraph is what falls off the bottom.
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation))
+                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation), first = true)
                 ExplainerParagraph(stringResource(R.string.mosque_diff_twilight))
                 ExplainerAction(stringResource(R.string.settings_method)) {
                     onOpen(SettingsChooser.METHOD)
@@ -521,23 +584,29 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
     )
 }
 
+/**
+ * A paragraph in an explainer dialog. With [ExplainerAction] it follows the spacing scale
+ * (theme/Spacing.kt): a paragraph sits [Space.Group] under whatever came before, and the button
+ * that acts on it sits [Space.Related] under it, so each paragraph and its button read as one
+ * group. The first paragraph adds nothing, because the dialog already spaces it from the title.
+ */
 @Composable
-internal fun ExplainerParagraph(text: String) {
+internal fun ExplainerParagraph(text: String, first: Boolean = false) {
     Text(
         text = text,
         style = MaterialTheme.typography.bodyMedium,
-        modifier = Modifier.padding(top = 12.dp),
+        modifier = Modifier.padding(top = if (first) 0.dp else Space.Group),
     )
 }
 
 @Composable
 internal fun ExplainerAction(label: String, onClick: () -> Unit) {
-    OutlinedButton(
+    CtaButton(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp)
-            .heightIn(min = 48.dp),
+            .padding(top = Space.Related)
+            .heightIn(min = 52.dp),
     ) {
         Text(label)
     }
@@ -554,7 +623,7 @@ private fun ExportSheet(
     onPick: (PrayerPdfExporter.Range) -> Unit,
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
-        Column(Modifier.padding(bottom = 32.dp)) {
+        Column(Modifier.padding(bottom = Space.Section)) {
             Text(
                 text = stringResource(R.string.export_sheet_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -562,7 +631,7 @@ private fun ExportSheet(
                     .padding(horizontal = 24.dp)
                     .semantics { heading() },
             )
-            Spacer(Modifier.height(6.dp))
+            Spacer(Modifier.height(Space.Tight))
             Text(
                 text = stringResource(
                     R.string.export_sheet_body,
@@ -575,7 +644,7 @@ private fun ExportSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 24.dp),
             )
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(Space.Group))
 
             PrayerPdfExporter.Range.entries
                 .filter { it != PrayerPdfExporter.Range.RAMADAN || ramadanYear != null }
@@ -625,11 +694,12 @@ private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onCl
 @Composable
 private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
     if (!state.settings.usingDefaultLocation) return
-    Spacer(Modifier.height(12.dp))
-    NoticeCard(
+    Spacer(Modifier.height(Space.Group))
+    Notice(
         title = stringResource(R.string.home_default_location_title),
-        body = stringResource(R.string.home_default_location_body),
-        onClick = onFix,
+        brief = stringResource(R.string.home_default_location_body),
+        actionLabel = stringResource(R.string.action_set_location),
+        onAction = onFix,
     )
 }
 
@@ -662,16 +732,18 @@ private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
 @Composable
 private fun PolarBanner(state: UiState) {
     val from = state.today?.approximatedFrom ?: return
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     // The alarm sentence is added only when it is both true and about to matter: the user
     // has set at least one alarm, and has not already turned the override on. Without it the
     // only way to learn that today's alarms will not ring is to not be woken by one. With it
     // shown to everyone, most polar users would read a paragraph about a feature they never
     // enabled. See AppSettings.alarmOnApproximateDays.
     val quietened = state.settings.usesAlarm && !state.settings.alarmOnApproximateDays
-    NoticeCard(
+    // Brief first (where the times come from), the reasoning folded behind it.
+    Notice(
         title = stringResource(R.string.polar_notice_title),
-        body = stringResource(R.string.polar_notice_body, from.toInt()) +
+        brief = stringResource(R.string.polar_notice_brief, from.toInt()),
+        details = stringResource(R.string.polar_notice_body, from.toInt()) +
             if (quietened) "\n\n" + stringResource(R.string.polar_notice_alarm) else "",
     )
 }
@@ -682,78 +754,15 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     if (PrayerAlarmScheduler.canScheduleExact(context)) return
     if (state.settings.exactAlarmNoticeDismissed) return
 
-    Spacer(Modifier.height(12.dp))
+    Spacer(Modifier.height(Space.Group))
     PermissionCard(
         title = stringResource(R.string.settings_exact_alarms_title),
-        body = stringResource(R.string.settings_exact_alarms_desc),
+        body = stringResource(R.string.settings_exact_alarms_brief),
+        details = stringResource(R.string.settings_exact_alarms_desc),
         granted = false,
         onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
         onDismiss = onDismiss,
     )
-}
-
-/**
- * "The system is withholding something you asked for." Amber container, amber icon and
- * amber-on-amber text, so it reads as a warning at a glance rather than as one more grey
- * card in a stack of grey cards — which is what it looked like before, and why the exact
- * alarm notice went unnoticed.
- */
-@Composable
-private fun NoticeCard(
-    title: String,
-    body: String,
-    // Null when the card only informs. Not every notice has somewhere to go: the polar
-    // one states a fact about where the user lives, and a card that looks tappable but
-    // does nothing teaches people that tapping cards here is pointless.
-    onClick: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null,
-) {
-    val scheme = MaterialTheme.colorScheme
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(16.dp), scheme.tertiaryContainer)
-            .border(1.dp, scheme.tertiary.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
-            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .padding(16.dp),
-    ) {
-        Icon(
-            Icons.Outlined.WarningAmber,
-            contentDescription = null,
-            tint = scheme.tertiary,
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                color = scheme.onTertiaryContainer,
-            )
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onTertiaryContainer,
-            )
-        }
-        if (onDismiss != null) {
-            // Its own clickable inside a clickable row. The row opens the system screen
-            // that grants the permission; this closes the card. They must not be the same
-            // gesture, and 44dp is the smallest target that is honestly tappable — the
-            // 24dp glyph alone would be a trap for anyone with less than perfect aim.
-            Spacer(Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = stringResource(R.string.notice_dismiss),
-                tint = scheme.onTertiaryContainer,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .clickable(role = Role.Button, onClick = onDismiss)
-                    .padding(10.dp)
-                    .size(24.dp),
-            )
-        }
-    }
 }
 
 @Composable
@@ -766,6 +775,8 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     // button under everything, and on a 20:9 phone it was the thing that fell below the
     // fold; beside the list it exports it costs no height at all and reads as what it is —
     // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
+    // Compact (40dp drawn, 48dp to touch) and 8dp above the list it saves, 16dp under the card:
+    // at full size it looked squashed between the two (owner, 18 Oct 2026, screenshot).
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth(),
@@ -777,12 +788,13 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                 .weight(1f)
                 .semantics { heading() },
         )
-        TextButton(onClick = onExport) {
+        CtaButton(onClick = onExport, compact = true) {
             Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(Space.Related))
             Text(stringResource(R.string.action_save_pdf))
         }
     }
+    Spacer(Modifier.height(Space.Related))
 
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }
@@ -863,6 +875,8 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
+            .semantics(mergeDescendants = true) {}
             .background(background)
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this
@@ -948,12 +962,12 @@ private fun PrayerRow(slot: PrayerSlot, time: String, isNext: Boolean, isCurrent
 }
 
 private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
-    PrayerSlot.FAJR -> Icons.Filled.Brightness3
-    PrayerSlot.SUNRISE -> Icons.Filled.WbTwilight
-    PrayerSlot.DHUHR -> Icons.Filled.WbSunny
-    PrayerSlot.ASR -> Icons.Filled.Brightness5
-    PrayerSlot.MAGHRIB -> Icons.Filled.Brightness6
-    PrayerSlot.ISHA -> Icons.Filled.NightsStay
+    PrayerSlot.FAJR -> Icons.Rounded.Brightness3
+    PrayerSlot.SUNRISE -> Icons.Rounded.WbTwilight
+    PrayerSlot.DHUHR -> Icons.Rounded.WbSunny
+    PrayerSlot.ASR -> Icons.Rounded.Brightness5
+    PrayerSlot.MAGHRIB -> Icons.Rounded.Brightness6
+    PrayerSlot.ISHA -> Icons.Rounded.NightsStay
 }
 
 /**

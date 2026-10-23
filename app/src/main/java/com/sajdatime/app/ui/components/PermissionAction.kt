@@ -26,6 +26,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.draw.rotate
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.material.icons.rounded.WarningAmber
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -56,7 +70,7 @@ fun rememberGranted(check: (Context) -> Boolean): State<Boolean> {
 
 /**
  * A real button until the permission is granted, then a plain "Allowed" line with a tick.
- * The button is 48dp tall at least and announces itself as a button; the allowed line is not
+ * The button is 52dp tall at least and announces itself as a button; the allowed line is not
  * clickable (there is nothing left to do) and says "Allowed" as its state, so TalkBack does
  * not rely on the tick glyph alone.
  */
@@ -87,27 +101,26 @@ fun PermissionButton(
             )
         }
     } else {
+        // 52dp and 16sp, the same as a standalone CtaButton (DESIGN_SYSTEM 4.1).
         Button(
             onClick = onClick,
-            modifier = modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp),
+            modifier = modifier.heightIn(min = 52.dp),
             // Amber cards use the accent pair that ColorContrastTest already checks.
             colors = if (amber) {
                 ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
             } else {
-                ButtonDefaults.buttonColors()
+                ctaButtonColors()
             },
         ) {
-            Text(label)
+            Text(label, style = actionLabelStyle())
         }
     }
 }
 
 /**
- * The amber "the system is withholding something" card with the action as its own button
- * (not a whole-card tap), turning into a calm "Allowed" card once granted. [onDismiss] is for
- * Times only; Settings never offers a close button.
+ * A permission the system is withholding, as a [Notice] (warning tone), turning into a calm
+ * "Allowed" line once granted. [onDismiss] is for Times only; Settings never hides a problem.
+ * The action opens the phone's own settings screen. Redesigned 17 Oct 2026: see [Notice].
  */
 @Composable
 fun PermissionCard(
@@ -116,50 +129,21 @@ fun PermissionCard(
     granted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    details: String? = null,
     onDismiss: (() -> Unit)? = null,
 ) {
-    val scheme = MaterialTheme.colorScheme
-    val shape = RoundedCornerShape(16.dp)
-    val container = if (granted) scheme.secondaryContainer else scheme.tertiaryContainer
-    val content = if (granted) scheme.onSecondaryContainer else scheme.onTertiaryContainer
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .sajdaSurface(shape, container)
-            .border(1.dp, (if (granted) scheme.primary else scheme.tertiary).copy(alpha = 0.35f), shape)
-            .padding(16.dp),
-    ) {
-        if (!granted) {
-            Row(verticalAlignment = Alignment.Top) {
-                Icon(Icons.Outlined.WarningAmber, contentDescription = null, tint = scheme.tertiary)
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(title, style = MaterialTheme.typography.titleMedium, color = content)
-                    Text(body, style = MaterialTheme.typography.bodyMedium, color = content)
-                }
-                if (onDismiss != null) {
-                    // 48dp, separate from the action button: one gesture opens the system
-                    // screen, the other closes the card, and they must never be the same tap.
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = stringResource(R.string.notice_dismiss),
-                        tint = content,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(50))
-                            .clickable(role = Role.Button, onClick = onDismiss)
-                            .padding(12.dp),
-                    )
-                }
-            }
-        Spacer(Modifier.height(12.dp))
-        }
-        PermissionButton(
-            label = title,
-            granted = granted,
-            onClick = onClick,
-            amber = true,
-            allowedColor = content,
-            modifier = Modifier.fillMaxWidth(),
-        )
-    }
+    // Granted: nothing. A permanent "Allowed" card at the top of Settings is the furniture
+    // DESIGN_SYSTEM §4 forbids; the user did the right thing and needs no badge for it
+    // (research F21, 17 Oct 2026). Onboarding keeps its "Allowed" line via PermissionButton.
+    if (granted) return
+    Notice(
+        title = title,
+        brief = body,
+        details = details,
+        actionLabel = stringResource(R.string.action_allow),
+        actionSpokenAs = title,
+        onAction = onClick,
+        onDismiss = onDismiss,
+        modifier = modifier,
+    )
 }

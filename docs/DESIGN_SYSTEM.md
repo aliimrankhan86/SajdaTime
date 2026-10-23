@@ -10,6 +10,69 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 
 ---
 
+## 0. Read this before any visual change: the owner's rules, and when to ask him
+
+This section exists because the same mistakes were made again and again, each time after
+being told it was done. It is written so that the next session cannot repeat them.
+
+### 0.1 What went wrong, so you recognise it in yourself
+
+| Date | What the owner asked | What was done instead | Why it happened |
+|---|---|---|---|
+| Up to 18 Oct 2026 | Buttons that stand out, hard to miss | Outlined buttons | Material's default "secondary" choice was taken as good enough |
+| 18 Oct 2026 | Same, again | Tonal buttons (pale green fill) | Material calls tonal "medium emphasis"; in dark it was green on dark green and read as a panel |
+| 18 Oct 2026 | "Make the text white" | Solid green, but about 15 actions left as green text links, and the reply said "every action button" was solid | The claim was made without listing the buttons; this document itself said text links were right for "Skip", "Details" and "Save as PDF", contradicting him |
+| 18 Oct 2026 | Even gaps between bold and normal text | Said "every gap comes from `Space`" | Only `Notice.kt` was checked; 74 eyeballed gaps remained in 10 files |
+| 18 Oct 2026 | Test on the emulator | He judged an old build twice | Nobody checked which build was installed |
+
+The pattern: **a general instruction was applied to the place in front of you, then reported
+as applied everywhere.** The fix is §0.3: never say "every" without the inventory.
+
+### 0.2 When to ask the owner first (do not guess)
+
+Ask him **before building** when any of these is true:
+
+1. The change alters how something **looks** on a screen he has seen, and no rule below
+   decides it exactly.
+2. Two of his instructions, or one of his instructions and a rule here, **pull in different
+   directions** (for example "every action solid" against "a clear main action").
+3. You would **reverse an entry in §9** (the decision log), or in §11 the item is marked OPEN.
+4. A choice changes **what the user can do or what they see first** (order of buttons, what is
+   hidden behind a tap, what is removed).
+5. You are about to use a word like "prominent", "clean", "premium" or "consistent" to justify
+   a choice. Those are his words; ask what he means by them on this screen.
+6. You cannot say in one sentence which rule in this document makes the choice for you.
+
+How to ask: with the `AskUserQuestion` tool, at most four questions, two to four options each,
+your recommendation first and labelled "(Recommended)", each option saying what he will see.
+Show screenshots, light and dark, of the options when the question is visual. **Silence is never
+a yes.** Record the answer in §9 the same day, and remove the item from §11.
+
+Do **not** ask about engineering detail he cannot judge (dp values, component names). Decide
+those from §1 to §4 and say what you decided.
+
+### 0.3 The words "done", "every" and "all"
+
+Do not tell him a rule is applied "everywhere" or that a change is "done" until all of these
+are true, and say which you checked:
+
+1. **The inventory is clean.** Run the command in §4.1 "How to check" and read every line.
+   Paste the count into your reply ("19 solid buttons, 2 text links, both Close").
+2. **The tests pass**: `DesignRulesTest` and `ColorContrastTest` at least; the full gate before
+   a merge.
+3. **Screenshots** of every screen you changed, light and dark, have been shown to him.
+4. **The build he will test is the new one**: give him the install command and the commit he
+   should see (`git log --oneline -1`).
+5. **What you did not check is written down**, in the reply and in `docs/HANDOVER.md`.
+
+### 0.4 When this document and the owner disagree
+
+The owner wins, and this document is corrected **in the same commit**, with the old rule moved to
+§9 as reversed. When this document and the code disagree, the code is the bug unless §9 says
+otherwise; if neither says, ask him (§0.2).
+
+---
+
 ## 1. Colour
 
 ### Dark
@@ -47,7 +110,7 @@ Nothing in the UI hardcodes a hex value. If you find one, it is a bug.
 | surfaceHighlight | `primaryContainer` | `#D7EAE0` | Next-prayer row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
-| primary | `primary` | `#0E6B4F` | Accent bar, Qibla arrow and arc, "Next" pill |
+| primary | `primary` | `#0B5A43` | Accent bar, Qibla arrow and arc, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
 | onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
 | onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
@@ -70,8 +133,17 @@ a gradient is permitted here: it is **fixed**. The gradient this replaced change
 prayer slot, so the contrast under the countdown was different at Isha than at Fajr and
 could not be asserted at all. Fixed gradient, testable. Moving gradient, not.
 
-In **dark** the same card is a flat `primaryContainer` with a hairline border — never a
-gradient. That asymmetry is the design's and is deliberate.
+In **dark** the card is a fixed green gradient in the widgets' countdown card colours: `#18382D` →
+`primaryContainer` `#143028` → `#0F241D`. It was flat until 18 Oct 2026, when the owner asked for
+"the widget style glossy look". Ink: countdown `onSurface`, label `onPrimaryContainer`, time
+`secondary`.
+
+**The gloss, both themes** (owner, 18 Oct 2026): a white sheen over the top half fading out by the
+middle (light `#99FFFFFF`, dark `#12FFFFFF`), a 1dp rim brightest at the top (light `#CCFFFFFF` to
+`#33FFFFFF`, dark `#29FFFFFF` to `#0AFFFFFF`), and in light only a soft green shadow (`#590B5A43`,
+12dp). The tokens are `LightHero*` and `DarkHero*` in `Color.kt`. `ColorContrastTest` checks every
+ink against every stop and against the top stop under the sheen; the sheen lightens, so in dark it
+is the worst case (5.75:1 for the time).
 
 ### The rule that has bitten this project four times
 
@@ -149,9 +221,48 @@ threshold and the build fails.** Add the pair to the test when you add a role.
 Applied as: screen gutter **16dp** · card padding **20dp** · list row minimum **56dp** ·
 tap target **48dp** · gap between sections **24dp**.
 
-> ponytail: these are dp literals in the screens, not a `Spacing` object. An indirection
-> whose every call site reads `space4` instead of `16.dp` buys nothing a grep cannot do,
-> and Compose already has the unit. The scale is the contract; the constant is not.
+### Gaps by relationship (owner, 18 Oct 2026; enforced)
+
+The owner reported uneven gaps between bold and normal text many times. The cause was never
+the line heights; it was gaps chosen by eye, so a title, its sentence and its button were
+spaced 0, 12 and 20 in one card and 12, 8 and 12 in the next. Now a gap is chosen by **how
+closely the two things belong together**, from `ui/theme/Spacing.kt` (`Space`):
+
+| Relationship | Token | dp |
+|---|---|---|
+| A title and the line that belongs to it | `Space.Tight` | 4 |
+| A paragraph and the button that acts on it; two buttons side by side | `Space.Related` | 8 |
+| One paragraph and the next in the same block | `Space.Paragraph` | 12 |
+| One group (text plus its button) and the next; card padding | `Space.Group` | 16 |
+| One section of a screen and the next | `Space.Section` | 24 |
+
+Closer means related (proximity), so a reader can tell which button belongs to which paragraph
+without reading. Never two different gaps for the same relationship on one screen.
+`DesignRulesTest` fails the build if every `Spacer`, every column's spacing and every top or bottom padding in the phone app's screens is written as a
+number instead of a token (D5, 18 Oct 2026). Not covered, so never claim them: horizontal gaps inside a
+row, a component's own `padding(vertical = …)` (a row's height, a pill, a card's edge), and the watch app
+(`wear/`), which has its own small screens and was not converted.
+
+How the common cases were decided, so the next screen uses the same answers:
+
+| Between | Token |
+|---|---|
+| A screen headline (headlineMedium or larger) and its paragraph | `Paragraph` 12 (bigger type needs more than `Tight`) |
+| A sheet or card title (titleLarge or smaller) and its line; a label and its value | `Tight` 4 |
+| A dialog's help text and the choices under it | `Group` 16 (it was 8 in some dialogs and 16 in one) |
+| A section heading and the field it introduces | `Related` 8 |
+| The last choice card and setup's Back and Continue | `Section` 24 (it was 8: the buttons looked stuck to the cards) |
+| Stacked choice cards; summary rows | `Paragraph` 12 |
+| A divider and what is either side of it | `Related` 8 each side |
+| A progress line under the button that started it | `Related` 8 |
+
+Not covered by the check, on purpose: horizontal gaps inside a row (an icon beside its label, two
+tiles side by side) and a component's own padding (a pill, a card, a sheet's edge). Those are the
+component's fixed metrics, not gaps between pieces of text.
+
+> Reversed 18 Oct 2026: this section used to say "dp literals, not a `Spacing` object". The
+> literals are exactly how the gaps drifted apart, card by card. Named tokens make the
+> relationship part of the code, so the reviewer sees `Space.Related` where a 12 would hide.
 
 ---
 
@@ -175,6 +286,14 @@ jitter as they change width.
 > becomes live again the moment a translation into a language with its own digits ships:
 > `displayLarge` on the next-prayer card is the first thing to re-measure.
 
+**A word is never split across two lines** (19 Oct 2026). Android breaks a word that is wider than
+its line, and short labels in fixed width slots hit that at large text: "Settings" in the tab bar
+became "Setting" over "s" on a 320dp phone at 2.0, and Turkish "Telefona uy" and Indonesian
+"Pengaturan" split on an ordinary phone at 2.0. Such labels (today the tab bar and the theme
+selector) use `WholeWords`, which shrinks the text only while a break falls inside a word, to no
+less than 60% of its size; at normal sizes nothing changes. Wrapping between words stays. A button
+label that wraps is centred (`actionLabelStyle`), never left hugging the start edge.
+
 Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp.
 
 > They are **not** uppercased in code. `String.uppercase()` on a translated string is a
@@ -184,6 +303,146 @@ Section labels (`PRAYER TIMES`, `NEXT PRAYER`) carry `letterSpacing` 1.4–1.6sp
 ---
 
 ## 4. Components
+
+### 4.1 Buttons and actions: the full specification (owner, 18 Oct 2026)
+
+**The rule in one line:** every action a person can take is a **solid button with white bold text**
+in light and dark, so nobody has to guess what is tappable. The only text links in the app are
+**"Close" and "Got it" at the foot of a dialog**, and **one named exception the owner chose: the
+two bold links on the usage question** (kind F below). Decided by the owner on 18 Oct 2026, after
+outlined and then tonal buttons were both too easy to miss (§0.1).
+
+#### The six kinds of control that act, and nothing else
+
+| Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
+|---|---|---|---|---|---|
+| **A. Solid green** | `CtaButton` (or `ctaButtonColors()` on a Material `Button` inside `Notice` and `PermissionButton`) | `#0B5A43` (`LightCta`) | `#17805A` (`DarkCta`) | `#FFFFFF` (`OnCta`) | Every action that is not a warning |
+| **B. Solid amber** | Material `Button` with `tertiary`/`onTertiary`, only inside `Notice` (warning tone) | `#9A6208` | `#E8B14A` | light `#FFFFFF`, dark `#3A2A00` | The action and "Details" in a warning notice ("Allow exact alarms") |
+| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque" |
+| **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
+| **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
+| **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
+
+Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
+row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
+to another icon button.
+
+Dark amber text is `#3A2A00`, not white, because white on `#E8B14A` is about 1.9:1 and fails. This
+is the only exception to white text, and the owner accepted it on 18 Oct 2026 ("keep amber for
+warnings").
+
+#### Every property of a solid button (kinds A and B)
+
+| Property | Value | Notes |
+|---|---|---|
+| Shape | Full pill (Material `Button` default) | Never square corners, never a custom radius |
+| Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
+| Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
+| Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area was measured once, in the scratch render harness (Robolectric, not part of the repo's tests, which carry no Robolectric): taps 2 and 3.5dp outside the drawn edge pressed it, 6dp did not. Material 3 `Button` gives it that area through `minimumInteractiveComponentSize` |
+| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
+| Padding | Material default (24dp each side); compact 16dp each side | |
+| Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
+| Elevation and shadow | None | Flat on purpose: the fill does the work |
+| Pressed | Material ripple | |
+| Disabled | Material default (12% `onSurface` fill, 38% label). **Only while the action is running** (finding your location) | Never shown as a grey placeholder: hide the button until it can be used ("Find place" appears once something is typed) |
+| Contrast | Label to fill at least 4.5:1; fill to the surface behind it at least 3:1 | `ColorContrastTest` asserts both, in both themes |
+
+#### Order, hierarchy and wording
+
+- **Order:** the main action comes first: top of a column, start of a row (right in Urdu and
+  Arabic, which mirror automatically). The one exception is setup's Back and Continue pair,
+  where Back is first because that is where every phone puts it.
+- **Hierarchy comes from order, position and wording, never from fading a button.** A button that
+  is easy to miss is a bug, however secondary it is.
+- **Two equal answers stay equal.** The usage question's "Yes, share usage counts" and "No thanks"
+  are the same size, colour and height, and neither is first by accident (yes is first because it
+  is the question's own word). Nudging either way breaks the consent.
+- **Wording:** a verb first ("Allow location", "Save as PDF", "Shift the date"), two to five words,
+  no full stop, never "Tap here" or "Click". A question may label a button that opens an
+  explanation ("Different from your mosque?").
+
+#### Spacing around buttons (from §2, by relationship)
+
+| Between | Gap |
+|---|---|
+| A single paragraph and the button that acts on it (explainer dialogs) | `Space.Related` 8dp |
+| A text field and its button ("Find place") | `Space.Related` 8dp |
+| Two buttons stacked or side by side | `Space.Related` 8dp |
+| A block of several lines (title and sentence, or several paragraphs) and its button row | `Space.Group` 16dp |
+| A group of buttons and a different group (the usage question's two links and its two answers) | `Space.Section` 24dp |
+| A button and the next section of the screen | `Space.Section` 24dp |
+
+#### Banned, and the test that fails the build
+
+| Banned | Why | Enforced by |
+|---|---|---|
+| `OutlinedButton`, `FilledTonalButton` | Easy to miss (§0.1) | `DesignRulesTest` |
+| `FilledTonalIconButton`, `OutlinedIconButton` | Pale, the same problem as tonal | `DesignRulesTest` |
+| A bare Material `Button` outside `CtaButton.kt`, `Notice.kt`, `PermissionAction.kt` | Its dark default is pale mint with black text | `DesignRulesTest` |
+| A `TextButton` saying anything but "Close" or "Got it" | Every action is solid (owner, 18 Oct 2026) | `DesignRulesTest` |
+| `InfoLink` outside `UsageCountsConsent.kt` | It is his exception for one screen, not a new style | `DesignRulesTest` |
+| A file with a button that is not in the inventory below | So no button is added without being specified here | `DesignRulesTest` |
+| Two icon buttons next to each other | Opposite actions a finger apart (§4 Notices) | Review question in §10 |
+| A disabled button shown as a placeholder | Reads as broken | Review question in §10 |
+| A `CtaButton` with no stated size (no `fillMaxWidth`, `weight` or `compact = true`) | It defaults to 52dp wrapped, which looked squashed beside a heading | `DesignRulesTest` |
+
+#### The inventory: every button in the app
+
+Update this table in the same commit as any button you add, move or remove. `DesignRulesTest`
+fails if a Kotlin file containing a button is missing from the **File** column.
+
+| Screen | Label | Kind | Height, width | File |
+|---|---|---|---|---|
+| Setup, welcome | Begin | A | 56, full | `OnboardingScreen.kt` |
+| Setup, welcome | Globe and the language's own name ("English", "اردو"), top end corner, 16dp in; opens the language list | A, compact | 40 drawn, 48 target, wraps | `OnboardingScreen.kt` |
+| Setup, location | Allow location (pin icon) | A | 56, full | `OnboardingScreen.kt` |
+| Setup, location | How your location is used (info icon) | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Find place (search icon), once something is typed | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Skip for now and use Makkah, at the **foot of the screen** under "Prayer times will be for Makkah until you set your location." (after the content at large text) | A | 52, full | `OnboardingScreen.kt` |
+| Setup, location | Continue, once located | A | 56, full | `OnboardingScreen.kt` |
+| Setup, location | "How your location is used" dialog: Got it | E | | `OnboardingScreen.kt` |
+| Setup, sect, madhab, method | Back, Continue | A | 56, half each, 8 apart | `OnboardingScreen.kt` |
+| Setup, confirm | Allow exact alarms, until allowed | A (`PermissionButton`) | 52, wraps | `OnboardingScreen.kt`, `PermissionAction.kt` |
+| Setup, confirm | Finish | A | 56, full | `OnboardingScreen.kt` |
+| Usage question (setup, and the Settings switch) | See exactly what is sent / Hide, 16dp under the text | F | 48 target, wraps | `UsageCountsConsent.kt` |
+| Usage question | Read the privacy policy, straight under it | F | 48 target, wraps | `UsageCountsConsent.kt` |
+| Usage question | Yes, share usage counts; No thanks, 24dp under the links (under "The full privacy policy is in English." when the app is not in English, since 19 Oct 2026) | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
+| First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
+| First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
+| Times | Save as PDF (PDF icon), end of the Today heading; 16dp under the card above, 8dp over the list it saves | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
+| Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
+| Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
+| Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
+| Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
+| Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
+| Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
+| Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
+| Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Settings, Match your mosque | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
+| Settings, the clock ("Isha: the time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
+| Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
+| Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
+
+Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row
+is the target, with a chevron), switches, radio rows, the tab bar, and the city name with its caret
+on Times, which opens the location sheet.
+
+#### How to check, before you say "every"
+
+```bash
+# Every acting control in the app, with file and line. Read all of it.
+grep -rnE "\b(CtaButton|PermissionButton|FilledIconButton|IconButton|TextButton|Button)\(" \
+  app/src/main/java --include=*.kt | grep -v "fun \|import"
+# Must print only Close and Got it (the usage question's InfoLinks are kind F, not TextButtons):
+grep -rn -A1 "TextButton(" app/src/main/java --include=*.kt | grep -oE "R\.string\.[a-z_]+" | sort | uniq -c
+./gradlew :app:testDebugUnitTest --tests '*DesignRulesTest' --tests '*ColorContrastTest'
+```
+
+Then screenshots of each changed screen in light and dark, and §0.3.
 
 **Next-prayer card** — `primaryContainer`, 24dp radius, 1dp `outlineVariant` border, flat.
 Label, then name and time on one optical line, then the countdown, then "until it begins".
@@ -255,67 +514,104 @@ drawn twice cannot end up as two different buildings.
 A legend names the two abstract marks. The Kaaba is not in it, because a legend explains
 shapes and this one is a picture; the subtitle above the dial already says the word.
 
-**Warning banner** — `tertiaryContainer` fill, `tertiary` icon and border,
-`onTertiaryContainer` text, 16dp radius. Used for "the system is withholding something you
-asked for": exact alarms, Do Not Disturb access, compass calibration.
+**Notices** (one component, `ui/components/Notice.kt`, since 17 Oct 2026). Every message that
+is not a setting goes through it, so a person learns one shape and reads every notice the same
+way. Two tones only: **warning** (`tertiaryContainer`, amber: something is wrong or withheld)
+and **quiet** (`secondaryContainer`, soft green: information or an occasion, Ramadan and Eid).
+Anatomy, since 18 Oct 2026: a round mark (the icon on a 14% tile of the tone's accent); the
+title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
+"follow your mosque"); the full explanation, folded; then, 16dp under the text, **one row of
+buttons**: the action as a **solid button** in the tone's colour with an arrow ("Allow", "See
+why", "Change location", "Shift the date"; never "Tap to…") and, when there is more to say, a
+**"Details" button with a down chevron** ("expanded"/"collapsed" spoken). The close X sits
+**alone at the top right**, on Times only.
 
-On **home** the exact-alarm banner carries a close button (`Outlined.Close`,
-`onTertiaryContainer`, 24dp glyph in a 44dp target) and stays closed once tapped. On
-**Settings** the same banner has no close button and never hides while the permission is
-missing.
+**Never put two icon buttons side by side** (owner, 18 Oct 2026, from the emulator: the fold
+chevron sat next to the close X, two opposite actions a finger apart). A close X is the last
+trailing element and stands alone; "show more" is a labelled button with a chevron; the main
+action is a filled button (Android banner guidance, Devon and Primer design standards).
 
-> A warning that cannot be put away is not a warning, it is furniture. Shown on every
-> launch it stops being read — and worse, people learn to skip that whole band of the
-> screen, which is where the Makkah notice lives too, and *that* one they need to act on.
-> Closable on home, permanent in Settings: it is said once, and the way to fix it is still
-> exactly where someone would go looking for it.
->
-> The close button has its own `clickable` inside the card's `clickable`. The card opens
-> the system permission screen; the button closes the card. Two different outcomes must
-> never share one gesture. 44dp because a bare 24dp glyph is a target only someone with a
-> steady hand and good eyes can hit.
+**Dialogs.** Every dialog a person can simply leave has a close X at the top right
+(`DialogTitle`) as well as its text button at the bottom (owner's request). Two must be
+answered, not closed, and have no X: the first run disclaimer and the usage counts question.
+Explainer dialogs pair each paragraph with its button (`ExplainerParagraph`, `ExplainerAction`):
+paragraph to its button 8dp, group to group 16dp. `DesignRulesTest` checks the X.
 
-> Amber, not red. Prayer alerts still arrive; they are just at the mercy of the scheduler.
-> An error colour would say the app is broken when it is not. And it is not grey any more,
-> because as one more grey card in a stack of grey cards the exact-alarm notice went
-> unread.
+> Why: the owner found the old notices bland and the full width amber button unclean, and asked
+> for a brief accordion "applied systemically", not to one card. The old exact alarm card was
+> four lines of explanation and a button that repeated its title; closed, it is now two lines
+> and a link, and Times fits all six prayers with it showing. The card never does the action
+> itself: opening and closing must never be the same gesture.
 
-**Ramadan card** (1.4.0, Times screen, inside Ramadan only): the same flat surface as the
-next-prayer card (`sajdaSurface`, 24dp radius, 1dp `outlineVariant` border). Suhoor end and iftar sit
-side by side as two 16dp blocks. The one coming next is `primaryContainer` and carries the word
-"Next" in a small `primary` pill (not colour alone), the other is `surfaceContainerLow`. Below them
-the fast length and tomorrow's two times. It adds no colour of its own. The info button is 48dp.
-The **eve notice** is a quiet 16dp radius `secondaryContainer` row, neutral and not amber: it is
-information, not a fault. The **Eid greeting** is a 24dp `secondaryContainer` card, deliberately not
-`tertiaryContainer`.
+On **home** a notice may carry a close button and stays closed once tapped. On **Settings** the
+same notice has no close button and never hides while the permission is missing.
 
-**Home screen widgets** (1.4.0): drawn in the launcher with `RemoteViews`, so colours cannot be Compose
-roles. Six colours in `res/values/colors.xml` and `values-night/colors.xml` (`widget_surface`,
-`widget_on_surface`, `widget_on_surface_variant`, `widget_highlight`, `widget_primary`,
-`widget_outline_variant`), each the same hex as its `Color.kt` twin in both themes, which
-`WidgetColorsTest` enforces along with seven contrast pairs. They are set in the layout XML and not in
-code, so the launcher re resolves them when the phone changes theme. There is deliberately no "text on
-highlight" colour: the ordinary text colours clear 4.5:1 on the highlight in both themes. Corner
-radius is 16dp, or the system's own on Android 12 and later (`values-v31`). Text sizes are 11sp for
-labels and context, 13sp for times, 14sp for messages, 16 to 20sp for the next prayer, never below 11sp
-(lint `SmallSp`). Minimum sizes: Next prayer 3 by 2, Today 4 by 3, headerless. The picker previews are
-drawn PNGs from `tools/make-widget-previews.py`.
+> A warning that cannot be put away is not a warning, it is furniture. Closable on home,
+> permanent in Settings: it is said once, and the way to fix it is still exactly where someone
+> would go looking for it. Amber, not red: prayer alerts still arrive, just at the mercy of the
+> scheduler, and an error colour would say the app is broken when it is not.
 
-**Settings groups** — a letterspaced `primary` label, then the rows inside one card with a
-1dp `outlineVariant` border, 16dp gutter, 20dp radius.
+**Home screen widgets** (hero countdown, 18 Oct 2026; research in
+`docs/plans/2026-10-widget-redesign/RESEARCH.md`). Two widgets, each with two layouts the launcher
+chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`):
 
----
+| Widget | Layout | Shows |
+|---|---|---|
+| Next prayer | small (default, and the only one below Android 12) | glyph, name, time; the countdown at the foot; the day's five bars |
+| Next prayer | wide (from 270 by 150dp) | the small widget's countdown beside the six rows |
+| Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
+| Today | large (from 250 by 280dp, 330dp in Urdu and Arabic; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+
+- **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
+  in dp because it is already three times the body text and a large font setting pushed the prayer
+  name off a 110dp widget. Names and times stay in sp.
+- **Prayer glyphs show where the sun is**, so they read without the language: Fajr rays above an empty
+  horizon, Sunrise a rising half sun, Dhuhr the sun over a post with no shadow, Asr a post whose shadow
+  equals its height (the Asr rule), Maghrib a setting half sun, Isha a crescent and star. One Asr glyph
+  for every madhab. Drawn white, tinted in the layout from a widget colour (never from code).
+- **The day's five bars** (Sunrise is not a prayer): done in `primary`, next outlined in `primary`, to
+  come in `outlineVariant`. Shape as well as fill separates next from done.
+- **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the
+  large Today widget and its empty state only. Never on a small widget.
+- **Glossy finish** (owner, 18 Oct 2026, "Apple premium style"): the surface is a FIXED three stop
+  gradient (lighter at the top), a white sheen over the top half that fades out (7 percent in dark,
+  none in light, where the top stop is already white), and a rim (16 percent white in dark, the
+  hairline in light). The countdown card has the same treatment in the highlight colour. Opaque on
+  purpose. `WidgetColorsTest` holds every ink to AA on every stop and on the top stop under the
+  sheen; it caught the first dark card top (#1C4034, 4.30:1) and set it to #18382D.
+- **The location chip**: a highlight pill with a pin, the town and an update arrow, on every widget
+  (under the countdown on Next, at the end of the large Today header, at the foot of the compact
+  Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
+  opening the app is what updates the location (onResume); it cannot update without opening the app,
+  because location is read only in the foreground. The large header uses the short date ("Sun, 18
+  Oct") so the chip never cuts it short. The Hijri line under it shrinks from 12 to as small as 9sp
+  rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
+  screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
+  pressing the chip opens the app.
+- **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
+  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
+  town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
+  1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
+  more.
+
+**Settings groups** (Quiet Glass, 17 Oct 2026): a sentence case `onSurfaceVariant` title
+(labelLarge, medium), then the rows inside one `sajdaSurface` card, 24dp radius, 16dp gutter.
+Each row: a 36dp `secondaryContainer` tile with a 20dp `onSecondaryContainer` icon, a
+titleMedium title over a bodyMedium `onSurfaceVariant` description, hairline dividers inset to
+the text (66dp). Information-only rows (charity, credits, data) fold behind their title.
+Code: `ui/settings/SettingsList.kt`.
 
 ## 5. Choosing a theme
 
 `ThemeChoice` is `SYSTEM` (default), `LIGHT` or `DARK`, persisted in DataStore under
-`theme_choice`, and shown as three chips under **Settings → Appearance**.
+`theme_choice`, and shown as a sliding three way selector under **Settings → Appearance**
+(three chips until 17 Oct 2026; they read as filters rather than one choice).
 
 `SYSTEM` reads `isSystemInDarkTheme()`, which reports **false** when the OS expresses no
 preference — on older devices, and on any device where the user has never chosen. So
 following the phone resolves to light, and light is the effective default.
 
-Chips rather than a chooser dialog, because unlike every other setting on that screen the
+A selector rather than a chooser dialog, because unlike every other setting on that screen the
 result is visible the instant it is tapped, and a dialog would sit on top of the change it
 just made. They are `selectable` with `Role.RadioButton`, not `clickable`, so a screen
 reader announces the active one as selected and treats the three as one choice.
@@ -357,11 +653,314 @@ applied in the "dark design system" and "light design system" commits. What was 
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
-and it should stay that way. (The Ramadan card and the widgets in 1.4.0 reuse these tokens and
-add none. A prayer tracker, if it is ever built, is its own design pass.)
+and it should stay that way. (The Ramadan card and the widgets reuse these tokens and add none; the
+widget glyphs and the mark are drawings, not colours. A prayer tracker, if it is ever built, is its own design pass.)
 
 One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
 and 52sp in dark, on the argument that dark text on a pale background carries more optical
 weight. That is a fair argument, and acting on it means a whole second `Typography` that
 exists to change one number by 6sp. Not worth the machinery. Noted here so the next
 session knows it was considered rather than missed.
+
+---
+
+## 8. Quiet Glass (17 Oct 2026)
+
+The owner chose "Quiet Glass" from three researched directions (research, mockups and the
+rejected options: `docs/HANDOVER.md` §11, the Quiet Glass block). The rules it adds:
+
+**Glass is for what floats, never for content.** The tab bar floats over the screens as a
+pill, `surface` at `GlassBarAlpha` (97% since 18 Oct 2026; it was 90%, see §9), so what scrolls
+underneath shows through only as a hint, never as words that run into the labels.
+Prayer times, cards and every line of text stay on solid surfaces. This is Apple's own rule for
+Liquid Glass, and the usability research behind it is in the HANDOVER block. The bar's labels
+are tested against pure black and pure white behind it (`ColorContrastTest`).
+
+> ponytail: translucency without blur, on every Android version. Real backdrop blur needs
+> Android 12+ and the Haze library; at 97% opacity the visible difference is small. Add it only
+> if the owner asks for more glass, and keep the current bar as the Android 7 to 11 fallback.
+
+**Every tab opens the same way.** `ScreenTitle` (headlineMedium, start aligned, 20dp gutter)
+on Qibla and Settings; on Times the title is the city, same size and line, with a green caret
+because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
+which is the bar's measured height, so it grows with large text.
+
+**Every call to action is a `CtaButton`: solid green, white bold 16sp text, at least 52dp tall,
+full width where it stands alone** (owner, 18 Oct 2026, many times: "make the buttons stand out,
+hard to miss, look like a button with prominent text ... make the text white"). Light fill
+`#0B5A43` (white 8.2:1), dark fill `#17805A` (white 4.9:1; 3.2:1 or more against every dark
+surface, so the shape stands out too). `ColorContrastTest` asserts both.
+
+**The full specification, with every property, the inventory and the checks, is §4.1.** It
+replaces what this paragraph used to say: until 18 Oct 2026 it allowed text links for "Skip for
+now and use Makkah", "Details" and "Save as PDF". That contradicted the owner, and it is how
+about 15 actions stayed as easy-to-miss green text after he had asked for solid buttons. The
+owner then chose (18 Oct 2026): every action solid, only "Close" and "Got it" stay text.
+
+> History, so nobody softens it again: outlined until 18 Oct 2026 ("easy to miss"), then tonal
+> for one day ("do you think this button stands out?"), then this. Hierarchy between two buttons
+> comes from position and wording, never from making one of them faint.
+
+**Actions are solid buttons; the only links are "Close" and "Got it".** Both are labelLarge
+(SemiBold), so they read as tappable without a guess. Rows that open something carry a chevron.
+
+**Green means something.** It is the colour of Paradise in the Qur'an, and here it marks the
+next prayer, the Qibla and anything you can tap. It is never decoration.
+
+**Times fits without scrolling** on a phone at the default text size: city, next prayer, all
+six times and the mosque button. Measured 17 Oct 2026 on 914dp (fits, including the far north
+notice) and on 823dp, the owner's S23 Ultra (all six times fit; the far north notice needs a
+short scroll). Large text and the rare banners are allowed to scroll; they never clip.
+
+**Words.** Plain, short, human and accurate; no hyphens or em dashes in app text, except
+where a name requires one (ir-Rahman, Eid al-Fitr, Rabi al-Awwal, Open-Meteo). Religious names
+are never "simplified". The disclaimer is never softened.
+
+**Icons.** The selected tab uses the Rounded (filled) set, the rest the Outlined set, from the
+already installed `material-icons-extended`. Google has stopped maintaining that library;
+moving to Material Symbols Rounded vector drawables is the planned next step (it removes a
+dependency), not done yet because it means downloading the icon files.
+
+---
+
+## 9. Decision log
+
+Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
+"improves" it back.
+
+- **19 Oct 2026, "Match your mosque" can be set from the mosque's board: one button at the top.**
+  From the 8 Oct 2026 branch, whose version made the minutes number an underlined, tappable link (now
+  banned, §4.1). Three solid button versions were drawn on the emulator in light and dark, and the
+  owner chose with AskUserQuestion: **one full width "Use your mosque's board" above the list**, which
+  opens "Which prayer?" (each prayer with the time it shows now) and then the clock. The minutes are
+  worked out (`AdjustmentFit`); a board time more than 30 minutes away is refused and explained under
+  that prayer with "Choose a calculation method" (§5.17 of HANDOVER: a gap that size is a method or a
+  congregation board). Rejected: a time button under each prayer ("5:53 am") and "Shows 5:53 am" with
+  "Set time" under each prayer: both added six green buttons to a calm dialog. The clock's chosen a.m.
+  or p.m. is drawn in `primaryContainer`, not the stock amber, because amber means a warning here.
+- **19 Oct 2026, the welcome screen offers the language list.** From the 8 Oct branch (a bare globe
+  icon). The owner chose from screenshots: **a compact solid button in the top end corner with a globe
+  and the current language's own name**, so someone who cannot read English sees a way out before the
+  first question. Rejected: the bare globe icon (easy to miss, and a seventh kind of control) and a
+  "Language" button under Begin (the word itself is English). The Settings Language row stays under
+  Theme, as before: only its subtitle changed ("Phone language · English" until a language is chosen).
+
+- **18 Oct 2026 (Mac release check), the tab bar made 97% solid.** Found on the emulator while
+  retaking the store screenshots: at 90% the text and buttons scrolling under the floating bar were
+  readable through it and ran into its labels, clearest in dark (a notice's amber "See why" behind
+  "Times" and "Qibla"; Isha's time behind "Settings"). Measured over the bar: +19 shades at 90%, +4 at
+  97%. The owner chose 97% from before and after screenshots, asked with AskUserQuestion. Rejected:
+  keeping 90% (the collision is a legibility fault, not a look); fully solid (loses the glass he chose
+  on 17 Oct). Still true and not changed: content is fully visible in the strip between the floating
+  bar and the bottom edge, which is how a floating bar works.
+- **18 Oct 2026 (Mac release check), the large Today widget's Hijri line shrinks to fit.** Found
+  while taking the store widget screenshot: on a 5 column home screen (the Pixel 2 profile) the town
+  chip left the Hijri line too little room and it read "2 Rabi al-Awwal 14…". First offered and
+  approved: wrap onto a second line; **then withdrawn the same hour**, because measured on the launcher
+  at 4 by 3 the extra line pushed Isha off the bottom. Chosen by the owner instead: one line that
+  autosizes from 12 down to 9sp (`widget_today_large.xml`). Rejected: leaving the year cut; dropping
+  the year (a longer month such as "Jumada al-Akhirah" would still be cut); raising the large layout's
+  height threshold (4 by 3 users would lose the countdown card). Android 7 ignores autosize and keeps
+  the ellipsis. **9sp is deliberately below the floor** (14sp in §3, 12sp in the widget research): it
+  applies to this one line only, only when it would otherwise be cut, and the owner chose it from
+  screenshots, so do not raise the minimum without asking him. Known and cosmetic: with a wrap_content
+  height the shrink can stay until the launcher redraws the widget from scratch (a resize, a restart),
+  so a shorter month can show a little small; it is never cut.
+
+- **18 Oct 2026 (night), D5 built: the gaps between text and buttons on the scale, on every phone screen.** The owner, asked whether to do
+  it before 1.5.0: "I told you about the design system ... you should know the clean, spacing, and
+  premium look of the app." So it was done in one pass across every screen (setup, Times, Ramadan
+  card and timetable, export sheet, location sheet, Qibla, Settings and every dialog): 88 hand picked
+  gaps replaced by tokens by relationship (the table in §2), and `DesignRulesTest` fails on a new one
+  (mutation tested). An independent review caught the first write-up claiming "every vertical gap"
+  while four paddings and the watch were left; the four were converted, the check widened, the claim
+  narrowed (§0.3 again). Visible changes, so nobody is surprised: setup's Back and Continue 24dp under
+  the cards (was 8); every Settings dialog's help text 16dp above its choices (was 8, one was 16); the
+  Hijri help 16dp above its stepper (was 4); the welcome button 24dp under the tagline (was 48) and the
+  Bismillah 24dp above the name (was 32); the confirm step's gaps 24, 4 and 8 (were 32, 8 and 12); the
+  permission step's progress line 8 under its button (was 20) and the located row 16 (was 20); the
+  location sheet's text 16dp above its field (was 12) and the progress line 8 (was 16); the Ramadan
+  card's header 12 above the times (was 10), the countdown to the fast line 4 (was 6), small lines 4
+  (were 2); the export sheet title to its text 4 (was 6); Settings rows 4 between title and subtitle
+  (was 2), the folded row's text 16 above the next row (was 14); the tab bar icon to label 4 (was 2);
+  Qibla's "set your location" 24 from the top (was 48). **Shown to the owner as screenshots before
+  merging** (`docs/plans/2026-10-times-gloss/d5-*.png`), as D5 was agreed. **Approved:** "the
+  screenshots look correct to me and I am happy to proceed further" (owner, 18 Oct 2026). Rendered in light, dark, Urdu and 2x text (`docs/plans/2026-10-times-gloss/d5-*.png`).
+
+- **18 Oct 2026 (late night), from his emulator screenshots: Save as PDF, place wording, sounds.**
+  - *Save as PDF* "too large and squashing": a compact size, 40dp drawn and 48dp to touch, for every
+    button that shares a line with text (Save as PDF on Times and in the Ramadan timetable, Shift the
+    date on the Ramadan card). Times gaps moved to the scale at the same time:
+    `Space.Group` between blocks, `Space.Related` from the Today heading to its list.
+  - *Place wording*: he asked for "your nearest region" and then for help ("city, town, village ...
+    something suitable for the masses"). Chosen, with his request for help as the brief: heading
+    **"Or type where you are"**, box **"Town, city or village"**, hint **"For example: Karachi,
+    London, Makkah, New York"** (his examples, in every language), not found **"... or type the
+    nearest town"**, button **"Find place"**. Rejected: "region" (vague, translates as province, and a
+    province name gives times for its middle, minutes out); "city" (excludes villages, his objection).
+  - *Sounds*: "From your phone" already existed but sat below a fold at the foot of Prayer alerts, so
+    he never saw it. He chose (AskUserQuestion) **each sound its own Settings row** under Prayer
+    alerts, showing the current choice, over moving it to the top of the dialog or adding a scroll
+    hint. He then asked for a sound choice for notifications too ("adhan or another sound for an
+    alarm or notification"): a **Notification sound** row beside **Alarm sound**, each offering Adhan
+    or From your phone. Nobody's sound changes until they pick one. Found by the independent review
+    and fixed before he saw it: the phone picker's "Default" row now means the default for that sound
+    and is saved as blank, and only one "Prayer times" channel exists at a time.
+  - *Vibration*: every prayer notification, alarm and reminder already vibrates. He chose **"follow
+    the phone"** (Ring: sound and buzz; Vibrate: buzz; Silent: nothing; Do Not Disturb: nothing unless
+    the alarm's Play on silent is on). Rejected: forcing a buzz on Silent (overrides the person's mute).
+  - *Ramadan card*, after the screenshots ("all good but"): the timetable button says **"Get the full
+    Ramadan timetable"** (was "Full timetable") and **fills its row** beside the (i), at 52dp. Then,
+    "spacing looks tight": 24dp above and below it, the (i) centred beside it.
+  - *Panel stops the adhan* (Android's rule, found on his emulator): he chose to **tell users briefly
+    and change nothing else for now**. The Notification sound pop up's help ends "Pulling down your
+    notifications or swiping the notification away stops the sound". Rejected for now: the app playing
+    the adhan itself so the panel cannot stop it (a different design, his decision if ever).
+
+- **18 Oct 2026 (night), D2 decided, and D1 and D3 approved from screenshots.** Usage question: the
+  owner chose **B, bold links**, over A (solid buttons under "Before you decide" and "Your answer"
+  headings), from the two drawn side by side in light and dark. "See exactly what is sent" and
+  "Read the privacy policy" are bold, underlined green links (kind F, `InfoLink`), 16dp under the
+  text; Yes and No stay equal solid buttons 24dp below. So finding out more never looks like an
+  answer. This is the **only** exception to "every action is a solid button", allowed on this
+  screen alone; `DesignRulesTest` fails if `InfoLink` appears anywhere else. Rejected: A (four
+  solid buttons read as four answers even with headings). He also approved the setup screen (Makkah
+  skip at the foot) and Match your mosque (Reset all full width, the steppers as they are): "happy
+  with it".
+- **18 Oct 2026 (late evening), the owner's answers to D1, D3, D4 and D5.** D1: "Skip for now and
+  use Makkah" stays solid but moves to the foot of the setup location screen, under "Prayer times
+  will be for Makkah until you set your location." (his choice of the recommended option). Pinning it
+  outside the scroll was built first and took a quarter of the screen at 2x text, so it sits at the
+  foot when there is room and after the content when not. D3: he kept the fourteen steppers and asked
+  for "Reset all" centred, in its own row and wider: it is now full width, 24dp under the steppers. D4:
+  "happy with" notices as they are (Allow and Details equal in weight; order and the arrow lead). D5:
+  spacing to be converted screen by screen, each with light and dark screenshots, after this merge.
+  D2 followed (next entry up).
+- **18 Oct 2026 (evening), every action a solid button, and this document made the place that
+  stops repeat mistakes.** The owner, after the third round on buttons: "You always say it's done
+  but nothing is done." Asked, not guessed (§0.2), he chose: every text link becomes a solid
+  button except "Close" and "Got it" at the foot of a dialog; warning buttons stay amber; the
+  minute steppers go solid green; screenshots before merging. At the same time every solid
+  button was given one label style (16sp SemiBold; notice and permission buttons had been 14sp)
+  and heights by placement (56, 52, 48), and the location sheet's "Find city" stopped being a
+  grey placeholder. Reversed: the 18 Oct entry below that rejected "the full green fill for
+  secondary actions", and the §8 list of allowed text links. Added: §0 (when to ask, and the
+  words "done" and "every"), §4.1 (the full button spec and inventory), §11 (open decisions),
+  and a `DesignRulesTest` check that fails when a file with a button is missing from the
+  inventory.
+- **18 Oct 2026, notices restructured, dialogs given a close X, spacing made a scale.** From the
+  owner's emulator screenshots. Rejected: keeping the chevron in the header and moving the X
+  away from it (still two icon buttons in one corner); making the whole card the fold target
+  (it was, and nobody knew; a labelled "Details" button says so); the notice action as a bold
+  link (he could not see it as a button); an X instead of the bottom "Close" (he wants both).
+- **18 Oct 2026, the Times card made glossy, calls to action made solid, setup location screen
+  shortened**, each approved by the owner from screenshots. This extends the widgets' gloss override
+  to the next prayer card (fixed gradient, opaque, tested; still no colour that moves with the time).
+  Rejected: a graphite glass card in dark (the widget body colour; the green card is what he pointed
+  at and keeps "green means the next prayer"); the full green fill for secondary actions (two filled
+  buttons on one screen lose the main one; **reversed the same evening by the owner, see above**); keeping the 66 word city lookup paragraph above the empty
+  field (it hid the choice); putting it only behind "How your location is used" (missed at the moment
+  of typing, the independent review); showing it only once typing starts (text jumping in under the
+  cursor; the owner found it confusing). Chosen: the standard short notice plus detail, one line in the
+  city box's hint area, always visible, with the full detail behind the link.
+- **18 Oct 2026, widgets made glossy, at the owner's request** ("a bit glossy background like apple
+  premium style"). This overrides, for the widgets only, the 17 Oct rejection of a shiny finish below.
+  Built within the rules that made the rejection sensible: a fixed gradient (testable), no colour
+  that moves with the time of day, opaque. Rejected: real translucency (text over an unknown photo
+  wallpaper cannot be contrast tested, and a RemoteViews cannot blur the backdrop); a "Tap to update"
+  sentence (DESIGN_SYSTEM 4 bans "Tap to" wording, and a pill with a pin and an arrow says it in every
+  language); a background location update without opening the app (needs background location,
+  against the foreground only rule and Play policy).
+- **18 Oct 2026, widgets: hero countdown chosen** by the owner from three drawn directions (A hero
+  countdown, B ring and sun path, C timeline strip). Rejected: B's sun arc (a bitmap drawn per refresh
+  bakes in colours that go stale when the phone changes theme, lesson 130); C as the main design (names
+  too small at 4 by 2); the mark on every widget (costs a 2 by 2 its prayer name, against Apple's
+  widget guidance); a time of day colour behind the countdown (§4, untestable contrast); a bundled
+  display font (§3); "4h 59m" wording (needs a redraw every minute; the Chronometer ticks for free).
+- **17 Oct 2026, Quiet Glass chosen.** Rejected: *Refined Calm* (no glass; the owner wanted
+  the premium feel), *Night & Emerald* (glass and five changing colours behind the countdown,
+  against Apple's guidance and the readability research; a second brand colour). Also
+  rejected: a shiny "glossy" finish (dates fast), Material 3 Expressive components (need
+  material3 1.5.0, still beta), a time of day gradient (removed once already because contrast
+  under the countdown could not be tested).
+- **17 Oct 2026, primary deepened to `#0B5A43`.** 7.5:1 on the page, up from 6.0:1. Green kept
+  as the identity on purpose. The widgets moved with it (`WidgetColorsTest` holds them equal).
+  Not moved: launcher icon and PDF logo (`#0E6B4F`), to be moved together in an icon refresh.
+- **17 Oct 2026, one Notice component for every notice** (exact alarms, Do Not Disturb, no
+  location, far north, mosque difference, compass accuracy, Ramadan eve, Eid). Rejected: fixing
+  only the exact alarm card (the owner: "applied in a systemic design system"); a whole-card tap
+  for the action (opening and closing would share a gesture); folding Eid's fine print (it says
+  follow your mosque, so it stays visible as a footnote).
+- **17 Oct 2026, Settings "option B" chosen** over a no-card list and a green summary card.
+- **17 Oct 2026, section titles and the next prayer label in sentence case** in English,
+  Turkish and Indonesian (Urdu has no case). Written that way in the strings, never cased in
+  code.
+
+- **19 Oct 2026, the emulator checks left from the 8 Oct merge** (owner: test whatever is left, do it
+  autonomously). Found and fixed, each seen before and after on the emulator: words split at large
+  text (`WholeWords`, §3); the theme selector's ends cut the first letters once a label wrapped (fixed
+  24dp and 28dp radii, the same pill at normal size) and its height was measured before the shrink
+  (`matchParentSize`); wrapped button labels sat at the start edge (centred); the board time clock in
+  landscape covered its own minutes (always the upright layout, the dialog scrolls); Match your mosque's
+  plus and minus said nothing to TalkBack (the value is a polite live region, "Dhuhr, +2 min").
+  Rejected: shorter Turkish and Indonesian words (English splits too on a 320dp phone, so the cause is
+  the layout, not the language); capping the font size (the clock's 1.3 cap is for fixed size boxes;
+  these labels can shrink a little instead); one line labels ("Follow phone" would need well under
+  half size on a 320dp phone at 2.0; reasoned, not run).
+- **17 Oct 2026, research pass (FINDINGS.md):** granted permissions show nothing on Settings;
+  every card is 24dp, notices included; dialog section labels speak in the Settings section
+  voice. Kept against the research: the iOS style chevron (the owner asked for an iPhone feel).
+  Rating is Google's card only, never a component of ours.
+
+---
+
+## 10. The learning loop
+
+A design system that only lists colours decays. Every visual change goes round this loop, and
+each lesson ends as a rule here or a test that fails the build.
+
+1. **Observe.** Play reviews (the daily health check watches them), the owner's two phones,
+   opt in screen counts, user emails.
+2. **Propose.** A preview, never straight into the shipping screen: a branch, emulator
+   screenshots, or a debug only switch as Settings was done.
+3. **Verify, automatically where possible.** `ColorContrastTest` for every pair, including the
+   glass bar over its worst backdrop. Screenshots in light, dark, 2.0 text, Urdu right to left
+   and on a short (823dp) screen. No hex outside `ui/theme`.
+4. **Decide.** The owner chooses from screenshots. Silence is never a yes.
+5. **Record.** An entry in §9, with what was rejected and why.
+6. **Enforce.** Turn the lesson into a test or into one of the review questions below.
+
+**Review questions** (the owner's, 17 Oct 2026), answered with a screenshot for every change:
+Is the text easier to read? Is the hierarchy clearer? Is the type consistent? Is the spacing
+comfortable? Can someone understand the screen quickly? Are the controls obvious? Are
+unnecessary taps avoided? Is information grouped logically? Does it look modern rather than
+dated? Is the layout balanced? Are colours and components consistent? Has clutter been removed?
+Does it work at large text? Is contrast sufficient? Are touch targets comfortable? Does it read
+in Urdu right to left? **Added 18 Oct 2026, because the owner had to repeat them:** Is every gap
+a `Space` token chosen by relationship? Is any icon button sitting next to another? Is every call
+to action a solid button? Does every dismissable dialog have the X? **Is the build he will test the
+one these screenshots came from** (an emulator still running yesterday's install showed none of
+the day's changes, and that cost a round of his trust)?
+
+**Added 18 Oct 2026 (evening):** Did any choice here depend on a guess about what he wants
+(§0.2)? If so, did you ask? Is every button in the §4.1 inventory, with the right kind, height and
+width? Did you run the §4.1 checks and paste the counts before writing "every" or "done"? Is any
+§11 item still OPEN on the screen you changed?
+
+---
+
+## 11. Open decisions: waiting for the owner
+
+Anything here is **not decided**. Do not build an answer to it, do not describe it as done, and
+raise it with him (§0.2) the next time the screen is touched. When he answers, move it to §9 with
+the date and his words, and delete it here.
+
+| Id | Raised | Question | Recommendation given to him | Status |
+|---|---|---|---|---|
+| (none) | | Nothing is waiting for the owner on 18 Oct 2026. | | |
+
+**Decided, work not yet done** (do not report these as done):
+
+| Id | Decision | Next step |
+|---|---|---|
+| (none) | Nothing decided is waiting to be built. D5 was approved from screenshots on 18 Oct 2026 (§9). | |

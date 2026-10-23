@@ -42,7 +42,9 @@ class SettingsSyncService : WearableListenerService() {
                         } else {
                             null
                         },
-                        cityName = map.getString(WatchSyncContract.KEY_CITY),
+                        // Capped like the phone's own city lookup (CityLookup, 80 characters): a label,
+                        // never a document. Only this app on the paired phone can write this item.
+                        cityName = map.getString(WatchSyncContract.KEY_CITY)?.take(80),
                         adjustments = map.getString(WatchSyncContract.KEY_ADJUSTMENTS),
                         // getInt also returns 0 for a missing key, but here 0 *is* the
                         // correct meaning of absence — no shift — so it needs no guard.
