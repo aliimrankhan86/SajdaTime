@@ -1,12 +1,12 @@
 package com.sajdatime.app.ui.settings
 
+import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -274,7 +274,7 @@ private fun PlainRow(item: SettingsItem, leading: @Composable () -> Unit, titleS
 @Composable
 private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, titleStyle: TextStyle) {
     var open by rememberSaveable(item.key) { mutableStateOf(false) }
-    val turn by animateFloatAsState(if (open) 180f else 0f, tween(200), label = "fold")
+    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.quick(), label = "fold")
     val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)
     Column {
         Row(
@@ -349,7 +349,7 @@ private fun ThemeSelector(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit)
         ThemeChoice.LIGHT to R.string.theme_light,
         ThemeChoice.DARK to R.string.theme_dark,
     )
-    val position by animateFloatAsState(options.indexOf(current).toFloat(), tween(240), label = "thumb")
+    val position by animateFloatAsState(options.indexOf(current).toFloat(), Motion.standard(), label = "thumb")
     var width by remember { mutableIntStateOf(0) }
     val inset = 4.dp
     val insetPx = with(LocalDensity.current) { inset.roundToPx() }

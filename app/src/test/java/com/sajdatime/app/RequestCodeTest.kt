@@ -89,4 +89,22 @@ class RequestCodeTest {
         assertNotEquals(PrayerAlarmScheduler.ACTION_PRAYER, WidgetRefreshScheduler.ACTION_REFRESH)
         assertNotEquals(PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER, WidgetRefreshScheduler.ACTION_REFRESH)
     }
+
+    @Test
+    fun `prayer reminder codes run 30010 to 33665, above the widget alarm and below 40000`() {
+        // Formed as 30,000 + dayOfYear * 10 + slot ordinal, so the band is read off the formula's
+        // own function over a leap year (day 366), not from a comment.
+        val codes = days("2028-01-01", "2028-12-31").flatMap { date ->
+            prayers.map { PrayerAlarmScheduler.prayerReminderRequestCode(it, date) }
+        }
+        assertEquals(codes.size, codes.toSet().size)
+        val low = codes.min()
+        val high = codes.max()
+        assertEquals(30_000 + 1 * 10 + prayers.minOf { it.ordinal }, low)
+        assertEquals(30_000 + 366 * 10 + prayers.maxOf { it.ordinal }, high)
+        println("prayer reminder band: $low to $high")
+        assertTrue(low > WidgetRefreshScheduler.REQUEST_CODE)
+        assertTrue(high < 40_000)
+        assertEquals(30_000, PrayerAlarmScheduler.PRAYER_REMINDER_REQUEST_BASE)
+    }
 }

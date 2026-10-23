@@ -5762,9 +5762,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 "go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
 `SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's answers to all 27 questions, the
 ordered build table, animation, development and testing guidance, and (§0.1) which model does which job.
-- **Progress (23 Oct 2026, night):** step P done (`55ef229`). Step 0: Fable's motion spec is written into
-  BUILD-INSTRUCTIONS §5 row 0 and §6 and checked by `plan-verifier` (its 12 small findings fixed); **waiting for
-  Ali's yes before building.** Steps 1 to 11 not started. The five agents ran for the first time and each runs on its
+- **Progress (23 Oct 2026, night):** step P done (`55ef229`). **Step 0 done** (Ali: "Yes, build it"):
+  `Motion.kt` and its tests, full gate green (518 unit tests: app 301, core 190 with 1 skipped, wear 27; lint
+  clean; both bundles), installed and launched on the phone emulator. **Next: step 1, the My prayers tab:** Fable's
+  design exists, then `plan-verifier`, then prototype pictures for Ali's yes. Steps 2 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
   start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).

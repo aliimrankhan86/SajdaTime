@@ -3,6 +3,7 @@ package com.sajdatime.app.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
+import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.height
@@ -10,7 +11,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Button
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -114,7 +114,7 @@ fun Notice(
     // 24, the same as every other card: at 20 a notice between two 24dp cards read as a mistake.
     val shape = RoundedCornerShape(24.dp)
     var open by rememberSaveable(title, brief) { mutableStateOf(false) }
-    val turn by animateFloatAsState(if (open) 180f else 0f, tween(200), label = "notice fold")
+    val turn by animateFloatAsState(if (open) 180f else 0f, Motion.quick(), label = "notice fold")
     val hasAction = actionLabel != null && onAction != null
 
     Column(

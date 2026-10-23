@@ -40,7 +40,8 @@ than repeating it.
   - Step P: **done**, `55ef229` (privacy page section and `TrackerPrivacyTest`; full gate not run).
   - Steps 1 to 11: not started.
   - Before step 0: merge `main` in. **Done**, `ceb2504`.
-  - Step 0: motion spec by Fable (`ux-lead`) on 23 Oct 2026 night, written into §5 row 0 and §6; build not started.
+  - Step 0: **done**, 23 Oct 2026 night (Ali approved the plan: "Yes, build it"). `Motion.kt`, the three literals moved, `DesignRulesTest` motion bans, `RequestCodeTest` 30,000 band, `InertReminderSettingsTest`, DESIGN_SYSTEM §2 Motion and §9. Full gate green (518 unit tests, 0 failed).
+  - Step 1: Fable's design written (23 Oct night); next is plan-verifier, then prototype pictures for Ali.
 
 ## 0.1 Which model does what (Ali, 23 Oct 2026)
 

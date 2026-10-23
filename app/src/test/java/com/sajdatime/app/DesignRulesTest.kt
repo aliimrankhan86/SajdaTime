@@ -164,4 +164,39 @@ class DesignRulesTest {
         val stray = Regex("""Spacer\(Modifier\.height\(\d+\.dp\)\)""").findAll(text).map { it.value }.toList()
         assertTrue("Notice.kt has gaps outside the scale: $stray", stray.isEmpty())
     }
+
+    /**
+     * Animation timing comes from Motion (1.6, 23 Oct 2026), so a call site says Motion.quick() and
+     * the easing comes with it, the way gaps come from Space. The one exemption is the Qibla dial's
+     * 120 ms tween, which follows the compass, so it is input driven and is not a choice of feel; only
+     * that exact call (and its import) is let through, so a second tween in QiblaScreen.kt still fails.
+     * Word bounded because a plain tween( would also match Duration.between(; TweenSpec is caught too.
+     * The watch has no animation and is not scanned.
+     */
+    @Test
+    fun `animation durations come from Motion`() {
+        val tween = Regex("""\btween\b|\bTweenSpec\b""")
+        val dial = Regex("""import androidx\.compose\.animation\.core\.tween|tween\(durationMillis = 120\)""")
+        val found = sources.filter { it.name != "Motion.kt" }
+            .filter { tween.containsMatchIn(if (it.name == "QiblaScreen.kt") it.readText().replace(dial, "") else it.readText()) }
+            .map { it.name }
+        assertTrue("Use Motion.quick(), standard() or draw(), not a written tween: $found", found.isEmpty())
+    }
+
+    /** Nothing loops: a moving thing the user did not cause is how an app feels restless. */
+    @Test
+    fun `nothing animates forever`() {
+        val found = offenders(Regex("""\b(rememberInfiniteTransition|infiniteRepeatable)\b"""))
+        assertTrue("No infinite animations (BUILD-INSTRUCTIONS section 6): $found", found.isEmpty())
+    }
+
+    /**
+     * A written spring has no fixed duration, so it cannot be one of the three. Compose's own default
+     * specs on approved screens (tab fade, folds) are kept; only a spring someone writes is banned.
+     */
+    @Test
+    fun `no written springs`() {
+        val found = offenders(Regex("""\bspring\s*(<[^>]*>)?\s*\(|\bSpringSpec\b"""))
+        assertTrue("Use a Motion token, not a spring: $found", found.isEmpty())
+    }
 }

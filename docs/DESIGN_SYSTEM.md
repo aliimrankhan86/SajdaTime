@@ -264,6 +264,38 @@ component's fixed metrics, not gaps between pieces of text.
 > literals are exactly how the gaps drifted apart, card by card. Named tokens make the
 > relationship part of the code, so the reviewer sees `Space.Related` where a 12 would hide.
 
+### Motion (1.6, 23 Oct 2026)
+
+Durations come from `ui/theme/Motion.kt`, the way gaps come from `Space`. There are three, all with
+`FastOutSlowInEasing`, chosen by what moves and never by mood:
+
+| What moves | Token | ms |
+|---|---|---|
+| An icon or arrow swaps or turns (the bell, the fold chevrons) | `Motion.quick()` | 150 |
+| A shape, colour, position or block of text changes in place (the tick, the theme thumb, the pause row, Now and Next) | `Motion.standard()` | 250 |
+| A drawing runs across the screen (rings, sky, day path) | `Motion.draw()` | 400 |
+
+- **Exits** use the token one step shorter than the enter. A `Standard` enter leaves at `Quick`, and a
+  `Quick` enter also leaves at `Quick`. Reversing the same animation (an untick) counts as an exit. A call
+  site passes the shorter spec itself; there is no exit helper.
+- **No entrance animation.** Nothing moves when a screen opens. Something moves only when the user touched
+  it, a sensor reading changed (the Qibla dial), or a real event happened (a prayer time passed, the sky
+  period changed). The one exception is the day path drawing in once per app open.
+- **Never animated:** prayer times, the countdown digits, notice text, the disclaimer, the city title and
+  Hijri date, the glass bar's position, any dialog or sheet text. Letters never move or morph on their own,
+  because per letter effects break Arabic and Urdu joining. A whole block of text may fade.
+- **Haptics** go through `LocalHapticFeedback` only, on the user's own tap that changes something stored
+  (`ToggleOn` and `ToggleOff`, `SegmentTick` for pickers). Two shipped exceptions stay, named so nobody
+  "fixes" them: `SegmentTick` on a tab change (`MainScaffold.kt`) and `LongPress` when the Qibla aligns
+  (`QiblaScreen.kt`, a sensor event). Never on a prayer passing, a sky change, Undo, a
+  snackbar or a ring filling. One pulse per tap.
+- **Enforced** by `DesignRulesTest`: a written `tween` or `TweenSpec` anywhere except `Motion.kt` and the
+  Qibla dial's one 120 ms call (input driven), a `rememberInfiniteTransition` or `infiniteRepeatable`, and a
+  written `spring(`, `spring<…>(` or `SpringSpec` all fail the build. It scans the phone app only. The watch has
+  no animation and is not covered. Not caught, so never claim it: a duration hidden in a constant passed to an
+  API other than `tween`, and an animation loop written by hand with a `LaunchedEffect`; the reviewer checks those. Compose's own default
+  specs on approved screens (tab fade, folds) are kept.
+
 ---
 
 ## 3. Type
@@ -739,6 +771,22 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **23 Oct 2026 (night), motion rules for 1.6 (Fable; Ali approved).** Written down before any animation
+  is built, so the eight new animations of 1.6 (BUILD-INSTRUCTIONS §6 rows 1 to 4 and 6 to 9) feel like one app. Detail: §2 Motion and
+  `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` §6.
+  * **Three durations, not four.** `Quick` 150, `Standard` 250, `Draw` 400. A fourth, `Reveal` 300, was
+    dropped: 50 ms from `Standard` is below what anyone notices, so the choice would drift by mood, the way
+    gaps did before `Space`. Rejected: leaving durations as numbers at each call site.
+  * **No entrance animation.** Nothing moves when a screen opens; only a touch, a sensor or a real event
+    moves something. Rejected: a fade or slide on arrival, because it makes every screen slower to read.
+  * **Haptics only on the user's own tap that changes something stored.** Never on events the app causes.
+    Two shipped exceptions are kept: the tab bar's tick on a tab change and the Qibla's buzz on alignment.
+  * **Material 3 `MotionScheme` and `MaterialExpressiveTheme` considered and not used.** Switching either on
+    changes the motion of every component at once, and Ali has not seen that. Revisit only with screenshots
+    or video in front of him.
+  * **Two shipped values moved to tokens:** the fold chevrons from 200 to 150 ms (`Quick`) and the theme thumb
+    from 240 to 250 ms (`Standard`). Nobody will see the thumb change; the arrows turn a little faster.
 
 - **23 Oct 2026, the 1.6 design direction (Pillars as a reference for thinking, our green kept).** The
   owner answered three questions in chat. **Decided, not built.** Each choice is shown to him on screenshots

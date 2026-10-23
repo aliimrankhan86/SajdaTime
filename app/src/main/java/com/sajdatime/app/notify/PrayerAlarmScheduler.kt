@@ -53,7 +53,7 @@ object PrayerAlarmScheduler {
 
     /**
      * The "prayer in N minutes" reminder (1.5.0). Its own action, and codes `30,000 + dayOfYear * 10 +
-     * slot`, so 30,010 to 33,669: clear of prayers, suhoor and the widget redraw alarm (20,000). The
+     * slot`, so 30,010 to 33,665 (Isha on day 366; `RequestCodeTest` pins it): clear of prayers, suhoor and the widget redraw alarm (20,000). The
      * day is the prayer's, not the reminder's, matching how prayer codes are made.
      */
     const val ACTION_PRAYER_REMINDER = "com.sajdatime.app.action.PRAYER_REMINDER"
