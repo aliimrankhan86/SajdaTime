@@ -198,6 +198,17 @@ session inherits it instead of relearning it.
 
 ## How to work here
 
+- **Use the right model for each job, and the cheapest one that can do it well** (Ali, 23 Oct 2026). The
+  agents are defined in `.claude/agents/`, each with its model fixed; the reasons are in `docs/HANDOVER.md` §5.28.
+  - **Fable decides UX and verifies plans:** `ux-lead` (ease of use, usability, what information a screen shows,
+    wording, every state) and `plan-verifier` (every plan or scope change, before work starts and before Ali sees it).
+  - **Opus checks everything:** `reviewer` reviews every diff and every piece of work from a cheaper agent before
+    it is committed or called done. The main session, which talks to Ali and commits, should itself run on Opus.
+  - **Cheaper models do the routine work:** `implementer` (Sonnet) builds a step whose spec is already decided;
+    `mechanic` (Haiku) does searching, counting and other mechanical, checkable work.
+  - Never hand a cheaper model a decision, alarm or data logic, translations or anything user facing without a
+    written spec, and never skip the `reviewer` to save tokens. Visual decisions stay Ali's, from screenshots.
+
 - **The quality bar is the owner's, and it is not negotiable** (17 Oct 2026: "make sure its all done
   to a good standard ... so nothing is done of bad standard and UX design, clean, easy to use and
   read"). Nothing is finished until it meets `docs/DESIGN_SYSTEM.md` (Quiet Glass): its components and

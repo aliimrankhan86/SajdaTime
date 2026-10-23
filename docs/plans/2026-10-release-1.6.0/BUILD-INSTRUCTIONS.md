@@ -18,8 +18,14 @@ than repeating it.
 - **Ali said "go" on 23 Oct 2026,** after the plan, two gap reviews, a final check and his answers to 27
   questions. Build in §5 order, with screenshots to him after each step.
 - **Where everything is.** Branch `claude/1-6-0`, worktree `/Users/aliimrankhan/Developer/SajdaTime-1-6-0`.
-  - 1.5.0 is **not released yet**; it is on `claude/quiet-glass` (PR #15), and Ali picks its day.
+  - **1.5.0 (updated 23 Oct 2026, evening):** the release day was 23 Oct 2026. PR #15 is merged into `main`
+    (`12c3af5`). The Play Console upload was not finished that day, so 1.5.0 is **not live yet**: Play's
+    "Updated on" still read 17 Oct 2026. Check that date before believing anyone's "it is live".
   - Never merge into `main`. Never push to `main`.
+  - **This branch has not had `main` merged in since 1.5.0 was finished.** A trial merge on 23 Oct 2026
+    conflicted in `MainActivity.kt`, `data/SettingsRepository.kt` and `docs/store/LISTING.md`. Merge `main` in
+    (never rebase) as the first job of the next build session, before step 0, so 1.6 is built on the code that
+    actually shipped as 1.5.0. Keep both sides' behaviour; ask Ali only if both changed the same logic.
   - Never merge `claude/analytics-default-on-1-4-0`.
 - **Already on the branch, built before the design pause, and reworked by this plan** (`DETAILED-PLAN.md` 8.1):
   - `e98b2a6` tracker: ticks on the Times rows, the tracker line under the list. Both move to a tab.
@@ -30,6 +36,44 @@ than repeating it.
   their step. **A step whose screenshot decision is pending stops there and shows him.** Silence is never a yes (DESIGN_SYSTEM §0.2).
 - **Memory.** Every session reads GBrain `projects/sajdatime` first (`recall` or `context_pack`) and writes what
   changed at the end. The 1.6 plan is recorded there too.
+- **Progress, kept current here** (update this list in every commit that finishes a step):
+  - Step P: **done**, `55ef229` (privacy page section and `TrackerPrivacyTest`; full gate not run).
+  - Steps 0 to 11: not started.
+  - Before step 0: merge `main` in (above).
+
+## 0.1 Which model does what (Ali, 23 Oct 2026)
+
+Ali: "use the right model for the task and if tokens can be saved using lower tier model then do it. However,
+everything will be checked by most likely Opus and the plan should be verified by Fable 5. Also the UX decision,
+ease of use, Usability, information to display aspect should be done by fable." The agents are in
+`.claude/agents/`, with the reasons in `docs/HANDOVER.md` §5.28.
+
+- **The main session runs on Opus.** It talks to Ali, writes the plan changes, does alarm, data and animation
+  logic, translates, commits and pushes.
+- **Fable (`plan-verifier`) verifies every plan change** before work starts and before Ali sees it. That
+  includes a change to this file or any 1.6 plan file.
+- **Fable (`ux-lead`) owns UX:** ease of use, usability, what information each screen shows and in what order,
+  wording and every state. It reviews each step's spec before the build and its screenshots before they go to
+  Ali. Ali still decides visual questions from screenshots.
+- **Sonnet (`implementer`) builds routine parts** once the spec is fixed. **Haiku (`mechanic`)** does counts
+  and lookups.
+- **Opus (`reviewer`) checks everything** before commit, including everything Sonnet and Haiku produced.
+
+| Step | Fable `ux-lead` before build | Built by | Haiku `mechanic` | Opus `reviewer` |
+|---|---|---|---|---|
+| P | no (done) | main | none | yes |
+| 0 Foundations | no | `implementer` (`Motion.kt`, moving `tween` literals, the `DesignRulesTest` bans) | count `tween(` and `rememberInfiniteTransition` | yes |
+| 1 My prayers tab | **yes**: tab content order, off, paused and first day states, ring a11y wording | main (tracker data, `tracker_started`, review prompt exclusion); `implementer` for strings and tests | string parity, §4.1 counts | yes |
+| 2 Dates sheet, 2a Shia dates | **yes**: plain names, nothing celebratory on Ashura or Arbaeen | main (each date from a named Shia source) | none | yes, sources checked |
+| 3 Bell with Undo | **yes**: bell states, Undo message wording | main (alert restore logic, permission) | string parity | yes |
+| 4 Timetable | **yes**: day card content, Today marking, PDF sheet | `implementer` for the sheet; main for the PDF ranges | none | yes |
+| 5 Skies | **yes**: artwork, what the header shows, screenshot pairs for Q10 | main (colour stops, contrast, animation) | contrast pair count | yes |
+| 6 Qibla | **yes**: direction sentence first, Details contents | `implementer` (`MeasurementSystem.kt`, layout) | none | yes |
+| 7 Jama'ah | **yes**: the out of window wording | main (codec v2, zone guard) | none | yes |
+| 8 Widgets | **yes**: the 4 by 1 strip content at each width | main (refresh scheduling); `implementer` for layouts and XML | resource and string parity | yes |
+| 9 Disclaimer move | **yes**: About row wording and order | `implementer` | find every use of removed keys | yes, plus the CLAUDE.md rule text |
+| 10 Languages | **yes**: Language row subtitle | main (translations) | string parity in five languages | yes, religious terms |
+| 11 Release | **yes**: "What's new" and listing copy | main | counts for the release script | yes, full diff since 1.5.0 |
 
 ## 1. What 1.6 is, in one paragraph
 
@@ -152,9 +196,9 @@ decisions now. Items marked *screenshot* are decided by Ali from screenshots at 
 | 21 | Shia-specific dates (Ghadir, Arbaeen and others) | **Add in 1.6.0, for Shia users.** See §2 item 2a |
 | 22 | Tasbih counter | Dropped for now |
 | 23 | "What's new" | All nine listing languages |
-| 24 | Play short description | "Offline prayer times, adhan, Qibla and a private salah tracker, with Wear OS." on release day |
+| 24 | Play short description | "Offline prayer times, adhan, Qibla and a private salah tracker, with Wear OS." on release day (77 / 80). **Check with Ali at paste time (added 23 Oct 2026):** it drops "namaz", which `docs/store/LISTING.md` ("Why *namaz* went in after all") kept for search across South Asia and Turkey, and "Sunni and Shia". Show him both lines and the trade-off; his answer stands either way |
 | 25 | The 4 Dec cut | **Allow a late approval.** Something approved after 4 Dec can still go in. The 15 Dec submission and Ramadan stay the real limits. If a late approval would push the submission past 15 Dec, ask Ali which matters more |
-| 26 | 1.5.0 release day | Ali will pick a day this week. Ask him for the day; release work follows `RELEASE-1.5.0.md` |
+| 26 | 1.5.0 release day | **23 Oct 2026.** PR #15 merged that day; the Play Console part was still to finish (§0). Release work follows `RELEASE-1.5.0.md` |
 | 27 | Start building | **Yes, go** (23 Oct 2026). Build in §5 order, with screenshots after each step |
 ## 4. Hard rules that never bend (from `CLAUDE.md`; read it in full)
 
@@ -190,7 +234,7 @@ step starts only after his yes. Section numbers refer to `DETAILED-PLAN.md`.
 
 | # | Step | Main files | Strings (5 languages each) | Tests | Docs | Ends with |
 |---|---|---|---|---|---|---|
-| P | **Privacy first** (9.2) | `docs/privacy.html` | none | new `TrackerPrivacyTest` (moves the backup check from `TrackerWordingTest.kt:65`) | privacy page | test green |
+| P | **Privacy first** (9.2). **Done, `55ef229`** | `docs/privacy.html` | none | new `TrackerPrivacyTest` (moves the backup check from `TrackerWordingTest.kt:65`) | privacy page | test green |
 | 0 | **Foundations** (§1, 8.9, 9.10) | new `ui/theme/Motion.kt`; existing `tween` literals moved (`SettingsList.kt:277,352`, `Notice.kt:117`) | none | `DesignRulesTest` (ban `rememberInfiniteTransition`; ban number literals in `tween(` except `Motion.kt` and the Qibla dial); `RequestCodeTest` adds the 30,000 band; new `InertReminderSettingsTest` (app unit test: no file under `ui/` reads `jamaahReminderMinutes` or `fastReminders`, 8.8) | DESIGN_SYSTEM §2 (a "Motion" subsection beside the gaps) | tests green |
 | 1 | **My prayers tab** (2.4, 8.6, 9.7, 9.9, 9.10, 9.11) | `MainScaffold.kt` (`Destination.PRAYERS`, `TaskAlt` icons, no usage word, `SnackbarHost`); new `ui/prayers/MyPrayersScreen.kt`; ticks and tracker line out of `HomeScreen.kt` (`:907-946`, `:216-218`); `Tick.kt` (PAUSED); `ui/home/MyPrayers.kt` (30-day grid); `TrackerRepository.kt` (`tracker_started`, in the tracker DataStore so Delete clears one store); `review/ReviewPrompt.kt` (the tab never counts as a calm screen) | `nav_tracker`, `tracker_off_line`, `tracker_paused_from_today`, `tracker_ring_a11y` (plurals), `tracker_ring_paused_a11y`, `tracker_ring_today_a11y`, `tracker_state_paused` (and `tracker_tick_a11y` gains the paused state), `tracker_last_night_isha`, `action_undo`; reuse `action_pause` and `action_resume` | `WeekStripTest` (core unit test: share of five, wrap by width, first day), tracker codec test (`tracker_started`), `UsageCountsTest` (3 screens), `TrackerWordingTest` (wider prefixes), `DesignRulesTest` inventory, `LargeTextAndTalkBackDeviceTest` (rings and animation on device) | DESIGN_SYSTEM §4.1 inventory: rewrite rows 429-432 (Times placement) and add `MyPrayersScreen.kt`; §9; HANDOVER | screenshots to Ali |
 | 2 | **Islamic dates sheet** (built) | check only | none | existing | none | screenshots |
@@ -202,8 +246,23 @@ step starts only after his yes. Section numbers refer to `DETAILED-PLAN.md`.
 | 8 | **Widgets** (§5, 8.11) | new `TodayStripWidgetProvider`, `widget_today_strip_info.xml`, layouts; sky drawables; `WidgetRefreshScheduler.nextRefreshAt` (sunrise); `colors.xml` and `values-night` | `widget_strip_label`, `widget_strip_desc` | `WidgetManifestTest` (3 providers), `WidgetResourcesTest`, `WidgetThemeTest`, `WidgetColorsTest`, `WidgetStateTest`, `WidgetRefreshSchedulerTest`, `WidgetDeviceTest` | DESIGN_SYSTEM widgets section | real launcher in light, dark, Urdu and 130% |
 | 9 | **Disclaimer move** (6.0, 8.3, 9.3) | `MainActivity.kt` (remove `FirstRunDisclaimer`, `disclaimerSeen`); `SettingsScreen.kt` About, first row; `README.md:162` | `about_disclaimer_short` "A helper, not a religious authority. Worth reading."; `disclaimer_title` "Disclaimer"; delete `disclaimer_brief`, `disclaimer_read_full`, `action_understood` if unused | `DisclaimerContentTest`, `DesignRulesTest` (remove `:123` exemption), `TranslationIntegrityTest` | `CLAUDE.md` hard rule rewritten on this branch; HANDOVER §1, §5.15, :456; DESIGN_SYSTEM :410-411, :546, §9 | screenshot of Settings |
 | 10 | **Languages** (§7, 8.13) | Language row subtitle (`settings_language_all`, untranslatable, bidi-isolated) | as listed | `TranslationIntegrityTest`; RTL with `./gradlew :app:installRtl` (never bare: HANDOVER lesson 149, the bare task installs the watch app over the phone app) | translation notes (8.13 religious terms) | screenshot (Q18) |
-| 11 | **Release** (8.16) | `versionCode 10`, `1.6.0`; watch unchanged at `1002 / 1.5.0`; `docs/release-tools/release-1.6.0.sh` | "What's new" in nine languages | full gate | HANDOVER §11, PROJECT_BRIEF, RELEASE notes | about 20 store screenshots (01, 02, 03, 05, 06 and My prayers; 01, 02 and My prayers in four more languages) |
+| 11 | **Release** (8.16, and the release checklist below) | `versionCode 10`, `1.6.0`; watch unchanged at `1002 / 1.5.0`; `docs/release-tools/release-1.6.0.sh` | "What's new" in nine languages | full gate | HANDOVER §11, PROJECT_BRIEF, RELEASE notes | about 20 store screenshots (01, 02, 03, 05, 06 and My prayers; 01, 02 and My prayers in four more languages) |
 | 1.6.1 | Reminders and the Fasts count | `PrayerAlarmScheduler` (bands 40,000 and 50,000), Settings rows | `fasts_*` and reminder strings | `RequestCodeTest`, `ExtraReminderPlanTest`, `FastingDaysTest` | privacy page sentence | after Eid |
+
+**Release checklist for step 11** (added 23 Oct 2026 from what 1.5.0's release day taught; none of it is new
+scope):
+- **Copy `release-1.5.0.sh` to `release-1.6.0.sh`** and change the counts (unit tests, device suite, screenshots,
+  `versionCode 10`). `set-release-date.sh` already moves both the privacy page date and the date pinned in
+  `UsageCountsTest`; on 1.5.0's day the test failed because only the page moved (HANDOVER §11, 23 Oct evening).
+- **Watch:** unchanged, so no new watch bundle. Leave the 1.5.0 watch release (1002) where it is in the Wear
+  track, and say so in the Console walk through so nobody uploads the old bundle again.
+- **Data safety:** the tracker is kept on the phone only, so Play's form should not change (data that never
+  leaves the device is not "collected" in Play's terms). Check the current answers against `docs/privacy.html`
+  in the Console walk through; do not change them without Ali.
+- **Store listing:** the line "Coming soon to Chrome and Edge browsers" is in all nine languages. Update it if the
+  extension has shipped, or take it out if it has slipped. The short description is Q24 (check with Ali).
+- **After it is live:** re-baseline the daily health check to 1.6.0, record "live on <date>" in HANDOVER §11 and
+  PROJECT_BRIEF, and close the 1.6 progress list in §0.
 
 **Checkpoints:**
 - **20 Nov:** steps P, 0, 1 and 3 on the emulator.
@@ -307,6 +366,7 @@ a frame does not recompose the row. Give every animation a `label`.
 
 ## 9. How to work with Ali
 
+- **Show him nothing that the `ux-lead` (Fable) and `reviewer` (Opus) have not seen first** (§0.1).
 - He is not technical. Use plain language, and keep what was verified apart from what was assumed.
 - **He decides visual things from screenshots,** light and dark. Ask with `AskUserQuestion`, at most four
   questions, your recommendation first.
@@ -330,3 +390,4 @@ a frame does not recompose the row. Give every animation a `label`.
 | Ramadan layout | `FABLE-REVIEW.md`, "Follow-ups", section 1 |
 | The reference app | `PILLARS-STUDY.md` |
 | Design decisions log | `docs/DESIGN_SYSTEM.md` §9 (23 Oct 2026 entry), §11 |
+| Which model does what | §0.1 here; `docs/HANDOVER.md` §5.28; `.claude/agents/` |

@@ -1918,6 +1918,44 @@ unchanged (checked in captures, §10).
 
 **Privacy:** no change. Nothing new leaves the watch; the phone to watch transfer `docs/privacy.html` describes is unchanged.
 
+### 5.28 Which model does what (owner, 23 Oct 2026)
+
+**Ali's words:** "I want to add mechanism will inform claude to use the right model for the task and if tokens
+can be saved using lower tier model then do it. However, everything will be checked by most likely Opus and the
+plan should be verified by Fable 5. Also the UX decision, ease of use, Usability, information to display aspect
+should be done by fable."
+
+**The mechanism.** Five subagents in `.claude/agents/`, each with its `model:` fixed in its frontmatter, so the
+choice is made by the file rather than remembered by each session. `CLAUDE.md` ("How to work here", first bullet)
+tells every session to use them.
+
+| Agent | Model | Does | Never does |
+|---|---|---|---|
+| `ux-lead` | Fable | UX decisions, ease of use, usability, what a screen shows and in what order, wording, every state, DESIGN_SYSTEM §10 questions | Edit files; decide an OPEN §11 item or a "screenshot" question (it recommends, Ali decides) |
+| `plan-verifier` | Fable | Verifies every plan, build instruction or scope change against the code, before work starts and before Ali sees it | Defend or write the plan |
+| `reviewer` | Opus | Checks every diff and every output of a cheaper agent before commit or "done" | Edit files |
+| `implementer` | Sonnet | Builds a step whose spec is already written and verified | UX, plans, alarm or data logic, anything without a spec; commit |
+| `mechanic` | Haiku | Search, counts (§4.1 checks, string parity), file and line lookups, collecting test output | Decisions, code logic, translations, user facing words |
+
+**The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
+Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.
+The main session talks to Ali, commits and pushes, and should run on Opus. Translations stay with the main
+session (religious terms, CLAUDE.md), and the `reviewer` checks them.
+
+**Rejected:**
+- *Fable for everything.* It is the most expensive, and Ali asked for tokens to be saved where a cheaper model
+  is good enough.
+- *Haiku or Sonnet reviewing their own work.* Ali asked for Opus to check everything; a model checking itself
+  misses its own blind spots.
+- *A hook that switches the main session's model automatically.* A session's own model is chosen when it starts,
+  and a hook is not a dependable way to change it. Subagents with a fixed model are the supported way.
+- *Naming a dated model ID in the agent files.* The aliases (`fable`, `opus`, `sonnet`, `haiku`) follow the
+  latest release, so the files do not go stale.
+
+**Not tested:** the agent files were written in a cloud session on 23 Oct 2026. Their frontmatter parses as
+YAML, but no agent was run from them in that session. The first session that uses one should confirm it starts on
+the named model (the session's model list shows it) and record that in §10.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -5659,14 +5697,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 **The 1.6 plan is complete and checked by two independent reviews. Ali answered all 27 open questions and said
 "go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
-`SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's 20 open questions with defaults, the
-ordered build table, animation, and development and testing guidance.
+`SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's answers to all 27 questions, the
+ordered build table, animation, development and testing guidance, and (§0.1) which model does which job.
+- **Progress (23 Oct 2026, evening):** step P done (`55ef229`); steps 0 to 11 not started. **First job of the next
+  build session:** merge `main` into `claude/1-6-0` (a trial merge conflicts in `MainActivity.kt`,
+  `SettingsRepository.kt` and `docs/store/LISTING.md`), so 1.6 sits on the code that shipped as 1.5.0.
+- **Which model does what** (Ali, 23 Oct 2026): §5.28 and `.claude/agents/`. Fable verifies plans and owns UX,
+  Opus checks everything, Sonnet and Haiku do routine and mechanical work.
 - **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`
   tracker (ticks on Times), `9cc78bf` dates sheet, `9e9102e` jama'ah lines, `762e622` 1.6.1 planners.
 - **Do not show screenshots of that build to Ali as the new design.**
 - **The owner changed one hard rule:** the disclaimer will live in Settings, About, first row, and not be shown
   at first launch. CLAUDE.md is rewritten in the commit that builds it.
-- **1.5.0 is still first.**
+- **1.5.0 is still first.** Its release day was 23 Oct 2026; it is live only when Play's "Updated on" moves from 17 Oct 2026.
 
 ### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
 

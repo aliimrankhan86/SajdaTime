@@ -109,7 +109,8 @@ Ali decided on 16 Oct 2026:
   - a Timetable button
   - the disclaimer moved to Settings
 
-  The plan is checked twice and ready, and nothing is built until he says go. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`. Not before 1.5.0 is uploaded.
+  The plan is checked twice, Ali answered all 27 questions and said go on 23 Oct 2026. The privacy page step is done; the rest waits until 1.5.0 is uploaded. Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0`.
+- **Which model does what** (Ali, 23 Oct 2026): Fable checks every plan and makes the UX decisions (ease of use, what each screen shows, the wording), Opus checks all work before it is saved, and cheaper models do routine and mechanical jobs to save tokens. Set up in `.claude/agents/`; details in HANDOVER §5.28.
 
 ## Known gaps (documented, accepted)
 - On a small round watch (192dp) at large text, the disclaimer's top line touches the clock at the very end of the scroll.
