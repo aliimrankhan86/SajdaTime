@@ -109,6 +109,17 @@ session inherits it instead of relearning it.
 
 ## Hard rules — these are not preferences
 
+- **An iPhone version is planned, so every design must also suit Apple.** Ali, 23 Oct 2026: "I do have
+  aspiration later to make it this app for iOS as well ... So it doesn't look like a design mess, as Apple has often
+  objection about the design aspect of the apps." From 1.6 on, every screen, icon and asset is checked against
+  Apple's Human Interface Guidelines as well as `docs/DESIGN_SYSTEM.md`, because App Store Review Guideline 4
+  (Design) and 4.3 (look-alike apps in a crowded category) are how Apple rejects apps like this one. Only patterns
+  both platforms share (no floating action button, no navigation drawer, a visible back or close on every screen),
+  an SF Symbol named beside each Material icon, 48dp targets (meets Apple's 44pt), text that scales, a distinct look
+  of our own, and assets licensed for both stores; label Android only features (widgets, Wear OS, exact alarms) in
+  each spec. Fable (`ux-lead`) owns this check. No iOS work and no cross platform framework until he decides; keep
+  calculation and rules logic free of Android imports where that costs nothing. Full rule: `docs/HANDOVER.md` §5.28
+  and `.claude/agents/ux-lead.md` on `claude/1-6-0`.
 - **Watch testing is finished. Never ask him to test the watch.** He tested it himself on
   1 September 2026, the Qibla included, reported it fine, and asked explicitly that it not be
   raised again. The times half was proved separately on 31 Aug, when his own paired watch and
