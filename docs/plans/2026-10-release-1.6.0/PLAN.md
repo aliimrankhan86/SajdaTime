@@ -143,6 +143,35 @@ references.
      build and review time allow, and 1.6.1 otherwise. The prayer tracker still comes first.
    - Pillars lists this as "coming soon" (Play listing, 23 Oct 2026).
 
+**Animation (Ali, 23 Oct 2026: "some animation like Pillars, where required").**
+
+*Tool.* Use Compose's own animation APIs: `animate*AsState`, `AnimatedContent`, `AnimatedVisibility`,
+`Animatable`, and path drawing on a `Canvas`. The app already uses them (Settings folds, the Qibla dial,
+the tab pill).
+- **Framer is rejected.** Framer and Framer Motion are web (React) tools and cannot run in a Compose app.
+- **Lottie is rejected for now.** It adds a dependency and a designer's file format for effects Compose can
+  draw in a few lines.
+
+*Where:*
+1. **The tracker tick.** The ring fills and the tick draws in, about 300 ms, with a light haptic. Unticking
+   reverses it.
+2. **Week rings.** The arc grows to its share when the screen opens or a tick changes it.
+3. **The day path on the home screen.** It draws in once when the screen opens. After that the "now" dot
+   moves only when the time updates. **No endless animation**, to save battery.
+4. **The current prayer.** When a prayer time arrives, the highlight moves to the next row.
+5. **Changing day.** Content slides left or right with the arrow tapped, mirrored in RTL.
+6. **Time of day.** The header shifts its tone between morning, day, evening and night, using
+   `DESIGN_SYSTEM.md` colours.
+7. **Qibla.** A gentle confirmation, with a haptic, when the phone is lined up.
+8. **The bell on each row.** A short switch between on and off.
+
+*Rules:*
+- Short: 150 to 400 ms.
+- Nothing animates in the widget or on the watch.
+- With the phone's "remove animations" setting on, every animation jumps to its end state. Check this on
+  the emulator, do not assume it.
+- Nothing flashes.
+
 **Later, not 1.6:**
 - A moon-age number beside the Hijri date.
 - More widget sizes (a reviewer asked for a one-row widget).
