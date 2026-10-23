@@ -58,6 +58,8 @@ ease of use, Usability, information to display aspect should be done by fable." 
   UX and UI, icons, ease of use, the premium look, what information each screen shows and in what order, wording
   and every state. It shapes each step's spec before the build and judges its screenshots before they go to Ali.
   The main session writes the spec down and builds it; Ali still decides visual questions from screenshots.
+  Fable also looks for ready-made assets before anything is drawn (icons, sky artwork for step 5, illustrations),
+  free licensed, bundled, never AI generated; Ali approves each, and its source and licence go in `docs/ASSETS.md`.
 - **Sonnet (`implementer`) builds routine parts** once the spec is fixed. **Haiku (`mechanic`)** does counts
   and lookups.
 - **Opus (`reviewer`) checks everything** before commit, including everything Sonnet and Haiku produced.

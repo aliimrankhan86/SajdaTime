@@ -1941,6 +1941,14 @@ tells every session to use them.
 I prefer Fable to do all the planning, brainstorming, including the correct icons, ease to use, and to look good on a
 premium style or design for the app. So for that, I want Fable to do all the brain thinking." So `ux-lead` no longer
 only reviews: it thinks the feature through first and hands the main session the spec to write down and build.
+Later that day Ali added assets: "I also want Fable to maybe extract the right assets or help us, so visually it's
+easier not to make something ... I want the premium look app on it." So `ux-lead` can search the web and
+recommends ready-made assets (Material Symbols first, then free licensed illustrations, skies, patterns, fonts),
+each with link, licence, size and look. Rules in `.claude/agents/ux-lead.md`: free licence usable in app and
+store (CC0, Apache, MIT, OFL), bundled not fetched, **no generative AI images** (the Play AI asset declaration is
+"Don't label assets"; changing it is Ali's call), no brand or other app's artwork, nothing disrespectful. Fable only
+recommends; Ali approves each one, then the main session downloads it and records source and licence in
+`docs/ASSETS.md` (created with the first asset).
 
 **The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
 Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.
