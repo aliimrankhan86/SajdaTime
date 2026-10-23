@@ -49,8 +49,10 @@ avds=("sajdawear:wearos_small_round:384" "sajdawear_large:wearos_large_round:454
 image="system-images;android-34;android-wear;arm64-v8a"
 
 mkdir -p "$out"
-"$root/gradlew" -p "$root" :wear:assembleDebug -q
+"$root/gradlew" -p "$root" :wear:assembleDebug :wear:assembleDebugAndroidTest -q
 apk="$root/wear/build/outputs/apk/debug/wear-debug.apk"
+testApk="$root/wear/build/outputs/apk/androidTest/debug/wear-debug-androidTest.apk"
+storeTest=""
 
 boot() {  # name profile -> echoes the serial
   local name=$1 profile=$2
@@ -109,8 +111,22 @@ for entry in "${avds[@]}"; do
     grab qibla
   done
   "$adb" -s "$serial" shell settings put system font_scale 1.0
+
+  # The place rules through the real store (WearSettingsDeviceTest): "Same as phone" cannot be reached by
+  # tapping, because an emulator pair cannot sync. Once, on the first watch. It clears the app's settings.
+  # Pushed and installed with pm: adb install of the test APK hung on these images (23 Oct 2026).
+  if [ -z "$storeTest" ]; then
+    "$adb" -s "$serial" push "$testApk" /data/local/tmp/sajda-test.apk >/dev/null
+    "$adb" -s "$serial" shell pm install -r -t /data/local/tmp/sajda-test.apk >/dev/null
+    storeTest="$("$adb" -s "$serial" shell am instrument -w -e class com.sajdatime.wear.WearSettingsDeviceTest \
+      com.sajdatime.app.test/androidx.test.runner.AndroidJUnitRunner | tr -d '\r' | grep -E '^OK|FAILURES|shortMsg' | head -1)"
+    "$adb" -s "$serial" shell pm clear com.sajdatime.app >/dev/null
+  fi
 done
 
+echo
+case "$storeTest" in OK*) echo "PASS  watch place rules on the real store: $storeTest" ;;
+  *) echo "FAIL  watch place rules on the real store: ${storeTest:-no result}" ;; esac
 echo
 "$root/tools/wear-round-check.py" "$out"/"$tag"*.png
 echo

@@ -1004,7 +1004,7 @@ the app as it is at 9:16, not a capture fault. The watch screenshots (`w1-times`
 retaken: on the 1.5.0 build the watch Times screen lays out exactly as in `w1` (checked on
 `sajdawear_large`), and nothing in 1.5.0 changed the Qibla page. **Two watch screenshots were added on 23 Oct 2026**, on
 `sajdawear_large` (read only, London time zone, 15 Aug 2026 15:03, Manchester): `w3-tile`, the tile beside the watch face
-("Asr, 5:13 pm · in 2h 9m", the same moment as `w1`), and `w4-location`, the 1.5.0 Location screen with "Same as phone ·
+("Asr, 5:13 pm · in 2h 9m", two minutes before `w1` and the same Asr), and `w4-location`, the 1.5.0 Location screen with "Same as phone ·
 Manchester" chosen. An emulator pair cannot sync, so the phone's place was handed to the watch by
 `WearScreenSeedDeviceTest` (`-e seed true`), the same call the phone's sync makes; the screen is otherwise exactly as a paired
 watch shows it.

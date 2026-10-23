@@ -14,8 +14,8 @@ Earlier on 21 Oct: submit on Monday 2 November 2026 (it was 9 Nov). The final ch
 **Fri 30 Oct 2026 at 12:00 noon UK**, the "leave the Mac on" reminder comes Thu 29 Oct 18:00, the submit reminder Mon 2 Nov
 09:00. Also on 21 Oct: **the suhoor reminder is on by default, 60 minutes before Fajr, a Notification on the phone's usual
 tone, the adhan only if chosen for it** (HANDOVER §5.19 item 8), and **the store listing was rewritten** to name every
-feature (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026"; the eight translations rebuilt). Gate 421 unit tests, independent review done and acted on, and `release-1.5.0.sh` clean on `bab51ab` (23 of 24, phone SKIPPED; device suite 26 of 26). HANDOVER §11
-STATE OF PLAY 21 Oct has the rest.
+feature (LISTING.md "1.5.0 listing, FINAL 21 Oct 2026"; the eight translations rebuilt). Gate 421 unit tests, independent review done and acted on, and `release-1.5.0.sh` clean on `bab51ab` (23 of 24, phone SKIPPED; device suite 26 of 26), **and again on `6be39c7`, 23 Oct 2026, the same result with the watch location work in (430 unit tests)**. HANDOVER §11
+STATE OF PLAY 23 Oct has the latest, 21 Oct the rest.
 
 Each line says who does it. Claude can do the "Claude" lines from a session on his Mac. Nothing here
 is done by touching the signing key, and **he presses every submit, publish and consent button**.
@@ -207,7 +207,7 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
    Turkish and Indonesian" and no longer says "Your coordinates never leave your device". The daily review replies
    job tells him once when it sees it, and the preparation job (Mon 2 Nov) checks it too. **Claude:** then change that heading to
    LIVE with the date, and update GBrain.
-0b. **DONE for the text, 21 Oct 2026. The six screenshots were read against the 21 Oct change: none shows anything it touched (`05-settings` shows only Location to Language; the Ramadan notice and the sound rows are in none of them), so none was retaken. The 30 Oct job still compares all six by measurement, as below.**
+0b. **DONE for the text, 21 Oct 2026. The six screenshots were read against the 21 Oct change: none shows anything it touched (`05-settings` shows only Location to Language; the Ramadan notice and the sound rows are in none of them), so none was retaken. The 30 Oct job still compares them by measurement, as below. **23 Oct 2026:** two more phone screenshots (`07`, `08`) and two watch ones (`w3`, `w4`) were added, so the set is now eight and four; where this step says six, read eight.**
    **Store screenshots and description must match the final app** (owner, 20 Oct 2026: "we need to update the screenshots in the playstore and description to match the features of our app"). The six
    phone screenshots were taken on 18 Oct and the morning of 19 Oct, before that evening's Ramadan window and widget
    theme changes. **The preparation job (Mon 2 Nov) compares each one, and the "1.5.0 listing, FINAL" description
@@ -271,9 +271,10 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
      `docs/store/LISTING-LOCALES.md`, "1.5.0" (Grow, Store presence, Store listings, Add translations; title, short
      and full description each; the screenshots are shared). This also settles which language a user sees the
      What's new in, because each of the app's four other languages then has its own listing;
-   - replace the phone screenshots with the six new ones in `docs/store/upload/phone/` (checked, or retaken, by the
-     2 Nov job, step 0b; show him them first), in filename order
-     (the old `03-times-dark` goes; the two Wear OS screenshots stay);
+   - replace the phone screenshots with the **eight** in `docs/store/upload/phone/` (checked, or retaken, by the
+     2 Nov job, step 0b; show him them first), in filename order (the old `03-times-dark` goes);
+   - on the Wear OS screenshots, keep `w1-times` and `w2-qibla` and **add `w3-tile` and `w4-location`** from
+     `docs/store/upload/wear-os/` (23 Oct 2026), in filename order;
    - confirm the Data safety answers (expected unchanged);
    - then **he presses Send for review himself**.
 6. **After it is live** (watch Play's "Updated on" date move; Play sends no email):
@@ -285,7 +286,7 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
    - record the release in `docs/HANDOVER.md` §11 and `docs/PROJECT_BRIEF.md`;
    - **Claude re-baselines the daily health check** (`trig_0129FQnWihf8XG6rKLCB4oFr`) to 1.5.0: until then it
      reports "1.5.0 is live" every day, on purpose. The new baseline is the 1.5.0 "Updated on", What's new,
-     the six new phone screenshot IDs (the two watch ones stay), the privacy policy's new date, and the 1.5.0
+     the eight phone screenshot IDs and the four watch ones (w3 and w4 are new), the privacy policy's new date, and the 1.5.0
      description, which no longer has the words "chosen automatically for your school" that its check 3
      looks for.
 

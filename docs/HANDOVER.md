@@ -2302,6 +2302,64 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 
 ## 10. What has been verified on a device, and how
 
+**The watch's Location screen on the Wear emulators, and 1.5.0 end to end (23 Oct 2026, Mac session; §5.27, §11
+STATE OF PLAY 23 Oct).**
+- `tools/wear-verify.sh`, `sajdawear` (192dp) and `sajdawear_large` (227dp), font 1.0 and 1.3, English: **24 of 24
+  captures PASS** the bezel check. Read by eye: the place button sits between Isha and the disclaimer, and at the end of
+  the list the school button is clear of the clock at both sizes and both scales.
+- **Driven by adb on `sajdawear`** (unpaired, so automatic used the watch's own fix, and the button read "This watch's
+  location"): the Location screen showed Same as phone greyed with "Open SajdaTime on your phone", and This watch selected.
+  - Makkah, then OK: the button read "Makkah" and the times moved to Makkah's (Dhuhr 10:06 BST = 12:06 AST).
+  - This watch, then OK: back to "This watch's location".
+  - Back on the Location screen returned to the times without closing the app.
+- **Same as phone cannot be tapped into being** (an emulator pair cannot sync). So `WearSettingsDeviceTest`
+  (`wear/src/androidTest`, the watch's first on-device test) drives the real `WearSettingsStore` on the watch:
+  - the owner's scenario: the phone's place wins under automatic, and the watch's next fix no longer replaces it;
+  - This watch holds through a phone sync, with the phone's place kept aside;
+  - Same as phone switches back at once, and refuses a watch fix;
+  - Makkah holds through both a phone sync and a watch fix;
+  - the phone's own Makkah fallback does not pin a watch that can find itself;
+  - a watch updated from 1.2.0 (the phone's city only in the old keys) keeps it on its first fix.
+
+  **OK (3 tests) on `sajdawear`**, run by `wear-verify.sh`, which now does it every time.
+  - The first version had one test and passed the same way.
+  - The 1.2.0 and Makkah fallback tests were added after an independent review pointed out that only the cloud's
+    uncommitted Robolectric harness had covered them.
+  - `WearSettingsStore.Keys` and the `dataStore` property went from private to internal for that, and nothing else
+    changed.
+- **`release-1.5.0.sh` on `6be39c7`: every line PASS or TAKEN, phone SKIPPED** (Ali's choice).
+  - Gate: 430 unit tests (app 272, core 131 with 1 opt-in skip, wear 27), 0 failed, lint 0 errors.
+  - Bundles, both signed CN=Ali Imran Khan:
+    - phone 9 / 1.5.0, 9,608,652 bytes;
+    - watch 1002 / 1.5.0, 3,712,229 bytes.
+  - Languages, permissions (11 phone, 3 watch) and size all PASS.
+  - Device suite: 26 of 26.
+  - Suhoor reminder alarms 1, Ramadan calendar 4, widgets in Ramadan 5, widgets at font 2.0 5, Ramadan PDF 2: all OK.
+  - Ramadan timetable sheet and RTL first screen taken.
+  - Looked at by eye: the eve of Ramadan notice, Eid al-Fitr, Arabic first run and Urdu Ramadan.
+  - The amber exact alarm banner on those captures is the test emulator not granting the permission. It is not a fault.
+- **Four store screenshots added** (LISTING.md "What the eight phone screenshots show"):
+  - phone `07-alerts-and-adhan` and `08-ramadan-suhoor-reminder`, on `sajdastore`, read only, Manchester chosen in setup;
+  - watch `w3-tile` and `w4-location`, on `sajdawear_large`, the phone's place handed over by `WearScreenSeedDeviceTest`.
+- **Independent review** (a subagent, read only, the two commits and readiness as a whole): no code fault. Fixed:
+  - the docs that still said six and two screenshots;
+  - this block and the STATE OF PLAY being stale;
+  - the brief contradicting itself;
+  - the per-language length labels;
+  - the Arabic Wear line, which read as a Qibla tile;
+  - the Indonesian and Malay "dan";
+  - the widened watch test.
+
+  Kept against its advice: the Chrome and Edge line, which Ali asked for. The review rated the policy risk low.
+- **Not tested:**
+  - a real watch, which is never asked of Ali;
+  - TalkBack on the Location screen;
+  - the Location screen in Arabic and Urdu on an emulator (the cloud captured all five languages on Robolectric);
+  - the permission dialog itself;
+  - the Data Layer sync end to end;
+  - the Android 12 phone (the 19 Oct result stands);
+  - the Samsung phone.
+
 **The watch's Location screen (22 Oct 2026, cloud session, no emulator; §5.27).** A cloud container has no KVM, so no
 emulator: everything below ran on Robolectric 4.17 (Android 15 framework, native graphics) in a scratch copy that was
 **not committed** (lesson 132), driving the **real** `WearMainActivity`, `WearViewModel` and DataStore, with Robolectric's
@@ -5596,6 +5654,43 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > **This section opens with the current state of play, then the dated record of how the project
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
+
+### 📍 STATE OF PLAY, 23 Oct 2026 (read this first; the 22 and 21 Oct blocks below still hold for everything not named here)
+
+**In one line: 1.4.0 is live; 1.5.0 is READY on `claude/quiet-glass`, now checked on the Wear emulators too, with eight
+phone and four watch store screenshots and a listing that names every feature. A pull request into main is open for Ali
+(do not merge it before the release day: the privacy page date goes in first). The release day is still not fixed.**
+
+- **Ali, 23 Oct 2026:**
+  - "merge everything and keep the release ready first ... test it in every possible way ... add / edit description
+    features and create screenshots ... mention all the features including widget, wearable app, ramadan settings";
+  - "the timing should come from the phone for the location - this will be easier for the user";
+  - "we are going to be on chrome and edge very soon";
+  - "check again to make sure everything is ready".
+- **The 22 Oct block's five steps are DONE.**
+  - GBrain was brought up to date (facts 2476 to 2484).
+  - Step 0c ran: §10 top entry. Every check passed, nothing needed fixing.
+  - "From the phone": already the default, because automatic follows the phone once it has sent a real place (§5.27).
+    Now said in the watch note (330 / 500).
+- **Merging: there is nothing left to merge into 1.5.0.**
+  - Every branch's work is in `claude/quiet-glass`, except `claude/analytics-default-on-1-4-0`. That one is deliberately
+    NOT merged; its one commit is the same patch as 8a39b2b, which is already on main and opt in.
+  - main is an ancestor, so the merge is a clean fast forward (`git merge-tree` checked by the review).
+  - The pull request is Ali's to merge on the release day, after `set-release-date.sh` (lesson 137).
+- **Store (LISTING.md, LISTING-LOCALES.md):**
+  - English description 3991 / 4000. It now names the suhoor reminder's 15 to 60 minute choice, the watch Qibla, the
+    watch following the phone, and "Coming soon to Chrome and Edge browsers".
+  - To fit that line, the method line was folded into the methods list in English and dropped in seven translations.
+  - **Change the Chrome and Edge line when the extension ships, or take it out if it slips** (all nine languages).
+  - The independent review would drop it; Ali asked for it, so it stays, his call.
+  - Screenshots: 8 phone, 4 watch.
+  - Every claim was checked against the code by the review.
+- **Watch test:** `WearSettingsDeviceTest`, OK (3 tests), now run by `tools/wear-verify.sh` and so by the 30 Oct job.
+  That job's prompt was updated for the new counts (430 unit tests, device suite 26) and the eight and four screenshots.
+- **Left to do, and whose job:**
+  - **Claude:** nothing until the 30 Oct job (Fri 30 Oct 12:00) or Ali's "Release 1.5.0 today".
+  - **Ali:** pick the day. On it: Claude runs `set-release-date.sh` and pushes; Ali merges the pull request; then the
+    Play Console, walked one screen at a time (RELEASE-1.5.0.md "Still to do"), and Ali presses Send for review.
 
 ### 📍 STATE OF PLAY, 22 Oct 2026 (read this first; the 21 Oct block below still holds for everything not named here)
 
@@ -10448,3 +10543,9 @@ matters more than the stable hashes, that is the trade being made.
     bar, the `preferencesDataStore` singleton and `ShadowLocationManager` keep state across tests (clear both in
     `@Before`), and the software renderer skips the list's edge fading, so `tools/wear-round-check.py` fails every
     capture of a list, changed or not. Judge those captures by eye, and only against the same render of the old code.
+175. **On the Wear OS 34 emulator images, `adb install` of a test APK can hang for minutes; push it and `pm install -t`
+    instead.** Seen 23 Oct 2026 with the watch's first androidTest APK, while the app APK installed fine. Also: an
+    instrumentation run that dies with "Process crashed" may be `ClassNotFoundException: androidx.test.runner
+    .AndroidJUnitRunner`. `androidx.test.ext:junit` alone does not bring the runner; the phone gets it through
+    `espresso-core`, so the watch now does the same. And two Wear emulators with Gradle running starve each other
+    (load average about 20, "failed to complete startup" ANRs): run one at a time when a test must start a process.

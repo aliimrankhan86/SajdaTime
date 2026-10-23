@@ -39,7 +39,7 @@ feature graphic are reused automatically unless you upload language-specific one
 minute suhoor setting, and a "coming soon to Chrome and Edge" line follows the Wear line (the owner: "we are going to be on
 chrome and edge very soon"; the extension is designed, not built). To fit 4000, seven languages dropped their "the method is
 set for your school and can be changed" line (Arabic had room and kept it). Measured by Python `len` after the change:
-ar 3527, ur 3961, tr 3974, id 3976, ms 3976, bn 3965, fr 3982, hi 3978. Change or remove the Chrome and Edge line in the same
+ar 3525, ur 3961, tr 3974, id 3980, ms 3979, bn 3965, fr 3982, hi 3978 (after the review's Arabic, Indonesian and Malay wording fixes). Change or remove the Chrome and Edge line in the same
 edit as the English one (LISTING.md says when).
 
 **Rebuilt 21 Oct 2026 from the regrouped English.** The English full description was regrouped on 21 Oct 2026 (five feature
@@ -84,7 +84,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 أوقات الصلاة والأذان والقبلة بدون نت، للسنة والشيعة، مع Wear OS.
 ```
 
-**Full description** `3472 / 4000`
+**Full description** `3525 / 4000` (23 Oct 2026; was 3472)
 ```
 يمنحك SajdaTime مواقيت الصلاة وتنبيهات الأذان وبوصلة تحدد اتجاه القبلة، للمسلمين من السنة والشيعة، على هاتف أندرويد وساعة Wear OS. بلا إعلانات، وبلا حساب، وتعمل مواقيت الصلاة بدون إنترنت.
 
@@ -114,7 +114,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 التطبيقات المصغّرة وساعة Wear OS
 
 • تطبيقات مصغّرة للشاشة الرئيسية: عدّ تنازلي كبير حتى الصلاة التالية ومواقيت اليوم، مع اسم بلدتك، وبمظهر التطبيق نفسه
-• تطبيق Wear OS وبطاقة للساعة والقبلة، تتبع هاتفك أو تعمل وحدها
+• تطبيق Wear OS مع بطاقة وبوصلة قبلة، يتبع هاتفك أو يعمل وحده
 • قريبًا على متصفحي Chrome وEdge
 
 للجميع
@@ -169,7 +169,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 سنی و شیعہ کے لیے آف لائن اوقات نماز، اذان، قبلہ اور Wear OS ایپ۔
 ```
 
-**Full description** `3987 / 4000`
+**Full description** `3961 / 4000` (23 Oct 2026; was 3987)
 ```
 آپ کے اینڈرائیڈ فون اور Wear OS گھڑی پر SajdaTime سنی اور شیعہ مسلمانوں کو نماز کے اوقات، اذان کے الرٹ اور قبلہ نما دیتی ہے۔ نہ اشتہارات، نہ اکاؤنٹ، اور نماز کے اوقات آف لائن کام کرتے ہیں۔
 
@@ -253,7 +253,7 @@ SajdaTime: Namaz Vakitleri
 İnternetsiz namaz vakitleri, ezan ve kıble. Sünni ve Şii için, Wear OS ile.
 ```
 
-**Full description** `3980 / 4000`
+**Full description** `3974 / 4000` (23 Oct 2026; was 3980)
 ```
 SajdaTime, Sünni ve Şii Müslümanlara Android telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan vakti uyarıları ve kıble pusulası sunar. Reklam yok, hesap yok, namaz vakitleri internetsiz çalışır.
 
@@ -337,7 +337,7 @@ SajdaTime: Jadwal Sholat
 Jadwal sholat offline, adzan dan arah kiblat. Sunni dan Syiah, juga Wear OS.
 ```
 
-**Full description** `3981 / 4000`
+**Full description** `3980 / 4000` (23 Oct 2026; was 3981)
 ```
 SajdaTime menyajikan jadwal sholat, pengingat adzan, dan kompas arah kiblat bagi Muslim Sunni dan Syiah di ponsel Android dan jam tangan Wear OS. Tanpa iklan, tanpa akun, dan jadwal sholat bisa offline.
 
@@ -367,7 +367,7 @@ RAMADAN DAN HARI RAYA
 WIDGET DAN WEAR OS
 
 • Widget layar utama: hitung mundur besar ke sholat berikutnya dan jadwal hari ini, dengan nama kota, sesuai tema aplikasi
-• Aplikasi, tile, kiblat Wear OS, dengan atau tanpa ponsel
+• Aplikasi, tile, dan kiblat Wear OS, dengan atau tanpa ponsel
 • Segera hadir di browser Chrome dan Edge
 
 UNTUK SEMUA
@@ -420,7 +420,7 @@ SajdaTime: Waktu Solat, Kiblat
 Waktu solat, azan dan arah kiblat untuk Sunni dan Syiah, juga di Wear OS.
 ```
 
-**Full description** `3986 / 4000`
+**Full description** `3979 / 4000` (23 Oct 2026; was 3986)
 ```
 SajdaTime memberi waktu solat, peringatan azan dan kompas arah kiblat untuk Muslim Sunni dan Syiah di telefon Android dan jam tangan Wear OS. Tiada iklan, tiada akaun, dan waktu solat berfungsi luar talian.
 
@@ -450,7 +450,7 @@ RAMADAN DAN HARI RAYA
 WIDGET DAN WEAR OS
 
 • Widget skrin utama: kiraan detik besar ke solat seterusnya dan waktu hari ini, dengan nama bandar, ikut tema aplikasi
-• Aplikasi, tile, kiblat Wear OS, dengan atau tanpa telefon
+• Aplikasi, tile dan kiblat Wear OS, dengan atau tanpa telefon
 • Akan datang ke pelayar Chrome dan Edge
 
 UNTUK SEMUA
@@ -503,7 +503,7 @@ SajdaTime: নামাজের সময়সূচি
 অফলাইন নামাজের সময়, আজান, কিবলা কম্পাস, সুন্নি ও শিয়া, Wear OS
 ```
 
-**Full description** `3973 / 4000`
+**Full description** `3965 / 4000` (23 Oct 2026; was 3973)
 ```
 SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের সময়সূচি, আজানের অ্যালার্ট ও কিবলা কম্পাস নিয়ে আসে, আপনার Android ফোন ও Wear OS ঘড়িতে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না, আর নামাজের সময় অফলাইনেও পাওয়া যায়।
 
@@ -587,7 +587,7 @@ SajdaTime: Horaires de prière
 Heures de prière hors ligne, adhan et Qibla, sunnites et chiites, avec Wear OS
 ```
 
-**Full description** `3986 / 4000`
+**Full description** `3982 / 4000` (23 Oct 2026; was 3986)
 ```
 SajdaTime : horaires de prière, alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone Android et montre Wear OS. Sans pub ni compte, horaires hors ligne.
 
@@ -670,7 +670,7 @@ SajdaTime: नमाज़ का समय
 ऑफ़लाइन नमाज़ का समय, अज़ान और किबला, सुन्नी और शिया, Wear OS
 ```
 
-**Full description** `3979 / 4000`
+**Full description** `3978 / 4000` (23 Oct 2026; was 3979)
 ```
 SajdaTime सुन्नी और शिया मुसलमानों के लिए नमाज़ का समय, अज़ान अलर्ट और क़िबला कम्पास देता है, आपके Android फ़ोन और Wear OS घड़ी पर। कोई विज्ञापन नहीं, कोई खाता नहीं, और नमाज़ के समय ऑफ़लाइन मिलते हैं।
 

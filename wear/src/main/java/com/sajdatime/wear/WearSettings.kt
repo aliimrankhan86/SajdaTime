@@ -25,7 +25,8 @@ import kotlinx.coroutines.flow.map
 // An unreadable settings file becomes an empty one, so the watch shows "set up on your phone"
 // again instead of crashing on open and at every tile refresh. The phone re-sends everything
 // on its next sync. Same reasoning and same handler as the phone: see SettingsRepository.
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
+// Internal, not private, only so WearSettingsDeviceTest can write a 1.2.0 watch's keys.
+internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = "sajdatime_wear",
     corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
 )
@@ -225,7 +226,7 @@ class WearSettingsStore(private val context: Context) {
         refreshTile(context)
     }
 
-    private object Keys {
+    internal object Keys {
         val SECT = stringPreferencesKey("sect")
         val MADHAB = stringPreferencesKey("madhab")
         val METHOD = stringPreferencesKey("method")
