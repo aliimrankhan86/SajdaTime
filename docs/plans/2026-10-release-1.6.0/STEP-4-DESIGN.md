@@ -6,7 +6,8 @@ Written before any code, as Ali's process asks: journey and design first, then `
 Ali's yes, then the build. Skills: none invoked; the design system (§2, §4, §4.1), the two shipped sheets (Islamic
 dates, Ramadan timetable) and the Last 30 days sheet decide nearly everything. Apple HIG checks applied by hand: a
 sheet with a grabber and an explicit close, plain list cells, a calendar glyph, no FAB.
-**Status: a recommendation. Nothing is decided until Ali answers §13 and sees §12.**
+**Status: Ali answered §13 Q1, Q2 and Q4 on 24 Oct 2026, all as recommended (Ramadan view from day 1 only; this
+month and next; no Hijri date on cards). Q8 (table or cards) waits for pictures 9 and 10. Ready to build.**
 
 Decided before this file and not reopened: Q7 (PDF ranges Today, 7 days, This month stay), Q8 (Ramadan cards or
 table, Ali decides from side by side pictures), Q9 (the Ramadan card keeps its own door), DETAILED-PLAN 8.5 and 9.8
@@ -299,7 +300,7 @@ Q8, clock on 22 Feb 2027 (day 15 of Ramadan 1448, the date `RamadanPdfRangeTest`
 table light beside cards light; (10) table dark beside cards dark. For `plan-verifier` and `reviewer`: TalkBack on
 one card; Urdu at 320dp 2.0.
 
-## 13. Questions for Ali
+## 13. Questions for Ali (answered 24 Oct 2026: Q1 day 1, Q2 this month and next, Q4 no Hijri; Q8 open)
 
 1. When the Timetable opens on Ramadan: **"From day 1 to the last day, with the Ramadan PDF offered 30 days ahead
    as now (Recommended)"**, or "From 30 days before day 1, as planned". Why the change from the plan: someone
