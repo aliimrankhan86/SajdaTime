@@ -346,3 +346,14 @@ button on permission cards); §4.1 "Every notice" row: Details only when the not
 row; §9 dated entry with the rejected options: a switch (§17), a text Details link, green CTA on amber (3.2:1 dark),
 full width amber button (rejected 17 Oct), a glow under the card, glossing the quiet tone, a white card with an amber
 bar. Pictures for Ali before building: light, dark, Urdu, 2x, Times and Settings, both cards.
+
+## 20. Ali's four answers on the card (24 Oct 2026, AskUserQuestion)
+
+1. Buttons on the two permission cards: **"Allow only (Recommended)"**.
+2. Finish: **"Warning cards glossy (Recommended)"**; quiet (green) notices stay flat.
+3. Icon circle: **"Remove it, bare icon (Recommended)"**, on every notice.
+4. Notifications card icon: **"Crossed bell (Recommended)"**; exact alarms keeps the triangle.
+
+So §19 is decided as written. **Next:** build §19 on `claude/1-6-0-step3-proto` (implementer, spec §19), translate
+the changed exact alarms sentence, then pictures for Ali (light, dark, Urdu, 2x, Times and Settings, both cards)
+before the rest of step 3 (HANDOVER §11 list).
