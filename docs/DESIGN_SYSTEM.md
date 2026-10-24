@@ -209,7 +209,7 @@ is the thin one, 4.57:1 under `onSurfaceVariant`: it cannot be darkened without 
 These sixteen stops are the second depictive colour family after the Kaaba gold: the sky shows the time of
 day the way the gold shows what the Kaaba is. No role, no state, never behind a prayer time or the
 countdown, never on a widget's text. Dark night is told by hue (`#0B1730` is 1.05:1 against the page), which
-is `1.6-dark-skies` in section 11, still OPEN.
+Ali kept on 24 Oct 2026 ("Keep it this deep"; `1.6-dark-skies`, §9).
 
 ### Light and dark separate surfaces differently
 
@@ -827,9 +827,8 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     the glyph. It hides when the city name needs the room (`Sky.markFits`) and always at 2.0 text. No period word
     on screen; TalkBack hears "Dawn, until 7:40 am" (`sky_now_a11y`, which replaces 9.6's wording).
   * **Glyphs.** The app's own widget drawings (`widget_glyph_fajr`, new `sky_glyph_day`, `widget_glyph_maghrib`,
-    `widget_glyph_isha`), so step 8 puts the same four on the widgets. `skyUseMaterialGlyphs` in `Sky.kt` is a
-    temporary switch for the Q2 comparison picture (WbTwilight, WbSunny, WbTwilight, NightsStay) and is removed
-    once he answers. The 23 Oct entry's "sun, moon, stars, the day path with the now dot" is built as: sun or moon
+    `widget_glyph_isha`), so step 8 puts the same four on the widgets. Ali chose them over the row icons (WbTwilight,
+    WbSunny, WbTwilight, NightsStay) from picture 8 on 24 Oct 2026 ("Widget drawings"); the comparison switch is gone. The 23 Oct entry's "sun, moon, stars, the day path with the now dot" is built as: sun or moon
     as the glyph, the one star inside the Isha glyph as the stars, the arc as the day path and the glyph itself as
     the now dot; a separate star field was considered and dropped as clutter. The sun is `primary`: no third
     depictive colour.
@@ -1180,7 +1179,7 @@ the date and his words, and delete it here.
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
 | 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
-| 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | OPEN: screenshots at step 5 |
+| 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | DECIDED 24 Oct 2026 from the eight pictures: dark versions, night kept this deep ("Keep it this deep"); also four light hues kept, light skies kept pale, widget drawings as glyphs |
 | 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
 | 1.6-mosque-door | 23 Oct 2026 | Keep "Different from your mosque?" under the times? | Keep | OPEN: screenshots at step 7 |
 | 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
@@ -1189,7 +1188,7 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Not built for the owner until he answers the four questions in STEP-5-DESIGN section 13 (`1.6-dark-skies` stays OPEN) |
+| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Ali answered the four STEP-5-DESIGN §13 questions on 24 Oct 2026, all as recommended |
 | 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | **Decided and built (24 Oct 2026)** on `claude/1-6-0-step3-proto`; Ali approved the prototype and the card; merge pending (HANDOVER §11) |
 | 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
 | 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Built in the step 5 prototype (`claude/1-6-0-step5-proto`); becomes built when he says yes to the pictures |

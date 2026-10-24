@@ -521,3 +521,9 @@ has answered Q1 to Q3.
 15. The §9 entry says how the 23 Oct "sun, moon, stars, day path, now dot" is realised (one star in the Isha glyph,
     no star field).
 16. `home_sky_a11y` never existed; noted in §9 so nothing searches for it.
+
+## 15. Ali's answers (24 Oct 2026, evening, from the pictures in `screens/step5/`)
+
+All four as recommended: Q1 "Keep it this deep (Recommended)"; Q2 "Widget drawings (Recommended)"; Q3 "Keep the
+four colours (Recommended)"; Q4 "Keep them this pale (Recommended)". The Q2 comparison switch
+(`skyUseMaterialGlyphs`) and its Material icon imports are removed. `1.6-dark-skies` is decided.

@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.NightsStay
-import androidx.compose.material.icons.rounded.WbSunny
-import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -31,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -57,9 +52,6 @@ import kotlin.math.sin
  * city row: a glyph for the period riding an arc of five dots, the five prayers.
  */
 
-// ponytail: for the Q2 comparison picture only (the widget drawings against the Material icons the rows use).
-// Flipped by a temporary edit, never by the user; removed once Ali has answered Q2.
-internal var skyUseMaterialGlyphs = false
 
 // Once per process the passed arc draws in (Q11); later returns to Times start at the end.
 private var skyDrawn = false
@@ -119,25 +111,16 @@ internal fun Modifier.skyBackdrop(colours: () -> SkyColours): Modifier = drawBeh
     drawRect(Brush.verticalGradient(0f to c.top, 0.55f to c.mid, 1f to c.foot, startY = 0f, endY = size.height))
 }
 
-/** The period's glyph: the app's own widget drawings, or (Q2 picture only) the Material icons the rows use. */
+/** The period's glyph: the app's own widget drawings (Ali chose them over the row icons, 24 Oct 2026, Q2). */
 @Composable
 private fun SkyGlyph(period: SkyPeriod, tint: Color, modifier: Modifier) {
-    if (skyUseMaterialGlyphs) {
-        val vector: ImageVector = when (period) {
-            SkyPeriod.DAWN, SkyPeriod.EVENING -> Icons.Rounded.WbTwilight
-            SkyPeriod.DAY -> Icons.Rounded.WbSunny
-            SkyPeriod.NIGHT -> Icons.Rounded.NightsStay
-        }
-        Icon(vector, contentDescription = null, tint = tint, modifier = modifier)
-    } else {
-        val drawable = when (period) {
-            SkyPeriod.DAWN -> R.drawable.widget_glyph_fajr
-            SkyPeriod.DAY -> R.drawable.sky_glyph_day
-            SkyPeriod.EVENING -> R.drawable.widget_glyph_maghrib
-            SkyPeriod.NIGHT -> R.drawable.widget_glyph_isha
-        }
-        Icon(painterResource(drawable), contentDescription = null, tint = tint, modifier = modifier)
+    val drawable = when (period) {
+        SkyPeriod.DAWN -> R.drawable.widget_glyph_fajr
+        SkyPeriod.DAY -> R.drawable.sky_glyph_day
+        SkyPeriod.EVENING -> R.drawable.widget_glyph_maghrib
+        SkyPeriod.NIGHT -> R.drawable.widget_glyph_isha
     }
+    Icon(painterResource(drawable), contentDescription = null, tint = tint, modifier = modifier)
 }
 
 /** Angle from the arc's vertical, in radians, at [u] (0 Fajr end, 1 Isha end) along the arc. */
