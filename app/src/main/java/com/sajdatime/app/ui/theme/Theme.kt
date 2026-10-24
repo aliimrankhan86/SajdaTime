@@ -248,3 +248,34 @@ fun heroStyle(): HeroStyle {
         )
     }
 }
+
+/**
+ * The warning notice's panel: the hero card's gloss in amber (24 Oct 2026). Quiet notices stay
+ * flat, because the dark CTA on them is already at 2.32:1 and a sheen would take it to 1.64:1.
+ */
+data class GlossStyle(
+    val brush: Brush,
+    val sheen: Color,
+    val rim: Color,
+    val rimBottom: Color,
+)
+
+@Composable
+fun warningGloss(): GlossStyle {
+    val scheme = MaterialTheme.colorScheme
+    return if (LocalDarkTheme.current) {
+        GlossStyle(
+            brush = Brush.verticalGradient(listOf(DarkWarnTop, scheme.tertiaryContainer, DarkWarnBottom)),
+            sheen = DarkHeroSheen,
+            rim = DarkHeroRim,
+            rimBottom = DarkHeroRimBottom,
+        )
+    } else {
+        GlossStyle(
+            brush = Brush.verticalGradient(listOf(LightWarnTop, scheme.tertiaryContainer, LightWarnBottom)),
+            sheen = LightHeroSheen,
+            rim = LightHeroRim,
+            rimBottom = LightHeroRimBottom,
+        )
+    }
+}

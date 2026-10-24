@@ -5,6 +5,12 @@ import com.sajdatime.app.ui.components.Bell
 import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.theme.Space
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.material.icons.rounded.NotificationsOff
+import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.shadow
@@ -853,18 +859,21 @@ private fun PolarBanner(state: UiState) {
 @Composable
 private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    if (PrayerAlarmScheduler.canScheduleExact(context)) return
-    if (state.settings.exactAlarmNoticeDismissed) return
+    val show = !PrayerAlarmScheduler.canScheduleExact(context) && !state.settings.exactAlarmNoticeDismissed
 
-    Spacer(Modifier.height(Space.Group))
-    PermissionCard(
-        title = stringResource(R.string.settings_exact_alarms_title),
-        body = stringResource(R.string.settings_exact_alarms_brief),
-        details = stringResource(R.string.settings_exact_alarms_desc),
-        granted = false,
-        onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
-        onDismiss = onDismiss,
-    )
+    // No entrance; closing fades and folds away so the cards below do not jump (24 Oct 2026).
+    AnimatedVisibility(show, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
+        Column {
+            Spacer(Modifier.height(Space.Group))
+            PermissionCard(
+                title = stringResource(R.string.settings_exact_alarms_title),
+                body = stringResource(R.string.settings_exact_alarms_brief),
+                granted = false,
+                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                onDismiss = onDismiss,
+            )
+        }
+    }
 }
 
 /**
@@ -874,16 +883,19 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
  */
 @Composable
 private fun NotificationsBanner(visible: Boolean, onAllow: () -> Unit, onDismiss: () -> Unit) {
-    if (!visible) return
-    Spacer(Modifier.height(Space.Group))
-    PermissionCard(
-        title = stringResource(R.string.notifications_off_title),
-        body = stringResource(R.string.notifications_off_brief),
-        details = stringResource(R.string.notifications_off_desc),
-        granted = false,
-        onClick = onAllow,
-        onDismiss = onDismiss,
-    )
+    AnimatedVisibility(visible, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
+        Column {
+            Spacer(Modifier.height(Space.Group))
+            PermissionCard(
+                title = stringResource(R.string.notifications_off_title),
+                body = stringResource(R.string.notifications_off_brief),
+                granted = false,
+                onClick = onAllow,
+                onDismiss = onDismiss,
+                icon = Icons.Rounded.NotificationsOff,
+            )
+        }
+    }
 }
 
 @Composable

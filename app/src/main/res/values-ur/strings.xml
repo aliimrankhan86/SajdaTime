@@ -197,10 +197,9 @@
     <string name="settings_ongoing_badge_desc">ایک خاموش اطلاع جو بتاتی ہے کہ اگلی نماز کون سی ہے اور آپ کے پاس کتنا وقت ہے</string>
     <string name="settings_exact_alarms_title">درست وقت کے الارم کی اجازت دیں</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">نماز کے الرٹ ایک گھنٹہ دیر سے آ سکتے ہیں۔</string>
+    <string name="settings_exact_alarms_brief">نماز کے الرٹ ایک گھنٹہ دیر سے آ سکتے ہیں، اور فجر کا الرٹ شاید بالکل نہ آئے۔</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">اجازت دیں</string>
-    <string name="settings_exact_alarms_desc">اس کے بغیر نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر سے آ سکتے ہیں، اور کچھ فونز پر فجر کا الرٹ شاید بالکل نہ آئے۔</string>
     <string name="confirm_exact_alarm_title">ایک آخری بات</string>
     <string name="confirm_exact_alarm_body">جب تک آپ اجازت نہ دیں، Android ایپس کو بالکل درست منٹ پر الرٹ لگانے نہیں دیتا۔ اس کے بغیر آپ کا فون نماز کے الرٹ ایک گھنٹہ یا اس سے زیادہ دیر تک روک سکتا ہے، اور کچھ فونز پر فجر جیسا رات کا الرٹ شاید بالکل نہ آئے۔ آپ یہ بعد میں ترتیبات سے بھی کر سکتے ہیں۔</string>
     <string name="action_close">بند کریں</string>
@@ -530,4 +529,6 @@
     <string name="bell_off_reminder_message">%1$s کا الرٹ اور یاددہانی بند</string>
     <string name="bell_off_message_fajr_ramadan">فجر کا الرٹ بند۔ سحری کی یاددہانی آن رہے گی۔</string>
     <string name="bell_off_reminder_message_fajr_ramadan">فجر کا الرٹ اور یاددہانی بند۔ سحری کی یاددہانی آن رہے گی۔</string>
+    <string name="notifications_off_title">اطلاعات کی اجازت دیں</string>
+    <string name="notifications_off_brief">اس فون پر نماز کے الرٹ نہیں آ سکتے۔</string>
 </resources>

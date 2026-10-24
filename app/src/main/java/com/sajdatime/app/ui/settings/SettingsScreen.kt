@@ -226,7 +226,6 @@ fun SettingsScreen(
             PermissionCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
                 body = stringResource(R.string.settings_exact_alarms_brief),
-                details = stringResource(R.string.settings_exact_alarms_desc),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),

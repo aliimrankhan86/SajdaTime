@@ -217,11 +217,10 @@
     <string name="settings_ongoing_badge_desc">إشعار صامت يعرض الصلاة التالية والوقت المتبقي</string>
     <string name="settings_exact_alarms_title">السماح بالمنبّهات الدقيقة</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">قد تصل تنبيهات الصلاة متأخرة ساعة.</string>
+    <string name="settings_exact_alarms_brief">قد تصل تنبيهات الصلاة متأخرة ساعة، وقد لا يصل تنبيه الفجر أبدًا.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">السماح</string>
     <!-- "An hour or more late" is measured on two phones. Keep the figure and the Fajr case. -->
-    <string name="settings_exact_alarms_desc">بدونه، قد تصل تنبيهات الصلاة متأخرة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل الفجر أبدًا.</string>
     <string name="confirm_exact_alarm_title">أمر أخير</string>
     <string name="confirm_exact_alarm_body">لا يسمح Android للتطبيقات بضبط التنبيهات على دقيقة محددة إلا بإذنك. وبدونه قد يؤخر هاتفك تنبيهات الصلاة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل أبدًا تنبيه ليلي مثل الفجر. يمكنك فعل ذلك لاحقًا من الإعدادات أيضًا.</string>
     <string name="action_close">إغلاق</string>
@@ -618,4 +617,6 @@
     <string name="bell_off_reminder_message">تم إيقاف تنبيه %1$s والتذكير</string>
     <string name="bell_off_message_fajr_ramadan">تم إيقاف تنبيه الفجر. يبقى تذكير السحور مفعّلًا.</string>
     <string name="bell_off_reminder_message_fajr_ramadan">تم إيقاف تنبيه الفجر والتذكير. يبقى تذكير السحور مفعّلًا.</string>
+    <string name="notifications_off_title">السماح بالإشعارات</string>
+    <string name="notifications_off_brief">لا يمكن أن تصل تنبيهات الصلاة إلى هذا الهاتف.</string>
 </resources>

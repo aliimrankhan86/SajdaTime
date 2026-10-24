@@ -194,10 +194,9 @@
     <string name="settings_ongoing_badge_desc">Notifikasi senyap yang menunjukkan salat berikutnya dan sisa waktunya</string>
     <string name="settings_exact_alarms_title">Izinkan alarm tepat waktu</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Pengingat salat bisa terlambat satu jam.</string>
+    <string name="settings_exact_alarms_brief">Pengingat salat bisa terlambat satu jam, dan pengingat Subuh mungkin tidak muncul sama sekali.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">Izinkan</string>
-    <string name="settings_exact_alarms_desc">Tanpa izin ini, pengingat salat bisa terlambat satu jam atau lebih, dan di beberapa ponsel pengingat Subuh bisa tidak muncul sama sekali.</string>
     <string name="confirm_exact_alarm_title">Satu hal terakhir</string>
     <string name="confirm_exact_alarm_body">Android tidak mengizinkan aplikasi memasang pengingat pada menit yang tepat kecuali Anda mengizinkannya. Tanpa izin itu, ponsel Anda bisa menunda pengingat salat satu jam atau lebih, dan di beberapa ponsel pengingat dini hari seperti Subuh bisa tidak muncul sama sekali. Anda juga bisa melakukannya nanti dari Pengaturan.</string>
     <string name="action_close">Tutup</string>
@@ -512,4 +511,6 @@
     <string name="bell_off_reminder_message">Pengingat %1$s dan pengingat sebelumnya dinonaktifkan</string>
     <string name="bell_off_message_fajr_ramadan">Pengingat Subuh dinonaktifkan. Pengingat sahur tetap aktif.</string>
     <string name="bell_off_reminder_message_fajr_ramadan">Pengingat Subuh dan pengingat sebelumnya dinonaktifkan. Pengingat sahur tetap aktif.</string>
+    <string name="notifications_off_title">Izinkan notifikasi</string>
+    <string name="notifications_off_brief">Pengingat salat tidak bisa sampai di ponsel ini.</string>
 </resources>
