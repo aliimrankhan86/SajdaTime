@@ -346,3 +346,11 @@ Minor fixes applied: the 84dp reason, the Ramadan title style change, the place 
 `internal DayCard`, the missing slot guard, the contrast pairs named exactly, hoisting the Ramadan rule, the stale
 `timetable_month_heading` references, two line numbers. Verdict: sound; none of the fixes change what Ali is shown.
 It added one question for Ali (Hijri date on cards), now §13 Q4.
+
+## After the build (24 Oct 2026)
+
+Opus `reviewer` found that the Ramadan table's Save as PDF (§2 item 5, "as today") had become the only door to
+Save as PDF in Ramadan, so Today, 7 days and the month were unreachable all Ramadan. **Ali, 24 Oct 2026: "Show the
+choices"**: Save as PDF on the Ramadan table opens the same chooser as the month sheet; it offers Ramadan too.
+Also fixed from the review: today's card scrolled down by the pinned heading's height, the month name through ICU,
+months and days produced together, the later month's gap as its own item. Rules recorded in HANDOVER §5.32.

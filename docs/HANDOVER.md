@@ -2064,6 +2064,31 @@ DataStore edit each so a crash cannot half apply them.
 Rejected: an iPhone style switch for notifications (only the phone can allow them, a switch would spring back,
 §17); the bell clearing the reminder for good (Ali's Q6: Undo must be complete).
 
+### 5.32 The Timetable (1.6.0 step 4, Ali 24 Oct 2026; STEP-4-DESIGN.md)
+
+- **One door.** The Today line's button is "Timetable" (calendar icon); "Save as PDF" moved inside it. One
+  `timetable` flag in `HomeScreen`; the Ramadan card's "Get the full Ramadan timetable" sets the same flag.
+- **Which view.** `ramadanView = state.ramadan?.info?.isRamadan == true && ramadanCardEnabled`: from Ramadan day 1
+  to the last day, with the card on, the approved Ramadan table opens; otherwise the month sheet. **Not 30 days
+  ahead** (the plan said so): `state.ramadan` is null until three days before (`RamadanState.kt:76-77`), and someone
+  tapping Timetable in January expects January. Ali chose "From day 1". The Ramadan PDF is still offered 30 days
+  ahead in the chooser.
+- **Month sheet.** This month and next (Ali: "This month and next"), sticky month headings, one card per day with
+  six times, opened with today's card just under the pinned heading (scrolled down by the heading's measured
+  height: a sticky header draws over the first visible item). Today in `primaryContainer` with the Today pill.
+  Past days not dimmed. **No Hijri date on cards** (Ali). Columns by `TimetableGrid.columns(width, fontScale)`
+  (`:core`): 3, 2 or 1.
+- **Save as PDF** on both views opens the same chooser (Today, 7 days, This month, Ramadan when offered) over the
+  sheet, which stays open after a save. On the Ramadan table it used to make the Ramadan PDF straight away; that
+  left week and month PDFs unreachable all Ramadan once the Timetable became the only door (Opus review). Ali,
+  24 Oct 2026: "Show the choices".
+- **Month name** via ICU `getInstanceForSkeleton("yMMMM")`, not java.time `LLLL`: below API 26 the desugared
+  java.time prints a standalone month as a number.
+- **Rejected:** a table (breaks at 320dp and 2.0), dimmed past days (fails AA, reads as guilt), a rolling 30 days
+  (PDF "This month" would not match), a Month/Ramadan segmented control (not in the design system).
+- **Open:** Q8, the Ramadan view as table or cards, from side by side pictures; `DayCard(ramadanDay)` and
+  `RamadanCardsPreviewList` exist for that and are not wired in.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
