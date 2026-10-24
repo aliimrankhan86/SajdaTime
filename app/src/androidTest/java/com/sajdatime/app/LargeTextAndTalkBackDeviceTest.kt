@@ -244,13 +244,13 @@ class LargeTextAndTalkBackDeviceTest {
     }
 
     /** Facing 60 degrees with the Kaaba at 118: a turn of 58 to the right, compass working, in London. */
-    private fun qiblaState(settings: AppSettings = AppSettings(cityName = "London"), bearing: Double = 118.0, km: Double = 4794.0) =
+    private fun qiblaState(settings: AppSettings = AppSettings(cityName = "London"), bearing: Double = 118.0, km: Double = 4794.0, heading: Double = 60.0) =
         UiState(
             loading = false,
             settings = settings,
             qiblaBearing = bearing,
             qiblaDistanceKm = km,
-            compassHeading = 60.0,
+            compassHeading = heading,
             compassAccuracy = CompassAccuracy.HIGH,
         )
 
@@ -295,13 +295,13 @@ class LargeTextAndTalkBackDeviceTest {
 
     /**
      * The Makkah fallback is no location on Qibla: the bearing from Makkah to Makkah is 0 and the distance 0 km,
-     * which would say "You are now facing the Kaaba" whenever the phone points north. Mutation proof: drop
+     * which would say "You are now facing the Kaaba" whenever the phone points north (seeded here, heading 0). Mutation proof: drop
      * `|| usingDefaultLocation` from the guard and this fails.
      */
     @Test
     fun the_makkah_fallback_on_qibla_shows_the_set_location_notice_and_no_numbers() {
         val fallback = AppSettings(usingDefaultLocation = true, cityName = "Makkah")
-        atText(1f, width = 360.dp) { QiblaBody(qiblaState(fallback, bearing = 0.0, km = 0.0), onUseGps = {}, onSearchCity = {}) }
+        atText(1f, width = 360.dp) { QiblaBody(qiblaState(fallback, bearing = 0.0, km = 0.0, heading = 0.0), onUseGps = {}, onSearchCity = {}) }
         compose.onNode(hasText(word(R.string.qibla_needs_location))).assertExists()
         compose.onAllNodes(hasClickAction()).assertCountEquals(1)
         compose.onNode(hasText(word(R.string.qibla_bearing, 0)), useUnmergedTree = true).assertDoesNotExist()

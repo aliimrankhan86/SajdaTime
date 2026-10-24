@@ -1,6 +1,7 @@
 package com.sajdatime.app.ui.qibla
 
 import com.sajdatime.app.ui.theme.Space
+import androidx.core.app.LocaleManagerCompat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -44,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import android.content.res.Resources
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -265,8 +265,10 @@ private fun PlaceRow(place: String) {
  * are the least useful line for the most people, so they cost nothing and are one tap away. The chevron
  * and the open label are the pattern Notice's own Details button already uses.
  *
- * Miles or km by the phone's own region, not the app's language (an Urdu speaker in Bradford wants
- * miles). `Resources.getSystem()` is the platform's configuration, untouched by AppLocale.
+ * Miles or km by the region of the phone's own language setting (en-GB, ur-GB: miles), never the
+ * language picked inside the app. Not `Resources.getSystem()`: on Android 13+ the app's own language
+ * ("en", no region) reaches that configuration too, so it said km on an en-US phone (emulator, 24 Oct).
+ * `LocaleManagerCompat.getSystemLocales` asks LocaleManager on 13+ and reads the system list below.
  */
 @Composable
 private fun DetailsBlock(state: UiState, hasCompass: Boolean) {
@@ -274,7 +276,7 @@ private fun DetailsBlock(state: UiState, hasCompass: Boolean) {
     val turn by animateFloatAsState(if (open) 180f else 0f, Motion.quick(), label = "qibla details fold")
     val stateText = stringResource(if (open) R.string.state_expanded else R.string.state_collapsed)
     val km = state.qiblaDistanceKm ?: 0.0
-    val miles = MeasurementSystem.usesMiles(Resources.getSystem().configuration.locales[0].country)
+    val miles = MeasurementSystem.usesMiles(LocaleManagerCompat.getSystemLocales(LocalContext.current)[0]?.country.orEmpty())
 
     // ponytail: a compact button standing alone, centred, is a disclosure under a picture (4.1 width row).
     CtaButton(
@@ -376,8 +378,8 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
 
     // Face, rim colour and rim width fade together: 250 ms on arrival, 150 ms on leaving (a reversal
     // is an exit, DESIGN_SYSTEM section 2). The face is read here, in composition, because
-    // sajdaSurface takes a colour, so the dial Box recomposes for the 250 ms of an arrival and at no
-    // other time. The rim values are read inside the draw lambda below and recompose nothing.
+    // sajdaSurface takes a colour; the dial already recomposes on every compass sample (it reads the
+    // heading), so this adds nothing of its own. The rim values are read inside the draw lambda below.
     val face by animateColorAsState(
         if (aligned) scheme.primaryContainer else scheme.surfaceVariant,
         if (aligned) Motion.standard() else Motion.quick(),
@@ -620,7 +622,7 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * the arrow end at the Kaaba on alignment rather than beside it or through it. So it is
  * four numbers, not two — mark distance, mark size, needle tip, letter ring — and they move
  * together: change any and check the others. The watch keeps its own dial and its own shares
- * (0.66 for the mark), because it has a readout in the middle that the phone does not; see
+ * (0.66 for the mark), because it draws no letters and its tick ring did not move; see
  * `WearApp.kt`.
  */
 /**
