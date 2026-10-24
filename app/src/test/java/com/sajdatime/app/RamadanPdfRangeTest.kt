@@ -4,6 +4,7 @@ import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.pdf.PrayerPdfExporter.Range
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
+import com.sajdatime.core.TimetableList
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -73,6 +74,15 @@ class RamadanPdfRangeTest {
         } catch (expected: IllegalStateException) {
             assertNotNull(expected.message)
         }
+    }
+
+    @Test
+    fun `the Timetable's first month is the PDF's This month, so screen and file cannot disagree`() {
+        val today = LocalDate.of(2027, 2, 22)
+        val first = TimetableList.months(today).first()
+        val span = PrayerPdfExporter.spanOf(Range.THIS_MONTH, today, prefs)
+        assertEquals(span.start, first.first)
+        assertEquals(span.days, first.length)
     }
 
     @Test

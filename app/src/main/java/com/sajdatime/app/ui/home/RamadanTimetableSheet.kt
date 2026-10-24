@@ -7,20 +7,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.PictureAsPdf
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -48,7 +42,6 @@ import com.sajdatime.app.ui.RamadanTimetable
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
 import com.sajdatime.app.ui.theme.Space
-import com.sajdatime.core.bidiIsolated
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -94,37 +87,12 @@ internal fun RamadanTimetableSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth()) {
-            Row(
-                verticalAlignment = Alignment.Top,
-                modifier = Modifier.padding(start = 24.dp, end = 12.dp),
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.ramadan_timetable_title, info.hijriYear),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.semantics { heading() },
-                    )
-                    Spacer(Modifier.height(Space.Tight))
-                    Text(
-                        // isBlank is checked before isolating, so the fallback still fires.
-                        text = state.settings.placeName(LocalContext.current).bidiIsolated().ifBlank {
-                            stringResource(R.string.pdf_place_unknown)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Text(
-                        text = stringResource(R.string.pdf_area_label),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                CtaButton(onClick = onExport, compact = true) {
-                    Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(Space.Related))
-                    Text(stringResource(R.string.action_save_pdf))
-                }
-            }
-            Spacer(Modifier.height(Space.Paragraph))
+            TimetableHeader(
+                title = stringResource(R.string.ramadan_timetable_title, info.hijriYear),
+                place = state.settings.placeName(LocalContext.current),
+                onExport = onExport,
+                onClose = onDismiss,
+            )
             HeaderRow()
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
@@ -238,7 +206,7 @@ private fun TimeCell(
 }
 
 @Composable
-private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
+internal fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     Column(
         verticalArrangement = Arrangement.spacedBy(Space.Related),

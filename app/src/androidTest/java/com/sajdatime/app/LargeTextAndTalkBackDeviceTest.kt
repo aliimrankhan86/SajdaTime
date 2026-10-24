@@ -19,11 +19,21 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertWidthIsAtLeast
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.ui.Destination
+import com.sajdatime.app.ui.home.DayCard
+import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.TimetableGrid
+import java.time.Instant
+import java.time.LocalDate
 import com.sajdatime.app.ui.GlassTabBar
 import com.sajdatime.app.ui.components.splitsAWord
 import com.sajdatime.app.ui.settings.SettingsItem
@@ -132,5 +142,41 @@ class LargeTextAndTalkBackDeviceTest {
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
         compose.onNodeWithContentDescription(word(R.string.action_increase, "Fajr")).performClick()
         compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.adjustment_minutes, 1)).assertExists()
+    }
+
+    private val sampleDay = DayPrayerTimes(
+        date = LocalDate.of(2026, 10, 24),
+        times = PrayerSlot.entries.mapIndexed { i, slot -> slot to Instant.parse("2026-10-24T0${i + 3}:15:00Z") }.toMap(),
+    )
+
+    /** At 2.0 on 320dp the card is one column: its spoken text starts with "Today," and names all six times. */
+    @Test
+    fun a_timetable_card_reads_as_one_sentence_with_all_six_times_at_the_largest_text() {
+        atText(2f) { DayCard(day = sampleDay, isToday = true, columns = TimetableGrid.columns(256f, 2f)) }
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val date = TimeFormat.date(context, sampleDay.date)
+        val times = PrayerSlot.entries.map { TimeFormat.clock(context, sampleDay.times.getValue(it)) }
+        val spoken = word(
+            R.string.timetable_today_a11y,
+            word(R.string.timetable_day_a11y, date, times[0], times[1], times[2], times[3], times[4], times[5]),
+        )
+        compose.onNodeWithContentDescription(spoken).assertExists()
+        assertWhole(date)
+    }
+
+    /** Both Timetable buttons keep a 48dp target (the drawn button is 40dp, compact). */
+    @Test
+    fun the_timetable_buttons_have_48dp_targets() {
+        atText(1f) {
+            com.sajdatime.app.ui.components.CtaButton(onClick = {}, compact = true) {
+                androidx.compose.material3.Text(stringResource(R.string.action_timetable))
+            }
+            com.sajdatime.app.ui.components.CtaButton(onClick = {}, compact = true) {
+                androidx.compose.material3.Text(stringResource(R.string.action_save_pdf))
+            }
+        }
+        for (id in listOf(R.string.action_timetable, R.string.action_save_pdf)) {
+            compose.onNode(hasText(word(id)) and hasClickAction()).assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+        }
     }
 }

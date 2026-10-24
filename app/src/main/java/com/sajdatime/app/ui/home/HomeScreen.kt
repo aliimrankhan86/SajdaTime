@@ -43,7 +43,7 @@ import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.PictureAsPdf
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -134,10 +134,11 @@ fun HomeScreen(
     onDismissNotificationsNotice: () -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
+    // One flag for both Timetable views: the month sheet, or the Ramadan table inside Ramadan (see ramadanView).
+    var timetable by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
     var explaining by rememberSaveable { mutableStateOf(false) }
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
-    var ramadanTimetable by rememberSaveable { mutableStateOf(false) }
     var islamicDates by rememberSaveable { mutableStateOf(false) }
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
@@ -153,8 +154,11 @@ fun HomeScreen(
     // so a tick on My prayers can never start it (sign-off, 23 Oct 2026, SIGNOFF.md:52).
     val notificationsWarning = notificationsBlocked && state.settings.alertFor.isNotEmpty() &&
         !state.settings.notificationsNoticeDismissed
-    val calm = !bellMessageShowing && !notificationsWarning && !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
+    val calm = !bellMessageShowing && !notificationsWarning && !exportSheet && !timetable && !locationSheet && !explaining && !ramadanInfo && !islamicDates &&
         state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
+    // During Ramadan, with the Ramadan card on, the Timetable opens the Ramadan table; otherwise the month
+    // view. The same test as the suhoor and iftar labels on the Times rows.
+    val ramadanView = state.ramadan?.info?.isRamadan == true && state.settings.ramadanCardEnabled
     val times = state.today?.times
     LaunchedEffect(calm, times) {
         if (activity == null || times == null) return@LaunchedEffect
@@ -222,7 +226,7 @@ fun HomeScreen(
         RamadanSection(
             state = state,
             onOpenInfo = { ramadanInfo = true },
-            onOpenTimetable = { ramadanTimetable = true },
+            onOpenTimetable = { timetable = true },
             onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
             onDismissNotice = onDismissRamadanNotice,
         )
@@ -231,7 +235,8 @@ fun HomeScreen(
         Spacer(Modifier.height(Space.Group))
         TodayTimeline(
             state,
-            onExport = { exportSheet = true },
+            onTimetable = { timetable = true },
+            ramadanView = ramadanView,
             onBell = onBell,
             snapBell = snapBell,
             notificationsBlocked = notificationsBlocked,
@@ -271,20 +276,30 @@ fun HomeScreen(
         )
     }
 
-    if (ramadanTimetable) {
-        RamadanTimetableSheet(
-            state = state,
-            sheetState = timetableSheetState,
-            onExport = {
-                onExport(PrayerPdfExporter.Range.RAMADAN)
-                ramadanTimetable = false
-            },
-            onShiftDate = {
-                ramadanTimetable = false
-                onOpenSetting(SettingsChooser.ADJUSTMENTS)
-            },
-            onDismiss = { ramadanTimetable = false },
-        )
+    if (timetable) {
+        if (ramadanView) {
+            RamadanTimetableSheet(
+                state = state,
+                sheetState = timetableSheetState,
+                onExport = {
+                    onExport(PrayerPdfExporter.Range.RAMADAN)
+                    timetable = false
+                },
+                onShiftDate = {
+                    timetable = false
+                    onOpenSetting(SettingsChooser.ADJUSTMENTS)
+                },
+                onDismiss = { timetable = false },
+            )
+        } else {
+            // The chooser below opens over this sheet and the sheet stays after a save.
+            TimetableSheet(
+                state = state,
+                sheetState = timetableSheetState,
+                onExport = { exportSheet = true },
+                onDismiss = { timetable = false },
+            )
+        }
     }
 
     if (islamicDates) {
@@ -901,7 +916,8 @@ private fun NotificationsBanner(visible: Boolean, onAllow: () -> Unit, onDismiss
 @Composable
 private fun TodayTimeline(
     state: UiState,
-    onExport: () -> Unit,
+    onTimetable: () -> Unit,
+    ramadanView: Boolean,
     onBell: (PrayerSlot, Boolean) -> Unit,
     snapBell: PrayerSlot?,
     notificationsBlocked: Boolean,
@@ -910,7 +926,8 @@ private fun TodayTimeline(
     val context = LocalContext.current
     val next = state.next
 
-    // The heading and the export action share one line. The export used to be a 56dp filled
+    // The heading and the Timetable button share one line (it was Save as PDF until 1.6.0; the PDF now
+    // lives in the Timetable's header). It used to be a 56dp filled
     // button under everything, and on a 20:9 phone it was the thing that fell below the
     // fold; beside the list it exports it costs no height at all and reads as what it is —
     // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
@@ -918,11 +935,11 @@ private fun TodayTimeline(
     // at full size it looked squashed between the two (owner, 18 Oct 2026, screenshot).
     // At 1.5 text and above the button drops under the heading: at 320dp and 2.0 it squeezed "Today" until it
     // broke mid word. The same rule as the prayer rows below and step 2's dates rows.
-    val exportButton: @Composable () -> Unit = {
-        CtaButton(onClick = onExport, compact = true) {
-            Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
+    val timetableButton: @Composable () -> Unit = {
+        CtaButton(onClick = onTimetable, compact = true) {
+            Icon(Icons.Outlined.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(Space.Related))
-            Text(stringResource(R.string.action_save_pdf))
+            Text(stringResource(R.string.action_timetable))
         }
     }
     if (LocalDensity.current.fontScale >= 1.5f) {
@@ -934,7 +951,7 @@ private fun TodayTimeline(
                 modifier = Modifier.semantics { heading() },
             )
             Spacer(Modifier.height(Space.Related))
-            exportButton()
+            timetableButton()
         }
     } else {
         Row(
@@ -948,7 +965,7 @@ private fun TodayTimeline(
                     .weight(1f)
                     .semantics { heading() },
             )
-            exportButton()
+            timetableButton()
         }
     }
     Spacer(Modifier.height(Space.Related))
@@ -960,7 +977,6 @@ private fun TodayTimeline(
     // labels come from the same state as the card, so they start with day 1 on the user's own
     // calendar and are gone at midnight into 1 Shawwal with nothing to switch off. They follow
     // the "Ramadan card" setting: someone who is not fasting hid it to stop seeing fasting.
-    val inRamadan = state.ramadan?.info?.isRamadan == true && state.settings.ramadanCardEnabled
     val suhoorLabel = stringResource(R.string.ramadan_suhoor_ends)
     val iftarLabel = stringResource(R.string.ramadan_iftar)
 
@@ -977,7 +993,7 @@ private fun TodayTimeline(
                 isCurrent = slot == state.current,
                 note = rowNote(
                     ramadan = when {
-                        !inRamadan -> null
+                        !ramadanView -> null
                         slot == PrayerSlot.FAJR -> suhoorLabel
                         slot == PrayerSlot.MAGHRIB -> iftarLabel
                         else -> null
