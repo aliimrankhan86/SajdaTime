@@ -570,13 +570,20 @@ shapes and this one is a picture; the subtitle above the dial already says the w
 is not a setting goes through it, so a person learns one shape and reads every notice the same
 way. Two tones only: **warning** (`tertiaryContainer`, amber: something is wrong or withheld)
 and **quiet** (`secondaryContainer`, soft green: information or an occasion, Ramadan and Eid).
-Anatomy, since 18 Oct 2026: a round mark (the icon on a 14% tile of the tone's accent); the
-title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
+Anatomy, since 24 Oct 2026 (1.6.0 step 3, Ali's four choices, `STEP-3-DESIGN.md` §19 and §20): a
+**bare mark**, the icon itself at 24dp in the tone's colour, top-aligned, with no tile behind it;
+the title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
 "follow your mosque"); the full explanation, folded; then, 16dp under the text, **one row of
 buttons**: the action as a **solid button** in the tone's colour with an arrow ("Allow", "See
 why", "Change location", "Shift the date"; never "Tap to…") and, when there is more to say, a
 **"Details" button with a down chevron** ("expanded"/"collapsed" spoken). The close X sits
-**alone at the top right**, on Times only.
+**alone at the top right**, on Times only. The **warning tone is glossy**: a soft top to bottom
+amber gradient with a light sheen (`warningGloss()`, the `Warn` tokens in §1); the quiet tone
+stays flat. The two **permission cards** (exact alarms, and notifications while the phone blocks
+them) carry **one button only, "Allow"**, and no Details: the brief sentence says what goes
+wrong, the button fixes it. Their marks are `WarningAmber` and the crossed bell
+`NotificationsOff`. On Times a card leaves with a quick fade and shrink once the permission is
+granted. Before 24 Oct the mark sat on a 14% tile and every warning was flat amber.
 
 **Never put two icon buttons side by side** (owner, 18 Oct 2026, from the emulator: the fold
 chevron sat next to the close X, two opposite actions a finger apart). A close X is the last

@@ -916,21 +916,39 @@ private fun TodayTimeline(
     // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
     // Compact (40dp drawn, 48dp to touch) and 8dp above the list it saves, 16dp under the card:
     // at full size it looked squashed between the two (owner, 18 Oct 2026, screenshot).
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(R.string.home_today),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .weight(1f)
-                .semantics { heading() },
-        )
+    // At 1.5 text and above the button drops under the heading: at 320dp and 2.0 it squeezed "Today" until it
+    // broke mid word. The same rule as the prayer rows below and step 2's dates rows.
+    val exportButton: @Composable () -> Unit = {
         CtaButton(onClick = onExport, compact = true) {
             Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(Space.Related))
             Text(stringResource(R.string.action_save_pdf))
+        }
+    }
+    if (LocalDensity.current.fontScale >= 1.5f) {
+        // Full width so both start at the leading edge; the screen's column centres its children.
+        Column(Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.home_today),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+            Spacer(Modifier.height(Space.Related))
+            exportButton()
+        }
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.home_today),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { heading() },
+            )
+            exportButton()
         }
     }
     Spacer(Modifier.height(Space.Related))
@@ -1061,6 +1079,49 @@ private fun PrayerRow(
     val accent = scheme.primary
     val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
 
+    // At 1.5 text and above the pill and time drop under the name, as step 2's dates rows do: at 320dp and 2.0
+    // the bell's 48dp squeezed the name until "Fajr" broke one letter a line (STEP-3-DESIGN §7). The bell
+    // stays at the end either way. Below 1.5 the row is unchanged.
+    val stacked = LocalDensity.current.fontScale >= 1.5f
+    val markersAndTime: @Composable () -> Unit = {
+        if (isNext) {
+            // Not colour alone: the next prayer also carries a text marker.
+            Text(
+                text = stringResource(R.string.home_next_marker),
+                style = MaterialTheme.typography.labelMedium,
+                color = scheme.onPrimary,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(accent)
+                    .padding(horizontal = 9.dp, vertical = 3.dp),
+            )
+            Spacer(Modifier.width(10.dp))
+        }
+        if (isCurrent) {
+            // Tonal rather than filled, so it reads as a note beside the loud "Next" pill
+            // instead of arguing with it. onSecondaryContainer/secondaryContainer is an
+            // already-asserted pair in ColorContrastTest, in both themes.
+            val nowLabel = stringResource(R.string.home_now_marker_a11y)
+            Text(
+                text = stringResource(R.string.home_now_marker),
+                style = MaterialTheme.typography.labelMedium,
+                color = scheme.onSecondaryContainer,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(scheme.secondaryContainer)
+                    .padding(horizontal = 9.dp, vertical = 3.dp)
+                    // "Now" alone is meaningless read aloud in a list of times.
+                    .semantics { contentDescription = nowLabel },
+            )
+            Spacer(Modifier.width(10.dp))
+        }
+        Text(
+            text = time,
+            style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
+            color = contentColor,
+        )
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -1117,43 +1178,11 @@ private fun PrayerRow(
                     color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                 )
             }
+            if (stacked) {
+                Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
+            }
         }
-        if (isNext) {
-            // Not colour alone: the next prayer also carries a text marker.
-            Text(
-                text = stringResource(R.string.home_next_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onPrimary,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(accent)
-                    .padding(horizontal = 9.dp, vertical = 3.dp),
-            )
-            Spacer(Modifier.width(10.dp))
-        }
-        if (isCurrent) {
-            // Tonal rather than filled, so it reads as a note beside the loud "Next" pill
-            // instead of arguing with it. onSecondaryContainer/secondaryContainer is an
-            // already-asserted pair in ColorContrastTest, in both themes.
-            val nowLabel = stringResource(R.string.home_now_marker_a11y)
-            Text(
-                text = stringResource(R.string.home_now_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSecondaryContainer,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(scheme.secondaryContainer)
-                    .padding(horizontal = 9.dp, vertical = 3.dp)
-                    // "Now" alone is meaningless read aloud in a list of times.
-                    .semantics { contentDescription = nowLabel },
-            )
-            Spacer(Modifier.width(10.dp))
-        }
-        Text(
-            text = time,
-            style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
-            color = contentColor,
-        )
+        if (!stacked) markersAndTime()
         trailing()
     }
 }
