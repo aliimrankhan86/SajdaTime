@@ -205,9 +205,12 @@ fun MainScaffold(
     // calendar (the evening before 1 Ramadan the reminder already fires for the next Fajr).
     val resources = LocalResources.current
     var undoneBell by remember { mutableStateOf<PrayerSlot?>(null) }
+    var offMessageFor by remember { mutableStateOf<PrayerSlot?>(null) }
     val onBell: (PrayerSlot, Boolean) -> Unit = { slot, on ->
         undoneBell = null
         if (on) {
+            // That prayer's own "alert off" message and its Undo are now stale; any other message stays.
+            if (offMessageFor == slot) snackbar.currentSnackbarData?.dismiss()
             bell.on(slot)
         } else {
             scope.launch {
@@ -226,7 +229,9 @@ fun MainScaffold(
                         resources.getString(R.string.bell_off_reminder_message_fajr_ramadan)
                 }
                 snackbar.currentSnackbarData?.dismiss()
+                offMessageFor = slot
                 val result = snackbar.showSnackbar(text, actionLabel = undoLabel, duration = SnackbarDuration.Short)
+                if (offMessageFor == slot) offMessageFor = null
                 if (result == SnackbarResult.ActionPerformed) {
                     undoneBell = slot
                     bell.undo(slot)

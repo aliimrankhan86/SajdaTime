@@ -523,6 +523,6 @@
     <string name="bell_off_reminder_message">%1$s uyarısı ve hatırlatıcısı kapatıldı</string>
     <string name="bell_off_message_fajr_ramadan">Sabah uyarısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
     <string name="bell_off_reminder_message_fajr_ramadan">Sabah uyarısı ve hatırlatıcısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
-    <string name="notifications_off_title">Bildirimlere izin verin</string>
+    <string name="notifications_off_title">Bildirimlere izin ver</string>
     <string name="notifications_off_brief">Namaz uyarıları bu telefona ulaşamıyor.</string>
 </resources>

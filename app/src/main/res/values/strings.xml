@@ -746,7 +746,7 @@
     <string name="jamaah_out_of_window">Your %1$s jama\'ah time is outside %1$s today. Check your mosque\'s times.</string>
     <string name="jamaah_pick_time_title">%1$s: the jama\'ah time on your mosque\'s board</string>
     <string name="mosque_diff_add_jamaah">Add your mosque\'s jama\'ah times</string>
-    <!-- The bell on each prayer row (1.6.0, step 3). %1$s is a prayer name. English only in this prototype. -->
+    <!-- The bell on each prayer row (1.6.0, step 3). %1$s is a prayer name. -->
     <string name="bell_on_a11y">%1$s alert on, notification</string>
     <string name="bell_alarm_a11y">%1$s alert on, alarm</string>
     <string name="bell_off_a11y">%1$s alert off</string>

@@ -57,7 +57,9 @@ object BellRules {
     /**
      * Settings' alerts dialog sets [slot] to [style] (null is Off). Off there also remembers the style,
      * so a bell turned on later restores what the user last chose, but it never touches the reminder:
-     * only the bell carries Q6 (§14.9).
+     * only the bell carries Q6 (§14.9). On there, for a prayer the bell turned off, also gives back the
+     * reminder the bell took, as the bell would: otherwise the prayer looks fully back with its heads up
+     * still silently off (Opus review, 24 Oct 2026).
      */
     fun <S> setFromSettings(state: BellState<S>, slot: PrayerSlot, style: S?): BellState<S> {
         val current = state.alertFor[slot]
@@ -67,7 +69,12 @@ object BellRules {
                 lastStyle = if (current != null) state.lastStyle + (slot to current) else state.lastStyle,
             )
         } else {
-            state.copy(alertFor = state.alertFor + (slot to style))
+            val giveBack = current == null && slot in state.bellRemovedReminder
+            state.copy(
+                alertFor = state.alertFor + (slot to style),
+                reminderFor = if (giveBack) state.reminderFor + slot else state.reminderFor,
+                bellRemovedReminder = state.bellRemovedReminder - slot,
+            )
         }
     }
 

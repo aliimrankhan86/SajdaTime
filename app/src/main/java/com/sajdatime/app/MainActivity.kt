@@ -373,6 +373,11 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationsIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             awaitingSetupNotificationResult = true
+            // Counts as asked, so a later bell tap after a refusal here goes to the phone's settings rather
+            // than launching a system ask some phones no longer show (Opus review, 24 Oct 2026). A deliberate trade:
+            // someone who backs out of the setup prompt without choosing also gets the phone's settings on the
+            // first bell tap, where they can still allow. Better than a tap that shows nothing; do not undo.
+            viewModel.setNotificationPermissionAsked()
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }

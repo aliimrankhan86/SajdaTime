@@ -61,6 +61,14 @@ class BellRulesTest {
         assertEquals("A", BellRules.on(off, FAJR, "N").alertFor[FAJR])
     }
 
+    @Test fun `bell off then Settings on gives the reminder back too`() {
+        val (off, _) = BellRules.off(start, ASR, 10)
+        val back = BellRules.setFromSettings(off, ASR, "A")
+        assertEquals("A", back.alertFor[ASR])
+        assertTrue(ASR in back.reminderFor)
+        assertFalse(ASR in back.bellRemovedReminder)
+    }
+
     @Test fun `off on an off prayer and on on an on prayer change nothing`() {
         val (off, _) = BellRules.off(start, DHUHR, 10)
         assertEquals(off to false, BellRules.off(off, DHUHR, 10))

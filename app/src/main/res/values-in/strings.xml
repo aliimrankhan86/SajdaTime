@@ -508,9 +508,9 @@
     <string name="bell_off_a11y">Pengingat %1$s nonaktif</string>
     <string name="bell_blocked_a11y">Pengingat %1$s aktif. Notifikasi dimatikan di ponsel ini.</string>
     <string name="bell_off_message">Pengingat %1$s dinonaktifkan</string>
-    <string name="bell_off_reminder_message">Pengingat %1$s dan pengingat sebelumnya dinonaktifkan</string>
+    <string name="bell_off_reminder_message">Pengingat %1$s dan pengingat sebelum salat dinonaktifkan</string>
     <string name="bell_off_message_fajr_ramadan">Pengingat Subuh dinonaktifkan. Pengingat sahur tetap aktif.</string>
-    <string name="bell_off_reminder_message_fajr_ramadan">Pengingat Subuh dan pengingat sebelumnya dinonaktifkan. Pengingat sahur tetap aktif.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Pengingat Subuh dan pengingat sebelum salat dinonaktifkan. Pengingat sahur tetap aktif.</string>
     <string name="notifications_off_title">Izinkan notifikasi</string>
     <string name="notifications_off_brief">Pengingat salat tidak bisa sampai di ponsel ini.</string>
 </resources>
