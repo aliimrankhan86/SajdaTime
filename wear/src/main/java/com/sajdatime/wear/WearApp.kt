@@ -880,16 +880,14 @@ private fun QiblaPage(state: WearUiState) {
 /**
  * Where the Kaaba mark sits on the dial and how big it is, as shares of the dial radius.
  *
- * The same two numbers as the phone's `QiblaScreen.kt`, and they have to stay the same:
- * this is one dial drawn twice, and the two watch sizes plus every phone size mean shares
- * are the only form these can take.
+ * Once the same two numbers as the phone's `QiblaScreen.kt`; since step 6 (24 Oct 2026) the phone's mark
+ * sits at 0.60 and this dial keeps 0.66, so the two differ on purpose. The watch has no room for letters
+ * and does not draw them, and its tick ring was not moved, so there is nothing to make room for.
  *
- * Pulled in from 0.72/0.32 on 15 Aug 2026 when the phone gained cardinal letters. The watch
- * has no room for letters and does not draw them, but the mark must not drift between the
- * two screens, so it moved here too. It also ended a long-standing squeeze: at the old
- * numbers the mark's furthest corner reached 0.892 on the 1.2" watch against a tick ring
- * starting at 0.897, a margin of well under a pixel. At 0.66 and 0.30 the corner reaches
- * 0.822 and there is real space again.
+ * Pulled in from 0.72/0.32 on 15 Aug 2026 when the phone gained cardinal letters. It also ended a
+ * long-standing squeeze: at the old numbers the mark's furthest corner reached 0.892 on the 1.2" watch
+ * against a tick ring starting at 0.897, a margin of well under a pixel. At 0.66 and 0.30 the corner
+ * reaches 0.822 at a cardinal bearing and there is real space again.
  */
 /** Shortest gap between arrival buzzes. Mirrors ARRIVAL_QUIET_MILLIS in QiblaScreen. */
 private const val ARRIVAL_QUIET_MILLIS = 5_000L

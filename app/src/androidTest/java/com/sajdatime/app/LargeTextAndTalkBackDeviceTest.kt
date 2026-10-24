@@ -34,6 +34,10 @@ import com.sajdatime.app.ui.home.DayCard
 import com.sajdatime.app.ui.home.LocationHeader
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.app.ui.qibla.QiblaBody
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.assertIsDisplayed
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.core.DayPrayerTimes
@@ -237,5 +241,70 @@ class LargeTextAndTalkBackDeviceTest {
             .assert(hasClickAction()).assertWidthIsAtLeast(48.dp)
         compose.onNodeWithContentDescription(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dates_header_a11y).substringBefore("%1\$s").trim(), substring = true)
             .assert(hasClickAction()).assertHeightIsAtLeast(48.dp)
+    }
+
+    /** Facing 60 degrees with the Kaaba at 118: a turn of 58 to the right, compass working, in London. */
+    private fun qiblaState(settings: AppSettings = AppSettings(cityName = "London"), bearing: Double = 118.0, km: Double = 4794.0) =
+        UiState(
+            loading = false,
+            settings = settings,
+            qiblaBearing = bearing,
+            qiblaDistanceKm = km,
+            compassHeading = 60.0,
+            compassAccuracy = CompassAccuracy.HIGH,
+        )
+
+    /**
+     * Qibla (STEP-6-DESIGN section 9): Details has a 48dp target and says collapsed, then expanded and shows the
+     * bearing line after a tap; the direction is a polite live region; the dial and key say nothing, so the
+     * direction line is the only node with a spoken description.
+     */
+    @Test
+    fun qibla_details_is_a_48dp_disclosure_and_the_direction_is_the_spoken_dial() {
+        atText(1f, width = 360.dp) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
+        val details = compose.onNode(hasText(word(R.string.notice_show_details)) and hasClickAction())
+        val touch = details.fetchSemanticsNode().touchBoundsInRoot
+        with(compose.density) {
+            assertTrue("touch height ${touch.height.toDp()}", touch.height.toDp() >= 47.5.dp)
+            assertTrue("touch width ${touch.width.toDp()}", touch.width.toDp() >= 47.5.dp)
+        }
+        details.assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, word(R.string.state_collapsed)))
+        compose.onNode(hasText(word(R.string.qibla_bearing, 118))).assertDoesNotExist()
+        details.performClick()
+        compose.onNode(hasText(word(R.string.notice_hide_details)) and hasClickAction())
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.StateDescription, word(R.string.state_expanded)))
+        compose.onNode(hasText(word(R.string.qibla_bearing, 118))).assertExists()
+        compose.onNode(SemanticsMatcher.keyIsDefined(SemanticsProperties.LiveRegion))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
+        compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.ContentDescription)).assertCountEquals(1)
+    }
+
+    /** At 2.0 on 320dp the key wraps instead of clipping: both labels are drawn whole, inside the width. */
+    @Test
+    fun the_qibla_key_stays_inside_the_screen_at_the_largest_text() {
+        atText(2f) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
+        val width = with(compose.density) { 320.dp.toPx() }
+        for (label in listOf(word(R.string.qibla_legend_kaaba), word(R.string.qibla_legend_facing))) {
+            // The key clears its semantics, so its words are only in the unmerged tree.
+            val node = compose.onNode(hasText(label), useUnmergedTree = true)
+            node.assertIsDisplayed()
+            val bounds = node.fetchSemanticsNode().boundsInRoot
+            assertTrue("\"$label\" spans ${bounds.left}..${bounds.right} of $width", bounds.left >= 0f && bounds.right <= width + 1f)
+        }
+    }
+
+    /**
+     * The Makkah fallback is no location on Qibla: the bearing from Makkah to Makkah is 0 and the distance 0 km,
+     * which would say "You are now facing the Kaaba" whenever the phone points north. Mutation proof: drop
+     * `|| usingDefaultLocation` from the guard and this fails.
+     */
+    @Test
+    fun the_makkah_fallback_on_qibla_shows_the_set_location_notice_and_no_numbers() {
+        val fallback = AppSettings(usingDefaultLocation = true, cityName = "Makkah")
+        atText(1f, width = 360.dp) { QiblaBody(qiblaState(fallback, bearing = 0.0, km = 0.0), onUseGps = {}, onSearchCity = {}) }
+        compose.onNode(hasText(word(R.string.qibla_needs_location))).assertExists()
+        compose.onAllNodes(hasClickAction()).assertCountEquals(1)
+        compose.onNode(hasText(word(R.string.qibla_bearing, 0)), useUnmergedTree = true).assertDoesNotExist()
+        compose.onNode(hasText(word(R.string.qibla_facing)), useUnmergedTree = true).assertDoesNotExist()
     }
 }

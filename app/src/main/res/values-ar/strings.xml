@@ -161,7 +161,9 @@
 
     <!-- Qibla -->
     <string name="qibla_title">القبلة</string>
-    <string name="qibla_subtitle">تبعد الكعبة نحو %2$d كم من هنا، على زاوية %1$d° من الشمال.</string>
+    <string name="qibla_distance_km">نحو %1$d كم من هنا</string>
+    <string name="qibla_distance_miles">نحو %1$d ميل من هنا</string>
+    <string name="qibla_bearing">%1$d° من الشمال</string>
     <string name="qibla_needs_location">حدّد موقعك لتجد القبلة.</string>
     <string name="qibla_facing">أنت الآن تتجه نحو الكعبة</string>
     <string name="qibla_heading_now">الاتجاه %1$d°</string>

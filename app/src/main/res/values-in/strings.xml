@@ -141,7 +141,9 @@
 
     <!-- Qibla -->
     <string name="qibla_title">Kiblat</string>
-    <string name="qibla_subtitle">Ka\'bah berjarak sekitar %2$d km dari sini, pada %1$d° dari utara.</string>
+    <string name="qibla_distance_km">Sekitar %1$d km dari sini</string>
+    <string name="qibla_distance_miles">Sekitar %1$d mil dari sini</string>
+    <string name="qibla_bearing">%1$d° dari utara</string>
     <string name="qibla_needs_location">Atur lokasi Anda untuk menemukan kiblat.</string>
     <string name="qibla_facing">Anda kini menghadap Ka\'bah</string>
     <string name="qibla_heading_now">Menghadap %1$d°</string>

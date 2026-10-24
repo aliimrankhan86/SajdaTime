@@ -144,7 +144,9 @@
 
     <!-- Qibla -->
     <string name="qibla_title">قبلہ</string>
-    <string name="qibla_subtitle">خانہ کعبہ یہاں سے تقریباً %2$d کلومیٹر دور ہے، شمال سے %1$d° پر۔</string>
+    <string name="qibla_distance_km">یہاں سے تقریباً %1$d کلومیٹر</string>
+    <string name="qibla_distance_miles">یہاں سے تقریباً %1$d میل</string>
+    <string name="qibla_bearing">شمال سے %1$d°</string>
     <string name="qibla_needs_location">قبلہ معلوم کرنے کے لیے اپنا مقام مقرر کریں۔</string>
     <string name="qibla_facing">اب آپ کا رخ خانہ کعبہ کی طرف ہے</string>
     <string name="qibla_heading_now">رخ %1$d°</string>

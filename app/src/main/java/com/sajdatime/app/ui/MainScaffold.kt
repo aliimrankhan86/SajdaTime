@@ -294,7 +294,9 @@ fun MainScaffold(
                         onDismissNotificationsNotice = bell::dismissNotice,
                     )
 
-                    Destination.QIBLA -> ReadingFrame { QiblaScreen(state = state) }
+                    Destination.QIBLA -> ReadingFrame {
+                        QiblaScreen(state = state, onUseGps = onRefreshLocation, onSearchCity = onSearchCity)
+                    }
 
                     Destination.PRAYERS -> ReadingFrame {
                         MyPrayersScreen(

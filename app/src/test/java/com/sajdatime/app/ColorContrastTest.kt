@@ -168,6 +168,12 @@ class ColorContrastTest {
         Pair("dark onSurface/dial face", DarkOnSurface, DarkSurfaceVariant, 3.0),
         Pair("light onSurface/dial face aligned", LightOnSurface, LightPrimaryContainer, 3.0),
         Pair("dark onSurface/dial face aligned", DarkOnSurface, DarkPrimaryContainer, 3.0),
+        // The turn arc, the needle and the aligned rim are primary, drawn on the two dial faces (step 6).
+        // Computed 24 Oct 2026: 7.08 and 6.54 in light, 8.05 and 6.49 in dark.
+        Pair("light primary/dial face", LightPrimary, LightSurfaceVariant, 3.0),
+        Pair("dark primary/dial face", DarkPrimary, DarkSurfaceVariant, 3.0),
+        Pair("light primary/dial face aligned", LightPrimary, LightPrimaryContainer, 3.0),
+        Pair("dark primary/dial face aligned", DarkPrimary, DarkPrimaryContainer, 3.0),
         // The Kaaba's hizam and door, in gold on the silhouette. **Two pairs, not four**,
         // and the difference is the whole reason gold was rejected once and is used now:
         // these shapes sit wholly inside the wall, so they are never drawn on the dial and

@@ -401,7 +401,7 @@ warnings").
 | Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
 | Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
 | Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area was measured once, in the scratch render harness (Robolectric, not part of the repo's tests, which carry no Robolectric): taps 2 and 3.5dp outside the drawn edge pressed it, 6dp did not. Material 3 `Button` gives it that area through `minimumInteractiveComponentSize` |
-| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
+| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally. A compact button may stand alone, centred, when it is a disclosure under a picture (Qibla Details; the welcome globe is the earlier case): a 52dp full width button under the dial would outweigh the thing it explains | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
 | Padding | Material default (24dp each side); compact 16dp each side | |
 | Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
 | Elevation and shadow | None | Flat on purpose: the fill does the work |
@@ -497,6 +497,8 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
 | My prayers tab, tracking off | the switch row; not a button | Switch | 56 row | `MyPrayersScreen.kt` |
 | My prayers tab, no location | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
+| Qibla | Details (down chevron that turns; "Hide details" when open), centred under the place name, 16dp under it | A, compact | 40 drawn, 48 target, wraps | `QiblaScreen.kt` |
+| Qibla, no location (or the Makkah fallback) | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
 | Last 30 days sheet | the X, alone at the top end | D | 48 | `MyPrayers.kt` |
 | Last 30 days sheet | each day cell is `selectable`, not a button; the chosen day's five ticks under the grid | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
 | Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | G, new | platform | `MainScaffold.kt` |
@@ -566,15 +568,18 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > the moment Fajr's window shuts, and it is why there is no "Now" pill anywhere on the list
 > between sunrise and Dhuhr. See `PrayerEngine.currentPrayer`.
 
-**Qibla dial** — face in `surfaceVariant`, rim in `outlineVariant`, ticks every 15°, a
-`primary` arrow at the true bearing, and a fixed grey tick at the top meaning *you are
-pointing here*. Between them, a `primary` arc: **the turn you still owe**. Signed, so a
-left turn sweeps anticlockwise and nobody is sent the long way round. Inside ±5° the arc
-clears, the face fills with `primaryContainer`, the rim switches to `primary`, and the
-wording changes to confirmation. Three independent signals again, only one of them colour.
+**Qibla dial** (restyled in step 6, 24 Oct 2026) — a circle with the lift every card has (shadow in light,
+hairline in dark, `sajdaSurface`), its face `surfaceVariant`. The rim is a **band** inside the edge, `outlineVariant`,
+0.04 of the radius. Ticks every 15° sit at 0.84 to 0.92 and the four letters at 0.77. The needle is **you**: a
+`primary` tapered arrow with rounded corners, fixed at the top with a compass (it points at the bearing without
+one), tip at 0.68. Between the needle and the Kaaba, a `primary` arc, 0.11 of the radius thick: **the turn you
+still owe**, signed so a left turn sweeps anticlockwise and nobody is sent the long way round. Inside ±5° the arc
+clears, the face fills with `primaryContainer` and the rim turns `primary` and thickens to 0.07, all over 250 ms
+(150 ms on leaving), and the line above the dial turns green with a tick. Independent signals, only one of them
+colour.
 
-**The Kaaba mark** sits at the far end of the arrow, at 0.72 of the dial radius, in
-`onSurface` with its band and door painted in whatever the dial face currently is. Same
+**The Kaaba mark** sits at 0.60 of the dial radius, in
+`onSurface` with its band and door in `kiswahGold()`. Same
 artwork on the phone and the watch — `core/res/drawable/ic_kaaba*.xml`, shared so one dial
 drawn twice cannot end up as two different buildings.
 
@@ -593,7 +598,7 @@ drawn twice cannot end up as two different buildings.
 > mark, and what is behind the mark is the needle, so the doorway filled with green.
 
 A legend names the two abstract marks. The Kaaba is not in it, because a legend explains
-shapes and this one is a picture; the subtitle above the dial already says the word.
+shapes and this one is a picture.
 
 **Notices** (one component, `ui/components/Notice.kt`, since 17 Oct 2026). Every message that
 is not a setting goes through it, so a person learns one shape and reads every notice the same
@@ -816,6 +821,32 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **24 Oct 2026, the Qibla restyle (step 6, Fable's design, prototype built; the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-6-DESIGN.md` (section 14 wins where it differs).
+  * **The direction first.** Under the title, "Turn right 58°" in `headlineMedium` with tabular figures, start
+    aligned like the city on Times; on arrival it turns green with a tick, the same size so nothing jumps. **"Facing
+    60°" stays on arrival** (with a compass): it now sits above the dial, and a line vanishing there would move the
+    dial at the very moment it animates. Q1 (start aligned or centred over the dial) is Ali's from the pictures.
+  * **The dial.** The card lift, a rim band that thickens and turns green on arrival, a rounder needle (filled and
+    stroked with round joins), and new shares: ticks 0.84 to 0.92, letters 0.77, Kaaba 0.60, arc 0.11 thick inside
+    the band. Face and rim animate at `Motion.standard()` in and `Motion.quick()` out. The one buzz and its guard are
+    unchanged. Q2 (lifted or flat) is Ali's.
+  * **Details.** Distance and bearing sit behind a compact solid "Details" button with the Notice chevron, "Hide
+    details" when open, closed on each fresh open. **Miles or km by the phone's region** from a plain list (US, GB,
+    LR, MM, the CLDR data), not ICU: one path that unit tests and an iPhone can share, and `android.icu` is banned
+    in `:core` anyway.
+  * **No location, and the Makkah fallback, show the amber "Set location" notice** (same door as My prayers; Q3 is
+    Ali's). The fallback counts as no location because the bearing from Makkah to Makkah is 0 degrees: the screen
+    would say "You are now facing the Kaaba" whenever the phone pointed north. A defect fix, not taste.
+  * **Two notice slots.** "No compass" is permanent, so it sits above the dial beside the number it explains.
+    Calibration and "may wander" come and go in the hand, so they sit below Details and never move the dial.
+  * **No sky on Qibla.** The sky answers which prayer period it is, a Times question; the dial's `surfaceVariant`
+    face would lose its edge on a tinted page, and the green arrival fill would sit on a green day sky.
+  * **Rejected:** numbers on the dial face (sat on the needle, removed once already); a bare "i" for details; the
+    place name as a second door to the location sheet; hiding the degree number as Pillars does; a teardrop needle;
+    artwork. **Comparison switches** `qiblaCentreInstruction` and `qiblaFlatDial` in `QiblaScreen.kt` are marked
+    TEMPORARY and go when Ali has chosen.
 
 - **24 Oct 2026, the skies (step 5, Fable's design, prototype built; the owner has not yet seen the pictures).**
   Detail: `docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md` (section 14 wins where it differs).

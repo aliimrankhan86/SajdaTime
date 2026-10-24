@@ -141,7 +141,9 @@
 
     <!-- Qibla -->
     <string name="qibla_title">Kıble</string>
-    <string name="qibla_subtitle">Kâbe buradan yaklaşık %2$d km uzakta. Yönü kuzeyden %1$d°.</string>
+    <string name="qibla_distance_km">Buradan yaklaşık %1$d km</string>
+    <string name="qibla_distance_miles">Buradan yaklaşık %1$d mil</string>
+    <string name="qibla_bearing">Kuzeyden %1$d°</string>
     <string name="qibla_needs_location">Kıbleyi bulmak için konumunuzu belirleyin.</string>
     <string name="qibla_facing">Şu anda Kâbe yönüne bakıyorsunuz</string>
     <string name="qibla_heading_now">Baktığınız yön: %1$d°</string>
