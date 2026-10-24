@@ -127,7 +127,7 @@
 
     <!-- Export -->
     <string name="action_save_timetable">حفظ الجدول بصيغة PDF</string>
-    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <!-- The short form in the Timetable sheet header, beside the place name (1.6.0 step 4). -->
     <string name="action_save_pdf">حفظ بصيغة PDF</string>
     <string name="action_timetable">جدول المواقيت</string>
     <string name="timetable_title">جدول المواقيت</string>

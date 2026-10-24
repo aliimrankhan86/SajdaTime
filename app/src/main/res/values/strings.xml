@@ -234,7 +234,7 @@
 
     <!-- Export -->
     <string name="action_save_timetable">Save timetable as PDF</string>
-    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <!-- The short form in the Timetable sheet header, beside the place name (1.6.0 step 4). -->
     <string name="action_save_pdf">Save as PDF</string>
     <!-- 1.6.0 step 4, the Timetable (STEP-4-DESIGN §8). Prayer names are written inside timetable_day_a11y on purpose: religious terms, translated by the translator, never joined in code. -->
     <string name="action_timetable">Timetable</string>

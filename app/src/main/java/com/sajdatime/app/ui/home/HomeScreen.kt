@@ -192,8 +192,8 @@ fun HomeScreen(
     ) {
         // Order and heights are budgeted so that on a phone at the default font size the
         // whole of this — header, next prayer, all six times, the mosque door — sits above
-        // the navigation bar without scrolling. That is why the export action lives on the
-        // "Today" line rather than in a 56dp button of its own, and why the far-north
+        // the navigation bar without scrolling. That is why the Timetable (with Save as PDF
+        // inside it) opens from the "Today" line rather than a 56dp button of its own, and why the far-north
         // notice is the door under the times rather than a card above them (which alone was
         // 185dp and pushed Maghrib and Isha off the screen). The rare banners in between —
         // no location, polar, exact alarms — are allowed to push things down; they are
@@ -281,10 +281,10 @@ fun HomeScreen(
             RamadanTimetableSheet(
                 state = state,
                 sheetState = timetableSheetState,
-                onExport = {
-                    onExport(PrayerPdfExporter.Range.RAMADAN)
-                    timetable = false
-                },
+                // The chooser, not the Ramadan PDF straight away: this table is now the only door to
+                // Save as PDF in Ramadan, and Today, 7 days and the month must stay reachable (Q7; Ali,
+                // 24 Oct 2026, "Show the choices"). The chooser offers Ramadan too in Ramadan.
+                onExport = { exportSheet = true },
                 onShiftDate = {
                     timetable = false
                     onOpenSetting(SettingsChooser.ADJUSTMENTS)
