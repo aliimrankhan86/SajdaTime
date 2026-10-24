@@ -705,6 +705,12 @@
     <string name="date_eid_fitr">Eid al-Fitr</string>
     <string name="date_arafah">Day of Arafah</string>
     <string name="date_eid_adha">Eid al-Adha</string>
+    <!-- Shia only dates (1.6 step 2a): shown only when the sect is Shia. -->
+    <string name="date_ghadir">Eid al-Ghadir</string>
+    <string name="date_arbaeen">Arbaeen</string>
+    <string name="date_prophet_birth">Birth of the Prophet ﷺ</string>
+    <string name="date_imam_ali_birth">Birth of Imam Ali</string>
+    <string name="date_imam_mahdi_birth">Birth of Imam al-Mahdi</string>
     <plurals name="dates_in_days">
         <item quantity="one">in %d day</item>
         <item quantity="other">in %d days</item>

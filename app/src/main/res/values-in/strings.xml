@@ -470,6 +470,11 @@
     <string name="date_eid_fitr">Idulfitri</string>
     <string name="date_arafah">Hari Arafah</string>
     <string name="date_eid_adha">Iduladha</string>
+    <string name="date_ghadir">Idul Ghadir</string>
+    <string name="date_arbaeen">Arbain</string>
+    <string name="date_prophet_birth">Kelahiran Nabi ﷺ</string>
+    <string name="date_imam_ali_birth">Kelahiran Imam Ali</string>
+    <string name="date_imam_mahdi_birth">Kelahiran Imam Mahdi</string>
     <plurals name="dates_in_days">
         <item quantity="other">%d hari lagi</item>
     </plurals>

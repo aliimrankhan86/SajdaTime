@@ -264,6 +264,7 @@ fun HomeScreen(
         IslamicDatesSheet(
             today = state.today?.date ?: state.now.atZone(ZoneId.systemDefault()).toLocalDate(),
             offsetDays = state.settings.calculationPrefs.hijriOffset,
+            sect = state.settings.sect,
             onShiftDate = {
                 islamicDates = false
                 onOpenSetting(SettingsChooser.ADJUSTMENTS)

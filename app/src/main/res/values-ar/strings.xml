@@ -561,6 +561,11 @@
     <string name="date_eid_fitr">عيد الفطر</string>
     <string name="date_arafah">يوم عرفة</string>
     <string name="date_eid_adha">عيد الأضحى</string>
+    <string name="date_ghadir">عيد الغدير</string>
+    <string name="date_arbaeen">الأربعين</string>
+    <string name="date_prophet_birth">مولد النبي ﷺ</string>
+    <string name="date_imam_ali_birth">مولد الإمام علي</string>
+    <string name="date_imam_mahdi_birth">مولد الإمام المهدي</string>
     <plurals name="dates_in_days">
         <item quantity="zero">بعد %d يوم</item>
         <item quantity="one">بعد %d يوم</item>

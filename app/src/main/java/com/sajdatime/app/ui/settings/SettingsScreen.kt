@@ -690,6 +690,7 @@ fun SettingsScreen(
         SettingsChooser.ISLAMIC_DATES -> IslamicDatesSheet(
             today = state.today?.date ?: LocalDate.now(),
             offsetDays = settings.calculationPrefs.hijriOffset,
+            sect = settings.sect,
             // One chooser open at a time: the sheet makes way for the date shift.
             onShiftDate = { open = SettingsChooser.ADJUSTMENTS },
             onDismiss = { open = null },

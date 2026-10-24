@@ -2025,6 +2025,25 @@ Ali chose from pictures on 23 Oct 2026: "B: calendar grid" and "Yes, build it". 
 - **The tab keeps its own day:** with no saved place the clock loop republishes it after midnight (not tested; read
   from code, review 23 Oct 2026).
 
+### 5.30 Islamic dates: six for everyone, five more for Shia users (1.6.0 step 2a, Ali 23 Oct 2026)
+
+Design by Fable: `docs/plans/2026-10-release-1.6.0/STEP-2-DESIGN.md` (§7a and §8 win). Rules, tested in
+`IslamicDatesGoldenTest`:
+- **Everyone** sees the six shared days (1 Muharram, Ashura, 1 Ramadan, the two Eids, Arafah). Mawlid, Isra and
+  Mi'raj and 15 Sha'ban are not in the shared list (Q20); 12 Rabi al-Awwal is out for everyone.
+- **Shia users** (stored sect Shia) also see Eid al-Ghadir (18 Dhu al-Hijjah), Arbaeen (20 Safar), Birth of the
+  Prophet ﷺ (17 Rabi al-Awwal), Birth of Imam Ali (13 Rajab), Birth of Imam al-Mahdi (15 Sha'ban) (Q21). Merged in
+  date order with no heading, so the screen never prints the user's sect. Sources: five I.M.A.M. pages, cited in
+  the KDocs of `IslamicDay`.
+- **Unset means Sunni**, six rows (`SettingsRepository` default). `IslamicDates.upcoming(today, offset, sect)` has
+  **no default for `sect`** on purpose: a caller that forgets it must not compile, rather than silently show six.
+- **The three Shia Ramadan nights (19, 21, 23) are out of 1.6** (Ali): a Hijri night starts at the previous
+  sunset, so a row dated by the day is a day off. Their later home is the Ramadan timetable.
+- **Honorific (Ali):** the Prophet with ﷺ, the Imams plain, in every language. Names plain, nothing celebratory.
+- Golden dates come from Aladhan Umm al-Qura, not I.M.A.M.'s own calendar (it can differ by a day); the footer
+  already says local sighting may differ. Nothing is sent: no usage event, the sect stays on the phone.
+- **Do not "improve" back:** a "Shia dates" heading, a default `sect`, or the Ramadan nights as day rows.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -2408,6 +2427,17 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.6.0 step 2a, Shia only Islamic dates (24 Oct 2026, early morning, Mac session).** Phone emulator `sajda`
+(API 36), real clock (24 Oct 2026, 13 Jumada al-Ula 1448), London. Golden dates: the main session and the reviewer
+each fetched all ten (five days, 1448 and 1449) from Aladhan `hToG?calendarMethod=UAQ`; all match the code. Screens
+in `docs/plans/2026-10-release-1.6.0/screens/step2/`: Shia light, scrolled, dark, Urdu (right to left), text 1.5 and
+2.0, 320dp at 1.0 and 2.0, and Sunni showing the same six rows as before. Found on the emulator and fixed, seen
+before and after: at 320dp and 2.0 text "Ramadan" broke mid word ("Ramad / an"), a fault of the shared row older
+than 2a; rows now stack name, date, count at text 1.5 and above (Fable's spec, `IslamicDatesSheet.kt`). Accepted
+(Fable): the ﷺ ligature makes its row about 10dp taller, from the phone's Arabic fallback font; not resized, since
+shrinking it reads as less respect and the height differs per maker. Also checked: text 1.3 at 320dp in Indonesian, Turkish and Urdu, the longest titles, still side by side: every title wraps between words, so the threshold stays at 1.5. Full gate green: app 303, core 203 (1 skipped), wear 27 unit tests, lint clean, both bundles. Left as is: the stacked count reads "in 59 days" lower case under "Today" rows (existing strings). Not checked: ﷺ on an API 26 emulator, how
+TalkBack reads ﷺ, a Samsung or Xiaomi font, the five I.M.A.M. pages re-fetched (Fable fetched them 23 Oct).
 
 **1.6.0 step 1, the My prayers tab (23 Oct 2026, night, Mac session).** Phone emulator `sajda` (API 36), seeded by
 `TrackerSeedDeviceTest` and `ScreenSeedDeviceTest`, clock set to Fri 23 Oct 14:30 (`adb root`, `auto_time 0`).
@@ -5801,7 +5831,7 @@ ordered build table, animation, development and testing guidance, and (§0.1) wh
   evidence. **Ali approved step 1's finished screenshots on 23 Oct night ("Yes, it's right (Recommended)"). Step 1 is done.** Step 2 is
   designed (`STEP-2-DESIGN.md`, by Fable, checked by `plan-verifier`, `ad41a39` and the next commit): the shared
   dates sheet unchanged; five Shia only dates with named sources; Ali's answers: the Ramadan nights stay out of 1.6;
-  "Birth of the Prophet ﷺ", Imams plain. **Next: build step 2** (start with STEP-2-DESIGN §7a and §8). Steps 3 to 11 not started. The five agents ran for the first time and each runs on its
+  "Birth of the Prophet ﷺ", Imams plain. **Step 2 built 24 Oct 2026, early morning** (§5.30, §10): the shared sheet unchanged, five Shia only dates, rows stack at large text; reviewed by Opus, pictures judged by Fable, in `screens/step2/`. **Next: Ali's yes on those pictures, then step 3.** Steps 3 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
   start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).

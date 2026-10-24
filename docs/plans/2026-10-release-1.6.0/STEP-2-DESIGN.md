@@ -2,7 +2,7 @@
 
 > **READING ORDER:** as `STEP-1-DESIGN.md`: `BUILD-INSTRUCTIONS.md` first, then this file for step 2 only.
 
-**Status: a design, not built.** Written while Ali's yes on step 1's finished pictures was still awaited (he
+**Status: built 24 Oct 2026 (§9); waiting for Ali's yes on the pictures.** Originally: Written while Ali's yes on step 1's finished pictures was still awaited (he
 asked to use the remaining usage, 23 Oct 2026 night), so nothing for step 2 is built until he says yes to step 1
 and to this. Next: `plan-verifier`, then Ali's two questions (§7), then the build.
 
@@ -110,3 +110,13 @@ stays out for everyone). Before building:
    (`HomeScreen.kt:264` reads `state.settings.sect`; `SettingsScreen.kt:690`) and cannot silently show six rows.
 6. Golden values come from Aladhan Umm al-Qura, not from I.M.A.M.'s own calendar (its 17 Rabi al-Awwal 1446 is a day
    off Umm al-Qura); the sheet's footer already says local sighting may differ.
+
+## 9. Built (24 Oct 2026, early morning)
+
+Built by `implementer`, reviewed by `reviewer` (no blocking findings; it asked for the Shia list pinned exactly,
+done), pictures judged by Fable. Two decisions from Fable on the emulator pictures:
+1. **Rows stack at text 1.5 and above** (name, date, then the count), because at 320dp and 2.0 "Ramadan" broke
+   mid word. Below 1.5 the row is unchanged. Rejected: a weight or max width on the count (breaks "107"),
+   `FlowRow` (ragged), shrinking the title.
+2. **ﷺ is accepted as it renders:** its row is about 10dp taller (the phone's Arabic fallback font). Not resized.
+Pictures: `screens/step2/`. Evidence: HANDOVER §10; rules: HANDOVER §5.30.
