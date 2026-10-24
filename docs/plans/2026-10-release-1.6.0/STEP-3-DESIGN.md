@@ -275,3 +275,85 @@ Blocked notifications: **"Amber notice with Allow (Recommended)"**. Build §6's 
 "Yes, build it", with one change, in his words: "the allow notification panel should look modern and great UI maybe
 a modern looking slider like iPhone style which the user select allows and not allowed and details. Check if it
 makes sense". Sent to Fable to judge before the build (§17).
+
+## 17. Fable on Ali's switch idea (24 Oct 2026): no switch, keep the amber notice
+
+A switch only makes sense when the app can turn the thing on and off. Here only the phone can allow notifications:
+the switch would flip on, the phone would refuse, and it would spring back, which looks broken; and "not allowed"
+cannot be done from the app at all. Apple's own pattern for a blocked permission is a short message with a button to
+Settings; the iPhone switch lives in the phone's Settings app, not inside apps. The exact alarms notice uses the same
+card and Ali approved it on 17 and 18 Oct, so two notices with two control styles would clash. The modern on/off in
+step 3 is the bell on each row, which is the app's own setting and never springs back. Build §6 as corrected by §14,
+unchanged. Rejected: a switch (springs back, misleading to TalkBack as "switch, off", a new control kind outside
+DESIGN_SYSTEM §4.1). Put to Ali as a one tap question; his answer is §18.
+
+## 18. Ali's answer on the notice (24 Oct 2026, AskUserQuestion)
+
+"Keep the amber card", with, in his words: "but make look nice in UI not plan old looking buttons and panel". So: no
+switch; the card's look (panel and buttons) gets a visual polish, designed by Fable within DESIGN_SYSTEM, shown to
+Ali as pictures before it is built. The exact alarms notice shares the component, so it changes with it (§19).
+
+## 19. The polished permission card (Fable, 24 Oct 2026). Not built; waits for Ali's four answers (§20)
+
+**For Ali:** keep the amber card but give it the countdown card's finish: a soft amber glass panel (lighter at the
+top, faint sheen, thin bright rim) instead of the flat beige box. One message, one button: the triangle in a tinted
+circle goes, replaced by a plain crossed bell (the same bell as the rows); title and one sentence; one solid amber
+"Allow" with its arrow. "Details" goes on both permission cards because it only repeated the sentence; the one fact
+that mattered ("Fajr may not arrive at all") moves into the exact alarms sentence. The X stays alone in the corner.
+
+**What looked dated:** flat beige panel under a glossy hero card; two equal brown pills, neither leading; the stock
+triangle in a 14% circle costing 48dp; a details sentence that repeats the brief.
+
+**Panel (warning tone only):** the hero stack (`HomeScreen.kt:459-477`) minus the 12dp glow:
+`.sajdaSurface(shape, warning.brush)` + `.background(verticalGradient(0f to warning.sheen, 0.5f to Transparent))` +
+`.border(1.dp, verticalGradient(rim, rimBottom), shape)` + `.padding(Space.Group)`; shape 24dp; the old 22% accent
+border removed. New `Color.kt` tokens: `LightWarnTop #FBF0D8`, `LightWarnBottom #F3E2BE` (middle `tertiaryContainer`),
+`DarkWarnTop #352A17`, `DarkWarnBottom #20190D`; sheen and rim reuse `Light/DarkHeroSheen/Rim/RimBottom`. `Theme.kt`:
+`data class GlossStyle(brush, sheen, rim, rimBottom)` and `@Composable fun warningGloss()` reading `LocalDarkTheme`.
+**Quiet tone stays flat** (`secondaryContainer`): dark CTA `#17805A` on it is already 2.32:1 and a sheen drops it to
+1.64:1. That existing 2.32:1 is a gap against §4.1's 3:1 claim: record in HANDOVER §11, out of scope.
+
+**New ColorContrastTest pairs** (WCAG, via `over()`): light onTertiaryContainer `#5A4408` on WarnTop 8.19, WarnBottom
+7.25, top under sheen 8.82 (min 4.5); light tertiary `#9A6208` on WarnTop 4.50, WarnBottom 3.98, under sheen 4.84 (min
+3.0); dark onTertiaryContainer `#F3E4C5` on WarnTop 11.18, WarnBottom 13.86, under sheen 9.02 (4.5); dark tertiary
+`#E8B14A` on WarnTop 7.24, WarnBottom 8.97, under sheen 5.84 (3.0).
+
+**Mark:** no tile. Bare 24dp icon, tint `tertiary` (warning) or `onSecondaryContainer` (quiet), aligned top,
+`contentDescription = null`. `MarkSize` 24dp; text and buttons start at `24 + Space.Paragraph`; remove the 6/8dp top
+padding. `PermissionCard` gains `icon: ImageVector = Icons.Rounded.WarningAmber`; notifications passes
+`Icons.Rounded.NotificationsOff` (SF `bell.slash.fill`); exact alarms keeps WarningAmber (SF
+`exclamationmark.triangle.fill`).
+
+**Text:** title titleMedium with heading semantics; brief bodyMedium, `Space.Tight` below. `notifications_off_desc`
+deleted and the `details =` argument dropped at both call sites. `settings_exact_alarms_brief` becomes "Prayer alerts
+can arrive an hour late, and Fajr may not arrive at all." (translate ur, ar, tr, in); delete
+`settings_exact_alarms_desc` only if the two cards are its only users (grep first).
+
+**Buttons:** one row, `Space.Group` under the text, start padding `MarkSize + Space.Paragraph`. Allow: kind B
+unchanged (tertiary/onTertiary, actionLabelStyle, 48dp pill, trailing AutoMirrored ArrowForward 18dp, 6dp gap,
+`contentDescription = title`). No Details on the two permission cards; `Notice` keeps Details for polar and Ramadan.
+X: kind D unchanged.
+
+**Motion:** no entrance. Dismiss on Times: `AnimatedVisibility(exit = fadeOut(Motion.quick()) +
+shrinkVertically(Motion.quick()))`, enter none. No haptics.
+
+**States:** 2.0 text at 320dp, text column 172dp (was 160), title wraps beside the X; Urdu and Arabic mirror (gradient
+vertical, does not); TalkBack: heading, sentence, "Dismiss, button", "Allow notifications, button"; light 2dp shadow,
+dark hairline. **iPhone:** carries over (inset card, tinted glyph, one sentence, one filled button; SF Symbols named).
+
+**DESIGN_SYSTEM edits:** §1 four Warn tokens; §4 Notices (bare icon, gloss on warning only with the 2.32:1 reason, one
+button on permission cards); §4.1 "Every notice" row: Details only when the notice has details, plus the notifications
+row; §9 dated entry with the rejected options: a switch (§17), a text Details link, green CTA on amber (3.2:1 dark),
+full width amber button (rejected 17 Oct), a glow under the card, glossing the quiet tone, a white card with an amber
+bar. Pictures for Ali before building: light, dark, Urdu, 2x, Times and Settings, both cards.
+
+## 20. Ali's four answers on the card (24 Oct 2026, AskUserQuestion)
+
+1. Buttons on the two permission cards: **"Allow only (Recommended)"**.
+2. Finish: **"Warning cards glossy (Recommended)"**; quiet (green) notices stay flat.
+3. Icon circle: **"Remove it, bare icon (Recommended)"**, on every notice.
+4. Notifications card icon: **"Crossed bell (Recommended)"**; exact alarms keeps the triangle.
+
+So §19 is decided as written. **Next:** build §19 on `claude/1-6-0-step3-proto` (implementer, spec §19), translate
+the changed exact alarms sentence, then pictures for Ali (light, dark, Urdu, 2x, Times and Settings, both cards)
+before the rest of step 3 (HANDOVER §11 list).
