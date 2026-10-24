@@ -5661,6 +5661,24 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 24 Oct 2026: 1.5.0 IS LIVE (read this first; the 23 Oct 17:45 block below is history)
+
+**In one line: 1.5.0 (phone versionCode 9) is live on Google Play. Nothing is left for Ali except merging PR #16. Release 1.6 is being built by Ali in a separate session on `claude/1-6-0`; do not start it from here.**
+
+- **Live evidence, 24 Oct 2026:**
+  - The public page (signed out, raw HTML) reads "Updated on 23 Oct 2026" and version 1.5.0; before it read 17 Oct 2026.
+  - It carries the 1.5.0 short description and the What's new that begins "Ramadan is built in".
+  - The method line now ends "Jafari and Tehran, set for your school". The 1.4.0 words "chosen automatically for your school" are gone on purpose.
+  - The privacy page returns 200, says "Last updated: 23 October 2026" and still has the disclaimer.
+  - The Play Console showed 3.857 from 6 rated reviews.
+  - Not independently checked: the watch half (1002) and the exact Console wording; Ali confirmed live.
+- **Done on 24 Oct 2026:**
+  - **Arabic reviewer reply posted** (Ali: "Post it"). 303 characters, at 11:56. Wording by Ali: thanks, Arabic added on request, update the app to use it, he is the only developer and works on it as sadaqah jariyah, "any help from you with an honest review of your experience is much appreciated". The 17 Oct draft's "if you are happy ... update your review" was dropped, as too close to asking for a higher rating (Play policy). Recorded in `build/review-replies/DRAFTS.md`.
+  - `sajdatime-1-5-0-live-check` disabled (task kept, description says RETIRED).
+  - Health check `trig_0129FQnWihf8XG6rKLCB4oFr` re-baselined to 1.5.0 and its prompt corrected: the 1.5.0 description has no "chosen automatically for your school", so the old check 3 would have raised a false alarm every day.
+- **Whose job now:** Ali merges PR #16 (docs only). Then the 1.6 session merges `main` into `claude/1-6-0` (merge, never rebase; on a CLAUDE.md conflict take 1-6-0's version). Later: change or remove the "Coming soon to Chrome and Edge browsers" line when the extension ships or slips.
+- **Not tested / not done:** nothing in the app changed; docs only.
+
 ### 📍 STATE OF PLAY, 23 Oct 2026, 17:45: 1.5.0 SUBMITTED, IN GOOGLE'S REVIEW (read this first; the blocks below are history for everything they say about release day)
 
 **In one line: 1.4.0 is live; 1.5.0 is submitted and in review. Nothing is left for Claude or Ali until the Play Console
@@ -10623,3 +10641,7 @@ matters more than the stable hashes, that is the trade being made.
 177. **Retire the scheduled jobs written for "before release" as soon as the release is submitted, not when it is live.**
     On 23 Oct 2026 three jobs still planned to tell Ali to leave his Mac on and to "pick the release day", days after he had
     submitted. Disable (do not delete) them in the same session as the submit, and record it in RELEASE-1.5.0.md.
+177a. **Check a re-baselined watcher against the live page before saving it, line by line.** On 24 Oct 2026 the health check was
+    re-baselined from memory of the 1.4.0 wording and said the 1.5.0 description still contained "chosen automatically for
+    your school". It does not (1.5.0 says "set for your school"), so the check would have raised a false alarm every day.
+    A grep of the raw page for each baseline string caught it before the first run. Do that grep every time.

@@ -290,7 +290,7 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
      `docs/store/upload/wear-os/` (23 Oct 2026), in filename order;
    - confirm the Data safety answers (expected unchanged);
    - then **he presses Send for review himself**.
-6. **After it is live** (watch Play's "Updated on" date move; Play sends no email):
+6. **After it is live** (watch Play's "Updated on" date move; Play sends no email). **DONE 24 Oct 2026:** live (Updated on 23 Oct 2026); Arabic reply posted in Ali's own final wording (no ask for a higher rating); live check disabled; health check re-baselined to 1.5.0; records updated. The list below is the original plan:
    - Ali posts the reply to the 1 star Arabic reviewer who asked for Arabic (drafted, in his own 17 Oct words,
      in `build/review-replies/DRAFTS.md`; the daily review job reminds him with the text the day Arabic is
      live). It thanks them, says Arabic was added because of their request, and ends "if you are happy with
