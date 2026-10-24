@@ -72,6 +72,8 @@ private const val GAP_TO_GLYPH = 11f // the glyph's 9dp radius plus a 2dp gap
  * The sky's colours as a lambda read inside the draw. On a period change they cross-fade over
  * [Motion.draw] (row 6), from wherever the sky is on screen right now, so a second change in the
  * middle of a fade starts from what is showing. First composition draws at once, no entrance.
+ * A theme change alone snaps with the rest of the page; theme and period changing in the same frame
+ * fade from the old theme's colours, deliberately (one rare frame, not worth a second path).
  * Not `Modifier.skyBackdrop(period)` with `composed`: a state holder plus a plain modifier keeps
  * to the current Compose guidance and reads the animation only in the draw phase.
  */
@@ -84,11 +86,17 @@ internal fun rememberSkyColours(period: SkyPeriod): () -> SkyColours {
     // so (t - base) / (generation - base) is 0 to 1 over every fade, mid fade or not.
     var generation by remember { mutableIntStateOf(0) }
     var base by remember { mutableFloatStateOf(0f) }
+    var shownPeriod by remember { mutableStateOf(period) }
     val t by animateFloatAsState(generation.toFloat(), Motion.draw(), label = "sky")
     fun fraction(): Float =
         if (generation.toFloat() == base) 1f else ((t - base) / (generation - base)).coerceIn(0f, 1f)
     LaunchedEffect(target) {
-        if (target != to) {
+        if (period == shownPeriod) {
+            // Same period, new colours: the theme changed. Snap with the rest of the page, never fade (review, 24 Oct).
+            from = target
+            to = target
+        } else if (target != to) {
+            shownPeriod = period
             val now = fraction()
             from = SkyColours(lerp(from.top, to.top, now), lerp(from.mid, to.mid, now), lerp(from.foot, to.foot, now))
             base = t

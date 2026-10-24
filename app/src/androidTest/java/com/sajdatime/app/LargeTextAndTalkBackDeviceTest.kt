@@ -52,6 +52,7 @@ import com.sajdatime.app.ui.theme.SajdaTimeTheme
 import com.sajdatime.app.ui.theme.ThemeChoice
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
@@ -181,8 +182,14 @@ class LargeTextAndTalkBackDeviceTest {
         atText(1f) {
             com.sajdatime.app.ui.home.TimetableHeader(title = "Timetable", place = "London", onExport = {}, onClose = {})
         }
-        compose.onNode(hasText(word(R.string.action_save_pdf)) and hasClickAction())
-            .assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+        // The touch bounds, not the drawn ones: the compact button draws at 40dp and Compose widens only
+        // where a tap lands to 48dp, so assertHeightIsAtLeast measured 40 (first device run, 24 Oct 2026).
+        val touch = compose.onNode(hasText(word(R.string.action_save_pdf)) and hasClickAction())
+            .fetchSemanticsNode().touchBoundsInRoot
+        with(compose.density) {
+            assertTrue("touch height ${touch.height.toDp()}", touch.height.toDp() >= 47.5.dp)
+            assertTrue("touch width ${touch.width.toDp()}", touch.width.toDp() >= 47.5.dp)
+        }
     }
 
     /** A morning in London for the sky mark: Fajr's window is open, so the sky is Dawn and ends at sunrise. */
@@ -225,8 +232,10 @@ class LargeTextAndTalkBackDeviceTest {
         mark.assertExists().assert(hasNoClickAction())
         val description = mark.fetchSemanticsNode().config[SemanticsProperties.ContentDescription].single()
         assertEquals(word(R.string.sky_now_a11y, word(R.string.sky_dawn), sunrise), description)
-        val clickable = compose.onAllNodes(hasClickAction())
-        clickable[0].assertWidthIsAtLeast(48.dp)
-        clickable[1].assertHeightIsAtLeast(48.dp)
+        // Found by what they say, not by position, so a new clickable in the header cannot shift them (review, 24 Oct).
+        compose.onNodeWithContentDescription(word(R.string.action_change_location), substring = true)
+            .assert(hasClickAction()).assertWidthIsAtLeast(48.dp)
+        compose.onNodeWithContentDescription(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.dates_header_a11y).substringBefore("%1\$s").trim(), substring = true)
+            .assert(hasClickAction()).assertHeightIsAtLeast(48.dp)
     }
 }

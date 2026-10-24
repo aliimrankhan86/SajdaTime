@@ -224,6 +224,13 @@ fun HomeScreen(
         // and note that the column stays `verticalScroll` on purpose so that a screen
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
         //
+        // **Since 1.6 (steps 1 to 4) the budget no longer holds at 823dp, by decision.** At 914dp and taller
+        // everything still fits; at 823dp the mosque door is the one thing that scrolls, about 60dp short,
+        // and must never need more than one short scroll. BottomBarClearance under it keeps the end of
+        // scroll clear of the glass bar. Fable judged it (24 Oct 2026): no honest Space tightening buys
+        // 60dp, and moving the door beside Timetable breaks one solid button per line; content passing
+        // under a glass bar is how Quiet Glass and iOS tab bars both behave.
+        //
         // The sky (1.6, step 5) is a backdrop behind the header and the card, edge to edge and under the
         // status bar; the card itself is unchanged. The side padding and the 600dp reading column live on
         // the inner columns, because the sky has to run out to both edges.
