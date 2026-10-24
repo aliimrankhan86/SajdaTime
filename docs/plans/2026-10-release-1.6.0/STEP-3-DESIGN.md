@@ -265,3 +265,7 @@ Nothing serious; every cited line resolves. Before building:
     one `edit`.
 
 Only §13's question needs Ali.
+
+## 15. Ali's answer (24 Oct 2026, AskUserQuestion)
+
+Blocked notifications: **"Amber notice with Allow (Recommended)"**. Build §6's notice as corrected by §14.6.
