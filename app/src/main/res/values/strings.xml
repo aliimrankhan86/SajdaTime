@@ -763,4 +763,10 @@
     <string name="bell_off_reminder_message_fajr_ramadan">Fajr alert and reminder off. Suhoor reminder stays on.</string>
     <string name="notifications_off_title">Allow notifications</string>
     <string name="notifications_off_brief">Prayer alerts cannot arrive on this phone.</string>
+    <!-- 1.6 step 5: the skies. Times of day, never prayer or fasting names (STEP-5-DESIGN §9). -->
+    <string name="sky_dawn">Dawn</string>
+    <string name="sky_day">Day</string>
+    <string name="sky_evening">Evening</string>
+    <string name="sky_night">Night</string>
+    <string name="sky_now_a11y">%1$s, until %2$s</string>
 </resources>
