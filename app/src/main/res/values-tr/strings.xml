@@ -514,4 +514,14 @@
     <string name="jamaah_out_of_window">%1$s cemaat vaktiniz bugün %1$s vaktinin dışında. Caminizin vakitlerini kontrol edin.</string>
     <string name="jamaah_pick_time_title">%1$s: caminizin panosundaki cemaat saati</string>
     <string name="mosque_diff_add_jamaah">Caminizin cemaat vakitlerini ekleyin</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">%1$s uyarısı açık, bildirim</string>
+    <string name="bell_alarm_a11y">%1$s uyarısı açık, alarm</string>
+    <string name="bell_off_a11y">%1$s uyarısı kapalı</string>
+    <string name="bell_blocked_a11y">%1$s uyarısı açık. Bu telefonda bildirimler kapalı.</string>
+    <string name="bell_off_message">%1$s uyarısı kapatıldı</string>
+    <string name="bell_off_reminder_message">%1$s uyarısı ve hatırlatıcısı kapatıldı</string>
+    <string name="bell_off_message_fajr_ramadan">Sabah uyarısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Sabah uyarısı ve hatırlatıcısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
 </resources>

@@ -608,4 +608,14 @@
     <string name="jamaah_out_of_window">وقت جماعة %1$s الذي أدخلته خارج وقت %1$s اليوم. تحقق من أوقات مسجدك.</string>
     <string name="jamaah_pick_time_title">%1$s: وقت الجماعة على لوحة مسجدك</string>
     <string name="mosque_diff_add_jamaah">أضف أوقات الجماعة في مسجدك</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">تنبيه %1$s مفعّل، إشعار</string>
+    <string name="bell_alarm_a11y">تنبيه %1$s مفعّل، منبّه</string>
+    <string name="bell_off_a11y">تنبيه %1$s متوقف</string>
+    <string name="bell_blocked_a11y">تنبيه %1$s مفعّل. الإشعارات متوقفة على هذا الهاتف.</string>
+    <string name="bell_off_message">تم إيقاف تنبيه %1$s</string>
+    <string name="bell_off_reminder_message">تم إيقاف تنبيه %1$s والتذكير</string>
+    <string name="bell_off_message_fajr_ramadan">تم إيقاف تنبيه الفجر. يبقى تذكير السحور مفعّلًا.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">تم إيقاف تنبيه الفجر والتذكير. يبقى تذكير السحور مفعّلًا.</string>
 </resources>

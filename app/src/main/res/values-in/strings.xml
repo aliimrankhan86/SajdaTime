@@ -502,4 +502,14 @@
     <string name="jamaah_out_of_window">Waktu berjamaah %1$s Anda di luar waktu %1$s hari ini. Periksa jadwal masjid Anda.</string>
     <string name="jamaah_pick_time_title">%1$s: waktu berjamaah di papan jadwal masjid Anda</string>
     <string name="mosque_diff_add_jamaah">Tambahkan waktu berjamaah masjid Anda</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">Pengingat %1$s aktif, notifikasi</string>
+    <string name="bell_alarm_a11y">Pengingat %1$s aktif, alarm</string>
+    <string name="bell_off_a11y">Pengingat %1$s nonaktif</string>
+    <string name="bell_blocked_a11y">Pengingat %1$s aktif. Notifikasi dimatikan di ponsel ini.</string>
+    <string name="bell_off_message">Pengingat %1$s dinonaktifkan</string>
+    <string name="bell_off_reminder_message">Pengingat %1$s dan pengingat sebelumnya dinonaktifkan</string>
+    <string name="bell_off_message_fajr_ramadan">Pengingat Subuh dinonaktifkan. Pengingat sahur tetap aktif.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Pengingat Subuh dan pengingat sebelumnya dinonaktifkan. Pengingat sahur tetap aktif.</string>
 </resources>

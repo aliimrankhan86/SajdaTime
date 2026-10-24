@@ -520,4 +520,14 @@
     <string name="jamaah_out_of_window">آپ کا %1$s کی جماعت کا وقت آج %1$s کے وقت سے باہر ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
     <string name="jamaah_pick_time_title">%1$s: آپ کی مسجد کے بورڈ پر جماعت کا وقت</string>
     <string name="mosque_diff_add_jamaah">اپنی مسجد کی جماعت کے اوقات شامل کریں</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">%1$s کا الرٹ آن، اطلاع</string>
+    <string name="bell_alarm_a11y">%1$s کا الرٹ آن، الارم</string>
+    <string name="bell_off_a11y">%1$s کا الرٹ بند</string>
+    <string name="bell_blocked_a11y">%1$s کا الرٹ آن۔ اس فون پر اطلاعات بند ہیں۔</string>
+    <string name="bell_off_message">%1$s کا الرٹ بند</string>
+    <string name="bell_off_reminder_message">%1$s کا الرٹ اور یاددہانی بند</string>
+    <string name="bell_off_message_fajr_ramadan">فجر کا الرٹ بند۔ سحری کی یاددہانی آن رہے گی۔</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">فجر کا الرٹ اور یاددہانی بند۔ سحری کی یاددہانی آن رہے گی۔</string>
 </resources>
