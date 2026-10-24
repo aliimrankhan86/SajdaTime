@@ -199,4 +199,12 @@ class DesignRulesTest {
         val found = offenders(Regex("""\bspring\s*(<[^>]*>)?\s*\(|\bSpringSpec\b"""))
         assertTrue("Use a Motion token, not a spring: $found", found.isEmpty())
     }
+
+    /** The sky's two animations (the crossfade and the draw in) are drawings, so both run at Motion.draw() (step 5). */
+    @Test
+    fun `the sky animates with Motion draw only`() {
+        val sky = sources.single { it.name == "Sky.kt" }.readText()
+        assertTrue("Sky.kt must animate with Motion.draw()", Regex("""Motion\.draw\(\)""").findAll(sky).count() >= 2)
+        assertTrue("Sky.kt must not use another Motion token", !Regex("""Motion\.(quick|standard)\(""").containsMatchIn(sky))
+    }
 }

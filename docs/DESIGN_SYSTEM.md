@@ -155,10 +155,11 @@ and the navigation pill all rendered in Material's default **lilac** because
 happened a fourth time on the watch, which was using Wear's default scheme. If anything
 looks purple, an unset role is the cause.
 
-### One colour is depictive rather than semantic, and it is the only one
+### One colour is depictive rather than semantic, and it is the only one (until the skies of 1.6)
 
 Every other hue here carries meaning: green is the identity, amber is a warning, and
-nothing is decorative. **`kiswah` is the exception, and it is deliberate.** It is the gold
+nothing is decorative. **`kiswah` is the exception, and it is deliberate** (the only one until the
+skies of 1.6, see the next heading but one). It is the gold
 of the Kaaba's hizam and its door on the Qibla dial — not a role, not a state, just what
 the object is, in the same way the silhouette is a cube and not a circle. It has no
 Material slot; it is read through `kiswahGold()` in `Theme.kt`, which reads `LocalDarkTheme`
@@ -183,6 +184,32 @@ detail in the dial's face colour instead. That reasoning measured the wrong back
 what it shipped was not a band but a slot cut through the cube, which made the mark read as
 a shopfront. Contrast was never the problem: both themes were already about 14:1. See
 `ic_kaaba_detail.xml`.
+
+### The four skies (1.6, step 5; prototype, awaiting the owner's pictures)
+
+The top of Times is a fixed three stop gradient per period, from under the status bar to the foot of the
+next prayer card, where it has faded into the page (`background`). Four skies, never a continuous
+gradient. Tokens `LightSky*` and `DarkSky*` in `Color.kt`, read through `skyStyle(period)` in `Theme.kt`.
+The period is `Sky.periodOf` in `:core` (Dawn Fajr to sunrise, Day sunrise to Asr, Evening Asr to Isha,
+Night Isha to Fajr; no times means Day).
+
+| Sky | Light top, mid | Dark top, mid |
+|---|---|---|
+| Dawn | `#EADFE3`, `#F0E9EC` (pale rose) | `#231E2C`, `#171520` (deep violet) |
+| Day | `#D6E8DC`, `#E6EFE9` (mint) | `#17323A`, `#13262B` (deep teal) |
+| Evening | `#ECD8BB`, `#F1E5D3` (sand) | `#262A1E`, `#181B15` (olive dusk) |
+| Night | `#D0DBE1`, `#DFE6EA` (slate) | `#0B1730`, `#0C1320` (navy) |
+
+The foot of every sky is the page: `#F7F5F3` light, `#101312` dark. **Inks on a sky:** the city
+`onSurface`, the Gregorian date, arc and dots `onSurfaceVariant`, the Hijri date, caret, glyph and passed arc
+`primary`. Nothing but the header's three texts and the sky mark ever sits on a sky. The status bar icons
+follow the theme and hold 3:1 on every top. **88 new assertions** in `ColorContrastTest`: 72 text pairs
+(3 inks x 3 stops x 4 skies x 2 themes), 8 feet equal the page, 8 status bar pairs. The light night top
+is the thin one, 4.57:1 under `onSurfaceVariant`: it cannot be darkened without a darker date ink.
+These sixteen stops are the second depictive colour family after the Kaaba gold: the sky shows the time of
+day the way the gold shows what the Kaaba is. No role, no state, never behind a prayer time or the
+countdown, never on a widget's text. Dark night is told by hue (`#0B1730` is 1.05:1 against the page), which
+is `1.6-dark-skies` in section 11, still OPEN.
 
 ### Light and dark separate surfaces differently
 
@@ -744,7 +771,7 @@ are tested against pure black and pure white behind it (`ColorContrastTest`).
 
 **Every tab opens the same way.** `ScreenTitle` (headlineMedium, start aligned, 20dp gutter)
 on Qibla and Settings; on Times the title is the city, same size and line, with a green caret
-because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
+because it opens the location sheet, and (1.6, step 5) on a sky that says the period. Every scrolling screen ends with `BottomBarClearance()`,
 which is the bar's measured height, so it grows with large text.
 
 **Every call to action is a `CtaButton`: solid green, white bold 16sp text, at least 52dp tall,
@@ -789,6 +816,33 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **24 Oct 2026, the skies (step 5, Fable's design, prototype built; the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md` (section 14 wins where it differs).
+  * **Built as recommended, until Ali answers the four questions.** Option D: the sky is a backdrop behind the
+    header and the unchanged card. One addition to the header: the sky mark at the end of the city row, a sibling
+    of the clickable city (never inside it), 104 by 36dp, the row's own height, so the header adds no height. The
+    mark is a glyph riding a shallow arc of five dots, the five prayers, spaced evenly by prayer and not by clock
+    (Fajr to Dhuhr is six hours, Maghrib to Isha ninety minutes). The passed part is green and stops 11dp short of
+    the glyph. It hides when the city name needs the room (`Sky.markFits`) and always at 2.0 text. No period word
+    on screen; TalkBack hears "Dawn, until 7:40 am" (`sky_now_a11y`, which replaces 9.6's wording).
+  * **Glyphs.** The app's own widget drawings (`widget_glyph_fajr`, new `sky_glyph_day`, `widget_glyph_maghrib`,
+    `widget_glyph_isha`), so step 8 puts the same four on the widgets. `skyUseMaterialGlyphs` in `Sky.kt` is a
+    temporary switch for the Q2 comparison picture (WbTwilight, WbSunny, WbTwilight, NightsStay) and is removed
+    once he answers. The 23 Oct entry's "sun, moon, stars, the day path with the now dot" is built as: sun or moon
+    as the glyph, the one star inside the Isha glyph as the stars, the arc as the day path and the glyph itself as
+    the now dot; a separate star field was considered and dropped as clutter. The sun is `primary`: no third
+    depictive colour.
+  * **Motion.** The crossfade is one `drawBehind` lerp at `Motion.draw()` (no animation on open, a change mid
+    fade starts from what is on screen); the arc draws in once per process (`Motion.draw()`). Row 8 is built here:
+    a prayer row's fill and bar fade to the next row at `Motion.standard()`, read inside `drawBehind`.
+  * **Layout.** The Scaffold no longer takes the top inset; Times draws its sky under the status bar and Qibla, My
+    prayers and Settings take the same inset one level down. Everything is capped at 600dp and centred
+    (`Modifier.readingWidth()`, Q18 and Q20), the sky full width; a phone in landscape gets it too.
+  * **Rejected, with reasons.** A visible period word (a fifth text on a calm header); a star field, skyline or
+    mosque silhouette (clutter, and a skyline is the stock prayer app look); a yellow sun (second depictive colour);
+    dots by clock time (they bunch); the arc on its own band (costs the no scroll rule at 823dp); the mark beside
+    the date line (too narrow in most languages); Material Symbols as the default glyphs (offered as Q2).
 
 - **23 Oct 2026 (night), the My prayers tab (step 1, Fable's design, Ali approved from pictures).** Ali chose
   "B: calendar grid" and then "Yes, build it". Detail: `docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md`
@@ -1135,8 +1189,8 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
+| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Not built for the owner until he answers the four questions in STEP-5-DESIGN section 13 (`1.6-dark-skies` stays OPEN) |
 | 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | **Decided and built (24 Oct 2026)** on `claude/1-6-0-step3-proto`; Ali approved the prototype and the card; merge pending (HANDOVER §11) |
 | 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
-| 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Build in step 5 |
+| 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Built in the step 5 prototype (`claude/1-6-0-step5-proto`); becomes built when he says yes to the pictures |
 | 1.6-qibla | Qibla restyle: direction line first, labelled details button, km or miles, key kept (§9, 23 Oct 2026) | Same |

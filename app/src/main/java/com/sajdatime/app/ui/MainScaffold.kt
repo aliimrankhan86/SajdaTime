@@ -52,6 +52,11 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.statusBarsPadding
+import com.sajdatime.app.ui.components.readingWidth
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -249,7 +254,12 @@ fun MainScaffold(
     // Quiet Glass (17 Oct 2026): no bottomBar slot. The tab bar floats over the content in the
     // same Box, so the screens scroll softly underneath it; each screen ends with
     // BottomBarClearance() so its last row can still be scrolled clear of the bar.
-    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
+    // The top inset is no longer taken here (1.6, step 5): Times draws its sky under the status bar, and the
+    // other three tabs take the same inset one level down (ReadingFrame), so nothing else moves.
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+    ) { padding ->
         var barHeight by remember { mutableStateOf(0.dp) }
         val density = LocalDensity.current
         Box(
@@ -285,47 +295,51 @@ fun MainScaffold(
                         onDismissNotificationsNotice = bell::dismissNotice,
                     )
 
-                    Destination.QIBLA -> QiblaScreen(state = state)
+                    Destination.QIBLA -> ReadingFrame { QiblaScreen(state = state) }
 
-                    Destination.PRAYERS -> MyPrayersScreen(
-                        state = state,
-                        tracker = tracker,
-                        onPause = pauseToday,
-                        onUseGps = onRefreshLocation,
-                        onSearchCity = onSearchCity,
-                    )
+                    Destination.PRAYERS -> ReadingFrame {
+                        MyPrayersScreen(
+                            state = state,
+                            tracker = tracker,
+                            onPause = pauseToday,
+                            onUseGps = onRefreshLocation,
+                            onSearchCity = onSearchCity,
+                        )
+                    }
 
-                    Destination.SETTINGS -> SettingsScreen(
-                        state = state,
-                        request = settingsRequest,
-                        onRequestHandled = { settingsRequest = null },
-                        onSetSect = onSetSect,
-                        onSetMadhab = onSetMadhab,
-                        onSetMethod = onSetMethod,
-                        onSetAlert = onSetAlert,
-                        onSetAdjustment = onSetAdjustment,
-                        onSetHijriOffset = onSetHijriOffset,
-                        onResetAdjustments = onResetAdjustments,
-                        onSetOngoingBadge = onSetOngoingBadge,
-                        onSetRamadanCard = onSetRamadanCard,
-                        onSetSuhoorMinutes = onSetSuhoorMinutes,
-                        onSetSuhoorStyle = onSetSuhoorStyle,
-                        onSetSuhoorAdhan = onSetSuhoorAdhan,
-                        onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
-                        onSetPrayerReminder = onSetPrayerReminder,
-                        onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
-                        onPickAlarmSound = onPickAlarmSound,
-                        onPickBuiltInAdhan = onPickBuiltInAdhan,
-                        onPickNotificationSound = onPickNotificationSound,
-                        onPickBuiltInNotificationAdhan = onPickBuiltInNotificationAdhan,
-                        onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
-                        onRefreshLocation = onRefreshLocation,
-                        onSearchCity = onSearchCity,
-                        onSetThemeChoice = onSetThemeChoice,
-                        onSetAnalytics = onSetAnalytics,
-                        tracker = tracker,
-                        jamaah = jamaah,
-                    )
+                    Destination.SETTINGS -> ReadingFrame {
+                        SettingsScreen(
+                            state = state,
+                            request = settingsRequest,
+                            onRequestHandled = { settingsRequest = null },
+                            onSetSect = onSetSect,
+                            onSetMadhab = onSetMadhab,
+                            onSetMethod = onSetMethod,
+                            onSetAlert = onSetAlert,
+                            onSetAdjustment = onSetAdjustment,
+                            onSetHijriOffset = onSetHijriOffset,
+                            onResetAdjustments = onResetAdjustments,
+                            onSetOngoingBadge = onSetOngoingBadge,
+                            onSetRamadanCard = onSetRamadanCard,
+                            onSetSuhoorMinutes = onSetSuhoorMinutes,
+                            onSetSuhoorStyle = onSetSuhoorStyle,
+                            onSetSuhoorAdhan = onSetSuhoorAdhan,
+                            onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
+                            onSetPrayerReminder = onSetPrayerReminder,
+                            onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
+                            onPickAlarmSound = onPickAlarmSound,
+                            onPickBuiltInAdhan = onPickBuiltInAdhan,
+                            onPickNotificationSound = onPickNotificationSound,
+                            onPickBuiltInNotificationAdhan = onPickBuiltInNotificationAdhan,
+                            onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
+                            onRefreshLocation = onRefreshLocation,
+                            onSearchCity = onSearchCity,
+                            onSetThemeChoice = onSetThemeChoice,
+                            onSetAnalytics = onSetAnalytics,
+                            tracker = tracker,
+                            jamaah = jamaah,
+                        )
+                    }
                 }
             }
           }
@@ -417,5 +431,17 @@ internal fun GlassTabBar(
                 )
             }
         }
+    }
+}
+
+/**
+ * The three tabs that are not Times (1.6, step 5): the status bar inset the Scaffold used to apply, taken here
+ * instead, and the 600dp reading column (Q18, Q20) centred. Times does both itself, because its sky runs
+ * under the status bar and out to both edges.
+ */
+@Composable
+private fun ReadingFrame(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
+        Box(Modifier.readingWidth()) { content() }
     }
 }

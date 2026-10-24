@@ -6,6 +6,13 @@ import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.text.rememberTextMeasurer
+import com.sajdatime.app.ui.components.readingWidth
+import com.sajdatime.core.Sky
+import com.sajdatime.core.SkyPeriod
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
@@ -19,6 +26,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -186,8 +194,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Order and heights are budgeted so that on a phone at the default font size the
@@ -208,11 +215,27 @@ fun HomeScreen(
         // room than a modest one. If this list grows again, measure on the *short* device,
         // and note that the column stays `verticalScroll` on purpose so that a screen
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
-        LocationHeader(state = state, now = state.now, onClick = { locationSheet = true }, onOpenDates = { islamicDates = true })
-        // Tight, not Group, since 1.6.0: the date line's 48dp target already leaves about 14dp of
-        // its own under the text, so the card still sits a Group's distance from the words.
-        Spacer(Modifier.height(Space.Tight))
-        NextPrayerCard(state)
+        //
+        // The sky (1.6, step 5) is a backdrop behind the header and the card, edge to edge and under the
+        // status bar; the card itself is unchanged. The side padding and the 600dp reading column live on
+        // the inner columns, because the sky has to run out to both edges.
+        val skyColours = rememberSkyColours(Sky.periodOf(state.current))
+        Box(Modifier.fillMaxWidth().skyBackdrop(skyColours).statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
+            Column(
+                Modifier.padding(horizontal = 16.dp).readingWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                LocationHeader(state = state, now = state.now, onClick = { locationSheet = true }, onOpenDates = { islamicDates = true })
+                // Tight, not Group, since 1.6.0: the date line's 48dp target already leaves about 14dp of
+                // its own under the text, so the card still sits a Group's distance from the words.
+                Spacer(Modifier.height(Space.Tight))
+                NextPrayerCard(state)
+            }
+        }
+        Column(
+            Modifier.padding(horizontal = 16.dp).readingWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
         DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
         // Below the two banners that say the times may be for the wrong place or approximate,
@@ -250,6 +273,7 @@ fun HomeScreen(
         // room to scroll the mosque button clear of it. Measured, so it grows with the bar.
         Spacer(Modifier.height(Space.Related))
         BottomBarClearance()
+        }
     }
 
     if (explaining) {
@@ -351,7 +375,7 @@ fun HomeScreen(
  * traveller needs, and burying it in Settings makes them hunt for it.
  */
 @Composable
-private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, onOpenDates: () -> Unit) {
+internal fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, onOpenDates: () -> Unit) {
     val city = state.settings.placeName(LocalContext.current).ifBlank {
         stringResource(R.string.location_set_generic)
     }
@@ -378,31 +402,64 @@ private fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, on
     // green meaning tappable, and no extra caret). The 6dp the whole row used to have above and
     // below is split between them, so the header is no taller than the date line's own target.
     Column(Modifier.fillMaxWidth().padding(top = Space.Tight)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .clickable(role = Role.Button, onClick = onClick)
-                .padding(horizontal = 4.dp, vertical = 2.dp)
-                .semantics { contentDescription = spokenLocation },
-        ) {
-            Text(
-                text = city,
-                style = MaterialTheme.typography.headlineMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            Spacer(Modifier.width(2.dp))
-            // A name alone reads as a label. The green caret is what says "you can change
-            // this", which is the single most common thing a traveller needs.
-            Icon(
-                Icons.Rounded.ArrowDropDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp),
-            )
+        // The sky mark (step 5) sits at the end of this row as a sibling of the clickable city, never inside
+        // it: clickable merges its descendants, so a mark inside would be read as part of "London, Change
+        // location" and a tap on it would open the sheet. It hides when the name needs the room (Sky.markFits).
+        BoxWithConstraints(Modifier.fillMaxWidth()) {
+            val density = LocalDensity.current
+            val measurer = rememberTextMeasurer()
+            val style = MaterialTheme.typography.headlineMedium
+            val nameWidth = remember(city, style, density) { measurer.measure(city, style, maxLines = 1).size.width.toFloat() }
+            val today = state.today
+            val showMark = today != null &&
+                Sky.markFits(nameWidth, constraints.maxWidth.toFloat(), density.density, density.fontScale)
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .weight(1f, fill = !showMark)
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable(role = Role.Button, onClick = onClick)
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .semantics { contentDescription = spokenLocation },
+                ) {
+                    Text(
+                        text = city,
+                        style = MaterialTheme.typography.headlineMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    Spacer(Modifier.width(2.dp))
+                    // A name alone reads as a label. The green caret is what says "you can change
+                    // this", which is the single most common thing a traveller needs.
+                    Icon(
+                        Icons.Rounded.ArrowDropDown,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+                if (showMark && today != null) {
+                    val context = LocalContext.current
+                    val period = Sky.periodOf(state.current)
+                    // Once a minute, not on the clock's every second tick.
+                    val minute = now.epochSecond / 60
+                    val progress = remember(minute, today) { Sky.progress(now, today.prayersOnly) }
+                    val periodName = stringResource(
+                        when (period) {
+                            SkyPeriod.DAWN -> R.string.sky_dawn
+                            SkyPeriod.DAY -> R.string.sky_day
+                            SkyPeriod.EVENING -> R.string.sky_evening
+                            SkyPeriod.NIGHT -> R.string.sky_night
+                        },
+                    )
+                    val end = Sky.endOf(period, today, now, state.next?.takeIf { it.slot == PrayerSlot.FAJR }?.at)
+                    val spoken = end?.let { stringResource(R.string.sky_now_a11y, periodName, TimeFormat.clock(context, it)) } ?: periodName
+                    Spacer(Modifier.width(8.dp))
+                    SkyMark(period = period, progress = progress, spoken = spoken)
+                }
+            }
         }
         DateLine(now, state.settings.hijriOffsetDays, onOpenDates)
     }
@@ -1094,6 +1151,10 @@ private fun PrayerRow(
     val iconColor = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant
     val accent = scheme.primary
     val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
+    // The fill and the bar move to the next row over Motion.standard when a prayer passes (motion row 8,
+    // step 5), read only inside drawBehind so nothing recomposes per frame. On open they start at the target.
+    val fill by animateColorAsState(background, Motion.standard(), label = "rowFill")
+    val bar by animateColorAsState(if (isNext) accent else Color.Transparent, Motion.standard(), label = "rowBar")
 
     // At 1.5 text and above the pill and time drop under the name, as step 2's dates rows do: at 320dp and 2.0
     // the bell's 48dp squeezed the name until "Fajr" broke one letter a line (STEP-3-DESIGN §7). The bell
@@ -1144,12 +1205,12 @@ private fun PrayerRow(
             .fillMaxWidth()
             // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
             .semantics(mergeDescendants = true) {}
-            .background(background)
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this
             // gets the same pixels without asking the layout to measure twice.
             .drawBehind {
-                if (isNext) drawRect(accent, size = Size(barWidth, size.height))
+                drawRect(fill)
+                drawRect(bar, size = Size(barWidth, size.height))
             }
             // Vertical padding plus a floor, not a fixed height: at a large system font
             // size the row has to grow rather than crop the prayer name. 50, not 56, since
