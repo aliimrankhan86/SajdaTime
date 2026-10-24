@@ -112,6 +112,11 @@
     <!-- Export -->
     <string name="action_save_timetable">Vakit çizelgesini PDF olarak kaydet</string>
     <string name="action_save_pdf">PDF olarak kaydet</string>
+    <string name="action_timetable">Vakit çizelgesi</string>
+    <string name="timetable_title">Vakit çizelgesi</string>
+    <string name="timetable_month_a11y">%1$s namaz vakitleri</string>
+    <string name="timetable_day_a11y">%1$s. Sabah %2$s. Güneş %3$s. Öğle %4$s. İkindi %5$s. Akşam %6$s. Yatsı %7$s.</string>
+    <string name="timetable_today_a11y">Bugün, %1$s</string>
     <string name="export_sheet_title">Vakit çizelgenizi kaydedin</string>
     <string name="export_sheet_body">Namaz vakitlerinizin PDF dosyasını hazırlayacağız. Konum: %1$s. Ardından dosyayı kaydedebilir, yazdırabilir ya da birine gönderebilirsiniz.</string>
     <string name="export_today">Yalnızca bugün</string>
