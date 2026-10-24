@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Day: a plain sun, a circle and eight short rays; the Dhuhr glyph without its post. Drawn white and tinted at draw, like the widget glyphs. Used by the sky mark on Times (1.6, step 5). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:autoMirrored="false"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M15,12A3,3 0,1 1,9,12A3,3 0,1 1,15,12ZM12,3.5V5.5M12,18.5V20.5M3.5,12H5.5M18.5,12H20.5M6,6L7.4,7.4M16.6,16.6L18,18M6,18L7.4,16.6M16.6,7.4L18,6"
+        android:strokeWidth="1.8"
+        android:strokeAlpha="1"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

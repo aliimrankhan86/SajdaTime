@@ -70,6 +70,9 @@ import com.sajdatime.app.ui.theme.LightPrimaryContainer
 import com.sajdatime.app.ui.theme.LightSecondary
 import com.sajdatime.app.ui.theme.LightSurface
 import com.sajdatime.app.ui.theme.LightSurfaceVariant
+import com.sajdatime.app.ui.theme.skyColours
+import com.sajdatime.core.SkyPeriod
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import kotlin.math.max
@@ -296,6 +299,64 @@ class ColorContrastTest {
                 darkStops.map { (name, stop) -> Pair("dark notice ink on $name", DarkOnAccentContainer, stop, 4.5) } +
                 darkStops.map { (name, stop) -> Pair("dark accent on $name", DarkAccent, stop, 3.0) },
         )
+    }
+
+    private fun skyTops(dark: Boolean) = SkyPeriod.entries.map { it to skyColours(it, dark) }
+
+    /**
+     * The four skies (1.6 step 5, STEP-5-DESIGN section 5): the city (onSurface), the date, arc and dots
+     * (onSurfaceVariant) and the Hijri date, caret and glyph (primary) sit on every stop of every sky, in both
+     * themes. 3 inks x 3 stops x 4 skies x 2 themes = 72, all at 4.5:1, which also clears the 3:1 the arc,
+     * dots and glyph need. The light night top is the thin one (4.57:1 under onSurfaceVariant).
+     */
+    @Test
+    fun `sky stops are readable under every ink`() {
+        val pairs = mutableListOf<Pair>()
+        for (dark in listOf(false, true)) {
+            val theme = if (dark) "dark" else "light"
+            val inks = if (dark) {
+                listOf("onSurface" to DarkOnSurface, "onSurfaceVariant" to DarkOnSurfaceVariant, "primary" to DarkPrimary)
+            } else {
+                listOf("onSurface" to LightOnSurface, "onSurfaceVariant" to LightOnSurfaceVariant, "primary" to LightPrimary)
+            }
+            for ((period, sky) in skyTops(dark)) {
+                for ((stopName, stop) in listOf("top" to sky.top, "mid" to sky.mid, "foot" to sky.foot)) {
+                    for ((inkName, ink) in inks) {
+                        pairs += Pair("$theme $inkName on $period $stopName", ink, stop, 4.5)
+                    }
+                }
+            }
+        }
+        assertEquals(72, pairs.size)
+        assertAll(pairs)
+    }
+
+    /** Each sky fades into the page: the foot stop is the background, so no seam shows under the card. */
+    @Test
+    fun `sky feet equal the page`() {
+        var checked = 0
+        for ((dark, page) in listOf(false to LightBackground, true to DarkBackground)) {
+            for ((period, sky) in skyTops(dark)) {
+                assertEquals("${if (dark) "dark" else "light"} $period foot", page, sky.foot)
+                checked++
+            }
+        }
+        assertEquals(8, checked)
+    }
+
+    /**
+     * The status bar icons follow the theme (dark icons on light, white on dark), and the sky now runs under
+     * the bar, so black on every light top and white on every dark top must hold 3:1. 8 pairs.
+     */
+    @Test
+    fun `status bar icons hold on every sky top`() {
+        val pairs = listOf(false, true).flatMap { dark ->
+            skyTops(dark).map { (period, sky) ->
+                Pair("${if (dark) "white" else "black"} icons on ${if (dark) "dark" else "light"} $period top", if (dark) Color.White else Color.Black, sky.top, 3.0)
+            }
+        }
+        assertEquals(8, pairs.size)
+        assertAll(pairs)
     }
 
     /**

@@ -14,20 +14,27 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.hasNoClickAction
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.ui.Destination
 import com.sajdatime.app.ui.home.DayCard
+import com.sajdatime.app.ui.home.LocationHeader
+import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.ui.UiState
+import com.sajdatime.core.NextPrayer
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.PrayerSlot
@@ -62,10 +69,10 @@ class LargeTextAndTalkBackDeviceTest {
         InstrumentationRegistry.getInstrumentation().targetContext.getString(id, *args)
 
     /** [content] 320dp wide at [scale] times the text size; 2.0 as `wm density 540` and `font_scale 2.0` showed it. */
-    private fun atText(scale: Float, content: @Composable () -> Unit) = compose.setContent {
+    private fun atText(scale: Float, width: Dp = 320.dp, content: @Composable () -> Unit) = compose.setContent {
         val density = LocalDensity.current
         CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = scale)) {
-            SajdaTimeTheme { Box(Modifier.width(320.dp)) { content() } }
+            SajdaTimeTheme { Box(Modifier.width(width)) { content() } }
         }
     }
 
@@ -176,5 +183,50 @@ class LargeTextAndTalkBackDeviceTest {
         }
         compose.onNode(hasText(word(R.string.action_save_pdf)) and hasClickAction())
             .assertHeightIsAtLeast(48.dp).assertWidthIsAtLeast(48.dp)
+    }
+
+    /** A morning in London for the sky mark: Fajr's window is open, so the sky is Dawn and ends at sunrise. */
+    private fun dawnState(city: String): UiState {
+        val now = Instant.parse("2026-10-24T03:30:00Z")
+        return UiState(
+            loading = false,
+            settings = AppSettings(cityName = city),
+            today = sampleDay,
+            next = NextPrayer(PrayerSlot.DHUHR, sampleDay.getValue(PrayerSlot.DHUHR), false),
+            current = PrayerSlot.FAJR,
+            now = now,
+        )
+    }
+
+    private fun DayPrayerTimes.getValue(slot: PrayerSlot) = this[slot]
+
+    private fun hasDescriptionStartingWith(prefix: String) = SemanticsMatcher("description starts with $prefix") {
+        it.config.getOrNull(SemanticsProperties.ContentDescription)?.any { d -> d.startsWith(prefix) } == true
+    }
+
+    /** At 2.0 on 320dp the name wins: the sky mark is not drawn and the city is whole (STEP-5-DESIGN section 4). */
+    @Test
+    fun the_sky_mark_hides_at_the_largest_text_and_the_city_stays_whole() {
+        atText(2f) { LocationHeader(state = dawnState("London"), now = dawnState("London").now, onClick = {}, onOpenDates = {}) }
+        compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn))).assertDoesNotExist()
+        assertWhole("London")
+    }
+
+    /**
+     * At 1.0 on 360dp the mark is its own node: spoken as the period and when it ends, with no click, apart
+     * from "London, Change location". The city row keeps 48dp across and the date line 48dp down.
+     */
+    @Test
+    fun the_sky_mark_is_its_own_spoken_node_and_the_targets_hold() {
+        val state = dawnState("London")
+        atText(1f, width = 360.dp) { LocationHeader(state = state, now = state.now, onClick = {}, onOpenDates = {}) }
+        val sunrise = TimeFormat.clock(InstrumentationRegistry.getInstrumentation().targetContext, sampleDay.getValue(PrayerSlot.SUNRISE))
+        val mark = compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn)))
+        mark.assertExists().assert(hasNoClickAction())
+        val description = mark.fetchSemanticsNode().config[SemanticsProperties.ContentDescription].single()
+        assertEquals(word(R.string.sky_now_a11y, word(R.string.sky_dawn), sunrise), description)
+        val clickable = compose.onAllNodes(hasClickAction())
+        clickable[0].assertWidthIsAtLeast(48.dp)
+        clickable[1].assertHeightIsAtLeast(48.dp)
     }
 }

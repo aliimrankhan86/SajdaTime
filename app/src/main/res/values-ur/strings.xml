@@ -536,4 +536,10 @@
     <string name="bell_off_reminder_message_fajr_ramadan">فجر کا الرٹ اور یاددہانی بند۔ سحری کی یاددہانی آن رہے گی۔</string>
     <string name="notifications_off_title">اطلاعات کی اجازت دیں</string>
     <string name="notifications_off_brief">اس فون پر نماز کے الرٹ نہیں آ سکتے۔</string>
+    <!-- 1.6 step 5: the skies. Times of day, never prayer or fasting names (STEP-5-DESIGN §9). -->
+    <string name="sky_dawn">صبح سویرے</string>
+    <string name="sky_day">دن</string>
+    <string name="sky_evening">شام</string>
+    <string name="sky_night">رات</string>
+    <string name="sky_now_a11y">%1$s، %2$s تک</string>
 </resources>

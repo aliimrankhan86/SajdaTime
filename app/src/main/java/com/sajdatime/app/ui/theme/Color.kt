@@ -150,6 +150,31 @@ val LightWarnBottom = Color(0xFFF3E2BE)
 val DarkWarnTop = Color(0xFF352A17)
 val DarkWarnBottom = Color(0xFF20190D)
 
+// The four skies behind the top of Times (1.6 step 5, docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md
+// section 5). Fixed three-stop gradients, the foot always the page background so the sky fades into
+// it. The second depictive colour family after the Kaaba gold: the sky shows the time of day, never a
+// role or a state, and nothing but the header's three texts and the sky mark ever sits on it. Every
+// stop is checked under onSurface, onSurfaceVariant and primary in ColorContrastTest. The light
+// night top is the thin one (4.57:1 under onSurfaceVariant): do not darken it.
+val LightSkyDawnTop = Color(0xFFEADFE3)
+val LightSkyDawnMid = Color(0xFFF0E9EC)
+val LightSkyDayTop = Color(0xFFD6E8DC)
+val LightSkyDayMid = Color(0xFFE6EFE9)
+val LightSkyEveningTop = Color(0xFFECD8BB)
+val LightSkyEveningMid = Color(0xFFF1E5D3)
+val LightSkyNightTop = Color(0xFFD0DBE1)
+val LightSkyNightMid = Color(0xFFDFE6EA)
+val LightSkyFoot = Color(0xFFF7F5F3)
+val DarkSkyDawnTop = Color(0xFF231E2C)
+val DarkSkyDawnMid = Color(0xFF171520)
+val DarkSkyDayTop = Color(0xFF17323A)
+val DarkSkyDayMid = Color(0xFF13262B)
+val DarkSkyEveningTop = Color(0xFF262A1E)
+val DarkSkyEveningMid = Color(0xFF181B15)
+val DarkSkyNightTop = Color(0xFF0B1730)
+val DarkSkyNightMid = Color(0xFF0C1320)
+val DarkSkyFoot = Color(0xFF101312)
+
 // --- Dark ----------------------------------------------------------------------------
 //
 // These are the tokens from the SajdaTime dark design system (docs/DESIGN_SYSTEM.md).

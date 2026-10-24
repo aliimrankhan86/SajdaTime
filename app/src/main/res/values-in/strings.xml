@@ -518,4 +518,10 @@
     <string name="bell_off_reminder_message_fajr_ramadan">Pengingat Subuh dan pengingat sebelum salat dinonaktifkan. Pengingat sahur tetap aktif.</string>
     <string name="notifications_off_title">Izinkan notifikasi</string>
     <string name="notifications_off_brief">Pengingat salat tidak bisa sampai di ponsel ini.</string>
+    <!-- 1.6 step 5: the skies. Times of day, never prayer or fasting names (STEP-5-DESIGN §9). -->
+    <string name="sky_dawn">Fajar</string>
+    <string name="sky_day">Siang</string>
+    <string name="sky_evening">Sore</string>
+    <string name="sky_night">Malam</string>
+    <string name="sky_now_a11y">%1$s, sampai %2$s</string>
 </resources>

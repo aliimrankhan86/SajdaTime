@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.sajdatime.core.SkyPeriod
 
 private val LightColors = lightColorScheme(
     primary = LightPrimary,
@@ -248,6 +249,30 @@ fun heroStyle(): HeroStyle {
         )
     }
 }
+
+/** One sky: three fixed stops, top to foot. The foot is the page background. */
+data class SkyColours(val top: Color, val mid: Color, val foot: Color)
+
+/** Pure, so ColorContrastTest can read every stop without composing anything. */
+fun skyColours(period: SkyPeriod, dark: Boolean): SkyColours = if (dark) {
+    when (period) {
+        SkyPeriod.DAWN -> SkyColours(DarkSkyDawnTop, DarkSkyDawnMid, DarkSkyFoot)
+        SkyPeriod.DAY -> SkyColours(DarkSkyDayTop, DarkSkyDayMid, DarkSkyFoot)
+        SkyPeriod.EVENING -> SkyColours(DarkSkyEveningTop, DarkSkyEveningMid, DarkSkyFoot)
+        SkyPeriod.NIGHT -> SkyColours(DarkSkyNightTop, DarkSkyNightMid, DarkSkyFoot)
+    }
+} else {
+    when (period) {
+        SkyPeriod.DAWN -> SkyColours(LightSkyDawnTop, LightSkyDawnMid, LightSkyFoot)
+        SkyPeriod.DAY -> SkyColours(LightSkyDayTop, LightSkyDayMid, LightSkyFoot)
+        SkyPeriod.EVENING -> SkyColours(LightSkyEveningTop, LightSkyEveningMid, LightSkyFoot)
+        SkyPeriod.NIGHT -> SkyColours(LightSkyNightTop, LightSkyNightMid, LightSkyFoot)
+    }
+}
+
+/** The sky for [period] in the current theme, as [heroStyle] reads [LocalDarkTheme]. */
+@Composable
+fun skyStyle(period: SkyPeriod): SkyColours = skyColours(period, LocalDarkTheme.current)
 
 /**
  * The warning notice's panel: the hero card's gloss in amber (24 Oct 2026). Quiet notices stay
