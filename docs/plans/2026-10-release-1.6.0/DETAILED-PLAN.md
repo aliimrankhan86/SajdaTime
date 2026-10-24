@@ -444,7 +444,6 @@ or `fastReminders`. [Ali to confirm] `RequestCodeTest` covers the 30,000 band no
   - `tracker_last_night_isha`
   - `widget_strip_label` and `widget_strip_desc`
   - `bell_blocked_a11y`
-  - `timetable_month_heading`
   - `settings_language_all`, which is `translatable="false"`, bidi-isolated with `Bidi.kt`
 - **Fixes:**
   - Use `action_resume` (it exists), not `tracker_resume`.

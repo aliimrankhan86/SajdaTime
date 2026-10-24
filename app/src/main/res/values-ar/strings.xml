@@ -127,8 +127,13 @@
 
     <!-- Export -->
     <string name="action_save_timetable">حفظ الجدول بصيغة PDF</string>
-    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <!-- The short form in the Timetable sheet header, beside the place name (1.6.0 step 4). -->
     <string name="action_save_pdf">حفظ بصيغة PDF</string>
+    <string name="action_timetable">جدول المواقيت</string>
+    <string name="timetable_title">جدول المواقيت</string>
+    <string name="timetable_month_a11y">مواقيت الصلاة لشهر %1$s</string>
+    <string name="timetable_day_a11y">%1$s. الفجر %2$s. الشروق %3$s. الظهر %4$s. العصر %5$s. المغرب %6$s. العشاء %7$s.</string>
+    <string name="timetable_today_a11y">اليوم، %1$s</string>
     <string name="export_sheet_title">احفظ جدول مواقيتك</string>
     <string name="export_sheet_body">سنُعِدّ ملف PDF لمواقيت صلاتك في %1$s. ويمكنك بعدها حفظه أو طباعته أو إرساله إلى أحد.</string>
     <string name="export_today">اليوم فقط</string>

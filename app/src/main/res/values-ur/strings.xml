@@ -115,6 +115,11 @@
     <!-- Export -->
     <string name="action_save_timetable">نظام الاوقات PDF میں محفوظ کریں</string>
     <string name="action_save_pdf">PDF محفوظ کریں</string>
+    <string name="action_timetable">اوقات نامہ</string>
+    <string name="timetable_title">اوقات نامہ</string>
+    <string name="timetable_month_a11y">%1$s کے نماز کے اوقات</string>
+    <string name="timetable_day_a11y">%1$s۔ فجر %2$s۔ طلوع آفتاب %3$s۔ ظہر %4$s۔ عصر %5$s۔ مغرب %6$s۔ عشاء %7$s۔</string>
+    <string name="timetable_today_a11y">آج، %1$s</string>
     <string name="export_sheet_title">اپنا نظام الاوقات محفوظ کریں</string>
     <string name="export_sheet_body">ہم %1$s کے لیے آپ کے نماز کے اوقات کی PDF بنائیں گے۔ پھر آپ اسے محفوظ کر سکتے ہیں، پرنٹ کر سکتے ہیں یا کسی کو بھیج سکتے ہیں۔</string>
     <string name="export_today">صرف آج</string>

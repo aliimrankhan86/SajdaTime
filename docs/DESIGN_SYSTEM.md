@@ -444,14 +444,16 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Usage question | Yes, share usage counts; No thanks, 24dp under the links (under "The full privacy policy is in English." when the app is not in English, since 19 Oct 2026) | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
 | First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
-| Times | Save as PDF (PDF icon), end of the Today heading; 16dp under the card above, 8dp over the list it saves | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
+| Times | Timetable (calendar icon), end of the Today heading, under it from 1.5 text; 16dp under the card above, 8dp over the list | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
 | Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
 | Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
 | Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
 | Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
-| Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
+| Timetable sheet | Save as PDF (PDF icon), end of the place line under the title | A, compact | 40 drawn, 48 target, wraps | `TimetableSheet.kt` |
+| Timetable sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TimetableSheet.kt`, `Common.kt` |
+| Ramadan timetable | Save as PDF moves to the place line; the X alone at the top end (shared header) | A, compact; D | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
@@ -1061,6 +1063,22 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   the notifications card shows the crossed bell, exact alarms keeps the triangle. Rejected: a switch; a text
   Details link; green CTA on amber (3.2:1 dark); a full width amber button (17 Oct); a glow under the card;
   glossing the quiet tone; a white card with an amber bar (loses the amber card Ali kept).
+- **24 Oct 2026, 1.6 step 4, the Timetable (`STEP-4-DESIGN.md`; Ali's answers Q1, Q2, Q4):** "Timetable" with the
+  calendar glyph (`CalendarMonth`, the one that already means "the month" on Last 30 days) replaces "Save as PDF" on the
+  Today line and opens a full height sheet: this month and the next as day cards (a six column table breaks at 320dp
+  and 2.0, which is why cards), opened on today's card, today in `primaryContainer` with a "Today" pill. Month
+  headings are pinned on the sheet's own colour. Past days are not dimmed (Pillars fades them and fails AA; a faded
+  day reads as a day to feel bad about). No Hijri date on cards (Q4). Inside Ramadan with the card on, the same door
+  opens the approved Ramadan table from day 1 to the last day (Q1); someone who hid the card gets the month view and
+  still has "Ramadan 1448" in the PDF chooser. Save as PDF moved into the sheet's header, which the Ramadan table
+  shares (so it gained the close X and a `headlineSmall` title); the existing chooser opens over the sheet and the
+  sheet stays after a save. Times across a card follow one rule, `floor(width / (84 x fontScale))` clamped to 1..3
+  (`TimetableGrid`), the Dynamic Type equivalent. Rejected: a rolling 30 days (no month heading, and "This whole
+  month" in the PDF would not match the screen); a segmented "Month | Ramadan" control (a component the system does
+  not have); a dialog chooser; a FAB; `timetable_month_heading` (the heading is the month name from the date
+  formatter). Q8 (Ramadan as cards or the table): **Ali, 24 Oct 2026, "Keep the table"** from side by side pictures
+  (`plans/2026-10-release-1.6.0/screens/step4/9a` to `10b`): the table fits about seventeen days on a screen against
+  about four cards, and suhoor, iftar and the fast compare day to day. The card prototype was deleted.
 
 ---
 
@@ -1107,8 +1125,9 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
+| 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
 | 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | OPEN: screenshots at step 5 |
-| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | OPEN: screenshots at step 4 |
+| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
 | 1.6-mosque-door | 23 Oct 2026 | Keep "Different from your mosque?" under the times? | Keep | OPEN: screenshots at step 7 |
 | 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
 

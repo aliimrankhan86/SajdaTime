@@ -16,6 +16,7 @@ import com.sajdatime.app.ui.theme.LightOnSecondaryContainer
 import com.sajdatime.app.ui.theme.LightSecondaryContainer
 import com.sajdatime.app.ui.theme.DarkSurfaceBright
 import com.sajdatime.app.ui.theme.DarkSurfaceContainerHigh
+import com.sajdatime.app.ui.theme.DarkSurfaceContainerLow
 import com.sajdatime.app.ui.theme.DarkSurfaceContainerHighest
 import com.sajdatime.app.ui.theme.LightInverseOnSurface
 import com.sajdatime.app.ui.theme.LightInverseSurface
@@ -113,6 +114,8 @@ class ColorContrastTest {
         Pair("light onSurface/containerHighest", LightOnSurface, LightSurfaceContainerHighest, 4.5),
         Pair("light primary/containerHigh", LightPrimary, LightSurfaceContainerHigh, 4.5),
         Pair("light onSurface/containerLow", LightOnSurface, LightSurfaceContainerLow, 4.5),
+        // The Timetable's month heading is pinned on the sheet's own colour.
+        Pair("light onSurfaceVariant/containerLow", LightOnSurfaceVariant, LightSurfaceContainerLow, 4.5),
         Pair("light inverseOnSurface/inverseSurface", LightInverseOnSurface, LightInverseSurface, 4.5),
         // The navigation bar's selected pill.
         Pair("light onSecondaryContainer/secondaryContainer", LightOnSecondaryContainer, LightSecondaryContainer, 4.5),
@@ -136,6 +139,8 @@ class ColorContrastTest {
         Pair("dark onSurface/containerHighest", DarkOnSurface, DarkSurfaceContainerHighest, 4.5),
         Pair("dark primary/containerHigh", DarkPrimary, DarkSurfaceContainerHigh, 4.5),
         Pair("dark onSurface/surfaceBright", DarkOnSurface, DarkSurfaceBright, 4.5),
+        Pair("dark onSurface/containerLow", DarkOnSurface, DarkSurfaceContainerLow, 4.5),
+        Pair("dark onSurfaceVariant/containerLow", DarkOnSurfaceVariant, DarkSurfaceContainerLow, 4.5),
         Pair("dark inverseOnSurface/inverseSurface", DarkInverseOnSurface, DarkInverseSurface, 4.5),
         Pair("dark onSecondaryContainer/secondaryContainer", DarkOnSecondaryContainer, DarkSecondaryContainer, 4.5),
     )
