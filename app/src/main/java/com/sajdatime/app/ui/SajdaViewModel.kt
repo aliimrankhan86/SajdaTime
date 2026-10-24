@@ -135,6 +135,25 @@ interface TrackerActions {
     fun delete()
 }
 
+/**
+ * What the bell on a prayer row and the "Allow notifications" notice do (1.6.0 step 3). MainActivity binds
+ * it to this ViewModel and to the system's permission ask.
+ */
+interface BellActions {
+    /** Turns [slot] off in one edit; true if a reminder that would have fired went off with it. */
+    suspend fun off(slot: PrayerSlot): Boolean
+
+    /** The user's own tap: on, then, if the phone blocks notifications, the permission door. */
+    fun on(slot: PrayerSlot)
+
+    /** Undo: on again, never the door. */
+    fun undo(slot: PrayerSlot)
+
+    /** The notice's Allow: the same door the bell opens. */
+    fun allow()
+    fun dismissNotice()
+}
+
 /** What the Jama'ah times screen changes. Bound to this ViewModel by MainActivity. */
 interface JamaahActions {
     /** null clears that prayer. */
@@ -419,6 +438,16 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissMethodNotice() =
         viewModelScope.launch { settingsRepository.dismissMethodNotice() }
+
+    suspend fun bellOff(slot: PrayerSlot): Boolean = settingsRepository.bellOff(slot)
+
+    fun bellOn(slot: PrayerSlot) = viewModelScope.launch { settingsRepository.bellOn(slot) }
+
+    fun setNotificationsNoticeDismissed(dismissed: Boolean) =
+        viewModelScope.launch { settingsRepository.setNotificationsNoticeDismissed(dismissed) }
+
+    fun setNotificationPermissionAsked() =
+        viewModelScope.launch { settingsRepository.setNotificationPermissionAsked(true) }
 
     fun setRamadanCardEnabled(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setRamadanCardEnabled(enabled) }

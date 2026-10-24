@@ -3,6 +3,7 @@ package com.sajdatime.app.data
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.doublePreferencesKey
@@ -12,6 +13,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.sajdatime.core.AdjustmentCodec
+import com.sajdatime.core.BellRules
+import com.sajdatime.core.BellState
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.Coordinates
@@ -254,6 +257,17 @@ data class AppSettings(
      * only ever acted on for Sunni users ([com.sajdatime.core.FastingDays]).
      */
     val fastReminders: Set<FastKind> = emptySet(),
+    /**
+     * The style each prayer had when its alert last went off (the bell or the alerts dialog), so the
+     * bell turns it back on as it was (1.6.0 step 3). A prayer with no entry comes back as a notification.
+     */
+    val lastAlertStyle: Map<PrayerSlot, AlertStyle> = emptyMap(),
+    /** Reminders the bell took away, which the bell (or its Undo) gives back and nothing else does. */
+    val bellRemovedReminder: Set<PrayerSlot> = emptySet(),
+    /** True once the user closed the "Allow notifications" notice on Times. A bell turned on while blocked clears it. */
+    val notificationsNoticeDismissed: Boolean = false,
+    /** True once the app has launched the system's notification permission ask from the bell or the notice. */
+    val notificationPermissionAsked: Boolean = false,
 ) {
     val calculationPrefs: CalculationPrefs
         get() = CalculationPrefs(
@@ -395,11 +409,28 @@ class SettingsRepository(private val context: Context) {
         it[Keys.DEFAULT_LOCATION] = false
     }
 
-    /** [style] of null silences that prayer. */
+    /** [style] of null silences that prayer. Off also records the style, for the bell (BellRules). */
     suspend fun setAlert(slot: PrayerSlot, style: AlertStyle?) = edit { prefs ->
-        val current = prefs.decodeAlerts()
-        val updated = if (style == null) current - slot else current + (slot to style)
-        prefs[Keys.ALERTS] = AlertCodec.encode(updated)
+        prefs.writeBell(BellRules.setFromSettings(prefs.readBell(), slot, style))
+    }
+
+    /**
+     * The bell turns [slot] off, in one edit so the file never holds half a change. Returns whether a
+     * reminder that would have fired went off, which picks the message.
+     */
+    suspend fun bellOff(slot: PrayerSlot): Boolean {
+        var reminderRemoved = false
+        edit { prefs ->
+            val (next, removed) = BellRules.off(prefs.readBell(), slot, prefs.readReminderMinutes())
+            reminderRemoved = removed
+            prefs.writeBell(next)
+        }
+        return reminderRemoved
+    }
+
+    /** The bell (or its Undo) turns [slot] on again with its last style and the reminder the bell took. */
+    suspend fun bellOn(slot: PrayerSlot) = edit { prefs ->
+        prefs.writeBell(BellRules.on(prefs.readBell(), slot, AlertStyle.NOTIFICATION))
     }
 
     /** A [minutes] of 0 clears the correction rather than storing a no-op. */
@@ -473,10 +504,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     suspend fun setPrayerReminder(slot: PrayerSlot, on: Boolean) = edit { prefs ->
-        val current = decodeSlots(prefs[Keys.PRAYER_REMINDER_FOR])
-        val updated = if (on) current + slot else current - slot
-        // Written in the enum's order, so the stored string is stable (see AlertCodec.encode).
-        prefs[Keys.PRAYER_REMINDER_FOR] = updated.sortedBy { it.ordinal }.joinToString(",") { it.name }
+        prefs.writeBell(BellRules.setReminderFromSettings(prefs.readBell(), slot, on))
     }
 
     suspend fun setTrackerEnabled(enabled: Boolean) = edit { it[Keys.TRACKER_ENABLED] = enabled }
@@ -526,6 +554,13 @@ class SettingsRepository(private val context: Context) {
     /** Closes the exact-alarm notice on home for good. Settings still shows it. */
     suspend fun dismissExactAlarmNotice() = edit { it[Keys.EXACT_ALARM_DISMISSED] = true }
 
+    /** Closes the "Allow notifications" notice on home; a bell turned on while still blocked brings it back. */
+    suspend fun setNotificationsNoticeDismissed(dismissed: Boolean) =
+        edit { it[Keys.NOTIFICATIONS_NOTICE_DISMISSED] = dismissed }
+
+    suspend fun setNotificationPermissionAsked(asked: Boolean) =
+        edit { it[Keys.NOTIFICATION_PERMISSION_ASKED] = asked }
+
     /** Closes the calculation-method notice on home for good. Settings still shows the row. */
     suspend fun dismissMethodNotice() = edit { it[Keys.METHOD_NOTICE_DISMISSED] = true }
 
@@ -539,7 +574,7 @@ class SettingsRepository(private val context: Context) {
     /** Closes the Eid greeting for the Eid whose [code] this is, and for that Eid only. */
     suspend fun dismissEidGreeting(code: Int) = edit { it[Keys.EID_GREETING_DISMISSED_CODE] = code }
 
-    private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
+    private suspend fun edit(block: (MutablePreferences) -> Unit) {
         context.dataStore.edit(block)
     }
 
@@ -592,6 +627,10 @@ class SettingsRepository(private val context: Context) {
         val JAMAAH = stringPreferencesKey("jamaah_times")
         val JAMAAH_REMINDER = intPreferencesKey("jamaah_reminder_minutes")
         val FAST_REMINDERS = stringPreferencesKey("fast_reminders")
+        val LAST_ALERT_STYLE = stringPreferencesKey("last_alert_style")
+        val BELL_REMOVED_REMINDER = stringPreferencesKey("bell_removed_reminder")
+        val NOTIFICATIONS_NOTICE_DISMISSED = booleanPreferencesKey("notifications_notice_dismissed")
+        val NOTIFICATION_PERMISSION_ASKED = booleanPreferencesKey("notification_permission_asked")
     }
 
     private companion object {
@@ -605,6 +644,25 @@ class SettingsRepository(private val context: Context) {
         this[Keys.ALERTS]
             ?.let(AlertCodec::decode)
             ?: AlertCodec.migrate(this[Keys.NOTIFY], this[Keys.ALERT_STYLE])
+
+    private fun Preferences.readReminderMinutes(): Int =
+        (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0
+
+    /** The four values the bell rules work on. Absent or garbage bell keys read as empty. */
+    private fun Preferences.readBell() = BellState(
+        alertFor = decodeAlerts(),
+        lastStyle = this[Keys.LAST_ALERT_STYLE]?.let(AlertCodec::decode).orEmpty(),
+        reminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
+        bellRemovedReminder = decodeBellRemoved(this[Keys.BELL_REMOVED_REMINDER]),
+    )
+
+    private fun MutablePreferences.writeBell(state: BellState<AlertStyle>) {
+        this[Keys.ALERTS] = AlertCodec.encode(state.alertFor)
+        this[Keys.LAST_ALERT_STYLE] = AlertCodec.encode(state.lastStyle)
+        // Written in the enum's order, so the stored string is stable (see AlertCodec.encode).
+        this[Keys.PRAYER_REMINDER_FOR] = state.reminderFor.sortedBy { it.ordinal }.joinToString(",") { it.name }
+        this[Keys.BELL_REMOVED_REMINDER] = state.bellRemovedReminder.sortedBy { it.ordinal }.joinToString(",") { it.name }
+    }
 
     private fun Preferences.toAppSettings(): AppSettings {
         return AppSettings(
@@ -647,6 +705,10 @@ class SettingsRepository(private val context: Context) {
             jamaah = JamaahCodec.decode(this[Keys.JAMAAH]),
             jamaahReminderMinutes = (this[Keys.JAMAAH_REMINDER] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             fastReminders = decodeFastKinds(this[Keys.FAST_REMINDERS]),
+            lastAlertStyle = this[Keys.LAST_ALERT_STYLE]?.let(AlertCodec::decode).orEmpty(),
+            bellRemovedReminder = decodeBellRemoved(this[Keys.BELL_REMOVED_REMINDER]),
+            notificationsNoticeDismissed = this[Keys.NOTIFICATIONS_NOTICE_DISMISSED] ?: false,
+            notificationPermissionAsked = this[Keys.NOTIFICATION_PERMISSION_ASKED] ?: false,
         )
     }
 
@@ -664,6 +726,9 @@ internal fun decodeSlots(raw: String?): Set<PrayerSlot> {
     if (raw == null) return prayers.toSet()
     return raw.split(",").mapNotNull { name -> prayers.firstOrNull { it.name == name } }.toSet()
 }
+
+/** Unlike [decodeSlots], absent means none: the bell has taken nothing yet. */
+internal fun decodeBellRemoved(raw: String?): Set<PrayerSlot> = if (raw == null) emptySet() else decodeSlots(raw)
 
 /** "MONDAY_THURSDAY,SPECIAL"; unknown names dropped, absent or blank is none. */
 internal fun decodeFastKinds(raw: String?): Set<FastKind> =

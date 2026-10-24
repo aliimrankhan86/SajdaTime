@@ -1,6 +1,8 @@
 package com.sajdatime.app.ui.home
 
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.Bell
+import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.components.DialogTitle
@@ -114,6 +116,16 @@ fun HomeScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
+    /** A user's tap on a prayer's bell: the prayer and whether it is now on (MainScaffold shows the message). */
+    onBell: (PrayerSlot, Boolean) -> Unit,
+    /** The prayer whose bell Undo just restored, which snaps instead of fading. */
+    snapBell: PrayerSlot?,
+    /** True while the bell's message is up, so the rating card never lands over Undo. */
+    bellMessageShowing: Boolean,
+    /** The phone is not letting SajdaTime post notifications at all. */
+    notificationsBlocked: Boolean,
+    onAllowNotifications: () -> Unit,
+    onDismissNotificationsNotice: () -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
@@ -133,7 +145,9 @@ fun HomeScreen(
         !state.settings.exactAlarmNoticeDismissed
     // The card's calm timer lives only here: this screen is not composed while another tab shows,
     // so a tick on My prayers can never start it (sign-off, 23 Oct 2026, SIGNOFF.md:52).
-    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
+    val notificationsWarning = notificationsBlocked && state.settings.alertFor.isNotEmpty() &&
+        !state.settings.notificationsNoticeDismissed
+    val calm = !bellMessageShowing && !notificationsWarning && !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
         state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
     val times = state.today?.times
     LaunchedEffect(calm, times) {
@@ -207,8 +221,15 @@ fun HomeScreen(
             onDismissNotice = onDismissRamadanNotice,
         )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
+        NotificationsBanner(visible = notificationsWarning, onAllow = onAllowNotifications, onDismiss = onDismissNotificationsNotice)
         Spacer(Modifier.height(Space.Group))
-        TodayTimeline(state, onExport = { exportSheet = true })
+        TodayTimeline(
+            state,
+            onExport = { exportSheet = true },
+            onBell = onBell,
+            snapBell = snapBell,
+            notificationsBlocked = notificationsBlocked,
+        )
         MosqueDifferenceDoor(
             state = state,
             onOpen = { explaining = true },
@@ -846,8 +867,33 @@ private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     )
 }
 
+/**
+ * Shown while the phone blocks notifications and at least one alert is on (Ali, 24 Oct 2026): without it a
+ * user who refused them at setup sees five bells and never learns why nothing arrives. Closable and it stays
+ * closed, like the exact alarm notice; a bell turned on while still blocked brings it back.
+ */
 @Composable
-private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
+private fun NotificationsBanner(visible: Boolean, onAllow: () -> Unit, onDismiss: () -> Unit) {
+    if (!visible) return
+    Spacer(Modifier.height(Space.Group))
+    PermissionCard(
+        title = stringResource(R.string.notifications_off_title),
+        body = stringResource(R.string.notifications_off_brief),
+        details = stringResource(R.string.notifications_off_desc),
+        granted = false,
+        onClick = onAllow,
+        onDismiss = onDismiss,
+    )
+}
+
+@Composable
+private fun TodayTimeline(
+    state: UiState,
+    onExport: () -> Unit,
+    onBell: (PrayerSlot, Boolean) -> Unit,
+    snapBell: PrayerSlot?,
+    notificationsBlocked: Boolean,
+) {
     val today = state.today ?: return
     val context = LocalContext.current
     val next = state.next
@@ -908,6 +954,24 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                     },
                     jamaah = state.jamaah[slot],
                 ),
+                trailing = {
+                    if (slot.isPrayer) {
+                        // A crossed bell keeps the style it had while it fades, so an alarm does not flip to a bell.
+                        val style = state.settings.alertFor[slot]
+                        Bell(
+                            on = style != null,
+                            alarm = (style ?: state.settings.lastAlertStyle[slot]) == AlertStyle.ALARM,
+                            blocked = notificationsBlocked,
+                            prayerName = stringResource(slot.labelRes),
+                            onNext = next != null && slot == next.slot && !next.isTomorrow,
+                            snap = snapBell == slot,
+                            onChange = { on -> onBell(slot, on) },
+                        )
+                    } else {
+                        // Sunrise has no bell; the space keeps its time in line with the others.
+                        Spacer(Modifier.width(48.dp))
+                    }
+                },
             )
             if (index != slots.lastIndex) {
                 HorizontalDivider(color = scheme.outlineVariant)
@@ -964,6 +1028,8 @@ private fun PrayerRow(
     isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
+    /** The bell, after the time. Its 48dp target takes the row's end padding. */
+    trailing: @Composable () -> Unit,
 ) {
     val scheme = MaterialTheme.colorScheme
     val dimmed = !slot.isPrayer && !isNext
@@ -1004,7 +1070,11 @@ private fun PrayerRow(
             .heightIn(min = 50.dp)
             // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
             // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
-            .padding(horizontal = 18.dp, vertical = if (note != null) 6.dp else 12.dp),
+            // The bell's 48dp target overlaps the 18dp end padding, so the time ends where it did, and it
+            // fills the row's 50dp floor: 12dp above and below a 48dp target made every row 72dp and pushed
+            // Isha under the tab bar on the 823dp frame (the tick, e98b2a6).
+            .padding(start = 18.dp, end = 6.dp)
+            .padding(vertical = 1.dp),
     ) {
         Icon(
             imageVector = slotIcon(slot),
@@ -1072,6 +1142,7 @@ private fun PrayerRow(
             style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
             color = contentColor,
         )
+        trailing()
     }
 }
 

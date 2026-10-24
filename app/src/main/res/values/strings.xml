@@ -746,4 +746,16 @@
     <string name="jamaah_out_of_window">Your %1$s jama\'ah time is outside %1$s today. Check your mosque\'s times.</string>
     <string name="jamaah_pick_time_title">%1$s: the jama\'ah time on your mosque\'s board</string>
     <string name="mosque_diff_add_jamaah">Add your mosque\'s jama\'ah times</string>
+    <!-- The bell on each prayer row (1.6.0, step 3). %1$s is a prayer name. English only in this prototype. -->
+    <string name="bell_on_a11y">%1$s alert on, notification</string>
+    <string name="bell_alarm_a11y">%1$s alert on, alarm</string>
+    <string name="bell_off_a11y">%1$s alert off</string>
+    <string name="bell_blocked_a11y">%1$s alert on. Notifications are off on this phone.</string>
+    <string name="bell_off_message">%1$s alert off</string>
+    <string name="bell_off_reminder_message">%1$s alert and reminder off</string>
+    <string name="bell_off_message_fajr_ramadan">Fajr alert off. Suhoor reminder stays on.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Fajr alert and reminder off. Suhoor reminder stays on.</string>
+    <string name="notifications_off_title">Allow notifications</string>
+    <string name="notifications_off_brief">Prayer alerts cannot arrive on this phone.</string>
+    <string name="notifications_off_desc">Your phone is not letting SajdaTime send notifications, so no prayer alert or reminder can reach you.</string>
 </resources>

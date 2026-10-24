@@ -70,7 +70,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
+import com.sajdatime.core.BellMessage
+import com.sajdatime.core.BellRules
 import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.HijriCalendar
+import com.sajdatime.core.labelRes
+import java.time.LocalDate
+import androidx.compose.ui.platform.LocalResources
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
@@ -136,6 +142,8 @@ fun MainScaffold(
     onScreenViewed: (Screen) -> Unit,
     tracker: TrackerActions,
     jamaah: JamaahActions,
+    bell: BellActions,
+    notificationsBlocked: Boolean,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -191,6 +199,42 @@ fun MainScaffold(
         }
     }
 
+    // The bell's message (1.6.0 step 3): only when a bell goes off, with Undo, and one at a time like the
+    // pause message. Which wording comes from what the edit actually removed (BellRules.message). The
+    // suhoor part follows the scheduler: minutes above 0 and Ramadan today or tomorrow on the user's own
+    // calendar (the evening before 1 Ramadan the reminder already fires for the next Fajr).
+    val resources = LocalResources.current
+    var undoneBell by remember { mutableStateOf<PrayerSlot?>(null) }
+    val onBell: (PrayerSlot, Boolean) -> Unit = { slot, on ->
+        undoneBell = null
+        if (on) {
+            bell.on(slot)
+        } else {
+            scope.launch {
+                val removed = bell.off(slot)
+                val settings = state.settings
+                val day = state.today?.date ?: LocalDate.now()
+                val shift = settings.calculationPrefs.hijriOffset
+                val suhoor = settings.suhoorReminderMinutes > 0 &&
+                    (HijriCalendar.isRamadan(day, shift) || HijriCalendar.isRamadan(day.plusDays(1), shift))
+                val name = resources.getString(slot.labelRes)
+                val text = when (BellRules.message(slot, removed, suhoor)) {
+                    BellMessage.OFF -> resources.getString(R.string.bell_off_message, name)
+                    BellMessage.OFF_AND_REMINDER -> resources.getString(R.string.bell_off_reminder_message, name)
+                    BellMessage.OFF_FAJR_RAMADAN -> resources.getString(R.string.bell_off_message_fajr_ramadan)
+                    BellMessage.OFF_AND_REMINDER_FAJR_RAMADAN ->
+                        resources.getString(R.string.bell_off_reminder_message_fajr_ramadan)
+                }
+                snackbar.currentSnackbarData?.dismiss()
+                val result = snackbar.showSnackbar(text, actionLabel = undoLabel, duration = SnackbarDuration.Short)
+                if (result == SnackbarResult.ActionPerformed) {
+                    undoneBell = slot
+                    bell.undo(slot)
+                }
+            }
+        }
+    }
+
     // The magnetometer only runs while the Qibla tab is actually on screen.
     DisposableEffect(destination) {
         onQiblaVisible(destination == Destination.QIBLA)
@@ -228,6 +272,12 @@ fun MainScaffold(
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
+                        onBell = onBell,
+                        snapBell = undoneBell,
+                        bellMessageShowing = snackbar.currentSnackbarData != null,
+                        notificationsBlocked = notificationsBlocked,
+                        onAllowNotifications = bell::allow,
+                        onDismissNotificationsNotice = bell::dismissNotice,
                     )
 
                     Destination.QIBLA -> QiblaScreen(state = state)
