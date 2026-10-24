@@ -1,0 +1,87 @@
+package com.sajdatime.app
+
+// TEMPORARY, never committed: renders the Qibla screen with seeded headings for Ali's step 6 pictures,
+// because the emulator's console sensor commands do not reach its fused rotation vector.
+
+import android.graphics.Bitmap
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
+import androidx.test.platform.app.InstrumentationRegistry
+import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.app.ui.Destination
+import com.sajdatime.app.ui.GlassTabBar
+import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.ui.qibla.QiblaScreen
+import com.sajdatime.app.ui.qibla.qiblaCentreInstruction
+import com.sajdatime.app.ui.qibla.qiblaFlatDial
+import com.sajdatime.app.ui.theme.SajdaTimeTheme
+import com.sajdatime.app.ui.theme.ThemeChoice
+import java.io.File
+import org.junit.Rule
+import org.junit.Test
+
+class QiblaPicturesTmp {
+    @get:Rule val compose = createComposeRule()
+
+    private val args = InstrumentationRegistry.getArguments()
+
+    @Test
+    fun picture() {
+        val name = args.getString("pic") ?: "pic"
+        val heading = args.getString("heading")?.toDouble()
+        val dark = args.getString("dark") == "1"
+        val scale = args.getString("scale")?.toFloat() ?: 1f
+        val narrow = args.getString("narrow") == "1"
+        val noLocation = args.getString("noloc") == "1"
+        val open = args.getString("open") == "1"
+        qiblaCentreInstruction = args.getString("centre") == "1"
+        qiblaFlatDial = args.getString("flat") == "1"
+        val accuracy = when (args.getString("acc")) {
+            "low" -> CompassAccuracy.LOW
+            "none" -> CompassAccuracy.UNAVAILABLE
+            else -> CompassAccuracy.HIGH
+        }
+        val state = UiState(
+            loading = false,
+            settings = AppSettings(cityName = "London"),
+            qiblaBearing = if (noLocation) null else 118.0,
+            qiblaDistanceKm = if (noLocation) null else 4794.0,
+            compassHeading = if (accuracy == CompassAccuracy.UNAVAILABLE) null else heading,
+            compassAccuracy = accuracy,
+        )
+        compose.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(LocalDensity provides Density(density.density, fontScale = scale)) {
+                SajdaTimeTheme(if (dark) ThemeChoice.DARK else ThemeChoice.LIGHT) {
+                    androidx.compose.material3.Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { Box(contentAlignment = Alignment.TopCenter) {
+                        Box(if (narrow) Modifier.width(320.dp).statusBarsPadding() else Modifier.fillMaxSize().statusBarsPadding()) {
+                            QiblaScreen(state, onUseGps = {}, onSearchCity = {})
+                            GlassTabBar(Destination.QIBLA, onSelect = {}, modifier = Modifier.align(Alignment.BottomCenter))
+                        }
+                    } }
+                }
+            }
+        }
+        if (open) compose.onNode(hasText(InstrumentationRegistry.getInstrumentation().targetContext.getString(R.string.notice_show_details)) and hasClickAction()).performClick()
+        compose.waitForIdle()
+        Thread.sleep(1500)
+        val shot: Bitmap = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
+        val dir = InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null)!!
+        File(dir, "$name.png").outputStream().use { shot.compress(Bitmap.CompressFormat.PNG, 100, it) }
+    }
+}
