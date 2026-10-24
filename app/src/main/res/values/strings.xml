@@ -356,8 +356,9 @@
          Galaxy S23 Ultra and a Redmi Note 13 Pro in daytime use, and on the Redmi
          overnight the alarm was parked roughly three days out by HyperOS and never fired
          at all. "Late" undersold that badly enough to talk a user out of a permission
-         that silently costs them Fajr, so both strings now name the measured floor and
-         the overnight case. Fajr is named because it is the one that matters and the one
+         that silently costs them Fajr, so this string names the measured floor and the
+         overnight case, and since 1.6 (STEP-3-DESIGN §19) the exact alarms card's one
+         sentence does too (its separate detail string was removed). Fajr is named because it is the one that matters and the one
          that fails. Evidence in HANDOVER section 10. -->
     <string name="confirm_exact_alarm_title">One last thing</string>
     <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>

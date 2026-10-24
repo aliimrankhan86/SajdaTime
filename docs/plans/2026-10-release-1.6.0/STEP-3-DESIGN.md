@@ -357,3 +357,7 @@ bar. Pictures for Ali before building: light, dark, Urdu, 2x, Times and Settings
 So §19 is decided as written. **Next:** build §19 on `claude/1-6-0-step3-proto` (implementer, spec §19), translate
 the changed exact alarms sentence, then pictures for Ali (light, dark, Urdu, 2x, Times and Settings, both cards)
 before the rest of step 3 (HANDOVER §11 list).
+
+## 21. Ali approved the built card (24 Oct 2026, ~04:05, AskUserQuestion)
+
+"Yes, it's right (Recommended)" on `screens/step3/card/`. The card is decided and built; the rest of step 3 follows the HANDOVER §11 list.
