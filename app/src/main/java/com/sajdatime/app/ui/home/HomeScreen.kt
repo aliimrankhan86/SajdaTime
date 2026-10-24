@@ -1,8 +1,16 @@
 package com.sajdatime.app.ui.home
 
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.Bell
+import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.theme.Space
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.material.icons.rounded.NotificationsOff
+import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.shadow
@@ -114,6 +122,16 @@ fun HomeScreen(
     onSetRamadanCard: (Boolean) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
+    /** A user's tap on a prayer's bell: the prayer and whether it is now on (MainScaffold shows the message). */
+    onBell: (PrayerSlot, Boolean) -> Unit,
+    /** The prayer whose bell Undo just restored, which snaps instead of fading. */
+    snapBell: PrayerSlot?,
+    /** True while the bell's message is up, so the rating card never lands over Undo. */
+    bellMessageShowing: Boolean,
+    /** The phone is not letting SajdaTime post notifications at all. */
+    notificationsBlocked: Boolean,
+    onAllowNotifications: () -> Unit,
+    onDismissNotificationsNotice: () -> Unit,
 ) {
     var exportSheet by rememberSaveable { mutableStateOf(false) }
     var locationSheet by rememberSaveable { mutableStateOf(false) }
@@ -133,7 +151,9 @@ fun HomeScreen(
         !state.settings.exactAlarmNoticeDismissed
     // The card's calm timer lives only here: this screen is not composed while another tab shows,
     // so a tick on My prayers can never start it (sign-off, 23 Oct 2026, SIGNOFF.md:52).
-    val calm = !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
+    val notificationsWarning = notificationsBlocked && state.settings.alertFor.isNotEmpty() &&
+        !state.settings.notificationsNoticeDismissed
+    val calm = !bellMessageShowing && !notificationsWarning && !exportSheet && !locationSheet && !explaining && !ramadanInfo && !ramadanTimetable && !islamicDates &&
         state.problem == null && !state.settings.usingDefaultLocation && !exactWarning
     val times = state.today?.times
     LaunchedEffect(calm, times) {
@@ -207,8 +227,15 @@ fun HomeScreen(
             onDismissNotice = onDismissRamadanNotice,
         )
         ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
+        NotificationsBanner(visible = notificationsWarning, onAllow = onAllowNotifications, onDismiss = onDismissNotificationsNotice)
         Spacer(Modifier.height(Space.Group))
-        TodayTimeline(state, onExport = { exportSheet = true })
+        TodayTimeline(
+            state,
+            onExport = { exportSheet = true },
+            onBell = onBell,
+            snapBell = snapBell,
+            notificationsBlocked = notificationsBlocked,
+        )
         MosqueDifferenceDoor(
             state = state,
             onOpen = { explaining = true },
@@ -832,22 +859,53 @@ private fun PolarBanner(state: UiState) {
 @Composable
 private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    if (PrayerAlarmScheduler.canScheduleExact(context)) return
-    if (state.settings.exactAlarmNoticeDismissed) return
+    val show = !PrayerAlarmScheduler.canScheduleExact(context) && !state.settings.exactAlarmNoticeDismissed
 
-    Spacer(Modifier.height(Space.Group))
-    PermissionCard(
-        title = stringResource(R.string.settings_exact_alarms_title),
-        body = stringResource(R.string.settings_exact_alarms_brief),
-        details = stringResource(R.string.settings_exact_alarms_desc),
-        granted = false,
-        onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
-        onDismiss = onDismiss,
-    )
+    // No entrance; closing fades and folds away so the cards below do not jump (24 Oct 2026).
+    AnimatedVisibility(show, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
+        Column {
+            Spacer(Modifier.height(Space.Group))
+            PermissionCard(
+                title = stringResource(R.string.settings_exact_alarms_title),
+                body = stringResource(R.string.settings_exact_alarms_brief),
+                granted = false,
+                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+                onDismiss = onDismiss,
+            )
+        }
+    }
+}
+
+/**
+ * Shown while the phone blocks notifications and at least one alert is on (Ali, 24 Oct 2026): without it a
+ * user who refused them at setup sees five bells and never learns why nothing arrives. Closable and it stays
+ * closed, like the exact alarm notice; a bell turned on while still blocked brings it back.
+ */
+@Composable
+private fun NotificationsBanner(visible: Boolean, onAllow: () -> Unit, onDismiss: () -> Unit) {
+    AnimatedVisibility(visible, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
+        Column {
+            Spacer(Modifier.height(Space.Group))
+            PermissionCard(
+                title = stringResource(R.string.notifications_off_title),
+                body = stringResource(R.string.notifications_off_brief),
+                granted = false,
+                onClick = onAllow,
+                onDismiss = onDismiss,
+                icon = Icons.Rounded.NotificationsOff,
+            )
+        }
+    }
 }
 
 @Composable
-private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
+private fun TodayTimeline(
+    state: UiState,
+    onExport: () -> Unit,
+    onBell: (PrayerSlot, Boolean) -> Unit,
+    snapBell: PrayerSlot?,
+    notificationsBlocked: Boolean,
+) {
     val today = state.today ?: return
     val context = LocalContext.current
     val next = state.next
@@ -858,21 +916,39 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
     // "save this". A text button with an icon, not an icon alone: icon-only is guesswork.
     // Compact (40dp drawn, 48dp to touch) and 8dp above the list it saves, 16dp under the card:
     // at full size it looked squashed between the two (owner, 18 Oct 2026, screenshot).
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        Text(
-            text = stringResource(R.string.home_today),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .weight(1f)
-                .semantics { heading() },
-        )
+    // At 1.5 text and above the button drops under the heading: at 320dp and 2.0 it squeezed "Today" until it
+    // broke mid word. The same rule as the prayer rows below and step 2's dates rows.
+    val exportButton: @Composable () -> Unit = {
         CtaButton(onClick = onExport, compact = true) {
             Icon(Icons.Outlined.PictureAsPdf, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(Space.Related))
             Text(stringResource(R.string.action_save_pdf))
+        }
+    }
+    if (LocalDensity.current.fontScale >= 1.5f) {
+        // Full width so both start at the leading edge; the screen's column centres its children.
+        Column(Modifier.fillMaxWidth()) {
+            Text(
+                text = stringResource(R.string.home_today),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.semantics { heading() },
+            )
+            Spacer(Modifier.height(Space.Related))
+            exportButton()
+        }
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(
+                text = stringResource(R.string.home_today),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics { heading() },
+            )
+            exportButton()
         }
     }
     Spacer(Modifier.height(Space.Related))
@@ -908,6 +984,24 @@ private fun TodayTimeline(state: UiState, onExport: () -> Unit) {
                     },
                     jamaah = state.jamaah[slot],
                 ),
+                trailing = {
+                    if (slot.isPrayer) {
+                        // A crossed bell keeps the style it had while it fades, so an alarm does not flip to a bell.
+                        val style = state.settings.alertFor[slot]
+                        Bell(
+                            on = style != null,
+                            alarm = (style ?: state.settings.lastAlertStyle[slot]) == AlertStyle.ALARM,
+                            blocked = notificationsBlocked,
+                            prayerName = stringResource(slot.labelRes),
+                            onNext = next != null && slot == next.slot && !next.isTomorrow,
+                            snap = snapBell == slot,
+                            onChange = { on -> onBell(slot, on) },
+                        )
+                    } else {
+                        // Sunrise has no bell; the space keeps its time in line with the others.
+                        Spacer(Modifier.width(48.dp))
+                    }
+                },
             )
             if (index != slots.lastIndex) {
                 HorizontalDivider(color = scheme.outlineVariant)
@@ -964,6 +1058,8 @@ private fun PrayerRow(
     isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
+    /** The bell, after the time. Its 48dp target takes the row's end padding. */
+    trailing: @Composable () -> Unit,
 ) {
     val scheme = MaterialTheme.colorScheme
     val dimmed = !slot.isPrayer && !isNext
@@ -983,59 +1079,11 @@ private fun PrayerRow(
     val accent = scheme.primary
     val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
-            .semantics(mergeDescendants = true) {}
-            .background(background)
-            // drawBehind rather than a sibling Box: a full-height stripe next to a row
-            // whose height is driven by the text needs intrinsic measurement, and this
-            // gets the same pixels without asking the layout to measure twice.
-            .drawBehind {
-                if (isNext) drawRect(accent, size = Size(barWidth, size.height))
-            }
-            // Vertical padding plus a floor, not a fixed height: at a large system font
-            // size the row has to grow rather than crop the prayer name. 50, not 56, since
-            // 15 Aug 2026: six dp a row over six rows is what lets the mosque door under
-            // the list clear the navigation bar (see the budget note in HomeScreen). Still
-            // above the 48dp touch-target minimum, though these rows are not tappable.
-            .heightIn(min = 50.dp)
-            // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
-            // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
-            .padding(horizontal = 18.dp, vertical = if (note != null) 6.dp else 12.dp),
-    ) {
-        Icon(
-            imageVector = slotIcon(slot),
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
-        )
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(
-                text = stringResource(slot.labelRes),
-                style = if (dimmed) {
-                    MaterialTheme.typography.bodyMedium
-                } else {
-                    MaterialTheme.typography.bodyLarge
-                },
-                color = contentColor,
-            )
-            // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
-            // a pill beside the name: the row already holds the name, a Next or Now marker and the
-            // time, and a third item squeezes them at 360dp.
-            if (note != null) {
-                Text(
-                    text = note,
-                    style = MaterialTheme.typography.labelMedium,
-                    // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
-                    // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
-                    color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
-                )
-            }
-        }
+    // At 1.5 text and above the pill and time drop under the name, as step 2's dates rows do: at 320dp and 2.0
+    // the bell's 48dp squeezed the name until "Fajr" broke one letter a line (STEP-3-DESIGN §7). The bell
+    // stays at the end either way. Below 1.5 the row is unchanged.
+    val stacked = LocalDensity.current.fontScale >= 1.5f
+    val markersAndTime: @Composable () -> Unit = {
         if (isNext) {
             // Not colour alone: the next prayer also carries a text marker.
             Text(
@@ -1072,6 +1120,70 @@ private fun PrayerRow(
             style = if (dimmed) PrayerTimeTextStyle.copy(fontSize = 15.sp) else PrayerTimeTextStyle,
             color = contentColor,
         )
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
+            .semantics(mergeDescendants = true) {}
+            .background(background)
+            // drawBehind rather than a sibling Box: a full-height stripe next to a row
+            // whose height is driven by the text needs intrinsic measurement, and this
+            // gets the same pixels without asking the layout to measure twice.
+            .drawBehind {
+                if (isNext) drawRect(accent, size = Size(barWidth, size.height))
+            }
+            // Vertical padding plus a floor, not a fixed height: at a large system font
+            // size the row has to grow rather than crop the prayer name. 50, not 56, since
+            // 15 Aug 2026: six dp a row over six rows is what lets the mosque door under
+            // the list clear the navigation bar (see the budget note in HomeScreen). Still
+            // above the 48dp touch-target minimum, though these rows are not tappable.
+            .heightIn(min = 50.dp)
+            // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
+            // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
+            // The bell's 48dp target overlaps the 18dp end padding, so the time ends where it did, and it
+            // fills the row's 50dp floor: 12dp above and below a 48dp target made every row 72dp and pushed
+            // Isha under the tab bar on the 823dp frame (the tick, e98b2a6).
+            .padding(start = 18.dp, end = 6.dp)
+            .padding(vertical = 1.dp),
+    ) {
+        Icon(
+            imageVector = slotIcon(slot),
+            contentDescription = null,
+            tint = iconColor,
+            modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
+        )
+        Spacer(Modifier.width(14.dp))
+        Column(Modifier.weight(1f)) {
+            Text(
+                text = stringResource(slot.labelRes),
+                style = if (dimmed) {
+                    MaterialTheme.typography.bodyMedium
+                } else {
+                    MaterialTheme.typography.bodyLarge
+                },
+                color = contentColor,
+            )
+            // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
+            // a pill beside the name: the row already holds the name, a Next or Now marker and the
+            // time, and a third item squeezes them at 360dp.
+            if (note != null) {
+                Text(
+                    text = note,
+                    style = MaterialTheme.typography.labelMedium,
+                    // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
+                    // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
+                    color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                )
+            }
+            if (stacked) {
+                Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
+            }
+        }
+        if (!stacked) markersAndTime()
+        trailing()
     }
 }
 

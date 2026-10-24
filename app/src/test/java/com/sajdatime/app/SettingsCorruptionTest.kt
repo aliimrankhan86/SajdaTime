@@ -3,7 +3,11 @@ package com.sajdatime.app
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.edit
+import com.sajdatime.app.data.AlertCodec
+import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.decodeBellRemoved
 import com.sajdatime.app.data.settingsCorruptionHandler
+import com.sajdatime.core.PrayerSlot
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,5 +50,15 @@ class SettingsCorruptionTest {
         } finally {
             scope.cancel()
         }
+    }
+
+    @Test
+    fun `garbage in the bell keys reads as empty`() {
+        // The new bell keys (1.6.0 step 3) must never throw or invent a style or a reminder.
+        val garbage = "FAJR:BOGUS,::,NOTASLOT:ALARM,,"
+        assertEquals(emptyMap<PrayerSlot, AlertStyle>(), AlertCodec.decode(garbage))
+        assertEquals(emptySet<PrayerSlot>(), decodeBellRemoved("garbage,,NOPE"))
+        assertEquals(emptySet<PrayerSlot>(), decodeBellRemoved(null))
+        assertEquals(setOf(PrayerSlot.ASR), decodeBellRemoved("ASR,NOPE"))
     }
 }

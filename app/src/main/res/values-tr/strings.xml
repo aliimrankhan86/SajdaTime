@@ -194,10 +194,9 @@
     <string name="settings_ongoing_badge_desc">Sıradaki vakti ve ne kadar süre kaldığını gösteren sessiz bir bildirim</string>
     <string name="settings_exact_alarms_title">Tam zamanlı alarmlara izin ver</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Namaz uyarıları bir saat gecikebilir.</string>
+    <string name="settings_exact_alarms_brief">Namaz uyarıları bir saat gecikebilir ve Sabah uyarısı hiç gelmeyebilir.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">İzin ver</string>
-    <string name="settings_exact_alarms_desc">Bu izin olmadan namaz uyarıları bir saat ya da daha geç gelebilir. Bazı telefonlarda Sabah uyarısı hiç gelmeyebilir.</string>
     <string name="confirm_exact_alarm_title">Son bir şey</string>
     <string name="confirm_exact_alarm_body">Siz izin vermedikçe Android, uygulamaların tam dakikasında uyarı kurmasına izin vermez. Bu izin olmadan telefonunuz namaz uyarılarını bir saat ya da daha fazla geciktirebilir. Bazı telefonlarda Sabah gibi gece gelen bir uyarı hiç gelmeyebilir. Bunu daha sonra Ayarlar bölümünden de yapabilirsiniz.</string>
     <string name="action_close">Kapat</string>
@@ -514,4 +513,16 @@
     <string name="jamaah_out_of_window">%1$s cemaat vaktiniz bugün %1$s vaktinin dışında. Caminizin vakitlerini kontrol edin.</string>
     <string name="jamaah_pick_time_title">%1$s: caminizin panosundaki cemaat saati</string>
     <string name="mosque_diff_add_jamaah">Caminizin cemaat vakitlerini ekleyin</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">%1$s uyarısı açık, bildirim</string>
+    <string name="bell_alarm_a11y">%1$s uyarısı açık, alarm</string>
+    <string name="bell_off_a11y">%1$s uyarısı kapalı</string>
+    <string name="bell_blocked_a11y">%1$s uyarısı açık. Bu telefonda bildirimler kapalı.</string>
+    <string name="bell_off_message">%1$s uyarısı kapatıldı</string>
+    <string name="bell_off_reminder_message">%1$s uyarısı ve hatırlatıcısı kapatıldı</string>
+    <string name="bell_off_message_fajr_ramadan">Sabah uyarısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Sabah uyarısı ve hatırlatıcısı kapatıldı. Sahur hatırlatıcısı açık kalıyor.</string>
+    <string name="notifications_off_title">Bildirimlere izin ver</string>
+    <string name="notifications_off_brief">Namaz uyarıları bu telefona ulaşamıyor.</string>
 </resources>

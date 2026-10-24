@@ -14,7 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.WarningAmber
+import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.background
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -119,7 +120,7 @@ fun PermissionCard(
     granted: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    details: String? = null,
+    icon: ImageVector = Icons.Rounded.WarningAmber,
     onDismiss: (() -> Unit)? = null,
 ) {
     // Granted: nothing. A permanent "Allowed" card at the top of Settings is the furniture
@@ -129,7 +130,7 @@ fun PermissionCard(
     Notice(
         title = title,
         brief = body,
-        details = details,
+        icon = icon,
         actionLabel = stringResource(R.string.action_allow),
         actionSpokenAs = title,
         onAction = onClick,

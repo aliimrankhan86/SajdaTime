@@ -40,14 +40,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
+import com.sajdatime.core.BellRules
+import com.sajdatime.core.PermissionDoor
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
+import com.sajdatime.app.ui.BellActions
 import com.sajdatime.app.ui.TrackerActions
 import com.sajdatime.app.ui.JamaahActions
 import com.sajdatime.app.ui.TrackerEvent
@@ -155,6 +159,54 @@ class MainActivity : ComponentActivity() {
             trackerLoad.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
         }.getOrElse { toast(getString(R.string.tracker_load_failed_format)) }
         override fun delete() { viewModel.deleteTracker() }
+    }
+
+    /**
+     * Whether the phone lets SajdaTime post at all: Android 13's permission and the older "turn off for this
+     * app" switch (not channels). Read again in [onResume], so the bells turn green the moment the user
+     * comes back from the phone's settings.
+     */
+    private var notificationsBlocked by mutableStateOf(false)
+
+    private fun readNotificationsBlocked() = !NotificationManagerCompat.from(this).areNotificationsEnabled()
+
+    /**
+     * Chosen before anything is launched, so a second "Don't allow" is never answered by Settings
+     * (BellRules.permissionDoor). A result that is a denial does nothing, and nothing here is counted
+     * as setup, so awaitingSetupNotificationResult stays false.
+     */
+    private fun openNotificationDoor() {
+        val systemCanAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !Notifications.canPost(this)
+        when (
+            BellRules.permissionDoor(
+                blocked = readNotificationsBlocked(),
+                systemCanAsk = systemCanAsk,
+                rationale = shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS),
+                askedBefore = viewModel.state.value.settings.notificationPermissionAsked,
+            )
+        ) {
+            PermissionDoor.ASK -> {
+                viewModel.setNotificationPermissionAsked()
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            PermissionDoor.OPEN_SETTINGS -> Notifications.openAppNotificationSettings(this)
+            PermissionDoor.NONE -> Unit
+        }
+    }
+
+    private val bellActions = object : BellActions {
+        override suspend fun off(slot: com.sajdatime.core.PrayerSlot) = viewModel.bellOff(slot)
+        override fun on(slot: com.sajdatime.core.PrayerSlot) {
+            viewModel.bellOn(slot)
+            if (readNotificationsBlocked()) {
+                // Asking again after a refusal brings the notice back (it was closed on purpose before).
+                viewModel.setNotificationsNoticeDismissed(false)
+                openNotificationDoor()
+            }
+        }
+        override fun undo(slot: com.sajdatime.core.PrayerSlot) { viewModel.bellOn(slot) }
+        override fun allow() = openNotificationDoor()
+        override fun dismissNotice() { viewModel.setNotificationsNoticeDismissed(true) }
     }
 
     private val jamaahActions = object : JamaahActions {
@@ -280,6 +332,8 @@ class MainActivity : ComponentActivity() {
                                 onScreenViewed = viewModel::recordScreen,
                                 tracker = trackerActions,
                                 jamaah = jamaahActions,
+                                bell = bellActions,
+                                notificationsBlocked = notificationsBlocked,
                             )
 
                             // Shown once, immediately after setup, never after an update (the flag is
@@ -303,6 +357,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        notificationsBlocked = readNotificationsBlocked()
         // Coordinates may be stale after travel, and alarms may have been cleared by the
         // system, so a foreground visit always refreshes both.
         if (viewModel.state.value.settings.coordinates != null) viewModel.refreshLocation()
@@ -318,6 +373,11 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationsIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             awaitingSetupNotificationResult = true
+            // Counts as asked, so a later bell tap after a refusal here goes to the phone's settings rather
+            // than launching a system ask some phones no longer show (Opus review, 24 Oct 2026). A deliberate trade:
+            // someone who backs out of the setup prompt without choosing also gets the phone's settings on the
+            // first bell tap, where they can still allow. Better than a tap that shows nothing; do not undo.
+            viewModel.setNotificationPermissionAsked()
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }

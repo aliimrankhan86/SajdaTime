@@ -142,6 +142,14 @@ val DarkHeroSheen = Color(0x12FFFFFF)
 val DarkHeroRim = Color(0x29FFFFFF)
 val DarkHeroRimBottom = Color(0x0AFFFFFF)
 
+// The amber notice's glossy panel (owner, 24 Oct 2026): the hero card's finish in amber. The
+// middle stop is tertiaryContainer; the sheen and rim are the hero's. Every stop, and the top
+// under the sheen, is checked against the notice ink and the accent in ColorContrastTest.
+val LightWarnTop = Color(0xFFFBF0D8)
+val LightWarnBottom = Color(0xFFF3E2BE)
+val DarkWarnTop = Color(0xFF352A17)
+val DarkWarnBottom = Color(0xFF20190D)
+
 // --- Dark ----------------------------------------------------------------------------
 //
 // These are the tokens from the SajdaTime dark design system (docs/DESIGN_SYSTEM.md).

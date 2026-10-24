@@ -4,6 +4,10 @@ import androidx.compose.ui.graphics.Color
 import com.sajdatime.app.ui.theme.DarkAccent
 import com.sajdatime.app.ui.theme.DarkAccentContainer
 import com.sajdatime.app.ui.theme.DarkOnAccentContainer
+import com.sajdatime.app.ui.theme.DarkWarnBottom
+import com.sajdatime.app.ui.theme.DarkWarnTop
+import com.sajdatime.app.ui.theme.LightWarnBottom
+import com.sajdatime.app.ui.theme.LightWarnTop
 import com.sajdatime.app.ui.theme.DarkInverseOnSurface
 import com.sajdatime.app.ui.theme.DarkInverseSurface
 import com.sajdatime.app.ui.theme.DarkOnSecondaryContainer
@@ -257,6 +261,35 @@ class ColorContrastTest {
             } + light.flatMap { (stopName, stop) ->
                 lightInks.map { (inkName, ink) -> Pair("light hero $inkName on $stopName", ink, stop, 4.5) }
             },
+        )
+    }
+
+    /**
+     * The amber notice's gloss (24 Oct 2026, STEP-3-DESIGN 19): the notice ink must hold AA at
+     * every stop and under the sheen, and the accent (mark and button) 3:1 as a graphic.
+     */
+    @Test
+    fun `glossy amber notice is readable at every stop and under the sheen`() {
+        fun over(top: Color, under: Color) = Color(
+            red = top.red * top.alpha + under.red * (1 - top.alpha),
+            green = top.green * top.alpha + under.green * (1 - top.alpha),
+            blue = top.blue * top.alpha + under.blue * (1 - top.alpha),
+        )
+        val lightStops = listOf(
+            "top" to LightWarnTop,
+            "bottom" to LightWarnBottom,
+            "top under sheen" to over(LightHeroSheen, LightWarnTop),
+        )
+        val darkStops = listOf(
+            "top" to DarkWarnTop,
+            "bottom" to DarkWarnBottom,
+            "top under sheen" to over(DarkHeroSheen, DarkWarnTop),
+        )
+        assertAll(
+            lightStops.map { (name, stop) -> Pair("light notice ink on $name", LightOnAccentContainer, stop, 4.5) } +
+                lightStops.map { (name, stop) -> Pair("light accent on $name", LightAccent, stop, 3.0) } +
+                darkStops.map { (name, stop) -> Pair("dark notice ink on $name", DarkOnAccentContainer, stop, 4.5) } +
+                darkStops.map { (name, stop) -> Pair("dark accent on $name", DarkAccent, stop, 3.0) },
         )
     }
 

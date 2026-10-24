@@ -13,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,8 +37,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -49,6 +49,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.app.ui.theme.sajdaSurface
+import com.sajdatime.app.ui.theme.warningGloss
 
 /**
  * The two kinds of notice the app has, and the only two.
@@ -64,7 +65,7 @@ enum class NoticeTone { WARNING, QUIET }
  * Every notice in the app (Quiet Glass, 17 Oct 2026; restructured 18 Oct 2026). One anatomy,
  * so a person learns it once and reads every notice the same way:
  *
- *  1. a round mark ([icon] on a soft tile in the tone's colour)
+ *  1. a bare mark ([icon], 24dp, top-aligned, no tile, in the tone's colour)
  *  2. the [title], if there is one, then [brief] 4dp under it (they belong together)
  *  3. a close X alone at the top right, when [onDismiss] is given (Times only; Settings never
  *     hides a problem)
@@ -86,7 +87,8 @@ enum class NoticeTone { WARNING, QUIET }
  * Contrast: text is the tone's on-container ink; both buttons (the action and "Details") are
  * solid, tertiary/onTertiary in a warning and the CtaButton green in a quiet notice (all
  * asserted in ColorContrastTest); the mark is the tone's
- * accent on a 14% tile of itself, 3:1 or better.
+ * accent, 3:1 or better. The warning tone is a glossy amber panel (the hero card's finish,
+ * `warningGloss()`); the quiet tone stays flat.
  */
 @Composable
 fun Notice(
@@ -103,9 +105,9 @@ fun Notice(
     onDismiss: (() -> Unit)? = null,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val (container, ink, accent) = when (tone) {
-        NoticeTone.WARNING -> Triple(scheme.tertiaryContainer, scheme.onTertiaryContainer, scheme.tertiary)
-        NoticeTone.QUIET -> Triple(scheme.secondaryContainer, scheme.onSecondaryContainer, scheme.onSecondaryContainer)
+    val (ink, accent) = when (tone) {
+        NoticeTone.WARNING -> scheme.onTertiaryContainer to scheme.tertiary
+        NoticeTone.QUIET -> scheme.onSecondaryContainer to scheme.onSecondaryContainer
     }
     val buttonColors = when (tone) {
         NoticeTone.WARNING -> ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary)
@@ -116,25 +118,29 @@ fun Notice(
     var open by rememberSaveable(title, brief) { mutableStateOf(false) }
     val turn by animateFloatAsState(if (open) 180f else 0f, Motion.quick(), label = "notice fold")
     val hasAction = actionLabel != null && onAction != null
+    val gloss = warningGloss()
 
     Column(
         modifier
             .fillMaxWidth()
-            .sajdaSurface(shape, container)
-            .border(1.dp, accent.copy(alpha = 0.22f), shape)
+            .then(
+                if (tone == NoticeTone.WARNING) {
+                    // The hero card's stack without its glow: gradient, sheen over the top half,
+                    // rim brightest at the top.
+                    Modifier
+                        .sajdaSurface(shape, gloss.brush)
+                        .background(Brush.verticalGradient(0f to gloss.sheen, 0.5f to Color.Transparent))
+                        .border(1.dp, Brush.verticalGradient(listOf(gloss.rim, gloss.rimBottom)), shape)
+                } else {
+                    Modifier.sajdaSurface(shape, scheme.secondaryContainer)
+                },
+            )
             .padding(Space.Group),
     ) {
         Row(verticalAlignment = Alignment.Top, modifier = Modifier.fillMaxWidth()) {
-            Box(
-                Modifier.size(MarkSize).clip(RoundedCornerShape(50)).background(accent.copy(alpha = 0.14f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(20.dp))
-            }
+            Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(MarkSize))
             Spacer(Modifier.width(Space.Paragraph))
-            // The text column's first line is centred on the 36dp mark: 7dp down for a 23sp title
-            // line, 8dp for a 21sp brief line.
-            Column(Modifier.weight(1f).padding(top = if (title != null) 6.dp else 8.dp)) {
+            Column(Modifier.weight(1f)) {
                 if (title != null) {
                     Text(
                         title,
@@ -227,5 +233,5 @@ fun Notice(
     }
 }
 
-/** The notice's round mark. The text and the button row both start after it. */
-private val MarkSize = 36.dp
+/** The notice's bare mark. The text and the button row both start after it. */
+private val MarkSize = 24.dp

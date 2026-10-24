@@ -376,19 +376,28 @@ object Notifications {
      */
     fun openDndAccessSettings(context: Context) {
         val list = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-        val appNotifications = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
-        } else {
-            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
-        }
-        for (intent in listOf(list, appNotifications)) {
+        for (intent in listOf(list, appNotificationsIntent(context))) {
             // Settings calls this with the Activity. Anything else (the instrumented test, a
             // future notification action) needs a new task or startActivity throws.
             if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (runCatching { context.startActivity(intent) }.isSuccess) return
         }
     }
+
+    /** SajdaTime's own notification page in the phone's settings (the bell's door, 1.6.0 step 3). */
+    fun openAppNotificationSettings(context: Context) {
+        val intent = appNotificationsIntent(context)
+        if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching { context.startActivity(intent) }
+    }
+
+    private fun appNotificationsIntent(context: Context): Intent =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+        } else {
+            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        }
 
     /** True once the user has allowed the app to sound through Do Not Disturb. */
     fun hasDndAccess(context: Context): Boolean = runCatching {

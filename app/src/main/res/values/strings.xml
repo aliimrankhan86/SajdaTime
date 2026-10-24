@@ -346,7 +346,7 @@
     <string name="settings_ongoing_badge_desc">A silent notification with the next prayer and the time left</string>
     <string name="settings_exact_alarms_title">Allow exact alarms</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">Prayer alerts can arrive an hour late.</string>
+    <string name="settings_exact_alarms_brief">Prayer alerts can arrive an hour late, and Fajr may not arrive at all.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">Allow</string>
     <!-- These two said only "and deliver them late", with no number, because Android
@@ -356,10 +356,10 @@
          Galaxy S23 Ultra and a Redmi Note 13 Pro in daytime use, and on the Redmi
          overnight the alarm was parked roughly three days out by HyperOS and never fired
          at all. "Late" undersold that badly enough to talk a user out of a permission
-         that silently costs them Fajr, so both strings now name the measured floor and
-         the overnight case. Fajr is named because it is the one that matters and the one
+         that silently costs them Fajr, so this string names the measured floor and the
+         overnight case, and since 1.6 (STEP-3-DESIGN §19) the exact alarms card's one
+         sentence does too (its separate detail string was removed). Fajr is named because it is the one that matters and the one
          that fails. Evidence in HANDOVER section 10. -->
-    <string name="settings_exact_alarms_desc">Without it, prayer alerts can arrive an hour or more late, and on some phones Fajr may not arrive at all.</string>
     <string name="confirm_exact_alarm_title">One last thing</string>
     <string name="confirm_exact_alarm_body">Android does not let apps set alerts for an exact minute unless you say so. Without it your phone can hold prayer alerts back by an hour or more, and on some phones an overnight alert like Fajr may not arrive at all. You can also do this later from Settings.</string>
     <string name="action_close">Close</string>
@@ -746,4 +746,15 @@
     <string name="jamaah_out_of_window">Your %1$s jama\'ah time is outside %1$s today. Check your mosque\'s times.</string>
     <string name="jamaah_pick_time_title">%1$s: the jama\'ah time on your mosque\'s board</string>
     <string name="mosque_diff_add_jamaah">Add your mosque\'s jama\'ah times</string>
+    <!-- The bell on each prayer row (1.6.0, step 3). %1$s is a prayer name. -->
+    <string name="bell_on_a11y">%1$s alert on, notification</string>
+    <string name="bell_alarm_a11y">%1$s alert on, alarm</string>
+    <string name="bell_off_a11y">%1$s alert off</string>
+    <string name="bell_blocked_a11y">%1$s alert on. Notifications are off on this phone.</string>
+    <string name="bell_off_message">%1$s alert off</string>
+    <string name="bell_off_reminder_message">%1$s alert and reminder off</string>
+    <string name="bell_off_message_fajr_ramadan">Fajr alert off. Suhoor reminder stays on.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">Fajr alert and reminder off. Suhoor reminder stays on.</string>
+    <string name="notifications_off_title">Allow notifications</string>
+    <string name="notifications_off_brief">Prayer alerts cannot arrive on this phone.</string>
 </resources>
