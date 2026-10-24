@@ -474,3 +474,38 @@ paragraph, §9 dated entry (Ali's words, arc removed and why, teardrop reverses 
 2. **Light bezel colour:** "White bezel, lifted (Recommended)" or "Sand bezel". (Replaces lifted or flat.)
 3. **No location:** "Amber notice, Set location (Recommended)" or "Plain sentence, as today".
 4. **The turn arc:** "No arc, Pillars style (Recommended)" or "Keep the green arc".
+
+## 16. Corrections to §15 from `plan-verifier` (24 Oct 2026). This section wins over §15.
+
+No blockers. Verified: 15.3 contrast numbers, the 15.2 path (Compose angles clockwise from 3 o'clock, y down:
+`startAngle 180`, `sweep -180` runs through the bottom and ends at (0.12, 0.10), tangent joins), the tip inside the
+cube, `dialBezel()` fits the `kiswahGold()` pattern, Motion and the exempt `tween(durationMillis = 120)`.
+
+1. **Kaaba corner.** The box corner reaches 0.856 at a diagonal and crosses the minor ticks, but the drawn artwork
+   (`ic_kaaba.xml` plinth) reaches 0.816 at worst, under the ticks and the aligned bezel at 0.89. Budget line: tip
+   0.6525; Kaaba ink 0.59 to 0.816; letters 0.695 to 0.785; ticks 0.845 to 0.87 (cardinal from 0.80); bezel inner
+   edge 0.89 aligned, 0.92 not.
+2. **Ticks end at 0.87** (minor 0.845 to 0.87, cardinal 0.80 to 0.87), so the round cap ends 0.877, clear of the
+   aligned bezel.
+3. **The Kaaba covers a letter** when the Qibla is within about 15° of a cardinal (W from Pakistan and India, E from
+   Morocco), as in the Pillars dial. Accepted: the Kaaba is the more useful mark there.
+4. **`arcTo(Rect(-0.12f, -0.02f, 0.12f, 0.22f), 180f, -180f, forceMoveTo = false)`**; every coordinate is multiplied
+   by r and offset by the dial centre before rotation about the centre.
+5. `primary` on the page already exists in `ColorContrastTest` (`:111`, `:137` at 4.5); new pairs are the four
+   `outline` and two `onSurfaceVariant` on `primaryContainer`.
+6. §15 also overrides §14 item 5 (now the bezel colour is the composition read through `sajdaSurface`, the face and
+   width are read in the draw lambda) and every mention of the arc or rim in §2, §7, §9, §12. DESIGN_SYSTEM §1
+   `primary` row drops "and arc" in both tables.
+7. **Q4 picture arc:** the bezel band itself, `primary`, from the needle round to the Kaaba, at the bezel's width;
+   aligned, the whole bezel is green (15.5 unchanged). Behind TEMPORARY `qiblaShowArc` (default false).
+8. **Q2 sand:** `surfaceContainerHighest` in light, behind TEMPORARY `qiblaSandBezel` (default false). Both new
+   switches are deleted with `qiblaCentreInstruction` once Ali answers.
+9. **Dark bezel:** the `sajdaSurface` hairline is invisible on either dark candidate, so the bezel carries the edge.
+   The dark picture decides between `surfaceContainerHighest` and `surfaceBright` before the code is final (main
+   session and Fable judge; take `surfaceBright` if the disc does not read against the page).
+10. **Pin test:** `PlaceRow` icon gets `Modifier.testTag("qibla_place_pin")`; at 2.0 on 320dp, with §9's London seed,
+    its bounds are at least 40dp tall. Mutation proof: put `16.dp` back, see it fail.
+11. **`WearApp.kt:883-884` comment:** phone 0.70 and 0.22, watch keeps 0.66 and 0.30.
+12. Arrival has three signals that are not colour (sentence with tick, bezel thickening, buzz), not two.
+13. Keep the region read through `LocaleManagerCompat.getSystemLocales` (a7a39d4); §14 item 3's `Resources.getSystem()`
+    is superseded. The buzz stays `arrivalBuzz` (f43d50a).
