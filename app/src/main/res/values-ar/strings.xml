@@ -163,16 +163,16 @@
     <string name="qibla_title">القبلة</string>
     <string name="qibla_distance_km">نحو %1$d كم من هنا</string>
     <string name="qibla_distance_miles">نحو %1$d ميل من هنا</string>
-    <string name="qibla_bearing">%1$d° من الشمال</string>
+    <string name="qibla_bearing">\u2066%1$d°\u2069 من الشمال</string>
     <string name="qibla_needs_location">حدّد موقعك لتجد القبلة.</string>
     <string name="qibla_facing">أنت الآن تتجه نحو الكعبة</string>
-    <string name="qibla_heading_now">الاتجاه %1$d°</string>
+    <string name="qibla_heading_now">الاتجاه \u2066%1$d°\u2069</string>
     <!-- The dial's legend. The needle is the user: it points the way the phone points. -->
     <string name="qibla_legend_kaaba">الكعبة</string>
     <string name="qibla_legend_facing">الاتجاه الذي تواجهه</string>
-    <string name="qibla_turn_left">استدر يسارًا %1$d°</string>
-    <string name="qibla_turn_right">استدر يمينًا %1$d°</string>
-    <string name="qibla_no_compass">اتجه إلى %1$d° من الشمال الحقيقي</string>
+    <string name="qibla_turn_left">استدر يسارًا \u2066%1$d°\u2069</string>
+    <string name="qibla_turn_right">استدر يمينًا \u2066%1$d°\u2069</string>
+    <string name="qibla_no_compass">اتجه إلى \u2066%1$d°\u2069 من الشمال الحقيقي</string>
     <string name="qibla_calibrate">تحتاج البوصلة إلى معايرة. أمسك هاتفك وحرّكه على شكل الرقم ثمانية بضع مرات.</string>
     <string name="qibla_sensor_missing">لا يحتوي هذا الهاتف على بوصلة، لذا يمكننا أن نعطيك الزاوية لكن لا يمكننا أن نشير إلى الاتجاه.</string>
     <string name="qibla_accuracy_medium">قد تتذبذب القراءة قليلًا. ابتعد عن المعادن والمغناطيسات ومكبرات الصوت لتحصل على نتيجة أثبت.</string>
