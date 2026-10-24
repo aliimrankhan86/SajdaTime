@@ -1,58 +1,48 @@
 package com.sajdatime.app.ui.home
 
-import com.sajdatime.app.ui.components.CtaButton
-import com.sajdatime.app.ui.components.Bell
-import com.sajdatime.app.data.AlertStyle
-import com.sajdatime.app.data.placeName
-import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.ui.text.rememberTextMeasurer
-import com.sajdatime.app.ui.components.readingWidth
-import com.sajdatime.core.Sky
-import com.sajdatime.core.SkyPeriod
 import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.material.icons.rounded.NotificationsOff
-import com.sajdatime.app.ui.theme.Motion
-import com.sajdatime.app.ui.components.DialogTitle
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.draw.shadow
-import androidx.compose.material.icons.rounded.Mosque
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Brightness3
 import androidx.compose.material.icons.rounded.Brightness5
 import androidx.compose.material.icons.rounded.Brightness6
+import androidx.compose.material.icons.rounded.Mosque
 import androidx.compose.material.icons.rounded.NightsStay
+import androidx.compose.material.icons.rounded.NotificationsOff
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.WbTwilight
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -72,13 +62,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.sajdatime.app.ui.components.Notice
-import androidx.compose.ui.text.font.FontWeight
-import com.sajdatime.app.ui.components.BottomBarClearance
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -90,28 +78,43 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
+import com.sajdatime.app.data.AlertStyle
+import com.sajdatime.app.data.placeName
+import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.review.ReviewPrompt
+import com.sajdatime.app.ui.UiState
+import com.sajdatime.app.ui.components.Bell
+import com.sajdatime.app.ui.components.BottomBarClearance
+import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.DialogTitle
+import com.sajdatime.app.ui.components.LocationSheet
+import com.sajdatime.app.ui.components.Notice
 import com.sajdatime.app.ui.components.PermissionCard
+import com.sajdatime.app.ui.components.readingWidth
+import com.sajdatime.app.ui.components.rememberRemainingText
+import com.sajdatime.app.ui.settings.SettingsChooser
+import com.sajdatime.app.ui.theme.Motion
+import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
+import com.sajdatime.app.ui.theme.Space
+import com.sajdatime.app.ui.theme.heroStyle
+import com.sajdatime.app.ui.theme.sajdaSurface
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.JamaahResult
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sky
+import com.sajdatime.core.SkyPeriod
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
-import com.sajdatime.app.notify.PrayerAlarmScheduler
-import com.sajdatime.app.review.ReviewPrompt
-import com.sajdatime.app.notify.TimeFormat
-import com.sajdatime.app.pdf.PrayerPdfExporter
-import com.sajdatime.app.ui.UiState
-import com.sajdatime.app.ui.components.LocationSheet
-import com.sajdatime.app.ui.components.rememberRemainingText
-import com.sajdatime.app.ui.settings.SettingsChooser
-import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
-import com.sajdatime.app.ui.theme.heroStyle
-import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.math.abs
@@ -191,6 +194,11 @@ fun HomeScreen(
         }
     }
 
+    // Review fix (24 Oct): the Scaffold no longer reserves the top inset, so the scroll would carry the
+    // city and card under the clock icons at large text. A fixed strip in the sky's top colour keeps
+    // the bar readable; at scroll 0 it matches the sky under it, so it is invisible.
+    val skyColours = rememberSkyColours(Sky.periodOf(state.current))
+    Box(Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -219,7 +227,6 @@ fun HomeScreen(
         // The sky (1.6, step 5) is a backdrop behind the header and the card, edge to edge and under the
         // status bar; the card itself is unchanged. The side padding and the 600dp reading column live on
         // the inner columns, because the sky has to run out to both edges.
-        val skyColours = rememberSkyColours(Sky.periodOf(state.current))
         Box(Modifier.fillMaxWidth().skyBackdrop(skyColours).statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
             Column(
                 Modifier.padding(horizontal = 16.dp).readingWidth(),
@@ -274,6 +281,11 @@ fun HomeScreen(
         Spacer(Modifier.height(Space.Related))
         BottomBarClearance()
         }
+    }
+        Box(
+            Modifier.fillMaxWidth().windowInsetsTopHeight(WindowInsets.statusBars)
+                .drawBehind { drawRect(skyColours().top) },
+        )
     }
 
     if (explaining) {

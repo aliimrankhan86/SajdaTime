@@ -1,6 +1,5 @@
 package com.sajdatime.app.ui.theme
 
-import com.sajdatime.core.SkyPeriod
 import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.sajdatime.core.SkyPeriod
 
 private val LightColors = lightColorScheme(
     primary = LightPrimary,

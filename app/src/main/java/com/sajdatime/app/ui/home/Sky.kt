@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -103,9 +104,12 @@ internal fun rememberSkyColours(period: SkyPeriod): () -> SkyColours {
             generation += 1
         }
     }
-    return {
-        val f = fraction()
-        SkyColours(lerp(from.top, to.top, f), lerp(from.mid, to.mid, f), lerp(from.foot, to.foot, f))
+    // Remembered, so the per second clock tick does not hand the backdrop a new lambda (and a redraw).
+    return remember {
+        {
+            val f = fraction()
+            SkyColours(lerp(from.top, to.top, f), lerp(from.mid, to.mid, f), lerp(from.foot, to.foot, f))
+        }
     }
 }
 
@@ -150,13 +154,18 @@ internal fun SkyMark(period: SkyPeriod, progress: Float, spoken: String, modifie
     val drawIn = remember { Animatable(if (skyDrawn) 1f else 0f) }
     LaunchedEffect(Unit) {
         if (!skyDrawn) {
+            skyDrawn = true // before the animation, so leaving Times mid draw does not replay it
             drawIn.animateTo(1f, Motion.draw())
-            skyDrawn = true
         }
     }
     val arcInk = scheme.onSurfaceVariant
     val passedInk = scheme.primary
-    Box(modifier.size(MarkWidth, MarkHeight).semantics { contentDescription = spoken }) {
+    // AbsoluteAlignment.TopLeft: the default TopStart puts the glyph at the right edge in right to left,
+    // and the mirrored absoluteOffset would then add on top of it (review, 24 Oct).
+    Box(
+        modifier.size(MarkWidth, MarkHeight).semantics { contentDescription = spoken },
+        contentAlignment = AbsoluteAlignment.TopLeft,
+    ) {
         Canvas(Modifier.fillMaxSize().clearAndSetSemantics {}) {
             val d = density
             val r = ARC_RADIUS * d
