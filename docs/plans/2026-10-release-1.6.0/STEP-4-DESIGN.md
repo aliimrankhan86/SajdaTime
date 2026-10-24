@@ -46,7 +46,7 @@ Words in quotes are on screen.
    today.
 6. **Ramadan, card hidden.** Someone who hid the Ramadan card ("to stop seeing fasting", `HomeScreen.kt:963`)
    gets the month view; "Ramadan 1448" still sits in the Save as PDF chooser.
-7. **No location yet.** The Today line is not drawn without today's times (`HomeScreen.kt:910`), so there is no
+7. **No location yet.** The Today line is not drawn without today's times (`HomeScreen.kt:909`), so there is no
    button. With the Makkah fallback the sheet says "Makkah" where the place goes; the Times banner already explains.
 8. **Large text.** At 1.5 the button drops under "Today" (the step 3 rule); the cards show two times across; at 2.0
    on a 320dp phone, one per line. Nothing is cut and no word breaks.
@@ -80,12 +80,14 @@ New file `ui/home/TimetableSheet.kt`. `ModalBottomSheet` with `timetableSheetSta
    .ifBlank { pdf_place_unknown }`) over `pdf_area_label` `bodySmall` `onSurfaceVariant`, exactly
    `RamadanTimetableSheet.kt:106-119`; at the row's end, vertically centred, `CtaButton(compact = true)` with
    `Icons.Outlined.PictureAsPdf` 18dp (SF `arrow.down.doc`) and `action_save_pdf`. A labelled button beside text is
-   §4.1's compact case; the X is on the line above, so no icon sits beside another.
+   §4.1's compact case; the X is on the line above, so no icon sits beside another. At `fontScale >= 1.5f` the
+   button stacks under the place text, full width, `Space.Related` above it (the Today line's rule).
 3. `Space.Group` to the list.
 
 **The same header goes on the Ramadan table** (`RamadanTimetableSheet.kt:96-126`): a shared private
 `TimetableHeader(title, place, onExport, onClose)`; the table under it is untouched until Q8. Reason: one door, one
-header, and the Q8 pictures compare bodies, not headers. It adds the X to an approved sheet: in the pictures.
+header, and the Q8 pictures compare bodies, not headers. It adds the X to an approved sheet and changes its title
+from `titleLarge` (`RamadanTimetableSheet.kt:104`) to `headlineSmall`: both in the pictures.
 
 **Save as PDF** opens the existing `ExportSheet` (`HomeScreen.kt:725-767`, unchanged) over the Timetable sheet,
 with its own `exportSheetState`. The pick calls `onExport(range)`, closes the chooser only; the toast
@@ -99,7 +101,11 @@ may still be reading).
 - Month heading: `titleMedium`, `onSurface`, padded 8dp sides so it aligns with the title; `semantics { heading();
   contentDescription = timetable_month_a11y(name) }`. Name from `DateTimeFormatter.ofPattern(DateFormat
   .getBestDateTimePattern(AppLocale.of(context), "LLLLyyyy"), locale)`: "October 2026", "اکتوبر 2026", "Ekim 2026".
-  This is the one place a year shows, because the second month can be January.
+  This is the one place a year shows, because the second month can be January. **Month headings are
+  `stickyHeader` items with the sheet's own background (`surfaceContainerLow`)**, so the month name stays visible
+  while its cards scroll under it, and `scrollToItem(todayIndex)` lands today's card directly under the pinned
+  heading (plan-verifier: without this the heading scrolls off and §2 items 1 and 9 do not hold). It is also
+  iOS's plain list section header. `todayIndex` stays `dayOfMonth`.
 - Gaps: first heading `padding(bottom = Space.Related)`; later headings `padding(top = Space.Section, bottom =
   Space.Related)`; each card `padding(bottom = Space.Paragraph)` (stacked cards, §2 table). No `spacedBy`.
 - Rows come from `PrayerEngine.computeRange(coordinates, month.first, month.length, prefs)`
@@ -118,7 +124,8 @@ may still be reading).
 
 **Which view opens** (one `val ramadanView = state.ramadan?.info?.isRamadan == true &&
 state.settings.ramadanCardEnabled`, the same test as the suhoor and iftar labels on the rows, `HomeScreen.kt:963`;
-extract it so both read one value): true → `RamadanTimetableSheet`; false → the month sheet. One `timetable` flag
+extract it so both read one value; it lives inside private `TodayTimeline` today, so hoist it to `HomeScreen`'s
+body, where the sheet is decided): true → `RamadanTimetableSheet`; false → the month sheet. One `timetable` flag
 replaces `ramadanTimetable` (`HomeScreen.kt:140`); the Ramadan card's button sets the same flag (it only shows
 inside Ramadan with the card on, so it always lands on the table). If Ali picks the 30 day option in §13 Q1:
 `ramadanView = HijriCalendar.ramadan(today, shift)?.offersTimetable(today) == true && ramadanCardEnabled`, and
@@ -133,7 +140,9 @@ days are gone, and a faded day reads as a day to feel bad about.
 
 ## 5. The day card
 
-`DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int)`, in `TimetableSheet.kt`.
+`internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int)`, in `TimetableSheet.kt` (internal so
+`LargeTextAndTalkBackDeviceTest` can compose it). A slot missing from `day.times` is omitted from the grid and the
+spoken text; `computeRange` always fills all six today, so this is a guard, not a state.
 
 | Part | Spec |
 |---|---|
@@ -147,9 +156,9 @@ days are gone, and a faded day reads as a day to feel bad about.
 | Today's card | every text `onPrimaryContainer` (as the Next row); Sunrise still `bodyMedium`, so weight separates it, not colour alone |
 | Names | `stringResource(slot.labelRes)` (`PrayerLabels.kt:21`); never typed |
 | Times | `TimeFormat.clock(context, instant)` (`TimeFormat.kt:39`), the same call as the Times rows, so digits and am/pm match the screen |
-| Columns | `TimetableGrid.columns(contentWidthDp, fontScale)` = `floor(width / (84 × fontScale))` clamped to 1..3. Width from one `BoxWithConstraints` round the list: `maxWidth - 32 (list sides) - 32 (card sides)`. On 360dp: 3 at 1.0 and 1.15, 2 at 1.3 and 1.5, 1 at 2.0; on 320dp: 3 at 1.0, 2 at 1.5, 1 at 2.0. 84dp holds "12:46 pm" at 15sp with room; one rule, measured once, no per cell wrapping |
+| Columns | `TimetableGrid.columns(contentWidthDp, fontScale)` = `floor(width / (84 × fontScale))` clamped to 1..3. Width from one `BoxWithConstraints` round the list: `maxWidth - 32 (list sides) - 32 (card sides)`. On 360dp: 3 at 1.0 and 1.15, 2 at 1.3 and 1.5, 1 at 2.0; on 320dp: 3 at 1.0, 2 at 1.5, 1 at 2.0. 84dp is a column's share including its 8dp gap, so a cell is at least 76dp × fontScale; "12:46 pm" at 15sp measures about 62dp; one rule, measured once, no per cell wrapping |
 | TalkBack | the card is one node: `semantics(mergeDescendants = true) { contentDescription = spoken }`, `spoken = timetable_day_a11y(dateText, six times)`, wrapped in `timetable_today_a11y` on today. No role (not actionable) |
-| Contrast | pairs already in `ColorContrastTest`: `onSurfaceVariant/surface` (:97, :123), `onPrimaryContainer/primaryContainer` (:101, :127), `onPrimary/primary`. Add `onSurface/surface` and `onSurfaceVariant/surfaceContainerLow` (the sheet's own colour under the month heading) if absent |
+| Contrast | pairs already in `ColorContrastTest`: `onSurface/surface` (:96, :122), `onSurfaceVariant/surface` (:97, :123), `onPrimaryContainer/primaryContainer` (:101, :127), `onPrimary/primary`. Add the three absent: dark `onSurface/surfaceContainerLow`, and `onSurfaceVariant/surfaceContainerLow` in light and dark (the sheet's own colour under the sticky month heading) |
 | Motion, haptics | none |
 
 Rejected: one card per month with hairline rows (a `LazyColumn` cannot scroll to a row inside one item, and thirty
@@ -171,7 +180,9 @@ Built so Ali can see table and cards side by side; not shipped unless he picks c
 - Footer: `pdf_ramadan_note`, the approximate note, then "Shift the date" full width
   (`RamadanTimetableSheet.kt:233-262`), the one button the table has.
 - TalkBack: `ramadan_row_a11y` (exists) for the prototype; if cards win, extend it to the six times.
-- Strings for the prototype are English only until Q8 is answered; if the table stays, delete them.
+- `timetable_ramadan_day` and `timetable_fast` are declared `translatable="false"` on the prototype branch so
+  `TranslationIntegrityTest` (`:102-113`) passes; if cards win they are translated into all five languages in the
+  build commit; if the table stays they are deleted.
 
 ## 7. States, accessibility, right to left, sizes
 
@@ -179,11 +190,11 @@ Built so Ali can see table and cards side by side; not shipped unless he picks c
 |---|---|
 | First run, located | Today line with Timetable; the sheet as §4 |
 | Makkah fallback | the sheet with "Makkah" in the place line; times are Makkah's |
-| No times at all | no Today line, no button (`HomeScreen.kt:910`) |
+| No times at all | no Today line, no button (`HomeScreen.kt:909`) |
 | Rows not yet computed | header only, for milliseconds; no spinner |
 | Polar place | "approx." on the affected cards, the latitude note in the footer |
 | Ramadan, card on | the approved table (§4); Ramadan, card hidden: the month view (§2 item 6) |
-| After a save | chooser closes, toast, sheet stays |
+| After a save | chooser closes; toast on Android 10 and up; on Android 9 and below the system share sheet opens over the Timetable (the existing path, `PrayerPdfExporter.kt:152` returns null below Q and `MainActivity` shares); the sheet stays either way |
 | Calendar beyond range | not reachable: the month view is Gregorian; the Ramadan branch guards on `ramadan() != null` as the exporter does |
 | Light and dark | existing roles only; `sajdaSurface` does the shadow or hairline |
 | Urdu and Arabic | `DialogTitle` puts the X at the left; the grid mirrors; dates and digits from `TimeFormat` |
@@ -262,6 +273,8 @@ object TimetableGrid {
   `RamadanTimetableSheet.kt`
 - Remove the old "Save as PDF, Today line" row.
 
+Also in this step's commit: BUILD-INSTRUCTIONS §5 row 4 and DETAILED-PLAN 8.13 lose `timetable_month_heading`.
+
 §9: a dated entry: calendar glyph; two month list; today first; cards not a table and why; past days not dimmed; no
 Hijri on cards; the shared header with the X; the chooser kept over the sheet; the width rule. Rejected: rolling 30
 days (no month heading, and "This whole month" in the PDF would not match the screen); a segmented "Month |
@@ -295,6 +308,8 @@ one card; Urdu at 320dp 2.0.
 2. Under this month: **"Show next month too, under its own heading (Recommended)"**, or "This month only". Why:
    on the 30th the sheet would show one card and twenty nine gone.
 3. Q8, from pictures 9 and 10: cards or the table (not a new question; listed so it is asked in the same round).
+4. Hijri date on the day cards (added by `plan-verifier`, DESIGN_SYSTEM §0.2 item 4: it changes every card):
+   **"No, Gregorian date only (Recommended, §4)"**, or "A small Hijri day after the date".
 
 ## Verified in code, and assumed
 
@@ -302,7 +317,7 @@ Verified: `HomeScreen.kt:136-144` sheet flags and states, `:156` calm, `:174-181
 Today line call, `:275-289` Ramadan sheet call, `:303-313` and `:725-801` the chooser, `:902-953` the Today line and
 its 1.5 stack, `:963-965` the Ramadan labels rule; `RamadanTimetableSheet.kt:78-126, 185-262`;
 `IslamicDatesSheet.kt:60-66`; `MyPrayers.kt:110-112` (X on a sheet via `DialogTitle`); `Common.kt:60-73`;
-`PrayerPdfExporter.kt:102, 375-381 (engine), 615-626`; `RamadanState.kt:71-84` (null until three days before);
+`PrayerPdfExporter.kt:102, 615-626`; `PrayerEngine.kt:375-381`; `RamadanState.kt:71-84` (null until three days before);
 `HijriCalendar.kt:62-63, 146`; `TimeFormat.kt:39, 68-72`; `PrayerLabels.kt:21`; `Theme.kt:163-177`;
 `ColorContrastTest.kt:97-135` pairs; `MainActivity.kt:246` toast; `MyPrayersScreen.kt:394` CalendarMonth;
 `RamadanPdfRangeTest`, `RamadanPdfDeviceTest:93`, `ScreenSeedDeviceTest:25`; no "Save as PDF" in `androidTest`.
@@ -320,3 +335,13 @@ table if Ali picks Q1's recommendation (the PDF keeps it).
 (`RamadanState.kt:76-77`), so "the sheet shows Ramadan while `offersTimetable` is true" (30 days, DETAILED-PLAN 8.5)
 cannot work with `RamadanTimetableSheet` as it stands. Raised as Q1 rather than built silently; §4 gives both
 branches so the implementer builds whichever Ali picks.
+
+## Plan check (`plan-verifier`, 24 Oct 2026)
+
+Every file:line checked against `claude/1-6-0` at f36613e; Fable's null claim confirmed (`RamadanState.kt:76-77`,
+`NOTICE_LEAD_DAYS = 3L` at `HijriCalendar.kt:66`). Three blocking fixes applied to the text above: sticky month
+headings (§4), `translatable="false"` on the Q8 prototype strings (§6), the share sheet path below Android 10 (§7).
+Minor fixes applied: the 84dp reason, the Ramadan title style change, the place row stack moved into §4,
+`internal DayCard`, the missing slot guard, the contrast pairs named exactly, hoisting the Ramadan rule, the stale
+`timetable_month_heading` references, two line numbers. Verdict: sound; none of the fixes change what Ali is shown.
+It added one question for Ali (Hijri date on cards), now §13 Q4.
