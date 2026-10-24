@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -83,6 +85,8 @@ fun Tick(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(48.dp)
+            // Round, so the press ripple matches the round mark, as Material's IconButton does.
+            .clip(CircleShape)
             .toggleable(value = ticked, enabled = enabled, role = Role.Checkbox) { on ->
                 haptics.performHapticFeedback(if (on) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
                 onChange(on)

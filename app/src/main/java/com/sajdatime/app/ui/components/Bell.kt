@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -72,6 +74,8 @@ fun Bell(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(48.dp)
+            // Round, so the press ripple matches the round mark, as Material's IconButton does.
+            .clip(CircleShape)
             .toggleable(value = on, role = Role.Switch) { now ->
                 haptics.performHapticFeedback(if (now) HapticFeedbackType.ToggleOn else HapticFeedbackType.ToggleOff)
                 onChange(now)
