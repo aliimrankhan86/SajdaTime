@@ -190,6 +190,17 @@ fun Modifier.sajdaSurface(shape: Shape, brush: Brush): Modifier {
 fun kiswahGold(): Color = if (LocalDarkTheme.current) DarkKiswah else LightKiswah
 
 /**
+ * The Qibla dial's bezel when it is not aligned: `surface` in light, `surfaceContainerHighest` in dark
+ * (STEP-6-DESIGN sections 15.3 and 16). A different role per theme, because in light the card shadow
+ * carries the edge and white reads as a lifted disc, while in dark the `sajdaSurface` hairline is
+ * invisible against the page and the bezel has to carry the edge itself. Read through [LocalDarkTheme]
+ * for the same reason [kiswahGold] is.
+ */
+@Composable
+fun dialBezel(): Color =
+    if (LocalDarkTheme.current) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surface
+
+/**
  * The next-prayer card's fill, its gloss, and the three text colours that sit on it.
  *
  * Light keeps the design's mint-to-sand gradient; dark is a fixed green gradient in the widgets'

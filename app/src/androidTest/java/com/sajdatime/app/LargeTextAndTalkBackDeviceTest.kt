@@ -18,6 +18,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.assertHeightIsAtLeast
@@ -291,6 +292,17 @@ class LargeTextAndTalkBackDeviceTest {
             val bounds = node.fetchSemanticsNode().boundsInRoot
             assertTrue("\"$label\" spans ${bounds.left}..${bounds.right} of $width", bounds.left >= 0f && bounds.right <= width + 1f)
         }
+    }
+
+    /**
+     * The place pin is sized from the text (STEP-6-DESIGN 16.10): at 2.0 text the 21dp line is 42dp, so the pin is at
+     * least 40dp tall. Mutation proof: put `16.dp` back in `PlaceRow` and this fails.
+     */
+    @Test
+    fun the_qibla_place_pin_grows_with_the_text() {
+        atText(2f) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
+        val height = with(compose.density) { compose.onNode(hasTestTag("qibla_place_pin"), useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height.toDp() }
+        assertTrue("the pin is $height tall", height >= 40.dp)
     }
 
     /**

@@ -146,6 +146,10 @@ class ColorContrastTest {
         Pair("dark onSurfaceVariant/containerLow", DarkOnSurfaceVariant, DarkSurfaceContainerLow, 4.5),
         Pair("dark inverseOnSurface/inverseSurface", DarkInverseOnSurface, DarkInverseSurface, 4.5),
         Pair("dark onSecondaryContainer/secondaryContainer", DarkOnSecondaryContainer, DarkSecondaryContainer, 4.5),
+        // The dial's E, S and W are onSurfaceVariant on the aligned face (on the plain face they are
+        // already covered above). Computed 24 Oct 2026: 5.13 and 6.52 (step 6, STEP-6-DESIGN 16.5).
+        Pair("light onSurfaceVariant/dial face aligned", LightOnSurfaceVariant, LightPrimaryContainer, 4.5),
+        Pair("dark onSurfaceVariant/dial face aligned", DarkOnSurfaceVariant, DarkPrimaryContainer, 4.5),
     )
 
     /** Icons, dividers and focus outlines only need 3:1 under WCAG 1.4.11. */
@@ -168,12 +172,18 @@ class ColorContrastTest {
         Pair("dark onSurface/dial face", DarkOnSurface, DarkSurfaceVariant, 3.0),
         Pair("light onSurface/dial face aligned", LightOnSurface, LightPrimaryContainer, 3.0),
         Pair("dark onSurface/dial face aligned", DarkOnSurface, DarkPrimaryContainer, 3.0),
-        // The turn arc, the needle and the aligned rim are primary, drawn on the two dial faces (step 6).
+        // The needle, the N and the aligned bezel are primary, drawn on the two dial faces (step 6).
         // Computed 24 Oct 2026: 7.08 and 6.54 in light, 8.05 and 6.49 in dark.
         Pair("light primary/dial face", LightPrimary, LightSurfaceVariant, 3.0),
         Pair("dark primary/dial face", DarkPrimary, DarkSurfaceVariant, 3.0),
         Pair("light primary/dial face aligned", LightPrimary, LightPrimaryContainer, 3.0),
         Pair("dark primary/dial face aligned", DarkPrimary, DarkPrimaryContainer, 3.0),
+        // The 60 ticks are `outline` on the face, and on the aligned face the moment you arrive (step 6,
+        // STEP-6-DESIGN 15.3 and 16.5). Computed 24 Oct 2026: 3.69 and 5.63; aligned 3.41 and 4.54.
+        Pair("light outline/dial face", LightOutline, LightSurfaceVariant, 3.0),
+        Pair("dark outline/dial face", DarkOutline, DarkSurfaceVariant, 3.0),
+        Pair("light outline/dial face aligned", LightOutline, LightPrimaryContainer, 3.0),
+        Pair("dark outline/dial face aligned", DarkOutline, DarkPrimaryContainer, 3.0),
         // The Kaaba's hizam and door, in gold on the silhouette. **Two pairs, not four**,
         // and the difference is the whole reason gold was rejected once and is used now:
         // these shapes sit wholly inside the wall, so they are never drawn on the dial and

@@ -7,7 +7,6 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,13 +43,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import com.sajdatime.app.ui.theme.LocalDarkTheme
+import com.sajdatime.app.ui.theme.dialBezel
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.components.LocationSheet
@@ -61,6 +63,7 @@ import com.sajdatime.core.bidiIsolated
 import com.sajdatime.app.ui.components.BottomBarClearance
 import com.sajdatime.app.ui.components.ScreenTitle
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -98,12 +101,16 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-// TEMPORARY step 6 Q1/Q2: comparison switches for Ali's pictures. Both default to the recommendations; delete
-// both, and the branches that read them, when he has chosen (STEP-6-DESIGN section 13).
+// TEMPORARY step 6 Q1, Q2, Q4: comparison switches for Ali's pictures. All default to the recommendations; delete
+// all of them, and the branches that read them, when he has chosen (STEP-6-DESIGN sections 13 and 16).
 // TEMPORARY step 6 Q1: true centres the direction block over the dial instead of starting it under the title.
 internal var qiblaCentreInstruction = false
-// TEMPORARY step 6 Q2: true draws the dial as a plain face, without the lift every card has (rim band kept).
-internal var qiblaFlatDial = false
+// TEMPORARY step 6 Q4: true draws the turn still owed as the bezel band in primary, from the needle round to the Kaaba.
+internal var qiblaShowArc = false
+// TEMPORARY step 6 Q2: true makes the light bezel surfaceContainerHighest (sand) instead of surface (white).
+internal var qiblaSandBezel = false
+// TEMPORARY step 6 dark picture: true makes the dark bezel surfaceBright instead of surfaceContainerHighest.
+internal var qiblaDarkBezelBright = false
 
 @Composable
 fun QiblaScreen(
@@ -244,7 +251,8 @@ private fun PlaceRow(place: String) {
             imageVector = Icons.Outlined.LocationOn,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(16.dp),
+            // Sized from the text, so it grows with it (21dp at 1.0, 42dp at 2.0); the glyph fills about 0.8 of its box.
+            modifier = Modifier.size(textLineHeight()).testTag("qibla_place_pin"),
         )
         Spacer(Modifier.width(Space.Tight))
         Text(
@@ -256,6 +264,10 @@ private fun PlaceRow(place: String) {
         )
     }
 }
+
+/** The body line height in dp, which scales with the text size: what the pin and the key marks are sized from. */
+@Composable
+private fun textLineHeight(): Dp = with(LocalDensity.current) { MaterialTheme.typography.bodyMedium.lineHeight.toDp() }
 
 /**
  * Distance and bearing, behind a labelled compact button (Ali's decision 23 Oct 2026, Q12): the numbers
@@ -346,10 +358,8 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
         label = "dial",
     )
 
-    // The arc is the turn still owed, measured from the needle at the top round to the
-    // Kaaba. Signed, so a left turn sweeps anticlockwise and the user is never told to walk
-    // the long way round. It is the same number DirectionBlock speaks aloud, drawn instead
-    // of said.
+    // The turn still owed, from the needle at the top round to the Kaaba, signed so a left turn goes
+    // anticlockwise. Only the Q4 picture draws it (qiblaShowArc); DirectionBlock says the same number aloud.
     val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qiblaTrueBearing) else 0.0
 
     // **The needle is you, not the Qibla.** It points the way the phone points — straight
@@ -373,25 +383,32 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
     val gold = kiswahGold()
     val measurer = rememberTextMeasurer()
 
-    // Face, rim colour and rim width fade together: 250 ms on arrival, 150 ms on leaving (a reversal
-    // is an exit, DESIGN_SYSTEM section 2). The face is read here, in composition, because
-    // sajdaSurface takes a colour; the dial already recomposes on every compass sample (it reads the
-    // heading), so this adds nothing of its own. The rim values are read inside the draw lambda below.
+    // Face, bezel colour and bezel width fade together: 250 ms on arrival, 150 ms on leaving (a reversal
+    // is an exit, DESIGN_SYSTEM section 2). The bezel colour is read here, in composition, because
+    // sajdaSurface takes a colour, so the dial Box recomposes for the length of an arrival and at no other
+    // time; the face and the width are read inside the draw lambda, so a frame recomposes nothing.
+    val dark = LocalDarkTheme.current
+    val restingBezel = when {
+        dark && qiblaDarkBezelBright -> scheme.surfaceBright
+        !dark && qiblaSandBezel -> scheme.surfaceContainerHighest
+        else -> dialBezel()
+    }
+    // Motion's specs are generic, so each state takes its own (colour twice, float once).
     val face by animateColorAsState(
         if (aligned) scheme.primaryContainer else scheme.surfaceVariant,
         if (aligned) Motion.standard() else Motion.quick(),
         label = "dialFace",
     )
-    val rim by animateColorAsState(
-        if (aligned) scheme.primary else scheme.outlineVariant,
+    val bezel by animateColorAsState(
+        if (aligned) scheme.primary else restingBezel,
         if (aligned) Motion.standard() else Motion.quick(),
-        label = "dialRim",
+        label = "dialBezel",
     )
-    // Thickness as well as colour, so a user who cannot tell green from grey still sees the ring get heavier.
-    val rimWidth by animateFloatAsState(
-        if (aligned) 0.07f else 0.04f,
+    // Thickness as well as colour, so a user who cannot tell green from grey still sees the bezel get heavier.
+    val bezelWidth by animateFloatAsState(
+        if (aligned) 0.11f else 0.08f,
         if (aligned) Motion.standard() else Motion.quick(),
-        label = "dialRimWidth",
+        label = "dialBezelWidth",
     )
 
     Box(
@@ -406,12 +423,9 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             .widthIn(max = dialMaxWidth())
             .fillMaxWidth()
             .aspectRatio(1f)
-            // The lift every card has (shadow in light, hairline in dark); the face is its colour, so
-            // the Canvas below draws no face. TEMPORARY step 6 Q2: the flat alternative is a plain face.
-            .then(
-                if (qiblaFlatDial) Modifier.clip(CircleShape).background(face)
-                else Modifier.sajdaSurface(CircleShape, face),
-            )
+            // The bezel is the lifted disc (shadow in light, hairline in dark, the lift every card has);
+            // the Canvas draws the face over it, inside the bezel band.
+            .sajdaSurface(CircleShape, bezel)
             // The dial is decorative; the spoken direction lives in DirectionBlock.
             .clearAndSetSemantics { },
         contentAlignment = Alignment.Center,
@@ -420,15 +434,13 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             val radius = size.minDimension / 2f
             val centre = Offset(size.width / 2f, size.height / 2f)
 
-            // Aligned fills the dial and switches its rim to the accent, and the rim thickens.
-            // That, the vanishing arc and the changed wording are independent signals of the same
-            // fact, none of which is colour on its own. The rim is a band inside the edge: its outer
-            // edge stays at 1.0 of the radius, so the stroke is centred half its width inwards.
-            val rimPx = radius * rimWidth
-            drawCircle(color = rim, radius = radius - rimPx / 2f, center = centre, style = Stroke(width = rimPx))
+            // Aligned fills the face, turns the bezel to the accent and thickens it. That, the changed
+            // wording and the buzz are independent signals of the same fact, three of them not colour.
+            // The bezel's outer edge stays at 1.0 of the radius and the face is what gives way.
+            drawCircle(color = face, radius = radius * (1f - bezelWidth), center = centre)
 
-            if (heading != null && !aligned) {
-                drawTurnArc(centre, radius, turn.toFloat(), scheme.primary)
+            if (qiblaShowArc && heading != null && !aligned) {
+                drawTurnArc(centre, radius, bezelWidth, turn.toFloat(), scheme.primary)
             }
 
             drawTicks(centre, radius, dialRotation, scheme.outline)
@@ -465,16 +477,15 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
 }
 
 /**
- * The turn still owed, as a band just inside the rim.
+ * TEMPORARY step 6 Q4: the turn still owed, drawn over the bezel band itself in the accent.
  *
  * `sweep` is signed: positive turns clockwise from the top, negative anticlockwise, so
  * the band always shows the shorter way round rather than a full lap. Compose measures
  * arcs from three o'clock, hence the -90 start.
  */
-private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, sweep: Float, colour: Color) {
-    val thickness = radius * 0.11f
-    // Clear of the rim band, which is 0.04 of the radius whenever the arc is drawn (never aligned).
-    val inset = radius * 0.04f + thickness / 2f
+private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, bezelWidth: Float, sweep: Float, colour: Color) {
+    val thickness = radius * bezelWidth
+    val inset = thickness / 2f
     drawArc(
         color = colour,
         startAngle = -90f,
@@ -487,32 +498,28 @@ private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, sweep: Float, c
 }
 
 /**
- * The tick ring, kept out at the rim so the cardinal letters have a band of their own.
+ * The tick ring: 60 ticks, one every 6 degrees, longer and heavier every 90 so the quarters read at a
+ * glance. Minor 0.845 to 0.87, cardinal 0.80 to 0.87, widths as shares of the radius, round caps (so
+ * the ends reach 0.877, clear of the aligned bezel's inner edge at 0.89).
  *
  * Takes the rotation itself rather than sitting inside a `rotate` block, because
  * [drawCardinals] cannot use one — the letters have to stay upright — and having the two
  * halves of the same ring computed the same way is what stops them drifting apart.
  */
 private fun DrawScope.drawTicks(centre: Offset, radius: Float, rotation: Float, colour: Color) {
-    // A tick every 15 degrees, longer and heavier every 90 so the quarters read at a
-    // glance. They span 0.84..0.92 of the radius: outside the letters, inside the rim band.
-    for (degrees in 0 until 360 step 15) {
+    for (degrees in 0 until 360 step 6) {
         val major = degrees % 90 == 0
-        val length = if (major) radius * 0.08f else radius * 0.045f
+        val inner = radius * (if (major) 0.80f else 0.845f)
+        val outer = radius * 0.87f
         val radians = Math.toRadians(degrees + rotation.toDouble() - 90.0)
-        val outer = Offset(
-            centre.x + radius * 0.92f * cos(radians).toFloat(),
-            centre.y + radius * 0.92f * sin(radians).toFloat(),
-        )
-        val inner = Offset(
-            centre.x + (radius * 0.92f - length) * cos(radians).toFloat(),
-            centre.y + (radius * 0.92f - length) * sin(radians).toFloat(),
-        )
+        val dx = cos(radians).toFloat()
+        val dy = sin(radians).toFloat()
         drawLine(
             color = colour,
-            start = inner,
-            end = outer,
-            strokeWidth = if (major) 4f else 2f,
+            start = Offset(centre.x + inner * dx, centre.y + inner * dy),
+            end = Offset(centre.x + outer * dx, centre.y + outer * dy),
+            strokeWidth = radius * (if (major) 0.014f else 0.007f),
+            cap = StrokeCap.Round,
         )
     }
 }
@@ -530,9 +537,10 @@ private fun DrawScope.drawTicks(centre: Offset, radius: Float, rotation: Float, 
  * upright rather than inside a `rotate` block. Rotating the glyphs too is what a physical
  * bezel does, and on a screen it means reading "M" for W while facing south.
  *
- * Sits at 0.77 of the radius, between the Kaaba mark (out to 0.765 at a cardinal bearing, 0.812
- * at a diagonal one, overlapping the letters' band and drawn last) and the ticks (in to 0.84). Those three numbers are one budget: move any and check the others, and see
- * [KAABA_DISTANCE] for the fourth term, the needle tip.
+ * Centred at 0.74 of the radius, size 0.09r: a band of 0.695 to 0.785. The Kaaba mark overlaps it and is
+ * drawn last, so it covers a letter when the Qibla is within about 15 degrees of a cardinal, which is
+ * accepted: the Kaaba is the more useful mark there. One budget with the ticks, the Kaaba, the needle tip
+ * and the bezel: see [KAABA_DISTANCE].
  *
  * ponytail: `Char` per point rather than a localised string array. These four glyphs are
  * the standard compass abbreviations, not prose, and the day a translated build ships they
@@ -554,8 +562,8 @@ private fun DrawScope.drawCardinals(
             text = label,
             style = TextStyle(
                 color = if (north) northColour else colour,
-                fontSize = (radius * 0.115f).toSp(),
-                fontWeight = if (north) FontWeight.Bold else FontWeight.Medium,
+                fontSize = (radius * 0.09f).toSp(),
+                fontWeight = if (north) FontWeight.Medium else FontWeight.Normal,
             ),
         )
         // Centre the glyph on the point rather than hanging it off the top-left corner,
@@ -563,39 +571,47 @@ private fun DrawScope.drawCardinals(
         drawText(
             textLayoutResult = laid,
             topLeft = Offset(
-                centre.x + radius * 0.77f * cos(radians).toFloat() - laid.size.width / 2f,
-                centre.y + radius * 0.77f * sin(radians).toFloat() - laid.size.height / 2f,
+                centre.x + radius * 0.74f * cos(radians).toFloat() - laid.size.width / 2f,
+                centre.y + radius * 0.74f * sin(radians).toFloat() - laid.size.height / 2f,
             ),
         )
     }
 }
 
 /**
- * The needle: a long tapered arrow from the centre outward. With a compass it is fixed at
- * the top and means "the way you are pointing"; without one it is turned to the Qibla
- * bearing. Its tip at 0.68 sits inside the Kaaba mark's box when the two coincide, see
- * [KAABA_DISTANCE], so on alignment the arrow visibly ends at the Kaaba.
+ * The needle path, a teardrop: tip at (0, -0.64), a round end centred at (0, 0.10) with radius 0.12, bottom
+ * at 0.22 (STEP-6-DESIGN 15.2 and 16.4), all in shares of `r`, dial centre at (`cx`, `cy`), y down. The
+ * left flank lands tangent to the round end, the arc runs through the bottom, the right flank returns
+ * to the tip. The key under the dial draws the same path.
+ */
+private fun needlePath(cx: Float, cy: Float, r: Float): Path = Path().apply {
+    moveTo(cx, cy - 0.64f * r)
+    cubicTo(cx - 0.05f * r, cy - 0.38f * r, cx - 0.12f * r, cy - 0.12f * r, cx - 0.12f * r, cy + 0.10f * r)
+    arcTo(
+        Rect(cx - 0.12f * r, cy - 0.02f * r, cx + 0.12f * r, cy + 0.22f * r),
+        startAngleDegrees = 180f,
+        sweepAngleDegrees = -180f,
+        forceMoveTo = false,
+    )
+    cubicTo(cx + 0.12f * r, cy - 0.12f * r, cx + 0.05f * r, cy - 0.38f * r, cx, cy - 0.64f * r)
+    close()
+}
+
+/**
+ * The needle: a teardrop from the tip to a round end past the centre. With a compass it is fixed at
+ * the top and means "the way you are pointing"; without one it is turned to the Qibla bearing. Its tip
+ * (0.64, 0.6525 with the stroke) sits inside the Kaaba mark's box when the two coincide, see
+ * [KAABA_DISTANCE], so on alignment the arrow visibly ends at the Kaaba. No hub: the round end is the pivot.
  */
 private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
-    // 0.68 plus half the 0.03 stroke is 0.695, inside the Kaaba's cube (0.45 to 0.75) when the two coincide.
-    val tip = Offset(centre.x, centre.y - radius * 0.68f)
-    val baseLeft = Offset(centre.x - radius * 0.075f, centre.y)
-    val baseRight = Offset(centre.x + radius * 0.075f, centre.y)
-
-    val arrow = Path().apply {
-        moveTo(tip.x, tip.y)
-        lineTo(baseLeft.x, baseLeft.y)
-        lineTo(baseRight.x, baseRight.y)
-        close()
-    }
-    drawPath(path = arrow, color = colour)
-    // Stroked as well as filled, with round joins, so the three corners round off.
+    val teardrop = needlePath(centre.x, centre.y, radius)
+    drawPath(path = teardrop, color = colour)
+    // Stroked as well as filled, with round joins, so the tip rounds off.
     drawPath(
-        path = arrow,
+        path = teardrop,
         color = colour,
-        style = Stroke(width = radius * 0.03f, join = StrokeJoin.Round, cap = StrokeCap.Round),
+        style = Stroke(width = radius * 0.025f, join = StrokeJoin.Round, cap = StrokeCap.Round),
     )
-    drawCircle(color = colour, radius = radius * 0.055f, center = centre)
 }
 
 /**
@@ -605,23 +621,20 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * at a large font scale (see [dialMaxWidth]), and a mark measured in dp would grow into
  * the tick ring as the dial got smaller.
  *
- * The two numbers are one decision. The mark stays upright while its position goes round,
- * so the corner reaching furthest out is a different corner at every bearing: at 0.60 and
- * 0.30 the worst of them lands at 0.765 of the radius at a cardinal bearing and 0.812 at a
- * diagonal one (0.60 + 0.15 x 1.414), both inside the ticks, which start at 0.84.
+ * **One budget, five numbers, outside in (STEP-6-DESIGN 16.1): bezel inner edge 0.92 (0.89 aligned); ticks
+ * 0.845 to 0.87 (cardinal from 0.80); letters 0.695 to 0.785; Kaaba ink 0.59 to 0.816; needle tip 0.6525.**
+ * Move one and check the others. The mark's box is 0.59 to 0.81 at a cardinal bearing and its corner
+ * reaches 0.856 at a diagonal one, crossing the minor ticks, but the drawn artwork (the plinth of
+ * `ic_kaaba.xml`) reaches only 0.816 at worst, under the ticks and the aligned bezel. The mark overlaps
+ * the letters' band and is drawn last.
  *
- * **Pulled in from 0.72/0.32 on 15 Aug 2026 to make room for the cardinal letters, and to 0.60 in
- * step 6 (24 Oct 2026) when the ticks moved in to 0.84..0.92 to make room for a rim band.** The
- * dial now reads outside-in as rim band, ticks, letters (0.77), then the Kaaba, which overlaps the
- * letters' band and is drawn last, as it always has.
- *
- * The needle tip, now 0.68, is *inside* the cube when the two coincide, which is what makes
- * the arrow end at the Kaaba on alignment rather than beside it or through it. So it is
- * four numbers, not two — mark distance, mark size, needle tip, letter ring — and they move
- * together: change any and check the others. The watch keeps its own dial and its own shares
- * (0.66 for the mark), because it draws no letters and its tick ring did not move; see
- * `WearApp.kt`.
+ * The needle tip is *inside* the box when the two coincide, which is what makes the arrow end at the
+ * Kaaba on alignment rather than beside it or through it. The watch keeps its own dial and its own
+ * shares (0.66 and 0.30 for the mark); see `WearApp.kt`.
  */
+private const val KAABA_DISTANCE = 0.70f
+private const val KAABA_SIZE = 0.22f
+
 /**
  * The shortest gap between two arrival buzzes. Long enough to swallow a compass settling
  * after the screen opens, short enough that a user who really does turn away and back is
@@ -658,9 +671,6 @@ private fun arrivalBuzz(context: android.content.Context) {
         else -> @Suppress("DEPRECATION") vibrator.vibrate(70)
     }
 }
-
-private const val KAABA_DISTANCE = 0.60f
-private const val KAABA_SIZE = 0.30f
 
 /**
  * The Kaaba itself, on the ring at the Qibla bearing: "it is over there".
@@ -809,10 +819,14 @@ private fun DialLegend() {
     val kaaba = painterResource(CoreR.drawable.ic_kaaba)
     val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
 
+    // Marks sized from the text line, so they grow with it; the Kaaba and the teardrop fill 0.75 of the box.
+    val box = textLineHeight()
+    val markSize = box * 0.75f
+
     @Composable
     fun Key(label: String, mark: @Composable () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(18.dp), contentAlignment = Alignment.Center) { mark() }
+            Box(Modifier.size(box), contentAlignment = Alignment.Center) { mark() }
             Spacer(Modifier.width(8.dp))
             Text(
                 text = label,
@@ -834,24 +848,17 @@ private fun DialLegend() {
             // Both layers, as on the dial: silhouette, then the hizam and door in gold on
             // top of it. The legend has to match the dial exactly — a key drawn in
             // different colours from the thing it explains is worse than no key.
-            Box(Modifier.size(16.dp)) {
-                Icon(painter = kaaba, contentDescription = null, tint = scheme.onSurface, modifier = Modifier.size(16.dp))
-                Icon(painter = kaabaDetail, contentDescription = null, tint = kiswahGold(), modifier = Modifier.size(16.dp))
+            Box(Modifier.size(markSize)) {
+                Icon(painter = kaaba, contentDescription = null, tint = scheme.onSurface, modifier = Modifier.size(markSize))
+                Icon(painter = kaabaDetail, contentDescription = null, tint = kiswahGold(), modifier = Modifier.size(markSize))
             }
         }
         Key(stringResource(R.string.qibla_legend_facing)) {
-            // A stubbier arrow than the dial's: the real needle's proportions are a hair's
-            // width at 18dp.
-            Canvas(Modifier.size(width = 12.dp, height = 18.dp)) {
-                drawPath(
-                    path = Path().apply {
-                        moveTo(size.width / 2f, 0f)
-                        lineTo(0f, size.height)
-                        lineTo(size.width, size.height)
-                        close()
-                    },
-                    color = scheme.primary,
-                )
+            // The dial's own teardrop in miniature, from the same path, so the key matches what it explains.
+            Canvas(Modifier.size(markSize)) {
+                // The shape spans -0.64r to 0.22r, so r is the box over 0.86 and the centre sits 0.21r below the middle.
+                val r = size.height / 0.86f
+                drawPath(path = needlePath(size.width / 2f, size.height / 2f + 0.21f * r, r), color = scheme.primary)
             }
         }
     }

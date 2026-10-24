@@ -881,8 +881,9 @@ private fun QiblaPage(state: WearUiState) {
  * Where the Kaaba mark sits on the dial and how big it is, as shares of the dial radius.
  *
  * Once the same two numbers as the phone's `QiblaScreen.kt`; since step 6 (24 Oct 2026) the phone's mark
- * sits at 0.60 and this dial keeps 0.66, so the two differ on purpose. The watch has no room for letters
- * and does not draw them, and its tick ring was not moved, so there is nothing to make room for.
+ * sits at 0.70 with size 0.22 and this dial keeps 0.66 and 0.30, so the two differ on purpose. The watch
+ * has no room for letters and does not draw them, and its tick ring was not moved, so there is nothing
+ * to make room for.
  *
  * Pulled in from 0.72/0.32 on 15 Aug 2026 when the phone gained cardinal letters. It also ended a
  * long-standing squeeze: at the old numbers the mark's furthest corner reached 0.892 on the 1.2" watch

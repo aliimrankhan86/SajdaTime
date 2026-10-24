@@ -87,7 +87,8 @@ otherwise; if neither says, ask him (§0.2).
 | surfaceHighlight | `primaryContainer` | `#143028` | Next-prayer card, next row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#8FD9B8` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#161A19` | The Qibla dial face |
-| primary | `primary` | `#4FC48F` | Accent bar, Qibla arrow and arc, "Next" pill |
+| dialBezel | `surfaceContainerHighest` (read through `dialBezel()`, not a role of its own) | `#262C29` | The Qibla dial's bezel when not aligned; `primary` when aligned |
+| primary | `primary` | `#4FC48F` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill |
 | onPrimary | `onPrimary` | `#062117` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#1E4034` | The selected tab pill |
 | onSurface | `onSurface` | `#E7EAE8` | Body text, prayer times |
@@ -111,7 +112,8 @@ otherwise; if neither says, ask him (§0.2).
 | surfaceHighlight | `primaryContainer` | `#D7EAE0` | Next-prayer row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
-| primary | `primary` | `#0B5A43` | Accent bar, Qibla arrow and arc, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
+| dialBezel | `surface` (read through `dialBezel()`, not a role of its own) | `#FDFCFB` | The Qibla dial's bezel when not aligned, lifted by the card shadow; `primary` when aligned |
+| primary | `primary` | `#0B5A43` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
 | onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
 | onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
@@ -570,17 +572,19 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > the moment Fajr's window shuts, and it is why there is no "Now" pill anywhere on the list
 > between sunrise and Dhuhr. See `PrayerEngine.currentPrayer`.
 
-**Qibla dial** (restyled in step 6, 24 Oct 2026) — a circle with the lift every card has (shadow in light,
-hairline in dark, `sajdaSurface`), its face `surfaceVariant`. The rim is a **band** inside the edge, `outlineVariant`,
-0.04 of the radius. Ticks every 15° sit at 0.84 to 0.92 and the four letters at 0.77. The needle is **you**: a
-`primary` tapered arrow with rounded corners, fixed at the top with a compass (it points at the bearing without
-one), tip at 0.68. Between the needle and the Kaaba, a `primary` arc, 0.11 of the radius thick: **the turn you
-still owe**, signed so a left turn sweeps anticlockwise and nobody is sent the long way round. Inside ±5° the arc
-clears, the face fills with `primaryContainer` and the rim turns `primary` and thickens to 0.07, all over 250 ms
-(150 ms on leaving), and the line above the dial turns green with a tick. Independent signals, only one of them
-colour.
+**Qibla dial** (restyled in step 6, 24 Oct 2026, the Pillars style in our theme) — a circle with the lift every
+card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is the lifted disc: 0.08 of the radius,
+`surface` in light and `surfaceContainerHighest` in dark (`dialBezel()`, a different role per theme because the dark
+hairline is invisible against the page). Inside it the face, `surfaceVariant`. Sixty ticks, one every 6°, in
+`outline` (minor 0.845 to 0.87, cardinal from 0.80, round caps); the letters at 0.74, E S W `onSurfaceVariant`
+Normal and N `primary` Medium. The needle is **you**: a `primary` teardrop (tip at 0.64, round end past the centre,
+no hub), fixed at the top with a compass (it points at the bearing without one). There is no arc: the Kaaba's side
+of the dial and the sentence ("Turn right 58°") say how far to turn. Inside ±5° the face fills with
+`primaryContainer`, the bezel turns `primary` and thickens to 0.11, all over 250 ms (150 ms on leaving), the line
+above the dial turns green with a tick, and the phone buzzes once: three signals that are not colour (the
+sentence with its tick, the thicker bezel, the buzz).
 
-**The Kaaba mark** sits at 0.60 of the dial radius, in
+**The Kaaba mark** sits at 0.70 of the dial radius, 0.22 across, in
 `onSurface` with its band and door in `kiswahGold()`. Same
 artwork on the phone and the watch — `core/res/drawable/ic_kaaba*.xml`, shared so one dial
 drawn twice cannot end up as two different buildings.
@@ -1165,6 +1169,19 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   formatter). Q8 (Ramadan as cards or the table): **Ali, 24 Oct 2026, "Keep the table"** from side by side pictures
   (`plans/2026-10-release-1.6.0/screens/step4/9a` to `10b`): the table fits about seventeen days on a screen against
   about four cards, and suhoor, iftar and the fast compare day to day. The card prototype was deleted.
+- **24 Oct 2026, 1.6 step 6, the Qibla dial in the Pillars style, in our theme (Ali; `STEP-6-DESIGN.md` §15 and §16):**
+  Ali: "I like pillar app qibla locator style ... I want that style of compass and needle but in my own theme."
+  The dial is now a lifted bezel with the face inside it, sixty fine ticks, quiet letters and a teardrop needle, in
+  our palette (the green N, the Quiet Glass lift). **The teardrop reverses the old §1 rejection of one**: Ali asked
+  for that style. **The turn arc is removed**: "Turn right 58°" already says it in words and a number, and the
+  Kaaba's side of the dial says it without; arrival keeps three signals that are not colour (sentence with tick,
+  thicker bezel, buzz). The bezel takes a different role per theme (`dialBezel()`: `surface` in light,
+  `surfaceContainerHighest` in dark) because the card hairline is invisible against the dark page. The pin and key
+  marks are sized from the text line so they grow with it. Pairs added to `ColorContrastTest` (`outline` on both
+  faces, `onSurfaceVariant` on the aligned face). Open for Ali's pictures, behind temporary switches: Q1 instruction
+  placement, Q2 sand or white light bezel, Q4 keep the arc as the bezel band, and whether the dark bezel needs
+  `surfaceBright`. Rejected: a hairline at the bezel's inner edge (1.37 and 1.32, neither clears 3:1 nor stays
+  invisible); a hub.
 
 ---
 
