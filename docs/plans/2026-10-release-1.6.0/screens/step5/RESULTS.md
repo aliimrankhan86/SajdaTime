@@ -15,3 +15,5 @@ Device: emulator-5554, 823dp frame (1440x3088, density 600), London, English, Ti
 | 8-day-light-material-glyphs.png | 10:00 | light | none (Next: Dhuhr 12:45 pm); built with skyUseMaterialGlyphs = true (temporary, reverted) |
 
 Notes: the 10:00 pictures show no Now pill because no prayer is current between Sunrise and Dhuhr. Picture 8 differs from picture 2 only in the sky mark sun glyph.
+
+0-before-step5-day-light.png: claude/1-6-0 at 9a250e4 (no skies), same 823dp frame, 10:00 light. Taken by the main session after Fable flagged that "Different from your mosque?" sits under the glass bar at scroll 0 in every step 5 picture. Same position before step 5, so it is not caused by the skies: the 823dp no scroll budget was already spent by steps 1 to 4 (the step 4 pictures were on a 914dp frame and hid it). The door scrolls into view. Recorded in HANDOVER §11 as a separate fix.
