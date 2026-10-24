@@ -382,3 +382,95 @@ API 24 safe (empty country gives km); `sajdaSurface(shape, color)` exists (`Them
 12. **§6 reason.** Also: `android.icu.util.LocaleData` is an `android.*` import, which `:core` forbids
     (`core/build.gradle.kts:9-14`), so 9.5's ICU branch could not have lived in `MeasurementSystem.kt` at all.
 13. **§3 sum.** `bodyMedium` line height is 21, not 20 (`Type.kt:70-74`): about 716dp. Still fits.
+
+## 15. The dial in the Pillars style, in our theme (Ali, 24 Oct 2026). Where this disagrees with §4 and §14 items 1 and 6, this section wins.
+
+Ali: "I like pillar app qibla locator style ... I want that style of compass and needle but in my own theme." This
+replaces §4's dial and the §1 rejection of a teardrop needle. Layout and style from `screens/step6/ref-pillars-site.jpg`
+and `ref-pillars-dial.png`; nothing of theirs is copied (no artwork, no colour, no type). Everything else in §2, §3,
+§5 to §14 stands; the one knock-on is the key's needle mark (15.6). Ali also asked (24 Oct): "Make sure when you point
+correctly then message also appears and vibration happens": done in `f43d50a` (the buzz through the `Vibrator`).
+
+**15.1 Geometry, as shares of the radius r, outer edge of the bezel at 1.0.**
+
+| Part | Share | Notes |
+|---|---|---|
+| Bezel | 0.92 to 1.00 (0.08r) not aligned; 0.89 to 1.00 (0.11r) aligned, `animateFloatAsState` | The dial `Box` keeps `sajdaSurface(CircleShape, bezel)` (shadow in light, hairline in dark), so the bezel *is* the lifted disc. The Canvas draws the face as a filled circle of radius `r × (1 − bezelWidth)` in `face` over it. Nothing else is drawn in the bezel band |
+| Ticks | 60, every 6°. Minor 0.845 to 0.88, width 0.007r. Cardinal (0, 90, 180, 270) 0.80 to 0.88, width 0.014r, `StrokeCap.Round` on both | Colour `outline` for all 60 (light `outline` on the face is 3.69:1). Widths as shares, not raw pixels |
+| Letters | centre at 0.74, size 0.09r | E S W `onSurfaceVariant`, `FontWeight.Normal`; N `primary`, `FontWeight.Medium`. Upright, positions rotate, as today. Band 0.695 to 0.785 |
+| Kaaba | `KAABA_DISTANCE` 0.70, `KAABA_SIZE` 0.22 | Box 0.59 to 0.81 at a cardinal bearing; worst corner 0.856 at a diagonal, inside the bezel at 0.92. Drawn last |
+| Needle | teardrop, path in 15.2; tip at 0.64, round end centred at (0, +0.10r) radius 0.12r, bottom at +0.22r; filled and stroked `primary`, stroke 0.025r `StrokeJoin.Round` `StrokeCap.Round` | With the stroke the tip reaches 0.6525, inside the cube when the two coincide. No hub |
+| Arc | none | 15.4 |
+| Rotation | `tween(120)` | unchanged, exempt by name |
+| Semantics | `clearAndSetSemantics {}` | unchanged |
+
+One budget, five numbers: tip 0.6525, Kaaba 0.59 to 0.81 (0.856 diagonal), letters 0.695 to 0.785, ticks 0.80 to
+0.88, bezel inner edge 0.92 (0.89 aligned). Move one and check the others.
+
+**15.2 The needle path** (dial centre at the origin, y down the screen, all in r):
+
+```
+moveTo(0, -0.64)                                  // tip
+cubicTo(-0.05, -0.38,  -0.12, -0.12,  -0.12, 0.10) // left flank, lands tangent to the round end
+arcTo(Rect(-0.12, -0.02, 0.12, 0.22), startAngle 180, sweep -180)  // round end, through the bottom
+cubicTo( 0.12, -0.12,   0.05, -0.38,   0, -0.64)   // right flank
+close()
+```
+
+Draw filled, then stroked, both `primary`, as `drawNeedle` does today. The pivot stays the dial centre.
+
+**15.3 Colour roles and the non text pairs** (computed from `Color.kt`).
+
+| Element | Light | Dark | Pair asserted |
+|---|---|---|---|
+| Bezel, not aligned | `surface` | `surfaceContainerHighest` | not a boundary (the lift carries the edge); against face 1.13 / 1.23 |
+| Bezel, aligned | `primary` | `primary` | `primary` on page 7.55 / 8.56, add at 3.0 |
+| Face | `surfaceVariant` | `surfaceVariant` | unchanged |
+| Face, aligned | `primaryContainer` | `primaryContainer` | unchanged |
+| Ticks | `outline` | `outline` | on face 3.69 / 5.63; on aligned face 3.41 / 4.54; add four at 3.0 |
+| Letters E S W | `onSurfaceVariant` | `onSurfaceVariant` | on aligned face 5.13 / 6.52, add two at 4.5 |
+| N, needle | `primary` | `primary` | exists |
+| Kaaba | `onSurface` + `kiswahGold()` | same | exists |
+
+The bezel takes a different role per theme: read it through `dialBezel()` in `Theme.kt` beside `kiswahGold()`, same
+`LocalDarkTheme` pattern, with a `dialBezel` row in both DESIGN_SYSTEM §1 tables. Dark fallback if too faint:
+`surfaceBright`. Rejected: a hairline at the bezel's inner edge (1.37 / 1.32, neither clears 3:1 nor stays invisible).
+
+**15.4 How far to turn: nothing on the dial.** The arc goes. "Turn right 58°" says it in words and a number; the
+Kaaba's side of the dial says it without words. Arrival keeps four signals, two not colour: the sentence changes and
+gains the tick, the face fills, the bezel turns green **and thickens**, one buzz. Q4 lets Ali keep the arc.
+
+**15.5 Arrival and motion.** `face`, `bezel` (`dialBezel()` → `primary`) and `bezelWidth` (0.08 → 0.11) each
+`animate*AsState` with `if (aligned) Motion.standard() else Motion.quick()`, labels `dialFace`, `dialBezel`,
+`dialBezelWidth`. Needle, ticks, letters and Kaaba do not change on arrival. Buzz guard unchanged. Nothing animates on open.
+
+**15.6 The key.** "Where you are facing" shows the same teardrop in miniature from the 15.2 path, `primary`.
+
+**15.7 Picture fixes folded in.** Degree sign isolate: committed (`98564e7`). Pin and key marks sized from the text:
+`bodyMedium.lineHeight` in dp (21dp at 1.0, 42 at 2.0) instead of `16.dp` / `18.dp`; the Kaaba and teardrop fill 0.75
+of the box, the pin 0.8.
+
+**15.8 Ours, not theirs (App Store 4.3).** (1) Our needle is *you*, fixed at the top with the dial turning under it,
+and its tip ends at the Kaaba on arrival; (2) the Kaaba is our own flat elevation with the gold hizam (`ic_kaaba*.xml`,
+`kiswahGold()`), not a tilted cube; (3) the arrival is ours: the sentence with the tick above the dial, the green face
+and thickened green bezel, and a Details disclosure below. Plus our palette, the green N and the Quiet Glass lift.
+
+**15.9 Dark, sizes, states.** All §7 states unchanged; no compass holds north up with the teardrop at the bearing.
+320dp: dial 205dp, Kaaba 22dp. 2.0 text: the dial does not grow; the pin and key marks do.
+
+**15.10 Code, tests, docs.** `QiblaScreen.kt`: delete `qiblaFlatDial` (Q2 superseded), keep `qiblaCentreInstruction`
+until Q1; delete `drawTurnArc`, `rimWidth`, the hub; replace ticks, letters, needle, the two constants and the budget
+comment. TEMPORARY `qiblaShowArc` (default false) for the Q4 picture only. `Theme.kt`: `dialBezel()`.
+`ColorContrastTest`: the pairs in 15.3, mutation proof at 20. `DesignRulesTest`: no change. Device test: at 2.0 on
+320dp the pin's bounds are at least 40dp tall. `WearApp.kt`: comment only. DESIGN_SYSTEM §1 `dialBezel`, §4 dial
+paragraph, §9 dated entry (Ali's words, arc removed and why, teardrop reverses §1, per theme bezel).
+
+**15.11 iPhone effect.** Carries over: `Path` `cubicTo`/`arcTo` maps one to one to SwiftUI `Path`; the bezel is a
+`Color` asset with light and dark variants.
+
+### 13 (rewritten after 15). Questions for Ali, from the new pictures, recommendation first
+
+1. **Where the instruction sits:** "Under the title (Recommended)" or "Centred over the dial".
+2. **Light bezel colour:** "White bezel, lifted (Recommended)" or "Sand bezel". (Replaces lifted or flat.)
+3. **No location:** "Amber notice, Set location (Recommended)" or "Plain sentence, as today".
+4. **The turn arc:** "No arc, Pillars style (Recommended)" or "Keep the green arc".
