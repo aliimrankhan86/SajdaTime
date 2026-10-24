@@ -97,6 +97,7 @@ otherwise; if neither says, ask him (§0.2).
 | warning | `tertiary` | `#E8B14A` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#2A2113` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#F3E4C5` | Text in that banner |
+| warnTop, warnBottom | `DarkWarnTop`, `DarkWarnBottom` in `Color.kt` (not a Material role) | `#352A17`, `#20190D` | The warning notice's gloss gradient, `tertiaryContainer` in the middle (1.6, §9 24 Oct) |
 | kiswah | *(none — `kiswahGold()`)* | `#8A5807` | The Kaaba's hizam and door on the Qibla dial |
 
 ### Light
@@ -120,6 +121,7 @@ otherwise; if neither says, ask him (§0.2).
 | warning | `tertiary` | `#9A6208` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#FBF1DC` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#5A4408` | Text in that banner |
+| warnTop, warnBottom | `LightWarnTop`, `LightWarnBottom` in `Color.kt` (not a Material role) | `#FBF0D8`, `#F3E2BE` | The warning notice's gloss gradient, `tertiaryContainer` in the middle (1.6, §9 24 Oct) |
 | kiswah | *(none — `kiswahGold()`)* | `#E8B14A` | The Kaaba's hizam and door on the Qibla dial |
 
 ### The light hero gradient
@@ -354,7 +356,7 @@ outlined and then tonal buttons were both too easy to miss (§0.1).
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
 | **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
-| **G. Snackbar action** | Material's own `SnackbarHost` action, written with `showSnackbar(actionLabel = ...)` in `MainScaffold.kt`, so no `TextButton` appears in our source | none | none | platform (`inversePrimary` on `inverseSurface`) | **Only** "Undo" in the message at the bottom ("Paused from today"), above the tab bar, on every tab. Added with step 1 of 1.6.0 |
+| **G. Snackbar action** | Material's own `SnackbarHost` action, written with `showSnackbar(actionLabel = ...)` in `MainScaffold.kt`, so no `TextButton` appears in our source | none | none | platform (`inversePrimary` on `inverseSurface`) | **Only** "Undo" in the message at the bottom ("Paused from today"; "Dhuhr alert off" and its three forms, 1.6 step 3), above the tab bar, on every tab. Added with step 1 of 1.6.0 |
 
 Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
 row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
@@ -452,7 +454,9 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
-| Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Times, notifications notice (1.6.0, while the phone blocks notifications) | Allow (trailing arrow); the X, alone | B; D | 48, wraps | `Notice.kt`, `PermissionAction.kt` |
+| Times | the bell at the end of each prayer row, not Sunrise (a 48dp blank keeps its time aligned) | Bell (`Bell.kt`), a toggle like Tick | 24 drawn, 48 target | `HomeScreen.kt`, `Bell.kt` |
 | Settings, Match your mosque | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
 | Settings, Match your mosque | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
 | Settings, the clock ("Isha: the time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
@@ -1035,6 +1039,22 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   voice. Kept against the research: the iOS style chevron (the owner asked for an iPhone feel).
   Rating is Google's card only, never a component of ours.
 
+- **24 Oct 2026, 1.6 step 3, the bell and the permission card (Ali, from pictures; `STEP-3-DESIGN.md` §15 to §21):**
+  the bell is a plain filled bell (on), an alarm clock (alarm) and a crossed bell (off), not `NotificationsActive`
+  (its sound waves say "ringing now" and break the crossfade); grey `outline` while the phone blocks notifications,
+  with an amber notice to explain. Settings' alerts dialog Off also remembers the style but never touches the
+  reminder: only the bell carries Q6. A fourth message key covers Fajr in Ramadan with a reminder removed, because
+  joining two sentences in code breaks Urdu and Arabic. **The permission cards:** no switch (only the phone can
+  allow notifications, so an in-app switch springs back; Apple's own pattern is a message with a button to
+  Settings). Ali then asked for a nicer look: warning notices get the hero card's gloss (sheen, rim, the new Warn
+  tokens in §1, contrast pairs in `ColorContrastTest`) minus its glow; quiet notices stay flat because the dark CTA
+  on `secondaryContainer` is only 2.32:1 and a sheen would drop it to 1.64:1 (that 2.32:1 is itself an open gap,
+  HANDOVER §11); every notice's icon is bare, 24dp, no tinted circle; the two permission cards show one button,
+  Allow, because their details only repeated the sentence (the Fajr fact moved into the exact alarms sentence);
+  the notifications card shows the crossed bell, exact alarms keeps the triangle. Rejected: a switch; a text
+  Details link; green CTA on amber (3.2:1 dark); a full width amber button (17 Oct); a glow under the card;
+  glossing the quiet tone; a white card with an amber bar (loses the amber card Ali kept).
+
 ---
 
 ## 10. The learning loop
@@ -1090,7 +1110,7 @@ the date and his words, and delete it here.
 | Id | Decision | Next step |
 |---|---|---|
 | 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Wait for the owner's "go". Then draw the four skies, add them to `ColorContrastTest`, and show light and dark screenshots |
-| 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | Same: wait for "go", then screenshots |
+| 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | **Decided and built (24 Oct 2026)** on `claude/1-6-0-step3-proto`; Ali approved the prototype and the card; merge pending (HANDOVER §11) |
 | 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
 | 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Build in step 5 |
 | 1.6-qibla | Qibla restyle: direction line first, labelled details button, km or miles, key kept (§9, 23 Oct 2026) | Same |
