@@ -295,14 +295,15 @@ class LargeTextAndTalkBackDeviceTest {
     }
 
     /**
-     * The place pin is sized from the text (STEP-6-DESIGN 16.10): at 2.0 text the 21dp line is 42dp, so the pin is at
-     * least 40dp tall. Mutation proof: put `16.dp` back in `PlaceRow` and this fails.
+     * The place pin is sized from the text (STEP-6-DESIGN 16.10), so at 2.0 text it is well over the old fixed 16dp.
+     * Not 42dp: Android 14 scales text non-linearly, larger sizes grow less, and the line measured 34.6dp on the
+     * API 35 emulator. Mutation proof: put `16.dp` back in `PlaceRow` and this fails.
      */
     @Test
     fun the_qibla_place_pin_grows_with_the_text() {
         atText(2f) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
         val height = with(compose.density) { compose.onNode(hasTestTag("qibla_place_pin"), useUnmergedTree = true).fetchSemanticsNode().boundsInRoot.height.toDp() }
-        assertTrue("the pin is $height tall", height >= 40.dp)
+        assertTrue("the pin is $height tall", height >= 30.dp)
     }
 
     /**

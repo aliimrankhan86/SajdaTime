@@ -28,7 +28,9 @@ import com.sajdatime.app.ui.GlassTabBar
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.qibla.qiblaCentreInstruction
-import com.sajdatime.app.ui.qibla.qiblaFlatDial
+import com.sajdatime.app.ui.qibla.qiblaDarkBezelBright
+import com.sajdatime.app.ui.qibla.qiblaSandBezel
+import com.sajdatime.app.ui.qibla.qiblaShowArc
 import com.sajdatime.app.ui.theme.SajdaTimeTheme
 import com.sajdatime.app.ui.theme.ThemeChoice
 import java.io.File
@@ -50,7 +52,9 @@ class QiblaPicturesTmp {
         val noLocation = args.getString("noloc") == "1"
         val open = args.getString("open") == "1"
         qiblaCentreInstruction = args.getString("centre") == "1"
-        qiblaFlatDial = args.getString("flat") == "1"
+        qiblaSandBezel = args.getString("sand") == "1"
+        qiblaShowArc = args.getString("arc") == "1"
+        qiblaDarkBezelBright = args.getString("bright") == "1"
         val accuracy = when (args.getString("acc")) {
             "low" -> CompassAccuracy.LOW
             "none" -> CompassAccuracy.UNAVAILABLE
