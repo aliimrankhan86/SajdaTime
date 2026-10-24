@@ -269,3 +269,9 @@ Only §13's question needs Ali.
 ## 15. Ali's answer (24 Oct 2026, AskUserQuestion)
 
 Blocked notifications: **"Amber notice with Allow (Recommended)"**. Build §6's notice as corrected by §14.6.
+
+## 16. Ali on the prototype pictures (24 Oct 2026, AskUserQuestion)
+
+"Yes, build it", with one change, in his words: "the allow notification panel should look modern and great UI maybe
+a modern looking slider like iPhone style which the user select allows and not allowed and details. Check if it
+makes sense". Sent to Fable to judge before the build (§17).
