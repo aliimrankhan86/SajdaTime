@@ -275,3 +275,14 @@ Blocked notifications: **"Amber notice with Allow (Recommended)"**. Build §6's 
 "Yes, build it", with one change, in his words: "the allow notification panel should look modern and great UI maybe
 a modern looking slider like iPhone style which the user select allows and not allowed and details. Check if it
 makes sense". Sent to Fable to judge before the build (§17).
+
+## 17. Fable on Ali's switch idea (24 Oct 2026): no switch, keep the amber notice
+
+A switch only makes sense when the app can turn the thing on and off. Here only the phone can allow notifications:
+the switch would flip on, the phone would refuse, and it would spring back, which looks broken; and "not allowed"
+cannot be done from the app at all. Apple's own pattern for a blocked permission is a short message with a button to
+Settings; the iPhone switch lives in the phone's Settings app, not inside apps. The exact alarms notice uses the same
+card and Ali approved it on 17 and 18 Oct, so two notices with two control styles would clash. The modern on/off in
+step 3 is the bell on each row, which is the app's own setting and never springs back. Build §6 as corrected by §14,
+unchanged. Rejected: a switch (springs back, misleading to TalkBack as "switch, off", a new control kind outside
+DESIGN_SYSTEM §4.1). Put to Ali as a one tap question; his answer is §18.
