@@ -2101,6 +2101,12 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
   it are meaningless (0°, 0 km, "facing the Kaaba" whenever the phone points north). Guarded by
   `usingDefaultLocation`, tested in `LargeTextAndTalkBackDeviceTest`, mutation proof run on the emulator.
 - **"Facing N°" stays on arrival.** It sits above the dial; hiding it would move the dial at the moment it animates.
+- **The arrival buzz always happens** (Ali, 24 Oct 2026: "when you point correctly then message also appears
+  and vibration happens"): `arrivalBuzz` in `QiblaScreen.kt`, 70 ms through the `Vibrator` with media usage and the
+  `VIBRATE` permission (on the privacy page). `performHapticFeedback` and an attribute-less vibration are both muted
+  when touch feedback is off (§15 lesson 183). Unchanged on purpose: no buzz when the screen opens already facing the
+  Kaaba, and none twice within 5 s (both measured on the S23 Ultra, comments at the buzz). The watch still uses
+  `performHapticFeedback`, so it has the same silent case; not changed in 1.6 (the watch is out of scope).
 - **The watch keeps its own dial** (Kaaba at 0.66 there, 0.60 on the phone, on purpose; comment in `WearApp.kt`).
 
 ## 6. Notification and alarm architecture
@@ -10861,3 +10867,7 @@ matters more than the stable hashes, that is the trade being made.
     `gyroscope` all change their raw values, but the fused `TYPE_ROTATION_VECTOR` the app reads did not follow (24 Oct
     2026). For Qibla pictures, render `QiblaScreen` from a temporary instrumentation test with a seeded `UiState` and
     `uiAutomation.takeScreenshot()`, never committed (it sets the TEMPORARY switches, which are process globals).
+183. **A vibration with no attributes is filed as touch feedback.** Step 6 moved the Qibla buzz off
+    `performHapticFeedback` to the `Vibrator` and the emulator still logged it `usage: TOUCH ... ignored_for_settings`
+    with touch feedback off. Marking it `USAGE_MEDIA` (VibrationAttributes on 33+, AudioAttributes on 26 to 32) made it
+    play. Check with `adb shell settings put system haptic_feedback_enabled 0` and `dumpsys vibrator_manager`.

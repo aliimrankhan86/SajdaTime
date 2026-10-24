@@ -78,9 +78,7 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextMeasurer
@@ -189,7 +187,6 @@ private fun QiblaLocated(state: UiState, qibla: Double, context: android.content
     // 00:29:18.393, 0.4 s after the tab was tapped. Deciding both together removes the
     // gap that the bug lived in.
     val heading = state.compassHeading
-    val haptics = LocalHapticFeedback.current
     var aligned by rememberSaveable { mutableStateOf(false) }
     // False until the first heading of the session has been read. Opening the screen
     // already facing the Kaaba is not an arrival, and must not be announced as one.
@@ -206,7 +203,7 @@ private fun QiblaLocated(state: UiState, qibla: Double, context: android.content
         val now = QiblaEngine.staysAligned(aligned, heading, qibla)
         val since = SystemClock.elapsedRealtime() - lastBuzzAt
         if (now && !aligned && haveRead && since > ARRIVAL_QUIET_MILLIS) {
-            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+            arrivalBuzz(context)
             lastBuzzAt = SystemClock.elapsedRealtime()
         }
         aligned = now
@@ -632,6 +629,35 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * modules share only `core` and this is a feel value, not a rule.
  */
 private const val ARRIVAL_QUIET_MILLIS = 5_000L
+
+/**
+ * The arrival buzz, straight from the Vibrator. `performHapticFeedback(LongPress)` until step 6 was
+ * silent on any phone whose touch feedback setting is off, which is the default on many Samsung and
+ * Xiaomi phones, so the message appeared and nothing was felt (Ali, 24 Oct 2026: the vibration must
+ * happen). A vibration with no attributes is still filed as touch and muted the same way (emulator,
+ * 24 Oct: "ignored_for_settings" with touch feedback off), so it is marked media, which that switch
+ * does not govern; the phone's own vibration settings still apply, as they should. 70 ms: one tap.
+ */
+private fun arrivalBuzz(context: android.content.Context) {
+    val vibrator = if (android.os.Build.VERSION.SDK_INT >= 31) {
+        context.getSystemService(android.os.VibratorManager::class.java)?.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(android.os.Vibrator::class.java)
+    }
+    if (vibrator == null || !vibrator.hasVibrator()) return
+    when {
+        android.os.Build.VERSION.SDK_INT >= 33 -> vibrator.vibrate(
+            android.os.VibrationEffect.createOneShot(70, android.os.VibrationEffect.DEFAULT_AMPLITUDE),
+            android.os.VibrationAttributes.createForUsage(android.os.VibrationAttributes.USAGE_MEDIA),
+        )
+        android.os.Build.VERSION.SDK_INT >= 26 -> @Suppress("DEPRECATION") vibrator.vibrate(
+            android.os.VibrationEffect.createOneShot(70, android.os.VibrationEffect.DEFAULT_AMPLITUDE),
+            android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).build(),
+        )
+        else -> @Suppress("DEPRECATION") vibrator.vibrate(70)
+    }
+}
 
 private const val KAABA_DISTANCE = 0.60f
 private const val KAABA_SIZE = 0.30f

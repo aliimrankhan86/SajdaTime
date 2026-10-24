@@ -72,6 +72,8 @@ class WidgetManifestTest {
             "android.permission.RECEIVE_BOOT_COMPLETED",
             "android.permission.SCHEDULE_EXACT_ALARM",
             "android.permission.ACCESS_NOTIFICATION_POLICY",
+            // 1.6.0 step 6: the Qibla arrival buzz (Ali, 24 Oct 2026), on the privacy page.
+            "android.permission.VIBRATE",
         )
         assertEquals(baseline, declared)
     }

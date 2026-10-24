@@ -315,8 +315,10 @@ Durations come from `ui/theme/Motion.kt`, the way gaps come from `Space`. There 
   because per letter effects break Arabic and Urdu joining. A whole block of text may fade.
 - **Haptics** go through `LocalHapticFeedback` only, on the user's own tap that changes something stored
   (`ToggleOn` and `ToggleOff`, `SegmentTick` for pickers). Two shipped exceptions stay, named so nobody
-  "fixes" them: `SegmentTick` on a tab change (`MainScaffold.kt`) and `LongPress` when the Qibla aligns
-  (`QiblaScreen.kt`, a sensor event). Never on a prayer passing, a sky change, Undo, a
+  "fixes" them: `SegmentTick` on a tab change (`MainScaffold.kt`) and the Qibla arrival buzz
+  (`QiblaScreen.kt`, a sensor event). Since 1.6 step 6 that one goes through the `Vibrator` (70 ms, media usage, the `VIBRATE`
+  permission), not `LocalHapticFeedback`: touch feedback is off by default on many phones, and Ali asked that
+  the buzz always happen (24 Oct 2026). Never on a prayer passing, a sky change, Undo, a
   snackbar or a ring filling. One pulse per tap.
 - **Enforced** by `DesignRulesTest`: a written `tween` or `TweenSpec` anywhere except `Motion.kt` and the
   Qibla dial's one 120 ms call (input driven), a `rememberInfiniteTransition` or `infiniteRepeatable`, and a

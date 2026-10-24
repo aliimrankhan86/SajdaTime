@@ -27,6 +27,14 @@
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" tools:node="remove" />
 
+    <!--
+      One short buzz when the Qibla screen says you are facing the Kaaba (Ali, 24 Oct 2026: "when you
+      point correctly then message also appears and vibration happens"). Through the Vibrator, because
+      performHapticFeedback is silent whenever the phone's touch feedback setting is off. A normal
+      permission: no prompt, reads nothing.
+    -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
