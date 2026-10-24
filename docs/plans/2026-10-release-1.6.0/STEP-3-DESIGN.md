@@ -286,3 +286,9 @@ card and Ali approved it on 17 and 18 Oct, so two notices with two control style
 step 3 is the bell on each row, which is the app's own setting and never springs back. Build §6 as corrected by §14,
 unchanged. Rejected: a switch (springs back, misleading to TalkBack as "switch, off", a new control kind outside
 DESIGN_SYSTEM §4.1). Put to Ali as a one tap question; his answer is §18.
+
+## 18. Ali's answer on the notice (24 Oct 2026, AskUserQuestion)
+
+"Keep the amber card", with, in his words: "but make look nice in UI not plan old looking buttons and panel". So: no
+switch; the card's look (panel and buttons) gets a visual polish, designed by Fable within DESIGN_SYSTEM, shown to
+Ali as pictures before it is built. The exact alarms notice shares the component, so it changes with it (§19).
