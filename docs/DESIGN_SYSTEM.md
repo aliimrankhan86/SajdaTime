@@ -1076,8 +1076,9 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   (`TimetableGrid`), the Dynamic Type equivalent. Rejected: a rolling 30 days (no month heading, and "This whole
   month" in the PDF would not match the screen); a segmented "Month | Ramadan" control (a component the system does
   not have); a dialog chooser; a FAB; `timetable_month_heading` (the heading is the month name from the date
-  formatter). Q8 (Ramadan as cards or the table) is open: the cards are built as `DayCard(ramadanDay)` and
-  `RamadanCardsPreviewList`, wired nowhere, for pictures.
+  formatter). Q8 (Ramadan as cards or the table): **Ali, 24 Oct 2026, "Keep the table"** from side by side pictures
+  (`plans/2026-10-release-1.6.0/screens/step4/9a` to `10b`): the table fits about seventeen days on a screen against
+  about four cards, and suhoor, iftar and the fast compare day to day. The card prototype was deleted.
 
 ---
 
@@ -1126,7 +1127,7 @@ the date and his words, and delete it here.
 |---|---|---|---|---|
 | 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
 | 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | OPEN: screenshots at step 5 |
-| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | OPEN: screenshots at step 4 |
+| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
 | 1.6-mosque-door | 23 Oct 2026 | Keep "Different from your mosque?" under the times? | Keep | OPEN: screenshots at step 7 |
 | 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
 

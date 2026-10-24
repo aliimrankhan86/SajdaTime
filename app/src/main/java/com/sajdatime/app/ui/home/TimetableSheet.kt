@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -49,13 +48,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.notify.TimeFormat
-import com.sajdatime.app.ui.RamadanTimetable
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.components.DialogTitle
@@ -232,37 +229,26 @@ private fun MonthHeading(name: String, modifier: Modifier = Modifier) {
 }
 
 /**
- * One day: the date, then the six times in a grid of [columns]. [ramadanDay] is the Q8 prototype
- * (STEP-4-DESIGN §6): the same card with the day number, Suhoor ends and Iftar picked out, and the
- * length of the fast. Not wired into the shipped flow.
+ * One day: the date, then the six times in a grid of [columns]. Ramadan keeps its table (Ali, 24 Oct
+ * 2026, Q8 "Keep the table"), so there is no Ramadan form of this card.
  */
 @Composable
-internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int, ramadanDay: Int? = null) {
+internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int) {
     val context = LocalContext.current
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(24.dp)
     val surfaceColour = if (isToday) scheme.primaryContainer else scheme.surface
     val labelColour = if (isToday) scheme.onPrimaryContainer else scheme.onSurfaceVariant
     val timeColour = if (isToday) scheme.onPrimaryContainer else scheme.onSurface
-    val emphasis = if (isToday) scheme.onPrimaryContainer else scheme.primary
     val dateText = TimeFormat.date(context, day.date)
     val slots = PrayerSlot.entries.filter { day.times[it] != null }
     fun clock(slot: PrayerSlot) = day.times[slot]?.let { TimeFormat.clock(context, it) }.orEmpty()
-    val fast = if (ramadanDay != null) {
-        TimeFormat.remaining(context, day.times.getValue(PrayerSlot.FAJR), day.times.getValue(PrayerSlot.MAGHRIB))
-    } else {
-        ""
-    }
     // ponytail: the sentence has six fixed places, so a slot missing (never today) reads as blank, not skipped.
-    val spoken = if (ramadanDay != null) {
-        stringResource(R.string.ramadan_row_a11y, ramadanDay, dateText, clock(PrayerSlot.FAJR), clock(PrayerSlot.MAGHRIB), fast)
-    } else {
-        stringResource(
-            R.string.timetable_day_a11y, dateText,
-            clock(PrayerSlot.FAJR), clock(PrayerSlot.SUNRISE), clock(PrayerSlot.DHUHR),
-            clock(PrayerSlot.ASR), clock(PrayerSlot.MAGHRIB), clock(PrayerSlot.ISHA),
-        )
-    }
+    val spoken = stringResource(
+        R.string.timetable_day_a11y, dateText,
+        clock(PrayerSlot.FAJR), clock(PrayerSlot.SUNRISE), clock(PrayerSlot.DHUHR),
+        clock(PrayerSlot.ASR), clock(PrayerSlot.MAGHRIB), clock(PrayerSlot.ISHA),
+    )
     val announced = if (isToday) stringResource(R.string.timetable_today_a11y, spoken) else spoken
     val approx = stringResource(R.string.ramadan_approx_marker)
 
@@ -275,13 +261,7 @@ internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int, ramada
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
-                if (ramadanDay != null) {
-                    Text(stringResource(R.string.timetable_ramadan_day, ramadanDay), style = MaterialTheme.typography.titleMedium, color = timeColour)
-                    Spacer(Modifier.width(Space.Related))
-                    Text(dateText, style = MaterialTheme.typography.bodyMedium, color = labelColour)
-                } else {
-                    Text(dateText, style = MaterialTheme.typography.titleMedium, color = timeColour)
-                }
+                Text(dateText, style = MaterialTheme.typography.titleMedium, color = timeColour)
                 if (day.approximated) {
                     Spacer(Modifier.width(Space.Related))
                     Text(approx, style = MaterialTheme.typography.labelSmall, color = labelColour)
@@ -306,23 +286,10 @@ internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int, ramada
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 rowSlots.forEach { slot ->
                     val sunrise = slot == PrayerSlot.SUNRISE
-                    val picked = ramadanDay != null && (slot == PrayerSlot.FAJR || slot == PrayerSlot.MAGHRIB)
-                    val label = when {
-                        ramadanDay != null && slot == PrayerSlot.FAJR -> stringResource(R.string.ramadan_suhoor_ends)
-                        ramadanDay != null && slot == PrayerSlot.MAGHRIB -> stringResource(R.string.ramadan_iftar)
-                        else -> stringResource(slot.labelRes)
-                    }
+                    val label = stringResource(slot.labelRes)
                     // Sunrise is not a prayer: one step quieter, by weight as well as colour.
-                    val textColour = when {
-                        sunrise && !isToday -> scheme.onSurfaceVariant
-                        picked -> emphasis
-                        else -> timeColour
-                    }
-                    val timeStyle = when {
-                        sunrise -> MaterialTheme.typography.bodyMedium
-                        picked -> PrayerTimeTextStyle.copy(fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                        else -> PrayerTimeTextStyle.copy(fontSize = 15.sp)
-                    }
+                    val textColour = if (sunrise && !isToday) scheme.onSurfaceVariant else timeColour
+                    val timeStyle = if (sunrise) MaterialTheme.typography.bodyMedium else PrayerTimeTextStyle.copy(fontSize = 15.sp)
                     val time = clock(slot)
                     if (columns == 1) {
                         Row(Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
@@ -340,37 +307,6 @@ internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int, ramada
                 // A short last row keeps its cells the same width as the rows above.
                 repeat(columns - rowSlots.size) { Spacer(Modifier.weight(1f)) }
             }
-        }
-        if (ramadanDay != null) {
-            Spacer(Modifier.height(Space.Tight))
-            Text(stringResource(R.string.timetable_fast, fast), style = MaterialTheme.typography.labelMedium, color = labelColour)
-        }
-    }
-}
-
-/**
- * Q8 prototype only (STEP-4-DESIGN §6): the Ramadan month as [DayCard]s with the table's footer,
- * for side by side pictures. Nothing wires it; drop it into the Ramadan branch temporarily to see it.
- * ponytail: it opens at the top, not on today; the pictures compare card against table, not scroll.
- */
-@Composable
-internal fun RamadanCardsPreviewList(state: UiState, onShiftDate: () -> Unit) {
-    val info = state.ramadan?.info ?: return
-    val coordinates = state.settings.coordinates ?: return
-    val prefs = state.settings.calculationPrefs
-    val rows by produceState(emptyList<com.sajdatime.app.ui.RamadanRow>(), coordinates, prefs, info) {
-        value = withContext(Dispatchers.Default) { RamadanTimetable.rows(coordinates, prefs, info) }
-    }
-    val today = state.today?.date
-    BoxWithConstraints {
-        val columns = TimetableGrid.columns((maxWidth - 64.dp).value, LocalDensity.current.fontScale)
-        LazyColumn(contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = Space.Section)) {
-            items(rows, key = { it.dayNumber }) { row ->
-                Column(Modifier.padding(bottom = Space.Paragraph)) {
-                    DayCard(day = row.times, isToday = row.date == today, columns = columns, ramadanDay = row.dayNumber)
-                }
-            }
-            item(key = "footer") { Footer(rows = rows, onShiftDate = onShiftDate) }
         }
     }
 }

@@ -206,7 +206,7 @@ private fun TimeCell(
 }
 
 @Composable
-internal fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
+private fun Footer(rows: List<RamadanRow>, onShiftDate: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     Column(
         verticalArrangement = Arrangement.spacedBy(Space.Related),

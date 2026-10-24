@@ -168,6 +168,9 @@ seventh "next" marker on the card (the Times screen answers that); fading past d
 
 ## 6. Ramadan cards, for Q8 only
 
+> **Answered 24 Oct 2026: Ali kept the table.** This section is the record of what was shown; the prototype and
+> its two strings were deleted. Not a task.
+
 Built so Ali can see table and cards side by side; not shipped unless he picks cards. The same `DayCard` with
 `ramadanDay: Int?`:
 - Line 1: "Day 12" (`timetable_ramadan_day`, `titleMedium`), then the date in `bodyMedium` `onSurfaceVariant` 8dp
@@ -354,3 +357,5 @@ Save as PDF in Ramadan, so Today, 7 days and the month were unreachable all Rama
 choices"**: Save as PDF on the Ramadan table opens the same chooser as the month sheet; it offers Ramadan too.
 Also fixed from the review: today's card scrolled down by the pinned heading's height, the month name through ICU,
 months and days produced together, the later month's gap as its own item. Rules recorded in HANDOVER §5.32.
+
+**Q8, 24 Oct 2026:** Ali approved the month view pictures and chose "Keep the table". Prototype deleted.
