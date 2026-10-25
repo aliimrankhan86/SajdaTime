@@ -346,3 +346,11 @@ strip. Where your mosque differs, go by your mosque.
 
 Notes: "नमाज़ ट्रैकर" is the transliterated term Indian users type. "जमाअत" and "इक़ामत" are the Urdu derived spellings the
 1.5.0 Hindi already uses for religious words; "जुमा" for Jumu'ah. "पहर" (part of the day) is everyday Hindi and Urdu.
+
+## Independent review, 25 Oct 2026
+
+A separate Opus reviewer back translated every new or changed line in all eight before reading this record. Meaning matched English everywhere; HONEST and FREE byte identical to 1.5.0 in 8 of 8; no added hyphens, no Chrome line, no promise of accuracy or reward. Three fixes applied by the main session:
+- French What's new: "Horaires" named both Timetable and Times; Timetable is now "Calendrier" (500 / 500).
+- French full description, first paragraph: "calculés" had no noun; now "Sans pub ni compte ; horaires calculés" (3996 / 4000).
+- Turkish timetable bullet: "kaydedip yazdırın" (save and print) is now "kaydedin ya da yazdırın" (save or print) (3993 / 4000).
+Left as is, deliberately: the "an hour before" suhoor wording in six languages (true for the default of 60, unchanged from 1.5.0); Indonesian "salat" in What's new against "sholat" in the full text (app spelling against search spelling).

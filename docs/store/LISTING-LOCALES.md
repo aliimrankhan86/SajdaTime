@@ -67,11 +67,11 @@ Python `len`, newlines counted, no final newline. Check Play's own counter when 
 |---|---|---|---|---|
 | Arabic (ar) | 30 (unchanged) | 69 / 80 | 3736 / 4000 | 459 / 500 |
 | Urdu (ur) | 30 (unchanged) | 75 / 80 | 3988 / 4000 | 494 / 500 |
-| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3987 / 4000 | 498 / 500 |
+| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3993 / 4000 | 498 / 500 |
 | Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3984 / 4000 | 496 / 500 |
 | Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3988 / 4000 | 494 / 500 |
 | Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3981 / 4000 | 490 / 500 |
-| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3986 / 4000 | 498 / 500 |
+| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3996 / 4000 | 500 / 500 |
 | Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3987 / 4000 | 499 / 500 |
 
 ### Arabic (ar), 1.6.0
@@ -275,7 +275,7 @@ SajdaTime: Namaz Vakitleri
 İnternetsiz namaz vakitleri, ezan, kıble ve size özel namaz takibi. Wear OS ile.
 ```
 
-**Full description** `3987 / 4000` (1.5.0 was 3974)
+**Full description** `3993 / 4000` (1.5.0 was 3974)
 ```
 SajdaTime, Sünni ve Şii Müslümanlara telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan vakti uyarıları ve kıble pusulası sunar. Reklam yok, hesap yok. Vakitler telefonunuzda hesaplanır, bu yüzden internetsiz, sinyal yokken de çalışır.
 
@@ -284,7 +284,7 @@ NAMAZ VAKİTLERİ VE KIBLE
 • Sabah, Güneş, Öğle, İkindi, Akşam ve Yatsı, sıradaki namaza canlı geri sayımla
 • Hicri tarih (İslami takvim) ve yılın İslami tarihleri
 • Kıble yönü: gerçek kuzeye göre düzeltilmiş, Kâbe'ye döndüğünüzde bir kez titreyen pusula
-• Bu ayın ve gelecek ayın vakit çizelgesi ile Ramazan imsakiyesi, PDF olarak kaydedip yazdırın
+• Bu ayın ve gelecek ayın vakit çizelgesi ile Ramazan imsakiyesi, PDF olarak kaydedin ya da yazdırın
 
 UYARILAR VE EZAN
 
@@ -641,9 +641,9 @@ SajdaTime: Horaires de prière
 Heures de prière hors ligne, adhan, Qibla et suivi privé des prières. Wear OS
 ```
 
-**Full description** `3986 / 4000` (1.5.0 was 3982)
+**Full description** `3996 / 4000` (1.5.0 was 3982)
 ```
-SajdaTime : horaires de prière (salat), alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone et montre Wear OS. Sans pub ni compte, calculés sur le téléphone, donc hors ligne.
+SajdaTime : horaires de prière (salat), alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone et montre Wear OS. Sans pub ni compte ; horaires calculés sur le téléphone, donc hors ligne.
 
 HORAIRES DE PRIÈRE ET QIBLA
 
@@ -713,9 +713,9 @@ Ni version payante, ni abonnement, rien de verrouillé. SajdaTime est offert en 
 Je ne demande qu'une chose en retour : pensez à moi, à ma famille et à mes parents dans vos douas. Jazak Allah khayr.
 ```
 
-**What's new** `498 / 500`
+**What's new** `500 / 500`
 ```
-Mes prières : suivi privé, semaine et 30 derniers jours, sur le téléphone. Une cloche par prière active ou coupe son alerte. Horaires : ce mois et le suivant, une carte par jour, à enregistrer en PDF. Ajoutez la jama'ah et le Joumou'a de votre mosquée sous chaque prière. La date hégirienne ouvre les dates islamiques de l'année. La Qibla dit où tourner d'abord. Horaires et widget prochaine prière suivent le moment du jour. Widget des cinq prières. Si votre mosquée diffère, suivez votre mosquée.
+Mes prières : suivi privé, semaine et 30 derniers jours, sur le téléphone. Une cloche par prière active ou coupe son alerte. Calendrier : ce mois et le suivant, une carte par jour, à enregistrer en PDF. Ajoutez la jama'ah et le Joumou'a de votre mosquée sous chaque prière. La date hégirienne ouvre les dates islamiques de l'année. La Qibla dit où tourner d'abord. Horaires et widget prochaine prière suivent le moment du jour. Widget des cinq prières. Si votre mosquée diffère, suivez votre mosquée.
 ```
 
 ### Hindi (hi-IN), 1.6.0
