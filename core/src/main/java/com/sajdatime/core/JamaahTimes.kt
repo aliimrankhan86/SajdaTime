@@ -29,20 +29,31 @@ data class JamaahTimes(
     val rules: Map<PrayerSlot, JamaahRule> = emptyMap(),
     /** Friday only, and only a fixed time: Jumu'ah is not counted from the start time. */
     val jumuah: LocalTime? = null,
+    /**
+     * The time zone id the times were typed in (hidden while the phone is in another zone, 1.6.0, BUILD-INSTRUCTIONS Q13). Null
+     * for a string saved before it was stored, which is shown everywhere until the next save stamps it.
+     */
+    val zoneId: String? = null,
 ) {
+    /** True when these times belong to [zoneId]'s clock. Ids are compared, never offsets: summer and winter at home both match. */
+    fun visibleIn(zoneId: String): Boolean = this.zoneId == null || this.zoneId == zoneId
+
     val isEmpty: Boolean get() = rules.isEmpty() && jumuah == null
     val count: Int get() = rules.size + if (jumuah != null) 1 else 0
 }
 
 sealed interface JamaahResult {
-    data class Shown(val at: Instant, val isJumuah: Boolean = false) : JamaahResult
+    data class InWindow(val at: Instant, val isJumuah: Boolean = false) : JamaahResult
 
     /**
-     * The typed time is earlier than the prayer begins, or not before the next one. Never shown as a
-     * time: a jama'ah earlier than the adhan would tell someone to pray before the prayer is due. The
-     * usual cause is a fixed time typed in summer that the start time has since passed.
+     * The typed time is earlier than the prayer begins. Never shown as a time: a jama'ah earlier than
+     * the adhan would tell someone to pray before the prayer is due. The usual cause is a fixed time
+     * typed in winter that the start time has since passed.
      */
-    data object OutOfWindow : JamaahResult
+    data object Before : JamaahResult
+
+    /** The typed time is not before [next] begins (SUNRISE for Fajr). Never shown as a time. */
+    data class After(val next: PrayerSlot) : JamaahResult
 }
 
 object JamaahPlan {
@@ -55,8 +66,12 @@ object JamaahPlan {
      *
      * On Friday, Dhuhr's line is Jumu'ah or nothing. It never falls back to Dhuhr's own jama'ah, which
      * many mosques do not hold that day.
+     *
+     * Times typed in another time zone give nothing: they are the home mosque's, and they are hidden
+     * here, in the one place the app and the 1.6.1 reminders both read. Ids compared, never offsets.
      */
     fun on(day: DayPrayerTimes, zone: ZoneId, jamaah: JamaahTimes): Map<PrayerSlot, JamaahResult> {
+        if (!jamaah.visibleIn(zone.id)) return emptyMap()
         val friday = day.date.dayOfWeek == DayOfWeek.FRIDAY
         val out = mutableMapOf<PrayerSlot, JamaahResult>()
         for (slot in TRACKED_SLOTS) {
@@ -76,15 +91,27 @@ object JamaahPlan {
             is JamaahRule.Fixed -> fixedAt(day, rule.time, zone, afterMidnight = slot == PrayerSlot.ISHA && rule.time < LocalTime.NOON)
             is JamaahRule.After -> start.plus(Duration.ofMinutes(rule.minutes.toLong()))
         }
-        return check(at, start, windowEnd(day, slot), isJumuah = false)
+        return check(at, start, day, slot, isJumuah = false)
     }
 
     /** A Jumu'ah time against [day]'s Dhuhr to Asr window, whatever the weekday (for the same preview). */
     fun jumuah(day: DayPrayerTimes, zone: ZoneId, time: LocalTime): JamaahResult =
-        check(fixedAt(day, time, zone), day[PrayerSlot.DHUHR], windowEnd(day, PrayerSlot.DHUHR), isJumuah = true)
+        check(fixedAt(day, time, zone), day[PrayerSlot.DHUHR], day, PrayerSlot.DHUHR, isJumuah = true)
 
-    private fun check(at: Instant, start: Instant, end: Instant, isJumuah: Boolean): JamaahResult =
-        if (!at.isBefore(start) && at.isBefore(end)) JamaahResult.Shown(at, isJumuah) else JamaahResult.OutOfWindow
+    private fun check(at: Instant, start: Instant, day: DayPrayerTimes, slot: PrayerSlot, isJumuah: Boolean): JamaahResult = when {
+        at.isBefore(start) -> JamaahResult.Before
+        at.isBefore(windowEnd(day, slot)) -> JamaahResult.InWindow(at, isJumuah)
+        else -> JamaahResult.After(nextSlot(slot))
+    }
+
+    /** The prayer whose start closes [slot]'s window: Fajr's is sunrise, Isha's is the next Fajr. */
+    private fun nextSlot(slot: PrayerSlot): PrayerSlot = when (slot) {
+        PrayerSlot.FAJR -> PrayerSlot.SUNRISE
+        PrayerSlot.DHUHR -> PrayerSlot.ASR
+        PrayerSlot.ASR -> PrayerSlot.MAGHRIB
+        PrayerSlot.MAGHRIB -> PrayerSlot.ISHA
+        else -> PrayerSlot.FAJR
+    }
 
     /**
      * A clock time on this day, in this zone. A time that a clock change skips moves forward with it
@@ -105,12 +132,15 @@ object JamaahPlan {
 }
 
 /**
- * How [JamaahTimes] survives a round trip through one stored string: "FAJR=+15,DHUHR=13:30,JUMUAH=13:15".
+ * How [JamaahTimes] survives a round trip through one stored string: "FAJR=+15,DHUHR=13:30,JUMUAH=13:15,ZONE=Europe/London".
+ * Version 2 adds ZONE; a string without it is version 1 and reads as zoneId = null. A ZONE that
+ * [ZoneId.of] rejects is dropped (read as version 1), so a corrupt id can never hide the lines.
  * Anything it cannot read is dropped entry by entry, as [AdjustmentCodec] does, and minutes are kept
  * to [JamaahRule.AFTER_CHOICES], so a damaged string loses an entry and never invents a time.
  */
 object JamaahCodec {
     private const val JUMUAH = "JUMUAH"
+    private const val ZONE = "ZONE"
 
     fun encode(j: JamaahTimes): String = buildList {
         for (slot in TRACKED_SLOTS) {
@@ -121,16 +151,22 @@ object JamaahCodec {
             }
         }
         j.jumuah?.let { add("$JUMUAH=$it") }
+        j.zoneId?.let { add("$ZONE=$it") }
     }.joinToString(",")
 
     fun decode(raw: String?): JamaahTimes {
         if (raw.isNullOrBlank()) return JamaahTimes()
         val rules = mutableMapOf<PrayerSlot, JamaahRule>()
         var jumuah: LocalTime? = null
+        var zoneId: String? = null
         for (entry in raw.split(",")) {
             val (key, value) = entry.split("=").takeIf { it.size == 2 } ?: continue
             if (key == JUMUAH) {
                 jumuah = parseTime(value) ?: continue
+                continue
+            }
+            if (key == ZONE) {
+                zoneId = value.takeIf { runCatching { ZoneId.of(it) }.isSuccess }
                 continue
             }
             val slot = TRACKED_SLOTS.firstOrNull { it.name == key } ?: continue
@@ -141,7 +177,7 @@ object JamaahCodec {
                 JamaahRule.Fixed(parseTime(value) ?: continue)
             }
         }
-        return JamaahTimes(rules, jumuah)
+        return JamaahTimes(rules, jumuah, zoneId)
     }
 
     private fun parseTime(s: String): LocalTime? = runCatching { LocalTime.parse(s) }.getOrNull()

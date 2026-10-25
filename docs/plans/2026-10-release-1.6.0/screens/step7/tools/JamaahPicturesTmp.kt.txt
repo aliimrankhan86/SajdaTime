@@ -1,0 +1,75 @@
+package com.sajdatime.app
+
+// TEMPORARY, never committed into androidTest: seeds jama'ah rules and opens the real app for Ali's step 7
+// pictures. See README.md beside this file.
+
+import android.graphics.Bitmap
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.test.core.app.ActivityScenario
+import androidx.test.platform.app.InstrumentationRegistry
+import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.ui.home.mosqueDoorShown
+import com.sajdatime.app.ui.theme.ThemeChoice
+import com.sajdatime.core.Coordinates
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.PrayerSlot
+import java.io.File
+import java.time.LocalTime
+import kotlinx.coroutines.runBlocking
+import org.junit.Rule
+import org.junit.Test
+
+class JamaahPicturesTmp {
+    @get:Rule val compose = createEmptyComposeRule()
+    private val args = InstrumentationRegistry.getArguments()
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    @Test
+    fun picture() {
+        val repo = SettingsRepository(context)
+        runBlocking {
+            if (args.getString("seed") == "1") {
+                repo.setLocation(Coordinates(51.5074, -0.1278), "London")
+                repo.completeOnboarding()
+                repo.markDisclaimerSeen()
+                repo.setAnalyticsEnabled(false)
+                repo.setJamaahRule(PrayerSlot.DHUHR, JamaahRule.Fixed(LocalTime.of(13, 30)))
+                repo.setJamaahRule(PrayerSlot.ASR, JamaahRule.Fixed(LocalTime.of(13, 0)))
+                repo.setJamaahRule(PrayerSlot.MAGHRIB, JamaahRule.After(15))
+                repo.setJamaahRule(PrayerSlot.ISHA, JamaahRule.After(20))
+                repo.setJumuah(LocalTime.of(13, 15))
+            }
+            args.getString("method")?.let { repo.setMethod(com.sajdatime.core.CalcMethod.valueOf(it)) }
+            repo.setThemeChoice(if (args.getString("dark") == "1") ThemeChoice.DARK else ThemeChoice.LIGHT)
+        }
+        mosqueDoorShown = args.getString("nodoor") != "1"
+        val name = args.getString("pic") ?: return
+        ActivityScenario.launch(MainActivity::class.java).use {
+            compose.waitForIdle()
+            Thread.sleep(2500)
+            if (args.getString("dialog") == "1") {
+                compose.onNode(hasText(context.getString(R.string.nav_settings)) and hasClickAction()).performSemanticsAction(SemanticsActions.OnClick)
+                compose.waitForIdle()
+                compose.onNode(hasText(context.getString(R.string.settings_jamaah)) and hasClickAction()).performScrollTo().performSemanticsAction(SemanticsActions.OnClick)
+                compose.waitForIdle()
+                Thread.sleep(1200)
+            }
+            // scroll = how many thumb swipes up, each from 60% to 20% (above the tab bar) of the screen height.
+            val h = context.resources.displayMetrics.heightPixels
+            val w = context.resources.displayMetrics.widthPixels / 2
+            repeat(args.getString("scroll")?.toInt() ?: 0) {
+                InstrumentationRegistry.getInstrumentation().uiAutomation
+                    .executeShellCommand("input swipe $w ${h * 6 / 10} $w ${h * 2 / 10} 600").close()
+                Thread.sleep(1200)
+            }
+            val shot: Bitmap = InstrumentationRegistry.getInstrumentation().uiAutomation.takeScreenshot()
+            File(context.getExternalFilesDir(null)!!, "$name.png").outputStream().use { shot.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }
+    }
+}

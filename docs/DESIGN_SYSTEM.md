@@ -383,7 +383,7 @@ outlined and then tonal buttons were both too easy to miss (§0.1).
 |---|---|---|---|---|---|
 | **A. Solid green** | `CtaButton` (or `ctaButtonColors()` on a Material `Button` inside `Notice` and `PermissionButton`) | `#0B5A43` (`LightCta`) | `#17805A` (`DarkCta`) | `#FFFFFF` (`OnCta`) | Every action that is not a warning |
 | **B. Solid amber** | Material `Button` with `tertiary`/`onTertiary`, only inside `Notice` (warning tone) | `#9A6208` | `#E8B14A` | light `#FFFFFF`, dark `#3A2A00` | The action and "Details" in a warning notice ("Allow exact alarms") |
-| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque" |
+| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque start times" |
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
 | **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
@@ -477,7 +477,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
 | Times | Timetable (calendar icon), end of the Today heading, under it from 1.5 text; 16dp under the card above, 8dp over the list | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
 | Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
-| Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Calculation method; Asr; Match your mosque start times | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
 | Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
 | Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
@@ -490,11 +490,11 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
 | Times, notifications notice (1.6.0, while the phone blocks notifications) | Allow (trailing arrow); the X, alone | B; D | 48, wraps | `Notice.kt`, `PermissionAction.kt` |
 | Times | the bell at the end of each prayer row, not Sunrise (a 48dp blank keeps its time aligned) | Bell (`Bell.kt`), a toggle like Tick | 24 drawn, 48 target | `HomeScreen.kt`, `Bell.kt` |
-| Settings, Match your mosque | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
-| Settings, the clock ("Isha: the time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
-| Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
+| Settings, the clock ("Isha: the Begins time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
 | My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
 | My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
@@ -508,7 +508,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | G, new | platform | `MainScaffold.kt` |
 | Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
 | Times, mosque dialog (1.6.0) | Add your mosque's jama'ah times, first, under the congregation paragraph | A | 52, full | `HomeScreen.kt` |
-| Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row | Row | 56 | `SettingsScreen.kt` |
+| Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row (before, after, Fajr after sunrise, Jumu'ah's own two); while the phone is in another time zone from the one the times were typed in, one quiet Notice (`Icons.Rounded.Public`, brief and Details) at the top instead, no "Today" lines and no amber (step 7, 25 Oct 2026) | Row | 56 | `SettingsScreen.kt` |
 | Settings, a prayer's jama'ah | Off, A fixed time (opens the clock, "Asr: the jama'ah time on your mosque's board"), Minutes after it begins (radio rows); − and + in fives, 0 to 60, value is the number alone | radio; C | 48; 40 visual, 48 target | `SettingsScreen.kt` |
 | Times, header (1.6.0) | The date line under the city, Hijri half in primary; opens Islamic dates. A 48dp text target, not a button, and no caret | Text target | 48 target | `HomeScreen.kt` |
 | Islamic dates sheet | Shift the date, alone under the footer | A | 52, full | `IslamicDatesSheet.kt` |
@@ -619,7 +619,9 @@ why", "Change location", "Shift the date"; never "Tap to…") and, when there is
 **"Details" button with a down chevron** ("expanded"/"collapsed" spoken). The close X sits
 **alone at the top right**, on Times only. The **warning tone is glossy**: a soft top to bottom
 amber gradient with a light sheen (`warningGloss()`, the `Warn` tokens in §1); the quiet tone
-stays flat. The two **permission cards** (exact alarms, and notifications while the phone blocks
+stays flat. The quiet tone is also used for a **withholding by the user's own rule**: the Jama'ah
+times dialog's notice while the phone is in another time zone (25 Oct 2026, step 7; nothing is wrong, so not
+amber). The two **permission cards** (exact alarms, and notifications while the phone blocks
 them) carry **one button only, "Allow"**, and no Details: the brief sentence says what goes
 wrong, the button fixes it. Their marks are `WarningAmber` and the crossed bell
 `NotificationsOff`. On Times a card leaves with a quick fade and shrink once the permission is
@@ -1186,6 +1188,25 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   invisible); a hub; a sand light bezel; a centred instruction; the green turn arc; `surfaceBright`
   for the dark bezel (Fable, from pictures: the disc already reads against the page, the quieter ring makes arrival
   louder).
+
+- **25 Oct 2026, jama'ah times on Times (step 7, Fable's design; built as a prototype, the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-7-DESIGN.md` (sections 14 and 15 win where they differ).
+  * **The Times line stays the quiet grey second line** ("Jama'ah 1:30 pm"); the time's space is a non breaking
+    space in the note only (not in `TimeFormat`), so "pm" never wraps alone. A jama'ah line costs 0dp a row at 1.0
+    (the old "about 2dp" was wrong). Out of window keeps "Check your jama'ah time" in the same line.
+  * **Typed times belong to the zone they were typed in** (codec v2, `ZONE=`; v1 reads as no zone). While the phone's
+    zone id differs, `JamaahPlan.on` gives nothing (one gate, in `:core`, so Times and 1.6.1 reminders agree), and
+    the Jama'ah times dialog shows one quiet green notice at the top, rules as typed, no "Today" lines, no amber.
+    The next save stamps the new zone. Compared by id, never by offset.
+  * **Out of window is two results** (`Before`, `After(next)`), five strings per language, Fajr's after form says
+    sunrise, Jumu'ah has its own two. The After rule's subtitle is two lines (`settings_value_lines`) so "Today"
+    never wraps away from its time.
+  * **Wording fixes from sign off:** "Match your mosque start times", the clock "the Begins time on your mosque's
+    board", and the help gains "Jama'ah times go in Jama'ah times."
+  * **The mosque door** (Q15, "Different from your mosque?") is kept under the rows for now; Ali decides from
+    pictures with and without (TEMPORARY `mosqueDoorShown`). Rejected: an icon on the Times line, the jama'ah
+    time in `primary` or bold, both times on one line, a tappable prayer row, a travel notice on Times, the zone
+    name in the notice, a compact door beside Timetable (two solid buttons side by side), hiding the door once set up.
 
 ---
 

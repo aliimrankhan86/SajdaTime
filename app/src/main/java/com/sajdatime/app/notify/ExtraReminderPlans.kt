@@ -47,7 +47,7 @@ object JamaahReminderPlan {
             val date = today.plusDays(offset)
             val day = PrayerEngine.compute(coordinates, date, prefs)
             JamaahPlan.on(day, zone, jamaah).mapNotNull { (slot, result) ->
-                val shown = result as? JamaahResult.Shown ?: return@mapNotNull null
+                val shown = result as? JamaahResult.InWindow ?: return@mapNotNull null
                 val at = shown.at.minus(Duration.ofMinutes(minutesBefore.toLong()))
                 JamaahReminder(slot, date, shown.at, at, shown.isJumuah).takeIf { at.isAfter(now) }
             }

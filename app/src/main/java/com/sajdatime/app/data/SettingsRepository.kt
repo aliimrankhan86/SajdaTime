@@ -511,15 +511,15 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setTrackerShowStreak(show: Boolean) = edit { it[Keys.TRACKER_STREAK] = show }
 
-    /** [rule] of null clears that prayer's jama'ah time. */
+    /** [rule] of null clears that prayer's jama'ah time. Every save stamps the phone's zone: the times follow where they were last set. */
     suspend fun setJamaahRule(slot: PrayerSlot, rule: JamaahRule?) = edit { prefs ->
         val current = JamaahCodec.decode(prefs[Keys.JAMAAH])
         val rules = if (rule == null) current.rules - slot else current.rules + (slot to rule)
-        prefs[Keys.JAMAAH] = JamaahCodec.encode(current.copy(rules = rules))
+        prefs[Keys.JAMAAH] = JamaahCodec.encode(current.copy(rules = rules, zoneId = java.time.ZoneId.systemDefault().id))
     }
 
     suspend fun setJumuah(time: java.time.LocalTime?) = edit { prefs ->
-        prefs[Keys.JAMAAH] = JamaahCodec.encode(JamaahCodec.decode(prefs[Keys.JAMAAH]).copy(jumuah = time))
+        prefs[Keys.JAMAAH] = JamaahCodec.encode(JamaahCodec.decode(prefs[Keys.JAMAAH]).copy(jumuah = time, zoneId = java.time.ZoneId.systemDefault().id))
     }
 
     suspend fun setJamaahReminderMinutes(minutes: Int) = edit {

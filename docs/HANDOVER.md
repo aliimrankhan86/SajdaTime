@@ -2117,6 +2117,28 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
   TEMPORARY switches are removed from `QiblaScreen.kt`.
 - **The watch keeps its own dial** (Kaaba at 0.66 there, 0.70 on the phone, on purpose; comment in `WearApp.kt`).
 
+### 5.34 Jama'ah times (1.6.0 step 7, built 25 Oct 2026, waiting for Ali's Q15; STEP-7-DESIGN.md, §15 over §14 over §1 to §13)
+
+- **Typed jama'ah times belong to the home mosque** (Ali, Q13). Every save stamps the phone's zone id (`ZONE=` in the
+  stored string, codec v2; a v1 string has no zone and always shows; an id `ZoneId.of` rejects is dropped).
+  `JamaahPlan.on` returns nothing while the stored id differs from the phone's: one gate in `:core` for Times and
+  the 1.6.1 planner. The Jama'ah times dialog reads raw settings, so it checks `visibleIn` itself: a quiet notice at
+  the top, rules as typed, no "Today" previews, no amber. **Ids, never offsets** (London and Lisbon share an offset).
+  The hide applies at the next recalculation (location refresh on resume, a settings change, a prayer passing), not
+  the instant the zone changes. No coordinates are stored. `docs/privacy.html` names the stored zone.
+- **Out of window has a before and an after form** (`JamaahResult.Before`, `After(next)`; Fajr's "after" is
+  sunrise). Times keeps the grey "Check your jama'ah time"; the amber sentence is in the dialog only. "After Maghrib
+  begins", never "after Asr ends": the app never states a deadline for a prayer.
+- **The line stays grey and unmarked** under the name. Its time uses a non breaking space (in `rowNote` only, not
+  `TimeFormat`) so "pm" never sits alone; an 8dp gap keeps it off the Next pill, so on the Next row it may wrap.
+- **"Match your mosque start times" and "Jama'ah times"** are named apart (SIGNOFF wording, applied in step 7), and
+  the Match your mosque help ends "Jama'ah times go in Jama'ah times." The disclaimer still says "Match your mosque"
+  in five languages: protected text, left for Ali (§11).
+- **The mosque door** ("Different from your mosque?", loud as "Does this match your mosque?" above 45 degrees until a
+  method is chosen) stays under the rows unless Ali says otherwise (Q15). A TEMPORARY `mosqueDoorShown` switch in
+  `HomeScreen.kt` exists only for his pictures and goes when he answers. Fable rejected inside the card, beside
+  Timetable (two solid buttons side by side), Settings only, and hidden once set up (STEP-7-DESIGN §5).
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -5918,7 +5940,7 @@ blocker, the pin test's 40dp bar, was a wrong guess about text scaling, now 30dp
 dark bezel `surfaceContainerHighest`. **Ali answered the four §13 questions as recommended** (instruction under the
 title, white lifted bezel, amber Set location notice, no arc; STEP-6-DESIGN §17); the four TEMPORARY switches are
 removed (Sonnet, reviewed by Opus). Full gate green (core 230 with 1 skipped, app 310, wear 27); device suite 37 of
-37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Next: step 7.** Not verified: a real compass, TalkBack
+37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Step 7 (jama'ah times) built 25 Oct 2026 on `claude/1-6-0-step7-proto`** (§5.34): Fable designed it and, at Ali's request, reviewed the mosque door in full (STEP-7-DESIGN §5); `plan-verifier` corrections in §14; strings in five languages by the main session (§15); Sonnet built it; Opus reviewed (no blockers; fixes applied: privacy date, comments, a zone stamp device test with mutation proof). Fable judged the pictures (`screens/step7/`, tool in `tools/`) and asked for an 8dp gap before the Next pill, done. **Waiting for Ali: Q15, keep the door under the rows or remove it from Times.** Then remove `mosqueDoorShown`, merge. **Left from review, not done:** the disclaimer still says "Match your mosque" (protected text, Ali's call); the 320dp device check measures the row, not the line wrap; the window end and next slot mappings are written twice in `JamaahTimes.kt`. Not verified: a real compass, TalkBack
 by ear, `:app:installRtl`, landscape and tablet for this screen. Steps 7 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
@@ -10886,3 +10908,10 @@ matters more than the stable hashes, that is the trade being made.
     `performHapticFeedback` to the `Vibrator` and the emulator still logged it `usage: TOUCH ... ignored_for_settings`
     with touch feedback off. Marking it `USAGE_MEDIA` (VibrationAttributes on 33+, AudioAttributes on 26 to 32) made it
     play. Check with `adb shell settings put system haptic_feedback_enabled 0` and `dumpsys vibrator_manager`.
+184. **A stored time zone id can stop matching at home without the user moving.** A phone reporting "GMT", or an
+    Android update renaming an id (`Asia/Calcutta` to `Asia/Kolkata`, `Europe/Kiev` to `Europe/Kyiv`), makes step
+    7's jama'ah guard show the travel notice at home until the next save stamps the new id. It heals itself and the
+    notice says how; accepted rather than mapping aliases (STEP-7-DESIGN §14.11).
+185. **`TimeZone.setDefault` in an instrumentation test moves `ZoneId.systemDefault()` for the app code too**,
+    because the test runs in the app's process. `JamaahZoneStampDeviceTest` uses it to give each save its own zone,
+    so a save that forgot to stamp fails. Restore the default in `finally`.

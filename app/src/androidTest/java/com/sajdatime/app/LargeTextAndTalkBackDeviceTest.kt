@@ -40,6 +40,15 @@ import com.sajdatime.app.ui.qibla.QiblaBody
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.JamaahPlan
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.JamaahTimes
+import com.sajdatime.core.labelRes
+import com.sajdatime.app.ui.JamaahActions
+import com.sajdatime.app.ui.home.TodayTimeline
+import com.sajdatime.app.ui.settings.JamaahDialog
+import java.time.LocalTime
+import java.time.ZoneId
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.PrayerSlot
@@ -319,5 +328,88 @@ class LargeTextAndTalkBackDeviceTest {
         compose.onAllNodes(hasClickAction()).assertCountEquals(1)
         compose.onNode(hasText(word(R.string.qibla_bearing, 0)), useUnmergedTree = true).assertDoesNotExist()
         compose.onNode(hasText(word(R.string.qibla_facing)), useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    /** A Thursday in London-like times, computed in UTC. `rowNote` formats in the phone's own zone, and the expected text is formatted the same way, so it matches on any phone. */
+    private val jamaahDay = DayPrayerTimes(
+        date = LocalDate.of(2026, 10, 22),
+        times = mapOf(
+            PrayerSlot.FAJR to Instant.parse("2026-10-22T05:00:00Z"),
+            PrayerSlot.SUNRISE to Instant.parse("2026-10-22T06:30:00Z"),
+            PrayerSlot.DHUHR to Instant.parse("2026-10-22T12:20:00Z"),
+            PrayerSlot.ASR to Instant.parse("2026-10-22T15:00:00Z"),
+            PrayerSlot.MAGHRIB to Instant.parse("2026-10-22T17:30:00Z"),
+            PrayerSlot.ISHA to Instant.parse("2026-10-22T19:00:00Z"),
+        ),
+    )
+
+    /**
+     * Jama'ah lines on Times (STEP-7-DESIGN section 9): at 2.0 on 320dp Dhuhr's fixed 1:30 pm reads "Jama'ah 1:30 pm"
+     * with the time held together by a non breaking space, Asr fixed at 1:00 pm (before Asr begins on any day) reads
+     * "Check your jama'ah time", both stay inside the width, and the Dhuhr row's merged text starts with its name.
+     */
+    @Test
+    fun the_jama_ah_lines_sit_under_their_prayers_and_stay_inside_the_screen_at_the_largest_text() {
+        val jamaah = JamaahPlan.on(
+            jamaahDay, ZoneId.of("UTC"),
+            JamaahTimes(mapOf(PrayerSlot.DHUHR to JamaahRule.Fixed(LocalTime.of(13, 30)), PrayerSlot.ASR to JamaahRule.Fixed(LocalTime.of(13, 0)))),
+        )
+        val state = UiState(loading = false, today = jamaahDay, jamaah = jamaah)
+        atText(2f) {
+            TodayTimeline(state = state, onTimetable = {}, ramadanView = false, onBell = { _, _ -> }, snapBell = null, notificationsBlocked = false)
+        }
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val dhuhrLine = word(R.string.jamaah_line, TimeFormat.clock(context, Instant.parse("2026-10-22T13:30:00Z")).replace(' ', '\u00A0'))
+        val dhuhr = compose.onNode(hasText(dhuhrLine, substring = true)).assertExists()
+        assertEquals(word(PrayerSlot.DHUHR.labelRes), dhuhr.fetchSemanticsNode().config[SemanticsProperties.Text].first().text)
+        val check = compose.onNode(hasText(word(R.string.jamaah_check), substring = true)).assertExists()
+        assertEquals(word(PrayerSlot.ASR.labelRes), check.fetchSemanticsNode().config[SemanticsProperties.Text].first().text)
+        val width = with(compose.density) { 320.dp.toPx() }
+        for (node in listOf(dhuhr, check)) {
+            val bounds = node.fetchSemanticsNode().boundsInRoot
+            assertTrue("spans ${bounds.left}..${bounds.right} of $width", bounds.left >= 0f && bounds.right <= width + 1f)
+        }
+    }
+
+    private val noJamaahActions = object : JamaahActions {
+        override fun setRule(slot: PrayerSlot, rule: JamaahRule?) = Unit
+        override fun setJumuah(time: LocalTime?) = Unit
+    }
+
+    /**
+     * Times typed in another zone (STEP-7-DESIGN 14.1): the Jama'ah times dialog shows the quiet notice and no
+     * "Today" preview. Seeded as the stored string, with ZONE= naming a zone the phone is not in, and a rule
+     * (15 minutes after) that would show "Today" if the zone matched. The same rule typed in this phone's own
+     * zone does show it, so the test cannot pass by the preview never appearing. Mutation proof: drop the
+     * `atHome` check in JamaahDialog and the first half fails.
+     */
+    @Test
+    fun the_jama_ah_dialog_in_another_time_zone_shows_the_notice_and_no_today_preview() {
+        val here = ZoneId.systemDefault().id
+        val away = if (here == "Asia/Dubai") "Europe/London" else "Asia/Dubai"
+        val stored = "ASR=+15,ZONE=$away"
+        val today = word(R.string.jamaah_today, "").trim()
+        compose.setContent {
+            SajdaTimeTheme {
+                JamaahDialog(jamaah = com.sajdatime.core.JamaahCodec.decode(stored), today = jamaahDay, actions = noJamaahActions, onDismiss = {})
+            }
+        }
+        compose.onNode(hasText(word(R.string.jamaah_away_brief))).assertExists()
+        compose.onAllNodes(hasText(today, substring = true)).assertCountEquals(0)
+    }
+
+    @Test
+    fun the_jama_ah_dialog_at_home_shows_the_today_preview_and_no_notice() {
+        val today = word(R.string.jamaah_today, "").trim()
+        compose.setContent {
+            SajdaTimeTheme {
+                JamaahDialog(
+                    jamaah = com.sajdatime.core.JamaahCodec.decode("ASR=+15,ZONE=${ZoneId.systemDefault().id}"),
+                    today = jamaahDay, actions = noJamaahActions, onDismiss = {},
+                )
+            }
+        }
+        compose.onAllNodes(hasText(today, substring = true)).assertCountEquals(1)
+        compose.onNode(hasText(word(R.string.jamaah_away_brief))).assertDoesNotExist()
     }
 }

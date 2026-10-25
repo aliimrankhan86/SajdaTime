@@ -104,7 +104,9 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.TrackerActions
 import com.sajdatime.app.ui.JamaahActions
 import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.NoticeTone
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.rounded.Public
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.JamaahPlan
 import com.sajdatime.core.JamaahResult
@@ -793,20 +795,32 @@ fun SettingsScreen(
  * one piece of advice, when to choose minutes after, sits where that choice is made.
  */
 @Composable
-private fun JamaahDialog(jamaah: JamaahTimes, today: DayPrayerTimes?, actions: JamaahActions, onDismiss: () -> Unit) {
+internal fun JamaahDialog(jamaah: JamaahTimes, today: DayPrayerTimes?, actions: JamaahActions, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val zone = remember { ZoneId.systemDefault() }
     // A slot's name, or JUMUAH, for the rule being edited; and which one's clock is open.
     var editing by rememberSaveable { mutableStateOf<String?>(null) }
     var picking by rememberSaveable { mutableStateOf<String?>(null) }
+    // Times typed in another zone are the home mosque's: the rules show as typed, but with no previews
+    // against today's prayer times (a London fixed time checked against Dubai would false flag) and no amber.
+    val atHome = jamaah.visibleIn(zone.id)
     ChooserDialog(title = stringResource(R.string.settings_jamaah), onDismiss = onDismiss) {
+        if (!atHome) {
+            Notice(
+                brief = stringResource(R.string.jamaah_away_brief),
+                details = stringResource(R.string.jamaah_away_details),
+                tone = NoticeTone.QUIET,
+                icon = Icons.Rounded.Public,
+                modifier = Modifier.padding(bottom = Space.Group),
+            )
+        }
         val rows = TRACKED_SLOTS.map { it.name to it.label(context) } + (JUMUAH to stringResource(R.string.jumuah))
         rows.forEachIndexed { i, (key, label) ->
             if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             val slot = TRACKED_SLOTS.firstOrNull { it.name == key }
             val rule = slot?.let { jamaah.rules[it] }
             val jumuahTime = if (slot == null) jamaah.jumuah else null
-            val result = today?.let { day ->
+            val result = today?.takeIf { atHome }?.let { day ->
                 when {
                     rule != null -> JamaahPlan.result(day, zone, slot, rule)
                     jumuahTime != null -> JamaahPlan.jumuah(day, zone, jumuahTime)
@@ -819,24 +833,32 @@ private fun JamaahDialog(jamaah: JamaahTimes, today: DayPrayerTimes?, actions: J
                 jumuahTime != null -> TimeFormat.clock(context, jumuahTime)
                 else -> stringResource(R.string.settings_jamaah_off)
             }
-            val shownToday = (result as? JamaahResult.Shown)?.let {
+            val shownToday = (result as? JamaahResult.InWindow)?.let {
                 stringResource(R.string.jamaah_today, TimeFormat.clock(context, it.at, zone))
             }
             SettingRow(
                 title = label,
                 subtitle = if (shownToday != null && rule is JamaahRule.After) {
-                    stringResource(R.string.settings_value_pair, ruleText, shownToday)
+                    stringResource(R.string.settings_value_lines, ruleText, shownToday)
                 } else {
                     ruleText
                 },
                 horizontalPadding = 0.dp,
                 onClick = { editing = key },
             )
-            if (result == JamaahResult.OutOfWindow) {
-                Notice(
-                    brief = stringResource(R.string.jamaah_out_of_window, label),
-                    modifier = Modifier.padding(bottom = Space.Related),
-                )
+            val outOfWindow = when (result) {
+                JamaahResult.Before ->
+                    if (slot != null) stringResource(R.string.jamaah_before_window, label)
+                    else stringResource(R.string.jumuah_before_window, PrayerSlot.DHUHR.label(context))
+                is JamaahResult.After -> when {
+                    slot == null -> stringResource(R.string.jumuah_after_window, PrayerSlot.ASR.label(context))
+                    result.next == PrayerSlot.SUNRISE -> stringResource(R.string.jamaah_after_sunrise, label)
+                    else -> stringResource(R.string.jamaah_after_window, label, result.next.label(context))
+                }
+                else -> null
+            }
+            if (outOfWindow != null) {
+                Notice(brief = outOfWindow, modifier = Modifier.padding(bottom = Space.Related))
             }
         }
     }

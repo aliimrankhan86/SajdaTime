@@ -674,6 +674,10 @@ private fun NextPrayerCard(state: UiState) {
     }
 }
 
+// TEMPORARY step 7 Q15: false hides the mosque door, for Ali's "without" picture. Default is the door shown. Delete
+// this, and the check that reads it, when he has chosen (STEP-7-DESIGN sections 5, 13 and 14).
+internal var mosqueDoorShown = true
+
 /**
  * The one door every user gets, at the moment they need it — right under the times being
  * doubted, because a user who thinks the app is broken is looking at the times, not at
@@ -708,7 +712,7 @@ private fun NextPrayerCard(state: UiState) {
  */
 @Composable
 private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNotice: () -> Unit) {
-    if (state.today == null) return
+    if (state.today == null || !mosqueDoorShown) return
     val latitude = state.settings.coordinates?.latitude
     val loud = !state.settings.methodNoticeDismissed &&
         state.settings.method == CalcMethod.AUTO &&
@@ -990,7 +994,7 @@ private fun NotificationsBanner(visible: Boolean, onAllow: () -> Unit, onDismiss
 }
 
 @Composable
-private fun TodayTimeline(
+internal fun TodayTimeline(
     state: UiState,
     onTimetable: () -> Unit,
     ramadanView: Boolean,
@@ -1112,11 +1116,13 @@ private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
     val context = LocalContext.current
     val jamaahText = when (jamaah) {
         null -> null
-        is JamaahResult.Shown -> stringResource(
+        is JamaahResult.InWindow -> stringResource(
             if (jamaah.isJumuah) R.string.jumuah_line else R.string.jamaah_line,
-            TimeFormat.clock(context, jamaah.at),
+            // A non breaking space in the time only, so "pm" never wraps alone onto its own line
+            // (not in TimeFormat: it feeds the PDF, the widgets and the card).
+            TimeFormat.clock(context, jamaah.at).replace(' ', '\u00A0'),
         )
-        JamaahResult.OutOfWindow -> stringResource(R.string.jamaah_check)
+        JamaahResult.Before, is JamaahResult.After -> stringResource(R.string.jamaah_check)
     }
     return when {
         ramadan != null && jamaahText != null -> stringResource(R.string.settings_value_pair, ramadan, jamaahText)
@@ -1237,8 +1243,8 @@ private fun PrayerRow(
             // the list clear the navigation bar (see the budget note in HomeScreen). Still
             // above the 48dp touch-target minimum, though these rows are not tappable.
             .heightIn(min = 50.dp)
-            // A second line (Ramadan or jama'ah) takes its height from the padding, 6dp not 12, so
-            // five jama'ah lines add about 2dp a row rather than 14 (UX.md height budget).
+            // A second line (Ramadan or jama'ah) fits inside the 50dp floor (24 name + 18 line + 2 padding
+            // = 44dp), so five jama'ah lines add 0dp a row at 1.0 (STEP-7-DESIGN section 3).
             // The bell's 48dp target overlaps the 18dp end padding, so the time ends where it did, and it
             // fills the row's 50dp floor: 12dp above and below a 48dp target made every row 72dp and pushed
             // Isha under the tab bar on the 823dp frame (the tick, e98b2a6).
@@ -1278,7 +1284,12 @@ private fun PrayerRow(
                 Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
             }
         }
-        if (!stacked) markersAndTime()
+        if (!stacked) {
+            // A gap so a long jama'ah note never touches the Next or Now pill (Fable, step 7 pictures).
+            // The note wraps one line earlier at 360dp instead, which STEP-7-DESIGN §3 allows.
+            Spacer(Modifier.width(8.dp))
+            markersAndTime()
+        }
         trailing()
     }
 }

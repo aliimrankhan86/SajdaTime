@@ -286,9 +286,9 @@
     <string name="duration_s">%1$d dtk</string>
 
     <!-- "Match your mosque" -->
-    <string name="settings_adjustments">Sesuaikan dengan masjid</string>
+    <string name="settings_adjustments">Sesuaikan waktu masuk dengan masjid</string>
     <string name="settings_adjustments_none">Tidak ada perubahan</string>
-    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini, atau setel ke waktu di papan jadwal masjid. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit.</string>
+    <string name="settings_adjustments_help">Jika masjid Anda mencetak waktu yang berbeda, geser di sini, atau setel ke waktu di papan jadwal masjid. Coba ubah metode perhitungan dulu. Biasanya itulah perbedaan sebenarnya, dan pengaturan ini untuk sisa selisih beberapa menit. Waktu berjamaah dimasukkan di Waktu salat berjamaah.</string>
     <string name="adjustment_use_board">Pakai waktu di papan masjid</string>
     <string name="adjustment_which_prayer">Salat yang mana?</string>
     <string name="action_set_time">Setel waktu</string>
@@ -505,7 +505,19 @@
     <string name="jamaah_line">Berjamaah %1$s</string>
     <string name="jumuah_line">Jumat %1$s</string>
     <string name="jamaah_check">Periksa waktu berjamaah Anda</string>
-    <string name="jamaah_out_of_window">Waktu berjamaah %1$s Anda di luar waktu %1$s hari ini. Periksa jadwal masjid Anda.</string>
+    <!-- %1$s is the prayer's own label. Typed time is before that prayer begins. -->
+    <string name="jamaah_before_window">Waktu berjamaah %1$s Anda sebelum waktu %1$s masuk. Periksa jadwal masjid Anda.</string>
+    <!-- %1$s is the prayer's own label, %2$s the label of the next prayer, whose start the typed time is not before. -->
+    <string name="jamaah_after_window">Waktu berjamaah %1$s Anda setelah waktu %2$s masuk. Periksa jadwal masjid Anda.</string>
+    <!-- %1$s is the prayer's own label (Fajr). Typed time is after sunrise. -->
+    <string name="jamaah_after_sunrise">Waktu berjamaah %1$s Anda setelah matahari terbit. Periksa jadwal masjid Anda.</string>
+    <!-- %1$s is the label of Dhuhr. -->
+    <string name="jumuah_before_window">Waktu salat Jumat Anda sebelum waktu %1$s masuk. Periksa jadwal masjid Anda.</string>
+    <!-- %1$s is the label of Asr. -->
+    <string name="jumuah_after_window">Waktu salat Jumat Anda setelah waktu %1$s masuk. Periksa jadwal masjid Anda.</string>
+    <!-- Quiet notice at the top of the Jama'ah times dialog while the phone is in another time zone. -->
+    <string name="jamaah_away_brief">Anda berada di zona waktu lain, jadi waktu salat berjamaah Anda tidak ditampilkan.</string>
+    <string name="jamaah_away_details">Waktu ini akan muncul lagi saat Anda kembali ke rumah. Jika Anda pindah, ubah salah satunya di sini dan semuanya akan mengikuti zona waktu ini.</string>
     <string name="jamaah_pick_time_title">%1$s: waktu berjamaah di papan jadwal masjid Anda</string>
     <string name="mosque_diff_add_jamaah">Tambahkan waktu berjamaah masjid Anda</string>
 

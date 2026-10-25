@@ -285,9 +285,9 @@
     <string name="duration_s">%1$d sn</string>
 
     <!-- "Match your mosque" -->
-    <string name="settings_adjustments">Camiye göre ayarla</string>
+    <string name="settings_adjustments">Giriş vakitlerini camiye göre ayarla</string>
     <string name="settings_adjustments_none">Değişiklik yok</string>
-    <string name="settings_adjustments_help">Caminiz farklı bir vakit yayımlıyorsa, burada biraz kaydırın ya da caminizin panosundaki saati ayarlayın. Önce hesaplama yöntemini deneyin. Asıl fark genellikle oradadır. Bu bölüm, geriye kalan birkaç dakika içindir.</string>
+    <string name="settings_adjustments_help">Caminiz farklı bir vakit yayımlıyorsa, burada biraz kaydırın ya da caminizin panosundaki saati ayarlayın. Önce hesaplama yöntemini deneyin. Asıl fark genellikle oradadır. Bu bölüm, geriye kalan birkaç dakika içindir. Cemaat vakitleri, Cemaat vakitleri bölümüne girilir.</string>
     <string name="adjustment_use_board">Cami panosundaki saati girin</string>
     <string name="adjustment_which_prayer">Hangi vakit?</string>
     <string name="action_set_time">Saati ayarla</string>
@@ -517,7 +517,19 @@
     <string name="jamaah_line">Cemaat %1$s</string>
     <string name="jumuah_line">Cuma %1$s</string>
     <string name="jamaah_check">Cemaat vaktinizi kontrol edin</string>
-    <string name="jamaah_out_of_window">%1$s cemaat vaktiniz bugün %1$s vaktinin dışında. Caminizin vakitlerini kontrol edin.</string>
+    <!-- %1$s is the prayer's own label. Typed time is before that prayer begins. -->
+    <string name="jamaah_before_window">%1$s cemaat vaktiniz, %1$s vakti girmeden önce. Caminizin vakitlerini kontrol edin.</string>
+    <!-- %1$s is the prayer's own label, %2$s the label of the next prayer, whose start the typed time is not before. -->
+    <string name="jamaah_after_window">%1$s cemaat vaktiniz, %2$s vakti girdikten sonra. Caminizin vakitlerini kontrol edin.</string>
+    <!-- %1$s is the prayer's own label (Fajr). Typed time is after sunrise. -->
+    <string name="jamaah_after_sunrise">%1$s cemaat vaktiniz, güneş doğduktan sonra. Caminizin vakitlerini kontrol edin.</string>
+    <!-- %1$s is the label of Dhuhr. -->
+    <string name="jumuah_before_window">Cuma vaktiniz, %1$s vakti girmeden önce. Caminizin vakitlerini kontrol edin.</string>
+    <!-- %1$s is the label of Asr. -->
+    <string name="jumuah_after_window">Cuma vaktiniz, %1$s vakti girdikten sonra. Caminizin vakitlerini kontrol edin.</string>
+    <!-- Quiet notice at the top of the Jama'ah times dialog while the phone is in another time zone. -->
+    <string name="jamaah_away_brief">Farklı bir saat dilimindesiniz, bu yüzden cemaat vakitleriniz gösterilmiyor.</string>
+    <string name="jamaah_away_details">Evinize döndüğünüzde geri gelirler. Taşındıysanız buradan herhangi birini değiştirin, hepsi bu saat dilimine uyar.</string>
     <string name="jamaah_pick_time_title">%1$s: caminizin panosundaki cemaat saati</string>
     <string name="mosque_diff_add_jamaah">Caminizin cemaat vakitlerini ekleyin</string>
 

@@ -22,7 +22,7 @@ class JamaahPlanTest {
     private val prefs = CalculationPrefs()
     private fun day(date: String, p: CalculationPrefs = prefs) = PrayerEngine.compute(london, LocalDate.parse(date), p)
     private fun t(s: String) = LocalTime.parse(s)
-    private fun shownAt(r: JamaahResult?) = (r as JamaahResult.Shown).at
+    private fun shownAt(r: JamaahResult?) = (r as JamaahResult.InWindow).at
 
     // Thursday 4 Feb 2027: Dhuhr about 12:20, Asr about 14:40 in London.
     private val thursday = day("2027-02-04")
@@ -46,28 +46,28 @@ class JamaahPlanTest {
 
     @Test fun `a fixed time before the prayer begins is never shown`() {
         val plan = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.ASR to JamaahRule.Fixed(t("13:00")))))
-        assertEquals(JamaahResult.OutOfWindow, plan[PrayerSlot.ASR])
+        assertEquals(JamaahResult.Before, plan[PrayerSlot.ASR])
     }
 
     @Test fun `a fixed time after the next prayer begins is never shown`() {
         val plan = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.DHUHR to JamaahRule.Fixed(t("16:00")))))
-        assertEquals(JamaahResult.OutOfWindow, plan[PrayerSlot.DHUHR])
+        assertEquals(JamaahResult.After(PrayerSlot.ASR), plan[PrayerSlot.DHUHR])
     }
 
     @Test fun `Fajr's window ends at sunrise`() {
         val afterSunrise = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.FAJR to JamaahRule.Fixed(t("09:00")))))
-        assertEquals(JamaahResult.OutOfWindow, afterSunrise[PrayerSlot.FAJR])
+        assertEquals(JamaahResult.After(PrayerSlot.SUNRISE), afterSunrise[PrayerSlot.FAJR])
         val tooLate = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.FAJR to JamaahRule.After(60))))
         val fajrToSunrise = Duration.between(thursday[PrayerSlot.FAJR], thursday[PrayerSlot.SUNRISE]).toMinutes()
         assertTrue(fajrToSunrise > 60)
-        assertTrue(tooLate[PrayerSlot.FAJR] is JamaahResult.Shown)
+        assertTrue(tooLate[PrayerSlot.FAJR] is JamaahResult.InWindow)
     }
 
     @Test fun `Maghrib's window ends at Isha, so a long gap is caught`() {
         val gap = Duration.between(thursday[PrayerSlot.MAGHRIB], thursday[PrayerSlot.ISHA]).toMinutes()
         assertTrue("Maghrib to Isha is $gap minutes", gap > 60)
         val atIsha = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.MAGHRIB to JamaahRule.Fixed(t("23:00")))))
-        assertEquals(JamaahResult.OutOfWindow, atIsha[PrayerSlot.MAGHRIB])
+        assertEquals(JamaahResult.After(PrayerSlot.ISHA), atIsha[PrayerSlot.MAGHRIB])
     }
 
     @Test fun `on Friday Dhuhr's line is Jumu'ah, and never falls back to Dhuhr's own jama'ah`() {
@@ -75,19 +75,50 @@ class JamaahPlanTest {
         val none = JamaahPlan.on(friday, zone, JamaahTimes(rules))
         assertFalse(PrayerSlot.DHUHR in none)
         val withJumuah = JamaahPlan.on(friday, zone, JamaahTimes(rules, jumuah = t("13:15")))
-        val r = withJumuah[PrayerSlot.DHUHR] as JamaahResult.Shown
+        val r = withJumuah[PrayerSlot.DHUHR] as JamaahResult.InWindow
         assertTrue(r.isJumuah)
         assertEquals(Instant.parse("2027-02-05T13:15:00Z"), r.at)
         // Thursday is unaffected by a Jumu'ah time.
         val thu = JamaahPlan.on(thursday, zone, JamaahTimes(rules, jumuah = t("13:15")))
-        assertFalse((thu[PrayerSlot.DHUHR] as JamaahResult.Shown).isJumuah)
+        assertFalse((thu[PrayerSlot.DHUHR] as JamaahResult.InWindow).isJumuah)
     }
 
     @Test fun `Jumu'ah must fall between Dhuhr and Asr`() {
-        for (time in listOf("11:00", "16:30")) {
-            val plan = JamaahPlan.on(friday, zone, JamaahTimes(jumuah = t(time)))
-            assertEquals(time, JamaahResult.OutOfWindow, plan[PrayerSlot.DHUHR])
-        }
+        val early = JamaahPlan.on(friday, zone, JamaahTimes(jumuah = t("11:00")))
+        assertEquals(JamaahResult.Before, early[PrayerSlot.DHUHR])
+        val late = JamaahPlan.on(friday, zone, JamaahTimes(jumuah = t("16:30")))
+        assertEquals(JamaahResult.After(PrayerSlot.ASR), late[PrayerSlot.DHUHR])
+    }
+
+    @Test fun `an Isha time that is not before the next Fajr is After Fajr`() {
+        // 05:30 typed for Isha reads as the small hours after this night (before noon); in June London's Fajr is earlier.
+        val plan = JamaahPlan.on(day("2027-06-20"), zone, JamaahTimes(mapOf(PrayerSlot.ISHA to JamaahRule.Fixed(t("05:30")))))
+        assertEquals(JamaahResult.After(PrayerSlot.FAJR), plan[PrayerSlot.ISHA])
+    }
+
+    @Test fun `Fajr after sunrise names sunrise as the slot it passed`() {
+        val plan = JamaahPlan.on(thursday, zone, JamaahTimes(mapOf(PrayerSlot.FAJR to JamaahRule.Fixed(t("09:00")))))
+        assertEquals(PrayerSlot.SUNRISE, (plan[PrayerSlot.FAJR] as JamaahResult.After).next)
+    }
+
+    // --- the time zone guard -----------------------------------------------------------
+
+    @Test fun `London rules in Dubai are hidden`() {
+        val rules = mapOf(PrayerSlot.DHUHR to JamaahRule.Fixed(t("13:30")))
+        val stored = JamaahTimes(rules, zoneId = "Europe/London")
+        assertTrue(JamaahPlan.on(thursday, ZoneId.of("Asia/Dubai"), stored).isEmpty())
+        assertEquals(1, JamaahPlan.on(thursday, zone, stored).size)
+        // No zone stored (v1): shown, whatever the zone.
+        assertEquals(1, JamaahPlan.on(thursday, ZoneId.of("Asia/Dubai"), JamaahTimes(rules)).size)
+    }
+
+    @Test fun `visibleIn compares zone ids and never offsets`() {
+        val london = JamaahTimes(zoneId = "Europe/London")
+        assertTrue(london.visibleIn("Europe/London"))
+        assertFalse(london.visibleIn("Asia/Dubai"))
+        // Lisbon and London share an offset all year, but they are different zones.
+        assertFalse(london.visibleIn("Europe/Lisbon"))
+        assertTrue(JamaahTimes().visibleIn("Asia/Dubai"))
     }
 
     @Test fun `a fixed time keeps its clock reading across the spring clock change`() {
@@ -130,5 +161,24 @@ class JamaahPlanTest {
         )
         assertTrue(JamaahCodec.decode(null).isEmpty)
         assertTrue(JamaahCodec.decode("").isEmpty)
+    }
+
+    @Test fun `codec version 2 writes the zone and reads it back`() {
+        val j = JamaahTimes(mapOf(PrayerSlot.DHUHR to JamaahRule.Fixed(t("13:30"))), jumuah = t("13:15"), zoneId = "Europe/London")
+        assertEquals("DHUHR=13:30,JUMUAH=13:15,ZONE=Europe/London", JamaahCodec.encode(j))
+        assertEquals(j, JamaahCodec.decode(JamaahCodec.encode(j)))
+    }
+
+    @Test fun `codec version 1 has no zone and reads as null`() {
+        val j = JamaahCodec.decode("DHUHR=13:30,JUMUAH=13:15")
+        assertEquals(null, j.zoneId)
+        assertEquals(2, j.count)
+    }
+
+    @Test fun `a damaged zone is dropped and the rules survive`() {
+        val j = JamaahCodec.decode("DHUHR=13:30,ZONE=Not/AZone")
+        assertEquals(null, j.zoneId)
+        assertEquals(JamaahRule.Fixed(t("13:30")), j.rules[PrayerSlot.DHUHR])
+        assertTrue(j.visibleIn("Asia/Dubai"))
     }
 }

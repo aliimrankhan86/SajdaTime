@@ -290,9 +290,9 @@
     <string name="duration_s">%1$d سیکنڈ</string>
 
     <!-- "Match your mosque" -->
-    <string name="settings_adjustments">اپنی مسجد سے ملائیں</string>
+    <string name="settings_adjustments">شروع کے اوقات اپنی مسجد سے ملائیں</string>
     <string name="settings_adjustments_none">کوئی تبدیلی نہیں</string>
-    <string name="settings_adjustments_help">اگر آپ کی مسجد کا چھپا ہوا وقت مختلف ہے تو اسے یہاں تھوڑا آگے پیچھے کر لیں، یا وہ وقت مقرر کریں جو آپ کی مسجد کا بورڈ دکھاتا ہے۔ پہلے حساب کا طریقہ بدل کر دیکھیں۔ عموماً اصل فرق وہی ہوتا ہے، اور یہ بچے ہوئے چند منٹوں کے لیے ہے۔</string>
+    <string name="settings_adjustments_help">اگر آپ کی مسجد کا چھپا ہوا وقت مختلف ہے تو اسے یہاں تھوڑا آگے پیچھے کر لیں، یا وہ وقت مقرر کریں جو آپ کی مسجد کا بورڈ دکھاتا ہے۔ پہلے حساب کا طریقہ بدل کر دیکھیں۔ عموماً اصل فرق وہی ہوتا ہے، اور یہ بچے ہوئے چند منٹوں کے لیے ہے۔ جماعت کے اوقات، جماعت کے اوقات میں درج کریں۔</string>
     <string name="adjustment_use_board">مسجد کے بورڈ سے وقت لیں</string>
     <string name="adjustment_which_prayer">کون سی نماز؟</string>
     <string name="action_set_time">وقت مقرر کریں</string>
@@ -523,7 +523,19 @@
     <string name="jamaah_line">جماعت %1$s</string>
     <string name="jumuah_line">جمعہ %1$s</string>
     <string name="jamaah_check">جماعت کا وقت چیک کریں</string>
-    <string name="jamaah_out_of_window">آپ کا %1$s کی جماعت کا وقت آج %1$s کے وقت سے باہر ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- %1$s is the prayer's own label. Typed time is before that prayer begins. -->
+    <string name="jamaah_before_window">آپ کا %1$s کی جماعت کا وقت %1$s شروع ہونے سے پہلے ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- %1$s is the prayer's own label, %2$s the label of the next prayer, whose start the typed time is not before. -->
+    <string name="jamaah_after_window">آپ کا %1$s کی جماعت کا وقت %2$s شروع ہونے کے بعد ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- %1$s is the prayer's own label (Fajr). Typed time is after sunrise. -->
+    <string name="jamaah_after_sunrise">آپ کا %1$s کی جماعت کا وقت طلوعِ آفتاب کے بعد ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- %1$s is the label of Dhuhr. -->
+    <string name="jumuah_before_window">آپ کا جمعہ کا وقت %1$s شروع ہونے سے پہلے ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- %1$s is the label of Asr. -->
+    <string name="jumuah_after_window">آپ کا جمعہ کا وقت %1$s شروع ہونے کے بعد ہے۔ اپنی مسجد کے اوقات دیکھیں۔</string>
+    <!-- Quiet notice at the top of the Jama'ah times dialog while the phone is in another time zone. -->
+    <string name="jamaah_away_brief">آپ کسی دوسرے ٹائم زون میں ہیں، اس لیے آپ کے جماعت کے اوقات نہیں دکھائے جا رہے۔</string>
+    <string name="jamaah_away_details">گھر واپس آنے پر یہ دوبارہ نظر آئیں گے۔ اگر آپ کہیں اور منتقل ہو گئے ہیں تو یہاں ان میں سے کوئی ایک بدل دیں، پھر سب اسی ٹائم زون کے مطابق ہو جائیں گے۔</string>
     <string name="jamaah_pick_time_title">%1$s: آپ کی مسجد کے بورڈ پر جماعت کا وقت</string>
     <string name="mosque_diff_add_jamaah">اپنی مسجد کی جماعت کے اوقات شامل کریں</string>
 
