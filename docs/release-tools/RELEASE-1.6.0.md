@@ -29,7 +29,7 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
 
 ## Before release day
 
-0. **PR #16 first** (https://github.com/aliimrankhan86/SajdaTime/pull/16, "1.5.0: submitted, then live (docs only)",
+0. **DONE 25 Oct 2026: Ali merged PR #16 and `main` was merged into `claude/1-6-0`.** **PR #16 first** (https://github.com/aliimrankhan86/SajdaTime/pull/16, "1.5.0: submitted, then live (docs only)",
    `claude/1-5-0-submitted` into `main`). It records 1.5.0 live, the Arabic review reply, the jobs re-baselined to
    1.5.0 and HANDOVER lesson 177a (check a re-baselined watcher against the live page, line by line). It conflicts with
    this branch in `CLAUDE.md`, `docs/HANDOVER.md`, `docs/PROJECT_BRIEF.md` and `docs/store/LISTING.md`. **Ali** merges
