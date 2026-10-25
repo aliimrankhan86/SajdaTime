@@ -6,6 +6,15 @@ also go in `docs/DESIGN_SYSTEM.md` §9 with his words.
 
 ---
 
+## 25 Oct 2026: independent review fixes
+
+- A playbook row offered a recipe for a missed prayer counter, which the owner refused on 16 Oct 2026; it now says No.
+- Precedence: the owner's §0 rules and the §4.1 inventory rank with his decisions, above these pages.
+- `DesignTokensTest`: the icon files it reads are declared test inputs; a duplicated Material role fails.
+- The deviations list is OPEN item `ds-deviations` in `docs/DESIGN_SYSTEM.md` §11, so it reaches the owner.
+- Wording: only dismissable dialogs carry the X; Google's review card is the one allowed rating ask; Times shows no
+  location in the card, not as a notice; `#14624B` is in the token file.
+
 ## 25 Oct 2026: created from release 1.6.0
 
 - **What:** this folder, taken from `claude/1-6-0` at `1cdae4a`. Ten pages, five token files, and

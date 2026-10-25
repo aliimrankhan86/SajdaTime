@@ -94,6 +94,8 @@ class DesignTokensTest {
         }
         val wired = mapOf("light" to scheme("lightColorScheme"), "dark" to scheme("darkColorScheme"))
         val roles = json("color.json").getJSONObject("roles")
+        val slots = roles.keys().asSequence().map { roles.getJSONObject(it).getString("m3Role") }.toList()
+        assertEquals("An m3Role is listed twice in color.json roles", slots.size, slots.toSet().size)
         for (themeName in listOf("light", "dark")) {
             val inDoc = roles.keys().asSequence().associate { key ->
                 val token = roles.getJSONObject(key)

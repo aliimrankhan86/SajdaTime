@@ -269,6 +269,12 @@ tasks.withType<Test>().configureEach {
                 "app/src/main/java/com/sajdatime/app/ui/components/CtaButton.kt",
                 "wear/src/main/java/com/sajdatime/wear/WearTheme.kt",
                 "wear/src/main/java/com/sajdatime/wear/NextPrayerTileService.kt",
+                // Its asset colour check reads these icon files too (color.json assets).
+                "app/src/main/res/drawable/ic_launcher_background.xml",
+                "app/src/main/res/drawable/ic_launcher_foreground.xml",
+                "app/src/main/res/mipmap/ic_launcher.xml",
+                "app/src/main/res/mipmap/ic_launcher_round.xml",
+                "wear/src/main/res/mipmap/ic_launcher.xml",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

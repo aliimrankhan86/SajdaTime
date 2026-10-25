@@ -146,7 +146,7 @@ Not decided; patterns to reach for if the owner asks. Each still needs his decis
 | Mosque finder or directory | **No**: needs network and a server | Breaks the charity rules |
 | Duas or adhkar text | A reading screen in `bodyLarge`, Arabic in the system Naskh font, translation under it | Religious content: never machine paraphrase; source each text; disclaimer applies |
 | Hijri calendar month view | Reuse the Last 30 days grid and Islamic dates sheet patterns | Hijri in `primary` only where it already is; follow the date shift setting |
-| Qada prayers (missed prayers to make up) | Copy "Fasts to make up": a count with −/+ steppers in Settings and one compact button on My prayers | No shame wording; count never goes below 0 |
+| A prayer counter of any kind for prayers not ticked | **No.** The owner decided on 16 Oct 2026: no such counter (`docs/HANDOVER.md` §11, `docs/PROJECT_BRIEF.md`) | Listed as Never in `05-screens-and-features.md` §5.8 |
 | More languages | `values-xx`, translated and checked by Claude; RTL if the script is | Packaged in the app (no language splits); `values-in` trap for legacy codes |
 | Lock screen or iPhone Live Activity | Android: the existing notification. iPhone: Live Activity with the countdown | Android only vs iPhone only, label it |
 | Tablet layout | Content capped at 600dp and centred, sky full width (already built) | Do not invent a two pane layout without the owner |

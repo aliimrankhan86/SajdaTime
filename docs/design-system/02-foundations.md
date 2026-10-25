@@ -111,7 +111,7 @@ darken it. Dark night is told by hue (1.05:1 against the page), kept by the owne
 | Launcher icon, PDF logo, widget mark, store icon | `#0E6B4F` green with `#F0D69A` sand | The icon is the Play listing's face; it moves with an icon refresh, not as a side effect of `primary` moving to `#0B5A43` |
 | Watch background | `#000000` | OLED pixels switch off |
 | Watch tile | See `wearTile` | **Known gap**: three colours that do not match the palette. Held by test; aligning them is the owner's call |
-| Android 7 launcher icon and the watch launcher icon | `#14624B` | **Known gap**: the older green. Not in the token file because it is an icon asset, not a theme colour |
+| Android 7 launcher icon and the watch launcher icon | `#14624B` | **Known gap**: the older green, an icon asset rather than a theme colour; recorded in `color.json` → `assets` and held to its files by test |
 
 ### Contrast is enforced
 

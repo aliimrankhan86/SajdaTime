@@ -48,7 +48,7 @@ Known exceptions in strings: `S:adjustment_none` is "—" on purpose (the "no ch
 | tracking (in the usage question) | Misleads | "usage counts" |
 | error, failed (alone), invalid | Blames | What happened and what to do |
 | amazing, premium, best, ultimate | Hype | Say what it does |
-| Any ask for a rating, share, review or donation | The owner's rule | The passive rows in About only |
+| Any ask for a rating, share, review or donation in our words | The owner's rule | Google's own review card, rarely (`05-screens-and-features.md` §5.9), and the passive rows in About |
 
 Sky names are times of day (Dawn, Day, Evening, Night), never prayer or fasting names.
 

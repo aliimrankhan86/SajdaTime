@@ -6024,8 +6024,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Checked:** `DesignTokensTest`, `DesignRulesTest`, `ColorContrastTest` and the full app and core unit tests in the
   cloud container (Android SDK installed there). **Not checked:** lint, release bundles, any device or emulator run
   (no app code changed); the SF Symbol names were not checked against Apple's current symbol list.
-- **Next:** Ali reviews the folder and decides whether to merge into `claude/1-6-0` before release day, and whether to
-  fix any recorded deviation (each is one small visible change).
+- **Independent review (about 70 claims checked, almost all correct), all eight findings fixed:** a playbook row
+  suggesting a missed prayer counter (Ali refused it 16 Oct 2026) now says No; the precedence table now ranks his §0
+  rules and the §4.1 inventory first; four icon files declared as test inputs; a duplicate Material role now fails; the
+  deviations raised as OPEN `ds-deviations` in `docs/DESIGN_SYSTEM.md` §11; three wording fixes (dismissable dialogs,
+  Google's review card, Times' no location state).
+- **Next:** Ali reviews the folder and decides whether to merge into `claude/1-6-0` before release day, and answers
+  `ds-deviations` (each fix is one small visible change).
 
 ### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)
 

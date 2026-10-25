@@ -13,7 +13,7 @@ pattern rather than inventing a variant.
 - **Tabs are siblings:** switching cross fades, never slides. Each tab keeps its own scroll.
 - **Everything else opens over the tab** as a dialog or a bottom sheet. No pushed full screens in the
   main app. (Setup is the one full screen flow.)
-- **Leaving:** every dialog and titled sheet has a visible close X. System Back closes the top sheet or
+- **Leaving:** every dialog the user can simply leave, and every titled sheet, has a visible close X. A question that must be answered (the usage question) has none, on purpose. System Back closes the top sheet or
   dialog; on a tab it leaves the app.
 - **Hand off from Times to Settings:** a button on Times that changes a setting switches to the
   Settings tab and opens that one chooser (for example the mosque dialog's four buttons). Only one
@@ -80,7 +80,7 @@ Write each one into the spec before building. If a state cannot happen, say why.
 |---|---|
 | Loading | Nothing flashes: draw nothing until settings load (they are local and fast). A running action shows `ProgressRow` and disables only its own button |
 | First run | Setup has run; defaults apply; nothing asks again |
-| No location | Warning notice "Set your location…" with "Set location"; never a blank screen |
+| No location | Never a blank screen. Qibla and My prayers: a warning notice "Set your location…" with "Set location". Times: the next prayer card says "Set your location to see prayer times." and the city chip opens the location sheet |
 | Makkah fallback | Times for Makkah with a warning notice saying so |
 | Permission missing | Permission card on Times (closable) and in Settings (permanent) |
 | Offline | Nothing changes; times never need the network. Only place search says it needs a connection |

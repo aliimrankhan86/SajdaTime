@@ -342,7 +342,8 @@ shake to undo: nobody finds it.
 ## 3.6 Known deviations (do not copy, do not "fix" without the owner)
 
 Found by the 25 Oct 2026 census. Each is a visible change, so fixing it is the owner's decision
-(`docs/DESIGN_SYSTEM.md` §0.2). New work follows the rule column.
+(`docs/DESIGN_SYSTEM.md` §0.2); the list is raised with him as OPEN item `ds-deviations` in
+`docs/DESIGN_SYSTEM.md` §11. New work follows the rule column.
 
 | Id | Where | Deviation | Rule for new work |
 |---|---|---|---|

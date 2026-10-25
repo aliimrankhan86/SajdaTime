@@ -112,12 +112,12 @@ in these pages, so a new file means a new row here and a spec in the right page.
 
 | Order | Source | Holds |
 |---|---|---|
-| 1 | **The owner** | Any decision he has made. Recorded in `docs/DESIGN_SYSTEM.md` §9 (decision log, dated, with his words) |
+| 1 | **The owner** | Any decision he has made, recorded in `docs/DESIGN_SYSTEM.md` §9 with his words; and his rules in `docs/DESIGN_SYSTEM.md` §0 and the enforced button inventory in §4.1 |
 | 2 | **Open questions** | `docs/DESIGN_SYSTEM.md` §11. An OPEN item is not decided: never build an answer to it |
 | 3 | **The code** for values | `app/src/main/java/com/sajdatime/app/ui/theme/` (`Color.kt`, `Type.kt`, `Spacing.kt`, `Motion.kt`, `Theme.kt`) |
 | 4 | **`tokens/*.json`** | The same values, platform neutral. `DesignTokensTest` fails the build if 3 and 4 differ |
 | 5 | **This folder's pages** | How and when to use the values; specs for components, patterns and screens |
-| 6 | **`docs/DESIGN_SYSTEM.md`** prose | The owner's rules (§0), the enforced button inventory (§4.1), the learning loop (§10). Its value tables are older copies of what is in `tokens/` |
+| 6 | **`docs/DESIGN_SYSTEM.md` value tables** (§1 to §8) | Older copies of what is in `tokens/`; the learning loop (§10) still applies |
 | 7 | Plans in `docs/plans/` | The reasoning behind each 1.6 step. History, not instruction |
 
 If a page here disagrees with the code, the code is right for the value; fix the page in the same
