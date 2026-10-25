@@ -160,13 +160,14 @@ internal object WidgetRenderer {
 
         val next = state.next
         if (!state.hasLocation || next == null) {
-            // The one message, in the small line, allowed to wrap. Everything else is hidden.
-            views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_no_location))
-            views.setViewVisibility(R.id.widget_sublabel, View.VISIBLE)
-            views.setInt(R.id.widget_sublabel, "setMaxLines", NO_LOCATION_LINES)
-            // A sentence the person has to read and act on, so it is larger than the context line it borrows.
-            views.setTextViewTextSize(R.id.widget_sublabel, TypedValue.COMPLEX_UNIT_SP, MESSAGE_SP)
-            for (id in HERO_IDS) views.setViewVisibility(id, View.GONE)
+            // The one message, in the name's place (on_surface ink, 14sp, up to two lines), with the glyph and the
+            // time hidden: in the grey foot line it read as an afterthought on the sky. Fable, 25 Oct 2026.
+            views.setTextViewText(R.id.widget_name, context.getString(R.string.widget_no_location))
+            views.setViewVisibility(R.id.widget_name, View.VISIBLE)
+            views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, MESSAGE_SP)
+            views.setInt(R.id.widget_name, "setMaxLines", NO_LOCATION_LINES)
+            views.setViewVisibility(R.id.widget_sublabel, View.GONE)
+            for (id in HERO_IDS) if (id != R.id.widget_name) views.setViewVisibility(id, View.GONE)
             if (wide) {
                 views.setViewVisibility(R.id.widget_divider, View.GONE)
                 for (slot in PrayerSlot.entries) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
@@ -176,6 +177,9 @@ internal object WidgetRenderer {
         }
 
         fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP, sky = true)
+        // Written back: a recycled view that showed the no location message had the name at 14sp and two lines.
+        views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, NAME_SP)
+        views.setInt(R.id.widget_name, "setMaxLines", 1)
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
@@ -240,7 +244,7 @@ internal object WidgetRenderer {
         applyDirection(context, views)
         applyTap(context, views)
         // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
-        val side = dp(context, 6f)
+        val side = dp(context, 4f)
         val edge = dp(context, if (glyphs) 4f else 2f)
         views.setViewPadding(R.id.widget_root, side, edge, side, edge)
         // From 1.3 text the five columns would cut names and times (STEP-8-DESIGN section 3), so the next
@@ -489,11 +493,14 @@ internal object WidgetRenderer {
     // --- shared helpers -------------------------------------------------------------------
 
     /** How many lines the "open SajdaTime" message may take before it is cut. Normal text takes one. */
-    private const val NO_LOCATION_LINES = 4
+    private const val NO_LOCATION_LINES = 2
 
     /** The context line is 12sp in the layouts; the no location message uses 14sp. Both are written every time. */
     private const val CONTEXT_SP = 12f
     private const val MESSAGE_SP = 14f
+
+    /** The Next prayer widgets' prayer name, 16sp in both layouts; rewritten after the message size. */
+    private const val NAME_SP = 16f
 
     /**
      * The countdown sizes, in dp, judged from renders at each layout's smallest size. At the small Next
