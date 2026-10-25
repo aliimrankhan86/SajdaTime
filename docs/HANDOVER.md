@@ -5962,7 +5962,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STEP 11 REVIEWED, 25 Oct 2026, afternoon (read this first): pictures go to Ali next
+### 📍 STEP 11 DONE, 25 Oct 2026, afternoon (read this first): Ali approved the pictures ("Yes all fine"); release day walkthrough `docs/release-tools/RELEASE-1.6.0.md`
 
 - **1.5.0 is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct).
 - **Step 11 design:** `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (Fable), `plan-verifier` corrections in its §9.
@@ -5992,8 +5992,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   Play's promotion notice (paste time check); the suhoor reminder device test at a Ramadan clock (6d) in this step.
 - **Capture trap learned:** the AVD's GPS is Manchester; with location granted the app moves off the seeded London. Revoke
   `ACCESS_COARSE_LOCATION` after seeding (no banner appears). The `!` on the wifi icon needs the demo `network ... fully true`.
-- **Next:** pictures to Ali (his yes, plus the two optional items); DESIGN_SYSTEM §9; GBrain; `RELEASE-1.6.0.md` walk
-  through; then Ali's merge of the release PR (checkpoints: PR 11 Dec, submit by 15 Dec).
+- **Ali approved the 24 pictures on 25 Oct 2026 ("Yes all fine")** and left the two optional items as they are (12 hour
+  status bar in tr and id; the 01 countdown). DESIGN_SYSTEM §9 records the set.
+- **Next:** release day, when Ali says so, by `docs/release-tools/RELEASE-1.6.0.md` (limits: pull request by 11 Dec,
+  Send for review by 15 Dec 2026). Before it: run `release-1.6.0.sh` end to end once on the final code.
 
 ### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): read with the STATE OF PLAY below
 

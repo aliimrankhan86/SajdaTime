@@ -840,8 +840,8 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
-- **25 Oct 2026, the 1.6.0 store pictures (step 11, Fable's design; the owner chose all four recommendations, has not
-  yet seen the finished set).** Detail: `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (§9 wins).
+- **25 Oct 2026, the 1.6.0 store pictures (step 11, Fable's design; the owner chose all four recommendations and
+  approved the finished set from pictures, 25 Oct 2026: "Yes all fine").** Detail: `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (§9 wins).
   * **Eight English, four in each app language.** Times light, My prayers, Qibla, Ramadan dark (01 to 04, also in
     ar, ur, tr-TR, id-ID), widgets, Timetable, alerts and adhan, suhoor reminder. My prayers sits second because Play
     shows the first pictures beside search results. Setup madhab and Settings pictures dropped (Ali's choice).
