@@ -5962,6 +5962,31 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STEP 11 IN PROGRESS, 25 Oct 2026, ~13:00 (read this first; stopped at the usage limit, work in progress committed)
+
+- **1.5.0 is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct). The "1.5.0 is in review" line below is stale.
+- **Step 11 design:** `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (Fable), `plan-verifier` corrections in its §9.
+  **Ali chose all four recommendations (25 Oct: "Yes all recommended options"):** short description C "Offline prayer times
+  (namaz), adhan, Qibla and a private salah tracker. Wear OS."; the Chrome and Edge line removed in all nine languages; My
+  prayers and Timetable replace the setup madhab and Settings screenshots; the strip shot without its town chip.
+- **Done, uncommitted until this WIP commit, NOT yet reviewed as a whole:** versionCode 10 / 1.6.0; `ScreenSeedDeviceTest`
+  (dismissMethodNotice in the London seed, new `seed_store_alert_settings`); screenshots moved to per language folders;
+  `tools/build-store-assets.sh` per folder; `docs/release-tools/release-1.6.0.sh`; `set-release-date.sh` version arg;
+  `upload/README.md`; English 1.6.0 listing block in `LISTING.md` (short 80, full 3983, What's new 494) and the new
+  screenshot notes there; **all 24 store pictures taken** on `sajdastore` (8 English, 01 to 04 in ar, ur, tr-TR, id-ID),
+  the five dropped English raws `git rm`'d. Gate was green on the mechanical half (core 237/1, app 322, wear 27, lint 0).
+- **Running when the session stopped (check their output, redo if missing):** (1) Fable judging the 24 pictures;
+  (2) Sonnet fixing Opus's release script findings: 6j skipped unless 1080x1920, build-store-assets clears old uploads,
+  `docs/index.html` JSON-LD screenshot links (they 404 after the move: blocking before merge), R1 alarm check removed,
+  6f runs only the London seed, 6j reordered (location revoke, wifi demo, alerts seed last), 05 manual, seed KDoc;
+  (3) an Opus agent translating the 1.6.0 listing into the eight languages in `LISTING-LOCALES.md` plus
+  `docs/translation/store-listing-1.6.0.md` (short, full, What's new each; Chrome line removed).
+- **Capture trap learned:** the AVD's GPS is Manchester; with location granted the app moves off the seeded London. Revoke
+  `ACCESS_COARSE_LOCATION` after seeding (no banner appears). The `!` on the wifi icon needs the demo `network ... fully true`.
+- **Next:** check the three outputs; Opus review of the whole diff plus a back translation review; run
+  `tools/build-store-assets.sh`; full gate and device suite; pictures to Ali; HANDOVER/PROJECT_BRIEF/DESIGN_SYSTEM §9; GBrain;
+  RELEASE-1.6.0.md walk through; then Ali's merge of the release PR (checkpoints: PR 11 Dec, submit by 15 Dec).
+
 ### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): read with the STATE OF PLAY below
 
 **The 1.6 plan is complete and checked by two independent reviews. Ali answered all 27 open questions and said

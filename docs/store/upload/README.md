@@ -6,11 +6,21 @@ raw captures and re-run it.
 
 Play Console → **Grow users → Store presence → Store listings → Default store listing**.
 
+The English set goes in the default listing. For each other language, open **Store listings**, pick
+that language (Arabic, Urdu, Turkish or Indonesian), and upload that folder's four files under
+**Phone screenshots**. The folder names (`ar`, `ur`, `tr-TR`, `id-ID`) are internal; the Console asks
+for the language by name. Whether a language with its own pictures shows only those is assumed, not
+verified: check the listing preview after uploading.
+
 | Folder | Play Console field | Files | Size |
 |---|---|---|---|
 | `app-icon/` | App icon | `icon-512.png` | 512 × 512 |
 | `feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
-| `phone/` | Phone screenshots | 8 files, upload all, in filename order | 1080 × 1920 |
+| `phone/en-GB/` | Phone screenshots, default listing (English) | 8 files, upload all, in filename order | 1080 × 1920 |
+| `phone/ar/` | Phone screenshots, Arabic listing | 4 files, in filename order | 1080 × 1920 |
+| `phone/ur/` | Phone screenshots, Urdu listing | 4 files, in filename order | 1080 × 1920 |
+| `phone/tr-TR/` | Phone screenshots, Turkish listing | 4 files, in filename order | 1080 × 1920 |
+| `phone/id-ID/` | Phone screenshots, Indonesian listing | 4 files, in filename order | 1080 × 1920 |
 | `wear-os/` | Wear OS screenshots | 4 files, in filename order | 454 × 454 |
 | `tablet-7in/` | 7-inch tablet screenshots | **empty on purpose** | — |
 | `tablet-10in/` | 10-inch tablet screenshots | **empty on purpose** | — |
@@ -64,6 +74,29 @@ The AVD matters, so it is scripted rather than described:
 avdmanager create avd -n sajdastore \
   -k "system-images;android-36;google_apis;arm64-v8a" -d pixel_2 --force
 ```
+
+From 1.6.0 the whole set is taken by `docs/release-tools/release-1.6.0.sh` (step 6j), straight into
+`docs/store/screenshots/raw/phone/<folder>/`. What it relies on, in case you take one by hand:
+
+- **Place is London**, written by `ScreenSeedDeviceTest` (which also completes onboarding, answers the
+  usage question No and dismisses the "Does this match your mosque?" notice), not typed by hand. Picture
+  07 uses `ScreenSeedDeviceTest#seed_store_alert_settings`; My prayers uses `TrackerSeedDeviceTest`.
+- **Dark theme** (04 and 08): set Theme to Dark in the app's Settings, not the emulator's dark mode, and
+  set it back to Follow phone afterwards.
+- **Dhuhr** is ticked by tapping its row on the My prayers tab after seeding, as a tracker user would have.
+- **Only on the sajdastore AVD.** Step 6j reads `wm size` and skips the whole block unless it is
+  1080 × 1920, so wrong-size pictures never reach the repo.
+- **Location is revoked** (`pm revoke ... ACCESS_COARSE_LOCATION`) after the London seed: the AVD's own GPS
+  fix is Manchester and the app would move itself there. Revoked, it keeps London and Times shows no banner.
+- **Status bar:** the demo bar also sets `network -e wifi show -e level 4 -e fully true`, else a wifi
+  exclamation shows.
+- **Picture 05 (widgets) is always by hand**, the script only prints a note and records it as MANUAL: on the
+  launcher open the widget picker, tap the preview, Add; drag the Next widget's right handle to four
+  columns; set the clock to 081518302026 and the demo clock to 1830; save as `raw/phone/en-GB/05-widgets.png`.
+- **Clocks (London):** 15 Aug 2026 15:00 for 01, 02, 03, 06, 07; 22 Feb 2027 15:00 for 04 and 08 (07 is taken after them, back at the August clock);
+  15 Aug 2026 18:30 for 05.
+
+The notes below are the 1.5.0 hand recipe (Manchester); the equipment is unchanged.
 
 Then, with the app installed:
 

@@ -64,8 +64,11 @@ android {
         // widgets, built-in adhan and notification and alarm sounds, reminder before prayer, Turkey with
         // Diyanet's minutes. **Phone and watch together this time**: the watch shares the core, so the
         // Turkey change reaches it too, and its new translations ship (watch 1002 / 1.5.0).
-        versionCode = 9
-        versionName = "1.5.0"
+        //
+        // 10 / 1.6.0, 25 Oct 2026: My prayers tracker, bells, Timetable, jama'ah times, skies, the
+        // widget strip. Phone only: the watch stays 1002 / 1.5.0 (docs/plans/2026-10-release-1.6.0/).
+        versionCode = 10
+        versionName = "1.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
