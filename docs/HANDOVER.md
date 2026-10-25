@@ -2091,7 +2091,7 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
   compare day to day. The card prototype (`DayCard(ramadanDay)`, `RamadanCardsPreviewList`, two English only
   strings) was deleted; do not rebuild it.
 
-### 5.33 The Qibla screen (1.6.0 step 6, built 24 Oct 2026, waiting for Ali's three answers; STEP-6-DESIGN.md, §14 wins)
+### 5.33 The Qibla screen (1.6.0 step 6, built 24 Oct 2026, Pillars style dial 5f56fba, waiting for Ali's four §13 answers; STEP-6-DESIGN.md, §16 wins over §15 over §14)
 
 - **Km or miles by the phone's own language region**, never the app's: `MeasurementSystem.usesMiles` in `:core`, a fixed
   list (US, GB, LR, MM), which is CLDR's own answer. Not ICU `LocaleData`: same answer, and an `android.*` import `:core`
@@ -2107,7 +2107,13 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
   when touch feedback is off (§15 lesson 183). Unchanged on purpose: no buzz when the screen opens already facing the
   Kaaba, and none twice within 5 s (both measured on the S23 Ultra, comments at the buzz). The watch still uses
   `performHapticFeedback`, so it has the same silent case; not changed in 1.6 (the watch is out of scope).
-- **The watch keeps its own dial** (Kaaba at 0.66 there, 0.60 on the phone, on purpose; comment in `WearApp.kt`).
+- **The dial is the Pillars style in our theme** (Ali, 24 Oct 2026: "I want that style of compass and needle but in
+  my own theme"; STEP-6-DESIGN §15/§16). A teardrop needle in `primary` (reverses the earlier rejection, on his word),
+  a lifted bezel from `dialBezel()` (`surface` light, `surfaceContainerHighest` dark) that turns `primary` on
+  arrival, 60 `outline` ticks, letters inside, the Kaaba at 0.70. **No hub and no turn arc** (Pillars has neither;
+  the turn is said in words above the dial). Don't add them back without Ali. The arc and the alternative bezels live
+  behind TEMPORARY switches until he answers §13.
+- **The watch keeps its own dial** (Kaaba at 0.66 there, 0.70 on the phone, on purpose; comment in `WearApp.kt`).
 
 ## 6. Notification and alarm architecture
 

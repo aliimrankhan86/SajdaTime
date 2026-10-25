@@ -251,7 +251,7 @@ private fun PlaceRow(place: String) {
             imageVector = Icons.Outlined.LocationOn,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            // Sized from the text, so it grows with it (21dp at 1.0, 42dp at 2.0); the glyph fills about 0.8 of its box.
+            // Sized from the text, so it grows with it (21dp at 1.0, about 34dp at 2.0: Compose scales large text non-linearly); the glyph fills about 0.8 of its box.
             modifier = Modifier.size(textLineHeight()).testTag("qibla_place_pin"),
         )
         Spacer(Modifier.width(Space.Tight))
@@ -385,8 +385,8 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
 
     // Face, bezel colour and bezel width fade together: 250 ms on arrival, 150 ms on leaving (a reversal
     // is an exit, DESIGN_SYSTEM section 2). The bezel colour is read here, in composition, because
-    // sajdaSurface takes a colour, so the dial Box recomposes for the length of an arrival and at no other
-    // time; the face and the width are read inside the draw lambda, so a frame recomposes nothing.
+    // sajdaSurface takes a colour; the dial already recomposes on every compass sample (it reads
+    // compassHeading here), so this adds nothing. The face and the width are read inside the draw lambda.
     val dark = LocalDarkTheme.current
     val restingBezel = when {
         dark && qiblaDarkBezelBright -> scheme.surfaceBright
@@ -855,6 +855,7 @@ private fun DialLegend() {
         }
         Key(stringResource(R.string.qibla_legend_facing)) {
             // The dial's own teardrop in miniature, from the same path, so the key matches what it explains.
+            // Fill only: at this size the dial's round stroke is invisible.
             Canvas(Modifier.size(markSize)) {
                 // The shape spans -0.64r to 0.22r, so r is the box over 0.86 and the centre sits 0.21r below the middle.
                 val r = size.height / 0.86f

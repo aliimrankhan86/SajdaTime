@@ -852,7 +852,8 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   * **Rejected:** numbers on the dial face (sat on the needle, removed once already); a bare "i" for details; the
     place name as a second door to the location sheet; hiding the degree number as Pillars does; a teardrop needle;
     artwork. **Comparison switches** `qiblaCentreInstruction` and `qiblaFlatDial` in `QiblaScreen.kt` are marked
-    TEMPORARY and go when Ali has chosen.
+    TEMPORARY and go when Ali has chosen. (Superseded 24 Oct 2026 by the Pillars entry below: the teardrop is back
+    on Ali's word and `qiblaFlatDial` is gone.)
 
 - **24 Oct 2026, the skies (step 5, Fable's design, prototype built; the owner has not yet seen the pictures).**
   Detail: `docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md` (section 14 wins where it differs).

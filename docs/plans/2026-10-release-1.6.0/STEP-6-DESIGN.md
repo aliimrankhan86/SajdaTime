@@ -447,7 +447,7 @@ gains the tick, the face fills, the bezel turns green **and thickens**, one buzz
 **15.6 The key.** "Where you are facing" shows the same teardrop in miniature from the 15.2 path, `primary`.
 
 **15.7 Picture fixes folded in.** Degree sign isolate: committed (`98564e7`). Pin and key marks sized from the text:
-`bodyMedium.lineHeight` in dp (21dp at 1.0, 42 at 2.0) instead of `16.dp` / `18.dp`; the Kaaba and teardrop fill 0.75
+`bodyMedium.lineHeight` in dp (21dp at 1.0, about 34 at 2.0, since Compose scales large text non-linearly; measured 34.6dp) instead of `16.dp` / `18.dp`; the Kaaba and teardrop fill 0.75
 of the box, the pin 0.8.
 
 **15.8 Ours, not theirs (App Store 4.3).** (1) Our needle is *you*, fixed at the top with the dial turning under it,
