@@ -209,8 +209,9 @@ follow the theme and hold 3:1 on every top. **88 new assertions** in `ColorContr
 (3 inks x 3 stops x 4 skies x 2 themes), 8 feet equal the page, 8 status bar pairs. The light night top
 is the thin one, 4.57:1 under `onSurfaceVariant`: it cannot be darkened without a darker date ink.
 These sixteen stops are the second depictive colour family after the Kaaba gold: the sky shows the time of
-day the way the gold shows what the Kaaba is. No role, no state, never behind a prayer time or the
-countdown, never on a widget's text. Dark night is told by hue (`#0B1730` is 1.05:1 against the page), which
+day the way the gold shows what the Kaaba is. No role, no state, never behind a prayer time in the app.
+On the Next prayer widget the sky is the body (Ali, 25 Oct 2026, step 8 Q1), its inks held at every stop by
+`WidgetColorsTest`; never on the Today widgets or the strip. Dark night is told by hue (`#0B1730` is 1.05:1 against the page), which
 Ali kept on 24 Oct 2026 ("Keep it this deep"; `1.6-dark-skies`, §9).
 
 ### Light and dark separate surfaces differently
@@ -691,7 +692,7 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
   rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
   screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
   pressing the chip opens the app.
-- **The sky on the Next prayer widget** (1.6 step 8, pending Ali's Q1 from pictures): the body is the
+- **The sky on the Next prayer widget** (1.6 step 8, Ali chose it for both Next layouts from the pictures, 25 Oct 2026): the body is the
   current period's sky (the phone's sixteen stops), sheen and rim unchanged. The chip and the highlighted
   row get a 1dp `primary` rim (`widget_highlight` is 1.0:1 on the light day top), and the "to come" bars
   and the divider become a 30 percent `onSurfaceVariant` track. `WidgetColorsTest` holds 120 more pairs.
@@ -1221,6 +1222,15 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     time in `primary` or bold, both times on one line, a tappable prayer row, a travel notice on Times, the zone
     name in the notice, a compact door beside Timetable (two solid buttons side by side), hiding the door once set up.
 
+* **25 Oct 2026, 1.6 step 8 widgets** (`STEP-8-DESIGN.md`, Ali "All recommend" from the pictures): a third widget,
+    the Today strip (five columns, the next prayer in the pill, glyphs, "Suhoor" and "Iftar" in Ramadan, the town
+    chip only from 380dp and never at large text); the four skies behind both Next prayer layouts with a rimmed pill
+    and a translucent track; sunrise as a redraw boundary. Earlier the same night he chose the next prayer marked
+    (not the current one) and no sun arc or period word. Times are 12sp with 2dp column padding and may shrink to
+    9sp only at 250dp (Fable, from the pictures: uneven times read as a bug). Reverses the 18 Oct rejection of a
+    time of day colour behind the countdown, because four fixed skies are tested, the reason it gave. Rejected: the
+    sky on Today widgets or the strip, a Now marker, faded past columns, dropping am or pm.
+
 ---
 
 ## 10. The learning loop
@@ -1275,7 +1285,7 @@ the date and his words, and delete it here.
 
 | Id | Decision | Next step |
 |---|---|---|
-| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Ali answered the four STEP-5-DESIGN §13 questions on 24 Oct 2026, all as recommended |
+| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Ali answered the four STEP-5-DESIGN §13 questions on 24 Oct 2026, all as recommended. Step 8 put the skies on the Next prayer widget (25 Oct 2026) |
 | 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | **Decided and built (24 Oct 2026)** on `claude/1-6-0-step3-proto`; Ali approved the prototype and the card; merge pending (HANDOVER §11) |
 | 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
 | 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Built in the step 5 prototype (`claude/1-6-0-step5-proto`); becomes built when he says yes to the pictures |

@@ -262,3 +262,7 @@ Fable judged the first pictures and asked for three changes, built in 5c83b57 an
   18 Oct; HANDOVER lesson 150 already notes renders at the exact minimum. Cheapest cure when picked up:
   `SMALL_COUNTDOWN_DP` 36 to 32 and the chip row margin 6 to 4dp.
 Pictures for Ali: Q1 03, 04, 05, 15-family-light-for-ali; Q2 10; Q3 09; Q4 08; the 9sp floor 07 and 09 (250x40); context 01, 02, 11.
+
+## 18. Ali's answers to Q1 to Q4 (25 Oct 2026)
+
+"All recommend": Q1 the sky on both Next layouts, Q2 glyph over name over time, Q3 "Suhoor" and "Iftar" in Ramadan, Q4 the chip from 380dp. Switches removed, DESIGN_SYSTEM §1 and §9 updated, merged into `claude/1-6-0`.

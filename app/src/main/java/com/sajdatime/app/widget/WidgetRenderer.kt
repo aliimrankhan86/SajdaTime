@@ -116,15 +116,6 @@ internal object WidgetRenderer {
     private const val STRIP_GLYPH_HEIGHT_DP = 64f
     private const val STRIP_CHIP_WIDTH_DP = 380f
 
-    /**
-     * TEMPORARY step 8: both go when Ali answers from the pictures (STEP-8-DESIGN section 13, Q3 and Q2).
-     * [stripRamadanWords]: "Suhoor" and "Iftar" as the Fajr and Maghrib column names on a Ramadan day (false
-     * keeps the prayer names). [stripGlyphs]: the glyph row (false forces the thin build at every size).
-     * Defaults are the recommended options. Nothing sets them in the app; only a picture session does.
-     */
-    internal var stripRamadanWords = true
-    internal var stripGlyphs = true
-
     private fun forText(context: Context, sizes: List<Pair<SizeF, Int>>) =
         if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.take(1) else sizes
 
@@ -240,7 +231,7 @@ internal object WidgetRenderer {
      */
     private fun stripViews(context: Context, state: WidgetState, now: Instant, size: SizeF): RemoteViews {
         val views = themedViews(context, state, R.layout.widget_strip)
-        val glyphs = stripGlyphs && size.height >= STRIP_GLYPH_HEIGHT_DP
+        val glyphs = size.height >= STRIP_GLYPH_HEIGHT_DP
         applyDirection(context, views)
         applyTap(context, views)
         // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
@@ -308,7 +299,7 @@ internal object WidgetRenderer {
             val highlighted = state.isHighlighted(slot)
             val word = state.ramadanWordFor(slot, state.ramadanToday)
             // The column heading a printed Ramadan timetable uses; the spoken row keeps "Suhoor ends".
-            val heading = if (stripRamadanWords && word != null) {
+            val heading = if (word != null) {
                 context.getString(if (word == RamadanWord.IFTAR) R.string.widget_iftar else R.string.widget_strip_suhoor)
             } else {
                 name

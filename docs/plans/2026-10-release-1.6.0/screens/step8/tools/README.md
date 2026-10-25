@@ -19,3 +19,4 @@ To use, copy `WidgetPicturesTmp.kt.txt` to `app/src/androidTest/java/com/sajdati
 `pic` is a filename prefix filter (omit for all). Scenes are the `scenes()` list: edit sizes, times or captions there.
 Delete the copy afterwards and never commit it. Picture 13 (the widget picker) is not drawn by this tool.
 Not a launcher: no launcher corner clipping, inset or wallpaper blur (see the report in the commit message).
+The `stripRamadanWords` and `stripGlyphs` switches were removed when Ali answered (25 Oct 2026, all recommended); delete those lines from the tool before reusing it.
