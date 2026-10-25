@@ -76,9 +76,9 @@ descriptions live in `core` because both the phone and the watch show them.
 
 ### The religious disclaimer (non-negotiable)
 
-The user was explicit about this. The app states plainly — **once after onboarding as a
-dialog (the short form since 18 Oct 2026, see §5.15), and permanently in full in Settings → About →
-Disclaimer** — that:
+The user was explicit about this. The app states plainly — **in full in Settings → About →
+Disclaimer, the first row of that group** (since 1.6; it is no longer shown at first launch, owner,
+23 Oct 2026, see §5.15) — that:
 
 - the author is **not a Mufti, Aalim, or an expert in Islam or fiqh**
 - it was **built with the help of artificial intelligence**
@@ -353,8 +353,8 @@ Welcome/bismillah → coarse-location permission with an **(i) info icon** expla
 is needed → Sunni/Shia cards → madhab (shown **only for Sunni**; Shia skips it because
 Jafari fixes the Asr rule anyway) → **calculation method** (everyone; the same list Settings
 shows, one plain line under each, "Automatic" preselected so the unsure user pays one tap)
-→ confirmation, which now names the method beside the location and school → finish. Then
-the one-time disclaimer dialog.
+→ confirmation, which now names the method beside the location and school → finish, straight to Times.
+Since 1.6 there is no disclaimer dialog after setup; the disclaimer is the first row of Settings, About.
 
 **The METHOD step was added on 15 Aug 2026 and it is the visible answer to the auto-mapping
 that was rejected.** Until then setup asked for sect and madhab and never mentioned the
@@ -453,8 +453,8 @@ Any row that opens something carries a chevron, so "this is tappable" is never a
 Madhab sits inside the School chooser and is hidden for Shia users, since Jafari fixes the
 Asr rule anyway.
 
-**The dua request lives at the end of the disclaimer**, which is shown once automatically
-after onboarding and is reachable any time from About. It appears nowhere else: asking
+**The dua request lives at the end of the disclaimer**, which lives in Settings → About →
+Disclaimer, the first row of that group (since 1.6 it is not shown at first launch). It appears nowhere else: asking
 twice for the same thing is asking too often.
 
 ### Notifications
@@ -1002,12 +1002,11 @@ have to survive any rewording:
 | 3 | **Where the app and the mosque disagree, follow the mosque.** | The owner's explicit instruction, 2 Aug 2026. It replaced *"It is your choice to make"*, which asserted the reader's agency without helping them use it. This is **not** the app taking a fiqh position — deferring to local scholars over a piece of software is the humble answer, not a partisan one. |
 | 4 | **Free, and given as it is, with no warranty and no promise of accuracy.** | Also the owner's explicit instruction, in his words: *"I dont want to be held accountable."* Stated plainly and once, in the register of the rest of the screen. Legal boilerplate would be read even less than point 2. |
 
-**The four copies, and which is canonical.**
+**The four copies, and which is canonical.** (Since 1.6 there is no setup dialog; the short form `disclaimer_brief` was deleted with it.)
 
 | Where | What it carries | File |
 |---|---|---|
-| **In-app dialog** — any time from Settings → About → Disclaimer, and one press away ("Read in full") in the setup dialog | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
-| **Setup dialog, short form** — once after setup, never after an update (since 18 Oct 2026) | All four points in about 70 words, no dua, a "Read in full" button that shows `disclaimer_body` in the same dialog | `R.string.disclaimer_brief` (`FirstRunDisclaimer` in `MainActivity.kt`) |
+| **In-app dialog** — any time from Settings → About → Disclaimer, the first row of that group (since 1.6) | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
 | **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
 | **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
 | **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
@@ -1029,7 +1028,19 @@ budget. Two things about it are deliberate:
   Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
   restoring it turns it green.
 
-**The short form after setup (owner, 18 Oct 2026).** He did not want a long message straight after
+**Superseded in 1.6 (owner, 23 Oct 2026: "My hard rules have evolved, based on user behaviour and
+more data"):** the disclaimer is no longer shown at first launch. It lives in Settings → About →
+Disclaimer, the first row of that group, title "Disclaimer", subtitle "A helper, not a religious
+authority. Worth reading."; the dialog is retitled "Disclaimer". `FirstRunDisclaimer`,
+`disclaimer_brief`, `disclaimer_read_full` and `action_understood` are deleted; the stored flag
+`disclaimer_seen` is retired but its key name is kept, never to be reused (upgraded installs hold
+`true`). The trade he chose: the four points reach every user who opens About, the watch, the store
+listing and the policy page, and no longer reach the user who never opens Settings. Nothing replaces
+the forced reading (Fable, STEP-9-DESIGN §2: a Notice, a setup sentence or a badge would each be a nag
+or a softened extra copy). `DisclaimerContentTest` holds the row's own subtitle to "not a religious
+authority"; `DesignRulesTest` holds the row first in About. The history below is kept for the reasoning.
+
+**The short form after setup (owner, 18 Oct 2026, superseded above).** He did not want a long message straight after
 installing; it was already shown only once, after setup, never after an update (the flag is stored).
 So the setup dialog shows `disclaimer_brief`: the same four points in three short paragraphs, under
 90 words, fitting one screen, with "Understood" and "Read in full". The full text stays canonical,
@@ -1042,8 +1053,8 @@ and 4 (that is the watch's budget, not the phone's). Rendered in light, dark and
 Compose harness, not committed); not seen on a device.
 
 **Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
-does not have room for, and every watch owner also has the phone app, where all four are shown
-once, unavoidably, at setup (in the short form since 18 Oct 2026, still all four). Points 1 and 3 are the two that change what someone *does*.
+does not have room for, and its 88 character budget cannot hold them; every watch owner also has the phone app, where all
+four are in full in Settings → About → Disclaimer. Points 1 and 3 are the two that change what someone *does*.
 
 **The watch string has a hard three-line budget**, and that is why it reads more bluntly than
 the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top
@@ -5963,7 +5974,7 @@ blocker, the pin test's 40dp bar, was a wrong guess about text scaling, now 30dp
 dark bezel `surfaceContainerHighest`. **Ali answered the four §13 questions as recommended** (instruction under the
 title, white lifted bezel, amber Set location notice, no arc; STEP-6-DESIGN §17); the four TEMPORARY switches are
 removed (Sonnet, reviewed by Opus). Full gate green (core 230 with 1 skipped, app 310, wear 27); device suite 37 of
-37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Step 7 (jama'ah times) built 25 Oct 2026 on `claude/1-6-0-step7-proto`** (§5.34): Fable designed it and, at Ali's request, reviewed the mosque door in full (STEP-7-DESIGN §5); `plan-verifier` corrections in §14; strings in five languages by the main session (§15); Sonnet built it; Opus reviewed (no blockers; fixes applied: privacy date, comments, a zone stamp device test with mutation proof). Fable judged the pictures (`screens/step7/`, tool in `tools/`) and asked for an 8dp gap before the Next pill, done. **Q15 answered 25 Oct 2026 (STEP-7-DESIGN §16):** Ali doubted the jama'ah feature and asked Fable; Fable said keep it, so by his rule jama'ah stays and the door stays under the rows. Ali also asked whether the app could find the nearest mosque's jama'ah times itself; research (`JAMAAH-RESEARCH.md`) says no app can (MAWAQIT and similar only have times mosques type in; it would need the network and the user's location), so typed in times stay. **Switch removed, §11 `1.6-mosque-door` closed, gate green (core 237/1 skipped, app 310, wear 27), device suite 41/41, step 7 merged into `claude/1-6-0` (25 Oct 2026).** **Step 8 (widgets) built 25 Oct 2026 on `claude/1-6-0-step8-proto` (§5.35):** strings in five languages by the main session (Arabic uses سطر, not صف, which reads as the prayer row); Sonnet built, Opus reviewed, review fixes applied; gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42. The device test helper `DeviceSupport.alarmTimes` had a parser bug (a block ran to the end of the dump and caught removal history) that made a cancelled redraw alarm look present; fixed, assertion unchanged (§15 lesson 186). Pictures taken (`screens/step8/`, tool in `tools/`), Fable judged them and her three fixes are in (STEP-8-DESIGN §17: even 12sp times, chip cap 56dp, no location message in the name's place); Opus reviewed, no blockers. The small Next clips its chip at exactly 180 by 110dp: predates step 8, cure in §17, open. **Ali answered Q1 to Q4 on 25 Oct 2026: "All recommend"** (sky on both Next layouts, glyphs on the strip, Suhoor and Iftar in Ramadan, chip from 380dp). The TEMPORARY switches are removed, DESIGN_SYSTEM §1 and §9 updated, gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42, **step 8 merged into `claude/1-6-0`**. Store screenshot `06-widgets.png` is retaken with the other store screenshots at step 10 or 11 (BUILD-INSTRUCTIONS §2 item 10, and the Release row lists 06). **Next: step 9** (the disclaimer moves to Settings, About). Not verified: 1.3 text on a device, Urdu, Android 7, a real launcher; `stripViews` has no JVM test (no Robolectric). Store screenshot 06 and the Next preview on Android 12+ (previewLayout shows paper) are open. Earlier: Fable's design saved as `STEP-8-DESIGN.md` (a 4 by 1 Today strip, the four skies on the Next prayer widget, sunrise as a refresh boundary; four questions for Ali in §13); `plan-verifier` was checking it when the session stopped at 85% of the usage limit. **Next:** apply the verifier's corrections as STEP-8-DESIGN §14, build with Sonnet (`implementer`) on the recommendations, Opus review, gate, device suite, pictures per §12, Fable judges, then Ali answers Q1 to Q4 from the pictures. Merge only after his yes. 1.6.1 candidates from the research: show when fixed jama'ah times were set; a quiet Ramadan reminder to check mosque times. **Left from review, not done:** the disclaimer still says "Match your mosque" (protected text, Ali's call); the 320dp device check measures the row, not the line wrap; the window end and next slot mappings are written twice in `JamaahTimes.kt`. Not verified: a real compass, TalkBack
+37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Step 7 (jama'ah times) built 25 Oct 2026 on `claude/1-6-0-step7-proto`** (§5.34): Fable designed it and, at Ali's request, reviewed the mosque door in full (STEP-7-DESIGN §5); `plan-verifier` corrections in §14; strings in five languages by the main session (§15); Sonnet built it; Opus reviewed (no blockers; fixes applied: privacy date, comments, a zone stamp device test with mutation proof). Fable judged the pictures (`screens/step7/`, tool in `tools/`) and asked for an 8dp gap before the Next pill, done. **Q15 answered 25 Oct 2026 (STEP-7-DESIGN §16):** Ali doubted the jama'ah feature and asked Fable; Fable said keep it, so by his rule jama'ah stays and the door stays under the rows. Ali also asked whether the app could find the nearest mosque's jama'ah times itself; research (`JAMAAH-RESEARCH.md`) says no app can (MAWAQIT and similar only have times mosques type in; it would need the network and the user's location), so typed in times stay. **Switch removed, §11 `1.6-mosque-door` closed, gate green (core 237/1 skipped, app 310, wear 27), device suite 41/41, step 7 merged into `claude/1-6-0` (25 Oct 2026).** **Step 8 (widgets) built 25 Oct 2026 on `claude/1-6-0-step8-proto` (§5.35):** strings in five languages by the main session (Arabic uses سطر, not صف, which reads as the prayer row); Sonnet built, Opus reviewed, review fixes applied; gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42. The device test helper `DeviceSupport.alarmTimes` had a parser bug (a block ran to the end of the dump and caught removal history) that made a cancelled redraw alarm look present; fixed, assertion unchanged (§15 lesson 186). Pictures taken (`screens/step8/`, tool in `tools/`), Fable judged them and her three fixes are in (STEP-8-DESIGN §17: even 12sp times, chip cap 56dp, no location message in the name's place); Opus reviewed, no blockers. The small Next clips its chip at exactly 180 by 110dp: predates step 8, cure in §17, open. **Ali answered Q1 to Q4 on 25 Oct 2026: "All recommend"** (sky on both Next layouts, glyphs on the strip, Suhoor and Iftar in Ramadan, chip from 380dp). The TEMPORARY switches are removed, DESIGN_SYSTEM §1 and §9 updated, gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42, **step 8 merged into `claude/1-6-0`**. Store screenshot `06-widgets.png` is retaken with the other store screenshots at step 10 or 11 (BUILD-INSTRUCTIONS §2 item 10, and the Release row lists 06). **Step 9 (disclaimer) built 25 Oct 2026 on `claude/1-6-0-step9-proto`** (STEP-9-DESIGN.md): the disclaimer is no longer shown at first launch and is the first row of Settings, About (Info tile, "Disclaimer", "A helper, not a religious authority. Worth reading."); dialog retitled "Disclaimer", text unchanged, dua last; `FirstRunDisclaimer`, `disclaimer_brief`, `disclaimer_read_full`, `action_understood` deleted in five languages; `disclaimer_seen` key retired, kept unread. Fable designed it (no question for Ali), `plan-verifier` corrections in §6, Sonnet built, Opus reviewed (no blockers, its doc fixes applied). Tests: `DisclaimerContentTest` holds the subtitle to "not a religious authority", `DesignRulesTest` holds the row first in About (mutation proofs for both). Pictures in `screens/step9/`. **Waiting for Ali's yes from the pictures, then merge.** Not verified: a 320dp screen (2x text was on the Pixel), Arabic, Turkish, Indonesian on screen. **Next after that: step 10.** Not verified: 1.3 text on a device, Urdu, Android 7, a real launcher; `stripViews` has no JVM test (no Robolectric). Store screenshot 06 and the Next preview on Android 12+ (previewLayout shows paper) are open. Earlier: Fable's design saved as `STEP-8-DESIGN.md` (a 4 by 1 Today strip, the four skies on the Next prayer widget, sunrise as a refresh boundary; four questions for Ali in §13); `plan-verifier` was checking it when the session stopped at 85% of the usage limit. **Next:** apply the verifier's corrections as STEP-8-DESIGN §14, build with Sonnet (`implementer`) on the recommendations, Opus review, gate, device suite, pictures per §12, Fable judges, then Ali answers Q1 to Q4 from the pictures. Merge only after his yes. 1.6.1 candidates from the research: show when fixed jama'ah times were set; a quiet Ramadan reminder to check mosque times. **Left from review, not done:** the disclaimer still says "Match your mosque" (protected text, Ali's call); the 320dp device check measures the row, not the line wrap; the window end and next slot mappings are written twice in `JamaahTimes.kt`. Not verified: a real compass, TalkBack
 by ear, `:app:installRtl`, landscape and tablet for this screen. Steps 7 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
@@ -5985,8 +5996,8 @@ by ear, `:app:installRtl`, landscape and tablet for this screen. Steps 7 to 11 n
 - **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`
   tracker (ticks on Times), `9cc78bf` dates sheet, `9e9102e` jama'ah lines, `762e622` 1.6.1 planners.
 - **Do not show screenshots of that build to Ali as the new design.**
-- **The owner changed one hard rule:** the disclaimer will live in Settings, About, first row, and not be shown
-  at first launch. CLAUDE.md is rewritten in the commit that builds it.
+- **The owner changed one hard rule:** the disclaimer lives in Settings, About, first row, and is not shown
+  at first launch. Built in step 9 (25 Oct 2026, STEP-9-DESIGN.md); CLAUDE.md rewritten in that commit.
 - **The 23 Oct STATE OF PLAY just below predates PR #15's merge;** `main`'s 23 Oct evening block replaces its 1.5.0 lines (draft PR, "nothing until the 30 Oct job").
 - **1.5.0 was submitted to Google on 23 Oct 2026** and is in review. It counts as live only when the Play Console shows it live (Ali's rule).
 
@@ -9084,6 +9095,10 @@ optional, opt in usage counts in `docs/ANALYTICS_PLAN.md`, approved by the owner
 Any other analytics, event, parameter or user property is still a non-goal until the owner agrees
 and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
 coordinates, or anything whose shape reveals them.**
+
+**Showing the disclaimer to installs that never saw it (decided 25 Oct 2026, step 9).** An install that never
+pressed "I understand" before 1.6 is never shown the dialog afterwards. Intended: the owner moved the disclaimer to
+Settings, About, first row, and a catch up dialog would be the first launch screen he removed.
 
 **A city search, or a geocoder, on the watch (decided 22 Oct 2026, §5.27).** The watch has no network permission and
 must not gain one for this: a city is chosen on the phone and the watch's Location screen offers "Same as phone". The watch

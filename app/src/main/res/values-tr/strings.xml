@@ -21,7 +21,6 @@
     <string name="action_allow_location">Konuma izin ver</string>
     <string name="action_how_location_used">Konumunuz nasıl kullanılır</string>
     <string name="action_got_it">Anladım</string>
-    <string name="action_understood">Anlıyorum</string>
     <string name="action_continue">Devam</string>
     <string name="location_set_generic">Konumunuz</string>
     <string name="location_finding">Konumunuz bulunuyor…</string>
@@ -67,12 +66,8 @@
     <string name="state_selected">Seçili</string>
 
     <!-- Disclaimer -->
-    <string name="disclaimer_title">Lütfen önce bunu okuyun</string>
+    <string name="disclaimer_title">Sorumluluk reddi</string>
     <string name="disclaimer_body">SajdaTime bir yardımcıdır, dinî bir otorite değildir.\n\nBu vakitler bana bir cami, bir âlim ya da herhangi bir otorite tarafından verilmedi. Telefonunuz bunları güneşin konumundan hesaplar. Bunu yaparken İslami otoritelerin ve âlimlerin yayımladığı hesaplama yöntemlerini kullanır. Ben bir müftü, bir âlim ya da fıkıh uzmanı değilim. Bu uygulama yapay zekâ yardımıyla yapıldı. Yazılımda hata olabilir. Telefonda yanlış konum ya da yanlış saat kayıtlı olabilir. Pil tasarrufu yapan bir telefon bir uyarıyı geciktirebilir. Ben de düpedüz yanılıyor olabilirim.\n\nBu yüzden lütfen burada gördüklerinizi dinî bir hüküm olarak değil, bir hesaplama olarak kabul edin. SajdaTime ile caminiz farklı söylüyorsa caminize uyun. Bir vakit ya da yön size yanlış görünüyorsa veya emin değilseniz, caminize ya da size yol gösterebilecek ehil başka birine danışın. Uygulama ücretsizdir ve olduğu gibi sunulur. Hiçbir garanti ya da doğruluk vaadi yoktur. Bu yüzden tam doğruluğun sizin için önemli olduğu durumlarda lütfen yalnızca uygulamaya güvenmeyin.\n\nAkıllı saati kullanıyorsanız, lütfen onu son söz olarak değil, bir kolaylık olarak görün. Akıllı saatin pusulası telefonunkinden küçüktür ve saat gökyüzünü telefon kadar iyi göremez. Ayrıca telefonunuzun bir süre önce bulduğu bir konuma göre çalışıyor olabilir. Özellikle kıble için telefonunuz ikisinden daha doğru olanıdır. Önemli olduğunda telefonunuzdan kontrol edin.\n\nCamiler bir namazın ne zaman başladığı konusunda her zaman aynı görüşte değildir. En çok fark Yatsı vaktindedir. Britanya\'da ve daha kuzeyde bir yöntemle diğeri arasındaki fark bir saati aşabilir, çünkü âlimler alacakaranlığın kayboluşunu farklı ölçer. Bu konuyu ben çözemem, uygulama da çözmeye çalışmaz. Buradaki vakitler caminizle uyuşmuyorsa, onlara hangi yöntemi kullandıklarını sorun ve Ayarlar bölümünde, Hesaplama yöntemi altında o yöntemi seçin. Bundan sonra da birkaç dakikalık fark kalırsa, Camiye göre ayarla bölümünde her vakti ve tarihi elle düzeltebilirsiniz. Bir fark yine kalırsa caminize uyun.\n\nBir şey daha. Bu uygulama bir namaz vaktinin ne zaman girdiğini gösterir. Caminiz ise cemaat için kendi saatini belirler ve bu genellikle biraz daha geçtir. Bu yüzden camideki vakit çizelgesi ile buradaki vakitler çoğu zaman farklı olur. İkisi de yanlış değildir.\n\nBir de ricam var, uygun görürseniz: lütfen beni, ailemi ve anne babamı dualarınızda anın.</string>
-    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
-         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
-    <string name="disclaimer_brief">SajdaTime bir yardımcıdır, dinî bir otorite değildir.\n\nBu vakitleri bir cami ya da âlim vermedi. Telefonunuz bunları güneşin konumundan hesaplar. Ben bir müftü ya da âlim değilim ve bu uygulama yapay zekâ yardımıyla yapıldı. Bu yüzden bir yazılım hatası, yanlış konum ya da yanlış saat bir vakti yanlış gösterebilir.\n\nSajdaTime ile caminiz farklı söylüyorsa caminize uyun. Uygulama ücretsizdir ve olduğu gibi sunulur. Hiçbir garanti yoktur.</string>
-    <string name="disclaimer_read_full">Tamamını oku</string>
 
     <!-- Home -->
     <string name="home_next_prayer">Sıradaki vakit</string>
@@ -210,7 +205,7 @@
 
     <string name="about_version">Sürüm</string>
     <string name="about_disclaimer">Sorumluluk reddi</string>
-    <string name="about_disclaimer_short">Bir yardımcı, dinî bir otorite değil. Okumak için dokunun.</string>
+    <string name="about_disclaimer_short">Bir yardımcı, dinî bir otorite değil. Okumaya değer.</string>
     <string name="about_privacy">Gizlilik</string>
     <string name="about_privacy_desc">Vakitler bu telefonda hesaplanır ve konumunuzu hiçbir zaman almayız. Hesap yok, reklam yok. Kullanım sayımları siz açmadıkça kapalı kalır.</string>
 

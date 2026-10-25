@@ -32,7 +32,6 @@
     <string name="action_allow_location">Allow location</string>
     <string name="action_how_location_used">How your location is used</string>
     <string name="action_got_it">Got it</string>
-    <string name="action_understood">I understand</string>
     <string name="action_continue">Continue</string>
     <string name="location_set_generic">Your location</string>
     <string name="location_finding">Finding your location…</string>
@@ -85,13 +84,13 @@
     <string name="state_selected">Selected</string>
 
     <!-- Disclaimer -->
-    <string name="disclaimer_title">Please read this first</string>
+    <string name="disclaimer_title">Disclaimer</string>
     <!--
-      The dua request lives here, at the end of the one screen every user is shown exactly
-      once, and nowhere else. It was briefly a permanent card in About as well; asking
-      twice for the same thing is asking too often. This dialog is also reachable any time
-      from Settings, so it stays available without ever being repeated unprompted.
-      Do not remove the last paragraph.
+      The dua request lives here, at the end of the full text, and nowhere else. It was
+      briefly a permanent card in About as well; asking twice for the same thing is asking
+      too often. Since 1.6 this dialog is not shown at first launch (owner, 23 Oct 2026): it
+      lives in Settings, About, Disclaimer, the first row of that group, so the user is
+      asked once, by choosing to read it. Do not remove the last paragraph.
 
       Paragraphs 2 and 3 are the ones that carry the weight, and each sentence in them is
       there on purpose. Between them they have to establish four separate things, because
@@ -126,10 +125,6 @@
       substance dressed as an edit, and the fourth is the owner's own request.
     -->
     <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
-    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
-         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
-    <string name="disclaimer_brief">SajdaTime is a helper, not a religious authority.\n\nNo mosque or scholar supplies these times. Your phone calculates them from the position of the sun. I am not a Mufti or Aalim, and the app was built with the help of artificial intelligence, so a software fault, a wrong location or a wrong clock can make a time wrong.\n\nWhere SajdaTime and your mosque disagree, follow your mosque. The app is free and given as it is, with no warranty.</string>
-    <string name="disclaimer_read_full">Read in full</string>
 
     <!-- Home -->
     <string name="home_next_prayer">Next prayer</string>
@@ -376,7 +371,7 @@
 
     <string name="about_version">Version</string>
     <string name="about_disclaimer">Disclaimer</string>
-    <string name="about_disclaimer_short">A helper, not a religious authority. Tap to read.</string>
+    <string name="about_disclaimer_short">A helper, not a religious authority. Worth reading.</string>
     <string name="about_privacy">Privacy</string>
     <string name="about_privacy_desc">Times are worked out on this phone, and we never receive your location. No accounts and no ads. Usage counts stay off unless you turn them on.</string>
 

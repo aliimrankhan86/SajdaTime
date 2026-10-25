@@ -474,8 +474,6 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Usage question (setup, and the Settings switch) | See exactly what is sent / Hide, 16dp under the text | F | 48 target, wraps | `UsageCountsConsent.kt` |
 | Usage question | Read the privacy policy, straight under it | F | 48 target, wraps | `UsageCountsConsent.kt` |
 | Usage question | Yes, share usage counts; No thanks, 24dp under the links (under "The full privacy policy is in English." when the app is not in English, since 19 Oct 2026) | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
-| First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
-| First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
 | Times | Timetable (calendar icon), end of the Today heading, under it from 1.5 text; 16dp under the card above, 8dp over the list | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
 | Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Calculation method; Asr; Match your mosque start times | A | 52, full | `HomeScreen.kt` |
@@ -634,8 +632,8 @@ trailing element and stands alone; "show more" is a labelled button with a chevr
 action is a filled button (Android banner guidance, Devon and Primer design standards).
 
 **Dialogs.** Every dialog a person can simply leave has a close X at the top right
-(`DialogTitle`) as well as its text button at the bottom (owner's request). Two must be
-answered, not closed, and have no X: the first run disclaimer and the usage counts question.
+(`DialogTitle`) as well as its text button at the bottom (owner's request). One must be
+answered, not closed, and has no X: the usage counts question (the first run disclaimer went in 1.6).
 Explainer dialogs pair each paragraph with its button (`ExplainerParagraph`, `ExplainerAction`):
 paragraph to its button 8dp, group to group 16dp. `DesignRulesTest` checks the X.
 
@@ -1230,6 +1228,13 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     9sp only at 250dp (Fable, from the pictures: uneven times read as a bug). Reverses the 18 Oct rejection of a
     time of day colour behind the countdown, because four fixed skies are tested, the reason it gave. Rejected: the
     sky on Today widgets or the strip, a Now marker, faded past columns, dropping am or pm.
+* **25 Oct 2026, 1.6 step 9 disclaimer** (`STEP-9-DESIGN.md`; owner's decision of 23 Oct 2026, reversing the
+    rule that it is "shown once, not merely available"): the disclaimer is no longer shown at first launch. It is
+    the first row of Settings, About (above Version), Info tile, "Disclaimer", subtitle "A helper, not a religious
+    authority. Worth reading."; the dialog is retitled "Disclaimer" and its text is unchanged, dua last. The first
+    run dialog, its two buttons and the short form are gone, so the usage counts question is the only dialog that
+    must be answered. Rejected (Fable): a one time Notice on Times, a setup sentence, a badge on the Settings tab, a
+    tinted row, the `gavel` or `warning` icons.
 
 ---
 

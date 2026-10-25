@@ -114,13 +114,30 @@ class DesignRulesTest {
     }
 
     /**
+     * The disclaimer is the first row of About, above Version (owner, 23 Oct 2026), never buried
+     * (CLAUDE.md). Read off the source: the first key after SettingsSectionId.ABOUT is the first row on screen.
+     */
+    @Test
+    fun `the disclaimer is the first row of About`() {
+        val text = sources.first { it.name == "SettingsScreen.kt" }.readText()
+        val about = text.indexOf("SettingsSectionId.ABOUT,")
+        assertTrue("SettingsSectionId.ABOUT not found in SettingsScreen.kt", about >= 0)
+        val first = Regex("""key = "(\w+)"""").find(text, about)?.groupValues?.get(1)
+        assertTrue(
+            "The first row of About is \"$first\". The disclaimer is the first row of About (owner, 23 Oct 2026), " +
+                "never buried. CLAUDE.md.",
+            first == "disclaimer",
+        )
+    }
+
+    /**
      * Every dialog the user can simply leave shows a close X at the top right (DialogTitle).
-     * The exceptions must be answered, never closed: the first run disclaimer (MainActivity)
-     * and the usage counts question, where an X would be an answer nobody gave.
+     * The exception must be answered, never closed: the usage counts question, where an X
+     * would be an answer nobody gave.
      */
     @Test
     fun `dismissable dialogs carry the close X`() {
-        val exempt = setOf("MainActivity.kt", "UsageCountsConsent.kt")
+        val exempt = setOf("UsageCountsConsent.kt")
         // Per file: at least as many DialogTitle calls as AlertDialog calls. Counting, not a
         // text window, so a long confirmButton block cannot hide the title from the check.
         val found = sources.filter { it.name !in exempt }.mapNotNull { file ->

@@ -1,6 +1,5 @@
 package com.sajdatime.app
 
-import com.sajdatime.app.ui.components.CtaButton
 import android.Manifest
 import android.content.ClipData
 import android.content.Context
@@ -25,17 +24,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -335,19 +329,6 @@ class MainActivity : ComponentActivity() {
                                 bell = bellActions,
                                 notificationsBlocked = notificationsBlocked,
                             )
-
-                            // Shown once, immediately after setup, never after an update (the flag is
-                            // stored). The app is a convenience, not a religious authority, and saying
-                            // so should not be buried.
-                            //
-                            // Short form first, since 18 Oct 2026 (the owner: no long message straight
-                            // after installing). disclaimer_brief still makes all four points of
-                            // HANDOVER 5.15 (DisclaimerContentTest), and "Read in full" swaps in the
-                            // complete disclaimer_body, dua request last, in this same dialog. The
-                            // complete text is also always in Settings, About, Disclaimer.
-                            if (!state.settings.disclaimerSeen) {
-                                FirstRunDisclaimer(onUnderstood = viewModel::markDisclaimerSeen)
-                            }
                         }
                     }
                 }
@@ -493,56 +474,3 @@ private fun PreviewBuildFrame(content: @Composable () -> Unit) {
 /** The sound address schemes the alarm channel can safely play: a media or settings provider, or an app's raw resource. */
 internal fun isAcceptedAlarmSound(scheme: String?): Boolean =
     scheme == "content" || scheme == "android.resource"
-
-/**
- * The disclaimer shown once after setup: the short form, a way to the full text, and Understood.
- * A composable of its own so the render harness (HANDOVER lesson 132) draws exactly what ships.
- */
-@Composable
-internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
-    var full by rememberSaveable { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = { },
-        // A filled, full-width button, not a text link. This is the
-        // one control on the one screen every user must pass
-        // through, and as a small tinted word in the corner it did
-        // not read as pressable — a tester said so. 56dp clears the
-        // 48dp minimum touch target with room for shaky hands.
-        confirmButton = {
-            CtaButton(
-                onClick = onUnderstood,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp),
-            ) {
-                Text(stringResource(R.string.action_understood))
-            }
-        },
-        // The way to the full text, gone once it is showing. Solid,
-        // like every action in the app (owner, 18 Oct 2026); it was a
-        // text link, and he asked that no action look like one.
-        dismissButton = if (full) {
-            null
-        } else {
-            {
-                CtaButton(
-                    onClick = { full = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.disclaimer_read_full))
-                }
-            }
-        },
-        title = { Text(stringResource(R.string.disclaimer_title)) },
-        // Scrollable. AlertDialog does not scroll its body for you.
-        // The short form fits one screen at the default font; the
-        // full one is seven paragraphs, and at a large font the last
-        // of them, the dua request, is exactly what would fall off
-        // the bottom unread. Do not remove the scroll.
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                Text(stringResource(if (full) R.string.disclaimer_body else R.string.disclaimer_brief))
-            }
-        },
-    )
-}

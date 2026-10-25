@@ -65,23 +65,15 @@ class DisclaimerContentTest {
     }
 
     /**
-     * The short form shown after setup (owner, 18 Oct 2026). Shorter is allowed, dropping a point is
-     * not: it must make the same four points as the full text, carry no dua request (that stays in
-     * the full text, asked once), and stay short, or it stops being the short form.
+     * The About row's own subtitle (`about_disclaimer_short`). The disclaimer is no longer shown at
+     * first launch (owner, 23 Oct 2026), so the row's own words carry point 1 now: it must still
+     * say the app is not a religious authority.
      */
     @Test
-    fun `the short disclaimer after setup still makes all four points, briefly, with no dua`() {
-        val brief = Regex("""<string name="disclaimer_brief">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
+    fun `the disclaimer row subtitle still says not a religious authority`() {
+        val short = Regex("""<string name="about_disclaimer_short">(.*?)</string>""", RegexOption.DOT_MATCHES_ALL)
             .find(phoneStrings)!!.groupValues[1]
-        assertContains(brief, "not a religious authority", "disclaimer_brief")
-        assertContains(brief, "calculat", "disclaimer_brief (point 1)")
-        assertContains(brief, "artificial intelligence", "disclaimer_brief (point 2)")
-        assertContains(brief, "wrong clock", "disclaimer_brief (point 2)")
-        assertContains(brief, "follow your mosque", "disclaimer_brief (point 3)")
-        assertContains(brief, "no warranty", "disclaimer_brief (point 4)")
-        assertTrue("the short form asks for duas, which belongs to the full text only", !brief.contains("dua", ignoreCase = true))
-        val words = brief.split(Regex("""\s+""")).size
-        assertTrue("the short form is $words words; keep it under 90 so it fits one screen", words < 90)
+        assertContains(short, "not a religious authority", "about_disclaimer_short")
     }
 
     /**
@@ -146,8 +138,8 @@ class DisclaimerContentTest {
 
         // The dua request is asked in the app, once. A web page that repeats it asks twice.
         assertTrue(
-            "docs/privacy.html now repeats the dua request. It belongs on the first-run " +
-                "screen and nowhere else — CLAUDE.md.",
+            "docs/privacy.html now repeats the dua request. It belongs in the in-app full " +
+                "text and nowhere else — CLAUDE.md.",
             !privacy.contains("duas", ignoreCase = true),
         )
 
@@ -169,7 +161,7 @@ class DisclaimerContentTest {
         assertContains(readme, "follow your mosque", "README.md (point 3)")
         assertContains(readme, "no warranty", "README.md (point 4)")
         assertTrue(
-            "README.md now repeats the dua request. It belongs on the first-run screen and " +
+            "README.md now repeats the dua request. It belongs in the in-app full text and " +
                 "nowhere else — CLAUDE.md.",
             !readme.contains("duas", ignoreCase = true),
         )

@@ -536,15 +536,15 @@ fun SettingsScreen(
         stringResource(R.string.settings_group_about),
         listOf(
             SettingsItem.Link(
-                key = "version",
-                title = stringResource(R.string.about_version),
-                subtitle = versionName(context),
-            ),
-            SettingsItem.Link(
                 key = "disclaimer",
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
                 onClick = { open = SettingsChooser.DISCLAIMER },
+            ),
+            SettingsItem.Link(
+                key = "version",
+                title = stringResource(R.string.about_version),
+                subtitle = versionName(context),
             ),
             SettingsItem.Link(
                 key = "privacy",

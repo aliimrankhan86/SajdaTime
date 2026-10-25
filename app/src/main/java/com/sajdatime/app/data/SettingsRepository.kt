@@ -140,7 +140,6 @@ data class AppSettings(
      * `SettingsScreen.hasApproximateDays`. Everyone below the polar circles never sees it.
      */
     val alarmOnApproximateDays: Boolean = false,
-    val disclaimerSeen: Boolean = false,
     /**
      * Whether the user has opted in to sending usage counts. Off until they say yes, and the
      * only record of that consent. Absent on every existing install, so it reads as false.
@@ -536,8 +535,6 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun completeOnboarding() = edit { it[Keys.ONBOARDED] = true }
 
-    suspend fun markDisclaimerSeen() = edit { it[Keys.DISCLAIMER] = true }
-
     suspend fun setAnalyticsEnabled(enabled: Boolean) = edit { it[Keys.ANALYTICS] = enabled }
 
     /**
@@ -608,6 +605,10 @@ class SettingsRepository(private val context: Context) {
         // unexpected alerts a day.
         val NOTIFY = stringPreferencesKey("notify_slots")
         val ALERT_STYLE = stringPreferencesKey("alert_style")
+        // Retired in 1.6 (owner, 23 Oct 2026): the disclaimer moved to Settings, About, first row, and is
+        // not shown at first launch. Never read. The name must never be reused: upgraded installs
+        // already hold `true`.
+        @Suppress("unused")
         val DISCLAIMER = booleanPreferencesKey("disclaimer_seen")
         val ANALYTICS = booleanPreferencesKey("analytics_enabled")
         val DEFAULT_LOCATION = booleanPreferencesKey("using_default_location")
@@ -683,7 +684,6 @@ class SettingsRepository(private val context: Context) {
             notificationSoundUri = this[Keys.NOTIFICATION_SOUND] ?: "",
             phoneNotificationSoundUri = this[Keys.PHONE_NOTIFICATION_SOUND] ?: "",
             alarmOnApproximateDays = this[Keys.ALARM_ON_APPROXIMATE] ?: false,
-            disclaimerSeen = this[Keys.DISCLAIMER] ?: false,
             analyticsEnabled = this[Keys.ANALYTICS] ?: false,
             analyticsAnswered = Keys.ANALYTICS in this,
             usingDefaultLocation = this[Keys.DEFAULT_LOCATION] ?: false,

@@ -99,8 +99,8 @@ import com.sajdatime.app.ui.components.SectionHeading
  *
  * CONSENT sits just before CONFIRM since 17 Oct 2026 (owner's decision, research F1). It used to
  * be the second screen, so a new user met a privacy decision before seeing one prayer time. The
- * steps passed before it are counted after a Yes instead ([stepsBeforeConsent]); the disclaimer
- * still comes after CONFIRM, so consent never follows it. Order here is the order on screen.
+ * steps passed before it are counted after a Yes instead ([stepsBeforeConsent]); CONFIRM is the
+ * last screen (the disclaimer is in Settings, About since 1.6). Order here is the order on screen.
  */
 internal enum class Step { WELCOME, PERMISSION, SECT, MADHAB, METHOD, CONSENT, CONFIRM }
 

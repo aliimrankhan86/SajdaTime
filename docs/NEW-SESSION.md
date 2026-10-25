@@ -93,7 +93,7 @@ deliberately, and several were built and then thrown away. All have their eviden
 | **No machine translation.** Prayer and madhab names are religious content; each language needs a native speaker first | `CLAUDE.md`, `NoTranslationsYetTest` |
 | **The app stays English and left-to-right** until it has words in a right-to-left language. It follows the phone's language the moment a reviewed translation ships | §5.16 |
 | **Moonsighting do not slide Fajr and Isha down to 60°.** Their own published timetable matches this engine to the minute. A "fix" was built and reverted; twelve of their rows are pinned as golden values | §10, `PolarAndHemisphereTest` |
-| **The disclaimer must make four points**, and its six copies change together. The dua request is on the first-run screen and nowhere else | §5.15, `DisclaimerContentTest` |
+| **The disclaimer must make four points**, and its six copies change together. The dua request is the last paragraph of the full text (Settings, About, Disclaimer) and nowhere else | §5.15, `DisclaimerContentTest` |
 | **The developer never receives location.** Coarse, foreground only. The town name label goes through Android's geocoder, see HANDOVER 5.21. Cloud backup and device-to-device transfer both off. `docs/privacy.html` is a published promise | §2, `CLAUDE.md` |
 | **The release signing key is the owner's alone.** No assistant may generate, hold, request or view it | `CLAUDE.md`, `docs/RELEASING.md` |
 | **The high-latitude rule is deliberately not a user setting** (item A4). "Match your mosque" closes the same gap without asking anyone to understand twilight models | §11 |

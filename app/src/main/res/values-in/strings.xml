@@ -21,7 +21,6 @@
     <string name="action_allow_location">Izinkan lokasi</string>
     <string name="action_how_location_used">Cara lokasi Anda digunakan</string>
     <string name="action_got_it">Mengerti</string>
-    <string name="action_understood">Saya mengerti</string>
     <string name="action_continue">Lanjut</string>
     <string name="location_set_generic">Lokasi Anda</string>
     <string name="location_finding">Mencari lokasi Anda…</string>
@@ -67,12 +66,8 @@
     <string name="state_selected">Dipilih</string>
 
     <!-- Disclaimer -->
-    <string name="disclaimer_title">Mohon baca ini dulu</string>
+    <string name="disclaimer_title">Penafian</string>
     <string name="disclaimer_body">SajdaTime adalah alat bantu, bukan otoritas agama.\n\nWaktu-waktu ini tidak diberikan kepada saya oleh masjid, ulama, atau otoritas mana pun. Ponsel Anda menghitungnya dari posisi matahari, dengan metode perhitungan yang diterbitkan oleh otoritas dan ulama Islam. Saya bukan mufti, bukan alim, dan bukan ahli fikih, dan aplikasi ini dibuat dengan bantuan kecerdasan buatan (AI). Perangkat lunak bisa mengandung kesalahan, ponsel bisa menyimpan lokasi atau jam yang salah, ponsel yang sedang menghemat baterai bisa menunda pengingat, dan saya pun bisa saja keliru.\n\nJadi, mohon anggap apa yang Anda lihat di sini sebagai hasil perhitungan, bukan sebagai fatwa atau hukum. Jika SajdaTime dan masjid Anda berbeda, ikutilah masjid Anda. Jika suatu waktu atau arah tampak tidak tepat, atau Anda ragu, tanyakan kepada mereka atau kepada orang lain yang berwenang memberi nasihat. Aplikasi ini gratis dan diberikan apa adanya, tanpa jaminan apa pun dan tanpa janji ketepatan. Jadi, bila ketepatan penting bagi Anda, mohon jangan hanya mengandalkan aplikasi ini.\n\nJika Anda memakai jam tangan pintar, mohon anggap itu sebagai kemudahan saja, bukan acuan terakhir. Jam tangan punya kompas yang lebih kecil dan pandangan ke langit yang lebih buruk daripada ponsel, dan bisa jadi memakai lokasi yang ditemukan ponsel Anda beberapa waktu lalu. Terutama untuk kiblat, ponsel Anda lebih akurat di antara keduanya. Bila itu penting, periksalah di ponsel.\n\nTidak semua masjid sepakat kapan waktu salat dimulai. Isya paling bervariasi. Di Inggris dan wilayah lebih ke utara, selisih antara satu metode dan lainnya bisa lebih dari satu jam, karena ulama mengukur memudarnya cahaya senja dengan cara berbeda. Saya tidak bisa memutuskan hal itu, dan aplikasi ini tidak mencoba memutuskannya. Jika waktu di sini tidak cocok dengan masjid Anda, tanyakan metode yang mereka pakai lalu pilih metode itu di Pengaturan, pada Metode perhitungan. Jika setelah itu masih ada selisih beberapa menit, Sesuaikan dengan masjid memungkinkan Anda mengatur setiap waktu salat, juga tanggalnya, secara manual. Jika masih ada perbedaan, ikutilah masjid Anda.\n\nSatu hal lagi. Aplikasi ini menunjukkan kapan waktu salat masuk. Masjid Anda lalu menentukan sendiri waktu salat berjamaahnya, biasanya sedikit lebih lambat, sehingga papan jadwal di sana dan waktu di sini sering berbeda. Keduanya tidak salah.\n\nDan satu permohonan, bila Anda berkenan: mohon ingat saya, keluarga saya, dan orang tua saya dalam doa-doa Anda.</string>
-    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
-         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
-    <string name="disclaimer_brief">SajdaTime adalah alat bantu, bukan otoritas agama.\n\nWaktu-waktu ini tidak diberikan oleh masjid atau ulama. Ponsel Anda menghitungnya dari posisi matahari. Saya bukan mufti atau alim, dan aplikasi ini dibuat dengan bantuan kecerdasan buatan (AI), jadi kesalahan perangkat lunak, lokasi yang salah, atau jam yang salah bisa membuat suatu waktu keliru.\n\nJika SajdaTime dan masjid Anda berbeda, ikutilah masjid Anda. Aplikasi ini gratis dan diberikan apa adanya, tanpa jaminan apa pun.</string>
-    <string name="disclaimer_read_full">Baca selengkapnya</string>
 
     <!-- Home -->
     <string name="home_next_prayer">Salat berikutnya</string>
@@ -210,7 +205,7 @@
 
     <string name="about_version">Versi</string>
     <string name="about_disclaimer">Penafian</string>
-    <string name="about_disclaimer_short">Alat bantu, bukan otoritas agama. Ketuk untuk membaca.</string>
+    <string name="about_disclaimer_short">Alat bantu, bukan otoritas agama. Layak dibaca.</string>
     <string name="about_privacy">Privasi</string>
     <string name="about_privacy_desc">Waktu salat dihitung di ponsel ini dan kami tidak pernah menerima lokasi Anda. Tanpa akun, tanpa iklan. Data jumlah penggunaan tetap mati kecuali Anda mengaktifkannya.</string>
 

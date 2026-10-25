@@ -505,8 +505,6 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun completeOnboarding() = viewModelScope.launch { settingsRepository.completeOnboarding() }
 
-    fun markDisclaimerSeen() = viewModelScope.launch { settingsRepository.markDisclaimerSeen() }
-
     /**
      * Last resort when neither GPS nor a city search produced a position: fall back to
      * Makkah so the app still works, and flag it so the UI can say so plainly rather
