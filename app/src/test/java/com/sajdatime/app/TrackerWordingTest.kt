@@ -42,7 +42,10 @@ class TrackerWordingTest {
     @Test
     fun `no judging word in English, and none of the words Ali ruled out`() {
         val english = trackerKeys(strings("values")).values.joinToString(" ").lowercase()
-        for (word in listOf("missed", "excused", "qada", "sin", "reward", "lazy", "shame", "failed to pray", "broke", "lost")) {
+        // "owed" and "debt" for the fasts to make up count (25 Oct 2026). English only, on purpose: in Arabic
+        // and Urdu قضا, and in Turkish kaza, is the plain word for making up a fast, not a label of guilt
+        // (DETAILED-PLAN.md §9 wording notes), so those may use it. Indonesian uses "diganti", not utang (debt).
+        for (word in listOf("missed", "excused", "qada", "sin", "reward", "lazy", "shame", "failed to pray", "broke", "lost", "owed", "debt")) {
             assertFalse("\"$word\" in the tracker strings", Regex("""\b${Regex.escape(word)}\b""").containsMatchIn(english))
         }
     }

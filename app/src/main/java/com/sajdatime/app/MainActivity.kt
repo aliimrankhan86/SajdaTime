@@ -147,6 +147,7 @@ class MainActivity : ComponentActivity() {
         }
         override fun pause(fromYesterday: Boolean) { viewModel.pauseTracker(fromYesterday) }
         override fun resume() { viewModel.resumeTracker() }
+        override fun adjustFastsToMakeUp(delta: Int) { viewModel.adjustFastsToMakeUp(delta) }
         override fun save() = runCatching { trackerSave.launch(viewModel.trackerFileName()) }
             .getOrElse { toast(getString(R.string.tracker_save_failed)) }
         override fun load() = runCatching {
@@ -247,7 +248,13 @@ class MainActivity : ComponentActivity() {
                     when (val event = state.trackerEvent) {
                         null -> Unit
                         is TrackerEvent.Saved -> toast(getString(R.string.tracker_saved, event.fileName))
-                        is TrackerEvent.Loaded -> toast(resources.getQuantityString(R.plurals.tracker_loaded, event.days, event.days))
+                        is TrackerEvent.Loaded -> toast(
+                            listOfNotNull(
+                                resources.getQuantityString(R.plurals.tracker_loaded, event.days, event.days)
+                                    .takeIf { event.days > 0 || event.fasts == null },
+                                event.fasts?.let { resources.getQuantityString(R.plurals.tracker_fasts_line, it, it) },
+                            ).joinToString(" "),
+                        )
                         TrackerEvent.SaveFailed -> toast(getString(R.string.tracker_save_failed))
                         is TrackerEvent.LoadFailed -> toast(
                             getString(if (event.tooNew) R.string.tracker_load_failed_newer else R.string.tracker_load_failed_format),

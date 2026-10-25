@@ -11,7 +11,8 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
 
 ## What ships
 
-- **Phone 1.6.0, versionCode 10** (`app/build.gradle.kts`). Contents: PROJECT_BRIEF "Next release: 1.6.0".
+- **Phone 1.6.0, versionCode 10** (`app/build.gradle.kts`). Contents: PROJECT_BRIEF "Next release: 1.6.0", including
+  "Fasts to make up" (added 25 Oct 2026 after step 11; not in the listing, by Ali's choice, and in no store picture).
 - **The watch is NOT uploaded.** It stays 1.5.0, versionCode 1002, submitted with 1.5.0 on 23 Oct 2026; `wear/` changed only
   in comments since `main` (one KDoc line; `WatchSync.kt` unchanged). Its store pictures and watch note stay as they are.
   (The watch half of 1.5.0 being live is not checked from the public page; PR #16 says so too.)
@@ -26,6 +27,8 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
   back translation review done; record `docs/translation/store-listing-1.6.0.md`.
 - 24 store pictures, approved by Ali 25 Oct 2026: `docs/store/upload/phone/<en-GB|ar|ur|tr-TR|id-ID>/`.
 - Gate green on the branch (core 237 with 1 skipped, app 322, wear 27, lint 0 errors), device suite 39 of 39.
+- 25 Oct 2026, evening: "Fasts to make up" added (HANDOVER §5.36). Gate green again: core 238, app 323, wear 27, lint 0
+  errors, device suite 39 of 39.
 
 ## Before release day
 

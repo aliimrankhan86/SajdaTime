@@ -646,6 +646,8 @@
     <string name="settings_tracker_desc">Tick each prayer you pray. Only you can see it.</string>
     <string name="settings_tracker_streak">Show streak</string>
     <string name="settings_tracker_streak_desc">Show how many days in a row you have ticked all five.</string>
+    <string name="settings_tracker_fasts">Fasts to make up</string>
+    <string name="settings_tracker_fasts_desc">Add one for each fast you still have to make up. Take one off when you make it up.</string>
     <string name="settings_tracker_pause">Pause tracking</string>
     <string name="settings_tracker_pause_desc">Your streak waits until you resume.</string>
     <string name="settings_tracker_resume">Resume tracking</string>
@@ -661,12 +663,17 @@
     <string name="settings_tracker_load_desc">Bring back a record you saved, on this phone or a new one.</string>
     <string name="settings_tracker_delete">Delete my prayer record</string>
     <string name="tracker_delete_title">Delete your prayer record?</string>
-    <string name="tracker_delete_body">This removes every tick from this phone. It cannot be undone.</string>
+    <string name="tracker_delete_body">This removes every tick and the fasts to make up count from this phone. It cannot be undone.</string>
     <string name="action_delete">Delete</string>
     <plurals name="tracker_streak">
         <item quantity="one">%d day in a row</item>
         <item quantity="other">%d days in a row</item>
     </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="one">%d fast to make up</item>
+        <item quantity="other">%d fasts to make up</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">Made up one</string>
     <string name="tracker_open_history">Last 30 days</string>
     <string name="tracker_paused_line">Tracking is paused</string>
     <string name="tracker_history_title">Last 30 days</string>

@@ -419,6 +419,8 @@
     <string name="settings_tracker_desc">Kıldığınız her namazı işaretleyin. Bunu yalnızca siz görebilirsiniz.</string>
     <string name="settings_tracker_streak">Seriyi göster</string>
     <string name="settings_tracker_streak_desc">Beş vaktin hepsini kaç gün üst üste işaretlediğinizi gösterir.</string>
+    <string name="settings_tracker_fasts">Kazası kalan oruçlar</string>
+    <string name="settings_tracker_fasts_desc">Kazasını henüz tutmadığınız her oruç için bir ekleyin. Kazasını tuttuğunuzda bir azaltın.</string>
     <string name="settings_tracker_pause">Takibi duraklat</string>
     <string name="settings_tracker_pause_desc">Devam edene kadar seriniz bekler.</string>
     <string name="settings_tracker_resume">Takibe devam et</string>
@@ -434,12 +436,17 @@
     <string name="settings_tracker_load_desc">Kaydettiğiniz bir kaydı bu telefona veya yeni bir telefona geri getirin.</string>
     <string name="settings_tracker_delete">Namaz kaydımı sil</string>
     <string name="tracker_delete_title">Namaz kaydınız silinsin mi?</string>
-    <string name="tracker_delete_body">Bu, bu telefondaki tüm işaretleri siler. Geri alınamaz.</string>
+    <string name="tracker_delete_body">Bu, bu telefondaki tüm işaretleri ve kazası kalan oruç sayısını siler. Geri alınamaz.</string>
     <string name="action_delete">Sil</string>
     <plurals name="tracker_streak">
         <item quantity="one">%d gün üst üste</item>
         <item quantity="other">%d gün üst üste</item>
     </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="one">Kazası kalan %d oruç</item>
+        <item quantity="other">Kazası kalan %d oruç</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">Birinin kazasını tuttum</string>
     <string name="tracker_open_history">Son 30 gün</string>
     <string name="tracker_paused_line">Takip duraklatıldı</string>
     <string name="tracker_history_title">Son 30 gün</string>

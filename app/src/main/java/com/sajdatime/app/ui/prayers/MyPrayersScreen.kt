@@ -28,6 +28,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -51,7 +52,9 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.font.FontWeight
@@ -210,6 +213,10 @@ private fun Checklist(
     Spacer(Modifier.height(Space.Section))
     WeekCard(t, showStreak = state.settings.trackerShowStreak)
     Spacer(Modifier.height(Space.Section))
+    if (t.data.fastsToMakeUp > 0) {
+        FastsRow(t, onMadeUpOne = { tracker.adjustFastsToMakeUp(-1) })
+        Spacer(Modifier.height(Space.Section))
+    }
 
     if (history) {
         TrackerHistorySheet(
@@ -395,6 +402,37 @@ private fun ButtonRow(t: TrackerState, onPause: () -> Unit, onResume: () -> Unit
                     Spacer(Modifier.width(Space.Related))
                     Text(stringResource(R.string.tracker_open_history))
                 }
+            }
+        }
+    }
+}
+
+/**
+ * "3 fasts to make up" with "Made up one" at the end (Ali, 25 Oct 2026, moved into 1.6.0), only while the
+ * count is above zero; at zero the line goes with no message, as the streak does. The same FlowRow as the
+ * Pause row, so the button drops under the line by measured width. No Undo: plus in Settings puts a wrong
+ * tap back. A record from a newer version shows the line without the button (writes are refused).
+ */
+@Composable
+private fun FastsRow(t: TrackerState, onMadeUpOne: () -> Unit) {
+    val count = t.data.fastsToMakeUp
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.spacedBy(Space.Related),
+    ) {
+        Text(
+            text = pluralStringResource(R.plurals.tracker_fasts_line, count, count),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            // Polite live region: "Made up one" is answered with the new number, as the steppers are.
+            modifier = Modifier.align(Alignment.CenterVertically).semantics { liveRegion = LiveRegionMode.Polite },
+        )
+        if (!t.data.readOnly) {
+            CtaButton(onClick = onMadeUpOne, compact = true) {
+                Icon(Icons.Outlined.EventAvailable, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(Space.Related))
+                Text(stringResource(R.string.tracker_fasts_made_up_one))
             }
         }
     }

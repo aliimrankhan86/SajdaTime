@@ -425,6 +425,8 @@
     <string name="settings_tracker_desc">جو نماز پڑھیں اس پر نشان لگائیں۔ اسے صرف آپ دیکھ سکتے ہیں۔</string>
     <string name="settings_tracker_streak">لگاتار دن دکھائیں</string>
     <string name="settings_tracker_streak_desc">دکھائیں کہ آپ نے کتنے دن لگاتار پانچوں نمازوں پر نشان لگایا۔</string>
+    <string name="settings_tracker_fasts">قضا روزے</string>
+    <string name="settings_tracker_fasts_desc">ہر اس روزے کے لیے ایک بڑھائیں جس کی قضا ابھی باقی ہے۔ قضا رکھ لیں تو ایک کم کریں۔</string>
     <string name="settings_tracker_pause">ٹریکنگ روکیں</string>
     <string name="settings_tracker_pause_desc">دوبارہ شروع کرنے تک آپ کے لگاتار دن رکے رہیں گے۔</string>
     <string name="settings_tracker_resume">ٹریکنگ دوبارہ شروع کریں</string>
@@ -440,12 +442,17 @@
     <string name="settings_tracker_load_desc">محفوظ کیا ہوا ریکارڈ واپس لائیں، اسی فون پر یا نئے فون پر۔</string>
     <string name="settings_tracker_delete">میری نمازوں کا ریکارڈ حذف کریں</string>
     <string name="tracker_delete_title">نمازوں کا ریکارڈ حذف کریں؟</string>
-    <string name="tracker_delete_body">اس سے اس فون سے تمام نشان ہٹ جائیں گے۔ اسے واپس نہیں لایا جا سکتا۔</string>
+    <string name="tracker_delete_body">اس سے اس فون سے تمام نشان اور قضا روزوں کی گنتی ہٹ جائے گی۔ اسے واپس نہیں لایا جا سکتا۔</string>
     <string name="action_delete">حذف کریں</string>
     <plurals name="tracker_streak">
         <item quantity="one">%d دن لگاتار</item>
         <item quantity="other">%d دن لگاتار</item>
     </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="one">%d قضا روزہ باقی</item>
+        <item quantity="other">%d قضا روزے باقی</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">ایک قضا رکھ لی</string>
     <string name="tracker_open_history">پچھلے 30 دن</string>
     <string name="tracker_paused_line">ٹریکنگ رکی ہوئی ہے</string>
     <string name="tracker_history_title">پچھلے 30 دن</string>

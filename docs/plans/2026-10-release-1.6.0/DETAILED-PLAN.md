@@ -133,10 +133,10 @@ Sources: [thepillarsapp.com](https://thepillarsapp.com/), [Pillars feature board
 
 **What this says for SajdaTime.** The value users name is the number owed and clearing it; the reasons are decoration that becomes health data the moment "menstruation" or "pregnancy" is stored. The complaints are about data survival and bulk entry, which our save-to-file and a plain number solve.
 
-**Recommendation: a count, no reasons, no dates, after Ramadan (1.6.1).**
+**Recommendation: a count, no reasons, no dates, after Ramadan (1.6.1).** **Superseded 25 Oct 2026: Ali moved it into 1.6.0, built basic; read `FASTS-TO-MAKE-UP.md`, which wins over this section and the strings table.**
 - One row in the My prayers group, "Fasts to make up", with the kind C minus and plus steppers (SettingsScreen.kt:426 pattern), value shown as the number; subtitle "Add one for each fast you still owe. Take one off when you make it up." Shown on the Tracker tab, under the week strip, only when the number is above zero: "3 fasts to make up" with a compact solid "Made up one" at the end; the line disappears at zero with no message, as the streak does.
 - Works for Sunni and Shia alike (making up Ramadan fasts is common to both, PLAN.md:132-133). Fidya and kaffarah are out: they are rulings that differ by madhab and involve money or food measures, and the disclaimer says the app gives no rulings. The app never suggests which days to fast.
-- Wording: "to make up", never "missed", "owed", "debt" or "qada". `TrackerWordingTest` then needs no exception; the conflict dissolves. No guilt line, no deadline, no "before next Ramadan" countdown (that is a nag).
+- Wording (English; Arabic, Urdu and Turkish may use the plain word قضا / kaza, §9): "to make up", never "missed", "owed", "debt" or "qada". `TrackerWordingTest` then needs no exception; the conflict dissolves. No guilt line, no deadline, no "before next Ramadan" countdown (that is a nag).
 - Privacy: the number is religious practice data, not health data. `docs/privacy.html` gains one sentence in the prayer record section: "If you use the fasts to make up count, that number stays on this phone, is saved in the file you save and is deleted with your prayer record." No usage-count event. Export: one more field in the tracker file, versioned; a file from a newer version stays read only (UX.md:105-108).
 - Why after Ramadan: the number is set after the month, and 1.6.0's deadline is the reason to keep it out (SIGNOFF.md:38). Why count only: it removes the one part of the Pillars feature that is both unloved in their reviews and dangerous in ours.
 
@@ -157,7 +157,7 @@ Gates stay as signed off: 1.5.0 live by 27 Nov or everything moves after Eid; PR
 | 6 | Qibla restyle | 0 | 5th |
 | 7 | Jama'ah lines on Times | signed-off jama'ah core | 3rd (SIGNOFF.md:38 says first; I move it behind the widgets because Ali has now put look and feel above typed-in features) |
 | 8 | Widgets (§5) | 5 (the skies) | 2nd |
-| 9 | Fasts to make up count | 1 | 1st: it is 1.6.1 already |
+| 9 | Fasts to make up count | 1 | Moved into 1.6.0 by Ali, 25 Oct 2026 (FASTS-TO-MAKE-UP.md) |
 
 Checkpoints: 20 Nov (steps 1 to 3 on the emulator in light, dark, Urdu, 1.5), 4 Dec (5 and 6 screenshots to Ali), 11 Dec PR. If 1.5.0 is not live by 27 Nov the whole branch keeps building and ships after Eid with 9 included.
 
@@ -262,7 +262,7 @@ Tone rules applied: short, warm, no "Tap", no "missed", no reward talk, sentence
 | `about_disclaimer_short` | A helper, not a religious authority. Please read this once. | Settings | Religious: point 1 must stay in these words (test) |
 | `widget_strip_desc` | All five prayers in one row, the next one marked. | Widget picker | |
 | `widget_strip_name` | Today strip | | |
-| `fasts_to_make_up` (1.6.1) | Fasts to make up | Settings row | Religious: never "missed", "owed", "qada" |
+| `fasts_to_make_up` (1.6.0 since 25 Oct 2026; built as `settings_tracker_fasts`, see FASTS-TO-MAKE-UP.md) | Fasts to make up | Settings row | Religious: never "missed", "owed", "qada" |
 | `fasts_to_make_up_desc` | Add one for each fast you still have to make up. Take one off when you make it up. | | |
 | `fasts_line` (plural) | %1$d fast to make up / %1$d fasts to make up | Tracker tab | |
 | `fasts_made_up_one` | Made up one | Button | |

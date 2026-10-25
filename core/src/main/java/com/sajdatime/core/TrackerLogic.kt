@@ -195,6 +195,24 @@ object TrackerLogic {
         return records.filter { (d, r) -> r.ticked.isNotEmpty() && !d.isBefore(windowStart) && !d.isAfter(today) }
             .keys.minOrNull() ?: today
     }
+
+    /**
+     * "Fasts to make up" (Ali, 25 Oct 2026, moved into 1.6.0): one number the person sets, no reasons and
+     * no dates. Anything stored or loaded passes through here, so a damaged file cannot show -4 or a
+     * million. ponytail: 999 by one step at a time; a typed number if anyone owes more and says so.
+     */
+    const val MAX_FASTS = 999
+
+    fun clampFasts(count: Int): Int = count.coerceIn(0, MAX_FASTS)
+
+    /** One plus or minus, applied to the stored number, so two quick taps count twice (review, 25 Oct 2026). */
+    fun adjustFasts(current: Int, delta: Int): Int = clampFasts(current + delta)
+
+    /**
+     * Loading a file keeps the larger count, never the sum: the same file loaded twice must not double
+     * it, and a new phone at 0 takes the file's number.
+     */
+    fun mergeFasts(here: Int, incoming: Int): Int = clampFasts(maxOf(here, incoming))
 }
 
 /**

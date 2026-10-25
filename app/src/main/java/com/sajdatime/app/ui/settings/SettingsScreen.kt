@@ -40,6 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
+import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.Language
@@ -92,6 +93,7 @@ import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.TrackerLogic
 import com.sajdatime.core.Sect
 import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
@@ -474,6 +476,24 @@ fun SettingsScreen(
                         onCheckedChange = tracker::setShowStreak,
                     ),
                 )
+                // "Fasts to make up" (Ali, 25 Oct 2026, moved into 1.6.0). Hidden on a record from a newer
+                // version: TrackerRepository refuses the write, so the stepper would seem to do nothing.
+                if (state.tracker?.data?.readOnly != true) {
+                    val fasts = state.tracker?.data?.fastsToMakeUp ?: 0
+                    add(
+                        SettingsItem.Link(
+                            key = "tracker_fasts",
+                            icon = Icons.Outlined.EventAvailable,
+                            title = stringResource(R.string.settings_tracker_fasts),
+                            subtitle = if (fasts > 0) {
+                                pluralStringResource(R.plurals.tracker_fasts_line, fasts, fasts)
+                            } else {
+                                stringResource(R.string.settings_tracker_fasts_desc)
+                            },
+                            onClick = { trackerDialog = TrackerDialog.FASTS },
+                        ),
+                    )
+                }
                 add(
                     if (paused) {
                         SettingsItem.Link(
@@ -639,6 +659,11 @@ fun SettingsScreen(
                 trackerDialog = null
                 tracker.pause(fromYesterday)
             },
+            onDismiss = { trackerDialog = null },
+        )
+        TrackerDialog.FASTS -> FastsDialog(
+            count = state.tracker?.data?.fastsToMakeUp ?: 0,
+            onAdjust = tracker::adjustFastsToMakeUp,
             onDismiss = { trackerDialog = null },
         )
         TrackerDialog.DELETE -> DeleteTrackerDialog(
@@ -1010,7 +1035,33 @@ private const val CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
 
 internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, TRACKER, ABOUT }
 
-private enum class TrackerDialog { PAUSE, DELETE }
+private enum class TrackerDialog { PAUSE, FASTS, DELETE }
+
+/**
+ * The fasts to make up count: the sentence that says what it is, then one stepper (the same one as the
+ * mosque adjustments). The label is the short title, so TalkBack says "Fasts to make up, 3". Each press
+ * is saved at once; Close only closes.
+ */
+@Composable
+private fun FastsDialog(count: Int, onAdjust: (Int) -> Unit, onDismiss: () -> Unit) {
+    val title = stringResource(R.string.settings_tracker_fasts)
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_tracker_fasts_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Paragraph))
+        StepperRow(
+            label = title,
+            value = count.toString(),
+            canDecrease = count > 0,
+            canIncrease = count < TrackerLogic.MAX_FASTS,
+            onDecrease = { onAdjust(-1) },
+            onIncrease = { onAdjust(1) },
+        )
+    }
+}
 
 /**
  * "Pause from": today or yesterday, nothing further back (Ali, 16 Oct 2026). No reason is asked or

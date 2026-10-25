@@ -62,4 +62,14 @@ class TrackerFileCodecTest {
 
     @Test fun `file name carries the date`() =
         assertEquals("sajdatime-prayers-2027-02-20.json", TrackerFileCodec.fileName(d("2027-02-20")))
+
+    @Test fun `the fasts to make up number round trips, is absent at zero and is clamped`() {
+        val back = TrackerFileCodec.decode(TrackerFileCodec.encode(sample.copy(fastsToMakeUp = 3), d("2027-02-20")))
+        assertEquals(3, back.fastsToMakeUp)
+        assertFalse(TrackerFileCodec.encode(sample, d("2027-02-20")).contains("fastsToMakeUp"))
+        assertEquals(0, TrackerFileCodec.decode(TrackerFileCodec.encode(sample, d("2027-02-20"))).fastsToMakeUp)
+        val base = """{"kind":"sajdatime-prayer-tracker","version":1,"days":{},"fastsToMakeUp":%s}"""
+        assertEquals(0, TrackerFileCodec.decode(base.format("-4")).fastsToMakeUp)
+        assertEquals(999, TrackerFileCodec.decode(base.format("1000000")).fastsToMakeUp)
+    }
 }

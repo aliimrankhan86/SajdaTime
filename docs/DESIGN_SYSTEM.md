@@ -498,6 +498,8 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
 | My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
 | My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, while fasts to make up is above zero | Made up one (calendar check icon) at the end, beside "3 fasts to make up", a Section under the week card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| Settings, Fasts to make up dialog | − and + for the count (0 to 999), under the sentence; Close and the X | C; E, D | 40 visual, 48 target | `SettingsScreen.kt` |
 | My prayers tab, tracking off | the switch row; not a button | Switch | 56 row | `MyPrayersScreen.kt` |
 | My prayers tab, no location | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
 | Qibla | Details (down chevron that turns; "Hide details" when open), centred under the place name, 16dp under it | A, compact | 40 drawn, 48 target, wraps | `QiblaScreen.kt` |

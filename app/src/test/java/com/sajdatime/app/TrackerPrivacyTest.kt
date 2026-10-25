@@ -29,7 +29,11 @@ class TrackerPrivacyTest {
         val section = Regex("""<h2 id="prayer-record">(.*?)<h2""", RegexOption.DOT_MATCHES_ALL).find(page)
         assertTrue("privacy.html has a prayer record section", section != null)
         val text = section!!.groupValues[1].replace(Regex("\\s+"), " ")
-        for (promise in listOf("kept on this phone only", "goes wherever you choose", "removes it from this phone", "never counted")) {
+        for (promise in listOf(
+            "kept on this phone only", "goes wherever you choose", "removes it from this phone", "never counted",
+            // The fasts to make up number (25 Oct 2026) is named both where it is kept and in the file.
+            "the number of fasts to make up", "your fasts to make up number",
+        )) {
             assertTrue("privacy.html prayer record says \"$promise\"", text.contains(promise))
         }
     }

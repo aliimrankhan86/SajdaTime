@@ -414,6 +414,8 @@
     <string name="settings_tracker_desc">Tandai setiap salat yang Anda kerjakan. Hanya Anda yang dapat melihatnya.</string>
     <string name="settings_tracker_streak">Tampilkan hari beruntun</string>
     <string name="settings_tracker_streak_desc">Tampilkan berapa hari beruntun Anda menandai kelima salat.</string>
+    <string name="settings_tracker_fasts">Puasa yang perlu diganti</string>
+    <string name="settings_tracker_fasts_desc">Tambah satu untuk setiap puasa yang masih perlu Anda ganti. Kurangi satu setelah Anda menggantinya.</string>
     <string name="settings_tracker_pause">Jeda pencatatan</string>
     <string name="settings_tracker_pause_desc">Hitungan hari Anda menunggu sampai Anda melanjutkan.</string>
     <string name="settings_tracker_resume">Lanjutkan pencatatan</string>
@@ -429,11 +431,15 @@
     <string name="settings_tracker_load_desc">Kembalikan catatan yang Anda simpan, di ponsel ini atau ponsel baru.</string>
     <string name="settings_tracker_delete">Hapus catatan salat saya</string>
     <string name="tracker_delete_title">Hapus catatan salat Anda?</string>
-    <string name="tracker_delete_body">Ini menghapus semua tanda dari ponsel ini. Tidak dapat dibatalkan.</string>
+    <string name="tracker_delete_body">Ini menghapus semua tanda dan jumlah puasa yang perlu diganti dari ponsel ini. Tidak dapat dibatalkan.</string>
     <string name="action_delete">Hapus</string>
     <plurals name="tracker_streak">
         <item quantity="other">%d hari beruntun</item>
     </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="other">%d puasa perlu diganti</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">Satu sudah diganti</string>
     <string name="tracker_open_history">30 hari terakhir</string>
     <string name="tracker_paused_line">Pencatatan dijeda</string>
     <string name="tracker_history_title">30 hari terakhir</string>

@@ -16,10 +16,13 @@ import java.time.LocalDate
  *
  * ```
  * {"kind":"sajdatime-prayer-tracker","version":1,"exported":"2027-02-20",
- *  "days":{"2027-02-08":["FAJR","DHUHR"]},"pauses":[{"start":"2027-02-09","end":"2027-02-12"}]}
+ *  "days":{"2027-02-08":["FAJR","DHUHR"]},"pauses":[{"start":"2027-02-09","end":"2027-02-12"}],
+ *  "fastsToMakeUp":3}
  * ```
  *
- * Dates and ticks only: no place, no settings, nothing else. Unknown prayer names are dropped one by
+ * Dates, ticks and the fasts to make up number only: no place, no settings, nothing else. The number is
+ * written only above zero and is optional on reading, so the version stays 1 (it came in with the
+ * tracker itself, in 1.6.0, before any file existed). Unknown prayer names are dropped one by
  * one, as AlertCodec does, so a file from a later version loses an entry rather than failing whole.
  */
 object TrackerFileCodec {
@@ -49,6 +52,7 @@ object TrackerFileCodec {
             .put("exported", exportedOn.toString())
             .put("days", days)
             .put("pauses", pauses)
+            .apply { if (data.fastsToMakeUp > 0) put("fastsToMakeUp", TrackerLogic.clampFasts(data.fastsToMakeUp)) }
             .toString(2)
     }
 
@@ -83,6 +87,10 @@ object TrackerFileCodec {
                 if (end != null && !end.isBefore(start)) pauses += PauseRange(start, end)
             }
         }
-        return TrackerData(records, TrackerLogic.normalise(pauses))
+        return TrackerData(
+            records,
+            TrackerLogic.normalise(pauses),
+            fastsToMakeUp = TrackerLogic.clampFasts(root.optInt("fastsToMakeUp", 0)),
+        )
     }
 }

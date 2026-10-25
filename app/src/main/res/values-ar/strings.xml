@@ -485,6 +485,8 @@
     <string name="settings_tracker_desc">ضع علامة على كل صلاة تصليها. لا يراها أحد غيرك.</string>
     <string name="settings_tracker_streak">إظهار الأيام المتتالية</string>
     <string name="settings_tracker_streak_desc">إظهار عدد الأيام المتتالية التي وضعت فيها علامة على الصلوات الخمس كلها.</string>
+    <string name="settings_tracker_fasts">أيام صيام للقضاء</string>
+    <string name="settings_tracker_fasts_desc">أضف يومًا لكل يوم صيام ما زال عليك قضاؤه، واحذف يومًا حين تقضيه.</string>
     <string name="settings_tracker_pause">إيقاف التتبع مؤقتًا</string>
     <string name="settings_tracker_pause_desc">يبقى عدّ أيامك كما هو حتى تستأنف.</string>
     <string name="settings_tracker_resume">استئناف التتبع</string>
@@ -500,7 +502,7 @@
     <string name="settings_tracker_load_desc">استعد سجلًا حفظته، على هذا الهاتف أو على هاتف جديد.</string>
     <string name="settings_tracker_delete">حذف سجل صلواتي</string>
     <string name="tracker_delete_title">حذف سجل صلواتك؟</string>
-    <string name="tracker_delete_body">يحذف هذا كل العلامات من هذا الهاتف. لا يمكن التراجع عن ذلك.</string>
+    <string name="tracker_delete_body">يحذف هذا كل العلامات وعدد أيام صيام القضاء من هذا الهاتف. لا يمكن التراجع عن ذلك.</string>
     <string name="action_delete">حذف</string>
     <plurals name="tracker_streak">
         <item quantity="zero">%d يوم على التوالي</item>
@@ -510,6 +512,15 @@
         <item quantity="many">%d يومًا على التوالي</item>
         <item quantity="other">%d يوم على التوالي</item>
     </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="zero">%d يوم صيام للقضاء</item>
+        <item quantity="one">يوم صيام واحد للقضاء</item>
+        <item quantity="two">يوما صيام للقضاء</item>
+        <item quantity="few">%d أيام صيام للقضاء</item>
+        <item quantity="many">%d يومًا من الصيام للقضاء</item>
+        <item quantity="other">%d يوم صيام للقضاء</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">قضيت يومًا</string>
     <string name="tracker_open_history">آخر 30 يومًا</string>
     <string name="tracker_paused_line">التتبع متوقف مؤقتًا</string>
     <string name="tracker_history_title">آخر 30 يومًا</string>

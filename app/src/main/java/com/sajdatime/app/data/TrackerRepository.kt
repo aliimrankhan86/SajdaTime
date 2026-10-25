@@ -44,11 +44,14 @@ data class TrackerData(
      * earlier tick or a loaded file. In this store, so Delete clears it with the record.
      */
     val startedOn: LocalDate? = null,
+    /** "Fasts to make up", 0 to [TrackerLogic.MAX_FASTS]. In this store, so Delete clears it with the record. */
+    val fastsToMakeUp: Int = 0,
 ) {
-    val isEmpty: Boolean get() = records.values.all { it.ticked.isEmpty() } && pauses.isEmpty()
+    val isEmpty: Boolean get() = records.values.all { it.ticked.isEmpty() } && pauses.isEmpty() && fastsToMakeUp == 0
 }
 
-data class MergeResult(val daysAdded: Int, val daysUpdated: Int)
+/** [fasts] is the new fasts to make up number when the file changed it, else null. */
+data class MergeResult(val daysAdded: Int, val daysUpdated: Int, val fasts: Int? = null)
 
 class TrackerRepository(private val context: Context) {
 
@@ -77,6 +80,12 @@ class TrackerRepository(private val context: Context) {
         if (prefs.toTrackerData().copy(startedOn = null).isEmpty) prefs.remove(STARTED)
     }
 
+    /** Read and written in one edit, so two quick taps are two steps, never one. */
+    suspend fun adjustFastsToMakeUp(delta: Int) = edit { prefs ->
+        val n = TrackerLogic.adjustFasts(prefs[FASTS] ?: 0, delta)
+        if (n == 0) prefs.remove(FASTS) else prefs[FASTS] = n
+    }
+
     suspend fun pause(from: LocalDate) = edit { prefs ->
         prefs[PAUSES] = PauseCodec.encode(TrackerLogic.pause(PauseCodec.decode(prefs[PAUSES]), from))
     }
@@ -93,6 +102,7 @@ class TrackerRepository(private val context: Context) {
     suspend fun merge(incoming: TrackerData): MergeResult {
         var added = 0
         var updated = 0
+        var fasts: Int? = null
         edit { prefs ->
             for ((date, record) in incoming.records) {
                 if (record.ticked.isEmpty()) continue
@@ -106,11 +116,16 @@ class TrackerRepository(private val context: Context) {
                 prefs[key] = joined
             }
             prefs[PAUSES] = PauseCodec.encode(PauseCodec.decode(prefs[PAUSES]) + incoming.pauses)
+            val before = prefs[FASTS] ?: 0
+            TrackerLogic.mergeFasts(before, incoming.fastsToMakeUp).let {
+                if (it > 0) prefs[FASTS] = it
+                if (it != before) fasts = it
+            }
             // A file with older days moves the start back, so those days show (9.11).
             (incoming.records.filterValues { it.ticked.isNotEmpty() }.keys + incoming.pauses.map { it.start })
                 .minOrNull()?.let { prefs.moveStartBackTo(it) }
         }
-        return MergeResult(added, updated)
+        return MergeResult(added, updated, fasts)
     }
 
     /** Clears the whole record. The only destructive action in the app, behind one confirmation. */
@@ -143,6 +158,7 @@ class TrackerRepository(private val context: Context) {
         pauses = PauseCodec.decode(this[PAUSES]),
         readOnly = (this[VERSION_KEY] ?: VERSION) > VERSION,
         startedOn = this[STARTED]?.let { runCatching { LocalDate.parse(it) }.getOrNull() },
+        fastsToMakeUp = TrackerLogic.clampFasts(this[FASTS] ?: 0),
     )
 
     private companion object {
@@ -152,6 +168,8 @@ class TrackerRepository(private val context: Context) {
         val PAUSES = stringPreferencesKey("pauses")
         // A plain ISO date, not a "d:" day key, so toTrackerData never reads it as a day of ticks.
         val STARTED = stringPreferencesKey("tracker_started")
+        // Not a "d:" key either, and absent at zero, so an untouched record stores nothing for it.
+        val FASTS = intPreferencesKey("fasts_to_make_up")
         fun dayKey(date: LocalDate) = intPreferencesKey(DAY_PREFIX + date)
     }
 }

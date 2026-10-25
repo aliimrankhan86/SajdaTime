@@ -174,4 +174,17 @@ class TrackerLogicTest {
         assertEquals(d("2027-03-10"), TrackerLogic.startAfterRecording(d("2027-03-10"), d("2027-03-12")))
         assertEquals(null, TrackerLogic.startAfterRecording(null, d("2027-03-09")))
     }
+
+    @Test fun `the fasts count stays between 0 and 999, and a load keeps the larger`() {
+        assertEquals(0, TrackerLogic.clampFasts(-4))
+        assertEquals(7, TrackerLogic.clampFasts(7))
+        assertEquals(TrackerLogic.MAX_FASTS, TrackerLogic.clampFasts(1_000_000))
+        assertEquals(5, TrackerLogic.mergeFasts(0, 5))
+        assertEquals(5, TrackerLogic.mergeFasts(5, 5)) // the same file twice does not double it
+        assertEquals(6, TrackerLogic.mergeFasts(6, 2))
+        assertEquals(TrackerLogic.MAX_FASTS, TrackerLogic.mergeFasts(3, 5000))
+        assertEquals(2, TrackerLogic.adjustFasts(3, -1))
+        assertEquals(0, TrackerLogic.adjustFasts(0, -1))
+        assertEquals(TrackerLogic.MAX_FASTS, TrackerLogic.adjustFasts(TrackerLogic.MAX_FASTS, 1))
+    }
 }

@@ -2182,6 +2182,30 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
 - `docs/privacy.html` unchanged: nothing new is stored or sent. iPhone: Android only, maps to WidgetKit
   (`nextRefreshAt` boundaries are a TimelineProvider's entries).
 
+### 5.36 Fasts to make up (moved into 1.6.0 by Ali, 25 Oct 2026; FASTS-TO-MAKE-UP.md)
+
+Ali, 25 Oct 2026: "what we can release in this, let's just go with that ... We don't need to even add it into the
+description ... maybe we don't even need Fable to design it ... design it basic for now ... but follow the same theme".
+So it was built from existing components only, with no Fable pass and no store listing line. The two 1.6.1 reminders
+stay in 1.6.1 (alarm changes, and no fix could ship in the 18 Jan to 9 Mar release pause).
+
+- **One number, 0 to 999** (`TrackerLogic.MAX_FASTS`), no reasons, no dates, no reminder, no deadline. Set in Settings,
+  My prayers, "Fasts to make up" (dialog with the existing `StepperRow`); shown on the My prayers tab under the week
+  card only above zero, with "Made up one". No Undo on purpose: plus in Settings puts a wrong tap back.
+- **Stored in the tracker DataStore** (`fasts_to_make_up`, absent at zero), so Delete clears it and backup never sees it.
+  Every change is `adjustFastsToMakeUp(±1)`, read and written in one edit (two quick taps are two steps; review).
+- **Save file:** optional `"fastsToMakeUp"`, written only above zero, version stays 1 (the tracker is new in 1.6.0, so no
+  older file exists). **Load keeps the larger count, never the sum** (`TrackerLogic.mergeFasts`): the same file twice
+  must not double it. A file that changes only the count says so in the toast, not "0 days added". **Accepted trade
+  off:** loading an older save made before some fasts were made up raises the count again; the toast shows the new
+  number, and minus in Settings puts it right. Taking the file's number instead would let an old file lower a count
+  the person has since raised, and summing would double it.
+- **Words:** English never "missed", "owed", "debt", "qada" (`TrackerWordingTest`). Arabic and Urdu use قضا and Turkish
+  kaza, the plain words for making up a fast (DETAILED-PLAN §9); Indonesian "diganti", never utang (debt).
+- **Privacy:** `docs/privacy.html` names the count where the record is kept and in the file; `TrackerPrivacyTest` pins
+  both phrases. No usage-count event.
+- **Not done, deliberately:** bulk entry (one step at a time; a repeating long press is the cheap upgrade if asked).
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -5961,6 +5985,22 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > **This section opens with the current state of play, then the dated record of how the project
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
+
+### 📍 FASTS TO MAKE UP ADDED TO 1.6.0, 25 Oct 2026, evening (read this first, then the STEP 11 block below)
+
+- **Ali, 25 Oct 2026:** move what 1.6.1 work can safely go into 1.6.0, built basic in the app's style, no Fable pass,
+  not in the store description. Only "Fasts to make up" qualified; the jama'ah reminder and Sunnah fast reminders stay in
+  1.6.1 (alarm changes; no fix could ship in the 18 Jan to 9 Mar pause). Rule and reasons: §5.36, spec
+  `docs/plans/2026-10-release-1.6.0/FASTS-TO-MAKE-UP.md`.
+- **Checked:** plan-verifier on the spec (five fixes taken); Opus reviewed twice (fixed: two quick taps lost a step, a
+  count only file said "0 days added", Turkish and Arabic wording, Indonesian button). Full gate green (core 238 with 1
+  skipped, app 323, wear 27, lint 0 errors); device suite 39 of 39 on `emulator-5554`; after a last Arabic plural fix, app
+  unit tests and lint rerun green. Pictures on `sajdastore`: Settings row and dialog at 0 and 3, the tab line at 3, "Made
+  up one" taking it to 2, dark, Urdu and Arabic right to left, Turkish, Indonesian, 2x text (button wraps under the line).
+- **Store pictures unchanged:** the line shows only above zero, and the seeds set no count. `release-1.6.0.sh`
+  `EXPECTED_COUNTS` moved to core 238, app 323.
+- **Not checked:** TalkBack by ear; the release script end to end (as before); 320dp width.
+- **Waiting for Ali:** his look at the pictures. Release day is unchanged otherwise.
 
 ### 📍 STEP 11 DONE, 25 Oct 2026, afternoon (read this first): Ali approved the pictures ("Yes all fine"); release day walkthrough `docs/release-tools/RELEASE-1.6.0.md`
 

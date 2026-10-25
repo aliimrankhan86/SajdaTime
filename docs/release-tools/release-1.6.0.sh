@@ -76,7 +76,7 @@ EOF
 )"
   LINT="$(for f in */build/reports/lint-results-debug.xml; do printf '%s %s errors, ' "${f%%/*}" "$(grep -cE 'severity="(Error|Fatal)"' "$f")"; done)"
   # Gate counts at 25 Oct 2026 (core 237 tests, 1 of them skipped; app 322; wear 27). Update with the code.
-  EXPECTED_COUNTS="app 322 tests 0 failed, core 237 tests 0 failed, wear 27 tests 0 failed"
+  EXPECTED_COUNTS="app 323 tests 0 failed, core 238 tests 0 failed, wear 27 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass

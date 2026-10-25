@@ -82,7 +82,8 @@ enum class LocationProblem {
  */
 sealed interface TrackerEvent {
     data class Saved(val fileName: String) : TrackerEvent
-    data class Loaded(val days: Int) : TrackerEvent
+    /** [fasts]: the new fasts to make up number when the file changed it, so a count-only file is not "0 days added". */
+    data class Loaded(val days: Int, val fasts: Int? = null) : TrackerEvent
     data object SaveFailed : TrackerEvent
     data class LoadFailed(val tooNew: Boolean) : TrackerEvent
 }
@@ -130,6 +131,8 @@ interface TrackerActions {
     fun tick(date: LocalDate, slot: PrayerSlot, ticked: Boolean)
     fun pause(fromYesterday: Boolean)
     fun resume()
+    /** +1 or -1 on the stored number. */
+    fun adjustFastsToMakeUp(delta: Int)
     fun save()
     fun load()
     fun delete()
@@ -588,6 +591,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun resumeTracker() =
         viewModelScope.launch { trackerRepository.resume(LocalDate.now(ZoneId.systemDefault())) }
 
+    fun adjustFastsToMakeUp(delta: Int) {
+        viewModelScope.launch { trackerRepository.adjustFastsToMakeUp(delta) }
+    }
+
     fun deleteTracker() = viewModelScope.launch { trackerRepository.deleteAll() }
 
     fun trackerFileName(): String = TrackerFileCodec.fileName(LocalDate.now(ZoneId.systemDefault()))
@@ -613,7 +620,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 app.contentResolver.openInputStream(uri)!!.use { String(it.readNBytesCompat(MAX_TRACKER_FILE_BYTES)) }
             }
             val result = trackerRepository.merge(TrackerFileCodec.decode(text))
-            TrackerEvent.Loaded(result.daysAdded + result.daysUpdated)
+            TrackerEvent.Loaded(result.daysAdded + result.daysUpdated, result.fasts)
         }.getOrElse { e -> TrackerEvent.LoadFailed(tooNew = (e as? TrackerFileCodec.Unreadable)?.tooNew == true) }
         _state.update { it.copy(trackerEvent = event) }
     }
