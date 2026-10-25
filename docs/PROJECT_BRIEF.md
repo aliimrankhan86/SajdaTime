@@ -98,7 +98,7 @@ Ali decided on 16 Oct 2026:
 - **Daily cloud health check at 12:00 UTC:** a silent alarm that speaks only if something changes on the store page. Re-baselined to 1.5.0 on 24 Oct 2026 (its prompt corrected, HANDOVER lesson 177a); it is re-baselined to 1.6.0 after that release is live (`RELEASE-1.6.0.md`).
 - **The Arabic reviewer reply was posted on 24 Oct 2026** (Ali's own words; no ask for a higher rating).
 - **On release day:** the date is written everywhere it belongs; for 1.6.0 the list is in `docs/release-tools/RELEASE-1.6.0.md` (Ali, 23 Oct 2026).
-- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders. **Updated 23 Oct 2026:** Ali chose a calmer, more modern look for 1.6:
+- **After 1.5.0: the agreed 1.6 plan** (Ali, 23 Oct 2026). 1.6.0 before Ramadan: the private prayer tracker, jama'ah times, an Islamic dates sheet; 1.6.1 after Eid: the jama'ah and fasting reminders and "Fasts to make up". **Updated 23 Oct 2026:** Ali chose a calmer, more modern look for 1.6:
   - a "My prayers" tab
   - a one-tap bell on each prayer
   - four skies behind the green card
