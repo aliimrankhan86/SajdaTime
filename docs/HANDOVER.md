@@ -5986,7 +5986,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 FASTS TO MAKE UP ADDED TO 1.6.0, 25 Oct 2026, evening (read this first, then the STEP 11 block below)
+### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read this first, then the STEP 11 block below)
 
 - **Ali, 25 Oct 2026:** move what 1.6.1 work can safely go into 1.6.0, built basic in the app's style, no Fable pass,
   not in the store description. Only "Fasts to make up" qualified; the jama'ah reminder and Sunnah fast reminders stay in
@@ -6000,7 +6000,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Store pictures unchanged:** the line shows only above zero, and the seeds set no count. `release-1.6.0.sh`
   `EXPECTED_COUNTS` moved to core 238, app 323.
 - **Not checked:** TalkBack by ear; the release script end to end (as before); 320dp width.
-- **Waiting for Ali:** his look at the pictures. Release day is unchanged otherwise.
+- **Ali approved it from the pictures, 25 Oct 2026:** "Yes, Fasts to make up looks fine. Keep it as it is." Nothing is
+  waiting; next is release day when Ali says so (`RELEASE-1.6.0.md`), PR by 11 Dec, submit by 15 Dec.
 
 ### 📍 STEP 11 DONE, 25 Oct 2026, afternoon (read this first): Ali approved the pictures ("Yes all fine"); release day walkthrough `docs/release-tools/RELEASE-1.6.0.md`
 

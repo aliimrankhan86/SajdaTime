@@ -842,6 +842,11 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **25 Oct 2026, Fasts to make up (moved into 1.6.0, built basic with no Fable pass at the owner's request):** a
+  Settings row in My prayers opening the chooser dialog with one StepperRow, and on the My prayers tab "3 fasts to make
+  up" with a compact "Made up one" under the week card, only above zero. **The owner approved it from the pictures
+  ("Yes, Fasts to make up looks fine. Keep it as it is.")**, including the stepper label repeating the title on two lines
+  (kept: TalkBack reads it). HANDOVER §5.36.
 - **25 Oct 2026, the 1.6.0 store pictures (step 11, Fable's design; the owner chose all four recommendations and
   approved the finished set from pictures, 25 Oct 2026: "Yes all fine").** Detail: `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (§9 wins).
   * **Eight English, four in each app language.** Times light, My prayers, Qibla, Ramadan dark (01 to 04, also in
