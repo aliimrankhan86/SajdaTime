@@ -258,3 +258,23 @@ Placeholders: `%1$s` is the prayer's own label (`labelRes`, so a Shia user's nam
 | `settings_value_lines` | `%1$s\n%2$s`, `translatable="false"`, values only | | | | |
 
 Deleted in all five: `jamaah_out_of_window`.
+
+## 16. Ali's answer to Q15, and Fable's verdict on the feature (25 Oct 2026)
+
+Ali, shown pictures 1b, 1c, 3, 6 and 8: "I'm beginning to think, adding jamaat could cause more confusion for thet
+timing will cause more confusion for the user check with fable and it agrees with me then maybe we remove it else go
+with recommendations but before development run compact". Then: "Jamaat time I meant".
+
+**Fable's independent verdict: keep jama'ah times as built.**
+- Nobody sees a jama'ah time without typing it, so the default screen is unchanged.
+- For the mosque goer it answers "when do I need to be there?".
+- The one real gap is a fixed time that drifts but stays inside the window. It has no warning. It is the same risk
+  as Match your mosque. A 1.6.1 candidate: the row subtitle names the month it was set ("3 prayers set in March").
+- Removing it would cost both 9e9102e and step 7: 29 strings in five languages, and the 1.6.1 jama'ah reminder.
+- No middle option is better.
+
+**So, by Ali's rule, the recommendations stand:**
+- Jama'ah times stay in 1.6.0.
+- The mosque door stays under the rows (Q15).
+- Next: remove `mosqueDoorShown`, close `1.6-mosque-door` in DESIGN_SYSTEM §11, gate, merge. This waits for the
+  context compact Ali asked for.
