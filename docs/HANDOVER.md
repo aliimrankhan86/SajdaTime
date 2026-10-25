@@ -5979,7 +5979,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   (2) DONE in the second WIP commit, not yet re-reviewed or run on an emulator: Sonnet fixed Opus's release script findings: 6j skipped unless 1080x1920, build-store-assets clears old uploads,
   `docs/index.html` JSON-LD screenshot links (they 404 after the move: blocking before merge), R1 alarm check removed,
   6f runs only the London seed, 6j reordered (location revoke, wifi demo, alerts seed last), 05 manual, seed KDoc;
-  (3) an Opus agent translating the 1.6.0 listing into the eight languages in `LISTING-LOCALES.md` plus
+  (3) DONE 25 Oct, not yet reviewed: an Opus agent translated the 1.6.0 listing into the eight languages in `LISTING-LOCALES.md` plus
   `docs/translation/store-listing-1.6.0.md` (short, full, What's new each; Chrome line removed).
 - **Capture trap learned:** the AVD's GPS is Manchester; with location granted the app moves off the seeded London. Revoke
   `ACCESS_COARSE_LOCATION` after seeding (no banner appears). The `!` on the wifi icon needs the demo `network ... fully true`.
