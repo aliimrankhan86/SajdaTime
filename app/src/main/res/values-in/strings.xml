@@ -213,7 +213,6 @@
     <string name="consent_title">Bantu tingkatkan SajdaTime?</string>
     <string name="consent_body">SajdaTime gratis dan tanpa iklan. Jika Anda setuju, aplikasi ini mengirim sedikit data jumlah penggunaan ke Google Analytics agar aplikasi bisa ditingkatkan. Data itu terhubung ke ID acak, bukan nama Anda, dan bisa diproses di luar Inggris Raya. Catatan terperinci disimpan selama 14 bulan.\n\nMemakai aplikasi salat bisa mengungkapkan sesuatu tentang keyakinan Anda, jadi ini sepenuhnya pilihan Anda, dan tidak ada yang berubah di aplikasi jika Anda menolak. SajdaTime tidak pernah mengirim posisi GPS atau pengaturan salat Anda.\n\nSampai Anda memilih ya, tidak ada yang dikirim. Anda bisa mematikannya di Pengaturan kapan saja. Penanggung jawabnya adalah Ali Imran Khan, pembuat aplikasi ini.</string>
     <string name="settings_language_title">Bahasa</string>
-    <string name="settings_language_desc">Pilih bahasa aplikasi</string>
     <string name="language_unavailable">Tidak tersedia di ponsel ini</string>
     <string name="language_phone">Bahasa ponsel</string>
     <string name="permission_allowed">Diizinkan</string>

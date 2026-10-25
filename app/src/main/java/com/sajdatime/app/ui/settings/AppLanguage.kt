@@ -7,6 +7,7 @@ import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
+import com.sajdatime.app.R
 import com.sajdatime.core.AppLocale
 import java.util.Locale
 
@@ -40,19 +41,26 @@ import java.util.Locale
  * decided they need no native speaker review: SajdaTime is a free utility he makes himself, and
  * the translator's own checking is the standard. The app must not tell users otherwise.
  */
-enum class AppLanguage(val tag: String, val nativeName: String) {
-    // Names are written in their own language and script on purpose, so a user who cannot
-    // read the current language can still find theirs. Not translatable.
-    ENGLISH("en", "English"),
-    URDU("ur", "اردو"),
-    TURKISH("tr", "Türkçe"),
-    INDONESIAN("id", "Bahasa Indonesia"),
+enum class AppLanguage(val tag: String, val nativeName: String, val englishName: String) {
+    // Every language is named twice, on purpose: [nativeName] in its own language and script, so a
+    // user who cannot read the current language can find theirs, and [englishName] in English in
+    // every app language, so someone who cannot read that script can still tell which it is.
+    // Constants, not resources, because they must never translate (owner, 25 Oct 2026: "write their
+    // name also urdu in their own text then write urdu in English also").
+    ENGLISH("en", "English", "English"),
+    URDU("ur", "اردو", "Urdu"),
+    TURKISH("tr", "Türkçe", "Turkish"),
+    INDONESIAN("id", "Bahasa Indonesia", "Indonesian"),
     // Added 17 Oct 2026 after a 1 star review asked for it ("إضافة اللغة العربية"). Claude's
     // translation, checked by Claude, as the owner decided for every language on 9 Oct 2026.
     // Choosing it turns the app right to left through AppLocale, with Western digits: its tag is
     // ar-u-nu-latn (see values-ar/strings.xml for why).
-    ARABIC("ar", "العربية"),
+    ARABIC("ar", "العربية", "Arabic"),
     ;
+
+    /** "اردو (Urdu)", or just "English" where the two names are the same. Not isolated: callers do that. */
+    fun namePair(context: Context): String =
+        if (nativeName == englishName) nativeName else context.getString(R.string.language_name_pair, nativeName, englishName)
 
     /** True when this language's words are installed on this phone. */
     fun isAvailable(context: Context): Boolean {
@@ -72,6 +80,21 @@ enum class AppLanguage(val tag: String, val nativeName: String) {
                 AppLocale.override(context)?.let(Locale::forLanguageTag)
             } ?: return null
             return fromLocale(locale)
+        }
+
+        /**
+         * The language following the phone would give: what the app shows when nothing is chosen,
+         * otherwise the phone's whole language list resolved against our resources, the way Android
+         * picks the app's words (a phone set to French then Urdu gets Urdu, not English). The list
+         * comes from LocaleManagerCompat because on Android 13+ the app's own choice reaches
+         * Resources.getSystem() (HANDOVER §15 lesson 181).
+         */
+        fun phone(context: Context): AppLanguage {
+            if (chosen(context) == null) return showing(context)
+            val tags = androidx.core.app.LocaleManagerCompat.getSystemLocales(context).toLanguageTags()
+            val config = Configuration(context.resources.configuration).apply { setLocales(LocaleList.forLanguageTags(tags)) }
+            val resolved = context.createConfigurationContext(config).getString(com.sajdatime.core.R.string.app_language_tag)
+            return fromLocale(Locale.forLanguageTag(resolved))
         }
 
         /** The language the app is actually showing now, whichever route got it there. */

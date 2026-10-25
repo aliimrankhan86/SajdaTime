@@ -90,4 +90,23 @@ class LanguagePickerTest {
         assertFalse("language_unavailable still mentions a review: $text", text!!.contains("review", ignoreCase = true))
         assertFalse("language_unavailable still mentions native speakers: $text", text.contains("native", ignoreCase = true))
     }
+
+    @Test
+    fun `every language is named in English as well, written out literally`() {
+        // Constants, not resources: the English name must read the same in every app language
+        // (owner, 25 Oct 2026). Written out so a changed or reordered name fails here.
+        assertEquals(
+            listOf("English", "Urdu", "Turkish", "Indonesian", "Arabic"),
+            AppLanguage.entries.map { it.englishName },
+        )
+    }
+
+    @Test
+    fun `the name pair format is fixed and never translated`() {
+        val line = Regex("""<string name="language_name_pair"([^>]*)>([^<]*)</string>""")
+            .find(read("app/src/main/res/values/strings.xml"))
+        assertTrue("language_name_pair is missing", line != null)
+        assertTrue("language_name_pair must be translatable=\"false\"", line!!.groupValues[1].contains("""translatable="false""""))
+        assertEquals("%1\$s (%2\$s)", line.groupValues[2])
+    }
 }

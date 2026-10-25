@@ -213,7 +213,6 @@
     <string name="consent_title">SajdaTime\'ı geliştirmeye yardım eder misiniz?</string>
     <string name="consent_body">SajdaTime ücretsizdir ve reklam içermez. Evet derseniz, uygulamanın geliştirilebilmesi için Google Analytics\'e birkaç kullanım sayımı gönderir. Bu sayımlar adınıza değil, rastgele bir kimliğe bağlıdır ve Birleşik Krallık dışında işlenebilir. Ayrıntılı kayıtlar 14 ay saklanır.\n\nBir namaz uygulaması kullanmak inancınız hakkında bir şey söyleyebilir. Bu yüzden karar sizindir ve hayır derseniz uygulamada hiçbir şey değişmez. SajdaTime GPS konumunuzu ya da namaz ayarlarınızı asla göndermez.\n\nEvet diyene kadar hiçbir şey gönderilmez. Bunu istediğiniz zaman Ayarlar bölümünden kapatabilirsiniz. Sorumlu kişi, uygulamayı yapan Ali Imran Khan\'dır.</string>
     <string name="settings_language_title">Dil</string>
-    <string name="settings_language_desc">Uygulamanın dilini seçin</string>
     <string name="language_unavailable">Bu telefonda kullanılamıyor</string>
     <string name="language_phone">Telefonun dili</string>
     <string name="permission_allowed">İzin verildi</string>

@@ -238,7 +238,6 @@
     <string name="consent_title">هل تساعد في تحسين SajdaTime؟</string>
     <string name="consent_body">SajdaTime مجاني ولا يحتوي على إعلانات. إن قلت نعم، يرسل بعض إحصاءات الاستخدام إلى Google Analytics كي يمكن تحسين التطبيق. وهي مرتبطة بمعرّف عشوائي، لا باسمك، وقد تُعالَج خارج المملكة المتحدة. وتُحفظ السجلات المفصّلة مدة أربعة عشر شهرًا.\n\nقد يكشف استخدام تطبيق للصلاة شيئًا عن إيمانك، لذا فهذا اختيارك، ولا يتغير شيء في التطبيق إن قلت لا. لا يرسل SajdaTime أبدًا موقعك عبر GPS ولا إعدادات صلاتك.\n\nلا يُرسَل شيء حتى تختار نعم. ويمكنك إيقاف ذلك من الإعدادات في أي وقت. والمسؤول عن ذلك هو علي عمران خان (Ali Imran Khan)، صانع التطبيق.</string>
     <string name="settings_language_title">اللغة</string>
-    <string name="settings_language_desc">اختر لغة التطبيق</string>
     <string name="language_unavailable">غير متاحة على هذا الهاتف</string>
     <string name="language_phone">لغة الهاتف</string>
     <string name="permission_allowed">مسموح</string>

@@ -217,7 +217,6 @@
     <string name="consent_title">SajdaTime کو بہتر بنانے میں مدد کریں؟</string>
     <string name="consent_body">SajdaTime مفت ہے اور اس میں کوئی اشتہار نہیں۔ اگر آپ ہاں کہیں تو یہ استعمال کے چند اعداد و شمار Google Analytics کو بھیجتی ہے تاکہ ایپ کو بہتر بنایا جا سکے۔ یہ آپ کے نام سے نہیں بلکہ ایک رینڈم شناختی نمبر (ID) سے جڑے ہوتے ہیں، اور ہو سکتا ہے انہیں برطانیہ سے باہر پروسیس کیا جائے۔ تفصیلی ریکارڈ 14 مہینے تک رکھے جاتے ہیں۔\n\nنماز کی ایپ استعمال کرنے سے آپ کے ایمان کے بارے میں کچھ ظاہر ہو سکتا ہے، اس لیے یہ فیصلہ آپ کا ہے، اور اگر آپ انکار کریں تو ایپ میں کچھ نہیں بدلتا۔ SajdaTime کبھی آپ کی GPS پوزیشن یا آپ کی نماز کی ترتیبات نہیں بھیجتی۔\n\nجب تک آپ ہاں نہ چنیں، کچھ نہیں بھیجا جاتا۔ آپ اسے کسی بھی وقت ترتیبات میں بند کر سکتے ہیں۔ اس کے ذمہ دار علی عمران خان (Ali Imran Khan) ہیں، جنہوں نے یہ ایپ بنائی ہے۔</string>
     <string name="settings_language_title">زبان</string>
-    <string name="settings_language_desc">ایپ کی زبان منتخب کریں</string>
     <string name="language_unavailable">اس فون پر دستیاب نہیں</string>
     <string name="language_phone">فون کی زبان</string>
     <string name="permission_allowed">اجازت ہے</string>

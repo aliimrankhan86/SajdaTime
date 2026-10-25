@@ -1236,6 +1236,15 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     must be answered. Rejected (Fable): a one time Notice on Times, a setup sentence, a badge on the Settings tab, a
     tinted row, the `gavel` or `warning` icons.
 
+* **25 Oct 2026, 1.6 step 10 languages** (`STEP-10-DESIGN.md`; Ali: "write their name also urdu in their own text
+    then write urdu in English also"): every language is shown in its own script and named in English, in English in
+    every app language. Language chooser rows: own name (`bodyLarge`, `onSurface`), English name under it
+    (`bodyMedium`, `onSurfaceVariant`, `Space.Tight`), shown once where they match ("English"); rows padded
+    `Space.Related` top and bottom so two line rows do not touch at 2x text (Fable, from the pictures). Phone language
+    row's second line names what following the phone gives ("اردو (Urdu)", or "English"). The welcome button keeps
+    the own name only (19 Oct entry). Settings subtitle: see §11 `1.6-language-row`. Rejected: the English name
+    following the app language (four translations that drift), flags (a flag is a country), one line "اردو · Urdu"
+    (wraps mid pair at large text).
 ---
 
 ## 10. The learning loop
@@ -1284,7 +1293,8 @@ the date and his words, and delete it here.
 | 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
 | 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | DECIDED 24 Oct 2026 from the eight pictures: dark versions, night kept this deep ("Keep it this deep"); also four light hues kept, light skies kept pale, widget drawings as glyphs |
 | 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
-| 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
+| 1.6-language-row | 23 Oct 2026 | Language row subtitle: (A) the language showing as "اردو (Urdu)", or (B) all five with English names | A (Fable, 25 Oct 2026; B was the planned item 18) | OPEN: Ali, from the step 10 pictures |
+| 1.6-script-line-box | 25 Oct 2026 | Urdu and Arabic single lines stand about 4dp taller than Latin ones (Noto Naskh's own ascent and descent; `LineHeightStyle` Trim.None did not change it on BOM 2026.06.01, measured) | A Type.kt wide fix, tried and measured, in 1.6.1 | OPEN, not blocking |
 
 **Decided, work not yet done** (do not report these as done):
 

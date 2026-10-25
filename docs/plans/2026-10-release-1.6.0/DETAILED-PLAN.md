@@ -444,7 +444,7 @@ or `fastReminders`. [Ali to confirm] `RequestCodeTest` covers the 30,000 band no
   - `tracker_last_night_isha`
   - `widget_strip_label` and `widget_strip_desc`
   - `bell_blocked_a11y`
-  - `settings_language_all`, which is `translatable="false"`, bidi-isolated with `Bidi.kt`
+  - `settings_language_all`, which is `translatable="false"`, bidi-isolated with `Bidi.kt` (superseded 25 Oct 2026 by STEP-10-DESIGN.md: `language_name_pair` and `AppLanguage.englishName`)
 - **Fixes:**
   - Use `action_resume` (it exists), not `tracker_resume`.
   - `tracker_ring_a11y` becomes `<plurals>`.
