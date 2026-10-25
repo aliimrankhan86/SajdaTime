@@ -290,7 +290,7 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
      `docs/store/upload/wear-os/` (23 Oct 2026), in filename order;
    - confirm the Data safety answers (expected unchanged);
    - then **he presses Send for review himself**.
-6. **After it is live** (watch Play's "Updated on" date move; Play sends no email):
+6. **After it is live** (watch Play's "Updated on" date move; Play sends no email). **DONE 24 Oct 2026:** live (Updated on 23 Oct 2026); Arabic reply posted in Ali's own final wording (no ask for a higher rating); live check disabled; health check re-baselined to 1.5.0; records updated. The list below is the original plan:
    - Ali posts the reply to the 1 star Arabic reviewer who asked for Arabic (drafted, in his own 17 Oct words,
      in `build/review-replies/DRAFTS.md`; the daily review job reminds him with the text the day Arabic is
      live). It thanks them, says Arabic was added because of their request, and ends "if you are happy with
@@ -328,6 +328,14 @@ Dates (**21 Oct 2026**, later): a reminder on Thu 29 Oct 2026 (18:00), the final
   page (claude.ai/artifact/GxU35nSJAfxqedU7DYa35L). Only Ali can see it; he can delete it if he wants.
 
 ## Scheduled jobs (all six checked and brought up to date on 19 Oct 2026)
+
+**23 Oct 2026, after the submit (Ali: "Retire the three outdated 1.5.0 reminders now ... so I don't get confusing
+messages"):** `sajdatime-1-5-0-reminder` (Fri 30 Oct), `trig_01Bpzq4t8wJCQZwABsC53ys8` (Thu 29 Oct) and
+`trig_01VexqUd1cJz8jfD5QFT874W` (Mon 2 Nov) are **disabled, not deleted**, each read back as `enabled: false`. Every one
+was written for an unreleased 1.5.0 ("leave the Mac on", "pick the release day"), so after the submit they could only
+mislead. New: `sajdatime-1-5-0-live-check` reads the Play Console in Chrome every 2 hours, 8:00 to 22:00, and turns itself
+off once 1.5.0 is live. Still on: `sajdatime-review-replies` (its step 4b falls silent now the spare file is gone) and the
+health check `trig_0129FQnWihf8XG6rKLCB4oFr`, which is re-baselined to 1.5.0 once it is live (step 6).
 
 **21 Oct 2026, for the 2 Nov submit (each read back after the change):** `sajdatime-1-5-0-reminder` moved to **Fri 30 Oct
 2026 12:00 UK** and its prompt rewritten for the 2 Nov submit, the 420 unit test count and the 21 Oct listing;
