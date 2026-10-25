@@ -46,7 +46,9 @@ class ScreenSeedDeviceTest {
 
     /**
      * Exactly the settings behind store picture 07: Fajr alarm, the other four prayers notification, Alarm
-     * sound Adhan, prayer reminder 15 minutes before all five. Nothing else is written.
+     * sound Adhan, prayer reminder 15 minutes before all five. Nothing else is written, except that choosing
+     * the built in adhan while the current sound is the phone's also saves that phone sound (PHONE_ALARM_SOUND),
+     * as the app itself does.
      */
     @Test
     fun seed_store_alert_settings() {

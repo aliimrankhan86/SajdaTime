@@ -840,6 +840,18 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **25 Oct 2026, the 1.6.0 store pictures (step 11, Fable's design; the owner chose all four recommendations, has not
+  yet seen the finished set).** Detail: `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (§9 wins).
+  * **Eight English, four in each app language.** Times light, My prayers, Qibla, Ramadan dark (01 to 04, also in
+    ar, ur, tr-TR, id-ID), widgets, Timetable, alerts and adhan, suhoor reminder. My prayers sits second because Play
+    shows the first pictures beside search results. Setup madhab and Settings pictures dropped (Ali's choice).
+  * **London, seeded, location revoked.** Times a reader can check (Qibla 119 minus facing 61 is "Turn right 58").
+  * **Arabic 01 to 03 on Thursday 20 Aug, the rest on Saturday 15 Aug.** Arabic weeks start on Saturday, so on a
+    Saturday the week card is empty; one language's set agrees with itself, languages need not agree with each other.
+  * **The widget strip without its town chip** (Ali's choice), the Next widget at four columns beside it.
+  * **Rejected:** Manchester (the AVD's GPS) for continuity with 1.5.0 pictures, since the app moved off the seed mid
+    capture; English pictures for the other languages; a 24 hour status bar for tr and id (left for Ali, optional).
+
 - **24 Oct 2026, the Qibla restyle (step 6, Fable's design, prototype built; the owner has not yet seen the pictures).**
   Detail: `docs/plans/2026-10-release-1.6.0/STEP-6-DESIGN.md` (section 14 wins where it differs).
   * **The direction first.** Under the title, "Turn right 58°" in `headlineMedium` with tabular figures, start

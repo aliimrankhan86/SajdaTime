@@ -354,3 +354,17 @@ A separate Opus reviewer back translated every new or changed line in all eight 
 - French full description, first paragraph: "calculés" had no noun; now "Sans pub ni compte ; horaires calculés" (3996 / 4000).
 - Turkish timetable bullet: "kaydedip yazdırın" (save and print) is now "kaydedin ya da yazdırın" (save or print) (3993 / 4000).
 Left as is, deliberately: the "an hour before" suhoor wording in six languages (true for the default of 60, unchanged from 1.5.0); Indonesian "salat" in What's new against "sholat" in the full text (app spelling against search spelling).
+
+## PDF bullet corrected in all nine, 25 Oct 2026
+
+The whole diff review found the timetable bullet promised a PDF of next month; the app saves only today, 7 days, this month and Ramadan (`PrayerPdfExporter.Range`). Fable's English: "• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a PDF". Translated by the main session, back translations:
+- ar: "Timetable for this month and the month after. Save today, 7 days, the month or Ramadan as PDF."
+- ur: "Timetable of this month and next month. Save today, 7 days, the month or Ramadan in PDF."
+- tr: "Prayer time chart of this month and next month. Save today, 7 days, the month or Ramadan as PDF."
+- id: "Schedule for this month and next month. Save today, 7 days, a month, or Ramadan as PDF."
+- ms: "Prayer schedule for this month and next month. Save today, 7 days, a month or Ramadan in PDF."
+- bn: "Timetable of this month and the next month. Save today, 7 days, the whole month or Ramadan as PDF."
+- fr: "Times for the month and the next. PDF of the day, of 7 days, of the month or of Ramadan."
+- hi: "Timetable of this month and next month. Save today, 7 days, the month or Ramadan in PDF."
+"or print" was dropped everywhere for room; printing is the phone's own step after saving. Full descriptions now: ar 3742, ur 3980, tr 3991, id 3985, ms 3997, bn 3987, fr 3998, hi 3989, English 3990 (all under 4000).
+Indonesian and Malay say "sebulan" (a month) for "the month": deliberate, Malay has 3 characters of room and "bulan ini" needs about 3 more; the meaning (one month's timetable) holds.

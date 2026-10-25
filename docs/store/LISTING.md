@@ -247,7 +247,7 @@ notice appears.
 Offline prayer times (namaz), adhan, Qibla and a private salah tracker. Wear OS.
 ```
 
-**Full description** `3983 / 4000` (Python `len`, newlines counted, no final newline). New: the MY PRAYERS AND YOUR
+**Full description** `3990 / 4000` (Python `len`, newlines counted, no final newline). New: the MY PRAYERS AND YOUR
 MOSQUE section (tracker, jama'ah and Jumu'ah, bell), the Islamic dates of the year, the two month Timetable, the five prayer
 strip. Applied to the 1.5.0 text this came to 4297, so lines were shortened: the "Namaz, salah or salat" paragraph folded
 into the first sentence, "wherever you are", "as day cards", "typed in once", "for your location", "Home screen", "matching
@@ -264,7 +264,7 @@ PRAYER TIMES AND QIBLA
 • Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, with a live countdown to the next prayer
 • The Hijri date (Islamic calendar) and the Islamic dates of the year
 • Qibla direction: a compass corrected to true north that buzzes once when you face the Kaaba
-• Timetable for this month and next, and for Ramadan, to save or print as a PDF
+• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a PDF
 
 ALERTS AND ADHAN
 
@@ -1113,8 +1113,9 @@ handle dragged to four columns); the strip shows no town chip at this width, by 
 | `07-alerts-and-adhan.png` | Settings, Reminders: "All five · Mixed", Adhan, 15 minutes before, the silent notification on | Seeded by `ScreenSeedDeviceTest#seed_store_alert_settings`, so it is reproducible |
 | `08-ramadan-suhoor-reminder.png` | The Suhoor reminder dialog at its defaults, dark | The Ramadan settings |
 
-Arabic, Urdu, Turkish and Indonesian get 01 to 04 in their own language (`raw/phone/<ar|ur|tr-TR|id-ID>/`). In Arabic the
-week starts on Saturday, so on Saturday 15 Aug the week card in `ar/02` shows only today. The watch pictures are unchanged.
+Arabic, Urdu, Turkish and Indonesian get 01 to 04 in their own language (`raw/phone/<ar|ur|tr-TR|id-ID>/`). Arabic 01 to 03
+were taken on Thursday 20 Aug 2026 15:00 instead (retaken 25 Oct, Fable's verdict): Arabic weeks start on Saturday, so on
+Saturday 15 Aug the week card in `ar/02` showed only today; on Thursday it is full. The watch pictures are unchanged.
 
 ### History: the 1.5.0 phone screenshots (retaken from the 1.5.0 build, 18 Oct 2026; 07 and 08 added 23 Oct 2026)
 

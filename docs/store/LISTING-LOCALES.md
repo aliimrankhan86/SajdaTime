@@ -65,14 +65,14 @@ Python `len`, newlines counted, no final newline. Check Play's own counter when 
 
 | Language | Title | Short | Full | What's new |
 |---|---|---|---|---|
-| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3736 / 4000 | 459 / 500 |
-| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3988 / 4000 | 494 / 500 |
-| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3993 / 4000 | 498 / 500 |
-| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3984 / 4000 | 496 / 500 |
-| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3988 / 4000 | 494 / 500 |
-| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3981 / 4000 | 490 / 500 |
-| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3996 / 4000 | 500 / 500 |
-| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3987 / 4000 | 499 / 500 |
+| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3742 / 4000 | 459 / 500 |
+| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3980 / 4000 | 494 / 500 |
+| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3991 / 4000 | 498 / 500 |
+| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3985 / 4000 | 496 / 500 |
+| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3997 / 4000 | 494 / 500 |
+| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3987 / 4000 | 490 / 500 |
+| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3998 / 4000 | 500 / 500 |
+| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3989 / 4000 | 499 / 500 |
 
 ### Arabic (ar), 1.6.0
 
@@ -88,7 +88,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 أوقات الصلاة والأذان والقبلة بدون نت، ومتتبّع خاص للصلاة، مع Wear OS.
 ```
 
-**Full description** `3736 / 4000` (1.5.0 was 3525)
+**Full description** `3742 / 4000` (1.5.0 was 3525)
 ```
 يمنحك SajdaTime مواقيت الصلاة وتنبيهات الأذان وبوصلة تحدد اتجاه القبلة، للمسلمين من السنة والشيعة، على هاتف أندرويد وساعة Wear OS. بلا إعلانات، وبلا حساب، وتعمل مواقيت الصلاة بدون إنترنت.
 
@@ -99,7 +99,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 • الفجر والشروق والظهر والعصر والمغرب والعشاء أينما كنت، مع عدّ تنازلي مباشر حتى الصلاة التالية
 • التاريخ الهجري (التقويم الإسلامي)، والتواريخ الإسلامية على مدار العام
 • اتجاه القبلة: بوصلة مصحّحة إلى الشمال الحقيقي، تهتز مرة واحدة حين تتجه نحو الكعبة
-• جدول المواقيت لهذا الشهر والشهر الذي يليه، وإمساكية رمضان، للحفظ أو الطباعة بصيغة PDF
+• جدول المواقيت لهذا الشهر والشهر الذي يليه. احفظ اليوم أو 7 أيام أو الشهر أو رمضان بصيغة PDF
 
 التنبيهات والأذان
 
@@ -183,7 +183,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 آف لائن اوقات نماز، اذان، قبلہ اور نجی نماز ٹریکر، سنی و شیعہ، Wear OS ایپ۔
 ```
 
-**Full description** `3988 / 4000` (1.5.0 was 3961)
+**Full description** `3980 / 4000` (1.5.0 was 3961)
 ```
 آپ کے فون اور Wear OS گھڑی پر SajdaTime سنی اور شیعہ مسلمانوں کو نماز کے اوقات، اذان کے الرٹ اور قبلہ نما دیتی ہے۔ نہ اشتہارات، نہ اکاؤنٹ، اور نماز کے اوقات آپ کے اپنے فون پر ہی نکالے جاتے ہیں، اس لیے آف لائن اور سگنل نہ ہونے پر بھی کام کرتے ہیں۔
 
@@ -192,7 +192,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 • فجر، طلوع آفتاب، ظہر، عصر، مغرب اور عشاء، اور اگلی نماز تک لمحہ بہ لمحہ الٹی گنتی
 • ہجری تاریخ (اسلامی کیلنڈر) اور سال بھر کی اسلامی تاریخیں
 • قبلہ رخ: اصل شمال کے مطابق درست قبلہ نما، جو کعبہ کی طرف رخ ہوتے ہی ایک بار وائبریٹ کرتا ہے
-• اس مہینے اور اگلے مہینے کا اوقات نامہ، اور رمضان کا بھی، PDF میں محفوظ یا پرنٹ کرنے کے لیے
+• اس مہینے اور اگلے مہینے کا اوقات نامہ۔ آج، 7 دن، مہینہ یا رمضان PDF میں محفوظ کریں
 
 الرٹ اور اذان
 
@@ -275,7 +275,7 @@ SajdaTime: Namaz Vakitleri
 İnternetsiz namaz vakitleri, ezan, kıble ve size özel namaz takibi. Wear OS ile.
 ```
 
-**Full description** `3993 / 4000` (1.5.0 was 3974)
+**Full description** `3991 / 4000` (1.5.0 was 3974)
 ```
 SajdaTime, Sünni ve Şii Müslümanlara telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan vakti uyarıları ve kıble pusulası sunar. Reklam yok, hesap yok. Vakitler telefonunuzda hesaplanır, bu yüzden internetsiz, sinyal yokken de çalışır.
 
@@ -284,7 +284,7 @@ NAMAZ VAKİTLERİ VE KIBLE
 • Sabah, Güneş, Öğle, İkindi, Akşam ve Yatsı, sıradaki namaza canlı geri sayımla
 • Hicri tarih (İslami takvim) ve yılın İslami tarihleri
 • Kıble yönü: gerçek kuzeye göre düzeltilmiş, Kâbe'ye döndüğünüzde bir kez titreyen pusula
-• Bu ayın ve gelecek ayın vakit çizelgesi ile Ramazan imsakiyesi, PDF olarak kaydedin ya da yazdırın
+• Bu ayın ve gelecek ayın vakit çizelgesi. Bugünü, 7 günü, ayı ya da Ramazan'ı PDF olarak kaydedin
 
 UYARILAR VE EZAN
 
@@ -367,7 +367,7 @@ SajdaTime: Jadwal Sholat
 Jadwal sholat offline, adzan, arah kiblat, dan pencatat sholat pribadi. Wear OS.
 ```
 
-**Full description** `3984 / 4000` (1.5.0 was 3980)
+**Full description** `3985 / 4000` (1.5.0 was 3980)
 ```
 SajdaTime menyajikan jadwal sholat (salat), pengingat adzan, dan kompas arah kiblat bagi Muslim Sunni dan Syiah di ponsel dan jam tangan Wear OS. Tanpa iklan, tanpa akun, dan waktu dihitung di ponsel Anda, jadi tetap jalan offline.
 
@@ -376,7 +376,7 @@ JADWAL SHOLAT DAN KIBLAT
 • Subuh, Terbit, Zuhur, Asar, Magrib, Isya, dan hitung mundur langsung ke sholat berikutnya
 • Tanggal Hijriah (kalender Islam) dan tanggal Islam sepanjang tahun
 • Arah kiblat: kompas berpatokan utara sejati, bergetar sekali saat menghadap Ka'bah
-• Jadwal bulan ini, bulan depan, dan imsakiyah Ramadan dalam PDF, untuk disimpan atau dicetak
+• Jadwal bulan ini dan bulan depan. Simpan hari ini, 7 hari, sebulan, atau Ramadan sebagai PDF
 
 PENGINGAT DAN ADZAN
 
@@ -458,7 +458,7 @@ SajdaTime: Waktu Solat, Kiblat
 Waktu solat, azan, arah kiblat dan penjejak solat peribadi, juga di Wear OS.
 ```
 
-**Full description** `3988 / 4000` (1.5.0 was 3979)
+**Full description** `3997 / 4000` (1.5.0 was 3979)
 ```
 SajdaTime memberi waktu solat, peringatan azan dan kompas arah kiblat untuk Muslim Sunni dan Syiah di telefon dan jam tangan Wear OS. Tiada iklan, tiada akaun, dan waktu dikira di telefon anda, jadi berfungsi luar talian.
 
@@ -467,7 +467,7 @@ WAKTU SOLAT DAN KIBLAT
 • Subuh, Syuruk, Zohor, Asar, Maghrib dan Isyak, dengan kiraan detik ke solat seterusnya
 • Tarikh Hijrah (kalendar Islam) dan tarikh Islam sepanjang tahun
 • Arah kiblat: kompas berpandukan utara benar, bergetar sekali apabila menghadap Kaabah
-• Jadual solat bulan ini, bulan depan dan Ramadan dalam PDF, untuk disimpan atau dicetak
+• Jadual solat bulan ini dan bulan depan. Simpan hari ini, 7 hari, sebulan atau Ramadan dalam PDF
 
 PERINGATAN DAN AZAN
 
@@ -549,7 +549,7 @@ SajdaTime: নামাজের সময়সূচি
 অফলাইন নামাজের সময়, আজান, কিবলা কম্পাস ও ব্যক্তিগত নামাজ ট্র্যাকার, Wear OS
 ```
 
-**Full description** `3981 / 4000` (1.5.0 was 3965)
+**Full description** `3987 / 4000` (1.5.0 was 3965)
 ```
 SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের (সালাত) সময়সূচি, আজানের অ্যালার্ট ও কিবলা কম্পাস নিয়ে আসে, আপনার ফোন ও Wear OS ঘড়িতে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না, আর সময় আপনার ফোনেই হিসাব হয়, তাই অফলাইনে, নেটওয়ার্ক না থাকলেও চলে।
 
@@ -558,7 +558,7 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 • ফজর, সূর্যোদয়, যোহর, আসর, মাগরিব ও এশা, পরের নামাজ পর্যন্ত লাইভ কাউন্টডাউনসহ
 • হিজরি তারিখ (ইসলামি ক্যালেন্ডার) ও সারা বছরের ইসলামি তারিখ
 • কিবলার দিক: প্রকৃত উত্তর অনুযায়ী ঠিক করা কম্পাস, কাবার দিকে মুখ করলে একবার ভাইব্রেট করে
-• এই মাস, পরের মাস ও রমজানের সময়সূচি, PDF হিসেবে সেভ বা প্রিন্ট করার জন্য
+• এই মাস ও পরের মাসের সময়সূচি। আজ, ৭ দিন, পুরো মাস বা রমজান PDF হিসেবে সেভ করুন
 
 অ্যালার্ট ও আজান
 
@@ -641,7 +641,7 @@ SajdaTime: Horaires de prière
 Heures de prière hors ligne, adhan, Qibla et suivi privé des prières. Wear OS
 ```
 
-**Full description** `3996 / 4000` (1.5.0 was 3982)
+**Full description** `3998 / 4000` (1.5.0 was 3982)
 ```
 SajdaTime : horaires de prière (salat), alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone et montre Wear OS. Sans pub ni compte ; horaires calculés sur le téléphone, donc hors ligne.
 
@@ -650,7 +650,7 @@ HORAIRES DE PRIÈRE ET QIBLA
 • Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha, avec compte à rebours en direct vers la prochaine prière
 • Date hégirienne (calendrier islamique) et dates islamiques de l'année
 • Qibla : boussole calée sur le nord géographique, qui vibre une fois face à la Kaaba
-• Horaires du mois, du suivant et du Ramadan, en PDF à enregistrer ou imprimer
+• Horaires du mois et du suivant. PDF du jour, de 7 jours, du mois ou du Ramadan
 
 ALERTES ET ADHAN
 
@@ -732,7 +732,7 @@ SajdaTime: नमाज़ का समय
 ऑफ़लाइन नमाज़ का समय, अज़ान, किबला और निजी नमाज़ ट्रैकर, सुन्नी और शिया, Wear OS
 ```
 
-**Full description** `3987 / 4000` (1.5.0 was 3978)
+**Full description** `3989 / 4000` (1.5.0 was 3978)
 ```
 SajdaTime सुन्नी और शिया मुसलमानों के लिए नमाज़ का समय, अज़ान अलर्ट और क़िबला कम्पास देता है, आपके फ़ोन और Wear OS घड़ी पर। कोई विज्ञापन नहीं, कोई खाता नहीं, और नमाज़ का समय आपके अपने फ़ोन पर ही निकलता है, इसलिए ऑफ़लाइन, बिना सिग्नल के भी मिलता है।
 
@@ -741,7 +741,7 @@ SajdaTime सुन्नी और शिया मुसलमानों क
 • फ़ज्र, सूर्योदय, ज़ुहर, अस्र, मग़रिब और इशा, अगली नमाज़ तक लाइव काउंटडाउन के साथ
 • हिजरी तारीख़ (इस्लामी कैलेंडर) और साल भर की इस्लामी तारीख़ें
 • क़िबला की दिशा: असली उत्तर के हिसाब से ठीक किया गया कम्पास, जो काबा की तरफ़ मुँह होते ही एक बार वाइब्रेट करता है
-• इस महीने, अगले महीने और रमज़ान का टाइम टेबल, PDF में सेव या प्रिंट करने के लिए
+• इस महीने और अगले महीने का टाइम टेबल। आज, 7 दिन, महीना या रमज़ान PDF में सेव करें
 
 अलर्ट और अज़ान
 

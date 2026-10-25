@@ -94,7 +94,8 @@ From 1.6.0 the whole set is taken by `docs/release-tools/release-1.6.0.sh` (step
   launcher open the widget picker, tap the preview, Add; drag the Next widget's right handle to four
   columns; set the clock to 081518302026 and the demo clock to 1830; save as `raw/phone/en-GB/05-widgets.png`.
 - **Clocks (London):** 15 Aug 2026 15:00 for 01, 02, 03, 06, 07; 22 Feb 2027 15:00 for 04 and 08 (07 is taken after them, back at the August clock);
-  15 Aug 2026 18:30 for 05.
+  15 Aug 2026 18:30 for 05. Arabic 01 to 03: Thursday 20 Aug 2026 15:00, because Arabic weeks start on Saturday and on
+  Saturday 15 Aug the My prayers week card shows only today.
 
 The notes below are the 1.5.0 hand recipe (Manchester); the equipment is unchanged.
 

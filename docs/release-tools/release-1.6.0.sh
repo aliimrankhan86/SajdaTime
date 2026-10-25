@@ -10,7 +10,8 @@
 # - Twelve permissions: VIBRATE (normal, no prompt) was added in step 6.
 # - The device suite also leaves out TrackerSeedDeviceTest, which is a seed, not a check.
 # - Step 6j retakes the store screenshots (8 English, 4 each in ar, ur, tr-TR, id-ID; 05 by hand) into
-#   docs/store/screenshots/raw/phone/<folder>/, only on a 1080x1920 screen. The Next prayer widget picture
+#   docs/store/screenshots/raw/phone/<folder>/, only with STORE_SHOTS=1 set (STORE_SHOTS=1 bash docs/release-tools/release-1.6.0.sh) on a 1080x1920 screen,
+#   the sajdastore emulator; otherwise SKIPPED, so a normal run never overwrites the tracked pictures. The Next prayer widget picture
 #   (05) is always taken by hand: the script prints the steps and records it as MANUAL.
 # - Expected unit test counts are checked, not just printed.
 #
@@ -133,7 +134,7 @@ if check_bundle bundle "$AAB" 10 1.6.0 yes; then
   PERMS="$(java -jar "$BT" dump manifest --bundle="$AAB" 2>/dev/null | grep -o 'uses-permission[^>]*name="[^"]*"' | sed 's/.*name="//;s/"//' | sort | tr '\n' ' ')"
   EXPECTED_PERMS="android.permission.ACCESS_COARSE_LOCATION android.permission.ACCESS_NETWORK_STATE android.permission.ACCESS_NOTIFICATION_POLICY android.permission.FOREGROUND_SERVICE android.permission.INTERNET android.permission.POST_NOTIFICATIONS android.permission.RECEIVE_BOOT_COMPLETED android.permission.SCHEDULE_EXACT_ALARM android.permission.VIBRATE android.permission.WAKE_LOCK com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE com.sajdatime.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "
   if [ "$PERMS" = "$EXPECTED_PERMS" ]; then result permissions "PASS (the eleven of 1.5.0 plus VIBRATE)"; else result permissions "FAIL (the permission list changed: $PERMS)"; fi
-  # Measured 25 Oct 2026 on the unsigned-by-me local build of this branch: 9,952,988 bytes (1.5.0 was
+  # Measured 25 Oct 2026 on the local signed build of this branch: 9,952,988 bytes (1.5.0 was
   # 9,475,100). The limit allows 300 KB on top, as 1.5.0's did over 1.4.0. Re-measure at the release commit.
   SIZE="$(wc -c < "$AAB" | tr -d ' ')"
   if [ "$SIZE" -le 10252988 ]; then result bundle-size "PASS ($SIZE bytes, measured 9952988 on 25 Oct 2026)"
@@ -324,13 +325,15 @@ if [ -n "$EMU_SERIAL" ]; then
 
     # --- 6j. The store screenshots (STEP-11-DESIGN.md §1): English 01 to 04, 06, 07, 08 into raw/phone/en-GB
     # (05 is by hand), and 01 to 04 for Arabic, Urdu, Turkish and Indonesian into raw/phone/<ar|ur|tr-TR|id-ID>.
-    # Needs the sajdastore AVD (1080x1920, see docs/store/upload/README.md). On any other emulator the whole
+    # Needs STORE_SHOTS=1 and the sajdastore AVD (1080x1920, see docs/store/upload/README.md). Otherwise the whole
     # block is skipped, because wrong-size pictures must never land in the repo. The screen words are read
     # from the app's own strings files, so the taps work in every language. Every tap that fails is reported
     # CHECK and the picture is still taken: look at it.
     STORE="$REPO/docs/store/screenshots/raw/phone"
     SIZE_NOW="$("$ADB" shell wm size | grep -o '[0-9]*x[0-9]*' | tail -1)"
-    if [ "$SIZE_NOW" != "1080x1920" ]; then
+    if [ "${STORE_SHOTS:-0}" != "1" ]; then
+      result store-screenshots "SKIPPED (set STORE_SHOTS=1 on the sajdastore emulator to retake)"
+    elif [ "$SIZE_NOW" != "1080x1920" ]; then
       result store-screenshots "SKIPPED (needs the sajdastore AVD at 1080x1920; this screen is $SIZE_NOW)"
     else
     str() {  # values folder suffix, string name: the app's own words
@@ -363,8 +366,9 @@ if [ -n "$EMU_SERIAL" ]; then
         || { "$ADB" shell input swipe 540 1400 540 700 400; sleep 1; tap_text "$(str "" "$1")"; } \
         || result "store-theme-$1" "CHECK (theme choice not found; set it by hand)"
     }
-    # Prayer alarm scheduling is covered by the device suite (SuhoorReminderDeviceTest) and RequestCodeTest;
-    # PLAN.md R1 (alarms before and after) is for 1.6.1's reminders, so nothing here counts alarms.
+    # PLAN.md R1 (a scheduler change breaks a prayer alarm) is not counted here: in 1.6.0 PrayerAlarmScheduler
+    # changed only in a comment, and the device suite in 6b already checks the alarms are set. The widget's new
+    # sunrise boundary (WidgetRefreshScheduler) is a widget refresh, not a prayer alarm.
 
     # Fresh start so nothing from the checks above is in the pictures.
     "$ADB" shell pm clear "$PKG" >/dev/null 2>&1
@@ -393,13 +397,31 @@ if [ -n "$EMU_SERIAL" ]; then
     go_tab en nav_times
     if tap_text "$(str "" action_timetable)"; then sleep 2; take en 06-timetable; "$ADB" shell input keyevent 4; sleep 1
     else result store-en-06-timetable "CHECK (Timetable button not found)"; fi
-    for L in ar ur tr id; do
+    for L in ur tr id; do
       "$ADB" shell cmd locale set-app-locales "$PKG" --locales "$L" >/dev/null 2>&1; sleep 2
       open_app
       take "$L" 01-times-light
       go_tab "$L" nav_tracker; take "$L" 02-my-prayers
       go_tab "$L" nav_qibla; sleep 3; take "$L" 03-qibla
     done
+    # Arabic light is its own pass, on Thursday 20 Aug 2026 15:00 London. Arabic weeks start on Saturday, so on
+    # Saturday 15 Aug the My prayers week card shows only today; on Thursday 20 Aug it is full (Fable's verdict,
+    # 25 Oct 2026; commit 0ca400f retook them this way by hand). The dark pictures below set their own clock.
+    set_clock 082015002026; demo_bar 1500
+    instrument store-seed-tracker-clear-ar -e class com.sajdatime.app.TrackerSeedDeviceTest#clear_the_record_and_switch_tracking_off
+    instrument store-seed-tracker-ar -e class com.sajdatime.app.TrackerSeedDeviceTest#seed_a_week_of_ticks_with_today_started
+    "$ADB" shell pm revoke "$PKG" android.permission.ACCESS_COARSE_LOCATION >/dev/null 2>&1
+    "$ADB" shell cmd locale set-app-locales "$PKG" --locales ar >/dev/null 2>&1; sleep 2
+    open_app
+    take ar 01-times-light
+    go_tab ar nav_tracker
+    # The row's content-desc is "<prayer_dhuhr>، <tracker_state_not_ticked>", "الظهر، بلا علامة". prayer_dhuhr
+    # lives in core's strings, not the app's, so it is read from there.
+    AR_DHUHR="$(sed -n 's|.*name="prayer_dhuhr"[^>]*>\(.*\)</string>.*|\1|p' core/src/main/res/values-ar/strings.xml | head -1)"
+    tap_prefix "$AR_DHUHR" || result store-ar-dhuhr-tick "CHECK (Arabic Dhuhr row not found, 02 shows Fajr only)"
+    sleep 1
+    take ar 02-my-prayers
+    go_tab ar nav_qibla; sleep 3; take ar 03-qibla
 
     # Dark pictures, 22 Feb 2027 15:00 London. Theme is set in the app (its DataStore), then put back.
     set_clock 022215002027; demo_bar 1500

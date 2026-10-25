@@ -5962,30 +5962,38 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STEP 11 IN PROGRESS, 25 Oct 2026, ~13:00 (read this first; stopped at the usage limit, work in progress committed)
+### 📍 STEP 11 REVIEWED, 25 Oct 2026, afternoon (read this first): pictures go to Ali next
 
-- **1.5.0 is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct). The "1.5.0 is in review" line below is stale.
+- **1.5.0 is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct).
 - **Step 11 design:** `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (Fable), `plan-verifier` corrections in its §9.
   **Ali chose all four recommendations (25 Oct: "Yes all recommended options"):** short description C "Offline prayer times
   (namaz), adhan, Qibla and a private salah tracker. Wear OS."; the Chrome and Edge line removed in all nine languages; My
   prayers and Timetable replace the setup madhab and Settings screenshots; the strip shot without its town chip.
-- **Done, uncommitted until this WIP commit, NOT yet reviewed as a whole:** versionCode 10 / 1.6.0; `ScreenSeedDeviceTest`
-  (dismissMethodNotice in the London seed, new `seed_store_alert_settings`); screenshots moved to per language folders;
-  `tools/build-store-assets.sh` per folder; `docs/release-tools/release-1.6.0.sh`; `set-release-date.sh` version arg;
-  `upload/README.md`; English 1.6.0 listing block in `LISTING.md` (short 80, full 3983, What's new 494) and the new
-  screenshot notes there; **all 24 store pictures taken** on `sajdastore` (8 English, 01 to 04 in ar, ur, tr-TR, id-ID),
-  the five dropped English raws `git rm`'d. Gate was green on the mechanical half (core 237/1, app 322, wear 27, lint 0).
-- **Running when the session stopped (check their output, redo if missing):** (1) Fable judging the 24 pictures;
-  (2) DONE in the second WIP commit, not yet re-reviewed or run on an emulator: Sonnet fixed Opus's release script findings: 6j skipped unless 1080x1920, build-store-assets clears old uploads,
-  `docs/index.html` JSON-LD screenshot links (they 404 after the move: blocking before merge), R1 alarm check removed,
-  6f runs only the London seed, 6j reordered (location revoke, wifi demo, alerts seed last), 05 manual, seed KDoc;
-  (3) DONE 25 Oct, not yet reviewed: an Opus agent translated the 1.6.0 listing into the eight languages in `LISTING-LOCALES.md` plus
-  `docs/translation/store-listing-1.6.0.md` (short, full, What's new each; Chrome line removed).
+- **Built:** versionCode 10 / 1.6.0 (watch stays 1002 / 1.5.0); `ScreenSeedDeviceTest` (dismissMethodNotice in the London
+  seed, `seed_store_alert_settings`); screenshots in per language folders, `tools/build-store-assets.sh` per folder;
+  `docs/release-tools/release-1.6.0.sh`; `set-release-date.sh` takes the version; `docs/index.html` JSON-LD links moved;
+  English 1.6.0 listing in `LISTING.md` (short 80, full 3990, What's new 494); eight translated listings in
+  `LISTING-LOCALES.md`, record `docs/translation/store-listing-1.6.0.md`; 24 store pictures on `sajdastore`.
+- **Reviewed:** Fable judged the 24 pictures: keep 23; `ar/02` retaken, with `ar/01` and `ar/03` retaken on the same date so the Arabic set agrees, on Thursday 20 Aug 2026 15:00 (Arabic weeks
+  start on Saturday, so on Saturday 15 Aug the week card showed only today). Two optional items Fable left for Ali, not
+  done: a 24 hour status bar for tr and id, and the countdown on 01 implying 3:03 against the 3:00 bar. An independent Opus
+  back translation of all eight listings: all pass, three fixes (French Timetable and Times named alike, a French sentence
+  with no noun, Turkish save and print). Opus on the whole diff: no code defect; fixed: 6j now runs only with
+  `STORE_SHOTS=1` (it would have overwritten the approved pictures, Arabic back to Saturday, on any run on `sajdastore`),
+  Arabic gets its own Thursday pass in the script, the R1 comment and the bundle size comment corrected, the seed KDoc;
+  **the description promised a PDF of next month, which the app cannot make** (`PrayerPdfExporter.Range` is today, 7 days,
+  this month, Ramadan): Fable's line "• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a
+  PDF" replaces it, translated into all eight by the main session (counts and back translations in the record); PROJECT_BRIEF
+  rewritten (1.5.0 live, 1.6.0 next).
+- **Checked:** full gate green (core 237 with 1 skipped, app 322, wear 27, lint 0 errors; bundle 9,952,988 bytes); device suite
+  39 of 39 on `emulator-5554` (6b's set: suhoor reminder and the seeds left out, as the script does).
+- **Not checked:** the release script end to end (its 6j Arabic pass is untested on a device; the Arabic retake was done by
+  hand with the same steps); whether Play shows only a language's own pictures; "private" in the short descriptions against
+  Play's promotion notice (paste time check); the suhoor reminder device test at a Ramadan clock (6d) in this step.
 - **Capture trap learned:** the AVD's GPS is Manchester; with location granted the app moves off the seeded London. Revoke
   `ACCESS_COARSE_LOCATION` after seeding (no banner appears). The `!` on the wifi icon needs the demo `network ... fully true`.
-- **Next:** check the three outputs; Opus review of the whole diff plus a back translation review; run
-  `tools/build-store-assets.sh`; full gate and device suite; pictures to Ali; HANDOVER/PROJECT_BRIEF/DESIGN_SYSTEM §9; GBrain;
-  RELEASE-1.6.0.md walk through; then Ali's merge of the release PR (checkpoints: PR 11 Dec, submit by 15 Dec).
+- **Next:** pictures to Ali (his yes, plus the two optional items); DESIGN_SYSTEM §9; GBrain; `RELEASE-1.6.0.md` walk
+  through; then Ali's merge of the release PR (checkpoints: PR 11 Dec, submit by 15 Dec).
 
 ### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): read with the STATE OF PLAY below
 
@@ -6033,7 +6041,7 @@ by ear, `:app:installRtl`, landscape and tablet for this screen. Steps 7 to 11 n
 - **The owner changed one hard rule:** the disclaimer lives in Settings, About, first row, and is not shown
   at first launch. Built in step 9 (25 Oct 2026, STEP-9-DESIGN.md); CLAUDE.md rewritten in that commit.
 - **The 23 Oct STATE OF PLAY just below predates PR #15's merge;** `main`'s 23 Oct evening block replaces its 1.5.0 lines (draft PR, "nothing until the 30 Oct job").
-- **1.5.0 was submitted to Google on 23 Oct 2026** and is in review. It counts as live only when the Play Console shows it live (Ali's rule).
+- **1.5.0 was submitted to Google on 23 Oct 2026 and is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct 2026).
 
 ### 📍 STATE OF PLAY, 23 Oct 2026, evening: 1.5.0 RELEASE DAY (read this first; the block below still holds for everything not named here)
 
