@@ -75,8 +75,8 @@ print(', '.join(f'{m} {a[0]} tests {a[1]} failed' for m, a in sorted(t.items()))
 EOF
 )"
   LINT="$(for f in */build/reports/lint-results-debug.xml; do printf '%s %s errors, ' "${f%%/*}" "$(grep -cE 'severity="(Error|Fatal)"' "$f")"; done)"
-  # Gate counts at 25 Oct 2026 (core 237 tests, 1 of them skipped; app 322; wear 27). Update with the code.
-  EXPECTED_COUNTS="app 323 tests 0 failed, core 238 tests 0 failed, wear 27 tests 0 failed"
+  # Gate counts at 25 Oct 2026 (core 238 tests, 1 of them skipped; app 335 since DesignTokensTest added 12; wear 27). Update with the code.
+  EXPECTED_COUNTS="app 335 tests 0 failed, core 238 tests 0 failed, wear 27 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass

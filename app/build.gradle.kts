@@ -262,6 +262,13 @@ tasks.withType<Test>().configureEach {
                 // TrackerPrivacyTest: the backup exclusion the prayer record relies on, and the usage counts.
                 "app/src/main/res/xml/data_extraction_rules.xml",
                 "app/src/main/java/com/sajdatime/app/data/UsageCounts.kt",
+                // DesignTokensTest holds the design system's token files and pages to the code, and
+                // reads Color.kt, Theme.kt, Spacing.kt, Motion.kt, Type.kt and CtaButton.kt as text.
+                "docs/design-system/**",
+                "app/src/main/java/com/sajdatime/app/ui/theme/*.kt",
+                "app/src/main/java/com/sajdatime/app/ui/components/CtaButton.kt",
+                "wear/src/main/java/com/sajdatime/wear/WearTheme.kt",
+                "wear/src/main/java/com/sajdatime/wear/NextPrayerTileService.kt",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

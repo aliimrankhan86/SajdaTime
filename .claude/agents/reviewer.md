@@ -12,6 +12,7 @@ Read `CLAUDE.md` first. Then review the diff you are given (`git diff` against t
 - correctness: trace a real path from a caller or input to each changed line; alarms, dates, time zones, Hijri
   offsets, DST and request codes are where this project's real bugs have lived;
 - the hard rules in `CLAUDE.md` and the design rules in `docs/DESIGN_SYSTEM.md` §0 and §4.1;
+- `docs/design-system/` (tokens, components, patterns, the known deviations in `03-components.md` §3.6 that new work must not copy);
 - the tests: do they fail if the change is wrong? Was the test itself checked (three past "bugs" were test
   errors)?
 - the commit rule: reasoning recorded, HANDOVER and PROJECT_BRIEF updated where they should be, gaps stated;

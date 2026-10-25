@@ -1,0 +1,185 @@
+{
+  "$description": "SajdaTime type scale, release 1.6. Tested against app/src/main/java/com/sajdatime/app/ui/theme/Type.kt (SajdaTypography, PrayerTimeTextStyle) by DesignTokensTest. Sizes are sp on Android and pt on iOS, always scalable with the user's text size. Line heights: about 1.4x for body, about 1.3x for titles (one rule since 17 Oct 2026). Nothing below 14 in the phone app.",
+  "fontFamily": {
+    "$value": "system",
+    "android": "FontFamily.Default (Roboto, or the font the user chose; Noto Naskh Arabic for Urdu and Arabic comes from the system)",
+    "ios": "SF Pro (Font.system), never a bundled font",
+    "rule": "No bundled font. It would add about 400KB and override a font the user chose for accessibility."
+  },
+  "weights": {
+    "normal": 400,
+    "medium": 500,
+    "semiBold": 600
+  },
+  "styles": {
+    "displayLarge": {
+      "size": 52,
+      "lineHeight": 60,
+      "weight": 600,
+      "letterSpacing": -0.5,
+      "tabular": true,
+      "usage": "The countdown on the next prayer card.",
+      "iosRelativeTo": "largeTitle"
+    },
+    "displayMedium": {
+      "size": 40,
+      "lineHeight": 48,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": true,
+      "usage": "The app name on the setup welcome screen (its one use).",
+      "iosRelativeTo": "largeTitle"
+    },
+    "headlineMedium": {
+      "size": 26,
+      "lineHeight": 32,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "ScreenTitle, the city on Times, setup step titles, the next prayer name and time on the hero card, the Qibla direction sentence.",
+      "iosRelativeTo": "title"
+    },
+    "headlineSmall": {
+      "size": 22,
+      "lineHeight": 28,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Sheet titles (Timetable, Last 30 days, Islamic dates) and the Bismillah on the welcome screen. AlertDialog titles inherit it.",
+      "iosRelativeTo": "title2"
+    },
+    "titleLarge": {
+      "size": 20,
+      "lineHeight": 26,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Location sheet and export sheet titles, setup choice card titles.",
+      "iosRelativeTo": "title3"
+    },
+    "titleMedium": {
+      "size": 17,
+      "lineHeight": 23,
+      "weight": 500,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Row titles (Settings rows, Islamic dates rows, Timetable day and month headings), notice titles, the Today heading.",
+      "iosRelativeTo": "headline"
+    },
+    "bodyLarge": {
+      "size": 17,
+      "lineHeight": 24,
+      "weight": 400,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Body text, list rows, paragraphs.",
+      "iosRelativeTo": "body"
+    },
+    "bodyMedium": {
+      "size": 15,
+      "lineHeight": 21,
+      "weight": 400,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Secondary text: row descriptions, notice briefs, footnotes.",
+      "iosRelativeTo": "subheadline"
+    },
+    "labelLarge": {
+      "size": 15,
+      "lineHeight": 20,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": false,
+      "usage": "Text links (Close, Got it). With weight 500 (Medium): the section label voice (Settings group titles, the Next prayer label, the week card title, dialog SectionLabel).",
+      "iosRelativeTo": "subheadline"
+    },
+    "labelMedium": {
+      "size": 14,
+      "lineHeight": 18,
+      "weight": 500,
+      "letterSpacing": 0.3,
+      "tabular": false,
+      "usage": "Pills (Next, Now, Today), tab labels, the until line, day names, small captions. The floor.",
+      "iosRelativeTo": "footnote"
+    }
+  },
+  "derived": {
+    "prayerTime": {
+      "size": 18,
+      "lineHeight": null,
+      "weight": 500,
+      "letterSpacing": 0,
+      "tabular": true,
+      "kotlin": "PrayerTimeTextStyle",
+      "usage": "Every time of day in a list (05:14). Tabular so columns never drift. lineHeight unset: inherits the platform default for 18sp.",
+      "iosRelativeTo": "body"
+    },
+    "actionLabel": {
+      "size": 16,
+      "lineHeight": 20,
+      "weight": 600,
+      "letterSpacing": 0,
+      "tabular": false,
+      "kotlin": "actionLabelStyle() in ui/components/CtaButton.kt (labelLarge at 16sp, centred)",
+      "usage": "Every solid button label and the usage question's two bold links. Never 14, never regular weight. A wrapped label is centred.",
+      "iosRelativeTo": "callout"
+    }
+  },
+  "unsetMaterialRoles": {
+    "$description": "Roles Type.kt does not define, so Material 3 baseline values apply. Three of them ARE used today (census 25 Oct 2026), below the 14 floor: a recorded gap, not a licence. Do not add new uses. The fix (define them in Type.kt or move the uses to bodyMedium and labelMedium) is a visible change for the owner to approve.",
+    "roles": [
+      "displaySmall",
+      "headlineLarge",
+      "titleSmall",
+      "bodySmall",
+      "labelSmall"
+    ],
+    "baselineAndUses": {
+      "bodySmall": {
+        "size": 12,
+        "lineHeight": 16,
+        "weight": 400,
+        "uses": [
+          "SettingsScreen.kt adjustments help x2 and LimitNote",
+          "TimetableSheet.kt footer and area label",
+          "RamadanTimetableSheet.kt footer notes x2",
+          "IslamicDatesSheet.kt footer",
+          "OutlinedTextField supporting text (internal)"
+        ]
+      },
+      "labelSmall": {
+        "size": 11,
+        "lineHeight": 16,
+        "weight": 500,
+        "uses": [
+          "TimetableSheet.kt approx marker",
+          "RamadanTimetableSheet.kt approx marker"
+        ]
+      },
+      "titleSmall": {
+        "size": 14,
+        "lineHeight": 20,
+        "weight": 500,
+        "uses": [
+          "UsageCountsConsent.kt two headings",
+          "MyPrayers.kt chosen day date"
+        ]
+      },
+      "displaySmall": {
+        "uses": []
+      },
+      "headlineLarge": {
+        "uses": []
+      }
+    }
+  },
+  "rules": [
+    "Section labels are sentence case and never uppercased in code (String.uppercase breaks Turkish i and caseless scripts). Quiet Glass retired the letterspaced label: today only the Ramadan card label keeps letterSpacing 1.6 (a leftover, do not copy). A language that wants capitals writes them in its string.",
+    "A word is never split across two lines. Short labels in fixed slots (tab bar, theme selector) use WholeWords, which shrinks text to no less than 60% while a break falls inside a word.",
+    "Tabular figures make Latin digits even width. Numbers are formatted in the language the words are in; Arabic uses ar-u-nu-latn so digits stay Western.",
+    "Widgets size the countdown in dp (34 to 38) because it is already three times body size; names and times stay in sp. Widget floor is 12sp, with two named exceptions that may shrink to 9sp (large Today widget Hijri line, Today strip time at 250dp).",
+    "Wear floor is 12sp.",
+    "Urdu and Arabic single lines stand about 4dp taller than Latin (Noto Naskh ascent and descent). Known, OPEN item 1.6-script-line-box; do not hard code heights that assume Latin.",
+    "Numbers that change in place (countdown, Qibla bearing and distance, prayer times) use tabular figures: tabular styles, PrayerTimeTextStyle, or .copy(fontFeatureSettings = \"tnum\")."
+  ]
+}

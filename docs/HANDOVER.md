@@ -5997,7 +5997,37 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read this first, then the STEP 11 block below)
+### 📍 DESIGN SYSTEM FOLDER ADDED, 25 Oct 2026, late evening (read this first, then the Fasts block below)
+
+- **Ali, 25 Oct 2026:** "create a comprehensive design system document ... which you and other AI can easily use to
+  extend or expand or create new features ... checked ... so any future session cannot drift away from it", later for
+  the iPhone app, taken from 1.6. Asked first; his choices: start from 1.6, a new folder with `docs/DESIGN_SYSTEM.md`
+  kept (his rules §0, the button inventory §4.1, decision log §9, open items §11), and a build test against drift.
+- **Built (branch `claude/sharp-mccarthy-vjh10j`, cut from `claude/1-6-0` at `1cdae4a`; docs and a unit test only, no
+  app behaviour change):** `docs/design-system/` (README with reading order, precedence and a code map; ten pages:
+  principles, foundations, components, patterns, screens and features, content and language, accessibility,
+  surfaces, iPhone mapping, new feature playbook; CHANGELOG) and `docs/design-system/tokens/` (`color.json`,
+  `typography.json`, `spacing.json`, `motion.json`, `shape.json`).
+- **`DesignTokensTest` (12 tests)** holds the tokens to the code in both directions: every `Color.kt` colour, every
+  Material role in `Theme.kt`, the widget colour resources, `WearTheme.kt` (the watch palette had **no test before**;
+  now it must equal the phone's dark roles except its black background), the watch tile's three colours, icon and PDF
+  colours in their files, `Space`, `Motion`, every `Type.kt` style, `actionLabelStyle()`, any hex quoted in the pages,
+  and that every phone UI file is named in the pages. Inputs declared in `app/build.gradle.kts`. **Proved:** four
+  deliberate breaks (a token hex, `Space.Group`, a watch colour, a stray hex in a page) each failed; restored green.
+- **Recorded, not fixed (visible changes, so Ali's call; list in `docs/design-system/03-components.md` §3.6 and
+  `08-surfaces.md`):** `bodySmall` 12, `labelSmall` 11, `titleSmall` 14 used 13 times though `Type.kt` does not define
+  them (below the 14 floor); the watch tile's mint `#7FD1AE` and two greys differ from the palette; the Android 7 and
+  watch launcher icons still use `#14624B`; cards at 16 and 12 in two places; older dialog rows; the Qibla tab's 20
+  gutter; the setup location error in red; the tile has no tap action; the watch marks next by colour alone.
+- **Wired in:** `CLAUDE.md`, the `ux-lead`, `implementer` and `reviewer` agents and the top of `docs/DESIGN_SYSTEM.md`
+  now point to the folder.
+- **Checked:** `DesignTokensTest`, `DesignRulesTest`, `ColorContrastTest` and the full app and core unit tests in the
+  cloud container (Android SDK installed there). **Not checked:** lint, release bundles, any device or emulator run
+  (no app code changed); the SF Symbol names were not checked against Apple's current symbol list.
+- **Next:** Ali reviews the folder and decides whether to merge into `claude/1-6-0` before release day, and whether to
+  fix any recorded deviation (each is one small visible change).
+
+### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)
 
 - **Ali, 25 Oct 2026:** move what 1.6.1 work can safely go into 1.6.0, built basic in the app's style, no Fable pass,
   not in the store description. Only "Fasts to make up" qualified; the jama'ah reminder and Sunnah fast reminders stay in

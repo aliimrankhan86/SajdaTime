@@ -1,0 +1,19 @@
+{
+  "$description": "SajdaTime spacing tokens, release 1.6. Tested against app/src/main/java/com/sajdatime/app/ui/theme/Spacing.kt (object Space) by DesignTokensTest. Units are dp on Android and pt on iOS (1dp maps to 1pt). A gap is chosen by how closely two things belong together, never by eye. Never two different gaps for the same relationship on one screen.",
+  "space": {
+    "tight":     { "$type": "dimension", "$value": 4,  "kotlin": "Space.Tight",     "usage": "A title and the line that belongs to it; a label and its value; a sheet or card title (titleLarge or smaller) and its line." },
+    "related":   { "$type": "dimension", "$value": 8,  "kotlin": "Space.Related",   "usage": "A paragraph and the button that acts on it; two buttons stacked or side by side; a text field and its button; a section heading and the field it introduces; a divider and what is either side of it; a progress line under its button." },
+    "paragraph": { "$type": "dimension", "$value": 12, "kotlin": "Space.Paragraph", "usage": "One paragraph and the next in the same block; stacked choice cards; summary rows; a screen headline (headlineMedium or larger) and its paragraph." },
+    "group":     { "$type": "dimension", "$value": 16, "kotlin": "Space.Group",     "usage": "One group (text plus its button) and the next; card padding; a block of several lines and its button row; a dialog's help text and the choices under it; screen gutter." },
+    "section":   { "$type": "dimension", "$value": 24, "kotlin": "Space.Section",   "usage": "One section of a screen and the next; a button and the next section; a group of buttons and a different group; the last choice card and setup's Back and Continue." }
+  },
+  "layout": {
+    "$description": "Fixed layout metrics. Not in Space because they are component sizes, not gaps. Documented in docs/design-system/02-foundations.md; enforced by review, not by the test, except where noted.",
+    "screenGutter":       { "$type": "dimension", "$value": 16,  "usage": "Horizontal page margin on phone screens and inside Settings groups." },
+    "screenTitleGutter":  { "$type": "dimension", "$value": 20,  "usage": "ScreenTitle start padding (Qibla, Settings, My prayers)." },
+    "minTouchTarget":     { "$type": "dimension", "$value": 48,  "usage": "Every tappable thing, drawn smaller or not. Meets Apple's 44pt." },
+    "listRowMin":         { "$type": "dimension", "$value": 56,  "usage": "Minimum height of a list or Settings row, a switch row, a jama'ah row." },
+    "contentMaxWidth":    { "$type": "dimension", "$value": 600, "usage": "Content column cap on tablets and wide windows, centred; the sky stays full width." },
+    "bottomBarClearance": { "$type": "dimension", "$value": "measured", "usage": "Every scrolling tab screen ends with BottomBarClearance(): the glass bar's measured height, so it grows with large text. Never a fixed number." }
+  }
+}

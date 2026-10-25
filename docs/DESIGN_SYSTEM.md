@@ -1,5 +1,12 @@
 # SajdaTime design system
 
+> **Start at [`docs/design-system/`](design-system/README.md) (since 25 Oct 2026).** That folder is the structured
+> reference: tokens in JSON held to the code by `DesignTokensTest`, every component, pattern and screen, content
+> rules, accessibility, widgets and watch, the iPhone mapping, and the new feature playbook. **This file still owns**
+> the owner's rules (§0), the enforced button inventory (§4.1, read by `DesignRulesTest`), the decision log (§9), the
+> learning loop (§10) and open decisions (§11). Its value tables below are older copies: where a value here differs
+> from `docs/design-system/tokens/`, the token file (tested against the code) is right.
+
 The tokens and component patterns the app is built from. `docs/HANDOVER.md` §7 is the
 short version; this is the reference you check a colour against.
 

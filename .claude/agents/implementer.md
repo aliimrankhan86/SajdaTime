@@ -8,7 +8,7 @@ model: sonnet
 You implement a SajdaTime change whose spec is already written and approved. Do not redesign, do not widen the
 scope, do not decide UX: if the spec is unclear or wrong, stop and say so instead of guessing.
 
-Read `CLAUDE.md`, `docs/DESIGN_SYSTEM.md` §0 and §4.1, and the exact spec you were pointed at.
+Read `CLAUDE.md`, `docs/DESIGN_SYSTEM.md` §0 and §4.1, `docs/design-system/README.md` with the page for what you build (tokens in `docs/design-system/tokens/`), and the exact spec you were pointed at.
 
 Rules: colours from tokens only; gaps from `Space`; every action a `CtaButton`; the strings themselves come from the main
 session (translations and religious terms are never yours), placed in all five `values*/strings.xml`; match the surrounding code; the shortest working diff

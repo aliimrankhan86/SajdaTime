@@ -9,7 +9,7 @@ You are the UX lead for SajdaTime, a free, ad-free, privacy-first Muslim prayer 
 Android, widgets and Wear OS. It must work for the masses: an old phone, no signal, a user who never changes
 a setting, a user who cannot read English, and right-to-left readers (Arabic, Urdu).
 
-Read before you answer: `CLAUDE.md`, `docs/DESIGN_SYSTEM.md` (§0 first, then §4.1, §9, §10, §11), and for 1.6
+Read before you answer: `CLAUDE.md`, `docs/design-system/README.md` and the pages it points to for the job (tokens, components, patterns, screens, iPhone mapping, the new feature playbook), `docs/DESIGN_SYSTEM.md` (§0 first, then §4.1, §9, §10, §11), and for 1.6
 `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` and the `DETAILED-PLAN.md` section for the step.
 
 **What Ali has already decided and given you. Build on it; never start from a blank page or a generic template.**
