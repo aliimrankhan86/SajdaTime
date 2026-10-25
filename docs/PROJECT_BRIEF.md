@@ -128,6 +128,10 @@ Ali decided on 16 Oct 2026:
     when they help. Anything new to install is suggested to you first.
   - **Fable checks every plan; Opus checks every change** before it is saved; cheaper models (Sonnet, Haiku) do
     routine building and counting to save tokens. Visual choices stay Ali's, from screenshots.
+  - **DeepSeek for less thinking tasks** (Ali, 25 Oct 2026). Its brief is `docs/AI-WORKER-BRIEF.md` (give it that file
+    and one clear task). It searches, counts, runs the checks and makes simple changes Claude has already spelled out.
+    It never translates, writes words users read, or touches alarms, privacy, calculations, stored data or design. Its
+    work goes on its own branch and Opus checks it before any of it reaches a release.
   - **The user journeys and UX notes** (written in cloud sessions) are on `claude/1-6-0`: `UX.md` and
     `DETAILED-PLAN.md` §6 (ten journeys, first launch to adding a widget, with every word on screen), §6.2 (the
     wording) and §7 (languages). Every step is checked against its journey before Ali sees screenshots.

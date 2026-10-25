@@ -6011,6 +6011,8 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Store pictures unchanged:** the line shows only above zero, and the seeds set no count. `release-1.6.0.sh`
   `EXPECTED_COUNTS` moved to core 238, app 323.
 - **Not checked:** TalkBack by ear; the release script end to end (as before); 320dp width.
+- **DeepSeek as a helper (Ali, 25 Oct 2026):** brief `docs/AI-WORKER-BRIEF.md`, role and limits in §5.28 "Outside
+  helper models". Keep its state, commands and counts current in the same commit that changes them.
 - **Ali approved it from the pictures, 25 Oct 2026:** "Yes, Fasts to make up looks fine. Keep it as it is." Nothing is
   waiting; next is release day when Ali says so (`RELEASE-1.6.0.md`), PR by 11 Dec, submit by 15 Dec.
 
