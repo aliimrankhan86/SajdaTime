@@ -6029,8 +6029,12 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   rules and the §4.1 inventory first; four icon files declared as test inputs; a duplicate Material role now fails; the
   deviations raised as OPEN `ds-deviations` in `docs/DESIGN_SYSTEM.md` §11; three wording fixes (dismissable dialogs,
   Google's review card, Times' no location state).
-- **Next:** Ali reviews the folder and decides whether to merge into `claude/1-6-0` before release day, and answers
-  `ds-deviations` (each fix is one small visible change).
+- **Merged into `claude/1-6-0` (Ali, 25 Oct 2026, fast forward to `7a78d23`).** He then asked about merging into `main`
+  so other AIs can work; checked the Play page ("Updated on 23 Oct 2026", so 1.5.0 is live and `main` matches it).
+  **Ali chose: other AIs work from `claude/1-6-0` (their own branch cut from it); nothing merges into `main` until 1.6
+  release day** (`docs/release-tools/RELEASE-1.6.0.md`). Rejected: merging 1.6 into `main` now (it would describe 1.6
+  as current while users have 1.5.0, his claude.ai project reads `main`, and release day loses its review step).
+- **Next:** Ali answers `ds-deviations` (each fix is one small visible change); release day when he says so.
 
 ### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)
 
