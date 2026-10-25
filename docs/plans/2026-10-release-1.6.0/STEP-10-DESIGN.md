@@ -77,5 +77,5 @@ Carries over: a list with a check per row and a value row in Settings exist on b
 - **Fable, from the pictures:** chooser rows padded `Space.Related` top and bottom (at 2x "Urdu" touched "Türkçe").
   Her `LineHeightStyle` fix for the taller Urdu and Arabic line box was tried and measured: no change (75px vs 63px
   line boxes before and after), so it was removed; recorded as DESIGN_SYSTEM §11 `1.6-script-line-box`.
-- Q17 for Ali: A (recommended) vs B (the planned item 18). B in Urdu splits "العربية (Arabic)" across lines and
+- **Ali answered A (25 Oct 2026: "A go ahead"); B and its switch removed.** Q17 was: A (recommended) vs B (the planned item 18). B in Urdu splits "العربية (Arabic)" across lines and
   strands a dot at line starts, worse at 2x.

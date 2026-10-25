@@ -75,14 +75,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sajdatime.app.R
@@ -165,10 +163,6 @@ import android.text.format.DateFormat
 enum class SettingsChooser {
     SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
 }
-
-// TEMPORARY, step 10 Q17 pictures, removed after Ali answers: true shows option B on the Language row,
-// all five names in enum order (English, Urdu, Turkish, Indonesian, Arabic); false is option A.
-internal var languageSubtitleAll = false
 
 @Composable
 fun SettingsScreen(
@@ -333,24 +327,19 @@ fun SettingsScreen(
                 ),
             )
             // Every Android version since 1.5.0: below 13 the choice is kept by AppLocale.setOverride.
-            val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
             add(
                 SettingsItem.Link(
                     key = "language",
                     icon = Icons.Outlined.Language,
                     title = stringResource(R.string.settings_language_title),
-                    subtitle = if (languageSubtitleAll) {
-                        // Isolated in the paragraph's own direction, not FSI: an FSI isolate would set
-                        // "اردو (Urdu)" right to left inside an English line, brackets first.
-                        val (open, close) = (if (rtl) "\u2067" else "\u2066") to "\u2069"
-                        AppLanguage.entries.joinToString(" · ") { open + it.namePair(context) + close }
-                    } else {
-                        AppLanguage.chosen(context)?.namePair(context)?.bidiIsolated() ?: stringResource(
-                            R.string.settings_value_pair,
-                            stringResource(R.string.language_phone),
-                            AppLanguage.showing(context).namePair(context).bidiIsolated(),
-                        )
-                    },
+                    // Only the language showing, own name and English name (Ali, 25 Oct 2026, step 10 Q17 "A": all
+                    // five ran to three lines in Urdu and tore a pair across two). Inside the sentence the pair is
+                    // isolated; it is always the app's own script, so it runs the same way as the line around it.
+                    subtitle = AppLanguage.chosen(context)?.namePair(context) ?: stringResource(
+                        R.string.settings_value_pair,
+                        stringResource(R.string.language_phone),
+                        AppLanguage.showing(context).namePair(context).bidiIsolated(),
+                    ),
                     onClick = { open = SettingsChooser.LANGUAGE },
                 ),
             )
