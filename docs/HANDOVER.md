@@ -5918,7 +5918,7 @@ blocker, the pin test's 40dp bar, was a wrong guess about text scaling, now 30dp
 dark bezel `surfaceContainerHighest`. **Ali answered the four §13 questions as recommended** (instruction under the
 title, white lifted bezel, amber Set location notice, no arc; STEP-6-DESIGN §17); the four TEMPORARY switches are
 removed (Sonnet, reviewed by Opus). Full gate green (core 230 with 1 skipped, app 310, wear 27); device suite 37 of
-37 on the emulator. **Next: Ali's yes to merge step 6 into `claude/1-6-0`.** Not verified: a real compass, TalkBack
+37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Next: step 7.** Not verified: a real compass, TalkBack
 by ear, `:app:installRtl`, landscape and tablet for this screen. Steps 7 to 11 not started. The five agents ran for the first time and each runs on its
   named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
 - **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
