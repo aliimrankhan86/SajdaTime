@@ -6034,6 +6034,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   **Ali chose: other AIs work from `claude/1-6-0` (their own branch cut from it); nothing merges into `main` until 1.6
   release day** (`docs/release-tools/RELEASE-1.6.0.md`). Rejected: merging 1.6 into `main` now (it would describe 1.6
   as current while users have 1.5.0, his claude.ai project reads `main`, and release day loses its review step).
+- **`docs/AI-START-HERE.md` added (Ali, 25 Oct 2026: other AIs "should know everything").** One self-contained briefing for
+  any AI: the app, what is live, branches, the design system, the rules that cause mistakes, finishing checks.
+  `AGENTS.md`, `CLAUDE.md` and `docs/AI-WORKER-BRIEF.md` point to it. **Keep it current** whenever branches, live
+  state, test counts or rules change, in the same commit.
 - **Next:** Ali answers `ds-deviations` (each fix is one small visible change); release day when he says so.
 
 ### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)

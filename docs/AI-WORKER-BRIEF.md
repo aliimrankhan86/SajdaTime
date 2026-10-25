@@ -82,6 +82,8 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 ./gradlew clean test lint :app:bundleRelease :wear:bundleRelease :app:compileDebugAndroidTestKotlin   # the full gate
 ```
 
+**Read `docs/AI-START-HERE.md` first** (the full briefing for any AI).
+
 **Which branch:** cut your branch from `claude/1-6-0`, never from `main` (Ali, 25 Oct 2026). `main` holds what is live
 (1.5.0) and only takes 1.6 on release day. Read `docs/design-system/README.md` before anything visual.
 

@@ -10,6 +10,8 @@ File auto-loaded. Deliberately short. **Full handover: [`docs/HANDOVER.md`](docs
 
 ## ⚠️ First thing, every session — before you ask him anything
 
+**Any AI new to the project: `docs/AI-START-HERE.md` is the full self-contained briefing (branches, design system, rules, finishing checks). Keep it current when branches, state or rules change.**
+
 **Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11, read the first 📍 block at top (the state of play; its title names the latest step, not the words "STATE OF PLAY", and the 24 Oct block with that title is history).** Dated. Says: what's true now, what's left + whose job each item is, how to check every claim without Play Console session, traps that actually cost project time, what assistant can/can't do with tooling here. Everything below that first block (each later block says it is history) = dated record of how project got here: read for reasoning, never as task list. STATE OF PLAY rewritten in every commit that moves project → never stale (stale status = what this file forbidden from carrying).
 
 **Don't invent work from older blocks, or from any "Not done" list further down §11.** Most closed; rest = deliberate non-goal. State block leaves nothing to do → correct answer: ask owner what next.

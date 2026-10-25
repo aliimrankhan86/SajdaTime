@@ -1,5 +1,9 @@
 # SajdaTime: instructions for any AI working on this project
 
+**First read [`docs/AI-START-HERE.md`](docs/AI-START-HERE.md) in full.** It is the complete briefing: what the app is, what
+is live, **which branch to use (`claude/1-6-0`, never `main`)**, the design system in `docs/design-system/`, the rules that
+cause the most mistakes and how to finish. The notes below stay for tools that read only this file.
+
 Tools such as Codex, Cursor and DeepSeek load or are given this file. **If you are a helper model doing routine work
 (searching, counting, running tests, a code change from a written spec), read
 [`docs/AI-WORKER-BRIEF.md`](docs/AI-WORKER-BRIEF.md) in full first: it is self-contained and says what you may and may
