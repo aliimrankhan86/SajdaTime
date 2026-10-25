@@ -5976,7 +5976,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   screenshot notes there; **all 24 store pictures taken** on `sajdastore` (8 English, 01 to 04 in ar, ur, tr-TR, id-ID),
   the five dropped English raws `git rm`'d. Gate was green on the mechanical half (core 237/1, app 322, wear 27, lint 0).
 - **Running when the session stopped (check their output, redo if missing):** (1) Fable judging the 24 pictures;
-  (2) Sonnet fixing Opus's release script findings: 6j skipped unless 1080x1920, build-store-assets clears old uploads,
+  (2) DONE in the second WIP commit, not yet re-reviewed or run on an emulator: Sonnet fixed Opus's release script findings: 6j skipped unless 1080x1920, build-store-assets clears old uploads,
   `docs/index.html` JSON-LD screenshot links (they 404 after the move: blocking before merge), R1 alarm check removed,
   6f runs only the London seed, 6j reordered (location revoke, wifi demo, alerts seed last), 05 manual, seed KDoc;
   (3) an Opus agent translating the 1.6.0 listing into the eight languages in `LISTING-LOCALES.md` plus
