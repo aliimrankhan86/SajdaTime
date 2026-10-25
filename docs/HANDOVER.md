@@ -2024,6 +2024,17 @@ YAML, but no agent was run from them in that session. The first session that use
 the named model (the session's model list shows it) and record that in §10. If `fable` is not accepted as an
 alias, use the undated ID `claude-fable-5-1`.
 
+**Outside helper models (Ali, 25 Oct 2026).** "Can you write all the notes for other AI to read and understand
+everything - I want to use deepseek for less thinking tasks." `docs/AI-WORKER-BRIEF.md` is their self-contained brief,
+and `AGENTS.md` points to it. They sit at the `mechanic`/`implementer` tier: searching, counting, running checks, routine
+code from a written spec. They never translate, write user-facing words, touch alarms, usage counts, privacy, signing or
+calculations, data logic, or make design choices. Their work goes on a `deepseek/<task>` branch and is reviewed by
+`reviewer` (Opus) before Claude merges it. **A deliberate exception to the table above** (which lists commit
+among what the implementer never does): an outside model may commit and push its own scratch branch, because it may run in another tool with no
+other way to hand work over; nothing reaches `claude/*` or `main` until `reviewer` has passed it and Claude merges. The repository is public on GitHub, so giving it to an outside model exposes nothing new;
+the signing key is never in it. **Keep the brief current:** a commit that changes a rule, a command, the test counts or
+the state of play also updates `docs/AI-WORKER-BRIEF.md` sections 2, 4 and 5.
+
 ### 5.29 My prayers, the tab (1.6.0 step 1, Ali approved 23 Oct 2026)
 
 Ali chose from pictures on 23 Oct 2026: "B: calendar grid" and "Yes, build it". Design by Fable:

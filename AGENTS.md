@@ -1,9 +1,11 @@
 # SajdaTime: instructions for any AI working on this project
 
-Tools such as Codex and Cursor load this file automatically. **The rules live in one place so they cannot drift: read
-[`CLAUDE.md`](CLAUDE.md) in full, then [`docs/HANDOVER.md`](docs/HANDOVER.md), starting with the `STATE OF PLAY` block at the
-top of section 11.** Do that before you change anything or ask the owner a question. He is not technical and does not want to
-brief you.
+Tools such as Codex, Cursor and DeepSeek load or are given this file. **If you are a helper model doing routine work
+(searching, counting, running tests, a code change from a written spec), read
+[`docs/AI-WORKER-BRIEF.md`](docs/AI-WORKER-BRIEF.md) in full first: it is self-contained and says what you may and may
+not do.** For anything more, the rules live in one place so they cannot drift: read [`CLAUDE.md`](CLAUDE.md) in full,
+then [`docs/HANDOVER.md`](docs/HANDOVER.md), starting with the first 📍 block at the top of section 11 (the state of play). Do that
+before you change anything or ask the owner a question. He is not technical and does not want to brief you.
 
 Four things that are easy to get wrong, each explained in `CLAUDE.md`:
 - Usage counts (Firebase Analytics) are **opt in, closed, and never about belief**. Do not turn them on by default, add events or

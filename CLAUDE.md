@@ -10,7 +10,7 @@ File auto-loaded. Deliberately short. **Full handover: [`docs/HANDOVER.md`](docs
 
 ## ⚠️ First thing, every session — before you ask him anything
 
-**Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11, read `STATE OF PLAY` block at top.** Dated. Says: what's true now, what's left + whose job each item is, how to check every claim without Play Console session, traps that actually cost project time, what assistant can/can't do with tooling here. Everything below `HISTORY BELOW THIS LINE` marker = dated record of how project got here: read for reasoning, never as task list. STATE OF PLAY rewritten in every commit that moves project → never stale (stale status = what this file forbidden from carrying).
+**Open [`docs/HANDOVER.md`](docs/HANDOVER.md) §11, read the first 📍 block at top (the state of play; its title names the latest step, not the words "STATE OF PLAY", and the 24 Oct block with that title is history).** Dated. Says: what's true now, what's left + whose job each item is, how to check every claim without Play Console session, traps that actually cost project time, what assistant can/can't do with tooling here. Everything below that first block (each later block says it is history) = dated record of how project got here: read for reasoning, never as task list. STATE OF PLAY rewritten in every commit that moves project → never stale (stale status = what this file forbidden from carrying).
 
 **Don't invent work from older blocks, or from any "Not done" list further down §11.** Most closed; rest = deliberate non-goal. State block leaves nothing to do → correct answer: ask owner what next.
 
@@ -102,6 +102,7 @@ Change taught you something (platform trap, wrong assumption, bug class reading 
   - **Opus checks everything:** `reviewer` reviews every diff + every piece of work from cheaper agent before commit or "done". Main session (talks to Ali, commits) should itself run on Opus.
   - **Cheaper models do routine work:** `implementer` (Sonnet) builds step with spec already decided; `mechanic` (Haiku) does searching, counting, other mechanical checkable work.
   - Never hand cheaper model a decision, alarm or data logic, translations, or anything user facing without written spec; never skip `reviewer` to save tokens. Visual decisions stay Ali's, from screenshots.
+  - **Outside helper models (DeepSeek, Ali 25 Oct 2026: "I want to use deepseek for less thinking tasks"):** same tier as `mechanic`/`implementer`, briefed by `docs/AI-WORKER-BRIEF.md` (keep it current when rules or state change). They work on `deepseek/<task>` branches, never merge; `reviewer` (Opus) reviews before anything reaches a release branch. Never translations, user-facing words, alarms or widgets, usage counts, privacy, signing, calculations, data logic or design, even with a spec (HANDOVER §5.28, "Outside helper models").
 
 - **Quality bar = owner's, not negotiable** (17 Oct 2026: "make sure its all done
   to a good standard ... so nothing is done of bad standard and UX design, clean, easy to use and
