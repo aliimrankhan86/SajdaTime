@@ -246,3 +246,19 @@ Q1 to Q4 (§13, Q1 narrowed by §14 item 4) are still his, from the pictures.
 - §14 item 1 was first built as "chip on the 380 entries at large text"; Opus review showed the chip squeezes the one fact at 2.0, so the chip is hidden at 1.3 text and above, and capped at 64dp otherwise.
 - The time autosize floor is 9sp (not 11sp) so "pm" is never cut at 250dp; names and times ellipsise.
 - Arabic label and description use سطر (line), not صف, which reads as the row of people praying.
+
+## 17. Fable's picture judgement and fixes (25 Oct 2026)
+
+Fable judged the first pictures and asked for three changes, built in 5c83b57 and re-rendered in e8451a2:
+- **Even times.** Per view autosize made "11:45 am" step down alone at 290 to 300dp, which reads as a bug. Now: root
+  side padding 4dp, columns 2dp side padding and 0dp margins, times 12sp (autosize 9 to 12sp). These supersede the
+  6dp, 1dp, 3dp and 13sp in §3. All five are one size from 290dp up; at the 250dp floor the widest time still steps down.
+- **The chip may not starve the columns.** Town maxWidth 56dp (was 64), chip margin 2dp. A long town at 380dp still
+  costs Dhuhr one step; accepted, since only a wide phone or tablet is ever that wide.
+- **Next widget with no location.** The message now sits in the name's place (on_surface, 14sp, bold as the name,
+  two lines, glyph and time hidden), not the grey foot line, which looked like an afterthought on a sky. The 8dp start
+  margin is the name's own; kept so the message lines up with where a prayer name sits.
+- **Not step 8:** the small Next clips its chip at exactly 180 by 110dp (picture 17). The layout is unchanged since
+  18 Oct; HANDOVER lesson 150 already notes renders at the exact minimum. Cheapest cure when picked up:
+  `SMALL_COUNTDOWN_DP` 36 to 32 and the chip row margin 6 to 4dp.
+Pictures for Ali: Q1 03, 04, 05, 15-family-light-for-ali; Q2 10; Q3 09; Q4 08; the 9sp floor 07 and 09 (250x40); context 01, 02, 11.
