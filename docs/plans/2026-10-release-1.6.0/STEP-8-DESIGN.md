@@ -233,3 +233,10 @@ Nothing that breaks a hard rule. No network, no new data (privacy page needs no 
 The plan's own Q1 to Q4 stand, with Q1 narrowed as in item 4.
 
 Files cited: `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/docs/plans/2026-10-release-1.6.0/STEP-8-DESIGN.md`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/main/java/com/sajdatime/app/widget/WidgetRenderer.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/main/java/com/sajdatime/app/widget/WidgetUpdater.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/main/java/com/sajdatime/app/widget/WidgetRefreshScheduler.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/test/java/com/sajdatime/app/WidgetThemeTest.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/test/java/com/sajdatime/app/WidgetResourcesTest.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/app/src/androidTest/java/com/sajdatime/app/WidgetDeviceTest.kt`, `/Users/aliimrankhan/Developer/SajdaTime-1-6-0/docs/plans/2026-10-release-1.6.0/PLAN.md`.
+
+## 15. Ali's answers (25 Oct 2026, ~01:45)
+
+Asked the two §14 questions, he said: "Let's go with recommendation". So:
+- The strip marks the **next** prayer, as the Today widgets and the Times screen do (supersedes "the current one marked" in PLAN.md:221).
+- **No sun path arc and no period word** on the Next widget.
+Q1 to Q4 (§13, Q1 narrowed by §14 item 4) are still his, from the pictures.
