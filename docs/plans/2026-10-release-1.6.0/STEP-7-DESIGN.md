@@ -276,5 +276,5 @@ with recommendations but before development run compact". Then: "Jamaat time I m
 **So, by Ali's rule, the recommendations stand:**
 - Jama'ah times stay in 1.6.0.
 - The mosque door stays under the rows (Q15).
-- Next: remove `mosqueDoorShown`, close `1.6-mosque-door` in DESIGN_SYSTEM §11, gate, merge. This waits for the
-  context compact Ali asked for.
+- Done 25 Oct 2026 after the compact: `mosqueDoorShown` removed, `1.6-mosque-door` closed in DESIGN_SYSTEM §11,
+  gate green, merged into `claude/1-6-0`.

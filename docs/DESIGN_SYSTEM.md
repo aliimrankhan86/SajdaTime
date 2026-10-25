@@ -1203,8 +1203,10 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     never wraps away from its time.
   * **Wording fixes from sign off:** "Match your mosque start times", the clock "the Begins time on your mosque's
     board", and the help gains "Jama'ah times go in Jama'ah times."
-  * **The mosque door** (Q15, "Different from your mosque?") is kept under the rows for now; Ali decides from
-    pictures with and without (TEMPORARY `mosqueDoorShown`). Rejected: an icon on the Times line, the jama'ah
+  * **The mosque door** (Q15, "Different from your mosque?") stays under the rows: decided 25 Oct 2026 (Q15).
+    Ali doubted jama'ah times and asked Fable; Fable said keep them, so by his rule the recommendation
+    stands. The competitor research (`JAMAAH-RESEARCH.md`) found no app that can know a mosque's times by
+    itself, so the user types them. Rejected: an icon on the Times line, the jama'ah
     time in `primary` or bold, both times on one line, a tappable prayer row, a travel notice on Times, the zone
     name in the notice, a compact door beside Timetable (two solid buttons side by side), hiding the door once set up.
 
@@ -1256,7 +1258,6 @@ the date and his words, and delete it here.
 | 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
 | 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | DECIDED 24 Oct 2026 from the eight pictures: dark versions, night kept this deep ("Keep it this deep"); also four light hues kept, light skies kept pale, widget drawings as glyphs |
 | 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
-| 1.6-mosque-door | 23 Oct 2026 | Keep "Different from your mosque?" under the times? | Keep | OPEN: screenshots at step 7 |
 | 1.6-language-row | 23 Oct 2026 | Language row subtitle lists five scripts? | Yes | OPEN: screenshot at step 10 |
 
 **Decided, work not yet done** (do not report these as done):

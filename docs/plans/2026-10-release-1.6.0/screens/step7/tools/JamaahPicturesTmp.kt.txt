@@ -14,7 +14,6 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sajdatime.app.data.SettingsRepository
-import com.sajdatime.app.ui.home.mosqueDoorShown
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.JamaahRule
@@ -48,7 +47,6 @@ class JamaahPicturesTmp {
             args.getString("method")?.let { repo.setMethod(com.sajdatime.core.CalcMethod.valueOf(it)) }
             repo.setThemeChoice(if (args.getString("dark") == "1") ThemeChoice.DARK else ThemeChoice.LIGHT)
         }
-        mosqueDoorShown = args.getString("nodoor") != "1"
         val name = args.getString("pic") ?: return
         ActivityScenario.launch(MainActivity::class.java).use {
             compose.waitForIdle()

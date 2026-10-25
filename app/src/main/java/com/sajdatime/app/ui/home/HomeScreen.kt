@@ -674,10 +674,6 @@ private fun NextPrayerCard(state: UiState) {
     }
 }
 
-// TEMPORARY step 7 Q15: false hides the mosque door, for Ali's "without" picture. Default is the door shown. Delete
-// this, and the check that reads it, when he has chosen (STEP-7-DESIGN sections 5, 13 and 14).
-internal var mosqueDoorShown = true
-
 /**
  * The one door every user gets, at the moment they need it — right under the times being
  * doubted, because a user who thinks the app is broken is looking at the times, not at
@@ -712,7 +708,7 @@ internal var mosqueDoorShown = true
  */
 @Composable
 private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNotice: () -> Unit) {
-    if (state.today == null || !mosqueDoorShown) return
+    if (state.today == null) return
     val latitude = state.settings.coordinates?.latitude
     val loud = !state.settings.methodNoticeDismissed &&
         state.settings.method == CalcMethod.AUTO &&
