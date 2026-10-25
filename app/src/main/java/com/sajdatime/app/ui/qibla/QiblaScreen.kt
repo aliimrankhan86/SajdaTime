@@ -51,7 +51,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import com.sajdatime.app.ui.theme.LocalDarkTheme
 import com.sajdatime.app.ui.theme.dialBezel
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.components.CtaButton
@@ -100,17 +99,6 @@ import com.sajdatime.app.ui.theme.sajdaSurface
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
-
-// TEMPORARY step 6 Q1, Q2, Q4: comparison switches for Ali's pictures. All default to the recommendations; delete
-// all of them, and the branches that read them, when he has chosen (STEP-6-DESIGN sections 13 and 16).
-// TEMPORARY step 6 Q1: true centres the direction block over the dial instead of starting it under the title.
-internal var qiblaCentreInstruction = false
-// TEMPORARY step 6 Q4: true draws the turn still owed as the bezel band in primary, from the needle round to the Kaaba.
-internal var qiblaShowArc = false
-// TEMPORARY step 6 Q2: true makes the light bezel surfaceContainerHighest (sand) instead of surface (white).
-internal var qiblaSandBezel = false
-// TEMPORARY step 6 dark picture: true makes the dark bezel surfaceBright instead of surfaceContainerHighest.
-internal var qiblaDarkBezelBright = false
 
 @Composable
 fun QiblaScreen(
@@ -358,10 +346,6 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
         label = "dial",
     )
 
-    // The turn still owed, from the needle at the top round to the Kaaba, signed so a left turn goes
-    // anticlockwise. Only the Q4 picture draws it (qiblaShowArc); DirectionBlock says the same number aloud.
-    val turn = if (heading != null) QiblaEngine.relativeTurn(heading, qiblaTrueBearing) else 0.0
-
     // **The needle is you, not the Qibla.** It points the way the phone points — straight
     // up the screen — and stays there while the dial and the Kaaba turn round it. Turn
     // until the needle touches the Kaaba.
@@ -387,12 +371,7 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
     // is an exit, DESIGN_SYSTEM section 2). The bezel colour is read here, in composition, because
     // sajdaSurface takes a colour; the dial already recomposes on every compass sample (it reads
     // compassHeading here), so this adds nothing. The face and the width are read inside the draw lambda.
-    val dark = LocalDarkTheme.current
-    val restingBezel = when {
-        dark && qiblaDarkBezelBright -> scheme.surfaceBright
-        !dark && qiblaSandBezel -> scheme.surfaceContainerHighest
-        else -> dialBezel()
-    }
+    val restingBezel = dialBezel()
     // Motion's specs are generic, so each state takes its own (colour twice, float once).
     val face by animateColorAsState(
         if (aligned) scheme.primaryContainer else scheme.surfaceVariant,
@@ -439,10 +418,6 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             // The bezel's outer edge stays at 1.0 of the radius and the face is what gives way.
             drawCircle(color = face, radius = radius * (1f - bezelWidth), center = centre)
 
-            if (qiblaShowArc && heading != null && !aligned) {
-                drawTurnArc(centre, radius, bezelWidth, turn.toFloat(), scheme.primary)
-            }
-
             drawTicks(centre, radius, dialRotation, scheme.outline)
 
             // The four letters, upright at every heading rather than rotating with the
@@ -474,27 +449,6 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
         // Nothing is drawn over the centre. An icon and a heading readout there sat
         // directly on top of the needle and made both harder to read.
     }
-}
-
-/**
- * TEMPORARY step 6 Q4: the turn still owed, drawn over the bezel band itself in the accent.
- *
- * `sweep` is signed: positive turns clockwise from the top, negative anticlockwise, so
- * the band always shows the shorter way round rather than a full lap. Compose measures
- * arcs from three o'clock, hence the -90 start.
- */
-private fun DrawScope.drawTurnArc(centre: Offset, radius: Float, bezelWidth: Float, sweep: Float, colour: Color) {
-    val thickness = radius * bezelWidth
-    val inset = thickness / 2f
-    drawArc(
-        color = colour,
-        startAngle = -90f,
-        sweepAngle = sweep,
-        useCenter = false,
-        topLeft = Offset(centre.x - radius + inset, centre.y - radius + inset),
-        size = Size((radius - inset) * 2f, (radius - inset) * 2f),
-        style = Stroke(width = thickness),
-    )
 }
 
 /**
@@ -753,14 +707,13 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
         }
     }
 
-    // Start aligned under the title like the city and date on Times; TEMPORARY step 6 Q1: centred over the dial.
-    val centred = qiblaCentreInstruction
+    // Start aligned under the title like the city and date on Times.
     Column(
-        horizontalAlignment = if (centred) Alignment.CenterHorizontally else Alignment.Start,
+        horizontalAlignment = Alignment.Start,
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
-            horizontalArrangement = if (centred) Arrangement.Center else Arrangement.Start,
+            horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.Top,
             modifier = Modifier.fillMaxWidth(),
         ) {
@@ -783,7 +736,7 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
                 } else {
                     MaterialTheme.colorScheme.onSurface
                 },
-                textAlign = if (centred) TextAlign.Center else TextAlign.Start,
+                textAlign = TextAlign.Start,
                 modifier = Modifier
                     .weight(1f, fill = false)
                     .semantics {
@@ -800,7 +753,7 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
                 text = stringResource(R.string.qibla_heading_now, heading.roundToInt()),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFeatureSettings = "tnum"),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = if (centred) TextAlign.Center else TextAlign.Start,
+                textAlign = TextAlign.Start,
             )
         }
     }

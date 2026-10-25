@@ -475,6 +475,8 @@ paragraph, §9 dated entry (Ali's words, arc removed and why, teardrop reverses 
 3. **No location:** "Amber notice, Set location (Recommended)" or "Plain sentence, as today".
 4. **The turn arc:** "No arc, Pillars style (Recommended)" or "Keep the green arc".
 
+Answered 25 Oct 2026, see §17.
+
 ## 16. Corrections to §15 from `plan-verifier` (24 Oct 2026). This section wins over §15.
 
 No blockers. Verified: 15.3 contrast numbers, the 15.2 path (Compose angles clockwise from 3 o'clock, y down:
@@ -509,3 +511,12 @@ cube, `dialBezel()` fits the `kiswahGold()` pattern, Motion and the exempt `twee
 12. Arrival has three signals that are not colour (sentence with tick, bezel thickening, buzz), not two.
 13. Keep the region read through `LocaleManagerCompat.getSystemLocales` (a7a39d4); §14 item 3's `Resources.getSystem()`
     is superseded. The buzz stays `arrivalBuzz` (f43d50a).
+
+## 17. Ali's answers, 25 Oct 2026. This section wins over §13 to §16.
+
+From the pictures in `screens/step6/pillars/`, Ali chose the recommendation each time: "Under the title
+(Recommended)", "White ring, lifted (Recommended)", "Amber notice + Set location (Recommended)", "No arc, Pillars
+style (Recommended)". The dark bezel is `surfaceContainerHighest` (Fable, from 02/04 against x-dark-bright-*: the disc
+already reads against the page, so §16.9's condition for `surfaceBright` is not met). All four TEMPORARY switches
+(`qiblaCentreInstruction`, `qiblaSandBezel`, `qiblaShowArc`, `qiblaDarkBezelBright`) are removed with the paths they
+guarded.

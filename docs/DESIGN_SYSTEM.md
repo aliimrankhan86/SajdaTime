@@ -851,9 +851,10 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     face would lose its edge on a tinted page, and the green arrival fill would sit on a green day sky.
   * **Rejected:** numbers on the dial face (sat on the needle, removed once already); a bare "i" for details; the
     place name as a second door to the location sheet; hiding the degree number as Pillars does; a teardrop needle;
-    artwork. **Comparison switches** `qiblaCentreInstruction` and `qiblaFlatDial` in `QiblaScreen.kt` are marked
-    TEMPORARY and go when Ali has chosen. (Superseded 24 Oct 2026 by the Pillars entry below: the teardrop is back
-    on Ali's word and `qiblaFlatDial` is gone.)
+    artwork. (Superseded 24 Oct 2026 by the Pillars entry below: the teardrop is back
+    on Ali's word. The comparison switches are gone: decided 25 Oct 2026, Ali chose the under title instruction, the
+    white lifted bezel, the amber notice with Set location and no arc; dark bezel `surfaceContainerHighest`, Fable's
+    choice from pictures; switches removed.)
 
 - **24 Oct 2026, the skies (step 5, Fable's design, prototype built; the owner has not yet seen the pictures).**
   Detail: `docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md` (section 14 wins where it differs).
@@ -1179,10 +1180,12 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   thicker bezel, buzz). The bezel takes a different role per theme (`dialBezel()`: `surface` in light,
   `surfaceContainerHighest` in dark) because the card hairline is invisible against the dark page. The pin and key
   marks are sized from the text line so they grow with it. Pairs added to `ColorContrastTest` (`outline` on both
-  faces, `onSurfaceVariant` on the aligned face). Open for Ali's pictures, behind temporary switches: Q1 instruction
-  placement, Q2 sand or white light bezel, Q4 keep the arc as the bezel band, and whether the dark bezel needs
-  `surfaceBright`. Rejected: a hairline at the bezel's inner edge (1.37 and 1.32, neither clears 3:1 nor stays
-  invisible); a hub.
+  faces, `onSurfaceVariant` on the aligned face). Decided by Ali from pictures, 25 Oct 2026: the instruction under
+  the title, the white lifted bezel in light, the amber Set location notice, no arc; the switches are removed.
+  Rejected: a hairline at the bezel's inner edge (1.37 and 1.32, neither clears 3:1 nor stays
+  invisible); a hub; a sand light bezel; a centred instruction; the green turn arc; `surfaceBright`
+  for the dark bezel (Fable, from pictures: the disc already reads against the page, the quieter ring makes arrival
+  louder).
 
 ---
 
