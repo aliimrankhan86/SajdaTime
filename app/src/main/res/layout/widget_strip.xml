@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Today strip widget (1.6 step 8; docs/plans/2026-10-release-1.6.0/STEP-8-DESIGN.md sections 3 and 14):
+  the five prayers in one row, each column the prayer's glyph over its name over its time, the next one in the
+  highlight pill and bold. Four 4 by 1 size entries are built from this one layout (WidgetRenderer.strip): the
+  glyph row is hidden under 64dp tall, the town chip is shown from 380dp wide (never at 1.3 text and above), and there the
+  columns give way to widget_strip_next, the next prayer alone. Everything that changes between entries is
+  written at render, in both directions (rule 2 of the renderer).
+
+  Names and times shrink (autosize) before they are cut, as the Hijri line does: the 250dp floor needs it,
+  300dp needs only the time one step down. Android 7 ignores autosize and ends the text with an ellipsis,
+  accepted. includeFontPadding is off on both so the thin entry fits 40dp (three lines of text, 2dp padding).
+  Text is centred in a match_parent view, so textAlignment is center, which reads the same in either direction.
+
+  The same rules as every widget layout (WidgetResourcesTest): no android:text, only inflatable classes, text
+  hidden from TalkBack with the root carrying one sentence, every colour a resource.
+
+  tools:ignore on the root: autosize is API 26 and the app's minimum is 24; there it is simply not applied.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_background"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="6dp"
+    android:paddingTop="4dp"
+    android:paddingEnd="6dp"
+    android:paddingBottom="4dp"
+    tools:ignore="UnusedAttribute">
+
+    <LinearLayout
+        android:id="@+id/widget_row_fajr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="3dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="2dp">
+        <ImageView
+            android:id="@+id/widget_glyph_fajr"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_fajr"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name_fajr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="12sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="12sp" />
+        <!-- The time may shrink to 9sp, below the 12sp widget floor, only at the 250dp width where "12:45 pm" would
+             otherwise lose its "pm": the owner's Hijri line precedent (DESIGN_SYSTEM §9, 18 Oct), shrink rather than cut.
+             A time without am or pm is ambiguous. Step 8 build, 25 Oct 2026. -->
+        <TextView
+            android:id="@+id/widget_time_fajr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="9sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget_row_dhuhr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="3dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="2dp">
+        <ImageView
+            android:id="@+id/widget_glyph_dhuhr"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_dhuhr"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name_dhuhr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="12sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/widget_time_dhuhr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="9sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget_row_asr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="3dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="2dp">
+        <ImageView
+            android:id="@+id/widget_glyph_asr"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_asr"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name_asr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="12sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/widget_time_asr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="9sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget_row_maghrib"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="3dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="2dp">
+        <ImageView
+            android:id="@+id/widget_glyph_maghrib"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_maghrib"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name_maghrib"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="12sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/widget_time_maghrib"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="9sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget_row_isha"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
+        android:layout_weight="1"
+        android:background="@drawable/widget_row_plain"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingStart="3dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="3dp"
+        android:paddingBottom="2dp">
+        <ImageView
+            android:id="@+id/widget_glyph_isha"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginBottom="2dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_isha"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name_isha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="12sp"
+            android:autoSizeMinTextSize="10sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="12sp" />
+        <TextView
+            android:id="@+id/widget_time_isha"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="13sp"
+            android:autoSizeMinTextSize="9sp"
+            android:autoSizeStepGranularity="1sp"
+            android:autoSizeTextType="uniform"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:includeFontPadding="false"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAlignment="center"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="13sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/widget_strip_next"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/widget_glyph"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_glyph_fajr"
+            android:tint="@color/widget_on_surface_variant" />
+        <TextView
+            android:id="@+id/widget_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/widget_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="14sp" />
+        <TextView
+            android:id="@+id/widget_sublabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface_variant"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/widget_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:importantForAccessibility="no"
+        android:maxLines="2"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textAlignment="viewStart"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="14sp"
+        android:visibility="gone" />
+    <LinearLayout
+        android:id="@+id/widget_place_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:background="@drawable/widget_chip"
+        android:gravity="center_vertical"
+        android:importantForAccessibility="yes"
+        android:minHeight="24dp"
+        android:orientation="horizontal"
+        android:paddingStart="7dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="3dp"
+        android:visibility="gone">
+        <ImageView
+            android:id="@+id/widget_place_pin"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_icon_pin"
+            android:tint="@color/widget_primary" />
+        <TextView
+            android:id="@+id/widget_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:maxWidth="64dp"
+            android:ellipsize="end"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_primary"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/widget_place_update"
+            android:layout_width="11dp"
+            android:layout_height="11dp"
+            android:layout_marginStart="5dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_icon_update"
+            android:tint="@color/widget_primary" />
+    </LinearLayout>
+</LinearLayout>

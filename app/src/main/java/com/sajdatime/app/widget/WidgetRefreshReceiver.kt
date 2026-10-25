@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**
- * Receives [WidgetRefreshScheduler]'s alarm, redraws both widgets and reposts the next prayer badge. The redraw sets the next alarm
+ * Receives [WidgetRefreshScheduler]'s alarm, redraws all three widgets and reposts the next prayer badge. The redraw sets the next alarm
  * itself (see [WidgetUpdater.refreshAll]), so this is the whole chain: one alarm, one redraw, the next
  * alarm. Not exported: only this app's own PendingIntent can reach it.
  */

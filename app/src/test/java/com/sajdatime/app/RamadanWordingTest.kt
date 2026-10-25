@@ -50,8 +50,9 @@ class RamadanWordingTest {
     @Test
     fun `the set is the size it should be, so a renamed prefix cannot make the checks vacuous`() {
         assertTrue("only ${keys.size} keys matched", keys.size >= 55)
-        // 13 since 18 Oct 2026: widget_update_location, the location chip's spoken label.
-        assertEquals(13, keys.count { it.startsWith("widget_") })
+        // 13 since 18 Oct 2026: widget_update_location, the location chip's spoken label. 16 since step 8:
+        // widget_strip_label, widget_strip_desc and widget_strip_suhoor.
+        assertEquals(16, keys.count { it.startsWith("widget_") })
     }
 
     @Test

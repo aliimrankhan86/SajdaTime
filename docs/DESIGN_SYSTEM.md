@@ -653,8 +653,9 @@ same notice has no close button and never hides while the permission is missing.
 > scheduler, and an error colour would say the app is broken when it is not.
 
 **Home screen widgets** (hero countdown, 18 Oct 2026; research in
-`docs/plans/2026-10-widget-redesign/RESEARCH.md`). Two widgets, each with two layouts the launcher
-chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`):
+`docs/plans/2026-10-widget-redesign/RESEARCH.md`; the Today strip and the sky, 1.6 step 8,
+`STEP-8-DESIGN.md`). Three widgets; the launcher chooses between layouts or size entries on Android 12
+and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
 
 | Widget | Layout | Shows |
 |---|---|---|
@@ -662,6 +663,7 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
 | Next prayer | wide (from 270 by 150dp) | the small widget's countdown beside the six rows |
 | Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
 | Today | large (from 250 by 280dp, 330dp in Urdu and Arabic; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+| Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 64dp tall); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 64dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
 
 - **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
   in dp because it is already three times the body text and a large font setting pushed the prayer
@@ -689,8 +691,17 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
   rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
   screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
   pressing the chip opens the app.
+- **The sky on the Next prayer widget** (1.6 step 8, pending Ali's Q1 from pictures): the body is the
+  current period's sky (the phone's sixteen stops), sheen and rim unchanged. The chip and the highlighted
+  row get a 1dp `primary` rim (`widget_highlight` is 1.0:1 on the light day top), and the "to come" bars
+  and the divider become a 30 percent `onSurfaceVariant` track. `WidgetColorsTest` holds 120 more pairs.
+  Never on the Today widgets or the strip. The sky changes at Fajr, sunrise, Asr and Isha, so sunrise is a
+  redraw boundary (`WidgetRefreshScheduler.nextRefreshAt`).
+- **The strip's time may shrink to 9sp** at the 250dp width so "12:45 pm" keeps its "pm" (a second exception
+  under the 12sp floor beside the Hijri line, set by the main session on 25 Oct 2026 and shown to Ali in
+  the 250dp picture); the names and times also ellipsise, so any cut shows.
 - **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
-  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
+  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer, on the strip only from 380dp wide and not at large text. Only the
   town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
   1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
   more.

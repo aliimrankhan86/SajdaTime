@@ -8,6 +8,7 @@ import com.sajdatime.app.widget.WidgetState.Segment
 import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.SkyPeriod
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -57,6 +58,28 @@ class WidgetStateTest {
         assertFalse(state.ramadanToday)
         assertFalse(state.ramadanOnNextDay)
         assertFalse(state.isHighlighted(PrayerSlot.FAJR))
+    }
+
+    /**
+     * The Next prayer widget's sky is the phone's rule (Sky.periodOf on the prayer whose window is open).
+     * London 22 Feb 2027, Muslim World League: Fajr about 05:20, sunrise about 07:00, Dhuhr 12:15,
+     * Asr about 15:00, Maghrib about 17:30, Isha about 19:00.
+     */
+    @Test
+    fun `the sky follows the prayer whose window is open`() {
+        val cases = listOf(
+            "02:00" to SkyPeriod.NIGHT, // last night's Isha is still the current prayer
+            "06:30" to SkyPeriod.DAWN, // Fajr is in, sunrise is not yet
+            "10:00" to SkyPeriod.DAY, // after sunrise, before Dhuhr: no prayer, Day
+            "16:00" to SkyPeriod.EVENING, // Asr
+            "21:00" to SkyPeriod.NIGHT, // Isha
+        )
+        for ((time, expected) in cases) assertEquals(time, expected, build("2027-02-22", time).period)
+    }
+
+    @Test
+    fun `with no location the sky is Day`() {
+        assertEquals(SkyPeriod.DAY, build("2027-02-22", "21:00", settings(where = null)).period)
     }
 
     @Test

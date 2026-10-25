@@ -44,8 +44,23 @@ internal object DeviceSupport {
     fun alarmTimes(packageName: String, action: String): List<LocalDateTime> {
         val lines = shell("dumpsys alarm").lines()
         val blocks = mutableListOf<MutableList<String>>()
+        // An entry ends at the first line that is not indented deeper than its header. Without this the last
+        // entry ("Next wake from idle: Alarm{... this.package}", near the end of the dump) swallowed the
+        // statistics and removal history after it, which name WIDGET_REFRESH for every alarm ever cancelled,
+        // so a dump with no redraw alarm at all counted one (25 Oct 2026, step 8 device run).
+        var headerIndent = 0
+        var inside = false
         for (line in lines) {
-            if (line.contains("Alarm{")) blocks += mutableListOf(line) else blocks.lastOrNull()?.add(line)
+            val indent = line.length - line.trimStart().length
+            if (line.contains("Alarm{")) {
+                blocks += mutableListOf(line)
+                headerIndent = indent
+                inside = true
+            } else if (inside && indent > headerIndent) {
+                blocks.last().add(line)
+            } else {
+                inside = false
+            }
         }
         val stamp = Regex("""origWhen=(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})""")
         return blocks

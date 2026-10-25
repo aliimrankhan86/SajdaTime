@@ -25,7 +25,8 @@ object WidgetUpdater {
         val manager = AppWidgetManager.getInstance(context) ?: return false
         val nextIds = manager.getAppWidgetIds(ComponentName(context, NextPrayerWidgetProvider::class.java))
         val todayIds = manager.getAppWidgetIds(ComponentName(context, TodayWidgetProvider::class.java))
-        val anyWidget = nextIds.isNotEmpty() || todayIds.isNotEmpty()
+        val stripIds = manager.getAppWidgetIds(ComponentName(context, TodayStripWidgetProvider::class.java))
+        val anyWidget = nextIds.isNotEmpty() || todayIds.isNotEmpty() || stripIds.isNotEmpty()
         // The same alarm also reposts the next prayer badge at each prayer (since 17 Oct 2026, when the
         // badge became a system countdown that times out at the prayer). Prayer alarms only exist for
         // prayers with an alert, so without this a badge would vanish at a prayer with alerts off and
@@ -55,6 +56,7 @@ object WidgetUpdater {
         runCatching {
             if (nextIds.isNotEmpty()) manager.updateAppWidget(nextIds, WidgetRenderer.nextPrayer(context, state, now))
             if (todayIds.isNotEmpty()) manager.updateAppWidget(todayIds, WidgetRenderer.today(context, state, now))
+            if (stripIds.isNotEmpty()) manager.updateAppWidget(stripIds, WidgetRenderer.strip(context, state, now))
         }
         return true
     }
@@ -64,7 +66,7 @@ object WidgetUpdater {
         refreshAll(context, SettingsRepository(context).current())
 
     /**
-     * The lifecycle callbacks of both providers arrive on the main thread inside onReceive, and reading
+     * The lifecycle callbacks of the three providers arrive on the main thread inside onReceive, and reading
      * the settings is a suspend call, so the redraw runs under goAsync on a background dispatcher, the
      * same shape as PrayerAlarmReceiver.
      */

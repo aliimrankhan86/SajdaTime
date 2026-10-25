@@ -63,4 +63,44 @@
     <color name="widget_dark_highlight_top">#18382D</color>
     <color name="widget_dark_sheen">#12FFFFFF</color>
     <color name="widget_dark_edge">#29FFFFFF</color>
+
+    <!--
+      The four skies behind the Next prayer widget (1.6 step 8; docs/plans/2026-10-release-1.6.0/STEP-8-DESIGN.md
+      section 5): the phone's sky stops (Color.kt LightSky* and DarkSky*), repeated here because a launcher
+      cannot reach Compose. WidgetColorsTest holds them to their Kotlin twins and every ink to AA on every stop.
+      widget_sky_track is the "to come" bars and the divider on a sky: on_surface_variant at 30 percent, because
+      widget_outline_variant is invisible on the mint day sky.
+    -->
+    <color name="widget_sky_dawn_top">#EADFE3</color>
+    <color name="widget_sky_dawn_mid">#F0E9EC</color>
+    <color name="widget_sky_day_top">#D6E8DC</color>
+    <color name="widget_sky_day_mid">#E6EFE9</color>
+    <color name="widget_sky_evening_top">#ECD8BB</color>
+    <color name="widget_sky_evening_mid">#F1E5D3</color>
+    <color name="widget_sky_night_top">#D0DBE1</color>
+    <color name="widget_sky_night_mid">#DFE6EA</color>
+    <color name="widget_sky_foot">#F7F5F3</color>
+    <color name="widget_sky_track">#4D5A605C</color>
+
+    <!-- The sky colours again under the fixed names (see the note above). -->
+    <color name="widget_light_sky_dawn_top">#EADFE3</color>
+    <color name="widget_light_sky_dawn_mid">#F0E9EC</color>
+    <color name="widget_light_sky_day_top">#D6E8DC</color>
+    <color name="widget_light_sky_day_mid">#E6EFE9</color>
+    <color name="widget_light_sky_evening_top">#ECD8BB</color>
+    <color name="widget_light_sky_evening_mid">#F1E5D3</color>
+    <color name="widget_light_sky_night_top">#D0DBE1</color>
+    <color name="widget_light_sky_night_mid">#DFE6EA</color>
+    <color name="widget_light_sky_foot">#F7F5F3</color>
+    <color name="widget_light_sky_track">#4D5A605C</color>
+    <color name="widget_dark_sky_dawn_top">#231E2C</color>
+    <color name="widget_dark_sky_dawn_mid">#171520</color>
+    <color name="widget_dark_sky_day_top">#17323A</color>
+    <color name="widget_dark_sky_day_mid">#13262B</color>
+    <color name="widget_dark_sky_evening_top">#262A1E</color>
+    <color name="widget_dark_sky_evening_mid">#181B15</color>
+    <color name="widget_dark_sky_night_top">#0B1730</color>
+    <color name="widget_dark_sky_night_mid">#0C1320</color>
+    <color name="widget_dark_sky_foot">#101312</color>
+    <color name="widget_dark_sky_track">#4DA9B2AE</color>
 </resources>

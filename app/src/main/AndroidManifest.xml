@@ -164,6 +164,18 @@
                 android:resource="@xml/widget_today_info" />
         </receiver>
 
+        <receiver
+            android:name=".widget.TodayStripWidgetProvider"
+            android:exported="false"
+            android:label="@string/widget_strip_label">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_today_strip_info" />
+        </receiver>
+
         <!-- The widgets' own redraw alarm. Not exported: only this app's PendingIntent reaches it. -->
         <receiver
             android:name=".widget.WidgetRefreshReceiver"

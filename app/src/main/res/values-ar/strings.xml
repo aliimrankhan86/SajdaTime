@@ -462,6 +462,10 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">نهاية السحور</string>
     <string name="widget_iftar">الإفطار</string>
+    <string name="widget_strip_label">SajdaTime: الصلوات الخمس في سطر</string>
+    <string name="widget_strip_desc">الصلوات الخمس في سطر واحد مع تمييز الصلاة التالية.</string>
+    <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
+    <string name="widget_strip_suhoor">السحور</string>
     <string name="widget_update_location">تحديث الموقع، %1$s</string>
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">اعرف السبب</string>

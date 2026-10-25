@@ -18,4 +18,16 @@
     <color name="widget_highlight_top">#18382D</color>
     <color name="widget_sheen">#12FFFFFF</color>
     <color name="widget_edge">#29FFFFFF</color>
+
+    <!-- Dark twins of the sky colours in values/colors.xml. -->
+    <color name="widget_sky_dawn_top">#231E2C</color>
+    <color name="widget_sky_dawn_mid">#171520</color>
+    <color name="widget_sky_day_top">#17323A</color>
+    <color name="widget_sky_day_mid">#13262B</color>
+    <color name="widget_sky_evening_top">#262A1E</color>
+    <color name="widget_sky_evening_mid">#181B15</color>
+    <color name="widget_sky_night_top">#0B1730</color>
+    <color name="widget_sky_night_mid">#0C1320</color>
+    <color name="widget_sky_foot">#101312</color>
+    <color name="widget_sky_track">#4DA9B2AE</color>
 </resources>

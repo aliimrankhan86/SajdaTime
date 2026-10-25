@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.ContextCompat
+import com.sajdatime.core.PrayerSlot
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -12,7 +13,7 @@ import java.time.ZoneId
 /**
  * The one alarm that keeps the widgets honest when nothing else wakes the app: it fires at the moment
  * the highlighted row has to move, which is the next prayer, or at local midnight, when the Today list
- * has to become the next day's, whichever comes first.
+ * has to become the next day's, or at sunrise, when the Next widget's sky changes; whichever comes first.
  *
  * It is deliberately the weak kind of alarm. A widget is not an alert, so this one is a non waking
  * `RTC` alarm: exact when the person has allowed exact alarms and inexact when not, never
@@ -40,13 +41,17 @@ object WidgetRefreshScheduler {
      * plus [SLACK]. Always later than [now] when [nextPrayerAt] is, so the alarm can never be set in the
      * past and a receiver that fires can never reschedule itself into a loop.
      *
+     * Sunrise is a boundary too when it is still ahead (step 8): no prayer alarm fires at sunrise, but
+     * the Next prayer widget's sky changes there (dawn to day), and without it a dawn sky would stay
+     * until Dhuhr. Defaulted and last so a caller with no sunrise (no location) is unchanged.
+     *
      * Midnight is the start of the next local day as the zone defines it, so on a day when a zone's
      * clocks skip midnight (a few still do) it is the first instant that day, not an instant that
      * does not exist.
      */
-    internal fun nextRefreshAt(nextPrayerAt: Instant, now: Instant, zone: ZoneId): Instant {
+    internal fun nextRefreshAt(nextPrayerAt: Instant, now: Instant, zone: ZoneId, sunriseAt: Instant? = null): Instant {
         val midnight = now.atZone(zone).toLocalDate().plusDays(1).atStartOfDay(zone).toInstant()
-        val boundary = if (nextPrayerAt.isBefore(midnight)) nextPrayerAt else midnight
+        val boundary = listOfNotNull(nextPrayerAt, midnight, sunriseAt?.takeIf { it.isAfter(now) }).min()
         return boundary.plus(SLACK)
     }
 
@@ -58,7 +63,7 @@ object WidgetRefreshScheduler {
             return
         }
         val manager = ContextCompat.getSystemService(context, AlarmManager::class.java) ?: return
-        val triggerAt = nextRefreshAt(next.at, now, zone).toEpochMilli()
+        val triggerAt = nextRefreshAt(next.at, now, zone, state.today?.get(PrayerSlot.SUNRISE)).toEpochMilli()
         val pending = pendingIntent(context, PendingIntent.FLAG_UPDATE_CURRENT)
             ?: return
 

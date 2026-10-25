@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The hairline of the wide Next prayer widget on a sky: widget_sky_track, as widget_seg_todo_sky. An ImageView drawable
+     because a plain View cannot be inflated by a RemoteViews (WidgetResourcesTest). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_sky_track" />
+</shape>

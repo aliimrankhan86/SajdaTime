@@ -6,12 +6,30 @@ import com.sajdatime.app.ui.theme.DarkOnSurfaceVariant
 import com.sajdatime.app.ui.theme.DarkOutlineVariant
 import com.sajdatime.app.ui.theme.DarkPrimary
 import com.sajdatime.app.ui.theme.DarkPrimaryContainer
+import com.sajdatime.app.ui.theme.DarkSkyDawnMid
+import com.sajdatime.app.ui.theme.DarkSkyDawnTop
+import com.sajdatime.app.ui.theme.DarkSkyDayMid
+import com.sajdatime.app.ui.theme.DarkSkyDayTop
+import com.sajdatime.app.ui.theme.DarkSkyEveningMid
+import com.sajdatime.app.ui.theme.DarkSkyEveningTop
+import com.sajdatime.app.ui.theme.DarkSkyFoot
+import com.sajdatime.app.ui.theme.DarkSkyNightMid
+import com.sajdatime.app.ui.theme.DarkSkyNightTop
 import com.sajdatime.app.ui.theme.DarkSurface
 import com.sajdatime.app.ui.theme.LightOnSurface
 import com.sajdatime.app.ui.theme.LightOnSurfaceVariant
 import com.sajdatime.app.ui.theme.LightOutlineVariant
 import com.sajdatime.app.ui.theme.LightPrimary
 import com.sajdatime.app.ui.theme.LightPrimaryContainer
+import com.sajdatime.app.ui.theme.LightSkyDawnMid
+import com.sajdatime.app.ui.theme.LightSkyDawnTop
+import com.sajdatime.app.ui.theme.LightSkyDayMid
+import com.sajdatime.app.ui.theme.LightSkyDayTop
+import com.sajdatime.app.ui.theme.LightSkyEveningMid
+import com.sajdatime.app.ui.theme.LightSkyEveningTop
+import com.sajdatime.app.ui.theme.LightSkyFoot
+import com.sajdatime.app.ui.theme.LightSkyNightMid
+import com.sajdatime.app.ui.theme.LightSkyNightTop
 import com.sajdatime.app.ui.theme.LightSurface
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -61,6 +79,16 @@ class WidgetColorsTest {
         "widget_surface_top" to Color(0xFFFFFFFF),
         "widget_surface_bottom" to Color(0xFFEEF1EC),
         "widget_highlight_top" to Color(0xFFE6F3EC),
+        // The four skies behind the Next prayer widget (step 8): the phone's own stops.
+        "widget_sky_dawn_top" to LightSkyDawnTop,
+        "widget_sky_dawn_mid" to LightSkyDawnMid,
+        "widget_sky_day_top" to LightSkyDayTop,
+        "widget_sky_day_mid" to LightSkyDayMid,
+        "widget_sky_evening_top" to LightSkyEveningTop,
+        "widget_sky_evening_mid" to LightSkyEveningMid,
+        "widget_sky_night_top" to LightSkyNightTop,
+        "widget_sky_night_mid" to LightSkyNightMid,
+        "widget_sky_foot" to LightSkyFoot,
     )
     private val dark = mapOf(
         "widget_surface" to DarkSurface,
@@ -72,6 +100,15 @@ class WidgetColorsTest {
         "widget_surface_top" to Color(0xFF252C29),
         "widget_surface_bottom" to Color(0xFF121514),
         "widget_highlight_top" to Color(0xFF18382D),
+        "widget_sky_dawn_top" to DarkSkyDawnTop,
+        "widget_sky_dawn_mid" to DarkSkyDawnMid,
+        "widget_sky_day_top" to DarkSkyDayTop,
+        "widget_sky_day_mid" to DarkSkyDayMid,
+        "widget_sky_evening_top" to DarkSkyEveningTop,
+        "widget_sky_evening_mid" to DarkSkyEveningMid,
+        "widget_sky_night_top" to DarkSkyNightTop,
+        "widget_sky_night_mid" to DarkSkyNightMid,
+        "widget_sky_foot" to DarkSkyFoot,
     )
 
     @Test
@@ -155,6 +192,55 @@ class WidgetColorsTest {
 
     @Test
     fun `dark text clears AA under the gloss sheen`() = checkSheen("dark", "values-night")
+
+    private val skies = listOf("dawn", "day", "evening", "night")
+    private val inks = listOf("widget_on_surface", "widget_on_surface_variant", "widget_primary")
+
+    /**
+     * The Next prayer widget sits on a sky (step 8): every ink on every stop of every sky (3 inks x 3
+     * stops x 4 skies), every ink on each sky's top under the sheen (the dark sheen is 7 percent white),
+     * and the translucent track that stands in for the paper one, composited over every stop, at 1.3:1
+     * (a track, not text; the hairline's floor is 1.2). 60 pairs a theme.
+     */
+    private fun checkSky(theme: String, folder: String) {
+        val xml = colours(folder)
+        val sheen = translucent(folder, "widget_sheen")
+        val track = translucent(folder, "widget_sky_track")
+        val failures = mutableListOf<String>()
+        for (sky in skies) {
+            val stops = listOf("widget_sky_${sky}_top", "widget_sky_${sky}_mid", "widget_sky_foot")
+            for (ink in inks) {
+                for (stop in stops) {
+                    val r = Wcag.contrast(asColor(xml.getValue(ink)), asColor(xml.getValue(stop)))
+                    if (r < 4.5) failures += "$theme $ink on $stop: %.2f:1".format(r)
+                }
+                val under = composite(sheen, xml.getValue(stops.first()))
+                val r = Wcag.contrast(asColor(xml.getValue(ink)), under)
+                if (r < 4.5) failures += "$theme $ink on ${stops.first()} under the sheen: %.2f:1".format(r)
+            }
+            for (stop in stops) {
+                val base = xml.getValue(stop)
+                val r = Wcag.contrast(composite(track, base), asColor(base))
+                if (r < 1.3) failures += "$theme track on $stop: %.2f:1 (needs 1.3:1)".format(r)
+            }
+        }
+        assertTrue("Sky contrast failures:\n" + failures.joinToString("\n"), failures.isEmpty())
+    }
+
+    /** The track is on_surface_variant at 30 percent (0x4D), so it follows that ink if the ink ever moves. */
+    @Test
+    fun `the sky track is the secondary ink at 30 percent in both themes`() {
+        for (folder in listOf("values", "values-night")) {
+            val ink = colours(folder).getValue("widget_on_surface_variant").toLong() and 0xFFFFFF
+            assertEquals(folder, 0x4D000000L or ink, translucent(folder, "widget_sky_track"))
+        }
+    }
+
+    @Test
+    fun `light inks clear AA on every sky and the track stays visible`() = checkSky("light", "values")
+
+    @Test
+    fun `dark inks clear AA on every sky and the track stays visible`() = checkSky("dark", "values-night")
 
     private fun check(theme: String, folder: String) {
         val xml = colours(folder)

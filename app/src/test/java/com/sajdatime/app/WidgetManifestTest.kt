@@ -30,10 +30,12 @@ class WidgetManifestTest {
     }
 
     @Test
-    fun `both widget providers are declared with the update action and their provider file`() {
+    fun `all three widget providers are declared with the update action and their provider file`() {
         val expected = mapOf(
             "NextPrayerWidgetProvider" to "widget_next_prayer_info",
             "TodayWidgetProvider" to "widget_today_info",
+            // Step 8: the Today strip. The file is named as BUILD-INSTRUCTIONS and DETAILED-PLAN say.
+            "TodayStripWidgetProvider" to "widget_today_strip_info",
         )
         for ((name, xml) in expected) {
             val block = receiver(name)
@@ -56,6 +58,7 @@ class WidgetManifestTest {
     fun `the picker labels are the widget label strings`() {
         assertTrue(receiver("NextPrayerWidgetProvider").contains("""android:label="@string/widget_next_label""""))
         assertTrue(receiver("TodayWidgetProvider").contains("""android:label="@string/widget_today_label""""))
+        assertTrue(receiver("TodayStripWidgetProvider").contains("""android:label="@string/widget_strip_label""""))
     }
 
     @Test

@@ -30,8 +30,9 @@ class WidgetResourcesTest {
 
     private val nextLayouts = listOf("layout/widget_next_prayer.xml", "layout/widget_next_prayer_wide.xml")
     private val todayLayouts = listOf("layout/widget_today.xml", "layout/widget_today_large.xml")
-    private val layouts = nextLayouts + todayLayouts
-    private val providers = listOf("xml/widget_next_prayer_info.xml", "xml/widget_today_info.xml")
+    private val stripLayouts = listOf("layout/widget_strip.xml")
+    private val layouts = nextLayouts + todayLayouts + stripLayouts
+    private val providers = listOf("xml/widget_next_prayer_info.xml", "xml/widget_today_info.xml", "xml/widget_today_strip_info.xml")
     private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
 
     private fun withoutComments(xml: String) = xml.replace(Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL), "")
@@ -78,7 +79,10 @@ class WidgetResourcesTest {
                 if (tag.startsWith("<TextView")) {
                     assertTrue(
                         "$layout: $tag has no textAlignment",
-                        tag.contains("""android:textAlignment="viewStart"""") || tag.contains("""android:textAlignment="viewEnd""""),
+                        // "center" is direction neutral, so it is as right in Urdu as in English: the strip's
+                        // columns centre their text in a match_parent view (step 8). Only the strip may.
+                        tag.contains("""android:textAlignment="viewStart"""") || tag.contains("""android:textAlignment="viewEnd"""") ||
+                            (layout in stripLayouts && tag.contains("""android:textAlignment="center"""")),
                     )
                 }
             }
@@ -100,6 +104,9 @@ class WidgetResourcesTest {
             "layout/widget_next_prayer_wide.xml" to hero + rows + chip,
             "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + chip,
             "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows + chip,
+            // The strip: five columns (no sunrise, no label), the large text row, the message, the chip.
+            "layout/widget_strip.xml" to listOf("widget_message", "widget_strip_next", "widget_glyph", "widget_name", "widget_time", "widget_sublabel") +
+                slots.filter { it != "sunrise" }.flatMap { listOf("widget_row_$it", "widget_glyph_$it", "widget_name_$it", "widget_time_$it") } + chip,
         )
         for ((layout, ids) in expected) {
             val xml = read(layout)
@@ -131,6 +138,7 @@ class WidgetResourcesTest {
         val pairs = mapOf(
             "xml/widget_next_prayer_info.xml" to Triple("widget_next_prayer", "widget_preview_next", "widget_next_desc"),
             "xml/widget_today_info.xml" to Triple("widget_today", "widget_preview_today", "widget_today_desc"),
+            "xml/widget_today_strip_info.xml" to Triple("widget_strip", "widget_preview_strip", "widget_strip_desc"),
         )
         val strings = read("values/strings.xml")
         for ((provider, expected) in pairs) {
@@ -148,7 +156,7 @@ class WidgetResourcesTest {
 
     @Test
     fun `the preview images are small, the first raster assets in the app`() {
-        for (name in listOf("widget_preview_next", "widget_preview_today")) {
+        for (name in listOf("widget_preview_next", "widget_preview_today", "widget_preview_strip")) {
             val size = File(res, "drawable-nodpi/$name.png").length()
             assertTrue("$name is $size bytes", size in 1..30_000)
         }
@@ -165,6 +173,35 @@ class WidgetResourcesTest {
         assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="4""""))
         // The Today widget must never be resizable below the height its six rows need.
         assertTrue(today.contains("""android:minResizeHeight="180dp""""))
+        // The strip is one cell tall everywhere. 40dp and not 60: a launcher that sizes by 70n minus 30 would
+        // round a 60dp minimum up to two cells (STEP-8-DESIGN section 3).
+        val strip = read("xml/widget_today_strip_info.xml")
+        assertTrue(strip.contains("""android:targetCellWidth="4"""") && strip.contains("""android:targetCellHeight="1""""))
+        assertTrue(strip.contains("""android:minHeight="40dp"""") && strip.contains("""android:minResizeHeight="40dp""""))
+    }
+
+    /**
+     * The four skies and their fixed copies are widget_background with the body colours changed and
+     * nothing else: one gradient with a centre stop at 55 percent, the sheen, the rim. A sky that lost its
+     * sheen or rim would be the one widget out of the family.
+     */
+    @Test
+    fun `each sky is the widget surface with its own three stops, the same sheen and the same rim`() {
+        fun shape(xml: String) = Regex("""<(layer-list|item|shape|gradient|solid|stroke|corners)\b""").findAll(withoutComments(xml)).map { it.groupValues[1] }.toList()
+        val surface = shape(read("drawable/widget_background.xml"))
+        for (sky in listOf("dawn", "day", "evening", "night")) {
+            for (suffix in listOf("", "_light", "_dark")) {
+                val name = "widget_sky_$sky$suffix"
+                val xml = withoutComments(read("drawable/$name.xml"))
+                assertEquals(name, surface, shape(xml))
+                assertTrue("$name body centre stop", xml.contains("""android:centerY="0.55""""))
+                assertTrue("$name sheen", xml.contains("""android:centerY="0.45""""))
+                val prefix = suffix.removePrefix("_").let { if (it.isEmpty()) "widget_" else "widget_${it}_" }
+                for (stop in listOf("sky_${sky}_top", "sky_${sky}_mid", "sky_foot", "sheen", "edge")) {
+                    assertTrue("$name lacks $prefix$stop", xml.contains("@color/$prefix$stop"))
+                }
+            }
+        }
     }
 
     @Test
@@ -172,6 +209,9 @@ class WidgetResourcesTest {
         val drawables = listOf(
             "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
             "widget_seg_done", "widget_seg_next", "widget_seg_todo",
+            // Step 8: the Next prayer widget's skies, and what has to stay visible on them.
+            "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
+            "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
         )
         val files = layouts + drawables.map { "drawable/$it.xml" }
         val used = files.flatMap { Regex("""@color/(widget_[a-z_]+)""").findAll(read(it)).map { m -> m.groupValues[1] }.toList() }.toSet()
@@ -185,7 +225,7 @@ class WidgetResourcesTest {
     @Test
     fun `every widget string exists in all four languages`() {
         val names = Regex("""<string name="(widget_[a-z0-9_]+)"""").findAll(read("values/strings.xml")).map { it.groupValues[1] }.toList()
-        assertEquals(13, names.size)
+        assertEquals(16, names.size)
         for (language in languages) {
             val strings = read("$language/strings.xml")
             for (name in names) assertTrue("$language lacks $name", strings.contains("""name="$name""""))
