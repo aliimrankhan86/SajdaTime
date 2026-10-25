@@ -345,6 +345,10 @@ Found by the 25 Oct 2026 census. Each is a visible change, so fixing it is the o
 (`docs/DESIGN_SYSTEM.md` §0.2); the list is raised with him as OPEN item `ds-deviations` in
 `docs/DESIGN_SYSTEM.md` §11. New work follows the rule column.
 
+**Pictures, exact file and line for every row, and four observations the census did not record:**
+[`docs/plans/2026-10-release-1.6.0/DS-DEVIATIONS-REVIEW.md`](../plans/2026-10-release-1.6.0/DS-DEVIATIONS-REVIEW.md)
+(Ali's request, 25 Oct 2026, taken on the emulator at `d167846`). Evidence only, no decisions.
+
 | Id | Where | Deviation | Rule for new work |
 |---|---|---|---|
 | 3.1 | 13 uses, listed in `typography.json` | `bodySmall` 12, `labelSmall` 11, `titleSmall` 14 used but not defined in `Type.kt` | Only the ten defined styles; 14 floor |

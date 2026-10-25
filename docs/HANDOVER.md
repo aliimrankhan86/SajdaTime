@@ -6038,7 +6038,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   any AI: the app, what is live, branches, the design system, the rules that cause mistakes, finishing checks.
   `AGENTS.md`, `CLAUDE.md` and `docs/AI-WORKER-BRIEF.md` point to it. **Keep it current** whenever branches, live
   state, test counts or rules change, in the same commit.
-- **Next:** Ali answers `ds-deviations` (each fix is one small visible change); release day when he says so.
+- **Deviation evidence recorded (Ali's request, 25 Oct 2026 late evening):** he asked for all the
+  `ds-deviations` items to be put in one place with pictures so Claude can check and give a verdict.
+  Done by DeepSeek on branch `deepseek/ds-deviations-record` from `d167846`, docs and pictures only,
+  no app or watch code touched: `docs/plans/2026-10-release-1.6.0/DS-DEVIATIONS-REVIEW.md` with
+  fifteen screenshots in `ds-deviations/` beside it, both colour deviations included, and four things
+  the pictures showed that the census did not say (the usage question's second button is clipped only
+  when opened from Settings; the setup error turns the field outline red as well as the text; the old
+  icon green is two different greens and one file's comment about it is now false; at 1.5x text a
+  notice is cut off behind the tab bar). **Decides nothing, changes nothing.** It is written outside
+  `docs/design-system/` on purpose: `DesignTokensTest` fails the build on any hex quoted in those
+  pages that is not a token, and this record has to quote the two stale greens.
+- **Next:** Ali answers `ds-deviations` (each fix is one small visible change), now with pictures in
+  front of him and Claude's verdict wanted on the record above; release day when he says so.
 
 ### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)
 
