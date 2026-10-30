@@ -1,5 +1,7 @@
 package com.sajdatime.app.ui.home
 
+import androidx.compose.ui.text.style.TextOverflow
+import com.sajdatime.app.ui.components.shrinkToFit
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -220,7 +222,10 @@ private fun ChosenDay(tracker: TrackerState, date: LocalDate, today: DayPrayerTi
                         style = MaterialTheme.typography.labelMedium,
                         color = scheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
+                        // One fifth of the card each: a longer name shrinks rather than being clipped.
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        autoSize = shrinkToFit(MaterialTheme.typography.labelMedium.fontSize),
                         modifier = Modifier.weight(1f).clearAndSetSemantics {},
                     )
                 }

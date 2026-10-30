@@ -695,7 +695,8 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
   Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
   opening the app is what updates the location (onResume); it cannot update without opening the app,
   because location is read only in the foreground. The large header uses the short date ("Sun, 18
-  Oct") so the chip never cuts it short. The Hijri line under it shrinks from 12 to as small as 9sp
+  Oct") so the chip never cuts it short in English; since 30 Oct 2026 it also shrinks 14 to 10sp before any cut
+  (Bengali "শুক্র 30 অক্টোবর" read "শুক্র 30 অ…" beside the chip). The Hijri line under it shrinks from 12 to as small as 9sp
   rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
   screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
   pressing the chip opens the app.
@@ -848,6 +849,15 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **30 Oct 2026, Bengali, and text that shrinks instead of breaking (owner: "any text is overlapping or feel like
+  breaking the design then shrink the text or lower its size enough to fit on the screen").** Text that can wrap still
+  wraps between whole words. Text held to one line (the city name, the Qibla place line, the My prayers column headings)
+  now shrinks until it fits (`shrinkToFit`): to 60%, or at large text to its normal size when smaller. **This may go
+  below the 14sp floor** (to 8.4sp for a 14sp label at normal text size): the owner's rule for this case only. The Today
+  widget's date line shrinks 14 to 10sp like the Hijri line under it. **Rejected:** tab labels on one line that shrink:
+  on a 320dp phone at 2.0 "My prayers" and "আমার নামাজ" still ended in an ellipsis (`LargeTextAndTalkBackDeviceTest`
+  now checks for one). Instead the tabs align to the top, so a two line label no longer lifts its icon out of line.
 
 - **25 Oct 2026, Fasts to make up (moved into 1.6.0, built basic with no Fable pass at the owner's request):** a
   Settings row in My prayers opening the chooser dialog with one StepperRow, and on the My prayers tab "3 fasts to make

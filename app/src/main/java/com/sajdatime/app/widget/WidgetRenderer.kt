@@ -80,12 +80,13 @@ internal object WidgetRenderer {
      */
     private fun todaySizes(context: Context): List<Pair<SizeF, Int>> {
         // Urdu and Arabic script sits taller than Latin at the same size: rendered on 18 Oct 2026, the
-        // large card at 280dp held four of their six rows, and all six from 330dp.
+        // large card at 280dp held four of their six rows, and all six from 330dp. Bengali joined them on
+        // 30 Oct 2026: its vowel signs sit above and below the line, so its rows are as tall.
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         return listOf(SizeF(250f, 180f) to R.layout.widget_today, SizeF(250f, if (tall) 330f else 280f) to R.layout.widget_today_large)
     }
 
-    private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar")
+    private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
 
     /**
      * From this text size the second layout of each widget stops showing the whole day (rendered at 1.3

@@ -6,6 +6,7 @@
           python3 tools/check-translation.py tr tr
           python3 tools/check-translation.py ur ur
           python3 tools/check-translation.py ar ar-u-nu-latn   (Arabic keeps Western digits)
+          python3 tools/check-translation.py bn bn-u-nu-latn   (Bengali keeps Western digits)
 
 Checks every module (app, core, wear) that has a values-<qualifier>/strings.xml against its
 English source. It cannot judge whether a translation is *good*. It can and does catch the
@@ -28,6 +29,7 @@ MODULES = ["app", "core", "wear"]
 PLURALS = {
     "in": {"other"}, "id": {"other"}, "tr": {"one", "other"}, "ur": {"one", "other"},
     "ar": {"zero", "one", "two", "few", "many", "other"},
+    "bn": {"one", "other"},
 }
 FMT = re.compile(r"%(?:\d+\$)?[-+#0 ,(]*\d*(?:\.\d+)?[sdfxXc%]")
 
@@ -122,7 +124,7 @@ def main(qualifier, tag):
                 if len(sv) != len(tv):
                     errors.append(f"{mod}:{name}: {len(sv)} items -> {len(tv)}")
         # Long prose that is still mostly ASCII letters is probably untranslated (not for Latin-script languages).
-        if lang in ("ur", "ar"):
+        if lang.split("-")[0] in ("ur", "ar", "bn"):
             for name in sorted(need & set(tr)):
                 k, tv, _ = tr[name]
                 if k == "string" and len(tv) > 60:

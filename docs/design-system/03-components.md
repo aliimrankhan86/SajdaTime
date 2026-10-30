@@ -331,6 +331,8 @@ shake to undo: nobody finds it.
 | `BottomBarClearance()` | `components/ScreenFrame.kt` | The bar's measured height (fallback 88). Last child of every scrolling tab |
 | `Modifier.readingWidth()` | `components/ScreenFrame.kt` | Caps content at 600 |
 | `WholeWords` | `components/WholeWords.kt` | Auto size that shrinks only while a break falls inside a word, to 60% at least. iPhone: `.minimumScaleFactor(0.6)` with `.lineLimit` |
+| `shrinkToFit` | `components/WholeWords.kt` | One line text shrinks until it fits, to 60% (at large text, its normal size when smaller), then ellipsis. City name, Qibla place, My prayers headings (30 Oct 2026). iPhone: `.lineLimit(1).minimumScaleFactor(0.6)` |
+| `MainScaffold` tab bar | `ui/MainScaffold.kt` | Tabs align to the top, so a two line label never lifts its icon (30 Oct 2026) |
 | `SectionHeading` | `components/Common.kt` | `titleMedium` in `onSurface`, used in setup (missing heading semantics: known gap) |
 | `ProgressRow` | `components/Common.kt` | 18 spinner (stroke 2), 12, `bodyMedium` `onSurfaceVariant` ("Finding your location…") |
 | `LocationSheet` | `components/Common.kt` | The shared location sheet, see `05-screens-and-features.md` |

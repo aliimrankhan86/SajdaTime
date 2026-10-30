@@ -6,6 +6,12 @@ also go in `docs/DESIGN_SYSTEM.md` §9 with his words.
 
 ---
 
+## 30 Oct 2026: Bengali, and text that shrinks instead of breaking
+
+- Bengali added to the languages table (`values-bn`, tag `bn-u-nu-latn`, tall script) and a full "Adding a language" checklist in 06 §6.6.
+- New `shrinkToFit` (one line text shrinks to fit, to 60% or at large text its normal size; may go below 14sp, owner's rule) in 02, 03 §3.5 and `tokens/typography.json`; the Today widget date may shrink to 10sp.
+- Tab bar aligns to the top so a two line label keeps its icon in line. Rejected: one line tab labels (cut with an ellipsis at 320dp, 2.0).
+
 ## 25 Oct 2026: independent review fixes
 
 - A playbook row offered a recipe for a missed prayer counter, which the owner refused on 16 Oct 2026; it now says No.

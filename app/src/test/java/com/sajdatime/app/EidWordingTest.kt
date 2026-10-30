@@ -19,7 +19,7 @@ class EidWordingTest {
 
     private val root = File("..").canonicalFile
 
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
+    private val languages = stringFolders
     private val names = listOf("eid_fitr_title", "eid_fitr_body", "eid_adha_title", "eid_adha_body", "eid_fine_print")
 
     private fun strings(folder: String): Map<String, String> {
@@ -39,6 +39,7 @@ class EidWordingTest {
         "values-tr" to FinePrintWords("hesab", "kusura", "camin"),
         "values-in" to FinePrintWords("perhitungan", "maaf", "masjid"),
         "values-ar" to FinePrintWords("حساب", "نعتذر", "مسجد"),
+        "values-bn" to FinePrintWords("হিসাব", "দুঃখিত", "মসজিদ"),
     )
 
     @Test

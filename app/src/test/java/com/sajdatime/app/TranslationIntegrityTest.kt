@@ -55,7 +55,15 @@ class TranslationIntegrityTest {
             "دعا",
             listOf("الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"),
         ),
+        // Bengali (30 Oct 2026): Western digits like Arabic; the spellings Bangladesh's mosques print.
+        "bn" to Lang("bn-u-nu-latn", setOf("one", "other"), "দোয়া", listOf("ফজর", "সূর্যোদয়", "যোহর", "আসর", "মাগরিব", "এশা")),
     )
+
+    @Test
+    fun `every translation folder on disk is checked here`() {
+        // A new values-<lang>/ with no entry above would skip every check in this file.
+        assertEquals(stringFolders.drop(1).map { it.removePrefix("values-") }.toSet(), languages.keys)
+    }
 
     private sealed interface Res {
         data class Str(val text: String) : Res

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bengali (Bangla), standard colloquial (cholito) with the polite apni form. Translated by Claude on 30 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. bn-u-nu-latn, not plain bn: Western digits everywhere, because java.time always prints Western digits while String.format would print Bengali ones on some Android versions, mixing both on one screen (the same reason as values-ar). -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- bn-u-nu-latn, not plain bn: Western digits everywhere, as in values-ar. -->
+    <string name="app_language_tag" tools:ignore="ExtraTranslation">bn-u-nu-latn</string>
+    <string name="app_name">SajdaTime</string>
+    <string name="tile_label">পরের নামাজ</string>
+    <string name="tile_description">পরের নামাজ ও তার বাকি সময়</string>
+    <string name="tile_needs_setup">ফোনে সেট আপ করুন</string>
+    <string name="wear_locating">আপনার অবস্থান খোঁজা হচ্ছে</string>
+    <string name="wear_no_location_title">এখনো অবস্থান নেই</string>
+    <string name="wear_no_location_body">আপনার ফোনে SajdaTime খুলুন, অথবা আপাতত মক্কা ব্যবহার করুন।</string>
+    <string name="wear_use_makkah">মক্কা ব্যবহার করুন</string>
+    <string name="wear_location">অবস্থান</string>
+    <string name="wear_location_phone">ফোনের মতোই</string>
+    <string name="wear_location_phone_missing">আপনার ফোনে SajdaTime খুলুন</string>
+    <string name="wear_location_watch">এই ঘড়ি</string>
+    <string name="wear_location_watch_unavailable">এই ঘড়ি তার অবস্থান খুঁজে পাচ্ছে না। ঘড়ির সেটিংসে অবস্থান চালু করুন এবং SajdaTime অ্যাপকে অনুমতি দিন।</string>
+    <string name="wear_place_makkah">মক্কা</string>
+    <string name="wear_place_watch">এই ঘড়ির অবস্থান</string>
+    <string name="wear_place_phone">আপনার ফোনের অবস্থান</string>
+    <!-- Three line budget (see values/strings.xml). Check with tools/wear-verify.sh before merging. -->
+    <string name="wear_disclaimer">সহায়ক মাত্র, ধর্মীয় কর্তৃপক্ষ নয়। সময় হিসাব করে বের করা। আপনার মসজিদ মানুন।</string>
+    <string name="wear_polar_notice">আনুমানিক। আজ এখানে সূর্য ওঠে না বা অস্ত যায় না, তাই এগুলো %1$d° অক্ষাংশ থেকে নেওয়া। আপনার মসজিদে জিজ্ঞেস করুন।</string>
+    <string name="wear_school">মতধারা</string>
+    <string name="wear_school_pair">%1$s · %2$s</string>
+    <string name="wear_sect_sunni">সুন্নি</string>
+    <string name="wear_sect_shia">শিয়া</string>
+    <string name="wear_madhab_hanafi">হানাফি</string>
+    <string name="wear_madhab_shafii">শাফেয়ি</string>
+    <string name="wear_madhab_maliki">মালিকি</string>
+    <string name="wear_madhab_hanbali">হাম্বলি</string>
+    <string name="wear_madhab_note">শুধু আসর বদলায়। হানাফিতে পরে।</string>
+    <string name="wear_qibla_needs_location">কিবলা খুঁজতে অবস্থান সেট করুন</string>
+    <string name="wear_qibla_facing">কাবার দিকে</string>
+    <string name="wear_qibla_bearing">%1$d°</string>
+    <string name="wear_qibla_from_true_north">প্রকৃত উত্তর থেকে</string>
+    <string name="wear_duration_h_m">%1$d ঘ %2$d মি</string>
+    <string name="wear_duration_m">%1$d মি</string>
+    <string name="wear_in_h_m">%1$d ঘ %2$d মি পরে</string>
+    <string name="wear_in_m">%1$d মি পরে</string>
+    <string name="wear_tile_detail">%1$s  ·  %2$s</string>
+    <string name="wear_tile_detail_approx">প্রায় %1$s  ·  %2$s</string>
+</resources>

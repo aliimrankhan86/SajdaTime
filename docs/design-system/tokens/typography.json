@@ -175,9 +175,9 @@
   },
   "rules": [
     "Section labels are sentence case and never uppercased in code (String.uppercase breaks Turkish i and caseless scripts). Quiet Glass retired the letterspaced label: today only the Ramadan card label keeps letterSpacing 1.6 (a leftover, do not copy). A language that wants capitals writes them in its string.",
-    "A word is never split across two lines. Short labels in fixed slots (tab bar, theme selector) use WholeWords, which shrinks text to no less than 60% while a break falls inside a word.",
+    "A word is never split across two lines. Short labels in fixed slots (tab bar, theme selector) use WholeWords, which shrinks text to no less than 60% while a break falls inside a word. Text held to one line (city name, Qibla place, My prayers headings) uses shrinkToFit: it shrinks until it fits, to 60%, or at large text to its normal size when smaller; it may go below 14sp (owner, 30 Oct 2026).",
     "Tabular figures make Latin digits even width. Numbers are formatted in the language the words are in; Arabic uses ar-u-nu-latn so digits stay Western.",
-    "Widgets size the countdown in dp (34 to 38) because it is already three times body size; names and times stay in sp. Widget floor is 12sp, with two named exceptions that may shrink to 9sp (large Today widget Hijri line, Today strip time at 250dp).",
+    "Widgets size the countdown in dp (34 to 38) because it is already three times body size; names and times stay in sp. Widget floor is 12sp, with named exceptions: the large Today widget date line may shrink to 10sp (30 Oct 2026), and two may shrink to 9sp (large Today widget Hijri line, Today strip time at 250dp).",
     "Wear floor is 12sp.",
     "Urdu and Arabic single lines stand about 4dp taller than Latin (Noto Naskh ascent and descent). Known, OPEN item 1.6-script-line-box; do not hard code heights that assume Latin.",
     "Numbers that change in place (countdown, Qibla bearing and distance, prayer times) use tabular figures: tabular styles, PrayerTimeTextStyle, or .copy(fontFeatureSettings = \"tnum\")."

@@ -156,6 +156,9 @@ weight (500 or 600), never colour alone, never italics, never capitals.
 - Never uppercase in code. Capitals, if a language wants them, are in its string.
 - A word is never split across lines. Fixed width labels (tabs, theme selector) use `WholeWords`
   (shrinks to no less than 60% only while a break falls inside a word).
+- Text held to one line (city name, Qibla place line, My prayers column headings) uses `shrinkToFit`:
+  it shrinks until it fits before any ellipsis, to 60% (at large text, to its normal size if smaller,
+  half at 2.0). May go below 14sp: owner's rule, 30 Oct 2026 (DESIGN_SYSTEM.md §9).
 - Numbers that change in place use tabular figures.
 - Numbers are formatted in the language the words are in. Arabic uses `ar-u-nu-latn` so digits stay
   Western on every Android version.

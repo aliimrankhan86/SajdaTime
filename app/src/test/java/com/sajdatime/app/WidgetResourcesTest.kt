@@ -33,7 +33,7 @@ class WidgetResourcesTest {
     private val stripLayouts = listOf("layout/widget_strip.xml")
     private val layouts = nextLayouts + todayLayouts + stripLayouts
     private val providers = listOf("xml/widget_next_prayer_info.xml", "xml/widget_today_info.xml", "xml/widget_today_strip_info.xml")
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
+    private val languages = stringFolders
 
     private fun withoutComments(xml: String) = xml.replace(Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL), "")
 

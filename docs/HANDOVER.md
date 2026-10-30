@@ -1198,6 +1198,9 @@ against our resources, as Android does. Bidi: a pair on its own Text is never is
 "اردو (Urdu)" back to front inside an English line); inside the "Phone language · …" sentence it is FSI isolated, which is right because the pair always starts in the app's
 own script.
 
+
+**Bengali, 30 Oct 2026.** Sixth language, left to right, tag `bn-u-nu-latn` (Western digits, the Arabic reason). Adding
+a language is the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find new folders on disk.
 ### 5.17 The method is asked, visibly, of everyone — and never chosen for them (15 Aug 2026)
 
 The owner brought a problem, with a proposed solution written by another AI: users still
@@ -5997,7 +6000,40 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 DESIGN SYSTEM FOLDER ADDED, 25 Oct 2026, late evening (read this first, then the Fasts block below)
+### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read this first, then the design system block below)
+
+- **Ali, 30 Oct 2026:** "implement another language bengali ... any text is overlapping or feel like breaking the design
+  then shrink the text or lower its size enough to fit on the screen ... Use i18n to make it easy to add any further
+  languages ... test it then commit it and merge it." Merged into `claude/1-6-0` (not `main`: main takes 1.6 only on
+  release day, his 25 Oct rule).
+- **Built (branch `claude/bengali-language`):** `values-bn/strings.xml` in app, core and wear (Claude's translation,
+  tag `bn-u-nu-latn` so digits stay Western like Arabic; prayer names ফজর সূর্যোদয় যোহর আসর মাগরিব এশা; School মতধারা,
+  Madhab মাযহাব); `AppLanguage.BENGALI` ("বাংলা (Bengali)", last in the picker); `locales_config.xml`; Bengali in the
+  widget's tall script set (Today large card needs 330dp, like Urdu); `check-translation.py` knows bn.
+- **Easier next language:** the wording tests now find `values-<lang>/` folders on disk (`app/src/test/.../Languages.kt`)
+  instead of four hand kept lists, and `LanguagePickerTest` plus `TranslationIntegrityTest` fail until a new folder is
+  registered (proved: a fake `values-fa` failed 4 tests). Checklist: `docs/design-system/06-content-and-language.md` §6.6.
+- **Shrink instead of break (DESIGN_SYSTEM.md §9, 30 Oct 2026):** new `shrinkToFit` for text held to one line (city
+  name, Qibla place line, My prayers column headings): shrinks until it fits, to 60%, or at large text to its normal size
+  when smaller; may go below 14sp, Ali's rule for this case. Today widget date shrinks 14 to 10sp. Tab bar: labels still
+  wrap between words, but tabs align to the top so a two line label no longer lifts its icon (seen in Bengali at 2.0).
+  **Rejected:** one line tab labels; on a 320dp phone at 2.0 "My prayers" ended in "…", so `LargeTextAndTalkBackDeviceTest`
+  now fails on any ellipsis.
+- **Checked:** full gate green (app 337, core 238 with 1 skipped, wear 27, 0 failed; lint 0 errors; both release
+  bundles); device suite 39 of 39 on `emulator-5554`; `LargeTextAndTalkBackDeviceTest` 15 of 15 in English and Bengali
+  after the tab change; `tools/check-translation.py bn bn-u-nu-latn` 0 errors; `WEAR_LOCALE=bn tools/wear-verify.sh` 24 of
+  24 pass on both watch sizes at 1.0 and 1.3 (disclaimer three lines at 1.0). On the emulator in Bengali: setup, all four
+  tabs, Settings, the language picker at 1.0 and 2.0; the strip and Today widgets. Independent Opus code review and a
+  back translation review: no must fix; their fixes taken.
+- **Not checked:** Ali's real phones; Android 7 (autosize may fall back to the ellipsis there); the PDF timetable in
+  Bengali; the Next prayer widget; TalkBack speaking Bengali; dark theme in Bengali. The Today widget's Hijri line can
+  still end in "…" for a long Bengali month at 4 by 4 (it is at its 9sp floor, Ali's earlier choice). The watch's own
+  clock at the top shows Bengali digits (drawn by Wear OS, not the app).
+- **Open for Ali:** the 1.6.0 What's new and description do not mention Bengali (the Bengali store listing itself was
+  already among the eight translated listings). Store pictures have no Bengali set; Play shows the English ones.
+- **Next:** unchanged; release day when Ali says so (`RELEASE-1.6.0.md`, PR by 11 Dec, submit by 15 Dec 2026).
+
+### 📍 DESIGN SYSTEM FOLDER ADDED, 25 Oct 2026, late evening (read the Bengali block above first, then the Fasts block below)
 
 - **Ali, 25 Oct 2026:** "create a comprehensive design system document ... which you and other AI can easily use to
   extend or expand or create new features ... checked ... so any future session cannot drift away from it", later for
@@ -11172,3 +11208,8 @@ matters more than the stable hashes, that is the trade being made.
     stats and removal history name every cancelled `WIDGET_REFRESH`. `WidgetDeviceTest` then saw one redraw alarm
     with no widget placed. `DeviceSupport.alarmTimes` now ends a block at the first line not indented deeper than
     its header. It passed before by luck of which alarm was next to wake.
+187. **A layout test that checks words are whole cannot see a one line label cut by an ellipsis** (30 Oct 2026, Bengali).
+    Moving the tab labels to one line that shrinks looked fine on a 1080 wide emulator and every test passed, but on a
+    320dp phone at 2.0 "My prayers" became "My pray…": `assertWhole` only looked at line ends. It now also fails on
+    `isLineEllipsized`. When text changes from wrapping to one line, add the ellipsis check in the same commit, and
+    measure on the narrowest phone, not the one on the desk.

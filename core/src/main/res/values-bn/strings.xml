@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bengali (Bangla), standard colloquial (cholito) with the polite apni form. Translated by Claude on 30 Oct 2026 and checked by Claude. On 9 Oct 2026 the owner (Ali Imran Khan) decided no native speaker review is needed for this free utility app. Correct any mistake a user reports. bn-u-nu-latn, not plain bn: Western digits everywhere, because java.time always prints Western digits while String.format would print Bengali ones on some Android versions, mixing both on one screen (the same reason as values-ar). -->
+<resources>
+    <!-- BCP-47 tag of this file's language. Read back by AppLocale; LocaleDisciplineTest checks it. -->
+    <!-- bn-u-nu-latn, not plain bn: Western digits everywhere, as in values-ar. -->
+    <string name="app_language_tag">bn-u-nu-latn</string>
+
+    <string name="prayer_fajr">ফজর</string>
+    <string name="prayer_sunrise">সূর্যোদয়</string>
+    <string name="prayer_dhuhr">যোহর</string>
+    <string name="prayer_asr">আসর</string>
+    <string name="prayer_maghrib">মাগরিব</string>
+    <string name="prayer_isha">এশা</string>
+
+    <string name="method_auto">স্বয়ংক্রিয়</string>
+    <string name="method_muslim_world_league">মুসলিম ওয়ার্ল্ড লীগ</string>
+    <string name="method_egyptian">মিশরীয় জেনারেল অথরিটি</string>
+    <string name="method_karachi">করাচি বিশ্ববিদ্যালয়</string>
+    <string name="method_umm_al_qura">উম্মুল কুরা, মক্কা</string>
+    <string name="method_dubai">দুবাই</string>
+    <string name="method_moon_sighting">মুনসাইটিং কমিটি</string>
+    <string name="method_north_america">ISNA, উত্তর আমেরিকা</string>
+    <string name="method_kuwait">কুয়েত</string>
+    <string name="method_qatar">কাতার</string>
+    <!-- Malaysia is deliberately NOT named here. See the note in values/strings.xml. -->
+    <string name="method_singapore">Kemenag &amp; MUIS, ইন্দোনেশিয়া ও সিঙ্গাপুর</string>
+    <string name="method_turkey">দিয়ানেত, তুরস্ক</string>
+    <string name="method_jafari">জাফরি (ইসনা আশারি)</string>
+    <string name="method_tehran">ভূপদার্থবিদ্যা ইনস্টিটিউট, তেহরান</string>
+
+    <!-- Religious content: keep the hedges ("many", "some", "common"). No angles, no degrees. -->
+    <string name="method_auto_desc">নিশ্চিত নন? এটিই রাখুন। মুসলিম ওয়ার্ল্ড লীগের সময়, বা শিয়াদের জন্য জাফরি। বিশ্বের অনেক জায়গায় স্থানীয় প্রচলনের কাছাকাছি। সুদূর উত্তরে পার্থক্য সবচেয়ে বেশি।</string>
+    <string name="method_muslim_world_league_desc">অনেক দেশে ব্যবহৃত একটি সাধারণ পদ্ধতি। এই অ্যাপে এটিই ডিফল্ট।</string>
+    <string name="method_egyptian_desc">মিশরের সরকারি পদ্ধতি।</string>
+    <string name="method_karachi_desc">পাকিস্তান ও দক্ষিণ এশিয়ায় প্রচলিত।</string>
+    <string name="method_umm_al_qura_desc">সৌদি আরবের সরকারি পদ্ধতি। এশা মাগরিবের পর একটি নির্দিষ্ট সময়ে ধরা হয়।</string>
+    <string name="method_dubai_desc">উপসাগরীয় অঞ্চলে ব্যবহৃত একটি পদ্ধতি।</string>
+    <string name="method_moon_sighting_desc">বিষুবরেখা থেকে দূরের জায়গার জন্য তৈরি ঋতুভিত্তিক নিয়ম। ব্রিটেনের কিছু মসজিদ এটি মেনে চলে।</string>
+    <string name="method_north_america_desc">ইসলামিক সোসাইটি অব নর্থ আমেরিকা। যুক্তরাষ্ট্র ও কানাডার অনেক মসজিদে ব্যবহৃত।</string>
+    <string name="method_kuwait_desc">কুয়েতে প্রচলিত পদ্ধতি।</string>
+    <string name="method_qatar_desc">কাতারে প্রচলিত পদ্ধতি।</string>
+    <string name="method_singapore_desc">ইন্দোনেশিয়া ও সিঙ্গাপুরের সরকারি সংস্থা।</string>
+    <string name="method_turkey_desc">তুরস্কের ধর্ম বিষয়ক অধিদপ্তর, তাদের সতর্কতামূলক বাড়তি মিনিটসহ।</string>
+    <string name="method_jafari_desc">শিয়াদের প্রচলিত পদ্ধতি। মাগরিব সূর্যাস্তের একটু পরে, যখন আকাশের লালিমা চলে যায়।</string>
+    <string name="method_tehran_desc">তেহরান বিশ্ববিদ্যালয়, যার ক্যালেন্ডার অনুযায়ী ইরানের সরকারি সময় ঠিক হয়।</string>
+</resources>

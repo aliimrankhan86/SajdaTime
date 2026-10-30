@@ -14,7 +14,7 @@ import java.io.File
 class TrackerWordingTest {
 
     private val root = File("..").canonicalFile
-    private val languages = listOf("values", "values-ar", "values-ur", "values-tr", "values-in")
+    private val languages = stringFolders
 
     /** Strings and plural items, comments removed. */
     private fun strings(folder: String): Map<String, String> {

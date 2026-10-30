@@ -56,6 +56,10 @@ enum class AppLanguage(val tag: String, val nativeName: String, val englishName:
     // Choosing it turns the app right to left through AppLocale, with Western digits: its tag is
     // ar-u-nu-latn (see values-ar/strings.xml for why).
     ARABIC("ar", "العربية", "Arabic"),
+    // Added 30 Oct 2026 at the owner's request. Claude's translation, checked by Claude. Its tag is
+    // bn-u-nu-latn, Western digits, for the same reason as Arabic (values-bn/strings.xml says why).
+    // Adding a language: docs/design-system/06-content-and-language.md, "Adding a language".
+    BENGALI("bn", "বাংলা", "Bengali"),
     ;
 
     /** "اردو (Urdu)", or just "English" where the two names are the same. Not isolated: callers do that. */

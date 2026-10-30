@@ -101,6 +101,9 @@ class LargeTextAndTalkBackDeviceTest {
         val layout = layoutOf(text)
         val ends = (0 until layout.lineCount - 1).map { layout.getLineEnd(it) }
         assertFalse("\"$text\" is split inside a word, lines end at $ends", splitsAWord(text, ends))
+        // Since 30 Oct 2026 the tab labels and the city are one line that shrinks to fit, so "whole" also
+        // means not cut short: without this a single line reading "My pray…" passed (independent review).
+        assertFalse("\"$text\" ends in an ellipsis", (0 until layout.lineCount).any { layout.isLineEllipsized(it) })
     }
 
     @Test

@@ -2,7 +2,7 @@
 
 Self-contained. Read all of it before you change anything or ask Ali a question. It tells you what the app
 is, what is live, which branch to use, how the design system works, the rules that cause the most mistakes,
-and how to finish. Kept current by every session that moves the project (last updated 25 Oct 2026).
+and how to finish. Kept current by every session that moves the project (last updated 30 Oct 2026).
 
 `AGENTS.md` (loaded by Codex, Cursor and similar tools) and `CLAUDE.md` (loaded by Claude) both point here.
 
@@ -67,7 +67,9 @@ calculations in `core/` (plain Kotlin, portable to iPhone); watch in `wear/`.
   appearance (theme, language), reminders, My prayers, About (disclaimer first).
 - Also: three home screen widgets, notifications, Ramadan card and timetable, the Wear OS app and tile.
 
-Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic. Urdu and Arabic are right to left.
+Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic, Bengali (30 Oct 2026). Urdu and Arabic are right
+to left. Adding one: the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find a new
+`values-<lang>/` folder on disk and fail until it is registered. Text held to one line shrinks to fit (`shrinkToFit`).
 
 Not in 1.6, do not build without Ali: jama'ah reminder and Sunnah fast reminders (1.6.1, logic built and
 switched off), tasbih, adhan choice per prayer. Never: a missed or qada prayer counter, network for times,
@@ -127,7 +129,7 @@ Visual:
 
 Words:
 - No hyphens or em dashes in app text (except names like Eid al-Fitr). Sentence case. Never uppercase in code.
-- Every new string in all five languages in the same commit. Prayer and madhab names exactly as written.
+- Every new string in every language in the same commit. Prayer and madhab names exactly as written.
 - Never "missed", "qada", "must", "valid" for prayers; explanations end "follow your mosque".
 - The religious disclaimer is never removed or softened; its dua request is the only ask in the app.
 - No rating or sharing asks in our words (only Google's own card and the passive About rows).
@@ -152,7 +154,7 @@ Platform:
 ./gradlew clean test lint :app:bundleRelease :wear:bundleRelease
 ```
 
-- Unit test counts on 25 Oct 2026: **app 335, core 238 (1 skipped), wear 27**. If you add tests, update
+- Unit test counts on 30 Oct 2026: **app 337, core 238 (1 skipped), wear 27**. If you add tests, update
   `EXPECTED_COUNTS` in `docs/release-tools/release-1.6.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
 - Run the checks in `docs/design-system/10-new-feature-playbook.md` §6 and paste the counts. Never write
   "done", "every" or "all" without them.

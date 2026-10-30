@@ -377,7 +377,9 @@ internal fun GlassTabBar(
     val shape = RoundedCornerShape(32.dp)
     val haptics = LocalHapticFeedback.current
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        // Top, not centred (30 Oct 2026): a label on two lines made its tab taller, and centring lifted
+        // that tab's icon out of line with the other three (Bengali "আমার নামাজ" at 2.0, emulator).
+        verticalAlignment = Alignment.Top,
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .fillMaxWidth()
@@ -428,6 +430,9 @@ internal fun GlassTabBar(
                     ).scaledLineHeight(),
                     color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
+                    // Wraps between words, shrinks only while a word would split. One line that shrinks was
+                    // tried on 30 Oct 2026 and measured worse: on a 320dp phone at 2.0 "My prayers" and
+                    // "আমার নামাজ" still ended in an ellipsis at the floor (LargeTextAndTalkBackDeviceTest).
                     autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize),
                 )
             }

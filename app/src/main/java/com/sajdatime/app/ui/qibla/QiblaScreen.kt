@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.testTag
 import com.sajdatime.app.ui.theme.dialBezel
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.shrinkToFit
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
 import com.sajdatime.app.ui.theme.Motion
@@ -249,6 +250,7 @@ private fun PlaceRow(place: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            autoSize = shrinkToFit(MaterialTheme.typography.bodyMedium.fontSize),
         )
     }
 }

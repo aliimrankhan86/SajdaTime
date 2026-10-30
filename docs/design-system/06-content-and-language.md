@@ -87,6 +87,7 @@ Jumada al-Akhirah, Rajab, Shaban, Ramadan, Shawwal, Dhu al-Qadah, Dhu al-Hijjah.
 | Arabic | `values-ar` | RTL | Tag `ar-u-nu-latn` keeps Western digits |
 | Turkish | `values-tr` | LTR | Dotted and dotless i: never uppercase in code |
 | Indonesian | `values-in` | LTR | Must be `in`, not `id` (Android passes the legacy code) |
+| Bengali | `values-bn` | LTR | Tag `bn-u-nu-latn` keeps Western digits; tall script like Urdu (widget heights) |
 
 Rules:
 
@@ -98,8 +99,30 @@ Rules:
 - **Claude translates and checks its own work**; no native review (owner, 9 Oct 2026). Religious names
   and the disclaimer get extra care; the disclaimer is never softened in any language. Never tell users
   a translation awaits review.
-- **A new string** lands in all five languages in the same commit (`TranslationIntegrityTest`).
+- **A new string** lands in every language in the same commit (`TranslationIntegrityTest`).
 - **Text grows**: allow 30 to 40% longer than English in buttons and rows; never fix a width to English.
+- **Text never breaks the design in any language (owner, 30 Oct 2026, adding Bengali).** Text that can
+  wrap wraps, between whole words (`WholeWords` for the tab and theme labels). Text held to one line
+  (city name, Qibla place line, My prayers headings) shrinks until it fits before it is cut
+  (`shrinkToFit` in `ui/components/WholeWords.kt`: 60 percent, or at large text its normal size when
+  smaller). Check a new language at 1.0 and 2.0 text on every tab, on a 320dp phone too
+  (`LargeTextAndTalkBackDeviceTest`), before it ships.
+
+### Adding a language (the whole checklist)
+
+The language lists in the tests are found on disk, so most checks pick a new folder up by themselves.
+
+1. Translate `values/strings.xml` in `app`, `core` and `wear` into `values-<code>/strings.xml`. Set
+   `app_language_tag` (with `-u-nu-latn` if the language's own digits would mix with java.time's).
+   `python3 tools/check-translation.py <code> <tag>` must pass (add its plural set to `PLURALS` there).
+2. Add one line to `AppLanguage` (tag, own name, English name) and one to `res/xml/locales_config.xml`.
+3. Add the language to `TranslationIntegrityTest.languages` (tag, plurals, dua word, the six prayer
+   names) and `EidWordingTest.finePrintWords`. Both tests fail until you do. Update the picker order in
+   `LanguagePickerTest`.
+4. Right to left? It already works (AppLocale); run the RTL checks in 6.7. Tall script? Add it to
+   `TALL_SCRIPT_LANGUAGES` in `WidgetRenderer.kt`.
+5. Run the full gate, then look at every tab, a dialog, the widgets and the watch in the new language at
+   1.0 and 2.0 text; fix any line that breaks with `shrinkToFit`. Add the row to the table above.
 
 ## 6.7 Right to left
 

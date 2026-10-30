@@ -93,6 +93,7 @@ import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.review.ReviewPrompt
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.components.Bell
+import com.sajdatime.app.ui.components.shrinkToFit
 import com.sajdatime.app.ui.components.BottomBarClearance
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.components.DialogTitle
@@ -447,6 +448,8 @@ internal fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, o
                         style = MaterialTheme.typography.headlineMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
+                        // A long town name, or one in a tall script, shrinks before it is cut short.
+                        autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     Spacer(Modifier.width(2.dp))

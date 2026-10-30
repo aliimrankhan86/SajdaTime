@@ -24,8 +24,16 @@ class LanguagePickerTest {
     private fun read(path: String) = File("..", path).readText()
 
     @Test
-    fun `the picker offers English first, then Urdu, Turkish, Indonesian and Arabic`() {
-        assertEquals(listOf("en", "ur", "tr", "id", "ar"), AppLanguage.entries.map { it.tag })
+    fun `the picker offers English first, then Urdu, Turkish, Indonesian, Arabic and Bengali`() {
+        assertEquals(listOf("en", "ur", "tr", "id", "ar", "bn"), AppLanguage.entries.map { it.tag })
+    }
+
+    @Test
+    fun `every translation folder is offered in the picker`() {
+        // Words on disk that the picker does not offer could only be reached by a phone already set to them.
+        val folders = stringFolders.drop(1).map { it.removePrefix("values-").substringBefore("-r") }
+        val offered = AppLanguage.entries.filter { it != AppLanguage.ENGLISH }.map { if (it.tag == "id") "in" else it.tag }
+        assertEquals(folders.sorted(), offered.sorted())
     }
 
     @Test
@@ -96,7 +104,7 @@ class LanguagePickerTest {
         // Constants, not resources: the English name must read the same in every app language
         // (owner, 25 Oct 2026). Written out so a changed or reordered name fails here.
         assertEquals(
-            listOf("English", "Urdu", "Turkish", "Indonesian", "Arabic"),
+            listOf("English", "Urdu", "Turkish", "Indonesian", "Arabic", "Bengali"),
             AppLanguage.entries.map { it.englishName },
         )
     }
