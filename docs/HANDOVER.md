@@ -11293,10 +11293,12 @@ matters more than the stable hashes, that is the trade being made.
     measure on the narrowest phone, not the one on the desk.
 188. **A translation already reviewed is not reviewed again** (30 Oct 2026, Ali: "have a mechanism not to retest the
     translation which you have already done"). `python3 tools/translation-ledger.py` lists only the strings and store
-    listing blocks that are new or changed since the last review. Each is hashed with its English, so a changed English
-    sentence counts as changed too. Send the reviewer only that list. After it passes, run `translation-ledger.py stamp`
-    and commit `docs/translation/reviewed.json` in the same commit. Stamped first on 30 Oct 2026: 2653 units, all reviewed
-    before (app strings step by step, the 1.6.0 full descriptions by an independent back translation that night). The
-    mechanical checks (`TranslationIntegrityTest`, `check-translation.py`) are cheap and still run on every build.
-    Limit: a listing block is hashed on its own text, so if the English description changes and a translation does not,
-    the ledger stays quiet. The release day listing step catches that.
+    listing blocks that are new or changed since the last review. A string is hashed whole (text, markup, plural
+    quantities, attributes) together with its English, so a changed English sentence counts as changed too. Send the
+    reviewer only that list. After it passes, run `translation-ledger.py stamp` and commit `docs/translation/reviewed.json`
+    in the same commit. `stamp` records the whole tree, so run it only when the list holds nothing the reviewer did not
+    pass. Stamped first on 30 Oct 2026: 2653 units, all reviewed before (app strings step by step, the 1.6.0 full
+    descriptions by an independent back translation that night). `TranslationIntegrityTest` still runs on every build;
+    `check-translation.py` is run by hand. Limits: a listing block is hashed on its own text, not with its English, so if
+    the English description changes and a translation does not, the ledger stays quiet (the release day listing step
+    catches that); and only files named `strings.xml` are read.

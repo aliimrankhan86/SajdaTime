@@ -20,7 +20,9 @@ Read `CLAUDE.md` first. Then review the diff you are given (`git diff` against t
   data in simple formats, no new Android only library where a portable one does the job;
 - claims: any "done", "every" or "all" must be backed by a count you can reproduce;
 - translations: review only what `python3 tools/translation-ledger.py` lists as new or changed. The rest was
-  reviewed before (HANDOVER §15 lesson 188), so don't spend the review on it again.
+  reviewed before (HANDOVER §15 lesson 188), so don't spend the review on it again. One exception: when the
+  English store description changed, check each translated description still matches it, because the ledger
+  cannot see that.
 
 You may run read only commands and tests. Do not edit files. Output: findings ranked by severity with file and
 line and the concrete failure, then what you checked and found sound, then what you could not check.

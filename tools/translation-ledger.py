@@ -9,8 +9,10 @@ A unit is one string key in a values-<lang>/strings.xml (hashed together with it
 English source counts as changed too) or one fenced block in docs/store/LISTING-LOCALES.md (title, short
 description, full description, What's new of one language and release). Run `stamp` only after the
 reviewer agent has passed the changes `check` listed, in the same commit. A unit whose hash is in the
-ledger needs no new review; mechanical checks (TranslationIntegrityTest, check-translation.py) still run
-every time, they are cheap.
+ledger needs no new review. `stamp` records the whole tree, so run it only when `check` lists nothing the
+reviewer did not pass. Mechanical checks still run: TranslationIntegrityTest on every build,
+check-translation.py by hand. Only files named strings.xml
+are read; a translation kept in another file would go unseen.
 """
 import hashlib
 import json
@@ -30,8 +32,9 @@ def h(*parts):
 def strings(path):
     out = {}
     for el in ET.parse(path).getroot():
-        items = [el] if el.tag == "string" else list(el)
-        out[el.get("name")] = "\x01".join((i.get("quantity") or "") + "".join(i.itertext()) for i in items)
+        el.tail = None
+        # The whole element: text, markup, plural quantities and attributes such as formatted="false".
+        out[el.get("name")] = ET.tostring(el, encoding="unicode")
     return out
 
 
