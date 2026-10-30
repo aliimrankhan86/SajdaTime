@@ -13,6 +13,8 @@ from the app's own strings (`nav_tracker`, `action_timetable`, `settings_jamaah`
 Claude and back translated by the same session, by the owner's rule of 9 Oct 2026 (no native speaker review). **Not done
 here:** the independent second agent review that 1.5.0 had; that is the reviewer's job before commit.
 
+**30 Oct 2026, night: full descriptions rewritten.** The eight full descriptions were translated fresh from the whole app English Ali approved that day, not edited from 25 Oct, so the per language back translations below cover the short description and What's new only. For the full descriptions they are history. Check done instead: an independent Opus reviewer back translated every line before the HONEST heading against the English and machine checked all eight (length under 4000, 27 bullets each, HONEST and FREE byte identical, no semicolons or dashes, "SajdaTime" untouched, no tracking word for usage counts, make up words only on the fasts line). It found no meaning change; three fixes applied (French Hijri shift line, Malay widget town line, Indonesian "bulan depan"). Counts: ar 3603, ur 3975, tr 3986, id 3999, ms 3996, bn 3983, fr 3992, hi 3990. Not checked: how natural Bengali and Hindi read to a native speaker. Also not checked: Play's own count for joined Bengali and Hindi letters (every text has at least 1 character spare by Python `len`; check Play's counter when pasting). The measured counts table below is the 25 Oct text and is history too. Current counts are the ones above.
+
 Below, for each language: the back translation of every new or changed line (full description, short description and
 What's new), then notes. Unchanged lines are not repeated; they are the 1.5.0 text and its back translation stands.
 

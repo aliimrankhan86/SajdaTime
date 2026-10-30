@@ -2201,7 +2201,8 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
 Ali, 25 Oct 2026: "what we can release in this, let's just go with that ... We don't need to even add it into the
 description ... maybe we don't even need Fable to design it ... design it basic for now ... but follow the same theme".
 So it was built from existing components only, with no Fable pass and no store listing line. The two 1.6.1 reminders
-stay in 1.6.1 (alarm changes, and no fix could ship in the 18 Jan to 9 Mar release pause).
+stay in 1.6.1 (alarm changes, and no fix could ship in the 18 Jan to 9 Mar release pause). Superseded 30 Oct 2026 for
+the listing: the whole app description names it in English and all eight translations (§5.38).
 
 - **One number, 0 to 999** (`TrackerLogic.MAX_FASTS`), no reasons, no dates, no reminder, no deadline. Set in Settings,
   My prayers, "Fasts to make up" (dialog with the existing `StepperRow`); shown on the My prayers tab under the week
@@ -6065,7 +6066,17 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   rewritten. Fact fix: Bengali added to the language line in English and all eight translations, and to What's new in
   English and Bengali; the Bengali listing had said the app was not in Bengali. All within Play limits (English 3999 and
   497; Malay at exactly 4000). RELEASE-1.6.0 step 3 now says the listing is judged as the whole app on release day.
-- **Open for Ali:** whether "Fasts to make up" goes into the listing; a Bengali store picture set; the deviations record.
+- **New whole app description (later the same night):** Ali made it a hard rule (§5.38) and approved a new English
+  full description ("Yes, use it", 3986 of 4000, `LISTING.md`), which adds Fasts to make up, the My prayers details,
+  Match your mosque and the 13 methods. The bullet above ("not rewritten") is superseded. The eight translations were
+  made from it and are in `LISTING-LOCALES.md` (3603 in Arabic to 3999 in Indonesian). An independent Opus back translation review found
+  no meaning change, three small fixes applied. Not checked: how natural Bengali and Hindi read to a native speaker.
+- **Translation ledger (Ali, 30 Oct 2026: "have a mechanism not to retest the translation which you have already
+  done"):** `tools/translation-ledger.py` keeps a hash of every reviewed string (with its English) and store block in
+  `docs/translation/reviewed.json`. Run it first, review only what it lists, `stamp` after the reviewer passes. Stamped
+  today as the baseline: every shipped translation and these eight descriptions were already reviewed. The mechanical
+  checks (`TranslationIntegrityTest`, `check-translation.py`) still run every time, they cost nothing.
+- **Open for Ali:** a Bengali store picture set; the deviations record.
 
 ### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read the 1.6.0 ready block above first, then the design system block below)
 
@@ -11280,3 +11291,12 @@ matters more than the stable hashes, that is the trade being made.
     320dp phone at 2.0 "My prayers" became "My pray…": `assertWhole` only looked at line ends. It now also fails on
     `isLineEllipsized`. When text changes from wrapping to one line, add the ellipsis check in the same commit, and
     measure on the narrowest phone, not the one on the desk.
+188. **A translation already reviewed is not reviewed again** (30 Oct 2026, Ali: "have a mechanism not to retest the
+    translation which you have already done"). `python3 tools/translation-ledger.py` lists only the strings and store
+    listing blocks that are new or changed since the last review. Each is hashed with its English, so a changed English
+    sentence counts as changed too. Send the reviewer only that list. After it passes, run `translation-ledger.py stamp`
+    and commit `docs/translation/reviewed.json` in the same commit. Stamped first on 30 Oct 2026: 2653 units, all reviewed
+    before (app strings step by step, the 1.6.0 full descriptions by an independent back translation that night). The
+    mechanical checks (`TranslationIntegrityTest`, `check-translation.py`) are cheap and still run on every build.
+    Limit: a listing block is hashed on its own text, so if the English description changes and a translation does not,
+    the ledger stays quiet. The release day listing step catches that.

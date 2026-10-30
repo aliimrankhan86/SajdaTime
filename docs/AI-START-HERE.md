@@ -135,6 +135,8 @@ Words:
 - Every new string in every language in the same commit. Prayer and madhab names exactly as written.
 - "SajdaTime" is never translated or written in another script, in any language: it is the Play Store name
   (Ali, 30 Oct 2026). `TranslationIntegrityTest` and `tools/check-translation.py` fail if it is.
+- Translations already reviewed are not reviewed again: `python3 tools/translation-ledger.py` lists what is new or
+  changed, review only that, `stamp` after the reviewer passes (Ali, 30 Oct 2026).
 - Never "missed", "qada", "must", "valid" for prayers; explanations end "follow your mosque".
 - The religious disclaimer is never removed or softened; its dua request is the only ask in the app.
 - No rating or sharing asks in our words (only Google's own card and the passive About rows).
