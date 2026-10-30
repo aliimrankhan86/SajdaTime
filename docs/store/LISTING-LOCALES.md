@@ -49,7 +49,12 @@ line lost "that you control in Settings", and the privacy policy line and a few 
 sentence, the place service line (shortened, claim unchanged), every method name, "Wear OS" in Latin. **HONEST and FREE
 are byte for byte the 1.5.0 text in every language** (checked by script: the 1.6.0 block ends with exactly the 1.5.0
 block's text from the HONEST heading on). Indonesian, Malay and French still leave out the far north bullet. Malay,
-Bengali, French and Hindi still say the app itself is in English, Arabic, Urdu, Turkish and Indonesian.
+French and Hindi still say the app itself is not in their language. **30 Oct 2026, Bengali joined the app:** every
+language line now names Bengali; the Bengali listing's line no longer says "not in Bengali" (it had become false) and
+its What's new opens "অ্যাপ এখন বাংলায়।" (the app is now in Bengali), "প্রতিদিনের কার্ডে" cut to fit, as in English. To fit,
+Turkish "telefonun dilini izler" became "telefonu izler", Malay "Turki dan" became "Turki," and "dalam" "di", French
+"L'appli est en" became "Appli en" and "pas en" "sans". Other What's new texts unchanged (Bengali matters to their readers
+less than the 500 limit allows).
 
 **Titles are unchanged.** Short descriptions add the tracker in each market's own word, with no price or promotion word;
 "private" is untested in this field, as in English, so if Play shows the "may not be promoted" notice, go back to that
@@ -65,14 +70,14 @@ Python `len`, newlines counted, no final newline. Check Play's own counter when 
 
 | Language | Title | Short | Full | What's new |
 |---|---|---|---|---|
-| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3742 / 4000 | 459 / 500 |
-| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3980 / 4000 | 494 / 500 |
-| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3991 / 4000 | 498 / 500 |
-| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3985 / 4000 | 496 / 500 |
-| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3997 / 4000 | 494 / 500 |
-| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3987 / 4000 | 490 / 500 |
-| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3998 / 4000 | 500 / 500 |
-| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3989 / 4000 | 499 / 500 |
+| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3753 / 4000 | 459 / 500 |
+| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3988 / 4000 | 494 / 500 |
+| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3993 / 4000 | 498 / 500 |
+| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3994 / 4000 | 496 / 500 |
+| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 4000 / 4000 | 494 / 500 |
+| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3968 / 4000 | 490 / 500 |
+| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3999 / 4000 | 500 / 500 |
+| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3998 / 4000 | 499 / 500 |
 
 ### Arabic (ar), 1.6.0
 
@@ -88,7 +93,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 أوقات الصلاة والأذان والقبلة بدون نت، ومتتبّع خاص للصلاة، مع Wear OS.
 ```
 
-**Full description** `3742 / 4000` (1.5.0 was 3525)
+**Full description** `3753 / 4000` (30 Oct 2026, Bengali added; was 3742) (1.5.0 was 3525)
 ```
 يمنحك SajdaTime مواقيت الصلاة وتنبيهات الأذان وبوصلة تحدد اتجاه القبلة، للمسلمين من السنة والشيعة، على هاتف أندرويد وساعة Wear OS. بلا إعلانات، وبلا حساب، وتعمل مواقيت الصلاة بدون إنترنت.
 
@@ -128,7 +133,7 @@ SajdaTime: مواقيت الصلاة، قبلة
 
 للجميع
 
-• الإنجليزية والعربية والأردية والتركية والإندونيسية، تختار اللغة في التطبيق أو يتبع لغة هاتفك
+• الإنجليزية والعربية والأردية والبنغالية والتركية والإندونيسية، تختار اللغة في التطبيق أو يتبع لغة هاتفك
 • مظهر فاتح وآخر داكن. ويعمل مع الخط الكبير وقارئات الشاشة
 
 مصمَّم وفق مذهبك
@@ -183,7 +188,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 آف لائن اوقات نماز، اذان، قبلہ اور نجی نماز ٹریکر، سنی و شیعہ، Wear OS ایپ۔
 ```
 
-**Full description** `3980 / 4000` (1.5.0 was 3961)
+**Full description** `3988 / 4000` (30 Oct 2026, Bengali added; was 3980) (1.5.0 was 3961)
 ```
 آپ کے فون اور Wear OS گھڑی پر SajdaTime سنی اور شیعہ مسلمانوں کو نماز کے اوقات، اذان کے الرٹ اور قبلہ نما دیتی ہے۔ نہ اشتہارات، نہ اکاؤنٹ، اور نماز کے اوقات آپ کے اپنے فون پر ہی نکالے جاتے ہیں، اس لیے آف لائن اور سگنل نہ ہونے پر بھی کام کرتے ہیں۔
 
@@ -221,7 +226,7 @@ SajdaTime: نماز کے اوقات، قبلہ
 
 سب کے لیے
 
-• انگریزی، عربی، اردو، ترکی اور انڈونیشی، ایپ میں منتخب کریں یا فون کی زبان کے مطابق
+• انگریزی، عربی، اردو، بنگالی، ترکی اور انڈونیشی، ایپ میں منتخب کریں یا فون کی زبان کے مطابق
 • روشن اور گہرا تھیم۔ بڑے حروف اور اسکرین ریڈر کے ساتھ کام کرتی ہے
 
 آپ کے مسلک کے مطابق
@@ -275,7 +280,7 @@ SajdaTime: Namaz Vakitleri
 İnternetsiz namaz vakitleri, ezan, kıble ve size özel namaz takibi. Wear OS ile.
 ```
 
-**Full description** `3991 / 4000` (1.5.0 was 3974)
+**Full description** `3993 / 4000` (30 Oct 2026, Bengali added; was 3991) (1.5.0 was 3974)
 ```
 SajdaTime, Sünni ve Şii Müslümanlara telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan vakti uyarıları ve kıble pusulası sunar. Reklam yok, hesap yok. Vakitler telefonunuzda hesaplanır, bu yüzden internetsiz, sinyal yokken de çalışır.
 
@@ -313,7 +318,7 @@ WIDGET'LAR VE WEAR OS
 
 HERKES İÇİN
 
-• Türkçe, İngilizce, Arapça, Urduca ve Endonezce, uygulamadan seçilir ya da telefonun dilini izler
+• Türkçe, İngilizce, Arapça, Urduca, Bengalce ve Endonezce, uygulamadan seçilir ya da telefonu izler
 • Açık ve koyu tema. Büyük yazı ve ekran okuyucularla uyumlu
 
 MEZHEBİNİZE GÖRE HAZIRLANDI
@@ -367,7 +372,7 @@ SajdaTime: Jadwal Sholat
 Jadwal sholat offline, adzan, arah kiblat, dan pencatat sholat pribadi. Wear OS.
 ```
 
-**Full description** `3985 / 4000` (1.5.0 was 3980)
+**Full description** `3994 / 4000` (30 Oct 2026, Bengali added; was 3985) (1.5.0 was 3980)
 ```
 SajdaTime menyajikan jadwal sholat (salat), pengingat adzan, dan kompas arah kiblat bagi Muslim Sunni dan Syiah di ponsel dan jam tangan Wear OS. Tanpa iklan, tanpa akun, dan waktu dihitung di ponsel Anda, jadi tetap jalan offline.
 
@@ -405,7 +410,7 @@ WIDGET DAN WEAR OS
 
 UNTUK SEMUA
 
-• Bahasa Indonesia, Inggris, Arab, Urdu, dan Turki, pilih di aplikasi atau ikut ponsel
+• Bahasa Indonesia, Inggris, Arab, Urdu, Bengali, dan Turki, pilih di aplikasi atau ikut ponsel
 • Tema terang dan gelap, teks besar, dan pembaca layar
 
 SESUAI MAZHAB ANDA
@@ -458,7 +463,7 @@ SajdaTime: Waktu Solat, Kiblat
 Waktu solat, azan, arah kiblat dan penjejak solat peribadi, juga di Wear OS.
 ```
 
-**Full description** `3997 / 4000` (1.5.0 was 3979)
+**Full description** `4000 / 4000` (30 Oct 2026, Bengali added; was 3997) (1.5.0 was 3979)
 ```
 SajdaTime memberi waktu solat, peringatan azan dan kompas arah kiblat untuk Muslim Sunni dan Syiah di telefon dan jam tangan Wear OS. Tiada iklan, tiada akaun, dan waktu dikira di telefon anda, jadi berfungsi luar talian.
 
@@ -496,7 +501,7 @@ WIDGET DAN WEAR OS
 
 UNTUK SEMUA
 
-• Bahasa aplikasi: Inggeris, Arab, Urdu, Turki dan Indonesia (tiada Melayu), pilih dalam aplikasi atau ikut telefon
+• Bahasa aplikasi: Inggeris, Arab, Urdu, Bengali, Turki, Indonesia (tiada Melayu), pilih di aplikasi atau ikut telefon
 • Tema cerah dan gelap, teks besar dan pembaca skrin
 
 MENGIKUT MAZHAB ANDA
@@ -549,7 +554,7 @@ SajdaTime: নামাজের সময়সূচি
 অফলাইন নামাজের সময়, আজান, কিবলা কম্পাস ও ব্যক্তিগত নামাজ ট্র্যাকার, Wear OS
 ```
 
-**Full description** `3987 / 4000` (1.5.0 was 3965)
+**Full description** `3968 / 4000` (30 Oct 2026, Bengali added; was 3987) (1.5.0 was 3965)
 ```
 SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের (সালাত) সময়সূচি, আজানের অ্যালার্ট ও কিবলা কম্পাস নিয়ে আসে, আপনার ফোন ও Wear OS ঘড়িতে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না, আর সময় আপনার ফোনেই হিসাব হয়, তাই অফলাইনে, নেটওয়ার্ক না থাকলেও চলে।
 
@@ -587,7 +592,7 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 
 সবার জন্য
 
-• অ্যাপটি নিজে ইংরেজি, আরবি, উর্দু, তুর্কি ও ইন্দোনেশীয় ভাষায়, বাংলায় নয়। ভাষা অ্যাপে বেছে নিন বা ফোন অনুযায়ী
+• বাংলা, ইংরেজি, আরবি, উর্দু, তুর্কি ও ইন্দোনেশীয় ভাষায়। ভাষা অ্যাপে বেছে নিন বা ফোন অনুযায়ী
 • লাইট ও ডার্ক থিম, বড় লেখা ও স্ক্রিন রিডার
 
 আপনার মাযহাব অনুযায়ী তৈরি
@@ -624,7 +629,7 @@ SajdaTime একটি সহায়ক, কোনো ধর্মীয় �
 
 **What's new** `490 / 500`
 ```
-আমার নামাজ: আপনার নামাজের ব্যক্তিগত রেকর্ড, এই সপ্তাহ ও গত ৩০ দিন, ফোনেই রাখা। প্রতিটি নামাজের ঘণ্টা তার অ্যালার্ট চালু বা বন্ধ করে। সময়সূচি: এই মাস ও পরের মাস, প্রতিদিনের কার্ডে, PDF সেভের সুবিধাসহ। প্রতিটি নামাজের নিচে আপনার মসজিদের জামাত ও জুমার সময় যোগ করুন। হিজরি তারিখ খুললে বছরের ইসলামি তারিখগুলো দেখা যায়। কিবলা এখন বলে দেয় আগে কোন দিকে ঘুরবেন। সময়ের স্ক্রিন ও পরের নামাজের উইজেট দিনের কোন সময় তা দেখায়। পাঁচ ওয়াক্তের উইজেট সারি। মসজিদের সঙ্গে অমিল হলে মসজিদকেই অনুসরণ করুন।
+অ্যাপ এখন বাংলায়। আমার নামাজ: আপনার নামাজের ব্যক্তিগত রেকর্ড, এই সপ্তাহ ও গত ৩০ দিন, ফোনেই রাখা। প্রতিটি নামাজের ঘণ্টা তার অ্যালার্ট চালু বা বন্ধ করে। সময়সূচি: এই মাস ও পরের মাস, PDF সেভের সুবিধাসহ। প্রতিটি নামাজের নিচে আপনার মসজিদের জামাত ও জুমার সময় যোগ করুন। হিজরি তারিখ খুললে বছরের ইসলামি তারিখগুলো দেখা যায়। কিবলা এখন বলে দেয় আগে কোন দিকে ঘুরবেন। সময়ের স্ক্রিন ও পরের নামাজের উইজেট দিনের কোন সময় তা দেখায়। পাঁচ ওয়াক্তের উইজেট সারি। মসজিদের সঙ্গে অমিল হলে মসজিদকেই অনুসরণ করুন।
 ```
 
 ### French (fr-FR), 1.6.0
@@ -641,7 +646,7 @@ SajdaTime: Horaires de prière
 Heures de prière hors ligne, adhan, Qibla et suivi privé des prières. Wear OS
 ```
 
-**Full description** `3998 / 4000` (1.5.0 was 3982)
+**Full description** `3999 / 4000` (30 Oct 2026, Bengali added; was 3998) (1.5.0 was 3982)
 ```
 SajdaTime : horaires de prière (salat), alertes d'adhan et boussole Qibla pour sunnites et chiites, sur téléphone et montre Wear OS. Sans pub ni compte ; horaires calculés sur le téléphone, donc hors ligne.
 
@@ -679,7 +684,7 @@ WIDGETS ET WEAR OS
 
 POUR TOUS
 
-• L'appli est en anglais, arabe, ourdou, turc et indonésien (pas en français), au choix ou selon le téléphone
+• Appli en anglais, arabe, ourdou, bengali, turc et indonésien (sans français), au choix ou selon le téléphone
 • Thèmes clair et sombre, texte agrandi et lecteurs d'écran
 
 ADAPTÉ À VOTRE ÉCOLE
@@ -732,7 +737,7 @@ SajdaTime: नमाज़ का समय
 ऑफ़लाइन नमाज़ का समय, अज़ान, किबला और निजी नमाज़ ट्रैकर, सुन्नी और शिया, Wear OS
 ```
 
-**Full description** `3989 / 4000` (1.5.0 was 3978)
+**Full description** `3998 / 4000` (30 Oct 2026, Bengali added; was 3989) (1.5.0 was 3978)
 ```
 SajdaTime सुन्नी और शिया मुसलमानों के लिए नमाज़ का समय, अज़ान अलर्ट और क़िबला कम्पास देता है, आपके फ़ोन और Wear OS घड़ी पर। कोई विज्ञापन नहीं, कोई खाता नहीं, और नमाज़ का समय आपके अपने फ़ोन पर ही निकलता है, इसलिए ऑफ़लाइन, बिना सिग्नल के भी मिलता है।
 
@@ -770,7 +775,7 @@ SajdaTime सुन्नी और शिया मुसलमानों क
 
 सबके लिए
 
-• ऐप ख़ुद अंग्रेज़ी, अरबी, उर्दू, तुर्की और इंडोनेशियाई में है, हिंदी में नहीं। भाषा ऐप में चुनें या फ़ोन के हिसाब से
+• ऐप ख़ुद अंग्रेज़ी, अरबी, उर्दू, बांग्ला, तुर्की और इंडोनेशियाई में है, हिंदी में नहीं। भाषा ऐप में चुनें या फ़ोन के हिसाब से
 • लाइट और डार्क थीम, बड़े अक्षर और स्क्रीन रीडर
 
 आपके मसलक के लिए बना

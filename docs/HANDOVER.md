@@ -6039,8 +6039,20 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   Opus review of the last: **merge only after fixes**; its conclusions are wrong in places (it calls the deliberate
   `#0E6B4F` icon green a deviation against 02-foundations; says the Settings consent dialog clips "No thanks" when it
   scrolls; gives a false reason, DesignTokensTest, for living outside the design system folder; edits a history block).
-  Not merged. Deleting the finished branches and the four extra worktrees waits for Ali's yes; nothing was deleted.
-- **Open for Ali:** What's new and the description do not mention Bengali; deleting old branches; the deviations record.
+  Not merged.
+- **Branches tidied (Ali, 30 Oct 2026: "delete the old branches which we are not using and could cause confusion ... As
+  long as we have everything merged and in our one branch"):** left are `main` (1.5.0), `claude/1-6-0` (all of 1.6.0)
+  and `deepseek/ds-deviations-record` (kept until fixed). 27 local and 31 GitHub branches deleted, every one already
+  inside `claude/1-6-0` except the two dropped on purpose, kept as tags `archive/analytics-default-on-1-4-0` and
+  `archive/customer-review-pain-points-9d35kl`. Tag `v1.5.0` marks `main` as live. The four extra worktrees
+  (`../SajdaTime-1-6-0`, `../SajdaTime-1-6-plan`, `../SajdaTime-settings-preview`, `.claude/worktrees/kind-kirch-cf2a70`)
+  were removed; none had uncommitted work. Branch names in older blocks are history.
+- **Store listing (Ali, 30 Oct 2026: "a proper release, not just the update ... highlight everything our app has to
+  offer"):** the 1.6.0 full description already describes the whole app (written that way on 25 Oct), so it was not
+  rewritten. Fact fix: Bengali added to the language line in English and all eight translations, and to What's new in
+  English and Bengali; the Bengali listing had said the app was not in Bengali. All within Play limits (English 3999 and
+  497; Malay at exactly 4000). RELEASE-1.6.0 step 3 now says the listing is judged as the whole app on release day.
+- **Open for Ali:** whether "Fasts to make up" goes into the listing; a Bengali store picture set; the deviations record.
 
 ### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read the 1.6.0 ready block above first, then the design system block below)
 
@@ -6071,7 +6083,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   Bengali; the Next prayer widget; TalkBack speaking Bengali; dark theme in Bengali. The Today widget's Hijri line can
   still end in "…" for a long Bengali month at 4 by 4 (it is at its 9sp floor, Ali's earlier choice). The watch's own
   clock at the top shows Bengali digits (drawn by Wear OS, not the app).
-- **Open for Ali:** the 1.6.0 What's new and description do not mention Bengali (the Bengali store listing itself was
+- **Open for Ali (closed 30 Oct 2026, see the block above: Bengali now in every listing):** the 1.6.0 What's new and description did not mention Bengali (the Bengali store listing itself was
   already among the eight translated listings). Store pictures have no Bengali set; Play shows the English ones.
 - **Next:** unchanged; release day when Ali says so (`RELEASE-1.6.0.md`, PR by 11 Dec, submit by 15 Dec 2026).
 

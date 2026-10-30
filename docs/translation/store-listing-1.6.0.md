@@ -368,3 +368,13 @@ The whole diff review found the timetable bullet promised a PDF of next month; t
 - hi: "Timetable of this month and next month. Save today, 7 days, the month or Ramadan in PDF."
 "or print" was dropped everywhere for room; printing is the phone's own step after saving. Full descriptions now: ar 3742, ur 3980, tr 3991, id 3985, ms 3997, bn 3987, fr 3998, hi 3989, English 3990 (all under 4000).
 Indonesian and Malay say "sebulan" (a month) for "the month": deliberate, Malay has 3 characters of room and "bulan ini" needs about 3 more; the meaning (one month's timetable) holds.
+
+
+## 30 Oct 2026: Bengali added to every 1.6.0 listing
+
+Bengali became the app's sixth language, so each language's line naming the app's languages now includes it (البنغالية,
+بنگالی, Bengalce, Bengali, bengali, বাংলা, बांग्ला), the Bengali line no longer says the app is not in Bengali, and the English
+and Bengali What's new add that the app is now in Bengali. Small cuts to fit are listed in `LISTING-LOCALES.md`. Checked
+by an independent Opus review for meaning, grammar and length (all within limits, Malay at exactly 4000: check Play's
+counter). Not back translated line by line like the rest of this file; the counts table above is from 25 Oct and the
+current counts are in `LISTING-LOCALES.md`.

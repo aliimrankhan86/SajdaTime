@@ -22,7 +22,9 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
 ## Already done (25 Oct 2026, step 11; HANDOVER §11 STATE OF PLAY)
 
 - English listing: `docs/store/LISTING.md`, "1.6.0 listing, 25 Oct 2026": short description (80), full description
-  (3990), What's new (494). Ali chose all four recommendations, the Chrome and Edge line is gone.
+  (3999), What's new (497). Ali chose all four recommendations, the Chrome and Edge line is gone. 30 Oct 2026: Bengali
+  added to the language line and What's new in English and the eight translations (the Bengali listing had said the
+  app was not in Bengali).
 - Eight translated listings with their What's new: `docs/store/LISTING-LOCALES.md`, "1.6.0 listings"; independent
   back translation review done; record `docs/translation/store-listing-1.6.0.md`.
 - 24 store pictures, approved by Ali 25 Oct 2026: `docs/store/upload/phone/<en-GB|ar|ur|tr-TR|id-ID>/`.
@@ -47,6 +49,12 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
    longer matches (`STORE_SHOTS=1` on `sajdastore`, or by hand as `docs/store/upload/README.md` says), then show Ali.
 3. **Claude:** read the full description and What's new against the final build once more, line by line. A fact that is
    no longer true is corrected (with the eight translations); any other wording change goes to Ali first.
+   **Ali, 30 Oct 2026: "It has to be a proper release, not just the update related release. It should mention and
+   highlight everything our app has to offer ... Even if screenshots needs updating, we will do that."** So on release
+   day the listing is judged as the whole app's shop window, not as an update note: every feature the build has is
+   either in the full description or left out on purpose (today only "Fasts to make up", Ali's 25 Oct choice; ask him
+   again then), the eight translations match, and the pictures show the current screens. Bengali has no store picture
+   set of its own (Play shows the English ones); offer Ali one taken on `sajdastore` in Bengali.
 
 ## Release day, in order
 

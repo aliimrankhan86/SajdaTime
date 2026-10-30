@@ -247,7 +247,8 @@ notice appears.
 Offline prayer times (namaz), adhan, Qibla and a private salah tracker. Wear OS.
 ```
 
-**Full description** `3990 / 4000` (Python `len`, newlines counted, no final newline). New: the MY PRAYERS AND YOUR
+**Full description** `3999 / 4000` (Python `len`, newlines counted, no final newline; was 3990 until Bengali joined the
+language line on 30 Oct 2026, a fact correction under RELEASE-1.6.0 step 3). New: the MY PRAYERS AND YOUR
 MOSQUE section (tracker, jama'ah and Jumu'ah, bell), the Islamic dates of the year, the two month Timetable, the five prayer
 strip. Applied to the 1.5.0 text this came to 4297, so lines were shortened: the "Namaz, salah or salat" paragraph folded
 into the first sentence, "wherever you are", "as day cards", "typed in once", "for your location", "Home screen", "matching
@@ -293,7 +294,7 @@ WIDGETS AND WEAR OS
 
 FOR EVERYONE
 
-• English, Arabic, Urdu, Turkish and Indonesian, chosen in the app or by your phone
+• English, Arabic, Urdu, Bengali, Turkish and Indonesian, chosen in the app or by your phone
 • Light and dark themes, large text and screen readers
 
 BUILT FOR YOUR SCHOOL OF THOUGHT
@@ -328,14 +329,14 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-**What's new, 1.6.0** `494 / 500`. Every claim checked against the branch by the plan verifier: My prayers and Last 30
+**What's new, 1.6.0** `497 / 500` (30 Oct 2026: "Now in Bengali." added, "as day cards" cut to fit; was 494). Every claim checked against the branch by the plan verifier: My prayers and Last 30
 days, the bell, the two month Timetable with Save as PDF, jama'ah and Jumu'ah typed by the user ("add" says they are theirs,
 never a feed), the Islamic dates sheet from the Hijri date, the Qibla turn sentence, the skies on Times and the Next prayer
-widget only, the strip. Left out: the Shia dates, the disclaimer move (not a feature), the languages (unchanged). The closing
+widget only, the strip. Left out: the Shia dates, the disclaimer move (not a feature). The closing
 sentence is the 1.5.0 one.
 
 ```
-My prayers: a private record of your prayers, this week and the last 30 days, kept on your phone. A bell on each prayer turns its alert on or off. Timetable: this month and next as day cards, with Save as PDF. Add your mosque's jama'ah and Jumu'ah times under each prayer. The Hijri date opens the Islamic dates of the year. Qibla now says which way to turn first. Times and the next prayer widget show the time of day. A five prayer widget strip. Where your mosque differs, follow your mosque.
+My prayers: a private record of your prayers, this week and the last 30 days, kept on your phone. A bell on each prayer turns its alert on or off. Timetable: this month and next, with Save as PDF. Add your mosque's jama'ah and Jumu'ah times under each prayer. The Hijri date opens the Islamic dates of the year. Qibla now says which way to turn first. Times and the next prayer widget show the time of day. A five prayer widget strip. Now in Bengali. Where your mosque differs, follow your mosque.
 ```
 
 ### 1.5.0 listing, LIVE since 23 Oct 2026 (public page "Updated on 23 Oct 2026", checked 25 Oct 2026; superseded by 1.6.0 on its release day) (short description, full description, watch note)
