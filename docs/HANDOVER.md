@@ -2220,6 +2220,17 @@ stay in 1.6.1 (alarm changes, and no fix could ship in the 18 Jan to 9 Mar relea
   both phrases. No usage-count event.
 - **Not done, deliberately:** bulk entry (one step at a time; a repeating long press is the cheap upgrade if asked).
 
+### 5.37 The app's name is never translated (Ali, 30 Oct 2026)
+
+Ali: "for every user, the name should remain the same because that's the name you have in Play Store ...
+S-A-J-D-A-T-I-M-E." Every language writes "SajdaTime" in Latin letters wherever the English does: the launcher
+label, the watch app name, widget names, the disclaimer, About, every sentence that names it, and every store
+title ("SajdaTime: ..."). Never সাজদাটাইম, سجدہ ٹائم, "Sajda Time" or a local translation. Checked 30 Oct 2026: all
+five translations already had it right in all three modules. Enforced by `TranslationIntegrityTest` ("SajdaTime is
+never translated or transliterated": the count per string, plural and array must equal the English) and by
+`tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
+failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -6000,7 +6011,38 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read this first, then the design system block below)
+### 📍 1.6.0 READY AND WAITING FOR RELEASE DAY, 30 Oct 2026, night (read this first, then the Bengali block below)
+
+- **Ali, 30 Oct 2026:** "record and remember everything for release 1.6 ... we should be ready to go soon ... only the
+  work which has the latest work and the complete work should remain ... the Ramadan functionality only enables when
+  Ramadan starts and disable itself when Ramadan stops. And Eid greeting ... confirm and check if that's there."
+- **State:** `claude/1-6-0` holds all of 1.6.0 and is the only branch with unreleased work. `main` = 1.5.0 (live since
+  23 Oct 2026). Release day unchanged: when Ali says so, by `docs/release-tools/RELEASE-1.6.0.md` (PR by 11 Dec,
+  submit by 15 Dec 2026). Full gate green on this commit: app 338, core 238 (1 skipped), wear 27, 0 failed; lint 0
+  errors; both release bundles built.
+- **App name rule added (§5.37):** "SajdaTime" never translated; already true in all five translations; now tested.
+- **Language list (checked, no change):** every language already shows its own name with its English name under it
+  (Ali's 25 Oct choice). Ali, asked whether the setup globe button should add the English name too: "No".
+- **Ramadan switches itself on and off (checked in code and tests, no change):** `RamadanState.build` is null outside
+  Ramadan and the notice window (3 days before day 1 to day 2), so the Times screen shows nothing of Ramadan the rest
+  of the year; the Ramadan Timetable view only while `isRamadan`; the PDF option from 30 days before to the last day;
+  suhoor reminders are planned only for Ramadan dates (`SuhoorReminderPlan`, `HijriCalendar.isRamadan`), so they stop
+  after the last day by themselves. All on the user's own Hijri date shift. Tests: `RamadanStateTest` ("the state exists
+  from 3 days before to the last day and not otherwise"), `RamadanGoldenTest`, `RamadanTimetableTest`, `RamadanPdfRangeTest`.
+- **Eid greeting is there (checked, no change):** `EidCard.kt`, shown on 1 Shawwal and 10 Dhul Hijjah of the user's own
+  calendar, gone at midnight, once closed never back for that Eid, independent of the Ramadan switch. `EidTest`
+  (2027: 9 March and 16 May; 2028: 26 February and 5 May) and `EidWordingTest` in all six languages.
+- **Branches audited (30 Oct 2026):** every local and remote branch except three is already wholly inside `claude/1-6-0`.
+  The three: `claude/analytics-default-on-1-4-0` (on by default usage counts, reversed by Ali 4 Oct 2026, never
+  merge); `claude/customer-review-pain-points-9d35kl` (rebuilt into 1.5.0 on 19 Oct, deliberately not merged, §11
+  history); `deepseek/ds-deviations-record` (pictures and locations of the 22 design deviations, Ali's request 25 Oct).
+  Opus review of the last: **merge only after fixes**; its conclusions are wrong in places (it calls the deliberate
+  `#0E6B4F` icon green a deviation against 02-foundations; says the Settings consent dialog clips "No thanks" when it
+  scrolls; gives a false reason, DesignTokensTest, for living outside the design system folder; edits a history block).
+  Not merged. Deleting the finished branches and the four extra worktrees waits for Ali's yes; nothing was deleted.
+- **Open for Ali:** What's new and the description do not mention Bengali; deleting old branches; the deviations record.
+
+### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read the 1.6.0 ready block above first, then the design system block below)
 
 - **Ali, 30 Oct 2026:** "implement another language bengali ... any text is overlapping or feel like breaking the design
   then shrink the text or lower its size enough to fit on the screen ... Use i18n to make it easy to add any further

@@ -130,6 +130,8 @@ Visual:
 Words:
 - No hyphens or em dashes in app text (except names like Eid al-Fitr). Sentence case. Never uppercase in code.
 - Every new string in every language in the same commit. Prayer and madhab names exactly as written.
+- "SajdaTime" is never translated or written in another script, in any language: it is the Play Store name
+  (Ali, 30 Oct 2026). `TranslationIntegrityTest` and `tools/check-translation.py` fail if it is.
 - Never "missed", "qada", "must", "valid" for prayers; explanations end "follow your mosque".
 - The religious disclaimer is never removed or softened; its dua request is the only ask in the app.
 - No rating or sharing asks in our words (only Google's own card and the passive About rows).
@@ -154,7 +156,7 @@ Platform:
 ./gradlew clean test lint :app:bundleRelease :wear:bundleRelease
 ```
 
-- Unit test counts on 30 Oct 2026: **app 337, core 238 (1 skipped), wear 27**. If you add tests, update
+- Unit test counts on 30 Oct 2026: **app 338, core 238 (1 skipped), wear 27**. If you add tests, update
   `EXPECTED_COUNTS` in `docs/release-tools/release-1.6.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
 - Run the checks in `docs/design-system/10-new-feature-playbook.md` §6 and paste the counts. Never write
   "done", "every" or "all" without them.

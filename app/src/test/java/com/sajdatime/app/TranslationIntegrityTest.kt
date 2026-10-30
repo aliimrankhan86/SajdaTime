@@ -120,6 +120,28 @@ class TranslationIntegrityTest {
     }
 
     @Test
+    fun `SajdaTime is never translated or transliterated`() {
+        // Owner, 30 Oct 2026: the name stays "SajdaTime" for every user, because that is the name on
+        // Google Play and the one people search. So every string that names it in English names it the
+        // same way, in Latin letters, in every language: never সাজদাটাইম, سجدہ ٹائم or "Sajda Time".
+        // Cannot see a transliteration added beside the Latin name, or in a string whose English has none.
+        fun names(r: Res) = when (r) {
+            is Res.Str -> count(r.text, "SajdaTime")
+            is Res.Plural -> r.items.values.maxOfOrNull { count(it, "SajdaTime") } ?: 0
+            is Res.Arr -> r.items.sumOf { count(it, "SajdaTime") }
+        }
+        val problems = mutableListOf<String>()
+        forEachTranslation { q, _, m, src, tr, _ ->
+            for ((key, res) in src) {
+                val want = names(res)
+                val got = names(tr[key] ?: continue)
+                if (want > 0 && got != want) problems += "$m/values-$q $key names SajdaTime $got times, English $want"
+            }
+        }
+        assertEquals(emptyList<String>(), problems)
+    }
+
+    @Test
     fun `placeholders, plural forms, line breaks, bullets and list lengths match the source`() {
         val problems = mutableListOf<String>()
         forEachTranslation { q, lang, m, src, tr, skip ->

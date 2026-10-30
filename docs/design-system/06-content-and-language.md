@@ -115,6 +115,8 @@ The language lists in the tests are found on disk, so most checks pick a new fol
 1. Translate `values/strings.xml` in `app`, `core` and `wear` into `values-<code>/strings.xml`. Set
    `app_language_tag` (with `-u-nu-latn` if the language's own digits would mix with java.time's).
    `python3 tools/check-translation.py <code> <tag>` must pass (add its plural set to `PLURALS` there).
+   Keep "SajdaTime" in Latin letters wherever the English has it, never translated or spelt in the
+   language's script: it is the Google Play name people search for (Ali, 30 Oct 2026). Both checks enforce it.
 2. Add one line to `AppLanguage` (tag, own name, English name) and one to `res/xml/locales_config.xml`.
 3. Add the language to `TranslationIntegrityTest.languages` (tag, plurals, dua word, the six prayer
    names) and `EidWordingTest.finePrintWords`. Both tests fail until you do. Update the picker order in

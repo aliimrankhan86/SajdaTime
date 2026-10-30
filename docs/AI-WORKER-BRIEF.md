@@ -89,7 +89,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 Last full gate (25 Oct 2026): core 238 tests (1 skipped), app 323, wear 27, 0 failed, lint 0 errors. Since then
 `DesignTokensTest` added 12 app tests (app 335; design system in `docs/design-system/`), and Bengali (30 Oct 2026) two more:
-app 337. A change that
+app 338. A change that
 adds tests moves these numbers; `docs/release-tools/release-1.6.0.sh` holds them in `EXPECTED_COUNTS`.
 
 **Device tests** run on an emulator with `am instrument`, never `connectedAndroidTest` (that uninstalls the app). Run
