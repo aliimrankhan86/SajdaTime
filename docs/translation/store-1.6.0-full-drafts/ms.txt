@@ -1,0 +1,65 @@
+SajdaTime memberi waktu solat, peringatan azan, kompas kiblat dan penjejak solat peribadi untuk Muslim Sunni dan Syiah di telefon dan jam Wear OS.
+Dikira di telefon, tidak perlu isyarat. Tiada iklan, tiada akaun.
+
+WAKTU SOLAT DAN KIBLAT
+
+• Subuh, Syuruk, Zohor, Asar, Maghrib dan Isyak, kiraan detik langsung dan langit ikut waktu hari
+• Tarikh Hijrah (kalendar Islam) dan tarikh Islam setahun, termasuk Syiah
+• Arah kiblat: kompas utara benar, tunjuk arah pusing, bergetar apabila menghadap Kaabah
+• Jadual bulan ini dan bulan depan. Simpan hari ini, 7 hari, sebulan atau Ramadan dalam PDF
+
+PERINGATAN DAN AZAN
+
+• Tiap solat: tiada, pemberitahuan atau penggera cukup kuat untuk Subuh, walau aplikasi ditutup. Boleh bunyi ketika senyap
+• Azan Sunni dan Syiah, atau sebarang bunyi telefon
+• Peringatan lembut 5 hingga 30 minit sebelum solat dipilih, dan pemberitahuan senyap solat seterusnya
+• Loceng di tiap solat: hidup atau matikan peringatan
+
+SOLAT SAYA
+
+• Peribadi: tanda solat yang didirikan, lihat minggu dalam bulatan, 30 hari dalam kalendar
+• Ia merekod, tidak pernah menghakimi. Rentetan hari pilihan, Jeda dan fail untuk telefon baharu
+• Puasa ganti: satu kiraan, tolak satu tiap kali diganti
+
+RAMADAN DAN HARI RAYA
+
+• Sahur dan berbuka, kiraan detik, tempoh puasa, jadual Ramadan dan ucapan Aidilfitri dan Aidiladha
+• Peringatan sahur 15 hingga 60 minit sebelum tamatnya, hidup secara lalai dalam Ramadan
+
+WIDGET DAN WEAR OS
+
+• Tiga widget: kiraan detik besar dan waktu hari ini (dengan nama bandar) dan lima waktu sebaris
+• Aplikasi, tile dan kiblat Wear OS, ikut telefon atau berdiri sendiri
+
+UNTUK SEMUA
+
+• Bahasa aplikasi: Inggeris, Arab, Urdu, Bengali, Turki, Indonesia (tiada Melayu), pilih di aplikasi atau ikut telefon
+• Tema cerah dan gelap, teks besar dan pembaca skrin
+
+MAZHAB ANDA, MASJID ANDA
+
+• Sunni: Hanafi, Syafie, Maliki dan Hanbali, tiap satu dengan kaedah Asar yang betul
+• Syiah: Jafari / Ithna Asyari, dengan kaedah Maghrib yang betul
+• 13 kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari dan Tehran, ikut mazhab anda. Subuh dan Isyak munasabah di jauh utara
+• Waktu berjemaah (iqamah) dan Jumaat masjid anda di bawah tiap solat
+• Ikut masjid anda: alih solat hingga 30 minit, salin papan masjid, atau anjak tarikh Hijrah sehari dua
+
+PRIVASI ANDA
+
+• Tiada pembelian, akaun atau log masuk
+• Kiraan penggunaan pilihan, mati kecuali anda setuju. Tiada laporan ranap
+• Lokasi anggaran, dibaca semasa aplikasi dibuka, atau taip nama bandar. Koordinat anda tidak pernah dihantar kepada pembangun atau kiraan penggunaan
+• Nama bandar datang dari perkhidmatan tempat telefon, biasanya Google. Bandar ditaip dicari dalam talian di situ atau oleh Open-Meteo
+• Sandaran awan dimatikan: tiada apa disalin ke pelayan
+
+JUJUR TENTANG APA ADANYA
+
+SajdaTime ialah pembantu, bukan pihak berkuasa agama. Waktu ini dikira oleh telefon anda dari kedudukan matahari dengan kaedah pengiraan yang diterbitkan, dan tidak dibekalkan oleh sebarang masjid, ulama atau pihak berkuasa. Aplikasi ini ditulis oleh seorang individu dengan bantuan kecerdasan buatan, dan boleh tersilap. Jika SajdaTime dan masjid anda berbeza, ikutlah masjid anda. Jika sesuatu waktu atau arah nampak tidak kena, atau anda tidak pasti, sila tanya mereka atau orang lain yang layak menasihati anda.
+
+Waktu solat dikira dengan adhan-java oleh Batoul Apps, pustaka sumber terbuka yang meluas digunakan, dan disemak dengan jadual rujukan bebas sebelum setiap keluaran. Namun, aplikasi ini diberi percuma dan seadanya, tanpa waranti dan tanpa janji ketepatan, jadi jika ketepatan penting bagi anda, sila jangan hanya bergantung padanya.
+
+PERCUMA, DAN KEKAL PERCUMA
+
+Tiada versi berbayar, tiada langganan dan tiada yang dikunci. SajdaTime diberi percuma sebagai sedekah jariah untuk ummah.
+
+Saya hanya minta satu perkara sebagai balasan: sudilah doakan saya, keluarga saya dan ibu bapa saya. Jazakallahu khairan.

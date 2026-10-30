@@ -1,0 +1,65 @@
+SajdaTime : horaires de prière (salat), alertes d'adhan, boussole Qibla et suivi privé des prières, pour sunnites et chiites, sur téléphone et montre Wear OS.
+Calculés sur le téléphone, sans réseau. Ni pub ni compte.
+
+HORAIRES ET QIBLA
+
+• Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha, compte à rebours en direct, ciel qui suit la journée
+• Date hégirienne et dates islamiques de l'année, dont chiites
+• Qibla : boussole au nord vrai qui dit où tourner, vibre face à la Kaaba
+• Horaires du mois et du suivant. PDF du jour, de 7 jours, du mois ou du Ramadan
+
+ALERTES ET ADHAN
+
+• Par prière : rien, notification ou alarme assez forte pour le Fajr, même l'appli fermée. Sonne en silencieux au choix
+• Adhan (azan) sunnite et chiite inclus, ou tout son du téléphone
+• Rappel discret 5 à 30 min avant les prières choisies, notification silencieuse de la suivante
+• Une cloche par prière active ou coupe son alerte
+
+MES PRIÈRES
+
+• Privé : cochez chaque prière faite. Semaine en anneaux, 30 jours en calendrier
+• Un relevé, pas un jugement. Série facultative, Pause et fichier pour changer de téléphone
+• Jeûnes à rattraper : un compteur qui baisse à chaque rattrapage
+
+RAMADAN ET AÏD
+
+• Suhoor et iftar, compte à rebours, durée du jeûne, tableau du Ramadan, vœux pour l'Aïd al-Fitr et l'Aïd al-Adha
+• Rappel du suhoor 15 à 60 min avant la fin, actif par défaut au Ramadan
+
+WIDGETS ET WEAR OS
+
+• Trois widgets : grand compte à rebours et horaires du jour, chacun avec votre ville, et cinq prières sur une ligne
+• Appli, tuile et Qibla Wear OS, avec ou sans téléphone
+
+POUR TOUS
+
+• Appli en anglais, arabe, ourdou, bengali, turc et indonésien (sans français), au choix ou selon le téléphone
+• Thèmes clair et sombre, grand texte, lecteurs d'écran
+
+VOTRE ÉCOLE, VOTRE MOSQUÉE
+
+• Sunnite : hanafite, chaféite, malikite, hanbalite, chacune sa bonne règle d'Asr
+• Chiite : jafarite / duodécimain, avec la bonne règle du Maghrib
+• 13 méthodes : Ligue islamique mondiale, ISNA, Umm al Qura, Égypte, Karachi, Dubaï, Koweït, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari et Téhéran, selon votre école. Fajr et Isha raisonnables dans le Grand Nord
+• Jama'ah (iqama) et Joumou'a de votre mosquée sous chaque prière
+• Suivre votre mosquée : décalez une prière (30 min max) ou copiez son affichage, ou la date hégirienne d'un ou deux jours
+
+VOTRE VIE PRIVÉE
+
+• Rien à acheter, ni compte, ni connexion
+• Compteurs d'usage facultatifs, inactifs sans votre accord. Aucun rapport de plantage
+• Position approximative, lue l'appli ouverte, ou saisissez votre ville. Vos coordonnées ne vont jamais au développeur ni dans les compteurs
+• Nom de la ville : service de localisation du téléphone, en général Google. Une ville saisie y est cherchée en ligne, ou par Open-Meteo
+• Sauvegarde cloud coupée : rien n'est copié sur un serveur
+
+EN TOUTE HONNÊTETÉ
+
+SajdaTime est une aide, pas une autorité religieuse. Votre téléphone calcule ces heures d'après la position du soleil, selon des méthodes publiées ; aucune mosquée, aucun savant ni aucune autorité ne les fournit. L'appli a été écrite par une seule personne, aidée de l'intelligence artificielle, et peut se tromper. Si SajdaTime et votre mosquée diffèrent, suivez votre mosquée. Si une heure ou une direction vous semble fausse, ou en cas de doute, merci de demander à votre mosquée ou à une autre personne qualifiée pour vous conseiller.
+
+Les heures sont calculées avec adhan-java de Batoul Apps, bibliothèque open source très utilisée, et comparées avant chaque version à des calendriers de référence indépendants. Malgré tout, l'appli est offerte gratuitement et telle quelle, sans garantie ni promesse d'exactitude : si l'exactitude compte pour vous, merci de ne pas vous fier à elle seule.
+
+GRATUIT, ET ÇA LE RESTERA
+
+Ni version payante, ni abonnement, rien de verrouillé. SajdaTime est offert en sadaqa jariya pour la Oumma.
+
+Je ne demande qu'une chose en retour : pensez à moi, à ma famille et à mes parents dans vos douas. Jazak Allah khayr.
