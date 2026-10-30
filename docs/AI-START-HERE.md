@@ -138,6 +138,8 @@ Words:
 - Never "missed", "qada", "must", "valid" for prayers; explanations end "follow your mosque".
 - The religious disclaimer is never removed or softened; its dua request is the only ask in the app.
 - No rating or sharing asks in our words (only Google's own card and the passive About rows).
+- Every release, the store description names everything the app offers first, then What's new gives the changes
+  (Ali, 30 Oct 2026, hard rule; HANDOVER §5.38).
 
 Privacy and safety:
 - No network for prayer times, ever. Location coarse, foreground, on device. No new usage count event,

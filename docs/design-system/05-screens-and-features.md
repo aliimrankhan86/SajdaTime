@@ -208,7 +208,7 @@ Each: what the user gets, where it lives, the logic, the iPhone effect.
 | My prayers | Ticks, pause, streak (opt in), rings, 30 day grid, file save and load, delete | `core/.../TrackerLogic.kt` | Carries over (JSON file format is portable) |
 | Fasts to make up | One number with a stepper and "Made up one" | `TrackerLogic` | Carries over |
 | Theme | Follow phone, Light, Dark | `ui/theme/Theme.kt` | Carries over |
-| Languages | English, Urdu, Turkish, Indonesian, Arabic; RTL for Urdu and Arabic | `core/.../AppLocale.kt` | Carries over (iOS per app language setting) |
+| Languages | English, Urdu, Turkish, Indonesian, Arabic, Bengali; RTL for Urdu and Arabic | `core/.../AppLocale.kt` | Carries over (iOS per app language setting) |
 | Usage counts | Opt in, fixed events only | `data/UsageCounts.kt` | Needs the owner's decision and a new privacy review |
 | Widgets | Next prayer, Today, Today strip | `widget/` | Android only now; WidgetKit later (`08-surfaces.md`) |
 | Wear OS | Times, Qibla, tile | `wear/` | Android only; watchOS later |

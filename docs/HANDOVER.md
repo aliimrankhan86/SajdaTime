@@ -2231,6 +2231,19 @@ never translated or transliterated": the count per string, plural and array must
 `tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
 failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
 
+### 5.38 The store listing always sells the whole app first (Ali, 30 Oct 2026, hard rule)
+
+Ali: "the listing should contain everything this app has to offer, and whenever we work on new release, make it a hard
+rule that we will always tell about what this app has to offer, and after that we can put in either improvement or the
+fixes or anything. We want to attract as many people as possible, so you have to creatively write something within the
+limits which covers it and makes it easier for the user to read." So, every release: (1) the full description in
+`docs/store/LISTING.md` and all of `LISTING-LOCALES.md` names every feature the release build has, benefit first and easy to
+scan, inside 4000 characters, a new feature getting its line in the same release; (2) What's new (500) then gives the
+improvements and fixes; (3) the HONEST and FREE sections stay byte for byte (the disclaimer and the one dua request), and
+the search words in `VISIBILITY-KEYWORDS.md` stay. Wording is drafted by `ux-lead`, facts checked against the code, an
+Opus review, Ali approves the English before the translations. This replaced the 25 Oct 2026 choice to leave "Fasts to
+make up" out of the listing.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
