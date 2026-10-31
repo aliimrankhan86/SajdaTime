@@ -6048,9 +6048,9 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   widgets are already in the listing text. Ali decides before the Mac run.
 - **GBrain:** the cloud session has no GBrain tool (checked 31 Oct 2026). This block is the record. The first session
   with GBrain compares GBrain page `projects/sajdatime` against this block and updates GBrain itself (`CLAUDE.md`).
-- **Branches:** the session branch `ccr-9e25a943-855wxx` was reset to `claude/1-6-0` (`b8c40fc`) and pushed. Nothing has
-  been merged into `claude/1-6-0` or `main`. Ali's rule: `main` takes 1.6 only on release day; `claude/1-6-0` only when
-  Ali says so, after review.
+- **Branches:** the session branch `ccr-9e25a943-855wxx` was reset to `claude/1-6-0` (`b8c40fc`) and pushed. Ali asked
+  (31 Oct 2026) for this record to be committed, pushed and merged into `claude/1-6-0`, so it was fast-forwarded there.
+  `main` is untouched: it takes 1.6 only on release day (Ali's rule).
 - **Not checked:** the listing text against the final build (not started); the pictures (blocked above).
 
 ### 📍 1.6.0 READY AND WAITING FOR RELEASE DAY, 30 Oct 2026, night (history now; read the 31 Oct block above first)
