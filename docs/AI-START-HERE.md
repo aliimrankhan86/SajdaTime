@@ -30,11 +30,12 @@ when a release publishes.
 | `main` | Exactly what users have: **1.5.0**, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes 1.6 only on release day, by `docs/release-tools/RELEASE-1.6.0.md` (Ali, 25 Oct 2026) |
 | `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system | **Work from here.** Cut your own branch from it |
 | your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-6-0` | Commit and push here. Merging into `claude/1-6-0` only when Ali says so, after review |
-| `deepseek/ds-deviations-record` | DeepSeek's record of the 22 design deviations, with pictures (25 Oct 2026) | Not merged: an Opus review (30 Oct 2026) found wrong conclusions to fix first (HANDOVER §11) |
 
 Every other branch was deleted on 30 Oct 2026 at Ali's word ("delete the old branches ... which could cause confusion"):
 all of them were already wholly inside `claude/1-6-0`, except two dropped on purpose, kept as tags
-`archive/analytics-default-on-1-4-0` and `archive/customer-review-pain-points-9d35kl`. Tag `v1.5.0` marks what is live.
+`archive/analytics-default-on-1-4-0` and `archive/customer-review-pain-points-9d35kl`. DeepSeek's picture record of the
+design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then remove it"), kept as tag
+`archive/ds-deviations-record`: the deviations themselves are listed in `docs/design-system/03-components.md` §3.6. Tag `v1.5.0` marks what is live.
 
 If GitHub shows a yellow "Compare & pull request" bar for `claude/1-6-0`, do not use it: that would merge
 unreleased 1.6 into `main`.

@@ -55,7 +55,7 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
    day the listing is judged as the whole app's shop window, not as an update note: every feature the build has is
    either in the full description or left out on purpose (on 30 Oct 2026 every feature was in, Fasts to make up
    included), the eight translations match, and the pictures show the current screens. Bengali has no store picture
-   set of its own (Play shows the English ones); offer Ali one taken on `sajdastore` in Bengali.
+   set of its own, by Ali's choice (31 Oct 2026: "English screenshots are fine"); Play shows the English ones.
 
 ## Release day, in order
 

@@ -6076,7 +6076,15 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   `docs/translation/reviewed.json`. Run it first, review only what it lists, `stamp` after the reviewer passes. Stamped
   today as the baseline: every shipped translation and these eight descriptions were already reviewed. The mechanical
   checks (`TranslationIntegrityTest`, `check-translation.py`) still run every time, they cost nothing.
-- **Open for Ali:** a Bengali store picture set; the deviations record.
+- **Both open items closed (Ali, 31 Oct 2026):**
+  - **No Bengali store pictures:** "English screenshots are fine, since we have mentioned that this app caters
+    multiple languages". Play shows Bengali users the English set. Do not offer it again.
+  - **DeepSeek deviations record dropped:** "do we need to add it ... if it is not required then remove it". Not
+    required: the 22 deviations are already listed in `docs/design-system/03-components.md` §3.6, and its pictures had
+    wrong conclusions. Branch `deepseek/ds-deviations-record` deleted, kept as tag `archive/ds-deviations-record`.
+    Branches left: `main` and `claude/1-6-0`. The instructions for any AI stay in the code (`CLAUDE.md`, `AGENTS.md`,
+    `docs/AI-START-HERE.md`, `docs/AI-WORKER-BRIEF.md`).
+- **Nothing is open.** Next: release day, when Ali says so.
 
 ### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read the 1.6.0 ready block above first, then the design system block below)
 
