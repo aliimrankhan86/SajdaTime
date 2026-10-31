@@ -6025,7 +6025,35 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 1.6.0 READY AND WAITING FOR RELEASE DAY, 30 Oct 2026, night (read this first, then the Bengali block below)
+### 📍 STATE OF PLAY, 31 Oct 2026: 1.6.0 STORE PICTURES NOT RETAKEN YET (read this first; the 30 Oct night block below holds for everything not named here)
+
+- **Ali, 31 Oct 2026:** "You retake the pictures and record it gbrain so you have all information." Ali also asked that
+  the pictures be retaken for the new release and that everything be committed, pushed and merged once done.
+- **Pictures: NOT retaken. Blocked, and it cannot be done from the cloud session.** The phone pictures are captured on
+  the `sajdastore` AVD (1080 × 1920) on Ali's Mac (`docs/store/upload/README.md`, `docs/release-tools/release-1.6.0.sh`
+  with `STORE_SHOTS=1`). This cloud container has no Android SDK, no emulator and no `/dev/kvm` (no hardware
+  virtualisation), so no emulator can run here. Checked 31 Oct 2026.
+- **Store pictures on `claude/1-6-0` are the 25 Oct 2026 set** (no picture changed since then). They predate the 30 Oct
+  changes: Bengali, the tab label change, `shrinkToFit`, and Fasts to make up (in the listing text, in no picture).
+  The Arabic set is older still (captured 20 Aug 2026). Ali has said screenshots may be updated.
+- **Ali's one command, on his Mac (AVD running, on `claude/1-6-0`):**
+  ```bash
+  export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+  STORE_SHOTS=1 bash docs/release-tools/release-1.6.0.sh
+  bash tools/build-store-assets.sh
+  ```
+  Then push the branch, or send the screenshot folder, so the cloud session can check the pictures against the build.
+- **Open decision for Ali (not built):** Play allows eight English phone pictures; the set has eight. The listing now
+  names Fasts to make up, and no picture shows it. Proposed: replace `05-widgets.png` with a fasts screen, because the
+  widgets are already in the listing text. Ali decides before the Mac run.
+- **GBrain:** the cloud session has no GBrain tool (checked 31 Oct 2026). This block is the record. The first session
+  with GBrain compares GBrain page `projects/sajdatime` against this block and updates GBrain itself (`CLAUDE.md`).
+- **Branches:** the session branch `ccr-9e25a943-855wxx` was reset to `claude/1-6-0` (`b8c40fc`) and pushed. Nothing has
+  been merged into `claude/1-6-0` or `main`. Ali's rule: `main` takes 1.6 only on release day; `claude/1-6-0` only when
+  Ali says so, after review.
+- **Not checked:** the listing text against the final build (not started); the pictures (blocked above).
+
+### 📍 1.6.0 READY AND WAITING FOR RELEASE DAY, 30 Oct 2026, night (history now; read the 31 Oct block above first)
 
 - **Ali, 30 Oct 2026:** "record and remember everything for release 1.6 ... we should be ready to go soon ... only the
   work which has the latest work and the complete work should remain ... the Ramadan functionality only enables when
