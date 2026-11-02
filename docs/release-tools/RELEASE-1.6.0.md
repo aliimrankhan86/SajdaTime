@@ -13,6 +13,12 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
 
 - **Phone 1.6.0, versionCode 10** (`app/build.gradle.kts`). Contents: PROJECT_BRIEF "Next release: 1.6.0", including
   "Fasts to make up" (added 25 Oct 2026 after step 11. In the full description since 30 Oct 2026 by Ali's whole app rule, in no store picture).
+  **Added 2 Nov 2026 (Ali: "we will call it release 1.6 now"; there is no 1.6.1):** night times (Islamic midnight and
+  last third, sunset to Fajr) with a "Why these times" caption, the Alert check (Settings, Reminders), optional Sunnah
+  fast reminders (Sunni, off by default). The jama'ah reminder is dropped. Each has its line in the store listing draft
+  (`docs/store/LISTING.md`, "DRAFT 2 Nov 2026") which **Ali must approve in English first**, then the eight translations
+  are made, reviewed and stamped. The Times store picture (night row and caption) must be retaken once; Ali's call on
+  the others.
 - **The watch is NOT uploaded.** It stays 1.5.0, versionCode 1002, submitted with 1.5.0 on 23 Oct 2026; `wear/` changed only
   in comments since `main` (one KDoc line; `WatchSync.kt` unchanged). Its store pictures and watch note stay as they are.
   (The watch half of 1.5.0 being live is not checked from the public page; PR #16 says so too.)
