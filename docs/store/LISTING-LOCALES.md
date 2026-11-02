@@ -58,6 +58,8 @@ less than the 500 limit allows).
 
 **30 Oct 2026, night: the eight full descriptions were rewritten** from the new whole app English Ali approved that day ("Yes, use it", in `LISTING.md`, "1.6.0 full description, APPROVED"), by his hard rule that every release's listing sells the whole app first (§5.38). New against the 25 Oct text: Fasts to make up, the My prayers section (records, never judges, an optional streak, Pause, moving to a new phone by file), Match your mosque, the 13 methods, two of the three widgets with the town. Fasts to make up uses the app's own label in Arabic «أيام صيام للقضاء» and Urdu «قضا روزے» (the "no qada" rule is for prayers). HONEST and FREE stay byte for byte the 1.5.0 text. An independent Opus back translation review passed all eight; three fixes applied: French (the Hijri shift read as "copy the date"), Malay (which widgets show the town), Indonesian ("bulan depan"). The paragraph above describes the 25 Oct text and is history. Short descriptions and What's new unchanged.
 
+**2 Nov 2026: the eight full descriptions and What's new were updated to the English Ali approved that day** (`LISTING.md`, "1.6.0 full description and What's new, DRAFT 2 Nov 2026 ... APPROVED"), as a diff against the 30 Oct text, keeping every other translated line. Added in all eight: a line for Islamic midnight, the last third of the night and which method made your times (the app's own terms: منتصف الليل الإسلامي / اسلامی آدھی رات / İslami gece yarısı / Tengah malam Islam / ইসলামি মধ্যরাত; Malay, French and Hindi follow their own listing words); an Alert check line after the bell (app terms: «فحص التنبيهات» / الرٹ کی جانچ / Uyarı kontrolü / Cek pengingat / অ্যালার্ট পরীক্ষা; Malay "Semakan peringatan", French "Contrôle des alertes", Hindi "अलर्ट जाँच"); a line for optional reminders the evening before a Sunnah fast (Mondays, Thursdays, White Days, Ashura, Arafah, Shawwal, in each app language's own names). What's new is rewritten to match the new English and now ends with "Now in Bengali" before the mosque line (Bengali keeps its opening "অ্যাপ এখন বাংলায়।" in front, as before). Every trim the English made was applied: the timetable and PDF line (a day, a week, the month or Ramadan), "included" and "the prayers you choose" and "correct" (Sunni Asr only, the Shia Maghrib "correct" stays) and "under each prayer" dropped, the widgets line without the town, "set for your school" and the far north Fajr and Isha claim dropped, **the Cloud backup is off line dropped (the English dropped it to fit; `docs/privacy.html` still says it)**, tracker lines shortened ("you pray" and "a file" gone). Further tightening, no claim changed, to fit 4000 and 500 in Turkish, Indonesian, Malay, French. HONEST and FREE are still byte for byte the 1.5.0 text (checked by script). Counts are Python `len`, newlines counted, no final newline. **Translated by Claude; needs the independent review and `translation-ledger.py stamp` before paste (not stamped here).**
+
 **Titles are unchanged.** Short descriptions add the tracker in each market's own word, with no price or promotion word;
 "private" is untested in this field, as in English, so if Play shows the "may not be promoted" notice, go back to that
 language's 1.5.0 short description. **What's new** is new for every language (1.5.0 had it only in Urdu, Turkish,
@@ -72,14 +74,14 @@ Python `len`, newlines counted, no final newline. Check Play's own counter when 
 
 | Language | Title | Short | Full | What's new |
 |---|---|---|---|---|
-| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3603 / 4000 | 459 / 500 |
-| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3975 / 4000 | 494 / 500 |
-| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3986 / 4000 | 498 / 500 |
-| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3999 / 4000 | 496 / 500 |
-| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3996 / 4000 | 494 / 500 |
-| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3983 / 4000 | 490 / 500 |
-| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3992 / 4000 | 500 / 500 |
-| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3990 / 4000 | 499 / 500 |
+| Arabic (ar) | 30 (unchanged) | 69 / 80 | 3632 / 4000 | 456 / 500 |
+| Urdu (ur) | 30 (unchanged) | 75 / 80 | 3946 / 4000 | 480 / 500 |
+| Turkish (tr-TR) | 26 (unchanged) | 80 / 80 | 3999 / 4000 | 489 / 500 |
+| Indonesian (id-ID) | 24 (unchanged) | 80 / 80 | 3999 / 4000 | 497 / 500 |
+| Malay (ms-MY) | 30 (unchanged) | 76 / 80 | 3995 / 4000 | 494 / 500 |
+| Bengali (bn-BD) | 27 (unchanged) | 76 / 80 | 3996 / 4000 | 497 / 500 |
+| French (fr-FR) | 29 (unchanged) | 77 / 80 | 3998 / 4000 | 499 / 500 |
+| Hindi (hi-IN) | 23 (unchanged) | 80 / 80 | 3980 / 4000 | 499 / 500 |
 
 ### Arabic (ar), 1.6.0
 
@@ -95,39 +97,42 @@ SajdaTime: مواقيت الصلاة، قبلة
 أوقات الصلاة والأذان والقبلة بدون نت، ومتتبّع خاص للصلاة، مع Wear OS.
 ```
 
-**Full description** `3603 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3753)
+**Full description** `3632 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3603)
 ```
 يمنحك SajdaTime مواقيت الصلاة وتنبيهات الأذان وبوصلة تحدد اتجاه القبلة ومتتبّعًا خاصًا للصلاة، للمسلمين من السنة والشيعة، على هاتفك وساعة Wear OS.
-تُحسب المواقيت على هاتفك نفسه، فلا حاجة إلى تغطية. بلا إعلانات، وبلا حساب.
+تُحسب المواقيت على هاتفك نفسه، لا حاجة إلى تغطية. بلا إعلانات، وبلا حساب.
 
 مواقيت الصلاة والقبلة
 
-• الفجر والشروق والظهر والعصر والمغرب والعشاء، مع عدّ تنازلي مباشر وسماء تتبع النهار
+• الفجر والشروق والظهر والعصر والمغرب والعشاء، مع عدّ تنازلي مباشر وسماء متغيّرة
 • التاريخ الهجري (التقويم الإسلامي) والتواريخ الإسلامية على مدار العام، مع تواريخ الشيعة
 • اتجاه القبلة: بوصلة إلى الشمال الحقيقي تخبرك إلى أي جهة تستدير، وتهتز حين تتجه نحو الكعبة
-• جدول المواقيت لهذا الشهر والشهر الذي يليه. احفظ اليوم أو 7 أيام أو الشهر أو رمضان بصيغة PDF
+• منتصف الليل الإسلامي، والثلث الأخير من الليل، والطريقة التي حُسبت بها مواقيتك
+• جدول المواقيت لهذا الشهر والشهر الذي يليه، وPDF ليوم أو أسبوع أو الشهر أو رمضان
 
 التنبيهات والأذان
 
 • لكل صلاة: إيقاف، أو إشعار، أو منبّه عالٍ بما يكفي لصلاة الفجر، حتى والتطبيق مغلق. والتشغيل في الوضع الصامت إن شئت
-• أذان مدمج للسنة وللشيعة، أو أي صوت على هاتفك
-• تذكير هادئ قبل الصلوات التي تختارها بـ 5 إلى 30 دقيقة، وإشعار صامت بالصلاة التالية
+• أذان للسنة وللشيعة، أو أي صوت على هاتفك
+• تذكير هادئ قبل الصلاة بـ 5 إلى 30 دقيقة، وإشعار صامت بالصلاة التالية
 • جرس على كل صلاة لتشغيل تنبيهها أو إيقافه
+• «فحص التنبيهات»: ما الذي يحجبه هاتفك، مع زر لإصلاحه
 
 صلواتي
 
-• خاص بك: علّم كل صلاة تصلّيها، وشاهد أسبوعك في حلقات وآخر 30 يومًا في تقويم
-• يسجّل ولا يحكم أبدًا. عدّ اختياري للأيام المتتالية، و«إيقاف مؤقت»، وملف لنقله إلى هاتف جديد
+• خاص بك: علّم كل صلاة، وشاهد أسبوعك في حلقات وآخر 30 يومًا في تقويم
+• يسجّل ولا يحكم أبدًا. عدّ اختياري للأيام المتتالية، و«إيقاف مؤقت»، ونقله إلى هاتف جديد
 • أيام صيام للقضاء: عدد واحد، ينقص واحدًا كلما عوّضت يومًا
 
 رمضان والعيد
 
 • وقتا السحور والإفطار، وعدّ تنازلي، ومدة الصيام، وإمساكية رمضان، وتهنئة في عيد الفطر وعيد الأضحى
 • تذكير بالسحور قبل انتهاء وقته بـ 15 إلى 60 دقيقة، مفعّل تلقائيًا في رمضان
+• تذكيرات اختيارية مساء اليوم السابق لصيام التطوع: الاثنين والخميس والأيام البيض وعاشوراء وعرفة وشوال
 
 التطبيقات المصغّرة وساعة Wear OS
 
-• ثلاثة تطبيقات مصغّرة: عدّ تنازلي كبير ومواقيت اليوم، وكلاهما باسم بلدتك، والصلوات الخمس في سطر واحد
+• ثلاثة تطبيقات مصغّرة: عدّ تنازلي، ومواقيت اليوم، والصلوات الخمس في سطر واحد
 • تطبيق Wear OS مع بطاقة وبوصلة قبلة، يتبع هاتفك أو يعمل وحده
 
 للجميع
@@ -137,10 +142,10 @@ SajdaTime: مواقيت الصلاة، قبلة
 
 مذهبك ومسجدك
 
-• السنة: الحنفي والشافعي والمالكي والحنبلي، مع قاعدة العصر الصحيحة لكل منها
+• السنة: الحنفي والشافعي والمالكي والحنبلي، مع قاعدة العصر لكل منها
 • الشيعة: الجعفري / الاثنا عشري، بما في ذلك قاعدة المغرب الصحيحة
-• 13 طريقة حساب: رابطة العالم الإسلامي، ISNA، أم القرى، الهيئة المصرية، كراتشي، دبي، الكويت، قطر، Kemenag/MUIS (إندونيسيا وسنغافورة)، ديانت (تركيا)، لجنة رؤية الهلال، الجعفري وطهران، تُختار بحسب مذهبك. وفجر وعشاء معقولان في أقصى الشمال
-• أوقات الجماعة (الإقامة) وصلاة الجمعة في مسجدك، تحت كل صلاة
+• 13 طريقة حساب: رابطة العالم الإسلامي، ISNA، أم القرى، الهيئة المصرية، كراتشي، دبي، الكويت، قطر، Kemenag/MUIS (إندونيسيا وسنغافورة)، ديانت (تركيا)، لجنة رؤية الهلال، الجعفري وطهران
+• أوقات الجماعة (الإقامة) وصلاة الجمعة في مسجدك
 • «طابِق مسجدك»: قدّم أي صلاة أو أخّرها حتى 30 دقيقة أو انقل لوحة مسجدك، أو قدّم التاريخ الهجري أو أخّره يومًا أو يومين
 
 خصوصيتك
@@ -149,7 +154,6 @@ SajdaTime: مواقيت الصلاة، قبلة
 • إحصاءات استخدام اختيارية، متوقفة ما لم توافق. ولا تقارير أعطال
 • موقع تقريبي يُقرأ والتطبيق مفتوح، أو اكتب اسم بلدتك بدلًا منه. ولا تصل إحداثياتك أبدًا إلى المطوّر ولا إلى إحصاءات الاستخدام
 • يأتي اسم بلدتك من خدمة الأماكن في هاتفك، وهي Google في الغالب. والبلدة التي تكتبها يُبحث عنها عبر الإنترنت هناك، أو عبر Open-Meteo
-• النسخ الاحتياطي السحابي متوقف، فلا يُنسخ أي شيء إلى خادم
 
 بصراحة: ما هو هذا التطبيق
 
@@ -164,9 +168,9 @@ SajdaTime: مواقيت الصلاة، قبلة
 لا أطلب في المقابل إلا شيئًا واحدًا: أرجو أن تذكرني وعائلتي ووالديّ في دعائك. جزاكم الله خيرًا.
 ```
 
-**What's new** `459 / 500`
+**What's new** `456 / 500` (2 Nov 2026, rewritten to the approved English; was 459)
 ```
-«صلواتي»: سجل خاص لصلواتك، لهذا الأسبوع وآخر 30 يومًا، محفوظ على هاتفك. جرس على كل صلاة يشغّل تنبيهها أو يوقفه. «جدول المواقيت»: هذا الشهر والشهر الذي يليه في بطاقة لكل يوم، مع الحفظ بصيغة PDF. أضف أوقات الجماعة والجمعة في مسجدك تحت كل صلاة. التاريخ الهجري يفتح التواريخ الإسلامية للعام. والقبلة تخبرك الآن إلى أي جهة تستدير أولًا. شاشة المواقيت وودجة الصلاة التالية تُظهران وقت النهار أو الليل. ودجة جديدة للصلوات الخمس في سطر. وحيث يختلف مسجدك، فاتبع مسجدك.
+«أوقات الليل»: منتصف الليل الإسلامي والثلث الأخير من الليل. «فحص التنبيهات»: اعرف ما يحجبه هاتفك. تذكيرات اختيارية قبل صيام التطوع. «صلواتي»: سجل خاص لصلواتك، محفوظ على هاتفك. جرس على كل صلاة يشغّل تنبيهها أو يوقفه. «جدول المواقيت» مع الحفظ بصيغة PDF. أضف أوقات الجماعة والجمعة في مسجدك. التاريخ الهجري يفتح التواريخ الإسلامية للعام. والقبلة تخبرك إلى أي جهة تستدير. ودجة جديدة للصلوات الخمس في سطر. والتطبيق الآن بالبنغالية. وحيث يختلف مسجدك، فاتبع مسجدك.
 ```
 
 ### Urdu (ur), 1.6.0
@@ -183,39 +187,42 @@ SajdaTime: نماز کے اوقات، قبلہ
 آف لائن اوقات نماز، اذان، قبلہ اور نجی نماز ٹریکر، سنی و شیعہ، Wear OS ایپ۔
 ```
 
-**Full description** `3975 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3988)
+**Full description** `3946 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3975)
 ```
 آپ کے فون اور Wear OS گھڑی پر SajdaTime سنی اور شیعہ مسلمانوں کو نماز کے اوقات، اذان کے الرٹ، قبلہ نما اور نجی نماز ٹریکر دیتی ہے۔
-اوقات آپ کے فون پر ہی نکالے جاتے ہیں، اس لیے سگنل کی ضرورت نہیں۔ نہ اشتہارات، نہ اکاؤنٹ۔
+اوقات آپ کے فون پر ہی نکالے جاتے ہیں، سگنل کی ضرورت نہیں۔ نہ اشتہارات، نہ اکاؤنٹ۔
 
 نماز کے اوقات اور قبلہ
 
-• فجر، طلوع آفتاب، ظہر، عصر، مغرب اور عشاء، لمحہ بہ لمحہ الٹی گنتی اور دن کے ساتھ بدلتا آسمان
+• فجر، طلوع آفتاب، ظہر، عصر، مغرب اور عشاء، لمحہ بہ لمحہ الٹی گنتی اور بدلتا آسمان
 • ہجری تاریخ (اسلامی کیلنڈر) اور سال بھر کی اسلامی تاریخیں، شیعہ تاریخوں سمیت
 • قبلہ رخ: اصل شمال کے مطابق قبلہ نما، جو مڑنے کی سمت بتائے اور کعبہ کی طرف رخ ہوتے ہی وائبریٹ کرے
-• اس مہینے اور اگلے مہینے کا اوقات نامہ۔ آج، 7 دن، مہینہ یا رمضان PDF میں محفوظ کریں
+• اسلامی آدھی رات، رات کی آخری تہائی، اور آپ کے اوقات کس طریقے سے نکلے
+• اس مہینے اور اگلے مہینے کا اوقات نامہ، اور ایک دن، ایک ہفتے، مہینے یا رمضان کا PDF
 
 الرٹ اور اذان
 
 • ہر نماز کے لیے: کچھ نہیں، اطلاع، یا فجر کے لیے کافی تیز الارم، چاہے ایپ بند ہو۔ چاہیں تو سائلنٹ پر بھی بجائیں
-• سنی اور شیعہ کے لیے ایپ میں شامل اذان، یا آپ کے فون کی کوئی بھی آواز
-• چنی ہوئی نمازوں سے 5 سے 30 منٹ پہلے دھیمی یاددہانی، اور اگلی نماز کی خاموش اطلاع
+• سنی اور شیعہ کے لیے اذان، یا آپ کے فون کی کوئی بھی آواز
+• نماز سے 5 سے 30 منٹ پہلے دھیمی یاددہانی، اور اگلی نماز کی خاموش اطلاع
 • ہر نماز پر گھنٹی، جس سے اس کا الرٹ آن یا بند ہو
+• الرٹ کی جانچ: آپ کا فون کیا روک رہا ہے، اور ٹھیک کرنے کا بٹن
 
 میری نمازیں
 
-• نجی: جو نماز پڑھیں اس پر نشان لگائیں، اپنا ہفتہ دائروں میں اور 30 دن کیلنڈر میں دیکھیں
-• یہ صرف ریکارڈ رکھتا ہے، کبھی فیصلہ نہیں کرتا۔ اختیاری لگاتار دن، روکیں، اور نئے فون پر لے جانے کے لیے فائل
+• نجی: ہر نماز پر نشان لگائیں، اپنا ہفتہ دائروں میں اور 30 دن کیلنڈر میں دیکھیں
+• یہ صرف ریکارڈ رکھتا ہے، کبھی فیصلہ نہیں کرتا۔ اختیاری لگاتار دن، روکیں، اور نئے فون پر منتقلی
 • قضا روزے: ایک ہی گنتی، ہر روزہ رکھنے پر ایک کم
 
 رمضان اور عید
 
 • سحری اور افطار کے اوقات، الٹی گنتی، روزے کا دورانیہ، رمضان کا اوقات نامہ، اور عید الفطر اور عید الاضحیٰ پر مبارکباد
 • سحری ختم ہونے سے 15 سے 60 منٹ پہلے سحری کی یاددہانی، رمضان میں خود بخود آن
+• سنت روزے سے ایک شام پہلے اختیاری یاددہانی: پیر، جمعرات، ایامِ بیض، عاشورہ، عرفہ، شوال
 
 ویجٹ اور Wear OS
 
-• تین ویجٹ: بڑی الٹی گنتی اور آج کے اوقات، دونوں آپ کے شہر کے نام کے ساتھ، اور ایک قطار میں پانچ نمازیں
+• تین ویجٹ: الٹی گنتی، آج کے اوقات، اور ایک قطار میں پانچ نمازیں
 • Wear OS ایپ، ٹائل اور قبلہ جو فون کے ساتھ یا بغیر چلتی ہیں
 
 سب کے لیے
@@ -225,10 +232,10 @@ SajdaTime: نماز کے اوقات، قبلہ
 
 آپ کا مسلک، آپ کی مسجد
 
-• سنی: حنفی، شافعی، مالکی اور حنبلی، ہر ایک کے لیے عصر کا درست اصول
+• سنی: حنفی، شافعی، مالکی اور حنبلی، ہر ایک کے لیے عصر کا اصول
 • شیعہ: جعفری / اثنا عشری، مغرب کے درست اصول سمیت
-• حساب کے 13 طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، Kemenag/MUIS، دیانت، مون سائٹنگ کمیٹی، جعفری اور تہران، آپ کے مسلک کے مطابق۔ دور شمال میں فجر اور عشاء کے معقول اوقات
-• ہر نماز کے نیچے آپ کی مسجد کے جماعت (اقامت) اور جمعہ کے اوقات
+• حساب کے 13 طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، Kemenag/MUIS، دیانت، مون سائٹنگ کمیٹی، جعفری اور تہران
+• آپ کی مسجد کے جماعت (اقامت) اور جمعہ کے اوقات
 • «اپنی مسجد سے ملائیں»: کسی نماز کو 30 منٹ تک آگے پیچھے کریں یا اپنی مسجد کا بورڈ نقل کریں، یا اسلامی تاریخ ایک دو دن آگے پیچھے کریں
 
 آپ کی پرائیویسی
@@ -237,7 +244,6 @@ SajdaTime: نماز کے اوقات، قبلہ
 • استعمال کے اختیاری اعداد و شمار، جو آپ کے ہاں کہے بغیر بند رہتے ہیں۔ کوئی کریش رپورٹنگ نہیں
 • اندازاً مقام، جو ایپ کھلی ہونے پر ہی دیکھا جاتا ہے، یا اس کی جگہ اپنے شہر کا نام لکھیں۔ آپ کے کوآرڈینیٹس نہ کبھی ڈویلپر کو جاتے ہیں نہ استعمال کے اعداد و شمار میں
 • شہر کا نام آپ کے فون کی مقام سروس سے آتا ہے، جو عموماً Google ہوتی ہے۔ آپ کا لکھا ہوا شہر وہیں، یا Open-Meteo کے ذریعے، آن لائن تلاش کیا جاتا ہے
-• کلاؤڈ بیک اپ بند ہے، اس لیے کچھ بھی کسی سرور پر نقل نہیں ہوتا
 
 یہ ایپ کیا ہے، سچ سچ
 
@@ -252,9 +258,9 @@ SajdaTime: نماز کے اوقات، قبلہ
 بدلے میں میری بس ایک گزارش ہے: براہِ کرم مجھے، میرے گھر والوں اور میرے والدین کو اپنی دعاؤں میں یاد رکھیں۔ جزاک اللہ خیر۔
 ```
 
-**What's new** `494 / 500`
+**What's new** `480 / 500` (2 Nov 2026, rewritten to the approved English; was 494)
 ```
-میری نمازیں: آپ کی نمازوں کا نجی ریکارڈ، اس ہفتے اور پچھلے 30 دن، آپ کے فون پر ہی محفوظ۔ ہر نماز پر گھنٹی اس کا الرٹ آن یا بند کرتی ہے۔ اوقات نامہ: یہ مہینہ اور اگلا، ہر دن کے کارڈ کے ساتھ، اور PDF محفوظ کریں۔ ہر نماز کے نیچے اپنی مسجد کے جماعت اور جمعہ کے اوقات شامل کریں۔ ہجری تاریخ سے سال کی اسلامی تاریخیں کھلتی ہیں۔ قبلہ اب بتاتا ہے کہ پہلے کس طرف مڑیں۔ اوقات کی اسکرین اور اگلی نماز کا ویجٹ دن کا پہر دکھاتے ہیں۔ پانچ نمازوں کی ویجٹ پٹی۔ جہاں آپ کی مسجد مختلف ہو، اپنی مسجد کی پیروی کریں۔
+رات کے اوقات: اسلامی آدھی رات اور رات کی آخری تہائی۔ الرٹ کی جانچ: دیکھیں فون کیا روک رہا ہے۔ سنت روزوں سے پہلے اختیاری یاددہانی۔ میری نمازیں: نمازوں کا نجی ریکارڈ، فون پر ہی محفوظ۔ ہر نماز پر گھنٹی اس کا الرٹ آن یا بند کرتی ہے۔ اوقات نامہ، PDF محفوظ کریں۔ اپنی مسجد کے جماعت اور جمعہ کے اوقات شامل کریں۔ ہجری تاریخ سے سال کی اسلامی تاریخیں کھلتی ہیں۔ قبلہ بتاتا ہے کہ کس طرف مڑیں۔ پانچ نمازوں کی ویجٹ پٹی۔ ایپ اب بنگالی میں بھی۔ جہاں آپ کی مسجد مختلف ہو، اپنی مسجد کی پیروی کریں۔
 ```
 
 ### Turkish (tr-TR), 1.6.0
@@ -271,39 +277,42 @@ SajdaTime: Namaz Vakitleri
 İnternetsiz namaz vakitleri, ezan, kıble ve size özel namaz takibi. Wear OS ile.
 ```
 
-**Full description** `3986 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3993)
+**Full description** `3999 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3986)
 ```
 SajdaTime, Sünni ve Şii Müslümanlara telefonunuzda ve Wear OS saatinizde namaz vakitleri, ezan uyarıları, kıble pusulası ve size özel namaz takibi sunar.
 Telefonunuzda hesaplanır, sinyal gerekmez. Reklam yok, hesap yok.
 
 NAMAZ VAKİTLERİ VE KIBLE
 
-• Sabah, Güneş, Öğle, İkindi, Akşam ve Yatsı, canlı geri sayım ve günü izleyen gökyüzü
+• Sabah, Güneş, Öğle, İkindi, Akşam ve Yatsı, canlı geri sayım ve değişen gökyüzü
 • Hicri tarih (İslami takvim) ve yılın İslami tarihleri, Şii tarihleri dahil
 • Kıble: gerçek kuzeye göre pusula, hangi yöne döneceğinizi söyler, Kâbe'ye dönünce titrer
-• Bu ayın ve gelecek ayın vakit çizelgesi. Bugünü, 7 günü, ayı ya da Ramazan'ı PDF olarak kaydedin
+• İslami gece yarısı, gecenin son üçte biri, vakitlerinizi hesaplayan yöntem
+• Bu ayın ve gelecek ayın vakit çizelgesi, bir günün, bir haftanın, ayın ya da Ramazan'ın PDF'i
 
 UYARILAR VE EZAN
 
 • Her namaz: yok, bildirim ya da Sabah için yeterince yüksek alarm, uygulama kapalıyken bile. Dilerseniz Sessizdeyken de çal
-• Sünni ve Şii için yerleşik ezan ya da telefonunuzdaki herhangi bir ses
-• Seçtiğiniz namazlardan 5 ila 30 dakika önce sessiz hatırlatma, sıradaki namaz için sessiz bildirim
+• Sünni ve Şii için ezan ya da telefonunuzdaki herhangi bir ses
+• Namazdan 5 ila 30 dakika önce sessiz hatırlatma, sıradaki namaz için sessiz bildirim
 • Her namazdaki zil uyarısını açar ya da kapatır
+• Uyarı kontrolü: telefonunuzun neyi engellediğini gösterir, düzeltme düğmesiyle
 
 NAMAZLARIM
 
-• Size özel: kıldığınız her namazı işaretleyin, haftanızı halkalar, 30 günü takvim olarak görün
-• Kayıt tutar, asla yargılamaz. İsteğe bağlı seri, Duraklat ve yeni telefona taşıma dosyası
-• Kazası kalan oruçlar: tek bir sayı, her kazasını tuttuğunuzda bir azalır
+• Size özel: her namazı işaretleyin, haftanızı halkalar, 30 günü takvim olarak görün
+• Kayıt tutar, asla yargılamaz. İsteğe bağlı seri, Duraklat, yeni telefona taşıma
+• Kazası kalan oruçlar: kaza ettikçe azalan tek bir sayı
 
 RAMAZAN VE BAYRAM
 
 • Sahur ve iftar vakitleri, geri sayım, oruç süresi, Ramazan imsakiyesi, Ramazan ve Kurban Bayramı'nda tebrik
 • İmsaktan 15 ila 60 dakika önce sahur hatırlatıcısı, Ramazan'da kendiliğinden açık
+• Sünnet oruçtan önceki akşam isteğe bağlı hatırlatma: Pazartesi, Perşembe, Eyyâm-ı Bîz, Aşure, Arefe, Şevval
 
 WIDGET'LAR VE WEAR OS
 
-• Üç widget: büyük geri sayım ve bugünün vakitleri, ikisi de şehrinizin adıyla, bir de tek satırda beş vakit
+• Üç widget: geri sayım, bugünün vakitleri ve tek satırda beş vakit
 • Telefonu izleyen ya da tek başına çalışan Wear OS uygulaması, saat kartı ve kıble
 
 HERKES İÇİN
@@ -313,10 +322,10 @@ HERKES İÇİN
 
 MEZHEBİNİZ, CAMİNİZ
 
-• Sünni: Hanefi, Şafii, Maliki ve Hanbeli, her biri için doğru İkindi kuralıyla
+• Sünni: Hanefi, Şafii, Maliki ve Hanbeli, her biri için İkindi kuralıyla
 • Şii: Caferi (İsna Aşeriyye), doğru Akşam kuralı dahil
-• 13 hesaplama yöntemi: Dünya İslam Birliği, ISNA, Ümmülkura, Mısır, Karaçi, Dubai, Kuveyt, Katar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Caferi ve Tahran, mezhebinize göre ayarlı. Uzak kuzeyde makul Sabah ve Yatsı
-• Her namazın altında caminizin cemaat (kamet) ve Cuma vakitleri
+• 13 hesaplama yöntemi: Dünya İslam Birliği, ISNA, Ümmülkura, Mısır, Karaçi, Dubai, Kuveyt, Katar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Caferi ve Tahran
+• Caminizin cemaat (kamet) ve Cuma vakitleri
 • Camiye göre ayarla: bir vakti 30 dakikaya kadar kaydırın, panodaki saati girin ya da Hicri tarihi bir iki gün kaydırın
 
 GİZLİLİĞİNİZ
@@ -325,7 +334,6 @@ GİZLİLİĞİNİZ
 • İsteğe bağlı kullanım sayımları, siz evet demedikçe kapalı. Çökme raporu yok
 • Yaklaşık konum, uygulama açıkken okunur, ya da şehrinizi yazın. Koordinatlarınız ne geliştiriciye ne de kullanım sayımlarına gider
 • Şehrinizin adını telefonunuzun yer arama hizmeti (genellikle Google) bulur. Yazdığınız şehir internette orada ya da Open-Meteo'da aranır
-• Bulut yedekleme kapalı, hiçbir şey sunucuya kopyalanmaz
 
 NE OLDUĞU KONUSUNDA DÜRÜST
 
@@ -340,9 +348,9 @@ Vakitler, Batoul Apps'in yaygın olarak kullanılan açık kaynaklı kütüphane
 Karşılığında tek bir şey istiyorum: lütfen beni, ailemi ve anne babamı dualarınızda anın. Allah razı olsun.
 ```
 
-**What's new** `498 / 500`
+**What's new** `489 / 500` (2 Nov 2026, rewritten to the approved English; was 498)
 ```
-Namazlarım: size özel namaz kaydı, bu hafta ve son 30 gün, telefonunuzda. Her namazdaki zil uyarısını açar ya da kapatır. Vakit çizelgesi: bu ay ve gelecek ay, her güne bir kart, PDF olarak kaydetme seçeneğiyle. Caminizin cemaat ve Cuma vakitlerini her namazın altına ekleyin. Hicri tarih yılın İslami tarihlerini açar. Kıble artık önce hangi yöne döneceğinizi söyler. Vakitler ve sonraki namaz widget'ı günün hangi vakti olduğunu gösterir. Beş vakit widget şeridi. Caminiz farklıysa caminize uyun.
+Gece vakitleri: İslami gece yarısı, gecenin son üçte biri. Uyarı kontrolü: telefonun neyi engellediğini görün. Sünnet oruçlardan önce isteğe bağlı hatırlatma. Namazlarım: size özel kayıt, telefonunuzda. Her namazdaki zil uyarısını açar ya da kapatır. Vakit çizelgesi, PDF kaydıyla. Caminizin cemaat ve Cuma vakitlerini ekleyin. Hicri tarih yılın İslami tarihlerini açar. Kıble hangi yöne döneceğinizi söyler. Beş vakit widget şeridi. Artık Bengalce de var. Caminiz farklıysa caminize uyun.
 ```
 
 ### Indonesian (id-ID), 1.6.0
@@ -359,39 +367,42 @@ SajdaTime: Jadwal Sholat
 Jadwal sholat offline, adzan, arah kiblat, dan pencatat sholat pribadi. Wear OS.
 ```
 
-**Full description** `3999 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3994)
+**Full description** `3999 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3999)
 ```
 SajdaTime: jadwal sholat (salat), pengingat adzan, kompas kiblat, dan pencatat sholat pribadi untuk Muslim Sunni dan Syiah, di ponsel dan jam Wear OS.
 Dihitung di ponsel, tak perlu sinyal. Tanpa iklan, tanpa akun.
 
 JADWAL SHOLAT DAN KIBLAT
 
-• Subuh, Terbit, Zuhur, Asar, Magrib, Isya, hitung mundur langsung, langit yang mengikuti hari
+• Subuh, Terbit, Zuhur, Asar, Magrib, Isya, hitung mundur langsung, langit berubah
 • Tanggal Hijriah (kalender Islam) dan tanggal Islam setahun, termasuk Syiah
-• Kiblat: kompas utara sejati, menunjukkan arah putar, bergetar saat menghadap Ka'bah
-• Jadwal bulan ini dan bulan depan. Simpan hari ini, 7 hari, sebulan, atau Ramadan ke PDF
+• Kiblat: kompas utara sejati, menunjukkan arah putar, bergetar menghadap Ka'bah
+• Tengah malam Islam, sepertiga malam terakhir, dan metode penghitung waktu Anda
+• Jadwal bulan ini dan depan, PDF sehari, sepekan, sebulan, atau Ramadan
 
 PENGINGAT DAN ADZAN
 
 • Tiap sholat: mati, notifikasi, atau alarm cukup keras untuk Subuh, walau aplikasi ditutup. Bunyikan saat senyap jika mau
-• Adzan (azan) bawaan Sunni dan Syiah, atau suara apa pun di ponsel
-• Pengingat senyap 5 sampai 30 menit sebelum sholat pilihan, notifikasi senyap sholat berikutnya
+• Adzan (azan) Sunni dan Syiah, atau suara apa pun di ponsel
+• Pengingat senyap 5 sampai 30 menit sebelum sholat, notifikasi senyap sholat berikutnya
 • Lonceng di tiap sholat menyalakan atau mematikan pengingat
+• Cek pengingat: apa yang diblokir ponsel Anda, dengan tombol perbaikan
 
 SALAT SAYA
 
-• Pribadi: centang sholat yang dikerjakan, lihat pekan ini dalam lingkaran, 30 hari dalam kalender
-• Mencatat, tak pernah menghakimi. Hari beruntun opsional, Jeda, dan file untuk ponsel baru
-• Puasa yang perlu diganti: satu angka, berkurang satu tiap kali diganti
+• Pribadi: centang tiap sholat, lihat pekan ini dalam lingkaran, 30 hari dalam kalender
+• Mencatat, tak pernah menghakimi. Hari beruntun opsional, Jeda, pindah ke ponsel baru
+• Puasa yang perlu diganti: satu angka, berkurang tiap kali diganti
 
 RAMADAN DAN HARI RAYA
 
 • Sahur dan buka puasa, hitung mundur, lama puasa, imsakiyah Ramadan, ucapan Idul Fitri dan Idul Adha
 • Pengingat sahur 15 sampai 60 menit sebelum sahur usai, otomatis aktif di Ramadan
+• Pengingat opsional malam sebelum puasa sunah: Senin, Kamis, Ayyamul Bidh, Asyura, Arafah, Syawal
 
 WIDGET DAN WEAR OS
 
-• Tiga widget: hitung mundur besar dan jadwal hari ini, keduanya dengan nama kota, dan lima waktu sebaris
+• Tiga widget: hitung mundur, jadwal hari ini, dan lima waktu sebaris
 • Aplikasi, tile, dan kiblat Wear OS yang ikut ponsel atau mandiri
 
 UNTUK SEMUA
@@ -401,10 +412,10 @@ UNTUK SEMUA
 
 MAZHAB ANDA, MASJID ANDA
 
-• Sunni: Hanafi, Syafi'i, Maliki, dan Hanbali, aturan Asar tepat tiap mazhab
+• Sunni: Hanafi, Syafi'i, Maliki, dan Hanbali, aturan Asar tiap mazhab
 • Syiah: Jafari (Itsna Asyariyah), aturan Magrib benar
-• 13 metode perhitungan: Liga Muslim Dunia, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari, dan Teheran, sesuai mazhab Anda. Subuh dan Isya yang wajar di ujung utara
-• Waktu berjamaah (iqamah) dan Jumat masjid Anda di bawah tiap sholat
+• 13 metode perhitungan: Liga Muslim Dunia, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari, dan Teheran
+• Waktu berjamaah (iqamah) dan Jumat masjid Anda
 • Sesuaikan dengan masjid: geser waktu hingga 30 menit atau salin papan masjid, atau geser tanggal Hijriah sehari dua
 
 PRIVASI ANDA
@@ -413,7 +424,6 @@ PRIVASI ANDA
 • Data penggunaan opsional, mati kecuali Anda setuju. Tanpa laporan crash
 • Perkiraan lokasi, dibaca saat aplikasi terbuka, atau ketik kota. Koordinat Anda tak pernah dikirim ke pengembang atau data penggunaan
 • Nama kota dari layanan tempat bawaan ponsel, biasanya Google. Kota yang diketik dicari online di sana, atau oleh Open-Meteo
-• Pencadangan cloud mati: tak ada yang disalin ke server
 
 JUJUR TENTANG APA ADANYA
 
@@ -428,9 +438,9 @@ Tidak ada versi berbayar, langganan, atau fitur yang dikunci. SajdaTime diberika
 Saya hanya minta satu hal sebagai balasan: mohon doakan saya, keluarga saya, dan orang tua saya. Jazakallahu khairan.
 ```
 
-**What's new** `496 / 500`
+**What's new** `497 / 500` (2 Nov 2026, rewritten to the approved English; was 496)
 ```
-Salat saya: catatan salat pribadi, minggu ini dan 30 hari terakhir, tersimpan di ponsel. Lonceng di tiap salat menyalakan atau mematikan pengingat. Jadwal: bulan ini dan bulan depan dalam kartu harian dan Simpan PDF. Tambah waktu berjamaah dan Jumat masjid Anda di bawah tiap salat. Tanggal Hijriah membuka tanggal Islam setahun. Kiblat kini menunjukkan arah putar dulu. Waktu dan widget salat berikutnya mengikuti waktu hari. Widget baris lima waktu. Jika masjid Anda berbeda, ikuti masjid Anda.
+Waktu malam: tengah malam Islam dan sepertiga malam terakhir. Cek pengingat: apa yang diblokir ponsel. Pengingat opsional sebelum puasa sunah. Salat saya: catatan salat pribadi, tersimpan di ponsel. Lonceng di tiap salat menyalakan atau mematikan pengingat. Jadwal dengan Simpan PDF. Tambah waktu berjamaah dan Jumat masjid Anda. Tanggal Hijriah membuka tanggal Islam setahun. Kiblat menunjukkan arah putar. Widget baris lima waktu. Kini dalam Bengali. Jika masjid Anda berbeda, ikuti masjid Anda.
 ```
 
 ### Malay (ms-MY), 1.6.0
@@ -447,39 +457,42 @@ SajdaTime: Waktu Solat, Kiblat
 Waktu solat, azan, arah kiblat dan penjejak solat peribadi, juga di Wear OS.
 ```
 
-**Full description** `3996 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 4000)
+**Full description** `3996 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3996)
 ```
 SajdaTime memberi waktu solat, peringatan azan, kompas kiblat dan penjejak solat peribadi untuk Muslim Sunni dan Syiah di telefon dan jam Wear OS.
 Dikira di telefon, tidak perlu isyarat. Tiada iklan, tiada akaun.
 
 WAKTU SOLAT DAN KIBLAT
 
-• Subuh, Syuruk, Zohor, Asar, Maghrib dan Isyak, kiraan detik langsung dan langit ikut waktu hari
+• Subuh, Syuruk, Zohor, Asar, Maghrib dan Isyak, kiraan detik langsung dan langit berubah
 • Tarikh Hijrah (kalendar Islam) dan tarikh Islam setahun, termasuk Syiah
-• Arah kiblat: kompas utara benar, tunjuk arah pusing, bergetar apabila menghadap Kaabah
-• Jadual bulan ini dan bulan depan. Simpan hari ini, 7 hari, sebulan atau Ramadan dalam PDF
+• Arah kiblat: kompas utara benar, tunjuk arah pusing, bergetar menghadap Kaabah
+• Tengah malam Islam, sepertiga malam terakhir dan kaedah pengira waktu anda
+• Jadual bulan ini dan depan, PDF sehari, seminggu, sebulan atau Ramadan
 
 PERINGATAN DAN AZAN
 
 • Tiap solat: tiada, pemberitahuan atau penggera cukup kuat untuk Subuh, walau aplikasi ditutup. Boleh bunyi ketika senyap
 • Azan Sunni dan Syiah, atau sebarang bunyi telefon
-• Peringatan lembut 5 hingga 30 minit sebelum solat dipilih, pemberitahuan senyap solat seterusnya
+• Peringatan lembut 5 hingga 30 minit sebelum solat, pemberitahuan senyap solat seterusnya
 • Loceng di tiap solat: hidup atau matikan peringatan
+• Semakan peringatan: apa yang disekat telefon anda, dengan butang pembetulan
 
 SOLAT SAYA
 
-• Peribadi: tanda solat yang didirikan, lihat minggu dalam bulatan, 30 hari dalam kalendar
-• Ia merekod, tidak pernah menghakimi. Rentetan hari pilihan, Jeda dan fail untuk telefon baharu
-• Puasa ganti: satu kiraan, tolak satu tiap kali diganti
+• Peribadi: tanda setiap solat, lihat minggu dalam bulatan, 30 hari dalam kalendar
+• Ia merekod, tak pernah menghakimi. Rentetan hari pilihan, Jeda, pindah ke telefon baharu
+• Puasa ganti: satu kiraan, berkurang tiap kali diganti
 
 RAMADAN DAN HARI RAYA
 
 • Sahur dan berbuka, kiraan detik, tempoh puasa, jadual Ramadan dan ucapan Aidilfitri dan Aidiladha
 • Peringatan sahur 15 hingga 60 minit sebelum tamatnya, hidup secara lalai dalam Ramadan
+• Peringatan pilihan malam sebelum puasa sunat: Isnin, Khamis, Ayyamul Bidh, Asyura, Arafah, Syawal
 
 WIDGET DAN WEAR OS
 
-• Tiga widget: kiraan detik besar dan waktu hari ini, kedua-duanya dengan nama bandar, serta lima waktu sebaris
+• Tiga widget: kiraan detik, waktu hari ini dan lima waktu sebaris
 • Aplikasi, tile dan kiblat Wear OS, ikut telefon atau berdiri sendiri
 
 UNTUK SEMUA
@@ -489,10 +502,10 @@ UNTUK SEMUA
 
 MAZHAB ANDA, MASJID ANDA
 
-• Sunni: Hanafi, Syafie, Maliki dan Hanbali, tiap satu dengan kaedah Asar yang betul
+• Sunni: Hanafi, Syafie, Maliki dan Hanbali, tiap satu dengan kaedah Asar
 • Syiah: Jafari / Ithna Asyari, dengan kaedah Maghrib yang betul
-• 13 kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari dan Tehran, ikut mazhab anda. Subuh dan Isyak munasabah di jauh utara
-• Waktu berjemaah (iqamah) dan Jumaat masjid anda di bawah tiap solat
+• 13 kaedah pengiraan: Muslim World League, ISNA, Umm al-Qura, Mesir, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari dan Tehran
+• Waktu berjemaah (iqamah) dan Jumaat masjid anda
 • Ikut masjid anda: alih solat hingga 30 minit, salin papan masjid, atau anjak tarikh Hijrah sehari dua
 
 PRIVASI ANDA
@@ -500,8 +513,7 @@ PRIVASI ANDA
 • Tiada pembelian, akaun, log masuk
 • Kiraan penggunaan pilihan, mati kecuali anda setuju. Tiada laporan ranap
 • Lokasi anggaran, dibaca semasa aplikasi dibuka, atau taip nama bandar. Koordinat anda tidak pernah dihantar kepada pembangun atau kiraan penggunaan
-• Nama bandar datang dari perkhidmatan tempat telefon, biasanya Google. Bandar ditaip dicari dalam talian di situ atau oleh Open-Meteo
-• Sandaran awan dimatikan: tiada apa disalin ke pelayan
+• Nama bandar dari perkhidmatan tempat telefon, biasanya Google. Bandar ditaip dicari dalam talian di situ atau oleh Open-Meteo
 
 JUJUR TENTANG APA ADANYA
 
@@ -516,9 +528,9 @@ Tiada versi berbayar, tiada langganan dan tiada yang dikunci. SajdaTime diberi p
 Saya hanya minta satu perkara sebagai balasan: sudilah doakan saya, keluarga saya dan ibu bapa saya. Jazakallahu khairan.
 ```
 
-**What's new** `494 / 500`
+**What's new** `494 / 500` (2 Nov 2026, rewritten to the approved English; was 494)
 ```
-Solat saya: rekod solat peribadi, minggu ini dan 30 hari lalu, di telefon anda. Loceng pada setiap solat: hidupkan atau matikan peringatannya. Jadual bulan ini dan bulan depan: kad harian, simpan PDF. Tambah waktu berjemaah dan Jumaat masjid anda di bawah tiap solat. Tarikh Hijrah membuka tarikh Islam sepanjang tahun. Kiblat kini memberitahu arah pusing dahulu. Skrin waktu dan widget solat seterusnya kini ikut waktu hari. Widget baris lima waktu. Jika masjid anda berbeza, ikut masjid anda.
+Waktu malam: tengah malam Islam dan sepertiga malam terakhir. Semakan peringatan: apa yang disekat telefon. Peringatan pilihan sebelum puasa sunat. Solat saya: rekod solat peribadi, di telefon. Loceng pada setiap solat: hidupkan atau matikan peringatannya. Jadual dengan simpan PDF. Tambah waktu berjemaah dan Jumaat masjid anda. Tarikh Hijrah membuka tarikh Islam setahun. Kiblat memberitahu arah pusing. Widget baris lima waktu. Kini dalam Bengali. Jika masjid anda berbeza, ikut masjid anda.
 ```
 
 ### Bengali (bn-BD), 1.6.0
@@ -535,39 +547,42 @@ SajdaTime: নামাজের সময়সূচি
 অফলাইন নামাজের সময়, আজান, কিবলা কম্পাস ও ব্যক্তিগত নামাজ ট্র্যাকার, Wear OS
 ```
 
-**Full description** `3983 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3968)
+**Full description** `3996 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3983)
 ```
 SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের (সালাত) সময়সূচি, আজানের অ্যালার্ট, কিবলা কম্পাস ও ব্যক্তিগত নামাজ ট্র্যাকার নিয়ে আসে, আপনার ফোন ও Wear OS ঘড়িতে।
-সময় আপনার ফোনেই হিসাব হয়, তাই অফলাইনে, নেটওয়ার্ক না থাকলেও চলে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না।
+সময় আপনার ফোনেই হিসাব হয়, অফলাইনে, নেটওয়ার্ক না থাকলেও চলে। কোনো বিজ্ঞাপন নেই, অ্যাকাউন্ট লাগে না।
 
 নামাজের সময় ও কিবলা
 
-• ফজর, সূর্যোদয়, যোহর, আসর, মাগরিব ও এশা, লাইভ কাউন্টডাউন আর দিনের সঙ্গে বদলানো আকাশ
+• ফজর, সূর্যোদয়, যোহর, আসর, মাগরিব ও এশা, লাইভ কাউন্টডাউন আর বদলানো আকাশ
 • হিজরি তারিখ (ইসলামি ক্যালেন্ডার) ও বছরের ইসলামি তারিখ, শিয়া তারিখসহ
 • কিবলার দিক: প্রকৃত উত্তর অনুযায়ী কম্পাস, কোন দিকে ঘুরবেন বলে, কাবার দিকে মুখ করলে ভাইব্রেট করে
-• এই মাস ও পরের মাসের সময়সূচি। আজ, ৭ দিন, পুরো মাস বা রমজান PDF হিসেবে সেভ করুন
+• ইসলামি মধ্যরাত, রাতের শেষ তৃতীয়াংশ, ও কোন পদ্ধতিতে আপনার সময় হিসাব হয়েছে
+• এই মাস ও পরের মাসের সময়সূচি, ও একদিন, এক সপ্তাহ, পুরো মাস বা রমজানের PDF
 
 অ্যালার্ট ও আজান
 
 • প্রতি ওয়াক্তে: কিছুই না, নোটিফিকেশন, অথবা ফজরের জন্য যথেষ্ট জোরালো অ্যালার্ম, অ্যাপ বন্ধ থাকলেও। চাইলে সাইলেন্টেও বাজবে
-• সুন্নি ও শিয়াদের জন্য অ্যাপেই আজান (আযান), অথবা ফোনের যেকোনো শব্দ
-• বেছে নেওয়া নামাজের ৫ থেকে ৩০ মিনিট আগে শান্ত রিমাইন্ডার, আর পরের নামাজের নীরব নোটিফিকেশন
+• সুন্নি ও শিয়াদের জন্য আজান (আযান), অথবা ফোনের যেকোনো শব্দ
+• নামাজের ৫ থেকে ৩০ মিনিট আগে শান্ত রিমাইন্ডার, আর পরের নামাজের নীরব নোটিফিকেশন
 • প্রতিটি নামাজে একটি ঘণ্টা, তার অ্যালার্ট চালু বা বন্ধ করতে
+• অ্যালার্ট পরীক্ষা: ফোন কী আটকে দিচ্ছে, ঠিক করার বোতামসহ
 
 আমার নামাজ
 
-• ব্যক্তিগত: যে নামাজ পড়েন তাতে টিক দিন, সপ্তাহ রিংয়ে আর ৩০ দিন ক্যালেন্ডারে দেখুন
-• এটি শুধু রেকর্ড রাখে, কখনও বিচার করে না। ঐচ্ছিক টানা দিন, বিরতি, আর নতুন ফোনে নেওয়ার ফাইল
+• ব্যক্তিগত: প্রতিটি নামাজে টিক দিন, সপ্তাহ রিংয়ে আর ৩০ দিন ক্যালেন্ডারে দেখুন
+• এটি শুধু রেকর্ড রাখে, কখনও বিচার করে না। ঐচ্ছিক টানা দিন, বিরতি, আর নতুন ফোনে নেওয়া
 • যে রোজাগুলো পূরণ করবেন: একটি সংখ্যা, প্রতিবার পূরণ করলে এক কমে
 
 রমজান ও ঈদ
 
 • সাহরি (সেহরি) ও ইফতারের সময়, কাউন্টডাউন, রোজা কতক্ষণের, রমজানের সময়সূচি, আর ঈদুল ফিতর ও ঈদুল আজহায় শুভেচ্ছা
 • সাহরি শেষের ১৫ থেকে ৬০ মিনিট আগে রিমাইন্ডার, রমজানে ডিফল্ট হিসেবে চালু
+• সুন্নত রোজার আগের সন্ধ্যায় ঐচ্ছিক রিমাইন্ডার: সোমবার, বৃহস্পতিবার, আইয়ামে বীজ, আশুরা, আরাফা, শাওয়াল
 
 উইজেট ও Wear OS
 
-• তিনটি উইজেট: বড় কাউন্টডাউন ও আজকের সময়, দুটোতেই শহরের নাম, আর এক সারিতে পাঁচ ওয়াক্ত
+• তিনটি উইজেট: কাউন্টডাউন, আজকের সময়, আর এক সারিতে পাঁচ ওয়াক্ত
 • Wear OS অ্যাপ, টাইল ও কিবলা, ফোন মেনে বা নিজে নিজে চলে
 
 সবার জন্য
@@ -577,10 +592,10 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 
 আপনার মাযহাব, আপনার মসজিদ
 
-• সুন্নি: হানাফি, শাফেয়ি, মালেকি ও হাম্বলি, প্রতিটির জন্য আসরের সঠিক নিয়ম
+• সুন্নি: হানাফি, শাফেয়ি, মালেকি ও হাম্বলি, প্রতিটির জন্য আসরের নিয়ম
 • শিয়া: জাফরি / ইসনা আশারি, মাগরিবের সঠিক নিয়মসহ
-• ১৩টি গণনা পদ্ধতি: মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, মিশরীয়, করাচি, দুবাই, কুয়েত, কাতার, Kemenag/MUIS, দিয়ানেত, মুনসাইটিং কমিটি, জাফরি ও তেহরান, মাযহাব অনুযায়ী ঠিক করা। সুদূর উত্তরেও ফজর ও এশার যুক্তিসঙ্গত সময়
-• প্রতিটি নামাজের নিচে আপনার মসজিদের জামাত (ইকামত) ও জুমার সময়
+• ১৩টি গণনা পদ্ধতি: মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, মিশরীয়, করাচি, দুবাই, কুয়েত, কাতার, Kemenag/MUIS, দিয়ানেত, মুনসাইটিং কমিটি, জাফরি ও তেহরান
+• আপনার মসজিদের জামাত (ইকামত) ও জুমার সময়
 • মসজিদের শুরুর সময়ের সাথে মেলান: কোনো নামাজ ৩০ মিনিট পর্যন্ত সরান বা বোর্ডের সময় নিন, অথবা ইসলামি তারিখ এক বা দুই দিন সরান
 
 আপনার গোপনীয়তা
@@ -589,7 +604,6 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 • ঐচ্ছিক ব্যবহারের গণনা, রাজি না হলে বন্ধ থাকে। কোনো ক্র্যাশ রিপোর্টিং নেই
 • আনুমানিক অবস্থান, অ্যাপ খোলা থাকার সময় পড়া হয়, অথবা শহরের নাম লিখুন। আপনার স্থানাঙ্ক কখনও ডেভেলপারের কাছে বা ব্যবহারের গণনায় যায় না
 • শহরের নাম আসে ফোনের নিজস্ব স্থান সেবা থেকে, সাধারণত Google। আপনার লেখা শহর সেখানেই অনলাইনে খোঁজা হয়, অথবা Open-Meteo দিয়ে
-• ক্লাউড ব্যাকআপ বন্ধ, তাই কোনো সার্ভারে কিছুই কপি হয় না
 
 এটি আসলে কী, সৎভাবে বলি
 
@@ -604,9 +618,9 @@ SajdaTime একটি সহায়ক, কোনো ধর্মীয় �
 বিনিময়ে আমার একটাই অনুরোধ: অনুগ্রহ করে আপনার দোয়ায় আমাকে, আমার পরিবারকে ও আমার মা বাবাকে রাখবেন। জাযাকাল্লাহু খাইরান।
 ```
 
-**What's new** `490 / 500`
+**What's new** `497 / 500` (2 Nov 2026, rewritten to the approved English; was 490)
 ```
-অ্যাপ এখন বাংলায়। আমার নামাজ: আপনার নামাজের ব্যক্তিগত রেকর্ড, এই সপ্তাহ ও গত ৩০ দিন, ফোনেই রাখা। প্রতিটি নামাজের ঘণ্টা তার অ্যালার্ট চালু বা বন্ধ করে। সময়সূচি: এই মাস ও পরের মাস, PDF সেভের সুবিধাসহ। প্রতিটি নামাজের নিচে আপনার মসজিদের জামাত ও জুমার সময় যোগ করুন। হিজরি তারিখ খুললে বছরের ইসলামি তারিখগুলো দেখা যায়। কিবলা এখন বলে দেয় আগে কোন দিকে ঘুরবেন। সময়ের স্ক্রিন ও পরের নামাজের উইজেট দিনের কোন সময় তা দেখায়। পাঁচ ওয়াক্তের উইজেট সারি। মসজিদের সঙ্গে অমিল হলে মসজিদকেই অনুসরণ করুন।
+অ্যাপ এখন বাংলায়। রাতের সময়: ইসলামি মধ্যরাত ও রাতের শেষ তৃতীয়াংশ। অ্যালার্ট পরীক্ষা: আপনার ফোন কী আটকে দিচ্ছে তা দেখুন। সুন্নত রোজার আগে ঐচ্ছিক রিমাইন্ডার। আমার নামাজ: আপনার নামাজের ব্যক্তিগত রেকর্ড, ফোনেই রাখা। প্রতিটি নামাজের ঘণ্টা তার অ্যালার্ট চালু বা বন্ধ করে। সময়সূচি, PDF সেভের সুবিধাসহ। আপনার মসজিদের জামাত ও জুমার সময় যোগ করুন। হিজরি তারিখ খুললে বছরের ইসলামি তারিখগুলো দেখা যায়। কিবলা বলে দেয় কোন দিকে ঘুরবেন। পাঁচ ওয়াক্তের উইজেট সারি। মসজিদের সঙ্গে অমিল হলে মসজিদকেই অনুসরণ করুন।
 ```
 
 ### French (fr-FR), 1.6.0
@@ -623,61 +637,63 @@ SajdaTime: Horaires de prière
 Heures de prière hors ligne, adhan, Qibla et suivi privé des prières. Wear OS
 ```
 
-**Full description** `3992 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3999)
+**Full description** `3998 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3992)
 ```
 SajdaTime : horaires de prière (salat), alertes d'adhan, boussole Qibla et suivi privé des prières, pour sunnites et chiites, sur téléphone et montre Wear OS.
 Calculés sur le téléphone, sans réseau. Ni pub ni compte.
 
 HORAIRES ET QIBLA
 
-• Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha, compte à rebours en direct, ciel qui suit la journée
+• Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha, compte à rebours en direct, ciel changeant
 • Date hégirienne et dates islamiques de l'année, dont chiites
 • Qibla : boussole au nord vrai qui dit où tourner, vibre face à la Kaaba
-• Horaires du mois et du suivant. PDF du jour, de 7 jours, du mois ou du Ramadan
+• Minuit islamique, dernier tiers de la nuit, méthode de calcul utilisée
+• Horaires du mois et du suivant, PDF d'un jour, semaine, mois ou Ramadan
 
 ALERTES ET ADHAN
 
 • Par prière : rien, notification ou alarme assez forte pour le Fajr, même l'appli fermée. Sonne en silencieux au choix
-• Adhan (azan) sunnite et chiite inclus, ou tout son du téléphone
-• Rappel discret 5 à 30 min avant les prières choisies, notification silencieuse de la suivante
+• Adhan (azan) sunnite et chiite, ou tout son du téléphone
+• Rappel discret 5 à 30 min avant une prière, notification silencieuse de la suivante
 • Une cloche par prière active ou coupe son alerte
+• Contrôle des alertes : ce que bloque le téléphone, bouton pour corriger
 
 MES PRIÈRES
 
-• Privé : cochez chaque prière faite. Semaine en anneaux, 30 jours en calendrier
-• Un relevé, pas un jugement. Série facultative, Pause et fichier pour changer de téléphone
+• Privé : cochez chaque prière. Semaine en anneaux, 30 jours en calendrier
+• Un relevé, pas un jugement. Série facultative, Pause, passage à un nouveau téléphone
 • Jeûnes à rattraper : un compteur qui baisse à chaque rattrapage
 
 RAMADAN ET AÏD
 
 • Suhoor et iftar, compte à rebours, durée du jeûne, tableau du Ramadan, vœux pour l'Aïd al-Fitr et l'Aïd al-Adha
 • Rappel du suhoor 15 à 60 min avant la fin, actif par défaut au Ramadan
+• Rappels facultatifs le soir avant un jeûne sunna : lundi, jeudi, jours blancs, Achoura, Arafat, Chawwal
 
 WIDGETS ET WEAR OS
 
-• Trois widgets : grand compte à rebours et horaires du jour, chacun avec votre ville, et cinq prières sur une ligne
+• Trois widgets : compte à rebours, horaires du jour, cinq prières sur une ligne
 • Appli, tuile et Qibla Wear OS, avec ou sans téléphone
 
 POUR TOUS
 
-• Appli en anglais, arabe, ourdou, bengali, turc et indonésien (sans français), au choix ou selon le téléphone
+• Appli en anglais, arabe, ourdou, bengali, turc, indonésien (sans français), au choix ou selon le téléphone
 • Thèmes clair et sombre, grand texte, lecteurs d'écran
 
 VOTRE ÉCOLE, VOTRE MOSQUÉE
 
-• Sunnite : hanafite, chaféite, malikite, hanbalite, chacune sa bonne règle d'Asr
-• Chiite : jafarite / duodécimain, avec la bonne règle du Maghrib
-• 13 méthodes : Ligue islamique mondiale, ISNA, Umm al Qura, Égypte, Karachi, Dubaï, Koweït, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari et Téhéran, selon votre école. Fajr et Isha raisonnables dans le Grand Nord
-• Jama'ah (iqama) et Joumou'a de votre mosquée sous chaque prière
+• Sunnite : hanafite, chaféite, malikite, hanbalite, chacune sa règle d'Asr
+• Chiite : jafarite / duodécimain, bonne règle du Maghrib
+• 13 méthodes : Ligue islamique mondiale, ISNA, Umm al Qura, Égypte, Karachi, Dubaï, Koweït, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari et Téhéran
+• Jama'ah (iqama) et Joumou'a de votre mosquée
 • Suivre votre mosquée : décalez une prière (30 min max) ou la date hégirienne (1 ou 2 jours), ou copiez son affichage
 
 VOTRE VIE PRIVÉE
 
-• Rien à acheter, ni compte, ni connexion
+• Rien à acheter, ni compte ni connexion
 • Compteurs d'usage facultatifs, inactifs sans votre accord. Aucun rapport de plantage
-• Position approximative, lue l'appli ouverte, ou saisissez votre ville. Vos coordonnées ne vont jamais au développeur ni dans les compteurs
+• Position approximative, lue l'appli ouverte, ou saisissez votre ville. Vos coordonnées ne vont jamais au développeur ni aux compteurs
 • Nom de la ville : service de localisation du téléphone, en général Google. Une ville saisie y est cherchée en ligne, ou par Open-Meteo
-• Sauvegarde cloud coupée : rien n'est copié sur un serveur
 
 EN TOUTE HONNÊTETÉ
 
@@ -692,9 +708,9 @@ Ni version payante, ni abonnement, rien de verrouillé. SajdaTime est offert en 
 Je ne demande qu'une chose en retour : pensez à moi, à ma famille et à mes parents dans vos douas. Jazak Allah khayr.
 ```
 
-**What's new** `500 / 500`
+**What's new** `499 / 500` (2 Nov 2026, rewritten to the approved English; was 500)
 ```
-Mes prières : suivi privé, semaine et 30 derniers jours, sur le téléphone. Une cloche par prière active ou coupe son alerte. Calendrier : ce mois et le suivant, une carte par jour, à enregistrer en PDF. Ajoutez la jama'ah et le Joumou'a de votre mosquée sous chaque prière. La date hégirienne ouvre les dates islamiques de l'année. La Qibla dit où tourner d'abord. Horaires et widget prochaine prière suivent le moment du jour. Widget des cinq prières. Si votre mosquée diffère, suivez votre mosquée.
+Nuit : minuit islamique et dernier tiers de la nuit. Contrôle des alertes : ce que bloque votre téléphone. Rappels facultatifs avant les jeûnes sunna. Mes prières : suivi privé, sur le téléphone. Une cloche par prière active ou coupe son alerte. Calendrier, enregistrable en PDF. Ajoutez jama'ah et Joumou'a de votre mosquée. La date hégirienne ouvre les dates islamiques de l'année. La Qibla dit où tourner. Widget des cinq prières. Aussi en bengali. Si votre mosquée diffère, suivez votre mosquée.
 ```
 
 ### Hindi (hi-IN), 1.6.0
@@ -711,39 +727,42 @@ SajdaTime: नमाज़ का समय
 ऑफ़लाइन नमाज़ का समय, अज़ान, किबला और निजी नमाज़ ट्रैकर, सुन्नी और शिया, Wear OS
 ```
 
-**Full description** `3990 / 4000` (30 Oct 2026, rewritten from the whole app English Ali approved that day; was 3998)
+**Full description** `3980 / 4000` (2 Nov 2026, rebuilt from the English Ali approved that day, see the note at the top of this section; was 3990)
 ```
 SajdaTime आपको नमाज़ (सलात) का समय, अज़ान अलर्ट, क़िबला कम्पास और निजी नमाज़ ट्रैकर देता है, सुन्नी और शिया मुसलमानों के लिए, आपके फ़ोन और Wear OS घड़ी पर।
-समय फ़ोन पर ही निकलता है, इसलिए सिग्नल की ज़रूरत नहीं। कोई विज्ञापन नहीं, कोई खाता नहीं।
+समय फ़ोन पर ही निकलता है, सिग्नल की ज़रूरत नहीं। कोई विज्ञापन नहीं, कोई खाता नहीं।
 
 नमाज़ का समय और क़िबला
 
-• फ़ज्र, सूर्योदय, ज़ुहर, अस्र, मग़रिब और इशा, लाइव काउंटडाउन और दिन के साथ बदलता आसमान
+• फ़ज्र, सूर्योदय, ज़ुहर, अस्र, मग़रिब और इशा, लाइव काउंटडाउन और बदलता आसमान
 • हिजरी तारीख़ (इस्लामी कैलेंडर) और साल की इस्लामी तारीख़ें, शिया तारीख़ें भी
 • क़िबला: असली उत्तर वाला कम्पास, जो बताता है किस तरफ़ मुड़ें और काबा की ओर मुँह होते ही वाइब्रेट करता है
-• इस और अगले महीने का टाइम टेबल। आज, 7 दिन, महीना या रमज़ान PDF में सेव करें
+• इस्लामी आधी रात, रात की आख़िरी तिहाई, और किस तरीक़े से आपके समय निकले
+• इस और अगले महीने का टाइम टेबल, और एक दिन, एक हफ़्ते, महीने या रमज़ान का PDF
 
 अलर्ट और अज़ान
 
 • हर नमाज़ के लिए: कुछ नहीं, नोटिफ़िकेशन, या फ़ज्र के लिए काफ़ी तेज़ अलार्म, ऐप बंद होने पर भी। चाहें तो साइलेंट पर भी बजे
-• सुन्नी और शिया दोनों के लिए ऐप में ही अज़ान (azan), या फ़ोन की कोई भी आवाज़
-• चुनी हुई नमाज़ों से 5 से 30 मिनट पहले हल्का रिमाइंडर, और अगली नमाज़ का साइलेंट नोटिफ़िकेशन
+• सुन्नी और शिया दोनों के लिए अज़ान (azan), या फ़ोन की कोई भी आवाज़
+• नमाज़ से 5 से 30 मिनट पहले हल्का रिमाइंडर, और अगली नमाज़ का साइलेंट नोटिफ़िकेशन
 • हर नमाज़ पर एक घंटी, उसका अलर्ट चालू या बंद करने के लिए
+• अलर्ट जाँच: आपका फ़ोन क्या रोक रहा है, ठीक करने के बटन के साथ
 
 मेरी नमाज़ें
 
-• निजी: पढ़ी हुई हर नमाज़ पर टिक करें, हफ़्ता छल्लों में और 30 दिन कैलेंडर में देखें
-• यह बस दर्ज करता है, कभी परखता नहीं। वैकल्पिक स्ट्रीक, पॉज़, और नए फ़ोन पर ले जाने के लिए एक फ़ाइल
+• निजी: हर नमाज़ पर टिक करें, हफ़्ता छल्लों में और 30 दिन कैलेंडर में देखें
+• यह बस दर्ज करता है, कभी परखता नहीं। वैकल्पिक स्ट्रीक, पॉज़, और नए फ़ोन पर ले जाना
 • बाक़ी रोज़े: एक ही गिनती, हर बाक़ी रोज़ा रखने पर एक कम
 
 रमज़ान और ईद
 
 • सहरी और इफ़्तार का समय, काउंटडाउन, रोज़े की अवधि, रमज़ान टाइम टेबल, और ईद उल फ़ित्र व ईद उल अज़हा पर मुबारकबाद
 • सहरी ख़त्म होने से 15 से 60 मिनट पहले रिमाइंडर, रमज़ान में पहले से चालू
+• सुन्नत रोज़े से एक शाम पहले वैकल्पिक रिमाइंडर: सोमवार, गुरुवार, अय्याम ए बीज़, आशूरा, अरफ़ा, शव्वाल
 
 विजेट और Wear OS
 
-• तीन विजेट: बड़ा काउंटडाउन और आज के समय, दोनों में आपके शहर का नाम, और एक पंक्ति में पाँचों नमाज़ें
+• तीन विजेट: काउंटडाउन, आज के समय, और एक पंक्ति में पाँचों नमाज़ें
 • Wear OS ऐप, टाइल और क़िबला, फ़ोन के अनुसार या अपने आप
 
 सबके लिए
@@ -753,10 +772,10 @@ SajdaTime आपको नमाज़ (सलात) का समय, अज�
 
 आपका मसलक, आपकी मस्जिद
 
-• सुन्नी: हनफ़ी, शाफ़ई, मालिकी और हंबली, हर एक के लिए अस्र का सही नियम
+• सुन्नी: हनफ़ी, शाफ़ई, मालिकी और हंबली, हर एक के लिए अस्र का नियम
 • शिया: जाफ़री / इसना अशरी, मग़रिब के सही नियम के साथ
-• हिसाब के 13 तरीक़े: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल क़ुरा, मिस्र, कराची, दुबई, कुवैत, क़तर, Kemenag/MUIS, दियानत, मूनसाइटिंग कमेटी, जाफ़री और तेहरान, आपके मसलक के हिसाब से सेट। सुदूर उत्तर में भी फ़ज्र और इशा के मुनासिब समय
-• हर नमाज़ के नीचे आपकी मस्जिद की जमाअत (इक़ामत) और जुमा का समय
+• हिसाब के 13 तरीक़े: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल क़ुरा, मिस्र, कराची, दुबई, कुवैत, क़तर, Kemenag/MUIS, दियानत, मूनसाइटिंग कमेटी, जाफ़री और तेहरान
+• आपकी मस्जिद की जमाअत (इक़ामत) और जुमा का समय
 • अपनी मस्जिद से मिलाएँ: कोई नमाज़ 30 मिनट तक आगे पीछे करें या बोर्ड से समय लें, या इस्लामी तारीख़ एक या दो दिन आगे पीछे करें
 
 आपकी निजता
@@ -765,7 +784,6 @@ SajdaTime आपको नमाज़ (सलात) का समय, अज�
 • वैकल्पिक उपयोग आँकड़े, आपकी हाँ के बिना बंद। कोई क्रैश रिपोर्टिंग नहीं
 • अनुमानित लोकेशन, ऐप खुला होने पर ही पढ़ी जाती है, या उसकी जगह शहर का नाम लिखें। आपके कोऑर्डिनेट्स कभी डेवलपर तक या उपयोग आँकड़ों में नहीं जाते
 • शहर का नाम फ़ोन की अपनी जगह खोजने वाली सेवा से आता है, आम तौर पर Google। लिखा गया शहर वहीं ऑनलाइन ढूँढा जाता है, या Open-Meteo से
-• क्लाउड बैकअप बंद: किसी सर्वर पर कुछ भी कॉपी नहीं होता
 
 यह क्या है, ईमानदारी से
 
@@ -780,9 +798,9 @@ SajdaTime एक मददगार है, कोई दीनी अथॉर�
 बदले में मैं बस एक ही चीज़ माँगता हूँ: कृपया मुझे, मेरे परिवार को और मेरे माँ बाप को अपनी दुआओं में याद रखें। जज़ाकल्लाह ख़ैर।
 ```
 
-**What's new** `499 / 500`
+**What's new** `499 / 500` (2 Nov 2026, rewritten to the approved English; was 499)
 ```
-मेरी नमाज़ें: आपकी नमाज़ों का निजी रिकॉर्ड, इस हफ़्ते और पिछले 30 दिन, फ़ोन पर ही। हर नमाज़ की घंटी उसका अलर्ट चालू या बंद करती है। टाइम टेबल: यह महीना और अगला, हर दिन का कार्ड, PDF सेव के साथ। हर नमाज़ के नीचे अपनी मस्जिद की जमाअत और जुमा का समय जोड़ें। हिजरी तारीख़ से साल की इस्लामी तारीख़ें खुलती हैं। क़िबला अब बताता है कि पहले किस तरफ़ मुड़ें। समय वाली स्क्रीन और अगली नमाज़ का विजेट दिन का पहर दिखाते हैं। पाँच नमाज़ों की विजेट पट्टी। जहाँ आपकी मस्जिद में अंतर हो, अपनी मस्जिद के अनुसार चलें।
+रात के समय: इस्लामी आधी रात और रात की आख़िरी तिहाई। अलर्ट जाँच: देखें फ़ोन क्या रोक रहा है। सुन्नत रोज़ों से पहले वैकल्पिक रिमाइंडर। मेरी नमाज़ें: नमाज़ों का निजी रिकॉर्ड, फ़ोन पर ही। हर नमाज़ की घंटी उसका अलर्ट चालू या बंद करती है। टाइम टेबल, PDF सेव के साथ। अपनी मस्जिद की जमाअत और जुमा का समय जोड़ें। हिजरी तारीख़ से साल की इस्लामी तारीख़ें खुलती हैं। क़िबला बताता है कि किस तरफ़ मुड़ें। पाँच नमाज़ों की विजेट पट्टी। ऐप अब बांग्ला में भी। जहाँ आपकी मस्जिद में अंतर हो, अपनी मस्जिद के अनुसार चलें।
 ```
 
 ---

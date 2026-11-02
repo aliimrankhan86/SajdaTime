@@ -380,3 +380,7 @@ and Bengali What's new add that the app is now in Bengali. Small cuts to fit are
 by an independent Opus review for meaning, grammar and length (all within limits, Malay at exactly 4000: check Play's
 counter). Not back translated line by line like the rest of this file; the counts table above is from 25 Oct and the
 current counts are in `LISTING-LOCALES.md`.
+
+---
+
+**2 Nov 2026, evening: the three 1.6.0 additions (night times and "which method made your times", Alert check, optional Sunnah fast reminders) and a rewritten What's new**, translated as a diff of the English Ali approved that day ("Approve text") and independently reviewed by an Opus `reviewer` (back translation of every new line matched the English in all eight; HONEST and FREE byte for byte unchanged). Current counts are those in `LISTING-LOCALES.md` (table at the top of "1.6.0 listings"), not the 30 Oct figures above; every full description now has 29 bullets, not 27. Fixes from that review: Malay "malam" not "petang" (the reminder rings after Isha), Hindi "रात की आख़िरी तिहाई" (feminine), Arabic «صيام التطوع» not «صيام السنة» (which also reads as "the Sunni fast"), Turkish "Artık Bengalce de var." Dropped to fit, as in the English: the "Cloud backup is off" line (still in `docs/privacy.html`), "Sensible Fajr and Isha in the far north", "set for your school", "with your town" on the widgets line. Not checked: how Bengali, Hindi and Malay read to a native speaker; Play's own counter (Turkish and Indonesian have 1 to 3 characters spare).
