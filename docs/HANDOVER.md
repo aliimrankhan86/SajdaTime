@@ -6090,6 +6090,20 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 1.6.0 SUBMITTED FOR REVIEW, 2 Nov 2026 (read this first)
+
+PR 17 merged into `main` (f5861af). Bundle 10 / 1.6.0 (built fresh from `main`, signed by Ali's key, 10028156 bytes)
+uploaded to Production; release notes and the new short and full descriptions saved for all nine languages (the
+approved texts in `docs/store/LISTING.md` "DRAFT 2 Nov 2026 ... APPROVED" and `LISTING-LOCALES.md`); Data safety
+confirmed unchanged by Ali; Play's quick checks passed; **Ali pressed "Submit 19 changes for review"** (1 release + 18
+listing changes) in the evening. Play then showed "Changes in review" with one more automatic check (up to 7 minutes).
+Driven in Chrome by Claude up to the Save buttons, which a safety check blocked, so Ali pressed Save and Submit himself.
+Warning on the release: only the known "no debug symbols". **Not live yet.** Proof it is: the public page "Updated on"
+date moves (Play sends no email). Then, still to do: mark LISTING.md and LISTING-LOCALES.md "LIVE since <date>", PROJECT_BRIEF
+"What is live" and "Next release", this block, GBrain, re-baseline the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr`
+to 1.6.0 and check it against the live page line by line (lesson 177a). Not checked and still open: Samsung (One UI), the
+Isha-overlap fix with a real adhan, light theme, 2x text and Urdu right to left of the three new screens.
+
 ### 📍 RELEASE DAY SET, 2 Nov 2026 (Ali: "Set release day"; read this first)
 
 Release date 2 Nov 2026 (privacy page and `UsageCountsTest` dated; if the merge slips, rerun `set-release-date.sh`).

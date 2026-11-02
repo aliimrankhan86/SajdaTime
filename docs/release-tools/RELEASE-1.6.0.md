@@ -94,6 +94,9 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
      not "collected" in Play's sense (`docs/privacy.html`, "Your prayer record"). Expected: no change;
    - then **Ali presses Send for review himself.**
 
+**2 Nov 2026: release day steps 1 to 4 DONE** (date set, PR merged by Ali, bundle built from `main`, uploaded with notes and all nine
+listings saved, Data safety unchanged, Submit pressed by Ali). Waiting for review.
+
 ## After it is live
 
 Watch the public page's "Updated on" date move (signed out; Play sends no email):
