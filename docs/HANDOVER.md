@@ -6090,22 +6090,17 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 NEXT STEPS, 2 Nov 2026, evening (read this first; saved in case a session ends mid-way)
+### 📍 NEXT STEPS, 2 Nov 2026, evening: ALL BUILD WORK DONE (read this first)
 
 Everything for 1.6.0 is built, reviewed, gate green (full `clean test lint bundleRelease` on b30e9c4) and pushed on
 `claude/1-6-0`: night times + "Why these times" (4ffb0c8), Alert check (165467d), Sunnah fast reminders (b30e9c4; rings
 10 minutes after Isha). Ali approved the English store text 2 Nov ("Approve text"): `docs/store/LISTING.md`, block
 "DRAFT 2 Nov 2026 ... APPROVED" (full description 3998/4000, What's new 493/500). Times store picture needs no retake
 (cut at Maghrib). Redmi checked: alert check clean and Restricted, fast reminder fired on a moved clock; Fast reminders
-turned back off there. **Left, in order:**
-1. The eight translated listings (ar ur tr-TR id-ID ms-MY bn-BD fr-FR hi-IN) updated in `docs/store/LISTING-LOCALES.md`
-   "1.6.0 listings" from the approved English diff (a helper agent was doing this; check `git status` for its edits,
-   verify every locale <= 4000 / <= 500 with Python `len`). Then an Opus `reviewer` pass, `translation-ledger.py stamp`,
-   commit, push.
-2. Open the PR `claude/1-6-0` into `main`, marked "do not merge before release day" (none exists yet).
-3. GBrain `projects/sajdatime`: already updated 2 Nov; refresh after step 1.
-4. Tell Ali everything is done (he asked to hear only when completely done). Then release day: `RELEASE-1.6.0.md`
-   (set-release-date.sh, gate, Ali merges and builds, Play Console one screen at a time, Ali presses every button).
+turned back off there. **Done later the same evening:** the eight translated listings (reviewed, stamped, 9d0397c) and the PR
+https://github.com/aliimrankhan86/SajdaTime/pull/17 ("DO NOT MERGE before release day"). **What is left is release day
+only** (`RELEASE-1.6.0.md`: set-release-date.sh, final gate and `release-1.6.0.sh` with the device suite, Ali merges and
+builds, Play Console one screen at a time, Ali presses every button), on Ali's word. Ali is told everything is done.
 Not done and not claimed: Samsung (One UI) check, light theme / 2x text / Urdu RTL of the new screens, the device suite
 (`am instrument`, run by release-1.6.0.sh), the Isha-overlap fix with a real adhan.
 
