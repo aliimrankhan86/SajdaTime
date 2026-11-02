@@ -17,8 +17,9 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
   last third, sunset to Fajr) with a "Why these times" caption, the Alert check (Settings, Reminders), optional Sunnah
   fast reminders (Sunni, off by default). The jama'ah reminder is dropped. Each has its line in the store listing draft
   (`docs/store/LISTING.md`, "DRAFT 2 Nov 2026") which **Ali must approve in English first**, then the eight translations
-  are made, reviewed and stamped. The Times store picture (night row and caption) must be retaken once; Ali's call on
-  the others.
+  are made, reviewed and stamped. The Times store picture does NOT need retaking: it is cut at Maghrib, so the night row and the
+  caption (below the list) are not in it and nothing in it is untrue (checked 2 Nov 2026). No store picture shows Alert check or fast reminders;
+  pictures stay as approved unless Ali asks for one.
 - **The watch is NOT uploaded.** It stays 1.5.0, versionCode 1002, submitted with 1.5.0 on 23 Oct 2026; `wear/` changed only
   in comments since `main` (one KDoc line; `WatchSync.kt` unchanged). Its store pictures and watch note stay as they are.
   (The watch half of 1.5.0 being live is not checked from the public page; PR #16 says so too.)

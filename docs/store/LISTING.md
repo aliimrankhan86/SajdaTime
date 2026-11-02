@@ -231,7 +231,7 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.6.0 full description and What's new, DRAFT 2 Nov 2026: NOT approved by Ali yet (adds night times, "Why these times", Alert check, Sunnah fast reminders)
+### 1.6.0 full description and What's new, DRAFT 2 Nov 2026: APPROVED by Ali 2 Nov 2026 ("Approve text"), translations next (adds night times, "Why these times", Alert check, Sunnah fast reminders)
 
 Under HANDOVER §5.38 each new feature gets its line in the same release. Made from the approved 30 Oct text (block above).
 Added: Islamic midnight and last third of the night plus the "which method made your times" caption; Alert check;
