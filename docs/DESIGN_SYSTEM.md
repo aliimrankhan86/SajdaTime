@@ -850,6 +850,16 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **2 Nov 2026, "Why these times" caption is plain text, not tappable.** §4.1: every action is a solid button, and the
+  "Different from your mosque?" door right below opens the same dialog. Centred `bodySmall` `onSurfaceVariant`, `Space`
+  gaps, no 48dp target.
+- **2 Nov 2026, Midnight row (night times) added to the Times list, reversing FABLE-REVIEW.md:76 ("Show more
+  (midnight, last third) carries rulings... Leave it").** Ali approved it. One dimmed row after Isha, same treatment as
+  Sunrise (smaller type, no bell), moon icon (`Icons.Outlined.DarkMode`), note "Last third from X", Settings toggle
+  "Night times", default on. The night is sunset to Fajr for everyone (HANDOVER 5.39). Wording never "Isha ends",
+  "Tahajjud time", "best time" or "Qiyam". Cost: the list plus the mosque door now needs a short scroll on a real
+  1080x2400 phone.
+
 - **30 Oct 2026, Bengali, and text that shrinks instead of breaking (owner: "any text is overlapping or feel like
   breaking the design then shrink the text or lower its size enough to fit on the screen").** Text that can wrap still
   wraps between whole words. Text held to one line (the city name, the Qibla place line, the My prayers column headings)

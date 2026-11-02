@@ -510,6 +510,17 @@
     <string name="dates_header_a11y">اسلامی تاریخیں۔ آج %1$s ہے</string>
     <string name="settings_islamic_dates">اسلامی تاریخیں</string>
     <string name="settings_islamic_dates_desc">رمضان، دونوں عیدیں اور دیگر اہم تاریخیں</string>
+    <string name="night_midnight">اسلامی آدھی رات</string>
+    <string name="night_last_third_from">آخری تہائی %1$s سے</string>
+    <string name="night_row_a11y">اسلامی آدھی رات %1$s۔ رات کی آخری تہائی %2$s سے۔</string>
+    <string name="settings_night_times">رات کے اوقات</string>
+    <string name="settings_night_times_desc">عشاء کے نیچے اسلامی آدھی رات اور رات کی آخری تہائی دکھاتا ہے</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">تبدیل شدہ</string>
+    <string name="why_times_sunni">یہ اوقات %1$s کے مطابق ہیں، اور عصر %2$s کے مطابق۔</string>
+    <string name="why_times_shia">یہ اوقات جعفری طریقے کے مطابق ہیں۔</string>
+    <string name="why_times_method">یہ اوقات %1$s کے مطابق ہیں۔</string>
+    <string name="why_times_shia_caption">جعفری (شیعہ)</string>
     <string name="settings_jamaah">جماعت کے اوقات</string>
     <plurals name="settings_jamaah_count">
         <item quantity="one">%d نماز مقرر</item>

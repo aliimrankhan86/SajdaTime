@@ -535,6 +535,17 @@
     <string name="dates_header_a11y">ইসলামি তারিখ। আজ %1$s</string>
     <string name="settings_islamic_dates">ইসলামি তারিখ</string>
     <string name="settings_islamic_dates_desc">রমজান, দুই ঈদ ও অন্যান্য গুরুত্বপূর্ণ তারিখ</string>
+    <string name="night_midnight">ইসলামি মধ্যরাত</string>
+    <string name="night_last_third_from">শেষ তৃতীয়াংশ %1$s থেকে</string>
+    <string name="night_row_a11y">ইসলামি মধ্যরাত %1$s। রাতের শেষ তৃতীয়াংশ %2$s থেকে।</string>
+    <string name="settings_night_times">রাতের সময়</string>
+    <string name="settings_night_times_desc">এশার নিচে ইসলামি মধ্যরাত ও রাতের শেষ তৃতীয়াংশ দেখায়</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">সমন্বয় করা</string>
+    <string name="why_times_sunni">এই সময়গুলোতে %1$s এবং আসরের জন্য %2$s মাযহাব ব্যবহার করা হয়েছে।</string>
+    <string name="why_times_shia">এই সময়গুলোতে জাফরি পদ্ধতি ব্যবহার করা হয়েছে।</string>
+    <string name="why_times_method">এই সময়গুলোতে %1$s ব্যবহার করা হয়েছে।</string>
+    <string name="why_times_shia_caption">জাফরি (শিয়া)</string>
     <!-- Jama'ah times: the user's own mosque's congregation times, typed in by them. -->
     <string name="settings_jamaah">জামাতের সময়</string>
     <plurals name="settings_jamaah_count">

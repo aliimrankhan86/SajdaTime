@@ -250,6 +250,8 @@ object PrayerEngine {
         return DayPrayerTimes(
             date = date,
             approximatedFrom = reference.takeIf { local == null },
+            // adhan bakes method offsets (Turkey +7, Dubai/MoonSighting +3 min) into maghrib; take them back out.
+            sunset = instantOf(base.maghrib).minusSeconds(60L * params.methodAdjustments.maghrib),
             times = mapOf(
                 PrayerSlot.FAJR to instantOf(base.fajr),
                 PrayerSlot.SUNRISE to instantOf(base.sunrise),

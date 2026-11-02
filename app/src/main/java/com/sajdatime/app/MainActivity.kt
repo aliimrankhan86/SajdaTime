@@ -324,6 +324,7 @@ class MainActivity : ComponentActivity() {
                                 onDismissRamadanNotice = viewModel::dismissRamadanNotice,
                                 onDismissEid = viewModel::dismissEidGreeting,
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
+                                onSetNightTimes = viewModel::setNightTimesEnabled,
                                 onSetSuhoorMinutes = viewModel::setSuhoorReminderMinutes,
                                 onSetSuhoorStyle = viewModel::setSuhoorReminderStyle,
                                 onSetSuhoorAdhan = viewModel::setSuhoorUsesAdhan,

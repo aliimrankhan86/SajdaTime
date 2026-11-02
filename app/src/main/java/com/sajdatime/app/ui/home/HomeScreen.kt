@@ -32,6 +32,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material.icons.rounded.ArrowDropDown
@@ -102,6 +103,7 @@ import com.sajdatime.app.ui.components.Notice
 import com.sajdatime.app.ui.components.PermissionCard
 import com.sajdatime.app.ui.components.readingWidth
 import com.sajdatime.app.ui.components.rememberRemainingText
+import com.sajdatime.app.ui.onboarding.madhabLabel
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
@@ -109,9 +111,12 @@ import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.heroStyle
 import com.sajdatime.app.ui.theme.sajdaSurface
 import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.JamaahResult
+import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
 import com.sajdatime.core.Sky
 import com.sajdatime.core.SkyPeriod
 import com.sajdatime.core.bidiIsolated
@@ -226,8 +231,11 @@ fun HomeScreen(
         // shorter still, or a large font setting, loses nothing — it only has to be reached.
         //
         // **Since 1.6 (steps 1 to 4) the budget no longer holds at 823dp, by decision.** At 914dp and taller
-        // everything still fits; at 823dp the mosque door is the one thing that scrolls, about 60dp short,
-        // and must never need more than one short scroll. BottomBarClearance under it keeps the end of
+        // everything still fit; at 823dp the mosque door is the one thing that scrolls, about 60dp short,
+        // and must never need more than one short scroll. **Since the night row (Midnight, 1.6.0, on by default)
+        // that is no longer true at 914dp either:** on a real 1080x2400 phone (Redmi 23117RA68G) the list plus
+        // the mosque door needs a short scroll. Same rule: one short scroll, nothing lost. The "Why these times" caption under the list adds about 20dp plus its
+        // gaps (plain text, no longer a 48dp target). BottomBarClearance under it keeps the end of
         // scroll clear of the glass bar. Fable judged it (24 Oct 2026): no honest Space tightening buys
         // 60dp, and moving the door beside Timetable breaks one solid button per line; content passing
         // under a glass bar is how Quiet Glass and iOS tab bars both behave.
@@ -279,6 +287,7 @@ fun HomeScreen(
             snapBell = snapBell,
             notificationsBlocked = notificationsBlocked,
         )
+        WhyTheseTimes(state)
         MosqueDifferenceDoor(
             state = state,
             onOpen = { explaining = true },
@@ -298,6 +307,7 @@ fun HomeScreen(
 
     if (explaining) {
         MosqueDifferenceDialog(
+            prefs = state.settings.calculationPrefs,
             onDismiss = { explaining = false },
             onOpen = { chooser ->
                 explaining = false
@@ -740,6 +750,53 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
     }
 }
 
+/** True for the one case the caption and sentence name by sect: Shia on the Jafari method. */
+private fun CalculationPrefs.isJafari() = sect == Sect.SHIA && PrayerEngine.resolveMethod(this) == CalcMethod.JAFARI
+
+/** "These times use the method X with Y Asr." for the mosque dialog's first line. */
+@Composable
+private fun whyTheseTimesSentence(prefs: CalculationPrefs): String {
+    val method = stringResource(PrayerEngine.resolveMethod(prefs).labelRes).bidiIsolated()
+    return when {
+        prefs.isJafari() -> stringResource(R.string.why_times_shia)
+        prefs.sect == Sect.SHIA -> stringResource(R.string.why_times_method, method)
+        else -> stringResource(R.string.why_times_sunni, method, madhabLabel(prefs.madhab))
+    }
+}
+
+/**
+ * One quiet line under the list saying which method and school the times use, so "why does it say
+ * 1:15?" has its answer on the screen (2 Nov 2026). AUTO shows the method it resolved to, never the
+ * word Auto. Plain text, not tappable: DESIGN_SYSTEM §4.1 says every action is a solid button, and the
+ * "Different from your mosque?" door right below opens the dialog whose first sentence says the same in full.
+ */
+@Composable
+private fun WhyTheseTimes(state: UiState) {
+    if (state.today == null) return
+    val prefs = state.settings.calculationPrefs
+    val base = if (prefs.isJafari()) {
+        stringResource(R.string.why_times_shia_caption)
+    } else {
+        val method = stringResource(PrayerEngine.resolveMethod(prefs).labelRes).bidiIsolated()
+        if (prefs.sect == Sect.SHIA) method
+        else stringResource(R.string.settings_value_pair, method, madhabLabel(prefs.madhab))
+    }
+    val text = if (state.settings.adjustments.any { it.value != 0 }) {
+        stringResource(R.string.settings_value_pair, base, stringResource(R.string.why_times_adjusted))
+    } else {
+        base
+    }
+    Text(
+        text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = Space.Related),
+    )
+}
+
 /**
  * Why the app and the mosque board disagree, in the user's own order of surprise, with the
  * fix for each cause one tap away. The paragraphs are the four causes the project has
@@ -752,7 +809,7 @@ private fun MosqueDifferenceDoor(state: UiState, onOpen: () -> Unit, onDismissNo
  * "valid". "Neither is wrong" is as far as it goes.
  */
 @Composable
-private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChooser) -> Unit) {
+private fun MosqueDifferenceDialog(prefs: CalculationPrefs, onDismiss: () -> Unit, onOpen: (SettingsChooser) -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -763,7 +820,8 @@ private fun MosqueDifferenceDialog(onDismiss: () -> Unit, onOpen: (SettingsChoos
         // you, and at a raised font size the last paragraph is what falls off the bottom.
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
-                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation), first = true)
+                ExplainerParagraph(whyTheseTimesSentence(prefs), first = true)
+                ExplainerParagraph(stringResource(R.string.mosque_diff_congregation))
                 // 1.6.0: the congregation time itself, the most direct answer to "the board says 1:30".
                 ExplainerAction(stringResource(R.string.mosque_diff_add_jamaah)) {
                     onOpen(SettingsChooser.JAMAAH)
@@ -1004,6 +1062,7 @@ internal fun TodayTimeline(
     val today = state.today ?: return
     val context = LocalContext.current
     val next = state.next
+    val night = state.night
 
     // The heading and the Timetable button share one line (it was Save as PDF until 1.6.0; the PDF now
     // lives in the Timetable's header). It used to be a 56dp filled
@@ -1066,7 +1125,9 @@ internal fun TodayTimeline(
     ) {
         slots.forEachIndexed { index, slot ->
             PrayerRow(
-                slot = slot,
+                label = stringResource(slot.labelRes),
+                icon = slotIcon(slot),
+                quiet = !slot.isPrayer,
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
                 isNext = next != null && slot == next.slot && !next.isTomorrow,
                 isCurrent = slot == state.current,
@@ -1098,9 +1159,26 @@ internal fun TodayTimeline(
                     }
                 },
             )
-            if (index != slots.lastIndex) {
+            if (index != slots.lastIndex || night != null) {
                 HorizontalDivider(color = scheme.outlineVariant)
             }
+        }
+        // Islamic midnight and the last third of the night, one dimmed row after Isha (1.6.0). Not a prayer:
+        // no bell, never Next or Now, and no word that calls it a prayer time or a ruling.
+        if (night != null) {
+            val midnight = TimeFormat.clock(context, night.midnight)
+            val lastThird = TimeFormat.clock(context, night.lastThirdStart)
+            PrayerRow(
+                label = stringResource(R.string.night_midnight),
+                icon = Icons.Outlined.DarkMode,
+                quiet = true,
+                time = midnight,
+                isNext = false,
+                isCurrent = false,
+                note = stringResource(R.string.night_last_third_from, lastThird.replace(' ', '\u00A0')),
+                description = stringResource(R.string.night_row_a11y, midnight, lastThird),
+                trailing = { Spacer(Modifier.width(48.dp)) },
+            )
         }
     }
 }
@@ -1140,8 +1218,8 @@ private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
  *              pill in words
  *  - current — a quieter lift off the card and a "Now" pill, deliberately softer than
  *              next: two loud rows next to each other and neither reads as the answer
- *  - sunrise — dimmed and set in smaller type, because it is not a prayer and it should
- *              not compete with the five that are
+ *  - sunrise, and the night row (Midnight, 1.6.0) — dimmed and set in smaller type, because they are not
+ *              prayers and should not compete with the five that are
  *  - the rest — plain
  *
  * `isNext` and `isCurrent` can never both be true for the same row — one time is in the
@@ -1150,16 +1228,21 @@ private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
  */
 @Composable
 private fun PrayerRow(
-    slot: PrayerSlot,
+    label: String,
+    icon: ImageVector,
+    /** Not a prayer (sunrise, midnight): smaller, dimmed, no bell. */
+    quiet: Boolean,
     time: String,
     isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
+    /** What a screen reader says for the whole row, when it is not the label and time read in turn. */
+    description: String? = null,
     /** The bell, after the time. Its 48dp target takes the row's end padding. */
     trailing: @Composable () -> Unit,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val dimmed = !slot.isPrayer && !isNext
+    val dimmed = quiet && !isNext
 
     val background = when {
         isNext -> scheme.primaryContainer
@@ -1228,7 +1311,7 @@ private fun PrayerRow(
         modifier = Modifier
             .fillMaxWidth()
             // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
-            .semantics(mergeDescendants = true) {}
+            .semantics(mergeDescendants = true) { if (description != null) contentDescription = description }
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this
             // gets the same pixels without asking the layout to measure twice.
@@ -1251,7 +1334,7 @@ private fun PrayerRow(
             .padding(vertical = 1.dp),
     ) {
         Icon(
-            imageVector = slotIcon(slot),
+            imageVector = icon,
             contentDescription = null,
             tint = iconColor,
             modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
@@ -1259,7 +1342,7 @@ private fun PrayerRow(
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                text = stringResource(slot.labelRes),
+                text = label,
                 style = if (dimmed) {
                     MaterialTheme.typography.bodyMedium
                 } else {

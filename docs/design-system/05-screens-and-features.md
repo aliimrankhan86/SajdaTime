@@ -47,7 +47,13 @@ Top to bottom:
    Allow notifications (permission card, only while blocked and an alert is on).
 6. **Today** (`titleMedium`, heading) with a compact "Timetable" button at the end (under it from
    1.5× text) → Timetable sheet, or the Ramadan table during Ramadan with the Ramadan card on.
-7. **Today list**: six rows with Next and Now, notes (jama'ah, Jumu'ah, Suhoor ends, Iftar) and bells.
+7. **Today list**: six rows with Next and Now, notes (jama'ah, Jumu'ah, Suhoor ends, Iftar) and bells. After
+   Isha, an **Islamic midnight row** (1.6.0): dimmed like Sunrise, no bell, moon icon, note "Last third from X".
+   Shown by the Settings toggle "Night times" (default on).
+7a. **Why these times caption** (2 Nov 2026): one centred `bodySmall` line in `onSurfaceVariant`, a 48dp tappable
+   row, between the list and the mosque button. "<method> · <school>", Shia "Jafari (Shia)", Automatic shows the
+   method it resolved to, " · adjusted" appended when prayer minutes are adjusted. Opens the mosque dialog. Absent
+   with no location. iPhone: carries over.
 8. **Mosque button**: full width "Different from your mosque?" with the mosque icon → the mosque
    dialog. Above 45° latitude with the method still Automatic it becomes a warning notice "Does this
    match your mosque?" with "See why" and a close X.

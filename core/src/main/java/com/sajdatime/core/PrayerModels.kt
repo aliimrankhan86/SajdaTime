@@ -109,6 +109,11 @@ data class DayPrayerTimes(
      * worse than no times at all.
      */
     val approximatedFrom: Double? = null,
+    /**
+     * The raw astronomical sunset of [date]: adhan's method offsets (Turkey, Dubai, Moonsighting) removed, before
+     * any Jafari Maghrib delay and before the user's per-prayer corrections. Only [Night] reads it (night times, 1.6.0); null where a caller built the day by hand.
+     */
+    val sunset: Instant? = null,
 ) {
     /** True when these times came from somewhere other than where the user is standing. */
     val approximated: Boolean get() = approximatedFrom != null

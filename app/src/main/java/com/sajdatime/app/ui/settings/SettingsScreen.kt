@@ -43,6 +43,7 @@ import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MoreTime
@@ -185,6 +186,7 @@ fun SettingsScreen(
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetNightTimes: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
@@ -313,6 +315,15 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_islamic_dates),
                 subtitle = stringResource(R.string.settings_islamic_dates_desc),
                 onClick = { open = SettingsChooser.ISLAMIC_DATES },
+            ),
+            // 1.6.0: on for everyone, Times screen only (not the PDF, widgets or watch).
+            SettingsItem.Toggle(
+                key = "night_times",
+                icon = Icons.Outlined.DarkMode,
+                title = stringResource(R.string.settings_night_times),
+                subtitle = stringResource(R.string.settings_night_times_desc),
+                checked = settings.nightTimesEnabled,
+                onCheckedChange = onSetNightTimes,
             ),
         ),
     )

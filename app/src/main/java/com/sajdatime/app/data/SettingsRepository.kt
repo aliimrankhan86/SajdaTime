@@ -181,6 +181,8 @@ data class AppSettings(
      * widget labels, the timetable PDF and the suhoor reminder to their own settings.
      */
     val ramadanCardEnabled: Boolean = true,
+    /** Islamic midnight and the last third of the night under Isha on Times (1.6.0). On for everyone; Times only. */
+    val nightTimesEnabled: Boolean = true,
     /**
      * The Hijri year whose notice the user closed, or 0. A year and not a flag, so the notice
      * returns next Ramadan without anything having to reset it.
@@ -563,6 +565,8 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun setRamadanCardEnabled(enabled: Boolean) = edit { it[Keys.RAMADAN_CARD] = enabled }
 
+    suspend fun setNightTimesEnabled(enabled: Boolean) = edit { it[Keys.NIGHT_TIMES] = enabled }
+
     /** Closes the Ramadan notice for [hijriYear] only, so it returns the following year. */
     suspend fun dismissRamadanNotice(hijriYear: Int) = edit {
         it[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] = hijriYear
@@ -616,6 +620,7 @@ class SettingsRepository(private val context: Context) {
         val METHOD_NOTICE_DISMISSED = booleanPreferencesKey("method_notice_dismissed")
         val THEME = stringPreferencesKey("theme_choice")
         val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
+        val NIGHT_TIMES = booleanPreferencesKey("night_times_enabled")
         val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
         val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
@@ -691,6 +696,7 @@ class SettingsRepository(private val context: Context) {
             methodNoticeDismissed = this[Keys.METHOD_NOTICE_DISMISSED] ?: false,
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
+            nightTimesEnabled = this[Keys.NIGHT_TIMES] ?: true,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
             eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
             suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: AppSettings.SUHOOR_DEFAULT_MINUTES)

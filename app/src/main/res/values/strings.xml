@@ -737,6 +737,18 @@
     <string name="dates_header_a11y">Islamic dates. Today is %1$s</string>
     <string name="settings_islamic_dates">Islamic dates</string>
     <string name="settings_islamic_dates_desc">Ramadan, the two Eids and other key dates</string>
+    <!-- Night times (1.6.0): one dimmed row after Isha on Times. Calculated facts only: no ruling, no act named. -->
+    <string name="night_midnight">Islamic midnight</string>
+    <string name="night_last_third_from">Last third from %1$s</string>
+    <string name="night_row_a11y">Islamic midnight %1$s. Last third of the night from %2$s.</string>
+    <string name="settings_night_times">Night times</string>
+    <string name="settings_night_times_desc">Shows Islamic midnight and the last third of the night under Isha</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">adjusted</string>
+    <string name="why_times_sunni">These times use %1$s with %2$s Asr.</string>
+    <string name="why_times_shia">These times use the Jafari method.</string>
+    <string name="why_times_method">These times use %1$s.</string>
+    <string name="why_times_shia_caption">Jafari (Shia)</string>
     <!-- Jama'ah times (1.6.0): the user's own mosque's congregation times, typed in by them. -->
     <string name="settings_jamaah">Jama\'ah times</string>
     <plurals name="settings_jamaah_count">

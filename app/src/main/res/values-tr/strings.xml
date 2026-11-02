@@ -504,6 +504,17 @@
     <string name="dates_header_a11y">İslami tarihler. Bugün %1$s</string>
     <string name="settings_islamic_dates">İslami tarihler</string>
     <string name="settings_islamic_dates_desc">Ramazan, iki bayram ve diğer önemli günler</string>
+    <string name="night_midnight">İslami gece yarısı</string>
+    <string name="night_last_third_from">Son üçte bir başlangıcı: %1$s</string>
+    <string name="night_row_a11y">İslami gece yarısı %1$s. Gecenin son üçte birinin başlangıcı: %2$s.</string>
+    <string name="settings_night_times">Gece vakitleri</string>
+    <string name="settings_night_times_desc">Yatsının altında İslami gece yarısını ve gecenin son üçte birini gösterir</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">düzeltilmiş</string>
+    <string name="why_times_sunni">Bu vakitler %1$s yöntemiyle hesaplanır; ikindi %2$s mezhebine göredir.</string>
+    <string name="why_times_shia">Bu vakitler Caferi yöntemini kullanır.</string>
+    <string name="why_times_method">Bu vakitler %1$s yöntemini kullanır.</string>
+    <string name="why_times_shia_caption">Caferi (Şii)</string>
     <string name="settings_jamaah">Cemaat vakitleri</string>
     <plurals name="settings_jamaah_count">
         <item quantity="one">%d vakit ayarlı</item>

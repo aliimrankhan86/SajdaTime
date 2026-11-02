@@ -594,6 +594,17 @@
     <string name="dates_header_a11y">التواريخ الإسلامية. اليوم %1$s</string>
     <string name="settings_islamic_dates">التواريخ الإسلامية</string>
     <string name="settings_islamic_dates_desc">رمضان والعيدان وتواريخ مهمة أخرى</string>
+    <string name="night_midnight">منتصف الليل الإسلامي</string>
+    <string name="night_last_third_from">الثلث الأخير ابتداءً من %1$s</string>
+    <string name="night_row_a11y">منتصف الليل الإسلامي %1$s. الثلث الأخير من الليل ابتداءً من %2$s.</string>
+    <string name="settings_night_times">أوقات الليل</string>
+    <string name="settings_night_times_desc">تعرض منتصف الليل الإسلامي والثلث الأخير من الليل أسفل العشاء</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">معدّلة</string>
+    <string name="why_times_sunni">تستخدم هذه الأوقات %1$s مع حساب العصر وفق المذهب %2$s.</string>
+    <string name="why_times_shia">تستخدم هذه الأوقات الطريقة الجعفرية.</string>
+    <string name="why_times_method">تستخدم هذه الأوقات %1$s.</string>
+    <string name="why_times_shia_caption">الجعفري (شيعي)</string>
     <string name="settings_jamaah">أوقات الجماعة</string>
     <plurals name="settings_jamaah_count">
         <item quantity="zero">%d صلاة محددة</item>

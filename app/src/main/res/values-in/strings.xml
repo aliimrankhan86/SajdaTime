@@ -493,6 +493,17 @@
     <string name="dates_header_a11y">Tanggal Islam. Hari ini %1$s</string>
     <string name="settings_islamic_dates">Tanggal Islam</string>
     <string name="settings_islamic_dates_desc">Ramadan, dua hari raya, dan tanggal penting lainnya</string>
+    <string name="night_midnight">Tengah malam Islam</string>
+    <string name="night_last_third_from">Sepertiga malam terakhir mulai %1$s</string>
+    <string name="night_row_a11y">Tengah malam Islam %1$s. Sepertiga malam terakhir mulai %2$s.</string>
+    <string name="settings_night_times">Waktu malam</string>
+    <string name="settings_night_times_desc">Menampilkan tengah malam Islam dan sepertiga malam terakhir di bawah Isya</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">disesuaikan</string>
+    <string name="why_times_sunni">Waktu ini memakai %1$s dengan Asar menurut mazhab %2$s.</string>
+    <string name="why_times_shia">Waktu ini memakai metode Jafari.</string>
+    <string name="why_times_method">Waktu ini memakai %1$s.</string>
+    <string name="why_times_shia_caption">Jafari (Syiah)</string>
     <string name="settings_jamaah">Waktu salat berjamaah</string>
     <plurals name="settings_jamaah_count">
         <item quantity="other">%d salat diatur</item>

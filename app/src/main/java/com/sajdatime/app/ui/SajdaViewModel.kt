@@ -12,6 +12,8 @@ import com.sajdatime.core.EidDay
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.Night
+import com.sajdatime.core.NightTimes
 import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
@@ -208,6 +210,8 @@ data class UiState(
      * ([JamaahPlan]). Empty for everyone who has set none.
      */
     val jamaah: Map<PrayerSlot, JamaahResult> = emptyMap(),
+    /** Midnight and the last third of the night now on, or null with the setting off or no usable night. */
+    val night: NightTimes? = null,
     /** The prayer record, while "My prayers" is on. See [TrackerState]. */
     val tracker: TrackerState? = null,
     /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
@@ -455,6 +459,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setRamadanCardEnabled(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setRamadanCardEnabled(enabled) }
 
+    fun setNightTimesEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setNightTimesEnabled(enabled) }
+
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
 
@@ -681,7 +688,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap()) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null) }
             // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
             withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
@@ -701,7 +708,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
             val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
             val jamaah = JamaahPlan.on(today, zone, settings.jamaah)
-            Computed(today, next, current, ramadan, eid, jamaah)
+            val night = if (settings.nightTimesEnabled) Night.at(coordinates, settings.calculationPrefs, now, zone) else null
+            Computed(today, next, current, ramadan, eid, jamaah, night)
         }
 
         publishTracker()
@@ -713,6 +721,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 ramadan = computed.ramadan,
                 eid = computed.eid,
                 jamaah = computed.jamaah,
+                night = computed.night,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -763,4 +772,5 @@ private data class Computed(
     val ramadan: RamadanState?,
     val eid: EidDay?,
     val jamaah: Map<PrayerSlot, JamaahResult>,
+    val night: NightTimes?,
 )

@@ -2232,6 +2232,26 @@ never translated or transliterated": the count per string, plural and array must
 `tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
 failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
 
+### 5.39 Night times: the night is sunset to Fajr, for everyone (Ali, 2 Nov 2026, religious call)
+
+The Times list shows Islamic midnight and the start of the last third of the night. **The night is measured from
+astronomical sunset to the next Fajr (Tahajjud ends at Fajr), for all users, Sunni and Shia.** Ali chose "Sunset to
+Fajr" on 2 Nov 2026. This equals Aladhan midnightMode=1 (Jafari); it is NOT Aladhan's default. Midnight = sunset plus
+half the night; last third = sunset plus two thirds (`core/NightTimes.kt`). Sunset is the raw astronomical one (adhan's
+method offsets for Turkey, Dubai and Moonsighting removed), never Maghrib, so the Jafari delay cannot move it for one
+sect only.
+**Rejected:** Aladhan's default (sunset to sunrise), about an hour later; a per-school split (Sunni one way, Shia
+another). **Wording rule for the row:** only "Islamic midnight" and "Last third from X"; never "Isha ends", "Tahajjud time",
+"best time" or "Qiyam". The row is dimmed and has no bell: it is a calculated fact, not a prayer or a ruling.
+**Reversal:** `docs/plans/2026-10-release-1.6.0/FABLE-REVIEW.md:76` said to leave midnight and last third out ("carries
+rulings"); Ali approved adding them on 2 Nov 2026. Shipped in 1.6.0, no separate 1.6.1. Tested on his Redmi
+23117RA68G in Slough: Midnight 22:50, last third 00:55. iPhone effect: carries over (plain Kotlin in `:core`).
+**Why these times caption (2 Nov 2026):** a quiet line under the list names the method and school. It is plain text, not
+a button, on purpose: DESIGN_SYSTEM 4.1 says every action is a solid button, and the "Different from your mosque?" door
+right below opens the same dialog. **Rounding:** night times are cut to the minute, not rounded, so a time can show one
+minute earlier than Aladhan; accepted, it is the safe direction. **Recorded gap:** `NightTimes.approximated` (high
+latitudes) exists but is not shown in the UI.
+
 ### 5.38 The store listing always sells the whole app first (Ali, 30 Oct 2026, hard rule)
 
 Ali: "the listing should contain everything this app has to offer, and whenever we work on new release, make it a hard
@@ -6025,7 +6045,24 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 31 Oct 2026: 1.6.0 STORE PICTURES NOT RETAKEN YET (read this first; the 30 Oct night block below holds for everything not named here)
+### 📍 STATE OF PLAY, 2 Nov 2026: NIGHT TIMES (MIDNIGHT AND LAST THIRD) ADDED TO 1.6.0 (read this first; the 31 Oct block below holds for everything not named here)
+
+- **Ali, 2 Nov 2026:** night times ship in 1.6.0, no separate 1.6.1. Built uncommitted on `claude/1-6-0`: a dimmed
+  Midnight row after Isha (no bell, note "Last third from X"), Settings toggle "Night times", default on. Rule and
+  reasons: section 5.39. Strings in all six languages (translation fixes applied after review: Turkish, Urdu, Bengali).
+- **Tested by Ali on his Redmi 23117RA68G** (Slough): Midnight 22:50, last third 00:55.
+- **Checked:** the London pair against the live Aladhan API with midnightMode=1 (sunset 2026-11-02 16:32Z, next Fajr
+  05:04Z gives midnight 22:48:00Z, last third 00:53:20Z); that pair is now a unit test.
+- **Not done:** store pictures still do not show the Midnight row (they are the 25 Oct set); the listing text does not
+  yet mention night times; the Home height budget now needs a short scroll on a real 1080x2400 phone (HomeScreen.kt
+  comment). Not committed at the time of writing.
+- **Later 2 Nov 2026 (Ali's decisions, built uncommitted):** the row label is now "Islamic midnight" in all six
+  languages (a bare "Midnight" read as clock midnight). New caption "Why these times" between the list and the mosque
+  door: "<method> · <school>" (Shia: "Jafari (Shia)"; AUTO shows the method it resolved to; " · adjusted" when any
+  prayer has a minute adjustment), tapping opens the mosque dialog, whose first sentence now says the same in full.
+  Strings translated by Claude, ledger entries not yet stamped. Not tested on a device or emulator; screenshots not retaken.
+
+### 📍 STATE OF PLAY, 31 Oct 2026: 1.6.0 STORE PICTURES NOT RETAKEN YET (history now; read the 2 Nov block above first; the 30 Oct night block below holds for everything not named here)
 
 - **Ali, 31 Oct 2026:** "You retake the pictures and record it gbrain so you have all information." Ali also asked that
   the pictures be retaken for the new release and that everything be committed, pushed and merged once done.

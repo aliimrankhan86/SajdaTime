@@ -86,6 +86,7 @@ Every icon in 1.6, with its SF Symbol. A new Material icon is not finished until
 | `WbTwilight` | Sunrise row | `sunrise` |
 | `WbSunny` | Dhuhr row | `sun.max` |
 | `Brightness5` | Asr row | `sun.min` |
+| `Icons.Outlined.DarkMode` | Midnight row, Settings toggle | `moon` |
 | `Brightness6` | Maghrib row | `sunset` |
 | `NightsStay` | Isha row, Ramadan card row | `moon.stars` |
 | `CalendarMonth` | Timetable, Last 30 days, streak row | `calendar` |
