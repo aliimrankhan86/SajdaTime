@@ -6090,6 +6090,16 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 RELEASE DAY SET, 2 Nov 2026 (Ali: "Set release day"; read this first)
+
+Release date 2 Nov 2026 (privacy page and `UsageCountsTest` dated; if the merge slips, rerun `set-release-date.sh`).
+`release-1.6.0.sh` ran end to end on the final code: every line PASS (push, bundle 10 / 1.6.0 signed, permissions the
+eleven plus VIBRATE, device suite 39 of 39, Ramadan and widget suites) except the two CHECKs explained here: the tree
+(only the untracked `.codex/`, deliberately never committed) and the unit test counts (app 348, core 245, wear 27; the
+script's `EXPECTED_COUNTS` was stale and is updated). Store screenshots SKIPPED and phone SKIPPED by choice. Left: Ali
+merges PR 17, builds the bundle from `main`, uploads in the Play Console, one screen at a time, and presses Send for
+review himself; then the "After it is live" list in `RELEASE-1.6.0.md`.
+
 ### 📍 NEXT STEPS, 2 Nov 2026, evening: ALL BUILD WORK DONE (read this first)
 
 Everything for 1.6.0 is built, reviewed, gate green (full `clean test lint bundleRelease` on b30e9c4) and pushed on
