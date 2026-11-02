@@ -55,7 +55,15 @@ class TranslationIntegrityTest {
             "دعا",
             listOf("الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"),
         ),
+        // Bengali (30 Oct 2026): Western digits like Arabic; the spellings Bangladesh's mosques print.
+        "bn" to Lang("bn-u-nu-latn", setOf("one", "other"), "দোয়া", listOf("ফজর", "সূর্যোদয়", "যোহর", "আসর", "মাগরিব", "এশা")),
     )
+
+    @Test
+    fun `every translation folder on disk is checked here`() {
+        // A new values-<lang>/ with no entry above would skip every check in this file.
+        assertEquals(stringFolders.drop(1).map { it.removePrefix("values-") }.toSet(), languages.keys)
+    }
 
     private sealed interface Res {
         data class Str(val text: String) : Res
@@ -109,6 +117,28 @@ class TranslationIntegrityTest {
             (have - need).sorted().takeIf { it.isNotEmpty() }?.let { problems += "$m/values-$q has keys not in the source: $it" }
         }
         assertEquals("Translation keys differ from the English source", emptyList<String>(), problems)
+    }
+
+    @Test
+    fun `SajdaTime is never translated or transliterated`() {
+        // Owner, 30 Oct 2026: the name stays "SajdaTime" for every user, because that is the name on
+        // Google Play and the one people search. So every string that names it in English names it the
+        // same way, in Latin letters, in every language: never সাজদাটাইম, سجدہ ٹائم or "Sajda Time".
+        // Cannot see a transliteration added beside the Latin name, or in a string whose English has none.
+        fun names(r: Res) = when (r) {
+            is Res.Str -> count(r.text, "SajdaTime")
+            is Res.Plural -> r.items.values.maxOfOrNull { count(it, "SajdaTime") } ?: 0
+            is Res.Arr -> r.items.sumOf { count(it, "SajdaTime") }
+        }
+        val problems = mutableListOf<String>()
+        forEachTranslation { q, _, m, src, tr, _ ->
+            for ((key, res) in src) {
+                val want = names(res)
+                val got = names(tr[key] ?: continue)
+                if (want > 0 && got != want) problems += "$m/values-$q $key names SajdaTime $got times, English $want"
+            }
+        }
+        assertEquals(emptyList<String>(), problems)
     }
 
     @Test

@@ -8,6 +8,8 @@ import com.sajdatime.core.HijriDay
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sky
+import com.sajdatime.core.SkyPeriod
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -79,6 +81,11 @@ data class WidgetState(
      * always followed the phone and its description said so.
      */
     val theme: ThemeChoice = ThemeChoice.SYSTEM,
+    /**
+     * Which of the four skies the Next prayer widget sits on (step 8): the phone's own rule, so widget
+     * and Times screen agree. Day with no location, as the phone shows no times on the day sky.
+     */
+    val period: SkyPeriod = SkyPeriod.DAY,
 ) {
     /** The Times screen's rule: the next prayer, and only if it is still today. Sunrise is never next. */
     fun isHighlighted(slot: PrayerSlot): Boolean = next != null && slot == next.slot && !next.isTomorrow
@@ -149,6 +156,7 @@ data class WidgetState(
                 cityName = settings.cityName,
                 usingDefaultLocation = settings.usingDefaultLocation,
                 theme = settings.themeChoice,
+                period = Sky.periodOf(PrayerEngine.currentPrayer(coordinates, prefs, now, zone)),
             )
         }
 

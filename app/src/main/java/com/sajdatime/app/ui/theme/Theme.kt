@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import com.sajdatime.core.SkyPeriod
 
 private val LightColors = lightColorScheme(
     primary = LightPrimary,
@@ -189,6 +190,17 @@ fun Modifier.sajdaSurface(shape: Shape, brush: Brush): Modifier {
 fun kiswahGold(): Color = if (LocalDarkTheme.current) DarkKiswah else LightKiswah
 
 /**
+ * The Qibla dial's bezel when it is not aligned: `surface` in light, `surfaceContainerHighest` in dark
+ * (STEP-6-DESIGN sections 15.3 and 16). A different role per theme, because in light the card shadow
+ * carries the edge and white reads as a lifted disc, while in dark the `sajdaSurface` hairline is
+ * invisible against the page and the bezel has to carry the edge itself. Read through [LocalDarkTheme]
+ * for the same reason [kiswahGold] is.
+ */
+@Composable
+fun dialBezel(): Color =
+    if (LocalDarkTheme.current) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surface
+
+/**
  * The next-prayer card's fill, its gloss, and the three text colours that sit on it.
  *
  * Light keeps the design's mint-to-sand gradient; dark is a fixed green gradient in the widgets'
@@ -245,6 +257,61 @@ fun heroStyle(): HeroStyle {
             rim = LightHeroRim,
             rimBottom = LightHeroRimBottom,
             glow = LightHeroGlow,
+        )
+    }
+}
+
+/** One sky: three fixed stops, top to foot. The foot is the page background. */
+data class SkyColours(val top: Color, val mid: Color, val foot: Color)
+
+/** Pure, so ColorContrastTest can read every stop without composing anything. */
+fun skyColours(period: SkyPeriod, dark: Boolean): SkyColours = if (dark) {
+    when (period) {
+        SkyPeriod.DAWN -> SkyColours(DarkSkyDawnTop, DarkSkyDawnMid, DarkSkyFoot)
+        SkyPeriod.DAY -> SkyColours(DarkSkyDayTop, DarkSkyDayMid, DarkSkyFoot)
+        SkyPeriod.EVENING -> SkyColours(DarkSkyEveningTop, DarkSkyEveningMid, DarkSkyFoot)
+        SkyPeriod.NIGHT -> SkyColours(DarkSkyNightTop, DarkSkyNightMid, DarkSkyFoot)
+    }
+} else {
+    when (period) {
+        SkyPeriod.DAWN -> SkyColours(LightSkyDawnTop, LightSkyDawnMid, LightSkyFoot)
+        SkyPeriod.DAY -> SkyColours(LightSkyDayTop, LightSkyDayMid, LightSkyFoot)
+        SkyPeriod.EVENING -> SkyColours(LightSkyEveningTop, LightSkyEveningMid, LightSkyFoot)
+        SkyPeriod.NIGHT -> SkyColours(LightSkyNightTop, LightSkyNightMid, LightSkyFoot)
+    }
+}
+
+/** The sky for [period] in the current theme, as [heroStyle] reads [LocalDarkTheme]. */
+@Composable
+fun skyStyle(period: SkyPeriod): SkyColours = skyColours(period, LocalDarkTheme.current)
+
+/**
+ * The warning notice's panel: the hero card's gloss in amber (24 Oct 2026). Quiet notices stay
+ * flat, because the dark CTA on them is already at 2.32:1 and a sheen would take it to 1.64:1.
+ */
+data class GlossStyle(
+    val brush: Brush,
+    val sheen: Color,
+    val rim: Color,
+    val rimBottom: Color,
+)
+
+@Composable
+fun warningGloss(): GlossStyle {
+    val scheme = MaterialTheme.colorScheme
+    return if (LocalDarkTheme.current) {
+        GlossStyle(
+            brush = Brush.verticalGradient(listOf(DarkWarnTop, scheme.tertiaryContainer, DarkWarnBottom)),
+            sheen = DarkHeroSheen,
+            rim = DarkHeroRim,
+            rimBottom = DarkHeroRimBottom,
+        )
+    } else {
+        GlossStyle(
+            brush = Brush.verticalGradient(listOf(LightWarnTop, scheme.tertiaryContainer, LightWarnBottom)),
+            sheen = LightHeroSheen,
+            rim = LightHeroRim,
+            rimBottom = LightHeroRimBottom,
         )
     }
 }

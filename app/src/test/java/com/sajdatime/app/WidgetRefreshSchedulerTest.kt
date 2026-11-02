@@ -32,6 +32,33 @@ class WidgetRefreshSchedulerTest {
         assertEquals(asr.plus(slack), WidgetRefreshScheduler.nextRefreshAt(asr, now, london))
     }
 
+    // London 22 Feb 2027: sunrise about 07:00, Dhuhr about 12:15 (see WidgetStateTest). No prayer alarm fires at
+    // sunrise, but the Next widget's sky changes there, so it is a redraw boundary (step 8).
+
+    @Test
+    fun `sunrise ahead of the next prayer is the boundary, so the dawn sky does not outlive it`() {
+        val now = at(london, "2027-02-22T06:00:00")
+        val dhuhr = at(london, "2027-02-22T12:15:00")
+        val sunrise = at(london, "2027-02-22T07:00:00")
+        assertEquals(sunrise.plus(slack), WidgetRefreshScheduler.nextRefreshAt(dhuhr, now, london, sunrise))
+    }
+
+    @Test
+    fun `a sunrise that has passed is ignored`() {
+        val now = at(london, "2027-02-22T13:00:00")
+        val asr = at(london, "2027-02-22T15:00:00")
+        val sunrise = at(london, "2027-02-22T07:00:00")
+        assertEquals(asr.plus(slack), WidgetRefreshScheduler.nextRefreshAt(asr, now, london, sunrise))
+    }
+
+    @Test
+    fun `no sunrise behaves as before`() {
+        val now = at(london, "2027-02-22T06:00:00")
+        val dhuhr = at(london, "2027-02-22T12:15:00")
+        assertEquals(dhuhr.plus(slack), WidgetRefreshScheduler.nextRefreshAt(dhuhr, now, london, null))
+        assertEquals(WidgetRefreshScheduler.nextRefreshAt(dhuhr, now, london), WidgetRefreshScheduler.nextRefreshAt(dhuhr, now, london, null))
+    }
+
     @Test
     fun `after Isha the next prayer is tomorrow, so midnight wins and the day list turns over`() {
         val now = at(london, "2027-02-22T21:30:00")
@@ -85,7 +112,8 @@ class WidgetRefreshSchedulerTest {
             repeat(24 * 365 / 3) {
                 // The prayer is a few seconds to a day away, which covers both branches of the rule.
                 for (gapSeconds in listOf(1L, 59L, 3_600L, 43_200L, 86_399L)) {
-                    val result = WidgetRefreshScheduler.nextRefreshAt(now.plusSeconds(gapSeconds), now, zone)
+                    // A sunrise two hours out, as on a morning with the dawn sky up, joins the sweep.
+                    val result = WidgetRefreshScheduler.nextRefreshAt(now.plusSeconds(gapSeconds), now, zone, now.plus(Duration.ofHours(2)))
                     assertTrue("$id $now +${gapSeconds}s gave $result", result.isAfter(now))
                     assertTrue("$id $now +${gapSeconds}s is more than a day out: $result", result.isBefore(now.plus(Duration.ofHours(26))))
                 }

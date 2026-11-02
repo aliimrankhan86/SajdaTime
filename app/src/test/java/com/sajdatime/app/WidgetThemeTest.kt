@@ -30,6 +30,7 @@ class WidgetThemeTest {
         "widget_next_prayer_wide" to R.layout.widget_next_prayer_wide,
         "widget_today" to R.layout.widget_today,
         "widget_today_large" to R.layout.widget_today_large,
+        "widget_strip" to R.layout.widget_strip,
     )
 
     /** A drawable that carries a widget colour has a light and a dark copy; one that carries none needs none. */
@@ -106,8 +107,13 @@ class WidgetThemeTest {
 
         val drawables = pinned.filter { it.ink == Ink.BACKGROUND || it.ink == Ink.IMAGE }.map { drawableNames.getValue(it.resource) } +
             // Switched by the renderer after the paint, not declared once per layout: the highlighted row
-            // and the three states of a day bar.
-            listOf("widget_row_highlight", "widget_seg_done", "widget_seg_next", "widget_seg_todo")
+            // and the three states of a day bar, and (step 8) the Next widget's four skies, the rimmed
+            // pill, and the track and hairline on a sky.
+            listOf(
+                "widget_row_highlight", "widget_seg_done", "widget_seg_next", "widget_seg_todo",
+                "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
+                "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
+            )
         val themed = drawables.filter { hasCopies(it) }.toSet()
         val fixedDrawables = WidgetRenderer.FIXED_DRAWABLES.map { (k, v) ->
             drawableNames.getValue(k) to (drawableNames.getValue(v.first) to drawableNames.getValue(v.second))
@@ -148,7 +154,7 @@ class WidgetThemeTest {
         val sources = res.resolve("drawable").listFiles()!!.map { it.name.removeSuffix(".xml") }
             .filter { it.startsWith("widget_") && !it.endsWith("_light") && !it.endsWith("_dark") }
         val themed = sources.filter { read("drawable/$it.xml").contains("@color/widget_") }
-        assertEquals(8, themed.size)
+        assertEquals(15, themed.size)
         for (name in themed) {
             val source = withoutComments(read("drawable/$name.xml"))
             for (theme in listOf("light", "dark")) {

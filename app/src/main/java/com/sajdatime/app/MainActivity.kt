@@ -1,6 +1,5 @@
 package com.sajdatime.app
 
-import com.sajdatime.app.ui.components.CtaButton
 import android.Manifest
 import android.content.ClipData
 import android.content.Context
@@ -25,29 +24,31 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
+import com.sajdatime.core.BellRules
+import com.sajdatime.core.PermissionDoor
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.notify.AlertCheck
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
+import com.sajdatime.app.ui.BellActions
+import com.sajdatime.app.ui.TrackerActions
+import com.sajdatime.app.ui.JamaahActions
+import com.sajdatime.app.ui.TrackerEvent
 import com.sajdatime.app.ui.MainScaffold
 import com.sajdatime.app.ui.SajdaViewModel
 import com.sajdatime.app.ui.onboarding.OnboardingScreen
@@ -124,6 +125,92 @@ class MainActivity : ComponentActivity() {
         viewModel.setNotificationSound(storedSound(uri, RingtoneManager.TYPE_NOTIFICATION))
     }
 
+    /**
+     * The prayer record's save and load (1.6.0): the system's own save and open dialogs. They hand back
+     * a content:// address with access granted for this one write or read, so the app needs no storage
+     * permission, keeps nothing afterwards and sends nothing anywhere.
+     */
+    private val trackerSave = registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
+        uri?.let(viewModel::saveTrackerTo)
+    }
+
+    /** Several types, because some pickers label a .json file as plain or unknown; the codec checks the content. */
+    private val trackerLoad = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        uri?.let(viewModel::loadTrackerFrom)
+    }
+
+    private val trackerActions = object : TrackerActions {
+        override fun setEnabled(on: Boolean) { viewModel.setTrackerEnabled(on) }
+        override fun setShowStreak(on: Boolean) { viewModel.setTrackerShowStreak(on) }
+        override fun tick(date: java.time.LocalDate, slot: com.sajdatime.core.PrayerSlot, ticked: Boolean) {
+            viewModel.tick(date, slot, ticked)
+        }
+        override fun pause(fromYesterday: Boolean) { viewModel.pauseTracker(fromYesterday) }
+        override fun resume() { viewModel.resumeTracker() }
+        override fun adjustFastsToMakeUp(delta: Int) { viewModel.adjustFastsToMakeUp(delta) }
+        override fun save() = runCatching { trackerSave.launch(viewModel.trackerFileName()) }
+            .getOrElse { toast(getString(R.string.tracker_save_failed)) }
+        override fun load() = runCatching {
+            trackerLoad.launch(arrayOf("application/json", "text/plain", "application/octet-stream"))
+        }.getOrElse { toast(getString(R.string.tracker_load_failed_format)) }
+        override fun delete() { viewModel.deleteTracker() }
+    }
+
+    /**
+     * Whether the phone lets SajdaTime post at all: Android 13's permission and the older "turn off for this
+     * app" switch (not channels). Read again in [onResume], so the bells turn green the moment the user
+     * comes back from the phone's settings.
+     */
+    private var notificationsBlocked by mutableStateOf(false)
+
+    private fun readNotificationsBlocked() = !AlertCheck.notificationsAllowed(this)
+
+    /**
+     * Chosen before anything is launched, so a second "Don't allow" is never answered by Settings
+     * (BellRules.permissionDoor). A result that is a denial does nothing, and nothing here is counted
+     * as setup, so awaitingSetupNotificationResult stays false.
+     */
+    private fun openNotificationDoor() {
+        val systemCanAsk = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !Notifications.canPost(this)
+        when (
+            BellRules.permissionDoor(
+                blocked = readNotificationsBlocked(),
+                systemCanAsk = systemCanAsk,
+                rationale = shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS),
+                askedBefore = viewModel.state.value.settings.notificationPermissionAsked,
+            )
+        ) {
+            PermissionDoor.ASK -> {
+                viewModel.setNotificationPermissionAsked()
+                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+            PermissionDoor.OPEN_SETTINGS -> Notifications.openAppNotificationSettings(this)
+            PermissionDoor.NONE -> Unit
+        }
+    }
+
+    private val bellActions = object : BellActions {
+        override suspend fun off(slot: com.sajdatime.core.PrayerSlot) = viewModel.bellOff(slot)
+        override fun on(slot: com.sajdatime.core.PrayerSlot) {
+            viewModel.bellOn(slot)
+            if (readNotificationsBlocked()) {
+                // Asking again after a refusal brings the notice back (it was closed on purpose before).
+                viewModel.setNotificationsNoticeDismissed(false)
+                openNotificationDoor()
+            }
+        }
+        override fun undo(slot: com.sajdatime.core.PrayerSlot) { viewModel.bellOn(slot) }
+        override fun allow() = openNotificationDoor()
+        override fun dismissNotice() { viewModel.setNotificationsNoticeDismissed(true) }
+    }
+
+    private val jamaahActions = object : JamaahActions {
+        override fun setRule(slot: com.sajdatime.core.PrayerSlot, rule: com.sajdatime.core.JamaahRule?) {
+            viewModel.setJamaahRule(slot, rule)
+        }
+        override fun setJumuah(time: java.time.LocalTime?) { viewModel.setJumuah(time) }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // The window's direction must come from the app's language (AppLocale.wrap above), not be
@@ -155,6 +242,25 @@ class MainActivity : ComponentActivity() {
                         ExportEvent.Failed -> toast(getString(R.string.export_failed))
                     }
                     if (state.exportEvent != null) viewModel.consumeExportEvent()
+                }
+
+                LaunchedEffect(state.trackerEvent) {
+                    when (val event = state.trackerEvent) {
+                        null -> Unit
+                        is TrackerEvent.Saved -> toast(getString(R.string.tracker_saved, event.fileName))
+                        is TrackerEvent.Loaded -> toast(
+                            listOfNotNull(
+                                resources.getQuantityString(R.plurals.tracker_loaded, event.days, event.days)
+                                    .takeIf { event.days > 0 || event.fasts == null },
+                                event.fasts?.let { resources.getQuantityString(R.plurals.tracker_fasts_line, it, it) },
+                            ).joinToString(" "),
+                        )
+                        TrackerEvent.SaveFailed -> toast(getString(R.string.tracker_save_failed))
+                        is TrackerEvent.LoadFailed -> toast(
+                            getString(if (event.tooNew) R.string.tracker_load_failed_newer else R.string.tracker_load_failed_format),
+                        )
+                    }
+                    if (state.trackerEvent != null) viewModel.consumeTrackerEvent()
                 }
 
                 PreviewBuildFrame {
@@ -218,27 +324,20 @@ class MainActivity : ComponentActivity() {
                                 onDismissRamadanNotice = viewModel::dismissRamadanNotice,
                                 onDismissEid = viewModel::dismissEidGreeting,
                                 onSetRamadanCard = viewModel::setRamadanCardEnabled,
+                                onSetNightTimes = viewModel::setNightTimesEnabled,
                                 onSetSuhoorMinutes = viewModel::setSuhoorReminderMinutes,
                                 onSetSuhoorStyle = viewModel::setSuhoorReminderStyle,
                                 onSetSuhoorAdhan = viewModel::setSuhoorUsesAdhan,
                                 onSetPrayerReminderMinutes = viewModel::setPrayerReminderMinutes,
                                 onSetPrayerReminder = viewModel::setPrayerReminder,
+                                onSetFastReminder = viewModel::setFastReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
+                                tracker = trackerActions,
+                                jamaah = jamaahActions,
+                                bell = bellActions,
+                                notificationsBlocked = notificationsBlocked,
                             )
-
-                            // Shown once, immediately after setup, never after an update (the flag is
-                            // stored). The app is a convenience, not a religious authority, and saying
-                            // so should not be buried.
-                            //
-                            // Short form first, since 18 Oct 2026 (the owner: no long message straight
-                            // after installing). disclaimer_brief still makes all four points of
-                            // HANDOVER 5.15 (DisclaimerContentTest), and "Read in full" swaps in the
-                            // complete disclaimer_body, dua request last, in this same dialog. The
-                            // complete text is also always in Settings, About, Disclaimer.
-                            if (!state.settings.disclaimerSeen) {
-                                FirstRunDisclaimer(onUnderstood = viewModel::markDisclaimerSeen)
-                            }
                         }
                     }
                 }
@@ -248,6 +347,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        notificationsBlocked = readNotificationsBlocked()
         // Coordinates may be stale after travel, and alarms may have been cleared by the
         // system, so a foreground visit always refreshes both.
         if (viewModel.state.value.settings.coordinates != null) viewModel.refreshLocation()
@@ -263,6 +363,11 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationsIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             awaitingSetupNotificationResult = true
+            // Counts as asked, so a later bell tap after a refusal here goes to the phone's settings rather
+            // than launching a system ask some phones no longer show (Opus review, 24 Oct 2026). A deliberate trade:
+            // someone who backs out of the setup prompt without choosing also gets the phone's settings on the
+            // first bell tap, where they can still allow. Better than a tap that shows nothing; do not undo.
+            viewModel.setNotificationPermissionAsked()
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
@@ -378,56 +483,3 @@ private fun PreviewBuildFrame(content: @Composable () -> Unit) {
 /** The sound address schemes the alarm channel can safely play: a media or settings provider, or an app's raw resource. */
 internal fun isAcceptedAlarmSound(scheme: String?): Boolean =
     scheme == "content" || scheme == "android.resource"
-
-/**
- * The disclaimer shown once after setup: the short form, a way to the full text, and Understood.
- * A composable of its own so the render harness (HANDOVER lesson 132) draws exactly what ships.
- */
-@Composable
-internal fun FirstRunDisclaimer(onUnderstood: () -> Unit) {
-    var full by rememberSaveable { mutableStateOf(false) }
-    AlertDialog(
-        onDismissRequest = { },
-        // A filled, full-width button, not a text link. This is the
-        // one control on the one screen every user must pass
-        // through, and as a small tinted word in the corner it did
-        // not read as pressable — a tester said so. 56dp clears the
-        // 48dp minimum touch target with room for shaky hands.
-        confirmButton = {
-            CtaButton(
-                onClick = onUnderstood,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = 56.dp),
-            ) {
-                Text(stringResource(R.string.action_understood))
-            }
-        },
-        // The way to the full text, gone once it is showing. Solid,
-        // like every action in the app (owner, 18 Oct 2026); it was a
-        // text link, and he asked that no action look like one.
-        dismissButton = if (full) {
-            null
-        } else {
-            {
-                CtaButton(
-                    onClick = { full = true },
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Text(stringResource(R.string.disclaimer_read_full))
-                }
-            }
-        },
-        title = { Text(stringResource(R.string.disclaimer_title)) },
-        // Scrollable. AlertDialog does not scroll its body for you.
-        // The short form fits one screen at the default font; the
-        // full one is seven paragraphs, and at a large font the last
-        // of them, the dua request, is exactly what would fall off
-        // the bottom unread. Do not remove the scroll.
-        text = {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                Text(stringResource(if (full) R.string.disclaimer_body else R.string.disclaimer_brief))
-            }
-        },
-    )
-}

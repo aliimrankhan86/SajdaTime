@@ -1,5 +1,12 @@
 # SajdaTime design system
 
+> **Start at [`docs/design-system/`](design-system/README.md) (since 25 Oct 2026).** That folder is the structured
+> reference: tokens in JSON held to the code by `DesignTokensTest`, every component, pattern and screen, content
+> rules, accessibility, widgets and watch, the iPhone mapping, and the new feature playbook. **This file still owns**
+> the owner's rules (§0), the enforced button inventory (§4.1, read by `DesignRulesTest`), the decision log (§9), the
+> learning loop (§10) and open decisions (§11). Its value tables below are older copies: where a value here differs
+> from `docs/design-system/tokens/`, the token file (tested against the code) is right.
+
 The tokens and component patterns the app is built from. `docs/HANDOVER.md` §7 is the
 short version; this is the reference you check a colour against.
 
@@ -87,7 +94,8 @@ otherwise; if neither says, ask him (§0.2).
 | surfaceHighlight | `primaryContainer` | `#143028` | Next-prayer card, next row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#8FD9B8` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#161A19` | The Qibla dial face |
-| primary | `primary` | `#4FC48F` | Accent bar, Qibla arrow and arc, "Next" pill |
+| dialBezel | `surfaceContainerHighest` (read through `dialBezel()`, not a role of its own) | `#262C29` | The Qibla dial's bezel when not aligned; `primary` when aligned |
+| primary | `primary` | `#4FC48F` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill |
 | onPrimary | `onPrimary` | `#062117` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#1E4034` | The selected tab pill |
 | onSurface | `onSurface` | `#E7EAE8` | Body text, prayer times |
@@ -97,6 +105,7 @@ otherwise; if neither says, ask him (§0.2).
 | warning | `tertiary` | `#E8B14A` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#2A2113` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#F3E4C5` | Text in that banner |
+| warnTop, warnBottom | `DarkWarnTop`, `DarkWarnBottom` in `Color.kt` (not a Material role) | `#352A17`, `#20190D` | The warning notice's gloss gradient, `tertiaryContainer` in the middle (1.6, §9 24 Oct) |
 | kiswah | *(none — `kiswahGold()`)* | `#8A5807` | The Kaaba's hizam and door on the Qibla dial |
 
 ### Light
@@ -110,7 +119,8 @@ otherwise; if neither says, ask him (§0.2).
 | surfaceHighlight | `primaryContainer` | `#D7EAE0` | Next-prayer row, aligned dial |
 | onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
-| primary | `primary` | `#0B5A43` | Accent bar, Qibla arrow and arc, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
+| dialBezel | `surface` (read through `dialBezel()`, not a role of its own) | `#FDFCFB` | The Qibla dial's bezel when not aligned, lifted by the card shadow; `primary` when aligned |
+| primary | `primary` | `#0B5A43` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
 | onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
 | onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
@@ -120,6 +130,7 @@ otherwise; if neither says, ask him (§0.2).
 | warning | `tertiary` | `#9A6208` | The warning icon |
 | warningSurface | `tertiaryContainer` | `#FBF1DC` | The warning banner |
 | onWarningSurface | `onTertiaryContainer` | `#5A4408` | Text in that banner |
+| warnTop, warnBottom | `LightWarnTop`, `LightWarnBottom` in `Color.kt` (not a Material role) | `#FBF0D8`, `#F3E2BE` | The warning notice's gloss gradient, `tertiaryContainer` in the middle (1.6, §9 24 Oct) |
 | kiswah | *(none — `kiswahGold()`)* | `#E8B14A` | The Kaaba's hizam and door on the Qibla dial |
 
 ### The light hero gradient
@@ -153,10 +164,11 @@ and the navigation pill all rendered in Material's default **lilac** because
 happened a fourth time on the watch, which was using Wear's default scheme. If anything
 looks purple, an unset role is the cause.
 
-### One colour is depictive rather than semantic, and it is the only one
+### One colour is depictive rather than semantic, and it is the only one (until the skies of 1.6)
 
 Every other hue here carries meaning: green is the identity, amber is a warning, and
-nothing is decorative. **`kiswah` is the exception, and it is deliberate.** It is the gold
+nothing is decorative. **`kiswah` is the exception, and it is deliberate** (the only one until the
+skies of 1.6, see the next heading but one). It is the gold
 of the Kaaba's hizam and its door on the Qibla dial — not a role, not a state, just what
 the object is, in the same way the silhouette is a cube and not a circle. It has no
 Material slot; it is read through `kiswahGold()` in `Theme.kt`, which reads `LocalDarkTheme`
@@ -181,6 +193,33 @@ detail in the dial's face colour instead. That reasoning measured the wrong back
 what it shipped was not a band but a slot cut through the cube, which made the mark read as
 a shopfront. Contrast was never the problem: both themes were already about 14:1. See
 `ic_kaaba_detail.xml`.
+
+### The four skies (1.6, step 5; prototype, awaiting the owner's pictures)
+
+The top of Times is a fixed three stop gradient per period, from under the status bar to the foot of the
+next prayer card, where it has faded into the page (`background`). Four skies, never a continuous
+gradient. Tokens `LightSky*` and `DarkSky*` in `Color.kt`, read through `skyStyle(period)` in `Theme.kt`.
+The period is `Sky.periodOf` in `:core` (Dawn Fajr to sunrise, Day sunrise to Asr, Evening Asr to Isha,
+Night Isha to Fajr; no times means Day).
+
+| Sky | Light top, mid | Dark top, mid |
+|---|---|---|
+| Dawn | `#EADFE3`, `#F0E9EC` (pale rose) | `#231E2C`, `#171520` (deep violet) |
+| Day | `#D6E8DC`, `#E6EFE9` (mint) | `#17323A`, `#13262B` (deep teal) |
+| Evening | `#ECD8BB`, `#F1E5D3` (sand) | `#262A1E`, `#181B15` (olive dusk) |
+| Night | `#D0DBE1`, `#DFE6EA` (slate) | `#0B1730`, `#0C1320` (navy) |
+
+The foot of every sky is the page: `#F7F5F3` light, `#101312` dark. **Inks on a sky:** the city
+`onSurface`, the Gregorian date, arc and dots `onSurfaceVariant`, the Hijri date, caret, glyph and passed arc
+`primary`. Nothing but the header's three texts and the sky mark ever sits on a sky. The status bar icons
+follow the theme and hold 3:1 on every top. **88 new assertions** in `ColorContrastTest`: 72 text pairs
+(3 inks x 3 stops x 4 skies x 2 themes), 8 feet equal the page, 8 status bar pairs. The light night top
+is the thin one, 4.57:1 under `onSurfaceVariant`: it cannot be darkened without a darker date ink.
+These sixteen stops are the second depictive colour family after the Kaaba gold: the sky shows the time of
+day the way the gold shows what the Kaaba is. No role, no state, never behind a prayer time in the app.
+On the Next prayer widget the sky is the body (Ali, 25 Oct 2026, step 8 Q1), its inks held at every stop by
+`WidgetColorsTest`; never on the Today widgets or the strip. Dark night is told by hue (`#0B1730` is 1.05:1 against the page), which
+Ali kept on 24 Oct 2026 ("Keep it this deep"; `1.6-dark-skies`, §9).
 
 ### Light and dark separate surfaces differently
 
@@ -264,6 +303,40 @@ component's fixed metrics, not gaps between pieces of text.
 > literals are exactly how the gaps drifted apart, card by card. Named tokens make the
 > relationship part of the code, so the reviewer sees `Space.Related` where a 12 would hide.
 
+### Motion (1.6, 23 Oct 2026)
+
+Durations come from `ui/theme/Motion.kt`, the way gaps come from `Space`. There are three, all with
+`FastOutSlowInEasing`, chosen by what moves and never by mood:
+
+| What moves | Token | ms |
+|---|---|---|
+| An icon or arrow swaps or turns (the bell, the fold chevrons) | `Motion.quick()` | 150 |
+| A shape, colour, position or block of text changes in place (the tick, the theme thumb, the pause row, Now and Next) | `Motion.standard()` | 250 |
+| A drawing runs across the screen (rings, sky, day path) | `Motion.draw()` | 400 |
+
+- **Exits** use the token one step shorter than the enter. A `Standard` enter leaves at `Quick`, and a
+  `Quick` enter also leaves at `Quick`. Reversing the same animation (an untick) counts as an exit. A call
+  site passes the shorter spec itself; there is no exit helper.
+- **No entrance animation.** Nothing moves when a screen opens. Something moves only when the user touched
+  it, a sensor reading changed (the Qibla dial), or a real event happened (a prayer time passed, the sky
+  period changed). The one exception is the day path drawing in once per app open.
+- **Never animated:** prayer times, the countdown digits, notice text, the disclaimer, the city title and
+  Hijri date, the glass bar's position, any dialog or sheet text. Letters never move or morph on their own,
+  because per letter effects break Arabic and Urdu joining. A whole block of text may fade.
+- **Haptics** go through `LocalHapticFeedback` only, on the user's own tap that changes something stored
+  (`ToggleOn` and `ToggleOff`, `SegmentTick` for pickers). Two shipped exceptions stay, named so nobody
+  "fixes" them: `SegmentTick` on a tab change (`MainScaffold.kt`) and the Qibla arrival buzz
+  (`QiblaScreen.kt`, a sensor event). Since 1.6 step 6 that one goes through the `Vibrator` (70 ms, media usage, the `VIBRATE`
+  permission), not `LocalHapticFeedback`: touch feedback is off by default on many phones, and Ali asked that
+  the buzz always happen (24 Oct 2026). Never on a prayer passing, a sky change, Undo, a
+  snackbar or a ring filling. One pulse per tap.
+- **Enforced** by `DesignRulesTest`: a written `tween` or `TweenSpec` anywhere except `Motion.kt` and the
+  Qibla dial's one 120 ms call (input driven), a `rememberInfiniteTransition` or `infiniteRepeatable`, and a
+  written `spring(`, `spring<…>(` or `SpringSpec` all fail the build. It scans the phone app only. The watch has
+  no animation and is not covered. Not caught, so never claim it: a duration hidden in a constant passed to an
+  API other than `tween`, and an animation loop written by hand with a `LaunchedEffect`; the reviewer checks those. Compose's own default
+  specs on approved screens (tab fade, folds) are kept.
+
 ---
 
 ## 3. Type
@@ -312,16 +385,17 @@ in light and dark, so nobody has to guess what is tappable. The only text links 
 two bold links on the usage question** (kind F below). Decided by the owner on 18 Oct 2026, after
 outlined and then tonal buttons were both too easy to miss (§0.1).
 
-#### The six kinds of control that act, and nothing else
+#### The seven kinds of control that act, and nothing else
 
 | Kind | Component | Fill, light | Fill, dark | Label and icon | Used for |
 |---|---|---|---|---|---|
 | **A. Solid green** | `CtaButton` (or `ctaButtonColors()` on a Material `Button` inside `Notice` and `PermissionButton`) | `#0B5A43` (`LightCta`) | `#17805A` (`DarkCta`) | `#FFFFFF` (`OnCta`) | Every action that is not a warning |
 | **B. Solid amber** | Material `Button` with `tertiary`/`onTertiary`, only inside `Notice` (warning tone) | `#9A6208` | `#E8B14A` | light `#FFFFFF`, dark `#3A2A00` | The action and "Details" in a warning notice ("Allow exact alarms") |
-| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque" |
+| **C. Solid green icon** | `FilledIconButton` with `ctaIconButtonColors()` | `#0B5A43` | `#17805A` | `#FFFFFF` icon | The − and + minute steppers in "Match your mosque start times" |
 | **D. Close X** | `IconButton`, `Icons.Outlined.Close`, ink of the surface | none | none | `onSurface` (or the notice's ink) | Top right of a dialog (`DialogTitle`) and of a closable notice on Times. Always **alone** |
 | **E. Dialog text link** | `TextButton` | none | none | `primary`, labelLarge | **Only** "Close" or "Got it" at the bottom end of a dialog |
 | **F. Bold information link** | `InfoLink` (private to `UsageCountsConsent.kt`) | none | none | `primary`, `actionLabelStyle()` (16sp SemiBold) **underlined**, 48dp target, start aligned, announced as a button | **Only** "See exactly what is sent" and "Read the privacy policy" on the usage question (owner's choice, 18 Oct 2026). Nowhere else without asking him |
+| **G. Snackbar action** | Material's own `SnackbarHost` action, written with `showSnackbar(actionLabel = ...)` in `MainScaffold.kt`, so no `TextButton` appears in our source | none | none | platform (`inversePrimary` on `inverseSurface`) | **Only** "Undo" in the message at the bottom ("Paused from today"; "Dhuhr alert off" and its three forms, 1.6 step 3), above the tab bar, on every tab. Added with step 1 of 1.6.0 |
 
 Plus one icon that informs rather than acts: the **(i)** at the end of the Ramadan card's last
 row (48dp target, `onSurfaceVariant`). It opens the Ramadan explanation. It is never placed next
@@ -339,7 +413,7 @@ warnings").
 | Label style | `actionLabelStyle()`: labelLarge (SemiBold) at **16sp** | The same in A and B. Never 14sp, never regular weight |
 | Label case | Sentence case, as written in the string | Never uppercased in code (§3) |
 | Height | **56dp** the main button of a setup step or a must answer dialog; **52dp** every other standalone button; **48dp** buttons inside a notice; **40dp drawn, 48dp to touch** a button that shares a line with a heading or a sentence, or sits in a card row (`CtaButton(compact = true)`) | Minimums; large text grows them. The compact size exists because "Save as PDF" at 52dp beside "Today" looked squashed (owner, 18 Oct 2026). Its 48dp tap area was measured once, in the scratch render harness (Robolectric, not part of the repo's tests, which carry no Robolectric): taps 2 and 3.5dp outside the drawn edge pressed it, 6dp did not. Material 3 `Button` gives it that area through `minimumInteractiveComponentSize` |
-| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
+| Width | **Full width** when the button stands alone on its line or in a column of buttons; **wraps its label, compact** when it shares a line with text (a heading, a question) or sits inside a card row; two buttons side by side in setup share the width equally. A compact button may stand alone, centred, when it is a disclosure under a picture (Qibla Details; the welcome globe is the earlier case): a 52dp full width button under the dial would outweigh the thing it explains | `DesignRulesTest` fails a `CtaButton` that states none of the three (`fillMaxWidth`, `weight`, `compact = true`) |
 | Padding | Material default (24dp each side); compact 16dp each side | |
 | Icon | Optional, **leading** (before the label), 24dp (18dp in a wrapped button), the label's colour, `Space.Related` (8dp) gap | Notice actions carry a trailing arrow; "Details" a trailing chevron that turns |
 | Elevation and shadow | None | Flat on purpose: the fill does the work |
@@ -407,25 +481,48 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Usage question (setup, and the Settings switch) | See exactly what is sent / Hide, 16dp under the text | F | 48 target, wraps | `UsageCountsConsent.kt` |
 | Usage question | Read the privacy policy, straight under it | F | 48 target, wraps | `UsageCountsConsent.kt` |
 | Usage question | Yes, share usage counts; No thanks, 24dp under the links (under "The full privacy policy is in English." when the app is not in English, since 19 Oct 2026) | A | 56, full, equal, 8 apart | `UsageCountsConsent.kt` |
-| First run disclaimer | I understand | A | 56, full | `MainActivity.kt` |
-| First run disclaimer | Read in full, until opened | A | 52, full | `MainActivity.kt` |
-| Times | Save as PDF (PDF icon), end of the Today heading; 16dp under the card above, 8dp over the list it saves | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
+| Times | Timetable (calendar icon), end of the Today heading, under it from 1.5 text; 16dp under the card above, 8dp over the list | A, compact | 40 drawn, 48 target, wraps | `HomeScreen.kt` |
 | Times | Different from your mosque? (mosque icon) | A | 52, full | `HomeScreen.kt` |
-| Times, mosque dialog | Calculation method; Asr; Match your mosque | A | 52, full | `HomeScreen.kt` |
+| Times, mosque dialog | Calculation method; Asr; Match your mosque start times | A | 52, full | `HomeScreen.kt` |
 | Times, mosque dialog | Close, and the X | E, D | | `HomeScreen.kt`, `Common.kt` |
 | Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
 | Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
 | Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
-| Ramadan timetable | Save as PDF, beside the title | A, compact | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
+| Timetable sheet | Save as PDF (PDF icon), end of the place line under the title | A, compact | 40 drawn, 48 target, wraps | `TimetableSheet.kt` |
+| Timetable sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TimetableSheet.kt`, `Common.kt` |
+| Ramadan timetable | Save as PDF moves to the place line; the X alone at the top end (shared header) | A, compact; D | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
-| Every notice | The action (trailing arrow); Details or Hide details (chevron); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
-| Settings, Match your mosque | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
-| Settings, the clock ("Isha: the time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
-| Settings, Match your mosque | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
+| Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Times, notifications notice (1.6.0, while the phone blocks notifications) | Allow (trailing arrow); the X, alone | B; D | 48, wraps | `Notice.kt`, `PermissionAction.kt` |
+| Times | the bell at the end of each prayer row, not Sunrise (a 48dp blank keeps its time aligned) | Bell (`Bell.kt`), a toggle like Tick | 24 drawn, 48 target | `HomeScreen.kt`, `Bell.kt` |
+| Settings, Match your mosque start times | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
+| Settings, the clock ("Isha: the Begins time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
+| Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
+| Settings, Fast reminders dialog (1.6.0) | No buttons of its own: three switch rows (Monday and Thursday; White Days; Ashura, Arafah and the six days of Shawwal) under one help line, the X and the foot "Close". No `CtaButton` | E, D | | `SettingsScreen.kt` |
+| My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
+| My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| My prayers tab, while fasts to make up is above zero | Made up one (calendar check icon) at the end, beside "3 fasts to make up", a Section under the week card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
+| Settings, Fasts to make up dialog | − and + for the count (0 to 999), under the sentence; Close and the X | C; E, D | 40 visual, 48 target | `SettingsScreen.kt` |
+| My prayers tab, tracking off | the switch row; not a button | Switch | 56 row | `MyPrayersScreen.kt` |
+| My prayers tab, no location | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
+| Qibla | Details (down chevron that turns; "Hide details" when open), centred under the place name, 16dp under it | A, compact | 40 drawn, 48 target, wraps | `QiblaScreen.kt` |
+| Qibla, no location (or the Makkah fallback) | Set location, the notice's action | A (notice) | 48, wraps | `Notice.kt` |
+| Last 30 days sheet | the X, alone at the top end | D | 48 | `MyPrayers.kt` |
+| Last 30 days sheet | each day cell is `selectable`, not a button; the chosen day's five ticks under the grid | Tick | 24 drawn, 48 target | `MyPrayers.kt` |
+| Every tab | Undo in the message at the bottom (Material's own snackbar action, written with `showSnackbar(actionLabel = ...)`, so no `TextButton` in our source) | G, new | platform | `MainScaffold.kt` |
+| Settings, Pause from | Pause, under Today and Yesterday; the X | A; D | 52, full | `SettingsScreen.kt` |
+| Times, mosque dialog (1.6.0) | Add your mosque's jama'ah times, first, under the congregation paragraph | A | 52, full | `HomeScreen.kt` |
+| Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row (before, after, Fajr after sunrise, Jumu'ah's own two); while the phone is in another time zone from the one the times were typed in, one quiet Notice (`Icons.Rounded.Public`, brief and Details) at the top instead, no "Today" lines and no amber (step 7, 25 Oct 2026) | Row | 56 | `SettingsScreen.kt` |
+| Settings, a prayer's jama'ah | Off, A fixed time (opens the clock, "Asr: the jama'ah time on your mosque's board"), Minutes after it begins (radio rows); − and + in fives, 0 to 60, value is the number alone | radio; C | 48; 40 visual, 48 target | `SettingsScreen.kt` |
+| Times, header (1.6.0) | The date line under the city, Hijri half in primary; opens Islamic dates. A 48dp text target, not a button, and no caret | Text target | 48 target | `HomeScreen.kt` |
+| Islamic dates sheet | Shift the date, alone under the footer | A | 52, full | `IslamicDatesSheet.kt` |
+| Settings, Delete your prayer record? | Delete; the X. Solid green like every action: there is no error role, the words carry the warning | A; D | 52, full | `SettingsScreen.kt` |
 
 Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row
 is the target, with a chevron), switches, radio rows, the tab bar, and the city name with its caret
@@ -485,15 +582,20 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > the moment Fajr's window shuts, and it is why there is no "Now" pill anywhere on the list
 > between sunrise and Dhuhr. See `PrayerEngine.currentPrayer`.
 
-**Qibla dial** — face in `surfaceVariant`, rim in `outlineVariant`, ticks every 15°, a
-`primary` arrow at the true bearing, and a fixed grey tick at the top meaning *you are
-pointing here*. Between them, a `primary` arc: **the turn you still owe**. Signed, so a
-left turn sweeps anticlockwise and nobody is sent the long way round. Inside ±5° the arc
-clears, the face fills with `primaryContainer`, the rim switches to `primary`, and the
-wording changes to confirmation. Three independent signals again, only one of them colour.
+**Qibla dial** (restyled in step 6, 24 Oct 2026, the Pillars style in our theme) — a circle with the lift every
+card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is the lifted disc: 0.08 of the radius,
+`surface` in light and `surfaceContainerHighest` in dark (`dialBezel()`, a different role per theme because the dark
+hairline is invisible against the page). Inside it the face, `surfaceVariant`. Sixty ticks, one every 6°, in
+`outline` (minor 0.845 to 0.87, cardinal from 0.80, round caps); the letters at 0.74, E S W `onSurfaceVariant`
+Normal and N `primary` Medium. The needle is **you**: a `primary` teardrop (tip at 0.64, round end past the centre,
+no hub), fixed at the top with a compass (it points at the bearing without one). There is no arc: the Kaaba's side
+of the dial and the sentence ("Turn right 58°") say how far to turn. Inside ±5° the face fills with
+`primaryContainer`, the bezel turns `primary` and thickens to 0.11, all over 250 ms (150 ms on leaving), the line
+above the dial turns green with a tick, and the phone buzzes once: three signals that are not colour (the
+sentence with its tick, the thicker bezel, the buzz).
 
-**The Kaaba mark** sits at the far end of the arrow, at 0.72 of the dial radius, in
-`onSurface` with its band and door painted in whatever the dial face currently is. Same
+**The Kaaba mark** sits at 0.70 of the dial radius, 0.22 across, in
+`onSurface` with its band and door in `kiswahGold()`. Same
 artwork on the phone and the watch — `core/res/drawable/ic_kaaba*.xml`, shared so one dial
 drawn twice cannot end up as two different buildings.
 
@@ -512,19 +614,28 @@ drawn twice cannot end up as two different buildings.
 > mark, and what is behind the mark is the needle, so the doorway filled with green.
 
 A legend names the two abstract marks. The Kaaba is not in it, because a legend explains
-shapes and this one is a picture; the subtitle above the dial already says the word.
+shapes and this one is a picture.
 
 **Notices** (one component, `ui/components/Notice.kt`, since 17 Oct 2026). Every message that
 is not a setting goes through it, so a person learns one shape and reads every notice the same
 way. Two tones only: **warning** (`tertiaryContainer`, amber: something is wrong or withheld)
 and **quiet** (`secondaryContainer`, soft green: information or an occasion, Ramadan and Eid).
-Anatomy, since 18 Oct 2026: a round mark (the icon on a 14% tile of the tone's accent); the
-title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
+Anatomy, since 24 Oct 2026 (1.6.0 step 3, Ali's four choices, `STEP-3-DESIGN.md` §19 and §20): a
+**bare mark**, the icon itself at 24dp in the tone's colour, top-aligned, with no tile behind it;
+the title, then **one brief sentence** 4dp under it; a footnote that must stay visible (Eid's
 "follow your mosque"); the full explanation, folded; then, 16dp under the text, **one row of
 buttons**: the action as a **solid button** in the tone's colour with an arrow ("Allow", "See
 why", "Change location", "Shift the date"; never "Tap to…") and, when there is more to say, a
 **"Details" button with a down chevron** ("expanded"/"collapsed" spoken). The close X sits
-**alone at the top right**, on Times only.
+**alone at the top right**, on Times only. The **warning tone is glossy**: a soft top to bottom
+amber gradient with a light sheen (`warningGloss()`, the `Warn` tokens in §1); the quiet tone
+stays flat. The quiet tone is also used for a **withholding by the user's own rule**: the Jama'ah
+times dialog's notice while the phone is in another time zone (25 Oct 2026, step 7; nothing is wrong, so not
+amber). The two **permission cards** (exact alarms, and notifications while the phone blocks
+them) carry **one button only, "Allow"**, and no Details: the brief sentence says what goes
+wrong, the button fixes it. Their marks are `WarningAmber` and the crossed bell
+`NotificationsOff`. On Times a card leaves with a quick fade and shrink once the permission is
+granted. Before 24 Oct the mark sat on a 14% tile and every warning was flat amber.
 
 **Never put two icon buttons side by side** (owner, 18 Oct 2026, from the emulator: the fold
 chevron sat next to the close X, two opposite actions a finger apart). A close X is the last
@@ -532,8 +643,8 @@ trailing element and stands alone; "show more" is a labelled button with a chevr
 action is a filled button (Android banner guidance, Devon and Primer design standards).
 
 **Dialogs.** Every dialog a person can simply leave has a close X at the top right
-(`DialogTitle`) as well as its text button at the bottom (owner's request). Two must be
-answered, not closed, and have no X: the first run disclaimer and the usage counts question.
+(`DialogTitle`) as well as its text button at the bottom (owner's request). One must be
+answered, not closed, and has no X: the usage counts question (the first run disclaimer went in 1.6).
 Explainer dialogs pair each paragraph with its button (`ExplainerParagraph`, `ExplainerAction`):
 paragraph to its button 8dp, group to group 16dp. `DesignRulesTest` checks the X.
 
@@ -552,8 +663,9 @@ same notice has no close button and never hides while the permission is missing.
 > scheduler, and an error colour would say the app is broken when it is not.
 
 **Home screen widgets** (hero countdown, 18 Oct 2026; research in
-`docs/plans/2026-10-widget-redesign/RESEARCH.md`). Two widgets, each with two layouts the launcher
-chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`):
+`docs/plans/2026-10-widget-redesign/RESEARCH.md`; the Today strip and the sky, 1.6 step 8,
+`STEP-8-DESIGN.md`). Three widgets; the launcher chooses between layouts or size entries on Android 12
+and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
 
 | Widget | Layout | Shows |
 |---|---|---|
@@ -561,6 +673,7 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
 | Next prayer | wide (from 270 by 150dp) | the small widget's countdown beside the six rows |
 | Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
 | Today | large (from 250 by 280dp, 330dp in Urdu and Arabic; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+| Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 64dp tall); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 64dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
 
 - **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
   in dp because it is already three times the body text and a large font setting pushed the prayer
@@ -584,12 +697,22 @@ chooses between by size on Android 12 and later (`WidgetRenderer.NEXT_SIZES`, `t
   Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
   opening the app is what updates the location (onResume); it cannot update without opening the app,
   because location is read only in the foreground. The large header uses the short date ("Sun, 18
-  Oct") so the chip never cuts it short. The Hijri line under it shrinks from 12 to as small as 9sp
+  Oct") so the chip never cuts it short in English; since 30 Oct 2026 it also shrinks 14 to 10sp before any cut
+  (Bengali "শুক্র 30 অক্টোবর" read "শুক্র 30 অ…" beside the chip). The Hijri line under it shrinks from 12 to as small as 9sp
   rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
   screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
   pressing the chip opens the app.
+- **The sky on the Next prayer widget** (1.6 step 8, Ali chose it for both Next layouts from the pictures, 25 Oct 2026): the body is the
+  current period's sky (the phone's sixteen stops), sheen and rim unchanged. The chip and the highlighted
+  row get a 1dp `primary` rim (`widget_highlight` is 1.0:1 on the light day top), and the "to come" bars
+  and the divider become a 30 percent `onSurfaceVariant` track. `WidgetColorsTest` holds 120 more pairs.
+  Never on the Today widgets or the strip. The sky changes at Fajr, sunrise, Asr and Isha, so sunrise is a
+  redraw boundary (`WidgetRefreshScheduler.nextRefreshAt`).
+- **The strip's time may shrink to 9sp** at the 250dp width so "12:45 pm" keeps its "pm" (a second exception
+  under the 12sp floor beside the Hijri line, set by the main session on 25 Oct 2026 and shown to Ali in
+  the 250dp picture); the names and times also ellipsise, so any cut shows.
 - **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
-  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer. Only the
+  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer, on the strip only from 380dp wide and not at large text. Only the
   town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
   1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
   more.
@@ -653,7 +776,8 @@ applied in the "dark design system" and "light design system" commits. What was 
 row states, the dial arc, the banner treatment, the group cards. What was **not** taken:
 anything that would have added a feature the app does not have. The design was drawn
 against the shipping feature set on purpose — no day stepper, no per-row mute, no tracker —
-and it should stay that way. (The Ramadan card and the widgets reuse these tokens and add none; the
+and it should stay that way. (Reversed by the owner on 23 Oct 2026 for 1.6: a one-tap bell on each row,
+and a tracker. See §9.) (The Ramadan card and the widgets reuse these tokens and add none; the
 widget glyphs and the mark are drawings, not colours. A prayer tracker, if it is ever built, is its own design pass.)
 
 One thing in the light design was **not** adopted: it sets the countdown at 46sp in light
@@ -682,7 +806,7 @@ are tested against pure black and pure white behind it (`ColorContrastTest`).
 
 **Every tab opens the same way.** `ScreenTitle` (headlineMedium, start aligned, 20dp gutter)
 on Qibla and Settings; on Times the title is the city, same size and line, with a green caret
-because it opens the location sheet. Every scrolling screen ends with `BottomBarClearance()`,
+because it opens the location sheet, and (1.6, step 5) on a sky that says the period. Every scrolling screen ends with `BottomBarClearance()`,
 which is the bar's measured height, so it grows with large text.
 
 **Every call to action is a `CtaButton`: solid green, white bold 16sp text, at least 52dp tall,
@@ -727,6 +851,170 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **2 Nov 2026, "Why these times" caption is plain text, not tappable.** §4.1: every action is a solid button, and the
+  "Different from your mosque?" door right below opens the same dialog. Centred `bodySmall` `onSurfaceVariant`, `Space`
+  gaps, no 48dp target.
+- **2 Nov 2026, Midnight row (night times) added to the Times list, reversing FABLE-REVIEW.md:76 ("Show more
+  (midnight, last third) carries rulings... Leave it").** Ali approved it. One dimmed row after Isha, same treatment as
+  Sunrise (smaller type, no bell), moon icon (`Icons.Outlined.DarkMode`), note "Last third from X", Settings toggle
+  "Night times", default on. The night is sunset to Fajr for everyone (HANDOVER 5.39). Wording never "Isha ends",
+  "Tahajjud time", "best time" or "Qiyam". Cost: the list plus the mosque door now needs a short scroll on a real
+  1080x2400 phone.
+
+- **30 Oct 2026, Bengali, and text that shrinks instead of breaking (owner: "any text is overlapping or feel like
+  breaking the design then shrink the text or lower its size enough to fit on the screen").** Text that can wrap still
+  wraps between whole words. Text held to one line (the city name, the Qibla place line, the My prayers column headings)
+  now shrinks until it fits (`shrinkToFit`): to 60%, or at large text to its normal size when smaller. **This may go
+  below the 14sp floor** (to 8.4sp for a 14sp label at normal text size): the owner's rule for this case only. The Today
+  widget's date line shrinks 14 to 10sp like the Hijri line under it. **Rejected:** tab labels on one line that shrink:
+  on a 320dp phone at 2.0 "My prayers" and "আমার নামাজ" still ended in an ellipsis (`LargeTextAndTalkBackDeviceTest`
+  now checks for one). Instead the tabs align to the top, so a two line label no longer lifts its icon out of line.
+
+- **25 Oct 2026, Fasts to make up (moved into 1.6.0, built basic with no Fable pass at the owner's request):** a
+  Settings row in My prayers opening the chooser dialog with one StepperRow, and on the My prayers tab "3 fasts to make
+  up" with a compact "Made up one" under the week card, only above zero. **The owner approved it from the pictures
+  ("Yes, Fasts to make up looks fine. Keep it as it is.")**, including the stepper label repeating the title on two lines
+  (kept: TalkBack reads it). HANDOVER §5.36.
+- **25 Oct 2026, the 1.6.0 store pictures (step 11, Fable's design; the owner chose all four recommendations and
+  approved the finished set from pictures, 25 Oct 2026: "Yes all fine").** Detail: `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (§9 wins).
+  * **Eight English, four in each app language.** Times light, My prayers, Qibla, Ramadan dark (01 to 04, also in
+    ar, ur, tr-TR, id-ID), widgets, Timetable, alerts and adhan, suhoor reminder. My prayers sits second because Play
+    shows the first pictures beside search results. Setup madhab and Settings pictures dropped (Ali's choice).
+  * **London, seeded, location revoked.** Times a reader can check (Qibla 119 minus facing 61 is "Turn right 58").
+  * **Arabic 01 to 03 on Thursday 20 Aug, the rest on Saturday 15 Aug.** Arabic weeks start on Saturday, so on a
+    Saturday the week card is empty; one language's set agrees with itself, languages need not agree with each other.
+  * **The widget strip without its town chip** (Ali's choice), the Next widget at four columns beside it.
+  * **Rejected:** Manchester (the AVD's GPS) for continuity with 1.5.0 pictures, since the app moved off the seed mid
+    capture; English pictures for the other languages; a 24 hour status bar for tr and id (left for Ali, optional).
+
+- **24 Oct 2026, the Qibla restyle (step 6, Fable's design, prototype built; the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-6-DESIGN.md` (section 14 wins where it differs).
+  * **The direction first.** Under the title, "Turn right 58°" in `headlineMedium` with tabular figures, start
+    aligned like the city on Times; on arrival it turns green with a tick, the same size so nothing jumps. **"Facing
+    60°" stays on arrival** (with a compass): it now sits above the dial, and a line vanishing there would move the
+    dial at the very moment it animates. Q1 (start aligned or centred over the dial) is Ali's from the pictures.
+  * **The dial.** The card lift, a rim band that thickens and turns green on arrival, a rounder needle (filled and
+    stroked with round joins), and new shares: ticks 0.84 to 0.92, letters 0.77, Kaaba 0.60, arc 0.11 thick inside
+    the band. Face and rim animate at `Motion.standard()` in and `Motion.quick()` out. The one buzz and its guard are
+    unchanged. Q2 (lifted or flat) is Ali's.
+  * **Details.** Distance and bearing sit behind a compact solid "Details" button with the Notice chevron, "Hide
+    details" when open, closed on each fresh open. **Miles or km by the phone's region** from a plain list (US, GB,
+    LR, MM, the CLDR data), not ICU: one path that unit tests and an iPhone can share, and `android.icu` is banned
+    in `:core` anyway.
+  * **No location, and the Makkah fallback, show the amber "Set location" notice** (same door as My prayers; Q3 is
+    Ali's). The fallback counts as no location because the bearing from Makkah to Makkah is 0 degrees: the screen
+    would say "You are now facing the Kaaba" whenever the phone pointed north. A defect fix, not taste.
+  * **Two notice slots.** "No compass" is permanent, so it sits above the dial beside the number it explains.
+    Calibration and "may wander" come and go in the hand, so they sit below Details and never move the dial.
+  * **No sky on Qibla.** The sky answers which prayer period it is, a Times question; the dial's `surfaceVariant`
+    face would lose its edge on a tinted page, and the green arrival fill would sit on a green day sky.
+  * **Rejected:** numbers on the dial face (sat on the needle, removed once already); a bare "i" for details; the
+    place name as a second door to the location sheet; hiding the degree number as Pillars does; a teardrop needle;
+    artwork. (Superseded 24 Oct 2026 by the Pillars entry below: the teardrop is back
+    on Ali's word. The comparison switches are gone: decided 25 Oct 2026, Ali chose the under title instruction, the
+    white lifted bezel, the amber notice with Set location and no arc; dark bezel `surfaceContainerHighest`, Fable's
+    choice from pictures; switches removed.)
+
+- **24 Oct 2026, the skies (step 5, Fable's design, prototype built; the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md` (section 14 wins where it differs).
+  * **Built as recommended, until Ali answers the four questions.** Option D: the sky is a backdrop behind the
+    header and the unchanged card. One addition to the header: the sky mark at the end of the city row, a sibling
+    of the clickable city (never inside it), 104 by 36dp, the row's own height, so the header adds no height. The
+    mark is a glyph riding a shallow arc of five dots, the five prayers, spaced evenly by prayer and not by clock
+    (Fajr to Dhuhr is six hours, Maghrib to Isha ninety minutes). The passed part is green and stops 11dp short of
+    the glyph. It hides when the city name needs the room (`Sky.markFits`) and always at 2.0 text. No period word
+    on screen; TalkBack hears "Dawn, until 7:40 am" (`sky_now_a11y`, which replaces 9.6's wording).
+  * **Glyphs.** The app's own widget drawings (`widget_glyph_fajr`, new `sky_glyph_day`, `widget_glyph_maghrib`,
+    `widget_glyph_isha`), so step 8 puts the same four on the widgets. Ali chose them over the row icons (WbTwilight,
+    WbSunny, WbTwilight, NightsStay) from picture 8 on 24 Oct 2026 ("Widget drawings"); the comparison switch is gone. The 23 Oct entry's "sun, moon, stars, the day path with the now dot" is built as: sun or moon
+    as the glyph, the one star inside the Isha glyph as the stars, the arc as the day path and the glyph itself as
+    the now dot; a separate star field was considered and dropped as clutter. The sun is `primary`: no third
+    depictive colour.
+  * **Motion.** The crossfade is one `drawBehind` lerp at `Motion.draw()` (no animation on open, a change mid
+    fade starts from what is on screen); the arc draws in once per process (`Motion.draw()`). Row 8 is built here:
+    a prayer row's fill and bar fade to the next row at `Motion.standard()`, read inside `drawBehind`.
+  * **Layout.** The Scaffold no longer takes the top inset; Times draws its sky under the status bar and Qibla, My
+    prayers and Settings take the same inset one level down. Everything is capped at 600dp and centred
+    (`Modifier.readingWidth()`, Q18 and Q20), the sky full width; a phone in landscape gets it too.
+  * **Rejected, with reasons.** A visible period word (a fifth text on a calm header); a star field, skyline or
+    mosque silhouette (clutter, and a skyline is the stock prayer app look); a yellow sun (second depictive colour);
+    dots by clock time (they bunch); the arc on its own band (costs the no scroll rule at 823dp); the mark beside
+    the date line (too narrow in most languages); Material Symbols as the default glyphs (offered as Q2).
+
+- **23 Oct 2026 (night), the My prayers tab (step 1, Fable's design, Ali approved from pictures).** Ali chose
+  "B: calendar grid" and then "Yes, build it". Detail: `docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md`
+  (section 9 wins where it differs).
+  * **Chosen.** A fourth tab, with the tick at the start of each prayer row, a week card of seven rings, and
+    Last 30 days as a calendar grid in weeks of seven, replacing the old list of day cards (Ali chose B).
+    Weeks wholly before tracking began are dropped, so there are no rows of empty numbers to read as misses; the
+    week holding the start day stays. Pausing keeps the ticks already given: it means "do not count what is
+    still to come", never "forget what I prayed". The tab icon is `CheckCircle`. Day names are always `SHORT`, on one
+    line, shrinking to 70 percent and then ending in an ellipsis where a cell is too narrow (Urdu at 320dp and 2.0
+    text); never `NARROW` (Fable, after the review showed NARROW gives Latin letters on an Urdu screen). Switching
+    tracking on again starts the rings afresh unless something was ticked in the last 30 days. A paused day's ring
+    shows only the pause mark; the sheet's row for that day shows its earlier ticks, disabled, under "Paused".
+    Known and accepted: at 320dp and 2.0 text the Turkish tab label "Namazlarım" wraps inside the word (rare; the
+    icon carries it; revisit only if seen on a real phone). Grid cells are
+    about 45.7dp wide at 320dp because the sheet's side padding is dropped for the grid, which meets Apple's 44pt.
+  * **Rejected.** A list of 30 day cards: long to scroll, and it reads newest first, against every calendar.
+    `TaskAlt` for the tab icon: it has no filled twin for the selected state. `NARROW` day names, anywhere:
+    "T T" and "S S" are ambiguous, and Urdu's are Latin letters. Per language two letter abbreviations of our own:
+    invented words in Urdu and Arabic are a religious wording risk for no gain.
+  * **Exempt from contrast, on purpose.** The 38 percent ring for days to come and prayers not due yet is a
+    disabled control (WCAG 1.4.11), so `ColorContrastTest` has no pair for it.
+
+- **23 Oct 2026 (night), motion rules for 1.6 (Fable; Ali approved).** Written down before any animation
+  is built, so the eight new animations of 1.6 (BUILD-INSTRUCTIONS §6 rows 1 to 4 and 6 to 9) feel like one app. Detail: §2 Motion and
+  `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` §6.
+  * **Three durations, not four.** `Quick` 150, `Standard` 250, `Draw` 400. A fourth, `Reveal` 300, was
+    dropped: 50 ms from `Standard` is below what anyone notices, so the choice would drift by mood, the way
+    gaps did before `Space`. Rejected: leaving durations as numbers at each call site.
+  * **No entrance animation.** Nothing moves when a screen opens; only a touch, a sensor or a real event
+    moves something. Rejected: a fade or slide on arrival, because it makes every screen slower to read.
+  * **Haptics only on the user's own tap that changes something stored.** Never on events the app causes.
+    Two shipped exceptions are kept: the tab bar's tick on a tab change and the Qibla's buzz on alignment.
+  * **Material 3 `MotionScheme` and `MaterialExpressiveTheme` considered and not used.** Switching either on
+    changes the motion of every component at once, and Ali has not seen that. Revisit only with screenshots
+    or video in front of him.
+  * **Two shipped values moved to tokens:** the fold chevrons from 200 to 150 ms (`Quick`) and the theme thumb
+    from 240 to 250 ms (`Standard`). Nobody will see the thumb change; the arrows turn a little faster.
+
+- **23 Oct 2026, the 1.6 design direction (Pillars as a reference for thinking, our green kept).** The
+  owner answered three questions in chat. **Decided, not built.** Each choice is shown to him on screenshots
+  before it ships (§10). The reference study is in `docs/plans/2026-10-release-1.6.0/PLAN.md` §0.1.
+  1. **Four fixed skies, with an animated change between them.** Dawn, day, evening and night. Each one is
+     a fixed gradient, so `ColorContrastTest` checks every ink against every stop of all four, the way it
+     checks the hero gradient today (§1). The change between skies is animated. The sky has drawn
+     artwork (sun, moon, stars, the day path with the "now" dot) that shows which prayer time it is, as well
+     as the words.
+     - **The prayer name and the time left keep a prominent, readable place on the sky.** The owner made
+       this point himself: "I used the gradient to have a prominent space for the reader to read and
+       understand the time of which prayer is current." The artwork never sits behind those words.
+     - **Rejected:** a sky that changes colour continuously through the day, because contrast cannot be
+       asserted on a moving background; keeping the single gradient with only the path moving, because the
+       owner wants the time of day shown in pictures; weather in the sky, because it needs the network.
+  2. **A bell on each prayer row: one tap turns that prayer's alert on or off.** This reverses §7's
+     "no per-row mute", which was a choice made when the app first took its design from Claude Design. It
+     was not a rule. The owner's reason: the user gets the feature with nothing added, and the screen
+     stays uncluttered.
+     - **One tap and nothing else.** No long press and no per-row sound sheet. Sounds stay in Settings.
+     - The bell shows its state by shape (filled or crossed out) as well as colour.
+     - It has a 48dp target and a content description saying the prayer and the state.
+     - Settings keeps the same choice too, so both places show the same setting.
+  3. **No icon buttons side by side.** Where the tracker needs more than one action at the top (pause,
+     Last 30 days), each is a **labelled compact solid button with its icon** (§4.1 kind; not a new chip component), with a clear gap between them and a 48dp target.
+     - **Rejected:** Pillars' two unlabelled round icons, because they are easy to mis-tap and unclear (the
+       §10 review question "Is any icon button sitting next to another?").
+  4. **Qibla: modern look in our theme** (Pillars' Qibla screen as the reference).
+     - **The direction is the message.** One large line: "Turn right 58°", then "You are now facing the Kaaba"
+       on alignment (the shipped `qibla_facing`).
+     - **The place name is optional,** and small when shown.
+     - **Distance and bearing move behind a labelled details button,** never a bare "i".
+     - **Distance is in km or miles, by the phone's region.** Today it is km only (`qibla_subtitle`).
+     - **The key (Kaaba and needle) stays on screen,** because it is what helps a first-time user.
+     - **These stay:** the green turn arc, the alignment vibration and the calibration warnings.
+     - The dial stays its current size (room for the instruction under it), with a thicker soft rim and a rounder needle.
 
 - **19 Oct 2026, "Match your mosque" can be set from the mosque's board: one button at the top.**
   From the 8 Oct 2026 branch, whose version made the minutes number an underlined, tappable link (now
@@ -912,6 +1200,99 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   voice. Kept against the research: the iOS style chevron (the owner asked for an iPhone feel).
   Rating is Google's card only, never a component of ours.
 
+- **24 Oct 2026, 1.6 step 3, the bell and the permission card (Ali, from pictures; `STEP-3-DESIGN.md` §15 to §21):**
+  the bell is a plain filled bell (on), an alarm clock (alarm) and a crossed bell (off), not `NotificationsActive`
+  (its sound waves say "ringing now" and break the crossfade); grey `outline` while the phone blocks notifications,
+  with an amber notice to explain. Settings' alerts dialog Off also remembers the style but never touches the
+  reminder: only the bell carries Q6. A fourth message key covers Fajr in Ramadan with a reminder removed, because
+  joining two sentences in code breaks Urdu and Arabic. **The permission cards:** no switch (only the phone can
+  allow notifications, so an in-app switch springs back; Apple's own pattern is a message with a button to
+  Settings). Ali then asked for a nicer look: warning notices get the hero card's gloss (sheen, rim, the new Warn
+  tokens in §1, contrast pairs in `ColorContrastTest`) minus its glow; quiet notices stay flat because the dark CTA
+  on `secondaryContainer` is only 2.32:1 and a sheen would drop it to 1.64:1 (that 2.32:1 is itself an open gap,
+  HANDOVER §11); every notice's icon is bare, 24dp, no tinted circle; the two permission cards show one button,
+  Allow, because their details only repeated the sentence (the Fajr fact moved into the exact alarms sentence);
+  the notifications card shows the crossed bell, exact alarms keeps the triangle. Rejected: a switch; a text
+  Details link; green CTA on amber (3.2:1 dark); a full width amber button (17 Oct); a glow under the card;
+  glossing the quiet tone; a white card with an amber bar (loses the amber card Ali kept).
+- **24 Oct 2026, 1.6 step 4, the Timetable (`STEP-4-DESIGN.md`; Ali's answers Q1, Q2, Q4):** "Timetable" with the
+  calendar glyph (`CalendarMonth`, the one that already means "the month" on Last 30 days) replaces "Save as PDF" on the
+  Today line and opens a full height sheet: this month and the next as day cards (a six column table breaks at 320dp
+  and 2.0, which is why cards), opened on today's card, today in `primaryContainer` with a "Today" pill. Month
+  headings are pinned on the sheet's own colour. Past days are not dimmed (Pillars fades them and fails AA; a faded
+  day reads as a day to feel bad about). No Hijri date on cards (Q4). Inside Ramadan with the card on, the same door
+  opens the approved Ramadan table from day 1 to the last day (Q1); someone who hid the card gets the month view and
+  still has "Ramadan 1448" in the PDF chooser. Save as PDF moved into the sheet's header, which the Ramadan table
+  shares (so it gained the close X and a `headlineSmall` title); the existing chooser opens over the sheet and the
+  sheet stays after a save. Times across a card follow one rule, `floor(width / (84 x fontScale))` clamped to 1..3
+  (`TimetableGrid`), the Dynamic Type equivalent. Rejected: a rolling 30 days (no month heading, and "This whole
+  month" in the PDF would not match the screen); a segmented "Month | Ramadan" control (a component the system does
+  not have); a dialog chooser; a FAB; `timetable_month_heading` (the heading is the month name from the date
+  formatter). Q8 (Ramadan as cards or the table): **Ali, 24 Oct 2026, "Keep the table"** from side by side pictures
+  (`plans/2026-10-release-1.6.0/screens/step4/9a` to `10b`): the table fits about seventeen days on a screen against
+  about four cards, and suhoor, iftar and the fast compare day to day. The card prototype was deleted.
+- **24 Oct 2026, 1.6 step 6, the Qibla dial in the Pillars style, in our theme (Ali; `STEP-6-DESIGN.md` §15 and §16):**
+  Ali: "I like pillar app qibla locator style ... I want that style of compass and needle but in my own theme."
+  The dial is now a lifted bezel with the face inside it, sixty fine ticks, quiet letters and a teardrop needle, in
+  our palette (the green N, the Quiet Glass lift). **The teardrop reverses the old §1 rejection of one**: Ali asked
+  for that style. **The turn arc is removed**: "Turn right 58°" already says it in words and a number, and the
+  Kaaba's side of the dial says it without; arrival keeps three signals that are not colour (sentence with tick,
+  thicker bezel, buzz). The bezel takes a different role per theme (`dialBezel()`: `surface` in light,
+  `surfaceContainerHighest` in dark) because the card hairline is invisible against the dark page. The pin and key
+  marks are sized from the text line so they grow with it. Pairs added to `ColorContrastTest` (`outline` on both
+  faces, `onSurfaceVariant` on the aligned face). Decided by Ali from pictures, 25 Oct 2026: the instruction under
+  the title, the white lifted bezel in light, the amber Set location notice, no arc; the switches are removed.
+  Rejected: a hairline at the bezel's inner edge (1.37 and 1.32, neither clears 3:1 nor stays
+  invisible); a hub; a sand light bezel; a centred instruction; the green turn arc; `surfaceBright`
+  for the dark bezel (Fable, from pictures: the disc already reads against the page, the quieter ring makes arrival
+  louder).
+
+- **25 Oct 2026, jama'ah times on Times (step 7, Fable's design; built as a prototype, the owner has not yet seen the pictures).**
+  Detail: `docs/plans/2026-10-release-1.6.0/STEP-7-DESIGN.md` (sections 14 and 15 win where they differ).
+  * **The Times line stays the quiet grey second line** ("Jama'ah 1:30 pm"); the time's space is a non breaking
+    space in the note only (not in `TimeFormat`), so "pm" never wraps alone. A jama'ah line costs 0dp a row at 1.0
+    (the old "about 2dp" was wrong). Out of window keeps "Check your jama'ah time" in the same line.
+  * **Typed times belong to the zone they were typed in** (codec v2, `ZONE=`; v1 reads as no zone). While the phone's
+    zone id differs, `JamaahPlan.on` gives nothing (one gate, in `:core`, so Times and 1.6.1 reminders agree), and
+    the Jama'ah times dialog shows one quiet green notice at the top, rules as typed, no "Today" lines, no amber.
+    The next save stamps the new zone. Compared by id, never by offset.
+  * **Out of window is two results** (`Before`, `After(next)`), five strings per language, Fajr's after form says
+    sunrise, Jumu'ah has its own two. The After rule's subtitle is two lines (`settings_value_lines`) so "Today"
+    never wraps away from its time.
+  * **Wording fixes from sign off:** "Match your mosque start times", the clock "the Begins time on your mosque's
+    board", and the help gains "Jama'ah times go in Jama'ah times."
+  * **The mosque door** (Q15, "Different from your mosque?") stays under the rows: decided 25 Oct 2026 (Q15).
+    Ali doubted jama'ah times and asked Fable; Fable said keep them, so by his rule the recommendation
+    stands. The competitor research (`JAMAAH-RESEARCH.md`) found no app that can know a mosque's times by
+    itself, so the user types them. Rejected: an icon on the Times line, the jama'ah
+    time in `primary` or bold, both times on one line, a tappable prayer row, a travel notice on Times, the zone
+    name in the notice, a compact door beside Timetable (two solid buttons side by side), hiding the door once set up.
+
+* **25 Oct 2026, 1.6 step 8 widgets** (`STEP-8-DESIGN.md`, Ali "All recommend" from the pictures): a third widget,
+    the Today strip (five columns, the next prayer in the pill, glyphs, "Suhoor" and "Iftar" in Ramadan, the town
+    chip only from 380dp and never at large text); the four skies behind both Next prayer layouts with a rimmed pill
+    and a translucent track; sunrise as a redraw boundary. Earlier the same night he chose the next prayer marked
+    (not the current one) and no sun arc or period word. Times are 12sp with 2dp column padding and may shrink to
+    9sp only at 250dp (Fable, from the pictures: uneven times read as a bug). Reverses the 18 Oct rejection of a
+    time of day colour behind the countdown, because four fixed skies are tested, the reason it gave. Rejected: the
+    sky on Today widgets or the strip, a Now marker, faded past columns, dropping am or pm.
+* **25 Oct 2026, 1.6 step 9 disclaimer** (`STEP-9-DESIGN.md`; owner's decision of 23 Oct 2026, reversing the
+    rule that it is "shown once, not merely available"): the disclaimer is no longer shown at first launch. It is
+    the first row of Settings, About (above Version), Info tile, "Disclaimer", subtitle "A helper, not a religious
+    authority. Worth reading."; the dialog is retitled "Disclaimer" and its text is unchanged, dua last. The first
+    run dialog, its two buttons and the short form are gone, so the usage counts question is the only dialog that
+    must be answered. Rejected (Fable): a one time Notice on Times, a setup sentence, a badge on the Settings tab, a
+    tinted row, the `gavel` or `warning` icons.
+
+* **25 Oct 2026, 1.6 step 10 languages** (`STEP-10-DESIGN.md`; Ali: "write their name also urdu in their own text
+    then write urdu in English also"): every language is shown in its own script and named in English, in English in
+    every app language. Language chooser rows: own name (`bodyLarge`, `onSurface`), English name under it
+    (`bodyMedium`, `onSurfaceVariant`, `Space.Tight`), shown once where they match ("English"); rows padded
+    `Space.Related` top and bottom so two line rows do not touch at 2x text (Fable, from the pictures). Phone language
+    row's second line names what following the phone gives ("اردو (Urdu)", or "English"). The welcome button keeps
+    the own name only (19 Oct entry). Settings subtitle (Ali chose A from the pictures, "A go ahead"): only the language showing, "اردو (Urdu)", or "Phone language · اردو (Urdu)" while following the phone; B, all five, ran to three lines in Urdu and tore "العربية (Arabic)" across two. Rejected: the English name
+    following the app language (four translations that drift), flags (a flag is a country), one line "اردو · Urdu"
+    (wraps mid pair at large text).
 ---
 
 ## 10. The learning loop
@@ -957,10 +1338,19 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
-| (none) | | Nothing is waiting for the owner on 18 Oct 2026. | | |
+| 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
+| 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | DECIDED 24 Oct 2026 from the eight pictures: dark versions, night kept this deep ("Keep it this deep"); also four light hues kept, light skies kept pale, widget drawings as glyphs |
+| 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |
+| 1.6-language-row | 23 Oct 2026 | Language row subtitle: (A) the language showing as "اردو (Urdu)", or (B) all five with English names | A (Fable, 25 Oct 2026; B was the planned item 18) | **Decided A** (Ali, 25 Oct 2026, from the pictures: "A go ahead") |
+| ds-deviations | 25 Oct 2026 | Fix the small visible inconsistencies the design system census found (text below the 14sp floor in 13 places, two cards not at 24, older dialog rows, the Qibla 20 gutter, the setup error in red, the watch tile's own greens, the old icon green), listed in `docs/design-system/03-components.md` §3.6 and `08-surfaces.md` | Fix the type floor and the watch tile first, from pictures; the rest when each screen is next touched | OPEN, not blocking |
+| 1.6-script-line-box | 25 Oct 2026 | Urdu and Arabic single lines stand about 4dp taller than Latin ones (Noto Naskh's own ascent and descent; `LineHeightStyle` Trim.None did not change it on BOM 2026.06.01, measured) | A Type.kt wide fix, tried and measured, in 1.6.1 | OPEN, not blocking |
 
 **Decided, work not yet done** (do not report these as done):
 
 | Id | Decision | Next step |
 |---|---|---|
-| (none) | Nothing decided is waiting to be built. D5 was approved from screenshots on 18 Oct 2026 (§9). | |
+| 1.6-sky | (Dark variants are OPEN until the owner sees four pairs.) Four fixed skies with animated change, the prayer name and time left on a prominent readable area (§9, 23 Oct 2026) | Prototype built on `claude/1-6-0-step5-proto` with the 88 contrast assertions; pictures next. Ali answered the four STEP-5-DESIGN §13 questions on 24 Oct 2026, all as recommended. Step 8 put the skies on the Next prayer widget (25 Oct 2026) |
+| 1.6-bell | One-tap bell on each prayer row (§9, 23 Oct 2026) | **Decided and built (24 Oct 2026)** on `claude/1-6-0-step3-proto`; Ali approved the prototype and the card; merge pending (HANDOVER §11) |
+| 1.6-chips | Labelled compact solid buttons with a gap, never icon buttons side by side (§9, 23 Oct 2026) | Same |
+| 1.6-tablet | Content capped at 600dp and centred on tablets, the sky full width (owner, 23 Oct 2026) | Built in the step 5 prototype (`claude/1-6-0-step5-proto`); becomes built when he says yes to the pictures |
+| 1.6-qibla | Qibla restyle: direction line first, labelled details button, km or miles, key kept (§9, 23 Oct 2026) | Same |

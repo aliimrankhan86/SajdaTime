@@ -256,7 +256,7 @@ It supports Sunni and Shia conventions properly (the Jafari Maghrib rule, the ri
 calculation methods, Hijri date, alarms, widgets, a monthly PDF timetable, and a watch app that calculates on its own.
 Four languages in the app, eight more on the store.
 
-I am one person and I built it with a lot of help from AI, which the app says on first run: it is a helper, not a
+I am one person and I built it with a lot of help from AI, which the app says in Settings, About, Disclaimer: it is a helper, not a
 religious authority, and where it disagrees with your mosque you follow your mosque.
 
 Play: https://play.google.com/store/apps/details?id=com.sajdatime.app

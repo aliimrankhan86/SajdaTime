@@ -1,0 +1,59 @@
+{
+  "$description": "SajdaTime motion tokens, release 1.6. Tested against app/src/main/java/com/sajdatime/app/ui/theme/Motion.kt by DesignTokensTest. Pick by what moves, never by mood. DesignRulesTest bans a written tween, spring or infinite animation anywhere else.",
+  "easing": {
+    "$type": "cubicBezier",
+    "$value": [
+      0.4,
+      0.0,
+      0.2,
+      1.0
+    ],
+    "kotlin": "FastOutSlowInEasing",
+    "ios": "Animation.timingCurve(0.4, 0, 0.2, 1, duration:)"
+  },
+  "duration": {
+    "quick": {
+      "$type": "duration",
+      "$value": 150,
+      "unit": "ms",
+      "kotlin": "Motion.QUICK",
+      "usage": "An icon or arrow swaps or turns (the bell, fold chevrons). Also the exit of a Standard or Quick enter."
+    },
+    "standard": {
+      "$type": "duration",
+      "$value": 250,
+      "unit": "ms",
+      "kotlin": "Motion.STANDARD",
+      "usage": "A shape, colour, position or block of text changes in place (the tick, theme thumb, pause row, Now and Next, Qibla aligned state)."
+    },
+    "draw": {
+      "$type": "duration",
+      "$value": 400,
+      "unit": "ms",
+      "kotlin": "Motion.DRAW",
+      "usage": "A drawing runs across the screen (rings, sky, day path). Nothing in the app is longer."
+    }
+  },
+  "exceptions": {
+    "qiblaDialFollow": {
+      "$type": "duration",
+      "$value": 120,
+      "unit": "ms",
+      "usage": "The Qibla dial follows the compass; input driven, the one written tween outside Motion.kt."
+    },
+    "qiblaArrivalBuzz": {
+      "$type": "duration",
+      "$value": 70,
+      "unit": "ms",
+      "usage": "One vibration through Vibrator (media usage) when the phone first points within 5 degrees of the Qibla."
+    }
+  },
+  "rules": [
+    "Exits use the token one step shorter than the enter; reversing an animation counts as an exit.",
+    "No entrance animation. Things move only when the user touched them, a sensor changed, or a real event happened. One exception: the day path draws in once per app open.",
+    "Never animated: prayer times, countdown digits, notice text, the disclaimer, the city title and Hijri date, the glass bar's position, dialog or sheet text.",
+    "Letters never move or morph on their own (breaks Arabic and Urdu joining). A whole block of text may fade.",
+    "Nothing loops forever. No springs.",
+    "Respect the system's reduce motion setting. Android: Compose animations follow the system animator duration scale; never bypass it with a hand written loop. iOS: read accessibilityReduceMotion and replace movement with a fade or no animation."
+  ]
+}

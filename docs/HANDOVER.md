@@ -76,9 +76,9 @@ descriptions live in `core` because both the phone and the watch show them.
 
 ### The religious disclaimer (non-negotiable)
 
-The user was explicit about this. The app states plainly — **once after onboarding as a
-dialog (the short form since 18 Oct 2026, see §5.15), and permanently in full in Settings → About →
-Disclaimer** — that:
+The user was explicit about this. The app states plainly — **in full in Settings → About →
+Disclaimer, the first row of that group** (since 1.6; it is no longer shown at first launch, owner,
+23 Oct 2026, see §5.15) — that:
 
 - the author is **not a Mufti, Aalim, or an expert in Islam or fiqh**
 - it was **built with the help of artificial intelligence**
@@ -353,8 +353,8 @@ Welcome/bismillah → coarse-location permission with an **(i) info icon** expla
 is needed → Sunni/Shia cards → madhab (shown **only for Sunni**; Shia skips it because
 Jafari fixes the Asr rule anyway) → **calculation method** (everyone; the same list Settings
 shows, one plain line under each, "Automatic" preselected so the unsure user pays one tap)
-→ confirmation, which now names the method beside the location and school → finish. Then
-the one-time disclaimer dialog.
+→ confirmation, which now names the method beside the location and school → finish, straight to Times.
+Since 1.6 there is no disclaimer dialog after setup; the disclaimer is the first row of Settings, About.
 
 **The METHOD step was added on 15 Aug 2026 and it is the visible answer to the auto-mapping
 that was rejected.** Until then setup asked for sect and madhab and never mentioned the
@@ -453,8 +453,8 @@ Any row that opens something carries a chevron, so "this is tappable" is never a
 Madhab sits inside the School chooser and is hidden for Shia users, since Jafari fixes the
 Asr rule anyway.
 
-**The dua request lives at the end of the disclaimer**, which is shown once automatically
-after onboarding and is reachable any time from About. It appears nowhere else: asking
+**The dua request lives at the end of the disclaimer**, which lives in Settings → About →
+Disclaimer, the first row of that group (since 1.6 it is not shown at first launch). It appears nowhere else: asking
 twice for the same thing is asking too often.
 
 ### Notifications
@@ -1002,12 +1002,11 @@ have to survive any rewording:
 | 3 | **Where the app and the mosque disagree, follow the mosque.** | The owner's explicit instruction, 2 Aug 2026. It replaced *"It is your choice to make"*, which asserted the reader's agency without helping them use it. This is **not** the app taking a fiqh position — deferring to local scholars over a piece of software is the humble answer, not a partisan one. |
 | 4 | **Free, and given as it is, with no warranty and no promise of accuracy.** | Also the owner's explicit instruction, in his words: *"I dont want to be held accountable."* Stated plainly and once, in the register of the rest of the screen. Legal boilerplate would be read even less than point 2. |
 
-**The four copies, and which is canonical.**
+**The four copies, and which is canonical.** (Since 1.6 there is no setup dialog; the short form `disclaimer_brief` was deleted with it.)
 
 | Where | What it carries | File |
 |---|---|---|
-| **In-app dialog** — any time from Settings → About → Disclaimer, and one press away ("Read in full") in the setup dialog | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
-| **Setup dialog, short form** — once after setup, never after an update (since 18 Oct 2026) | All four points in about 70 words, no dua, a "Read in full" button that shows `disclaimer_body` in the same dialog | `R.string.disclaimer_brief` (`FirstRunDisclaimer` in `MainActivity.kt`) |
+| **In-app dialog** — any time from Settings → About → Disclaimer, the first row of that group (since 1.6) | All four points, plus the watch caveat, the Isha/method paragraph, the due-vs-congregation paragraph, and the dua request last | `R.string.disclaimer_body` — **canonical** |
 | **Watch** — second-to-last item in the times list | Points 1 and 3 only, in three lines | `R.string.wear_disclaimer` |
 | **Published policy page** | All four, expanded, no dua | `docs/privacy.html#disclaimer` |
 | **Play listing**, "HONEST ABOUT WHAT IT IS" | All four, condensed | `docs/store/LISTING.md` |
@@ -1029,7 +1028,19 @@ budget. Two things about it are deliberate:
   Verified the same way: softening "no warranty" in `docs/privacy.html` turns it red, and
   restoring it turns it green.
 
-**The short form after setup (owner, 18 Oct 2026).** He did not want a long message straight after
+**Superseded in 1.6 (owner, 23 Oct 2026: "My hard rules have evolved, based on user behaviour and
+more data"):** the disclaimer is no longer shown at first launch. It lives in Settings → About →
+Disclaimer, the first row of that group, title "Disclaimer", subtitle "A helper, not a religious
+authority. Worth reading."; the dialog is retitled "Disclaimer". `FirstRunDisclaimer`,
+`disclaimer_brief`, `disclaimer_read_full` and `action_understood` are deleted; the stored flag
+`disclaimer_seen` is retired but its key name is kept, never to be reused (upgraded installs hold
+`true`). The trade he chose: the four points reach every user who opens About, the watch, the store
+listing and the policy page, and no longer reach the user who never opens Settings. Nothing replaces
+the forced reading (Fable, STEP-9-DESIGN §2: a Notice, a setup sentence or a badge would each be a nag
+or a softened extra copy). `DisclaimerContentTest` holds the row's own subtitle to "not a religious
+authority"; `DesignRulesTest` holds the row first in About. The history below is kept for the reasoning.
+
+**The short form after setup (owner, 18 Oct 2026, superseded above).** He did not want a long message straight after
 installing; it was already shown only once, after setup, never after an update (the flag is stored).
 So the setup dialog shows `disclaimer_brief`: the same four points in three short paragraphs, under
 90 words, fitting one screen, with "Understood" and "Read in full". The full text stays canonical,
@@ -1042,8 +1053,8 @@ and 4 (that is the watch's budget, not the phone's). Rendered in light, dark and
 Compose harness, not committed); not seen on a device.
 
 **Why the watch carries two points and not four.** Points 2 and 4 need sentences the wrist
-does not have room for, and every watch owner also has the phone app, where all four are shown
-once, unavoidably, at setup (in the short form since 18 Oct 2026, still all four). Points 1 and 3 are the two that change what someone *does*.
+does not have room for, and its 88 character budget cannot hold them; every watch owner also has the phone app, where all
+four are in full in Settings → About → Disclaimer. Points 1 and 3 are the two that change what someone *does*.
 
 **The watch string has a hard three-line budget**, and that is why it reads more bluntly than
 the phone's. It is the second-to-last item in a list that anchors from the bottom, so the top
@@ -1178,6 +1189,18 @@ Evidence for the whole of this section — eleven surfaces on a phone and a watc
 - **The privacy policy needs no change:** the stored choice never leaves the phone, and the policy already
   says the typed place lookup sends "the language the app is set to", which is now true below 13 as well.
 
+**1.6 step 10 (25 Oct 2026, STEP-10-DESIGN.md): every language named twice.** Owner: "write their name also urdu in
+their own text then write urdu in English also". `AppLanguage.englishName` (constants, never translated) beside
+`nativeName`; `language_name_pair` = `%1$s (%2$s)`, untranslatable. The chooser shows the English name under the own
+name; the Phone language row says what following the phone gives, through `AppLanguage.phone()`, which resolves the
+phone's whole language list (`LocaleManagerCompat.getSystemLocales`, never `Resources.getSystem()` on 13+, lesson 181)
+against our resources, as Android does. Bidi: a pair on its own Text is never isolated (an FSI isolate sets
+"اردو (Urdu)" back to front inside an English line); inside the "Phone language · …" sentence it is FSI isolated, which is right because the pair always starts in the app's
+own script.
+
+
+**Bengali, 30 Oct 2026.** Sixth language, left to right, tag `bn-u-nu-latn` (Western digits, the Arabic reason). Adding
+a language is the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find new folders on disk.
 ### 5.17 The method is asked, visibly, of everyone — and never chosen for them (15 Aug 2026)
 
 The owner brought a problem, with a proposed solution written by another AI: users still
@@ -1918,6 +1941,368 @@ unchanged (checked in captures, §10).
 
 **Privacy:** no change. Nothing new leaves the watch; the phone to watch transfer `docs/privacy.html` describes is unchanged.
 
+### 5.28 Which model does what (owner, 23 Oct 2026)
+
+**Ali's words:** "I want to add mechanism will inform claude to use the right model for the task and if tokens
+can be saved using lower tier model then do it. However, everything will be checked by most likely Opus and the
+plan should be verified by Fable 5. Also the UX decision, ease of use, Usability, information to display aspect
+should be done by fable."
+
+**The mechanism.** Five subagents in `.claude/agents/`, each with its `model:` fixed in its frontmatter, so the
+choice is made by the file rather than remembered by each session. `CLAUDE.md` ("How to work here", first bullet)
+tells every session to use them.
+
+| Agent | Model | Does | Never does |
+|---|---|---|---|
+| `ux-lead` | Fable | All the thinking for what users see: planning and brainstorming, user journeys, UX and UI, icons, ease of use, the premium look, what a screen shows and in what order, wording, every state, DESIGN_SYSTEM §10 questions | Edit files; decide an OPEN §11 item or a "screenshot" question (it recommends, Ali decides) |
+| `plan-verifier` | Fable | Verifies every plan, build instruction or scope change against the code, before work starts and before Ali sees it | Defend or write the plan |
+| `reviewer` | Opus | Checks every diff and every output of a cheaper agent before commit or "done" | Edit files |
+| `implementer` | Sonnet | Builds a step whose spec is already written and verified | UX, plans, alarm or data logic, anything without a spec; commit |
+| `mechanic` | Haiku | Search, counts (§4.1 checks, string parity), file and line lookups, collecting test output | Decisions, code logic, translations, user facing words |
+
+**Widened the same day.** Ali: "I want the user experience, user journey, user interface to be thoughtful. So hence
+I prefer Fable to do all the planning, brainstorming, including the correct icons, ease to use, and to look good on a
+premium style or design for the app. So for that, I want Fable to do all the brain thinking." So `ux-lead` no longer
+only reviews: it thinks the feature through first and hands the main session the spec to write down and build.
+Later that day Ali added assets: "I also want Fable to maybe extract the right assets or help us, so visually it's
+easier not to make something ... I want the premium look app on it." So `ux-lead` can search the web and
+recommends ready-made assets (Material Symbols first, then free licensed illustrations, skies, patterns, fonts),
+each with link, licence, size and look. Rules in `.claude/agents/ux-lead.md`: free licence usable in app and
+store (CC0, Apache, MIT, OFL), bundled not fetched, **no generative AI images** (the Play AI asset declaration is
+"Don't label assets"; changing it is Ali's call), no brand or other app's artwork, nothing disrespectful. Fable only
+recommends; Ali approves each one, then the main session downloads it and records source and licence in
+`docs/ASSETS.md` (created with the first asset).
+
+**iPhone later, so design for it now.** Also 23 Oct 2026, Ali: "I do have aspiration later to make it this app for iOS as well ... So the design and everything is also put into consideration. So it doesn't look like a design mess, as Apple has often objection about the design aspect of the apps." Decision: no iOS work in 1.6 and no
+cross platform framework chosen (that is a later, separate decision), but `ux-lead` checks every design against
+Apple's Human Interface Guidelines as well as Quiet Glass: shared patterns only (no floating action button or
+navigation drawer, a visible back or close on every screen), an SF Symbol named beside each Material icon, 48dp
+targets (meets Apple's 44pt), scalable text, assets licensed for both stores, and a distinct look of our own,
+because App Store Review Guideline 4 (Design) and 4.3 (look-alike apps in a crowded category) are the usual
+rejection reasons. Android only features (widgets, Wear OS, exact alarms) are labelled as such in each spec. In
+code: keep calculation and rules logic free of Android imports where it costs nothing; no refactor for it now.
+
+**References and skills, same day.** Ali: "Fable also knows if it feels there's an appropriate skill or tool which
+it can use to provide better designs, then we can use it, or look into the skills we have already ... we have already
+defined the design system and everything, and I've provided all the references as well. That should be stored so
+Fable can use it." So `ux-lead.md` now opens with what Ali has already decided (DESIGN_SYSTEM.md, PILLARS-STUDY,
+UX.md, FABLE-REVIEW, DETAILED-PLAN §6 journeys, BUILD-INSTRUCTIONS §3 answers, the 1.6 `screens/`, the widget
+redesign and Times gloss pictures he chose, the store screenshots, the feature research) and a list of installed
+skills that fit (sovereign-ui, make-interfaces-feel-better, ui-ux-pro-max, impeccable, high-end-visual-design,
+apple-design, liquid-glass-design, wear-compose-m3, accessibility, the design: skills, designlang:extract). `Skill` was added
+to its tools: with an explicit tools list a subagent cannot call skills otherwise (Claude Code sub-agents docs,
+checked 23 Oct 2026). The design system and Ali's decisions outrank any skill; web output is advice, not code;
+anything not installed is a recommendation for Ali. **Not yet run:** the first use must confirm `ux-lead` can call
+a skill, along with its model (§10).
+
+**Widened to every decision, same day.** Ali: "I informed you so that we can take into consideration for any
+development even though we are not developing for the iphone right now but its useful for decision making now so
+when we develop ios app then things are still smooth for us." So the rule is now a `CLAUDE.md` hard rule covering
+code and data as well as design: when two options cost about the same, take the portable one; new rules and
+calculations go in `:core` as plain Kotlin; stored data in simple formats; no new Android only library where a
+portable one does the job; every plan states its iPhone effect in one line, checked by `plan-verifier`, and
+`reviewer` checks diffs for it. Still no iOS code and no Kotlin Multiplatform move until Ali decides.
+**Checked 23 Oct 2026, the starting point:** `:core` (15 Kotlin files) is plain Kotlin except `AppLocale.kt` and
+`PrayerLabels.kt`, which take an Android `Context`; it uses `java.time` (including `HijrahDate`) and the Java
+`adhan` 1.2.1 library. None of those run on iPhone unchanged, so an iPhone version would replace them. Recorded,
+not fixed: it costs nothing to leave them now.
+
+**The flow for any piece of work:** plan (main session) → `plan-verifier` → `ux-lead` for anything a user sees →
+Ali for visual decisions → build (`implementer` if routine, the main session if not) → `reviewer` → commit.
+The main session talks to Ali, commits and pushes, and should run on Opus. Translations stay with the main
+session (religious terms, CLAUDE.md), and the `reviewer` checks them.
+
+**Rejected:**
+- *Fable for everything.* It is the most expensive, and Ali asked for tokens to be saved where a cheaper model
+  is good enough.
+- *Haiku or Sonnet reviewing their own work.* Ali asked for Opus to check everything; a model checking itself
+  misses its own blind spots.
+- *A hook that switches the main session's model automatically.* A session's own model is chosen when it starts,
+  and a hook is not a dependable way to change it. Subagents with a fixed model are the supported way.
+- *Naming a dated model ID in the agent files.* The aliases (`fable`, `opus`, `sonnet`, `haiku`) follow the
+  latest release, so the files do not go stale.
+
+**Not tested:** the agent files were written in a cloud session on 23 Oct 2026. Their frontmatter parses as
+YAML, but no agent was run from them in that session. The first session that uses one should confirm it starts on
+the named model (the session's model list shows it) and record that in §10. If `fable` is not accepted as an
+alias, use the undated ID `claude-fable-5-1`.
+
+**Outside helper models (Ali, 25 Oct 2026).** "Can you write all the notes for other AI to read and understand
+everything - I want to use deepseek for less thinking tasks." `docs/AI-WORKER-BRIEF.md` is their self-contained brief,
+and `AGENTS.md` points to it. They sit at the `mechanic`/`implementer` tier: searching, counting, running checks, routine
+code from a written spec. They never translate, write user-facing words, touch alarms, usage counts, privacy, signing or
+calculations, data logic, or make design choices. Their work goes on a `deepseek/<task>` branch and is reviewed by
+`reviewer` (Opus) before Claude merges it. **A deliberate exception to the table above** (which lists commit
+among what the implementer never does): an outside model may commit and push its own scratch branch, because it may run in another tool with no
+other way to hand work over; nothing reaches `claude/*` or `main` until `reviewer` has passed it and Claude merges. The repository is public on GitHub, so giving it to an outside model exposes nothing new;
+the signing key is never in it. **Keep the brief current:** a commit that changes a rule, a command, the test counts or
+the state of play also updates `docs/AI-WORKER-BRIEF.md` sections 2, 4 and 5.
+
+### 5.29 My prayers, the tab (1.6.0 step 1, Ali approved 23 Oct 2026)
+
+Ali chose from pictures on 23 Oct 2026: "B: calendar grid" and "Yes, build it". Design by Fable:
+`docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md` (its §9 and 13 win). The rules, each tested in `:core`
+(`TrackerLogicTest`, `WeekStripTest`) unless marked:
+- **Where.** A fourth tab: Times, Qibla, My prayers, Settings. Times has no ticks any more. The tab sends no usage
+  count (`Destination.PRAYERS -> null`; `UsageCountsTest` pins the three counted screens).
+- **Where the rings begin (`tracker_started`, in the tracker store).** Set on each switch on: today, unless a tick
+  exists in the last 30 days, then the oldest such day (`startOnSwitchOn`). Moved back by an earlier tick or a loaded
+  file (`startAfterRecording`); removed on switching off with nothing recorded; cleared by Delete. Not in the save
+  file: the oldest loaded day sets it. Days before it: no ring, not selectable (Ali, Q4).
+- **A day's ring** (`dayKind`): before the start, to come (never shown paused, though an open pause has no end),
+  paused (pause mark only), or its share of five.
+- **Pausing keeps what was ticked:** `tickState` tests ticked before paused; ticks are disabled while paused.
+- **No location** means no coordinates or the Makkah fallback: rows show no times and no Now pill, every ring is
+  tickable, no "Last night's Isha" row. Ticking is safe: the record stores days, never times.
+- **Last night's Isha** (Isha still current after midnight) ticks yesterday and follows yesterday's pause.
+- **Nothing is drawn until the record has loaded** (`trackerLoaded`), so no ring animates in on open.
+- **The tab keeps its own day:** with no saved place the clock loop republishes it after midnight (not tested; read
+  from code, review 23 Oct 2026).
+
+### 5.30 Islamic dates: six for everyone, five more for Shia users (1.6.0 step 2a, Ali 23 Oct 2026)
+
+Design by Fable: `docs/plans/2026-10-release-1.6.0/STEP-2-DESIGN.md` (§7a and §8 win). Rules, tested in
+`IslamicDatesGoldenTest`:
+- **Everyone** sees the six shared days (1 Muharram, Ashura, 1 Ramadan, the two Eids, Arafah). Mawlid, Isra and
+  Mi'raj and 15 Sha'ban are not in the shared list (Q20); 12 Rabi al-Awwal is out for everyone.
+- **Shia users** (stored sect Shia) also see Eid al-Ghadir (18 Dhu al-Hijjah), Arbaeen (20 Safar), Birth of the
+  Prophet ﷺ (17 Rabi al-Awwal), Birth of Imam Ali (13 Rajab), Birth of Imam al-Mahdi (15 Sha'ban) (Q21). Merged in
+  date order with no heading, so the screen never prints the user's sect. Sources: five I.M.A.M. pages, cited in
+  the KDocs of `IslamicDay`.
+- **Unset means Sunni**, six rows (`SettingsRepository` default). `IslamicDates.upcoming(today, offset, sect)` has
+  **no default for `sect`** on purpose: a caller that forgets it must not compile, rather than silently show six.
+- **The three Shia Ramadan nights (19, 21, 23) are out of 1.6** (Ali): a Hijri night starts at the previous
+  sunset, so a row dated by the day is a day off. Their later home is the Ramadan timetable.
+- **Honorific (Ali):** the Prophet with ﷺ, the Imams plain, in every language. Names plain, nothing celebratory.
+- Golden dates come from Aladhan Umm al-Qura, not I.M.A.M.'s own calendar (it can differ by a day); the footer
+  already says local sighting may differ. Nothing is sent: no usage event, the sect stays on the phone.
+- **Do not "improve" back:** a "Shia dates" heading, a default `sect`, or the Ramadan nights as day rows.
+
+### 5.31 The bell on each prayer row (1.6.0 step 3, Ali 24 Oct 2026; STEP-3-DESIGN §5, §14, §19 to §21)
+
+Rules in `:core` `BellRules.kt` (plain Kotlin, maps in and out; `BellRulesTest`), applied by `SettingsRepository` in one
+DataStore edit each so a crash cannot half apply them.
+1. **Bell off** removes the prayer's alert and remembers its style (notification or alarm), and moves its "minutes
+   before" reminder into `bell_removed_reminder`, even at 0 minutes. The message says "and reminder" only when a
+   reminder that would have fired went. Fajr in Ramadan (today or tomorrow on the user's calendar, suhoor reminder
+   on) says the suhoor reminder stays on.
+2. **Bell on, or Undo** restores the remembered style (or notification) and gives back the reminder the bell took.
+3. **Settings' alerts dialog:** Off remembers the style but never touches the reminder (§14.9). On, for a prayer
+   the bell turned off, gives the bell's reminder back too (Opus review, 24 Oct: otherwise it stayed silently off).
+   Ticking or unticking a prayer in the reminder dialog clears the bell's memory for it.
+4. **Permission door** chosen before asking (§14.2): not blocked, nothing; below Android 13 or granted but switched
+   off, the phone's settings; never asked or rationale shown, the system ask; otherwise the phone's settings. The
+   setup ask counts as asked. Blocked state re-read on every return to the app.
+5. **Large text:** at fontScale >= 1.5 a Times row puts its pill and time under the name, bell at the end; the
+   "Today" heading puts Save as PDF under it. Same threshold as step 2's dates rows.
+Rejected: an iPhone style switch for notifications (only the phone can allow them, a switch would spring back,
+§17); the bell clearing the reminder for good (Ali's Q6: Undo must be complete).
+
+### 5.32 The Timetable (1.6.0 step 4, Ali 24 Oct 2026; STEP-4-DESIGN.md)
+
+- **One door.** The Today line's button is "Timetable" (calendar icon); "Save as PDF" moved inside it. One
+  `timetable` flag in `HomeScreen`; the Ramadan card's "Get the full Ramadan timetable" sets the same flag.
+- **Which view.** `ramadanView = state.ramadan?.info?.isRamadan == true && ramadanCardEnabled`: from Ramadan day 1
+  to the last day, with the card on, the approved Ramadan table opens; otherwise the month sheet. **Not 30 days
+  ahead** (the plan said so): `state.ramadan` is null until three days before (`RamadanState.kt:76-77`), and someone
+  tapping Timetable in January expects January. Ali chose "From day 1". The Ramadan PDF is still offered 30 days
+  ahead in the chooser.
+- **Month sheet.** This month and next (Ali: "This month and next"), sticky month headings, one card per day with
+  six times, opened with today's card just under the pinned heading (scrolled down by the heading's measured
+  height: a sticky header draws over the first visible item). Today in `primaryContainer` with the Today pill.
+  Past days not dimmed. **No Hijri date on cards** (Ali). Columns by `TimetableGrid.columns(width, fontScale)`
+  (`:core`): 3, 2 or 1.
+- **Save as PDF** on both views opens the same chooser (Today, 7 days, This month, Ramadan when offered) over the
+  sheet, which stays open after a save. On the Ramadan table it used to make the Ramadan PDF straight away; that
+  left week and month PDFs unreachable all Ramadan once the Timetable became the only door (Opus review). Ali,
+  24 Oct 2026: "Show the choices".
+- **Month name** via ICU `getInstanceForSkeleton("yMMMM")`, not java.time `LLLL`: below API 26 the desugared
+  java.time prints a standalone month as a number.
+- **Rejected:** a table (breaks at 320dp and 2.0), dimmed past days (fails AA, reads as guilt), a rolling 30 days
+  (PDF "This month" would not match), a Month/Ramadan segmented control (not in the design system).
+- **Q8 answered, Ali 24 Oct 2026: "Keep the table".** From side by side pictures (`screens/step4/9a` to `10b`):
+  the table shows about seventeen days on a screen against about four cards, and suhoor, iftar and the fast
+  compare day to day. The card prototype (`DayCard(ramadanDay)`, `RamadanCardsPreviewList`, two English only
+  strings) was deleted; do not rebuild it.
+
+### 5.33 The Qibla screen (1.6.0 step 6, built 24 Oct 2026, Pillars style dial 5f56fba, waiting for Ali's four §13 answers; STEP-6-DESIGN.md, §16 wins over §15 over §14)
+
+- **Km or miles by the phone's own language region**, never the app's: `MeasurementSystem.usesMiles` in `:core`, a fixed
+  list (US, GB, LR, MM), which is CLDR's own answer. Not ICU `LocaleData`: same answer, and an `android.*` import `:core`
+  cannot take. The region comes from `LocaleManagerCompat.getSystemLocales`, not `Resources.getSystem()` (§15 lesson 181).
+  No setting (Q12).
+- **The Makkah fallback counts as no location on Qibla.** It stores the Kaaba's own point, so a bearing and distance from
+  it are meaningless (0°, 0 km, "facing the Kaaba" whenever the phone points north). Guarded by
+  `usingDefaultLocation`, tested in `LargeTextAndTalkBackDeviceTest`, mutation proof run on the emulator.
+- **"Facing N°" stays on arrival.** It sits above the dial; hiding it would move the dial at the moment it animates.
+- **The arrival buzz always happens** (Ali, 24 Oct 2026: "when you point correctly then message also appears
+  and vibration happens"): `arrivalBuzz` in `QiblaScreen.kt`, 70 ms through the `Vibrator` with media usage and the
+  `VIBRATE` permission (on the privacy page). `performHapticFeedback` and an attribute-less vibration are both muted
+  when touch feedback is off (§15 lesson 183). Unchanged on purpose: no buzz when the screen opens already facing the
+  Kaaba, and none twice within 5 s (both measured on the S23 Ultra, comments at the buzz). The watch still uses
+  `performHapticFeedback`, so it has the same silent case; not changed in 1.6 (the watch is out of scope).
+- **The dial is the Pillars style in our theme** (Ali, 24 Oct 2026: "I want that style of compass and needle but in
+  my own theme"; STEP-6-DESIGN §15/§16). A teardrop needle in `primary` (reverses the earlier rejection, on his word),
+  a lifted bezel from `dialBezel()` (`surface` light, `surfaceContainerHighest` dark) that turns `primary` on
+  arrival, 60 `outline` ticks, letters inside, the Kaaba at 0.70. **No hub and no turn arc** (Pillars has neither;
+  the turn is said in words above the dial). Don't add them back without Ali. **Decided 25 Oct 2026:** Ali chose the
+  instruction under the title, the white lifted bezel, the amber notice with Set location and no arc (the
+  recommendation each time); the dark bezel `surfaceContainerHighest` is Fable's choice from pictures. The four
+  TEMPORARY switches are removed from `QiblaScreen.kt`.
+- **The watch keeps its own dial** (Kaaba at 0.66 there, 0.70 on the phone, on purpose; comment in `WearApp.kt`).
+
+### 5.34 Jama'ah times (1.6.0 step 7, built 25 Oct 2026, waiting for Ali's Q15; STEP-7-DESIGN.md, §15 over §14 over §1 to §13)
+
+- **Typed jama'ah times belong to the home mosque** (Ali, Q13). Every save stamps the phone's zone id (`ZONE=` in the
+  stored string, codec v2; a v1 string has no zone and always shows; an id `ZoneId.of` rejects is dropped).
+  `JamaahPlan.on` returns nothing while the stored id differs from the phone's: one gate in `:core` for Times and
+  the 1.6.1 planner. The Jama'ah times dialog reads raw settings, so it checks `visibleIn` itself: a quiet notice at
+  the top, rules as typed, no "Today" previews, no amber. **Ids, never offsets** (London and Lisbon share an offset).
+  The hide applies at the next recalculation (location refresh on resume, a settings change, a prayer passing), not
+  the instant the zone changes. No coordinates are stored. `docs/privacy.html` names the stored zone.
+- **Out of window has a before and an after form** (`JamaahResult.Before`, `After(next)`; Fajr's "after" is
+  sunrise). Times keeps the grey "Check your jama'ah time"; the amber sentence is in the dialog only. "After Maghrib
+  begins", never "after Asr ends": the app never states a deadline for a prayer.
+- **The line stays grey and unmarked** under the name. Its time uses a non breaking space (in `rowNote` only, not
+  `TimeFormat`) so "pm" never sits alone; an 8dp gap keeps it off the Next pill, so on the Next row it may wrap.
+- **"Match your mosque start times" and "Jama'ah times"** are named apart (SIGNOFF wording, applied in step 7), and
+  the Match your mosque help ends "Jama'ah times go in Jama'ah times." The disclaimer still says "Match your mosque"
+  in five languages: protected text, left for Ali (§11).
+- **The mosque door** ("Different from your mosque?", loud as "Does this match your mosque?" above 45 degrees until a
+  method is chosen) stays under the rows: Q15 decided 25 Oct 2026 (Fable said keep, and `JAMAAH-RESEARCH.md` found no app
+  can know a mosque's jama'ah times by itself). The TEMPORARY picture switch was removed the same day. Fable rejected inside the card, beside
+  Timetable (two solid buttons side by side), Settings only, and hidden once set up (STEP-7-DESIGN §5).
+
+### 5.35 Widgets: the Today strip and the sky (1.6.0 step 8, built 25 Oct 2026, Ali answered Q1 to Q4 all recommended on 25 Oct 2026; STEP-8-DESIGN.md, §15 over §14 over §1 to §13)
+
+- **Today strip**, a third widget (`TodayStripWidgetProvider`, `widget_strip.xml`, `widget_today_strip_info.xml`,
+  4 by 1, minHeight 40dp so formula launchers do not round it to two rows). Four size entries from one layout:
+  250 or 380dp wide by 40 or 64dp tall. Five columns, Fajr to Isha (no sunrise), the **next** prayer in the pill
+  (Ali, 25 Oct 2026; supersedes PLAN.md "current"). Glyphs only from 64dp tall. Town chip only from 380dp, capped
+  at 64dp, and never at 1.3 text, where the strip shows the next prayer alone. Ramadan: "Suhoor" and "Iftar" as
+  the Fajr and Maghrib names. One TalkBack sentence; an approximated day says so in speech only (no room for a mark).
+- **The time may shrink to 9sp** at 250dp so "pm" is not cut, and every name and time ellipsises (review). This is
+  a second exception under the 12sp widget floor, decided by the main session, shown to Ali in the 250dp picture.
+- **Sky on the Next prayer widget** (small and wide): `WidgetState.period` is the phone's own
+  `Sky.periodOf(currentPrayer(...))`, Day with no location. Rimmed pill for the chip and highlighted row, a 30 percent
+  track for the to come bars and the divider. Today widgets and the strip stay paper. No sun arc and no period word
+  (Ali, 25 Oct 2026).
+- **Sunrise is a redraw boundary**: `nextRefreshAt(..., sunriseAt: Instant? = null)` takes the earliest of the next
+  prayer, midnight and a sunrise still ahead. Mutation proof: drop the branch and the 06:00 test fails.
+- The TEMPORARY picture switches were removed after Ali's answers; DESIGN_SYSTEM §1 now allows the sky as the Next
+  widget's body.
+- Rejected (STEP-8 §1): the sky on Today widgets or the strip, a sun arc, a period word, a green glyph on the next
+  column, a Now marker, faded past columns, dropping am or pm, a sixth column for the town.
+- `docs/privacy.html` unchanged: nothing new is stored or sent. iPhone: Android only, maps to WidgetKit
+  (`nextRefreshAt` boundaries are a TimelineProvider's entries).
+
+### 5.36 Fasts to make up (moved into 1.6.0 by Ali, 25 Oct 2026; FASTS-TO-MAKE-UP.md)
+
+Ali, 25 Oct 2026: "what we can release in this, let's just go with that ... We don't need to even add it into the
+description ... maybe we don't even need Fable to design it ... design it basic for now ... but follow the same theme".
+So it was built from existing components only, with no Fable pass and no store listing line. The two 1.6.1 reminders
+stay in 1.6.1 (alarm changes, and no fix could ship in the 18 Jan to 9 Mar release pause). Superseded 30 Oct 2026 for
+the listing: the whole app description names it in English and all eight translations (§5.38).
+
+- **One number, 0 to 999** (`TrackerLogic.MAX_FASTS`), no reasons, no dates, no reminder, no deadline. Set in Settings,
+  My prayers, "Fasts to make up" (dialog with the existing `StepperRow`); shown on the My prayers tab under the week
+  card only above zero, with "Made up one". No Undo on purpose: plus in Settings puts a wrong tap back.
+- **Stored in the tracker DataStore** (`fasts_to_make_up`, absent at zero), so Delete clears it and backup never sees it.
+  Every change is `adjustFastsToMakeUp(±1)`, read and written in one edit (two quick taps are two steps; review).
+- **Save file:** optional `"fastsToMakeUp"`, written only above zero, version stays 1 (the tracker is new in 1.6.0, so no
+  older file exists). **Load keeps the larger count, never the sum** (`TrackerLogic.mergeFasts`): the same file twice
+  must not double it. A file that changes only the count says so in the toast, not "0 days added". **Accepted trade
+  off:** loading an older save made before some fasts were made up raises the count again; the toast shows the new
+  number, and minus in Settings puts it right. Taking the file's number instead would let an old file lower a count
+  the person has since raised, and summing would double it.
+- **Words:** English never "missed", "owed", "debt", "qada" (`TrackerWordingTest`). Arabic and Urdu use قضا and Turkish
+  kaza, the plain words for making up a fast (DETAILED-PLAN §9); Indonesian "diganti", never utang (debt).
+- **Privacy:** `docs/privacy.html` names the count where the record is kept and in the file; `TrackerPrivacyTest` pins
+  both phrases. No usage-count event.
+- **Not done, deliberately:** bulk entry (one step at a time; a repeating long press is the cheap upgrade if asked).
+
+### 5.37 The app's name is never translated (Ali, 30 Oct 2026)
+
+Ali: "for every user, the name should remain the same because that's the name you have in Play Store ...
+S-A-J-D-A-T-I-M-E." Every language writes "SajdaTime" in Latin letters wherever the English does: the launcher
+label, the watch app name, widget names, the disclaimer, About, every sentence that names it, and every store
+title ("SajdaTime: ..."). Never সাজদাটাইম, سجدہ ٹائم, "Sajda Time" or a local translation. Checked 30 Oct 2026: all
+five translations already had it right in all three modules. Enforced by `TranslationIntegrityTest` ("SajdaTime is
+never translated or transliterated": the count per string, plural and array must equal the English) and by
+`tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
+failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
+
+### 5.41 Sunnah fast reminders: in 1.6.0 (Ali, 2 Nov 2026: "Lets do it" on his list that included them, then "we will call it release 1.6 now"; spec from the main session)
+
+Settings, Reminders, "Fast reminders", **Sunni only** (row hidden for Shia, and `FastReminderPlan` and the receiver both
+refuse Shia as well, so a stored choice can never ring after a switch of school). **Off by default.** Three switches stored
+as the `FastKind` set already in `SettingsRepository`: Monday and Thursday; White Days; Ashura, Arafah and the six days
+of Shawwal (the last also carries 9 Muharram, announced as "the day before Ashura"). The reminder rings the evening before
+at the planner's time (**ten minutes after Isha**, so the Isha adhan is not cut short by a second sound at the same instant, review 2 Nov 2026; or 30 minutes after Maghrib when Isha is late; sign-off conditions of 23 Oct 2026 unchanged)
+and says when suhoor ends (Fajr of the fast day, the user's method). Words never call the fast obligatory; Arafah says
+"on this calendar" and "follow your mosque", as `FastingDays` documents. **Notification only:** own channel
+`fast_reminders` ("Fast reminders", default importance so the phone's usual tone, no alarm, no vibration pattern of ours),
+created on the first reminder so nobody sees an empty channel. **No usage count event, ever** (nothing was added to
+`UsageCounts`). Scheduler: action `FAST_REMINDER`, request codes `50,000 + dayOfYear of the evening it rings on`
+(`RequestCodeTest`-style pin in `FastReminderReceiverTest`), laid down in `PrayerAlarmScheduler.reschedule` before the
+early return (so wanted with all prayer alerts off), cancelled in `cancelAll` (so switching off or choosing Shia clears
+on the very next reschedule), not an alarm clock (must not become the phone's "next alarm"). Every existing reschedule
+trigger (open, alarm chain, 12 hour worker, boot, time change, settings change) therefore covers it. The receiver
+re-checks at fire time: Sunni, kind still on, the day still a fast on the calendar in use, and the clock still on the
+evening before. **Seen on the Redmi (2 Nov 2026, clock moved to Wednesday evening):** the reminder fired with "Tomorrow is a Sunnah fast (Thursday). Suhoor ends at 05:09." on channel `fast_reminders`. **Not checked:** a One UI delivery, the Isha overlap fix on a real adhan, any translation by eye. Privacy page: no change needed (choices are on-device settings, nothing sent, no new event).
+iPhone effect: carries over in idea. `FastingDays` is in `:core`; `FastReminderPlan` (the evening rule) and `shouldPostFastReminder` are plain Kotlin but sit in `:app`, to be moved to `:core` when iOS starts (recorded gap); SF Symbol `calendar.badge.clock`.
+
+### 5.40 Alert check: Settings, Reminders, first row (Fable design, Ali delegated the decisions, 2 Nov 2026)
+
+One always shown row opening a dialog that reads four things the phone can withhold: notifications, exact alarms (Android
+12+), background restriction, and Do Not Disturb sound (only while a prayer is an alarm). Reads only: nothing stored or
+sent, so no usage count and no privacy page change. **The battery check uses `ActivityManager.isBackgroundRestricted()`
+only.** Ordinary battery optimisation is not asked about because prayer alerts use `setAlarmClock`, which is exempt.
+**No battery permission, ever:** `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` is restricted by Play policy; the failing battery
+button (labelled "Open app settings") and the closing one (hidden while the battery check fails, so never two) open `ACTION_APPLICATION_DETAILS_SETTINGS` for our package, never a vendor intent. **The
+failing battery wording stays "may", permanently:** on 2 Nov 2026 the Redmi test (below, section 10) showed Restricted
+battery did NOT stop a Maghrib alert (`setAlarmClock` is exempt), so the check shows a risk, never a certainty. The
+notification check is `areNotificationsEnabled()` (the Times bell's own test, now `AlertCheck.notificationsAllowed`)
+plus no prayer alert channel (`Notifications.isPrayerAlertChannel`) switched off by hand. The Do Not Disturb line says
+alarms "can" sound (the default "Play on silent" off still drops them to a notification on a silent phone). The battery
+line reads only Android's own "Restricted" setting; HyperOS and One UI have their own controls it cannot see (the
+closing paragraph says so). iPhone effect: Android only as built; a notification and Focus check would carry over,
+exact alarms and battery do not exist there. Not unit tested: the read itself (a backwards check would pass
+`AlertCheckTest`); checked by hand on the Redmi, clean and Restricted.
+
+### 5.39 Night times: the night is sunset to Fajr, for everyone (Ali, 2 Nov 2026, religious call)
+
+The Times list shows Islamic midnight and the start of the last third of the night. **The night is measured from
+astronomical sunset to the next Fajr (Tahajjud ends at Fajr), for all users, Sunni and Shia.** Ali chose "Sunset to
+Fajr" on 2 Nov 2026. This equals Aladhan midnightMode=1 (Jafari); it is NOT Aladhan's default. Midnight = sunset plus
+half the night; last third = sunset plus two thirds (`core/NightTimes.kt`). Sunset is the raw astronomical one (adhan's
+method offsets for Turkey, Dubai and Moonsighting removed), never Maghrib, so the Jafari delay cannot move it for one
+sect only.
+**Rejected:** Aladhan's default (sunset to sunrise), about an hour later; a per-school split (Sunni one way, Shia
+another). **Wording rule for the row:** only "Islamic midnight" and "Last third from X"; never "Isha ends", "Tahajjud time",
+"best time" or "Qiyam". The row is dimmed and has no bell: it is a calculated fact, not a prayer or a ruling.
+**Reversal:** `docs/plans/2026-10-release-1.6.0/FABLE-REVIEW.md:76` said to leave midnight and last third out ("carries
+rulings"); Ali approved adding them on 2 Nov 2026. Shipped in 1.6.0, no separate 1.6.1. Tested on his Redmi
+23117RA68G in Slough: Midnight 22:50, last third 00:55. iPhone effect: carries over (plain Kotlin in `:core`).
+**Why these times caption (2 Nov 2026):** a quiet line under the list names the method and school. It is plain text, not
+a button, on purpose: DESIGN_SYSTEM 4.1 says every action is a solid button, and the "Different from your mosque?" door
+right below opens the same dialog. **Rounding:** night times are cut to the minute, not rounded, so a time can show one
+minute earlier than Aladhan; accepted, it is the safe direction. **Recorded gap:** `NightTimes.approximated` (high
+latitudes) exists but is not shown in the UI.
+
+### 5.38 The store listing always sells the whole app first (Ali, 30 Oct 2026, hard rule)
+
+Ali: "the listing should contain everything this app has to offer, and whenever we work on new release, make it a hard
+rule that we will always tell about what this app has to offer, and after that we can put in either improvement or the
+fixes or anything. We want to attract as many people as possible, so you have to creatively write something within the
+limits which covers it and makes it easier for the user to read." So, every release: (1) the full description in
+`docs/store/LISTING.md` and all of `LISTING-LOCALES.md` names every feature the release build has, benefit first and easy to
+scan, inside 4000 characters, a new feature getting its line in the same release; (2) What's new (500) then gives the
+improvements and fixes; (3) the HONEST and FREE sections stay byte for byte (the disclaimer and the one dua request), and
+the search words in `VISIBILITY-KEYWORDS.md` stay. Wording is drafted by `ux-lead`, facts checked against the code, an
+Opus review, Ali approves the English before the translations. This replaced the 25 Oct 2026 choice to leave "Fasts to
+make up" out of the listing.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -2301,6 +2686,50 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.6.0 alert check, battery test (2 Nov 2026, Redmi Note 13 Pro, HyperOS).** `com.sajdatime.app.sideload` set to
+Restricted (`RUN_ANY_IN_BACKGROUND` deny, standby bucket restricted), process killed, Home. Clock moved to 16:33:30
+(`cmd alarm set-time`, then auto time back on); the 16:34 Maghrib alarm fired on time and notification 2004 (channel
+`prayer_times`, importance 4) was posted. So Restricted battery did not block a `setAlarmClock` alert on this phone;
+the app wording stays "may". Alert check dialog seen on the phone clean (three ticks) and with Restricted (warning line,
+one button). Not seen: the Do Not Disturb row, light theme, 2x text, Urdu right to left.
+
+**1.6.0 step 3, the bell (24 Oct 2026, Mac session).** Phone emulator `sajda` (API 36), London, Shia. Undo re-arms
+the alarm: `dumpsys alarm` count 198, 190 after Dhuhr's bell off, 198 after Undo (Haiku `mechanic`,
+`screens/step3/checks/RESULTS.md`). Urdu message and Undo, dark, bell labels in a uiautomator dump. 320dp at 2.0
+text: names broke inside words (checks/3), fixed and retaken (checks/6, 7; checks/5 shows the rows fixed before the
+"Today" fix); normal size unchanged (checks/8). Finished set in `screens/step3/final/`. Full gate green on a4f96c2;
+unit tests and lint green after the review fixes. Not run: TalkBack by ear, a real Android 13+ phone, the Ramadan
+message, device test suite.
+
+**1.6.0 step 2a, Shia only Islamic dates (24 Oct 2026, early morning, Mac session).** Phone emulator `sajda`
+(API 36), real clock (24 Oct 2026, 13 Jumada al-Ula 1448), London. Golden dates: the main session and the reviewer
+each fetched all ten (five days, 1448 and 1449) from Aladhan `hToG?calendarMethod=UAQ`; all match the code. Screens
+in `docs/plans/2026-10-release-1.6.0/screens/step2/`: Shia light, scrolled, dark, Urdu (right to left), text 1.5 and
+2.0, 320dp at 1.0 and 2.0, and Sunni showing the same six rows as before. Found on the emulator and fixed, seen
+before and after: at 320dp and 2.0 text "Ramadan" broke mid word ("Ramad / an"), a fault of the shared row older
+than 2a; rows now stack name, date, count at text 1.5 and above (Fable's spec, `IslamicDatesSheet.kt`). Accepted
+(Fable): the ﷺ ligature makes its row about 10dp taller, from the phone's Arabic fallback font; not resized, since
+shrinking it reads as less respect and the height differs per maker. Also checked: text 1.3 at 320dp in Indonesian, Turkish and Urdu, the longest titles, still side by side: every title wraps between words, so the threshold stays at 1.5. Full gate green: app 303, core 203 (1 skipped), wear 27 unit tests, lint clean, both bundles. Left as is: the stacked count reads "in 59 days" lower case under "Today" rows (existing strings). Not checked: ﷺ on an API 26 emulator, how
+TalkBack reads ﷺ, a Samsung or Xiaomi font, the five I.M.A.M. pages re-fetched (Fable fetched them 23 Oct).
+
+**1.6.0 step 1, the My prayers tab (23 Oct 2026, night, Mac session).** Phone emulator `sajda` (API 36), seeded by
+`TrackerSeedDeviceTest` and `ScreenSeedDeviceTest`, clock set to Fri 23 Oct 14:30 (`adb root`, `auto_time 0`).
+Screens taken in light and dark at 823dp (1440x3088, density 600) and at 320dp (720x1280, density 360), at text
+1.0, 1.5 and 2.0, in English, Urdu (right to left), Arabic and Turkish. Found and fixed on the emulator, each seen
+before and after: a cold start crash (§15, 179); future week days drawn paused; prayer names split one letter a line
+at 320dp and 2.0 ("D h u h r"), then cut ("Maghr"); weekday names split ("Cum" over "m"). Accepted and recorded: the
+Turkish tab label wraps inside the word at 320dp and 2.0. Not checked: TalkBack by ear, a real launcher or phone,
+the watch (untouched).
+
+**The five agents' first use (23 Oct 2026, night, Mac session; §5.28).** Each agent was asked to state the model in
+its own system prompt, and reported (their word, matching each file's frontmatter): `ux-lead` Fable 5.1 (`claude-fable-5-1`), `plan-verifier` Fable 5.1, `reviewer` Opus 5.5
+(`claude-opus-5-5`), `implementer` Sonnet 5.5 (`claude-sonnet-5-5`), `mechanic` Haiku 5.5 (`claude-haiku-5-5`), so the
+`fable`, `opus`, `sonnet` and `haiku` aliases in the frontmatter work. `ux-lead` called the `make-interfaces-feel-better`
+skill through its `Skill` tool and the call loaded with no error. **Trap found first:** the session had been started in
+`~/Developer/SajdaTime` (the 1.5.0 checkout, which has no `.claude/agents/`), and every agent type was "not found".
+Agents are read from the session's own folder, so **a 1.6 session must start in `~/Developer/SajdaTime-1-6-0`** (§15
+lesson 178). Not checked: whether an agent obeys its read only line (none was asked to write).
 
 **1.5.0 release day run (23 Oct 2026, Mac session; §11 STATE OF PLAY 23 Oct evening).** `release-1.5.0.sh` on `63ae275`,
 emulator `sajda` (its leftover 1440x3088 size override reset first): 23 of 24 PASS or TAKEN, phone SKIPPED by Ali's choice.
@@ -5661,7 +6090,333 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 24 Oct 2026: 1.5.0 IS LIVE (read this first; the 23 Oct 17:45 block below is history)
+### 📍 RELEASE DAY SET, 2 Nov 2026 (Ali: "Set release day"; read this first)
+
+Release date 2 Nov 2026 (privacy page and `UsageCountsTest` dated; if the merge slips, rerun `set-release-date.sh`).
+`release-1.6.0.sh` ran end to end on the final code: every line PASS (push, bundle 10 / 1.6.0 signed, permissions the
+eleven plus VIBRATE, device suite 39 of 39, Ramadan and widget suites) except the two CHECKs explained here: the tree
+(only the untracked `.codex/`, deliberately never committed) and the unit test counts (app 348, core 245, wear 27; the
+script's `EXPECTED_COUNTS` was stale and is updated). Store screenshots SKIPPED and phone SKIPPED by choice. Left: Ali
+merges PR 17, builds the bundle from `main`, uploads in the Play Console, one screen at a time, and presses Send for
+review himself; then the "After it is live" list in `RELEASE-1.6.0.md`.
+
+### 📍 NEXT STEPS, 2 Nov 2026, evening: ALL BUILD WORK DONE (read this first)
+
+Everything for 1.6.0 is built, reviewed, gate green (full `clean test lint bundleRelease` on b30e9c4) and pushed on
+`claude/1-6-0`: night times + "Why these times" (4ffb0c8), Alert check (165467d), Sunnah fast reminders (b30e9c4; rings
+10 minutes after Isha). Ali approved the English store text 2 Nov ("Approve text"): `docs/store/LISTING.md`, block
+"DRAFT 2 Nov 2026 ... APPROVED" (full description 3998/4000, What's new 493/500). Times store picture needs no retake
+(cut at Maghrib). Redmi checked: alert check clean and Restricted, fast reminder fired on a moved clock; Fast reminders
+turned back off there. **Done later the same evening:** the eight translated listings (reviewed, stamped, 9d0397c) and the PR
+https://github.com/aliimrankhan86/SajdaTime/pull/17 ("DO NOT MERGE before release day"). **What is left is release day
+only** (`RELEASE-1.6.0.md`: set-release-date.sh, final gate and `release-1.6.0.sh` with the device suite, Ali merges and
+builds, Play Console one screen at a time, Ali presses every button), on Ali's word. Ali is told everything is done.
+Not done and not claimed: Samsung (One UI) check, light theme / 2x text / Urdu RTL of the new screens, the device suite
+(`am instrument`, run by release-1.6.0.sh), the Isha-overlap fix with a real adhan.
+
+### 📍 ADDED LATER 2 Nov 2026: SUNNAH FAST REMINDERS SWITCHED ON IN THE 1.6.0 BUILD (not released; rules in section 5.41)
+
+- Settings > Reminders > "Fast reminders" (Sunni only, off by default, three switches) now lays down an evening before
+  notification through the planners that were inert (`FastReminderPlan`, `FastingDays`). Strings in all six languages by
+  Claude, ledger not stamped. **Not tested on a device or emulator**, no screenshots. `InertReminderSettingsTest` now
+  guards the jama'ah reminder only. The jama'ah reminder is still off.
+
+### 📍 ADDED LATER 2 Nov 2026: ALERT CHECK (read with the block below; built uncommitted on `claude/1-6-0`)
+
+- New first row in Settings > Reminders, "Alert check", opens a dialog of up to four checks with a glyph, words and a
+  solid button to the exact system screen, plus an "Open app settings" button. Rules and rejected options: section 5.40.
+- Strings in all six languages by Claude; ledger not stamped. **Not tested on a device or emulator**, no screenshots,
+  and the battery wording is unconfirmed on the Redmi (section 5.40).
+
+### 📍 STATE OF PLAY, 2 Nov 2026: NIGHT TIMES (MIDNIGHT AND LAST THIRD) ADDED TO 1.6.0 (read this first; the 31 Oct block below holds for everything not named here)
+
+- **Ali, 2 Nov 2026:** night times ship in 1.6.0, no separate 1.6.1. Built uncommitted on `claude/1-6-0`: a dimmed
+  Midnight row after Isha (no bell, note "Last third from X"), Settings toggle "Night times", default on. Rule and
+  reasons: section 5.39. Strings in all six languages (translation fixes applied after review: Turkish, Urdu, Bengali).
+- **Tested by Ali on his Redmi 23117RA68G** (Slough): Midnight 22:50, last third 00:55.
+- **Checked:** the London pair against the live Aladhan API with midnightMode=1 (sunset 2026-11-02 16:32Z, next Fajr
+  05:04Z gives midnight 22:48:00Z, last third 00:53:20Z); that pair is now a unit test.
+- **Not done:** store pictures still do not show the Midnight row (they are the 25 Oct set); the listing text does not
+  yet mention night times; the Home height budget now needs a short scroll on a real 1080x2400 phone (HomeScreen.kt
+  comment). Not committed at the time of writing.
+- **Later 2 Nov 2026 (Ali's decisions, built uncommitted):** the row label is now "Islamic midnight" in all six
+  languages (a bare "Midnight" read as clock midnight). New caption "Why these times" between the list and the mosque
+  door: "<method> · <school>" (Shia: "Jafari (Shia)"; AUTO shows the method it resolved to; " · adjusted" when any
+  prayer has a minute adjustment), tapping opens the mosque dialog, whose first sentence now says the same in full.
+  Strings translated by Claude, ledger entries not yet stamped. Not tested on a device or emulator; screenshots not retaken.
+
+### 📍 STATE OF PLAY, 31 Oct 2026: 1.6.0 STORE PICTURES NOT RETAKEN YET (history now; read the 2 Nov block above first; the 30 Oct night block below holds for everything not named here)
+
+- **Ali, 31 Oct 2026:** "You retake the pictures and record it gbrain so you have all information." Ali also asked that
+  the pictures be retaken for the new release and that everything be committed, pushed and merged once done.
+- **Pictures: NOT retaken. Blocked, and it cannot be done from the cloud session.** The phone pictures are captured on
+  the `sajdastore` AVD (1080 × 1920) on Ali's Mac (`docs/store/upload/README.md`, `docs/release-tools/release-1.6.0.sh`
+  with `STORE_SHOTS=1`). This cloud container has no Android SDK, no emulator and no `/dev/kvm` (no hardware
+  virtualisation), so no emulator can run here. Checked 31 Oct 2026.
+- **Store pictures on `claude/1-6-0` are the 25 Oct 2026 set** (no picture changed since then). They predate the 30 Oct
+  changes: Bengali, the tab label change, `shrinkToFit`, and Fasts to make up (in the listing text, in no picture).
+  The Arabic set is older still (captured 20 Aug 2026). Ali has said screenshots may be updated.
+- **Ali's one command, on his Mac (AVD running, on `claude/1-6-0`):**
+  ```bash
+  export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+  STORE_SHOTS=1 bash docs/release-tools/release-1.6.0.sh
+  bash tools/build-store-assets.sh
+  ```
+  Then push the branch, or send the screenshot folder, so the cloud session can check the pictures against the build.
+- **Open decision for Ali (not built):** Play allows eight English phone pictures; the set has eight. The listing now
+  names Fasts to make up, and no picture shows it. Proposed: replace `05-widgets.png` with a fasts screen, because the
+  widgets are already in the listing text. Ali decides before the Mac run.
+- **GBrain:** the cloud session has no GBrain tool (checked 31 Oct 2026). This block is the record. The first session
+  with GBrain compares GBrain page `projects/sajdatime` against this block and updates GBrain itself (`CLAUDE.md`).
+- **Branches:** the session branch `ccr-9e25a943-855wxx` was reset to `claude/1-6-0` (`b8c40fc`) and pushed. Ali asked
+  (31 Oct 2026) for this record to be committed, pushed and merged into `claude/1-6-0`, so it was fast-forwarded there.
+  `main` is untouched: it takes 1.6 only on release day (Ali's rule).
+- **Not checked:** the listing text against the final build (not started); the pictures (blocked above).
+
+### 📍 1.6.0 READY AND WAITING FOR RELEASE DAY, 30 Oct 2026, night (history now; read the 31 Oct block above first)
+
+- **Ali, 30 Oct 2026:** "record and remember everything for release 1.6 ... we should be ready to go soon ... only the
+  work which has the latest work and the complete work should remain ... the Ramadan functionality only enables when
+  Ramadan starts and disable itself when Ramadan stops. And Eid greeting ... confirm and check if that's there."
+- **State:** `claude/1-6-0` holds all of 1.6.0 and is the only branch with unreleased work. `main` = 1.5.0 (live since
+  23 Oct 2026). Release day unchanged: when Ali says so, by `docs/release-tools/RELEASE-1.6.0.md` (PR by 11 Dec,
+  submit by 15 Dec 2026). Full gate green on this commit: app 338, core 238 (1 skipped), wear 27, 0 failed; lint 0
+  errors; both release bundles built.
+- **App name rule added (§5.37):** "SajdaTime" never translated; already true in all five translations; now tested.
+- **Language list (checked, no change):** every language already shows its own name with its English name under it
+  (Ali's 25 Oct choice). Ali, asked whether the setup globe button should add the English name too: "No".
+- **Ramadan switches itself on and off (checked in code and tests, no change):** `RamadanState.build` is null outside
+  Ramadan and the notice window (3 days before day 1 to day 2), so the Times screen shows nothing of Ramadan the rest
+  of the year; the Ramadan Timetable view only while `isRamadan`; the PDF option from 30 days before to the last day;
+  suhoor reminders are planned only for Ramadan dates (`SuhoorReminderPlan`, `HijriCalendar.isRamadan`), so they stop
+  after the last day by themselves. All on the user's own Hijri date shift. Tests: `RamadanStateTest` ("the state exists
+  from 3 days before to the last day and not otherwise"), `RamadanGoldenTest`, `RamadanTimetableTest`, `RamadanPdfRangeTest`.
+- **Eid greeting is there (checked, no change):** `EidCard.kt`, shown on 1 Shawwal and 10 Dhul Hijjah of the user's own
+  calendar, gone at midnight, once closed never back for that Eid, independent of the Ramadan switch. `EidTest`
+  (2027: 9 March and 16 May; 2028: 26 February and 5 May) and `EidWordingTest` in all six languages.
+- **Branches audited (30 Oct 2026):** every local and remote branch except three is already wholly inside `claude/1-6-0`.
+  The three: `claude/analytics-default-on-1-4-0` (on by default usage counts, reversed by Ali 4 Oct 2026, never
+  merge); `claude/customer-review-pain-points-9d35kl` (rebuilt into 1.5.0 on 19 Oct, deliberately not merged, §11
+  history); `deepseek/ds-deviations-record` (pictures and locations of the 22 design deviations, Ali's request 25 Oct).
+  Opus review of the last: **merge only after fixes**; its conclusions are wrong in places (it calls the deliberate
+  `#0E6B4F` icon green a deviation against 02-foundations; says the Settings consent dialog clips "No thanks" when it
+  scrolls; gives a false reason, DesignTokensTest, for living outside the design system folder; edits a history block).
+  Not merged.
+- **Branches tidied (Ali, 30 Oct 2026: "delete the old branches which we are not using and could cause confusion ... As
+  long as we have everything merged and in our one branch"):** left are `main` (1.5.0), `claude/1-6-0` (all of 1.6.0)
+  and `deepseek/ds-deviations-record` (kept until fixed). 27 local and 31 GitHub branches deleted, every one already
+  inside `claude/1-6-0` except the two dropped on purpose, kept as tags `archive/analytics-default-on-1-4-0` and
+  `archive/customer-review-pain-points-9d35kl`. Tag `v1.5.0` marks `main` as live. The four extra worktrees
+  (`../SajdaTime-1-6-0`, `../SajdaTime-1-6-plan`, `../SajdaTime-settings-preview`, `.claude/worktrees/kind-kirch-cf2a70`)
+  were removed; none had uncommitted work. Branch names in older blocks are history.
+- **Store listing (Ali, 30 Oct 2026: "a proper release, not just the update ... highlight everything our app has to
+  offer"):** the 1.6.0 full description already describes the whole app (written that way on 25 Oct), so it was not
+  rewritten. Fact fix: Bengali added to the language line in English and all eight translations, and to What's new in
+  English and Bengali; the Bengali listing had said the app was not in Bengali. All within Play limits (English 3999 and
+  497; Malay at exactly 4000). RELEASE-1.6.0 step 3 now says the listing is judged as the whole app on release day.
+- **New whole app description (later the same night):** Ali made it a hard rule (§5.38) and approved a new English
+  full description ("Yes, use it", 3986 of 4000, `LISTING.md`), which adds Fasts to make up, the My prayers details,
+  Match your mosque and the 13 methods. The bullet above ("not rewritten") is superseded. The eight translations were
+  made from it and are in `LISTING-LOCALES.md` (3603 in Arabic to 3999 in Indonesian). An independent Opus back translation review found
+  no meaning change, three small fixes applied. Not checked: how natural Bengali and Hindi read to a native speaker.
+- **Translation ledger (Ali, 30 Oct 2026: "have a mechanism not to retest the translation which you have already
+  done"):** `tools/translation-ledger.py` keeps a hash of every reviewed string (with its English) and store block in
+  `docs/translation/reviewed.json`. Run it first, review only what it lists, `stamp` after the reviewer passes. Stamped
+  today as the baseline: every shipped translation and these eight descriptions were already reviewed. The mechanical
+  checks (`TranslationIntegrityTest`, `check-translation.py`) still run every time, they cost nothing.
+- **Both open items closed (Ali, 31 Oct 2026):**
+  - **No Bengali store pictures:** "English screenshots are fine, since we have mentioned that this app caters
+    multiple languages". Play shows Bengali users the English set. Do not offer it again.
+  - **DeepSeek deviations record dropped:** "do we need to add it ... if it is not required then remove it". Not
+    required: the 22 deviations are already listed in `docs/design-system/03-components.md` §3.6, and its pictures had
+    wrong conclusions. Branch `deepseek/ds-deviations-record` deleted, kept as tag `archive/ds-deviations-record`.
+    Branches left: `main` and `claude/1-6-0`. The instructions for any AI stay in the code (`CLAUDE.md`, `AGENTS.md`,
+    `docs/AI-START-HERE.md`, `docs/AI-WORKER-BRIEF.md`).
+- **Nothing is open.** Next: release day, when Ali says so.
+
+### 📍 BENGALI ADDED TO 1.6.0, 30 Oct 2026 (read the 1.6.0 ready block above first, then the design system block below)
+
+- **Ali, 30 Oct 2026:** "implement another language bengali ... any text is overlapping or feel like breaking the design
+  then shrink the text or lower its size enough to fit on the screen ... Use i18n to make it easy to add any further
+  languages ... test it then commit it and merge it." Merged into `claude/1-6-0` (not `main`: main takes 1.6 only on
+  release day, his 25 Oct rule).
+- **Built (branch `claude/bengali-language`):** `values-bn/strings.xml` in app, core and wear (Claude's translation,
+  tag `bn-u-nu-latn` so digits stay Western like Arabic; prayer names ফজর সূর্যোদয় যোহর আসর মাগরিব এশা; School মতধারা,
+  Madhab মাযহাব); `AppLanguage.BENGALI` ("বাংলা (Bengali)", last in the picker); `locales_config.xml`; Bengali in the
+  widget's tall script set (Today large card needs 330dp, like Urdu); `check-translation.py` knows bn.
+- **Easier next language:** the wording tests now find `values-<lang>/` folders on disk (`app/src/test/.../Languages.kt`)
+  instead of four hand kept lists, and `LanguagePickerTest` plus `TranslationIntegrityTest` fail until a new folder is
+  registered (proved: a fake `values-fa` failed 4 tests). Checklist: `docs/design-system/06-content-and-language.md` §6.6.
+- **Shrink instead of break (DESIGN_SYSTEM.md §9, 30 Oct 2026):** new `shrinkToFit` for text held to one line (city
+  name, Qibla place line, My prayers column headings): shrinks until it fits, to 60%, or at large text to its normal size
+  when smaller; may go below 14sp, Ali's rule for this case. Today widget date shrinks 14 to 10sp. Tab bar: labels still
+  wrap between words, but tabs align to the top so a two line label no longer lifts its icon (seen in Bengali at 2.0).
+  **Rejected:** one line tab labels; on a 320dp phone at 2.0 "My prayers" ended in "…", so `LargeTextAndTalkBackDeviceTest`
+  now fails on any ellipsis.
+- **Checked:** full gate green (app 337, core 238 with 1 skipped, wear 27, 0 failed; lint 0 errors; both release
+  bundles); device suite 39 of 39 on `emulator-5554`; `LargeTextAndTalkBackDeviceTest` 15 of 15 in English and Bengali
+  after the tab change; `tools/check-translation.py bn bn-u-nu-latn` 0 errors; `WEAR_LOCALE=bn tools/wear-verify.sh` 24 of
+  24 pass on both watch sizes at 1.0 and 1.3 (disclaimer three lines at 1.0). On the emulator in Bengali: setup, all four
+  tabs, Settings, the language picker at 1.0 and 2.0; the strip and Today widgets. Independent Opus code review and a
+  back translation review: no must fix; their fixes taken.
+- **Not checked:** Ali's real phones; Android 7 (autosize may fall back to the ellipsis there); the PDF timetable in
+  Bengali; the Next prayer widget; TalkBack speaking Bengali; dark theme in Bengali. The Today widget's Hijri line can
+  still end in "…" for a long Bengali month at 4 by 4 (it is at its 9sp floor, Ali's earlier choice). The watch's own
+  clock at the top shows Bengali digits (drawn by Wear OS, not the app).
+- **Open for Ali (closed 30 Oct 2026, see the block above: Bengali now in every listing):** the 1.6.0 What's new and description did not mention Bengali (the Bengali store listing itself was
+  already among the eight translated listings). Store pictures have no Bengali set; Play shows the English ones.
+- **Next:** unchanged; release day when Ali says so (`RELEASE-1.6.0.md`, PR by 11 Dec, submit by 15 Dec 2026).
+
+### 📍 DESIGN SYSTEM FOLDER ADDED, 25 Oct 2026, late evening (read the Bengali block above first, then the Fasts block below)
+
+- **Ali, 25 Oct 2026:** "create a comprehensive design system document ... which you and other AI can easily use to
+  extend or expand or create new features ... checked ... so any future session cannot drift away from it", later for
+  the iPhone app, taken from 1.6. Asked first; his choices: start from 1.6, a new folder with `docs/DESIGN_SYSTEM.md`
+  kept (his rules §0, the button inventory §4.1, decision log §9, open items §11), and a build test against drift.
+- **Built (branch `claude/sharp-mccarthy-vjh10j`, cut from `claude/1-6-0` at `1cdae4a`; docs and a unit test only, no
+  app behaviour change):** `docs/design-system/` (README with reading order, precedence and a code map; ten pages:
+  principles, foundations, components, patterns, screens and features, content and language, accessibility,
+  surfaces, iPhone mapping, new feature playbook; CHANGELOG) and `docs/design-system/tokens/` (`color.json`,
+  `typography.json`, `spacing.json`, `motion.json`, `shape.json`).
+- **`DesignTokensTest` (12 tests)** holds the tokens to the code in both directions: every `Color.kt` colour, every
+  Material role in `Theme.kt`, the widget colour resources, `WearTheme.kt` (the watch palette had **no test before**;
+  now it must equal the phone's dark roles except its black background), the watch tile's three colours, icon and PDF
+  colours in their files, `Space`, `Motion`, every `Type.kt` style, `actionLabelStyle()`, any hex quoted in the pages,
+  and that every phone UI file is named in the pages. Inputs declared in `app/build.gradle.kts`. **Proved:** four
+  deliberate breaks (a token hex, `Space.Group`, a watch colour, a stray hex in a page) each failed; restored green.
+- **Recorded, not fixed (visible changes, so Ali's call; list in `docs/design-system/03-components.md` §3.6 and
+  `08-surfaces.md`):** `bodySmall` 12, `labelSmall` 11, `titleSmall` 14 used 13 times though `Type.kt` does not define
+  them (below the 14 floor); the watch tile's mint `#7FD1AE` and two greys differ from the palette; the Android 7 and
+  watch launcher icons still use `#14624B`; cards at 16 and 12 in two places; older dialog rows; the Qibla tab's 20
+  gutter; the setup location error in red; the tile has no tap action; the watch marks next by colour alone.
+- **Wired in:** `CLAUDE.md`, the `ux-lead`, `implementer` and `reviewer` agents and the top of `docs/DESIGN_SYSTEM.md`
+  now point to the folder.
+- **Checked:** `DesignTokensTest`, `DesignRulesTest`, `ColorContrastTest` and the full app and core unit tests in the
+  cloud container (Android SDK installed there). **Not checked:** lint, release bundles, any device or emulator run
+  (no app code changed); the SF Symbol names were not checked against Apple's current symbol list.
+- **Independent review (about 70 claims checked, almost all correct), all eight findings fixed:** a playbook row
+  suggesting a missed prayer counter (Ali refused it 16 Oct 2026) now says No; the precedence table now ranks his §0
+  rules and the §4.1 inventory first; four icon files declared as test inputs; a duplicate Material role now fails; the
+  deviations raised as OPEN `ds-deviations` in `docs/DESIGN_SYSTEM.md` §11; three wording fixes (dismissable dialogs,
+  Google's review card, Times' no location state).
+- **Merged into `claude/1-6-0` (Ali, 25 Oct 2026, fast forward to `7a78d23`).** He then asked about merging into `main`
+  so other AIs can work; checked the Play page ("Updated on 23 Oct 2026", so 1.5.0 is live and `main` matches it).
+  **Ali chose: other AIs work from `claude/1-6-0` (their own branch cut from it); nothing merges into `main` until 1.6
+  release day** (`docs/release-tools/RELEASE-1.6.0.md`). Rejected: merging 1.6 into `main` now (it would describe 1.6
+  as current while users have 1.5.0, his claude.ai project reads `main`, and release day loses its review step).
+- **`docs/AI-START-HERE.md` added (Ali, 25 Oct 2026: other AIs "should know everything").** One self-contained briefing for
+  any AI: the app, what is live, branches, the design system, the rules that cause mistakes, finishing checks.
+  `AGENTS.md`, `CLAUDE.md` and `docs/AI-WORKER-BRIEF.md` point to it. **Keep it current** whenever branches, live
+  state, test counts or rules change, in the same commit.
+- **Next:** Ali answers `ds-deviations` (each fix is one small visible change); release day when he says so.
+
+### 📍 FASTS TO MAKE UP ADDED TO 1.6.0 AND APPROVED, 25 Oct 2026, evening (read the design system block above first, then the STEP 11 block below)
+
+- **Ali, 25 Oct 2026:** move what 1.6.1 work can safely go into 1.6.0, built basic in the app's style, no Fable pass,
+  not in the store description. Only "Fasts to make up" qualified; the jama'ah reminder and Sunnah fast reminders stay in
+  1.6.1 (alarm changes; no fix could ship in the 18 Jan to 9 Mar pause). Rule and reasons: §5.36, spec
+  `docs/plans/2026-10-release-1.6.0/FASTS-TO-MAKE-UP.md`.
+- **Checked:** plan-verifier on the spec (five fixes taken); Opus reviewed twice (fixed: two quick taps lost a step, a
+  count only file said "0 days added", Turkish and Arabic wording, Indonesian button). Full gate green (core 238 with 1
+  skipped, app 323, wear 27, lint 0 errors); device suite 39 of 39 on `emulator-5554`; after a last Arabic plural fix, app
+  unit tests and lint rerun green. Pictures on `sajdastore`: Settings row and dialog at 0 and 3, the tab line at 3, "Made
+  up one" taking it to 2, dark, Urdu and Arabic right to left, Turkish, Indonesian, 2x text (button wraps under the line).
+- **Store pictures unchanged:** the line shows only above zero, and the seeds set no count. `release-1.6.0.sh`
+  `EXPECTED_COUNTS` moved to core 238, app 323.
+- **Not checked:** TalkBack by ear; the release script end to end (as before); 320dp width.
+- **DeepSeek as a helper (Ali, 25 Oct 2026):** brief `docs/AI-WORKER-BRIEF.md`, role and limits in §5.28 "Outside
+  helper models". Keep its state, commands and counts current in the same commit that changes them.
+- **Ali approved it from the pictures, 25 Oct 2026:** "Yes, Fasts to make up looks fine. Keep it as it is." Nothing is
+  waiting; next is release day when Ali says so (`RELEASE-1.6.0.md`), PR by 11 Dec, submit by 15 Dec.
+
+### 📍 STEP 11 DONE, 25 Oct 2026, afternoon (read this first): Ali approved the pictures ("Yes all fine"); release day walkthrough `docs/release-tools/RELEASE-1.6.0.md`
+
+- **1.5.0 is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct).
+- **Step 11 design:** `docs/plans/2026-10-release-1.6.0/STEP-11-DESIGN.md` (Fable), `plan-verifier` corrections in its §9.
+  **Ali chose all four recommendations (25 Oct: "Yes all recommended options"):** short description C "Offline prayer times
+  (namaz), adhan, Qibla and a private salah tracker. Wear OS."; the Chrome and Edge line removed in all nine languages; My
+  prayers and Timetable replace the setup madhab and Settings screenshots; the strip shot without its town chip.
+- **Built:** versionCode 10 / 1.6.0 (watch stays 1002 / 1.5.0); `ScreenSeedDeviceTest` (dismissMethodNotice in the London
+  seed, `seed_store_alert_settings`); screenshots in per language folders, `tools/build-store-assets.sh` per folder;
+  `docs/release-tools/release-1.6.0.sh`; `set-release-date.sh` takes the version; `docs/index.html` JSON-LD links moved;
+  English 1.6.0 listing in `LISTING.md` (short 80, full 3990, What's new 494); eight translated listings in
+  `LISTING-LOCALES.md`, record `docs/translation/store-listing-1.6.0.md`; 24 store pictures on `sajdastore`.
+- **Reviewed:** Fable judged the 24 pictures: keep 23; `ar/02` retaken, with `ar/01` and `ar/03` retaken on the same date so the Arabic set agrees, on Thursday 20 Aug 2026 15:00 (Arabic weeks
+  start on Saturday, so on Saturday 15 Aug the week card showed only today). Two optional items Fable left for Ali, not
+  done: a 24 hour status bar for tr and id, and the countdown on 01 implying 3:03 against the 3:00 bar. An independent Opus
+  back translation of all eight listings: all pass, three fixes (French Timetable and Times named alike, a French sentence
+  with no noun, Turkish save and print). Opus on the whole diff: no code defect; fixed: 6j now runs only with
+  `STORE_SHOTS=1` (it would have overwritten the approved pictures, Arabic back to Saturday, on any run on `sajdastore`),
+  Arabic gets its own Thursday pass in the script, the R1 comment and the bundle size comment corrected, the seed KDoc;
+  **the description promised a PDF of next month, which the app cannot make** (`PrayerPdfExporter.Range` is today, 7 days,
+  this month, Ramadan): Fable's line "• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a
+  PDF" replaces it, translated into all eight by the main session (counts and back translations in the record); PROJECT_BRIEF
+  rewritten (1.5.0 live, 1.6.0 next).
+- **Checked:** full gate green (core 237 with 1 skipped, app 322, wear 27, lint 0 errors; bundle 9,952,988 bytes); device suite
+  39 of 39 on `emulator-5554` (6b's set: suhoor reminder and the seeds left out, as the script does).
+- **Not checked:** the release script end to end (its 6j Arabic pass is untested on a device; the Arabic retake was done by
+  hand with the same steps); whether Play shows only a language's own pictures; "private" in the short descriptions against
+  Play's promotion notice (paste time check); the suhoor reminder device test at a Ramadan clock (6d) in this step.
+- **Capture trap learned:** the AVD's GPS is Manchester; with location granted the app moves off the seeded London. Revoke
+  `ACCESS_COARSE_LOCATION` after seeding (no banner appears). The `!` on the wifi icon needs the demo `network ... fully true`.
+- **Ali approved the 24 pictures on 25 Oct 2026 ("Yes all fine")** and left the two optional items as they are (12 hour
+  status bar in tr and id; the 01 countdown). DESIGN_SYSTEM §9 records the set.
+- **Next:** release day, when Ali says so, by `docs/release-tools/RELEASE-1.6.0.md` (limits: pull request by 11 Dec,
+  Send for review by 15 Dec 2026). Before it: run `release-1.6.0.sh` end to end once on the final code.
+
+### 📍 1.6 PLAN, 23 Oct 2026 (afternoon): the build record; read the STEP 11 block above first
+
+**The 1.6 plan is complete and checked by two independent reviews. Ali answered all 27 open questions and said
+"go" on 23 Oct 2026 (BUILD-INSTRUCTIONS §3).** Start with `docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` on branch `claude/1-6-0` (worktree
+`SajdaTime-1-6-0`). It covers the scope, the decisions with reasons, Ali's answers to all 27 questions, the
+ordered build table, animation, development and testing guidance, and (§0.1) which model does which job.
+- **Progress (23 Oct 2026, night):** step P done (`55ef229`). **Step 0 done** (Ali: "Yes, build it"):
+  `Motion.kt` and its tests, full gate green (518 unit tests: app 301, core 190 with 1 skipped, wear 27; lint
+  clean; both bundles), installed and launched on the phone emulator. **Next: step 1, the My prayers tab:** Fable's
+  design exists, then `plan-verifier`, then prototype pictures for Ali's yes. **Step 1 (My prayers tab) built 23 Oct 2026, night** on
+  `claude/1-6-0-step1-proto` and merged here: Ali approved from pictures ("B: calendar grid", "Yes, build it");
+  Opus reviewed it twice, Fable judged the pictures and decided four follow ups; §5.29 has the rules, §10 the
+  evidence. **Ali approved step 1's finished screenshots on 23 Oct night ("Yes, it's right (Recommended)"). Step 1 is done.** Step 2 is
+  designed (`STEP-2-DESIGN.md`, by Fable, checked by `plan-verifier`, `ad41a39` and the next commit): the shared
+  dates sheet unchanged; five Shia only dates with named sources; Ali's answers: the Ramadan nights stay out of 1.6;
+  "Birth of the Prophet ﷺ", Imams plain. **Step 2 built 24 Oct 2026, early morning** (§5.30, §10): the shared sheet unchanged, five Shia only dates, rows stack at large text; reviewed by Opus, pictures judged by Fable, in `screens/step2/`. **Ali approved step 2's pictures on 24 Oct 2026 ("Yes, it's right (Recommended)"). Step 2 is done.** Step 3 (bell with Undo) designed by Fable and checked by `plan-verifier` (`STEP-3-DESIGN.md`, §14 wins), Ali chose the amber notice ("Amber notice with Allow (Recommended)", 24 Oct). **Step 3 prototype built 24 Oct 2026, early morning, on branch `claude/1-6-0-step3-proto`** (not yet merged into `claude/1-6-0`): bell rules in `:core` `BellRules.kt` (9 tests), settings in one edit, the bell, Undo message and blocked notice (pictures in `screens/step3/`, Fable judged them after a round ripple fix). **Ali said "Yes, build it" but asked for a more modern notifications notice** (his words in STEP-3-DESIGN §16: an iPhone style switch, allowed or not, and details, "check if it makes sense"). Fable judged it (STEP-3-DESIGN §17): no switch, keep the amber notice, because only the phone can allow notifications and a switch would spring back; Ali: "Keep the amber card" but "make look nice in UI not plan old looking buttons and panel" (§18), so Fable designs a polished card (shared with the exact alarms notice) and Ali sees pictures first. Fable's polished card design is STEP-3-DESIGN §19 (amber glass panel, crossed bell, one Allow button, Details removed on both permission cards); it changes four approved rules, put to Ali as four one tap questions; **Ali chose all four recommendations on 24 Oct (§20): Allow only, warning cards glossy, bare icon on every notice, crossed bell.** **Polished card BUILT 24 Oct ~04:00 on the proto branch** (implementer; `settings_exact_alarms_desc` and `notifications_off_desc` deleted in all locales; notice strings and the new exact alarms sentence translated by the main session; app unit tests and lint green); pictures in `screens/step3/card/`. **Ali approved the built card on 24 Oct ("Yes, it's right", STEP-3-DESIGN §21).** **Step 3 FINISHED 24 Oct 2026, ~11:30, and merged into `claude/1-6-0`** (rules §5.31, evidence §10): Haiku `mechanic` emulator checks (`screens/step3/checks/RESULTS.md`: Undo re-arms alarms 198 → 190 → 198, Urdu, dark); its one failure, names breaking inside the word at 320dp and 2.0 text, fixed (a4f96c2: at fontScale >= 1.5 the pill and time drop under the name, the bell stays at the end, and the "Today" heading puts Save as PDF under it, as step 2's rows); DESIGN_SYSTEM §4 Notices prose rewritten; Opus `reviewer` on the whole diff: one blocking alarm gap fixed (bell off, then Settings on, left the reminder silently off; `setFromSettings` now gives it back, tested) plus small fixes (turning a bell back on closes that prayer's own Undo message, only that one; the setup ask counts as asked, a deliberate trade: someone who backs out of the setup prompt gets the phone's settings on the first bell tap, where they can still allow; Indonesian and Turkish wording); full gate green. Finished pictures: `screens/step3/final/` (light, Asr off with Undo, dark, Urdu, 320dp at 2.0). **Left from the review, not done, each small:** tests the spec asked for and the build lacks (Ramadan today or tomorrow in `MainScaffold.kt`, three ColorContrastTest pairs that pass today, `bell_` in TrackerWordingTest, the single edit wiring); the review card can still land over Undo if the bell is tapped in the last moment of the 5 s calm wait (set a pending flag on tap); two quick taps on one bell drop "and reminder" from the message; once the notifications card is closed only grey bells show the blocked state, and Settings has no card (ask Fable); quiet notices lost their 1dp border in the polish and Ali has not seen a quiet notice since (show him). **Not verified:** TalkBack by ear; the permission door on a real Android 13+ phone; the Ramadan message; 320dp at 2.0 in Urdu and dark. **Found, not fixed (Fable, 24 Oct):** dark CTA `#17805A` on `secondaryContainer #1E4034` (quiet notices: "See why", "Shift the date") is 2.32:1, under DESIGN_SYSTEM §4.1's claimed 3:1; `ColorContrastTest` checks the CTA only against background, surface and dialog. Needs a decision (darken the container or the CTA) in its own change. **Step 4 (Timetable) DESIGNED 24 Oct 2026, ~14:00:** Fable's `STEP-4-DESIGN.md`, checked by `plan-verifier` (three text fixes applied, sticky month headings among them); Ali answered all as recommended: the Timetable opens the Ramadan table only from Ramadan day 1 (the PDF still offers Ramadan 30 days ahead; `state.ramadan` is null until three days before, so the planned 30 day view was not possible as built), the sheet shows this month and next, no Hijri date on day cards. Q8 (Ramadan as table or cards) waits for side by side pictures. **Step 4 BUILT 24 Oct 2026, ~14:20, on branch `claude/1-6-0-step4-proto`** (not yet merged; rules §5.32): strings in five languages by the main session (960c90a), build by the Sonnet implementer (c7a2f0b), Opus `reviewer`: today's card hidden under the pinned heading (fixed, scrolled by the heading's height), the Ramadan table's Save as PDF left week and month PDFs unreachable all Ramadan (Ali: "Show the choices", it now opens the chooser), month name through ICU for API 24 and 25, small fixes (516ded3). Full gate green on 516ded3 (553 unit tests, 0 failures; androidTest compiles). Pictures in `screens/step4/` with `RESULTS.md`: light, dark, Urdu, 1.5, 2.0 at 320dp in English and Urdu, 31 Oct (November under October), the chooser over the sheet, and Q8 table beside cards in light and dark (cards from an uncommitted temporary edit). **Ali approved the pictures and chose "Keep the table" for Ramadan (Q8) on 24 Oct 2026;** the card prototype was deleted (Opus reviewed), gate green again, and step 4 is **merged into `claude/1-6-0`**. **Not verified:** device tests (compiled only; the two new ones in `LargeTextAndTalkBackDeviceTest`), TalkBack by ear, API 24 month name on a real old phone, the share sheet path on Android 9. **Found in passing (step 1's tab bar, not step 4):** at font 1.5 "My prayers" wraps to two lines; at 320dp and 2.0 "Times" and "Qibla" run into each other (`screens/step4/4b`, `5b`). **Step 5 (the skies) DESIGNED 24 Oct 2026, ~16:00:** Fable's `STEP-5-DESIGN.md` (option D: one fixed three stop gradient per period, dawn Fajr to sunrise, day sunrise to Asr, evening Asr to Isha, night Isha to Fajr, fading into the page above the next prayer card; header unchanged plus a 104 by 36dp sky mark, a period glyph on a five dot arc, hidden when the city name needs the room; `Sky` in `:core`; no third party artwork), checked by `plan-verifier` (two blockers fixed: progress over `prayersOnly` not the six entry `ordered`, the mark a sibling of the clickable city row, not inside it; plus 14 smaller fixes, recorded in its §14). Contrast count corrected: 72 text pairs plus 8 foot equals background plus 8 status bar pairs (the planned 24 non-text pairs on `outlineVariant` could never pass). Four questions for Ali, all from pictures (§13): dark night depth, glyph set, four light hues or one family, light sky strength. **Step 5 prototype BUILT 24 Oct 2026, evening, on `claude/1-6-0-step5-proto`** (not merged): `sky_*` strings in five languages by the main session (7b488ec; Arabic avoids الفجر, Urdu avoids سحری and فجر), build by the Sonnet implementer (bf4bfb9), Opus `reviewer`: one blocker fixed (in right to left the glyph sat outside the mark, the Box's TopStart plus the mirrored offset mirrored twice; now `AbsoluteAlignment.TopLeft`), plus a fixed status bar strip in the sky's top colour so content no longer scrolls under the clock icons, the sky lambda remembered (it redrew every second), the draw in no longer replays (6388b21). Full gate green (core 227 with 1 skipped, app 310, wear 27, 0 failed; androidTest compiles). Pictures `screens/step5/` (four light, four dark, picture 8 Material glyphs), judged by Fable: all match the design. **Found, pre-existing, not step 5:** at 823dp the "Different from your mosque?" door sits under the glass bar at scroll 0, identical on `claude/1-6-0` before the skies (`0-before-step5-day-light.png`); steps 1 to 4 spent the no scroll budget, hidden because step 4's pictures were 914dp. Needs its own fix. **Left from review, not done:** theme switch fades the sky instead of snapping; device test finds clickables by index; **Not verified:** device tests (compiled only), right to left render, TalkBack, 1.5/2.0 text, tablet, landscape, animator scale 0, Qibla/My prayers/Settings after the inset move. **Ali answered all four §13 questions as recommended on 24 Oct 2026, evening** (deep dark night, widget drawings, four light hues, pale; STEP-5-DESIGN §15); the Q2 switch is removed. **Ali said yes; step 5 is done and merged into `claude/1-6-0` (24 Oct 2026, evening), full gate green on the merge.** **Leftovers closed the same evening:** the theme switch now snaps the sky (a period change still fades); the device test finds the header's buttons by name; the step 4 Timetable target test measured the drawn 40dp instead of the 48dp touch bounds, now `touchBoundsInRoot`; device suite 33 of 33 on the emulator. The door under the glass bar at 823dp: Fable ruled no layout change (no honest Space tightening buys the ~60dp, end of scroll already clears the bar; the HomeScreen budget comment now says so); an optional scroll edge fade under the bar on all tabs is Ali's call, with pictures. Emulator checks in `screens/step5/checks/RESULTS.md`: Urdu, Arabic, dark Urdu, 1.5, 2.0, tablet, landscape, animations off, other three tabs, all PASS. **Still not verified:** TalkBack by ear (semantics are covered by device tests), a real phone. **Step 6 (Qibla restyle) DESIGNED and BUILT 24 Oct 2026, late evening, on `claude/1-6-0-step6-proto`** (not merged; `STEP-6-DESIGN.md`, §14 wins): Fable's design (direction line first, "Facing" kept on arrival, the dial lifted like the cards with a rim band that thickens and turns green, rounded needle, place name small, distance and bearing behind a compact Details button, no sky on Qibla), checked by `plan-verifier` (four blockers fixed in §14: arc inset, exit at Motion.quick, the location sheet wired through QiblaScreen, strings). `qibla_details` not added (`notice_show_details` exists); `qibla_subtitle` deleted; three new strings in five languages (Arabic bare "ميل"). Km or miles from `MeasurementSystem` in `:core` (US, GB, LR, MM; the ICU branch of DETAILED-PLAN 9.5 dropped: same answer, and an `android.*` import). **Defect fixed:** the Makkah fallback stores the Kaaba's own point, so the old screen said 0 km and "You are now facing the Kaaba" whenever the phone pointed north; it now shows the Set location notice. **Defect found on the emulator and fixed:** miles read from `Resources.getSystem()` said km on an en-US phone, because the app's own language reaches that configuration on Android 13+; now `LocaleManagerCompat.getSystemLocales` (§15 lesson 181). Sonnet built it (bb61425), Opus reviewed (nothing blocking; fixes in a7a39d4). Device tests: LargeTextAndTalkBack 11 of 11 on the emulator, Makkah guard mutation proof run. Pictures in `screens/step6/` (rendered by a temporary uncommitted test that seeds the heading; §15 lesson 182). Three questions for Ali from pictures (§13: where the instruction sits, lifted or flat dial, the no location notice, which reopens DETAILED-PLAN 8.10). Two TEMPORARY switches in `QiblaScreen.kt` (`qiblaCentreInstruction`, `qiblaFlatDial`) go when he answers. `docs/privacy.html` unchanged: the region is read on the phone for a unit choice and goes nowhere. **Not verified:** a real compass, TalkBack by ear, `:app:installRtl`, landscape and tablet for this screen. **Later the same night:** Ali asked that facing the Kaaba always shows the message and vibrates (done, `f43d50a`, §5.33) and that the dial and needle follow the Pillars app's Qibla style in our own theme (`STEP-6-DESIGN.md` §15, corrected by `plan-verifier` in §16, which wins). **25 Oct 2026, ~01:00:** Opus reviewed `5f56fba` (geometry, colours, arrival and right to left match; its
+blocker, the pin test's 40dp bar, was a wrong guess about text scaling, now 30dp with the 16dp mutation proof run,
+`9ec684a`; comment and doc fixes `568d039`). 23 pictures in `screens/step6/pillars/`, Fable passed them and chose the
+dark bezel `surfaceContainerHighest`. **Ali answered the four §13 questions as recommended** (instruction under the
+title, white lifted bezel, amber Set location notice, no arc; STEP-6-DESIGN §17); the four TEMPORARY switches are
+removed (Sonnet, reviewed by Opus). Full gate green (core 230 with 1 skipped, app 310, wear 27); device suite 37 of
+37 on the emulator. **Ali said yes; step 6 is done and merged into `claude/1-6-0` (25 Oct 2026, ~01:30), full gate green on the merge (fast-forward of `c7e939f`).** **Step 7 (jama'ah times) built 25 Oct 2026 on `claude/1-6-0-step7-proto`** (§5.34): Fable designed it and, at Ali's request, reviewed the mosque door in full (STEP-7-DESIGN §5); `plan-verifier` corrections in §14; strings in five languages by the main session (§15); Sonnet built it; Opus reviewed (no blockers; fixes applied: privacy date, comments, a zone stamp device test with mutation proof). Fable judged the pictures (`screens/step7/`, tool in `tools/`) and asked for an 8dp gap before the Next pill, done. **Q15 answered 25 Oct 2026 (STEP-7-DESIGN §16):** Ali doubted the jama'ah feature and asked Fable; Fable said keep it, so by his rule jama'ah stays and the door stays under the rows. Ali also asked whether the app could find the nearest mosque's jama'ah times itself; research (`JAMAAH-RESEARCH.md`) says no app can (MAWAQIT and similar only have times mosques type in; it would need the network and the user's location), so typed in times stay. **Switch removed, §11 `1.6-mosque-door` closed, gate green (core 237/1 skipped, app 310, wear 27), device suite 41/41, step 7 merged into `claude/1-6-0` (25 Oct 2026).** **Step 8 (widgets) built 25 Oct 2026 on `claude/1-6-0-step8-proto` (§5.35):** strings in five languages by the main session (Arabic uses سطر, not صف, which reads as the prayer row); Sonnet built, Opus reviewed, review fixes applied; gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42. The device test helper `DeviceSupport.alarmTimes` had a parser bug (a block ran to the end of the dump and caught removal history) that made a cancelled redraw alarm look present; fixed, assertion unchanged (§15 lesson 186). Pictures taken (`screens/step8/`, tool in `tools/`), Fable judged them and her three fixes are in (STEP-8-DESIGN §17: even 12sp times, chip cap 56dp, no location message in the name's place); Opus reviewed, no blockers. The small Next clips its chip at exactly 180 by 110dp: predates step 8, cure in §17, open. **Ali answered Q1 to Q4 on 25 Oct 2026: "All recommend"** (sky on both Next layouts, glyphs on the strip, Suhoor and Iftar in Ramadan, chip from 380dp). The TEMPORARY switches are removed, DESIGN_SYSTEM §1 and §9 updated, gate green (core 237/1 skipped, app 319, wear 27), device suite 42/42, **step 8 merged into `claude/1-6-0`**. Store screenshot `06-widgets.png` is retaken with the other store screenshots at step 10 or 11 (BUILD-INSTRUCTIONS §2 item 10, and the Release row lists 06). **Step 9 (disclaimer) built 25 Oct 2026 on `claude/1-6-0-step9-proto`** (STEP-9-DESIGN.md): the disclaimer is no longer shown at first launch and is the first row of Settings, About (Info tile, "Disclaimer", "A helper, not a religious authority. Worth reading."); dialog retitled "Disclaimer", text unchanged, dua last; `FirstRunDisclaimer`, `disclaimer_brief`, `disclaimer_read_full`, `action_understood` deleted in five languages; `disclaimer_seen` key retired, kept unread. Fable designed it (no question for Ali), `plan-verifier` corrections in §6, Sonnet built, Opus reviewed (no blockers, its doc fixes applied). Tests: `DisclaimerContentTest` holds the subtitle to "not a religious authority", `DesignRulesTest` holds the row first in About (mutation proofs for both). Pictures in `screens/step9/`. **Ali said yes from the pictures (25 Oct 2026: "Yes merge it"); step 9 merged into `claude/1-6-0`.** Not verified: a 320dp screen (2x text was on the Pixel), Arabic, Turkish, Indonesian on screen. **Next after that: step 10.** **Step 10 (languages) built 25 Oct 2026 on `claude/1-6-0-step10-proto`** (STEP-10-DESIGN.md): each language in its own script with its English name (Ali's words, 25 Oct 2026). Fable designed, `plan-verifier` corrections §8, Sonnet built, Opus reviewed (two fixes applied: no FSI isolate on a pair's own Text; the phone's whole language list), Fable judged the pictures (row padding added; the Naskh line box difference recorded as DESIGN_SYSTEM §11 `1.6-script-line-box`). Gate green (core 237/1 skipped, app 322, wear 27), device suite 42/42. **Ali answered Q17 "A go ahead" (25 Oct 2026):** the Settings subtitle names only the language showing; option B and the TEMPORARY switch are removed; **step 10 merged into `claude/1-6-0`. Next: step 11** (store screenshots in each language, the release script). Store screenshots per language moved to step 11. Not verified: Android 12 (setOverride route), a phone whose own language is Urdu, Turkish and Indonesian on screen, TalkBack. Not verified: 1.3 text on a device, Urdu, Android 7, a real launcher; `stripViews` has no JVM test (no Robolectric). Store screenshot 06 and the Next preview on Android 12+ (previewLayout shows paper) are open. Earlier: Fable's design saved as `STEP-8-DESIGN.md` (a 4 by 1 Today strip, the four skies on the Next prayer widget, sunrise as a refresh boundary; four questions for Ali in §13); `plan-verifier` was checking it when the session stopped at 85% of the usage limit. **Next:** apply the verifier's corrections as STEP-8-DESIGN §14, build with Sonnet (`implementer`) on the recommendations, Opus review, gate, device suite, pictures per §12, Fable judges, then Ali answers Q1 to Q4 from the pictures. Merge only after his yes. 1.6.1 candidates from the research: show when fixed jama'ah times were set; a quiet Ramadan reminder to check mosque times. **Left from review, not done:** the disclaimer still says "Match your mosque" (protected text, Ali's call); the 320dp device check measures the row, not the line wrap; the window end and next slot mappings are written twice in `JamaahTimes.kt`. Not verified: a real compass, TalkBack
+by ear, `:app:installRtl`, landscape and tablet for this screen. The five agents ran for the first time and each runs on its
+  named model (§10); a 1.6 session must start in `~/Developer/SajdaTime-1-6-0` or the agents are not found (§15, 178).
+- **`main` was merged into `claude/1-6-0` on 23 Oct 2026, evening** (Ali: "merge them to have a clean and accurate
+  start for release 1.6"). So 1.6 now sits on the exact code submitted as 1.5.0 (PR #15, `12c3af5`).
+  - The only conflict was this §11 heading. The code merged cleanly, so the earlier trial's conflicts in
+    `MainActivity.kt`, `SettingsRepository.kt` and LISTING no longer arise.
+  - **Full gate on the merge:** `clean test lint :app:bundleRelease :wear:bundleRelease`, BUILD SUCCESSFUL. 512 unit
+    tests, 0 failed, 1 skipped (the opt in one); lint passed; both bundles built. Emulators not run: the merge brought only
+    1.5.0's release-day docs, the privacy date and its pinned test.
+  - Branches checked the same day:
+    - `claude/focused-newton-btyrzf` is the same commit as this branch, so there was nothing to merge.
+    - `claude/1-6-0-plan` is already contained.
+    - `claude/customer-review-pain-points-9d35kl` is deliberately NOT merged: it was rebuilt into 1.5.0 on 19 Oct,
+      and merging it would bring old code back.
+    - `claude/analytics-default-on-1-4-0` is never merged.
+  - **PR #16 (docs only, 1.5.0 live) merged by Ali and `main` merged in again on 25 Oct 2026** (step 0 of RELEASE-1.6.0.md):
+    CLAUDE.md and LISTING.md kept as on this branch (it already held main's rule changes), HANDOVER and PROJECT_BRIEF combined.
+    Full gate on the merge `6863791`: core 237 with 1 skipped, app 322, wear 27, 0 failed, lint passed, both bundles built;
+    device suite not rerun (docs only from main). Reviewed by Opus: nothing from main lost.
+- **Which model does what** (Ali, 23 Oct 2026): §5.28 and `.claude/agents/`. Fable verifies plans and owns UX,
+  Opus checks everything, Sonnet and Haiku do routine and mechanical work.
+- **On the branch already,** built before the 23 Oct design pause and to be reworked by the plan: `e98b2a6`
+  tracker (ticks on Times), `9cc78bf` dates sheet, `9e9102e` jama'ah lines, `762e622` 1.6.1 planners.
+- **Do not show screenshots of that build to Ali as the new design.**
+- **The owner changed one hard rule:** the disclaimer lives in Settings, About, first row, and is not shown
+  at first launch. Built in step 9 (25 Oct 2026, STEP-9-DESIGN.md); CLAUDE.md rewritten in that commit.
+- **The 23 Oct STATE OF PLAY just below predates PR #15's merge;** `main`'s 23 Oct evening block replaces its 1.5.0 lines (draft PR, "nothing until the 30 Oct job").
+- **1.5.0 was submitted to Google on 23 Oct 2026 and is LIVE** (public Play page "Updated on 23 Oct 2026", checked 25 Oct 2026).
+
+
+### 📍 STATE OF PLAY, 24 Oct 2026: 1.5.0 IS LIVE (history since 25 Oct 2026, from PR #16; read the STEP 11 block above first)
 
 **In one line: 1.5.0 (phone versionCode 9) is live on Google Play. Nothing is left for Ali except merging PR #16. Release 1.6 is being built by Ali in a separate session on `claude/1-6-0`; do not start it from here.**
 
@@ -5676,10 +6431,10 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   - **Arabic reviewer reply posted** (Ali: "Post it"). 303 characters, at 11:56. Wording by Ali: thanks, Arabic added on request, update the app to use it, he is the only developer and works on it as sadaqah jariyah, "any help from you with an honest review of your experience is much appreciated". The 17 Oct draft's "if you are happy ... update your review" was dropped, as too close to asking for a higher rating (Play policy). Recorded in `build/review-replies/DRAFTS.md`.
   - `sajdatime-1-5-0-live-check` disabled (task kept, description says RETIRED).
   - Health check `trig_0129FQnWihf8XG6rKLCB4oFr` re-baselined to 1.5.0 and its prompt corrected: the 1.5.0 description has no "chosen automatically for your school", so the old check 3 would have raised a false alarm every day.
-- **Whose job now:** Ali merges PR #16 (docs only). Then the 1.6 session merges `main` into `claude/1-6-0` (merge, never rebase; on a CLAUDE.md conflict take 1-6-0's version). Later: change or remove the "Coming soon to Chrome and Edge browsers" line when the extension ships or slips.
+- **Whose job now (done 25 Oct 2026):** Ali merges PR #16 (docs only). Then the 1.6 session merges `main` into `claude/1-6-0` (merge, never rebase; on a CLAUDE.md conflict take 1-6-0's version). Later: change or remove the "Coming soon to Chrome and Edge browsers" line when the extension ships or slips.
 - **Not tested / not done:** nothing in the app changed; docs only.
 
-### 📍 STATE OF PLAY, 23 Oct 2026, 17:45: 1.5.0 SUBMITTED, IN GOOGLE'S REVIEW (read this first; the blocks below are history for everything they say about release day)
+### 📍 STATE OF PLAY, 23 Oct 2026, 17:45: 1.5.0 SUBMITTED, IN GOOGLE'S REVIEW (history; the blocks below are history for everything they say about release day)
 
 **In one line: 1.4.0 is live; 1.5.0 is submitted and in review. Nothing is left for Claude or Ali until the Play Console
 shows it live.**
@@ -8812,6 +9567,10 @@ Any other analytics, event, parameter or user property is still a non-goal until
 and `docs/privacy.html` changes first. **Never send sect, madhab, method, settings, city or
 coordinates, or anything whose shape reveals them.**
 
+**Showing the disclaimer to installs that never saw it (decided 25 Oct 2026, step 9).** An install that never
+pressed "I understand" before 1.6 is never shown the dialog afterwards. Intended: the owner moved the disclaimer to
+Settings, About, first row, and a catch up dialog would be the first launch screen he removed.
+
 **A city search, or a geocoder, on the watch (decided 22 Oct 2026, §5.27).** The watch has no network permission and
 must not gain one for this: a city is chosen on the phone and the watch's Location screen offers "Same as phone". The watch
 names its own fix "This watch's location" rather than look the name up. Do not add `INTERNET` to the watch to "improve" it.
@@ -10645,3 +11404,57 @@ matters more than the stable hashes, that is the trade being made.
     re-baselined from memory of the 1.4.0 wording and said the 1.5.0 description still contained "chosen automatically for
     your school". It does not (1.5.0 says "set for your school"), so the check would have raised a false alarm every day.
     A grep of the raw page for each baseline string caught it before the first run. Do that grep every time.
+178. **Project agents load from the folder the session started in, not from the branch you work on.** On 23 Oct 2026 a 1.6
+    session started in `~/Developer/SajdaTime` (the 1.5.0 checkout) and worked on the `SajdaTime-1-6-0` worktree by
+    absolute path; every `.claude/agents/` type was "not found", because that checkout has no agent files. Moving the
+    session's folder fixed it from the next turn. Start every 1.6 session in `~/Developer/SajdaTime-1-6-0`.
+179. **Kotlin runs property initialisers and `init` blocks in file order, so a field declared below `init` can be
+    null inside it.** `SajdaViewModel`'s `init` starts a settings collector that can deliver at once on
+    `Main.immediate`, and it called `publishTracker()`, which read `trackerData`, declared 300 lines further down.
+    On a cold start in Urdu on 23 Oct 2026 the app crashed ("Parameter specified as non-null is null"). It was
+    already on `claude/1-6-0` from `e98b2a6` and had passed every unit test, because no test builds the ViewModel.
+    Fixed by declaring the field above `init`. Any field a collector started in `init` touches goes above it.
+180. **A test that builds its allowed list from the enum it guards cannot catch a new entry.** `UsageCountsTest`
+    took its allowed screen words from `Screen.entries`, so adding a fourth counted screen would have passed. The
+    Opus review found it on 23 Oct 2026; the test now pins the exact set and checks `Destination.PRAYERS -> null`
+    in the source. When a test guards a closed list, write the list out.
+181. **On Android 13+ the app's own language reaches `Resources.getSystem()`.** Step 6 read the phone's region there for
+    km or miles and got "en" with no region on an en-US emulator whose app language was set in the app, so it said km.
+    `LocaleManagerCompat.getSystemLocales(context)` gives the phone's own list on every version. Anything that means
+    "the phone's setting, not the app's" goes through it, never `Resources.getSystem()` (24 Oct 2026).
+182. **The emulator's console sensor commands do not turn its compass.** `sensor set orientation`, `magnetic-field` and
+    `gyroscope` all change their raw values, but the fused `TYPE_ROTATION_VECTOR` the app reads did not follow (24 Oct
+    2026). For Qibla pictures, render `QiblaScreen` from a temporary instrumentation test with a seeded `UiState` and
+    `uiAutomation.takeScreenshot()`, never committed (it set the TEMPORARY switches, removed 25 Oct 2026).
+183. **A vibration with no attributes is filed as touch feedback.** Step 6 moved the Qibla buzz off
+    `performHapticFeedback` to the `Vibrator` and the emulator still logged it `usage: TOUCH ... ignored_for_settings`
+    with touch feedback off. Marking it `USAGE_MEDIA` (VibrationAttributes on 33+, AudioAttributes on 26 to 32) made it
+    play. Check with `adb shell settings put system haptic_feedback_enabled 0` and `dumpsys vibrator_manager`.
+184. **A stored time zone id can stop matching at home without the user moving.** A phone reporting "GMT", or an
+    Android update renaming an id (`Asia/Calcutta` to `Asia/Kolkata`, `Europe/Kiev` to `Europe/Kyiv`), makes step
+    7's jama'ah guard show the travel notice at home until the next save stamps the new id. It heals itself and the
+    notice says how; accepted rather than mapping aliases (STEP-7-DESIGN §14.11).
+185. **`TimeZone.setDefault` in an instrumentation test moves `ZoneId.systemDefault()` for the app code too**,
+    because the test runs in the app's process. `JamaahZoneStampDeviceTest` uses it to give each save its own zone,
+    so a save that forgot to stamp fails. Restore the default in `finally`.
+186. **A `dumpsys alarm` parser that splits only on `Alarm{` can count alarms that no longer exist** (25 Oct 2026,
+    step 8). When this app's alarm is the "Next wake from idle" line, its block ran to the end of the dump, where the
+    stats and removal history name every cancelled `WIDGET_REFRESH`. `WidgetDeviceTest` then saw one redraw alarm
+    with no widget placed. `DeviceSupport.alarmTimes` now ends a block at the first line not indented deeper than
+    its header. It passed before by luck of which alarm was next to wake.
+187. **A layout test that checks words are whole cannot see a one line label cut by an ellipsis** (30 Oct 2026, Bengali).
+    Moving the tab labels to one line that shrinks looked fine on a 1080 wide emulator and every test passed, but on a
+    320dp phone at 2.0 "My prayers" became "My pray…": `assertWhole` only looked at line ends. It now also fails on
+    `isLineEllipsized`. When text changes from wrapping to one line, add the ellipsis check in the same commit, and
+    measure on the narrowest phone, not the one on the desk.
+188. **A translation already reviewed is not reviewed again** (30 Oct 2026, Ali: "have a mechanism not to retest the
+    translation which you have already done"). `python3 tools/translation-ledger.py` lists only the strings and store
+    listing blocks that are new or changed since the last review. A string is hashed whole (text, markup, plural
+    quantities, attributes) together with its English, so a changed English sentence counts as changed too. Send the
+    reviewer only that list. After it passes, run `translation-ledger.py stamp` and commit `docs/translation/reviewed.json`
+    in the same commit. `stamp` records the whole tree, so run it only when the list holds nothing the reviewer did not
+    pass. Stamped first on 30 Oct 2026: 2653 units, all reviewed before (app strings step by step, the 1.6.0 full
+    descriptions by an independent back translation that night). `TranslationIntegrityTest` still runs on every build;
+    `check-translation.py` is run by hand. Limits: a listing block is hashed on its own text, not with its English, so if
+    the English description changes and a translation does not, the ledger stays quiet (the release day listing step
+    catches that); and only files named `strings.xml` are read.

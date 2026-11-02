@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  widget_strip.xml for a widget whose theme is chosen in the app (Settings, Theme: Light or Dark), owner's
+  request, 19 Oct 2026. The renderer pins every colour on it (WidgetRenderer.PAINTS).
+
+  Why a second layout id and not the same one: a launcher re-applies a new update to the views it
+  already has when the layout id is unchanged. Colours pinned under Light or Dark would then survive a
+  switch back to System, which sets none, and the widget would stay that colour until the launcher
+  next inflated it. A different id makes the launcher inflate afresh on every switch between System
+  and a chosen theme, so System always starts from the layout's own phone resolved colours.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <include
+        layout="@layout/widget_strip"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</FrameLayout>

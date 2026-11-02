@@ -1,6 +1,8 @@
 package com.sajdatime.app.ui.components
 
 import androidx.compose.foundation.text.TextAutoSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.text.modifiers.TextAutoSizeLayoutScope
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -35,6 +37,20 @@ data class WholeWords(private val max: TextUnit) : TextAutoSize {
         return floor
     }
 }
+
+/**
+ * For text held to one line, where a second line or a clipped end would break the layout (the city
+ * name in the header, the Qibla place line, the My prayers column headings): the size steps down until
+ * it fits, and only past the floor does it end in an ellipsis. Owner, 30 Oct 2026, adding Bengali:
+ * text that would overlap or break the design is made smaller until it fits. The floor is 60 percent
+ * of [max], or, at large text sizes, the size the text has at normal text size when that is smaller
+ * (at 2.0, half). So it can go below the 14sp floor (60 percent of a 14sp label is 8.4sp): that is
+ * the owner's rule for this one case, recorded in DESIGN_SYSTEM.md §9. Text that fits never shrinks,
+ * in any language; a long English town name can shrink too. Pass the style's own size as [max].
+ */
+@Composable
+fun shrinkToFit(max: TextUnit): TextAutoSize =
+    TextAutoSize.StepBased(minFontSize = max * minOf(0.6f, 1f / LocalDensity.current.fontScale), maxFontSize = max)
 
 /**
  * The same style with its line height as a share of its font size, for text that [WholeWords]

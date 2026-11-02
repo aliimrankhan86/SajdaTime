@@ -1,0 +1,219 @@
+package com.sajdatime.app
+
+// TEMPORARY, never committed into androidTest: draws the step 8 widgets (strip, Next prayer, Today) through the
+// real WidgetRenderer, into AppWidgetHostViews of exact dp sizes, for Ali's step 8 pictures. See README.md beside
+// the copy of this file. Nothing here changes the phone's clock, font scale, locale or theme: the instant, the text
+// size, the language and the Theme row are all passed in code.
+
+import android.appwidget.AppWidgetHostView
+import android.content.Context
+import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
+import android.util.SizeF
+import android.util.TypedValue
+import android.view.Gravity
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.RemoteViews
+import android.widget.TextView
+import androidx.test.platform.app.InstrumentationRegistry
+import com.sajdatime.app.data.SettingsRepository
+import com.sajdatime.app.ui.theme.ThemeChoice
+import com.sajdatime.app.widget.WidgetRenderer
+import com.sajdatime.app.widget.WidgetState
+import com.sajdatime.core.AppLocale
+import com.sajdatime.core.Coordinates
+import java.io.File
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Locale
+import kotlinx.coroutines.runBlocking
+import org.junit.Test
+
+class WidgetPicturesTmp {
+    private val inst = InstrumentationRegistry.getInstrumentation()
+    private val context: Context = inst.targetContext
+    private val args = InstrumentationRegistry.getArguments()
+    private val zone = ZoneId.of("Europe/London")
+    private val density = context.resources.displayMetrics.density
+    private val outDir = File(context.getExternalFilesDir(null), "step8").apply { mkdirs() }
+
+    private class Cell(
+        val caption: String,
+        val w: Int,
+        val h: Int,
+        val kind: String,
+        val at: String = "2026-10-26T16:00",
+        val scale: Float = 1f,
+        val lang: String? = null,
+        val noLoc: Boolean = false,
+        val city: String = "London, United Kingdom",
+        val ramadanWords: Boolean = true,
+        val glyphs: Boolean = true,
+    )
+
+    private class Scene(val name: String, val dark: Boolean, val rows: List<List<Cell>>)
+
+    private fun strip(cap: String, w: Int, h: Int, at: String = "2026-10-26T16:00", scale: Float = 1f) = Cell(cap, w, h, "strip", at, scale)
+    private fun next(cap: String, w: Int = 220, h: Int = 120, at: String = "2026-10-26T16:00") = Cell(cap, w, h, "next", at)
+
+    private fun scenes(): List<Scene> {
+        val out = mutableListOf<Scene>()
+        for (dark in listOf(false, true)) {
+            val t = if (dark) "dark" else "light"
+            out += Scene(if (dark) "02-strip-next-dark-1600" else "01-strip-next-light-1600", dark, listOf(listOf(strip("strip 300x64, 16:00", 300, 64), next("Next 3x2 220x120, 16:00"))))
+            out += Scene(
+                if (dark) "04-next-skies-dark" else "03-next-skies-light", dark,
+                listOf(
+                    listOf("06:30", "10:00").map { next("Next 3x2 220x120, $it", 220, 120, "2026-10-26T$it") },
+                    listOf("16:00", "21:00").map { next("Next 3x2 220x120, $it", 220, 120, "2026-10-26T$it") },
+                ),
+            )
+            out += Scene("05-wide-next-day-$t-1200", dark, listOf(listOf(next("Next wide 300x160, 12:00", 300, 160, "2026-10-26T12:00"))))
+            out += Scene(
+                "15-family-today-large-next-sky-$t", dark,
+                listOf(
+                    listOf(Cell("Today large 300x330, 16:00", 300, 330, "today"), next("Next wide 300x160, 16:00", 300, 160)),
+                    listOf(Cell("Today 300x190, 16:00", 300, 190, "today"), next("Next 180x110, 16:00", 180, 110)),
+                ),
+            )
+        }
+        out += Scene(
+            "17-next-floor-180x110-light", false,
+            listOf(listOf(next("Next at its 180x110 minimum, 16:00", 180, 110), next("Next at 200x110, 16:00", 200, 110))),
+        )
+        out += Scene(
+            "06-strip-after-isha-and-0200-light", false,
+            listOf(listOf(strip("strip 300x64, 21:30 (after Isha)", 300, 64, "2026-10-26T21:30"), strip("strip 300x64, 02:00", 300, 64, "2026-10-26T02:00"))),
+        )
+        out += Scene(
+            "07-strip-320dp-light", false,
+            listOf(
+                listOf(strip("250x40 (floor, thin)", 250, 40), strip("250x64 (floor, glyphs)", 250, 64)),
+                listOf(strip("290x40 (320dp phone, thin)", 290, 40), strip("290x64 (320dp phone, glyphs)", 290, 64)),
+            ),
+        )
+        out += Scene(
+            "08-strip-chip-light", false,
+            listOf(
+                listOf(strip("380x64 with chip", 380, 64)),
+                listOf(Cell("380x64, long town", 380, 64, "strip", city = "Newcastle upon Tyne, United Kingdom")),
+                listOf(strip("380x40 with chip (thin)", 380, 40)),
+                listOf(strip("340x64 (no chip, under 380)", 340, 64)),
+            ),
+        )
+        val ram = "2027-02-22T16:00"
+        out += Scene(
+            "09-strip-ramadan-light", false,
+            listOf(
+                listOf(Cell("Suhoor / Iftar, 300x64", 300, 64, "strip", ram), Cell("Suhoor / Iftar, 250x64", 250, 64, "strip", ram), Cell("Suhoor / Iftar, 250x40", 250, 40, "strip", ram)),
+                listOf(
+                    Cell("names unchanged, 300x64", 300, 64, "strip", ram, ramadanWords = false),
+                    Cell("names unchanged, 250x64", 250, 64, "strip", ram, ramadanWords = false),
+                    Cell("names unchanged, 250x40", 250, 40, "strip", ram, ramadanWords = false),
+                ),
+            ),
+        )
+        out += Scene(
+            "10-strip-glyphs-light", false,
+            listOf(
+                listOf(strip("glyph row, 300x64", 300, 64), Cell("names and times only, 300x64 tall", 300, 64, "strip", glyphs = false)),
+                listOf(strip("thin entry, 300x40", 300, 40), Cell("names and times only, 300x40", 300, 40, "strip", glyphs = false)),
+            ),
+        )
+        out += Scene(
+            "11-strip-large-text-light", false,
+            listOf(
+                listOf(strip("1.3 text, 300x64", 300, 64, scale = 1.3f), strip("1.3 text, 380x64", 380, 64, scale = 1.3f)),
+                listOf(strip("2.0 text, 300x64", 300, 64, scale = 2f), strip("2.0 text, 380x64", 380, 64, scale = 2f)),
+                listOf(strip("2.0 text, 250x40", 250, 40, scale = 2f), strip("2.0 text, 250x64", 250, 64, scale = 2f)),
+            ),
+        )
+        out += Scene(
+            "12-urdu-light", false,
+            listOf(
+                listOf(Cell("Urdu strip 300x64", 300, 64, "strip", lang = "ur"), Cell("Urdu Next 220x120", 220, 120, "next", lang = "ur")),
+                listOf(Cell("Urdu strip 380x64 (chip)", 380, 64, "strip", lang = "ur"), Cell("Urdu Next wide 300x160", 300, 160, "next", lang = "ur")),
+            ),
+        )
+        out += Scene(
+            "14-no-location-light", false,
+            listOf(listOf(Cell("strip 300x64, no location", 300, 64, "strip", noLoc = true), Cell("Next 220x120, no location", 220, 120, "next", noLoc = true))),
+        )
+        return out
+    }
+
+    @Test
+    fun pictures() {
+        val repo = SettingsRepository(context)
+        runBlocking { repo.setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val only = args.getString("pic")
+        for (scene in scenes()) {
+            if (only != null && !scene.name.startsWith(only)) continue
+            var shot: Bitmap? = null
+            inst.runOnMainSync { shot = draw(scene) }
+            File(outDir, "${scene.name}.png").outputStream().use { shot!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        }
+    }
+
+    private fun px(dp: Int) = (dp * density).toInt()
+
+    private fun draw(scene: Scene): Bitmap {
+        val root = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(px(16), px(16), px(16), px(16))
+            background = GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                if (scene.dark) intArrayOf(Color.parseColor("#0E1218"), Color.parseColor("#2A3441")) else intArrayOf(Color.parseColor("#AEBBD0"), Color.parseColor("#DCE3EC")),
+            )
+        }
+        val ink = if (scene.dark) Color.parseColor("#C8CED6") else Color.parseColor("#2B3340")
+        for (row in scene.rows) {
+            val line = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.TOP }
+            for (cell in row) {
+                val column = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL; setPadding(0, 0, px(16), px(14)) }
+                val (view, note) = widget(cell, scene.dark)
+                column.addView(TextView(context).apply { text = cell.caption + note; setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f); setTextColor(ink); setPadding(px(2), 0, 0, px(4)) })
+                column.addView(FrameLayout(context).apply { addView(view, FrameLayout.LayoutParams(px(cell.w), px(cell.h))) }, LinearLayout.LayoutParams(px(cell.w), px(cell.h)))
+                line.addView(column)
+            }
+            root.addView(line)
+        }
+        root.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        root.layout(0, 0, root.measuredWidth, root.measuredHeight)
+        return Bitmap.createBitmap(root.measuredWidth, root.measuredHeight, Bitmap.Config.ARGB_8888).also { root.draw(Canvas(it)) }
+    }
+
+    private fun widget(cell: Cell, dark: Boolean): Pair<View, String> {
+        val config = Configuration(context.resources.configuration).apply {
+            fontScale = cell.scale
+            cell.lang?.let { setLocale(Locale.forLanguageTag(it)) }
+        }
+        val ctx = context.createConfigurationContext(config)
+        val now = LocalDateTime.parse(cell.at).atZone(zone).toInstant()
+        val settings = runBlocking { SettingsRepository(context).current() }
+        var state = WidgetState.build(settings, now, zone, true).copy(theme = if (dark) ThemeChoice.DARK else ThemeChoice.LIGHT, cityName = cell.city)
+        if (cell.noLoc) state = state.copy(hasLocation = false, today = null, next = null, progress = emptyList(), cityName = "")
+        WidgetRenderer.stripRamadanWords = cell.ramadanWords
+        WidgetRenderer.stripGlyphs = cell.glyphs
+        val views: RemoteViews = try {
+            when (cell.kind) {
+                "strip" -> WidgetRenderer.strip(ctx, state, now)
+                "next" -> WidgetRenderer.nextPrayer(ctx, state, now)
+                else -> WidgetRenderer.today(ctx, state, now)
+            }
+        } finally {
+            WidgetRenderer.stripRamadanWords = true
+            WidgetRenderer.stripGlyphs = true
+        }
+        val host = AppWidgetHostView(AppLocale.wrap(ctx))
+        host.updateAppWidgetSize(Bundle(), listOf(SizeF(cell.w.toFloat(), cell.h.toFloat())))
+        host.updateAppWidget(views)
+        return host to " [${state.period.name.lowercase()}]"
+    }
+}

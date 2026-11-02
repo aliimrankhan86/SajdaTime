@@ -22,7 +22,7 @@ import java.io.File
 class RamadanWordingTest {
 
     private val root = File("..").canonicalFile
-    private val languages = listOf("values", "values-ur", "values-tr", "values-in", "values-ar")
+    private val languages = stringFolders
 
     private fun strings(folder: String): Map<String, String> {
         val file = File(root, "app/src/main/res/$folder/strings.xml")
@@ -50,8 +50,9 @@ class RamadanWordingTest {
     @Test
     fun `the set is the size it should be, so a renamed prefix cannot make the checks vacuous`() {
         assertTrue("only ${keys.size} keys matched", keys.size >= 55)
-        // 13 since 18 Oct 2026: widget_update_location, the location chip's spoken label.
-        assertEquals(13, keys.count { it.startsWith("widget_") })
+        // 13 since 18 Oct 2026: widget_update_location, the location chip's spoken label. 16 since step 8:
+        // widget_strip_label, widget_strip_desc and widget_strip_suhoor.
+        assertEquals(16, keys.count { it.startsWith("widget_") })
     }
 
     @Test

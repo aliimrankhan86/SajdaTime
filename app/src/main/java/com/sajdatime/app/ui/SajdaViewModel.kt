@@ -12,6 +12,8 @@ import com.sajdatime.core.EidDay
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
+import com.sajdatime.core.Night
+import com.sajdatime.core.NightTimes
 import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
@@ -30,6 +32,15 @@ import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.data.SettingsRepository
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.data.TrackerData
+import com.sajdatime.app.data.TrackerFileCodec
+import com.sajdatime.app.data.TrackerRepository
+import com.sajdatime.core.TickState
+import com.sajdatime.core.JamaahPlan
+import com.sajdatime.core.JamaahResult
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.DayKind
+import com.sajdatime.core.TrackerLogic
 import com.sajdatime.app.data.UsageCounts
 import com.sajdatime.app.R
 import com.sajdatime.app.data.WatchSync
@@ -67,6 +78,94 @@ enum class LocationProblem {
  * [Failed] exists because the previous version swallowed every export error: the user
  * tapped "Save timetable as PDF", chose a range, and absolutely nothing happened.
  */
+/**
+ * What happened to a save or load of the prayer record, shown once as a message and then cleared,
+ * the same way as [ExportEvent].
+ */
+sealed interface TrackerEvent {
+    data class Saved(val fileName: String) : TrackerEvent
+    /** [fasts]: the new fasts to make up number when the file changed it, so a count-only file is not "0 days added". */
+    data class Loaded(val days: Int, val fasts: Int? = null) : TrackerEvent
+    data object SaveFailed : TrackerEvent
+    data class LoadFailed(val tooNew: Boolean) : TrackerEvent
+}
+
+/**
+ * The prayer record as the Times screen and the history sheet draw it. Present only while the
+ * tracker is on, so nothing about it reaches the Times screen otherwise.
+ */
+data class TrackerState(
+    val data: TrackerData,
+    val today: LocalDate,
+    val streak: Int,
+    /**
+     * The first day the record covers: days before it are "before tracking began" (no ring, not
+     * selectable). Worked out once here, not in a getter: up to 49 rings ask for it on every
+     * recomposition, and the screen recomposes each second for the clock (review, 23 Oct 2026).
+     */
+    val started: LocalDate = today,
+) {
+    val paused: Boolean get() = TrackerLogic.isPaused(today, data.pauses)
+
+    fun state(date: LocalDate, slot: PrayerSlot, due: Boolean): TickState =
+        TrackerLogic.tickState(data.records[date], slot, due, TrackerLogic.isPaused(date, data.pauses))
+
+    fun isPaused(date: LocalDate): Boolean = TrackerLogic.isPaused(date, data.pauses)
+
+    /** What a day's ring shows in the week card and the grid (a rule, so it lives in :core). */
+    fun dayKind(date: LocalDate): DayKind = TrackerLogic.dayKind(date, today, started, data.pauses)
+
+    companion object {
+        fun build(data: TrackerData, today: LocalDate) = TrackerState(
+            data, today, TrackerLogic.streak(data.records, data.pauses, today),
+            TrackerLogic.started(data.startedOn, data.records, data.pauses, today),
+        )
+    }
+}
+
+/**
+ * What the tracker's controls do, as one parameter rather than eight threaded through every screen.
+ * MainActivity binds it to this ViewModel and to the system's save and open dialogs.
+ */
+interface TrackerActions {
+    fun setEnabled(on: Boolean)
+    fun setShowStreak(on: Boolean)
+    fun tick(date: LocalDate, slot: PrayerSlot, ticked: Boolean)
+    fun pause(fromYesterday: Boolean)
+    fun resume()
+    /** +1 or -1 on the stored number. */
+    fun adjustFastsToMakeUp(delta: Int)
+    fun save()
+    fun load()
+    fun delete()
+}
+
+/**
+ * What the bell on a prayer row and the "Allow notifications" notice do (1.6.0 step 3). MainActivity binds
+ * it to this ViewModel and to the system's permission ask.
+ */
+interface BellActions {
+    /** Turns [slot] off in one edit; true if a reminder that would have fired went off with it. */
+    suspend fun off(slot: PrayerSlot): Boolean
+
+    /** The user's own tap: on, then, if the phone blocks notifications, the permission door. */
+    fun on(slot: PrayerSlot)
+
+    /** Undo: on again, never the door. */
+    fun undo(slot: PrayerSlot)
+
+    /** The notice's Allow: the same door the bell opens. */
+    fun allow()
+    fun dismissNotice()
+}
+
+/** What the Jama'ah times screen changes. Bound to this ViewModel by MainActivity. */
+interface JamaahActions {
+    /** null clears that prayer. */
+    fun setRule(slot: PrayerSlot, rule: JamaahRule?)
+    fun setJumuah(time: java.time.LocalTime?)
+}
+
 sealed interface ExportEvent {
     data class Saved(val fileName: String) : ExportEvent
     data class Share(val uri: Uri) : ExportEvent
@@ -106,6 +205,23 @@ data class UiState(
      * the header cannot disagree.
      */
     val eid: EidDay? = null,
+    /**
+     * Today's jama'ah for each prayer that has one set, already checked against its window
+     * ([JamaahPlan]). Empty for everyone who has set none.
+     */
+    val jamaah: Map<PrayerSlot, JamaahResult> = emptyMap(),
+    /** Midnight and the last third of the night now on, or null with the setting off or no usable night. */
+    val night: NightTimes? = null,
+    /** The prayer record, while "My prayers" is on. See [TrackerState]. */
+    val tracker: TrackerState? = null,
+    /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
+    val trackerHasData: Boolean = false,
+    /**
+     * The record has been read once. Until then My prayers draws nothing: drawn from the empty
+     * record first, every ring would animate up when the real one arrived (no entrance animation).
+     */
+    val trackerLoaded: Boolean = false,
+    val trackerEvent: TrackerEvent? = null,
 )
 
 class SajdaViewModel(application: Application) : AndroidViewModel(application) {
@@ -114,6 +230,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private val locationRepository = LocationRepository(application)
     private val cityLookup = CityLookup(application)
     private val compassRepository = CompassRepository(application)
+    private val trackerRepository = TrackerRepository(application)
 
     /**
      * Optional usage counts. [UsageCounts.apply] is the only thing that ever switches
@@ -128,6 +245,13 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     /** Sensor collection runs only while the Qibla screen is on-screen. */
     private var compassJob: Job? = null
 
+    /**
+     * Declared before `init`: Kotlin runs property initialisers and `init` blocks in file order, and the
+     * settings collector in `init` can deliver at once (Main.immediate), calling publishTracker() while a
+     * field declared further down is still null. That crashed cold starts on 23 Oct 2026 (HANDOVER §15, 179).
+     */
+    private var trackerData = TrackerData()
+
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state.asStateFlow()
 
@@ -136,6 +260,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             var first = true
             settingsRepository.settings.collect { settings ->
                 _state.update { it.copy(settings = settings, loading = false) }
+                publishTracker()
                 // Re-applies the saved choice on every launch. A user who never opted in
                 // causes no Firebase call here at all.
                 usage.apply(settings.analyticsEnabled)
@@ -148,6 +273,15 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 // after being backgrounded once. So the first load does the refresh itself.
                 if (first && settings.coordinates != null) refreshLocation()
                 first = false
+            }
+        }
+        viewModelScope.launch {
+            // The record is read whether or not the tracker is on, so Settings knows there is
+            // something to delete; it is only handed to the Times screen while the tracker is on.
+            trackerRepository.data.collect { data ->
+                trackerData = data
+                _state.update { it.copy(trackerLoaded = true) }
+                publishTracker()
             }
         }
         startClock()
@@ -182,6 +316,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                     snapshot.today?.times?.get(PrayerSlot.SUNRISE)
                         ?.let { !now.isBefore(it) } == true
                 if (prayerPassed || dayChanged || sunrisePassed) recalculate()
+                // My prayers keeps its own day, because with no saved place there is no `today` above
+                // and nothing else would roll it over: ticks after midnight went to yesterday (review).
+                else if (snapshot.tracker?.let { it.today != LocalDate.now(ZoneId.systemDefault()) } == true) publishTracker()
                 delay(1_000)
             }
         }
@@ -309,8 +446,21 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissMethodNotice() =
         viewModelScope.launch { settingsRepository.dismissMethodNotice() }
 
+    suspend fun bellOff(slot: PrayerSlot): Boolean = settingsRepository.bellOff(slot)
+
+    fun bellOn(slot: PrayerSlot) = viewModelScope.launch { settingsRepository.bellOn(slot) }
+
+    fun setNotificationsNoticeDismissed(dismissed: Boolean) =
+        viewModelScope.launch { settingsRepository.setNotificationsNoticeDismissed(dismissed) }
+
+    fun setNotificationPermissionAsked() =
+        viewModelScope.launch { settingsRepository.setNotificationPermissionAsked(true) }
+
     fun setRamadanCardEnabled(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setRamadanCardEnabled(enabled) }
+
+    fun setNightTimesEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setNightTimesEnabled(enabled) }
 
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
@@ -348,12 +498,22 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setBuiltInNotificationAdhan(adhan: BuiltInAdhan) =
         viewModelScope.launch { settingsRepository.setBuiltInNotificationAdhan(adhan) }
 
+    fun setJamaahRule(slot: PrayerSlot, rule: JamaahRule?) =
+        viewModelScope.launch { settingsRepository.setJamaahRule(slot, rule) }
+
+    fun setJumuah(time: java.time.LocalTime?) =
+        viewModelScope.launch { settingsRepository.setJumuah(time) }
+
+    fun setJamaahReminderMinutes(minutes: Int) =
+        viewModelScope.launch { settingsRepository.setJamaahReminderMinutes(minutes) }
+
+    fun setFastReminder(kind: com.sajdatime.core.FastKind, on: Boolean) =
+        viewModelScope.launch { settingsRepository.setFastReminder(kind, on) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 
     fun completeOnboarding() = viewModelScope.launch { settingsRepository.completeOnboarding() }
-
-    fun markDisclaimerSeen() = viewModelScope.launch { settingsRepository.markDisclaimerSeen() }
 
     /**
      * Last resort when neither GPS nor a city search produced a position: fall back to
@@ -402,6 +562,77 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun consumeExportEvent() = _state.update { it.copy(exportEvent = null) }
+
+    // --- my prayers (the tracker) ----------------------------------------------------
+
+    /** Rebuilds the tracker state from the record in hand. Called when the record, the switch or the day changes. */
+    private fun publishTracker() {
+        val today = LocalDate.now(ZoneId.systemDefault())
+        _state.update {
+            it.copy(
+                tracker = if (it.settings.trackerEnabled) TrackerState.build(trackerData, today) else null,
+                trackerHasData = !trackerData.isEmpty,
+            )
+        }
+    }
+
+    fun setTrackerEnabled(enabled: Boolean) =
+        viewModelScope.launch {
+            if (enabled) trackerRepository.markStarted(LocalDate.now(ZoneId.systemDefault()))
+            else trackerRepository.clearStartIfEmpty()
+            settingsRepository.setTrackerEnabled(enabled)
+        }
+
+    fun setTrackerShowStreak(show: Boolean) =
+        viewModelScope.launch { settingsRepository.setTrackerShowStreak(show) }
+
+    fun tick(date: LocalDate, slot: PrayerSlot, ticked: Boolean) =
+        viewModelScope.launch { trackerRepository.setTicked(date, slot, ticked) }
+
+    /** Today, or yesterday for someone who notices a day late. Nothing further back (Ali, 16 Oct 2026). */
+    fun pauseTracker(fromYesterday: Boolean) = viewModelScope.launch {
+        val today = LocalDate.now(ZoneId.systemDefault())
+        trackerRepository.pause(if (fromYesterday) today.minusDays(1) else today)
+    }
+
+    fun resumeTracker() =
+        viewModelScope.launch { trackerRepository.resume(LocalDate.now(ZoneId.systemDefault())) }
+
+    fun adjustFastsToMakeUp(delta: Int) {
+        viewModelScope.launch { trackerRepository.adjustFastsToMakeUp(delta) }
+    }
+
+    fun deleteTracker() = viewModelScope.launch { trackerRepository.deleteAll() }
+
+    fun trackerFileName(): String = TrackerFileCodec.fileName(LocalDate.now(ZoneId.systemDefault()))
+
+    /** Writes the record to the file the person chose in the system's save dialog. */
+    fun saveTrackerTo(uri: Uri) = viewModelScope.launch {
+        val app = getApplication<Application>()
+        val event = runCatching {
+            withContext(Dispatchers.IO) {
+                val text = TrackerFileCodec.encode(trackerRepository.current(), LocalDate.now(ZoneId.systemDefault()))
+                app.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(text.toByteArray()) }
+            }
+            TrackerEvent.Saved(uri.lastPathSegment?.substringAfterLast('/') ?: trackerFileName())
+        }.getOrDefault(TrackerEvent.SaveFailed)
+        _state.update { it.copy(trackerEvent = event) }
+    }
+
+    /** Reads a saved file and adds it to the record. Never removes anything already here. */
+    fun loadTrackerFrom(uri: Uri) = viewModelScope.launch {
+        val app = getApplication<Application>()
+        val event = runCatching {
+            val text = withContext(Dispatchers.IO) {
+                app.contentResolver.openInputStream(uri)!!.use { String(it.readNBytesCompat(MAX_TRACKER_FILE_BYTES)) }
+            }
+            val result = trackerRepository.merge(TrackerFileCodec.decode(text))
+            TrackerEvent.Loaded(result.daysAdded + result.daysUpdated, result.fasts)
+        }.getOrElse { e -> TrackerEvent.LoadFailed(tooNew = (e as? TrackerFileCodec.Unreadable)?.tooNew == true) }
+        _state.update { it.copy(trackerEvent = event) }
+    }
+
+    fun consumeTrackerEvent() = _state.update { it.copy(trackerEvent = null) }
 
     // --- qibla -----------------------------------------------------------------------
 
@@ -457,7 +688,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null) }
             // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
             withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
@@ -476,9 +707,12 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             // midnight. No new timer.
             val ramadan = RamadanState.build(coordinates, settings.calculationPrefs, today)
             val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
-            Computed(today, next, current, ramadan, eid)
+            val jamaah = JamaahPlan.on(today, zone, settings.jamaah)
+            val night = if (settings.nightTimesEnabled) Night.at(coordinates, settings.calculationPrefs, now, zone) else null
+            Computed(today, next, current, ramadan, eid, jamaah, night)
         }
 
+        publishTracker()
         _state.update {
             it.copy(
                 today = computed.today,
@@ -486,6 +720,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 current = computed.current,
                 ramadan = computed.ramadan,
                 eid = computed.eid,
+                jamaah = computed.jamaah,
+                night = computed.night,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -513,6 +749,21 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     }
 }
 
+/** Ten years of ticks is under 100 KB; anything far larger is not a SajdaTime file. */
+private const val MAX_TRACKER_FILE_BYTES = 2 * 1024 * 1024
+
+/** InputStream.readNBytes is API 33; this reads at most [max] bytes on every version. */
+private fun java.io.InputStream.readNBytesCompat(max: Int): ByteArray {
+    val out = java.io.ByteArrayOutputStream()
+    val buffer = ByteArray(8192)
+    while (out.size() < max) {
+        val n = read(buffer, 0, minOf(buffer.size, max - out.size()))
+        if (n < 0) break
+        out.write(buffer, 0, n)
+    }
+    return out.toByteArray()
+}
+
 /** One recalculation's results, carried out of the background block together. */
 private data class Computed(
     val today: DayPrayerTimes,
@@ -520,4 +771,6 @@ private data class Computed(
     val current: PrayerSlot?,
     val ramadan: RamadanState?,
     val eid: EidDay?,
+    val jamaah: Map<PrayerSlot, JamaahResult>,
+    val night: NightTimes?,
 )

@@ -38,8 +38,8 @@ import com.sajdatime.core.AppLocale
  * Settings switch so a user who finds it later in Settings reads exactly what a new user
  * reads, not a shorter hint. Two buttons of equal weight and nothing pre-selected.
  *
- * Deliberately kept apart from the disclaimer and its dua request: this screen never appears
- * inside or after that dialog. See docs/ANALYTICS_PLAN.md section 4.5.
+ * Deliberately kept apart from the disclaimer and its dua request: this text is never shown
+ * inside that dialog (it lives in Settings, About since 1.6). See docs/ANALYTICS_PLAN.md section 4.5.
  */
 @Composable
 fun UsageCountsConsentBody(onYes: () -> Unit, onNo: () -> Unit) {

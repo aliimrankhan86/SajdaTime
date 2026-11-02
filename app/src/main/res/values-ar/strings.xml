@@ -28,7 +28,6 @@
     <string name="action_allow_location">اسمح بالموقع</string>
     <string name="action_how_location_used">كيف يُستخدم موقعك</string>
     <string name="action_got_it">حسنًا</string>
-    <string name="action_understood">فهمت</string>
     <string name="action_continue">متابعة</string>
     <string name="location_set_generic">موقعك</string>
     <string name="location_finding">جارٍ تحديد موقعك…</string>
@@ -78,12 +77,8 @@
          comment in values/strings.xml): where the times come from, how they can be wrong,
          follow your mosque, and no warranty. The dua request stays the last paragraph and
          appears nowhere else. First person throughout: the author speaks. -->
-    <string name="disclaimer_title">يُرجى قراءة هذا أولًا</string>
+    <string name="disclaimer_title">إخلاء المسؤولية</string>
     <string name="disclaimer_body">SajdaTime مساعد، وليس مرجعًا دينيًا.\n\nهذه الأوقات لم يعطني إياها مسجد ولا عالم ولا أي جهة. يحسبها هاتفك من موقع الشمس، مستخدمًا طرق حساب نشرتها هيئات إسلامية وعلماء. لست مفتيًا ولا عالمًا ولا خبيرًا في الفقه، وقد بُني هذا التطبيق بمساعدة الذكاء الاصطناعي. قد يحتوي البرنامج على أخطاء، وقد يحمل الهاتف موقعًا خاطئًا أو ساعة خاطئة، وقد يؤخر الهاتف تنبيهًا حين يوفّر البطارية، وقد أكون أنا مخطئًا.\n\nلذا أرجو أن تعدّ ما تراه هنا حسابًا لا حكمًا شرعيًا. وحيث يختلف SajdaTime ومسجدك، فاتبع مسجدك. إن بدا لك وقت أو اتجاه غير صحيح، أو لم تكن متأكدًا، فاسألهم أو اسأل شخصًا آخر مؤهلًا لينصحك. التطبيق مجاني ويُقدَّم كما هو، دون أي ضمان ودون أي وعد بالدقة، فحيث تهمّك الدقة التامة، أرجو ألا تعتمد عليه وحده.\n\nإن كنت تستخدم الساعة، فأرجو أن تعدّها وسيلة تيسير لا الكلمة الأخيرة. فبوصلة الساعة أصغر من بوصلة الهاتف ورؤيتها للسماء أضعف، وقد تعمل بموقع وجده هاتفك قبل مدة. وفي القبلة خاصةً، هاتفك هو الأدق بين الاثنين. وحين يكون الأمر مهمًا، فتحقق منه هناك.\n\nلا تتفق المساجد كلها على وقت بدء الصلاة. والعشاء أكثرها اختلافًا. وفي بريطانيا وما يقع شمالها قد يزيد الفرق بين طريقة وأخرى على ساعة، لأن العلماء يقيسون اختفاء الشفق بطرق مختلفة. لا أستطيع أن أحسم ذلك، ولا يحاول التطبيق ذلك. إن لم تطابق الأوقات هنا مسجدك، فاسألهم عن الطريقة التي يتبعونها واخترها في الإعدادات، تحت طريقة الحساب. وإن بقيت بينكما بضع دقائق بعد ذلك، فإن خيار «طابِق مسجدك» يتيح لك أن تعدّل كل صلاة، والتاريخ أيضًا، بيدك. وحيث يبقى اختلاف، فاتبع مسجدك.\n\nأمر أخير. يبيّن هذا التطبيق متى يدخل وقت الصلاة. ثم يحدد مسجدك وقته الخاص لصلاة الجماعة، وغالبًا ما يكون بعده بقليل، لذا سيختلف لوح المسجد عن الأوقات هنا في كثير من الأحيان. وليس أيٌّ منهما خاطئًا.\n\nوطلب واحد، إن تكرّمت: أرجو أن تذكرني وعائلتي ووالديّ في دعائك.</string>
-    <!-- The short form shown once after setup (owner, 18 Oct 2026). It keeps all four points of
-         HANDOVER 5.15; the full disclaimer_body is one button away and in Settings, About. -->
-    <string name="disclaimer_brief">SajdaTime مساعد، وليس مرجعًا دينيًا.\n\nهذه الأوقات لم يعطها مسجد ولا عالم. يحسبها هاتفك من موقع الشمس. لست مفتيًا ولا عالمًا، وقد بُني هذا التطبيق بمساعدة الذكاء الاصطناعي، لذا قد يجعل خطأ في البرنامج أو موقع خاطئ أو ساعة خاطئة وقتًا ما خاطئًا.\n\nوحيث يختلف SajdaTime ومسجدك، فاتبع مسجدك. التطبيق مجاني ويُقدَّم كما هو، دون أي ضمان.</string>
-    <string name="disclaimer_read_full">اقرأ النص كاملًا</string>
 
     <!-- Home -->
     <string name="home_next_prayer">الصلاة التالية</string>
@@ -127,8 +122,13 @@
 
     <!-- Export -->
     <string name="action_save_timetable">حفظ الجدول بصيغة PDF</string>
-    <!-- The short form on the "Today" line of the Times screen, beside the heading. -->
+    <!-- The short form in the Timetable sheet header, beside the place name (1.6.0 step 4). -->
     <string name="action_save_pdf">حفظ بصيغة PDF</string>
+    <string name="action_timetable">جدول المواقيت</string>
+    <string name="timetable_title">جدول المواقيت</string>
+    <string name="timetable_month_a11y">مواقيت الصلاة لشهر %1$s</string>
+    <string name="timetable_day_a11y">%1$s. الفجر %2$s. الشروق %3$s. الظهر %4$s. العصر %5$s. المغرب %6$s. العشاء %7$s.</string>
+    <string name="timetable_today_a11y">اليوم، %1$s</string>
     <string name="export_sheet_title">احفظ جدول مواقيتك</string>
     <string name="export_sheet_body">سنُعِدّ ملف PDF لمواقيت صلاتك في %1$s. ويمكنك بعدها حفظه أو طباعته أو إرساله إلى أحد.</string>
     <string name="export_today">اليوم فقط</string>
@@ -156,16 +156,18 @@
 
     <!-- Qibla -->
     <string name="qibla_title">القبلة</string>
-    <string name="qibla_subtitle">تبعد الكعبة نحو %2$d كم من هنا، على زاوية %1$d° من الشمال.</string>
+    <string name="qibla_distance_km">نحو %1$d كم من هنا</string>
+    <string name="qibla_distance_miles">نحو %1$d ميل من هنا</string>
+    <string name="qibla_bearing">\u2066%1$d°\u2069 من الشمال</string>
     <string name="qibla_needs_location">حدّد موقعك لتجد القبلة.</string>
     <string name="qibla_facing">أنت الآن تتجه نحو الكعبة</string>
-    <string name="qibla_heading_now">الاتجاه %1$d°</string>
+    <string name="qibla_heading_now">الاتجاه \u2066%1$d°\u2069</string>
     <!-- The dial's legend. The needle is the user: it points the way the phone points. -->
     <string name="qibla_legend_kaaba">الكعبة</string>
     <string name="qibla_legend_facing">الاتجاه الذي تواجهه</string>
-    <string name="qibla_turn_left">استدر يسارًا %1$d°</string>
-    <string name="qibla_turn_right">استدر يمينًا %1$d°</string>
-    <string name="qibla_no_compass">اتجه إلى %1$d° من الشمال الحقيقي</string>
+    <string name="qibla_turn_left">استدر يسارًا \u2066%1$d°\u2069</string>
+    <string name="qibla_turn_right">استدر يمينًا \u2066%1$d°\u2069</string>
+    <string name="qibla_no_compass">اتجه إلى \u2066%1$d°\u2069 من الشمال الحقيقي</string>
     <string name="qibla_calibrate">تحتاج البوصلة إلى معايرة. أمسك هاتفك وحرّكه على شكل الرقم ثمانية بضع مرات.</string>
     <string name="qibla_sensor_missing">لا يحتوي هذا الهاتف على بوصلة، لذا يمكننا أن نعطيك الزاوية لكن لا يمكننا أن نشير إلى الاتجاه.</string>
     <string name="qibla_accuracy_medium">قد تتذبذب القراءة قليلًا. ابتعد عن المعادن والمغناطيسات ومكبرات الصوت لتحصل على نتيجة أثبت.</string>
@@ -217,18 +219,17 @@
     <string name="settings_ongoing_badge_desc">إشعار صامت يعرض الصلاة التالية والوقت المتبقي</string>
     <string name="settings_exact_alarms_title">السماح بالمنبّهات الدقيقة</string>
     <!-- The one line an exact alarm notice shows before it is opened (17 Oct 2026). -->
-    <string name="settings_exact_alarms_brief">قد تصل تنبيهات الصلاة متأخرة ساعة.</string>
+    <string name="settings_exact_alarms_brief">قد تصل تنبيهات الصلاة متأخرة ساعة، وقد لا يصل تنبيه الفجر أبدًا.</string>
     <!-- The action on a permission notice. It opens the phone's own settings screen. -->
     <string name="action_allow">السماح</string>
     <!-- "An hour or more late" is measured on two phones. Keep the figure and the Fajr case. -->
-    <string name="settings_exact_alarms_desc">بدونه، قد تصل تنبيهات الصلاة متأخرة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل الفجر أبدًا.</string>
     <string name="confirm_exact_alarm_title">أمر أخير</string>
     <string name="confirm_exact_alarm_body">لا يسمح Android للتطبيقات بضبط التنبيهات على دقيقة محددة إلا بإذنك. وبدونه قد يؤخر هاتفك تنبيهات الصلاة ساعة أو أكثر، وعلى بعض الهواتف قد لا يصل أبدًا تنبيه ليلي مثل الفجر. يمكنك فعل ذلك لاحقًا من الإعدادات أيضًا.</string>
     <string name="action_close">إغلاق</string>
 
     <string name="about_version">الإصدار</string>
     <string name="about_disclaimer">إخلاء المسؤولية</string>
-    <string name="about_disclaimer_short">مساعد، وليس مرجعًا دينيًا. انقر للقراءة.</string>
+    <string name="about_disclaimer_short">مساعد، وليس مرجعًا دينيًا. يستحق القراءة.</string>
     <string name="about_privacy">الخصوصية</string>
     <string name="about_privacy_desc">تُحسب الأوقات على هذا الهاتف، ولا نتلقى موقعك أبدًا. لا حسابات ولا إعلانات. وتبقى إحصاءات الاستخدام متوقفة ما لم تفعّلها.</string>
 
@@ -237,7 +238,6 @@
     <string name="consent_title">هل تساعد في تحسين SajdaTime؟</string>
     <string name="consent_body">SajdaTime مجاني ولا يحتوي على إعلانات. إن قلت نعم، يرسل بعض إحصاءات الاستخدام إلى Google Analytics كي يمكن تحسين التطبيق. وهي مرتبطة بمعرّف عشوائي، لا باسمك، وقد تُعالَج خارج المملكة المتحدة. وتُحفظ السجلات المفصّلة مدة أربعة عشر شهرًا.\n\nقد يكشف استخدام تطبيق للصلاة شيئًا عن إيمانك، لذا فهذا اختيارك، ولا يتغير شيء في التطبيق إن قلت لا. لا يرسل SajdaTime أبدًا موقعك عبر GPS ولا إعدادات صلاتك.\n\nلا يُرسَل شيء حتى تختار نعم. ويمكنك إيقاف ذلك من الإعدادات في أي وقت. والمسؤول عن ذلك هو علي عمران خان (Ali Imran Khan)، صانع التطبيق.</string>
     <string name="settings_language_title">اللغة</string>
-    <string name="settings_language_desc">اختر لغة التطبيق</string>
     <string name="language_unavailable">غير متاحة على هذا الهاتف</string>
     <string name="language_phone">لغة الهاتف</string>
     <string name="permission_allowed">مسموح</string>
@@ -306,13 +306,13 @@
     <string name="duration_s">%1$d ث</string>
 
     <!-- "Match your mosque" -->
-    <string name="settings_adjustments">طابِق مسجدك</string>
+    <string name="settings_adjustments">طابِق أوقات الدخول مع مسجدك</string>
     <string name="settings_adjustments_none">بلا تغييرات</string>
-    <string name="settings_adjustments_help">إذا طبع مسجدك وقتًا مختلفًا، فعدّله هنا قليلًا، أو اضبطه على الوقت الذي تعرضه لوحة مسجدك. جرّب طريقة الحساب أولًا. فهي عادةً سبب الفرق الحقيقي، وهذا للدقائق القليلة المتبقية.</string>
+    <string name="settings_adjustments_help">إذا طبع مسجدك وقتًا مختلفًا، فعدّله هنا قليلًا، أو اضبطه على الوقت الذي تعرضه لوحة مسجدك. جرّب طريقة الحساب أولًا. فهي عادةً سبب الفرق الحقيقي، وهذا للدقائق القليلة المتبقية. أما أوقات الجماعة فتُدخل في أوقات الجماعة.</string>
     <string name="adjustment_use_board">استخدم وقت لوحة مسجدك</string>
     <string name="adjustment_which_prayer">أي صلاة؟</string>
     <string name="action_set_time">اضبط الوقت</string>
-    <string name="adjustment_pick_time_title">%1$s: الوقت على لوحة مسجدك</string>
+    <string name="adjustment_pick_time_title">%1$s: وقت الدخول على لوحة مسجدك</string>
     <string name="adjustment_limit_note">الفرق الذي يبلغ %1$d دقيقة أو أكثر يعني عادةً طريقة حساب مختلفة، أو لوحة مسجد تعرض وقت الجماعة، وهو بعد ذلك بقليل. جرّب الطريقة أولًا.</string>
     <string name="adjustment_choose_method">اختر طريقة الحساب</string>
     <string name="settings_adjustments_reset">إعادة ضبط الكل</string>
@@ -456,6 +456,10 @@
     <string name="widget_a11y_row">%1$s %2$s</string>
     <string name="widget_suhoor_ends">نهاية السحور</string>
     <string name="widget_iftar">الإفطار</string>
+    <string name="widget_strip_label">SajdaTime: الصلوات الخمس في سطر</string>
+    <string name="widget_strip_desc">الصلوات الخمس في سطر واحد مع تمييز الصلاة التالية.</string>
+    <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
+    <string name="widget_strip_suhoor">السحور</string>
     <string name="widget_update_location">تحديث الموقع، %1$s</string>
     <!-- Notices (17 Oct 2026): one brief line before a notice is opened, and its action. -->
     <string name="action_see_why">اعرف السبب</string>
@@ -476,4 +480,228 @@
     <string name="about_share_message">SajdaTime: مواقيت صلاة مجانية وبوصلة للقبلة، بلا إعلانات ولا حسابات. https://play.google.com/store/apps/details?id=com.sajdatime.app</string>
     <!-- The fallback place, shown in the app's own language. -->
     <string name="location_makkah">مكة</string>
+    <string name="settings_group_tracker">صلواتي</string>
+    <string name="settings_tracker">صلواتي</string>
+    <string name="settings_tracker_desc">ضع علامة على كل صلاة تصليها. لا يراها أحد غيرك.</string>
+    <string name="settings_tracker_streak">إظهار الأيام المتتالية</string>
+    <string name="settings_tracker_streak_desc">إظهار عدد الأيام المتتالية التي وضعت فيها علامة على الصلوات الخمس كلها.</string>
+    <string name="settings_tracker_fasts">أيام صيام للقضاء</string>
+    <string name="settings_tracker_fasts_desc">أضف يومًا لكل يوم صيام ما زال عليك قضاؤه، واحذف يومًا حين تقضيه.</string>
+    <string name="settings_tracker_pause">إيقاف التتبع مؤقتًا</string>
+    <string name="settings_tracker_pause_desc">يبقى عدّ أيامك كما هو حتى تستأنف.</string>
+    <string name="settings_tracker_resume">استئناف التتبع</string>
+    <string name="settings_tracker_resume_desc">التتبع متوقف مؤقتًا.</string>
+    <string name="tracker_pause_title">الإيقاف ابتداءً من</string>
+    <string name="tracker_pause_today">اليوم</string>
+    <string name="tracker_pause_yesterday">أمس</string>
+    <string name="action_pause">إيقاف مؤقت</string>
+    <string name="action_resume">استئناف</string>
+    <string name="settings_tracker_save">حفظ في ملف</string>
+    <string name="settings_tracker_save_desc">سجل شخصي لصلواتك. احتفظ بالملف لنفسك.</string>
+    <string name="settings_tracker_load">تحميل من ملف</string>
+    <string name="settings_tracker_load_desc">استعد سجلًا حفظته، على هذا الهاتف أو على هاتف جديد.</string>
+    <string name="settings_tracker_delete">حذف سجل صلواتي</string>
+    <string name="tracker_delete_title">حذف سجل صلواتك؟</string>
+    <string name="tracker_delete_body">يحذف هذا كل العلامات وعدد أيام صيام القضاء من هذا الهاتف. لا يمكن التراجع عن ذلك.</string>
+    <string name="action_delete">حذف</string>
+    <plurals name="tracker_streak">
+        <item quantity="zero">%d يوم على التوالي</item>
+        <item quantity="one">%d يوم على التوالي</item>
+        <item quantity="two">%d يوم على التوالي</item>
+        <item quantity="few">%d أيام على التوالي</item>
+        <item quantity="many">%d يومًا على التوالي</item>
+        <item quantity="other">%d يوم على التوالي</item>
+    </plurals>
+    <plurals name="tracker_fasts_line">
+        <item quantity="zero">%d يوم صيام للقضاء</item>
+        <item quantity="one">يوم صيام واحد للقضاء</item>
+        <item quantity="two">يوما صيام للقضاء</item>
+        <item quantity="few">%d أيام صيام للقضاء</item>
+        <item quantity="many">%d يومًا من الصيام للقضاء</item>
+        <item quantity="other">%d يوم صيام للقضاء</item>
+    </plurals>
+    <string name="tracker_fasts_made_up_one">قضيت يومًا</string>
+    <string name="tracker_open_history">آخر 30 يومًا</string>
+    <string name="tracker_paused_line">التتبع متوقف مؤقتًا</string>
+    <string name="tracker_history_title">آخر 30 يومًا</string>
+    <string name="tracker_paused_day">متوقف مؤقتًا</string>
+    <string name="tracker_newer_version">هذا السجل من إصدار أحدث من SajdaTime. حدّث التطبيق لتعديله.</string>
+    <string name="tracker_saved">تم الحفظ في %1$s.</string>
+    <plurals name="tracker_loaded">
+        <item quantity="zero">أُضيف %d يوم.</item>
+        <item quantity="one">أُضيف %d يوم.</item>
+        <item quantity="two">أُضيف %d يوم.</item>
+        <item quantity="few">أُضيفت %d أيام.</item>
+        <item quantity="many">أُضيف %d يومًا.</item>
+        <item quantity="other">أُضيف %d يوم.</item>
+    </plurals>
+    <string name="tracker_save_failed">تعذّر حفظ الملف.</string>
+    <string name="tracker_load_failed_format">تعذّرت قراءة هذا الملف. اختر ملفًا حفظه SajdaTime.</string>
+    <string name="tracker_load_failed_newer">يحتاج هذا الملف إلى إصدار أحدث من SajdaTime.</string>
+    <string name="tracker_tick_a11y">%1$s، %2$s</string>
+    <string name="tracker_state_prayed">صُلّيت</string>
+    <string name="tracker_state_not_ticked">بلا علامة</string>
+    <string name="tracker_state_not_due">لم يحن وقتها</string>
+    <!-- My prayers tab (1.6.0, step 1). Translated by Claude, 23 Oct 2026. -->
+    <string name="nav_tracker">صلواتي</string>
+    <string name="tracker_state_paused">متوقف مؤقتًا</string>
+    <string name="tracker_off_line">لا يُسجَّل شيء حتى تشغّل هذا الخيار.</string>
+    <string name="tracker_paused_from_today">متوقف مؤقتًا من اليوم</string>
+    <string name="action_undo">تراجع</string>
+    <string name="tracker_last_night_isha">العشاء، الليلة الماضية</string>
+    <string name="tracker_week_title">هذا الأسبوع</string>
+    <plurals name="tracker_ring_a11y">
+        <item quantity="zero">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="one">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="two">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="few">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="many">%1$s، %2$d من 5 صُلّيت</item>
+        <item quantity="other">%1$s، %2$d من 5 صُلّيت</item>
+    </plurals>
+    <plurals name="tracker_ring_today_a11y">
+        <item quantity="zero">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="one">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="two">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="few">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="many">اليوم، %1$d من 5 حتى الآن</item>
+        <item quantity="other">اليوم، %1$d من 5 حتى الآن</item>
+    </plurals>
+    <string name="tracker_ring_paused_a11y">%1$s، متوقف مؤقتًا</string>
+    <string name="tracker_ring_future_a11y">%1$s، لم يأتِ بعد</string>
+    <string name="tracker_ring_before_a11y">%1$s، قبل بدء التتبع</string>
+    <string name="dates_title">التواريخ الإسلامية</string>
+    <string name="dates_today_is">اليوم %1$s</string>
+    <string name="date_ashura">عاشوراء</string>
+    <string name="date_ramadan_1">بداية رمضان</string>
+    <string name="date_eid_fitr">عيد الفطر</string>
+    <string name="date_arafah">يوم عرفة</string>
+    <string name="date_eid_adha">عيد الأضحى</string>
+    <string name="date_ghadir">عيد الغدير</string>
+    <string name="date_arbaeen">الأربعين</string>
+    <string name="date_prophet_birth">مولد النبي ﷺ</string>
+    <string name="date_imam_ali_birth">مولد الإمام علي</string>
+    <string name="date_imam_mahdi_birth">مولد الإمام المهدي</string>
+    <plurals name="dates_in_days">
+        <item quantity="zero">بعد %d يوم</item>
+        <item quantity="one">بعد %d يوم</item>
+        <item quantity="two">بعد %d يوم</item>
+        <item quantity="few">بعد %d أيام</item>
+        <item quantity="many">بعد %d يومًا</item>
+        <item quantity="other">بعد %d يوم</item>
+    </plurals>
+    <string name="dates_footer">تقويم أم القرى مع تعديل التاريخ الخاص بك. قد تختلف رؤية الهلال في بلدك بيوم.</string>
+    <string name="dates_unavailable">التواريخ الإسلامية غير متاحة لهذه السنة.</string>
+    <string name="dates_header_a11y">التواريخ الإسلامية. اليوم %1$s</string>
+    <string name="settings_islamic_dates">التواريخ الإسلامية</string>
+    <string name="settings_islamic_dates_desc">رمضان والعيدان وتواريخ مهمة أخرى</string>
+    <string name="night_midnight">منتصف الليل الإسلامي</string>
+    <string name="night_last_third_from">الثلث الأخير ابتداءً من %1$s</string>
+    <string name="night_row_a11y">منتصف الليل الإسلامي %1$s. الثلث الأخير من الليل ابتداءً من %2$s.</string>
+    <string name="settings_night_times">أوقات الليل</string>
+    <string name="settings_night_times_desc">تعرض منتصف الليل الإسلامي والثلث الأخير من الليل أسفل العشاء</string>
+    <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
+    <string name="why_times_adjusted">معدّلة</string>
+    <string name="why_times_sunni">تستخدم هذه الأوقات %1$s مع حساب العصر وفق المذهب %2$s.</string>
+    <string name="why_times_shia">تستخدم هذه الأوقات الطريقة الجعفرية.</string>
+    <string name="why_times_method">تستخدم هذه الأوقات %1$s.</string>
+    <string name="why_times_shia_caption">الجعفري (شيعي)</string>
+    <string name="settings_jamaah">أوقات الجماعة</string>
+    <plurals name="settings_jamaah_count">
+        <item quantity="zero">%d صلاة محددة</item>
+        <item quantity="one">%d صلاة محددة</item>
+        <item quantity="two">%d صلاة محددة</item>
+        <item quantity="few">%d صلوات محددة</item>
+        <item quantity="many">%d صلاة محددة</item>
+        <item quantity="other">%d صلاة محددة</item>
+    </plurals>
+    <string name="settings_jamaah_off">إيقاف</string>
+    <string name="jumuah">الجمعة</string>
+    <string name="jamaah_rule_fixed">وقت ثابت</string>
+    <string name="jamaah_rule_after">دقائق بعد دخول الوقت</string>
+    <string name="jamaah_rule_after_help">الأنسب إذا كان مسجدك يغيّر أوقاته مع الفصول.</string>
+    <plurals name="jamaah_after_minutes">
+        <item quantity="zero">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="one">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="two">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="few">بعد دخول الوقت بـ%d دقائق</item>
+        <item quantity="many">بعد دخول الوقت بـ%d دقيقة</item>
+        <item quantity="other">بعد دخول الوقت بـ%d دقيقة</item>
+    </plurals>
+    <string name="jamaah_today">اليوم %1$s</string>
+    <string name="jamaah_line">الجماعة %1$s</string>
+    <string name="jumuah_line">الجمعة %1$s</string>
+    <string name="jamaah_check">تحقق من وقت الجماعة</string>
+    <!-- %1$s is the prayer's own label. Typed time is before that prayer begins. -->
+    <string name="jamaah_before_window">وقت جماعة %1$s الذي أدخلته قبل دخول وقت %1$s. تحقق من أوقات مسجدك.</string>
+    <!-- %1$s is the prayer's own label, %2$s the label of the next prayer, whose start the typed time is not before. -->
+    <string name="jamaah_after_window">وقت جماعة %1$s الذي أدخلته بعد دخول وقت %2$s. تحقق من أوقات مسجدك.</string>
+    <!-- %1$s is the prayer's own label (Fajr). Typed time is after sunrise. -->
+    <string name="jamaah_after_sunrise">وقت جماعة %1$s الذي أدخلته بعد شروق الشمس. تحقق من أوقات مسجدك.</string>
+    <!-- %1$s is the label of Dhuhr. -->
+    <string name="jumuah_before_window">وقت الجمعة الذي أدخلته قبل دخول وقت %1$s. تحقق من أوقات مسجدك.</string>
+    <!-- %1$s is the label of Asr. -->
+    <string name="jumuah_after_window">وقت الجمعة الذي أدخلته بعد دخول وقت %1$s. تحقق من أوقات مسجدك.</string>
+    <!-- Quiet notice at the top of the Jama'ah times dialog while the phone is in another time zone. -->
+    <string name="jamaah_away_brief">أنت في منطقة زمنية مختلفة، لذلك لا تظهر أوقات الجماعة.</string>
+    <string name="jamaah_away_details">ستعود عندما تكون في بلدك. إذا انتقلت، فغيّر أيًّا منها هنا وستتبع كلها هذه المنطقة الزمنية.</string>
+    <string name="jamaah_pick_time_title">%1$s: وقت الجماعة على لوحة مسجدك</string>
+    <string name="mosque_diff_add_jamaah">أضف أوقات الجماعة في مسجدك</string>
+
+    <!-- 1.6 step 3: the bell on each prayer row. -->
+    <string name="bell_on_a11y">تنبيه %1$s مفعّل، إشعار</string>
+    <string name="bell_alarm_a11y">تنبيه %1$s مفعّل، منبّه</string>
+    <string name="bell_off_a11y">تنبيه %1$s متوقف</string>
+    <string name="bell_blocked_a11y">تنبيه %1$s مفعّل. الإشعارات متوقفة على هذا الهاتف.</string>
+    <string name="bell_off_message">تم إيقاف تنبيه %1$s</string>
+    <string name="bell_off_reminder_message">تم إيقاف تنبيه %1$s والتذكير</string>
+    <string name="bell_off_message_fajr_ramadan">تم إيقاف تنبيه الفجر. يبقى تذكير السحور مفعّلًا.</string>
+    <string name="bell_off_reminder_message_fajr_ramadan">تم إيقاف تنبيه الفجر والتذكير. يبقى تذكير السحور مفعّلًا.</string>
+    <string name="notifications_off_title">السماح بالإشعارات</string>
+    <string name="notifications_off_brief">لا يمكن أن تصل تنبيهات الصلاة إلى هذا الهاتف.</string>
+    <!-- 1.6 step 5: the skies. Times of day, never prayer or fasting names (STEP-5-DESIGN §9). -->
+    <string name="sky_dawn">الصباح الباكر</string>
+    <string name="sky_day">النهار</string>
+    <string name="sky_evening">المساء</string>
+    <string name="sky_night">الليل</string>
+    <string name="sky_now_a11y">%1$s، حتى %2$s</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">فحص التنبيهات</string>
+    <string name="alert_check_all_ok">كل شيء مسموح</string>
+    <string name="alert_check_notifications_ok">الإشعارات مسموحة</string>
+    <string name="alert_check_notifications_fail">الإشعارات متوقفة. لن تصل التنبيهات.</string>
+    <string name="alert_check_notifications_button">السماح بالإشعارات</string>
+    <string name="alert_check_exact_ok">المنبّهات الدقيقة مسموحة</string>
+    <string name="alert_check_exact_fail">قد تصل التنبيهات متأخرة أو لا تصل أبدًا.</string>
+    <string name="alert_check_exact_button">السماح بالمنبّهات الدقيقة</string>
+    <string name="alert_check_battery_ok">البطارية غير مقيّدة</string>
+    <string name="alert_check_battery_fail">قد يؤدي توفير البطارية إلى حجب التنبيهات.</string>
+    <string name="alert_check_dnd_ok">يمكن للمنبّه أن يعمل في وضع عدم الإزعاج</string>
+    <string name="alert_check_dnd_fail">يبقى المنبّه صامتًا في وضع عدم الإزعاج.</string>
+    <string name="alert_check_background">تغلق بعض الهواتف التطبيقات لتوفير البطارية، مثل هواتف شاومي وسامسونج. إذا لم يصل تنبيه رغم ذلك، فاسمح لتطبيق SajdaTime بالعمل في الخلفية من إعدادات هاتفك.</string>
+    <string name="alert_check_app_settings">فتح إعدادات التطبيق</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="zero">%d أمر يحتاج إلى إصلاح</item>
+        <item quantity="one">%d أمر يحتاج إلى إصلاح</item>
+        <item quantity="two">أمران يحتاجان إلى إصلاح</item>
+        <item quantity="few">%d أمور تحتاج إلى إصلاح</item>
+        <item quantity="many">%d أمرًا يحتاج إلى إصلاح</item>
+        <item quantity="other">%d أمر يحتاج إلى إصلاح</item>
+    </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">تذكيرات الصيام</string>
+    <string name="settings_fast_reminders_off">إيقاف</string>
+    <string name="settings_fast_reminders_on">المفعّل: %1$d</string>
+    <string name="settings_fast_reminders_help">تذكير مساء اليوم السابق لكل صيام تختاره، مع وقت انتهاء السحور، بحسب التقويم المضبوط عليه SajdaTime.</string>
+    <string name="settings_fast_monday_thursday">الاثنين والخميس</string>
+    <string name="settings_fast_white_days">الأيام البيض (13 و14 و15)</string>
+    <string name="settings_fast_special">عاشوراء ويوم عرفة وستة أيام من شوال</string>
+    <string name="notif_fast_monday">غدًا صيام سنة (الاثنين). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_thursday">غدًا صيام سنة (الخميس). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_white_day">غدًا صيام سنة (من الأيام البيض). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_muharram_9">غدًا صيام سنة (التاسع من محرم، قبل عاشوراء). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_ashura">غدًا صيام سنة (عاشوراء). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_arafah">غدًا صيام سنة (يوم عرفة بحسب هذا التقويم). اتبع مسجدك في تحديد اليوم. ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_shawwal">غدًا صيام سنة (من ستة أيام من شوال). ينتهي السحور الساعة %1$s.</string>
 </resources>

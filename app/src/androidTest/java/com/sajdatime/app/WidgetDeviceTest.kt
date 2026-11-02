@@ -20,6 +20,7 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.notify.TimeFormat
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.widget.NextPrayerWidgetProvider
+import com.sajdatime.app.widget.TodayStripWidgetProvider
 import com.sajdatime.app.widget.TodayWidgetProvider
 import com.sajdatime.app.widget.WidgetRefreshScheduler
 import com.sajdatime.app.widget.WidgetState
@@ -32,6 +33,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -42,7 +44,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 /**
- * Both widgets, bound for real through the system's widget service and drawn by a host the way a
+ * The three widgets, bound for real through the system's widget service and drawn by a host the way a
  * launcher draws them, then read back. Everything the JVM tests cannot say: that the layouts inflate in
  * the system's `RemoteViews` host, that the provider is reachable and updates, that the words and the
  * highlight match what the engine says, and that the redraw alarm is really registered with the
@@ -83,7 +85,7 @@ class WidgetDeviceTest {
     }
 
     private fun removeAllOurWidgets() {
-        for (provider in listOf(NextPrayerWidgetProvider::class.java, TodayWidgetProvider::class.java)) {
+        for (provider in listOf(NextPrayerWidgetProvider::class.java, TodayWidgetProvider::class.java, TodayStripWidgetProvider::class.java)) {
             manager.getAppWidgetIds(ComponentName(context, provider)).forEach { host.deleteAppWidgetId(it) }
         }
     }
@@ -194,6 +196,44 @@ class WidgetDeviceTest {
         }
     }
 
+    // ---- Today strip -------------------------------------------------------------------------
+
+    /**
+     * Step 8. The strip's root description starts with the town, names the five prayers and leaves out
+     * Sunrise (it is not shown); at 1.3 text the five columns are gone and the next prayer alone shows.
+     */
+    @Test
+    fun the_strip_speaks_the_town_and_five_prayers_and_shows_one_at_large_text() {
+        val (_, view) = bindOrFail(TodayStripWidgetProvider::class.java)
+        // The host view's own description defaults to the provider label, so wait for the one the renderer writes
+        // on the layout's root, which leads with the town.
+        fun spoken() = view.findViewById<View>(R.id.widget_root)?.contentDescription?.toString().orEmpty()
+            // The town is wrapped in bidi isolates so it reads right in Urdu; they are not words.
+            .filter { it !in '\u2066'..'\u2069' }
+        waitFor("the strip's first draw") { spoken().startsWith("London") }
+        save("widget-strip-${tag()}", layoutAt(view, 380, 64))
+
+        val said = spoken()
+        assertTrue("the town leads: \"$said\"", said.startsWith("London"))
+        for (slot in listOf(PrayerSlot.FAJR, PrayerSlot.DHUHR, PrayerSlot.ASR, PrayerSlot.MAGHRIB, PrayerSlot.ISHA)) {
+            assertTrue("$slot is not spoken: \"$said\"", said.contains(slot.label(appContext)))
+        }
+        assertFalse("Sunrise is not on the strip: \"$said\"", said.contains(PrayerSlot.SUNRISE.label(appContext)))
+
+        val columnsVisible = view.textOf("widget_name_dhuhr")?.visibility == View.VISIBLE &&
+            (view.textOf("widget_name_dhuhr")!!.parent as View).visibility == View.VISIBLE
+        val nextRow = view.textOf("widget_name")?.parent as? View
+        if (context.resources.configuration.fontScale >= 1.3f) {
+            assertFalse("the five columns are still shown at large text", columnsVisible)
+            assertEquals("the next prayer row is not shown at large text", View.VISIBLE, nextRow?.visibility)
+            // Opus review, 25 Oct 2026: the town chip would squeeze the one prayer left, so it is hidden at every width.
+            assertNotEquals("the town chip shows at large text", View.VISIBLE, view.findViewById<View>(R.id.widget_place_chip)?.visibility)
+        } else {
+            assertTrue("the five columns are missing at normal text", columnsVisible)
+            assertEquals("the large text row shows at normal text", View.GONE, nextRow?.visibility)
+        }
+    }
+
     // ---- Next prayer -------------------------------------------------------------------------
 
     @Test
@@ -299,7 +339,7 @@ class WidgetDeviceTest {
         waitFor("the redraw alarm to be registered") { DeviceSupport.alarmTimes(pkg, action).isNotEmpty() }
 
         val (state, now) = stateNow()
-        val expected = WidgetRefreshScheduler.nextRefreshAt(state.next!!.at, now, zone)
+        val expected = WidgetRefreshScheduler.nextRefreshAt(state.next!!.at, now, zone, state.today?.get(PrayerSlot.SUNRISE))
             .atZone(zone).toLocalDateTime()
         val set = DeviceSupport.alarmTimes(pkg, action)
         assertEquals("exactly one redraw alarm", 1, set.size)

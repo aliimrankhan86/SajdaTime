@@ -114,13 +114,30 @@ class DesignRulesTest {
     }
 
     /**
+     * The disclaimer is the first row of About, above Version (owner, 23 Oct 2026), never buried
+     * (CLAUDE.md). Read off the source: the first key after SettingsSectionId.ABOUT is the first row on screen.
+     */
+    @Test
+    fun `the disclaimer is the first row of About`() {
+        val text = sources.first { it.name == "SettingsScreen.kt" }.readText()
+        val about = text.indexOf("SettingsSectionId.ABOUT,")
+        assertTrue("SettingsSectionId.ABOUT not found in SettingsScreen.kt", about >= 0)
+        val first = Regex("""key = "(\w+)"""").find(text, about)?.groupValues?.get(1)
+        assertTrue(
+            "The first row of About is \"$first\". The disclaimer is the first row of About (owner, 23 Oct 2026), " +
+                "never buried. CLAUDE.md.",
+            first == "disclaimer",
+        )
+    }
+
+    /**
      * Every dialog the user can simply leave shows a close X at the top right (DialogTitle).
-     * The exceptions must be answered, never closed: the first run disclaimer (MainActivity)
-     * and the usage counts question, where an X would be an answer nobody gave.
+     * The exception must be answered, never closed: the usage counts question, where an X
+     * would be an answer nobody gave.
      */
     @Test
     fun `dismissable dialogs carry the close X`() {
-        val exempt = setOf("MainActivity.kt", "UsageCountsConsent.kt")
+        val exempt = setOf("UsageCountsConsent.kt")
         // Per file: at least as many DialogTitle calls as AlertDialog calls. Counting, not a
         // text window, so a long confirmButton block cannot hide the title from the check.
         val found = sources.filter { it.name !in exempt }.mapNotNull { file ->
@@ -163,5 +180,48 @@ class DesignRulesTest {
         assertTrue("Notice.kt must space with Space.*", "Space.Group" in text && "Space.Tight" in text)
         val stray = Regex("""Spacer\(Modifier\.height\(\d+\.dp\)\)""").findAll(text).map { it.value }.toList()
         assertTrue("Notice.kt has gaps outside the scale: $stray", stray.isEmpty())
+    }
+
+    /**
+     * Animation timing comes from Motion (1.6, 23 Oct 2026), so a call site says Motion.quick() and
+     * the easing comes with it, the way gaps come from Space. The one exemption is the Qibla dial's
+     * 120 ms tween, which follows the compass, so it is input driven and is not a choice of feel; only
+     * that exact call (and its import) is let through, so a second tween in QiblaScreen.kt still fails.
+     * Word bounded because a plain tween( would also match Duration.between(; TweenSpec is caught too.
+     * The watch has no animation and is not scanned.
+     */
+    @Test
+    fun `animation durations come from Motion`() {
+        val tween = Regex("""\btween\b|\bTweenSpec\b""")
+        val dial = Regex("""import androidx\.compose\.animation\.core\.tween|tween\(durationMillis = 120\)""")
+        val found = sources.filter { it.name != "Motion.kt" }
+            .filter { tween.containsMatchIn(if (it.name == "QiblaScreen.kt") it.readText().replace(dial, "") else it.readText()) }
+            .map { it.name }
+        assertTrue("Use Motion.quick(), standard() or draw(), not a written tween: $found", found.isEmpty())
+    }
+
+    /** Nothing loops: a moving thing the user did not cause is how an app feels restless. */
+    @Test
+    fun `nothing animates forever`() {
+        val found = offenders(Regex("""\b(rememberInfiniteTransition|infiniteRepeatable)\b"""))
+        assertTrue("No infinite animations (BUILD-INSTRUCTIONS section 6): $found", found.isEmpty())
+    }
+
+    /**
+     * A written spring has no fixed duration, so it cannot be one of the three. Compose's own default
+     * specs on approved screens (tab fade, folds) are kept; only a spring someone writes is banned.
+     */
+    @Test
+    fun `no written springs`() {
+        val found = offenders(Regex("""\bspring\s*(<[^>]*>)?\s*\(|\bSpringSpec\b"""))
+        assertTrue("Use a Motion token, not a spring: $found", found.isEmpty())
+    }
+
+    /** The sky's two animations (the crossfade and the draw in) are drawings, so both run at Motion.draw() (step 5). */
+    @Test
+    fun `the sky animates with Motion draw only`() {
+        val sky = sources.single { it.name == "Sky.kt" }.readText()
+        assertTrue("Sky.kt must animate with Motion.draw()", Regex("""Motion\.draw\(\)""").findAll(sky).count() >= 2)
+        assertTrue("Sky.kt must not use another Motion token", !Regex("""Motion\.(quick|standard)\(""").containsMatchIn(sky))
     }
 }

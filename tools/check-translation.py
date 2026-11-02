@@ -6,12 +6,14 @@
           python3 tools/check-translation.py tr tr
           python3 tools/check-translation.py ur ur
           python3 tools/check-translation.py ar ar-u-nu-latn   (Arabic keeps Western digits)
+          python3 tools/check-translation.py bn bn-u-nu-latn   (Bengali keeps Western digits)
 
 Checks every module (app, core, wear) that has a values-<qualifier>/strings.xml against its
 English source. It cannot judge whether a translation is *good*. It can and does catch the
 things that break the app or change its meaning silently: a missing key, a lost or reordered
 placeholder, a wrong plural form set, an unescaped apostrophe (a build error), a changed
-paragraph count (the disclaimer's structure carries meaning), a changed bullet count, and
+paragraph count (the disclaimer's structure carries meaning), a changed bullet count,
+"SajdaTime" translated or dropped (it is the Play Store name, owner 30 Oct 2026), and
 the wrong app_language_tag. Exit status 0 only when there are no errors; warnings do not fail.
 
 The same checks run in the build as app/src/test/.../TranslationIntegrityTest.kt (8 Oct 2026
@@ -28,6 +30,7 @@ MODULES = ["app", "core", "wear"]
 PLURALS = {
     "in": {"other"}, "id": {"other"}, "tr": {"one", "other"}, "ur": {"one", "other"},
     "ar": {"zero", "one", "two", "few", "many", "other"},
+    "bn": {"one", "other"},
 }
 FMT = re.compile(r"%(?:\d+\$)?[-+#0 ,(]*\d*(?:\.\d+)?[sdfxXc%]")
 
@@ -107,6 +110,9 @@ def main(qualifier, tag):
                     errors.append(f"{mod}:{name}: markup presence differs")
                 if sv.strip() and not tv.strip():
                     errors.append(f"{mod}:{name}: empty translation")
+                # The name stays "SajdaTime", the Play Store name, in every language (owner, 30 Oct 2026).
+                if sv.count("SajdaTime") != tv.count("SajdaTime"):
+                    errors.append(f"{mod}:{name}: SajdaTime {sv.count('SajdaTime')} -> {tv.count('SajdaTime')}, never translate it")
             elif k == "plurals":
                 want = PLURALS.get(lang)
                 have = set(tv)
@@ -122,7 +128,7 @@ def main(qualifier, tag):
                 if len(sv) != len(tv):
                     errors.append(f"{mod}:{name}: {len(sv)} items -> {len(tv)}")
         # Long prose that is still mostly ASCII letters is probably untranslated (not for Latin-script languages).
-        if lang in ("ur", "ar"):
+        if lang.split("-")[0] in ("ur", "ar", "bn"):
             for name in sorted(need & set(tr)):
                 k, tv, _ = tr[name]
                 if k == "string" and len(tv) > 60:

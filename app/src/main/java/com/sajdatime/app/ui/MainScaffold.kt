@@ -1,85 +1,104 @@
 package com.sajdatime.app.ui
 
 import androidx.annotation.VisibleForTesting
-import com.sajdatime.app.ui.theme.Space
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import com.sajdatime.app.ui.components.LocalBottomBarClearance
-import com.sajdatime.app.ui.components.WholeWords
-import com.sajdatime.app.ui.components.scaledLineHeight
-import com.sajdatime.app.ui.theme.GlassBarAlpha
-import com.sajdatime.app.ui.theme.LocalDarkTheme
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Explore
-import androidx.compose.material.icons.rounded.Schedule
-import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Schedule
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
-import com.sajdatime.core.CalcMethod
-import com.sajdatime.core.Madhab
-import com.sajdatime.core.PrayerSlot
-import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.ui.components.LocalBottomBarClearance
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
+import com.sajdatime.app.ui.components.WholeWords
+import com.sajdatime.app.ui.components.readingWidth
+import com.sajdatime.app.ui.components.scaledLineHeight
 import com.sajdatime.app.ui.home.HomeScreen
+import com.sajdatime.app.ui.prayers.MyPrayersScreen
 import com.sajdatime.app.ui.qibla.QiblaScreen
 import com.sajdatime.app.ui.settings.SettingsChooser
 import com.sajdatime.app.ui.settings.SettingsScreen
-import com.sajdatime.app.ui.components.UsageCountsConsentDialog
+import com.sajdatime.app.ui.theme.GlassBarAlpha
+import com.sajdatime.app.ui.theme.LocalDarkTheme
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.ThemeChoice
+import com.sajdatime.core.BellMessage
+import com.sajdatime.core.BellRules
+import com.sajdatime.core.CalcMethod
+import com.sajdatime.core.HijriCalendar
+import com.sajdatime.core.Madhab
+import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
+import com.sajdatime.core.labelRes
+import java.time.LocalDate
+import kotlinx.coroutines.launch
 
-/** Top-level destinations. Three is comfortably inside the five-item guidance. */
+/** Top-level destinations. Four is inside the five-item guidance. */
 enum class Destination(
     val labelRes: Int,
     val selectedIcon: ImageVector,
@@ -87,6 +106,7 @@ enum class Destination(
 ) {
     TIMES(R.string.nav_times, Icons.Rounded.Schedule, Icons.Outlined.Schedule),
     QIBLA(R.string.nav_qibla, Icons.Rounded.Explore, Icons.Outlined.Explore),
+    PRAYERS(R.string.nav_tracker, Icons.Rounded.CheckCircle, Icons.Outlined.CheckCircle),
     SETTINGS(R.string.nav_settings, Icons.Rounded.Settings, Icons.Outlined.Settings),
 }
 
@@ -117,13 +137,19 @@ fun MainScaffold(
     onDismissRamadanNotice: (Int) -> Unit,
     onDismissEid: (Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetNightTimes: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
+    onSetFastReminder: (com.sajdatime.core.FastKind, Boolean) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
+    tracker: TrackerActions,
+    jamaah: JamaahActions,
+    bell: BellActions,
+    notificationsBlocked: Boolean,
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -152,15 +178,72 @@ fun MainScaffold(
     }
 
     // Usage counts (opt-in only; a no-op otherwise): one fixed word per main tab, sent only
-    // when the tab changes. Never anything about what is on the screen.
+    // when the tab changes. Never anything about what is on the screen. My prayers has no word: opening
+    // it is never counted (owner's rule for the tracker; UsageCountsTest pins the three screens).
     LaunchedEffect(destination) {
-        onScreenViewed(
-            when (destination) {
-                Destination.TIMES -> Screen.TIMES
-                Destination.QIBLA -> Screen.QIBLA
-                Destination.SETTINGS -> Screen.SETTINGS
-            },
-        )
+        when (destination) {
+            Destination.TIMES -> Screen.TIMES
+            Destination.QIBLA -> Screen.QIBLA
+            Destination.PRAYERS -> null
+            Destination.SETTINGS -> Screen.SETTINGS
+        }?.let(onScreenViewed)
+    }
+
+    // The one snackbar host, above the glass bar, so a message can follow the user to any tab. Its only
+    // message today is "Paused from today" with Undo, and Undo is resume (a pause started and ended on
+    // the same day leaves nothing behind, TrackerLogic.resume).
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val pausedMessage = stringResource(R.string.tracker_paused_from_today)
+    val undoLabel = stringResource(R.string.action_undo)
+    val pauseToday: () -> Unit = {
+        tracker.pause(false)
+        scope.launch {
+            snackbar.currentSnackbarData?.dismiss()
+            val result = snackbar.showSnackbar(pausedMessage, actionLabel = undoLabel, duration = SnackbarDuration.Short)
+            if (result == SnackbarResult.ActionPerformed) tracker.resume()
+        }
+    }
+
+    // The bell's message (1.6.0 step 3): only when a bell goes off, with Undo, and one at a time like the
+    // pause message. Which wording comes from what the edit actually removed (BellRules.message). The
+    // suhoor part follows the scheduler: minutes above 0 and Ramadan today or tomorrow on the user's own
+    // calendar (the evening before 1 Ramadan the reminder already fires for the next Fajr).
+    val resources = LocalResources.current
+    var undoneBell by remember { mutableStateOf<PrayerSlot?>(null) }
+    var offMessageFor by remember { mutableStateOf<PrayerSlot?>(null) }
+    val onBell: (PrayerSlot, Boolean) -> Unit = { slot, on ->
+        undoneBell = null
+        if (on) {
+            // That prayer's own "alert off" message and its Undo are now stale; any other message stays.
+            if (offMessageFor == slot) snackbar.currentSnackbarData?.dismiss()
+            bell.on(slot)
+        } else {
+            scope.launch {
+                val removed = bell.off(slot)
+                val settings = state.settings
+                val day = state.today?.date ?: LocalDate.now()
+                val shift = settings.calculationPrefs.hijriOffset
+                val suhoor = settings.suhoorReminderMinutes > 0 &&
+                    (HijriCalendar.isRamadan(day, shift) || HijriCalendar.isRamadan(day.plusDays(1), shift))
+                val name = resources.getString(slot.labelRes)
+                val text = when (BellRules.message(slot, removed, suhoor)) {
+                    BellMessage.OFF -> resources.getString(R.string.bell_off_message, name)
+                    BellMessage.OFF_AND_REMINDER -> resources.getString(R.string.bell_off_reminder_message, name)
+                    BellMessage.OFF_FAJR_RAMADAN -> resources.getString(R.string.bell_off_message_fajr_ramadan)
+                    BellMessage.OFF_AND_REMINDER_FAJR_RAMADAN ->
+                        resources.getString(R.string.bell_off_reminder_message_fajr_ramadan)
+                }
+                snackbar.currentSnackbarData?.dismiss()
+                offMessageFor = slot
+                val result = snackbar.showSnackbar(text, actionLabel = undoLabel, duration = SnackbarDuration.Short)
+                if (offMessageFor == slot) offMessageFor = null
+                if (result == SnackbarResult.ActionPerformed) {
+                    undoneBell = slot
+                    bell.undo(slot)
+                }
+            }
+        }
     }
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
@@ -172,7 +255,12 @@ fun MainScaffold(
     // Quiet Glass (17 Oct 2026): no bottomBar slot. The tab bar floats over the content in the
     // same Box, so the screens scroll softly underneath it; each screen ends with
     // BottomBarClearance() so its last row can still be scrolled clear of the bar.
-    Scaffold(containerColor = MaterialTheme.colorScheme.background) { padding ->
+    // The top inset is no longer taken here (1.6, step 5): Times draws its sky under the status bar, and the
+    // other three tabs take the same inset one level down (ReadingFrame), so nothing else moves.
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+    ) { padding ->
         var barHeight by remember { mutableStateOf(0.dp) }
         val density = LocalDensity.current
         Box(
@@ -200,39 +288,63 @@ fun MainScaffold(
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
                         onOpenSetting = openSetting,
+                        onBell = onBell,
+                        snapBell = undoneBell,
+                        bellMessageShowing = snackbar.currentSnackbarData != null,
+                        notificationsBlocked = notificationsBlocked,
+                        onAllowNotifications = bell::allow,
+                        onDismissNotificationsNotice = bell::dismissNotice,
                     )
 
-                    Destination.QIBLA -> QiblaScreen(state = state)
+                    Destination.QIBLA -> ReadingFrame {
+                        QiblaScreen(state = state, onUseGps = onRefreshLocation, onSearchCity = onSearchCity)
+                    }
 
-                    Destination.SETTINGS -> SettingsScreen(
-                        state = state,
-                        request = settingsRequest,
-                        onRequestHandled = { settingsRequest = null },
-                        onSetSect = onSetSect,
-                        onSetMadhab = onSetMadhab,
-                        onSetMethod = onSetMethod,
-                        onSetAlert = onSetAlert,
-                        onSetAdjustment = onSetAdjustment,
-                        onSetHijriOffset = onSetHijriOffset,
-                        onResetAdjustments = onResetAdjustments,
-                        onSetOngoingBadge = onSetOngoingBadge,
-                        onSetRamadanCard = onSetRamadanCard,
-                        onSetSuhoorMinutes = onSetSuhoorMinutes,
-                        onSetSuhoorStyle = onSetSuhoorStyle,
-                        onSetSuhoorAdhan = onSetSuhoorAdhan,
-                        onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
-                        onSetPrayerReminder = onSetPrayerReminder,
-                        onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
-                        onPickAlarmSound = onPickAlarmSound,
-                        onPickBuiltInAdhan = onPickBuiltInAdhan,
-                        onPickNotificationSound = onPickNotificationSound,
-                        onPickBuiltInNotificationAdhan = onPickBuiltInNotificationAdhan,
-                        onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
-                        onRefreshLocation = onRefreshLocation,
-                        onSearchCity = onSearchCity,
-                        onSetThemeChoice = onSetThemeChoice,
-                        onSetAnalytics = onSetAnalytics,
-                    )
+                    Destination.PRAYERS -> ReadingFrame {
+                        MyPrayersScreen(
+                            state = state,
+                            tracker = tracker,
+                            onPause = pauseToday,
+                            onUseGps = onRefreshLocation,
+                            onSearchCity = onSearchCity,
+                        )
+                    }
+
+                    Destination.SETTINGS -> ReadingFrame {
+                        SettingsScreen(
+                            state = state,
+                            request = settingsRequest,
+                            onRequestHandled = { settingsRequest = null },
+                            onSetSect = onSetSect,
+                            onSetMadhab = onSetMadhab,
+                            onSetMethod = onSetMethod,
+                            onSetAlert = onSetAlert,
+                            onSetAdjustment = onSetAdjustment,
+                            onSetHijriOffset = onSetHijriOffset,
+                            onResetAdjustments = onResetAdjustments,
+                            onSetOngoingBadge = onSetOngoingBadge,
+                            onSetRamadanCard = onSetRamadanCard,
+                            onSetNightTimes = onSetNightTimes,
+                            onSetSuhoorMinutes = onSetSuhoorMinutes,
+                            onSetSuhoorStyle = onSetSuhoorStyle,
+                            onSetSuhoorAdhan = onSetSuhoorAdhan,
+                            onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
+                            onSetPrayerReminder = onSetPrayerReminder,
+                            onSetFastReminder = onSetFastReminder,
+                            onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
+                            onPickAlarmSound = onPickAlarmSound,
+                            onPickBuiltInAdhan = onPickBuiltInAdhan,
+                            onPickNotificationSound = onPickNotificationSound,
+                            onPickBuiltInNotificationAdhan = onPickBuiltInNotificationAdhan,
+                            onSetAlarmRespectsSilent = onSetAlarmRespectsSilent,
+                            onRefreshLocation = onRefreshLocation,
+                            onSearchCity = onSearchCity,
+                            onSetThemeChoice = onSetThemeChoice,
+                            onSetAnalytics = onSetAnalytics,
+                            tracker = tracker,
+                            jamaah = jamaah,
+                        )
+                    }
                 }
             }
           }
@@ -243,6 +355,7 @@ fun MainScaffold(
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { barHeight = with(density) { it.height.toDp() } },
             )
+            SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).padding(bottom = barHeight))
         }
     }
 }
@@ -268,7 +381,9 @@ internal fun GlassTabBar(
     val shape = RoundedCornerShape(32.dp)
     val haptics = LocalHapticFeedback.current
     Row(
-        verticalAlignment = Alignment.CenterVertically,
+        // Top, not centred (30 Oct 2026): a label on two lines made its tab taller, and centring lifted
+        // that tab's icon out of line with the other three (Bengali "আমার নামাজ" at 2.0, emulator).
+        verticalAlignment = Alignment.Top,
         modifier = modifier
             .padding(horizontal = 16.dp, vertical = 12.dp)
             .fillMaxWidth()
@@ -319,9 +434,24 @@ internal fun GlassTabBar(
                     ).scaledLineHeight(),
                     color = if (selected) scheme.onSurface else scheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
+                    // Wraps between words, shrinks only while a word would split. One line that shrinks was
+                    // tried on 30 Oct 2026 and measured worse: on a 320dp phone at 2.0 "My prayers" and
+                    // "আমার নামাজ" still ended in an ellipsis at the floor (LargeTextAndTalkBackDeviceTest).
                     autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize),
                 )
             }
         }
+    }
+}
+
+/**
+ * The three tabs that are not Times (1.6, step 5): the status bar inset the Scaffold used to apply, taken here
+ * instead, and the 600dp reading column (Q18, Q20) centred. Times does both itself, because its sky runs
+ * under the status bar and out to both edges.
+ */
+@Composable
+private fun ReadingFrame(content: @Composable () -> Unit) {
+    Box(Modifier.fillMaxSize().statusBarsPadding(), contentAlignment = Alignment.TopCenter) {
+        Box(Modifier.readingWidth()) { content() }
     }
 }

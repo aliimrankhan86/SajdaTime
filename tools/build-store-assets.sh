@@ -5,7 +5,7 @@
 #
 #   upload/app-icon/icon-512.png                 512x512   -> "App icon"
 #   upload/feature-graphic/feature-graphic.png   1024x500  -> "Feature graphic"
-#   upload/phone/*.png                           1080x1920 -> "Phone screenshots"
+#   upload/phone/<folder>/*.png                  1080x1920 -> "Phone screenshots" (one folder per listing language)
 #   upload/wear-os/*.png                         454x454   -> "Wear OS screenshots"
 #   upload/tablet-7in, tablet-10in, chromebook   deliberately empty, see their READMEs
 #
@@ -134,7 +134,9 @@ HTML
 shot "$work/feature.html" 1024 500 "$out/feature-graphic/feature-graphic-1024.png"
 
 # --- Phone screenshots ---------------------------------------------------------------
-# Copied through untouched, because they are already exactly right.
+# Copied through untouched, because they are already exactly right. One folder per listing
+# language (en-GB is the default listing; ar, ur, tr-TR, id-ID carry their own), copied to the
+# same folder name under upload/phone/.
 #
 # Play accepts phone screenshots at 16:9 or 9:16 and nothing between — the Console's own
 # wording, not a guess. The captures used to come off a Pixel 7 AVD at 1080x2400, which is
@@ -147,9 +149,13 @@ shot "$work/feature.html" 1024 500 "$out/feature-graphic/feature-graphic-1024.pn
 # inset does not fit a 1920-tall screen and clips the status bar). Nothing is reframed,
 # nothing is scaled, nothing is invented. See docs/store/upload/README.md for the capture
 # recipe.
-for src in "$root/docs/store/screenshots/raw/phone"/*.png; do
+# Cleared first so a picture dropped from raw/ never lingers in upload/ (and stale loose files go too).
+rm -f "$out/phone"/*.png "$out/phone"/*/*.png
+for src in "$root/docs/store/screenshots/raw/phone"/*/*.png; do
   [ -e "$src" ] || continue
-  cp "$src" "$out/phone/$(basename "$src")"
+  dir="$(basename "$(dirname "$src")")"
+  mkdir -p "$out/phone/$dir"
+  cp "$src" "$out/phone/$dir/$(basename "$src")"
 done
 
 # --- Wear OS screenshots -------------------------------------------------------------

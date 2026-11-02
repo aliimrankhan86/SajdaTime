@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Day progress on a sky: a prayer still to come. widget_outline_variant is 1.2:1 on the day sky, so the track is the
+     translucent widget_sky_track (WidgetColorsTest holds it to 1.3:1 on every stop). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_sky_track" />
+    <corners android:radius="3dp" />
+</shape>

@@ -38,7 +38,7 @@
 <body>
 
 <h1>Privacy Policy for SajdaTime</h1>
-<p class="updated">Last updated: 23 October 2026 · <a href="#disclaimer">Disclaimer</a></p>
+<p class="updated">Last updated: 2 November 2026 · <a href="#disclaimer">Disclaimer</a></p>
 
 <p class="lede">SajdaTime has no accounts, shows no advertising and runs no server. Your prayer
 times are worked out on your phone and your location is never sent to us. To show the name of
@@ -122,7 +122,7 @@ If you say yes later, it is sent along with the rest, as the time you first open
 <h3>What is sent if you say yes</h3>
 <ul>
   <li>How often and for how long the app is open (sessions and time open)</li>
-  <li>Which of the three main screens you open: Times, Qibla or Settings</li>
+  <li>Which of three screens you open: Times, Qibla or Settings. Opening My prayers is never counted.</li>
   <li>Which setup steps you reach, and whether you allow notifications and location, as a yes or no
       each. For exact alarms it records only whether they are allowed when setup ends</li>
   <li>Your phone model, Android version, app version and language</li>
@@ -176,6 +176,16 @@ local Data Layer so the watch can work out prayer times on its own. This travels
 between two devices that belong to you. It does not go to a server, and it does not reach us.
 Google Play services also keeps a copy of it on your phone while it is delivered.</p>
 
+<h2 id="prayer-record">Your prayer record</h2>
+<!-- TrackerPrivacyTest reads this section for its four promises. Change them together. -->
+<p>If you switch on My prayers, the prayers you tick, the days you pause, the day your record
+starts, the number of fasts to make up if you set one, and any jama'ah times you type in, with the time zone they were set in, are kept on this phone only. Nothing about them is sent to us or to anyone, and they are
+left out of cloud backup and of moving to a new phone.</p>
+<p>If you save your prayer record, the file goes wherever you choose. It contains your ticks, any
+paused days and your fasts to make up number. Anyone you give it to can read them.</p>
+<p>Delete my prayer record in Settings removes it from this phone.</p>
+<p>The My prayers screen is never counted, even if you have said yes to usage counts.</p>
+
 <h2>If you save or share the prayer times PDF</h2>
 <p>The PDF is made on your phone. It contains the times and the name of your area, not your
 coordinates. If you save it, it goes to your Downloads folder, and if you share it, it goes to the
@@ -213,6 +223,8 @@ switch them on.</p>
   <li><code>ACCESS_NOTIFICATION_POLICY</code> — only so that you can choose to let your prayer alarm
       sound during Do Not Disturb. Nothing changes unless you switch it on for SajdaTime in your
       phone&rsquo;s settings, and the app never changes your Do Not Disturb setting itself.</li>
+  <li><code>VIBRATE</code> — one short buzz when the Qibla screen shows you are facing the Kaaba.
+      It reads nothing.</li>
   <li><code>INTERNET</code> — for the optional city-name lookup and, only if you switch them on, the
       optional usage counts, both described above.</li>
   <li><code>com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE</code> — added by
@@ -244,7 +256,7 @@ That page is public, so please do not put personal information there; use the em
 for anything private.</p>
 
 <!--
-  The published copy of the disclaimer the app shows on first run. Kept here, on the page
+  The published copy of the disclaimer in the app's Settings, About. Kept here, on the page
   Google Play links to, so it exists somewhere a reader can reach without installing
   anything. The wording tracks R.string.disclaimer_body and should be updated in the same
   commit whenever that changes — see docs/HANDOVER.md §5.15.

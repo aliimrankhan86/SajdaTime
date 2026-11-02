@@ -1,0 +1,139 @@
+{
+  "$description": "Corner radii, borders, elevation and component sizes, release 1.6. A census of the phone app source taken 25 Oct 2026, NOT enforced by a test (the values are spread across ui/ with no single file). Units dp (pt on iOS). New work uses these values only; a new radius or size is a design decision.",
+  "radius": {
+    "card": {
+      "$value": 24,
+      "usage": "Every card and bounded surface: next prayer card, Today list, notices, Settings group cards, Ramadan card, Timetable day cards, Islamic dates list, My prayers cards, theme selector thumb. The default for anything new."
+    },
+    "inner": {
+      "$value": 16,
+      "usage": "A tile nested inside a card (Ramadan time columns); the city button's press shape."
+    },
+    "small": {
+      "$value": 12,
+      "usage": "The date line's press shape."
+    },
+    "iconTile": {
+      "$value": 10,
+      "usage": "The 36dp icon tile at the start of a Settings row."
+    },
+    "track": {
+      "$value": 28,
+      "usage": "Theme selector track (card radius plus its 4dp inset, so the thumb nests evenly)."
+    },
+    "tabBar": {
+      "$value": 32,
+      "usage": "The floating glass tab bar."
+    },
+    "pill": {
+      "$value": "50%",
+      "usage": "Next, Now and Today pills, the selected tab indicator, choice chips, every button (Material default stadium)."
+    },
+    "circle": {
+      "$value": "circle",
+      "usage": "Qibla dial, Tick and Bell press areas, setup badges, icon buttons."
+    },
+    "materialDefaults": {
+      "dialog": 28,
+      "bottomSheetTop": 28,
+      "textField": 4,
+      "snackbar": 4,
+      "usage": "Material components left at their defaults; the app sets no custom Shapes."
+    },
+    "widget": {
+      "body": "16, or the launcher's own system_app_widget_background_radius on Android 12+",
+      "countdownCard": 18,
+      "row": 12,
+      "chip": "pill",
+      "dayBar": 3
+    },
+    "knownDeviations": [
+      "MyPrayers.kt chosen day card uses 16, not 24",
+      "OnboardingScreen.kt ChoiceCard and summary card use Material Card at 12 with surfaceVariant and no sajdaSurface"
+    ]
+  },
+  "border": {
+    "hairline": {
+      "$value": 1,
+      "color": "outlineVariant",
+      "usage": "Dark theme card edge (sajdaSurface), list dividers."
+    },
+    "glassBar": {
+      "$value": 1,
+      "color": "outlineVariant at 70%",
+      "usage": "Tab bar edge, both themes."
+    },
+    "rim": {
+      "$value": 1,
+      "color": "hero rim to rimBottom gradient",
+      "usage": "Glossy panels only: next prayer card, warning notice."
+    },
+    "chip": {
+      "$value": 1,
+      "color": "primary when selected, outline when not",
+      "usage": "Choice chips."
+    }
+  },
+  "elevation": {
+    "card": {
+      "$value": 2,
+      "theme": "light only",
+      "usage": "sajdaSurface shadow. Dark uses the hairline instead, never a shadow."
+    },
+    "tabBar": {
+      "$value": 10,
+      "theme": "light only",
+      "usage": "Glass tab bar."
+    },
+    "hero": {
+      "$value": 12,
+      "theme": "light only",
+      "color": "hero glow (#0B5A43 at 35%)",
+      "usage": "Next prayer card."
+    },
+    "buttons": {
+      "$value": 0,
+      "usage": "Buttons are flat; the fill does the work."
+    }
+  },
+  "size": {
+    "touchTarget": 48,
+    "buttonMain": 56,
+    "buttonStandalone": 52,
+    "buttonInNotice": 48,
+    "buttonCompactDrawn": 40,
+    "listRow": 56,
+    "settingsRow": 64,
+    "settingsFoldRow": 60,
+    "prayerRow": 50,
+    "tabBarMin": 64,
+    "icon": 24,
+    "iconInCompactButton": 18,
+    "noticeMark": 24,
+    "settingsTile": 36,
+    "settingsTileIcon": 20,
+    "rowChevron": 14,
+    "prayerRowIcon": 21,
+    "prayerRowIconSunrise": 18,
+    "cityCaret": 28,
+    "tickDrawn": 24,
+    "bellDrawn": 24,
+    "pillPadding": "9 horizontal, 3 vertical",
+    "nextRowAccentBar": 3,
+    "weekRing": "36, or 32 when 7 rings of 36 do not fit",
+    "historyRing": 32,
+    "skyMark": "104 x 36",
+    "qiblaDialMax": "320, and at most 36% of screen height",
+    "readingWidthMax": 600,
+    "settingsTextInset": 66
+  },
+  "stroke": {
+    "tick": 2,
+    "dayRingHalo": 2,
+    "dayRing": 3,
+    "dayRingMark": 2,
+    "skyArcTrack": 1.5,
+    "skyArcPassed": 2.5,
+    "spinner": 2
+  }
+}

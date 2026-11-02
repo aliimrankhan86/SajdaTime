@@ -21,6 +21,7 @@ import androidx.core.net.toUri
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.R
 import com.sajdatime.core.AppLocale
+import com.sajdatime.core.FastReason
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.label
 import com.sajdatime.app.data.AlertStyle
@@ -41,12 +42,19 @@ object Notifications {
     const val CHANNEL_PRAYERS = "prayer_times"
     const val CHANNEL_ONGOING = "next_prayer_badge"
 
+    /** The channels a prayer alert itself posts on (not the heads up, the silent badge or suhoor). */
+    fun isPrayerAlertChannel(id: String) =
+        id == CHANNEL_PRAYERS || id.startsWith(CHANNEL_ALARM_PREFIX) || id.startsWith(CHANNEL_NOTIFICATION_PREFIX)
+
     /**
      * The heads up before a prayer (1.5.0) has its own channel so it can be truly quiet: no sound,
      * no pop up, one short buzz. On the prayer channel it sounded like a second alert ten minutes
      * early (independent review, 17 Oct 2026). Named with the Settings row's own words.
      */
     const val CHANNEL_REMINDERS = "prayer_reminders"
+
+    /** The Sunnah fast reminder's own channel (1.6.0): the phone's usual tone, no alarm, nothing from the prayer channels. */
+    const val CHANNEL_FAST = "fast_reminders"
 
     /**
      * Versioned by sound: a channel's sound cannot be changed after creation, so a new
@@ -77,6 +85,9 @@ object Notifications {
 
     /** One per prayer, so a Dhuhr heads up never replaces an unread Asr one. */
     private const val ID_PRAYER_REMINDER_BASE = 4000
+
+    /** One slot: tomorrow evening's replaces tonight's if it was never read. */
+    private const val ID_FAST = 5000
 
     /** One short buzz for the heads up before a prayer: a nudge, not an alert. */
     private val REMINDER_VIBRATION = longArrayOf(0, 200)
@@ -124,6 +135,11 @@ object Notifications {
                     vibrationPattern = REMINDER_VIBRATION
                 },
             )
+
+            // Only once it exists (the first fast reminder creates it), so someone who never switches
+            // the reminder on never sees an empty "Fast reminders" entry in the phone's settings. Here
+            // only to put the name in the app's language, as for the suhoor channel.
+            if (manager.getNotificationChannel(CHANNEL_FAST) != null) ensureFastChannel(context)
 
             manager.createNotificationChannel(
                 NotificationChannel(
@@ -376,19 +392,28 @@ object Notifications {
      */
     fun openDndAccessSettings(context: Context) {
         val list = Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
-        val appNotifications = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
-        } else {
-            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
-        }
-        for (intent in listOf(list, appNotifications)) {
+        for (intent in listOf(list, appNotificationsIntent(context))) {
             // Settings calls this with the Activity. Anything else (the instrumented test, a
             // future notification action) needs a new task or startActivity throws.
             if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             if (runCatching { context.startActivity(intent) }.isSuccess) return
         }
     }
+
+    /** SajdaTime's own notification page in the phone's settings (the bell's door, 1.6.0 step 3). */
+    fun openAppNotificationSettings(context: Context) {
+        val intent = appNotificationsIntent(context)
+        if (context !is Activity) intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching { context.startActivity(intent) }
+    }
+
+    private fun appNotificationsIntent(context: Context): Intent =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName)
+        } else {
+            Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.fromParts("package", context.packageName, null))
+        }
 
     /** True once the user has allowed the app to sound through Do Not Disturb. */
     fun hasDndAccess(context: Context): Boolean = runCatching {
@@ -560,6 +585,52 @@ object Notifications {
             .markIfApproximate(context, approximate)
 
         post(context, ID_PRAYER_REMINDER_BASE + slot.ordinal, builder.build())
+    }
+
+    /**
+     * "Tomorrow is a Sunnah fast (Monday). Suhoor ends at 5:12 am." Posted the evening before, on its
+     * own channel, never an alarm, never a usage count. The words never call the fast obligatory. It
+     * clears itself at Fajr of the fast day, when "tomorrow" has stopped being true.
+     */
+    fun postFastReminder(base: Context, reason: FastReason, fajrAt: Instant) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+        ensureFastChannel(context)
+
+        val body = context.getString(fastBodyRes(reason), TimeFormat.clock(context, fajrAt))
+        val builder = NotificationCompat.Builder(context, CHANNEL_FAST)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.settings_fast_reminders))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setTimeoutAfter(Duration.between(Instant.now(), fajrAt).toMillis().coerceAtLeast(1L))
+            .setContentIntent(openAppIntent(context))
+
+        post(context, ID_FAST, builder.build())
+    }
+
+    private fun ensureFastChannel(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        synchronized(channelLock) { context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_FAST,
+                context.getString(R.string.settings_fast_reminders),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ),
+        ) }
+    }
+
+    private fun fastBodyRes(reason: FastReason): Int = when (reason) {
+        FastReason.MONDAY -> R.string.notif_fast_monday
+        FastReason.THURSDAY -> R.string.notif_fast_thursday
+        FastReason.WHITE_DAY -> R.string.notif_fast_white_day
+        FastReason.MUHARRAM_9 -> R.string.notif_fast_muharram_9
+        FastReason.ASHURA -> R.string.notif_fast_ashura
+        FastReason.ARAFAH -> R.string.notif_fast_arafah
+        FastReason.SHAWWAL_SIX -> R.string.notif_fast_shawwal
     }
 
     /**

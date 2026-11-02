@@ -5,7 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
 
-/** The Today widget. See [NextPrayerWidgetProvider]: the two behave identically. */
+/** The Today widget. See [NextPrayerWidgetProvider]: the three behave identically. */
 class TodayWidgetProvider : AppWidgetProvider() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) =
@@ -13,7 +13,7 @@ class TodayWidgetProvider : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) = WidgetUpdater.refreshFromProvider(this, context)
 
-    /** The last instance of this widget was removed: redraw finds none of either and cancels the alarm. */
+    /** The last instance of this widget was removed: redraw finds none of the three and cancels the alarm. */
     override fun onDisabled(context: Context) = WidgetUpdater.refreshFromProvider(this, context)
 
     override fun onAppWidgetOptionsChanged(

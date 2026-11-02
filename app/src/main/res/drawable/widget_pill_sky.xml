@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The chip and the highlighted row ON A SKY (the Next prayer widget, 1.6 step 8): the highlight fill is the same mint as
+     the day sky (1.0:1), so a 1dp green rim keeps the container visible. Paper widgets keep widget_chip and widget_row_highlight. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_highlight" />
+    <stroke android:width="1dp" android:color="@color/widget_primary" />
+    <corners android:radius="12dp" />
+</shape>

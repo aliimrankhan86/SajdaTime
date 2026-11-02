@@ -159,7 +159,7 @@ follow your mosque.** If a time or direction looks off, or you are unsure, ask t
 else qualified to advise you. The app is free and given as it is, **with no warranty and no
 promise of accuracy**.
 
-The full disclaimer is shown in the app on first run and published at
+The full disclaimer is in the app under Settings, About, Disclaimer and published at
 [docs/privacy.html#disclaimer](https://aliimrankhan86.github.io/SajdaTime/privacy.html#disclaimer).
 All copies must make the same four points and change together — see `docs/HANDOVER.md` §5.15.
 

@@ -40,8 +40,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
+import androidx.compose.material.icons.outlined.EventAvailable
+import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
+import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MoreTime
@@ -91,7 +94,9 @@ import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.FastKind
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.TrackerLogic
 import com.sajdatime.core.Sect
 import com.sajdatime.core.label
 import com.sajdatime.core.labelRes
@@ -101,7 +106,29 @@ import com.sajdatime.app.data.AppSettings
 import kotlin.math.abs
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
+import com.sajdatime.app.ui.TrackerActions
+import com.sajdatime.app.ui.JamaahActions
+import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.NoticeTone
+import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.rounded.Public
+import com.sajdatime.core.DayPrayerTimes
+import com.sajdatime.core.JamaahPlan
+import com.sajdatime.core.JamaahResult
+import com.sajdatime.core.JamaahRule
+import com.sajdatime.core.JamaahTimes
+import com.sajdatime.core.TRACKED_SLOTS
 import com.sajdatime.app.ui.UiState
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.DeleteOutline
+import androidx.compose.material.icons.outlined.FileDownload
+import androidx.compose.material.icons.outlined.FileUpload
+import androidx.compose.material.icons.outlined.PauseCircleOutline
+import androidx.compose.material.icons.outlined.PlayCircleOutline
+import androidx.compose.material.icons.outlined.Event
+import com.sajdatime.app.ui.home.IslamicDatesSheet
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.MethodChoiceList
 import com.sajdatime.app.ui.components.RadioRow
@@ -111,6 +138,7 @@ import com.sajdatime.app.ui.theme.sajdaSurface
 import java.time.LocalDate
 import java.util.Locale
 import com.sajdatime.core.AppLocale
+import com.sajdatime.core.bidiIsolated
 import androidx.compose.runtime.DisposableEffect
 import android.os.LocaleList
 import androidx.compose.ui.unit.Density
@@ -139,7 +167,7 @@ import android.text.format.DateFormat
  * See [SettingsScreen]'s `request` parameter.
  */
 enum class SettingsChooser {
-    SCHOOL, METHOD, ADJUSTMENTS, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER, ALERT_CHECK, FAST_REMINDERS,
 }
 
 @Composable
@@ -161,11 +189,13 @@ fun SettingsScreen(
     onResetAdjustments: () -> Unit,
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetNightTimes: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
+    onSetFastReminder: (FastKind, Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
@@ -176,12 +206,15 @@ fun SettingsScreen(
     onSearchCity: (String) -> Unit,
     onSetThemeChoice: (ThemeChoice) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
+    tracker: TrackerActions,
+    jamaah: JamaahActions,
 ) {
     val context = LocalContext.current
     var open by rememberSaveable { mutableStateOf<SettingsChooser?>(null) }
     // Turning usage counts ON never flips the switch directly: it opens the full consent text
     // and only a Yes there records the choice. Turning it OFF is a single tap.
     var askingUsageConsent by rememberSaveable { mutableStateOf(false) }
+    var trackerDialog by rememberSaveable { mutableStateOf<TrackerDialog?>(null) }
     val settings = state.settings
 
     // Keyed on the request, so a second identical request after the first was closed still
@@ -198,13 +231,13 @@ fun SettingsScreen(
     // inside the group they belong to meant nobody found them.
     val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
     val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    val alertCheck = rememberAlertCheck(settings.usesAlarm)
     val banners: @Composable () -> Unit = {
         // Before Android 12 there is no exact-alarm permission to ask for, so no row.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             PermissionCard(
                 title = stringResource(R.string.settings_exact_alarms_title),
                 body = stringResource(R.string.settings_exact_alarms_brief),
-                details = stringResource(R.string.settings_exact_alarms_desc),
                 granted = exactAllowed,
                 onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
@@ -255,6 +288,19 @@ fun SettingsScreen(
                 },
                 onClick = { open = SettingsChooser.METHOD },
             ),
+            // 1.6.0, directly above Match your mosque: the congregation time is the other number on a
+            // mosque board, and the two rows side by side say which is which.
+            SettingsItem.Link(
+                key = "jamaah",
+                icon = Icons.Outlined.Groups,
+                title = stringResource(R.string.settings_jamaah),
+                subtitle = if (settings.jamaah.isEmpty) {
+                    stringResource(R.string.settings_jamaah_off)
+                } else {
+                    pluralStringResource(R.plurals.settings_jamaah_count, settings.jamaah.count, settings.jamaah.count)
+                },
+                onClick = { open = SettingsChooser.JAMAAH },
+            ),
             // Last in this group on purpose. The method and school rows above explain the
             // two divergences that have a reason; this one is the catch-all for whatever is
             // left, and offering it first would invite someone to nudge a number when the
@@ -265,6 +311,24 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_adjustments),
                 subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
+            ),
+            // 1.6.0: the same sheet the date under the city opens, here for anyone who looks in
+            // Settings first. One place for every sect (sign-off, 23 Oct 2026).
+            SettingsItem.Link(
+                key = "islamic_dates",
+                icon = Icons.Outlined.Event,
+                title = stringResource(R.string.settings_islamic_dates),
+                subtitle = stringResource(R.string.settings_islamic_dates_desc),
+                onClick = { open = SettingsChooser.ISLAMIC_DATES },
+            ),
+            // 1.6.0: on for everyone, Times screen only (not the PDF, widgets or watch).
+            SettingsItem.Toggle(
+                key = "night_times",
+                icon = Icons.Outlined.DarkMode,
+                title = stringResource(R.string.settings_night_times),
+                subtitle = stringResource(R.string.settings_night_times_desc),
+                checked = settings.nightTimesEnabled,
+                onCheckedChange = onSetNightTimes,
             ),
         ),
     )
@@ -286,10 +350,13 @@ fun SettingsScreen(
                     key = "language",
                     icon = Icons.Outlined.Language,
                     title = stringResource(R.string.settings_language_title),
-                    subtitle = AppLanguage.chosen(context)?.nativeName ?: stringResource(
+                    // Only the language showing, own name and English name (Ali, 25 Oct 2026, step 10 Q17 "A": all
+                    // five ran to three lines in Urdu and tore a pair across two). Inside the sentence the pair is
+                    // isolated; it is always the app's own script, so it runs the same way as the line around it.
+                    subtitle = AppLanguage.chosen(context)?.namePair(context) ?: stringResource(
                         R.string.settings_value_pair,
                         stringResource(R.string.language_phone),
-                        AppLanguage.showing(context).nativeName,
+                        AppLanguage.showing(context).namePair(context).bidiIsolated(),
                     ),
                     onClick = { open = SettingsChooser.LANGUAGE },
                 ),
@@ -328,6 +395,19 @@ fun SettingsScreen(
         SettingsSectionId.REMINDERS,
         stringResource(R.string.settings_group_reminders),
         listOfNotNull(
+            // Alert check (1.6.0): always shown, first, so the person who never got an alert has one
+            // place that says what the phone is holding back. Reads only; see AlertCheck.
+            SettingsItem.Link(
+                key = "alert_check",
+                icon = Icons.Outlined.Checklist,
+                title = stringResource(R.string.alert_check_title),
+                subtitle = if (alertCheck.failing == 0) {
+                    stringResource(R.string.alert_check_all_ok)
+                } else {
+                    pluralStringResource(R.plurals.alert_check_to_fix, alertCheck.failing, alertCheck.failing)
+                },
+                onClick = { open = SettingsChooser.ALERT_CHECK },
+            ),
             // One row, not two. "Which prayers" and "How you are told" were separate
             // choosers answering halves of the same question, and between them they could
             // not express "wake me for Fajr, a quiet notification for the rest" — which is
@@ -361,6 +441,19 @@ fun SettingsScreen(
                 subtitle = prayerReminderSummary(settings.prayerReminderMinutes, settings.prayerReminderFor),
                 onClick = { open = SettingsChooser.PRAYER_REMINDER },
             ),
+            // Sunnah fast reminders (1.6.0): Sunni only (the planner also refuses Shia), off until chosen,
+            // notification only, never a usage count. iPhone: carries over (SF Symbol calendar.badge.clock).
+            SettingsItem.Link(
+                key = "fast_reminders",
+                icon = Icons.Outlined.EventRepeat,
+                title = stringResource(R.string.settings_fast_reminders),
+                subtitle = if (settings.fastReminders.isEmpty()) {
+                    stringResource(R.string.settings_fast_reminders_off)
+                } else {
+                    stringResource(R.string.settings_fast_reminders_on, settings.fastReminders.size)
+                },
+                onClick = { open = SettingsChooser.FAST_REMINDERS },
+            ).takeIf { settings.sect == Sect.SUNNI },
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
             SettingsItem.Toggle(
@@ -396,6 +489,106 @@ fun SettingsScreen(
         ),
     )
 
+    // "My prayers" (1.6.0), between Reminders and About. Off by default, one tap to switch on, and
+    // nothing else appears until it is. With the switch off but a record kept, only Delete stays, so
+    // the record can always be removed.
+    val paused = state.tracker?.paused == true
+    val myPrayers = SettingsSection(
+        SettingsSectionId.TRACKER,
+        stringResource(R.string.settings_group_tracker),
+        buildList {
+            add(
+                SettingsItem.Toggle(
+                    key = "tracker",
+                    icon = Icons.Outlined.CheckCircle,
+                    title = stringResource(R.string.settings_tracker),
+                    subtitle = stringResource(R.string.settings_tracker_desc),
+                    checked = settings.trackerEnabled,
+                    onCheckedChange = tracker::setEnabled,
+                ),
+            )
+            if (settings.trackerEnabled) {
+                add(
+                    SettingsItem.Toggle(
+                        key = "tracker_streak",
+                        icon = Icons.Outlined.CalendarMonth,
+                        title = stringResource(R.string.settings_tracker_streak),
+                        subtitle = stringResource(R.string.settings_tracker_streak_desc),
+                        checked = settings.trackerShowStreak,
+                        onCheckedChange = tracker::setShowStreak,
+                    ),
+                )
+                // "Fasts to make up" (Ali, 25 Oct 2026, moved into 1.6.0). Hidden on a record from a newer
+                // version: TrackerRepository refuses the write, so the stepper would seem to do nothing.
+                if (state.tracker?.data?.readOnly != true) {
+                    val fasts = state.tracker?.data?.fastsToMakeUp ?: 0
+                    add(
+                        SettingsItem.Link(
+                            key = "tracker_fasts",
+                            icon = Icons.Outlined.EventAvailable,
+                            title = stringResource(R.string.settings_tracker_fasts),
+                            subtitle = if (fasts > 0) {
+                                pluralStringResource(R.plurals.tracker_fasts_line, fasts, fasts)
+                            } else {
+                                stringResource(R.string.settings_tracker_fasts_desc)
+                            },
+                            onClick = { trackerDialog = TrackerDialog.FASTS },
+                        ),
+                    )
+                }
+                add(
+                    if (paused) {
+                        SettingsItem.Link(
+                            key = "tracker_resume",
+                            icon = Icons.Outlined.PlayCircleOutline,
+                            title = stringResource(R.string.settings_tracker_resume),
+                            subtitle = stringResource(R.string.settings_tracker_resume_desc),
+                            onClick = tracker::resume,
+                        )
+                    } else {
+                        SettingsItem.Link(
+                            key = "tracker_pause",
+                            icon = Icons.Outlined.PauseCircleOutline,
+                            title = stringResource(R.string.settings_tracker_pause),
+                            subtitle = stringResource(R.string.settings_tracker_pause_desc),
+                            onClick = { trackerDialog = TrackerDialog.PAUSE },
+                        )
+                    },
+                )
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_save",
+                        icon = Icons.Outlined.FileDownload,
+                        title = stringResource(R.string.settings_tracker_save),
+                        // The warning is the subtitle, not a dialog before the save: one tap fewer, and
+                        // it is read every time (sign-off, 23 Oct 2026).
+                        subtitle = stringResource(R.string.settings_tracker_save_desc),
+                        onClick = tracker::save,
+                    ),
+                )
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_load",
+                        icon = Icons.Outlined.FileUpload,
+                        title = stringResource(R.string.settings_tracker_load),
+                        subtitle = stringResource(R.string.settings_tracker_load_desc),
+                        onClick = tracker::load,
+                    ),
+                )
+            }
+            if (settings.trackerEnabled || state.trackerHasData) {
+                add(
+                    SettingsItem.Link(
+                        key = "tracker_delete",
+                        icon = Icons.Outlined.DeleteOutline,
+                        title = stringResource(R.string.settings_tracker_delete),
+                        onClick = { trackerDialog = TrackerDialog.DELETE },
+                    ),
+                )
+            }
+        },
+    )
+
     // Play requires a privacy policy reachable from inside the app, not only from
     // the Console field. Opening the hosted policy satisfies that.
     val privacyUrl = stringResource(R.string.privacy_policy_url)
@@ -409,15 +602,15 @@ fun SettingsScreen(
         stringResource(R.string.settings_group_about),
         listOf(
             SettingsItem.Link(
-                key = "version",
-                title = stringResource(R.string.about_version),
-                subtitle = versionName(context),
-            ),
-            SettingsItem.Link(
                 key = "disclaimer",
                 title = stringResource(R.string.about_disclaimer),
                 subtitle = stringResource(R.string.about_disclaimer_short),
                 onClick = { open = SettingsChooser.DISCLAIMER },
+            ),
+            SettingsItem.Link(
+                key = "version",
+                title = stringResource(R.string.about_version),
+                subtitle = versionName(context),
             ),
             SettingsItem.Link(
                 key = "privacy",
@@ -497,9 +690,32 @@ fun SettingsScreen(
         ),
     )
 
-    val sections = listOf(prayerTimes, appearance, reminders, about)
+    val sections = listOf(prayerTimes, appearance, reminders, myPrayers, about)
     val title = stringResource(R.string.title_settings)
     SettingsList(title, banners, sections)
+
+    when (trackerDialog) {
+        null -> Unit
+        TrackerDialog.PAUSE -> PauseDialog(
+            onPause = { fromYesterday ->
+                trackerDialog = null
+                tracker.pause(fromYesterday)
+            },
+            onDismiss = { trackerDialog = null },
+        )
+        TrackerDialog.FASTS -> FastsDialog(
+            count = state.tracker?.data?.fastsToMakeUp ?: 0,
+            onAdjust = tracker::adjustFastsToMakeUp,
+            onDismiss = { trackerDialog = null },
+        )
+        TrackerDialog.DELETE -> DeleteTrackerDialog(
+            onDelete = {
+                trackerDialog = null
+                tracker.delete()
+            },
+            onDismiss = { trackerDialog = null },
+        )
+    }
 
     if (askingUsageConsent) {
         UsageCountsConsentDialog(
@@ -535,6 +751,22 @@ fun SettingsScreen(
                 onDismiss = { open = null },
             )
         }
+
+        SettingsChooser.JAMAAH -> JamaahDialog(
+            jamaah = settings.jamaah,
+            today = state.today,
+            actions = jamaah,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.ISLAMIC_DATES -> IslamicDatesSheet(
+            today = state.today?.date ?: LocalDate.now(),
+            offsetDays = settings.calculationPrefs.hijriOffset,
+            sect = settings.sect,
+            // One chooser open at a time: the sheet makes way for the date shift.
+            onShiftDate = { open = SettingsChooser.ADJUSTMENTS },
+            onDismiss = { open = null },
+        )
 
         SettingsChooser.SCHOOL -> SchoolDialog(
             sect = settings.sect,
@@ -586,6 +818,12 @@ fun SettingsScreen(
             onDismiss = { open = null },
         )
 
+        SettingsChooser.FAST_REMINDERS -> FastRemindersDialog(
+            kinds = settings.fastReminders,
+            onSetKind = onSetFastReminder,
+            onDismiss = { open = null },
+        )
+
         SettingsChooser.SUHOOR -> SuhoorDialog(
             minutes = settings.suhoorReminderMinutes,
             style = settings.suhoorReminderStyle,
@@ -607,6 +845,8 @@ fun SettingsScreen(
 
         SettingsChooser.LANGUAGE -> LanguageChooserDialog(onDismiss = { open = null })
 
+        SettingsChooser.ALERT_CHECK -> AlertCheckDialog(check = alertCheck, onDismiss = { open = null })
+
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },
             confirmButton = {
@@ -624,6 +864,178 @@ fun SettingsScreen(
         )
     }
 }
+
+/**
+ * "Jama'ah times": each prayer's congregation time at the user's own mosque, and Jumu'ah (1.6.0).
+ *
+ * Each row says its rule and what it gives today, so the person can check it against the board. A
+ * time outside its prayer (before it begins, or after the next one begins) is flagged in amber under
+ * the row and is never shown on Times as a time. No paragraph at the top (sign-off, 23 Oct 2026): the
+ * one piece of advice, when to choose minutes after, sits where that choice is made.
+ */
+@Composable
+internal fun JamaahDialog(jamaah: JamaahTimes, today: DayPrayerTimes?, actions: JamaahActions, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val zone = remember { ZoneId.systemDefault() }
+    // A slot's name, or JUMUAH, for the rule being edited; and which one's clock is open.
+    var editing by rememberSaveable { mutableStateOf<String?>(null) }
+    var picking by rememberSaveable { mutableStateOf<String?>(null) }
+    // Times typed in another zone are the home mosque's: the rules show as typed, but with no previews
+    // against today's prayer times (a London fixed time checked against Dubai would false flag) and no amber.
+    val atHome = jamaah.visibleIn(zone.id)
+    ChooserDialog(title = stringResource(R.string.settings_jamaah), onDismiss = onDismiss) {
+        if (!atHome) {
+            Notice(
+                brief = stringResource(R.string.jamaah_away_brief),
+                details = stringResource(R.string.jamaah_away_details),
+                tone = NoticeTone.QUIET,
+                icon = Icons.Rounded.Public,
+                modifier = Modifier.padding(bottom = Space.Group),
+            )
+        }
+        val rows = TRACKED_SLOTS.map { it.name to it.label(context) } + (JUMUAH to stringResource(R.string.jumuah))
+        rows.forEachIndexed { i, (key, label) ->
+            if (i > 0) HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            val slot = TRACKED_SLOTS.firstOrNull { it.name == key }
+            val rule = slot?.let { jamaah.rules[it] }
+            val jumuahTime = if (slot == null) jamaah.jumuah else null
+            val result = today?.takeIf { atHome }?.let { day ->
+                when {
+                    rule != null -> JamaahPlan.result(day, zone, slot, rule)
+                    jumuahTime != null -> JamaahPlan.jumuah(day, zone, jumuahTime)
+                    else -> null
+                }
+            }
+            val ruleText = when {
+                rule is JamaahRule.After -> pluralStringResource(R.plurals.jamaah_after_minutes, rule.minutes, rule.minutes)
+                rule is JamaahRule.Fixed -> TimeFormat.clock(context, rule.time)
+                jumuahTime != null -> TimeFormat.clock(context, jumuahTime)
+                else -> stringResource(R.string.settings_jamaah_off)
+            }
+            val shownToday = (result as? JamaahResult.InWindow)?.let {
+                stringResource(R.string.jamaah_today, TimeFormat.clock(context, it.at, zone))
+            }
+            SettingRow(
+                title = label,
+                subtitle = if (shownToday != null && rule is JamaahRule.After) {
+                    stringResource(R.string.settings_value_lines, ruleText, shownToday)
+                } else {
+                    ruleText
+                },
+                horizontalPadding = 0.dp,
+                onClick = { editing = key },
+            )
+            val outOfWindow = when (result) {
+                JamaahResult.Before ->
+                    if (slot != null) stringResource(R.string.jamaah_before_window, label)
+                    else stringResource(R.string.jumuah_before_window, PrayerSlot.DHUHR.label(context))
+                is JamaahResult.After -> when {
+                    slot == null -> stringResource(R.string.jumuah_after_window, PrayerSlot.ASR.label(context))
+                    result.next == PrayerSlot.SUNRISE -> stringResource(R.string.jamaah_after_sunrise, label)
+                    else -> stringResource(R.string.jamaah_after_window, label, result.next.label(context))
+                }
+                else -> null
+            }
+            if (outOfWindow != null) {
+                Notice(brief = outOfWindow, modifier = Modifier.padding(bottom = Space.Related))
+            }
+        }
+    }
+
+    val editKey = editing
+    if (editKey != null) {
+        val slot = TRACKED_SLOTS.firstOrNull { it.name == editKey }
+        val label = slot?.label(context) ?: stringResource(R.string.jumuah)
+        JamaahRuleDialog(
+            title = label,
+            current = if (slot != null) jamaah.rules[slot] else jamaah.jumuah?.let { JamaahRule.Fixed(it) },
+            // Jumu'ah is a fixed time only: it is not counted from the start of Dhuhr.
+            allowAfter = slot != null,
+            onOff = {
+                if (slot != null) actions.setRule(slot, null) else actions.setJumuah(null)
+                editing = null
+            },
+            onAfter = { minutes -> if (slot != null) actions.setRule(slot, JamaahRule.After(minutes)) },
+            onPickTime = {
+                editing = null
+                picking = editKey
+            },
+            onDismiss = { editing = null },
+        )
+    }
+
+    val pickKey = picking
+    if (pickKey != null) {
+        val slot = TRACKED_SLOTS.firstOrNull { it.name == pickKey }
+        val label = slot?.label(context) ?: stringResource(R.string.jumuah)
+        val existing = if (slot != null) (jamaah.rules[slot] as? JamaahRule.Fixed)?.time else jamaah.jumuah
+        TimeEntryDialog(
+            title = stringResource(R.string.jamaah_pick_time_title, label),
+            // Opens on the time already set, or on the prayer's start today, so a small change is a small move.
+            initial = existing
+                ?: today?.let { (slot ?: PrayerSlot.DHUHR).let { s -> it[s].atZone(zone).toLocalTime().withSecond(0).withNano(0) } }
+                ?: LocalTime.of(13, 0),
+            is24Hour = DateFormat.is24HourFormat(context.applicationContext),
+            onConfirm = { time ->
+                if (slot != null) actions.setRule(slot, JamaahRule.Fixed(time)) else actions.setJumuah(time)
+                picking = null
+            },
+            onDismiss = { picking = null },
+        )
+    }
+}
+
+private const val JUMUAH = "JUMUAH"
+
+/** Off, a fixed time, or minutes after it begins (0 to 60 in fives, with the minus and plus steppers). */
+@Composable
+private fun JamaahRuleDialog(
+    title: String,
+    current: JamaahRule?,
+    allowAfter: Boolean,
+    onOff: () -> Unit,
+    onAfter: (Int) -> Unit,
+    onPickTime: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Column(Modifier.selectableGroup()) {
+            RadioRow(label = stringResource(R.string.settings_jamaah_off), selected = current == null, onSelect = onOff)
+            RadioRow(
+                label = stringResource(R.string.jamaah_rule_fixed),
+                supporting = (current as? JamaahRule.Fixed)?.let { TimeFormat.clock(context, it.time) },
+                selected = current is JamaahRule.Fixed,
+                onSelect = onPickTime,
+            )
+            if (allowAfter) {
+                RadioRow(
+                    label = stringResource(R.string.jamaah_rule_after),
+                    supporting = stringResource(R.string.jamaah_rule_after_help),
+                    selected = current is JamaahRule.After,
+                    onSelect = { if (current !is JamaahRule.After) onAfter(DEFAULT_AFTER_MINUTES) },
+                )
+            }
+        }
+        if (current is JamaahRule.After) {
+            val choices = JamaahRule.AFTER_CHOICES
+            val i = choices.indexOf(current.minutes).coerceAtLeast(0)
+            StepperRow(
+                label = stringResource(R.string.jamaah_rule_after),
+                // The number alone: the label beside it already says what it counts, and the
+                // full phrase wrapped to four lines in the stepper's 64dp (emulator, 23 Oct 2026).
+                value = current.minutes.toString(),
+                canDecrease = i > 0,
+                canIncrease = i < choices.lastIndex,
+                onDecrease = { onAfter(choices[i - 1]) },
+                onIncrease = { onAfter(choices[i + 1]) },
+            )
+        }
+    }
+}
+
+/** Where "minutes after" starts when first chosen: a common gap, one tap either way to change. */
+private const val DEFAULT_AFTER_MINUTES = 15
 
 // --- what the screen shows, kept apart from how it is drawn ------------------------------
 
@@ -671,7 +1083,78 @@ private const val ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:Beauti
 private const val SHIA_ADHAN_SOURCE = "https://commons.wikimedia.org/wiki/File:AzaanMaahur.ogg"
 private const val CC_BY_SA_4 = "https://creativecommons.org/licenses/by-sa/4.0/"
 
-internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, ABOUT }
+internal enum class SettingsSectionId { PRAYER_TIMES, APPEARANCE, REMINDERS, TRACKER, ABOUT }
+
+private enum class TrackerDialog { PAUSE, FASTS, DELETE }
+
+/**
+ * The fasts to make up count: the sentence that says what it is, then one stepper (the same one as the
+ * mosque adjustments). The label is the short title, so TalkBack says "Fasts to make up, 3". Each press
+ * is saved at once; Close only closes.
+ */
+@Composable
+private fun FastsDialog(count: Int, onAdjust: (Int) -> Unit, onDismiss: () -> Unit) {
+    val title = stringResource(R.string.settings_tracker_fasts)
+    ChooserDialog(title = title, onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_tracker_fasts_desc),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Paragraph))
+        StepperRow(
+            label = title,
+            value = count.toString(),
+            canDecrease = count > 0,
+            canIncrease = count < TrackerLogic.MAX_FASTS,
+            onDecrease = { onAdjust(-1) },
+            onIncrease = { onAdjust(1) },
+        )
+    }
+}
+
+/**
+ * "Pause from": today or yesterday, nothing further back (Ali, 16 Oct 2026). No reason is asked or
+ * stored, so the same Pause serves a period, illness and travel and says nothing about which.
+ */
+@Composable
+private fun PauseDialog(onPause: (fromYesterday: Boolean) -> Unit, onDismiss: () -> Unit) {
+    var yesterday by rememberSaveable { mutableStateOf(false) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(stringResource(R.string.tracker_pause_title), onDismiss) },
+        text = {
+            Column(Modifier.selectableGroup()) {
+                RadioRow(label = stringResource(R.string.tracker_pause_today), selected = !yesterday, onSelect = { yesterday = false })
+                RadioRow(label = stringResource(R.string.tracker_pause_yesterday), selected = yesterday, onSelect = { yesterday = true })
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = { onPause(yesterday) }, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_pause))
+            }
+        },
+    )
+}
+
+/**
+ * The only destructive action in the app, behind one confirmation that says it cannot be undone.
+ * A solid button like every other action here (DESIGN_SYSTEM 4.1: only Close may be a text link), not
+ * a red one: the design system has no error colour role, and the words carry the warning.
+ */
+@Composable
+private fun DeleteTrackerDialog(onDelete: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(stringResource(R.string.tracker_delete_title), onDismiss) },
+        text = { Text(stringResource(R.string.tracker_delete_body)) },
+        confirmButton = {
+            CtaButton(onClick = onDelete, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.action_delete))
+            }
+        },
+    )
+}
 
 internal class SettingsSection(
     val id: SettingsSectionId,
@@ -913,6 +1396,35 @@ private fun PrayerReminderDialog(
                     horizontalPadding = 0.dp,
                 )
             }
+        }
+    }
+}
+
+/** The Sunnah fast reminders: three switches, each a kind of fast. Notification only, no style or sound here. */
+@Composable
+private fun FastRemindersDialog(
+    kinds: Set<FastKind>,
+    onSetKind: (FastKind, Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_fast_reminders), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_fast_reminders_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Group))
+        listOf(
+            FastKind.MONDAY_THURSDAY to R.string.settings_fast_monday_thursday,
+            FastKind.WHITE_DAYS to R.string.settings_fast_white_days,
+            FastKind.SPECIAL to R.string.settings_fast_special,
+        ).forEach { (kind, label) ->
+            SwitchRow(
+                title = stringResource(label),
+                checked = kind in kinds,
+                onCheckedChange = { onSetKind(kind, it) },
+                horizontalPadding = 0.dp,
+            )
         }
     }
 }

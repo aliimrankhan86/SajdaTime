@@ -64,8 +64,11 @@ android {
         // widgets, built-in adhan and notification and alarm sounds, reminder before prayer, Turkey with
         // Diyanet's minutes. **Phone and watch together this time**: the watch shares the core, so the
         // Turkey change reaches it too, and its new translations ship (watch 1002 / 1.5.0).
-        versionCode = 9
-        versionName = "1.5.0"
+        //
+        // 10 / 1.6.0, 25 Oct 2026: My prayers tracker, bells, Timetable, jama'ah times, skies, the
+        // widget strip. Phone only: the watch stays 1002 / 1.5.0 (docs/plans/2026-10-release-1.6.0/).
+        versionCode = 10
+        versionName = "1.6.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -256,6 +259,22 @@ tasks.withType<Test>().configureEach {
                 "app/build.gradle.kts",
                 "app/src/**/res/values/bools.xml",
                 "app/src/**/res/values/firebase_config.xml",
+                // TrackerPrivacyTest: the backup exclusion the prayer record relies on, and the usage counts.
+                "app/src/main/res/xml/data_extraction_rules.xml",
+                "app/src/main/java/com/sajdatime/app/data/UsageCounts.kt",
+                // DesignTokensTest holds the design system's token files and pages to the code, and
+                // reads Color.kt, Theme.kt, Spacing.kt, Motion.kt, Type.kt and CtaButton.kt as text.
+                "docs/design-system/**",
+                "app/src/main/java/com/sajdatime/app/ui/theme/*.kt",
+                "app/src/main/java/com/sajdatime/app/ui/components/CtaButton.kt",
+                "wear/src/main/java/com/sajdatime/wear/WearTheme.kt",
+                "wear/src/main/java/com/sajdatime/wear/NextPrayerTileService.kt",
+                // Its asset colour check reads these icon files too (color.json assets).
+                "app/src/main/res/drawable/ic_launcher_background.xml",
+                "app/src/main/res/drawable/ic_launcher_foreground.xml",
+                "app/src/main/res/mipmap/ic_launcher.xml",
+                "app/src/main/res/mipmap/ic_launcher_round.xml",
+                "wear/src/main/res/mipmap/ic_launcher.xml",
             )
         },
     ).withPropertyName("disclaimerCopies").withPathSensitivity(PathSensitivity.RELATIVE)

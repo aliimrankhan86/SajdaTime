@@ -1,5 +1,9 @@
 # Play Store listing copy
 
+> **Hard rule (Ali, 30 Oct 2026; HANDOVER §5.38):** every release, the full description sells the whole app first: every
+> feature the build has, benefit first, easy to scan, inside the limits, in every language. What's new then gives the
+> improvements and fixes. A feature added in a release gets its description line in that release.
+
 Everything Google asks you to type into the Play Console, written out so you can paste it.
 Character limits are Google's and are checked below each block.
 
@@ -227,7 +231,283 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.5.0 listing, FINAL 21 Oct 2026: release day 23 Oct 2026, paste now (**LIVE, Play "Updated on" 23 Oct 2026, confirmed 24 Oct 2026**) (short description, full description, watch note)
+### 1.6.0 full description and What's new, DRAFT 2 Nov 2026: APPROVED by Ali 2 Nov 2026 ("Approve text"), translations next (adds night times, "Why these times", Alert check, Sunnah fast reminders)
+
+Under HANDOVER §5.38 each new feature gets its line in the same release. Made from the approved 30 Oct text (block above).
+Added: Islamic midnight and last third of the night plus the "which method made your times" caption; Alert check;
+Sunnah fast reminders (Sunni, off by default). To fit `3998 / 4000` these were trimmed, no claim changed: "Sensible Fajr and
+Isha in the far north", ", set for your school", "Cloud backup is off" line (still in the privacy policy), "with your
+town" on the widgets line, "under each prayer" on jama'ah, PDF and several phrasings. What's new `493 / 500`. **Ali approves
+this English text first; then the eight translations (ar ur tr id ms bn fr hi) are made, independently reviewed and
+stamped; then it replaces the approved block at paste time.** Fast reminders wording matches the build only if the
+Sunnah fast reminders step ships as specced (cut it from both texts if it does not).
+
+What's new:
+
+```
+Night times: Islamic midnight and the last third of the night. Alert check: see what your phone is blocking. Optional reminders before Sunnah fasts. My prayers: a private record, kept on your phone. A bell on each prayer turns its alert on or off. Timetable with Save as PDF. Add your mosque's jama'ah and Jumu'ah times. The Hijri date opens the Islamic dates of the year. Qibla says which way to turn. A five prayer widget strip. Now in Bengali. Where your mosque differs, follow your mosque.
+```
+
+Full description:
+
+```
+SajdaTime gives you prayer times (namaz, salah or salat), adhan alerts, a Qibla compass and a private salah tracker, for Sunni and Shia Muslims, on your phone and Wear OS watch.
+Worked out on your phone, no signal needed. No ads, no account.
+
+PRAYER TIMES AND QIBLA
+
+• Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, a live countdown and a changing sky
+• The Hijri date (Islamic calendar) and the Islamic dates of the year, with Shia dates
+• Qibla direction: a true north compass that says which way to turn and buzzes facing the Kaaba
+• Islamic midnight, the last third of the night, and which method made your times
+• Timetable for this month and next, and a PDF of a day, a week, the month or Ramadan
+
+ALERTS AND ADHAN
+
+• Each prayer: off, a notification, or an alarm loud enough for Fajr, even with the app closed. Play on silent if you choose
+• Adhan (azan) for Sunni and Shia, or any sound on your phone
+• A quiet reminder 5 to 30 minutes before a prayer, a silent next prayer notification
+• A bell on each prayer turns its alert on or off
+• Alert check: what your phone is blocking, with a button to fix it
+
+MY PRAYERS
+
+• Private: tick each prayer, see your week as rings and 30 days as a calendar
+• It records, never judges. Optional streak, Pause, move it to a new phone
+• Fasts to make up: one count that goes down as you make them up
+
+RAMADAN AND EID
+
+• Suhoor (sehri) and iftar times, a countdown, the fast's length, a Ramadan table, and a greeting on Eid al-Fitr and Eid al-Adha
+• A suhoor reminder 15 to 60 minutes before suhoor ends, on by default in Ramadan
+• Optional reminders the evening before a Sunnah fast: Mondays, Thursdays, White Days, Ashura, Arafah, Shawwal
+
+WIDGETS AND WEAR OS
+
+• Three widgets: a countdown, today's times, five prayers in a row
+• A Wear OS app, tile and Qibla that follow your phone or work alone
+
+FOR EVERYONE
+
+• English, Arabic, Urdu, Bengali, Turkish and Indonesian, set in the app or by your phone
+• Light and dark themes, large text, screen readers
+
+YOUR SCHOOL, YOUR MOSQUE
+
+• Sunni: Hanafi, Shafi'i, Maliki, Hanbali, each with its Asr rule
+• Shia: Jafari / Ithna Ashari, with the correct Maghrib rule
+• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari and Tehran.
+• Your mosque's jama'ah (iqamah) and Jumu'ah times
+• Match your mosque: move a prayer up to 30 minutes or copy its board, or shift the Islamic date a day or two
+
+YOUR PRIVACY
+
+• Nothing to buy, no accounts, no login
+• Optional usage counts, off unless you say yes. No crash reporting
+• Approximate location, read while the app is open, or type your town instead. Your coordinates never go to the developer or the usage counts
+• Your town's name comes from your phone's place service, usually Google. A town you type is looked up online there, or by Open-Meteo
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+### 1.6.0 full description, APPROVED by Ali 30 Oct 2026 ("Yes, use it"): this replaces the 25 Oct full description below
+
+Written under Ali's hard rule of 30 Oct 2026 (HANDOVER §5.38: the whole app first). Drafted by Fable (`ux-lead`), every
+claim checked in code, Opus review: its fixes taken (the typed town line now names Open-Meteo as `docs/privacy.html`
+does; "Muslims", Eid al-Fitr and Eid al-Adha and "Play on silent" back for search; Match your mosque and the widget town
+lines made exact). `3986 / 4000`. New against the 25 Oct text: Fasts to make up, a My prayers section (rings, 30 day
+calendar, optional streak, Pause, move to a new phone), the sky, the Qibla turn sentence, Shia dates, Bengali. HONEST and
+FREE byte for byte. Cut: "(Indonesia, Singapore)" and "(Turkey)" after two method names, "no email address", "The
+privacy policy explains this", "YOUR PRIVACY IS NOT THE PRICE" became "YOUR PRIVACY". Not yet checked: Play's promotion
+notice for "Private:"; Play's own counter. Pasted verbatim from the block below.
+
+```
+SajdaTime gives you prayer times (namaz, salah or salat), adhan alerts, a Qibla compass and a private salah tracker, for Sunni and Shia Muslims, on your phone and Wear OS watch.
+Worked out on your phone, so no signal needed. No ads, no account.
+
+PRAYER TIMES AND QIBLA
+
+• Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, a live countdown and a sky that follows the day
+• The Hijri date (Islamic calendar) and the Islamic dates of the year, with Shia dates
+• Qibla direction: a true north compass that says which way to turn and buzzes when facing the Kaaba
+• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a PDF
+
+ALERTS AND ADHAN
+
+• Each prayer: off, a notification, or an alarm loud enough for Fajr, even with the app closed. Play on silent if you choose
+• Adhan (azan) included for Sunni and Shia, or any sound on your phone
+• A quiet reminder 5 to 30 minutes before the prayers you choose, and a silent next prayer notification
+• A bell on each prayer turns its alert on or off
+
+MY PRAYERS
+
+• Private: tick each prayer you pray, see your week as rings and 30 days as a calendar
+• It records, never judges. Optional streak, Pause, and a file to move it to a new phone
+• Fasts to make up: one count, one less each time you make one up
+
+RAMADAN AND EID
+
+• Suhoor (sehri) and iftar times, a countdown, the fast's length, a Ramadan table, and a greeting on Eid al-Fitr and Eid al-Adha
+• A suhoor reminder 15 to 60 minutes before suhoor ends, on by default in Ramadan
+
+WIDGETS AND WEAR OS
+
+• Three widgets: a big countdown and today's times, both with your town, and five prayers in one row
+• A Wear OS app, tile and Qibla that follow your phone or work alone
+
+FOR EVERYONE
+
+• English, Arabic, Urdu, Bengali, Turkish and Indonesian, set in the app or by your phone
+• Light and dark themes, large text, screen readers
+
+YOUR SCHOOL, YOUR MOSQUE
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, each with its correct Asr rule
+• Shia: Jafari / Ithna Ashari, with the correct Maghrib rule
+• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari and Tehran, set for your school. Sensible Fajr and Isha in the far north
+• Your mosque's jama'ah (iqamah) and Jumu'ah times under each prayer
+• Match your mosque: move a prayer up to 30 minutes or copy its board, or shift the Islamic date a day or two
+
+YOUR PRIVACY
+
+• Nothing to buy, no accounts, no login
+• Optional usage counts, off unless you say yes. No crash reporting
+• Approximate location, read while the app is open, or type your town instead. Your coordinates never go to the developer or the usage counts
+• Your town's name comes from your phone's place service, usually Google. A town you type is looked up online there, or by Open-Meteo
+• Cloud backup is off: nothing is copied to a server
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+### 1.6.0 listing, 25 Oct 2026: paste on the 1.6.0 release day (short description, full description, What's new)
+
+Designed by Fable (`STEP-11-DESIGN.md` §2 and §3), checked by the plan verifier against the code on `claude/1-6-0`.
+**Owner's decisions, 25 Oct 2026 ("Yes all recommended options"):** the short description below (option C), and the
+"Coming soon to Chrome and Edge browsers" line removed in all nine languages (the extension is designed, not built; by a
+December submit the line would have stood two months, and this file's own rule says a long "coming soon" reads as a broken
+promise). Put it back, naming where to get it, only when the extension is published. The eight translations are in
+`LISTING-LOCALES.md`, "1.6.0 listings". No watch note: the watch is unchanged (1002 / 1.5.0) and gets no new release.
+
+**Short description** `80 / 80`. Keeps "namaz", "adhan", "Qibla" and "Wear OS", adds "salah tracker" (the
+tracker ships in 1.6.0, so VISIBILITY-KEYWORDS' "not to be mentioned" no longer applies). Loses "for Sunni and Shia", which
+stays in the full description's first line and on the feature graphic. Rejected: the plan's line without "namaz" (77), and
+"Offline namaz times..." (loses "prayer times", the phrase most searches use). The paste, save, reload and "may not be
+promoted" check at the top of this file applies; "private" is untested in this field, so go back to the 1.5.0 line if the
+notice appears.
+
+```
+Offline prayer times (namaz), adhan, Qibla and a private salah tracker. Wear OS.
+```
+
+**Full description** `3986 / 4000`, **replaced 30 Oct 2026 by Ali's approved whole app text** (block above, same text). Earlier history: `3999 / 4000` (Python `len`, newlines counted, no final newline; was 3990 until Bengali joined the
+language line on 30 Oct 2026, a fact correction under RELEASE-1.6.0 step 3). New: the MY PRAYERS AND YOUR
+MOSQUE section (tracker, jama'ah and Jumu'ah, bell), the Islamic dates of the year, the two month Timetable, the five prayer
+strip. Applied to the 1.5.0 text this came to 4297, so lines were shortened: the "Namaz, salah or salat" paragraph folded
+into the first sentence, "wherever you are", "as day cards", "typed in once", "for your location", "Home screen", "matching
+the app's theme", "in summer" and the Shia dates clause went, and several privacy lines lost words without changing a
+claim. Kept on purpose: every method name, "Qibla direction", "iqamah", "Jumu'ah", "sehri", "azan", the coordinates
+sentence word for word, and the place service line. HONEST and FREE are byte for byte the 1.5.0 text. "fasting days" is
+not added: the Fasts count is 1.6.1.
+
+```
+SajdaTime gives you prayer times (namaz, salah or salat), adhan alerts, a Qibla compass and a private salah tracker, for Sunni and Shia Muslims, on your phone and Wear OS watch.
+Worked out on your phone, so no signal needed. No ads, no account.
+
+PRAYER TIMES AND QIBLA
+
+• Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, a live countdown and a sky that follows the day
+• The Hijri date (Islamic calendar) and the Islamic dates of the year, with Shia dates
+• Qibla direction: a true north compass that says which way to turn and buzzes when facing the Kaaba
+• Timetable for this month and next. Save today, 7 days, the month or Ramadan as a PDF
+
+ALERTS AND ADHAN
+
+• Each prayer: off, a notification, or an alarm loud enough for Fajr, even with the app closed. Play on silent if you choose
+• Adhan (azan) included for Sunni and Shia, or any sound on your phone
+• A quiet reminder 5 to 30 minutes before the prayers you choose, and a silent next prayer notification
+• A bell on each prayer turns its alert on or off
+
+MY PRAYERS
+
+• Private: tick each prayer you pray, see your week as rings and 30 days as a calendar
+• It records, never judges. Optional streak, Pause, and a file to move it to a new phone
+• Fasts to make up: one count, one less each time you make one up
+
+RAMADAN AND EID
+
+• Suhoor (sehri) and iftar times, a countdown, the fast's length, a Ramadan table, and a greeting on Eid al-Fitr and Eid al-Adha
+• A suhoor reminder 15 to 60 minutes before suhoor ends, on by default in Ramadan
+
+WIDGETS AND WEAR OS
+
+• Three widgets: a big countdown and today's times, both with your town, and five prayers in one row
+• A Wear OS app, tile and Qibla that follow your phone or work alone
+
+FOR EVERYONE
+
+• English, Arabic, Urdu, Bengali, Turkish and Indonesian, set in the app or by your phone
+• Light and dark themes, large text, screen readers
+
+YOUR SCHOOL, YOUR MOSQUE
+
+• Sunni: Hanafi, Shafi'i, Maliki and Hanbali, each with its correct Asr rule
+• Shia: Jafari / Ithna Ashari, with the correct Maghrib rule
+• 13 calculation methods: Muslim World League, ISNA, Umm al-Qura, Egyptian, Karachi, Dubai, Kuwait, Qatar, Kemenag/MUIS, Diyanet, Moonsighting Committee, Jafari and Tehran, set for your school. Sensible Fajr and Isha in the far north
+• Your mosque's jama'ah (iqamah) and Jumu'ah times under each prayer
+• Match your mosque: move a prayer up to 30 minutes or copy its board, or shift the Islamic date a day or two
+
+YOUR PRIVACY
+
+• Nothing to buy, no accounts, no login
+• Optional usage counts, off unless you say yes. No crash reporting
+• Approximate location, read while the app is open, or type your town instead. Your coordinates never go to the developer or the usage counts
+• Your town's name comes from your phone's place service, usually Google. A town you type is looked up online there, or by Open-Meteo
+• Cloud backup is off: nothing is copied to a server
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+There is no paid tier, no subscription and nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
+**What's new, 1.6.0** `497 / 500` (30 Oct 2026: "Now in Bengali." added, "as day cards" cut to fit; was 494). Every claim checked against the branch by the plan verifier: My prayers and Last 30
+days, the bell, the two month Timetable with Save as PDF, jama'ah and Jumu'ah typed by the user ("add" says they are theirs,
+never a feed), the Islamic dates sheet from the Hijri date, the Qibla turn sentence, the skies on Times and the Next prayer
+widget only, the strip. Left out: the Shia dates, the disclaimer move (not a feature). The closing
+sentence is the 1.5.0 one.
+
+```
+My prayers: a private record of your prayers, this week and the last 30 days, kept on your phone. A bell on each prayer turns its alert on or off. Timetable: this month and next, with Save as PDF. Add your mosque's jama'ah and Jumu'ah times under each prayer. The Hijri date opens the Islamic dates of the year. Qibla now says which way to turn first. Times and the next prayer widget show the time of day. A five prayer widget strip. Now in Bengali. Where your mosque differs, follow your mosque.
+```
+
+### 1.5.0 listing, LIVE since 23 Oct 2026 (public page "Updated on 23 Oct 2026", checked 25 Oct 2026; superseded by 1.6.0 on its release day) (short description, full description, watch note)
 
 **Rewritten 21 Oct 2026** (the owner: "the playstore descriptions, features, screenshots and other should be written
 properly. Do not [miss] features like widget and other things"). The 19 Oct text below this note was regrouped under what a
@@ -955,7 +1235,8 @@ the capture recipe, are in [`upload/README.md`](upload/README.md).
 |---|---|---|---|
 | `upload/app-icon/` | App icon | `icon-512.png` | 512 × 512 |
 | `upload/feature-graphic/` | Feature graphic | `feature-graphic-1024.png` | 1024 × 500 |
-| `upload/phone/` | Phone screenshots | 8, upload all in filename order | 1080 × 1920 |
+| `upload/phone/en-GB/` | Phone screenshots, default listing | 8, upload all in filename order | 1080 × 1920 |
+| `upload/phone/ar/`, `ur/`, `tr-TR/`, `id-ID/` | Phone screenshots in that language's listing | 4 each (01 to 04), in filename order | 1080 × 1920 |
 | `upload/wear-os/` | Wear OS screenshots | `w1-times`, `w2-qibla`, `w3-tile`, `w4-location`, in that order | 454 × 454 |
 | `upload/tablet-7in/`, `tablet-10in/`, `chromebook/` | those boxes | **empty on purpose** | — |
 
@@ -978,7 +1259,34 @@ automatically rejected.
 They are now captured **natively at 1080 × 1920** on a Pixel 2 profile AVD and copied
 through untouched — no scaling, no reframing, no invented pixels.
 
-### What the eight phone screenshots show (retaken from the 1.5.0 build, 18 Oct 2026; 07 and 08 added 23 Oct 2026)
+### What the phone screenshots show (1.6.0 set, taken 25 Oct 2026)
+
+Designed in `STEP-11-DESIGN.md`; the owner chose the set on 25 Oct 2026 ("Yes all recommended options"): My prayers and the
+Timetable take the two slots the setup madhab step and Settings had. Captured on the `sajdastore` AVD (1080 × 1920, `-read-only`)
+from the 1.6.0 debug build, London seeded by `ScreenSeedDeviceTest` (which also closes the "Does this match your mosque?" notice),
+a week of ticks seeded by `TrackerSeedDeviceTest` and Dhuhr ticked by hand, then **the location permission revoked**: the AVD's
+own GPS fix is Manchester, and with the permission granted the app moves itself there mid capture (it did on the first try;
+the two screens briefly disagreed until it settled). Demo status bar with a full wifi icon. Clocks: 15 Aug 2026 15:00 London for
+the light pictures, 18:30 for the widgets (Asr window, so the evening sky and Maghrib next), 22 Feb 2027 15:00 (15 Ramadan 1448)
+for the dark ones. `05` was placed by hand on the launcher (widget picker, tap the preview, Add, then the Next widget's right
+handle dragged to four columns); the strip shows no town chip at this width, by the owner's choice.
+
+| File | Screen | Why it earns a slot |
+|---|---|---|
+| `01-times-light.png` | Times, light, day sky, bells, Timetable button, Now and Next | The core screen, with four of the 1.6 changes |
+| `02-my-prayers.png` | My prayers: Fajr and Dhuhr ticked, the week, Pause and Last 30 days | The headline 1.6 feature, beside 01 in search |
+| `03-qibla.png` | Qibla, "Turn right 58°", facing 61° | Free maths check: from London the Qibla is 119°, and 119 − 61 = 58 |
+| `04-ramadan-dark.png` | Times, dark, 15 Ramadan 1448 | Dark theme and the Ramadan card |
+| `05-widgets.png` | The five prayer strip above the Next prayer widget at four columns, evening sky | Both 1.6 widget changes |
+| `06-timetable.png` | The Timetable sheet, August 2026, today marked, Save as PDF | New in 1.6, and the PDF |
+| `07-alerts-and-adhan.png` | Settings, Reminders: "All five · Mixed", Adhan, 15 minutes before, the silent notification on | Seeded by `ScreenSeedDeviceTest#seed_store_alert_settings`, so it is reproducible |
+| `08-ramadan-suhoor-reminder.png` | The Suhoor reminder dialog at its defaults, dark | The Ramadan settings |
+
+Arabic, Urdu, Turkish and Indonesian get 01 to 04 in their own language (`raw/phone/<ar|ur|tr-TR|id-ID>/`). Arabic 01 to 03
+were taken on Thursday 20 Aug 2026 15:00 instead (retaken 25 Oct, Fable's verdict): Arabic weeks start on Saturday, so on
+Saturday 15 Aug the week card in `ar/02` showed only today; on Thursday it is full. The watch pictures are unchanged.
+
+### History: the 1.5.0 phone screenshots (retaken from the 1.5.0 build, 18 Oct 2026; 07 and 08 added 23 Oct 2026)
 
 Captured on the `sajdastore` AVD (1080 × 1920, started `-read-only` so the AVD itself is unchanged) from
 the 1.5.0 debug build, Manchester typed into the location sheet (the emulator's own place lookup gave

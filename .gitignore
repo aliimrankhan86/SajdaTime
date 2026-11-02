@@ -56,7 +56,10 @@ graphify-out/
 # Per-machine Claude Code settings (.claude/settings.local.json). Local tool permissions
 # for whoever is sitting at this checkout, not a property of the project, and committing
 # one machine's answers would silently apply them to the next session on another machine.
-.claude/
+# The agent definitions are project policy (which model does which job, HANDOVER 5.28), so
+# they are shared and committed.
+.claude/*
+!.claude/agents/
 
 # Signed release copies the owner keeps in the repo root (SajdaTime-<version>/app-release.aab plus its
 # sha256.txt), moved there from the Desktop on 11 Oct 2026. Release artefacts, never committed.

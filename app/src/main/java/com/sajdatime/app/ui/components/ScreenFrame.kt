@@ -3,7 +3,9 @@ package com.sajdatime.app.ui.components
 import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,3 +47,10 @@ fun ScreenTitle(text: String, modifier: Modifier = Modifier) {
             .semantics { heading() },
     )
 }
+
+/**
+ * The reading column (1.6, Q18 and Q20): at most 600dp wide and centred by its parent (a Column with
+ * CenterHorizontally, or a Box with a Top Center alignment). On a phone in portrait it changes nothing;
+ * a tablet, a phone in landscape or an unfolded foldable gets the centred column.
+ */
+fun Modifier.readingWidth(): Modifier = widthIn(max = 600.dp).fillMaxWidth()
