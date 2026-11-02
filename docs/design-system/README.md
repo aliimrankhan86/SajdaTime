@@ -105,6 +105,7 @@ in these pages, so a new file means a new row here and a spec in the right page.
 | `settings/` | `SettingsScreen.kt` | Settings content, every chooser | 05 §5.5 |
 | | `SettingsList.kt` | Settings look: groups, rows, theme selector | 03 §3.3 |
 | | `LanguageChooser.kt` | Language list | 05 §5.5 |
+| | `AlertCheckDialog.kt` | Alert check dialog | 05 §5.5 |
 | | `AppLanguage.kt` | Which language the app is in | 06 §6.6 |
 | `onboarding/` | `OnboardingScreen.kt` | Setup | 05 §5.6 |
 

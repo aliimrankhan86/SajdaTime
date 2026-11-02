@@ -802,4 +802,24 @@
     <string name="sky_evening">Evening</string>
     <string name="sky_night">Night</string>
     <string name="sky_now_a11y">%1$s, until %2$s</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">Alert check</string>
+    <string name="alert_check_all_ok">Everything is allowed</string>
+    <string name="alert_check_notifications_ok">Notifications allowed</string>
+    <string name="alert_check_notifications_fail">Notifications are off. Alerts cannot arrive.</string>
+    <string name="alert_check_notifications_button">Allow notifications</string>
+    <string name="alert_check_exact_ok">Exact alarms allowed</string>
+    <string name="alert_check_exact_fail">Alerts may arrive late or not at all.</string>
+    <string name="alert_check_exact_button">Allow exact alarms</string>
+    <string name="alert_check_battery_ok">Battery not restricted</string>
+    <string name="alert_check_battery_fail">Battery saving may hold alerts back.</string>
+    <string name="alert_check_dnd_ok">Alarms can sound in Do Not Disturb</string>
+    <string name="alert_check_dnd_fail">Your alarm stays silent in Do Not Disturb.</string>
+    <string name="alert_check_background">Some phones close apps to save battery, for example Xiaomi and Samsung. If an alert still does not arrive, allow SajdaTime to run in the background in your phone\'s settings.</string>
+    <string name="alert_check_app_settings">Open app settings</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="one">%d thing to fix</item>
+        <item quantity="other">%d things to fix</item>
+    </plurals>
 </resources>

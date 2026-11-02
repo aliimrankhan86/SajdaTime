@@ -664,4 +664,28 @@
     <string name="sky_evening">المساء</string>
     <string name="sky_night">الليل</string>
     <string name="sky_now_a11y">%1$s، حتى %2$s</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">فحص التنبيهات</string>
+    <string name="alert_check_all_ok">كل شيء مسموح</string>
+    <string name="alert_check_notifications_ok">الإشعارات مسموحة</string>
+    <string name="alert_check_notifications_fail">الإشعارات متوقفة. لن تصل التنبيهات.</string>
+    <string name="alert_check_notifications_button">السماح بالإشعارات</string>
+    <string name="alert_check_exact_ok">المنبّهات الدقيقة مسموحة</string>
+    <string name="alert_check_exact_fail">قد تصل التنبيهات متأخرة أو لا تصل أبدًا.</string>
+    <string name="alert_check_exact_button">السماح بالمنبّهات الدقيقة</string>
+    <string name="alert_check_battery_ok">البطارية غير مقيّدة</string>
+    <string name="alert_check_battery_fail">قد يؤدي توفير البطارية إلى حجب التنبيهات.</string>
+    <string name="alert_check_dnd_ok">يمكن للمنبّه أن يعمل في وضع عدم الإزعاج</string>
+    <string name="alert_check_dnd_fail">يبقى المنبّه صامتًا في وضع عدم الإزعاج.</string>
+    <string name="alert_check_background">تغلق بعض الهواتف التطبيقات لتوفير البطارية، مثل هواتف شاومي وسامسونج. إذا لم يصل تنبيه رغم ذلك، فاسمح لتطبيق SajdaTime بالعمل في الخلفية من إعدادات هاتفك.</string>
+    <string name="alert_check_app_settings">فتح إعدادات التطبيق</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="zero">%d أمر يحتاج إلى إصلاح</item>
+        <item quantity="one">%d أمر يحتاج إلى إصلاح</item>
+        <item quantity="two">أمران يحتاجان إلى إصلاح</item>
+        <item quantity="few">%d أمور تحتاج إلى إصلاح</item>
+        <item quantity="many">%d أمرًا يحتاج إلى إصلاح</item>
+        <item quantity="other">%d أمر يحتاج إلى إصلاح</item>
+    </plurals>
 </resources>

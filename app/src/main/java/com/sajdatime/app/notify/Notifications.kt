@@ -41,6 +41,10 @@ object Notifications {
     const val CHANNEL_PRAYERS = "prayer_times"
     const val CHANNEL_ONGOING = "next_prayer_badge"
 
+    /** The channels a prayer alert itself posts on (not the heads up, the silent badge or suhoor). */
+    fun isPrayerAlertChannel(id: String) =
+        id == CHANNEL_PRAYERS || id.startsWith(CHANNEL_ALARM_PREFIX) || id.startsWith(CHANNEL_NOTIFICATION_PREFIX)
+
     /**
      * The heads up before a prayer (1.5.0) has its own channel so it can be truly quiet: no sound,
      * no pop up, one short buzz. On the prayer channel it sounded like a second alert ten minutes

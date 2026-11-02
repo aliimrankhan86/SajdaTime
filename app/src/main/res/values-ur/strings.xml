@@ -572,4 +572,24 @@
     <string name="sky_evening">شام</string>
     <string name="sky_night">رات</string>
     <string name="sky_now_a11y">%1$s، %2$s تک</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">الرٹ کی جانچ</string>
+    <string name="alert_check_all_ok">ہر چیز کی اجازت ہے</string>
+    <string name="alert_check_notifications_ok">اطلاعات کی اجازت ہے</string>
+    <string name="alert_check_notifications_fail">اطلاعات بند ہیں۔ الرٹ نہیں پہنچ سکتے۔</string>
+    <string name="alert_check_notifications_button">اطلاعات کی اجازت دیں</string>
+    <string name="alert_check_exact_ok">درست وقت کے الارم کی اجازت ہے</string>
+    <string name="alert_check_exact_fail">الرٹ دیر سے آ سکتے ہیں یا بالکل نہیں آ سکتے۔</string>
+    <string name="alert_check_exact_button">درست وقت کے الارم کی اجازت دیں</string>
+    <string name="alert_check_battery_ok">بیٹری پر کوئی پابندی نہیں</string>
+    <string name="alert_check_battery_fail">بیٹری بچت الرٹ روک سکتی ہے۔</string>
+    <string name="alert_check_dnd_ok">ڈسٹرب نہ کریں میں الارم بج سکتا ہے</string>
+    <string name="alert_check_dnd_fail">ڈسٹرب نہ کریں میں آپ کا الارم خاموش رہتا ہے۔</string>
+    <string name="alert_check_background">کچھ فون بیٹری بچانے کے لیے ایپس بند کر دیتے ہیں، مثلاً Xiaomi اور Samsung۔ اگر پھر بھی الرٹ نہ آئے تو اپنے فون کی سیٹنگز میں SajdaTime کو پس منظر میں چلنے کی اجازت دیں۔</string>
+    <string name="alert_check_app_settings">ایپ کی سیٹنگز کھولیں</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="one">%d چیز ٹھیک کرنی ہے</item>
+        <item quantity="other">%d چیزیں ٹھیک کرنی ہیں</item>
+    </plurals>
 </resources>

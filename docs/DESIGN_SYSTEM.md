@@ -502,6 +502,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
 | Settings, Match your mosque start times | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
+| Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
 | My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
 | My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
 | My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |

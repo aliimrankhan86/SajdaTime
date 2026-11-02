@@ -597,4 +597,24 @@
     <string name="sky_evening">সন্ধ্যা</string>
     <string name="sky_night">রাত</string>
     <string name="sky_now_a11y">%1$s, %2$s পর্যন্ত</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">অ্যালার্ট পরীক্ষা</string>
+    <string name="alert_check_all_ok">সবকিছুর অনুমতি দেওয়া আছে</string>
+    <string name="alert_check_notifications_ok">নোটিফিকেশনের অনুমতি দেওয়া আছে</string>
+    <string name="alert_check_notifications_fail">নোটিফিকেশন বন্ধ আছে। অ্যালার্ট পৌঁছাতে পারবে না।</string>
+    <string name="alert_check_notifications_button">নোটিফিকেশনের অনুমতি দিন</string>
+    <string name="alert_check_exact_ok">সঠিক সময়ের অ্যালার্মের অনুমতি দেওয়া আছে</string>
+    <string name="alert_check_exact_fail">অ্যালার্ট দেরিতে আসতে পারে বা একেবারেই নাও আসতে পারে।</string>
+    <string name="alert_check_exact_button">সঠিক সময়ের অ্যালার্মের অনুমতি দিন</string>
+    <string name="alert_check_battery_ok">ব্যাটারিতে কোনো সীমাবদ্ধতা নেই</string>
+    <string name="alert_check_battery_fail">ব্যাটারি সেভার অ্যালার্ট আটকে দিতে পারে।</string>
+    <string name="alert_check_dnd_ok">বিরক্ত করবে না মোডেও অ্যালার্ম বাজতে পারে</string>
+    <string name="alert_check_dnd_fail">বিরক্ত করবে না মোডে আপনার অ্যালার্ম নীরব থাকে।</string>
+    <string name="alert_check_background">কিছু ফোন ব্যাটারি বাঁচাতে অ্যাপ বন্ধ করে দেয়, যেমন Xiaomi ও Samsung। তবুও অ্যালার্ট না এলে ফোনের সেটিংসে ব্যাকগ্রাউন্ডে SajdaTime চালানোর অনুমতি দিন।</string>
+    <string name="alert_check_app_settings">অ্যাপ সেটিংস খুলুন</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="one">%dটি বিষয় ঠিক করতে হবে</item>
+        <item quantity="other">%dটি বিষয় ঠিক করতে হবে</item>
+    </plurals>
 </resources>

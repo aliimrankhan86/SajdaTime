@@ -2232,6 +2232,24 @@ never translated or transliterated": the count per string, plural and array must
 `tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
 failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
 
+### 5.40 Alert check: Settings, Reminders, first row (Fable design, Ali delegated the decisions, 2 Nov 2026)
+
+One always shown row opening a dialog that reads four things the phone can withhold: notifications, exact alarms (Android
+12+), background restriction, and Do Not Disturb sound (only while a prayer is an alarm). Reads only: nothing stored or
+sent, so no usage count and no privacy page change. **The battery check uses `ActivityManager.isBackgroundRestricted()`
+only.** Ordinary battery optimisation is not asked about because prayer alerts use `setAlarmClock`, which is exempt.
+**No battery permission, ever:** `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` is restricted by Play policy; the failing battery
+button (labelled "Open app settings") and the closing one (hidden while the battery check fails, so never two) open `ACTION_APPLICATION_DETAILS_SETTINGS` for our package, never a vendor intent. **The
+failing battery wording stays "may", permanently:** on 2 Nov 2026 the Redmi test (below, section 10) showed Restricted
+battery did NOT stop a Maghrib alert (`setAlarmClock` is exempt), so the check shows a risk, never a certainty. The
+notification check is `areNotificationsEnabled()` (the Times bell's own test, now `AlertCheck.notificationsAllowed`)
+plus no prayer alert channel (`Notifications.isPrayerAlertChannel`) switched off by hand. The Do Not Disturb line says
+alarms "can" sound (the default "Play on silent" off still drops them to a notification on a silent phone). The battery
+line reads only Android's own "Restricted" setting; HyperOS and One UI have their own controls it cannot see (the
+closing paragraph says so). iPhone effect: Android only as built; a notification and Focus check would carry over,
+exact alarms and battery do not exist there. Not unit tested: the read itself (a backwards check would pass
+`AlertCheckTest`); checked by hand on the Redmi, clean and Restricted.
+
 ### 5.39 Night times: the night is sunset to Fajr, for everyone (Ali, 2 Nov 2026, religious call)
 
 The Times list shows Islamic midnight and the start of the last third of the night. **The night is measured from
@@ -2648,6 +2666,13 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.6.0 alert check, battery test (2 Nov 2026, Redmi Note 13 Pro, HyperOS).** `com.sajdatime.app.sideload` set to
+Restricted (`RUN_ANY_IN_BACKGROUND` deny, standby bucket restricted), process killed, Home. Clock moved to 16:33:30
+(`cmd alarm set-time`, then auto time back on); the 16:34 Maghrib alarm fired on time and notification 2004 (channel
+`prayer_times`, importance 4) was posted. So Restricted battery did not block a `setAlarmClock` alert on this phone;
+the app wording stays "may". Alert check dialog seen on the phone clean (three ticks) and with Restricted (warning line,
+one button). Not seen: the Do Not Disturb row, light theme, 2x text, Urdu right to left.
 
 **1.6.0 step 3, the bell (24 Oct 2026, Mac session).** Phone emulator `sajda` (API 36), London, Shia. Undo re-arms
 the alarm: `dumpsys alarm` count 198, 190 after Dhuhr's bell off, 198 after Undo (Haiku `mechanic`,
@@ -6044,6 +6069,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > **This section opens with the current state of play, then the dated record of how the project
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
+
+### 📍 ADDED LATER 2 Nov 2026: ALERT CHECK (read with the block below; built uncommitted on `claude/1-6-0`)
+
+- New first row in Settings > Reminders, "Alert check", opens a dialog of up to four checks with a glyph, words and a
+  solid button to the exact system screen, plus an "Open app settings" button. Rules and rejected options: section 5.40.
+- Strings in all six languages by Claude; ledger not stamped. **Not tested on a device or emulator**, no screenshots,
+  and the battery wording is unconfirmed on the Redmi (section 5.40).
 
 ### 📍 STATE OF PLAY, 2 Nov 2026: NIGHT TIMES (MIDNIGHT AND LAST THIRD) ADDED TO 1.6.0 (read this first; the 31 Oct block below holds for everything not named here)
 

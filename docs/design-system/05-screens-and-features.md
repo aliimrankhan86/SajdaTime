@@ -143,7 +143,7 @@ here), then five groups. Every row shows its current value.
 |---|---|
 | Prayer times | Location; School of thought; Calculation method; Jama'ah times; Match your mosque start times; Islamic dates |
 | Appearance | Theme (inline selector: Follow phone, Light, Dark; widgets follow it); Language (`ui/settings/LanguageChooser.kt`, `ui/settings/AppLanguage.kt`) |
-| Reminders | Prayer alerts; Notification sound and Alarm sound (only when that style is used); Reminder before prayer; Next prayer in notifications (on); Suhoor reminder and Ramadan card (only from 3 days before Ramadan to its end) |
+| Reminders | Alert check (first, always shown; subtitle "Everything is allowed" or "N things to fix"; `Icons.Outlined.Checklist`); Prayer alerts; Notification sound and Alarm sound (only when that style is used); Reminder before prayer; Next prayer in notifications (on); Suhoor reminder and Ramadan card (only from 3 days before Ramadan to its end) |
 | My prayers | My prayers switch; when on: Show streak, Fasts to make up, Pause or Resume tracking, Save to a file, Load from a file; Delete my prayer record (when a record exists) |
 | About | Disclaimer (**first, enforced**); Version; Privacy; Send feedback; Rate SajdaTime on Google Play; Share SajdaTime; Share usage counts; Free, forever; Made by; Data and libraries; Adhan recordings |
 
@@ -153,6 +153,7 @@ here), then five groups. Every row shows its current value.
 | Calculation method | Automatic first, then the methods offered to the sect, each with a line. Closes on pick |
 | Jama'ah times | Fajr to Isha and Jumu'ah, each Off, a fixed time, or minutes after it begins (0 to 60 in fives); a warning under a time outside its prayer; a quiet notice instead while in another time zone |
 | Match your mosque start times | "Use your mosque's board" (pick a prayer, set the board's time, minutes fitted); six steppers ±30; at the limit a note and "Choose a calculation method"; "Islamic date" stepper ±2 days; "Reset all" |
+| Alert check | One block per check, each a 20dp glyph (`CheckCircle` primary, or `WarningAmber` tertiary) plus words, never colour alone: Notifications; Exact alarms (Android 12 and up only); Battery (fails only when the app is background restricted); Sound in Do Not Disturb (only while a prayer is an alarm). A failing block carries a solid button to the exact system screen. Closes with a paragraph on phones that close apps, and a solid "Open app settings". Re-read on open and on return from the system. Android only (`AlertCheckDialog.kt`) |
 | Prayer alerts | Each prayer: Off, Notification, Alarm chips; "Ring on approximate days" for polar users with an alarm |
 | Sounds | Adhan (the school's recording) or from your phone; "Play on silent" for alarms |
 | Reminder before prayer | Off, 5 to 30 minutes; then a switch per prayer |

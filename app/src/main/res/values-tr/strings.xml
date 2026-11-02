@@ -566,4 +566,24 @@
     <string name="sky_evening">Akşam</string>
     <string name="sky_night">Gece</string>
     <string name="sky_now_a11y">%1$s, %2$s saatine kadar</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">Uyarı kontrolü</string>
+    <string name="alert_check_all_ok">Her şeye izin verildi</string>
+    <string name="alert_check_notifications_ok">Bildirimlere izin verildi</string>
+    <string name="alert_check_notifications_fail">Bildirimler kapalı. Uyarılar ulaşamaz.</string>
+    <string name="alert_check_notifications_button">Bildirimlere izin ver</string>
+    <string name="alert_check_exact_ok">Tam zamanlı alarmlara izin verildi</string>
+    <string name="alert_check_exact_fail">Uyarılar geç gelebilir veya hiç gelmeyebilir.</string>
+    <string name="alert_check_exact_button">Tam zamanlı alarmlara izin ver</string>
+    <string name="alert_check_battery_ok">Pil kısıtlanmamış</string>
+    <string name="alert_check_battery_fail">Pil tasarrufu uyarıları geciktirebilir.</string>
+    <string name="alert_check_dnd_ok">Rahatsız Etmeyin modunda alarm çalabilir</string>
+    <string name="alert_check_dnd_fail">Rahatsız Etmeyin modunda alarmınız sessiz kalır.</string>
+    <string name="alert_check_background">Bazı telefonlar pil tasarrufu için uygulamaları kapatır, örneğin Xiaomi ve Samsung. Bir uyarı yine de gelmezse telefonunuzun ayarlarında SajdaTime\'ın arka planda çalışmasına izin verin.</string>
+    <string name="alert_check_app_settings">Uygulama ayarlarını aç</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="one">%d şey düzeltilmeli</item>
+        <item quantity="other">%d şey düzeltilmeli</item>
+    </plurals>
 </resources>

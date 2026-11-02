@@ -81,6 +81,8 @@ Every icon in 1.6, with its SF Symbol. A new Material icon is not finished until
 | `Notifications` | Bell on | `bell.fill` |
 | `Alarm` | Bell alarm, Suhoor row | `alarm.fill` / `alarm` |
 | `NotificationsActive` | Prayer alerts row | `bell.badge` |
+| `Checklist` | Alert check row | `checklist` |
+| `CheckCircle`, `WarningAmber` (20dp) | Alert check status lines, always beside words | `checkmark.circle`, `exclamationmark.triangle` (the check itself is Android only) |
 | `Mosque` | Mosque button | No SF Symbol: use our own drawing in the same weight, licensed for both stores |
 | `Brightness3` | Fajr row, Eid, Ramadan notice | `moon` |
 | `WbTwilight` | Sunrise row | `sunrise` |

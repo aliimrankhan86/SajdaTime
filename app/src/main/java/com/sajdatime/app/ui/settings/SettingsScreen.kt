@@ -119,6 +119,7 @@ import com.sajdatime.core.TRACKED_SLOTS
 import com.sajdatime.app.ui.UiState
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.FileUpload
@@ -164,7 +165,7 @@ import android.text.format.DateFormat
  * See [SettingsScreen]'s `request` parameter.
  */
 enum class SettingsChooser {
-    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER,
+    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER, ALERT_CHECK,
 }
 
 @Composable
@@ -227,6 +228,7 @@ fun SettingsScreen(
     // inside the group they belong to meant nobody found them.
     val exactAllowed by rememberGranted { PrayerAlarmScheduler.canScheduleExact(it) }
     val dndAllowed by rememberGranted { Notifications.hasDndAccess(it) }
+    val alertCheck = rememberAlertCheck(settings.usesAlarm)
     val banners: @Composable () -> Unit = {
         // Before Android 12 there is no exact-alarm permission to ask for, so no row.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -390,6 +392,19 @@ fun SettingsScreen(
         SettingsSectionId.REMINDERS,
         stringResource(R.string.settings_group_reminders),
         listOfNotNull(
+            // Alert check (1.6.0): always shown, first, so the person who never got an alert has one
+            // place that says what the phone is holding back. Reads only; see AlertCheck.
+            SettingsItem.Link(
+                key = "alert_check",
+                icon = Icons.Outlined.Checklist,
+                title = stringResource(R.string.alert_check_title),
+                subtitle = if (alertCheck.failing == 0) {
+                    stringResource(R.string.alert_check_all_ok)
+                } else {
+                    pluralStringResource(R.plurals.alert_check_to_fix, alertCheck.failing, alertCheck.failing)
+                },
+                onClick = { open = SettingsChooser.ALERT_CHECK },
+            ),
             // One row, not two. "Which prayers" and "How you are told" were separate
             // choosers answering halves of the same question, and between them they could
             // not express "wake me for Fajr, a quiet notification for the rest" — which is
@@ -807,6 +822,8 @@ fun SettingsScreen(
         )
 
         SettingsChooser.LANGUAGE -> LanguageChooserDialog(onDismiss = { open = null })
+
+        SettingsChooser.ALERT_CHECK -> AlertCheckDialog(check = alertCheck, onDismiss = { open = null })
 
         SettingsChooser.DISCLAIMER -> AlertDialog(
             onDismissRequest = { open = null },

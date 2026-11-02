@@ -553,4 +553,23 @@
     <string name="sky_evening">Sore</string>
     <string name="sky_night">Malam</string>
     <string name="sky_now_a11y">%1$s, sampai %2$s</string>
+
+    <!-- Alert check (1.6.0): Settings, Reminders, first row. Read only. -->
+    <string name="alert_check_title">Cek pengingat</string>
+    <string name="alert_check_all_ok">Semua sudah diizinkan</string>
+    <string name="alert_check_notifications_ok">Notifikasi diizinkan</string>
+    <string name="alert_check_notifications_fail">Notifikasi mati. Pengingat tidak bisa masuk.</string>
+    <string name="alert_check_notifications_button">Izinkan notifikasi</string>
+    <string name="alert_check_exact_ok">Alarm tepat waktu diizinkan</string>
+    <string name="alert_check_exact_fail">Pengingat bisa terlambat atau tidak masuk sama sekali.</string>
+    <string name="alert_check_exact_button">Izinkan alarm tepat waktu</string>
+    <string name="alert_check_battery_ok">Baterai tidak dibatasi</string>
+    <string name="alert_check_battery_fail">Penghemat baterai mungkin menahan pengingat.</string>
+    <string name="alert_check_dnd_ok">Alarm bisa berbunyi saat Jangan Ganggu</string>
+    <string name="alert_check_dnd_fail">Alarm Anda tetap senyap saat Jangan Ganggu.</string>
+    <string name="alert_check_background">Beberapa ponsel menutup aplikasi untuk menghemat baterai, misalnya Xiaomi dan Samsung. Jika pengingat tetap tidak masuk, izinkan SajdaTime berjalan di latar belakang lewat pengaturan ponsel Anda.</string>
+    <string name="alert_check_app_settings">Buka pengaturan aplikasi</string>
+    <plurals name="alert_check_to_fix">
+        <item quantity="other">%d hal perlu diperbaiki</item>
+    </plurals>
 </resources>

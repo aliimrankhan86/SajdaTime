@@ -34,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sajdatime.core.AppLocale
 import com.sajdatime.core.BellRules
@@ -42,6 +41,7 @@ import com.sajdatime.core.PermissionDoor
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Permission
 import com.sajdatime.app.data.SetupStep
+import com.sajdatime.app.notify.AlertCheck
 import com.sajdatime.app.notify.Notifications
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.ui.ExportEvent
@@ -163,7 +163,7 @@ class MainActivity : ComponentActivity() {
      */
     private var notificationsBlocked by mutableStateOf(false)
 
-    private fun readNotificationsBlocked() = !NotificationManagerCompat.from(this).areNotificationsEnabled()
+    private fun readNotificationsBlocked() = !AlertCheck.notificationsAllowed(this)
 
     /**
      * Chosen before anything is launched, so a second "Don't allow" is never answered by Settings
