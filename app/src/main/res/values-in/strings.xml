@@ -572,4 +572,20 @@
     <plurals name="alert_check_to_fix">
         <item quantity="other">%d hal perlu diperbaiki</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">Pengingat puasa</string>
+    <string name="settings_fast_reminders_off">Nonaktif</string>
+    <string name="settings_fast_reminders_on">%1$d aktif</string>
+    <string name="settings_fast_reminders_help">Pengingat pada malam sebelum setiap puasa yang Anda pilih, beserta waktu berakhirnya sahur, menurut kalender yang diatur di SajdaTime.</string>
+    <string name="settings_fast_monday_thursday">Senin dan Kamis</string>
+    <string name="settings_fast_white_days">Ayyamul Bidh (tanggal 13, 14, 15)</string>
+    <string name="settings_fast_special">Asyura, Arafah, dan enam hari Syawal</string>
+    <string name="notif_fast_monday">Besok puasa sunah (Senin). Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_thursday">Besok puasa sunah (Kamis). Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_white_day">Besok puasa sunah (salah satu Ayyamul Bidh). Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_muharram_9">Besok puasa sunah (9 Muharam, sehari sebelum Asyura). Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_ashura">Besok puasa sunah (Asyura). Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_arafah">Besok puasa sunah (Hari Arafah menurut kalender ini). Ikuti masjid Anda untuk menentukan harinya. Sahur berakhir pukul %1$s.</string>
+    <string name="notif_fast_shawwal">Besok puasa sunah (salah satu dari enam hari Syawal). Sahur berakhir pukul %1$s.</string>
 </resources>

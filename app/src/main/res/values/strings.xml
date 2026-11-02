@@ -822,4 +822,20 @@
         <item quantity="one">%d thing to fix</item>
         <item quantity="other">%d things to fix</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">Fast reminders</string>
+    <string name="settings_fast_reminders_off">Off</string>
+    <string name="settings_fast_reminders_on">%1$d on</string>
+    <string name="settings_fast_reminders_help">A reminder the evening before each fast you choose, with when suhoor ends, on the calendar SajdaTime is set to.</string>
+    <string name="settings_fast_monday_thursday">Monday and Thursday</string>
+    <string name="settings_fast_white_days">White Days (13th, 14th, 15th)</string>
+    <string name="settings_fast_special">Ashura, Arafah and the six days of Shawwal</string>
+    <string name="notif_fast_monday">Tomorrow is a Sunnah fast (Monday). Suhoor ends at %1$s.</string>
+    <string name="notif_fast_thursday">Tomorrow is a Sunnah fast (Thursday). Suhoor ends at %1$s.</string>
+    <string name="notif_fast_white_day">Tomorrow is a Sunnah fast (a White Day). Suhoor ends at %1$s.</string>
+    <string name="notif_fast_muharram_9">Tomorrow is a Sunnah fast (9 Muharram, the day before Ashura). Suhoor ends at %1$s.</string>
+    <string name="notif_fast_ashura">Tomorrow is a Sunnah fast (Ashura). Suhoor ends at %1$s.</string>
+    <string name="notif_fast_arafah">Tomorrow is a Sunnah fast (Day of Arafah, on this calendar). Follow your mosque for the day. Suhoor ends at %1$s.</string>
+    <string name="notif_fast_shawwal">Tomorrow is a Sunnah fast (one of the six days of Shawwal). Suhoor ends at %1$s.</string>
 </resources>

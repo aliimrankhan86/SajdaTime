@@ -59,6 +59,16 @@ object PrayerAlarmScheduler {
     const val ACTION_PRAYER_REMINDER = "com.sajdatime.app.action.PRAYER_REMINDER"
     internal const val PRAYER_REMINDER_REQUEST_BASE = 30_000
 
+    /**
+     * The Sunnah fast reminder (1.6.0): the evening before a fast day, Sunni only, off until chosen.
+     * Its own action and codes `50,000 + dayOfYear` of the day it rings on (the planner's `eve`), so
+     * 50,001 to 50,366: clear of prayers, suhoor (10,000), the prayer reminder (30,000) and the
+     * jama'ah band reserved at 40,000. One per evening, so rescheduling replaces rather than duplicates.
+     */
+    const val ACTION_FAST_REMINDER = "com.sajdatime.app.action.FAST_REMINDER"
+    const val EXTRA_FAST_REASON = "fast_reason"
+    internal const val FAST_REMINDER_REQUEST_BASE = 50_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -87,6 +97,23 @@ object PrayerAlarmScheduler {
         }.getOrDefault(emptyList())
         suhoor.forEach { reminder ->
             schedule(context, manager, suhoorIntent(context, reminder), reminder.at)
+        }
+
+        // Before the early return too: wanted with or without any prayer alert. Wrapped so a planner
+        // fault can never stop the prayer alarms below. Not an alarm clock (a quiet notification
+        // must not become the phone's "next alarm"), and a late one is dropped by the receiver.
+        runCatching {
+            FastReminderPlan.plan(
+                coordinates = coordinates,
+                prefs = settings.calculationPrefs,
+                sect = settings.sect,
+                kinds = settings.fastReminders,
+                today = today,
+                now = now,
+                zone = zone,
+            )
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, fastIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
         val upcoming = upcoming(coordinates, settings, today, now)
@@ -285,6 +312,7 @@ object PrayerAlarmScheduler {
                 cancelPending(context, manager, ACTION_PRAYER_REMINDER, prayerReminderRequestCode(slot, date))
             }
             cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
+            cancelPending(context, manager, ACTION_FAST_REMINDER, fastRequestCode(date))
         }
     }
 
@@ -333,6 +361,20 @@ object PrayerAlarmScheduler {
         )
     }
 
+    private fun fastIntent(context: Context, reminder: FastReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_FAST_REMINDER)
+            .putExtra(EXTRA_FAJR_AT_MILLIS, reminder.fajrAt.toEpochMilli())
+            .putExtra(EXTRA_DATE_EPOCH_DAY, reminder.fastDate.toEpochDay())
+            .putExtra(EXTRA_FAST_REASON, reminder.reason.name)
+        return PendingIntent.getBroadcast(
+            context,
+            fastRequestCode(reminder.eve),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     private fun prayerReminderIntent(context: Context, reminder: PrayerReminder): PendingIntent {
         val date = reminder.prayerAt.atZone(ZoneId.systemDefault()).toLocalDate()
         val intent = Intent(context, PrayerAlarmReceiver::class.java)
@@ -368,4 +410,8 @@ object PrayerAlarmScheduler {
     /** Stable per (slot, the prayer's calendar day), in its own range. */
     internal fun prayerReminderRequestCode(slot: PrayerSlot, date: LocalDate): Int =
         PRAYER_REMINDER_REQUEST_BASE + prayerRequestCode(slot, date)
+
+    /** Stable per evening the reminder rings on, in its own range. */
+    internal fun fastRequestCode(eve: LocalDate): Int =
+        FAST_REMINDER_REQUEST_BASE + eve.dayOfYear
 }

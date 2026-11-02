@@ -41,6 +41,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
+import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.DarkMode
@@ -93,6 +94,7 @@ import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.FastKind
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.TrackerLogic
 import com.sajdatime.core.Sect
@@ -165,7 +167,7 @@ import android.text.format.DateFormat
  * See [SettingsScreen]'s `request` parameter.
  */
 enum class SettingsChooser {
-    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER, ALERT_CHECK,
+    SCHOOL, METHOD, JAMAAH, ADJUSTMENTS, ISLAMIC_DATES, ALERTS, NOTIFICATION_SOUND, ALARM_SOUND, PRAYER_REMINDER, SUHOOR, LOCATION, LANGUAGE, DISCLAIMER, ALERT_CHECK, FAST_REMINDERS,
 }
 
 @Composable
@@ -193,6 +195,7 @@ fun SettingsScreen(
     onSetSuhoorAdhan: (Boolean) -> Unit,
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
+    onSetFastReminder: (FastKind, Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
@@ -438,6 +441,19 @@ fun SettingsScreen(
                 subtitle = prayerReminderSummary(settings.prayerReminderMinutes, settings.prayerReminderFor),
                 onClick = { open = SettingsChooser.PRAYER_REMINDER },
             ),
+            // Sunnah fast reminders (1.6.0): Sunni only (the planner also refuses Shia), off until chosen,
+            // notification only, never a usage count. iPhone: carries over (SF Symbol calendar.badge.clock).
+            SettingsItem.Link(
+                key = "fast_reminders",
+                icon = Icons.Outlined.EventRepeat,
+                title = stringResource(R.string.settings_fast_reminders),
+                subtitle = if (settings.fastReminders.isEmpty()) {
+                    stringResource(R.string.settings_fast_reminders_off)
+                } else {
+                    stringResource(R.string.settings_fast_reminders_on, settings.fastReminders.size)
+                },
+                onClick = { open = SettingsChooser.FAST_REMINDERS },
+            ).takeIf { settings.sect == Sect.SUNNI },
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
             SettingsItem.Toggle(
@@ -799,6 +815,12 @@ fun SettingsScreen(
             slots = settings.prayerReminderFor,
             onSetMinutes = onSetPrayerReminderMinutes,
             onSetSlot = onSetPrayerReminder,
+            onDismiss = { open = null },
+        )
+
+        SettingsChooser.FAST_REMINDERS -> FastRemindersDialog(
+            kinds = settings.fastReminders,
+            onSetKind = onSetFastReminder,
             onDismiss = { open = null },
         )
 
@@ -1374,6 +1396,35 @@ private fun PrayerReminderDialog(
                     horizontalPadding = 0.dp,
                 )
             }
+        }
+    }
+}
+
+/** The Sunnah fast reminders: three switches, each a kind of fast. Notification only, no style or sound here. */
+@Composable
+private fun FastRemindersDialog(
+    kinds: Set<FastKind>,
+    onSetKind: (FastKind, Boolean) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ChooserDialog(title = stringResource(R.string.settings_fast_reminders), onDismiss = onDismiss) {
+        Text(
+            text = stringResource(R.string.settings_fast_reminders_help),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(Space.Group))
+        listOf(
+            FastKind.MONDAY_THURSDAY to R.string.settings_fast_monday_thursday,
+            FastKind.WHITE_DAYS to R.string.settings_fast_white_days,
+            FastKind.SPECIAL to R.string.settings_fast_special,
+        ).forEach { (kind, label) ->
+            SwitchRow(
+                title = stringResource(label),
+                checked = kind in kinds,
+                onCheckedChange = { onSetKind(kind, it) },
+                horizontalPadding = 0.dp,
+            )
         }
     }
 }

@@ -592,4 +592,20 @@
         <item quantity="one">%d چیز ٹھیک کرنی ہے</item>
         <item quantity="other">%d چیزیں ٹھیک کرنی ہیں</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">روزے کی یاددہانیاں</string>
+    <string name="settings_fast_reminders_off">بند</string>
+    <string name="settings_fast_reminders_on">%1$d فعال</string>
+    <string name="settings_fast_reminders_help">ہر منتخب روزے سے ایک شام پہلے یاددہانی، سحری ختم ہونے کے وقت کے ساتھ، اس کیلنڈر کے مطابق جس پر SajdaTime سیٹ ہے۔</string>
+    <string name="settings_fast_monday_thursday">پیر اور جمعرات</string>
+    <string name="settings_fast_white_days">ایامِ بیض (13، 14، 15)</string>
+    <string name="settings_fast_special">عاشورہ، یوم عرفہ اور شوال کے چھ روزے</string>
+    <string name="notif_fast_monday">کل سنت روزہ ہے (پیر)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_thursday">کل سنت روزہ ہے (جمعرات)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_white_day">کل سنت روزہ ہے (ایامِ بیض میں سے ایک)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_muharram_9">کل سنت روزہ ہے (9 محرم، عاشورہ سے ایک دن پہلے)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_ashura">کل سنت روزہ ہے (عاشورہ)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_arafah">کل سنت روزہ ہے (اس کیلنڈر کے مطابق یوم عرفہ)۔ دن کے تعین کے لیے اپنی مسجد کی پیروی کریں۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="notif_fast_shawwal">کل سنت روزہ ہے (شوال کے چھ روزوں میں سے ایک)۔ سحری %1$s پر ختم ہوگی۔</string>
 </resources>

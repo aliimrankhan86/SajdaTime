@@ -75,7 +75,7 @@ Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic, Bengali (30
 to left. Adding one: the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find a new
 `values-<lang>/` folder on disk and fail until it is registered. Text held to one line shrinks to fit (`shrinkToFit`).
 
-Not in 1.6, do not build without Ali: jama'ah reminder and Sunnah fast reminders (1.6.1, logic built and
+Not in 1.6, do not build without Ali: the jama'ah reminder (dropped, 2 Nov 2026: mosque times are not reliable). Sunnah fast reminders ARE in 1.6.0 since 2 Nov 2026 (HANDOVER 5.41); their old note, kept as history: (1.6.1, logic built and
 switched off), tasbih, adhan choice per prayer. Never: a missed or qada prayer counter, network for times,
 anything that sells or nags.
 

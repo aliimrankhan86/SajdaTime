@@ -18,7 +18,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 
 /**
- * The two 1.6.1 reminders, planned as pure functions so they are tested without an AlarmManager.
+ * The two reminders, planned as pure functions so they are tested without an AlarmManager.
  * Signed off on 23 Oct 2026 with two conditions: every request code band proven apart
  * (RequestCodeTest), and a rule for an Isha after midnight ([FastReminderPlan.eveningOf]).
  */
@@ -93,7 +93,7 @@ object FastReminderPlan {
      * Unless Isha is late or borrowed: after [LATE_ISHA], after midnight, or projected from another
      * latitude (in a northern summer Isha can be past midnight, and an "evening before" reminder would
      * then arrive on the fast day itself). Then it rings [AFTER_MAGHRIB] after Maghrib instead, which
-     * is past iftar and still the evening before. Condition (b) of the 1.6.1 sign-off.
+     * is past iftar and still the evening before. Condition (b) of the sign-off.
      *
      * Where even that crosses midnight (the far north near midsummer, where the sun hardly sets), it
      * rings at [FALLBACK_EVENING] on the evening before, so it is never on the fast day itself.
@@ -102,11 +102,18 @@ object FastReminderPlan {
         val day = PrayerEngine.compute(coordinates, eve, prefs)
         val isha = day[PrayerSlot.ISHA].atZone(zone)
         val late = day.approximated || isha.toLocalDate() != eve || !isha.toLocalTime().isBefore(LATE_ISHA)
-        val at = if (late) day[PrayerSlot.MAGHRIB].plus(AFTER_MAGHRIB) else isha.toInstant()
+        val at = if (late) day[PrayerSlot.MAGHRIB].plus(AFTER_MAGHRIB) else isha.toInstant().plus(AFTER_ISHA)
         return if (at.atZone(zone).toLocalDate() == eve) at else eve.atTime(FALLBACK_EVENING).atZone(zone).toInstant()
     }
 
     private val LATE_ISHA: LocalTime = LocalTime.of(23, 0)
     private val FALLBACK_EVENING: LocalTime = LocalTime.of(21, 0)
     private val AFTER_MAGHRIB: Duration = Duration.ofMinutes(30)
+
+    /**
+     * Not AT Isha: the Isha alert rings at that very instant, and Android plays one notification
+     * sound at a time, so a second sounding notification in the same minute can cut the adhan short
+     * (review, 2 Nov 2026; seen firing in the same minute on the Redmi). Ten minutes clears it.
+     */
+    private val AFTER_ISHA: Duration = Duration.ofMinutes(10)
 }

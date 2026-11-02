@@ -4,7 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.sajdatime.app.data.AppSettings
+import com.sajdatime.core.FastReason
+import com.sajdatime.core.FastingDays
 import com.sajdatime.core.HijriCalendar
+import com.sajdatime.core.Sect
 import com.sajdatime.core.PrayerEngine
 import java.time.Duration
 import java.time.LocalDate
@@ -29,6 +32,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             PrayerAlarmScheduler.ACTION_PRAYER -> onPrayer(context, intent)
             PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER -> onSuhoorReminder(context, intent)
             PrayerAlarmScheduler.ACTION_PRAYER_REMINDER -> onPrayerReminder(context, intent)
+            PrayerAlarmScheduler.ACTION_FAST_REMINDER -> onFastReminder(context, intent)
         }
     }
 
@@ -56,6 +60,38 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     )
                 }
                 // Same chain as a prayer, so a person with every alert off still gets the next window.
+                PrayerAlarmScheduler.reschedule(appContext, settings)
+                OngoingBadge.refresh(appContext, settings)
+                WidgetUpdater.refreshAll(appContext, settings)
+            } finally {
+                pendingResult.finish()
+            }
+        }
+    }
+
+    private fun onFastReminder(context: Context, intent: Intent) {
+        if (!intent.hasExtra(PrayerAlarmScheduler.EXTRA_FAJR_AT_MILLIS) ||
+            !intent.hasExtra(PrayerAlarmScheduler.EXTRA_DATE_EPOCH_DAY)
+        ) {
+            return
+        }
+        val reason = intent.getStringExtra(PrayerAlarmScheduler.EXTRA_FAST_REASON)
+            ?.let { name -> FastReason.entries.firstOrNull { it.name == name } }
+            ?: return
+        val fajrAt = Instant.ofEpochMilli(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_FAJR_AT_MILLIS, 0L))
+        val fastDate = LocalDate.ofEpochDay(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_DATE_EPOCH_DAY, 0L))
+
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val settings = SettingsRepository(appContext).current()
+                val now = Instant.now()
+                if (shouldPostFastReminder(settings, fastDate, reason, now)) {
+                    Notifications.postFastReminder(appContext, reason, fajrAt)
+                }
+                // Same chain as a prayer, so the next window is laid down while awake.
                 PrayerAlarmScheduler.reschedule(appContext, settings)
                 OngoingBadge.refresh(appContext, settings)
                 WidgetUpdater.refreshAll(appContext, settings)
@@ -207,4 +243,21 @@ internal fun shouldPostPrayerReminder(
     if (!now.isBefore(prayerAt.minusSeconds(60))) return false
     val reminderAt = prayerAt.minusSeconds(60L * minutes)
     return !now.isAfter(reminderAt.plus(REMINDER_GRACE))
+}
+
+/**
+ * Whether an arriving fast reminder should still be shown, on the settings of the moment it fires:
+ * not Sunni, or that kind switched off, or the day no longer a fast on the calendar they use now, is
+ * silence. So is arriving on the wrong day: "Tomorrow is a fast" is only true on the evening before.
+ */
+internal fun shouldPostFastReminder(
+    settings: AppSettings,
+    fastDate: LocalDate,
+    reason: FastReason,
+    now: Instant,
+    zone: ZoneId = ZoneId.systemDefault(),
+): Boolean {
+    if (settings.sect != Sect.SUNNI) return false
+    if (FastingDays.fastOn(fastDate, settings.calculationPrefs.hijriOffset, settings.fastReminders) != reason) return false
+    return now.atZone(zone).toLocalDate() == fastDate.minusDays(1)
 }

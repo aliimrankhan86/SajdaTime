@@ -5,11 +5,11 @@ import org.junit.Test
 import java.io.File
 
 /**
- * The two 1.6.1 reminders (jama'ah and fasting day) have planners in notify/ExtraReminderPlans.kt
- * that are kept but switched off, by Ali's decision (BUILD-INSTRUCTIONS section 3 Q2, DETAILED-PLAN
- * 8.8). Nothing may read their settings from a screen, and nothing but that file may name the
- * planners, so they cannot go live through the scheduler or a settings row by accident in 1.6.0.
- * Switching them on in 1.6.1 means changing this test in the same commit, on purpose.
+ * The jama'ah reminder has a planner in notify/ExtraReminderPlans.kt that is kept but switched off, by
+ * Ali's decision (BUILD-INSTRUCTIONS section 3 Q2, DETAILED-PLAN 8.8). Nothing may read its setting from
+ * a screen, and nothing but that file may name the planner, so it cannot go live by accident. The Sunnah
+ * fast reminder was switched on in 1.6.0 (HANDOVER 5.41): its planner is named by the scheduler only,
+ * its setting by Settings. Switching the jama'ah one on means changing this test in the same commit, on purpose.
  */
 class InertReminderSettingsTest {
 
@@ -20,19 +20,27 @@ class InertReminderSettingsTest {
     @Test
     fun `no screen reads the inert reminder settings`() {
         // The ViewModel's setters too: a row could otherwise store the choice without reading it back.
-        val setting = Regex("""\b(jamaahReminderMinutes|fastReminders|setJamaahReminderMinutes|setFastReminder)\b""")
+        val setting = Regex("""\b(jamaahReminderMinutes|setJamaahReminderMinutes)\b""")
         // SajdaViewModel.kt declares the setters; what must not happen is a screen calling them.
         val found = sources.filter { "/ui/" in it.path.replace('\\', '/') && it.name != "SajdaViewModel.kt" }
             .filter { setting.containsMatchIn(it.readText()) }
             .map { it.name }
-        assertTrue("The 1.6.1 reminder settings stay off the screens: $found", found.isEmpty())
+        assertTrue("The jama'ah reminder setting stays off the screens: $found", found.isEmpty())
     }
 
     @Test
-    fun `only their own file names the inert planners`() {
-        val planner = Regex("""\b(JamaahReminderPlan|FastReminderPlan)\b""")
+    fun `only its own file names the jamaah planner`() {
+        val planner = Regex("""\bJamaahReminderPlan\b""")
         val found = sources.filter { it.name != "ExtraReminderPlans.kt" && planner.containsMatchIn(it.readText()) }
             .map { it.name }
-        assertTrue("The 1.6.1 planners must not be reachable from anything else: $found", found.isEmpty())
+        assertTrue("The jama'ah planner must not be reachable from anything else: $found", found.isEmpty())
+    }
+
+    @Test
+    fun `the fast planner is named by the scheduler only`() {
+        val planner = Regex("""\bFastReminderPlan\b""")
+        val found = sources.filter { it.name !in setOf("ExtraReminderPlans.kt", "PrayerAlarmScheduler.kt") && planner.containsMatchIn(it.readText()) }
+            .map { it.name }
+        assertTrue("Only the scheduler lays down fast reminders: $found", found.isEmpty())
     }
 }

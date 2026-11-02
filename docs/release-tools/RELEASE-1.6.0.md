@@ -100,7 +100,7 @@ Watch the public page's "Updated on" date move (signed out; Play sends no email)
   description. Until then it reports the change every day, on purpose.
 - **Claude:** close the build progress list (BUILD-INSTRUCTIONS §0), bring PROJECT_BRIEF "Automatic jobs on Ali's Mac"
   up to date, and point the daily review replies job at the 1.6.0 features, as 1.5.0 did.
-- **Claude:** then 1.6.1 (jama'ah and fasting reminders, after Eid) starts from the plan, not before Ali says so.
+- **Claude:** there is no 1.6.1 any more: Ali merged it into 1.6 on 2 Nov 2026 (night times, why these times, Alert check, Sunnah fast reminders). The jama'ah reminder is dropped. What else comes next is Ali's call.
 
 ## Not verified yet (say so, do not assume)
 

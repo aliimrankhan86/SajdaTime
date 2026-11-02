@@ -330,6 +330,7 @@ class MainActivity : ComponentActivity() {
                                 onSetSuhoorAdhan = viewModel::setSuhoorUsesAdhan,
                                 onSetPrayerReminderMinutes = viewModel::setPrayerReminderMinutes,
                                 onSetPrayerReminder = viewModel::setPrayerReminder,
+                                onSetFastReminder = viewModel::setFastReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                                 tracker = trackerActions,

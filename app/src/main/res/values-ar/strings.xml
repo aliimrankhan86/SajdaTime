@@ -688,4 +688,20 @@
         <item quantity="many">%d أمرًا يحتاج إلى إصلاح</item>
         <item quantity="other">%d أمر يحتاج إلى إصلاح</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">تذكيرات الصيام</string>
+    <string name="settings_fast_reminders_off">إيقاف</string>
+    <string name="settings_fast_reminders_on">المفعّل: %1$d</string>
+    <string name="settings_fast_reminders_help">تذكير مساء اليوم السابق لكل صيام تختاره، مع وقت انتهاء السحور، بحسب التقويم المضبوط عليه SajdaTime.</string>
+    <string name="settings_fast_monday_thursday">الاثنين والخميس</string>
+    <string name="settings_fast_white_days">الأيام البيض (13 و14 و15)</string>
+    <string name="settings_fast_special">عاشوراء ويوم عرفة وستة أيام من شوال</string>
+    <string name="notif_fast_monday">غدًا صيام سنة (الاثنين). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_thursday">غدًا صيام سنة (الخميس). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_white_day">غدًا صيام سنة (من الأيام البيض). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_muharram_9">غدًا صيام سنة (التاسع من محرم، قبل عاشوراء). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_ashura">غدًا صيام سنة (عاشوراء). ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_arafah">غدًا صيام سنة (يوم عرفة بحسب هذا التقويم). اتبع مسجدك في تحديد اليوم. ينتهي السحور الساعة %1$s.</string>
+    <string name="notif_fast_shawwal">غدًا صيام سنة (من ستة أيام من شوال). ينتهي السحور الساعة %1$s.</string>
 </resources>

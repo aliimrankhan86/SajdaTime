@@ -4,7 +4,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 /**
- * Sunnah fast reminders (1.6.1, signed off with conditions on 23 Oct 2026; PLAN.md section 0 and
+ * Sunnah fast reminders (1.6.0, signed off with conditions on 23 Oct 2026; PLAN.md section 0 and
  * SIGNOFF.md). Offered to Sunni users only: Monday and Thursday fasts and the White Days are Sunni
  * practice, and for Shia users fasting on Ashura is discouraged, so a Shia user must never get one.
  *

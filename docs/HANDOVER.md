@@ -2232,6 +2232,26 @@ never translated or transliterated": the count per string, plural and array must
 `tools/check-translation.py` (proved: a Turkish `app_name` of "Secde Vakti" and a Bengali one of সাজদাটাইম each
 failed). Cannot catch a script spelling added beside the Latin name, or in a string whose English has no name.
 
+### 5.41 Sunnah fast reminders: in 1.6.0 (Ali, 2 Nov 2026: "Lets do it" on his list that included them, then "we will call it release 1.6 now"; spec from the main session)
+
+Settings, Reminders, "Fast reminders", **Sunni only** (row hidden for Shia, and `FastReminderPlan` and the receiver both
+refuse Shia as well, so a stored choice can never ring after a switch of school). **Off by default.** Three switches stored
+as the `FastKind` set already in `SettingsRepository`: Monday and Thursday; White Days; Ashura, Arafah and the six days
+of Shawwal (the last also carries 9 Muharram, announced as "the day before Ashura"). The reminder rings the evening before
+at the planner's time (**ten minutes after Isha**, so the Isha adhan is not cut short by a second sound at the same instant, review 2 Nov 2026; or 30 minutes after Maghrib when Isha is late; sign-off conditions of 23 Oct 2026 unchanged)
+and says when suhoor ends (Fajr of the fast day, the user's method). Words never call the fast obligatory; Arafah says
+"on this calendar" and "follow your mosque", as `FastingDays` documents. **Notification only:** own channel
+`fast_reminders` ("Fast reminders", default importance so the phone's usual tone, no alarm, no vibration pattern of ours),
+created on the first reminder so nobody sees an empty channel. **No usage count event, ever** (nothing was added to
+`UsageCounts`). Scheduler: action `FAST_REMINDER`, request codes `50,000 + dayOfYear of the evening it rings on`
+(`RequestCodeTest`-style pin in `FastReminderReceiverTest`), laid down in `PrayerAlarmScheduler.reschedule` before the
+early return (so wanted with all prayer alerts off), cancelled in `cancelAll` (so switching off or choosing Shia clears
+on the very next reschedule), not an alarm clock (must not become the phone's "next alarm"). Every existing reschedule
+trigger (open, alarm chain, 12 hour worker, boot, time change, settings change) therefore covers it. The receiver
+re-checks at fire time: Sunni, kind still on, the day still a fast on the calendar in use, and the clock still on the
+evening before. **Seen on the Redmi (2 Nov 2026, clock moved to Wednesday evening):** the reminder fired with "Tomorrow is a Sunnah fast (Thursday). Suhoor ends at 05:09." on channel `fast_reminders`. **Not checked:** a One UI delivery, the Isha overlap fix on a real adhan, any translation by eye. Privacy page: no change needed (choices are on-device settings, nothing sent, no new event).
+iPhone effect: carries over in idea. `FastingDays` is in `:core`; `FastReminderPlan` (the evening rule) and `shouldPostFastReminder` are plain Kotlin but sit in `:app`, to be moved to `:core` when iOS starts (recorded gap); SF Symbol `calendar.badge.clock`.
+
 ### 5.40 Alert check: Settings, Reminders, first row (Fable design, Ali delegated the decisions, 2 Nov 2026)
 
 One always shown row opening a dialog that reads four things the phone can withhold: notifications, exact alarms (Android
@@ -6069,6 +6089,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > **This section opens with the current state of play, then the dated record of how the project
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
+
+### 📍 ADDED LATER 2 Nov 2026: SUNNAH FAST REMINDERS SWITCHED ON IN THE 1.6.0 BUILD (not released; rules in section 5.41)
+
+- Settings > Reminders > "Fast reminders" (Sunni only, off by default, three switches) now lays down an evening before
+  notification through the planners that were inert (`FastReminderPlan`, `FastingDays`). Strings in all six languages by
+  Claude, ledger not stamped. **Not tested on a device or emulator**, no screenshots. `InertReminderSettingsTest` now
+  guards the jama'ah reminder only. The jama'ah reminder is still off.
 
 ### 📍 ADDED LATER 2 Nov 2026: ALERT CHECK (read with the block below; built uncommitted on `claude/1-6-0`)
 

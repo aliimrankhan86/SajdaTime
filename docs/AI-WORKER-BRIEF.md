@@ -28,7 +28,7 @@ ask Ali to test anything or to do a step for you.
 - **Next release: 1.6.0** (phone versionCode 10; the watch is not uploaded again). Built and approved on branch
   `claude/1-6-0`. Pull request into `main` by 11 Dec 2026, Ali presses "Send for review" by 15 Dec 2026, before
   Ramadan (starts about 8 Feb 2027). Release steps: `docs/release-tools/RELEASE-1.6.0.md`.
-- **1.6.1, after Eid:** a jama'ah reminder and Sunnah fast reminders. Their rules are written and tested
+- **Merged into 1.6.0 on 2 Nov 2026 (Ali: "we will call it release 1.6 now"): Sunnah fast reminders. The jama'ah reminder is dropped. Old note:** a jama'ah reminder and Sunnah fast reminders. Their rules are written and tested
   (`core/FastingDays.kt`, `app/.../notify/ExtraReminderPlans.kt`) but nothing schedules them yet. Do not wire them up.
 - **The single source of truth for "what is true now"** is the first block (marked 📍) at the top of `docs/HANDOVER.md`
   section 11. Its title names the latest step; an older block titled "STATE OF PLAY, 24 Oct 2026" further down is

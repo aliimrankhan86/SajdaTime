@@ -586,4 +586,20 @@
         <item quantity="one">%d şey düzeltilmeli</item>
         <item quantity="other">%d şey düzeltilmeli</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">Oruç hatırlatıcıları</string>
+    <string name="settings_fast_reminders_off">Kapalı</string>
+    <string name="settings_fast_reminders_on">%1$d açık</string>
+    <string name="settings_fast_reminders_help">Seçtiğiniz her oruçtan bir akşam önce, imsak vaktiyle birlikte bir hatırlatma, SajdaTime\'ın ayarlı olduğu takvime göre.</string>
+    <string name="settings_fast_monday_thursday">Pazartesi ve Perşembe</string>
+    <string name="settings_fast_white_days">Eyyâm-ı Bîz (ayın 13, 14 ve 15. günleri)</string>
+    <string name="settings_fast_special">Aşure, Arefe günü ve Şevval\'in altı günü</string>
+    <string name="notif_fast_monday">Yarın sünnet orucu günü (Pazartesi). İmsak: %1$s.</string>
+    <string name="notif_fast_thursday">Yarın sünnet orucu günü (Perşembe). İmsak: %1$s.</string>
+    <string name="notif_fast_white_day">Yarın sünnet orucu günü (Eyyâm-ı Bîz günlerinden biri). İmsak: %1$s.</string>
+    <string name="notif_fast_muharram_9">Yarın sünnet orucu günü (9 Muharrem, Aşure\'den bir gün önce). İmsak: %1$s.</string>
+    <string name="notif_fast_ashura">Yarın sünnet orucu günü (Aşure). İmsak: %1$s.</string>
+    <string name="notif_fast_arafah">Yarın sünnet orucu günü (bu takvime göre Arefe günü). Günü belirlemek için caminize uyun. İmsak: %1$s.</string>
+    <string name="notif_fast_shawwal">Yarın sünnet orucu günü (Şevval\'in altı gününden biri). İmsak: %1$s.</string>
 </resources>

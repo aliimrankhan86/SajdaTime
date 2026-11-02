@@ -248,13 +248,13 @@ data class AppSettings(
      */
     val jamaah: JamaahTimes = JamaahTimes(),
     /**
-     * Minutes before each jama'ah at which a quiet heads up arrives (1.6.1), or 0 for off. Off by
+     * Minutes before each jama'ah at which a quiet heads up arrives (1.6.0), or 0 for off. Off by
      * default, read through [PRAYER_REMINDER_CHOICES] like the prayer reminder. A notification only,
      * never the alarm or the adhan, and never a change to Do Not Disturb.
      */
     val jamaahReminderMinutes: Int = 0,
     /**
-     * Which Sunnah fasts get a reminder the evening before (1.6.1). Empty, so off, by default, and
+     * Which Sunnah fasts get a reminder the evening before (1.6.0). Empty, so off, by default, and
      * only ever acted on for Sunni users ([com.sajdatime.core.FastingDays]).
      */
     val fastReminders: Set<FastKind> = emptySet(),

@@ -617,4 +617,20 @@
         <item quantity="one">%dটি বিষয় ঠিক করতে হবে</item>
         <item quantity="other">%dটি বিষয় ঠিক করতে হবে</item>
     </plurals>
+
+    <!-- Sunnah fast reminders (1.6.0): Settings, Reminders. Sunni only, off until chosen. -->
+    <string name="settings_fast_reminders">রোজার রিমাইন্ডার</string>
+    <string name="settings_fast_reminders_off">বন্ধ</string>
+    <string name="settings_fast_reminders_on">%1$dটি চালু</string>
+    <string name="settings_fast_reminders_help">আপনার বেছে নেওয়া প্রতিটি রোজার আগের সন্ধ্যায় একটি রিমাইন্ডার, সাহরি শেষের সময়সহ, SajdaTime যে ক্যালেন্ডারে সেট করা আছে সেই অনুযায়ী।</string>
+    <string name="settings_fast_monday_thursday">সোমবার ও বৃহস্পতিবার</string>
+    <string name="settings_fast_white_days">আইয়ামে বীজ (13, 14, 15 তারিখ)</string>
+    <string name="settings_fast_special">আশুরা, আরাফার দিন ও শাওয়ালের ছয় রোজা</string>
+    <string name="notif_fast_monday">আগামীকাল সুন্নত রোজা (সোমবার)। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_thursday">আগামীকাল সুন্নত রোজা (বৃহস্পতিবার)। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_white_day">আগামীকাল সুন্নত রোজা (আইয়ামে বীজের একটি)। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_muharram_9">আগামীকাল সুন্নত রোজা (9 মহররম, আশুরার আগের দিন)। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_ashura">আগামীকাল সুন্নত রোজা (আশুরা)। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_arafah">আগামীকাল সুন্নত রোজা (এই ক্যালেন্ডার অনুযায়ী আরাফার দিন)। দিনটির জন্য আপনার মসজিদ অনুসরণ করুন। সাহরি শেষ হবে %1$s।</string>
+    <string name="notif_fast_shawwal">আগামীকাল সুন্নত রোজা (শাওয়ালের ছয় রোজার একটি)। সাহরি শেষ হবে %1$s।</string>
 </resources>

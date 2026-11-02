@@ -46,12 +46,12 @@ class ExtraReminderPlanTest {
         assertEquals(0, JamaahReminderPlan.plan(london, prefs, ok, 0, d("2027-02-04"), morning("2027-02-04"), zone).size)
     }
 
-    @Test fun `a fast reminder rings at Isha the evening before`() {
+    @Test fun `a fast reminder rings ten minutes after Isha the evening before`() {
         // Mon 26 Oct 2026 is a Monday fast; the reminder is Sunday's Isha.
         val plan = FastReminderPlan.plan(london, prefs, Sect.SUNNI, setOf(FastKind.MONDAY_THURSDAY), d("2026-10-25"), morning("2026-10-25"), zone)
         val monday = plan.single { it.fastDate == d("2026-10-26") }
         assertEquals(FastReason.MONDAY, monday.reason)
-        assertEquals(PrayerEngine.compute(london, d("2026-10-25"), prefs)[PrayerSlot.ISHA], monday.at)
+        assertEquals(PrayerEngine.compute(london, d("2026-10-25"), prefs)[PrayerSlot.ISHA].plusSeconds(600), monday.at)
         assertEquals(PrayerEngine.compute(london, d("2026-10-26"), prefs)[PrayerSlot.FAJR], monday.fajrAt)
         assertEquals(d("2026-10-25"), monday.eve)
     }
