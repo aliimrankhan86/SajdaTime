@@ -94,8 +94,6 @@
     <string name="home_no_location">Atur lokasi Anda untuk melihat waktu salat.</string>
     <string name="home_countdown_a11y">%1$s dalam %2$s</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Waktu untuk Makkah</string>
-    <string name="home_default_location_body">Lokasi Anda belum diatur, jadi waktu ini untuk Makkah.</string>
     <string name="action_change_location">Ubah lokasi</string>
 
     <!-- Location sheet -->
@@ -607,4 +605,8 @@
     <string name="notif_fast_ashura">Besok puasa sunah (Asyura). Sahur berakhir pukul %1$s.</string>
     <string name="notif_fast_arafah">Besok puasa sunah (Hari Arafah menurut kalender ini). Ikuti masjid Anda untuk menentukan harinya. Sahur berakhir pukul %1$s.</string>
     <string name="notif_fast_shawwal">Besok puasa sunah (salah satu dari enam hari Syawal). Sahur berakhir pukul %1$s.</string>
+    <string name="home_fajr_exact_note">Mungkin tidak berbunyi tepat waktu</string>
+    <string name="exact_alarm_dialog_more">Android menanyakannya di layarnya sendiri. Anda dapat mengubahnya nanti di Pengaturan.</string>
+    <string name="tab_settings_attention_a11y">Pengaturan, perlu perhatian</string>
+    <string name="home_fajr_exact_a11y">%1$s, %2$s, mungkin tidak berbunyi tepat waktu</string>
 </resources>

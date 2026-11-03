@@ -853,6 +853,15 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **3 Nov 2026, Times prompts lose their cards (Option 2, DESIGN-D2, Ali: "Option 2 seems fine").** Ali called the
+  Set location and Allow exact alarms cards "horrendous", wanted a premium Apple feel, not "lots of unnecessary
+  cards with text". Now: no location set -> a compact green "Set location" button beside the city title (kind A
+  compact, already in §4.1); exact alarms withheld -> the Fajr row gets "May not ring on time" in
+  `onTertiaryContainer` and an 8dp `tertiary` dot on its bell, tapping the row opens a dialog (X only, no "Close"
+  text, full width green Allow), and the Settings tab wears the same dot. **Not yet built:** the Settings row with a
+  compact amber Allow (Settings still shows the old card), the notifications blocked line, and Qibla / My prayers
+  no-location sentences. Rejected: a status card row (still a card, chevron is not a solid button), and a one time
+  setup sheet (setup already asked both).
 - **3 Nov 2026, sky mark becomes a full width sky band under the date line (design G, option A).** Ali: the graphic "is too
   small and easier to miss ... improve its size or add colours". Built 52dp tall: bigger arc, 8dp ticks (filled when reached,
   rings when to come), a 32dp lit disc with the period glyph and a soft glow riding the arc by the clock. Stays green

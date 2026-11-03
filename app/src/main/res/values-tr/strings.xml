@@ -94,8 +94,6 @@
     <string name="home_no_location">Namaz vakitlerini görmek için konumunuzu belirleyin.</string>
     <string name="home_countdown_a11y">%1$s, %2$s sonra</string>
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Mekke vakitleri</string>
-    <string name="home_default_location_body">Konumunuz henüz ayarlanmadı, bu yüzden bu vakitler Mekke içindir.</string>
     <string name="action_change_location">Konumu değiştir</string>
 
     <!-- Location sheet -->
@@ -623,4 +621,8 @@
     <string name="notif_fast_ashura">Yarın sünnet orucu günü (Aşure). İmsak: %1$s.</string>
     <string name="notif_fast_arafah">Yarın sünnet orucu günü (bu takvime göre Arefe günü). Günü belirlemek için caminize uyun. İmsak: %1$s.</string>
     <string name="notif_fast_shawwal">Yarın sünnet orucu günü (Şevval\'in altı gününden biri). İmsak: %1$s.</string>
+    <string name="home_fajr_exact_note">Zamanında çalmayabilir</string>
+    <string name="exact_alarm_dialog_more">Android bunu kendi ekranında sorar. Daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
+    <string name="tab_settings_attention_a11y">Ayarlar, dikkat gerekiyor</string>
+    <string name="home_fajr_exact_a11y">%1$s, %2$s, zamanında çalmayabilir</string>
 </resources>

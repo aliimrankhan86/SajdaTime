@@ -20,6 +20,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import com.sajdatime.app.notify.PrayerAlarmScheduler
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -353,6 +359,7 @@ fun MainScaffold(
             GlassTabBar(
                 current = destination,
                 onSelect = { destination = it },
+                settingsNeedsAttention = !PrayerAlarmScheduler.canScheduleExact(LocalContext.current),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { barHeight = with(density) { it.height.toDp() } },
@@ -378,6 +385,8 @@ internal fun GlassTabBar(
     current: Destination,
     onSelect: (Destination) -> Unit,
     modifier: Modifier = Modifier,
+    /** An 8dp accent dot on the Settings tab while a permission is withheld (Option 2, 3 Nov 2026). */
+    settingsNeedsAttention: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(32.dp)
@@ -399,6 +408,7 @@ internal fun GlassTabBar(
     ) {
         Destination.entries.forEach { item ->
             val selected = item == current
+            val attention = settingsNeedsAttention && item == Destination.SETTINGS
             val pill by animateColorAsState(
                 if (selected) scheme.secondaryContainer else Color.Transparent,
                 label = "tab pill",
@@ -413,6 +423,14 @@ internal fun GlassTabBar(
                             onSelect(item)
                         }
                     }
+                    .then(
+                        if (attention) {
+                            val spoken = stringResource(R.string.tab_settings_attention_a11y)
+                            Modifier.semantics { contentDescription = spoken }
+                        } else {
+                            Modifier
+                        },
+                    )
                     .padding(vertical = 8.dp),
             ) {
                 Box(
@@ -420,7 +438,17 @@ internal fun GlassTabBar(
                         .clip(RoundedCornerShape(50))
                         .background(pill)
                         .padding(horizontal = 20.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
+                    if (attention) {
+                        Box(
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 6.dp, y = (-2).dp)
+                                .size(8.dp)
+                                .background(scheme.tertiary, CircleShape),
+                        )
+                    }
                     Icon(
                         imageVector = if (selected) item.selectedIcon else item.icon,
                         contentDescription = null,

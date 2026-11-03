@@ -10,6 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -160,6 +163,14 @@ fun HomeScreen(
     var explaining by rememberSaveable { mutableStateOf(false) }
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
     var islamicDates by rememberSaveable { mutableStateOf(false) }
+    var exactDialog by rememberSaveable { mutableStateOf(false) }
+    if (exactDialog) {
+        val context = LocalContext.current
+        ExactAlarmDialog(
+            onAllow = { exactDialog = false; PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+            onClose = { exactDialog = false; onDismissExactAlarmNotice() },
+        )
+    }
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
     val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -262,7 +273,6 @@ fun HomeScreen(
             Modifier.padding(horizontal = 16.dp).readingWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-        DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
         // Below the two banners that say the times may be for the wrong place or approximate,
         // so a card of suhoor and iftar times is never the first thing read about a doubtful
@@ -279,7 +289,6 @@ fun HomeScreen(
             onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
             onDismissNotice = onDismissRamadanNotice,
         )
-        ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         NotificationsBanner(visible = notificationsWarning, onAllow = onAllowNotifications, onDismiss = onDismissNotificationsNotice)
         Spacer(Modifier.height(Space.Group))
         TodayTimeline(
@@ -289,6 +298,8 @@ fun HomeScreen(
             onBell = onBell,
             snapBell = snapBell,
             notificationsBlocked = notificationsBlocked,
+            exactWarning = exactWarning,
+            onExactAlarm = { exactDialog = true },
         )
         WhyTheseTimes(state)
         MosqueDifferenceDoor(
@@ -435,33 +446,49 @@ internal fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, o
     // green meaning tappable, and no extra caret). The 6dp the whole row used to have above and
     // below is split between them, so the header is no taller than the date line's own target.
     Column(Modifier.fillMaxWidth().padding(top = Space.Tight)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .clickable(role = Role.Button, onClick = onClick)
-                .padding(horizontal = 4.dp, vertical = 2.dp)
-                .semantics { contentDescription = spokenLocation },
+        // 1.7.0 (Option 2, Ali 3 Nov 2026): while the times are Makkah's because no location is set, the prompt is
+        // a button beside the title it is about, not a card between the hero and Today. FlowRow drops it under the
+        // city when the name is long or the text is large.
+        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+        FlowRow(
+            verticalArrangement = Arrangement.Center,
+            itemVerticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            Text(
-                text = city,
-                style = MaterialTheme.typography.headlineMedium,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                // A long town name, or one in a tall script, shrinks before it is cut short.
-                autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
-                modifier = Modifier.weight(1f, fill = false),
-            )
-            Spacer(Modifier.width(2.dp))
-            // A name alone reads as a label. The green caret is what says "you can change
-            // this", which is the single most common thing a traveller needs.
-            Icon(
-                Icons.Rounded.ArrowDropDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(role = Role.Button, onClick = onClick)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .semantics { contentDescription = spokenLocation },
+            ) {
+                Text(
+                    text = city,
+                    style = MaterialTheme.typography.headlineMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    // A long town name, or one in a tall script, shrinks before it is cut short.
+                    autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Spacer(Modifier.width(2.dp))
+                // A name alone reads as a label. The green caret is what says "you can change
+                // this", which is the single most common thing a traveller needs.
+                Icon(
+                    Icons.Rounded.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+            if (state.settings.usingDefaultLocation) {
+                CtaButton(onClick = onClick, compact = true, modifier = Modifier.padding(start = 4.dp)) {
+                    Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(Space.Related))
+                    Text(stringResource(R.string.action_set_location))
+                }
+            }
         }
         DateLine(now, state.settings.hijriOffsetDays, onOpenDates)
         // The sky band (1.7, design G): where the day stands, a sibling of the two targets above, never inside one.
@@ -940,19 +967,6 @@ private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onCl
     }
 }
 
-/** Says plainly that the times on screen are not for where the user actually is. */
-@Composable
-private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
-    if (!state.settings.usingDefaultLocation) return
-    Spacer(Modifier.height(Space.Group))
-    Notice(
-        title = stringResource(R.string.home_default_location_title),
-        brief = stringResource(R.string.home_default_location_body),
-        actionLabel = stringResource(R.string.action_set_location),
-        onAction = onFix,
-    )
-}
-
 /**
  * Shown only when the OS is withholding exact alarms. Prayer alerts still arrive, but
  * possibly a few minutes late, and the user deserves to know that rather than quietly
@@ -998,24 +1012,26 @@ private fun PolarBanner(state: UiState) {
     )
 }
 
+/**
+ * Opens from the Fajr row's warning line. The X is the only way out (Ali, 3 Nov 2026: a "Close" under it made no
+ * sense beside the X). Closing hides the Fajr line for the day (`exactAlarmNoticeDismissed`), Settings keeps showing
+ * the problem. "Allow" goes to Android's own screen for exact alarms.
+ */
 @Composable
-private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-    val show = !PrayerAlarmScheduler.canScheduleExact(context) && !state.settings.exactAlarmNoticeDismissed
-
-    // No entrance; closing fades and folds away so the cards below do not jump (24 Oct 2026).
-    AnimatedVisibility(show, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
-        Column {
-            Spacer(Modifier.height(Space.Group))
-            PermissionCard(
-                title = stringResource(R.string.settings_exact_alarms_title),
-                body = stringResource(R.string.settings_exact_alarms_brief),
-                granted = false,
-                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
-                onDismiss = onDismiss,
-            )
-        }
-    }
+private fun ExactAlarmDialog(onAllow: () -> Unit, onClose: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { DialogTitle(stringResource(R.string.settings_exact_alarms_title), onClose) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                ExplainerParagraph(stringResource(R.string.settings_exact_alarms_brief), first = true)
+                ExplainerParagraph(stringResource(R.string.exact_alarm_dialog_more))
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = onAllow, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.action_allow)) }
+        },
+    )
 }
 
 /**
@@ -1048,6 +1064,8 @@ internal fun TodayTimeline(
     onBell: (PrayerSlot, Boolean) -> Unit,
     snapBell: PrayerSlot?,
     notificationsBlocked: Boolean,
+    exactWarning: Boolean = false,
+    onExactAlarm: () -> Unit = {},
 ) {
     val today = state.today ?: return
     val context = LocalContext.current
@@ -1148,7 +1166,9 @@ internal fun TodayTimeline(
                     jamaah = state.jamaah[slot],
                     timeLeft = if (slot == state.current) timeLeftText else null,
                 ),
-                description = if (slot == state.current && window != null && state.jamaah[slot] == null &&
+                description = if (exactWarning && slot == PrayerSlot.FAJR) {
+                    stringResource(R.string.home_fajr_exact_a11y, stringResource(slot.labelRes), TimeFormat.clock(context, today.times.getValue(slot)))
+                } else if (slot == state.current && window != null && state.jamaah[slot] == null &&
                     !(ramadanView && (slot == PrayerSlot.FAJR || slot == PrayerSlot.MAGHRIB))
                 ) {
                     stringResource(
@@ -1161,10 +1181,14 @@ internal fun TodayTimeline(
                 } else {
                     null
                 },
+                // 1.7.0: the exact alarm warning lives on the Fajr row, the alarm it endangers (Option 2).
+                warning = if (exactWarning && slot == PrayerSlot.FAJR) stringResource(R.string.home_fajr_exact_note) else null,
+                onClick = if (exactWarning && slot == PrayerSlot.FAJR) onExactAlarm else null,
                 trailing = {
                     if (slot.isPrayer) {
                         // A crossed bell keeps the style it had while it fades, so an alarm does not flip to a bell.
                         val style = state.settings.alertFor[slot]
+                        Box(contentAlignment = Alignment.TopEnd) {
                         Bell(
                             on = style != null,
                             alarm = (style ?: state.settings.lastAlertStyle[slot]) == AlertStyle.ALARM,
@@ -1174,6 +1198,10 @@ internal fun TodayTimeline(
                             snap = snapBell == slot,
                             onChange = { on -> onBell(slot, on) },
                         )
+                        if (exactWarning && slot == PrayerSlot.FAJR) {
+                            Box(Modifier.offset(x = (-10).dp, y = 10.dp).size(8.dp).background(scheme.tertiary, CircleShape))
+                        }
+                        }
                     } else {
                         // Sunrise has no bell; the space keeps its time in line with the others.
                         Spacer(Modifier.width(48.dp))
@@ -1307,6 +1335,9 @@ private fun PrayerRow(
     note: String?,
     /** What a screen reader says for the whole row, when it is not the label and time read in turn. */
     description: String? = null,
+    /** A warning line under the note, amber family (exact alarms on Fajr); the row then opens the dialog. */
+    warning: String? = null,
+    onClick: (() -> Unit)? = null,
     /** The bell, after the time. Its 48dp target takes the row's end padding. */
     trailing: @Composable () -> Unit,
 ) {
@@ -1379,6 +1410,7 @@ private fun PrayerRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
             // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
             .semantics(mergeDescendants = true) { if (description != null) contentDescription = description }
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
@@ -1435,6 +1467,14 @@ private fun PrayerRow(
                     // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
                     // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
                     color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                )
+            }
+            if (warning != null) {
+                Text(
+                    text = warning,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                    // onTertiaryContainer is the accent family's own text: 7.39:1 on the Next highlight (Fable, D2).
+                    color = scheme.onTertiaryContainer,
                 )
             }
             if (stacked && !quiet) {

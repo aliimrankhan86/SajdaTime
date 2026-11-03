@@ -97,8 +97,6 @@
     <string name="home_no_location">نماز کے اوقات دیکھنے کے لیے اپنا مقام مقرر کریں۔</string>
     <string name="home_countdown_a11y">%1$s، %2$s میں</string>
     <string name="home_location_a11y">%1$s۔ %2$s</string>
-    <string name="home_default_location_title">مکہ کے اوقات</string>
-    <string name="home_default_location_body">آپ کا مقام ابھی طے نہیں ہوا، اس لیے یہ اوقات مکہ کے ہیں۔</string>
     <string name="action_change_location">مقام بدلیں</string>
 
     <!-- Location sheet -->
@@ -629,4 +627,8 @@
     <string name="notif_fast_ashura">کل سنت روزہ ہے (عاشورہ)۔ سحری %1$s پر ختم ہوگی۔</string>
     <string name="notif_fast_arafah">کل سنت روزہ ہے (اس کیلنڈر کے مطابق یوم عرفہ)۔ دن کے تعین کے لیے اپنی مسجد کی پیروی کریں۔ سحری %1$s پر ختم ہوگی۔</string>
     <string name="notif_fast_shawwal">کل سنت روزہ ہے (شوال کے چھ روزوں میں سے ایک)۔ سحری %1$s پر ختم ہوگی۔</string>
+    <string name="home_fajr_exact_note">ہو سکتا ہے وقت پر نہ بجے</string>
+    <string name="exact_alarm_dialog_more">اینڈرائیڈ یہ اپنی ہی اسکرین پر پوچھتا ہے۔ آپ بعد میں سیٹنگز سے بدل سکتے ہیں۔</string>
+    <string name="tab_settings_attention_a11y">سیٹنگز، توجہ درکار ہے</string>
+    <string name="home_fajr_exact_a11y">%1$s، %2$s، ہو سکتا ہے وقت پر نہ بجے</string>
 </resources>

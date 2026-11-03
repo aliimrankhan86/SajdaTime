@@ -110,8 +110,6 @@
     <string name="home_countdown_a11y">%1$s بعد %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">مواقيت مكة</string>
-    <string name="home_default_location_body">لم يُحدَّد موقعك بعد، لذا هذه الأوقات لمكة.</string>
     <string name="action_change_location">تغيير الموقع</string>
 
     <!-- Location sheet. "Ten miles is about a minute" is measured; keep the figure. -->
@@ -733,4 +731,8 @@
     <string name="notif_fast_ashura">غدًا صيام سنة (عاشوراء). ينتهي السحور الساعة %1$s.</string>
     <string name="notif_fast_arafah">غدًا صيام سنة (يوم عرفة بحسب هذا التقويم). اتبع مسجدك في تحديد اليوم. ينتهي السحور الساعة %1$s.</string>
     <string name="notif_fast_shawwal">غدًا صيام سنة (من ستة أيام من شوال). ينتهي السحور الساعة %1$s.</string>
+    <string name="home_fajr_exact_note">قد لا يرن في وقته</string>
+    <string name="exact_alarm_dialog_more">يطلب أندرويد ذلك في شاشته الخاصة. يمكنك تغييره لاحقًا من الإعدادات.</string>
+    <string name="tab_settings_attention_a11y">الإعدادات، تحتاج إلى انتباه</string>
+    <string name="home_fajr_exact_a11y">%1$s، %2$s، قد لا يرن في وقته</string>
 </resources>

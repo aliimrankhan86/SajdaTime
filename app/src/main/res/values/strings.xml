@@ -211,8 +211,6 @@
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Times for Makkah</string>
-    <string name="home_default_location_body">Your location is not set yet, so these times are for Makkah.</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -862,4 +860,8 @@
     <string name="notif_fast_ashura">Tomorrow is a Sunnah fast (Ashura). Suhoor ends at %1$s.</string>
     <string name="notif_fast_arafah">Tomorrow is a Sunnah fast (Day of Arafah, on this calendar). Follow your mosque for the day. Suhoor ends at %1$s.</string>
     <string name="notif_fast_shawwal">Tomorrow is a Sunnah fast (one of the six days of Shawwal). Suhoor ends at %1$s.</string>
+    <string name="home_fajr_exact_note">May not ring on time</string>
+    <string name="exact_alarm_dialog_more">Android asks for this on its own screen. You can change it later in Settings.</string>
+    <string name="tab_settings_attention_a11y">Settings, needs attention</string>
+    <string name="home_fajr_exact_a11y">%1$s, %2$s, may not ring on time</string>
 </resources>
