@@ -100,7 +100,7 @@ mistakes he has now had to point out, so they are rules, not taste.
 5. **One fact per line, one line per fact.** Text under a card is short and scannable: a bold headline (the
    countdown), then short lines of one fact each. A sentence that wraps to a second line in English is split into
    two facts or shortened; people do not read long text on a home screen. Never join two facts with a comma.
-6. **Icons are one family and one size per role.** One glyph size for tiles, one for list rows, one for tabs; the
+6. **Icons are meaningful, one family and one size per role. A prayer has one glyph on every surface (see the 3 Nov 2026 decision).** One glyph size for tiles, one for list rows, one for tabs; the
    same stroke style. Names bold and larger than the line under them when they are the thing to find at a glance.
 7. **Colour carries the first read.** The one thing that needs attention on a screen is the one tinted or solid
    block (Ramadan is the `primaryContainer` card; the next time is the solid `primary` tile). Everything else is
@@ -893,6 +893,10 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   tall, from 300dp wide; two cells tall adds a big next prayer line on top; under 250dp wide (half a row) it shows the next
   prayer alone. Android 12 and up only for the size choices. Not changed yet: the Next prayer and Today list widgets'
   glyphs and fonts.
+- **3 Nov 2026, one meaningful icon per prayer everywhere (Ali: "icons should be meaningful").** The Times rows, the Ramadan tiles, the
+  widgets and the sky band now all use the app's own sun-position glyphs (`widget_glyph_fajr`, `_sunrise`, `_dhuhr`, `_asr`, `_maghrib`,
+  `_isha`; Duha uses `sky_glyph_day`; the Midnight row keeps the crescent). Material's Brightness3, 5 and 6 icons, which said nothing about
+  the time, are gone from the prayer rows. Rule: a prayer has one picture on every surface; a new surface reuses these.
 - **3 Nov 2026, polish after an Opus alignment audit (`private/plans/2026-11-next-release/ALIGNMENT-AUDIT.md`), reversing the
   glyph-beside-name widget choice E2.** Glyph above name above time in equal columns, all ten texts one size picked at render
   (`stripTextSp`, 12sp down to 9sp by measuring), glyphs only when 64dp tall and 300dp wide; Ramadan tiles 16dp corners and

@@ -75,6 +75,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.pluralStringResource
@@ -1151,7 +1154,7 @@ internal fun TodayTimeline(
         slots.forEachIndexed { index, slot ->
             PrayerRow(
                 label = stringResource(slot.labelRes),
-                icon = slotIcon(slot),
+                icon = slotGlyph(slot),
                 quiet = !slot.isPrayer,
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
                 isNext = next != null && slot == next.slot && !next.isTomorrow,
@@ -1218,7 +1221,7 @@ internal fun TodayTimeline(
                 val end = TimeFormat.clock(context, duha.end)
                 PrayerRow(
                     label = stringResource(R.string.duha_row),
-                    icon = Icons.Outlined.WbSunny,
+                    icon = painterResource(R.drawable.sky_glyph_day),
                     quiet = true,
                     time = start,
                     isNext = false,
@@ -1237,7 +1240,7 @@ internal fun TodayTimeline(
             val lastThird = TimeFormat.clock(context, night.lastThirdStart)
             PrayerRow(
                 label = stringResource(R.string.night_midnight),
-                icon = Icons.Outlined.DarkMode,
+                icon = rememberVectorPainter(Icons.Outlined.DarkMode),
                 quiet = true,
                 time = midnight,
                 isNext = false,
@@ -1326,7 +1329,7 @@ private fun windowTargetLabel(target: WindowTarget): String = stringResource(
 @Composable
 private fun PrayerRow(
     label: String,
-    icon: ImageVector,
+    icon: Painter,
     /** Not a prayer (sunrise, midnight): smaller, dimmed, no bell. */
     quiet: Boolean,
     time: String,
@@ -1438,7 +1441,7 @@ private fun PrayerRow(
         // (Opus audit, 3 Nov 2026: the smaller icon with the same gap put them 2.7dp left).
         Box(Modifier.size(21.dp), contentAlignment = Alignment.Center) {
             Icon(
-                imageVector = icon,
+                painter = icon,
                 contentDescription = null,
                 tint = iconColor,
                 modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
@@ -1495,14 +1498,21 @@ private fun PrayerRow(
     }
 }
 
-private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
-    PrayerSlot.FAJR -> Icons.Rounded.Brightness3
-    PrayerSlot.SUNRISE -> Icons.Rounded.WbTwilight
-    PrayerSlot.DHUHR -> Icons.Rounded.WbSunny
-    PrayerSlot.ASR -> Icons.Rounded.Brightness5
-    PrayerSlot.MAGHRIB -> Icons.Rounded.Brightness6
-    PrayerSlot.ISHA -> Icons.Rounded.NightsStay
-}
+/**
+ * The same glyphs as the widgets, the Ramadan tiles and the sky band (Ali, 3 Nov 2026: "icons should be meaningful"): each one
+ * shows where the sun is at that time, so one prayer has one picture everywhere. Material's Brightness icons said nothing.
+ */
+@Composable
+private fun slotGlyph(slot: PrayerSlot): Painter = painterResource(
+    when (slot) {
+        PrayerSlot.FAJR -> R.drawable.widget_glyph_fajr
+        PrayerSlot.SUNRISE -> R.drawable.widget_glyph_sunrise
+        PrayerSlot.DHUHR -> R.drawable.widget_glyph_dhuhr
+        PrayerSlot.ASR -> R.drawable.widget_glyph_asr
+        PrayerSlot.MAGHRIB -> R.drawable.widget_glyph_maghrib
+        PrayerSlot.ISHA -> R.drawable.widget_glyph_isha
+    },
+)
 
 /**
  * Hijri date, e.g. "16 Safar 1448".
