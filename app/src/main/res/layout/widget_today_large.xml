@@ -327,6 +327,13 @@
             android:importantForAccessibility="no"
             android:src="@drawable/widget_glyph_fajr"
             android:tint="@color/widget_on_surface_variant" />
+        <ImageView
+            android:id="@+id/widget_logo_fajr"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_name_fajr"
             android:layout_width="wrap_content"
@@ -445,6 +452,13 @@
             android:importantForAccessibility="no"
             android:src="@drawable/widget_glyph_fajr"
             android:tint="@color/widget_on_surface_variant" />
+        <ImageView
+            android:id="@+id/widget_logo_dhuhr"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_name_dhuhr"
             android:layout_width="wrap_content"
@@ -504,6 +518,13 @@
             android:importantForAccessibility="no"
             android:src="@drawable/widget_glyph_fajr"
             android:tint="@color/widget_on_surface_variant" />
+        <ImageView
+            android:id="@+id/widget_logo_asr"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_name_asr"
             android:layout_width="wrap_content"
@@ -563,6 +584,13 @@
             android:importantForAccessibility="no"
             android:src="@drawable/widget_glyph_fajr"
             android:tint="@color/widget_on_surface_variant" />
+        <ImageView
+            android:id="@+id/widget_logo_maghrib"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_name_maghrib"
             android:layout_width="wrap_content"
@@ -622,6 +650,13 @@
             android:importantForAccessibility="no"
             android:src="@drawable/widget_glyph_fajr"
             android:tint="@color/widget_on_surface_variant" />
+        <ImageView
+            android:id="@+id/widget_logo_isha"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_name_isha"
             android:layout_width="wrap_content"

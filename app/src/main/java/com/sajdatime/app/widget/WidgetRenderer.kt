@@ -3,7 +3,6 @@ package com.sajdatime.app.widget
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Build
 import android.os.SystemClock
@@ -490,7 +489,13 @@ internal object WidgetRenderer {
             // every time because the launcher reuses these views.
             views.setViewVisibility(ids.underline, if (highlighted && !band) View.VISIBLE else View.GONE)
             views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted && band) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
-            markGlyph(context, views, state, ids.glyph, glyph(slot), highlighted)
+            // The mark is its own view (the strip's widget_logo_*), never the glyph view with a filter or tint removed: under a theme
+            // chosen in the app the glyph carries a colour filter that turned the mark into a flat grey tile (seen on the emulator).
+            views.setImageViewResource(ids.glyph, glyph(slot))
+            STRIP_MARKS[slot]?.first?.let { logo ->
+                views.setViewVisibility(ids.glyph, if (highlighted) View.GONE else View.VISIBLE)
+                views.setViewVisibility(logo, if (highlighted) View.VISIBLE else View.GONE)
+            }
             views.setTextViewText(ids.name, if (highlighted) bold(name) else name)
             views.setTextViewText(ids.time, timeText(time, highlighted))
 
@@ -512,22 +517,6 @@ internal object WidgetRenderer {
             )
         }
         return spoken
-    }
-
-    /**
-     * The row's glyph, or the app's mark untinted when [mark]. The launcher reuses views, so both ways are written.
-     * Only from Android 12, where `setColorStateList` takes a light and a dark ink, so the launcher picks the ink when it
-     * draws and a phone that flips theme stays right with no redraw (HANDOVER §15 lesson 130; a baked colour went stale).
-     * Below 12 the row keeps its glyph (the layout tint stays), and bold name and time still mark it.
-     */
-    private fun markGlyph(context: Context, views: RemoteViews, state: WidgetState, id: Int, @DrawableRes glyph: Int, mark: Boolean) {
-        val show = mark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-        views.setImageViewResource(id, if (show) R.drawable.widget_mark else glyph)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val light = ColorStateList.valueOf(context.getColor(chosenDark(state)?.let { fixedColour(R.color.widget_on_surface_variant, it) } ?: fixedColour(R.color.widget_on_surface_variant, false)))
-            val dark = ColorStateList.valueOf(context.getColor(chosenDark(state)?.let { fixedColour(R.color.widget_on_surface_variant, it) } ?: fixedColour(R.color.widget_on_surface_variant, true)))
-            views.setColorStateList(id, "setImageTintList", if (show) null else light, if (show) null else dark)
-        }
     }
 
     /**
