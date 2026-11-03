@@ -64,3 +64,7 @@ graphify-out/
 # Signed release copies the owner keeps in the repo root (SajdaTime-<version>/app-release.aab plus its
 # sha256.txt), moved there from the Desktop on 11 Oct 2026. Release artefacts, never committed.
 /SajdaTime-*/
+
+# Planning notes, research and chat records between Ali and Claude. Private to us: the repo and the docs/
+# folder (served as a public website) are public, so nothing in here is ever committed.
+/private/
