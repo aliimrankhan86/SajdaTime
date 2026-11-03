@@ -101,18 +101,11 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp">
-            <ImageView
-                android:id="@+id/widget_glyph_fajr"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="2dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_fajr"
-                android:tint="@color/widget_on_surface_variant" />
             <TextView
                 android:id="@+id/widget_name_fajr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
@@ -120,6 +113,23 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_glyph_fajr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_glyph_fajr"
+                android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_fajr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <!-- The time may shrink to 9sp, below the 12sp widget floor, only at the 250dp width where "12:45 pm" would
                  otherwise lose its "pm": the owner's Hijri line precedent (DESIGN_SYSTEM §9, 18 Oct), shrink rather than cut.
                  A time without am or pm is ambiguous. Step 8 build, 25 Oct 2026. -->
@@ -135,6 +145,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_bar_fajr"
+                android:layout_width="28dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_underline"
+                android:visibility="invisible" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/widget_row_dhuhr"
@@ -150,18 +168,11 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp">
-            <ImageView
-                android:id="@+id/widget_glyph_dhuhr"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="2dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_dhuhr"
-                android:tint="@color/widget_on_surface_variant" />
             <TextView
                 android:id="@+id/widget_name_dhuhr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
@@ -169,6 +180,23 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_glyph_dhuhr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_glyph_dhuhr"
+                android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_dhuhr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_time_dhuhr"
                 android:layout_width="match_parent"
@@ -181,6 +209,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_bar_dhuhr"
+                android:layout_width="28dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_underline"
+                android:visibility="invisible" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/widget_row_asr"
@@ -196,18 +232,11 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp">
-            <ImageView
-                android:id="@+id/widget_glyph_asr"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="2dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_asr"
-                android:tint="@color/widget_on_surface_variant" />
             <TextView
                 android:id="@+id/widget_name_asr"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
@@ -215,6 +244,23 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_glyph_asr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_glyph_asr"
+                android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_asr"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_time_asr"
                 android:layout_width="match_parent"
@@ -227,6 +273,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_bar_asr"
+                android:layout_width="28dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_underline"
+                android:visibility="invisible" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/widget_row_maghrib"
@@ -242,18 +296,11 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp">
-            <ImageView
-                android:id="@+id/widget_glyph_maghrib"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="2dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_maghrib"
-                android:tint="@color/widget_on_surface_variant" />
             <TextView
                 android:id="@+id/widget_name_maghrib"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
@@ -261,6 +308,23 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_glyph_maghrib"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_glyph_maghrib"
+                android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_maghrib"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_time_maghrib"
                 android:layout_width="match_parent"
@@ -273,6 +337,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_bar_maghrib"
+                android:layout_width="28dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_underline"
+                android:visibility="invisible" />
         </LinearLayout>
         <LinearLayout
             android:id="@+id/widget_row_isha"
@@ -288,18 +360,11 @@
             android:paddingTop="2dp"
             android:paddingEnd="2dp"
             android:paddingBottom="2dp">
-            <ImageView
-                android:id="@+id/widget_glyph_isha"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:layout_marginBottom="2dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_isha"
-                android:tint="@color/widget_on_surface_variant" />
             <TextView
                 android:id="@+id/widget_name_isha"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="3dp"
                 android:importantForAccessibility="no"
                 android:includeFontPadding="false"
                 android:ellipsize="end"
@@ -307,6 +372,23 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_glyph_isha"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:padding="2dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_glyph_isha"
+                android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_isha"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginBottom="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_time_isha"
                 android:layout_width="match_parent"
@@ -319,6 +401,14 @@
                 android:textAlignment="center"
                 android:textColor="@color/widget_on_surface"
                 android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/widget_bar_isha"
+                android:layout_width="28dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="3dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_underline"
+                android:visibility="invisible" />
         </LinearLayout>
         <TextView
             android:id="@+id/widget_message"

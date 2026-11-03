@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A copy of widget_underline.xml with its colour fixed, for a widget whose theme is chosen in the app. WidgetThemeTest fails the build if the two drift. -->
+<!-- The current prayer's underline on the strip widget (Ali, 3 Nov 2026: "active namaz should be underline"). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_light_primary" />
+    <corners android:radius="2dp" />
+</shape>

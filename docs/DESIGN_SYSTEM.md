@@ -893,6 +893,11 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   tall, from 300dp wide; two cells tall adds a big next prayer line on top; under 250dp wide (half a row) it shows the next
   prayer alone. Android 12 and up only for the size choices. Not changed yet: the Next prayer and Today list widgets'
   glyphs and fonts.
+- **3 Nov 2026, strip widget current prayer: no box, the app logo and an underline (Ali, from a second Pillars screenshot: "instead of a
+  box, use my app logo as the current namaaz pointer ... active namaz should be underline").** Column order is name, icon, time, as in the
+  reference; the current prayer's sun glyph is replaced by `widget_mark` (the launcher mark on its green tile), its text is bold and a
+  28x3dp underline in `widget_primary` sits under its time (`widget_underline`, with light and dark copies, invisible on the other four so
+  all columns are the same height). Every icon slot is 20dp so the names line up. The old pill and outline are gone.
 - **3 Nov 2026, one meaningful icon per prayer everywhere (Ali: "icons should be meaningful").** The Times rows, the Ramadan tiles, the
   widgets and the sky band now all use the app's own sun-position glyphs (`widget_glyph_fajr`, `_sunrise`, `_dhuhr`, `_asr`, `_maghrib`,
   `_isha`; Duha uses `sky_glyph_day`; the Midnight row keeps the crescent). Material's Brightness3, 5 and 6 icons, which said nothing about

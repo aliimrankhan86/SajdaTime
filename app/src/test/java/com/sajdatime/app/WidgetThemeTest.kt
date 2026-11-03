@@ -154,7 +154,8 @@ class WidgetThemeTest {
         val sources = res.resolve("drawable").listFiles()!!.map { it.name.removeSuffix(".xml") }
             .filter { it.startsWith("widget_") && !it.endsWith("_light") && !it.endsWith("_dark") }
         val themed = sources.filter { read("drawable/$it.xml").contains("@color/widget_") }
-        assertEquals(15, themed.size)
+        // 16 since the strip's underline (1.7.0) has a light and a dark copy.
+        assertEquals(16, themed.size)
         for (name in themed) {
             val source = withoutComments(read("drawable/$name.xml"))
             for (theme in listOf("light", "dark")) {

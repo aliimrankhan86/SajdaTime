@@ -208,7 +208,7 @@ class WidgetResourcesTest {
     fun `every colour the widget files use is defined in both themes`() {
         val drawables = listOf(
             "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
-            "widget_seg_done", "widget_seg_next", "widget_seg_todo",
+            "widget_seg_done", "widget_seg_next", "widget_seg_todo", "widget_underline",
             // Step 8: the Next prayer widget's skies, and what has to stay visible on them.
             "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
             "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",

@@ -339,9 +339,14 @@ internal object WidgetRenderer {
             }
 
             views.setViewVisibility(ids.row, if (visible) View.VISIBLE else View.GONE)
-            views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
+            // No box (Ali, 3 Nov 2026, from a Pillars screenshot): the current prayer is marked by the app's own mark in place of
+            // its sun glyph, bold text, and an underline, like the reference's pointer and bar.
+            views.setInt(ids.row, "setBackgroundResource", skin(state, R.drawable.widget_row_plain))
             views.setImageViewResource(ids.glyph, glyph(slot))
-            views.setViewVisibility(ids.glyph, if (glyphs) View.VISIBLE else View.GONE)
+            views.setViewVisibility(ids.glyph, if (glyphs && !highlighted) View.VISIBLE else View.GONE)
+            val extra = STRIP_MARKS.getValue(slot)
+            views.setViewVisibility(extra.first, if (glyphs && highlighted) View.VISIBLE else View.GONE)
+            views.setViewVisibility(extra.second, if (highlighted) View.VISIBLE else View.INVISIBLE)
             views.setTextViewText(ids.name, if (highlighted) bold(heading) else heading)
             views.setTextViewText(ids.time, if (highlighted) bold(time) else time)
 
@@ -564,6 +569,15 @@ internal object WidgetRenderer {
     /** The view ids of one row. Both Today layouts and the wide Next layout use the same ones. */
     private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int)
 
+    /** The strip's per column mark (the app's logo, in place of the glyph) and underline. */
+    private val STRIP_MARKS = mapOf(
+        PrayerSlot.FAJR to (R.id.widget_logo_fajr to R.id.widget_bar_fajr),
+        PrayerSlot.DHUHR to (R.id.widget_logo_dhuhr to R.id.widget_bar_dhuhr),
+        PrayerSlot.ASR to (R.id.widget_logo_asr to R.id.widget_bar_asr),
+        PrayerSlot.MAGHRIB to (R.id.widget_logo_maghrib to R.id.widget_bar_maghrib),
+        PrayerSlot.ISHA to (R.id.widget_logo_isha to R.id.widget_bar_isha),
+    )
+
     private val ROWS = mapOf(
         PrayerSlot.FAJR to RowIds(R.id.widget_row_fajr, R.id.widget_glyph_fajr, R.id.widget_name_fajr, R.id.widget_label_fajr, R.id.widget_time_fajr),
         PrayerSlot.SUNRISE to RowIds(R.id.widget_row_sunrise, R.id.widget_glyph_sunrise, R.id.widget_name_sunrise, R.id.widget_label_sunrise, R.id.widget_time_sunrise),
@@ -639,6 +653,7 @@ internal object WidgetRenderer {
         R.drawable.widget_row_highlight to (R.drawable.widget_row_highlight_light to R.drawable.widget_row_highlight_dark),
         R.drawable.widget_seg_done to (R.drawable.widget_seg_done_light to R.drawable.widget_seg_done_dark),
         R.drawable.widget_seg_next to (R.drawable.widget_seg_next_light to R.drawable.widget_seg_next_dark),
+        R.drawable.widget_underline to (R.drawable.widget_underline_light to R.drawable.widget_underline_dark),
         R.drawable.widget_seg_todo to (R.drawable.widget_seg_todo_light to R.drawable.widget_seg_todo_dark),
         // Step 8: the Next prayer widget's four skies, its rimmed pill, and the track and hairline on a sky.
         R.drawable.widget_sky_dawn to (R.drawable.widget_sky_dawn_light to R.drawable.widget_sky_dawn_dark),
@@ -701,6 +716,7 @@ internal object WidgetRenderer {
             Paint(ids.glyph, Ink.TINT, R.color.widget_on_surface_variant),
             Paint(ids.name, Ink.TEXT, R.color.widget_on_surface),
             Paint(ids.time, Ink.TEXT, R.color.widget_on_surface),
+            Paint(STRIP_MARKS.getValue(slot).second, Ink.IMAGE, R.drawable.widget_underline),
         )
     }
 
