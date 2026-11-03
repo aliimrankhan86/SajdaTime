@@ -509,8 +509,8 @@
     <string name="night_row_a11y">İslami gece yarısı %1$s. Gecenin son üçte birinin başlangıcı: %2$s.</string>
     <string name="settings_night_times">Gece vakitleri</string>
     <string name="settings_night_times_desc">Yatsının altında İslami gece yarısını ve gecenin son üçte birini gösterir</string>
-    <string name="current_until">%1$s için %2$s kaldı</string>
-    <string name="current_row_a11y">%1$s, şimdiki namaz, %2$s, %3$s için %4$s kaldı</string>
+    <string name="current_until">%1$s vaktine %2$s</string>
+    <string name="current_row_a11y">%1$s, şimdiki namaz, %2$s, %3$s vaktine %4$s</string>
     <plurals name="duration_a11y_hours">
         <item quantity="one">%d saat</item>
         <item quantity="other">%d saat</item>

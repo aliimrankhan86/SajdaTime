@@ -321,7 +321,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 val sunrisePassed = snapshot.current == PrayerSlot.FAJR &&
                     snapshot.today?.times?.get(PrayerSlot.SUNRISE)
                         ?.let { !now.isBefore(it) } == true
-                if (prayerPassed || dayChanged || sunrisePassed) recalculate()
+                // The "time left" line counts to a time that is not always a prayer (Islamic midnight), so it
+                // needs its own trigger too, or "Until Islamic midnight" froze at 1m for hours (review, 3 Nov 2026).
+                val windowPassed = snapshot.window?.let { !now.isBefore(it.at) } == true
+                if (prayerPassed || dayChanged || sunrisePassed || windowPassed) recalculate()
                 // My prayers keeps its own day, because with no saved place there is no `today` above
                 // and nothing else would roll it over: ticks after midnight went to yesterday (review).
                 else if (snapshot.tracker?.let { it.today != LocalDate.now(ZoneId.systemDefault()) } == true) publishTracker()

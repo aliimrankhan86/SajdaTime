@@ -42,7 +42,7 @@ import com.sajdatime.app.ui.theme.Space
  * background. It touches no alarm scheduling. iPhone: carries over (AVAudioPlayer).
  */
 @Composable
-internal fun SoundPreview(uri: String, alarm: Boolean) {
+internal fun SoundPreview(uri: String, alarm: Boolean, respectsSilent: Boolean = true) {
     val context = LocalContext.current
     var player by remember { mutableStateOf<MediaPlayer?>(null) }
     var playing by remember { mutableStateOf(false) }
@@ -70,7 +70,7 @@ internal fun SoundPreview(uri: String, alarm: Boolean) {
             tick++
             if (playing) {
                 stop()
-            } else {
+            } else if (!silenced(context, alarm, respectsSilent)) {
                 player = startPreview(context, uri, alarm) { stop() }
                 playing = player != null
             }
@@ -90,18 +90,28 @@ internal fun SoundPreview(uri: String, alarm: Boolean) {
     // the ringer for a notification). `tick` only forces this to be read again after a press.
     @Suppress("UNUSED_EXPRESSION") tick
     Text(
-        text = stringResource(previewHelp(context, alarm)),
+        text = stringResource(previewHelp(context, alarm, respectsSilent)),
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
 
-private fun previewHelp(context: Context, alarm: Boolean): Int {
+/**
+ * The real alarm drops to a plain notification on a silent or vibrating phone unless "Play on silent" is on
+ * (Notifications.effectiveAlertStyle), so the preview stays quiet in exactly that case and says so.
+ */
+private fun silenced(context: Context, alarm: Boolean, respectsSilent: Boolean): Boolean {
     val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    return if (alarm) {
-        if (audio.getStreamVolume(AudioManager.STREAM_ALARM) == 0) R.string.preview_alarm_muted else R.string.preview_alarm_help
-    } else {
-        if (audio.ringerMode != AudioManager.RINGER_MODE_NORMAL) R.string.preview_notification_silent else R.string.preview_notification_help
+    return (!alarm || respectsSilent) && audio.ringerMode != AudioManager.RINGER_MODE_NORMAL
+}
+
+private fun previewHelp(context: Context, alarm: Boolean, respectsSilent: Boolean): Int {
+    val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    return when {
+        silenced(context, alarm, respectsSilent) -> R.string.preview_notification_silent
+        alarm && audio.getStreamVolume(AudioManager.STREAM_ALARM) == 0 -> R.string.preview_alarm_muted
+        alarm -> R.string.preview_alarm_help
+        else -> R.string.preview_notification_help
     }
 }
 
@@ -109,8 +119,9 @@ private fun previewHelp(context: Context, alarm: Boolean): Int {
 private fun startPreview(context: Context, uri: String, alarm: Boolean, onDone: () -> Unit): MediaPlayer? {
     val source: Uri = uri.takeIf { it.isNotBlank() }?.let(Uri::parse)
         ?: RingtoneManager.getDefaultUri(if (alarm) RingtoneManager.TYPE_ALARM else RingtoneManager.TYPE_NOTIFICATION)
+    val player = MediaPlayer()
     return runCatching {
-        MediaPlayer().apply {
+        player.apply {
             setAudioAttributes(
                 AudioAttributes.Builder()
                     .setUsage(if (alarm) AudioAttributes.USAGE_ALARM else AudioAttributes.USAGE_NOTIFICATION)
@@ -123,5 +134,5 @@ private fun startPreview(context: Context, uri: String, alarm: Boolean, onDone: 
             prepare()
             start()
         }
-    }.getOrNull()
+    }.onFailure { player.release() }.getOrNull()
 }

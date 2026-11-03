@@ -1523,7 +1523,7 @@ private fun SoundChoices(sound: SoundChoice) {
             onSelect = sound.onPickPhone,
         )
     }
-    SoundPreview(uri = sound.uri, alarm = sound.alarm)
+    SoundPreview(uri = sound.uri, alarm = sound.alarm, respectsSilent = sound.respectsSilent)
     sound.onSetRespectsSilent?.let { PlayOnSilentRow(sound.respectsSilent, it) }
 }
 
