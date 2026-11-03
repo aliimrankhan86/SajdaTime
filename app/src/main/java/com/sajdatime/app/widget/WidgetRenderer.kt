@@ -113,9 +113,19 @@ internal object WidgetRenderer {
      * (from 380dp). All four are the one layout, so the builder is given the size, not a layout id
      * (STEP-8-DESIGN section 14, item 2). The launcher picks the largest that fits, the smallest when none does.
      */
-    private val STRIP_SIZES = listOf(SizeF(250f, 40f), SizeF(250f, 64f), SizeF(380f, 40f), SizeF(380f, 64f))
-    private const val STRIP_GLYPH_HEIGHT_DP = 64f
-    private const val STRIP_CHIP_WIDTH_DP = 380f
+    // 1.7.0 (Ali, 3 Nov 2026: "row level widget with icons and prayer time ... adjusted to half a row"): the glyph
+    // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
+    // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
+    private val STRIP_SIZES = listOf(
+        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f),
+        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f),
+    )
+    private const val STRIP_GLYPH_WIDTH_DP = 300f
+    private const val STRIP_TALL_HEIGHT_DP = 64f
+    private const val STRIP_HALF_WIDTH_DP = 250f
+    private const val STRIP_HERO_HEIGHT_DP = 110f
+    private const val STRIP_CHIP_WIDTH_DP = 400f
+    private const val HERO_SP = 22f
 
     private fun forText(context: Context, sizes: List<Pair<SizeF, Int>>) =
         if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.take(1) else sizes
@@ -232,16 +242,21 @@ internal object WidgetRenderer {
      */
     private fun stripViews(context: Context, state: WidgetState, now: Instant, size: SizeF): RemoteViews {
         val views = themedViews(context, state, R.layout.widget_strip)
-        val glyphs = size.height >= STRIP_GLYPH_HEIGHT_DP
+        val glyphs = size.width >= STRIP_GLYPH_WIDTH_DP
+        val tall = size.height >= STRIP_TALL_HEIGHT_DP
         applyDirection(context, views)
         applyTap(context, views)
         // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
         val side = dp(context, 4f)
-        val edge = dp(context, if (glyphs) 4f else 2f)
+        val edge = dp(context, if (tall) 4f else 2f)
         views.setViewPadding(R.id.widget_root, side, edge, side, edge)
+        // 1.7.0 (Ali, 3 Nov 2026, from a Pillars screenshot: "clean and easy to understand"): on the period's sky, like
+        // the Next prayer widget, with the next prayer big on top once the widget is two cells tall.
+        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, skyDrawable(state.period)))
         // From 1.3 text the five columns would cut names and times (STEP-8-DESIGN section 3), so the next
         // prayer alone is shown at the user's size, at every one of the four entries.
-        val large = context.resources.configuration.fontScale >= LARGE_TEXT
+        // Half a row (under 250dp wide) shows the next prayer alone too: five columns cannot fit two cells.
+        val large = context.resources.configuration.fontScale >= LARGE_TEXT || size.width < STRIP_HALF_WIDTH_DP
         // fillChip shows or hides by whether there is a town; the width then decides whether there is room, and
         // large text never has it (Opus review, 25 Oct 2026: it squeezed the one prayer that is left).
         fillChip(context, views, state)
@@ -259,15 +274,20 @@ internal object WidgetRenderer {
         }
         views.setViewVisibility(R.id.widget_message, View.GONE)
 
+        val hero = large || size.height >= STRIP_HERO_HEIGHT_DP
         val spoken = fillColumns(context, views, state, today, glyphs, visible = !large)
-        if (large) {
+        views.setViewVisibility(R.id.widget_strip_row, if (large) View.GONE else View.VISIBLE)
+        if (hero) {
+            val sp = if (size.height >= STRIP_HERO_HEIGHT_DP) HERO_SP else 14f
+            views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, sp)
+            views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
             views.setTextViewText(R.id.widget_name, next.slot.label(context))
             views.setTextViewText(R.id.widget_time, TimeFormat.clock(context, next.at))
             views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_tomorrow))
             views.setViewVisibility(R.id.widget_sublabel, if (next.isTomorrow) View.VISIBLE else View.GONE)
         }
-        views.setViewVisibility(R.id.widget_strip_next, if (large) View.VISIBLE else View.GONE)
+        views.setViewVisibility(R.id.widget_strip_next, if (hero) View.VISIBLE else View.GONE)
 
         // Sunrise is not shown, so it is not spoken. A projected polar day has no visible marker (no room
         // in one row), so the sentence carries it.
@@ -307,7 +327,7 @@ internal object WidgetRenderer {
             }
 
             views.setViewVisibility(ids.row, if (visible) View.VISIBLE else View.GONE)
-            views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted) R.drawable.widget_row_highlight else R.drawable.widget_row_plain))
+            views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
             views.setImageViewResource(ids.glyph, glyph(slot))
             views.setViewVisibility(ids.glyph, if (glyphs) View.VISIBLE else View.GONE)
             views.setTextViewText(ids.name, if (highlighted) bold(heading) else heading)

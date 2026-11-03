@@ -12,7 +12,7 @@
     android:initialLayout="@layout/widget_strip"
     android:minWidth="250dp"
     android:minHeight="40dp"
-    android:minResizeWidth="250dp"
+    android:minResizeWidth="110dp"
     android:minResizeHeight="40dp"
     android:previewImage="@drawable/widget_preview_strip"
     android:previewLayout="@layout/widget_strip"

@@ -36,6 +36,7 @@ import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.Notice
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -134,24 +135,35 @@ private fun RamadanCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .sajdaSurface(RoundedCornerShape(24.dp))
+            // 1.7.0 (Ali, 3 Nov 2026: "the cards don't stand out ... colours should make it easier to see at a
+            // glance"): the card is the green container, so it is the one tinted block on Times; the two time
+            // tiles on it are paper, and the next one is solid green.
+            .clip(RoundedCornerShape(24.dp))
+            .background(scheme.primaryContainer)
             .padding(horizontal = 20.dp, vertical = 16.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                Icons.Rounded.Brightness3,
+                contentDescription = null,
+                tint = scheme.onPrimaryContainer,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(Modifier.width(8.dp))
             Text(
                 text = stringResource(R.string.ramadan_card_label),
                 // Letterspaced like "Next prayer" above it, not uppercased in code: see the note
                 // in NextPrayerCard about Turkish dotted and dotless i.
-                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 1.6.sp),
-                color = scheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelLarge.copy(letterSpacing = 1.6.sp),
+                color = scheme.onPrimaryContainer,
                 modifier = Modifier
                     .weight(1f)
                     .semantics { heading() },
             )
             Text(
                 text = stringResource(R.string.ramadan_day_of, info.dayNumber ?: 1, info.length),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelLarge,
+                color = scheme.onPrimaryContainer,
             )
         }
         Spacer(Modifier.height(Space.Paragraph))
@@ -159,12 +171,14 @@ private fun RamadanCard(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             TimeColumn(
                 label = stringResource(R.string.ramadan_suhoor_ends),
+                glyph = R.drawable.widget_glyph_fajr,
                 time = TimeFormat.clock(context, ramadan.suhoorEnds),
                 isNext = phase == RamadanState.Phase.BEFORE_SUHOOR_END,
                 modifier = Modifier.weight(1f),
             )
             TimeColumn(
                 label = stringResource(R.string.ramadan_iftar),
+                glyph = R.drawable.widget_glyph_maghrib,
                 time = TimeFormat.clock(context, ramadan.iftar),
                 isNext = phase == RamadanState.Phase.FASTING,
                 modifier = Modifier.weight(1f),
@@ -186,7 +200,7 @@ private fun RamadanCard(
                     TimeFormat.clock(context, ramadan.tomorrowIftar),
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSurfaceVariant,
+                color = scheme.onPrimaryContainer,
             )
         }
 
@@ -197,7 +211,7 @@ private fun RamadanCard(
             Text(
                 text = stringResource(R.string.notif_approximate),
                 style = MaterialTheme.typography.bodyMedium,
-                color = scheme.onSurfaceVariant,
+                color = scheme.onPrimaryContainer,
             )
         }
 
@@ -207,7 +221,7 @@ private fun RamadanCard(
                 Text(
                     text = stringResource(R.string.ramadan_date_differs),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = scheme.onSurfaceVariant,
+                    color = scheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f),
                 )
                 CtaButton(onClick = onShiftDate, compact = true) {
@@ -238,7 +252,7 @@ private fun RamadanCard(
                 Icon(
                     Icons.Outlined.Info,
                     contentDescription = stringResource(R.string.ramadan_info_a11y),
-                    tint = scheme.onSurfaceVariant,
+                    tint = scheme.onPrimaryContainer,
                 )
             }
         }
@@ -247,41 +261,47 @@ private fun RamadanCard(
 }
 
 @Composable
-private fun TimeColumn(label: String, time: String, isNext: Boolean, modifier: Modifier = Modifier) {
+private fun TimeColumn(label: String, glyph: Int, time: String, isNext: Boolean, modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
+    // Next: solid green with white text (onPrimary on primary is a tested pair). The other: paper on the green card.
+    val fill = if (isNext) scheme.primary else scheme.surface
+    val ink = if (isNext) scheme.onPrimary else scheme.onSurface
+    val soft = if (isNext) scheme.onPrimary else scheme.onSurfaceVariant
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (isNext) scheme.primaryContainer else scheme.surfaceContainerLow)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .clip(RoundedCornerShape(18.dp))
+            .background(fill)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(glyph), contentDescription = null, tint = soft, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(8.dp))
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                color = soft,
                 modifier = Modifier.weight(1f, fill = false),
             )
-            if (isNext) {
-                // Not colour alone: the next time also carries the same "Next" word the list uses.
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.home_next_marker),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = scheme.onPrimary,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .background(scheme.primary)
-                        .padding(horizontal = 9.dp, vertical = 3.dp),
-                )
-            }
         }
         Spacer(Modifier.height(Space.Tight))
         Text(
             text = time,
             style = PrayerTimeTextStyle,
-            color = scheme.onSurface,
+            color = ink,
         )
+        if (isNext) {
+            // Not colour alone: the next time also carries the same "Next" word the list uses.
+            Spacer(Modifier.height(Space.Tight))
+            Text(
+                text = stringResource(R.string.home_next_marker),
+                style = MaterialTheme.typography.labelMedium,
+                color = scheme.primary,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(scheme.onPrimary)
+                    .padding(horizontal = 9.dp, vertical = 3.dp),
+            )
+        }
     }
 }
 
@@ -294,8 +314,8 @@ private fun TimeColumn(label: String, time: String, isNext: Boolean, modifier: M
 @Composable
 private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.Phase) {
     val context = LocalContext.current
-    val primary = MaterialTheme.colorScheme.primary
-    val style = MaterialTheme.typography.bodyLarge
+    val primary = MaterialTheme.colorScheme.onPrimaryContainer
+    val style = MaterialTheme.typography.titleMedium
 
     when (phase) {
         RamadanState.Phase.BEFORE_SUHOOR_END, RamadanState.Phase.FASTING -> {
@@ -348,7 +368,7 @@ private fun FastLine(ramadan: RamadanState) {
             changeText,
         ),
         style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurface,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
     )
 }
 

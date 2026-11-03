@@ -854,6 +854,15 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **3 Nov 2026, Ramadan card made to stand out; strip widget restyled from a Pillars screenshot (Ali).** Ali: the
+  Ramadan cards "don't stand out ... colours should make it easier to see at a glance. The tiles are not clear".
+  The card is now `primaryContainer` (the one tinted block on Times) with a crescent in its title, the two tiles are
+  paper (suhoor ends, iftar) with a sunrise / sunset glyph, and the next one is solid `primary` with `onPrimary` text and
+  a paper "Next" pill; the countdown is `titleMedium`. No new colour. The Today strip widget now sits on the period's
+  sky like the Next prayer widget, the next prayer is a rimmed pill, the glyph sits beside each name so it fits one cell
+  tall, from 300dp wide; two cells tall adds a big next prayer line on top; under 250dp wide (half a row) it shows the next
+  prayer alone. Android 12 and up only for the size choices. Not changed yet: the Next prayer and Today list widgets'
+  glyphs and fonts.
 - **3 Nov 2026, Times prompts lose their cards (Option 2, DESIGN-D2, Ali: "Option 2 seems fine").** Ali called the
   Set location and Allow exact alarms cards "horrendous", wanted a premium Apple feel, not "lots of unnecessary
   cards with text". Now: no location set -> a compact green "Set location" button beside the city title (kind A
