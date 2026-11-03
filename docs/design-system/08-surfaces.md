@@ -37,9 +37,11 @@ start corner of the small widgets (top left, top right in right to left) so peop
 strip tier with room (about 90dp tall); the 64dp tier cannot promise it.
 
 **Type.** Countdown in the system light weight, tabular, sized in dp (36 small Next, 34 wide, 38 large
-Today) because a large font setting pushed names off. Names 16 bold on Next, 14 on Today, 12 (to 10) on
+Today) because a large font setting pushed names off. Names 16 bold on Next (rows 13), 15 on the large Today, 14 on the compact Today, 12 (to 9) on
 the strip. Floor 12; named exceptions down to 9: the large Today Hijri line and the strip time at 250
-wide. **Known gap:** labels and footers at 11 and strip names at 10 are not listed exceptions.
+wide. Labels and footers are 12 (raised from 11 on 3 Nov 2026, 1.7.0). **Known gaps:** strip names also shrink to 9, and
+the am/pm after a time is drawn at 0.7 of the time (about 10), neither listed as an exception; compact Today
+rows and wide Next rows stay 14 and 13 until their fit is measured at 1.15x and 2x (a 15 row clips at 180dp tall).
 
 **Glyphs** show where the sun is, so they read without language: Fajr rays over an empty horizon,
 Sunrise a rising half sun, Dhuhr the sun over a post with no shadow, Asr a shadow equal to the post,

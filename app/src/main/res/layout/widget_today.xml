@@ -109,7 +109,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_fajr"
                 android:layout_width="wrap_content"
@@ -181,7 +181,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_sunrise"
                 android:layout_width="wrap_content"
@@ -260,7 +260,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_dhuhr"
                 android:layout_width="wrap_content"
@@ -339,7 +339,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_asr"
                 android:layout_width="wrap_content"
@@ -418,7 +418,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_maghrib"
                 android:layout_width="wrap_content"
@@ -497,7 +497,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_isha"
                 android:layout_width="wrap_content"
@@ -586,7 +586,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp"
+            android:textSize="12sp"
             android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

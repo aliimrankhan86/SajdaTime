@@ -344,7 +344,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_fajr"
             android:layout_width="0dp"
@@ -357,7 +357,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_fajr"
             android:layout_width="wrap_content"
@@ -368,7 +368,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -403,7 +403,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_sunrise"
             android:layout_width="0dp"
@@ -416,7 +416,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_sunrise"
             android:layout_width="wrap_content"
@@ -427,7 +427,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -469,7 +469,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_dhuhr"
             android:layout_width="0dp"
@@ -482,7 +482,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_dhuhr"
             android:layout_width="wrap_content"
@@ -493,7 +493,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -535,7 +535,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_asr"
             android:layout_width="0dp"
@@ -548,7 +548,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_asr"
             android:layout_width="wrap_content"
@@ -559,7 +559,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -601,7 +601,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_maghrib"
             android:layout_width="0dp"
@@ -614,7 +614,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_maghrib"
             android:layout_width="wrap_content"
@@ -625,7 +625,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -667,7 +667,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
         <TextView
             android:id="@+id/widget_label_isha"
             android:layout_width="0dp"
@@ -680,7 +680,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="11sp" />
+            android:textSize="12sp" />
         <TextView
             android:id="@+id/widget_time_isha"
             android:layout_width="wrap_content"
@@ -691,7 +691,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="14sp" />
+            android:textSize="15sp" />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -710,6 +710,6 @@
         android:maxLines="1"
         android:textAlignment="viewStart"
         android:textColor="@color/widget_on_surface_variant"
-        android:textSize="11sp"
+        android:textSize="12sp"
         android:visibility="gone" />
 </LinearLayout>
