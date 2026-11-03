@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -258,6 +259,31 @@ fun LocationSheet(
                 Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
+        }
+    }
+}
+
+/**
+ * No location yet (1.7.0, Option 2): one sentence and a compact green button, centred, not a card. Used where the
+ * screen has nothing to show without a place (Qibla, My prayers). Times puts the same button beside the city.
+ */
+@Composable
+fun SetLocationPrompt(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    androidx.compose.foundation.layout.Column(
+        modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+        Spacer(Modifier.height(Space.Related))
+        CtaButton(onClick = onClick, compact = true) {
+            Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(Space.Related))
+            Text(stringResource(R.string.action_set_location))
         }
     }
 }

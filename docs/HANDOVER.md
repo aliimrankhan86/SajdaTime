@@ -6103,8 +6103,7 @@ minutes, so Settings says "about". Competitor apps: none counts to midnight, Duh
 private research folder. Label "Duha" and F still his. **Built after his go-ahead, 3 Nov 2026:** the sky mark became a full width 52dp **sky band** under the date (design G A;
 `ui/home/Sky.kt` `SkyBand`; `Sky.markFits` removed) and the Set location / exact alarm cards were replaced (Option 2): a compact
 "Set location" button beside the city, "May not ring on time" + amber dot on the Fajr row opening a dialog with X only, and a dot on
-the Settings tab. **Still to build for Option 2:** the Settings row with a compact amber Allow (Settings keeps the old card, a new
-§4.1 line is needed), the notifications blocked line, Qibla / My prayers no-location sentences. Not built, waiting for his choice:
+the Settings tab. Option 2 is now complete: Settings and Times notices are one row with a compact amber Allow, Qibla / My prayers show a sentence plus a compact green Set location. Seen on the emulator in light, dark and 2x (Times, Qibla, My prayers, Settings). Not checked: Urdu RTL, 320dp, TalkBack, a real phone. Not built, waiting for his choice:
 the one row strip widget (design specs and mockups are in Ali's private planning folder, not in this repo). Seen on the emulator, light
 only: band, Fajr line, dialog, tab dot; not seen: the Set location button (the emulator has a location), dark, 2x, Urdu. Not verified: real phone, TalkBack, Urdu RTL, 320dp, dark theme for the preview dialog.
 versionCode is still 10 on this branch; it becomes 11 only when Ali decides to release.

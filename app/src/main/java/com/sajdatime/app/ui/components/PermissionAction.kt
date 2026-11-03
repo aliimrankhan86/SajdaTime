@@ -41,6 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.clickable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -144,20 +145,31 @@ fun PermissionCard(
             Icon(icon, contentDescription = null, tint = scheme.onTertiaryContainer, modifier = Modifier.size(20.dp))
         }
         Spacer(Modifier.width(12.dp))
+        val allow = stringResource(R.string.action_allow)
+        // Kind B compact: solid amber, 40dp drawn, 48dp to touch.
+        val allowButton: @Composable () -> Unit = {
+            Button(
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.heightIn(min = 40.dp).semantics { contentDescription = "$allow, $title" },
+            ) {
+                Text(allow, style = actionLabelStyle())
+            }
+        }
+        // At 1.5 text and above the button drops under the words, so the title does not wrap word by word.
+        val stacked = androidx.compose.ui.platform.LocalDensity.current.fontScale >= 1.5f
         Column(Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall, color = scheme.onSurface)
             Text(body, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+            if (stacked) {
+                Spacer(Modifier.height(Space.Related))
+                allowButton()
+            }
         }
-        Spacer(Modifier.width(12.dp))
-        val allow = stringResource(R.string.action_allow)
-        // Kind B compact: solid amber, 40dp drawn, 48dp to touch.
-        Button(
-            onClick = onClick,
-            colors = ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            modifier = Modifier.heightIn(min = 40.dp).semantics { contentDescription = "$allow, $title" },
-        ) {
-            Text(allow, style = actionLabelStyle())
+        if (!stacked) {
+            Spacer(Modifier.width(12.dp))
+            allowButton()
         }
         if (onDismiss != null) {
             IconButton(onClick = onDismiss) {

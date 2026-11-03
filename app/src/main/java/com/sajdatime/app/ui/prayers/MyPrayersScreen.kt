@@ -72,6 +72,7 @@ import com.sajdatime.app.ui.components.DayRing
 import com.sajdatime.app.ui.components.weekRingDp
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.SetLocationPrompt
 import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RingKind
 import com.sajdatime.app.ui.components.ScreenTitle
@@ -195,11 +196,7 @@ private fun Checklist(
     }
     Spacer(Modifier.height(Space.Related))
     if (noLocation) {
-        Notice(
-            brief = stringResource(R.string.home_no_location),
-            actionLabel = stringResource(R.string.action_set_location),
-            onAction = { locationSheet = true },
-        )
+        SetLocationPrompt(stringResource(R.string.home_no_location), onClick = { locationSheet = true })
         Spacer(Modifier.height(Space.Group))
     }
     if (t.data.readOnly) {

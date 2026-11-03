@@ -57,6 +57,7 @@ import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.ui.components.shrinkToFit
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.SetLocationPrompt
 import com.sajdatime.app.ui.theme.Motion
 import com.sajdatime.core.MeasurementSystem
 import com.sajdatime.core.bidiIsolated
@@ -143,11 +144,7 @@ internal fun QiblaBody(
         // whenever the phone pointed north (STEP-6-DESIGN section 14).
         if (qibla == null || state.settings.usingDefaultLocation) {
             Spacer(Modifier.height(Space.Section))
-            Notice(
-                brief = stringResource(R.string.qibla_needs_location),
-                actionLabel = stringResource(R.string.action_set_location),
-                onAction = { locationSheet = true },
-            )
+            SetLocationPrompt(stringResource(R.string.qibla_needs_location), onClick = { locationSheet = true })
         } else {
             QiblaLocated(state, qibla, context)
         }

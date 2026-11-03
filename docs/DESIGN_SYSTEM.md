@@ -860,7 +860,7 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   compact, already in §4.1); exact alarms withheld -> the Fajr row gets "May not ring on time" in
   `onTertiaryContainer` and an 8dp `tertiary` dot on its bell, tapping the row opens a dialog (X only, no "Close"
   text, full width green Allow), and the Settings tab wears the same dot. The Settings rows (and the Times notifications notice) are now a single row with a compact amber Allow, Ali: the
-  old card "takes too much space". **Not yet built:** Qibla / My prayers no-location sentences. Rejected: a status card row (still a card, chevron is not a solid button), and a one time
+  old card "takes too much space". Qibla and My prayers show one centred sentence with a compact green "Set location" (`SetLocationPrompt`), no card. At 1.5x text and above the notice's Allow drops under its words. Rejected: a status card row (still a card, chevron is not a solid button), and a one time
   setup sheet (setup already asked both).
 - **3 Nov 2026, sky mark becomes a full width sky band under the date line (design G, option A).** Ali: the graphic "is too
   small and easier to miss ... improve its size or add colours". Built 52dp tall: bigger arc, 8dp ticks (filled when reached,
