@@ -893,6 +893,12 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   tall, from 300dp wide; two cells tall adds a big next prayer line on top; under 250dp wide (half a row) it shows the next
   prayer alone. Android 12 and up only for the size choices. Not changed yet: the Next prayer and Today list widgets'
   glyphs and fonts.
+- **3 Nov 2026, strip widget body: green in dark, tight big version (Ali: "for the dark theme use a green background ... according to
+  our theme"; "too much spacing between Maghrib and the time and the others").** New `widget_strip_*` body colours: the period skies in light,
+  in dark the app's own green (the DarkHero family: #18382D / #0F241D with faint shifts for dawn, evening and night). Text and the mint underline
+  keep the dark inks (checked in `WidgetColorsTest`: 4.5:1 text, 3:1 underline). The tall version has a fixed 10dp gap between the next
+  prayer line and the columns, and the whole block is centred; no flexible gap. Next prayer widget's dark skies are unchanged (they are the
+  app's DarkSky tokens).
 - **3 Nov 2026, strip widget current prayer: no box, the app logo and an underline (Ali, from a second Pillars screenshot: "instead of a
   box, use my app logo as the current namaaz pointer ... active namaz should be underline").** Column order is name, icon, time, as in the
   reference; the current prayer's sun glyph is replaced by `widget_mark` (the launcher mark on its green tile), its text is bold and a

@@ -212,6 +212,7 @@ class WidgetResourcesTest {
             // Step 8: the Next prayer widget's skies, and what has to stay visible on them.
             "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
             "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
+            "widget_strip_dawn", "widget_strip_day", "widget_strip_evening", "widget_strip_night",
         )
         val files = layouts + drawables.map { "drawable/$it.xml" }
         val used = files.flatMap { Regex("""@color/(widget_[a-z_]+)""").findAll(read(it)).map { m -> m.groupValues[1] }.toList() }.toSet()

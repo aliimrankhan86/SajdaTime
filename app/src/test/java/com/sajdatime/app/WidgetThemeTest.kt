@@ -113,6 +113,7 @@ class WidgetThemeTest {
                 "widget_row_highlight", "widget_seg_done", "widget_seg_next", "widget_seg_todo",
                 "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
                 "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
+                "widget_strip_dawn", "widget_strip_day", "widget_strip_evening", "widget_strip_night",
             )
         val themed = drawables.filter { hasCopies(it) }.toSet()
         val fixedDrawables = WidgetRenderer.FIXED_DRAWABLES.map { (k, v) ->
@@ -154,8 +155,8 @@ class WidgetThemeTest {
         val sources = res.resolve("drawable").listFiles()!!.map { it.name.removeSuffix(".xml") }
             .filter { it.startsWith("widget_") && !it.endsWith("_light") && !it.endsWith("_dark") }
         val themed = sources.filter { read("drawable/$it.xml").contains("@color/widget_") }
-        // 16 since the strip's underline (1.7.0) has a light and a dark copy.
-        assertEquals(16, themed.size)
+        // 20 since the strip's underline and its four bodies (1.7.0) have a light and a dark copy.
+        assertEquals(20, themed.size)
         for (name in themed) {
             val source = withoutComments(read("drawable/$name.xml"))
             for (theme in listOf("light", "dark")) {

@@ -35,6 +35,7 @@
         android:id="@+id/widget_strip_next"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:visibility="gone">
@@ -79,12 +80,6 @@
             android:textSize="12sp"
             android:visibility="gone" />
     </LinearLayout>
-    <FrameLayout
-        android:id="@+id/widget_strip_gap"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone" />
     <LinearLayout
         android:id="@+id/widget_strip_row"
         android:layout_width="match_parent"

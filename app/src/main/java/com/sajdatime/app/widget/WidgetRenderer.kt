@@ -117,8 +117,8 @@ internal object WidgetRenderer {
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
     // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
     private val STRIP_SIZES = listOf(
-        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f), SizeF(300f, 150f), SizeF(300f, 190f),
-        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f), SizeF(400f, 150f), SizeF(400f, 190f),
+        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f), SizeF(300f, 150f),
+        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f), SizeF(400f, 150f),
     )
     private const val STRIP_GLYPH_WIDTH_DP = 300f
     private const val STRIP_TALL_HEIGHT_DP = 64f
@@ -257,10 +257,9 @@ internal object WidgetRenderer {
         // A tall entry puts the next prayer at the top and the five columns at the foot, the gap between them flexible, so no
         // space is wasted above (Ali, 3 Nov 2026: "too much top spacing").
         views.setViewPadding(R.id.widget_root, side, if (heroEntry) dp(context, 10f) else edge, side, if (heroEntry) dp(context, 8f) else edge)
-        views.setViewVisibility(R.id.widget_strip_gap, if (heroEntry) View.VISIBLE else View.GONE)
         // 1.7.0 (Ali, 3 Nov 2026, from a Pillars screenshot: "clean and easy to understand"): on the period's sky, like
         // the Next prayer widget, with the next prayer big on top once the widget is two cells tall.
-        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, skyDrawable(state.period)))
+        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, stripBody(state.period)))
         // From 1.3 text the five columns would cut names and times (STEP-8-DESIGN section 3), so the next
         // prayer alone is shown at the user's size, at every one of the four entries.
         // Half a row (under 250dp wide) shows the next prayer alone too: five columns cannot fit two cells.
@@ -295,8 +294,7 @@ internal object WidgetRenderer {
         if (hero) {
             // The next prayer grows with the widget, so a tall one is not a small line in a big empty box.
             val sp = when {
-                size.height >= 190f -> 36f
-                size.height >= 150f -> 30f
+                size.height >= 150f -> 28f
                 size.height >= STRIP_HERO_HEIGHT_DP -> 24f
                 else -> 14f
             }
@@ -663,6 +661,10 @@ internal object WidgetRenderer {
         R.drawable.widget_seg_done to (R.drawable.widget_seg_done_light to R.drawable.widget_seg_done_dark),
         R.drawable.widget_seg_next to (R.drawable.widget_seg_next_light to R.drawable.widget_seg_next_dark),
         R.drawable.widget_underline to (R.drawable.widget_underline_light to R.drawable.widget_underline_dark),
+        R.drawable.widget_strip_dawn to (R.drawable.widget_strip_dawn_light to R.drawable.widget_strip_dawn_dark),
+        R.drawable.widget_strip_day to (R.drawable.widget_strip_day_light to R.drawable.widget_strip_day_dark),
+        R.drawable.widget_strip_evening to (R.drawable.widget_strip_evening_light to R.drawable.widget_strip_evening_dark),
+        R.drawable.widget_strip_night to (R.drawable.widget_strip_night_light to R.drawable.widget_strip_night_dark),
         R.drawable.widget_seg_todo to (R.drawable.widget_seg_todo_light to R.drawable.widget_seg_todo_dark),
         // Step 8: the Next prayer widget's four skies, its rimmed pill, and the track and hairline on a sky.
         R.drawable.widget_sky_dawn to (R.drawable.widget_sky_dawn_light to R.drawable.widget_sky_dawn_dark),
@@ -681,6 +683,15 @@ internal object WidgetRenderer {
         SkyPeriod.DAY -> R.drawable.widget_sky_day
         SkyPeriod.EVENING -> R.drawable.widget_sky_evening
         SkyPeriod.NIGHT -> R.drawable.widget_sky_night
+    }
+
+    /** The Today strip's own body: the period's sky in light, the app's dark green in dark (1.7.0). */
+    @DrawableRes
+    private fun stripBody(period: SkyPeriod): Int = when (period) {
+        SkyPeriod.DAWN -> R.drawable.widget_strip_dawn
+        SkyPeriod.DAY -> R.drawable.widget_strip_day
+        SkyPeriod.EVENING -> R.drawable.widget_strip_evening
+        SkyPeriod.NIGHT -> R.drawable.widget_strip_night
     }
 
     internal enum class Ink { TEXT, TINT, BACKGROUND, IMAGE }
