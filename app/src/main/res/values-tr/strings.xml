@@ -529,7 +529,7 @@
     <string name="duha_until">%1$s saatine kadar</string>
     <string name="duha_row_a11y">Kuşluk %1$s ile %2$s arası.</string>
     <string name="settings_duha">Kuşluk</string>
-    <string name="settings_duha_desc">Güneşten sonra kuşluk (duha) zamanını gösterir: güneş doğduktan %1$d dakika sonradan öğleden %2$d dakika öncesine kadar</string>
+    <string name="settings_duha_desc">Güneşten sonra kuşluk (duha) zamanını gösterir: güneş doğduktan yaklaşık %1$d dakika sonradan öğleden yaklaşık %2$d dakika öncesine kadar</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">düzeltilmiş</string>
     <string name="why_times_sunni">Bu vakitler %1$s yöntemiyle hesaplanır; ikindi %2$s mezhebine göredir.</string>

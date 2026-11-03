@@ -535,7 +535,7 @@
     <string name="duha_until">%1$s تک</string>
     <string name="duha_row_a11y">چاشت %1$s سے %2$s تک۔</string>
     <string name="settings_duha">چاشت</string>
-    <string name="settings_duha_desc">طلوعِ آفتاب کے بعد چاشت (ضحیٰ) کا وقت دکھاتا ہے: طلوع کے %1$d منٹ بعد سے ظہر سے %2$d منٹ پہلے تک</string>
+    <string name="settings_duha_desc">طلوعِ آفتاب کے بعد چاشت (ضحیٰ) کا وقت دکھاتا ہے: طلوع کے تقریباً %1$d منٹ بعد سے ظہر سے تقریباً %2$d منٹ پہلے تک</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">تبدیل شدہ</string>
     <string name="why_times_sunni">یہ اوقات %1$s کے مطابق ہیں، اور عصر %2$s کے مطابق۔</string>

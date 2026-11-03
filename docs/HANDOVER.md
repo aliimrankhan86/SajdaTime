@@ -6094,10 +6094,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 1.6.0 is still in review (not live). On `claude/1-7-0`, built overnight and checked on the emulator only: **time left**
 on the Now row ("Until Fajr · 2h 37m", counts only to the next time the list shows, `core/CurrentWindow.kt`),
-**optional Duha row** (off by default, Sunni only, 20 min after sunrise to 15 min before Dhuhr, `core/DuhaWindow.kt`),
+**optional Duha row** (off by default, Sunni only, about 20 min after sunrise to about 10 min before Dhuhr, `core/DuhaWindow.kt`),
 **quiet rows stack name, time, note at 1.5x text and above**, and **"Hear it"** in the two sound dialogs
-(`ui/settings/SoundPreview.kt`). The Isha counting rule, the Duha minutes, the label and Sunni only are PROPOSED and
-wait for Ali's word (religious content). Not built, waiting for his choice: banner free Set location and exact alarm
+(`ui/settings/SoundPreview.kt`). Ali approved the researched answers 3 Nov 2026: after Isha count to midnight (only while the
+night row shows) then Fajr; Duha 20 after sunrise / 10 before Dhuhr (Ibn Uthaymin 15/10, cautious Hanafi 20; 15 before
+Dhuhr rejected, no source); Duha Sunni only (Al-Kafi calls it bid'ah, no Shia app shows it). Sources agree on shape not
+minutes, so Settings says "about". Competitor apps: none counts to midnight, Duha always optional. Notes in Ali's
+private research folder. Label "Duha" and F still his. Not built, waiting for his choice: banner free Set location and exact alarm
 rows, the one row strip widget, a bigger header sky graphic (design specs and mockups are in Ali's private planning
 folder, not in this repo). Not verified: real phone, TalkBack, Urdu RTL, 320dp, dark theme for the preview dialog.
 versionCode is still 10 on this branch; it becomes 11 only when Ali decides to release.

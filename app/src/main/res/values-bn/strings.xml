@@ -560,7 +560,7 @@
     <string name="duha_until">%1$s পর্যন্ত</string>
     <string name="duha_row_a11y">চাশত %1$s থেকে %2$s পর্যন্ত।</string>
     <string name="settings_duha">চাশত</string>
-    <string name="settings_duha_desc">সূর্যোদয়ের পর চাশতের (দুহা) সময় দেখায়: সূর্যোদয়ের %1$d মিনিট পর থেকে যোহরের %2$d মিনিট আগ পর্যন্ত</string>
+    <string name="settings_duha_desc">সূর্যোদয়ের পর চাশতের (দুহা) সময় দেখায়: সূর্যোদয়ের প্রায় %1$d মিনিট পর থেকে যোহরের প্রায় %2$d মিনিট আগ পর্যন্ত</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">সমন্বয় করা</string>
     <string name="why_times_sunni">এই সময়গুলোতে %1$s এবং আসরের জন্য %2$s মাযহাব ব্যবহার করা হয়েছে।</string>

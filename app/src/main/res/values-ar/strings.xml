@@ -627,7 +627,7 @@
     <string name="duha_until">حتى %1$s</string>
     <string name="duha_row_a11y">الضحى من %1$s حتى %2$s.</string>
     <string name="settings_duha">الضحى</string>
-    <string name="settings_duha_desc">تعرض وقت صلاة الضحى بعد الشروق: من %1$d دقيقة بعد الشروق حتى %2$d دقيقة قبل الظهر</string>
+    <string name="settings_duha_desc">تعرض وقت صلاة الضحى بعد الشروق: من نحو %1$d دقيقة بعد الشروق حتى نحو %2$d دقيقة قبل الظهر</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">معدّلة</string>
     <string name="why_times_sunni">تستخدم هذه الأوقات %1$s مع حساب العصر وفق المذهب %2$s.</string>

@@ -5,14 +5,15 @@ import java.time.Instant
 
 /**
  * The Duha window (1.7.0, optional row, off by default, Sunni only). One window, no school table: sources differ
- * by minutes, not by school. PROPOSED minutes, Ali must approve (religious content): start 20 minutes after
- * sunrise, end 15 minutes before Dhuhr (DESIGN-A-B-C-F, B). Alternative B2 is 15 and 10.
+ * by minutes, not by school. minutes approved by Ali 3 Nov 2026 after research: start 20 minutes after
+ * sunrise (cautious Hanafi figure), end 10 minutes before Dhuhr (Ibn Uthaymin). Sources agree on the shape, not the
+ * exact minutes, so Settings says "about". Rejected: 15 before Dhuhr (no source quotes it).
  * Names no ruling and says nothing about "forbidden" times.
  */
 data class DuhaWindow(val start: Instant, val end: Instant) {
     companion object {
         const val START_AFTER_SUNRISE_MINUTES = 20L
-        const val END_BEFORE_DHUHR_MINUTES = 15L
+        const val END_BEFORE_DHUHR_MINUTES = 10L
 
         /** Cut to the minute in the safe direction (later start, earlier end), like night times. Null if it cannot be trusted. */
         fun of(sunrise: Instant?, dhuhr: Instant?, approximated: Boolean = false): DuhaWindow? {

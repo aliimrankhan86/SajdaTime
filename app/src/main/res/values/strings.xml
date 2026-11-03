@@ -766,7 +766,7 @@
     <string name="duha_until">Until %1$s</string>
     <string name="duha_row_a11y">Duha from %1$s until %2$s.</string>
     <string name="settings_duha">Duha</string>
-    <string name="settings_duha_desc">Shows the Duha window (Chasht) after Sunrise: from %1$d minutes after sunrise until %2$d minutes before Dhuhr</string>
+    <string name="settings_duha_desc">Shows the Duha window (Chasht) after Sunrise: from about %1$d minutes after sunrise until about %2$d minutes before Dhuhr</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">adjusted</string>
     <string name="why_times_sunni">These times use %1$s with %2$s Asr.</string>
