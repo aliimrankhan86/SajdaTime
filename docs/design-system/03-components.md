@@ -65,10 +65,12 @@ exists but is never called.
 
 ### Stepper (`StepperRow`, in `settings/SettingsScreen.kt`)
 
-Label (`bodyLarge`, fills), then − (`FilledIconButton`, `ctaIconButtonColors()`, `Icons.Outlined.Remove`),
-the value (`bodyLarge`, 64 wide, centred, polite live region "Dhuhr, +2 min"), then +
+Label (`bodyLarge`, fills) with an optional line under it (`bodySmall`, the prayer's time, "5:50 pm ·
+now 5:53 pm"), then − (`FilledIconButton`, `ctaIconButtonColors()`, `Icons.Outlined.Remove`),
+the value (`bodyLarge`, at least 64 wide and growing, never wraps, centred, polite live region "Dhuhr,
++2 min"), then +
 (`Icons.Outlined.Add`). Buttons 40 drawn, 48 touch, circular. Spoken "Decrease Dhuhr" and "Increase
-Dhuhr". Used for minutes (±30), the date shift (±2), jama'ah minutes (0 to 60 in fives) and fasts (0
+Dhuhr". From 1.5x text the row stacks: label and line on top, the controls centred under them. Used for minutes (±30), the date shift (±2), jama'ah minutes (0 to 60 in fives) and fasts (0
 to 999). iPhone: `Stepper` is allowed, but to match, two filled circular buttons around a value.
 
 ### Close X (`DialogTitle` in `components/Common.kt`, and in `Notice`)

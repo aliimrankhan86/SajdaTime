@@ -291,7 +291,10 @@
     <string name="settings_hijri_offset">Tanggal Hijriah</string>
     <string name="settings_hijri_offset_label">Geser tanggal</string>
     <string name="settings_hijri_offset_help">Tanggal Hijriah di sini adalah hasil perhitungan. Jika masjid Anda melakukan rukyat hilal sendiri, tanggalnya bisa maju atau mundur satu hari. Ini juga menggeser Ramadan dan hari raya.</string>
-    <string name="adjustment_none">—</string>
+    <string name="adjustment_zero_minutes">0 mnt</string>
+    <string name="adjustment_zero_days">0 hari</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">kini %1$s</string>
     <string name="adjustment_minutes">%+d mnt</string>
     <plurals name="adjustment_days">
         <item quantity="other">%+d hari</item>

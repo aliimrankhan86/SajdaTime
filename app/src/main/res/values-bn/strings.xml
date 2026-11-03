@@ -305,7 +305,10 @@
     <string name="settings_hijri_offset_label">তারিখ সরান</string>
     <string name="settings_hijri_offset_help">এখানকার ইসলামি তারিখ হিসাব করা। আপনার মসজিদ স্থানীয়ভাবে চাঁদ দেখলে, এক দিন আগে বা পরে হতে পারে। এতে রমজান ও ঈদও সরে যায়।</string>
     <!-- Shown when a prayer has no correction: the dash glyph, as in every other language. -->
-    <string name="adjustment_none">\u2014</string>
+    <string name="adjustment_zero_minutes">0 মিনিট</string>
+    <string name="adjustment_zero_days">0 দিন</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">এখন %1$s</string>
     <!-- Always signed: "+5 min", "-3 min". The sign is the information. -->
     <string name="adjustment_minutes">%+d মিনিট</string>
     <plurals name="adjustment_days">

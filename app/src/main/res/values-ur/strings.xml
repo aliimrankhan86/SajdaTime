@@ -295,7 +295,10 @@
     <string name="settings_hijri_offset">اسلامی تاریخ</string>
     <string name="settings_hijri_offset_label">تاریخ آگے پیچھے کریں</string>
     <string name="settings_hijri_offset_help">یہاں اسلامی تاریخ حساب سے نکالی گئی ہے۔ اگر آپ کی مسجد مقامی طور پر چاند دیکھتی ہے تو اس میں ایک دن آگے یا پیچھے کا فرق ہو سکتا ہے۔ اس سے رمضان اور عید بھی آگے پیچھے ہو جاتے ہیں۔</string>
-    <string name="adjustment_none">—</string>
+    <string name="adjustment_zero_minutes">0 منٹ</string>
+    <string name="adjustment_zero_days">0 دن</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">اب %1$s</string>
     <string name="adjustment_minutes">%+d منٹ</string>
     <plurals name="adjustment_days">
         <item quantity="one">%+d دن</item>

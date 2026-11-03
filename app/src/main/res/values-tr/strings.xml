@@ -290,7 +290,10 @@
     <string name="settings_hijri_offset">Hicri tarih</string>
     <string name="settings_hijri_offset_label">Tarihi kaydır</string>
     <string name="settings_hijri_offset_help">Buradaki Hicri tarih hesaplanmıştır. Caminiz hilali yerel olarak gözlüyorsa, tarih bir gün ileri ya da geri olabilir. Bu ayar Ramazan\'ı ve bayramları da kaydırır.</string>
-    <string name="adjustment_none">—</string>
+    <string name="adjustment_zero_minutes">0 dk</string>
+    <string name="adjustment_zero_days">0 gün</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">şimdi %1$s</string>
     <string name="adjustment_minutes">%+d dk</string>
     <plurals name="adjustment_days">
         <item quantity="one">%+d gün</item>

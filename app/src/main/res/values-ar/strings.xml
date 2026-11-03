@@ -318,7 +318,10 @@
     <string name="settings_hijri_offset_label">تقديم التاريخ أو تأخيره</string>
     <string name="settings_hijri_offset_help">التاريخ الهجري هنا محسوب. إذا كان مسجدك يتحرّى الهلال محليًا، فقد يختلف بيوم في أي من الاتجاهين. وهذا يغيّر أيضًا موعد رمضان والعيد.</string>
     <!-- Shown when a prayer has no correction. A dash reads faster down a column. -->
-    <string name="adjustment_none">\u2014</string>
+    <string name="adjustment_zero_minutes">0 دقيقة</string>
+    <string name="adjustment_zero_days">0 يوم</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">الآن %1$s</string>
     <!-- Always signed: "+5", "-3". The sign is the information. -->
     <string name="adjustment_minutes">%+d دقيقة</string>
     <plurals name="adjustment_days">

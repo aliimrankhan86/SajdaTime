@@ -35,8 +35,7 @@ spelling**. Plus:
 - **Counts use plurals** resources (Arabic has six forms).
 - Ellipsis "…" in progress lines ("Finding your location…").
 
-Known exceptions in strings: `S:adjustment_none` is "—" on purpose (the "no change" symbol);
-`S:location_permission_denied` says "tap Allow location" (rule breach, recorded).
+Known exceptions in strings: `S:location_permission_denied` says "tap Allow location" (rule breach, recorded).
 
 ## 6.3 Words we never use
 
@@ -62,7 +61,7 @@ Sky names are times of day (Dawn, Day, Evening, Night), never prayer or fasting 
 | Gregorian date | Short weekday, day, short month, no year | Thu 31 Jul |
 | Month heading | Month and year | October 2026 |
 | Hijri date | Day, month name, year | 16 Safar 1448 |
-| Minutes offset | Always signed; none is "—" | +5 min, −3 min |
+| Minutes offset | Always signed; none is "0 min" or "0 days" | +5 min, −3 min |
 | Degrees | Digits with the sign attached | 118° |
 | Distance | km, or miles in the US, UK, Liberia, Myanmar (phone region, never the app language) | About 4,512 km |
 | Digits | Western in every language, including Arabic (`ar-u-nu-latn`) | |

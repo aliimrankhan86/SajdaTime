@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.selection.selectable
@@ -1958,8 +1959,24 @@ private fun AdjustmentsDialog(
         PrayerSlot.entries.forEach { slot ->
             val minutes = adjustments[slot] ?: 0
             val label = slot.label(context)
+            // Calculated time, then "now" the corrected one when it differs: "5:50 pm · now 5:53 pm".
+            // Non breaking spaces keep "3:26 am" and "now 3:26 am" whole, so the line wraps only at the
+            // dot. Each part is bidi isolated: in Urdu the 12 hour clock starts with Latin "PM", which
+            // would otherwise set the whole line left to right and put "now" beside the wrong time.
+            val timeLine = calculated?.get(slot)?.let { at ->
+                val base = TimeFormat.clock(context, at, zone).noBreak().bidiIsolated()
+                if (minutes == 0) base else stringResource(
+                    R.string.settings_value_pair,
+                    base,
+                    stringResource(
+                        R.string.adjustment_now_time,
+                        TimeFormat.clock(context, at.plusSeconds(60L * minutes), zone).noBreak().bidiIsolated(),
+                    ),
+                )
+            }
             StepperRow(
                 label = label,
+                supporting = timeLine,
                 value = minuteLabel(minutes),
                 canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
                 canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
@@ -2169,64 +2186,88 @@ internal fun StepperRow(
     canIncrease: Boolean,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
+    /** A second line under the label, e.g. the prayer's time. */
+    supporting: String? = null,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Space.Tight),
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
-            Icon(
-                Icons.Outlined.Remove,
-                contentDescription = stringResource(R.string.action_decrease, label),
-            )
+    // From 1.5x text the label and its time take the full width and the controls sit under them:
+    // beside the controls "Maghrib" broke mid word and "12:19 pm" onto two lines (emulator, 2x, 3 Nov 2026).
+    val stacked = LocalDensity.current.fontScale >= 1.5f
+    val labelBlock: @Composable (Modifier) -> Unit = { modifier ->
+        Column(modifier) {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            if (supporting != null) {
+                Text(
+                    text = supporting,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
-        // The language's own list comma: "، " in Urdu and Arabic.
-        val separator = stringResource(R.string.list_separator)
-        val spoken = if (value == stringResource(R.string.adjustment_none)) {
-            stringResource(R.string.settings_adjustments_none)
-        } else {
-            value
-        }
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            // Wide enough for "-30 min" so the plus button does not shuffle sideways as
-            // the number grows a digit or loses its sign.
-            modifier = Modifier
-                .width(64.dp)
-                .semantics {
-                    contentDescription = label + separator + spoken
-                    liveRegion = LiveRegionMode.Polite
-                },
-        )
-        FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
-            Icon(
-                Icons.Outlined.Add,
-                contentDescription = stringResource(R.string.action_increase, label),
+    }
+    // The language's own list comma: "، " in Urdu and Arabic.
+    val separator = stringResource(R.string.list_separator)
+    val controls: @Composable (Modifier) -> Unit = { modifier ->
+        Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
+                Icon(
+                    Icons.Outlined.Remove,
+                    contentDescription = stringResource(R.string.action_decrease, label),
+                )
+            }
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                // At least wide enough for "-30 min" so the plus button does not shuffle sideways as
+                // the number grows a digit or loses its sign; it grows with the text size and never
+                // wraps ("0 min" broke onto two lines in a fixed 64dp box at 2x text, 3 Nov 2026).
+                softWrap = false,
+                modifier = Modifier
+                    .padding(horizontal = Space.Related)
+                    .widthIn(min = 64.dp)
+                    .semantics {
+                        contentDescription = label + separator + value
+                        liveRegion = LiveRegionMode.Polite
+                    },
             )
+            FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
+                Icon(
+                    Icons.Outlined.Add,
+                    contentDescription = stringResource(R.string.action_increase, label),
+                )
+            }
+        }
+    }
+    if (stacked) {
+        Column(Modifier.fillMaxWidth().padding(vertical = Space.Tight)) {
+            labelBlock(Modifier.fillMaxWidth())
+            Spacer(Modifier.height(Space.Related))
+            controls(Modifier.fillMaxWidth())
+        }
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(vertical = Space.Tight),
+        ) {
+            labelBlock(Modifier.weight(1f))
+            controls(Modifier)
         }
     }
 }
 
-/** "+5 min", "-3 min", or a dash for no change. */
+private fun String.noBreak() = replace(' ', '\u00A0')
+
+/** "+5 min", "-3 min", or "0 min" for no change. */
 @Composable
 private fun minuteLabel(minutes: Int): String = when {
-    minutes == 0 -> stringResource(R.string.adjustment_none)
+    minutes == 0 -> stringResource(R.string.adjustment_zero_minutes)
     else -> stringResource(R.string.adjustment_minutes, minutes)
 }
 
-/** "+1 day", "-2 days", or a dash. Plural-aware, because Arabic and Urdu are not English. */
+/** "+1 day", "-2 days", or "0 days". Plural-aware, because Arabic and Urdu are not English. */
 @Composable
 private fun dayLabel(days: Int): String = when {
-    days == 0 -> stringResource(R.string.adjustment_none)
+    days == 0 -> stringResource(R.string.adjustment_zero_days)
     else -> pluralStringResource(R.plurals.adjustment_days, abs(days), days)
 }
 

@@ -473,9 +473,12 @@
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>
     <string name="settings_hijri_offset_help">The Islamic date here is calculated. If your mosque sights the moon locally, it can be a day either way. This also moves Ramadan and Eid.</string>
-    <!-- Shown when a prayer has no correction. A dash reads faster down a column of six
-         rows than the word "none" repeated six times. -->
-    <string name="adjustment_none">\u2014</string>
+    <!-- Shown when nothing is adjusted. Owner, 3 Nov 2026: "0 min" and "0 days" say what the
+         number is; the old dash did not. -->
+    <string name="adjustment_zero_minutes">0 min</string>
+    <string name="adjustment_zero_days">0 days</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">now %1$s</string>
     <!-- Always signed: "+5 min", "-3 min". The sign is the information. -->
     <string name="adjustment_minutes">%+d min</string>
     <plurals name="adjustment_days">

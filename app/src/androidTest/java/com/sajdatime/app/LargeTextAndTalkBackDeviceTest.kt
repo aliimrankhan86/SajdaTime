@@ -154,7 +154,7 @@ class LargeTextAndTalkBackDeviceTest {
                 var minutes by remember { mutableIntStateOf(0) }
                 StepperRow(
                     label = "Fajr",
-                    value = if (minutes == 0) stringResource(R.string.adjustment_none) else stringResource(R.string.adjustment_minutes, minutes),
+                    value = if (minutes == 0) stringResource(R.string.adjustment_zero_minutes) else stringResource(R.string.adjustment_minutes, minutes),
                     canDecrease = true,
                     canIncrease = true,
                     onDecrease = { minutes-- },
@@ -163,7 +163,7 @@ class LargeTextAndTalkBackDeviceTest {
             }
         }
         val separator = word(R.string.list_separator)
-        compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.settings_adjustments_none))
+        compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.adjustment_zero_minutes))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
         compose.onNodeWithContentDescription(word(R.string.action_increase, "Fajr")).performClick()
         compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.adjustment_minutes, 1)).assertExists()

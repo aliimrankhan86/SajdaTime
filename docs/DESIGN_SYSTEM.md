@@ -530,7 +530,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque start times | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
 | Settings, Match your mosque start times | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
 | Settings, the clock ("Isha: the Begins time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` |
+| Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` (every `StepperRow`, so also jama'ah minutes and fasts, from 1.5x text stacks: label and time on top, − value + under, centred; value box never wraps) |
 | Settings, Match your mosque start times | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
 | Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
