@@ -211,7 +211,7 @@ class WidgetDeviceTest {
             // The town is wrapped in bidi isolates so it reads right in Urdu; they are not words.
             .filter { it !in '\u2066'..'\u2069' }
         waitFor("the strip's first draw") { spoken().startsWith("London") }
-        save("widget-strip-${tag()}", layoutAt(view, 380, 64))
+        save("widget-strip-${tag()}", layoutAt(view, 380, 86))
 
         val said = spoken()
         assertTrue("the town leads: \"$said\"", said.startsWith("London"))
@@ -240,7 +240,7 @@ class WidgetDeviceTest {
     fun the_next_prayer_widget_shows_the_next_prayer_its_time_and_the_right_context_line() {
         val (_, view) = bindOrFail(NextPrayerWidgetProvider::class.java)
         waitFor("the Next widget's first draw") { view.textOf("widget_name")?.text?.isNotEmpty() == true }
-        save("widget-next-${tag()}", layoutAt(view, 180, 110))
+        save("widget-next-${tag()}", layoutAt(view, 180, 132))
 
         val (state, _) = stateNow()
         val next = state.next!!

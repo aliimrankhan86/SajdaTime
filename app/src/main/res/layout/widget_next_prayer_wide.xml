@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Next prayer widget, wide: from 270 by 150dp on Android 12 and later (WidgetRenderer.NEXT_SIZES).
+  The Next prayer widget, wide: from 270 by 158dp (170, or 192 from 1.1x text, in Urdu, Arabic and Bengali) on Android 12 and later (WidgetRenderer.NEXT_SIZES).
   The small widget's countdown block on the start side (the time on its own line under the name, where
   beside it the name left it no room), and the whole day on the end side, the six rows
   spread over the height. The rows use the Today widget's ids, so one function fills both. Their

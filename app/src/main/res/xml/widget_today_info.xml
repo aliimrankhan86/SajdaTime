@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Today: placed at 4 cells by 4 since the hero countdown design (18 Oct 2026), so a new widget opens on
-  the large layout (date, countdown card, the day; widget_today_large.xml, from 280dp tall). It can
+  the large layout (date, countdown card, the day; widget_today_large.xml, from 300dp tall (324 from 1.1x text; 346 and 374 in Urdu, Arabic and Bengali)). It can
   still be shrunk to the old 4 by 3 minimum, where the compact list takes over (widget_today.xml says
   why that is not 4 by 2). The smallest resize stays the compact list's own minimum, because a
   shorter widget would clip the last rows.

@@ -702,10 +702,10 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
 | Widget | Layout | Shows |
 |---|---|---|
 | Next prayer | small (default, and the only one below Android 12) | glyph, name, time; the countdown at the foot; the day's five bars |
-| Next prayer | wide (from 270 by 150dp) | the small widget's countdown beside the six rows |
+| Next prayer | wide (from 270 by 158dp, or 170 (192 from 1.1x text) in Urdu, Arabic and Bengali) | the small widget's countdown beside the six rows |
 | Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
-| Today | large (from 250 by 280dp, 330dp in Urdu and Arabic; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
-| Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 64dp tall); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 64dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
+| Today | large (from 250 wide by 300dp tall, 324 from 1.1x text, 346 and 374 in Urdu, Arabic and Bengali; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+| Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 86dp tall); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 86dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
 
 - **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
   in dp because it is already three times the body text and a large font setting pushed the prayer
@@ -910,7 +910,7 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   the time, are gone from the prayer rows. Rule: a prayer has one picture on every surface; a new surface reuses these.
 - **3 Nov 2026, polish after an Opus alignment audit (`private/plans/2026-11-next-release/ALIGNMENT-AUDIT.md`), reversing the
   glyph-beside-name widget choice E2.** Glyph above name above time in equal columns, all ten texts one size picked at render
-  (`stripTextSp`, 12sp down to 9sp by measuring), glyphs only when 64dp tall and 300dp wide; Ramadan tiles 16dp corners and
+  (`stripTextSp`, 12sp down to 9sp by measuring), glyphs only when 86dp tall and 300dp wide; Ramadan tiles 16dp corners and
   `Space.Paragraph` padding; Ramadan card text is now only the countdown and "Fast today 12h 37m" (the change from yesterday and
   tomorrow's times were dropped, Ali: too much); every Times row's icon sits in one 21dp box so Sunrise and Midnight align with the
   prayers; the three line Fajr row gets `Space.Tight` vertical padding. Not decided: one icon set for a prayer across tiles, rows and

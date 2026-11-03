@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Today widget, large: from 250 by 280dp on Android 12 and later (WidgetRenderer.TODAY_SIZES), the
+  The Today widget, large: from 250 wide by 300dp tall (324 from 1.1x text; 346 and 374 in Urdu, Arabic and Bengali) on Android 12 and later (WidgetRenderer.TODAY_SIZES), the
   4 by 4 it is placed at by default. The SajdaTime mark with the date and the Hijri date; the countdown
   card (the next prayer, its time, the countdown and the day's five bars); then the six rows, weighted
   to fill. The countdown card uses the Next widget's ids, so one function fills both.
 
-  Measured: the six rows fit at 250 by 280dp at the normal text size. From 130 percent text the large
+  Measured: the six rows fit at 250 by 300dp at the normal text size. From 130 percent text the large
   layout is not used, because the countdown card leaves room for only three rows (WidgetRenderer).
 
   The mark appears here and on the "set your location" state only, never on the small widgets

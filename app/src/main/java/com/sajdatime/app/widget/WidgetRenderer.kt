@@ -72,10 +72,24 @@ internal object WidgetRenderer {
      * day) once it is both wide and tall enough for six rows beside the countdown. The launcher uses
      * the largest entry that fits inside the widget, and the smallest when none does.
      */
-    private val NEXT_SIZES = listOf(SizeF(180f, 110f) to R.layout.widget_next_prayer, SizeF(270f, 150f) to R.layout.widget_next_prayer_wide)
+    // Heights are what the layouts WANT, measured on 3 Nov 2026 with AppWidgetHostView and an unspecified height
+    // (WidgetRenderEvidenceTest, needed_heights): small 131.8dp at normal text (134.9, 140.6, 161.5 at 1.15x, 1.3x, 2.0),
+    // wide 149.0 and 156.2 at 1.15x. The wide entry was 150 and is now 158. The small entry stays 110 ON PURPOSE: it is the
+    // smallest, so the launcher uses it whatever its height, and the widget's minHeight (widget_next_prayer_info.xml) is
+    // 110 because a bigger one makes One UI (two rows are about 158dp) and every launcher below Android 12 open it three
+    // rows tall (Opus review, 3 Nov 2026). So at exactly 110dp the chip and bars are still cut: OPEN, needs Ali (drop the
+    // bars first, not the chip).
+    // Urdu, Arabic and Bengali sit taller (measured the same day): the wide layout wants 165.3dp in Urdu and Arabic and
+    // 188.2 at 1.15x, Bengali 150.9 and 169.9; the small one fits 162 in all three.
+    private fun nextSizes(context: Context): List<Pair<SizeF, Int>> {
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        val grown = context.resources.configuration.fontScale >= 1.1f
+        val wideHeight = if (tall) (if (grown) 192f else 170f) else 158f
+        return listOf(SizeF(180f, 110f) to R.layout.widget_next_prayer, SizeF(270f, wideHeight) to R.layout.widget_next_prayer_wide)
+    }
 
     /**
-     * Today: the compact list from its minimum, the large card (date, countdown, the day) from 280dp
+     * Today: the compact list from its minimum, the large card (date, countdown, the day) from 300dp (see [todaySizes] for the measured heights)
      * tall, which is what the header, the card and six rows need at the normal text size (rendered).
      */
     private fun todaySizes(context: Context): List<Pair<SizeF, Int>> {
@@ -83,7 +97,13 @@ internal object WidgetRenderer {
         // large card at 280dp held four of their six rows, and all six from 330dp. Bengali joined them on
         // 30 Oct 2026: its vowel signs sit above and below the line, so its rows are as tall.
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        return listOf(SizeF(250f, 180f) to R.layout.widget_today, SizeF(250f, if (tall) 330f else 280f) to R.layout.widget_today_large)
+        // Measured 3 Nov 2026 (needed_heights): the large card wants 296dp at normal text and 322dp at 1.15x, since the
+        // 15sp rows and the band's extra room (08bb2b8); the 280dp it used to take clipped the last row. Urdu, Arabic and
+        // Bengali: measured the same day, the large card wants 340.6dp (Urdu), 339.8 (Arabic), 309.0 (Bengali) and 369.9, 365.0,
+        // 336.8 at 1.15x, so 346 and 374 for all three.
+        val grown = context.resources.configuration.fontScale >= 1.1f
+        val largeHeight = if (tall) (if (grown) 374f else 346f) else (if (grown) 324f else 300f)
+        return listOf(SizeF(250f, 180f) to R.layout.widget_today, SizeF(250f, largeHeight) to R.layout.widget_today_large)
     }
 
     private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
@@ -100,7 +120,7 @@ internal object WidgetRenderer {
 
     fun nextPrayer(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        return responsive(forText(context, NEXT_SIZES)) { layout -> nextViews(context, state, now, layout) }
+        return responsive(forText(context, nextSizes(context))) { layout -> nextViews(context, state, now, layout) }
     }
 
     fun today(base: Context, state: WidgetState, now: Instant): RemoteViews {
@@ -117,13 +137,18 @@ internal object WidgetRenderer {
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
     // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
     private val STRIP_SIZES = listOf(
-        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f), SizeF(300f, 150f),
-        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f), SizeF(400f, 150f),
+        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, STRIP_TALL_HEIGHT_DP), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
+        SizeF(400f, 40f), SizeF(400f, STRIP_TALL_HEIGHT_DP), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
     )
     private const val STRIP_GLYPH_WIDTH_DP = 300f
-    private const val STRIP_TALL_HEIGHT_DP = 64f
+    // Measured 3 Nov 2026 (needed_heights): the glyph row wants 72.8dp (77.3 at 1.15x) and the hero tier 124.6dp
+    // (130.3 at 1.15x); they were 64 and 110, which cut the times and the underline off. Seen at 124dp: complete.
+    // The thin tier (40dp) wants 45 to 49.5: it is the floor, so it is still cut when a launcher gives 40 to 45dp.
+    // Urdu and Arabic want 78.9 and 84.2 (1.15x), 139.0 and 146.7, 145.5 and 151.6: so 86, 148 and 152 for every script.
+    private const val STRIP_TALL_HEIGHT_DP = 86f
     private const val STRIP_HALF_WIDTH_DP = 250f
-    private const val STRIP_HERO_HEIGHT_DP = 110f
+    private const val STRIP_HERO_HEIGHT_DP = 148f
+    private const val STRIP_HERO_BIG_DP = 152f
     private const val STRIP_CHIP_WIDTH_DP = 400f
     private const val STRIP_MAX_SP = 12f
     private const val STRIP_MIN_SP = 9f
@@ -248,7 +273,7 @@ internal object WidgetRenderer {
         val views = themedViews(context, state, R.layout.widget_strip)
         val tall = size.height >= STRIP_TALL_HEIGHT_DP
         // Glyph above name above time (Opus audit, 3 Nov 2026: glyph beside the name put the name off the time's axis and
-        // forced per column autosize). Needs 64dp tall and 300dp wide.
+        // forced per column autosize). Needs 86dp tall and 300dp wide (measured: 72.8dp, 77.3 at 1.15x, 84.2 in Urdu).
         val glyphs = tall && size.width >= STRIP_GLYPH_WIDTH_DP
         applyDirection(context, views)
         applyTap(context, views)
@@ -296,7 +321,7 @@ internal object WidgetRenderer {
         if (hero) {
             // The next prayer grows with the widget, so a tall one is not a small line in a big empty box.
             val sp = when {
-                size.height >= 150f -> 28f
+                size.height >= STRIP_HERO_BIG_DP -> 28f
                 size.height >= STRIP_HERO_HEIGHT_DP -> 24f
                 else -> 14f
             }
@@ -304,9 +329,9 @@ internal object WidgetRenderer {
             views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
             // The app's own mark at the top start corner, so the widget still says which app it is (Ali, 3 Nov 2026: a
-            // separate small logo, top left, top right in right to left). Only on the 110dp and 150dp entries at the
+            // separate small logo, top left, top right in right to left). Only on the 148dp and 152dp entries at the
             // normal text size: the Opus review estimated the hero line overflows 300dp with the logo from 1.15x text,
-            // and the thin and 64dp entries have no room. Not yet seen on a screen (emulator strip unreachable).
+            // and the thin and 86dp entries have no room. Seen on 3 Nov 2026 in a render at 300x148 and 300x150 and on the emulator launcher at about 225dp tall.
             val room = size.height >= STRIP_HERO_HEIGHT_DP && context.resources.configuration.fontScale <= 1.0f
             views.setViewVisibility(R.id.widget_corner_logo, if (room) View.VISIBLE else View.GONE)
             views.setTextViewText(R.id.widget_name, next.slot.label(context))

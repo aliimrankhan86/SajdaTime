@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   The Today widget, compact: from its 250 by 180dp minimum, on every launcher below Android 12, and
-  whenever it is shorter than 280dp (WidgetRenderer.TODAY_SIZES). The six times, each with the glyph of
+  whenever it is shorter than 300dp (324 from 1.1x text; 346 and 374 in Urdu, Arabic and Bengali) (WidgetRenderer.TODAY_SIZES). The six times, each with the glyph of
   where the sun is, the next one marked. Rows are weighted, so they spread over whatever height the
   launcher gives instead of stopping a third of the way down (the owner's 1.4.0 screenshot). No header
   here, for the reason the 1.4.0 version gave: at 180dp a header pushed Isha off at a larger font.

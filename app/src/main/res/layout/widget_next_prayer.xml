@@ -2,7 +2,7 @@
 <!--
   The Next prayer widget, small (hero countdown design, 18 Oct 2026; docs/plans/2026-10-widget-redesign/).
   Used from its 180 by 110dp minimum, on every launcher below Android 12, and whenever the widget is
-  shorter than 150dp or narrower than 270dp (WidgetRenderer.NEXT_SIZES).
+  shorter than 158dp (170, or 192 from 1.1x text, in Urdu, Arabic and Bengali) or narrower than 270dp (WidgetRenderer.NEXT_SIZES).
 
   Top: the prayer's glyph, its name and its time. Bottom: the countdown, large and light, then five bars
   for the day's prayers. A weighted spacer between them takes whatever height the launcher gives, so

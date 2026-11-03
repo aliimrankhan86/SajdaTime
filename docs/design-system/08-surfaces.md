@@ -14,9 +14,9 @@ sunrise or midnight.
 
 | Widget | Min size, cells | Layouts | Shows |
 |---|---|---|---|
-| Next prayer | 180 × 110, 3 × 2 | Small (default, the only one below Android 12); wide from 270 × 150 | Glyph, name, time; the countdown; the town chip; five day bars. Wide adds the six rows. Body is the current sky |
-| Today | 250 × 180, 4 × 4 | Compact; large from 250 × 280 (330 in Urdu, Arabic and Bengali) | Six rows with glyphs; large adds the mark, date and Hijri date, and a countdown card |
-| Today strip (new in 1.6) | 250 × 40, 4 × 1 | One layout, ten size entries: 250 × 40, 110 × 40; 300 and 400 wide each at 40, 64, 110 and 150 tall | Five columns; the next prayer, only when still today, has the logo in place of its glyph, bold text and an underline, without a pill; glyphs require at least 64 tall and 300 wide; the chip from 400 wide |
+| Next prayer | 180 × 110, 3 × 2 | Small (default, the only one below Android 12); wide from 270 × 158, or 170 (192 from 1.1x text) in Urdu, Arabic and Bengali (heights measured 3 Nov 2026: small wants 131.8dp, 134.9 at 1.15x, 140.6 at 1.3x and 161.5 at 2.0; wide 149 and 156 at 1.15x) | Glyph, name, time; the countdown; the town chip; five day bars. Wide adds the six rows. Body is the current sky |
+| Today | 250 × 204, 4 × 4 | Compact; large from 250 × 300, or 324 from 1.1x text (346, and 374 from 1.1x text, in Urdu, Arabic and Bengali, measured); measured 296dp and 322dp wanted | Six rows with glyphs; large adds the mark, date and Hijri date, and a countdown card |
+| Today strip (new in 1.6) | 250 × 40, 4 × 1 | One layout, ten size entries: 250 × 40, 110 × 40; 300 and 400 wide each at 40, 86, 148 and 152 tall (measured 3 Nov 2026: glyph row wants 72.8dp, hero tier 124.6dp, big hero 129.5, all +5 at 1.15x and about +15 in Urdu and Arabic; they were 64, 110 and 150 and cut the times and underline off) | Five columns; the next prayer, only when still today, has the logo in place of its glyph, bold text and an underline, without a pill; glyphs require at least 86 tall and 300 wide; the chip from 400 wide |
 
 At 1.3× text each widget keeps its first layout and the strip shows the next prayer alone.
 
@@ -34,8 +34,8 @@ underline. Smaller forms (the strip, compact Today 3x3) use a 4dp underline (`wi
 glance, no added row height: the strip's bar margin dropped from 3dp to 2dp, the compact Today's bar overlays the row) with the same
 logo and bold. Launchers below Android 12 always get the compact Today (underline, glyph kept). The exact size cut-off is confirmed in the widget space pass (task F). Ali also asked for a small app logo in the top
 start corner of the small widgets (top left, top right in right to left) so people remember the app, a separate small mark (Ali chose it over swapping the sun glyph).
-Built only on the strip's 110dp and 150dp entries at normal text size (3 Nov 2026), not yet seen on a screen. The thin and
-64dp entries have no room, and a 90dp entry was tried and dropped: the Opus review put its height over budget from 1.15x
+Built only on the strip's 148dp and 152dp entries at normal text size (3 Nov 2026), not yet seen on a screen. The thin and
+86dp entries have no room, and a 90dp entry was tried and dropped: the Opus review put its height over budget from 1.15x
 text and the hero line over 300dp wide. Next prayer, compact Today and the other small forms have no corner logo yet.
 
 **Type.** Countdown in the system light weight, tabular, sized in dp (36 small Next, 34 wide, 38 large
