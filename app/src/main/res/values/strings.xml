@@ -472,7 +472,6 @@
     <string name="settings_adjustments_reset">Reset all</string>
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>
-    <string name="settings_hijri_offset_help">The Islamic date here is calculated. If your mosque sights the moon locally, it can be a day either way. This also moves Ramadan and Eid.</string>
     <!-- Shown when nothing is adjusted. Owner, 3 Nov 2026: "0 min" and "0 days" say what the
          number is; the old dash did not. -->
     <string name="adjustment_zero_minutes">0 min</string>
@@ -720,12 +719,13 @@
         <item quantity="one">in %d day</item>
         <item quantity="other">in %d days</item>
     </plurals>
-    <string name="dates_footer">Umm al-Qura calendar, with your date shift. Local moon sighting may differ by a day.</string>
+    <string name="dates_footer">Dates follow the Umm al-Qura calendar. If your mosque sights the moon, they can be a day either way. Your shift moves every date here, including Ramadan and Eid.</string>
     <string name="dates_unavailable">Islamic dates are not available for this year.</string>
     <!-- Spoken only, for the date under the city on Times. %1$s is today's Hijri date. -->
     <string name="dates_header_a11y">Islamic dates. Today is %1$s</string>
     <string name="settings_islamic_dates">Islamic dates</string>
     <string name="settings_islamic_dates_desc">Ramadan, the two Eids and other key dates</string>
+    <string name="settings_islamic_dates_shifted">Shifted by %1$s</string>
     <!-- Night times (1.6.0): one dimmed row after Isha on Times. Calculated facts only: no ruling, no act named. -->
     <string name="night_midnight">Islamic midnight</string>
     <string name="night_last_third_from">Last third from %1$s</string>

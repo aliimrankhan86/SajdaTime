@@ -321,7 +321,13 @@ fun SettingsScreen(
                 key = "islamic_dates",
                 icon = Icons.Outlined.Event,
                 title = stringResource(R.string.settings_islamic_dates),
-                subtitle = stringResource(R.string.settings_islamic_dates_desc),
+                // The date shift is shown only once it is not zero, as the Jama'ah row does (ux-lead, 3 Nov 2026): it moved
+                // out of Match your mosque, and a shift set months ago would otherwise be visible only inside the sheet.
+                subtitle = if (settings.hijriOffsetDays == 0) {
+                    stringResource(R.string.settings_islamic_dates_desc)
+                } else {
+                    stringResource(R.string.settings_islamic_dates_shifted, dayLabel(settings.hijriOffsetDays))
+                },
                 onClick = { open = SettingsChooser.ISLAMIC_DATES },
             ),
             // 1.6.0: on for everyone, Times screen only (not the PDF, widgets or watch).

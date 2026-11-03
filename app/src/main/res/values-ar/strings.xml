@@ -316,7 +316,6 @@
     <string name="settings_adjustments_reset">إعادة ضبط الكل</string>
     <string name="settings_hijri_offset">التاريخ الهجري</string>
     <string name="settings_hijri_offset_label">تقديم التاريخ أو تأخيره</string>
-    <string name="settings_hijri_offset_help">التاريخ الهجري هنا محسوب. إذا كان مسجدك يتحرّى الهلال محليًا، فقد يختلف بيوم في أي من الاتجاهين. وهذا يغيّر أيضًا موعد رمضان والعيد.</string>
     <!-- Shown when a prayer has no correction. A dash reads faster down a column. -->
     <string name="adjustment_zero_minutes">0 دقيقة</string>
     <string name="adjustment_zero_days">0 يوم</string>
@@ -570,11 +569,12 @@
         <item quantity="many">بعد %d يومًا</item>
         <item quantity="other">بعد %d يوم</item>
     </plurals>
-    <string name="dates_footer">تقويم أم القرى مع تعديل التاريخ الخاص بك. قد تختلف رؤية الهلال في بلدك بيوم.</string>
+    <string name="dates_footer">التواريخ هنا وفق تقويم أم القرى. إذا كان مسجدك يتحرّى الهلال، فقد تختلف بيوم في أي من الاتجاهين. وتعديلك يغيّر كل تاريخ هنا، بما فيه رمضان والعيد.</string>
     <string name="dates_unavailable">التواريخ الإسلامية غير متاحة لهذه السنة.</string>
     <string name="dates_header_a11y">التواريخ الإسلامية. اليوم %1$s</string>
     <string name="settings_islamic_dates">التواريخ الإسلامية</string>
     <string name="settings_islamic_dates_desc">رمضان والعيدان وتواريخ مهمة أخرى</string>
+    <string name="settings_islamic_dates_shifted">مُعدَّل بمقدار %1$s</string>
     <string name="night_midnight">منتصف الليل الإسلامي</string>
     <string name="night_last_third_from">الثلث الأخير ابتداءً من %1$s</string>
     <string name="night_row_a11y">منتصف الليل الإسلامي %1$s. الثلث الأخير من الليل ابتداءً من %2$s.</string>

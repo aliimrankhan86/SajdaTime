@@ -294,7 +294,6 @@
     <string name="settings_adjustments_reset">سب ری سیٹ کریں</string>
     <string name="settings_hijri_offset">اسلامی تاریخ</string>
     <string name="settings_hijri_offset_label">تاریخ آگے پیچھے کریں</string>
-    <string name="settings_hijri_offset_help">یہاں اسلامی تاریخ حساب سے نکالی گئی ہے۔ اگر آپ کی مسجد مقامی طور پر چاند دیکھتی ہے تو اس میں ایک دن آگے یا پیچھے کا فرق ہو سکتا ہے۔ اس سے رمضان اور عید بھی آگے پیچھے ہو جاتے ہیں۔</string>
     <string name="adjustment_zero_minutes">0 منٹ</string>
     <string name="adjustment_zero_days">0 دن</string>
     <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
@@ -494,11 +493,12 @@
         <item quantity="one">%d دن میں</item>
         <item quantity="other">%d دن میں</item>
     </plurals>
-    <string name="dates_footer">ام القریٰ کیلنڈر، آپ کی تاریخ کی تبدیلی کے ساتھ۔ مقامی رؤیت ہلال میں ایک دن کا فرق ہو سکتا ہے۔</string>
+    <string name="dates_footer">تاریخیں ام القریٰ کیلنڈر کے مطابق ہیں۔ اگر آپ کی مسجد چاند دیکھتی ہے تو ان میں ایک دن آگے یا پیچھے کا فرق ہو سکتا ہے۔ آپ کی تبدیلی یہاں کی ہر تاریخ کو، رمضان اور عید سمیت، آگے پیچھے کر دیتی ہے۔</string>
     <string name="dates_unavailable">اس سال کی اسلامی تاریخیں دستیاب نہیں ہیں۔</string>
     <string name="dates_header_a11y">اسلامی تاریخیں۔ آج %1$s ہے</string>
     <string name="settings_islamic_dates">اسلامی تاریخیں</string>
     <string name="settings_islamic_dates_desc">رمضان، دونوں عیدیں اور دیگر اہم تاریخیں</string>
+    <string name="settings_islamic_dates_shifted">%1$s کی تبدیلی</string>
     <string name="night_midnight">اسلامی آدھی رات</string>
     <string name="night_last_third_from">آخری تہائی %1$s سے</string>
     <string name="night_row_a11y">اسلامی آدھی رات %1$s۔ رات کی آخری تہائی %2$s سے۔</string>

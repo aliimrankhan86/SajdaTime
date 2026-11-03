@@ -303,7 +303,6 @@
     <string name="settings_adjustments_reset">সব আগের মতো করুন</string>
     <string name="settings_hijri_offset">ইসলামি তারিখ</string>
     <string name="settings_hijri_offset_label">তারিখ সরান</string>
-    <string name="settings_hijri_offset_help">এখানকার ইসলামি তারিখ হিসাব করা। আপনার মসজিদ স্থানীয়ভাবে চাঁদ দেখলে, এক দিন আগে বা পরে হতে পারে। এতে রমজান ও ঈদও সরে যায়।</string>
     <!-- Shown when a prayer has no correction: the dash glyph, as in every other language. -->
     <string name="adjustment_zero_minutes">0 মিনিট</string>
     <string name="adjustment_zero_days">0 দিন</string>
@@ -518,12 +517,13 @@
         <item quantity="one">%d দিন পরে</item>
         <item quantity="other">%d দিন পরে</item>
     </plurals>
-    <string name="dates_footer">উম্মুল কুরা ক্যালেন্ডার, আপনার তারিখ সরানোসহ। স্থানীয়ভাবে চাঁদ দেখায় এক দিনের পার্থক্য হতে পারে।</string>
+    <string name="dates_footer">তারিখগুলো উম্মুল কুরা ক্যালেন্ডার অনুসারে। আপনার মসজিদ চাঁদ দেখলে, এক দিন আগে বা পরে হতে পারে। আপনার সরানো এখানকার প্রতিটি তারিখ সরায়, রমজান ও ঈদসহ।</string>
     <string name="dates_unavailable">এই বছরের ইসলামি তারিখ পাওয়া যাচ্ছে না।</string>
     <!-- Spoken only, for the date under the city on Times. -->
     <string name="dates_header_a11y">ইসলামি তারিখ। আজ %1$s</string>
     <string name="settings_islamic_dates">ইসলামি তারিখ</string>
     <string name="settings_islamic_dates_desc">রমজান, দুই ঈদ ও অন্যান্য গুরুত্বপূর্ণ তারিখ</string>
+    <string name="settings_islamic_dates_shifted">সরানো হয়েছে: %1$s</string>
     <string name="night_midnight">ইসলামি মধ্যরাত</string>
     <string name="night_last_third_from">শেষ তৃতীয়াংশ %1$s থেকে</string>
     <string name="night_row_a11y">ইসলামি মধ্যরাত %1$s। রাতের শেষ তৃতীয়াংশ %2$s থেকে।</string>

@@ -144,22 +144,9 @@ fun IslamicDatesSheet(today: LocalDate, offsetDays: Int, sect: Sect, onSetOffset
                 }
             }
             Spacer(Modifier.height(Space.Group))
-            Text(
-                text = stringResource(R.string.dates_footer),
-                style = MaterialTheme.typography.bodySmall,
-                color = scheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 8.dp),
-            )
-            Spacer(Modifier.height(Space.Group))
             // The date shift lives here, with the dates it moves (Ali, 3 Nov 2026; Muslim Pro and Al Adhan
-            // do the same), not in "Match your mosque start times".
-            Text(
-                text = stringResource(R.string.settings_hijri_offset_help),
-                style = MaterialTheme.typography.bodySmall,
-                color = scheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 8.dp),
-            )
-            Spacer(Modifier.height(Space.Related))
+            // do the same), not in "Match your mosque start times". The stepper first, one note under it
+            // (ux-lead, 3 Nov 2026: the control the user came for sits under the list it moves).
             Box(Modifier.padding(horizontal = 8.dp)) {
                 StepperRow(
                     label = stringResource(R.string.settings_hijri_offset_label),
@@ -170,6 +157,13 @@ fun IslamicDatesSheet(today: LocalDate, offsetDays: Int, sect: Sect, onSetOffset
                     onIncrease = { onSetOffset(offsetDays + 1) },
                 )
             }
+            Spacer(Modifier.height(Space.Related))
+            Text(
+                text = stringResource(R.string.dates_footer),
+                style = MaterialTheme.typography.bodySmall,
+                color = scheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 8.dp),
+            )
         }
     }
 }

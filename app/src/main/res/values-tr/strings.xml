@@ -289,7 +289,6 @@
     <string name="settings_adjustments_reset">Tümünü sıfırla</string>
     <string name="settings_hijri_offset">Hicri tarih</string>
     <string name="settings_hijri_offset_label">Tarihi kaydır</string>
-    <string name="settings_hijri_offset_help">Buradaki Hicri tarih hesaplanmıştır. Caminiz hilali yerel olarak gözlüyorsa, tarih bir gün ileri ya da geri olabilir. Bu ayar Ramazan\'ı ve bayramları da kaydırır.</string>
     <string name="adjustment_zero_minutes">0 dk</string>
     <string name="adjustment_zero_days">0 gün</string>
     <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
@@ -488,11 +487,12 @@
         <item quantity="one">%d gün sonra</item>
         <item quantity="other">%d gün sonra</item>
     </plurals>
-    <string name="dates_footer">Ümmü\'l Kurâ takvimi, tarih kaydırmanızla. Yerel hilal gözlemi bir gün farklı olabilir.</string>
+    <string name="dates_footer">Tarihler Ümmü\'l Kurâ takvimine göredir. Caminiz hilali gözlüyorsa, tarihler bir gün ileri ya da geri olabilir. Kaydırmanız buradaki her tarihi, Ramazan ve bayramlar dahil, kaydırır.</string>
     <string name="dates_unavailable">Bu yıl için İslami tarihler gösterilemiyor.</string>
     <string name="dates_header_a11y">İslami tarihler. Bugün %1$s</string>
     <string name="settings_islamic_dates">İslami tarihler</string>
     <string name="settings_islamic_dates_desc">Ramazan, iki bayram ve diğer önemli günler</string>
+    <string name="settings_islamic_dates_shifted">%1$s kaydırıldı</string>
     <string name="night_midnight">İslami gece yarısı</string>
     <string name="night_last_third_from">Son üçte bir başlangıcı: %1$s</string>
     <string name="night_row_a11y">İslami gece yarısı %1$s. Gecenin son üçte birinin başlangıcı: %2$s.</string>

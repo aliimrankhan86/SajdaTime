@@ -290,7 +290,6 @@
     <string name="settings_adjustments_reset">Atur ulang semua</string>
     <string name="settings_hijri_offset">Tanggal Hijriah</string>
     <string name="settings_hijri_offset_label">Geser tanggal</string>
-    <string name="settings_hijri_offset_help">Tanggal Hijriah di sini adalah hasil perhitungan. Jika masjid Anda melakukan rukyat hilal sendiri, tanggalnya bisa maju atau mundur satu hari. Ini juga menggeser Ramadan dan hari raya.</string>
     <string name="adjustment_zero_minutes">0 mnt</string>
     <string name="adjustment_zero_days">0 hari</string>
     <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
@@ -479,11 +478,12 @@
     <plurals name="dates_in_days">
         <item quantity="other">%d hari lagi</item>
     </plurals>
-    <string name="dates_footer">Kalender Umm al Qura, dengan penggeseran tanggal Anda. Rukyat hilal setempat bisa berbeda satu hari.</string>
+    <string name="dates_footer">Tanggal mengikuti kalender Umm al Qura. Jika masjid Anda melakukan rukyat hilal, tanggalnya bisa maju atau mundur satu hari. Penggeseran Anda menggeser setiap tanggal di sini, termasuk Ramadan dan hari raya.</string>
     <string name="dates_unavailable">Tanggal Islam tidak tersedia untuk tahun ini.</string>
     <string name="dates_header_a11y">Tanggal Islam. Hari ini %1$s</string>
     <string name="settings_islamic_dates">Tanggal Islam</string>
     <string name="settings_islamic_dates_desc">Ramadan, dua hari raya, dan tanggal penting lainnya</string>
+    <string name="settings_islamic_dates_shifted">Digeser %1$s</string>
     <string name="night_midnight">Tengah malam Islam</string>
     <string name="night_last_third_from">Sepertiga malam terakhir mulai %1$s</string>
     <string name="night_row_a11y">Tengah malam Islam %1$s. Sepertiga malam terakhir mulai %2$s.</string>
