@@ -146,6 +146,7 @@ fun HomeScreen(
     onDismissRamadanNotice: (hijriYear: Int) -> Unit,
     onDismissEid: (code: Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetHijriOffset: (Int) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
     /** A user's tap on a prayer's bell: the prayer and whether it is now on (MainScaffold shows the message). */
@@ -289,7 +290,7 @@ fun HomeScreen(
             state = state,
             onOpenInfo = { ramadanInfo = true },
             onOpenTimetable = { timetable = true },
-            onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
+            onShiftDate = { onOpenSetting(SettingsChooser.ISLAMIC_DATES) },
             onDismissNotice = onDismissRamadanNotice,
         )
         NotificationsBanner(visible = notificationsWarning, onAllow = onAllowNotifications, onDismiss = onDismissNotificationsNotice)
@@ -338,7 +339,7 @@ fun HomeScreen(
             onDismiss = { ramadanInfo = false },
             onOpenDateShift = {
                 ramadanInfo = false
-                onOpenSetting(SettingsChooser.ADJUSTMENTS)
+                onOpenSetting(SettingsChooser.ISLAMIC_DATES)
             },
             onHideCard = {
                 ramadanInfo = false
@@ -358,7 +359,7 @@ fun HomeScreen(
                 onExport = { exportSheet = true },
                 onShiftDate = {
                     timetable = false
-                    onOpenSetting(SettingsChooser.ADJUSTMENTS)
+                    onOpenSetting(SettingsChooser.ISLAMIC_DATES)
                 },
                 onDismiss = { timetable = false },
             )
@@ -378,10 +379,7 @@ fun HomeScreen(
             today = state.today?.date ?: state.now.atZone(ZoneId.systemDefault()).toLocalDate(),
             offsetDays = state.settings.calculationPrefs.hijriOffset,
             sect = state.settings.sect,
-            onShiftDate = {
-                islamicDates = false
-                onOpenSetting(SettingsChooser.ADJUSTMENTS)
-            },
+            onSetOffset = onSetHijriOffset,
             onDismiss = { islamicDates = false },
         )
     }

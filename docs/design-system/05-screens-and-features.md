@@ -74,7 +74,7 @@ Top to bottom:
 | Surface | File | Content |
 |---|---|---|
 | Location sheet | `ui/components/Common.kt` | "Your location", body; "Use my current location"; "Or type where you are", a field with an example, "Find place" once text is typed; spinners while working. Closes when a location lands |
-| Islamic dates sheet | `ui/home/IslamicDatesSheet.kt` | "Islamic dates", "Today is 12 Jumada al-Ula 1448", a card of upcoming dates soonest first with "Today", "Tomorrow" or "in 12 days"; six shared dates plus five for Shia users only; footer on the calendar; "Shift the date" |
+| Islamic dates sheet | `ui/home/IslamicDatesSheet.kt` | "Islamic dates", "Today is 12 Jumada al-Ula 1448", a card of upcoming dates soonest first with "Today", "Tomorrow" or "in 12 days"; six shared dates plus five for Shia users only; footer on the calendar; its note and a "Shift the date" stepper (moved here from Match your mosque, 3 Nov 2026) |
 | Timetable sheet | `ui/home/TimetableSheet.kt` | "Timetable" with the X, place and "Approximate area", compact "Save as PDF"; this month and next as day cards (today in `primaryContainer` with a Today pill), sticky month headings, opens at today |
 | Ramadan timetable | `ui/home/RamadanTimetableSheet.kt` | "Ramadan 1448", a table: Day, Date, Suhoor ends, Iftar, Fast; today highlighted and bold; notes; "Shift the date" |
 | Save your timetable | `ui/home/HomeScreen.kt` | Today only, The next 7 days, This whole month, Ramadan (from 30 days before). Saves to Downloads on Android 10+, else the share sheet |

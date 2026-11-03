@@ -308,7 +308,6 @@
         <item quantity="one">%d نماز میں تبدیلی</item>
         <item quantity="other">%d نمازوں میں تبدیلی</item>
     </plurals>
-    <string name="adjustment_summary_hijri">تاریخ %1$s</string>
     <!-- Quoted so Android keeps the trailing space. -->
     <string name="list_separator">"، "</string>
     <string name="action_decrease">%1$s کم کریں</string>

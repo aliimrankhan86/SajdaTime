@@ -521,6 +521,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Timetable sheet | Save as PDF (PDF icon), end of the place line under the title | A, compact | 40 drawn, 48 target, wraps | `TimetableSheet.kt` |
 | Timetable sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TimetableSheet.kt`, `Common.kt` |
 | Ramadan timetable | Save as PDF moves to the place line; the X alone at the top end (shared header) | A, compact; D | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |
+| Islamic dates sheet | − and + for the date shift (via `StepperRow`), under its note | C | 40 visual, 48 target | `IslamicDatesSheet.kt` |
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
@@ -530,7 +531,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Match your mosque start times | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
 | Settings, Match your mosque start times | Choose a calculation method, under a prayer at the 30 minute limit or whose board time was too far, 8dp under the note | A | 52, full | `SettingsScreen.kt` |
 | Settings, the clock ("Isha: the Begins time on your mosque's board") | Set time; the X | A; D | 52, full | `SettingsScreen.kt` |
-| Settings, Match your mosque start times | − and + for six times and the date | C | 40 visual, 48 target | `SettingsScreen.kt` (every `StepperRow`, so also jama'ah minutes and fasts, from 1.5x text stacks: label and time on top, − value + under, centred; value box never wraps) |
+| Settings, Match your mosque start times | − and + for six times (the date shift moved to the Islamic dates sheet on 3 Nov 2026: one more stepper there, under its note) | C | 40 visual, 48 target | `SettingsScreen.kt` (every `StepperRow`, so also jama'ah minutes and fasts, from 1.5x text stacks: label and time on top, − value + under, centred; value box never wraps) |
 | Settings, Match your mosque start times | Reset all, once something is adjusted: **its own row, full width (so centred)**, 24dp under the steppers | A | 52, full | `SettingsScreen.kt` |
 | Settings, every chooser and info dialog | Close, Got it, and the X | E, D | | `SettingsScreen.kt` |
 | Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
@@ -553,7 +554,6 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Jama'ah times (1.6.0) | Each prayer and Jumu'ah is a Settings-style row with a chevron, not a button; a time outside its prayer gets an amber Notice under its row (before, after, Fajr after sunrise, Jumu'ah's own two); while the phone is in another time zone from the one the times were typed in, one quiet Notice (`Icons.Rounded.Public`, brief and Details) at the top instead, no "Today" lines and no amber (step 7, 25 Oct 2026) | Row | 56 | `SettingsScreen.kt` |
 | Settings, a prayer's jama'ah | Off, A fixed time (opens the clock, "Asr: the jama'ah time on your mosque's board"), Minutes after it begins (radio rows); − and + in fives, 0 to 60, value is the number alone | radio; C | 48; 40 visual, 48 target | `SettingsScreen.kt` |
 | Times, header (1.6.0) | The date line under the city, Hijri half in primary; opens Islamic dates. A 48dp text target, not a button, and no caret | Text target | 48 target | `HomeScreen.kt` |
-| Islamic dates sheet | Shift the date, alone under the footer | A | 52, full | `IslamicDatesSheet.kt` |
 | Settings, Delete your prayer record? | Delete; the X. Solid green like every action: there is no error role, the words carry the warning | A; D | 52, full | `SettingsScreen.kt` |
 
 Not buttons, and not to be turned into buttons without asking (§0.2): Settings rows (the whole row

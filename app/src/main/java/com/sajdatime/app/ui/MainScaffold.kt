@@ -294,6 +294,7 @@ fun MainScaffold(
                         onDismissRamadanNotice = onDismissRamadanNotice,
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
+                        onSetHijriOffset = onSetHijriOffset,
                         onOpenSetting = openSetting,
                         onBell = onBell,
                         snapBell = undoneBell,

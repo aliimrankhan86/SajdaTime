@@ -1,6 +1,5 @@
 package com.sajdatime.app.ui.settings
 
-import androidx.annotation.VisibleForTesting
 import com.sajdatime.app.ui.components.ctaIconButtonColors
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
@@ -313,7 +312,7 @@ fun SettingsScreen(
                 key = "adjustments",
                 icon = Icons.Outlined.MoreTime,
                 title = stringResource(R.string.settings_adjustments),
-                subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
+                subtitle = adjustmentSummary(settings.adjustments),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
             ),
             // 1.6.0: the same sheet the date under the city opens, here for anyone who looks in
@@ -761,10 +760,8 @@ fun SettingsScreen(
             }
             AdjustmentsDialog(
                 adjustments = settings.adjustments,
-                hijriOffsetDays = settings.hijriOffsetDays,
                 calculated = calculated,
                 onSetAdjustment = onSetAdjustment,
-                onSetHijriOffset = onSetHijriOffset,
                 onReset = onResetAdjustments,
                 // One state variable holds the open chooser, so this closes this dialog as it
                 // opens the method list: the user is moved on, not stacked.
@@ -784,8 +781,7 @@ fun SettingsScreen(
             today = state.today?.date ?: LocalDate.now(),
             offsetDays = settings.calculationPrefs.hijriOffset,
             sect = settings.sect,
-            // One chooser open at a time: the sheet makes way for the date shift.
-            onShiftDate = { open = SettingsChooser.ADJUSTMENTS },
+            onSetOffset = onSetHijriOffset,
             onDismiss = { open = null },
         )
 
@@ -1904,12 +1900,17 @@ private fun rememberRingtoneTitle(uri: String): String? {
 }
 
 /**
- * "Match your mosque": the per-prayer corrections and the Hijri date shift, in one place.
+ * "Match your mosque": the per-prayer corrections.
  *
- * They are one dialog rather than two rows because from where the user is standing they
- * answer one question — *my mosque says something different* — and splitting them would
- * make someone decide, before they had any information, whether their disagreement was
- * about minutes or about days.
+ * Until 3 Nov 2026 the Hijri date shift lived here too, on the argument that from where the user is
+ * standing both answer "my mosque says something different" and that asking them to choose between
+ * minutes and days first was unfair. Ali reversed that: Muslim Pro and Al Adhan keep the date shift with
+ * the dates, so it now sits at the foot of the Islamic dates sheet ([IslamicDatesSheet]) and every
+ * "Shift the date" button routes there. What was given up: the date shift is no longer visible from this
+ * dialog or its Settings summary. Do not move it back without asking him.
+ *
+ * Under each prayer is its calculated time and, once adjusted, "now" the corrected one, so a board time
+ * can be compared without leaving the dialog.
  *
  * Steppers rather than a text field or a slider. A field invites "12:45" into a box that
  * wants "5" and needs validation, an error state and a keyboard; a slider cannot be landed
@@ -1921,11 +1922,9 @@ private fun rememberRingtoneTitle(uri: String): String? {
 @Composable
 private fun AdjustmentsDialog(
     adjustments: Map<PrayerSlot, Int>,
-    hijriOffsetDays: Int,
     /** Today's uncorrected times, or null before there is a location to calculate for. */
     calculated: Map<PrayerSlot, Instant>?,
     onSetAdjustment: (PrayerSlot, Int) -> Unit,
-    onSetHijriOffset: (Int) -> Unit,
     onReset: () -> Unit,
     onChooseMethod: () -> Unit,
     onDismiss: () -> Unit,
@@ -1994,33 +1993,13 @@ private fun AdjustmentsDialog(
             }
         }
 
-        HorizontalDivider(Modifier.padding(vertical = Space.Related))
-        SectionLabel(stringResource(R.string.settings_hijri_offset))
-        Text(
-            text = stringResource(R.string.settings_hijri_offset_help),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = Space.Group),
-        )
-        StepperRow(
-            label = stringResource(R.string.settings_hijri_offset_label),
-            value = dayLabel(hijriOffsetDays),
-            canDecrease = hijriOffsetDays > -CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
-            canIncrease = hijriOffsetDays < CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
-            onDecrease = { onSetHijriOffset(hijriOffsetDays - 1) },
-            onIncrease = { onSetHijriOffset(hijriOffsetDays + 1) },
-        )
-
-        if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
+        if (adjustments.isNotEmpty()) {
             // Its own row, full width (so centred), a Section below the steppers it resets: the
             // owner asked for it wider and easier to press (18 Oct 2026). Full width is also the
             // DESIGN_SYSTEM 4.1 rule for a button alone on its line.
             Spacer(Modifier.height(Space.Section))
             CtaButton(
-                onClick = {
-                    onReset()
-                    onSetHijriOffset(0)
-                },
+                onClick = onReset,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_adjustments_reset))
@@ -2178,7 +2157,6 @@ private fun TimeEntryDialog(
  * tap, so that is accepted (independent review, 19 Oct 2026).
  */
 @Composable
-@VisibleForTesting
 internal fun StepperRow(
     label: String,
     value: String,
@@ -2266,26 +2244,15 @@ private fun minuteLabel(minutes: Int): String = when {
 
 /** "+1 day", "-2 days", or "0 days". Plural-aware, because Arabic and Urdu are not English. */
 @Composable
-private fun dayLabel(days: Int): String = when {
+internal fun dayLabel(days: Int): String = when {
     days == 0 -> stringResource(R.string.adjustment_zero_days)
     else -> pluralStringResource(R.plurals.adjustment_days, abs(days), days)
 }
 
 /** The settings-row summary: what is set, without opening the dialog. */
 @Composable
-private fun adjustmentSummary(adjustments: Map<PrayerSlot, Int>, hijriOffsetDays: Int): String {
-    val parts = buildList {
-        val count = adjustments.count { it.value != 0 }
-        if (count > 0) add(pluralStringResource(R.plurals.adjustment_summary_times, count, count))
-        if (hijriOffsetDays != 0) {
-            add(
-                stringResource(
-                    R.string.adjustment_summary_hijri,
-                    pluralStringResource(R.plurals.adjustment_days, abs(hijriOffsetDays), hijriOffsetDays),
-                ),
-            )
-        }
-    }
-    return if (parts.isEmpty()) stringResource(R.string.settings_adjustments_none)
-    else parts.joinToString(stringResource(R.string.list_separator))
+private fun adjustmentSummary(adjustments: Map<PrayerSlot, Int>): String {
+    val count = adjustments.count { it.value != 0 }
+    return if (count == 0) stringResource(R.string.settings_adjustments_none)
+    else pluralStringResource(R.plurals.adjustment_summary_times, count, count)
 }

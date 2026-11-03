@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.home
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,9 +32,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.app.notify.TimeFormat
-import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.settings.StepperRow
+import com.sajdatime.app.ui.settings.dayLabel
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.sajdaSurface
+import com.sajdatime.core.CalculationPrefs
 import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.IslamicDates
 import com.sajdatime.core.IslamicDay
@@ -49,14 +52,15 @@ import java.time.temporal.ChronoUnit
  * dates merged in by date, with no heading (Q21). No fast tags, no ruling.
  *
  * Built on [IslamicDates], which is built on the header's own calendar and the user's date shift, so
- * the sheet cannot name a different day from the header. "Shift the date" is the one button, because
+ * the sheet cannot name a different day from the header. "Shift the date" is the one stepper, because
  * a mosque that sighted the moon locally is the one reason any of these dates would be wrong.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun IslamicDatesSheet(today: LocalDate, offsetDays: Int, sect: Sect, onShiftDate: () -> Unit, onDismiss: () -> Unit) {
+fun IslamicDatesSheet(today: LocalDate, offsetDays: Int, sect: Sect, onSetOffset: (Int) -> Unit, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val scheme = MaterialTheme.colorScheme
+    // ponytail: no dates (outside the calendar table) also means no stepper; unreachable in range.
     val dates = remember(today, offsetDays, sect) { IslamicDates.upcoming(today, offsetDays, sect) }
     // At 320dp and 2.0 text the count measured first and left the title under 90dp, so "Ramadan" broke
     // mid word; a weight or max width on the count would break "107" instead. So from 1.5 (Android's
@@ -147,8 +151,24 @@ fun IslamicDatesSheet(today: LocalDate, offsetDays: Int, sect: Sect, onShiftDate
                 modifier = Modifier.padding(horizontal = 8.dp),
             )
             Spacer(Modifier.height(Space.Group))
-            CtaButton(onClick = onShiftDate, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.settings_hijri_offset_label))
+            // The date shift lives here, with the dates it moves (Ali, 3 Nov 2026; Muslim Pro and Al Adhan
+            // do the same), not in "Match your mosque start times".
+            Text(
+                text = stringResource(R.string.settings_hijri_offset_help),
+                style = MaterialTheme.typography.bodySmall,
+                color = scheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 8.dp),
+            )
+            Spacer(Modifier.height(Space.Related))
+            Box(Modifier.padding(horizontal = 8.dp)) {
+                StepperRow(
+                    label = stringResource(R.string.settings_hijri_offset_label),
+                    value = dayLabel(offsetDays),
+                    canDecrease = offsetDays > -CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+                    canIncrease = offsetDays < CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
+                    onDecrease = { onSetOffset(offsetDays - 1) },
+                    onIncrease = { onSetOffset(offsetDays + 1) },
+                )
             }
         }
     }

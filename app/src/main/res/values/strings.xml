@@ -489,12 +489,11 @@
         <item quantity="one">%d prayer adjusted</item>
         <item quantity="other">%d prayers adjusted</item>
     </plurals>
-    <string name="adjustment_summary_hijri">Date %1$s</string>
     <!-- Joins the two halves of the summary line. Quoted because Android strips leading
          and trailing whitespace from an unquoted string resource, which silently turned
-         "2 prayers adjusted, Date +1 day" into "...adjusted,Date +1 day" on screen. -->
+         a joined summary into "...adjusted,Date +1 day" on screen. -->
     <string name="list_separator">", "</string>
-    <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->
+    <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name or "Shift the date". -->
     <string name="action_decrease">Decrease %1$s</string>
     <string name="action_increase">Increase %1$s</string>
     <!-- Header line of a prayer alert whose time was projected from another latitude,

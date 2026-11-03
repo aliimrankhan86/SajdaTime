@@ -303,7 +303,6 @@
         <item quantity="one">%d vakit ayarlandı</item>
         <item quantity="other">%d vakit ayarlandı</item>
     </plurals>
-    <string name="adjustment_summary_hijri">Tarih %1$s</string>
     <string name="list_separator">", "</string>
     <string name="action_decrease">%1$s: azalt</string>
     <string name="action_increase">%1$s: artır</string>

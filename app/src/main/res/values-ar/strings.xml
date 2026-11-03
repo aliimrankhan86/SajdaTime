@@ -340,7 +340,6 @@
         <item quantity="many">%d صلاةً معدّلة</item>
         <item quantity="other">%d صلاة معدّلة</item>
     </plurals>
-    <string name="adjustment_summary_hijri">التاريخ %1$s</string>
     <!-- Quoted so Android keeps the trailing space. Arabic comma. -->
     <string name="list_separator">"، "</string>
     <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->

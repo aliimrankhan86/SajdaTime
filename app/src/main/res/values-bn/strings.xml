@@ -319,7 +319,6 @@
         <item quantity="one">%dটি নামাজে পরিবর্তন</item>
         <item quantity="other">%dটি নামাজে পরিবর্তন</item>
     </plurals>
-    <string name="adjustment_summary_hijri">তারিখ %1$s</string>
     <!-- Quoted so Android keeps the trailing space. -->
     <string name="list_separator">", "</string>
     <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->

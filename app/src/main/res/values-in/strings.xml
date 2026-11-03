@@ -302,7 +302,6 @@
     <plurals name="adjustment_summary_times">
         <item quantity="other">%d waktu salat disesuaikan</item>
     </plurals>
-    <string name="adjustment_summary_hijri">Tanggal %1$s</string>
     <string name="list_separator">", "</string>
     <string name="action_decrease">Kurangi %1$s</string>
     <string name="action_increase">Tambah %1$s</string>
