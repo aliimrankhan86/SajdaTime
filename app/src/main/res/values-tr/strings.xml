@@ -509,6 +509,21 @@
     <string name="night_row_a11y">İslami gece yarısı %1$s. Gecenin son üçte birinin başlangıcı: %2$s.</string>
     <string name="settings_night_times">Gece vakitleri</string>
     <string name="settings_night_times_desc">Yatsının altında İslami gece yarısını ve gecenin son üçte birini gösterir</string>
+    <string name="current_until">%1$s için %2$s kaldı</string>
+    <string name="current_row_a11y">%1$s, şimdiki namaz, %2$s, %3$s için %4$s kaldı</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="one">%d saat</item>
+        <item quantity="other">%d saat</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="one">%d dakika</item>
+        <item quantity="other">%d dakika</item>
+    </plurals>
+    <string name="duha_row">Kuşluk</string>
+    <string name="duha_until">%1$s saatine kadar</string>
+    <string name="duha_row_a11y">Kuşluk %1$s ile %2$s arası.</string>
+    <string name="settings_duha">Kuşluk</string>
+    <string name="settings_duha_desc">Güneşten sonra kuşluk (duha) zamanını gösterir: güneş doğduktan %1$d dakika sonradan öğleden %2$d dakika öncesine kadar</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">düzeltilmiş</string>
     <string name="why_times_sunni">Bu vakitler %1$s yöntemiyle hesaplanır; ikindi %2$s mezhebine göredir.</string>

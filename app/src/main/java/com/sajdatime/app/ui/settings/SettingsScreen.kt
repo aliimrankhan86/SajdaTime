@@ -43,6 +43,8 @@ import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.WbSunny
+import com.sajdatime.core.DuhaWindow
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
@@ -190,6 +192,7 @@ fun SettingsScreen(
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
     onSetNightTimes: (Boolean) -> Unit,
+    onSetDuha: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
@@ -257,7 +260,7 @@ fun SettingsScreen(
     val prayerTimes = SettingsSection(
         SettingsSectionId.PRAYER_TIMES,
         stringResource(R.string.settings_group_prayer_times),
-        listOf(
+        listOfNotNull(
             SettingsItem.Link(
                 key = "location",
                 icon = Icons.Outlined.LocationOn,
@@ -330,6 +333,21 @@ fun SettingsScreen(
                 checked = settings.nightTimesEnabled,
                 onCheckedChange = onSetNightTimes,
             ),
+            // 1.7.0: the optional Duha row. Off by default and Sunni only: classical Shia scholars hold it is not
+            // legislated, so showing the row would be the app taking a side (Fable, DESIGN-A-B-C-F, B).
+            // iPhone: carries over (SF Symbol sun.max).
+            SettingsItem.Toggle(
+                key = "duha",
+                icon = Icons.Outlined.WbSunny,
+                title = stringResource(R.string.settings_duha),
+                subtitle = stringResource(
+                    R.string.settings_duha_desc,
+                    DuhaWindow.START_AFTER_SUNRISE_MINUTES.toInt(),
+                    DuhaWindow.END_BEFORE_DHUHR_MINUTES.toInt(),
+                ),
+                checked = settings.duhaEnabled,
+                onCheckedChange = onSetDuha,
+            ).takeIf { settings.sect == Sect.SUNNI },
         ),
     )
 

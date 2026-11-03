@@ -498,6 +498,19 @@
     <string name="night_row_a11y">Tengah malam Islam %1$s. Sepertiga malam terakhir mulai %2$s.</string>
     <string name="settings_night_times">Waktu malam</string>
     <string name="settings_night_times_desc">Menampilkan tengah malam Islam dan sepertiga malam terakhir di bawah Isya</string>
+    <string name="current_until">Sampai %1$s · %2$s</string>
+    <string name="current_row_a11y">%1$s, salat saat ini, %2$s, sampai %3$s, %4$s</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="other">%d jam</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="other">%d menit</item>
+    </plurals>
+    <string name="duha_row">Duha</string>
+    <string name="duha_until">Sampai %1$s</string>
+    <string name="duha_row_a11y">Duha dari %1$s sampai %2$s.</string>
+    <string name="settings_duha">Duha</string>
+    <string name="settings_duha_desc">Menampilkan waktu Duha (Dhuha) setelah Syuruq: dari %1$d menit setelah matahari terbit sampai %2$d menit sebelum Zuhur</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">disesuaikan</string>
     <string name="why_times_sunni">Waktu ini memakai %1$s dengan Asar menurut mazhab %2$s.</string>

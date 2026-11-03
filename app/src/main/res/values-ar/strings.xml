@@ -599,6 +599,29 @@
     <string name="night_row_a11y">منتصف الليل الإسلامي %1$s. الثلث الأخير من الليل ابتداءً من %2$s.</string>
     <string name="settings_night_times">أوقات الليل</string>
     <string name="settings_night_times_desc">تعرض منتصف الليل الإسلامي والثلث الأخير من الليل أسفل العشاء</string>
+    <string name="current_until">حتى %1$s · %2$s</string>
+    <string name="current_row_a11y">%1$s، الصلاة الحالية، %2$s، حتى %3$s، %4$s</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="zero">%d ساعة</item>
+        <item quantity="one">ساعة</item>
+        <item quantity="two">ساعتان</item>
+        <item quantity="few">%d ساعات</item>
+        <item quantity="many">%d ساعة</item>
+        <item quantity="other">%d ساعة</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="zero">%d دقيقة</item>
+        <item quantity="one">دقيقة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few">%d دقائق</item>
+        <item quantity="many">%d دقيقة</item>
+        <item quantity="other">%d دقيقة</item>
+    </plurals>
+    <string name="duha_row">الضحى</string>
+    <string name="duha_until">حتى %1$s</string>
+    <string name="duha_row_a11y">الضحى من %1$s حتى %2$s.</string>
+    <string name="settings_duha">الضحى</string>
+    <string name="settings_duha_desc">تعرض وقت صلاة الضحى بعد الشروق: من %1$d دقيقة بعد الشروق حتى %2$d دقيقة قبل الظهر</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">معدّلة</string>
     <string name="why_times_sunni">تستخدم هذه الأوقات %1$s مع حساب العصر وفق المذهب %2$s.</string>

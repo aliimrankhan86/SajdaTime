@@ -13,6 +13,8 @@ import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.Night
+import com.sajdatime.core.CurrentWindow
+import com.sajdatime.core.DuhaWindow
 import com.sajdatime.core.NightTimes
 import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
@@ -212,6 +214,10 @@ data class UiState(
     val jamaah: Map<PrayerSlot, JamaahResult> = emptyMap(),
     /** Midnight and the last third of the night now on, or null with the setting off or no usable night. */
     val night: NightTimes? = null,
+    /** What the Now row counts to (1.7.0), or null when no prayer is current. */
+    val window: CurrentWindow? = null,
+    /** The Duha window for today, or null with the row off, a Shia user, or no usable window. */
+    val duha: DuhaWindow? = null,
     /** The prayer record, while "My prayers" is on. See [TrackerState]. */
     val tracker: TrackerState? = null,
     /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
@@ -462,6 +468,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setNightTimesEnabled(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setNightTimesEnabled(enabled) }
 
+    fun setDuhaEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setDuhaEnabled(enabled) }
+
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
 
@@ -688,7 +697,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null, window = null, duha = null) }
             // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
             withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
@@ -709,7 +718,14 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
             val jamaah = JamaahPlan.on(today, zone, settings.jamaah)
             val night = if (settings.nightTimesEnabled) Night.at(coordinates, settings.calculationPrefs, now, zone) else null
-            Computed(today, next, current, ramadan, eid, jamaah, night)
+            val window = CurrentWindow.at(coordinates, settings.calculationPrefs, now, zone, settings.nightTimesEnabled)
+            // Sunni only: classical Shia scholars hold Duha is not legislated, so the app does not take a side (Fable, B).
+            val duha = if (settings.duhaEnabled && settings.calculationPrefs.sect == Sect.SUNNI) {
+                DuhaWindow.of(today.times[PrayerSlot.SUNRISE], today.times[PrayerSlot.DHUHR], today.approximated)
+            } else {
+                null
+            }
+            Computed(today, next, current, ramadan, eid, jamaah, night, window, duha)
         }
 
         publishTracker()
@@ -722,6 +738,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 eid = computed.eid,
                 jamaah = computed.jamaah,
                 night = computed.night,
+                window = computed.window,
+                duha = computed.duha,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -773,4 +791,6 @@ private data class Computed(
     val eid: EidDay?,
     val jamaah: Map<PrayerSlot, JamaahResult>,
     val night: NightTimes?,
+    val window: CurrentWindow?,
+    val duha: DuhaWindow?,
 )

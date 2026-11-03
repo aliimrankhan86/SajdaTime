@@ -743,6 +743,23 @@
     <string name="night_row_a11y">Islamic midnight %1$s. Last third of the night from %2$s.</string>
     <string name="settings_night_times">Night times</string>
     <string name="settings_night_times_desc">Shows Islamic midnight and the last third of the night under Isha</string>
+    <!-- 1.7.0: time left on the Now row. Counts only to the next time on the list, never an "ends" ruling. -->
+    <string name="current_until">Until %1$s · %2$s</string>
+    <string name="current_row_a11y">%1$s, current prayer, %2$s, until %3$s, %4$s</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <!-- 1.7.0: optional Duha row, Sunni only, off by default. Minutes are PROPOSED and wait for Ali. -->
+    <string name="duha_row">Duha</string>
+    <string name="duha_until">Until %1$s</string>
+    <string name="duha_row_a11y">Duha from %1$s until %2$s.</string>
+    <string name="settings_duha">Duha</string>
+    <string name="settings_duha_desc">Shows the Duha window (Chasht) after Sunrise: from %1$d minutes after sunrise until %2$d minutes before Dhuhr</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">adjusted</string>
     <string name="why_times_sunni">These times use %1$s with %2$s Asr.</string>

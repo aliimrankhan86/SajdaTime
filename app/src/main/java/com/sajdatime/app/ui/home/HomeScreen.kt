@@ -42,6 +42,7 @@ import androidx.compose.material.icons.rounded.Brightness6
 import androidx.compose.material.icons.rounded.Mosque
 import androidx.compose.material.icons.rounded.NightsStay
 import androidx.compose.material.icons.rounded.NotificationsOff
+import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material3.AlertDialog
@@ -73,6 +74,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -116,6 +118,7 @@ import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.JamaahResult
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.WindowTarget
 import com.sajdatime.core.Sect
 import com.sajdatime.core.Sky
 import com.sajdatime.core.SkyPeriod
@@ -1110,6 +1113,23 @@ internal fun TodayTimeline(
 
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }
+    val duha = state.duha
+
+    // "Until Maghrib · 2h 14m" on the Now row (1.7.0). Whole minutes rounded up, never seconds, so the line
+    // changes once a minute. The window is only ever the next time on this list (CurrentWindow).
+    val window = state.window?.takeIf { it.current == state.current }
+    val remainingMinutes = if (window == null) 0L else (window.remaining(state.now).seconds + 59).coerceAtLeast(60) / 60
+    val timeLeftText = window?.let {
+        stringResource(
+            R.string.current_until,
+            windowTargetLabel(it.target),
+            if (remainingMinutes >= 60) {
+                stringResource(R.string.duration_h_m, remainingMinutes / 60, remainingMinutes % 60)
+            } else {
+                stringResource(R.string.duration_m, remainingMinutes)
+            },
+        )
+    }
 
     // During Ramadan, and only then, Fajr is also where suhoor ends and Maghrib is iftar. The
     // labels come from the same state as the card, so they start with day 1 on the user's own
@@ -1139,7 +1159,21 @@ internal fun TodayTimeline(
                         else -> null
                     },
                     jamaah = state.jamaah[slot],
+                    timeLeft = if (slot == state.current) timeLeftText else null,
                 ),
+                description = if (slot == state.current && window != null && state.jamaah[slot] == null &&
+                    !(ramadanView && (slot == PrayerSlot.FAJR || slot == PrayerSlot.MAGHRIB))
+                ) {
+                    stringResource(
+                        R.string.current_row_a11y,
+                        stringResource(slot.labelRes),
+                        TimeFormat.clock(context, today.times.getValue(slot)),
+                        windowTargetLabel(window.target),
+                        spokenDuration(remainingMinutes),
+                    )
+                } else {
+                    null
+                },
                 trailing = {
                     if (slot.isPrayer) {
                         // A crossed bell keeps the style it had while it fades, so an alarm does not flip to a bell.
@@ -1160,6 +1194,24 @@ internal fun TodayTimeline(
                 },
             )
             if (index != slots.lastIndex || night != null) {
+                HorizontalDivider(color = scheme.outlineVariant)
+            }
+            // 1.7.0: the optional Duha window, one dimmed row after Sunrise. Not a prayer row: no bell, never Next
+            // or Now, no alert, not in the PDF, widgets or watch. Off by default, Sunni only (the ViewModel decides).
+            if (slot == PrayerSlot.SUNRISE && duha != null) {
+                val start = TimeFormat.clock(context, duha.start)
+                val end = TimeFormat.clock(context, duha.end)
+                PrayerRow(
+                    label = stringResource(R.string.duha_row),
+                    icon = Icons.Outlined.WbSunny,
+                    quiet = true,
+                    time = start,
+                    isNext = false,
+                    isCurrent = false,
+                    note = stringResource(R.string.duha_until, end.replace(' ', '\u00A0')),
+                    description = stringResource(R.string.duha_row_a11y, start, end),
+                    trailing = { Spacer(Modifier.width(48.dp)) },
+                )
                 HorizontalDivider(color = scheme.outlineVariant)
             }
         }
@@ -1189,7 +1241,7 @@ internal fun TodayTimeline(
  * window is never shown as a time: the line says "Check your jama'ah time" in the same height.
  */
 @Composable
-private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
+private fun rowNote(ramadan: String?, jamaah: JamaahResult?, timeLeft: String? = null): String? {
     val context = LocalContext.current
     val jamaahText = when (jamaah) {
         null -> null
@@ -1201,11 +1253,41 @@ private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
         )
         JamaahResult.Before, is JamaahResult.After -> stringResource(R.string.jamaah_check)
     }
-    return when {
+    val base = when {
         ramadan != null && jamaahText != null -> stringResource(R.string.settings_value_pair, ramadan, jamaahText)
         else -> ramadan ?: jamaahText
     }
+    // "Check your jama'ah time" wins: two warnings on one line is noise (Fable, DESIGN-A-B-C-F, A).
+    return when {
+        timeLeft == null || jamaah == JamaahResult.Before || jamaah is JamaahResult.After -> base
+        base == null -> timeLeft
+        else -> stringResource(R.string.settings_value_pair, base, timeLeft)
+    }
 }
+
+/** "2 hours 14 minutes" for a screen reader: "2h 14m" would be read as letters. */
+@Composable
+private fun spokenDuration(minutes: Long): String {
+    val h = (minutes / 60).toInt()
+    val m = (minutes % 60).toInt()
+    val hours = if (h > 0) pluralStringResource(R.plurals.duration_a11y_hours, h, h) else null
+    val mins = if (m > 0 || h == 0) pluralStringResource(R.plurals.duration_a11y_minutes, m, m) else null
+    return listOfNotNull(hours, mins).joinToString(" ")
+}
+
+/** The label of what the Now row counts to. Always a row the user can see in the list. */
+@Composable
+private fun windowTargetLabel(target: WindowTarget): String = stringResource(
+    when (target) {
+        WindowTarget.SUNRISE -> PrayerSlot.SUNRISE.labelRes
+        WindowTarget.DHUHR -> PrayerSlot.DHUHR.labelRes
+        WindowTarget.ASR -> PrayerSlot.ASR.labelRes
+        WindowTarget.MAGHRIB -> PrayerSlot.MAGHRIB.labelRes
+        WindowTarget.ISHA -> PrayerSlot.ISHA.labelRes
+        WindowTarget.FAJR -> PrayerSlot.FAJR.labelRes
+        WindowTarget.MIDNIGHT -> R.string.night_midnight
+    },
+)
 
 /**
  * One row of the day.
@@ -1350,6 +1432,12 @@ private fun PrayerRow(
                 },
                 color = contentColor,
             )
+            // 1.7.0 (F): on a quiet row at 1.5 text and above the time sits under the name and the note last.
+            // Note first put the midnight time under "Last third from 22:20", where it read as the last third's time.
+            // Nothing is shrunk: the caption is enlarged by the user, so it wraps (Ali, 3 Nov 2026).
+            if (stacked && quiet) {
+                Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
+            }
             // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
             // a pill beside the name: the row already holds the name, a Next or Now marker and the
             // time, and a third item squeezes them at 360dp.
@@ -1362,7 +1450,7 @@ private fun PrayerRow(
                     color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                 )
             }
-            if (stacked) {
+            if (stacked && !quiet) {
                 Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
             }
         }
