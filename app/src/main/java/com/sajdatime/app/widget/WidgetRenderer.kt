@@ -303,6 +303,12 @@ internal object WidgetRenderer {
             views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
+            // The app's own mark at the top start corner, so the widget still says which app it is (Ali, 3 Nov 2026: a
+            // separate small logo, top left, top right in right to left). Only on the 110dp and 150dp entries at the
+            // normal text size: the Opus review estimated the hero line overflows 300dp with the logo from 1.15x text,
+            // and the thin and 64dp entries have no room. Not yet seen on a screen (emulator strip unreachable).
+            val room = size.height >= STRIP_HERO_HEIGHT_DP && context.resources.configuration.fontScale <= 1.0f
+            views.setViewVisibility(R.id.widget_corner_logo, if (room) View.VISIBLE else View.GONE)
             views.setTextViewText(R.id.widget_name, next.slot.label(context))
             views.setTextViewText(R.id.widget_time, timeText(TimeFormat.clock(context, next.at), emphasis = false))
             views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_tomorrow))

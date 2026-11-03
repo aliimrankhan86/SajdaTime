@@ -36,9 +36,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:visibility="gone">
+        <ImageView
+            android:id="@+id/widget_corner_logo"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark"
+            android:visibility="gone" />
         <ImageView
             android:id="@+id/widget_glyph"
             android:layout_width="20dp"

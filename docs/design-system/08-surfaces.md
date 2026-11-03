@@ -33,8 +33,10 @@ Next prayer wide) put a highlight band (the rimmed `widget_pill_sky`, because th
 underline. Smaller forms (the strip, compact Today 3x3) use a 4dp underline (`widget_underline`, chosen over 3dp for reading at a
 glance, no added row height: the strip's bar margin dropped from 3dp to 2dp, the compact Today's bar overlays the row) with the same
 logo and bold. Launchers below Android 12 always get the compact Today (underline, glyph kept). The exact size cut-off is confirmed in the widget space pass (task F). Ali also asked for a small app logo in the top
-start corner of the small widgets (top left, top right in right to left) so people remember the app: not built yet, it needs a
-strip tier with room (about 90dp tall); the 64dp tier cannot promise it.
+start corner of the small widgets (top left, top right in right to left) so people remember the app, a separate small mark (Ali chose it over swapping the sun glyph).
+Built only on the strip's 110dp and 150dp entries at normal text size (3 Nov 2026), not yet seen on a screen. The thin and
+64dp entries have no room, and a 90dp entry was tried and dropped: the Opus review put its height over budget from 1.15x
+text and the hero line over 300dp wide. Next prayer, compact Today and the other small forms have no corner logo yet.
 
 **Type.** Countdown in the system light weight, tabular, sized in dp (36 small Next, 34 wide, 38 large
 Today) because a large font setting pushed names off. Names 16 bold on Next (rows 13), 15 on the large Today, 14 on the compact Today, 12 (to 9) on
