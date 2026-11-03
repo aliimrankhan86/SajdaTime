@@ -228,11 +228,15 @@ class LargeTextAndTalkBackDeviceTest {
         it.config.getOrNull(SemanticsProperties.ContentDescription)?.any { d -> d.startsWith(prefix) } == true
     }
 
-    /** At 2.0 on 320dp the name wins: the sky mark is not drawn and the city is whole (STEP-5-DESIGN section 4). */
+    /**
+     * At 2.0 the city is whole and the sky band is still there. Until b7886bc (3 Nov 2026) a small corner mark hid at this
+     * size (STEP-5-DESIGN section 4); the full width band that replaced it sits under the date line, so it needs no
+     * room from the name and stays at every text size. This test said the mark hides and had been failing since then.
+     */
     @Test
-    fun the_sky_mark_hides_at_the_largest_text_and_the_city_stays_whole() {
+    fun the_sky_band_stays_at_the_largest_text_and_the_city_stays_whole() {
         atText(2f) { LocationHeader(state = dawnState("London"), now = dawnState("London").now, onClick = {}, onOpenDates = {}) }
-        compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn))).assertDoesNotExist()
+        compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn))).assertExists()
         assertWhole("London")
     }
 

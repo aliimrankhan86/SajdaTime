@@ -421,6 +421,52 @@ class WidgetRenderEvidenceTest {
         File(dir, "tall.csv").writeText(csv.toString())
     }
 
+    // ---- Next prayer, short variants --------------------------------------------------------------
+
+    @Test
+    fun next_short_heights() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val picDir = File(dir, "next-short").apply { deleteRecursively(); mkdirs() }
+        val at = Instant.parse("2026-11-04T09:00:00Z")
+        val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+        fun ctxFor(lang: String, scale: Float): Context {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                if (lang != "en") setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            return base.createConfigurationContext(config)
+        }
+        // lang, heights, scales
+        val plan = listOf(
+            Triple("en", listOf(110, 132), listOf(1.0f, 1.15f, 1.3f, 2.0f)),
+            Triple("en", listOf(134, 135, 136), listOf(1.0f, 1.15f)),
+        ) + listOf("ur", "ar", "bn").map { Triple(it, listOf(110, 146), listOf(1.0f, 1.15f)) }
+        val csv = StringBuilder("widget,lang,W,Hnominal,fs,neededDp,fits,barsShown\n")
+        for ((lang, heights, scales) in plan) for (h in heights) for (scale in scales) {
+            val ctx = ctxFor(lang, scale)
+            var needed = -1f
+            var bars = "?"
+            instrumentation.runOnMainSync {
+                val (host, n) = hostAt(ctx, WidgetRenderer::nextPrayer, state, at, 180, h)
+                needed = n
+                bars = host.findViewById<View>(R.id.widget_progress)?.visibility?.let { if (it == View.VISIBLE) "shown" else "hidden" } ?: "absent"
+            }
+            val line = "next,$lang,180,$h,$scale,${"%.1f".format(needed)},${if (needed <= h + 0.5f) "yes" else "no"},$bars"
+            csv.append(line).append('\n')
+            Log.i("WidgetEvidence", line)
+        }
+        File(dir, "next-short.csv").writeText(csv.toString())
+        val pics = listOf("en" to (listOf(110, 122, 135, 136) to listOf(1.0f, 1.15f)), "ur" to (listOf(110, 146) to listOf(1.0f)))
+        for ((lang, hs) in pics) for (scale in hs.second) for (h in hs.first) {
+            instrumentation.runOnMainSync {
+                hostAt(ctxFor(lang, scale), WidgetRenderer::nextPrayer, state, at, 180, h)
+                FileOutputStream(File(picDir, "next_${lang}_180x${h}_fs${scale}_normal_light.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+        }
+    }
+
     private fun shown(v: View): Boolean {
         var x: View? = v
         while (x != null) {

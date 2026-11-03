@@ -77,15 +77,25 @@ internal object WidgetRenderer {
     // wide 149.0 and 156.2 at 1.15x. The wide entry was 150 and is now 158. The small entry stays 110 ON PURPOSE: it is the
     // smallest, so the launcher uses it whatever its height, and the widget's minHeight (widget_next_prayer_info.xml) is
     // 110 because a bigger one makes One UI (two rows are about 158dp) and every launcher below Android 12 open it three
-    // rows tall (Opus review, 3 Nov 2026). So at exactly 110dp the chip and bars are still cut: OPEN, needs Ali (drop the
-    // bars first, not the chip).
+    // rows tall (Opus review, 3 Nov 2026). So the 110dp entry hides the day bars instead (Ali, 3 Nov 2026, "drop the bars
+    // when short"); see nextSizes. Below Android 12 only the first entry is used, so the bars never show there.
     // Urdu, Arabic and Bengali sit taller (measured the same day): the wide layout wants 165.3dp in Urdu and Arabic and
     // 188.2 at 1.15x, Bengali 150.9 and 169.9; the small one fits 162 in all three.
+    // Measured needs of the full small layout: 131.8dp (134.9 at 1.15x) in Latin script, 137.1 (141.3) in Urdu and Arabic,
+    // 133.7 (137.5) in Bengali, so the bars come back from 136 and from 146 in those three scripts.
+    private fun nextBarsHeight(context: Context): Float = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 146f else 136f
+
     private fun nextSizes(context: Context): List<Pair<SizeF, Int>> {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         val grown = context.resources.configuration.fontScale >= 1.1f
         val wideHeight = if (tall) (if (grown) 192f else 170f) else 158f
-        return listOf(SizeF(180f, 110f) to R.layout.widget_next_prayer, SizeF(270f, wideHeight) to R.layout.widget_next_prayer_wide)
+        // Two entries of the small layout: from 136dp (146 in Urdu, Arabic and Bengali) it shows the five day bars; below that it hides them so the town
+        // chip is not cut (Ali, 3 Nov 2026: "drop the bars when short").
+        return listOf(
+            SizeF(180f, 110f) to R.layout.widget_next_prayer,
+            SizeF(180f, nextBarsHeight(context)) to R.layout.widget_next_prayer,
+            SizeF(270f, wideHeight) to R.layout.widget_next_prayer_wide,
+        )
     }
 
     /**
@@ -120,12 +130,12 @@ internal object WidgetRenderer {
 
     fun nextPrayer(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        return responsive(forText(context, nextSizes(context))) { layout -> nextViews(context, state, now, layout) }
+        return responsive(forText(context, nextSizes(context))) { layout, size -> nextViews(context, state, now, layout, size) }
     }
 
     fun today(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        return responsive(forText(context, todaySizes(context))) { layout -> todayViews(context, state, now, layout) }
+        return responsive(forText(context, todaySizes(context))) { layout, _ -> todayViews(context, state, now, layout) }
     }
 
     /**
@@ -167,18 +177,28 @@ internal object WidgetRenderer {
         }
     }
 
-    private fun responsive(sizes: List<Pair<SizeF, Int>>, build: (Int) -> RemoteViews): RemoteViews =
+    private fun responsive(sizes: List<Pair<SizeF, Int>>, build: (Int, SizeF) -> RemoteViews): RemoteViews =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sizes.size > 1) {
-            RemoteViews(sizes.associate { (size, layout) -> size to build(layout) })
+            RemoteViews(sizes.associate { (size, layout) -> size to build(layout, size) })
         } else {
-            build(sizes.first().second)
+            build(sizes.first().second, sizes.first().first)
         }
 
-    private fun nextViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int): RemoteViews {
+    private fun nextViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int, size: SizeF): RemoteViews {
         val views = themedViews(context, state, layout)
         val wide = layout == R.layout.widget_next_prayer_wide
         applyDirection(context, views)
         applyTap(context, views)
+        // The short small layout (the 110dp entry, normal text): no day bars, a 32 instead of 36 countdown and 8dp top and
+        // bottom padding instead of 12, so it needs about 106dp (measured 118.9 with only the bars gone) and the town chip is
+        // not cut. Padding is written on EVERY render: both entries share one layout, so the launcher reapplies actions onto
+        // the view it already has and a value left from the other entry would stay.
+        val short = !wide && size.height < nextBarsHeight(context) && context.resources.configuration.fontScale < LARGE_TEXT
+        // Urdu, Arabic and Bengali sit taller: the short variant wanted 111.2dp (115.4 at 1.15x) with the Latin 32 and 8, so
+        // they get a 28 countdown and 6dp padding (measured 102.5 and 106.7 in Urdu and Arabic, 99.0 and 102.9 in Bengali).
+        val tallScript = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        val padV = if (short) (if (tallScript) 6f else 8f) else 12f
+        if (!wide) views.setViewPadding(R.id.widget_root, dp(context, 14f), dp(context, padV), dp(context, 14f), dp(context, padV))
         // The body is the period's sky in light and the app's green in dark (stripBody), written after the paint
         // so it wins over the paper body the paint pins, and on every render so a period that ends is replaced.
         // The chip gets the rimmed pill: on this body the plain pill can be the body's own colour.
@@ -204,10 +224,12 @@ internal object WidgetRenderer {
             return views
         }
 
-        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else SMALL_COUNTDOWN_DP, sky = true)
+        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else if (short) (if (tallScript) SHORT_TALL_COUNTDOWN_DP else SHORT_COUNTDOWN_DP) else SMALL_COUNTDOWN_DP, sky = true)
         // Written back: a recycled view that showed the no location message had the name at 14sp and two lines.
         views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, NAME_SP)
         views.setInt(R.id.widget_name, "setMaxLines", 1)
+        // From 1.3x text the first entry is the only one, so the bars stay (they are cut there anyway).
+        if (short) views.setViewVisibility(R.id.widget_progress, View.GONE)
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
@@ -601,10 +623,12 @@ internal object WidgetRenderer {
 
     /**
      * The countdown sizes, in dp, judged from renders at each layout's smallest size. At the small Next
-     * widget's 110dp minimum with a context line showing ("Iftar"), the day's bars are the part that is
-     * clipped; the countdown never is. Taller launchers (One UI gives about 158dp) show everything.
+     * widget's 110dp minimum the short variant hides the day bars and uses [SHORT_COUNTDOWN_DP] (measured 3 Nov 2026: 105.9dp
+     * needed). From 136dp the bars show; One UI gives about 158dp and shows everything.
      */
     private const val SMALL_COUNTDOWN_DP = 36f
+    private const val SHORT_COUNTDOWN_DP = 32f
+    private const val SHORT_TALL_COUNTDOWN_DP = 28f
     private const val WIDE_COUNTDOWN_DP = 34f
     private const val LARGE_COUNTDOWN_DP = 38f
 
