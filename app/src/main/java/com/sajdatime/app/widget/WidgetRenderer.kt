@@ -125,7 +125,7 @@ internal object WidgetRenderer {
     private const val STRIP_HALF_WIDTH_DP = 250f
     private const val STRIP_HERO_HEIGHT_DP = 110f
     private const val STRIP_CHIP_WIDTH_DP = 400f
-    private const val HERO_SP = 22f
+    private const val HERO_SP = 28f
     private const val STRIP_MAX_SP = 12f
     private const val STRIP_MIN_SP = 9f
     private const val STRIP_CHIP_ALLOWANCE_DP = 105f
