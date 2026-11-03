@@ -3,6 +3,7 @@ package com.sajdatime.app.widget
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.os.Build
 import android.os.SystemClock
@@ -58,8 +59,8 @@ import kotlin.math.roundToInt
  * layout each, which left the content stranded in a corner of the larger widget One UI gives.
  *
  * **Three widgets since step 8 (1.6.0).** The Today strip (`strip`, `widget_strip.xml`) is five columns in one
- * row, built four ways from the one layout ([STRIP_SIZES]); the Next prayer widget sits on the sky of the
- * current period ([skyDrawable]) instead of the paper body.
+ * row, built four ways from the one layout ([STRIP_SIZES]); the Next prayer and Today widgets share its body
+ * ([stripBody]) since 1.7.0.
  *
  * The countdown is a `Chronometer`, which the launcher's process ticks, so it costs this app no wake
  * ups. Its digits are formatted in the PHONE's language, not the app's: nothing in a RemoteViews can
@@ -154,11 +155,10 @@ internal object WidgetRenderer {
         val wide = layout == R.layout.widget_next_prayer_wide
         applyDirection(context, views)
         applyTap(context, views)
-        // The body is the sky of the current period (step 8), written after the paint so it wins over
-        // the paper body the paint pins, and on every render so a period that ends is replaced. The chip
-        // gets the rimmed pill for the same reason as the highlighted row below: on a sky the plain pill
-        // can be the sky's own colour.
-        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, skyDrawable(state.period)))
+        // The body is the period's sky in light and the app's green in dark (stripBody), written after the paint
+        // so it wins over the paper body the paint pins, and on every render so a period that ends is replaced.
+        // The chip gets the rimmed pill: on this body the plain pill can be the body's own colour.
+        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, stripBody(state.period)))
         fillChip(context, views, state)
         views.setInt(R.id.widget_place_chip, "setBackgroundResource", skin(state, R.drawable.widget_pill_sky))
 
@@ -187,7 +187,7 @@ internal object WidgetRenderer {
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
-            fillRows(context, views, state, labels = false, sky = true)
+            fillRows(context, views, state, labels = false, band = true)
         }
 
         views.setContentDescription(R.id.widget_root, withPlace(context, state, nextSentence(context, next, now)))
@@ -199,7 +199,10 @@ internal object WidgetRenderer {
         val large = layout == R.layout.widget_today_large
         applyDirection(context, views)
         applyTap(context, views)
+        // 1.7.0: the same body as the strip (period sky in light, the app's dark green in dark), written after the paint.
+        views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, stripBody(state.period)))
         fillChip(context, views, state)
+        views.setInt(R.id.widget_place_chip, "setBackgroundResource", skin(state, R.drawable.widget_pill_sky))
         if (large) fillHeader(context, views, state)
 
         val today = state.today
@@ -221,7 +224,7 @@ internal object WidgetRenderer {
             fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
         }
 
-        val spoken = fillRows(context, views, state, labels = true)
+        val spoken = fillRows(context, views, state, labels = true, band = large)
 
         if (today.approximated) {
             views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
@@ -407,7 +410,7 @@ internal object WidgetRenderer {
         val time = TimeFormat.clock(context, next.at)
         views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
         views.setTextViewText(R.id.widget_name, next.slot.label(context))
-        views.setTextViewText(R.id.widget_time, time)
+        views.setTextViewText(R.id.widget_time, timeText(time, false))
         views.setViewVisibility(R.id.widget_glyph, View.VISIBLE)
         views.setViewVisibility(R.id.widget_name, View.VISIBLE)
 
@@ -467,10 +470,10 @@ internal object WidgetRenderer {
     }
 
     /**
-     * The six rows. Returns one spoken phrase per row for the widget's single description. [sky] is the
-     * wide Next widget, whose highlighted row takes the rimmed pill (see [nextViews]).
+     * The six rows. Returns one spoken phrase per row for the widget's single description. [band] is the larger
+     * forms (wide Next, large Today), whose highlighted row takes the rimmed band; otherwise the 4dp underline marks it.
      */
-    private fun fillRows(context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, sky: Boolean = false): List<String> {
+    private fun fillRows(context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean): List<String> {
         val today = state.today ?: return emptyList()
         val spoken = mutableListOf<String>()
         for (slot in PrayerSlot.entries) {
@@ -481,21 +484,15 @@ internal object WidgetRenderer {
             val word = state.ramadanWordFor(slot, state.ramadanToday)?.let { wordText(context, it) }
 
             views.setViewVisibility(ids.row, View.VISIBLE)
-            views.setInt(
-                ids.row,
-                "setBackgroundResource",
-                skin(
-                    state,
-                    when {
-                        !highlighted -> R.drawable.widget_row_plain
-                        sky -> R.drawable.widget_pill_sky
-                        else -> R.drawable.widget_row_highlight
-                    },
-                ),
-            )
-            views.setImageViewResource(ids.glyph, glyph(slot))
+            // The current row is marked by size (Ali, 3 Nov 2026): a highlight band behind it on the larger forms (Next prayer
+            // wide, Today with the countdown card), a 4dp underline on the compact Today. Both marks carry the app's logo and
+            // bold. The underline overlays the row, so the current prayer never moves its neighbours. Both states are written
+            // every time because the launcher reuses these views.
+            views.setViewVisibility(ids.underline, if (highlighted && !band) View.VISIBLE else View.GONE)
+            views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted && band) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
+            markGlyph(context, views, state, ids.glyph, glyph(slot), highlighted)
             views.setTextViewText(ids.name, if (highlighted) bold(name) else name)
-            views.setTextViewText(ids.time, if (highlighted) bold(time) else time)
+            views.setTextViewText(ids.time, timeText(time, highlighted))
 
             // "Next", a Ramadan word, both, or nothing. Written every time, so a row that stops being
             // next or stops carrying a word is cleared. Empty on the wide Next widget, where the label
@@ -515,6 +512,22 @@ internal object WidgetRenderer {
             )
         }
         return spoken
+    }
+
+    /**
+     * The row's glyph, or the app's mark untinted when [mark]. The launcher reuses views, so both ways are written.
+     * Only from Android 12, where `setColorStateList` takes a light and a dark ink, so the launcher picks the ink when it
+     * draws and a phone that flips theme stays right with no redraw (HANDOVER §15 lesson 130; a baked colour went stale).
+     * Below 12 the row keeps its glyph (the layout tint stays), and bold name and time still mark it.
+     */
+    private fun markGlyph(context: Context, views: RemoteViews, state: WidgetState, id: Int, @DrawableRes glyph: Int, mark: Boolean) {
+        val show = mark && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        views.setImageViewResource(id, if (show) R.drawable.widget_mark else glyph)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val light = ColorStateList.valueOf(context.getColor(chosenDark(state)?.let { fixedColour(R.color.widget_on_surface_variant, it) } ?: fixedColour(R.color.widget_on_surface_variant, false)))
+            val dark = ColorStateList.valueOf(context.getColor(chosenDark(state)?.let { fixedColour(R.color.widget_on_surface_variant, it) } ?: fixedColour(R.color.widget_on_surface_variant, true)))
+            views.setColorStateList(id, "setImageTintList", if (show) null else light, if (show) null else dark)
+        }
     }
 
     /**
@@ -574,7 +587,7 @@ internal object WidgetRenderer {
     private val SEGMENTS = listOf(R.id.widget_seg_1, R.id.widget_seg_2, R.id.widget_seg_3, R.id.widget_seg_4, R.id.widget_seg_5)
 
     /** The view ids of one row. Both Today layouts and the wide Next layout use the same ones. */
-    private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int)
+    private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int, val underline: Int)
 
     /** The strip's per column mark (the app's logo, in place of the glyph) and underline. */
     private val STRIP_MARKS = mapOf(
@@ -586,12 +599,12 @@ internal object WidgetRenderer {
     )
 
     private val ROWS = mapOf(
-        PrayerSlot.FAJR to RowIds(R.id.widget_row_fajr, R.id.widget_glyph_fajr, R.id.widget_name_fajr, R.id.widget_label_fajr, R.id.widget_time_fajr),
-        PrayerSlot.SUNRISE to RowIds(R.id.widget_row_sunrise, R.id.widget_glyph_sunrise, R.id.widget_name_sunrise, R.id.widget_label_sunrise, R.id.widget_time_sunrise),
-        PrayerSlot.DHUHR to RowIds(R.id.widget_row_dhuhr, R.id.widget_glyph_dhuhr, R.id.widget_name_dhuhr, R.id.widget_label_dhuhr, R.id.widget_time_dhuhr),
-        PrayerSlot.ASR to RowIds(R.id.widget_row_asr, R.id.widget_glyph_asr, R.id.widget_name_asr, R.id.widget_label_asr, R.id.widget_time_asr),
-        PrayerSlot.MAGHRIB to RowIds(R.id.widget_row_maghrib, R.id.widget_glyph_maghrib, R.id.widget_name_maghrib, R.id.widget_label_maghrib, R.id.widget_time_maghrib),
-        PrayerSlot.ISHA to RowIds(R.id.widget_row_isha, R.id.widget_glyph_isha, R.id.widget_name_isha, R.id.widget_label_isha, R.id.widget_time_isha),
+        PrayerSlot.FAJR to RowIds(R.id.widget_row_fajr, R.id.widget_glyph_fajr, R.id.widget_name_fajr, R.id.widget_label_fajr, R.id.widget_time_fajr, R.id.widget_row_underline_fajr),
+        PrayerSlot.SUNRISE to RowIds(R.id.widget_row_sunrise, R.id.widget_glyph_sunrise, R.id.widget_name_sunrise, R.id.widget_label_sunrise, R.id.widget_time_sunrise, R.id.widget_row_underline_sunrise),
+        PrayerSlot.DHUHR to RowIds(R.id.widget_row_dhuhr, R.id.widget_glyph_dhuhr, R.id.widget_name_dhuhr, R.id.widget_label_dhuhr, R.id.widget_time_dhuhr, R.id.widget_row_underline_dhuhr),
+        PrayerSlot.ASR to RowIds(R.id.widget_row_asr, R.id.widget_glyph_asr, R.id.widget_name_asr, R.id.widget_label_asr, R.id.widget_time_asr, R.id.widget_row_underline_asr),
+        PrayerSlot.MAGHRIB to RowIds(R.id.widget_row_maghrib, R.id.widget_glyph_maghrib, R.id.widget_name_maghrib, R.id.widget_label_maghrib, R.id.widget_time_maghrib, R.id.widget_row_underline_maghrib),
+        PrayerSlot.ISHA to RowIds(R.id.widget_row_isha, R.id.widget_glyph_isha, R.id.widget_name_isha, R.id.widget_label_isha, R.id.widget_time_isha, R.id.widget_row_underline_isha),
     )
 
     // --- a theme chosen in the app ---------------------------------------------------------
@@ -676,15 +689,6 @@ internal object WidgetRenderer {
         R.drawable.widget_divider_sky to (R.drawable.widget_divider_sky_light to R.drawable.widget_divider_sky_dark),
     )
 
-    /** The four skies are the phone's (Color.kt), one per period of the day. */
-    @DrawableRes
-    private fun skyDrawable(period: SkyPeriod): Int = when (period) {
-        SkyPeriod.DAWN -> R.drawable.widget_sky_dawn
-        SkyPeriod.DAY -> R.drawable.widget_sky_day
-        SkyPeriod.EVENING -> R.drawable.widget_sky_evening
-        SkyPeriod.NIGHT -> R.drawable.widget_sky_night
-    }
-
     /** The Today strip's own body: the period's sky in light, the app's dark green in dark (1.7.0). */
     @DrawableRes
     private fun stripBody(period: SkyPeriod): Int = when (period) {
@@ -728,6 +732,9 @@ internal object WidgetRenderer {
         )
     }
 
+    /** The compact Today's overlay underlines; the larger forms mark the current row with a band instead. */
+    private val ROW_UNDERLINE_PAINTS = ROWS.values.map { Paint(it.underline, Ink.IMAGE, R.drawable.widget_underline) }
+
     /** The strip's five columns: the Today row's inks without the label column or sunrise. */
     private val STRIP_COLUMN_PAINTS = WidgetState.PRAYERS.flatMap { slot ->
         val ids = ROWS.getValue(slot)
@@ -755,7 +762,7 @@ internal object WidgetRenderer {
             ROOT_PAINT,
             Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
-        ) + ROW_PAINTS + CHIP_PAINTS,
+        ) + ROW_PAINTS + ROW_UNDERLINE_PAINTS + CHIP_PAINTS,
         R.layout.widget_today_large to listOf(
             ROOT_PAINT,
             Paint(R.id.widget_date, Ink.TEXT, R.color.widget_on_surface),
@@ -812,7 +819,6 @@ internal object WidgetRenderer {
         },
     )
 
-    /** Bold for the highlighted row, so "which prayer is next" is not carried by a background tint alone. */
     /**
      * The time with its am or pm (any letters: "pm", "م", "PM") set smaller, so the digits lead (Ali, 3 Nov 2026: "make the
      * am/pm small text"). [emphasis] adds bold. A 24 hour clock has no letters and comes back unchanged.

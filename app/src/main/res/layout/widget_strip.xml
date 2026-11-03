@@ -149,8 +149,8 @@
             <ImageView
                 android:id="@+id/widget_bar_fajr"
                 android:layout_width="28dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="2dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_underline"
                 android:visibility="invisible" />
@@ -214,8 +214,8 @@
             <ImageView
                 android:id="@+id/widget_bar_dhuhr"
                 android:layout_width="28dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="2dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_underline"
                 android:visibility="invisible" />
@@ -279,8 +279,8 @@
             <ImageView
                 android:id="@+id/widget_bar_asr"
                 android:layout_width="28dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="2dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_underline"
                 android:visibility="invisible" />
@@ -344,8 +344,8 @@
             <ImageView
                 android:id="@+id/widget_bar_maghrib"
                 android:layout_width="28dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="2dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_underline"
                 android:visibility="invisible" />
@@ -409,8 +409,8 @@
             <ImageView
                 android:id="@+id/widget_bar_isha"
                 android:layout_width="28dp"
-                android:layout_height="3dp"
-                android:layout_marginTop="3dp"
+                android:layout_height="4dp"
+                android:layout_marginTop="2dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_underline"
                 android:visibility="invisible" />

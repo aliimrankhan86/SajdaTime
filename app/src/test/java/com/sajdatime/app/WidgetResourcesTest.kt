@@ -102,7 +102,7 @@ class WidgetResourcesTest {
         val expected = mapOf(
             "layout/widget_next_prayer.xml" to hero + chip,
             "layout/widget_next_prayer_wide.xml" to hero + rows + chip,
-            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + chip,
+            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + slots.map { "widget_row_underline_$it" } + chip,
             "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows + chip,
             // The strip: five columns (no sunrise, no label), the large text row, the message, the chip.
             "layout/widget_strip.xml" to listOf("widget_message", "widget_strip_next", "widget_glyph", "widget_name", "widget_time", "widget_sublabel") +
@@ -111,6 +111,19 @@ class WidgetResourcesTest {
         for ((layout, ids) in expected) {
             val xml = read(layout)
             for (id in listOf("widget_root") + ids) assertTrue("$layout lacks $id", xml.contains("""@+id/$id""""))
+            if (layout == "layout/widget_today.xml") {
+                for (slot in slots) {
+                    val row = Regex("""<FrameLayout\b[^>]*android:id="@\+id/widget_row_$slot"[^>]*>(.*?)</FrameLayout>""", RegexOption.DOT_MATCHES_ALL)
+                        .find(xml)?.groupValues?.get(1)
+                    assertTrue("$layout: $slot needs an overlay container", row != null)
+                    val bar = Regex("""<ImageView\b[^>]*android:id="@\+id/widget_row_underline_$slot"[^>]*/>""", RegexOption.DOT_MATCHES_ALL)
+                        .find(row!!)?.value.orEmpty()
+                    for (attribute in listOf(
+                        "layout_width=\"match_parent\"", "layout_height=\"4dp\"", "layout_gravity=\"bottom\"",
+                        "src=\"@drawable/widget_underline\"", "visibility=\"gone\"", "importantForAccessibility=\"no\"",
+                    )) assertTrue("$layout: $slot underline lacks $attribute", bar.contains("android:$attribute"))
+                }
+            }
         }
     }
 

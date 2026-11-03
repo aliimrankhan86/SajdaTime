@@ -22,11 +22,19 @@ At 1.3× text each widget keeps its first layout and the strip shows the next pr
 
 **Look.** Paper widgets: a fixed three stop body (`widget_surface_top` → `widget_surface` →
 `widget_surface_bottom`), a sheen (dark only, 7%), a 1dp rim; radius 16, or the launcher's own on
-Android 12+. Next prayer: the sky instead of paper, the chip and highlighted row get a 1dp `primary`
-rim, and "to come" bars become a 30% track. Countdown card (large Today): radius 18, highlight
+Android 12+. Next prayer and Today (1.7.0): the strip's body instead of paper, the town chip gets a 1dp `primary`
+rim, the current row carries the app mark in place of its glyph, bold name and time, and on Next prayer "to come" bars become a 30% track. Countdown card (large Today): radius 18, highlight
 gradient. Rows and pills radius 12. Day bars: done filled `primary`, next outlined `primary` (shape,
-not only fill), to come `outlineVariant`. The strip uses the period sky in light and the app's dark green
-in dark (`widget_strip_*`), rather than the paper body used by Today.
+not only fill), to come `outlineVariant`. All three use the period sky in light and the app's dark green
+in dark (`widget_strip_*`); the paper body remains only in the picker previews.
+
+**Current prayer marker, by size (Ali, 3 Nov 2026, from mockups).** Larger forms (Today with the countdown card, about 4x3 and up;
+Next prayer wide) put a highlight band (the rimmed `widget_pill_sky`, because the plain `widget_highlight` fill is 1.0:1 against the sky and would not show) behind the current row: logo in place of the glyph, bold, no
+underline. Smaller forms (the strip, compact Today 3x3) use a 4dp underline (`widget_underline`, chosen over 3dp for reading at a
+glance, no added row height: the strip's bar margin dropped from 3dp to 2dp, the compact Today's bar overlays the row) with the same
+logo and bold. Launchers below Android 12 always get the compact Today (underline, glyph kept). The exact size cut-off is confirmed in the widget space pass (task F). Ali also asked for a small app logo in the top
+start corner of the small widgets (top left, top right in right to left) so people remember the app: not built yet, it needs a
+strip tier with room (about 90dp tall); the 64dp tier cannot promise it.
 
 **Type.** Countdown in the system light weight, tabular, sized in dp (36 small Next, 34 wide, 38 large
 Today) because a large font setting pushed names off. Names 16 bold on Next, 14 on Today, 12 (to 10) on
@@ -55,13 +63,13 @@ Resource names listed literally in `WidgetResourcesTest`, `WidgetThemeTest` and 
 | `widget_chip` | Town chip |
 | `widget_divider`, `widget_divider_sky` | Dividers on paper and sky |
 | `widget_hero_background` | Large Today countdown card |
-| `widget_pill_sky` | Highlighted row on the Next prayer sky |
+| `widget_pill_sky` | Town chip and the large forms' current row band |
 | `widget_preview_next`, `widget_preview_strip`, `widget_preview_today` | Widget picker previews |
-| `widget_row_highlight`, `widget_row_plain` | Highlighted and plain rows |
+| `widget_row_highlight`, `widget_row_plain` | Rows (the plain fill is no longer the band: see widget_pill_sky) |
 | `widget_seg_done`, `widget_seg_next`, `widget_seg_todo`, `widget_seg_todo_sky` | Day bars on paper and sky |
-| `widget_sky_dawn`, `widget_sky_day`, `widget_sky_evening`, `widget_sky_night` | Next prayer body by sky period |
+| `widget_sky_dawn`, `widget_sky_day`, `widget_sky_evening`, `widget_sky_night` | Next prayer body by sky period (unused since 1.7.0) |
 | `widget_strip_dawn`, `widget_strip_day`, `widget_strip_evening`, `widget_strip_night` | Strip body by sky period |
-| `widget_underline` | Highlighted strip column underline |
+| `widget_underline` | Current prayer underline: the strip column and the compact Today row (4dp) |
 
 | Fixed colour resources | Use |
 |---|---|
@@ -128,7 +136,7 @@ Adaptive icon: background `#0E6B4F`, a sand `#F0D69A` mihrab and two minarets in
 (4.57:1), the same foreground as the monochrome layer for themed icons. The icon green is one step
 from `primary` on purpose; both move together only in an icon refresh. The notification icon is the
 arch alone. The widget mark (`widget_mark`) is the icon on a rounded tile, used on the large Today
-widget and in place of the highlighted prayer's glyph on the strip.
+widget and in place of the highlighted prayer's glyph on the strip, Next prayer and Today.
 
 **Known gap:** the Android 7 fallback icon and the watch icon still use `#14624B`.
 
