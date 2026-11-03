@@ -523,17 +523,7 @@
     <string name="ramadan_next_suhoor_tomorrow">Suhoor ends tomorrow at %1$s</string>
     <string name="ramadan_month_ends_today">On this calendar today is the last day of Ramadan. Your mosque will announce Eid.</string>
     <string name="ramadan_fast_length">Fast today %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">%d minute longer than yesterday</item>
-        <item quantity="other">%d minutes longer than yesterday</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">%d minute shorter than yesterday</item>
-        <item quantity="other">%d minutes shorter than yesterday</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">the same as yesterday</string>
     <!-- Joins the fast length and the change: "Fast today 12h 18m, 3 minutes longer than yesterday". -->
-    <string name="ramadan_tomorrow_line">Tomorrow: suhoor ends %1$s, iftar %2$s</string>
     <string name="ramadan_info_a11y">About these Ramadan times</string>
     <string name="ramadan_info_title">About these Ramadan times</string>
     <string name="ramadan_info_calc">SajdaTime shows Fajr and Maghrib as calculated for your location and uses them as the end of suhoor and the time of iftar.</string>

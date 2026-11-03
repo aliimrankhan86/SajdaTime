@@ -893,6 +893,13 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   tall, from 300dp wide; two cells tall adds a big next prayer line on top; under 250dp wide (half a row) it shows the next
   prayer alone. Android 12 and up only for the size choices. Not changed yet: the Next prayer and Today list widgets'
   glyphs and fonts.
+- **3 Nov 2026, polish after an Opus alignment audit (`private/plans/2026-11-next-release/ALIGNMENT-AUDIT.md`), reversing the
+  glyph-beside-name widget choice E2.** Glyph above name above time in equal columns, all ten texts one size picked at render
+  (`stripTextSp`, 12sp down to 9sp by measuring), glyphs only when 64dp tall and 300dp wide; Ramadan tiles 16dp corners and
+  `Space.Paragraph` padding; Ramadan card text is now only the countdown and "Fast today 12h 37m" (the change from yesterday and
+  tomorrow's times were dropped, Ali: too much); every Times row's icon sits in one 21dp box so Sunrise and Midnight align with the
+  prayers; the three line Fajr row gets `Space.Tight` vertical padding. Not decided: one icon set for a prayer across tiles, rows and
+  widgets (the tiles use the widget glyphs, the rows use Material icons).
 - **3 Nov 2026, Times prompts lose their cards (Option 2, DESIGN-D2, Ali: "Option 2 seems fine").** Ali called the
   Set location and Allow exact alarms cards "horrendous", wanted a premium Apple feel, not "lots of unnecessary
   cards with text". Now: no location set -> a compact green "Set location" button beside the city title (kind A

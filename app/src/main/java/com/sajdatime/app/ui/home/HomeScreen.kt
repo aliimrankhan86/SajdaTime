@@ -1432,14 +1432,18 @@ private fun PrayerRow(
             // fills the row's 50dp floor: 12dp above and below a 48dp target made every row 72dp and pushed
             // Isha under the tab bar on the 823dp frame (the tick, e98b2a6).
             .padding(start = 18.dp, end = 6.dp)
-            .padding(vertical = 1.dp),
+            .padding(vertical = if (note != null && warning != null) Space.Tight else 1.dp),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
-        )
+        // One 21dp box for every row, so the names of Sunrise and Midnight start on the same line as the prayers
+        // (Opus audit, 3 Nov 2026: the smaller icon with the same gap put them 2.7dp left).
+        Box(Modifier.size(21.dp), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
+            )
+        }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(

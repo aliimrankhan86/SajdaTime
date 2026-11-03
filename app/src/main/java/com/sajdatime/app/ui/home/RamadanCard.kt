@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -194,21 +195,6 @@ private fun RamadanCard(
         Spacer(Modifier.height(Space.Tight))
         FastLine(ramadan = ramadan)
 
-        if (ramadan.tomorrowIsRamadan) {
-            Spacer(Modifier.height(Space.Paragraph))
-            androidx.compose.material3.HorizontalDivider(color = scheme.onPrimaryContainer.copy(alpha = 0.2f))
-            Spacer(Modifier.height(Space.Related))
-            Text(
-                text = stringResource(
-                    R.string.ramadan_tomorrow_line,
-                    TimeFormat.clock(context, ramadan.tomorrowSuhoorEnds),
-                    TimeFormat.clock(context, ramadan.tomorrowIftar),
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = scheme.onPrimaryContainer,
-            )
-        }
-
         if (ramadan.today.approximated) {
             // The polar banner above names the latitude. This line keeps the marking on the card
             // itself, so a card that is looked at on its own is never taken for measured times.
@@ -253,7 +239,7 @@ private fun RamadanCard(
                 Text(stringResource(R.string.ramadan_open_timetable), textAlign = TextAlign.Center)
             }
             // 48dp target: this is the only way to the explanation, and it is small.
-            IconButton(onClick = onOpenInfo, modifier = Modifier.size(48.dp)) {
+            IconButton(onClick = onOpenInfo, modifier = Modifier.size(48.dp).offset(x = 12.dp)) {
                 Icon(
                     Icons.Outlined.Info,
                     contentDescription = stringResource(R.string.ramadan_info_a11y),
@@ -274,9 +260,9 @@ private fun TimeColumn(label: String, glyph: Int, time: String, isNext: Boolean,
     Column(
         modifier = modifier
             .fillMaxHeight()
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(fill)
-            .padding(horizontal = 14.dp, vertical = 12.dp),
+            .padding(Space.Paragraph),
     ) {
         // Both tiles have the same three parts in the same places: the glyph row (the "Next" pill sits at its end),
         // the bold name, the time. So they are the same height whichever one is next.
@@ -354,30 +340,18 @@ private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.P
     }
 }
 
-/** "Fast today 12h 18m, 4 minutes longer than yesterday". Joined by a resource: punctuation is a translator's call. */
+/** "Fast today 12h 37m": the one fact about the fast. The change from yesterday and tomorrow's times were dropped (Ali, 3 Nov 2026: too much). */
 @Composable
 private fun FastLine(ramadan: RamadanState) {
     val context = LocalContext.current
-    val change = ramadan.fastChangeMinutes.toInt()
-    val changeText = when {
-        change > 0 -> pluralStringResource(R.plurals.ramadan_fast_change_longer, change, change)
-        change < 0 -> pluralStringResource(R.plurals.ramadan_fast_change_shorter, abs(change), abs(change))
-        else -> stringResource(R.string.ramadan_fast_change_same)
-    }
-    // Two short lines, one fact each (1.7.0, Ali 3 Nov 2026: long text under the card is not read, and a sentence
-    // wrapped to a second line looks unaligned): how long the fast is, then how it differs from yesterday.
-    val ink = MaterialTheme.colorScheme.onPrimaryContainer
-    androidx.compose.foundation.layout.Column {
-        Text(
-            text = stringResource(
-                R.string.ramadan_fast_length,
-                TimeFormat.remaining(context, ramadan.suhoorEnds, ramadan.iftar),
-            ),
-            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Medium),
-            color = ink,
-        )
-        Text(text = changeText, style = MaterialTheme.typography.bodyMedium, color = ink)
-    }
+    Text(
+        text = stringResource(
+            R.string.ramadan_fast_length,
+            TimeFormat.remaining(context, ramadan.suhoorEnds, ramadan.iftar),
+        ),
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onPrimaryContainer,
+    )
 }
 
 /**

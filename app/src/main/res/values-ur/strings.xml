@@ -324,16 +324,6 @@
     <string name="ramadan_next_suhoor_tomorrow">کل سحری %1$s پر ختم ہوگی</string>
     <string name="ramadan_month_ends_today">اس کیلنڈر کے مطابق آج رمضان کا آخری دن ہے۔ عید کا اعلان آپ کی مسجد کرے گی۔</string>
     <string name="ramadan_fast_length">آج کا روزہ %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">کل سے %d منٹ لمبا</item>
-        <item quantity="other">کل سے %d منٹ لمبا</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">کل سے %d منٹ چھوٹا</item>
-        <item quantity="other">کل سے %d منٹ چھوٹا</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">کل جتنا ہی</string>
-    <string name="ramadan_tomorrow_line">کل: سحری ختم %1$s، افطار %2$s</string>
     <string name="ramadan_info_a11y">رمضان کے ان اوقات کے بارے میں</string>
     <string name="ramadan_info_title">رمضان کے ان اوقات کے بارے میں</string>
     <string name="ramadan_info_calc">SajdaTime آپ کے مقام کے لیے فجر اور مغرب کو حساب کے مطابق دکھاتا ہے اور انہی کو سحری کے ختم ہونے اور افطار کا وقت مانتا ہے۔</string>

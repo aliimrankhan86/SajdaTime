@@ -318,16 +318,6 @@
     <string name="ramadan_next_suhoor_tomorrow">Yarın imsak %1$s</string>
     <string name="ramadan_month_ends_today">Bu takvime göre bugün Ramazan\'ın son günü. Bayramı caminiz duyurur.</string>
     <string name="ramadan_fast_length">Bugünkü oruç %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">dünden %d dakika uzun</item>
-        <item quantity="other">dünden %d dakika uzun</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">dünden %d dakika kısa</item>
-        <item quantity="other">dünden %d dakika kısa</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">dünle aynı</string>
-    <string name="ramadan_tomorrow_line">Yarın: imsak %1$s, iftar %2$s</string>
     <string name="ramadan_info_a11y">Bu Ramazan vakitleri hakkında</string>
     <string name="ramadan_info_title">Bu Ramazan vakitleri hakkında</string>
     <string name="ramadan_info_calc">SajdaTime, bulunduğunuz yer için hesaplanan Sabah ve Akşam vakitlerini gösterir ve bunları imsak ile iftar vakti olarak kullanır.</string>

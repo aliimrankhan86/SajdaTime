@@ -126,6 +126,9 @@ internal object WidgetRenderer {
     private const val STRIP_HERO_HEIGHT_DP = 110f
     private const val STRIP_CHIP_WIDTH_DP = 400f
     private const val HERO_SP = 22f
+    private const val STRIP_MAX_SP = 12f
+    private const val STRIP_MIN_SP = 9f
+    private const val STRIP_CHIP_ALLOWANCE_DP = 105f
 
     private fun forText(context: Context, sizes: List<Pair<SizeF, Int>>) =
         if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.take(1) else sizes
@@ -242,8 +245,10 @@ internal object WidgetRenderer {
      */
     private fun stripViews(context: Context, state: WidgetState, now: Instant, size: SizeF): RemoteViews {
         val views = themedViews(context, state, R.layout.widget_strip)
-        val glyphs = size.width >= STRIP_GLYPH_WIDTH_DP
         val tall = size.height >= STRIP_TALL_HEIGHT_DP
+        // Glyph above name above time (Opus audit, 3 Nov 2026: glyph beside the name put the name off the time's axis and
+        // forced per column autosize). Needs 64dp tall and 300dp wide.
+        val glyphs = tall && size.width >= STRIP_GLYPH_WIDTH_DP
         applyDirection(context, views)
         applyTap(context, views)
         // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
@@ -276,6 +281,13 @@ internal object WidgetRenderer {
 
         val hero = large || size.height >= STRIP_HERO_HEIGHT_DP
         val spoken = fillColumns(context, views, state, today, glyphs, visible = !large)
+        // One size for all ten texts, so no column is smaller than its neighbour (Ali, 3 Nov 2026, "uneven").
+        val textSp = stripTextSp(context, today, size.width, chip = size.width >= STRIP_CHIP_WIDTH_DP && !large)
+        for (slot in WidgetState.PRAYERS) {
+            val ids = ROWS.getValue(slot)
+            views.setTextViewTextSize(ids.name, TypedValue.COMPLEX_UNIT_SP, textSp)
+            views.setTextViewTextSize(ids.time, TypedValue.COMPLEX_UNIT_SP, textSp)
+        }
         views.setViewVisibility(R.id.widget_strip_row, if (large) View.GONE else View.VISIBLE)
         if (hero) {
             val sp = if (size.height >= STRIP_HERO_HEIGHT_DP) HERO_SP else 14f
@@ -341,6 +353,25 @@ internal object WidgetRenderer {
             )
         }
         return spoken
+    }
+
+    /**
+     * The largest size up to 12sp (floor 9sp, steps of 0.5) at which the widest of the ten column texts fits one
+     * column, measured in bold at the user's font scale. The same size goes to every column.
+     */
+    private fun stripTextSp(context: Context, today: DayPrayerTimes, widthDp: Float, chip: Boolean): Float {
+        val d = context.resources.displayMetrics.density
+        val scale = context.resources.configuration.fontScale
+        val column = ((widthDp - 8f - (if (chip) STRIP_CHIP_ALLOWANCE_DP else 0f)) / WidgetState.PRAYERS.size - 4f) * d
+        val texts = WidgetState.PRAYERS.flatMap { listOf(it.label(context), TimeFormat.clock(context, today[it])) }
+        val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.DEFAULT_BOLD }
+        var sp = STRIP_MAX_SP
+        while (sp > STRIP_MIN_SP) {
+            paint.textSize = sp * d * scale
+            if (texts.maxOf { paint.measureText(it) } <= column) break
+            sp -= 0.5f
+        }
+        return sp
     }
 
     private fun dp(context: Context, value: Float): Int = (value * context.resources.displayMetrics.density).roundToInt()

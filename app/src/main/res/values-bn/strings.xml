@@ -336,17 +336,7 @@
     <string name="ramadan_next_suhoor_tomorrow">আগামীকাল সাহরি শেষ %1$s</string>
     <string name="ramadan_month_ends_today">এই ক্যালেন্ডার অনুযায়ী আজ রমজানের শেষ দিন। আপনার মসজিদ ঈদের ঘোষণা দেবে।</string>
     <string name="ramadan_fast_length">আজকের রোজা %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">গতকালের চেয়ে %d মিনিট বেশি</item>
-        <item quantity="other">গতকালের চেয়ে %d মিনিট বেশি</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">গতকালের চেয়ে %d মিনিট কম</item>
-        <item quantity="other">গতকালের চেয়ে %d মিনিট কম</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">গতকালের সমান</string>
     <!-- Joins the fast length and the change. -->
-    <string name="ramadan_tomorrow_line">আগামীকাল: সাহরি শেষ %1$s, ইফতার %2$s</string>
     <string name="ramadan_info_a11y">রমজানের এই সময়গুলো সম্পর্কে</string>
     <string name="ramadan_info_title">রমজানের এই সময়গুলো সম্পর্কে</string>
     <string name="ramadan_info_calc">SajdaTime আপনার অবস্থানের জন্য হিসাব করা ফজর ও মাগরিব দেখায় এবং সেগুলোকে সাহরির শেষ ও ইফতারের সময় হিসেবে ধরে।</string>

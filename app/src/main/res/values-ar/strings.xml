@@ -359,25 +359,7 @@
     <string name="ramadan_next_suhoor_tomorrow">ينتهي السحور غدًا الساعة %1$s</string>
     <string name="ramadan_month_ends_today">في هذا التقويم، اليوم هو آخر أيام رمضان. وسيعلن مسجدك العيد.</string>
     <string name="ramadan_fast_length">صيام اليوم %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="zero">أطول من أمس بـ %d دقيقة</item>
-        <item quantity="one">أطول من أمس بـ %d دقيقة</item>
-        <item quantity="two">أطول من أمس بدقيقتين</item>
-        <item quantity="few">أطول من أمس بـ %d دقائق</item>
-        <item quantity="many">أطول من أمس بـ %d دقيقة</item>
-        <item quantity="other">أطول من أمس بـ %d دقيقة</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="zero">أقصر من أمس بـ %d دقيقة</item>
-        <item quantity="one">أقصر من أمس بـ %d دقيقة</item>
-        <item quantity="two">أقصر من أمس بدقيقتين</item>
-        <item quantity="few">أقصر من أمس بـ %d دقائق</item>
-        <item quantity="many">أقصر من أمس بـ %d دقيقة</item>
-        <item quantity="other">أقصر من أمس بـ %d دقيقة</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">مثل أمس</string>
     <!-- Joins the fast length and the change. -->
-    <string name="ramadan_tomorrow_line">غدًا: ينتهي السحور %1$s، والإفطار %2$s</string>
     <string name="ramadan_info_a11y">حول مواقيت رمضان هذه</string>
     <string name="ramadan_info_title">حول مواقيت رمضان هذه</string>
     <string name="ramadan_info_calc">يعرض SajdaTime الفجر والمغرب كما حُسبا لموقعك، ويعدّهما نهاية السحور ووقت الإفطار.</string>
