@@ -6090,6 +6090,18 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 1.7.0 work started on branch `claude/1-7-0`, 3 Nov 2026 (not released; read with the block below)
+
+1.6.0 is still in review (not live). On `claude/1-7-0`, built overnight and checked on the emulator only: **time left**
+on the Now row ("Until Fajr · 2h 37m", counts only to the next time the list shows, `core/CurrentWindow.kt`),
+**optional Duha row** (off by default, Sunni only, 20 min after sunrise to 15 min before Dhuhr, `core/DuhaWindow.kt`),
+**quiet rows stack name, time, note at 1.5x text and above**, and **"Hear it"** in the two sound dialogs
+(`ui/settings/SoundPreview.kt`). The Isha counting rule, the Duha minutes, the label and Sunni only are PROPOSED and
+wait for Ali's word (religious content). Not built, waiting for his choice: banner free Set location and exact alarm
+rows, the one row strip widget, a bigger header sky graphic (design specs and mockups are in Ali's private planning
+folder, not in this repo). Not verified: real phone, TalkBack, Urdu RTL, 320dp, dark theme for the preview dialog.
+versionCode is still 10 on this branch; it becomes 11 only when Ali decides to release.
+
 ### 📍 1.6.0 SUBMITTED FOR REVIEW, 2 Nov 2026 (read this first)
 
 PR 17 merged into `main` (f5861af). Bundle 10 / 1.6.0 (built fresh from `main`, signed by Ali's key, 10028156 bytes)
