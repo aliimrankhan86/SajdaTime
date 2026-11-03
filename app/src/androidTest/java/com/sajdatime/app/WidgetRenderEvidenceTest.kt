@@ -298,11 +298,12 @@ class WidgetRenderEvidenceTest {
 
     // ---- After the threshold change ---------------------------------------------------------------
 
-    private fun hostAt(ctx: Context, build: (Context, WidgetState, Instant) -> RemoteViews, state: WidgetState, at: Instant, w: Int, h: Int): Pair<AppWidgetHostView, Float> {
+    private fun hostAt(ctx: Context, build: (Context, WidgetState, Instant) -> RemoteViews, state: WidgetState, at: Instant, w: Int, h: Int, rtl: Boolean = false): Pair<AppWidgetHostView, Float> {
         val density = ctx.resources.displayMetrics.density
         val wPx = (w * density).toInt()
         val hPx = (h * density).toInt()
         val host = AppWidgetHostView(ctx)
+        if (rtl) host.layoutDirection = View.LAYOUT_DIRECTION_RTL
         host.updateAppWidgetSize(Bundle(), listOf(SizeF(w.toFloat(), h.toFloat())))
         host.updateAppWidget(build(ctx, state, at))
         val exactW = View.MeasureSpec.makeMeasureSpec(wPx, View.MeasureSpec.EXACTLY)
@@ -465,6 +466,56 @@ class WidgetRenderEvidenceTest {
                 FileOutputStream(File(picDir, "next_${lang}_180x${h}_fs${scale}_normal_light.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
             }
         }
+    }
+
+    // ---- Right to left, dark, and in-between text sizes ------------------------------------------
+
+    @Test
+    fun rtl_dark_and_midscale() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val picDir = File(dir, "rtl-dark").apply { deleteRecursively(); mkdirs() }
+        val at = Instant.parse("2026-11-04T09:00:00Z")
+        val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+        fun ctxFor(lang: String, scale: Float, dark: Boolean): Context {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                // setLocale also sets the layout direction from the locale (right to left for ur and ar).
+                if (lang != "en") setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or
+                    (if (dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+            }
+            return base.createConfigurationContext(config)
+        }
+        class Pic(val widget: String, val lang: String, val w: Int, val h: Int, val dark: Boolean)
+        val pics = listOf(
+            Pic("strip", "ur", 300, 148, false), Pic("strip", "ur", 300, 152, false), Pic("strip", "ur", 300, 86, false),
+            Pic("strip", "ur", 300, 148, true), Pic("strip", "en", 300, 148, true),
+            Pic("next", "ur", 180, 110, false), Pic("next", "ur", 270, 170, false), Pic("next", "en", 180, 110, true),
+            Pic("today", "ur", 250, 346, true), Pic("today", "en", 250, 300, true),
+        )
+        for (p in pics) {
+            val build = when (p.widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }
+            instrumentation.runOnMainSync {
+                hostAt(ctxFor(p.lang, 1.0f, p.dark), build, state, at, p.w, p.h, rtl = p.lang == "ur" || p.lang == "ar")
+                val name = "${p.widget}_${p.lang}_${p.w}x${p.h}_fs1.0_normal_${if (p.dark) "dark" else "light"}"
+                FileOutputStream(File(picDir, "$name.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+        }
+        val csv = StringBuilder("widget,nominal,fs,neededDp,fits\n")
+        val sizes = listOf(
+            "strip" to listOf(300 to 86, 300 to 148, 300 to 152), "next" to listOf(180 to 110, 180 to 136, 270 to 158),
+            "today" to listOf(250 to 180, 250 to 300, 250 to 324),
+        )
+        for ((widget, list) in sizes) for ((w, h) in list) for (scale in listOf(1.2f, 1.25f)) {
+            val build = when (widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }
+            var needed = -1f
+            instrumentation.runOnMainSync { needed = hostAt(ctxFor("en", scale, false), build, state, at, w, h).second }
+            val line = "$widget,${w}x$h,$scale,${"%.1f".format(needed)},${if (needed <= h + 0.5f) "yes" else "no"}"
+            csv.append(line).append('\n')
+            Log.i("WidgetEvidence", line)
+        }
+        File(dir, "midscale.csv").writeText(csv.toString())
     }
 
     private fun shown(v: View): Boolean {

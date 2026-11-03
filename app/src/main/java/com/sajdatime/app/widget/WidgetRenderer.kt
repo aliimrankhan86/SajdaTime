@@ -82,14 +82,14 @@ internal object WidgetRenderer {
     // Urdu, Arabic and Bengali sit taller (measured the same day): the wide layout wants 165.3dp in Urdu and Arabic and
     // 188.2 at 1.15x, Bengali 150.9 and 169.9; the small one fits 162 in all three.
     // Measured needs of the full small layout: 131.8dp (134.9 at 1.15x) in Latin script, 137.1 (141.3) in Urdu and Arabic,
-    // 133.7 (137.5) in Bengali, so the bars come back from 136 and from 146 in those three scripts.
-    private fun nextBarsHeight(context: Context): Float = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 146f else 136f
+    // 133.7 (137.5) in Bengali, so the bars come back from 140 (137.1 and 138.3 at 1.2x and 1.25x, measured) and from 150 in those three scripts.
+    private fun nextBarsHeight(context: Context): Float = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 150f else 140f
 
     private fun nextSizes(context: Context): List<Pair<SizeF, Int>> {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         val grown = context.resources.configuration.fontScale >= 1.1f
-        val wideHeight = if (tall) (if (grown) 192f else 170f) else 158f
-        // Two entries of the small layout: from 136dp (146 in Urdu, Arabic and Bengali) it shows the five day bars; below that it hides them so the town
+        val wideHeight = if (tall) (if (grown) 192f else 170f) else if (grown) 166f else 158f
+        // Two entries of the small layout: from 140dp (150 in Urdu, Arabic and Bengali) it shows the five day bars; below that it hides them so the town
         // chip is not cut (Ali, 3 Nov 2026: "drop the bars when short").
         return listOf(
             SizeF(180f, 110f) to R.layout.widget_next_prayer,
@@ -110,9 +110,9 @@ internal object WidgetRenderer {
         // Measured 3 Nov 2026 (needed_heights): the large card wants 296dp at normal text and 322dp at 1.15x, since the
         // 15sp rows and the band's extra room (08bb2b8); the 280dp it used to take clipped the last row. Urdu, Arabic and
         // Bengali: measured the same day, the large card wants 340.6dp (Urdu), 339.8 (Arabic), 309.0 (Bengali) and 369.9, 365.0,
-        // 336.8 at 1.15x, so 346 and 374 for all three.
+        // 336.8 at 1.15x, so 346 and 374 for all three; 336 and 384 from 1.1x since 1.25x measured 334.1 (Latin) and the tall scripts add about 10 (estimated).
         val grown = context.resources.configuration.fontScale >= 1.1f
-        val largeHeight = if (tall) (if (grown) 374f else 346f) else (if (grown) 324f else 300f)
+        val largeHeight = if (tall) (if (grown) 384f else 346f) else (if (grown) 336f else 300f)
         return listOf(SizeF(250f, 180f) to R.layout.widget_today, SizeF(250f, largeHeight) to R.layout.widget_today_large)
     }
 
@@ -624,7 +624,7 @@ internal object WidgetRenderer {
     /**
      * The countdown sizes, in dp, judged from renders at each layout's smallest size. At the small Next
      * widget's 110dp minimum the short variant hides the day bars and uses [SHORT_COUNTDOWN_DP] (measured 3 Nov 2026: 105.9dp
-     * needed). From 136dp the bars show; One UI gives about 158dp and shows everything.
+     * needed). From 140dp the bars show; One UI gives about 158dp and shows everything.
      */
     private const val SMALL_COUNTDOWN_DP = 36f
     private const val SHORT_COUNTDOWN_DP = 32f
