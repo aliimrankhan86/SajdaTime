@@ -519,6 +519,12 @@
         <item quantity="one">%d dakika</item>
         <item quantity="other">%d dakika</item>
     </plurals>
+    <string name="action_hear_it">Dinle</string>
+    <string name="action_stop">Durdur</string>
+    <string name="preview_alarm_help">Alarm ses düzeyinde çalar, uyarı da öyle çalacak.</string>
+    <string name="preview_notification_help">Bildirim ses düzeyinde çalar, uyarı da öyle çalacak.</string>
+    <string name="preview_alarm_muted">Alarm sesiniz kısık, bu yüzden duymayacaksınız.</string>
+    <string name="preview_notification_silent">Telefonunuz sessizde, bu yüzden duymayacaksınız.</string>
     <string name="duha_row">Kuşluk</string>
     <string name="duha_until">%1$s saatine kadar</string>
     <string name="duha_row_a11y">Kuşluk %1$s ile %2$s arası.</string>

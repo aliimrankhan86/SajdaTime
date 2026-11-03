@@ -617,6 +617,12 @@
         <item quantity="many">%d دقيقة</item>
         <item quantity="other">%d دقيقة</item>
     </plurals>
+    <string name="action_hear_it">اسمعه</string>
+    <string name="action_stop">إيقاف</string>
+    <string name="preview_alarm_help">يُشغَّل بمستوى صوت المنبّه، كما سيكون التنبيه.</string>
+    <string name="preview_notification_help">يُشغَّل بمستوى صوت الإشعارات، كما سيكون التنبيه.</string>
+    <string name="preview_alarm_muted">مستوى صوت المنبّه منخفض، لذا لن تسمعه.</string>
+    <string name="preview_notification_silent">هاتفك على الوضع الصامت، لذا لن تسمعه.</string>
     <string name="duha_row">الضحى</string>
     <string name="duha_until">حتى %1$s</string>
     <string name="duha_row_a11y">الضحى من %1$s حتى %2$s.</string>

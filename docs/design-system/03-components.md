@@ -146,6 +146,14 @@ Pill, 1 border (`primary` selected, `outline` not), `secondaryContainer` fill wh
 Notification / Alarm and the suhoor style and sound. iPhone: segmented `Picker` when three or fewer
 short options, else chips.
 
+### Hear it (`SoundPreview`, in `settings/SoundPreview.kt`, 1.7.0)
+
+File `SoundPreview.kt`. One compact solid `CtaButton` (40 drawn, 48 touch, 18 play icon) under the sound choices in the Notification
+sound and Alarm sound dialogs, becoming "Stop" while it plays, with one `bodyMedium` `onSurfaceVariant` help
+line under it that says what the phone will really do (alarm volume, or the ringer). Plays through the same
+audio usage as the alert, never changes a volume, stops on Stop, sound end, another choice, dialog close and
+app to background. iPhone: `AVAudioPlayer`, same button; SF Symbols `play.fill` and `stop.fill`.
+
 ### Theme selector (`ThemeSelector`, in `settings/SettingsList.kt`)
 
 Three way sliding control: track `surfaceContainerHigh`, radius 28, inset 4; thumb `sajdaSurface` at

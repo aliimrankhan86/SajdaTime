@@ -755,6 +755,13 @@
         <item quantity="other">%d minutes</item>
     </plurals>
     <!-- 1.7.0: optional Duha row, Sunni only, off by default. Minutes are PROPOSED and wait for Ali. -->
+    <!-- 1.7.0: "Hear it" in the sound dialogs. -->
+    <string name="action_hear_it">Hear it</string>
+    <string name="action_stop">Stop</string>
+    <string name="preview_alarm_help">Plays at your alarm volume, like the alert will.</string>
+    <string name="preview_notification_help">Plays at your notification volume, like the alert will.</string>
+    <string name="preview_alarm_muted">Your alarm volume is turned down, so you will not hear it.</string>
+    <string name="preview_notification_silent">Your phone is on silent, so you will not hear it.</string>
     <string name="duha_row">Duha</string>
     <string name="duha_until">Until %1$s</string>
     <string name="duha_row_a11y">Duha from %1$s until %2$s.</string>

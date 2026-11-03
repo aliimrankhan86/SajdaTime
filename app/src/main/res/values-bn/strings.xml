@@ -550,6 +550,12 @@
         <item quantity="one">%d মিনিট</item>
         <item quantity="other">%d মিনিট</item>
     </plurals>
+    <string name="action_hear_it">শুনুন</string>
+    <string name="action_stop">থামান</string>
+    <string name="preview_alarm_help">অ্যালার্মের ভলিউমে বাজে, অ্যালার্ট যেমন বাজবে।</string>
+    <string name="preview_notification_help">নোটিফিকেশনের ভলিউমে বাজে, অ্যালার্ট যেমন বাজবে।</string>
+    <string name="preview_alarm_muted">আপনার অ্যালার্মের ভলিউম কমানো, তাই শুনতে পাবেন না।</string>
+    <string name="preview_notification_silent">আপনার ফোন সাইলেন্টে আছে, তাই শুনতে পাবেন না।</string>
     <string name="duha_row">চাশত</string>
     <string name="duha_until">%1$s পর্যন্ত</string>
     <string name="duha_row_a11y">চাশত %1$s থেকে %2$s পর্যন্ত।</string>

@@ -525,6 +525,12 @@
         <item quantity="one">%d منٹ</item>
         <item quantity="other">%d منٹ</item>
     </plurals>
+    <string name="action_hear_it">سنیں</string>
+    <string name="action_stop">روکیں</string>
+    <string name="preview_alarm_help">الارم کی آواز پر چلتا ہے، جیسے الرٹ چلے گا۔</string>
+    <string name="preview_notification_help">نوٹیفکیشن کی آواز پر چلتا ہے، جیسے الرٹ چلے گا۔</string>
+    <string name="preview_alarm_muted">آپ کے الارم کی آواز کم ہے، اس لیے سنائی نہیں دے گی۔</string>
+    <string name="preview_notification_silent">آپ کا فون خاموش پر ہے، اس لیے سنائی نہیں دے گا۔</string>
     <string name="duha_row">چاشت</string>
     <string name="duha_until">%1$s تک</string>
     <string name="duha_row_a11y">چاشت %1$s سے %2$s تک۔</string>

@@ -506,6 +506,12 @@
     <plurals name="duration_a11y_minutes">
         <item quantity="other">%d menit</item>
     </plurals>
+    <string name="action_hear_it">Dengarkan</string>
+    <string name="action_stop">Berhenti</string>
+    <string name="preview_alarm_help">Diputar dengan volume alarm, seperti peringatannya nanti.</string>
+    <string name="preview_notification_help">Diputar dengan volume notifikasi, seperti peringatannya nanti.</string>
+    <string name="preview_alarm_muted">Volume alarm Anda diturunkan, jadi Anda tidak akan mendengarnya.</string>
+    <string name="preview_notification_silent">Ponsel Anda dalam mode senyap, jadi Anda tidak akan mendengarnya.</string>
     <string name="duha_row">Duha</string>
     <string name="duha_until">Sampai %1$s</string>
     <string name="duha_row_a11y">Duha dari %1$s sampai %2$s.</string>

@@ -393,6 +393,7 @@ fun SettingsScreen(
         defaultLabel = R.string.settings_notification_sound_default,
         onPickPhone = onPickNotificationSound,
         onPickBuiltIn = onPickBuiltInNotificationAdhan,
+        alarm = false,
     )
     val alarmSound = SoundChoice(
         sect = settings.sect,
@@ -400,6 +401,7 @@ fun SettingsScreen(
         defaultLabel = R.string.settings_alarm_sound_default,
         onPickPhone = onPickAlarmSound,
         onPickBuiltIn = onPickBuiltInAdhan,
+        alarm = true,
         respectsSilent = settings.alarmRespectsSilent,
         onSetRespectsSilent = onSetAlarmRespectsSilent,
     )
@@ -1458,6 +1460,8 @@ private class SoundChoice(
     @StringRes val defaultLabel: Int,
     val onPickPhone: () -> Unit,
     val onPickBuiltIn: (BuiltInAdhan) -> Unit,
+    /** True for the alarm sound, false for the notification sound: the preview plays through the same usage. */
+    val alarm: Boolean,
     val respectsSilent: Boolean = true,
     val onSetRespectsSilent: ((Boolean) -> Unit)? = null,
 )
@@ -1519,6 +1523,7 @@ private fun SoundChoices(sound: SoundChoice) {
             onSelect = sound.onPickPhone,
         )
     }
+    SoundPreview(uri = sound.uri, alarm = sound.alarm)
     sound.onSetRespectsSilent?.let { PlayOnSilentRow(sound.respectsSilent, it) }
 }
 
