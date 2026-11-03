@@ -31,6 +31,7 @@ being told it was done. It is written so that the next session cannot repeat the
 | 18 Oct 2026 | "Make the text white" | Solid green, but about 15 actions left as green text links, and the reply said "every action button" was solid | The claim was made without listing the buttons; this document itself said text links were right for "Skip", "Details" and "Save as PDF", contradicting him |
 | 18 Oct 2026 | Even gaps between bold and normal text | Said "every gap comes from `Space`" | Only `Notice.kt` was checked; 74 eyeballed gaps remained in 10 files |
 | 18 Oct 2026 | Test on the emulator | He judged an old build twice | Nobody checked which build was installed |
+| 3 Nov 2026 | Cards and a widget that look clean | Sibling tiles of different heights (only one had a "Next" pill), icon and text off one axis, one widget column's time autosized smaller than its neighbours, a two line sentence under a card | Each element was built to be right alone and never compared with its sibling; screenshots were looked at for "does it work", not "do the two match" |
 
 The pattern: **a general instruction was applied to the place in front of you, then reported
 as applied everywhere.** The fix is §0.3: never say "every" without the inventory.
@@ -77,6 +78,35 @@ are true, and say which you checked:
 The owner wins, and this document is corrected **in the same commit**, with the old rule moved to
 §9 as reversed. When this document and the code disagree, the code is the bug unless §9 says
 otherwise; if neither says, ask him (§0.2).
+
+### 0.5 Sameness and alignment (3 Nov 2026, Ali: "basic mistakes")
+
+Before any screenshot goes to the owner, put the two siblings side by side and check each of these. They are the
+mistakes he has now had to point out, so they are rules, not taste.
+
+1. **Siblings are identical in structure and size.** Tiles in a row, cards in a stack, widget columns: same parts in
+   the same places, same height and width, same corner radius, same padding. A state that adds a part (a "Next"
+   pill, a badge, a second line) gets a slot in *every* sibling's layout, so the sibling that lacks it is not
+   shorter. Build the row as `Row(Modifier.height(IntrinsicSize.Min))` with each tile `fillMaxHeight()`, or give
+   the slot a fixed height. Never let content decide one tile's height.
+2. **One axis per row.** Icon and text in a row share a centre line (`verticalAlignment = CenterVertically`), or
+   the icon sits on its own row above the text. An icon beside text that wraps to two lines is not allowed: put
+   the icon above, or keep the text to one line.
+3. **One left edge.** Everything stacked in a card starts at the card's content edge, one `x`. Tile edges, titles,
+   sentences and buttons share it. Text inside a tile is inset by the tile's own padding, the same on every tile.
+4. **Same size across siblings.** The same kind of text (a name, a time, a label) is the same size and weight in
+   every sibling. No per-column autosize in a widget: it makes one time smaller than its neighbour. Pick a size
+   that fits the longest string ("Maghrib", "12:45 pm", the longest Urdu name) and use it for all.
+5. **One fact per line, one line per fact.** Text under a card is short and scannable: a bold headline (the
+   countdown), then short lines of one fact each. A sentence that wraps to a second line in English is split into
+   two facts or shortened; people do not read long text on a home screen. Never join two facts with a comma.
+6. **Icons are one family and one size per role.** One glyph size for tiles, one for list rows, one for tabs; the
+   same stroke style. Names bold and larger than the line under them when they are the thing to find at a glance.
+7. **Colour carries the first read.** The one thing that needs attention on a screen is the one tinted or solid
+   block (Ramadan is the `primaryContainer` card; the next time is the solid `primary` tile). Everything else is
+   paper. Not colour alone: the same thing also has a word ("Next").
+8. **Check it by overlaying, not by feel.** Take the screenshot, draw a line down every left edge and across every
+   icon and text centre; read tile heights off the picture. If two numbers that should match differ by 1px, fix it.
 
 ---
 
@@ -1346,6 +1376,8 @@ a `Space` token chosen by relationship? Is any icon button sitting next to anoth
 to action a solid button? Does every dismissable dialog have the X? **Is the build he will test the
 one these screenshots came from** (an emulator still running yesterday's install showed none of
 the day's changes, and that cost a round of his trust)?
+
+**Added 3 Nov 2026 (§0.5):** Are sibling tiles, cards and columns the same size and structure? Do icon and text share one axis? Is there one left edge? Is any sentence over one line? Is the same kind of text the same size in every sibling?
 
 **Added 18 Oct 2026 (evening):** Did any choice here depend on a guess about what he wants
 (§0.2)? If so, did you ask? Is every button in the §4.1 inventory, with the right kind, height and

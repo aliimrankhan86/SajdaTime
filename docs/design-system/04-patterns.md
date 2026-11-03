@@ -135,3 +135,11 @@ and Do Not Disturb access have no iPhone equivalent (Time Sensitive notification
 - Show calculation honestly: "Approximate", "as calculated", "Local moon sighting may differ by a day".
 - Sect specific content only for that sect. Nothing about belief is ever sent anywhere.
 - The disclaimer is in About, first row, never softened. Its dua request is the only ask in the app.
+
+## 4.11 Sameness and alignment
+
+The rules are in `docs/DESIGN_SYSTEM.md` section 0.5 (siblings identical, one axis per row, one left edge, same size across
+siblings, one fact per line, one icon family, colour carries the first read, check by overlay). Worked examples from 3 Nov 2026:
+the Ramadan time tiles (glyph row with the "Next" pill at its end, bold name, time: both tiles the same height whichever is
+next), the text under the card (bold countdown, "Fast today 12h 37m", "1 minute longer than yesterday", a hairline, the
+tomorrow line), and the strip widget's columns (fixed sizes, no per-column autosize).

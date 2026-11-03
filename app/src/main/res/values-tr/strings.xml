@@ -327,7 +327,6 @@
         <item quantity="other">dünden %d dakika kısa</item>
     </plurals>
     <string name="ramadan_fast_change_same">dünle aynı</string>
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
     <string name="ramadan_tomorrow_line">Yarın: imsak %1$s, iftar %2$s</string>
     <string name="ramadan_info_a11y">Bu Ramazan vakitleri hakkında</string>
     <string name="ramadan_info_title">Bu Ramazan vakitleri hakkında</string>

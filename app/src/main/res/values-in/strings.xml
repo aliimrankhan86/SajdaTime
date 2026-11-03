@@ -324,7 +324,6 @@
         <item quantity="other">%d menit lebih singkat dari kemarin</item>
     </plurals>
     <string name="ramadan_fast_change_same">sama dengan kemarin</string>
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
     <string name="ramadan_tomorrow_line">Besok: sahur berakhir %1$s, buka puasa %2$s</string>
     <string name="ramadan_info_a11y">Tentang waktu Ramadan ini</string>
     <string name="ramadan_info_title">Tentang waktu Ramadan ini</string>

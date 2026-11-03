@@ -377,7 +377,6 @@
     </plurals>
     <string name="ramadan_fast_change_same">مثل أمس</string>
     <!-- Joins the fast length and the change. -->
-    <string name="ramadan_fast_line">%1$s، %2$s</string>
     <string name="ramadan_tomorrow_line">غدًا: ينتهي السحور %1$s، والإفطار %2$s</string>
     <string name="ramadan_info_a11y">حول مواقيت رمضان هذه</string>
     <string name="ramadan_info_title">حول مواقيت رمضان هذه</string>

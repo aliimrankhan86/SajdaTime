@@ -346,7 +346,6 @@
     </plurals>
     <string name="ramadan_fast_change_same">গতকালের সমান</string>
     <!-- Joins the fast length and the change. -->
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
     <string name="ramadan_tomorrow_line">আগামীকাল: সাহরি শেষ %1$s, ইফতার %2$s</string>
     <string name="ramadan_info_a11y">রমজানের এই সময়গুলো সম্পর্কে</string>
     <string name="ramadan_info_title">রমজানের এই সময়গুলো সম্পর্কে</string>

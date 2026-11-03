@@ -533,7 +533,6 @@
     </plurals>
     <string name="ramadan_fast_change_same">the same as yesterday</string>
     <!-- Joins the fast length and the change: "Fast today 12h 18m, 3 minutes longer than yesterday". -->
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
     <string name="ramadan_tomorrow_line">Tomorrow: suhoor ends %1$s, iftar %2$s</string>
     <string name="ramadan_info_a11y">About these Ramadan times</string>
     <string name="ramadan_info_title">About these Ramadan times</string>

@@ -333,7 +333,6 @@
         <item quantity="other">کل سے %d منٹ چھوٹا</item>
     </plurals>
     <string name="ramadan_fast_change_same">کل جتنا ہی</string>
-    <string name="ramadan_fast_line">%1$s، %2$s</string>
     <string name="ramadan_tomorrow_line">کل: سحری ختم %1$s، افطار %2$s</string>
     <string name="ramadan_info_a11y">رمضان کے ان اوقات کے بارے میں</string>
     <string name="ramadan_info_title">رمضان کے ان اوقات کے بارے میں</string>
