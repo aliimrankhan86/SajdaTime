@@ -58,7 +58,7 @@ import kotlin.math.roundToInt
  * layout each, which left the content stranded in a corner of the larger widget One UI gives.
  *
  * **Three widgets since step 8 (1.6.0).** The Today strip (`strip`, `widget_strip.xml`) is five columns in one
- * row, built four ways from the one layout ([STRIP_SIZES]); the Next prayer and Today widgets share its body
+ * row, built four ways from the one layout ([stripSizes]); the Next prayer and Today widgets share its body
  * ([stripBody]) since 1.7.0.
  *
  * The countdown is a `Chronometer`, which the launcher's process ticks, so it costs this app no wake
@@ -146,16 +146,23 @@ internal object WidgetRenderer {
     // 1.7.0 (Ali, 3 Nov 2026: "row level widget with icons and prayer time ... adjusted to half a row"): the glyph
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
     // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
-    private val STRIP_SIZES = listOf(
-        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, STRIP_TALL_HEIGHT_DP), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
-        SizeF(400f, 40f), SizeF(400f, STRIP_TALL_HEIGHT_DP), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
-    )
+    private fun stripSizes(context: Context): List<SizeF> {
+        val tall = stripTallHeight(context)
+        return listOf(
+            SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, tall), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
+            SizeF(400f, 40f), SizeF(400f, tall), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
+        )
+    }
     private const val STRIP_GLYPH_WIDTH_DP = 300f
     // Measured 3 Nov 2026 (needed_heights): the glyph row wants 72.8dp (77.3 at 1.15x) and the hero tier 124.6dp
     // (130.3 at 1.15x); they were 64 and 110, which cut the times and the underline off. Seen at 124dp: complete.
     // The thin tier (40dp) wants 45 to 49.5: it is the floor, so it is still cut when a launcher gives 40 to 45dp.
-    // Urdu and Arabic want 78.9 and 84.2 (1.15x), 139.0 and 146.7, 145.5 and 151.6: so 86, 148 and 152 for every script.
-    private const val STRIP_TALL_HEIGHT_DP = 86f
+    // Urdu and Arabic want 78.9 and 84.2 (1.15x), 139.0 and 146.7, 145.5 and 151.6: so 86 (Latin script 78), 148 and 152.
+    private const val STRIP_TALL_HEIGHT_DP = 78f
+    // One UI gives a one row strip about 79dp: the glyph row must still show there (it wants 72.8, 77.3 at 1.15x in Latin
+    // script), so the Latin value is 78, not 86. Urdu, Arabic and Bengali want 84.2 at 1.15x.
+    private fun stripTallHeight(context: Context): Float =
+        if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 86f else STRIP_TALL_HEIGHT_DP
     private const val STRIP_HALF_WIDTH_DP = 250f
     private const val STRIP_HERO_HEIGHT_DP = 148f
     private const val STRIP_HERO_BIG_DP = 152f
@@ -171,9 +178,9 @@ internal object WidgetRenderer {
     fun strip(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            RemoteViews(STRIP_SIZES.associateWith { stripViews(context, state, now, it) })
+            RemoteViews(stripSizes(context).associateWith { stripViews(context, state, now, it) })
         } else {
-            stripViews(context, state, now, STRIP_SIZES.first())
+            stripViews(context, state, now, stripSizes(context).first())
         }
     }
 
@@ -293,9 +300,9 @@ internal object WidgetRenderer {
      */
     private fun stripViews(context: Context, state: WidgetState, now: Instant, size: SizeF): RemoteViews {
         val views = themedViews(context, state, R.layout.widget_strip)
-        val tall = size.height >= STRIP_TALL_HEIGHT_DP
+        val tall = size.height >= stripTallHeight(context)
         // Glyph above name above time (Opus audit, 3 Nov 2026: glyph beside the name put the name off the time's axis and
-        // forced per column autosize). Needs 86dp tall and 300dp wide (measured: 72.8dp, 77.3 at 1.15x, 84.2 in Urdu).
+        // forced per column autosize). Needs 78dp tall (86 in Urdu, Arabic, Bengali) and 300dp wide (measured: 72.8dp, 77.3 at 1.15x, 84.2 in Urdu).
         val glyphs = tall && size.width >= STRIP_GLYPH_WIDTH_DP
         applyDirection(context, views)
         applyTap(context, views)
@@ -353,7 +360,7 @@ internal object WidgetRenderer {
             // The app's own mark at the top start corner, so the widget still says which app it is (Ali, 3 Nov 2026: a
             // separate small logo, top left, top right in right to left). Only on the 148dp and 152dp entries at the
             // normal text size: the Opus review estimated the hero line overflows 300dp with the logo from 1.15x text,
-            // and the thin and 86dp entries have no room. Seen on 3 Nov 2026 in a render at 300x148 and 300x150 and on the emulator launcher at about 225dp tall.
+            // and the thin and 78dp entries have no room. Seen on 3 Nov 2026 in a render at 300x148 and 300x150 and on the emulator launcher at about 225dp tall.
             val room = size.height >= STRIP_HERO_HEIGHT_DP && context.resources.configuration.fontScale <= 1.0f
             views.setViewVisibility(R.id.widget_corner_logo, if (room) View.VISIBLE else View.GONE)
             views.setTextViewText(R.id.widget_name, next.slot.label(context))

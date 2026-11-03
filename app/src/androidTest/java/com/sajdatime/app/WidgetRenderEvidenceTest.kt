@@ -518,6 +518,42 @@ class WidgetRenderEvidenceTest {
         File(dir, "midscale.csv").writeText(csv.toString())
     }
 
+    // ---- Strip glyph row fit ---------------------------------------------------------------------
+
+    @Test
+    fun strip_glyph_row_fit() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val at = Instant.parse("2026-11-04T09:00:00Z")
+        val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+        class Row(val lang: String, val w: Int, val h: Int, val scales: List<Float>)
+        val en = listOf(1.0f, 1.15f, 1.2f, 1.25f)
+        val rows = listOf(
+            Row("en", 300, 78, en), Row("en", 400, 78, en), Row("en", 300, 79, listOf(1.0f)), Row("en", 300, 77, listOf(1.0f)),
+        ) + listOf("ur", "ar", "bn").map { Row(it, 300, 86, listOf(1.0f, 1.15f)) }
+        val csv = StringBuilder("widget,lang,nominal,fs,neededDp,fits,glyphRowVisible\n")
+        for (r in rows) for (scale in r.scales) {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                if (r.lang != "en") setLocale(java.util.Locale.forLanguageTag(r.lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            var needed = -1f
+            var glyph = "?"
+            instrumentation.runOnMainSync {
+                val (host, n) = hostAt(ctx, WidgetRenderer::strip, state, at, r.w, r.h, rtl = r.lang == "ur" || r.lang == "ar")
+                needed = n
+                val g = host.findViewById<View>(R.id.widget_glyph_asr) // Dhuhr is the highlighted prayer at this hour, and its sun glyph is swapped for the mark
+                glyph = if (g == null) "absent" else if (shown(g)) "yes" else "no"
+            }
+            val line = "strip,${r.lang},${r.w}x${r.h},$scale,${"%.1f".format(needed)},${if (needed <= r.h + 0.5f) "yes" else "no"},$glyph"
+            csv.append(line).append('\n')
+            Log.i("WidgetEvidence", line)
+        }
+        File(dir, "strip-glyph.csv").writeText(csv.toString())
+    }
+
     private fun shown(v: View): Boolean {
         var x: View? = v
         while (x != null) {
