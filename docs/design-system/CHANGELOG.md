@@ -6,6 +6,12 @@ also go in `docs/DESIGN_SYSTEM.md` §9 with his words.
 
 ---
 
+## 3 Nov 2026: correct nine stale prose facts and widget resource inventory
+
+- Corrected the nine Job 3 findings against committed code at `4c7b568`: strip size entries, chip and glyph thresholds, highlight treatment, Bengali Today threshold, strip body exception, mark usage, Ramadan detail lines and tile fill.
+- Added the 24 drawable and two fixed colour names named literally by the widget tests to the surface resource tables; the fixed colour families retain their wildcard coverage.
+- Facts only: no token, source or design change. Rejected expanding this into a restyle or documenting Claude's uncommitted widget work. iPhone effect: none.
+
 ## 30 Oct 2026: Bengali, and text that shrinks instead of breaking
 
 - Bengali added to the languages table (`values-bn`, tag `bn-u-nu-latn`, tall script) and a full "Adding a language" checklist in 06 §6.6.
