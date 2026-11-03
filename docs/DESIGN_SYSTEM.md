@@ -494,6 +494,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Ramadan timetable | Shift the date, alone under the notes | A | 52, full | `RamadanTimetableSheet.kt` |
 | Location sheet | Use my current location; Find place, once something is typed | A | 52, full | `Common.kt` |
 | Every notice | The action (trailing arrow); Details or Hide details (chevron) only when the notice has details (not the two permission cards, since 1.6); the X, alone | A or B; D | 48, wraps | `Notice.kt` |
+| Settings exact alarms and Do Not Disturb rows, Times notifications row (1.7.0, `PermissionCard`: tile, title, one line, no card) | Allow, solid amber; on Times also the X | B compact (40 drawn, 48 to touch); D | 40, no wrap | `PermissionAction.kt` |
 | Times, notifications notice (1.6.0, while the phone blocks notifications) | Allow (trailing arrow); the X, alone | B; D | 48, wraps | `Notice.kt`, `PermissionAction.kt` |
 | Times | the bell at the end of each prayer row, not Sunrise (a 48dp blank keeps its time aligned) | Bell (`Bell.kt`), a toggle like Tick | 24 drawn, 48 target | `HomeScreen.kt`, `Bell.kt` |
 | Settings, Match your mosque start times | Use your mosque's board (clock icon), under the help text, 16dp over the first prayer; opens "Which prayer?" (radio rows), then the clock | A | 52, full | `SettingsScreen.kt` |
@@ -858,9 +859,8 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   cards with text". Now: no location set -> a compact green "Set location" button beside the city title (kind A
   compact, already in §4.1); exact alarms withheld -> the Fajr row gets "May not ring on time" in
   `onTertiaryContainer` and an 8dp `tertiary` dot on its bell, tapping the row opens a dialog (X only, no "Close"
-  text, full width green Allow), and the Settings tab wears the same dot. **Not yet built:** the Settings row with a
-  compact amber Allow (Settings still shows the old card), the notifications blocked line, and Qibla / My prayers
-  no-location sentences. Rejected: a status card row (still a card, chevron is not a solid button), and a one time
+  text, full width green Allow), and the Settings tab wears the same dot. The Settings rows (and the Times notifications notice) are now a single row with a compact amber Allow, Ali: the
+  old card "takes too much space". **Not yet built:** Qibla / My prayers no-location sentences. Rejected: a status card row (still a card, chevron is not a solid button), and a one time
   setup sheet (setup already asked both).
 - **3 Nov 2026, sky mark becomes a full width sky band under the date line (design G, option A).** Ali: the graphic "is too
   small and easier to miss ... improve its size or add colours". Built 52dp tall: bigger arc, 8dp ticks (filled when reached,
