@@ -186,7 +186,7 @@ internal object WidgetRenderer {
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
-            fillRows(context, views, state, labels = false, band = true)
+            fillRows(context, views, state, labels = false, band = true, bandSideDp = 4f)
         }
 
         views.setContentDescription(R.id.widget_root, withPlace(context, state, nextSentence(context, next, now)))
@@ -223,7 +223,7 @@ internal object WidgetRenderer {
             fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
         }
 
-        val spoken = fillRows(context, views, state, labels = true, band = large)
+        val spoken = fillRows(context, views, state, labels = true, band = large, bandSideDp = 8f)
 
         if (today.approximated) {
             views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
@@ -478,7 +478,7 @@ internal object WidgetRenderer {
      * The six rows. Returns one spoken phrase per row for the widget's single description. [band] is the larger
      * forms (wide Next, large Today), whose highlighted row takes the rimmed band; otherwise the 4dp underline marks it.
      */
-    private fun fillRows(context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean): List<String> {
+    private fun fillRows(context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean, bandSideDp: Float = 0f): List<String> {
         val today = state.today ?: return emptyList()
         val spoken = mutableListOf<String>()
         for (slot in PrayerSlot.entries) {
@@ -495,6 +495,15 @@ internal object WidgetRenderer {
             // every time because the launcher reuses these views.
             views.setViewVisibility(ids.underline, if (highlighted && !band) View.VISIBLE else View.GONE)
             views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted && band) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
+            // The band row gets 4dp above and below the text so the current prayer is not squashed against its rim (Ali, 3 Nov
+            // 2026: "the active one needs to be nicely visible"). Only that row grows; the weighted gaps between the rows
+            // absorb it, so no neighbour moves. Written for every row because the launcher reuses views. The sides repeat
+            // the layout's own padding, which setViewPadding replaces.
+            if (band) {
+                val side = dp(context, bandSideDp)
+                val vertical = if (highlighted) dp(context, 4f) else 0
+                views.setViewPadding(ids.row, side, vertical, side, vertical)
+            }
             // The mark is its own view (the strip's widget_logo_*), never the glyph view with a filter or tint removed: under a theme
             // chosen in the app the glyph carries a colour filter that turned the mark into a flat grey tile (seen on the emulator).
             views.setImageViewResource(ids.glyph, glyph(slot))
