@@ -422,6 +422,41 @@ class WidgetRenderEvidenceTest {
         File(dir, "tall.csv").writeText(csv.toString())
     }
 
+    // ---- Compact Today: the rows shown when short (next prayer onward) ------------------------------
+
+    @Test
+    fun compact_today_windows() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        // Early morning (next Fajr or sunrise side), midday, late evening (after Isha: nothing next today).
+        val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z")
+        val csv = StringBuilder("lang,fs,at,H,neededDp,fits\n")
+        // H is the height the host is given: 180 is the first compact entry (fewer rows when short), the taller ones are the six row entry.
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (t in times) for (h in listOf(180, 210, 250, 300, 400)) {
+            val at = Instant.parse(t)
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            var needed = -1f
+            instrumentation.runOnMainSync {
+                try {
+                    needed = hostAt(ctx, WidgetRenderer::today, state, at, 250, h).second
+                    if (t.contains("12:30") || t.contains("21:30")) {
+                        FileOutputStream(File(dir, "compact_${lang}_fs${scale}_${t.substring(11, 13)}_h$h.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                    }
+                } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) }
+            }
+            val line = "$lang,$scale,${t.substring(11, 16)},$h,${"%.1f".format(needed)},${if (needed in 0f..h + 0.5f) "yes" else "no"}"
+            csv.append(line).append('\n')
+            Log.i("WidgetEvidence", line)
+        }
+        File(dir, "compact.csv").writeText(csv.toString())
+    }
+
     // ---- Next prayer, short variants --------------------------------------------------------------
 
     @Test

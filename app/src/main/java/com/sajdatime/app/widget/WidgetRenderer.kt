@@ -113,10 +113,58 @@ internal object WidgetRenderer {
         // 336.8 at 1.15x, so 346 and 374 for all three; 336 and 384 from 1.1x since 1.25x measured 334.1 (Latin) and the tall scripts add about 10 (estimated).
         val grown = context.resources.configuration.fontScale >= 1.1f
         val largeHeight = if (tall) (if (grown) 384f else 346f) else (if (grown) 336f else 300f)
-        return listOf(SizeF(250f, 180f) to R.layout.widget_today, SizeF(250f, largeHeight) to R.layout.widget_today_large)
+        // The first compact entry shows as many rows as 180dp holds; from the second (the height six rows need, see
+        // [compactSixRowsHeight]) all six show. Same layout, so todayViews is given the size.
+        val six = compactSixRowsHeight(context)
+        return listOfNotNull(
+            SizeF(250f, 180f) to R.layout.widget_today,
+            if (six > 180f) SizeF(250f, six) to R.layout.widget_today else null,
+            SizeF(250f, maxOf(largeHeight, six + 1f)) to R.layout.widget_today_large,
+        )
     }
 
     private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
+
+    /**
+     * The compact Today list is 180dp tall and six rows no longer fit from 1.1x text or in the tall scripts (measured 3 Nov 2026:
+     * six rows want 193dp at 1.15x, 206 at 1.25x, 282 at 2.0, 203 in Urdu). With these counts the first entry measures 126 to 180dp
+     * in English, Urdu, Arabic and Bengali from 1.0x to 2.0x, and [compactSixRowsHeight] (measured, with margin) gives six rows to a taller widget.
+     * already passed, so nothing is cut half way: the window starts at the next prayer (sunrise is never next) and, when that leaves too
+     * few rows, starts earlier. Row counts follow the measured heights per row; see HANDOVER.
+     */
+    /** The height six compact rows need, so a taller widget keeps all of them (measured 3 Nov 2026, see HANDOVER). */
+    private fun compactSixRowsHeight(context: Context): Float {
+        val scale = context.resources.configuration.fontScale
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        return when {
+            scale >= 1.6f -> if (tall) 345f else 300f
+            scale >= LARGE_TEXT -> if (tall) 300f else 250f
+            scale >= 1.1f -> if (tall) 250f else 210f
+            else -> if (tall) 210f else 180f
+        }
+    }
+
+    private fun compactSlots(context: Context, state: WidgetState, size: SizeF): List<PrayerSlot> {
+        // Below Android 12 only the first entry exists and its real height is unknown, so all six rows stay (as before 3 Nov 2026).
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || size.height >= compactSixRowsHeight(context)) return PrayerSlot.entries
+        val scale = context.resources.configuration.fontScale
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        val count = when {
+            tall -> when {
+                scale >= 1.6f -> 2
+                scale >= LARGE_TEXT -> 3
+                scale >= 1.1f -> 4
+                else -> 5
+            }
+            scale >= 1.6f -> 3
+            scale >= LARGE_TEXT -> 4
+            scale >= 1.1f -> 5
+            else -> 6
+        }
+        val all = PrayerSlot.entries
+        val start = state.next?.takeIf { !it.isTomorrow }?.let { all.indexOf(it.slot) } ?: (all.size - count)
+        return all.subList(start.coerceAtMost(all.size - count), (start.coerceAtMost(all.size - count)) + count)
+    }
 
     /**
      * From this text size the second layout of each widget stops showing the whole day (rendered at 1.3
@@ -135,7 +183,11 @@ internal object WidgetRenderer {
 
     fun today(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        return responsive(forText(context, todaySizes(context))) { layout, _ -> todayViews(context, state, now, layout) }
+        // At large text the large card is dropped (see LARGE_TEXT) but every compact entry stays, so a tall widget keeps all six rows.
+        val sizes = todaySizes(context).let { all ->
+            if (context.resources.configuration.fontScale >= LARGE_TEXT) all.filter { it.second == R.layout.widget_today } else all
+        }
+        return responsive(sizes) { layout, size -> todayViews(context, state, now, layout, size) }
     }
 
     /**
@@ -247,7 +299,7 @@ internal object WidgetRenderer {
         return views
     }
 
-    private fun todayViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int): RemoteViews {
+    private fun todayViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int, size: SizeF): RemoteViews {
         val views = themedViews(context, state, layout)
         val large = layout == R.layout.widget_today_large
         applyDirection(context, views)
@@ -277,7 +329,7 @@ internal object WidgetRenderer {
             fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
         }
 
-        val spoken = fillRows(context, views, state, labels = true, band = large, bandSideDp = 8f)
+        val spoken = fillRows(context, views, state, labels = true, band = large, bandSideDp = 8f, shown = if (large) PrayerSlot.entries else compactSlots(context, state, size))
 
         if (today.approximated) {
             views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
@@ -532,11 +584,21 @@ internal object WidgetRenderer {
      * The six rows. Returns one spoken phrase per row for the widget's single description. [band] is the larger
      * forms (wide Next, large Today), whose highlighted row takes the rimmed band; otherwise the 4dp underline marks it.
      */
-    private fun fillRows(context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean, bandSideDp: Float = 0f): List<String> {
+    private fun fillRows(
+        context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean, bandSideDp: Float = 0f,
+        shown: List<PrayerSlot> = PrayerSlot.entries,
+    ): List<String> {
         val today = state.today ?: return emptyList()
         val spoken = mutableListOf<String>()
         for (slot in PrayerSlot.entries) {
             val ids = ROWS.getValue(slot)
+            // Rows left out still get their text (the spoken sentence names all six); only the view goes. Written both ways,
+            // since the launcher reuses the view.
+            if (slot !in shown) {
+                views.setViewVisibility(ids.row, View.GONE)
+                spoken += context.getString(R.string.widget_a11y_row, slot.label(context), TimeFormat.clock(context, today[slot]))
+                continue
+            }
             val name = slot.label(context)
             val time = TimeFormat.clock(context, today[slot])
             val highlighted = state.isHighlighted(slot)
