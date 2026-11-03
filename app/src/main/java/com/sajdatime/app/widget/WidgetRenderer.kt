@@ -117,15 +117,14 @@ internal object WidgetRenderer {
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
     // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
     private val STRIP_SIZES = listOf(
-        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f),
-        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f),
+        SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, 64f), SizeF(300f, 110f), SizeF(300f, 150f), SizeF(300f, 190f),
+        SizeF(400f, 40f), SizeF(400f, 64f), SizeF(400f, 110f), SizeF(400f, 150f), SizeF(400f, 190f),
     )
     private const val STRIP_GLYPH_WIDTH_DP = 300f
     private const val STRIP_TALL_HEIGHT_DP = 64f
     private const val STRIP_HALF_WIDTH_DP = 250f
     private const val STRIP_HERO_HEIGHT_DP = 110f
     private const val STRIP_CHIP_WIDTH_DP = 400f
-    private const val HERO_SP = 28f
     private const val STRIP_MAX_SP = 12f
     private const val STRIP_MIN_SP = 9f
     private const val STRIP_CHIP_ALLOWANCE_DP = 105f
@@ -254,7 +253,11 @@ internal object WidgetRenderer {
         // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
         val side = dp(context, 4f)
         val edge = dp(context, if (tall) 4f else 2f)
-        views.setViewPadding(R.id.widget_root, side, edge, side, edge)
+        val heroEntry = size.height >= STRIP_HERO_HEIGHT_DP
+        // A tall entry puts the next prayer at the top and the five columns at the foot, the gap between them flexible, so no
+        // space is wasted above (Ali, 3 Nov 2026: "too much top spacing").
+        views.setViewPadding(R.id.widget_root, side, if (heroEntry) dp(context, 10f) else edge, side, if (heroEntry) dp(context, 8f) else edge)
+        views.setViewVisibility(R.id.widget_strip_gap, if (heroEntry) View.VISIBLE else View.GONE)
         // 1.7.0 (Ali, 3 Nov 2026, from a Pillars screenshot: "clean and easy to understand"): on the period's sky, like
         // the Next prayer widget, with the next prayer big on top once the widget is two cells tall.
         views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, skyDrawable(state.period)))
@@ -290,12 +293,18 @@ internal object WidgetRenderer {
         }
         views.setViewVisibility(R.id.widget_strip_row, if (large) View.GONE else View.VISIBLE)
         if (hero) {
-            val sp = if (size.height >= STRIP_HERO_HEIGHT_DP) HERO_SP else 14f
+            // The next prayer grows with the widget, so a tall one is not a small line in a big empty box.
+            val sp = when {
+                size.height >= 190f -> 36f
+                size.height >= 150f -> 30f
+                size.height >= STRIP_HERO_HEIGHT_DP -> 24f
+                else -> 14f
+            }
             views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
             views.setTextViewText(R.id.widget_name, next.slot.label(context))
-            views.setTextViewText(R.id.widget_time, TimeFormat.clock(context, next.at))
+            views.setTextViewText(R.id.widget_time, timeText(TimeFormat.clock(context, next.at), emphasis = false))
             views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_tomorrow))
             views.setViewVisibility(R.id.widget_sublabel, if (next.isTomorrow) View.VISIBLE else View.GONE)
         }
@@ -348,7 +357,7 @@ internal object WidgetRenderer {
             views.setViewVisibility(extra.first, if (glyphs && highlighted) View.VISIBLE else View.GONE)
             views.setViewVisibility(extra.second, if (highlighted) View.VISIBLE else View.INVISIBLE)
             views.setTextViewText(ids.name, if (highlighted) bold(heading) else heading)
-            views.setTextViewText(ids.time, if (highlighted) bold(time) else time)
+            views.setTextViewText(ids.time, timeText(time, highlighted))
 
             val spokenWord = word?.let { wordText(context, it) }
             spoken += context.getString(
@@ -793,6 +802,27 @@ internal object WidgetRenderer {
     )
 
     /** Bold for the highlighted row, so "which prayer is next" is not carried by a background tint alone. */
+    /**
+     * The time with its am or pm (any letters: "pm", "م", "PM") set smaller, so the digits lead (Ali, 3 Nov 2026: "make the
+     * am/pm small text"). [emphasis] adds bold. A 24 hour clock has no letters and comes back unchanged.
+     */
+    private fun timeText(text: String, emphasis: Boolean): CharSequence = SpannableString(text).apply {
+        if (emphasis) setSpan(StyleSpan(Typeface.BOLD), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        var i = 0
+        while (i < length) {
+            if (text[i].isLetter()) {
+                var j = i
+                while (j < length && text[j].isLetter()) j++
+                setSpan(android.text.style.RelativeSizeSpan(MERIDIEM_SCALE), i, j, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                i = j
+            } else {
+                i++
+            }
+        }
+    }
+
+    private const val MERIDIEM_SCALE = 0.7f
+
     private fun bold(text: String): CharSequence =
         SpannableString(text).apply { setSpan(StyleSpan(Typeface.BOLD), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) }
 
