@@ -29,7 +29,7 @@ when a release publishes.
 | Branch | What it is | What you do with it |
 |---|---|---|
 | `main` | Exactly what users have: **1.5.0**, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes the next release only when Ali says go, by `RELEASE-<version>.md`; Ali presses every merge, submit and publish button |
-| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, 20 commits ahead of `main`, all pushed (see git log for the latest commit), nothing merged, versionCode still 10, it becomes 11 only when Ali says release (the versionCode 11 and branch name decision is still open). Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
+| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 40 commits ahead of `main`, all pushed (see git log for the latest commit), nothing merged, versionCode still 10, it becomes 11 only when Ali says release (the versionCode 11 and branch name decision is still open). Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
 | `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system. Check the public Play page before acting on it | Do not cut new work from here; use `claude/1-7-0` |
 | your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-7-0` | Commit and push here. Merging into `claude/1-7-0` only when Ali says so, after review; Ali presses every merge, submit and publish button |
 
@@ -71,7 +71,7 @@ calculations in `core/` (plain Kotlin, portable to iPhone); watch in `wear/`.
   Records, never judges.
 - **Settings**: prayer times (location, school, method, jama'ah times, match your mosque, Islamic dates),
   appearance (theme, language), reminders, My prayers, About (disclaimer first).
-- Also: three home screen widgets (Today strip redone; Next prayer and Today list widgets restyle pending),
+- Also: three home screen widgets (all restyled to one look in 1.7.0; sizes set from measured heights, `WidgetRenderEvidenceTest`, run with `-e widgetEvidence true`, see HANDOVER section 11),
   notifications, Ramadan card and timetable, the Wear OS app and tile.
 
 Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic, Bengali (30 Oct 2026). Urdu and Arabic are right
