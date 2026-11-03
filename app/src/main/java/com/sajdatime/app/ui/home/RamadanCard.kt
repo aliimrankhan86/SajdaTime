@@ -6,6 +6,9 @@ import com.sajdatime.app.ui.components.DialogTitle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -168,7 +171,7 @@ private fun RamadanCard(
         }
         Spacer(Modifier.height(Space.Paragraph))
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.height(IntrinsicSize.Min)) {
             TimeColumn(
                 label = stringResource(R.string.ramadan_suhoor_ends),
                 glyph = R.drawable.widget_glyph_fajr,
@@ -266,42 +269,43 @@ private fun TimeColumn(label: String, glyph: Int, time: String, isNext: Boolean,
     // Next: solid green with white text (onPrimary on primary is a tested pair). The other: paper on the green card.
     val fill = if (isNext) scheme.primary else scheme.surface
     val ink = if (isNext) scheme.onPrimary else scheme.onSurface
-    val soft = if (isNext) scheme.onPrimary else scheme.onSurfaceVariant
     Column(
         modifier = modifier
+            .fillMaxHeight()
             .clip(RoundedCornerShape(18.dp))
             .background(fill)
             .padding(horizontal = 14.dp, vertical = 12.dp),
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(glyph), contentDescription = null, tint = soft, modifier = Modifier.size(22.dp))
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = soft,
-                modifier = Modifier.weight(1f, fill = false),
-            )
+        // Both tiles have the same three parts in the same places: the glyph row (the "Next" pill sits at its end),
+        // the bold name, the time. So they are the same height whichever one is next.
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().height(30.dp)) {
+            Icon(painterResource(glyph), contentDescription = null, tint = ink, modifier = Modifier.size(30.dp))
+            Spacer(Modifier.weight(1f))
+            if (isNext) {
+                // Not colour alone: the next time also carries the same "Next" word the list uses.
+                Text(
+                    text = stringResource(R.string.home_next_marker),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = scheme.primary,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .background(scheme.onPrimary)
+                        .padding(horizontal = 9.dp, vertical = 3.dp),
+                )
+            }
         }
+        Spacer(Modifier.height(Space.Related))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = ink,
+        )
         Spacer(Modifier.height(Space.Tight))
         Text(
             text = time,
             style = PrayerTimeTextStyle,
             color = ink,
         )
-        if (isNext) {
-            // Not colour alone: the next time also carries the same "Next" word the list uses.
-            Spacer(Modifier.height(Space.Tight))
-            Text(
-                text = stringResource(R.string.home_next_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.primary,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(scheme.onPrimary)
-                    .padding(horizontal = 9.dp, vertical = 3.dp),
-            )
-        }
     }
 }
 
