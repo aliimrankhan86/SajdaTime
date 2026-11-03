@@ -83,9 +83,11 @@ Top to bottom:
 
 ### Ramadan card (during Ramadan, card on)
 
-"Ramadan" and "Day 3 of 30"; two tiles, "Suhoor ends" (Fajr) and "Iftar" (Maghrib), the next one in
-`primaryContainer` with a Next pill; a countdown line in `primary`; the fast length and its change
-from yesterday; tomorrow's times; on days 1 and 2 "Did your mosque begin Ramadan on a different day?"
+"Ramadan" and "Day 3 of 30"; a `primaryContainer` card with two tiles, "Suhoor ends" (Fajr) and
+"Iftar" (Maghrib), the next one in `primary` with a Next pill, the other in `surface`; a countdown
+line in `primary`; the fast length only, without the change from yesterday or a separate tomorrow's
+times line (the after iftar countdown can still name tomorrow's suhoor); on days 1 and 2
+"Did your mosque begin Ramadan on a different day?"
 with "Shift the date"; then "Get the full Ramadan timetable" and an (i) for the info dialog. No imsak
 margin, never "stop eating".
 

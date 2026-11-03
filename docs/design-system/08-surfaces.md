@@ -15,8 +15,8 @@ sunrise or midnight.
 | Widget | Min size, cells | Layouts | Shows |
 |---|---|---|---|
 | Next prayer | 180 × 110, 3 × 2 | Small (default, the only one below Android 12); wide from 270 × 150 | Glyph, name, time; the countdown; the town chip; five day bars. Wide adds the six rows. Body is the current sky |
-| Today | 250 × 180, 4 × 4 | Compact; large from 250 × 280 (330 in Urdu and Arabic) | Six rows with glyphs; large adds the mark, date and Hijri date, and a countdown card |
-| Today strip (new in 1.6) | 250 × 40, 4 × 1 | One layout, four sizes (250 or 380 wide, 40 or 64 tall) | Five columns, the next in a pill; glyphs from 64 tall; the chip from 380 wide |
+| Today | 250 × 180, 4 × 4 | Compact; large from 250 × 280 (330 in Urdu, Arabic and Bengali) | Six rows with glyphs; large adds the mark, date and Hijri date, and a countdown card |
+| Today strip (new in 1.6) | 250 × 40, 4 × 1 | One layout, ten size entries: 250 × 40, 110 × 40; 300 and 400 wide each at 40, 64, 110 and 150 tall | Five columns; the next prayer, only when still today, has the logo in place of its glyph, bold text and an underline, without a pill; glyphs require at least 64 tall and 300 wide; the chip from 400 wide |
 
 At 1.3× text each widget keeps its first layout and the strip shows the next prayer alone.
 
@@ -25,7 +25,8 @@ At 1.3× text each widget keeps its first layout and the strip shows the next pr
 Android 12+. Next prayer: the sky instead of paper, the chip and highlighted row get a 1dp `primary`
 rim, and "to come" bars become a 30% track. Countdown card (large Today): radius 18, highlight
 gradient. Rows and pills radius 12. Day bars: done filled `primary`, next outlined `primary` (shape,
-not only fill), to come `outlineVariant`.
+not only fill), to come `outlineVariant`. The strip uses the period sky in light and the app's dark green
+in dark (`widget_strip_*`), rather than the paper body used by Today.
 
 **Type.** Countdown in the system light weight, tabular, sized in dp (36 small Next, 34 wide, 38 large
 Today) because a large font setting pushed names off. Names 16 bold on Next, 14 on Today, 12 (to 10) on
@@ -45,6 +46,29 @@ updates the location.
 
 **Colours** are in `tokens/color.json` → `widget` (tested), held to the app by `WidgetColorsTest` and
 `WidgetThemeTest`. The mark is the icon's own green and sand, not theme roles.
+
+Resource names listed literally in `WidgetResourcesTest`, `WidgetThemeTest` and `WidgetDeviceTest`:
+
+| Drawable resources | Use |
+|---|---|
+| `widget_background` | Paper body |
+| `widget_chip` | Town chip |
+| `widget_divider`, `widget_divider_sky` | Dividers on paper and sky |
+| `widget_hero_background` | Large Today countdown card |
+| `widget_pill_sky` | Highlighted row on the Next prayer sky |
+| `widget_preview_next`, `widget_preview_strip`, `widget_preview_today` | Widget picker previews |
+| `widget_row_highlight`, `widget_row_plain` | Highlighted and plain rows |
+| `widget_seg_done`, `widget_seg_next`, `widget_seg_todo`, `widget_seg_todo_sky` | Day bars on paper and sky |
+| `widget_sky_dawn`, `widget_sky_day`, `widget_sky_evening`, `widget_sky_night` | Next prayer body by sky period |
+| `widget_strip_dawn`, `widget_strip_day`, `widget_strip_evening`, `widget_strip_night` | Strip body by sky period |
+| `widget_underline` | Highlighted strip column underline |
+
+| Fixed colour resources | Use |
+|---|---|
+| `widget_light_on_surface` | Main text ink in a chosen Light theme |
+| `widget_dark_on_surface` | Main text ink in a chosen Dark theme |
+
+The 60 fixed colours remain covered by the existing `widget_light_*` and `widget_dark_*` wildcard prose in `tokens/color.json`.
 
 **iPhone:** WidgetKit. Next prayer → `systemSmall` and `systemMedium`; Today → `systemLarge` and
 `systemMedium`; strip → `systemMedium` or `accessoryRectangular` on the lock screen. Countdown →
@@ -103,7 +127,8 @@ six times, Fajr and Maghrib bold (emphasis by weight, so it prints in black and 
 Adaptive icon: background `#0E6B4F`, a sand `#F0D69A` mihrab and two minarets inside the safe zone
 (4.57:1), the same foreground as the monochrome layer for themed icons. The icon green is one step
 from `primary` on purpose; both move together only in an icon refresh. The notification icon is the
-arch alone. The widget mark is the icon on a rounded tile, used only on the large Today widget.
+arch alone. The widget mark (`widget_mark`) is the icon on a rounded tile, used on the large Today
+widget and in place of the highlighted prayer's glyph on the strip.
 
 **Known gap:** the Android 7 fallback icon and the watch icon still use `#14624B`.
 
