@@ -435,68 +435,55 @@ internal fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, o
     // green meaning tappable, and no extra caret). The 6dp the whole row used to have above and
     // below is split between them, so the header is no taller than the date line's own target.
     Column(Modifier.fillMaxWidth().padding(top = Space.Tight)) {
-        // The sky mark (step 5) sits at the end of this row as a sibling of the clickable city, never inside
-        // it: clickable merges its descendants, so a mark inside would be read as part of "London, Change
-        // location" and a tap on it would open the sheet. It hides when the name needs the room (Sky.markFits).
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val density = LocalDensity.current
-            val measurer = rememberTextMeasurer()
-            val style = MaterialTheme.typography.headlineMedium
-            val nameWidth = remember(city, style, density) { measurer.measure(city, style, maxLines = 1).size.width.toFloat() }
-            val today = state.today
-            val showMark = today != null &&
-                Sky.markFits(nameWidth, constraints.maxWidth.toFloat(), density.density, density.fontScale)
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1f, fill = !showMark)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable(role = Role.Button, onClick = onClick)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                        .semantics { contentDescription = spokenLocation },
-                ) {
-                    Text(
-                        text = city,
-                        style = MaterialTheme.typography.headlineMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        // A long town name, or one in a tall script, shrinks before it is cut short.
-                        autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
-                        modifier = Modifier.weight(1f, fill = false),
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    // A name alone reads as a label. The green caret is what says "you can change
-                    // this", which is the single most common thing a traveller needs.
-                    Icon(
-                        Icons.Rounded.ArrowDropDown,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-                if (showMark && today != null) {
-                    val context = LocalContext.current
-                    val period = Sky.periodOf(state.current)
-                    // Once a minute, not on the clock's every second tick.
-                    val minute = now.epochSecond / 60
-                    val progress = remember(minute, today) { Sky.progress(now, today.prayersOnly) }
-                    val periodName = stringResource(
-                        when (period) {
-                            SkyPeriod.DAWN -> R.string.sky_dawn
-                            SkyPeriod.DAY -> R.string.sky_day
-                            SkyPeriod.EVENING -> R.string.sky_evening
-                            SkyPeriod.NIGHT -> R.string.sky_night
-                        },
-                    )
-                    val end = Sky.endOf(period, today, now, state.next?.takeIf { it.slot == PrayerSlot.FAJR }?.at)
-                    val spoken = end?.let { stringResource(R.string.sky_now_a11y, periodName, TimeFormat.clock(context, it)) } ?: periodName
-                    Spacer(Modifier.width(8.dp))
-                    SkyMark(period = period, progress = progress, spoken = spoken)
-                }
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .clickable(role = Role.Button, onClick = onClick)
+                .padding(horizontal = 4.dp, vertical = 2.dp)
+                .semantics { contentDescription = spokenLocation },
+        ) {
+            Text(
+                text = city,
+                style = MaterialTheme.typography.headlineMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                // A long town name, or one in a tall script, shrinks before it is cut short.
+                autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
+                modifier = Modifier.weight(1f, fill = false),
+            )
+            Spacer(Modifier.width(2.dp))
+            // A name alone reads as a label. The green caret is what says "you can change
+            // this", which is the single most common thing a traveller needs.
+            Icon(
+                Icons.Rounded.ArrowDropDown,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(28.dp),
+            )
         }
         DateLine(now, state.settings.hijriOffsetDays, onOpenDates)
+        // The sky band (1.7, design G): where the day stands, a sibling of the two targets above, never inside one.
+        val today = state.today
+        if (today != null) {
+            val context = LocalContext.current
+            val period = Sky.periodOf(state.current)
+            // Once a minute, not on the clock's every second tick.
+            val minute = now.epochSecond / 60
+            val progress = remember(minute, today) { Sky.progress(now, today.prayersOnly) }
+            val periodName = stringResource(
+                when (period) {
+                    SkyPeriod.DAWN -> R.string.sky_dawn
+                    SkyPeriod.DAY -> R.string.sky_day
+                    SkyPeriod.EVENING -> R.string.sky_evening
+                    SkyPeriod.NIGHT -> R.string.sky_night
+                },
+            )
+            val end = Sky.endOf(period, today, now, state.next?.takeIf { it.slot == PrayerSlot.FAJR }?.at)
+            val spoken = end?.let { stringResource(R.string.sky_now_a11y, periodName, TimeFormat.clock(context, it)) } ?: periodName
+            SkyBand(period = period, progress = progress, spoken = spoken)
+        }
     }
 }
 

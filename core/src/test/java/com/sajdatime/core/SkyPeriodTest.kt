@@ -94,20 +94,4 @@ class SkyPeriodTest {
         } catch (expected: IllegalArgumentException) {
         }
     }
-
-    @Test
-    fun `mark fits only when the name leaves room`() {
-        // 2.0 text: the name wins at any width.
-        assertFalse(Sky.markFits(10f, 5000f, 1f, 2.0f))
-        // London (90) on a 288 row.
-        assertTrue(Sky.markFits(90f, 288f, 1f, 1.0f))
-        // Kuala Lumpur (160) on a 288 row.
-        assertFalse(Sky.markFits(160f, 288f, 1f, 1.0f))
-        // Boundary: row less 150 exactly.
-        assertTrue(Sky.markFits(138f, 288f, 1f, 1.0f))
-        assertFalse(Sky.markFits(138.5f, 288f, 1f, 1.0f))
-        // Density 3 scales the 150dp margin: 864 - 450 = 414.
-        assertTrue(Sky.markFits(414f, 864f, 3f, 1.0f))
-        assertFalse(Sky.markFits(415f, 864f, 3f, 1.0f))
-    }
 }

@@ -43,8 +43,4 @@ object Sky {
         val fraction = if (end > start) (now.toEpochMilli() - start).toFloat() / (end - start) else 0f
         return (i + fraction) / 4f
     }
-
-    /** Room for the mark beside the city: row width less 8dp row padding, 30dp caret, 8dp gap and the 104dp mark. */
-    fun markFits(nameWidthPx: Float, rowWidthPx: Float, density: Float, fontScale: Float): Boolean =
-        fontScale < 2.0f && nameWidthPx <= rowWidthPx - 150f * density
 }

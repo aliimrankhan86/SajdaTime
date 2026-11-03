@@ -262,15 +262,17 @@ day gets a 2dp `outline` halo. 36 on the week card (32 when seven do not fit), 3
 The arc grows with `Motion.draw()` when a tick changes it. Spoken by the caller ("Monday, 3 of 5
 prayed").
 
-### Sky mark and backdrop (`home/Sky.kt`)
+### Sky band and backdrop (`home/Sky.kt`)
 
 The backdrop is the period's sky behind the header and the next prayer card, with a status bar strip
-in the sky's top colour. The mark, 104 × 36 at the end of the city row: an arc (track 1.5
-`onSurfaceVariant`, passed part 2.5 `primary`), five dots for the five prayers, and an 18 glyph in
-`primary` riding the arc (Dawn uses `widget_glyph_fajr`, Day `sky_glyph_day`, Evening
-`widget_glyph_maghrib`, Night `widget_glyph_isha`). Not actionable; spoken "Dawn, until 7:40 am".
-Hidden when the city name needs the room or at 2.0× text. Draws in once per app open; a sky change
-cross fades with `Motion.draw()`.
+in the sky's top colour. The band (1.7, Ali 3 Nov 2026: the old corner mark was "too small and easier to
+miss"): full width, 52 tall, under the date line. A circular arc (ends 20 in from each side, rise 20; track
+1.5 `onSurfaceVariant`, passed part 3 `primary`), five 8 ticks for the five prayers (reached: filled
+`primary`; still to come: `surface` with a 1.5 `onSurfaceVariant` ring), and a 32 `surface` disc with a 1.5
+`primary` ring and a soft `primary` glow (32% to 0, radius 30) carrying a 20 glyph in `primary` at the
+current point of the day (Dawn `widget_glyph_fajr`, Day `sky_glyph_day`, Evening `widget_glyph_maghrib`,
+Night `widget_glyph_isha`). Not actionable; spoken "Dawn, until 7:40 am". No words, never hidden, any text
+size. Draws in once per app open; a sky change cross fades with `Motion.draw()`. RTL mirrors once.
 
 ### Qibla dial (`CompassDial` in `qibla/QiblaScreen.kt`)
 

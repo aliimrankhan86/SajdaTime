@@ -37,9 +37,10 @@ Top to bottom:
 1. **Sky** (`ui/home/Sky.kt`): the current period's sky behind the header and card, edge to edge
    under the status bar.
 2. **City** (`headlineMedium`, one line) with a green caret; the whole chip opens the location sheet.
-   Spoken "London. Change location". **Sky mark** at the row end when there is room.
+   Spoken "London. Change location".
 3. **Date line**: "Thu 31 Jul · 16 Safar 1448", Gregorian in `onSurfaceVariant`, Hijri in `primary`
    (tappable, 48 target) → Islamic dates sheet. Without a Hijri date: Gregorian only, not tappable.
+   **Sky band** under it (52 tall, full width): the day as an arc of the five prayers, with a marker at now.
 4. **Next prayer card** (see `03-components.md`).
 5. **Notices**, in order, each 16 above: Times for Makkah (warning, not closable); Approximate times
    (warning, Details); Eid Mubarak (quiet, footnote, closable, once per Eid; `ui/home/EidCard.kt`);

@@ -853,6 +853,11 @@ dependency), not done yet because it means downloading the icon files.
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 
+- **3 Nov 2026, sky mark becomes a full width sky band under the date line (design G, option A).** Ali: the graphic "is too
+  small and easier to miss ... improve its size or add colours". Built 52dp tall: bigger arc, 8dp ticks (filled when reached,
+  rings when to come), a 32dp lit disc with the period glyph and a soft glow riding the arc by the clock. Stays green
+  (`primary`) with the sky's own colours behind it; a gold sun was rejected (Kaaba gold is 1.52:1 on the light day sky, and
+  gold is the Kaaba's, amber is warnings). Never hidden, so `Sky.markFits` and its test are gone. +52dp on Times.
 - **2 Nov 2026, "Why these times" caption is plain text, not tappable.** §4.1: every action is a solid button, and the
   "Different from your mosque?" door right below opens the same dialog. Centred `bodySmall` `onSurfaceVariant`, `Space`
   gaps, no 48dp target.
