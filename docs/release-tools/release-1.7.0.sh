@@ -5,8 +5,8 @@
 # again: each step reports PASS, FAIL, CHECK, TAKEN or SKIPPED. It never prints or opens the signing key.
 #
 # What changed from 1.5.0, and why (docs/plans/2026-11-release-1.7.0/):
-# - Phone only: 11 / 1.7.0. The watch stays 1002 / 1.5.0, so its bundle is only built and checked as a gate,
-#   never copied into the folder of files to upload (Play refuses a repeated versionCode anyway).
+# - Phone 11 / 1.7.0 and watch 1003 / 1.7.0 (both uploaded; corrected 4 Nov 2026 late: the watch DOES change in 1.7.0, its Times
+#   list marks the current prayer like the phone, commit 6041c48, so the earlier "watch stays 1002 / 1.5.0" was wrong).
 # - Twelve permissions: VIBRATE (normal, no prompt) was added in step 6.
 # - The device suite also leaves out TrackerSeedDeviceTest, which is a seed, not a check.
 # - Step 6j retakes the store screenshots (8 English, 4 each in ar, ur, tr-TR, id-ID; 05 by hand) into
@@ -140,8 +140,8 @@ if check_bundle bundle "$AAB" 11 1.7.0 yes; then
   if [ "$SIZE" -le 10252988 ]; then result bundle-size "PASS ($SIZE bytes, measured 9952988 on 25 Oct 2026)"
   else result bundle-size "FAIL ($SIZE bytes, more than 300 KB over the 9952988 measured on 25 Oct 2026)"; fi
 fi
-if check_bundle watch-bundle "$WAAB" 1002 1.5.0 no; then
-  # The watch asks for three permissions, unchanged by 1.7.0 (comments only in wear/ since main).
+if check_bundle watch-bundle "$WAAB" 1003 1.7.0 yes; then
+  # The watch asks for three permissions, unchanged by 1.7.0 (the watch change is the highlighted row, no new permission).
   WPERMS="$(java -jar "$BT" dump manifest --bundle="$WAAB" 2>/dev/null | grep -o 'uses-permission[^>]*name="[^"]*"' | sed 's/.*name="//;s/"//' | sort | tr '\n' ' ')"
   if [ "$WPERMS" = "android.permission.ACCESS_COARSE_LOCATION android.permission.WAKE_LOCK com.sajdatime.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION " ]
   then result watch-permissions "PASS (the same three)"; else result watch-permissions "FAIL (the permission list changed: $WPERMS)"; fi

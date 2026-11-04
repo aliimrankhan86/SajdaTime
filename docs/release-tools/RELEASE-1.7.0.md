@@ -5,7 +5,7 @@ Started 4 Nov 2026 when Ali said yes to release prep. `claude/1-7-0` is the rele
 ## What ships
 
 - **Phone 1.7.0, versionCode 11, versionName 1.7.0** (`app/build.gradle.kts`, set 4 Nov 2026; unit tests green after the bump). What is in it: `git log main..claude/1-7-0`, PROJECT_BRIEF "Next release after 1.6.0", HANDOVER section 11 first block ("Built on the branch"). In short: time left on the Now row, optional Duha row, the Sky band, Match your mosque (times under each prayer, "0 min", the Hijri shift moved to the Islamic dates sheet), restyled widgets (Next prayer, Today, strip: sky body, logo mark on the current prayer, corner logo, sizes measured on a real launcher, thin strip shows the next prayer only).
-- **The watch is NOT uploaded.** It stays 1.5.0, versionCode 1002: `wear/` is unchanged since `main` (`git diff main --stat -- wear` is empty; check again on release day).
+- **The watch IS uploaded: 1.7.0, versionCode 1003** (`wear/build.gradle.kts`, bumped 4 Nov 2026, late). The earlier line here said the watch was unchanged since `main`; that was wrong. Commit `6041c48` makes the watch Times list mark the current prayer (not the next), matching the phone and the widgets (`git diff main..claude/1-7-0 --stat -- wear core`). Upload both bundles; the watch goes through its own Wear review. Permissions are unchanged (three).
 - **Adhan voices are NOT in this release**: the permission email to the Haram muezzin agency has no reply; nothing is bundled without a written yes.
 
 ## Done

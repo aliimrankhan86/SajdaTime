@@ -37,7 +37,7 @@ android {
         // Google recommends exactly this (an independent scheme per form factor) in
         // https://developer.android.com/training/wearables/packaging. Bump freely; the two
         // sequences can never collide. Version codes can never be reused or decreased.
-        versionCode = 1002
+        versionCode = 1003
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Normally kept in step with the phone's versionName so one release never shows two
         // version numbers to the same user. **Deliberate exception for phone 1.3.0 (3 Oct
@@ -49,7 +49,9 @@ android {
         // 1002 / 1.5.0 (set 18 Oct 2026): back in step with the phone, because 1.5.0 changes the watch
         // too (Turkey with Diyanet's minutes, from the shared core; Urdu, Turkish, Indonesian and Arabic;
         // the disclaimer no longer under the clock at large text). Upload both bundles in that release.
-        versionName = "1.5.0"
+        // 1003 / 1.7.0 (set 4 Nov 2026): the watch Times list now marks the current prayer like the phone (commit 6041c48), so it ships
+        // with phone 1.7.0. Upload both bundles. Permissions unchanged.
+        versionName = "1.7.0"
     }
 
     signingConfigs {

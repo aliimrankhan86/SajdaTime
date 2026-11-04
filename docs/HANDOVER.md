@@ -6090,6 +6090,89 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 4 Nov 2026 (widgets parked, read this first): three Today widgets, NOT committed
+
+Uncommitted on `claude/1-7-0` (working tree only, nothing pushed). Ali asked to park the widget work.
+
+- **Small = five-prayers row** (`widget_strip.xml`, 4 by 1). Gaps are an even 2dp each side, plain cells have no outline,
+  the current prayer is the filled pill only (underline bar and per-cell app mark removed). Checked on the emulator in light
+  and dark theme. At 1.3 text the five columns still truncate on the emulator; the single-line fallback did not show,
+  cause not found (the app process may not get the new text size on the emulator). Not fixed.
+- **Medium = next prayer** (`widget_next_prayer_info.xml`, `widget_next_prayer.xml`). Default now one row: minHeight 40dp,
+  minResizeHeight 100dp, targetCellHeight 1. The compact countdown is 26dp (24dp in tall scripts), down from 32 and 28,
+  so the one-row card fits about 103dp without clipping. Checked on the emulator in light theme, English. The launcher
+  kept the old 3 by 2 label until the app was reinstalled AND minHeight was under 40dp; a 100dp minHeight gave two rows.
+  The picker preview image (`widget_preview_next.png`) is still the old design.
+- **Large = Today's prayers** (`widget_today_large.xml`). Six equal weighted spacers sit above the rows so the spare height
+  is shared and no empty band is left under Isha. Bottom padding is 12dp (was 8) so the highlighted Isha row has a clear edge.
+  Checked in light and dark theme on the emulator.
+- **Current prayer strip border:** a strip-only drawable `widget_strip_current` (2dp border, light and dark copies),
+  so the Today card keeps its 1dp highlight. Theme test count is 22.
+- **Urdu (checked 4 Nov 2026 on the emulator, via the app's own language picker, not the system locale):**
+  - Five-prayers row: right to left, Isha first, app mark at the right end, Urdu names. Looks right.
+  - Next prayer card: right to left, "کل" (tomorrow) and the London chip read correctly.
+  - **Today card (fixed 4 Nov 2026, late):** the Isha row was cropped in Urdu. Row bottom margins went from 6dp to 2dp
+    (five rows) in `widget_today_large.xml`, which frees about 20dp. Re-checked in Urdu: the Isha outline is complete.
+    English re-checked: fine. If a longer Urdu header or a bigger text size crops again, the next lever is the 358/412
+    large-slot entries in `todaySizes` for tall scripts.
+  - **Medium card "looks wider" in Urdu:** it is NOT wider. Both frames run from x 68 to 765 on the emulator. The Urdu
+    text is right-aligned, so the empty space sits on the left and the card reads as fuller. Left as is; a design call
+    for Ali if he wants it balanced.
+  - The app language was set back to Phone language (English) afterwards and checked.
+  - Emulator tip: `settings put system system_locales ur-PK` did NOT switch the launcher or the app. Use the app's
+    language picker (the pill on the welcome screen) instead.
+- **Highlight cropping sweep (4 Nov 2026, late, emulator, no commit):** checked all three widgets in English light, English dark,
+  English at 2x text and Arabic dark; Urdu was done before. English light/dark and 2x: no outline is cropped (at 2x the Today card
+  simply runs out of height and the strip truncates its words, a known text-size limit, not an outline fault). **Arabic found two
+  real crops, both fixed:** (1) Today card, Isha row cut at the foot: Arabic lines are about 27dp at 15sp, so rows now take 3dp
+  top and bottom in Urdu, Arabic and Bengali (6dp elsewhere), in `WidgetRenderer.fillRows`; re-checked, Isha outline complete.
+  (2) Medium card on the 104dp default, town chip cut: the tall-script short variant now uses 2dp padding, a 22dp time and a
+  16sp name (was 4dp, 24dp, 18sp); re-checked, the chip is whole though close to the foot. Five-prayers row: outline intact in
+  every case. Not checked: Bengali, Urdu dark, 1.3x in Arabic. Arabic is set with `adb shell cmd locale set-app-locales
+  com.sajdatime.app --locales ar` (works, no need for the language pill); put back with `--locales en-GB`; dark with
+  `cmd uimode night yes|no`. `APPWIDGET_UPDATE` cannot be broadcast from adb (permission denied); reinstalling refreshes.
+- **Larger text, balance and cleanup (4 Nov 2026, late, uncommitted):**
+  - **Cause of the 1.3x "five-prayers row still truncates" is found: a stale render.** `font_scale` changes do not redraw
+    widgets and `APPWIDGET_UPDATE` cannot be sent from adb, so the earlier screenshots showed the old draw. After reinstalling
+    (`installDebug`) at 1.3x the row shows the next prayer alone (the designed fallback) and is fine. Always reinstall after
+    changing text size, language or theme before judging a widget.
+  - **Today card at 1.3x to 1.6x:** the large card is offered again (it filled a 464dp slot exactly, so it is offered from 480dp,
+    540dp in Urdu, Arabic and Bengali, the latter not measured); below that the compact list with six rows is the graceful
+    fallback. From 1.6x only the compact list is offered (`LARGE_TEXT_NO_CARD`). Next card at 1.3x: 2dp padding so the town chip
+    is not clipped.
+  - **Medium card balanced in right to left (Ali, 4 Nov 2026: "yes balance it"):** name and time are centred in Urdu and Arabic
+    (`widget_title_row`, `setGravity`, `textAlignment="gravity"` on the countdown and time; `WidgetResourcesTest` allows that value on
+    this layout only). English is unchanged. Checked in Urdu on the emulator.
+  - **Repo cleanup (Ali, 4 Nov 2026, safe tier only):** deleted the JVM `hs_err` and `replay` logs, `.DS_Store` files,
+    `design-extract-output/`, `graphify-out/` and ran `gradlew clean`. Left alone on purpose: `SajdaTime-1.x/` release folders,
+    `docs/plans` (269 files), `.codex/`. **`private/` (334 MB, gitignored, only on this Mac) is to be deleted when the release is
+    ready, Ali's instruction: do that on release day, not before.**
+- **RELEASE READINESS CHECK, 4 Nov 2026, late (read before releasing).**
+  - **Found and fixed: the entry heights had gone stale.** The 6dp row padding (Ali, "too cramped at 0") raised what the large Today
+    card needs from about 302dp to 401 (en), 417.5 (ur, ar), 386 (bn), and the wide Next card from 149 to 214dp, but `todaySizes` and
+    `nextSizes` still said 306/352/358/412 and 158/166/170/192. On a real launcher a slot between the old and new numbers (a normal 4
+    by 4 is about 300 to 340dp) would have cut the last rows. Now measured and set (`WidgetRenderEvidenceTest#release_entry_needs`:
+    four languages, six text sizes, six times of day, Ramadan): large Today 405 (en) / 422 (tall scripts) at 1.0x, 448 / 478 at 1.1 to 1.29x,
+    484 / 520 from 1.3x; wide Next 218 / 222 at 1.0x, 254 / 256 at 1.1 to 1.29x. A shorter slot gets the compact six row list (Today) or the
+    small card (Next): graceful, nothing cropped. **Consequence Ali may want to weigh:** the big Today card (date, countdown, rows) now
+    shows only on a tall slot; a plain 4 by 4 mostly gets the compact list. Cutting the large card's row padding (6dp to about 3dp) would
+    bring it back to about 340dp; his call, not made.
+  - Gate: `clean test lint :app:bundleRelease :wear:bundleRelease` green, 349 app, 252 core, 27 wear tests, 0 failures. Device suite on the
+    emulator: 49 of 49 (the three seed or reminder classes left out as the script does). The evidence run renders widgets across sizes,
+    text scales and themes: no outline clipped at the entry heights.
+  - **The watch changes in 1.7.0** (commit 6041c48: Times list marks the current prayer). Bumped to 1.7.0 / versionCode 1003. Both bundles
+    are uploaded; RELEASE-1.7.0.md, `release-1.7.0.sh` and PROJECT_BRIEF corrected (they said the watch stays 1.5.0).
+  - Nothing is committed. Before release: commit this work (widget files, the new drawables, tests, wear version, docs), run
+    `docs/release-tools/release-1.7.0.sh` on the committed code, then the release-day steps in RELEASE-1.7.0.md. The widgets must be
+    re-added by hand on any emulator after a device suite run (the suite removes them from the home screen).
+  - Not re-checked by hand on a launcher this round: Bengali, Urdu dark, Arabic 1.3x (the numeric run covers them, no picture).
+- **Tests:** 91 widget, design-rule and design-token tests pass after each change (`WidgetResourcesTest` now pins
+  the Medium default at 3 by 1 and the resize minimum at 100dp).
+- **Preview images** (`widget_preview_*.png`) are old and need regenerating only after Ali approves the designs.
+- **Lesson:** the picker and the launcher cache widget sizes per installed build. A rebuild with the same version code
+  kept showing the old label; reinstalling the app on the emulator (`adb uninstall`, then `installDebug`) refreshed it.
+  Do not change `versionCode` just to refresh a debug emulator.
+
 ### 📍 STATE OF PLAY, 4 Nov 2026 (late): Times highlights Now only; Settings theme is Follow phone or the opposite (read this first)
 
 **Store prep, 4 Nov 2026 (current).** Ali approved the English listing and all eight phone picture sets, including the

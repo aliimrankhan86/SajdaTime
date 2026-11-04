@@ -68,3 +68,5 @@ graphify-out/
 # Planning notes, research and chat records between Ali and Claude. Private to us: the repo and the docs/
 # folder (served as a public website) are public, so nothing in here is ever committed.
 /private/
+
+/docs/design-system/widget-review/
