@@ -68,7 +68,7 @@ Docs you will meet:
 | `docs/PROJECT_BRIEF.md` | one plain page for Ali |
 | `docs/DESIGN_SYSTEM.md` | the visual rules ("Quiet Glass"); §4.1 lists every button in the app |
 | `docs/privacy.html` | the published privacy policy, a promise to users |
-| `docs/plans/2026-10-release-1.6.0/` | the 1.6 plans and step designs |
+| the Google Drive folder "SajdaTime (private)" > 03 Plans and decisions (the plans left the repo on 4 Nov 2026; file names there are prefixed with the plan folder, for example 2026-10-release-1.6.0-PILLARS-STUDY.md) | the 1.6 plans and step designs |
 | `docs/store/` | Play listing text and store pictures |
 | `.claude/agents/*.md` | Claude's own helper roles (yours sits beside `mechanic` and `implementer`) |
 

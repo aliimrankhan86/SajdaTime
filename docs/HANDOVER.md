@@ -6090,6 +6090,24 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
+### 📍 STATE OF PLAY, 4 Nov 2026 (night, READ THIS FIRST): 1.7.0 committed, pushed and kept ready; release checklist corrected
+
+**Where it is.** Branch `claude/1-7-0`, committed and pushed (`15f37bc` widgets, `07e69ad` release prep, `3142074` planning files to Drive,
+`979a324` CLAUDE.md note, later docs and the watch test). Phone 11 / 1.7.0 and **watch 1003 / 1.7.0, both ship** (the watch Times list marks the
+current prayer, commit `6041c48`; earlier notes saying it stays 1.5.0 were wrong). Gate green: 349 app, 252 core, 30 wear tests. Device suite 49 of
+49. Nothing merged into `main`; no pull request yet. Public Play page: "Updated on 23 Oct 2026" (1.5.0); **1.6.0 is submitted and in review**.
+
+**What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
+`RELEASE-1.7.0.md`; (2) run the watch on the `sajdawear` emulator and look at the Times list; (3) Ali approves the one-line watch note drafted in
+`docs/store/LISTING.md`, Claude translates it and stamps the ledger; (4) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after
+1.6.0 is live, or replace it? (recommended: wait); whether the large Today widget card may lose some row padding so it shows on a plain 4 by 4.
+
+**Checks that were not done:** a picture of Bengali, Urdu dark and Arabic 1.3x widgets on a launcher (the measurement run covers them in numbers);
+the release script end to end; the signed bundle size.
+
+**Everything below this block is history** (the widget "parked" block, the 3 Nov block and older): read it for reasoning, not as a task list.
+Its statements "NOT committed", "the watch stays 1.5.0", "private/ is deleted on release day", "start from private/plans/..." are superseded here.
+
 ### 📍 STATE OF PLAY, 4 Nov 2026 (widgets parked, read this first): three Today widgets, NOT committed
 
 Uncommitted on `claude/1-7-0` (working tree only, nothing pushed). Ali asked to park the widget work.
@@ -6166,15 +6184,17 @@ Uncommitted on `claude/1-7-0` (working tree only, nothing pushed). Ali asked to 
     `docs/release-tools/release-1.7.0.sh` on the committed code, then the release-day steps in RELEASE-1.7.0.md. The widgets must be
     re-added by hand on any emulator after a device suite run (the suite removes them from the home screen).
   - Not re-checked by hand on a launcher this round: Bengali, Urdu dark, Arabic 1.3x (the numeric run covers them, no picture).
-- **One source of truth, 4 Nov 2026 (Ali: "keep one source of truth", planning files belong in Google Drive).** Planning, research, evidence, old
-  plans and the signed 1.6.0 bundle now live ONLY in the Drive folder "SajdaTime (private)" (id 1zRnPLe6oeGYssAUolFEfpxjwdEGhXbvP; its
-  "00 READ ME FIRST (v3)" says what is where). `docs/plans/` was removed from the repo in this commit (history keeps it; it is also on Drive,
-  folder 04, as 7 zip parts). The Mac's `private/` folder, the six `SajdaTime-codex-*` worktrees (their branches were already inside
-  `claude/1-7-0`; two had uncommitted diffs, saved as patches on Drive), `.codex/`, the old bundle folders (1.3.2, 1.4.0, 1.5.0, 1.6.0) and
-  `~/Developer/ds-shots` were deleted after every Drive upload was checked by exact byte size. The 309 MB of 1.7.0 widget working captures
-  were not kept (Ali: private/ is deleted at release time). What stays in the repo is what builds, tests, the store or the website needs:
-  code, HANDOVER, PROJECT_BRIEF (his claude.ai project reads it from GitHub), DESIGN_SYSTEM.md and `docs/design-system/` (the tests read the
-  tokens; Drive has a readable mirror), release-tools, store, privacy. Mentions of `docs/plans` or `private/` earlier in this file are history.
+- **One source of truth, 4 Nov 2026 (Ali: "keep one source of truth"; clarified later the same night).** Ali wants the MARKDOWN files, the design
+  philosophy and how we solve things, in Google Drive so a later session can read them and keep the same philosophy: text only, no pictures, no
+  zips. Drive folder "SajdaTime (private)" (id 1zRnPLe6oeGYssAUolFEfpxjwdEGhXbvP) holds them in folders 01 to 06; its "00 READ ME FIRST (v4)"
+  explains it. `docs/plans/` was removed from the repo (history keeps it) after its 64 markdown files were uploaded (03 Plans and decisions);
+  its pictures were not kept. The Mac keeps ONE folder, the repo, ready to merge to `main`: the `private/` folder, six `SajdaTime-codex-*`
+  worktrees (their branches were already inside `claude/1-7-0`; two had uncommitted diffs, tracked changes only saved as patches, then
+  trashed with the image zips on Drive), `.codex/`, the old bundle folders and `~/Developer/ds-shots` were deleted. What stays in the repo is what
+  builds, tests, the store or the website needs: code, HANDOVER, PROJECT_BRIEF (his claude.ai project reads it from GitHub), DESIGN_SYSTEM.md
+  and `docs/design-system/` tokens (the tests read them), release-tools, store, privacy. Files in both places: the repo copy is live, the Drive
+  copy is a snapshot (refresh after each release). The ten design-system pages (principles ... playbook) exist ONLY on Drive, folder 01: never
+  trash that folder. Mentions of `docs/plans` or `private/` earlier in this file are history.
 - **Tests:** 91 widget, design-rule and design-token tests pass after each change (`WidgetResourcesTest` now pins
   the Medium default at 3 by 1 and the resize minimum at 100dp).
 - **Preview images** (`widget_preview_*.png`) are old and need regenerating only after Ali approves the designs.

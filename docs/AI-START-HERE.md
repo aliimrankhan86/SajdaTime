@@ -29,7 +29,7 @@ when a release publishes.
 | Branch | What it is | What you do with it |
 |---|---|---|
 | `main` | Exactly what users have: **1.5.0**, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes the next release only when Ali says go, by `RELEASE-<version>.md`; Ali presses every merge, submit and publish button |
-| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 40 commits ahead of `main`, all pushed (see git log for the latest commit), nothing merged, versionCode still 10, it becomes 11 only when Ali says release (the versionCode 11 and branch name decision is still open). Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
+| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 40 commits ahead of `main`, all pushed (see git log for the latest commit), nothing merged, versionCode 11 / 1.7.0 and the watch 1003 / 1.7.0 are set (4 Nov 2026); the checklist is `docs/release-tools/RELEASE-1.7.0.md`. Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
 | `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system. Check the public Play page before acting on it | Do not cut new work from here; use `claude/1-7-0` |
 | your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-7-0` | Commit and push here. Merging into `claude/1-7-0` only when Ali says so, after review; Ali presses every merge, submit and publish button |
 
@@ -42,7 +42,7 @@ design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then r
 If GitHub shows a yellow "Compare & pull request" bar for `claude/1-6-0`, do not use it: that would merge
 unreleased 1.6 into `main`.
 
-Version numbers: phone 1.7.0 on `claude/1-7-0`, versionCode still 10; it becomes 11 only when Ali says release (the versionCode 11 and branch name decision is still open). Watch stays 1.5.0 (1002); bump it if it changes. Release steps when Ali says go for 1.7.0: bump versionCode to 11 (and the watch if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (it did not). Ali presses every merge, submit and publish button.
+Version numbers: phone 1.7.0 / versionCode 11 and watch 1.7.0 / 1003 on `claude/1-7-0` (the watch changed, so it ships). Release steps when Ali says go for 1.7.0: bump versionCode to 11 (and the watch if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (it did not). Ali presses every merge, submit and publish button.
 
 ## 3. Read before you work, in this order
 
@@ -168,7 +168,7 @@ Platform:
 ```
 
 - Unit test counts on 30 Oct 2026: **app 338, core 238 (1 skipped), wear 27**. If you add tests, update
-  `EXPECTED_COUNTS` in `docs/release-tools/release-1.6.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
+  `EXPECTED_COUNTS` in `docs/release-tools/release-1.7.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
 - Run the checks in `docs/design-system/10-new-feature-playbook.md` §6 and paste the counts. Never write
   "done", "every" or "all" without them.
 - Any visual change: screenshots in light, dark, 2x text and Urdu, shown to Ali with the install command and

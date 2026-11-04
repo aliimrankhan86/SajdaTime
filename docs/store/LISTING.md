@@ -1461,3 +1461,7 @@ Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
 - **Not verified on real hardware.** Every capture is from an emulator. The watch Qibla page
   in particular shows its bearing-from-north state because the Wear AVD has no
   magnetometer — a real state, but not the best version of that screen.
+
+## 1.7.0 watch note, DRAFT 4 Nov 2026 (for the Wear OS release's What's new; Ali approves, then Claude translates into the eight languages and stamps the ledger)
+
+The watch now marks the prayer that is current, like the phone.

@@ -4,7 +4,7 @@
 # release-1.6.0.sh on 4 Nov 2026 (which stays beside it as the record of the last release). Safe to run
 # again: each step reports PASS, FAIL, CHECK, TAKEN or SKIPPED. It never prints or opens the signing key.
 #
-# What changed from 1.5.0, and why (the 1.7.0 plans are on Drive, folder 04 Old planning moved from GitHub):
+# What changed from 1.6.0 (copied from the 1.6.0 script), and why (the 1.7.0 plans are on Drive, folder 04 Old planning moved from GitHub):
 # - Phone 11 / 1.7.0 and watch 1003 / 1.7.0 (both uploaded; corrected 4 Nov 2026 late: the watch DOES change in 1.7.0, its Times
 #   list marks the current prayer like the phone, commit 6041c48, so the earlier "watch stays 1002 / 1.5.0" was wrong).
 # - Twelve permissions: VIBRATE (normal, no prompt) was added in step 6.
@@ -76,7 +76,7 @@ EOF
 )"
   LINT="$(for f in */build/reports/lint-results-debug.xml; do printf '%s %s errors, ' "${f%%/*}" "$(grep -cE 'severity="(Error|Fatal)"' "$f")"; done)"
   # Gate counts at 25 Oct 2026 (core 238 tests, 1 of them skipped; app 335 since DesignTokensTest added 12; wear 27). Update with the code.
-  EXPECTED_COUNTS="app 349 tests 0 failed, core 252 tests 0 failed, wear 27 tests 0 failed"
+  EXPECTED_COUNTS="app 349 tests 0 failed, core 252 tests 0 failed, wear 30 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass
@@ -134,11 +134,11 @@ if check_bundle bundle "$AAB" 11 1.7.0 yes; then
   PERMS="$(java -jar "$BT" dump manifest --bundle="$AAB" 2>/dev/null | grep -o 'uses-permission[^>]*name="[^"]*"' | sed 's/.*name="//;s/"//' | sort | tr '\n' ' ')"
   EXPECTED_PERMS="android.permission.ACCESS_COARSE_LOCATION android.permission.ACCESS_NETWORK_STATE android.permission.ACCESS_NOTIFICATION_POLICY android.permission.FOREGROUND_SERVICE android.permission.INTERNET android.permission.POST_NOTIFICATIONS android.permission.RECEIVE_BOOT_COMPLETED android.permission.SCHEDULE_EXACT_ALARM android.permission.VIBRATE android.permission.WAKE_LOCK com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE com.sajdatime.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION "
   if [ "$PERMS" = "$EXPECTED_PERMS" ]; then result permissions "PASS (the eleven of 1.5.0 plus VIBRATE)"; else result permissions "FAIL (the permission list changed: $PERMS)"; fi
-  # Measured 25 Oct 2026 on the local signed build of this branch: 9,952,988 bytes (1.5.0 was
+  # Measured for 1.6.0: 10,028,156 bytes (HANDOVER); 1.7.0 built unsigned at 10,071,703 on 4 Nov 2026. The limit allows 300 KB over 1.6.0 (1.5.0 was
   # 9,475,100). The limit allows 300 KB on top, as 1.5.0's did over 1.4.0. Re-measure at the release commit.
   SIZE="$(wc -c < "$AAB" | tr -d ' ')"
-  if [ "$SIZE" -le 10252988 ]; then result bundle-size "PASS ($SIZE bytes, measured 9952988 on 25 Oct 2026)"
-  else result bundle-size "FAIL ($SIZE bytes, more than 300 KB over the 9952988 measured on 25 Oct 2026)"; fi
+  if [ "$SIZE" -le 10328159 ]; then result bundle-size "PASS ($SIZE bytes, 1.6.0 was 10028156)"
+  else result bundle-size "FAIL ($SIZE bytes, more than 300 KB over the 10028156 measured for 1.6.0)"; fi
 fi
 if check_bundle watch-bundle "$WAAB" 1003 1.7.0 yes; then
   # The watch asks for three permissions, unchanged by 1.7.0 (the watch change is the highlighted row, no new permission).

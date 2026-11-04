@@ -325,8 +325,11 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                 today,
                 PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone),
                 // Nothing is current before today's Fajr (the engine then answers yesterday's Isha).
-                PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
-                    ?.takeIf { !now.isBefore(today.times.getValue(PrayerSlot.FAJR)) },
+                currentForDisplay(
+                    PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone),
+                    now,
+                    today.times.getValue(PrayerSlot.FAJR),
+                ),
             )
         }
 
@@ -357,3 +360,10 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 }
+
+/**
+ * The prayer the watch marks as current (1.7.0, like the phone). Before today's Fajr the engine answers yesterday's Isha, which must
+ * not be marked: nothing is current until Fajr. Pulled out of the view model so a unit test can pin it.
+ */
+internal fun currentForDisplay(current: PrayerSlot?, now: java.time.Instant, fajr: java.time.Instant): PrayerSlot? =
+    current?.takeIf { !now.isBefore(fajr) }
