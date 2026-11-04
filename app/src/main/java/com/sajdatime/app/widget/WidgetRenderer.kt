@@ -607,7 +607,7 @@ internal object WidgetRenderer {
             views.setViewVisibility(ids.row, View.VISIBLE)
             // The current row is marked by size (Ali, 3 Nov 2026): a highlight band behind it on the larger forms (Next prayer
             // wide, Today with the countdown card), a 4dp underline on the compact Today. Both marks carry the app's logo and
-            // bold. The underline overlays the row, so the current prayer never moves its neighbours. Both states are written
+            // bold. The underline sits in the marked row's own 4dp of bottom padding (below the text, not over it), so that row is 3dp taller and the weighted gaps absorb it. Both states are written
             // every time because the launcher reuses these views.
             views.setViewVisibility(ids.underline, if (highlighted && !band) View.VISIBLE else View.GONE)
             views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted && band) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
@@ -619,6 +619,14 @@ internal object WidgetRenderer {
                 val side = dp(context, bandSideDp)
                 val vertical = if (highlighted) dp(context, 4f) else 0
                 views.setViewPadding(ids.row, side, vertical, side, vertical)
+            } else {
+                // The 4dp underline sits at the row's bottom (layout margin -4dp, row clipToPadding false). With no padding below it cut into the text and the
+                // logo tile on a real Redmi (HyperOS font sits lower in its line box than the emulator's Roboto, seen 4 Nov
+                // 2026), so the marked row gets 4dp below it for the line to sit in. The other rows give up their 1dp below
+                // (the layout's) so the whole widget stays near its measured height: with 5dp on the marked row alone, 21 of
+                // 640 measured sizes ran 1 to 8dp over. Written for every row both ways (the launcher reuses views); the sides
+                // and top repeat the layout's own 8dp and 1dp.
+                views.setViewPadding(ids.row, dp(context, 8f), dp(context, 1f), dp(context, 8f), dp(context, if (highlighted) 4f else 0f))
             }
             // The mark is its own view (the strip's widget_logo_*), never the glyph view with a filter or tint removed: under a theme
             // chosen in the app the glyph carries a colour filter that turned the mark into a flat grey tile (seen on the emulator).

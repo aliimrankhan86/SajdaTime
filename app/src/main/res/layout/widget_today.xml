@@ -58,8 +58,10 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:orientation="vertical" />
+    <!-- Row padding is rewritten on every render by WidgetRenderer.fillRows (marked row 4dp below, others 0), so the values here are only the first paint. Each row has clipToPadding false and its underline layout_marginBottom -4dp so the bar sits in that padding, under the text. -->
     <FrameLayout
         android:id="@+id/widget_row_fajr"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -127,6 +129,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"
@@ -139,6 +142,7 @@
         android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_sunrise"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -199,6 +203,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"
@@ -211,6 +216,7 @@
         android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_dhuhr"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -278,6 +284,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"
@@ -290,6 +297,7 @@
         android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_asr"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -357,6 +365,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"
@@ -369,6 +378,7 @@
         android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_maghrib"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -436,6 +446,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"
@@ -448,6 +459,7 @@
         android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_isha"
+        android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/widget_row_plain"
@@ -515,6 +527,7 @@
             android:layout_width="match_parent"
             android:layout_height="4dp"
             android:layout_gravity="bottom"
+            android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_underline"
             android:scaleType="fitXY"

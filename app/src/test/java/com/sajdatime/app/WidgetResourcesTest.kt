@@ -120,8 +120,11 @@ class WidgetResourcesTest {
                         .find(row!!)?.value.orEmpty()
                     for (attribute in listOf(
                         "layout_width=\"match_parent\"", "layout_height=\"4dp\"", "layout_gravity=\"bottom\"",
-                        "src=\"@drawable/widget_underline\"", "visibility=\"gone\"", "importantForAccessibility=\"no\"",
+                        "src=\"@drawable/widget_underline\"", "visibility=\"gone\"", "importantForAccessibility=\"no\"", "layout_marginBottom=\"-4dp\"",
                     )) assertTrue("$layout: $slot underline lacks $attribute", bar.contains("android:$attribute"))
+                    // Without these the bar goes back over the text (seen on a Redmi, 4 Nov 2026) or is clipped away.
+                    val rowTag = Regex("""<FrameLayout\b[^>]*android:id="@\+id/widget_row_$slot"[^>]*>""").find(xml)?.value.orEmpty()
+                    assertTrue("$layout: $slot row must not clip to padding", rowTag.contains("android:clipToPadding=\"false\""))
                 }
             }
         }

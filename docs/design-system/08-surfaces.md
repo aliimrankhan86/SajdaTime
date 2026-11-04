@@ -31,7 +31,7 @@ in dark (`widget_strip_*`); the paper body remains only in the picker previews.
 **Current prayer marker, by size (Ali, 3 Nov 2026, from mockups).** Larger forms (Today with the countdown card, about 4x3 and up;
 Next prayer wide) put a highlight band (the rimmed `widget_pill_sky`, because the plain `widget_highlight` fill is 1.0:1 against the sky and would not show) behind the current row: logo in place of the glyph, bold, no
 underline. Smaller forms (the strip, compact Today 3x3) use a 4dp underline (`widget_underline`, chosen over 3dp for reading at a
-glance, no added row height: the strip's bar margin dropped from 3dp to 2dp, the compact Today's bar overlays the row) with the same
+glance, no added row height on the strip, whose bar margin dropped from 3dp to 2dp; on the compact Today the marked row has 4dp of its own bottom padding for the bar, so it is 3dp taller and the other rows lose their 1dp, fixed 4 Nov 2026 after the bar cut the text on a real Redmi) with the same
 logo and bold. Launchers below Android 12 always get the compact Today (underline, glyph kept). The exact size cut-off is confirmed in the widget space pass (task F). Ali also asked for a small app logo in the top
 start corner of the small widgets (top left, top right in right to left) so people remember the app, a separate small mark (Ali chose it over swapping the sun glyph).
 Built only on the strip's 148dp and 152dp entries at normal text size (3 Nov 2026), not yet seen on a screen. The thin and
