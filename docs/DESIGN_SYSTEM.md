@@ -873,6 +873,12 @@ dependency), not done yet because it means downloading the icon files.
 
 ## 9. Decision log
 
+- **4 Nov 2026, colour quotes in design pages (decided by Claude, Ali asked it to decide and remember).**
+  The check that every hex quoted in the design pages is a token (`DesignTokensTest`) was removed when the pages
+  moved to Google Drive: with no pages in the repo it passed without checking anything. Decision: accept the
+  gap. The pages on Drive are checked by review against `tokens/color.json`, and any hex a page quotes must be
+  in that file. Reopen if a page in the repo ever quotes a colour again.
+
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
 

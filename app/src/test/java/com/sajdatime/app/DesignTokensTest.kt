@@ -269,21 +269,6 @@ class DesignTokensTest {
         assertTrue("color.json assets out of date: $missing", missing.isEmpty())
     }
 
-    /**
-     * A hex written in a page must be a token, so prose cannot quote a colour the code no longer has. The
-     * pages explain; the token file holds the value.
-     */
-    @Test
-    fun `every colour quoted in the pages is a token`() {
-        val known = allColourValues(json("color.json"))
-        // Only the pages in docs/design-system are checked. DESIGN_SYSTEM.md quotes earlier colours on purpose (the decision log in section 9), so it is not checked.
-        val quoted = File(root, "docs/design-system").walkTopDown().filter { it.extension == "md" }.flatMap { file ->
-            Regex("""#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?(?![0-9A-Za-z])""").findAll(file.readText())
-                .map { it.value.uppercase() }.filter { it !in known }.map { "${file.name}: $it" }
-        }.toSet()
-        assertTrue("Quoted in docs/design-system but not in color.json: $quoted", quoted.isEmpty())
-    }
-
     /** actionLabelStyle() is composable, so its one line is read rather than called. */
     @Test
     fun `the action label in the doc is actionLabelStyle`() {
