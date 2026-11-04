@@ -6092,10 +6092,11 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 4 Nov 2026 (late): Times highlights Now only; Settings theme is Follow phone or the opposite (read this first)
 
-**Store prep, 4 Nov 2026.** Ali approved the English. Commit `c838834` records it unchanged with eight translations. The
-ledger has 16 new blocks awaiting separate Claude review and remains unstamped. The 24 phone pictures are ready for Ali's
-approval. See [the store report](store/CODEX-REPORT-1.7.0.md) for the pictures, checks and open review items. Bengali uses the
-English set. Nothing was sent to Google Play.
+**Store prep, 4 Nov 2026 (current).** Ali approved the English listing and all eight phone picture sets, including the
+Arabic and Urdu Times pictures re-captured after the Now-bar fix (`20932f7`). The eight translations (`c838834`, corrected in
+`48b1696`) were reviewed by a separate Claude reviewer, six wording fixes applied, and the ledger stamped. The verification
+run passed (gate, listing sizes, ledger); its report lives in Drive, not the repo. Bengali uses the English set. Nothing was
+sent to Google Play.
 
 **Checkpoint, 4 Nov 2026 (later): branch claude/1-7-0 at cc80da9, pushed.** Full gate passed on the committed code
 (clean test, bundleRelease, wear bundleRelease, lint; unit tests app 349, core 252, wear 27, 0 failures). Still
