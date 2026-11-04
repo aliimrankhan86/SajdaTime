@@ -6166,6 +6166,15 @@ Uncommitted on `claude/1-7-0` (working tree only, nothing pushed). Ali asked to 
     `docs/release-tools/release-1.7.0.sh` on the committed code, then the release-day steps in RELEASE-1.7.0.md. The widgets must be
     re-added by hand on any emulator after a device suite run (the suite removes them from the home screen).
   - Not re-checked by hand on a launcher this round: Bengali, Urdu dark, Arabic 1.3x (the numeric run covers them, no picture).
+- **One source of truth, 4 Nov 2026 (Ali: "keep one source of truth", planning files belong in Google Drive).** Planning, research, evidence, old
+  plans and the signed 1.6.0 bundle now live ONLY in the Drive folder "SajdaTime (private)" (id 1zRnPLe6oeGYssAUolFEfpxjwdEGhXbvP; its
+  "00 READ ME FIRST (v3)" says what is where). `docs/plans/` was removed from the repo in this commit (history keeps it; it is also on Drive,
+  folder 04, as 7 zip parts). The Mac's `private/` folder, the six `SajdaTime-codex-*` worktrees (their branches were already inside
+  `claude/1-7-0`; two had uncommitted diffs, saved as patches on Drive), `.codex/`, the old bundle folders (1.3.2, 1.4.0, 1.5.0, 1.6.0) and
+  `~/Developer/ds-shots` were deleted after every Drive upload was checked by exact byte size. The 309 MB of 1.7.0 widget working captures
+  were not kept (Ali: private/ is deleted at release time). What stays in the repo is what builds, tests, the store or the website needs:
+  code, HANDOVER, PROJECT_BRIEF (his claude.ai project reads it from GitHub), DESIGN_SYSTEM.md and `docs/design-system/` (the tests read the
+  tokens; Drive has a readable mirror), release-tools, store, privacy. Mentions of `docs/plans` or `private/` earlier in this file are history.
 - **Tests:** 91 widget, design-rule and design-token tests pass after each change (`WidgetResourcesTest` now pins
   the Medium default at 3 by 1 and the resize minimum at 100dp).
 - **Preview images** (`widget_preview_*.png`) are old and need regenerating only after Ali approves the designs.

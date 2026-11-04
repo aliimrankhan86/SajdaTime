@@ -4,7 +4,7 @@
 # release-1.6.0.sh on 4 Nov 2026 (which stays beside it as the record of the last release). Safe to run
 # again: each step reports PASS, FAIL, CHECK, TAKEN or SKIPPED. It never prints or opens the signing key.
 #
-# What changed from 1.5.0, and why (docs/plans/2026-11-release-1.7.0/):
+# What changed from 1.5.0, and why (the 1.7.0 plans are on Drive, folder 04 Old planning moved from GitHub):
 # - Phone 11 / 1.7.0 and watch 1003 / 1.7.0 (both uploaded; corrected 4 Nov 2026 late: the watch DOES change in 1.7.0, its Times
 #   list marks the current prayer like the phone, commit 6041c48, so the earlier "watch stays 1002 / 1.5.0" was wrong).
 # - Twelve permissions: VIBRATE (normal, no prompt) was added in step 6.
