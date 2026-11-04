@@ -19,7 +19,7 @@ import java.io.File
  *
  * Both directions are checked: a value changed on one side only fails, and so does a colour, gap, timing
  * or type style added to the code without its token. The fix is always the same commit: change the Kotlin,
- * change the JSON, say why in docs/design-system/CHANGELOG.md.
+ * change the JSON, say why in the design-system changelog (on Google Drive, see docs/design-system/tokens/).
  *
  * Colours, gaps and timings are read from the source, as DesignRulesTest reads it, because their files
  * are one value per line and the token file names the Kotlin symbol. Type is read from the compiled
