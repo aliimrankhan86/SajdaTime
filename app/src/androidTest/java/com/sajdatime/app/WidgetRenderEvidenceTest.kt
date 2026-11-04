@@ -457,6 +457,41 @@ class WidgetRenderEvidenceTest {
         File(dir, "compact.csv").writeText(csv.toString())
     }
 
+    /**
+     * What the LARGE Today card and the WIDE Next card want, measured given a slot far taller than either (so the launcher's size
+     * choice picks them), per language, text size, time of day and Ramadan. The thresholds in WidgetRenderer.todaySizes and nextSizes
+     * must be at least the maximum of each row here (4 Nov 2026: the 6dp row padding raised the large card from about 302 to 400dp and
+     * the wide Next card from 149 to 214dp, and the thresholds had not followed). Output: release_needs.csv.
+     */
+    @Test
+    fun release_entry_needs() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z", "2027-02-22T09:00:00Z", "2027-02-22T21:30:00Z")
+        val csv = StringBuilder("widget,lang,fs,at,neededDp\n")
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f)) for (t in times) {
+            val at = Instant.parse(t)
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            for ((name, build, w, h) in listOf(
+                Quad("today", WidgetRenderer::today, 250, 700),
+                Quad("next", WidgetRenderer::nextPrayer, 270, 400),
+            )) {
+                var needed = -1f
+                instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
+                csv.append("$name,$lang,$scale,${t.substring(0, 16)},${"%.1f".format(needed)}\n")
+            }
+        }
+        File(dir, "release_needs.csv").writeText(csv.toString())
+    }
+
+    private data class Quad(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val h: Int)
+
     // ---- Next prayer, short variants --------------------------------------------------------------
 
     @Test

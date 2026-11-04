@@ -2,7 +2,7 @@
 <!--
   The Today widget, compact: from its 250 by 180dp minimum, on every launcher below Android 12, and
   whenever it is shorter than 300dp (324 from 1.1x text; 346 and 374 in Urdu, Arabic and Bengali) (WidgetRenderer.TODAY_SIZES). The six times, each with the glyph of
-  where the sun is, the next one marked. Rows are weighted, so they spread over whatever height the
+  where the sun is, the current one marked. Rows are weighted, so they spread over whatever height the
   launcher gives instead of stopping a third of the way down (the owner's 1.4.0 screenshot). No header
   here, for the reason the 1.4.0 version gave: at 180dp a header pushed Isha off at a larger font.
 
@@ -53,17 +53,15 @@
         android:textSize="14sp"
         android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+    <!-- No spacer above the rows: an empty band here (10dp padding plus a weighted spacer) showed as a gap above Fajr
+         on the Redmi's 4x4 slot (4 Nov 2026). The spare height now sits in the one spacer above the footer. -->
     <!-- Row padding is rewritten on every render by WidgetRenderer.fillRows (marked row 4dp below, others 0), so the values here are only the first paint. Each row has clipToPadding false and its underline layout_marginBottom -4dp so the bar sits in that padding, under the text. -->
     <FrameLayout
         android:id="@+id/widget_row_fajr"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -98,7 +96,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_fajr"
                 android:layout_width="0dp"
@@ -111,7 +109,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_fajr"
                 android:layout_width="wrap_content"
@@ -122,7 +120,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_fajr"
@@ -135,16 +133,12 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_sunrise"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -172,7 +166,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_sunrise"
                 android:layout_width="0dp"
@@ -185,7 +179,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_sunrise"
                 android:layout_width="wrap_content"
@@ -196,7 +190,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_sunrise"
@@ -209,16 +203,12 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_dhuhr"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -253,7 +243,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_dhuhr"
                 android:layout_width="0dp"
@@ -266,7 +256,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_dhuhr"
                 android:layout_width="wrap_content"
@@ -277,7 +267,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_dhuhr"
@@ -290,16 +280,12 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_asr"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -334,7 +320,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_asr"
                 android:layout_width="0dp"
@@ -347,7 +333,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_asr"
                 android:layout_width="wrap_content"
@@ -358,7 +344,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_asr"
@@ -371,16 +357,12 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_maghrib"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -415,7 +397,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_maghrib"
                 android:layout_width="0dp"
@@ -428,7 +410,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_maghrib"
                 android:layout_width="wrap_content"
@@ -439,7 +421,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_maghrib"
@@ -452,16 +434,12 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
     <FrameLayout
         android:id="@+id/widget_row_isha"
         android:clipToPadding="false"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        
         android:background="@drawable/widget_row_plain"
         android:paddingStart="8dp"
         android:paddingTop="1dp"
@@ -496,7 +474,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
             <TextView
                 android:id="@+id/widget_label_isha"
                 android:layout_width="0dp"
@@ -509,7 +487,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="12sp" />
+                android:textSize="13sp" />
             <TextView
                 android:id="@+id/widget_time_isha"
                 android:layout_width="wrap_content"
@@ -520,7 +498,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="14sp" />
+                android:textSize="16sp" />
         </LinearLayout>
         <ImageView
             android:id="@+id/widget_row_underline_isha"
@@ -533,18 +511,17 @@
             android:scaleType="fitXY"
             android:visibility="gone" />
     </FrameLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+    <!-- Footer sits right under the rows; spare height falls at the bottom edge as ordinary card padding, not as a
+         hole between Isha and the location (Ali, 4 Nov 2026, Redmi 4x4: "too many spacing in between"). -->
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
+        <!-- No mark here: the current prayer's row already carries it. The footer is the location chip and the countdown,
+             one line, so the chip is not cut at the bottom of the card (Ali, 4 Nov 2026: cleaner and easier to read). -->
         <LinearLayout
             android:id="@+id/widget_place_chip"
             android:layout_width="wrap_content"
@@ -552,15 +529,16 @@
             android:background="@drawable/widget_chip"
             android:gravity="center_vertical"
             android:importantForAccessibility="yes"
-            android:minHeight="24dp"
+            android:minHeight="22dp"
             android:orientation="horizontal"
             android:paddingStart="7dp"
-            android:paddingTop="3dp"
+            android:paddingTop="2dp"
             android:paddingEnd="8dp"
-            android:paddingBottom="3dp"
+            android:paddingBottom="2dp"
             android:visibility="gone">
             <ImageView
                 android:id="@+id/widget_place_pin"
+                android:visibility="gone"
                 android:layout_width="12dp"
                 android:layout_height="12dp"
                 android:importantForAccessibility="no"
@@ -571,7 +549,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:maxWidth="120dp"
+                android:maxWidth="64dp"
                 android:ellipsize="end"
                 android:importantForAccessibility="no"
                 android:maxLines="1"
@@ -581,6 +559,7 @@
                 android:textStyle="bold" />
             <ImageView
                 android:id="@+id/widget_place_update"
+                android:visibility="gone"
                 android:layout_width="11dp"
                 android:layout_height="11dp"
                 android:layout_marginStart="5dp"
@@ -588,6 +567,18 @@
                 android:src="@drawable/widget_icon_update"
                 android:tint="@color/widget_primary" />
         </LinearLayout>
+        <Chronometer
+            android:id="@+id/widget_compact_countdown"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:fontFeatureSettings="tnum"
+            android:importantForAccessibility="no"
+            android:maxLines="1"
+            android:textAlignment="viewStart"
+            android:textColor="@color/widget_on_surface"
+            android:textSize="14sp"
+            android:visibility="gone" />
         <TextView
             android:id="@+id/widget_footer"
             android:layout_width="0dp"
@@ -601,5 +592,18 @@
             android:textColor="@color/widget_on_surface_variant"
             android:textSize="12sp"
             android:visibility="gone" />
+        <!-- The app mark sits at the end of the footer, so the compact card shows the app's logo (Ali, 4 Nov 2026). -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical" />
+        <ImageView
+            android:id="@+id/widget_mark"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="6dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/widget_mark" />
     </LinearLayout>
 </LinearLayout>

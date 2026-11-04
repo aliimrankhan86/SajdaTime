@@ -82,7 +82,10 @@ class WidgetResourcesTest {
                         // "center" is direction neutral, so it is as right in Urdu as in English: the strip's
                         // columns centre their text in a match_parent view (step 8). Only the strip may.
                         tag.contains("""android:textAlignment="viewStart"""") || tag.contains("""android:textAlignment="viewEnd"""") ||
-                            (layout in stripLayouts && tag.contains("""android:textAlignment="center"""")),
+                            (layout in stripLayouts && tag.contains("""android:textAlignment="center"""")) ||
+                            // "gravity" follows the view's gravity, which WidgetRenderer.nextViews writes (start, or centred in
+                            // right to left on the small Next card, 4 Nov 2026), so it is as right in Urdu as in English.
+                            (layout == "layout/widget_next_prayer.xml" && tag.contains("""android:textAlignment="gravity"""")),
                     )
                 }
             }
@@ -138,7 +141,13 @@ class WidgetResourcesTest {
     fun `every glyph is tinted in the layout from a widget colour`() {
         for (layout in layouts) {
             val glyphs = Regex("""<ImageView\b[^>]*widget_glyph[^>]*>""", RegexOption.DOT_MATCHES_ALL).findAll(withoutComments(read(layout))).toList()
-            for (glyph in glyphs) assertTrue("$layout: ${glyph.value}", glyph.value.contains(Regex("""android:tint="@color/widget_[a-z_]+"""")))
+            for (glyph in glyphs) {
+                if (glyph.value.contains("""android:src="@drawable/widget_mark"""")) {
+                    assertFalse("$layout: the app mark must keep its own colours", glyph.value.contains("android:tint"))
+                    continue
+                }
+                assertTrue("$layout: ${glyph.value}", glyph.value.contains(Regex("""android:tint="@color/widget_[a-z_]+"""")))
+            }
         }
     }
 
@@ -181,14 +190,16 @@ class WidgetResourcesTest {
     @Test
     fun `the sizes are the ones the layouts were designed for`() {
         val next = read("xml/widget_next_prayer_info.xml")
-        assertTrue(next.contains("""android:targetCellWidth="3"""") && next.contains("""android:targetCellHeight="2""""))
+        assertTrue(next.contains("""android:targetCellWidth="3"""") && next.contains("""android:targetCellHeight="1""""))
         // Neither widget may be resized below the size its content was drawn for.
-        assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minResizeHeight="110dp""""))
+        assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minResizeHeight="100dp""""))
         val today = read("xml/widget_today_info.xml")
-        // Placed at 4 by 4 so a new widget opens on the large layout (18 Oct 2026).
-        assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="4""""))
-        // The Today widget must never be resizable below the height its six rows need.
-        assertTrue(today.contains("""android:minResizeHeight="180dp""""))
+        // Default 4 by 3 (Ali, 4 Nov 2026): a new widget opens as the compact card with no spare height. The 4 by 4
+        // default made the emulator's launcher open a tall 3 by 5 slot with an empty band under the rows.
+        assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
+        // The Today widget must never be resizable below the height its six rows need. 290dp since 4 Nov 2026 (Ali asked for
+        // the compact card to be taller, so its rows can sit with even gaps); WidgetRenderer.COMPACT_MIN_DP is the same figure.
+        assertTrue(today.contains("""android:minResizeHeight="290dp""""))
         // The strip is one cell tall everywhere. 40dp and not 60: a launcher that sizes by 70n minus 30 would
         // round a 60dp minimum up to two cells (STEP-8-DESIGN section 3).
         val strip = read("xml/widget_today_strip_info.xml")
@@ -223,7 +234,7 @@ class WidgetResourcesTest {
     @Test
     fun `every colour the widget files use is defined in both themes`() {
         val drawables = listOf(
-            "widget_background", "widget_row_highlight", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
+            "widget_background", "widget_row_highlight", "widget_strip_current", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
             "widget_seg_done", "widget_seg_next", "widget_seg_todo", "widget_underline",
             // Step 8: the Next prayer widget's skies, and what has to stay visible on them.
             "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",

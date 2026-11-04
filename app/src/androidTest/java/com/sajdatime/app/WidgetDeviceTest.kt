@@ -102,6 +102,9 @@ class WidgetDeviceTest {
         host.startListening()
         var view: AppWidgetHostView? = null
         instrumentation.runOnMainSync { view = host.createView(context, id, manager.getAppWidgetInfo(id)) }
+        // A bound widget gets no first update by itself, so ask for one here (the other tests do the same after a
+        // change). Without it the Today and strip tests waited forever for text that was never drawn (4 Nov 2026).
+        runBlocking { WidgetUpdater.refreshAll(context) }
         return id to view!!
     }
 
@@ -160,9 +163,12 @@ class WidgetDeviceTest {
     @Test
     fun the_today_widget_shows_six_rows_the_next_one_marked_and_the_ramadan_words_only_in_ramadan() {
         val (_, view) = bindOrFail(TodayWidgetProvider::class.java)
-        waitFor("the Today widget's first draw") { view.textOf("widget_time_fajr")?.text?.isNotEmpty() == true }
-        val bitmap = layoutAt(view, 250, 180)
+        // Isha is the last row and is always shown, even on the short card (compact Today shows the next prayer onward).
+        waitFor("the Today widget's first draw") { view.textOf("widget_time_isha")?.text?.isNotEmpty() == true }
+        val bitmap = layoutAt(view, 250, 290)
         save("widget-today-${tag()}", bitmap)
+        // The large card (4 by 4): the same host, taller, so the launcher would pick the large layout.
+        save("widget-today-large-${tag()}", layoutAt(view, 250, 330))
 
         val (state, _) = stateNow()
         // The widget marks the current prayer with the Now label (1.7.0, 4 Nov 2026), not Next.
@@ -171,14 +177,25 @@ class WidgetDeviceTest {
         val iftar = appContext.getString(R.string.widget_iftar)
         val fontScale = context.resources.configuration.fontScale
 
+        // A short card (the compact Today, 3 Nov 2026) shows the next prayer onward and hides the rows before it:
+        // the shown rows must run unbroken from some prayer to Isha, and a hidden row is not checked.
+        // The row is the name's grandparent: the frame that the layout hides, not the inner line it sits in.
+        val shown = PrayerSlot.entries.filter { slot ->
+            (view.textOf("widget_name_${slot.name.lowercase()}")?.parent?.parent as? View)?.visibility == View.VISIBLE
+        }
+        assertTrue("no prayer row is shown", shown.isNotEmpty())
+        assertEquals(
+            "the shown rows are not a run ending at Isha",
+            PrayerSlot.entries.drop(PrayerSlot.entries.indexOf(shown.first())), shown,
+        )
         for (slot in PrayerSlot.entries) {
+            if (slot !in shown) continue
             val key = slot.name.lowercase()
             val name = view.textOf("widget_name_$key")
             val time = view.textOf("widget_time_$key")
             val label = view.textOf("widget_label_$key")
             assertNotNull("row $key has no name view", name)
-            assertTrue("row $key is not visible", (name!!.parent as View).visibility == View.VISIBLE)
-            assertEquals("row $key name", slot.label(appContext), name.text.toString())
+            assertEquals("row $key name", slot.label(appContext), name!!.text.toString())
             assertTrue("row $key has no time", time!!.text.isNotEmpty())
             if (fontScale <= 1.0f) assertFalse("the name of row $key is cut off at normal font size", ellipsised(name))
 
@@ -299,7 +316,7 @@ class WidgetDeviceTest {
                 waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected }
                 waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected }
                 val tag = "theme-${choice.name.lowercase()}"
-                save("widget-today-$tag", layoutAt(today, 250, 180))
+                save("widget-today-$tag", layoutAt(today, 250, 290))
                 save("widget-next-$tag", layoutAt(next, 180, 110))
             }
         } finally {

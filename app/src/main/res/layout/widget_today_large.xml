@@ -40,7 +40,7 @@
     android:paddingStart="10dp"
     android:paddingTop="12dp"
     android:paddingEnd="10dp"
-    android:paddingBottom="8dp"
+    android:paddingBottom="12dp"
     tools:ignore="UselessLeaf,NestedWeights,UseCompoundDrawables">
 
     <LinearLayout
@@ -52,8 +52,8 @@
         android:paddingStart="4dp"
         android:paddingEnd="4dp">
         <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_mark" />
         <LinearLayout
@@ -304,6 +304,8 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -313,6 +315,7 @@
         android:id="@+id/widget_row_fajr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/widget_row_plain"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -344,7 +347,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_fajr"
             android:layout_width="0dp"
@@ -368,8 +371,10 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -379,6 +384,7 @@
         android:id="@+id/widget_row_sunrise"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/widget_row_plain"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -403,7 +409,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_sunrise"
             android:layout_width="0dp"
@@ -427,8 +433,10 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -438,6 +446,7 @@
         android:id="@+id/widget_row_dhuhr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/widget_row_plain"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -469,7 +478,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_dhuhr"
             android:layout_width="0dp"
@@ -493,8 +502,10 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -504,6 +515,7 @@
         android:id="@+id/widget_row_asr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/widget_row_plain"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -535,7 +547,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_asr"
             android:layout_width="0dp"
@@ -559,8 +571,10 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -570,6 +584,7 @@
         android:id="@+id/widget_row_maghrib"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="2dp"
         android:background="@drawable/widget_row_plain"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -601,7 +616,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_maghrib"
             android:layout_width="0dp"
@@ -625,8 +640,10 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
+    <!-- The spare height of the card is shared by equal spacers above each row, so no empty band is left under the last row
+         (owner, 4 Nov 2026: "do it"). Weights only take what is spare, so a row is never squeezed below its own height. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -667,7 +684,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
         <TextView
             android:id="@+id/widget_label_isha"
             android:layout_width="0dp"
@@ -691,13 +708,9 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface"
-            android:textSize="15sp" />
+            android:textSize="16sp" />
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="vertical" />
+    <!-- No spacer at the bottom: the card keeps its content at the top, and nothing is held back for empty space (Ali, 4 Nov 2026). -->
 
     <TextView
         android:id="@+id/widget_footer"

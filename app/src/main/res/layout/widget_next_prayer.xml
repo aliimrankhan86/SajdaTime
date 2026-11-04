@@ -44,6 +44,7 @@
     tools:ignore="UselessLeaf,NestedWeights,UseCompoundDrawables">
 
     <LinearLayout
+        android:id="@+id/widget_title_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -53,25 +54,24 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/widget_glyph_fajr"
-            android:tint="@color/widget_primary" />
+            android:src="@drawable/widget_mark" />
         <TextView
             android:id="@+id/widget_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:ellipsize="end"
             android:importantForAccessibility="no"
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface"
-            android:textSize="16sp"
+            android:textSize="18sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/widget_time"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:ellipsize="end"
             android:fontFeatureSettings="tnum"
@@ -79,7 +79,7 @@
             android:maxLines="1"
             android:textAlignment="viewEnd"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -97,7 +97,7 @@
         android:importantForAccessibility="no"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textAlignment="viewStart"
+        android:textAlignment="gravity"
         android:textColor="@color/widget_on_surface"
         android:textSize="36sp"
         android:visibility="gone" />
@@ -111,7 +111,7 @@
         android:importantForAccessibility="no"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textAlignment="viewStart"
+        android:textAlignment="gravity"
         android:textColor="@color/widget_on_surface"
         android:textSize="36sp"
         android:visibility="gone" />

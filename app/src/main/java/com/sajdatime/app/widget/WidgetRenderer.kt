@@ -11,6 +11,7 @@ import android.text.SpannableString
 import android.text.style.StyleSpan
 import android.util.SizeF
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
@@ -88,7 +89,9 @@ internal object WidgetRenderer {
     private fun nextSizes(context: Context): List<Pair<SizeF, Int>> {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         val grown = context.resources.configuration.fontScale >= 1.1f
-        val wideHeight = if (tall) (if (grown) 192f else 170f) else if (grown) 166f else 158f
+        // Re-measured 4 Nov 2026 with the 6dp rows (release_entry_needs): the wide card wants 214 to 215dp at 1.0x and 241.5 to 243.8 at
+        // 1.25x in every language, so it is offered from 218 (222 in Urdu and Arabic) and 254 (256) from 1.1x, which covers up to 1.29x; a shorter slot gets the small card.
+        val wideHeight = if (tall) (if (grown) 256f else 222f) else if (grown) 254f else 218f
         // Two entries of the small layout: from 140dp (150 in Urdu, Arabic and Bengali) it shows the five day bars; below that it hides them so the town
         // chip is not cut (Ali, 3 Nov 2026: "drop the bars when short").
         return listOf(
@@ -116,13 +119,25 @@ internal object WidgetRenderer {
         // wants 10 to 19dp more than in the day (302.5 at 1.0x, 347.8 at 1.25x in English; 354.7 and 408.4 in Urdu, 353.9 and 402.3
         // in Arabic, 320.4 and 366.9 in Bengali), so every evening a widget at the old heights cut its last row. These are those
         // maxima plus about 4dp.
-        val largeHeight = if (tall) (if (grown) 412f else 358f) else (if (grown) 352f else 306f)
+        // 1.3x to 1.6x (Ali, 4 Nov 2026: "see if something can be done for larger text"): the large card is kept for a slot tall enough to
+        // hold it, with the compact list (all six rows) as the graceful fallback below that; measured at 1.3x on the emulator: the card filled a
+        // 464dp slot with no spare, so 480 (540 for the tall scripts, not measured).
+        val big = context.resources.configuration.fontScale >= LARGE_TEXT
+        // RE-MEASURED 4 Nov 2026 (WidgetRenderEvidenceTest#release_entry_needs: four languages, six text sizes, six times of day, Ramadan
+        // included; the maximum plus 2 to 4dp). The older 306/352/358/412 above were measured when the rows had no padding; the 6dp row
+        // padding (Ali, 4 Nov 2026) raised the need to 401 (en), 417.5 (ur, ar), 386 (bn) at 1.0x; 438 (en) and 468 (ur) at 1.25x, 447 and 478 at 1.3x (the 1.1 to 1.29 entries are set to that edge);
+        // 477 (en) and 513 (ur, ar) at 1.5x. A launcher slot below the threshold gets the compact list with all six rows instead.
+        val largeHeight = when {
+            big -> if (tall) 520f else 484f
+            grown -> if (tall) 478f else 448f
+            else -> if (tall) 422f else 405f
+        }
         // The first compact entry shows as many rows as 180dp holds; from the second (the height six rows need, see
         // [compactSixRowsHeight]) all six show. Same layout, so todayViews is given the size.
         val six = compactSixRowsHeight(context)
         return listOfNotNull(
-            SizeF(250f, 180f) to R.layout.widget_today,
-            if (six > 180f) SizeF(250f, six) to R.layout.widget_today else null,
+            SizeF(250f, COMPACT_MIN_DP) to R.layout.widget_today,
+            if (six > COMPACT_MIN_DP) SizeF(250f, six) to R.layout.widget_today else null,
             SizeF(250f, maxOf(largeHeight, six + 1f)) to R.layout.widget_today_large,
         )
     }
@@ -137,14 +152,17 @@ internal object WidgetRenderer {
      * few rows, starts earlier. Row counts follow the measured heights per row; see HANDOVER.
      */
     /** The height six compact rows need, so a taller widget keeps all of them (measured 3 Nov 2026, see HANDOVER). */
+    /** The compact Today card, 290dp (Ali, 4 Nov 2026: taller, so the rows can sit with even gaps). Also the provider minimum. */
+    const val COMPACT_MIN_DP = 290f
+
     private fun compactSixRowsHeight(context: Context): Float {
         val scale = context.resources.configuration.fontScale
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         return when {
-            scale >= 1.6f -> if (tall) 345f else 300f
-            scale >= LARGE_TEXT -> if (tall) 300f else 250f
-            scale >= 1.1f -> if (tall) 250f else 210f
-            else -> if (tall) 210f else 180f
+            scale >= 1.6f -> if (tall) 435f else 390f
+            scale >= LARGE_TEXT -> if (tall) 390f else 340f
+            scale >= 1.1f -> if (tall) 340f else 320f
+            else -> if (tall) 310f else COMPACT_MIN_DP
         }
     }
 
@@ -166,7 +184,7 @@ internal object WidgetRenderer {
             else -> 6
         }
         val all = PrayerSlot.entries
-        val start = state.next?.takeIf { !it.isTomorrow }?.let { all.indexOf(it.slot) } ?: (all.size - count)
+        val start = state.current?.let(all::indexOf) ?: state.next?.takeIf { !it.isTomorrow }?.let { all.indexOf(it.slot) } ?: (all.size - count)
         return all.subList(start.coerceAtMost(all.size - count), (start.coerceAtMost(all.size - count)) + count)
     }
 
@@ -180,6 +198,9 @@ internal object WidgetRenderer {
      */
     private const val LARGE_TEXT = 1.3f
 
+    /** From this text size the large Today card is not offered at all (it wants about 470dp); the compact list keeps all six rows. */
+    private const val LARGE_TEXT_NO_CARD = 1.6f
+
     fun nextPrayer(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
         return responsive(forText(context, nextSizes(context))) { layout, size -> nextViews(context, state, now, layout, size) }
@@ -189,15 +210,14 @@ internal object WidgetRenderer {
         val context = AppLocale.wrap(base)
         // At large text the large card is dropped (see LARGE_TEXT) but every compact entry stays, so a tall widget keeps all six rows.
         val sizes = todaySizes(context).let { all ->
-            if (context.resources.configuration.fontScale >= LARGE_TEXT) all.filter { it.second == R.layout.widget_today } else all
+            if (context.resources.configuration.fontScale >= LARGE_TEXT_NO_CARD) all.filter { it.second == R.layout.widget_today } else all
         }
         return responsive(sizes) { layout, size -> todayViews(context, state, now, layout, size) }
     }
 
     /**
-     * Today strip, 4 cells by 1: thin (no glyph row) or with glyphs, and without or with the town chip
-     * (from 380dp). All four are the one layout, so the builder is given the size, not a layout id
-     * (STEP-8-DESIGN section 14, item 2). The launcher picks the entry that fits best, the smallest when none does.
+     * Today strip, 4 cells by 1. The launcher picks a size entry, and the renderer keeps five
+     * columns only when their text fits at the shared type size.
      */
     // 1.7.0 (Ali, 3 Nov 2026: "row level widget with icons and prayer time ... adjusted to half a row"): the glyph
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
@@ -210,6 +230,7 @@ internal object WidgetRenderer {
         // (Ali, 4 Nov 2026: "next prayer only" for the thinnest strip); from `five` the five columns return.
         return listOf(
             SizeF(250f, five), SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, five), SizeF(300f, tall), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
+            SizeF(350f, five), SizeF(350f, tall), SizeF(350f, STRIP_HERO_HEIGHT_DP),
             SizeF(400f, 40f), SizeF(400f, five), SizeF(400f, tall), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
         )
     }
@@ -232,10 +253,10 @@ internal object WidgetRenderer {
     private const val STRIP_HALF_WIDTH_DP = 250f
     private const val STRIP_HERO_HEIGHT_DP = 148f
     private const val STRIP_HERO_BIG_DP = 152f
-    private const val STRIP_CHIP_WIDTH_DP = 400f
-    private const val STRIP_MAX_SP = 12f
-    private const val STRIP_MIN_SP = 9f
-    private const val STRIP_CHIP_ALLOWANCE_DP = 105f
+    // 14sp, not 16 (Ali, 4 Nov 2026: the strip text read a little large next to the highlight).
+    private const val STRIP_MAX_SP = 14f
+    // 12sp floor (Ali, 4 Nov 2026): at 14sp the five columns did not fit 380dp in Urdu and the strip fell to one prayer.
+    private const val STRIP_MIN_SP = 12f
 
     private fun forText(context: Context, sizes: List<Pair<SizeF, Int>>) =
         if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.take(1) else sizes
@@ -266,12 +287,12 @@ internal object WidgetRenderer {
         // bottom padding instead of 12, so it needs about 106dp (measured 118.9 with only the bars gone) and the town chip is
         // not cut. Padding is written on EVERY render: both entries share one layout, so the launcher reapplies actions onto
         // the view it already has and a value left from the other entry would stay.
-        val short = !wide && size.height < nextBarsHeight(context) && context.resources.configuration.fontScale < LARGE_TEXT
+        val short = !wide && size.height < nextBarsHeight(context)
         // Urdu, Arabic and Bengali sit taller: the short variant wanted 111.2dp (115.4 at 1.15x) with the Latin 32 and 8, so
         // they get a 28 countdown and 6dp padding (measured 102.5 and 106.7 in Urdu and Arabic, 99.0 and 102.9 in Bengali).
         val tallScript = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        val padV = if (short) (if (tallScript) 6f else 8f) else 12f
-        if (!wide) views.setViewPadding(R.id.widget_root, dp(context, 14f), dp(context, padV), dp(context, 14f), dp(context, padV))
+        val padV = if (short) (if (tallScript || context.resources.configuration.fontScale >= LARGE_TEXT) 2f else 6f) else 12f
+        if (!wide) views.setViewPadding(R.id.widget_root, dp(context, 8f), dp(context, padV), dp(context, 8f), dp(context, padV))
         // The body is the period's sky in light and the app's green in dark (stripBody), written after the paint
         // so it wins over the paper body the paint pins, and on every render so a period that ends is replaced.
         // The chip gets the rimmed pill: on this body the plain pill can be the body's own colour.
@@ -288,7 +309,7 @@ internal object WidgetRenderer {
             views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, MESSAGE_SP)
             views.setInt(R.id.widget_name, "setMaxLines", NO_LOCATION_LINES)
             views.setViewVisibility(R.id.widget_sublabel, View.GONE)
-            for (id in HERO_IDS) if (id != R.id.widget_name) views.setViewVisibility(id, View.GONE)
+            for (id in HERO_IDS) if (id != R.id.widget_name && id != R.id.widget_glyph) views.setViewVisibility(id, View.GONE)
             if (wide) {
                 views.setViewVisibility(R.id.widget_divider, View.GONE)
                 for (slot in PrayerSlot.entries) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
@@ -297,12 +318,25 @@ internal object WidgetRenderer {
             return views
         }
 
-        fillHero(context, views, state, next, now, if (wide) WIDE_COUNTDOWN_DP else if (short) (if (tallScript) SHORT_TALL_COUNTDOWN_DP else SHORT_COUNTDOWN_DP) else SMALL_COUNTDOWN_DP, sky = true)
+        val baseDp = if (wide) WIDE_COUNTDOWN_DP else if (short) (if (tallScript) SHORT_TALL_COUNTDOWN_DP else SHORT_COUNTDOWN_DP) else SMALL_COUNTDOWN_DP
+        // The spare height goes to the time, not to an empty band (owner, 4 Nov 2026: "wasting too much space").
+        val heroDp = if (short) baseDp else heroDp(context, size, baseDp, TimeFormat.clock(context, next.at))
+        fillHero(context, views, state, next, now, heroDp, sky = true)
         // Written back: a recycled view that showed the no location message had the name at 14sp and two lines.
-        views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, NAME_SP)
+        // Arabic and Urdu names are 30dp tall at 18sp: on the 104dp default the chip's foot was cut (emulator, 4 Nov 2026), so 16sp there.
+        views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, if (short && tallScript) NAME_SP - 2f else NAME_SP)
         views.setInt(R.id.widget_name, "setMaxLines", 1)
-        // From 1.3x text the first entry is the only one, so the bars stay (they are cut there anyway).
         if (short) views.setViewVisibility(R.id.widget_progress, View.GONE)
+        // Right to left, small card (Ali, 4 Nov 2026: "balance it"): the name and the time hang off the right edge and leave the left
+        // 60 percent of the one-row card empty, so it reads wider than the English one. Centred there; English keeps its start edge.
+        // Written both ways because the launcher reuses the view. The countdown and time use textAlignment "gravity" in the layout.
+        if (!wide) {
+            val centre = AppLocale.of(context).layoutDirection == View.LAYOUT_DIRECTION_RTL
+            val gravity = if (centre) Gravity.CENTER_HORIZONTAL else Gravity.START
+            views.setInt(R.id.widget_title_row, "setGravity", gravity or Gravity.CENTER_VERTICAL)
+            views.setInt(R.id.widget_countdown, "setGravity", gravity)
+            views.setInt(R.id.widget_hero_time, "setGravity", gravity)
+        }
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
@@ -323,6 +357,7 @@ internal object WidgetRenderer {
         fillChip(context, views, state)
         views.setInt(R.id.widget_place_chip, "setBackgroundResource", skin(state, R.drawable.widget_pill_sky))
         if (large) fillHeader(context, views, state)
+        else views.setViewVisibility(R.id.widget_compact_countdown, View.GONE)
 
         val today = state.today
         val next = state.next
@@ -342,6 +377,9 @@ internal object WidgetRenderer {
             views.setViewVisibility(R.id.widget_hero, View.VISIBLE)
             fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
         }
+        // The compact card has no countdown line: the location chip alone (Ali, 4 Nov 2026: "we don't need" the next
+        // prayer and its countdown here). Hidden every time, because a launcher may reuse the view.
+        views.setViewVisibility(R.id.widget_compact_countdown, View.GONE)
 
         val spoken = fillRows(context, views, state, labels = true, band = large, bandSideDp = 8f, shown = if (large) PrayerSlot.entries else compactSlots(context, state, size))
 
@@ -385,18 +423,18 @@ internal object WidgetRenderer {
         // From 1.3 text the five columns would cut names and times (STEP-8-DESIGN section 3), so the next
         // prayer alone is shown at the user's size, at every entry.
         // Half a row (under 250dp wide) shows the next prayer alone too: five columns cannot fit two cells.
-        val large = context.resources.configuration.fontScale >= LARGE_TEXT || size.width < STRIP_HALF_WIDTH_DP || size.height < stripFiveHeight(context)
-        // fillChip shows or hides by whether there is a town; the width then decides whether there is room, and
-        // large text never has it (Opus review, 25 Oct 2026: it squeezed the one prayer that is left).
-        fillChip(context, views, state)
-        if (size.width < STRIP_CHIP_WIDTH_DP || large) views.setViewVisibility(R.id.widget_place_chip, View.GONE)
-
         val today = state.today
         val next = state.next
+        val textSp = today?.let { stripTextSp(context, state, it, size.width) }
+        val large = context.resources.configuration.fontScale >= LARGE_TEXT ||
+            size.width < STRIP_HALF_WIDTH_DP || size.height < stripFiveHeight(context) || textSp == null
+        // The strip gives the available width to the prayer times.
+        views.setViewVisibility(R.id.widget_place_chip, View.GONE)
         if (!state.hasLocation || today == null || next == null) {
             for (slot in WidgetState.PRAYERS) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
             // widget_message lives inside the row, which a thin or large text entry hides when there is a location: written both ways.
             views.setViewVisibility(R.id.widget_strip_row, View.VISIBLE)
+            views.setViewVisibility(R.id.widget_strip_logo, View.VISIBLE)
             views.setViewVisibility(R.id.widget_strip_next, View.GONE)
             views.setTextViewText(R.id.widget_message, context.getString(R.string.widget_no_location))
             views.setViewVisibility(R.id.widget_message, View.VISIBLE)
@@ -408,8 +446,8 @@ internal object WidgetRenderer {
         val hero = large || size.height >= STRIP_HERO_HEIGHT_DP
         val spoken = fillColumns(context, views, state, today, glyphs, visible = !large)
         // One size for all ten texts, so no column is smaller than its neighbour (Ali, 3 Nov 2026, "uneven").
-        val textSp = stripTextSp(context, today, size.width, chip = size.width >= STRIP_CHIP_WIDTH_DP && !large)
-        for (slot in WidgetState.PRAYERS) {
+        views.setViewVisibility(R.id.widget_strip_logo, if (hero) View.GONE else View.VISIBLE)
+        if (textSp != null) for (slot in WidgetState.PRAYERS) {
             val ids = ROWS.getValue(slot)
             views.setTextViewTextSize(ids.name, TypedValue.COMPLEX_UNIT_SP, textSp)
             views.setTextViewTextSize(ids.time, TypedValue.COMPLEX_UNIT_SP, textSp)
@@ -420,17 +458,11 @@ internal object WidgetRenderer {
             val sp = when {
                 size.height >= STRIP_HERO_BIG_DP -> 28f
                 size.height >= STRIP_HERO_HEIGHT_DP -> 24f
+                large -> nextLineSp(context, size.width, size.height, next, today)
                 else -> 14f
             }
             views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, sp)
             views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, sp)
-            views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
-            // The app's own mark at the top start corner, so the widget still says which app it is (Ali, 3 Nov 2026: a
-            // separate small logo, top left, top right in right to left). Only on the 148dp and 152dp entries at the
-            // normal text size: the Opus review estimated the hero line overflows 300dp with the logo from 1.15x text,
-            // and the thin and 78dp entries have no room. Seen on 3 Nov 2026 in a render at 300x148 and 300x150 and on the emulator launcher at about 225dp tall.
-            val room = size.height >= STRIP_HERO_HEIGHT_DP && context.resources.configuration.fontScale <= 1.0f
-            views.setViewVisibility(R.id.widget_corner_logo, if (room) View.VISIBLE else View.GONE)
             views.setTextViewText(R.id.widget_name, next.slot.label(context))
             views.setTextViewText(R.id.widget_time, timeText(TimeFormat.clock(context, next.at), emphasis = false))
             views.setTextViewText(R.id.widget_sublabel, context.getString(R.string.widget_tomorrow))
@@ -476,14 +508,15 @@ internal object WidgetRenderer {
             }
 
             views.setViewVisibility(ids.row, if (visible) View.VISIBLE else View.GONE)
-            // No box (Ali, 3 Nov 2026, from a Pillars screenshot): the current prayer is marked by the app's own mark in place of
-            // its sun glyph, bold text, and an underline, like the reference's pointer and bar.
-            views.setInt(ids.row, "setBackgroundResource", skin(state, R.drawable.widget_row_plain))
+            // One cue for the current prayer: its filled pill (with the bold text below). Plain cells have no outline or
+            // fill, so the five columns read as one row with equal gaps (owner, 4 Nov 2026: "not clean", "gaps not consistent").
+            if (highlighted) {
+                views.setInt(ids.row, "setBackgroundResource", skin(state, R.drawable.widget_strip_current))
+            } else {
+                views.setInt(ids.row, "setBackgroundColor", android.graphics.Color.TRANSPARENT)
+            }
             views.setImageViewResource(ids.glyph, glyph(slot))
-            views.setViewVisibility(ids.glyph, if (glyphs && !highlighted) View.VISIBLE else View.GONE)
-            val extra = STRIP_MARKS.getValue(slot)
-            views.setViewVisibility(extra.first, if (glyphs && highlighted) View.VISIBLE else View.GONE)
-            views.setViewVisibility(extra.second, if (highlighted) View.VISIBLE else View.INVISIBLE)
+            views.setViewVisibility(ids.glyph, if (glyphs) View.VISIBLE else View.GONE)
             views.setTextViewText(ids.name, if (highlighted) bold(heading) else heading)
             views.setTextViewText(ids.time, timeText(time, highlighted))
 
@@ -498,23 +531,72 @@ internal object WidgetRenderer {
     }
 
     /**
-     * The largest size up to 12sp (floor 9sp, steps of 0.5) at which the widest of the ten column texts fits one
-     * column, measured in bold at the user's font scale. The same size goes to every column.
+     * The next prayer's time at a size that uses the height left over by the header, the town chip and the day bars,
+     * never past what fits the width. Falls back to [baseDp] when the widget is no taller than the content needs.
      */
-    private fun stripTextSp(context: Context, today: DayPrayerTimes, widthDp: Float, chip: Boolean): Float {
-        val d = context.resources.displayMetrics.density
-        val scale = context.resources.configuration.fontScale
-        val column = ((widthDp - 8f - (if (chip) STRIP_CHIP_ALLOWANCE_DP else 0f)) / WidgetState.PRAYERS.size - 4f) * d
-        val texts = WidgetState.PRAYERS.flatMap { listOf(it.label(context), TimeFormat.clock(context, today[it])) }
+    private fun heroDp(context: Context, size: SizeF, baseDp: Float, time: String): Float {
+        val metrics = context.resources.displayMetrics
+        val spare = size.height - NEXT_CHROME_DP
+        var dp = minOf(baseDp + spare * 0.8f, baseDp * 2.4f)
+        val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.create("sans-serif-light", android.graphics.Typeface.NORMAL) }
+        val room = (size.width - 28f) * metrics.density
+        while (dp > baseDp) {
+            paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics)
+            if (paint.measureText(time) <= room) return dp
+            dp -= 1f
+        }
+        return baseDp
+    }
+
+    /** Height the header, the town chip and the day bars take on the next prayer card, from the measured layouts. */
+    private const val NEXT_CHROME_DP = 100f
+
+    /**
+     * The next prayer alone on a short strip at large text. It grows with the cell's height so the line does not float
+     * in an empty box (owner, 4 Nov 2026: "fix it"), but never past what fits the width: the largest size from 14 to 22sp
+     * at which "Fajr 5:07 am Tomorrow" stays on one line.
+     */
+    private fun nextLineSp(context: Context, widthDp: Float, heightDp: Float, next: NextPrayer, today: DayPrayerTimes): Float {
+        val metrics = context.resources.displayMetrics
+        val line = listOfNotNull(
+            next.slot.label(context),
+            TimeFormat.clock(context, next.at),
+            if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
+        ).joinToString(" ")
         val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.DEFAULT_BOLD }
-        var sp = STRIP_MAX_SP
-        while (sp > STRIP_MIN_SP) {
-            paint.textSize = sp * d * scale
-            if (texts.maxOf { paint.measureText(it) } <= column) break
+        var sp = (heightDp * 0.22f).coerceIn(14f, 22f)
+        while (sp > 14f) {
+            paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, metrics)
+            if (paint.measureText(line) <= (widthDp - 16f) * metrics.density) return sp
             sp -= 0.5f
         }
-        return sp
+        return 14f
     }
+
+    /** One size for all columns, or the single prayer layout when the full text needs more room. */
+    private fun stripTextSp(context: Context, state: WidgetState, today: DayPrayerTimes, widthDp: Float): Float? {
+        val metrics = context.resources.displayMetrics
+        val column = ((widthDp - 8f - 20f) / WidgetState.PRAYERS.size - 4f) * metrics.density
+        val texts = WidgetState.PRAYERS.flatMap { slot ->
+            val label = when (state.ramadanWordFor(slot, state.ramadanToday)) {
+                RamadanWord.IFTAR -> context.getString(R.string.widget_iftar)
+                RamadanWord.SUHOOR_ENDS -> context.getString(R.string.widget_strip_suhoor)
+                null -> slot.label(context)
+            }
+            listOf(label, TimeFormat.clock(context, today[slot]))
+        }
+        val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.DEFAULT_BOLD }
+        var sp = STRIP_MAX_SP
+        while (sp >= STRIP_MIN_SP) {
+            paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, metrics)
+            if (texts.maxOf { paint.measureText(it) } <= column) return sp
+            sp -= 0.5f
+        }
+        return null
+    }
+
+    private fun rowSurface(state: WidgetState, highlighted: Boolean): Int =
+        skin(state, if (highlighted) R.drawable.widget_row_highlight else R.drawable.widget_row_plain)
 
     private fun dp(context: Context, value: Float): Int = (value * context.resources.displayMetrics.density).roundToInt()
 
@@ -535,7 +617,7 @@ internal object WidgetRenderer {
         sky: Boolean = false,
     ) {
         val time = TimeFormat.clock(context, next.at)
-        views.setImageViewResource(R.id.widget_glyph, glyph(next.slot))
+        views.setImageViewResource(R.id.widget_glyph, if (sky) R.drawable.widget_mark else glyph(next.slot))
         views.setTextViewText(R.id.widget_name, next.slot.label(context))
         views.setTextViewText(R.id.widget_time, timeText(time, false))
         views.setViewVisibility(R.id.widget_glyph, View.VISIBLE)
@@ -621,38 +703,26 @@ internal object WidgetRenderer {
             val word = state.ramadanWordFor(slot, state.ramadanToday)?.let { wordText(context, it) }
 
             views.setViewVisibility(ids.row, View.VISIBLE)
-            // The current row is marked by size (Ali, 3 Nov 2026): a highlight band behind it on the larger forms (Next prayer
-            // wide, Today with the countdown card), a 4dp underline on the compact Today. Both marks carry the app's logo and
-            // bold. The underline sits in the marked row's own 4dp of bottom padding (below the text, not over it), so that row is 3dp taller and the weighted gaps absorb it. Both states are written
-            // every time because the launcher reuses these views.
-            views.setViewVisibility(ids.underline, if (highlighted && !band) View.VISIBLE else View.GONE)
-            views.setInt(ids.row, "setBackgroundResource", skin(state, if (highlighted && band) R.drawable.widget_pill_sky else R.drawable.widget_row_plain))
-            // The band row gets 4dp above and below the text so the current prayer is not squashed against its rim (Ali, 3 Nov
-            // 2026: "the active one needs to be nicely visible"). Only that row grows; the weighted gaps between the rows
-            // absorb it, so no neighbour moves. Written for every row because the launcher reuses views. The sides repeat
-            // the layout's own padding, which setViewPadding replaces.
-            if (band) {
-                val side = dp(context, bandSideDp)
-                val vertical = if (highlighted) dp(context, 4f) else 0
-                views.setViewPadding(ids.row, side, vertical, side, vertical)
-            } else {
-                // The 4dp underline sits at the row's bottom (layout margin -4dp, row clipToPadding false). With no padding below it cut into the text and the
-                // logo tile on a real Redmi (HyperOS font sits lower in its line box than the emulator's Roboto, seen 4 Nov
-                // 2026), so the marked row gets 4dp below it for the line to sit in. The other rows give up their 1dp below
-                // (the layout's) so the whole widget stays near its measured height: with 5dp on the marked row alone, 21 of
-                // 640 measured sizes ran 1 to 8dp over. Written for every row both ways (the launcher reuses views); the sides
-                // and top repeat the layout's own 8dp and 1dp.
-                views.setViewPadding(ids.row, dp(context, 8f), dp(context, 1f), dp(context, 8f), dp(context, if (highlighted) 4f else 0f))
-            }
+            views.setInt(ids.row, "setBackgroundResource", rowSurface(state, highlighted))
+            if (!band) views.setViewVisibility(ids.underline, View.GONE)
+            val side = dp(context, bandSideDp)
+            // 6dp above and below each prayer: the rows read as full bars, not squashed lines (Ali, 4 Nov 2026: too cramped at 0;
+            // 4 Nov 2026 Redmi check: 4dp still looked squashed at 16sp). Six of these plus 6dp gaps fit the 290dp minimum.
+            // Urdu, Arabic and Bengali lines are about 27dp tall at 15sp (emulator, 4 Nov 2026: Arabic Isha row cut at the card's foot
+            // with 6dp), so their rows take 3dp and the highlight outline always has the room to draw.
+            val padV = dp(context, if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 3f else 6f)
+            views.setViewPadding(ids.row, side, padV, side, padV)
             // The mark is its own view (the strip's widget_logo_*), never the glyph view with a filter or tint removed: under a theme
             // chosen in the app the glyph carries a colour filter that turned the mark into a flat grey tile (seen on the emulator).
             views.setImageViewResource(ids.glyph, glyph(slot))
-            STRIP_MARKS[slot]?.first?.let { logo ->
+            ROW_LOGOS[slot]?.let { logo ->
                 views.setViewVisibility(ids.glyph, if (highlighted) View.GONE else View.VISIBLE)
                 views.setViewVisibility(logo, if (highlighted) View.VISIBLE else View.GONE)
             }
-            views.setTextViewText(ids.name, if (highlighted) bold(name) else name)
-            views.setTextViewText(ids.time, timeText(time, highlighted))
+            // Same weight and size for every row (Ali, 4 Nov 2026: the bold current row read bigger than the rest).
+            // The current prayer is shown by its fill, its border and the "Now" word.
+            views.setTextViewText(ids.name, name)
+            views.setTextViewText(ids.time, timeText(time, emphasis = false))
 
             // "Now", a Ramadan word, both, or nothing. Written every time, so a row that stops being
             // current or stops carrying a word is cleared. Empty on the wide Next widget, where the label
@@ -712,7 +782,7 @@ internal object WidgetRenderer {
     private const val MESSAGE_SP = 14f
 
     /** The Next prayer widgets' prayer name, 16sp in both layouts; rewritten after the message size. */
-    private const val NAME_SP = 16f
+    private const val NAME_SP = 18f
 
     /**
      * The countdown sizes, in dp, judged from renders at each layout's smallest size. At the small Next
@@ -720,8 +790,10 @@ internal object WidgetRenderer {
      * needed). From 140dp the bars show; One UI gives about 158dp and shows everything.
      */
     private const val SMALL_COUNTDOWN_DP = 36f
-    private const val SHORT_COUNTDOWN_DP = 32f
-    private const val SHORT_TALL_COUNTDOWN_DP = 28f
+    // Ali, 4 Nov 2026 ("make it smaller"): the one-row Medium is about 103dp on the emulator, so the short countdown
+    // steps down from 32 to 26 (24 in tall scripts) to fit under 100dp. Measure again on a phone before changing.
+    private const val SHORT_COUNTDOWN_DP = 26f
+    private const val SHORT_TALL_COUNTDOWN_DP = 22f
     private const val WIDE_COUNTDOWN_DP = 34f
     private const val LARGE_COUNTDOWN_DP = 38f
 
@@ -736,12 +808,13 @@ internal object WidgetRenderer {
     private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int, val underline: Int)
 
     /** The strip's per column mark (the app's logo, in place of the glyph) and underline. */
-    private val STRIP_MARKS = mapOf(
-        PrayerSlot.FAJR to (R.id.widget_logo_fajr to R.id.widget_bar_fajr),
-        PrayerSlot.DHUHR to (R.id.widget_logo_dhuhr to R.id.widget_bar_dhuhr),
-        PrayerSlot.ASR to (R.id.widget_logo_asr to R.id.widget_bar_asr),
-        PrayerSlot.MAGHRIB to (R.id.widget_logo_maghrib to R.id.widget_bar_maghrib),
-        PrayerSlot.ISHA to (R.id.widget_logo_isha to R.id.widget_bar_isha),
+    /** The app mark that stands in for a prayer's glyph on the current row of the larger layouts. */
+    private val ROW_LOGOS = mapOf(
+        PrayerSlot.FAJR to R.id.widget_logo_fajr,
+        PrayerSlot.DHUHR to R.id.widget_logo_dhuhr,
+        PrayerSlot.ASR to R.id.widget_logo_asr,
+        PrayerSlot.MAGHRIB to R.id.widget_logo_maghrib,
+        PrayerSlot.ISHA to R.id.widget_logo_isha,
     )
 
     private val ROWS = mapOf(
@@ -816,7 +889,9 @@ internal object WidgetRenderer {
         R.drawable.widget_hero_background to (R.drawable.widget_hero_background_light to R.drawable.widget_hero_background_dark),
         R.drawable.widget_chip to (R.drawable.widget_chip_light to R.drawable.widget_chip_dark),
         R.drawable.widget_divider to (R.drawable.widget_divider_light to R.drawable.widget_divider_dark),
+        R.drawable.widget_row_plain to (R.drawable.widget_row_plain_light to R.drawable.widget_row_plain_dark),
         R.drawable.widget_row_highlight to (R.drawable.widget_row_highlight_light to R.drawable.widget_row_highlight_dark),
+        R.drawable.widget_strip_current to (R.drawable.widget_strip_current_light to R.drawable.widget_strip_current_dark),
         R.drawable.widget_seg_done to (R.drawable.widget_seg_done_light to R.drawable.widget_seg_done_dark),
         R.drawable.widget_seg_next to (R.drawable.widget_seg_next_light to R.drawable.widget_seg_next_dark),
         R.drawable.widget_underline to (R.drawable.widget_underline_light to R.drawable.widget_underline_dark),
@@ -858,7 +933,6 @@ internal object WidgetRenderer {
 
     /** The countdown block. The large Today card names the prayer in green and its time in full ink. */
     private fun heroPaints(name: Int, time: Int) = listOf(
-        Paint(R.id.widget_glyph, Ink.TINT, R.color.widget_primary),
         Paint(R.id.widget_name, Ink.TEXT, name),
         Paint(R.id.widget_time, Ink.TEXT, time),
         Paint(R.id.widget_sublabel, Ink.TEXT, R.color.widget_on_surface_variant),
@@ -885,11 +959,9 @@ internal object WidgetRenderer {
     private val STRIP_COLUMN_PAINTS = WidgetState.PRAYERS.flatMap { slot ->
         val ids = ROWS.getValue(slot)
         listOf(
-            Paint(ids.row, Ink.BACKGROUND, R.drawable.widget_row_plain),
             Paint(ids.glyph, Ink.TINT, R.color.widget_on_surface_variant),
             Paint(ids.name, Ink.TEXT, R.color.widget_on_surface),
             Paint(ids.time, Ink.TEXT, R.color.widget_on_surface),
-            Paint(STRIP_MARKS.getValue(slot).second, Ink.IMAGE, R.drawable.widget_underline),
         )
     }
 
@@ -906,6 +978,7 @@ internal object WidgetRenderer {
             heroPaints(R.color.widget_on_surface, R.color.widget_on_surface_variant) + CHIP_PAINTS + ROW_PAINTS,
         R.layout.widget_today to listOf(
             ROOT_PAINT,
+            Paint(R.id.widget_compact_countdown, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
         ) + ROW_PAINTS + ROW_UNDERLINE_PAINTS + CHIP_PAINTS,
@@ -916,12 +989,12 @@ internal object WidgetRenderer {
             Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_hero, Ink.BACKGROUND, R.drawable.widget_hero_background),
             Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
-        ) + heroPaints(R.color.widget_primary, R.color.widget_on_surface) + ROW_PAINTS + CHIP_PAINTS,
+        ) + heroPaints(R.color.widget_primary, R.color.widget_on_surface) +
+            Paint(R.id.widget_glyph, Ink.TINT, R.color.widget_primary) + ROW_PAINTS + CHIP_PAINTS,
         R.layout.widget_strip to listOf(
             ROOT_PAINT,
             Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
             // The large text row: the next prayer alone (the ids are the hero's, in a row of their own).
-            Paint(R.id.widget_glyph, Ink.TINT, R.color.widget_on_surface_variant),
             Paint(R.id.widget_name, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_time, Ink.TEXT, R.color.widget_on_surface),
             Paint(R.id.widget_sublabel, Ink.TEXT, R.color.widget_on_surface_variant),
@@ -1041,10 +1114,10 @@ internal object WidgetRenderer {
      * uses, so it is the distance to [at] from now added to that clock's reading. Only called when the
      * refresh alarm is exact (see [fillHero]).
      */
-    private fun applyCountdown(views: RemoteViews, id: Int, at: Instant, now: Instant) {
+    private fun applyCountdown(views: RemoteViews, id: Int, at: Instant, now: Instant, format: String? = null) {
         views.setViewVisibility(id, View.VISIBLE)
         views.setChronometerCountDown(id, true)
-        views.setChronometer(id, SystemClock.elapsedRealtime() + (at.toEpochMilli() - now.toEpochMilli()), null, true)
+        views.setChronometer(id, SystemClock.elapsedRealtime() + (at.toEpochMilli() - now.toEpochMilli()), format, true)
     }
 
     /** Distinct from the scheduler's open intent (request code 0), so neither replaces the other. */
