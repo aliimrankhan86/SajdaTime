@@ -67,8 +67,8 @@ android {
         //
         // 10 / 1.6.0, 25 Oct 2026: My prayers tracker, bells, Timetable, jama'ah times, skies, the
         // widget strip. Phone only: the watch stays 1002 / 1.5.0 (docs/plans/2026-10-release-1.6.0/).
-        versionCode = 10
-        versionName = "1.6.0"
+        versionCode = 11
+        versionName = "1.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
