@@ -184,7 +184,7 @@ Counts include spaces and line breaks, excluding the final line break and Markdo
 • شیعہ: جعفری / اثنا عشری، مغرب کے درست اصول سمیت
 • حساب کے 13 طریقے: مسلم ورلڈ لیگ، ISNA، ام القریٰ، مصری، کراچی، دبئی، کویت، قطر، Kemenag/MUIS، دیانت، مون سائٹنگ کمیٹی، جعفری اور تہران
 • آپ کی مسجد کے جماعت (اقامت) اور جمعہ کے اوقات
-• «شروع کے اوقات اپنی مسجد سے ملائیں»: ہر وقت دیکھیں، اسے 30 منٹ تک آگے پیچھے کریں یا مسجد کے بورڈ سے وقت لیں
+• «شروع کے اوقات اپنی مسجد سے ملائیں»: ہر نماز کا وقت دیکھیں، اسے 30 منٹ تک آگے پیچھے کریں یا مسجد کے بورڈ سے وقت لیں
 
 آپ کی پرائیویسی
 
@@ -209,7 +209,7 @@ Counts include spaces and line breaks, excluding the final line break and Markdo
 **What's new** `349 / 500`
 
 ```
-اوقات اور ویجٹ میں «ابھی» کا ایک نشان موجودہ نماز دکھاتا ہے۔ تھیم «فون کے مطابق» یا اس کے الٹ رکھیں۔ چاشت کا اختیاری وقت۔ اوقات میں باقی وقت اور آسمان کی پٹی۔ نئے ڈیزائن کے ویجٹ زیادہ سائز میں فٹ ہوتے ہیں۔ مسجد سے اوقات ملاتے ہوئے ہر وقت اپنی تبدیلی کے ساتھ دیکھیں۔ ہجری تاریخ کی تبدیلی اب «اسلامی تاریخیں» میں ہے۔ فرق ہو تو اپنی مسجد کی پیروی کریں۔
+اوقات اور ویجٹ میں «ابھی» کا ایک نشان موجودہ نماز دکھاتا ہے۔ تھیم «فون کے مطابق» یا اس کے الٹ رکھیں۔ چاشت کا اختیاری وقت۔ اوقات میں باقی وقت اور آسمان کی پٹی۔ نئے ڈیزائن کے ویجٹ زیادہ سائز میں فٹ ہوتے ہیں۔ مسجد سے اوقات ملاتے ہوئے ہر نماز کا وقت اپنی تبدیلی کے ساتھ دیکھیں۔ ہجری تاریخ کی تبدیلی اب «اسلامی تاریخیں» میں ہے۔ فرق ہو تو اپنی مسجد کی پیروی کریں۔
 ```
 
 ### Turkish (tr-TR), 1.7.0
@@ -312,7 +312,7 @@ JADWAL SHOLAT DAN KIBLAT
 
 PENGINGAT DAN ADZAN
 
-• Tiap salat: nonaktif, notifikasi, atau alarm cukup keras untuk Subuh, meski aplikasi ditutup.
+• Tiap salat: mati, notifikasi, atau alarm cukup keras untuk Subuh, meski aplikasi ditutup.
 • Adzan (azan) Sunni dan Syiah, atau suara apa pun di ponsel
 • Pengingat senyap 5 sampai 30 menit sebelum sholat, notifikasi senyap sholat berikutnya
 • Lonceng di tiap sholat menyalakan atau mematikan pengingat
@@ -371,7 +371,7 @@ Saya hanya minta satu hal sebagai balasan: mohon doakan saya, keluarga saya, dan
 **What's new** `411 / 500`
 
 ```
-Di Waktu dan widget, satu penanda “Sekarang” menunjukkan waktu salat yang sedang berlangsung. Tema “Ikuti ponsel” atau kebalikannya. Rentang waktu Duha opsional. Sisa waktu dan pita langit di Waktu. Desain baru widget muat di lebih banyak ukuran. Saat menyesuaikan dengan masjid, lihat tiap waktu di samping perubahan Anda. Penggeseran tanggal Hijriah kini ada di Tanggal Islam. Jika berbeda, ikuti masjid Anda.
+Di Waktu dan widget, satu penanda “Sekarang” menunjukkan waktu salat yang sedang berlangsung. Tema “Ikuti ponsel” atau kebalikannya. Rentang waktu Duha opsional. Sisa waktu dan pita langit di Waktu. Widget berdesain baru muat di lebih banyak ukuran. Saat menyesuaikan dengan masjid, lihat tiap waktu di samping perubahan Anda. Penggeseran tanggal Hijriah kini ada di Tanggal Islam. Jika berbeda, ikuti masjid Anda.
 ```
 
 ### Malay (ms-MY), 1.7.0
@@ -547,7 +547,7 @@ Calculés sur le téléphone, sans réseau. Ni pub ni compte.
 HORAIRES ET QIBLA
 
 • Fajr, lever du soleil, Dhuhr, Asr, Maghrib et Isha, temps restant et ciel changeant
-• Créneau de Duha au choix (sunnite)
+• Plage de Duha facultative (sunnite)
 • Date hégirienne (calendrier islamique) et dates islamiques de l’année, dont chiites. Décalage d’un ou deux jours
 • Qibla : boussole au nord vrai qui dit où tourner, vibre face à la Kaaba
 • Minuit islamique, dernier tiers de la nuit, méthode de calcul utilisée
@@ -670,7 +670,7 @@ SajdaTime आपको नमाज़ (सलात) का समय, अज�
 • शिया: जाफ़री / इसना अशरी, मग़रिब के सही नियम के साथ
 • हिसाब के 13 तरीक़े: मुस्लिम वर्ल्ड लीग, ISNA, उम्म अल क़ुरा, मिस्र, कराची, दुबई, कुवैत, क़तर, Kemenag/MUIS, दियानत, मूनसाइटिंग कमेटी, जाफ़री और तेहरान
 • आपकी मस्जिद की जमाअत (इक़ामत) और जुमा का समय
-• अपनी मस्जिद से मिलाएँ: हर समय देखें, 30 मिनट तक आगे पीछे करें या बोर्ड से समय लें
+• अपनी मस्जिद से मिलाएँ: हर नमाज़ का समय देखें, 30 मिनट तक आगे पीछे करें या बोर्ड से समय लें
 
 आपकी निजता
 
@@ -695,7 +695,7 @@ SajdaTime एक मददगार है, कोई दीनी अथॉर�
 **What's new** `390 / 500`
 
 ```
-समय वाले टैब और विजेट में एक «अभी» (Now) का निशान मौजूदा नमाज़ का वक़्त दिखाता है। थीम फ़ोन जैसी या उसकी उलट रखें। चाश्त का वैकल्पिक समय। समय वाले टैब में बचा समय और आसमान की पट्टी। नए डिज़ाइन के विजेट ज़्यादा आकारों में फ़िट होते हैं। मस्जिद से मिलाते समय हर वक़्त के बगल में अपना बदलाव देखें। हिजरी तारीख़ बदलने का विकल्प अब इस्लामी तारीख़ों में है। फ़र्क़ हो तो अपनी मस्जिद का समय मानें।
+समय वाले टैब और विजेट में एक «अभी» (Now) का निशान मौजूदा नमाज़ का वक़्त दिखाता है। थीम फ़ोन जैसी या उसके उलट रखें। चाश्त का वैकल्पिक समय। समय वाले टैब में बचा समय और आसमान की पट्टी। नए डिज़ाइन के विजेट ज़्यादा आकारों में फ़िट होते हैं। मस्जिद से मिलाते समय हर वक़्त के बगल में अपना बदलाव देखें। हिजरी तारीख़ बदलने का विकल्प अब इस्लामी तारीख़ों में है। फ़र्क़ हो तो अपनी मस्जिद का समय मानें।
 ```
 
 ---
