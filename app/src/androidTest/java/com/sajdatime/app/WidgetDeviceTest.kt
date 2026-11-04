@@ -165,7 +165,8 @@ class WidgetDeviceTest {
         save("widget-today-${tag()}", bitmap)
 
         val (state, _) = stateNow()
-        val marker = appContext.getString(R.string.home_next_marker)
+        // The widget marks the current prayer with the Now label (1.7.0, 4 Nov 2026), not Next.
+        val marker = appContext.getString(R.string.home_now_marker)
         val suhoor = appContext.getString(R.string.widget_suhoor_ends)
         val iftar = appContext.getString(R.string.widget_iftar)
         val fontScale = context.resources.configuration.fontScale
