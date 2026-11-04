@@ -375,7 +375,7 @@
     <string name="widget_next_label">SajdaTime: اگلی نماز</string>
     <string name="widget_today_label">SajdaTime: آج کی نمازیں</string>
     <string name="widget_next_desc">اگلی نماز اور اس کا وقت، الٹی گنتی کے ساتھ۔</string>
-    <string name="widget_today_desc">آج کے چھ اوقات، اگلی نماز نمایاں۔</string>
+    <string name="widget_today_desc">آج کے چھ اوقات، موجودہ نماز نمایاں۔</string>
     <string name="widget_tomorrow">کل</string>
     <string name="widget_no_location">اپنا مقام سیٹ کرنے کے لیے SajdaTime کھولیں</string>
     <string name="widget_a11y_next">اگلی نماز %1$s %2$s پر، %3$s میں</string>
@@ -385,7 +385,7 @@
     <string name="widget_suhoor_ends">سحری ختم</string>
     <string name="widget_iftar">افطار</string>
     <string name="widget_strip_label">SajdaTime: پانچ نمازیں ایک قطار میں</string>
-    <string name="widget_strip_desc">پانچوں نمازیں ایک قطار میں، اگلی نماز نمایاں۔</string>
+    <string name="widget_strip_desc">پانچوں نمازیں ایک قطار میں، موجودہ نماز نمایاں۔</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
     <string name="widget_strip_suhoor">سحری</string>
     <string name="widget_update_location">مقام اپ ڈیٹ کریں، %1$s</string>

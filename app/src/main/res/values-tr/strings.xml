@@ -369,7 +369,7 @@
     <string name="widget_next_label">SajdaTime: sonraki namaz</string>
     <string name="widget_today_label">SajdaTime: bugünün namazları</string>
     <string name="widget_next_desc">Sonraki namaz ve vakti, geri sayımla.</string>
-    <string name="widget_today_desc">Bugünün altı vakti, sıradaki işaretli.</string>
+    <string name="widget_today_desc">Bugünün altı vakti, şu anki vakit işaretli.</string>
     <string name="widget_tomorrow">Yarın</string>
     <string name="widget_no_location">Konumunuzu ayarlamak için SajdaTime\'ı açın</string>
     <string name="widget_a11y_next">Sonraki namaz %1$s, saat %2$s, %3$s sonra</string>
@@ -379,7 +379,7 @@
     <string name="widget_suhoor_ends">İmsak</string>
     <string name="widget_iftar">İftar</string>
     <string name="widget_strip_label">SajdaTime: beş vakit tek satırda</string>
-    <string name="widget_strip_desc">Beş vakit namaz tek satırda, sıradaki işaretli.</string>
+    <string name="widget_strip_desc">Beş vakit namaz tek satırda, şu anki vakit işaretli.</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
     <string name="widget_strip_suhoor">İmsak</string>
     <string name="widget_update_location">Konumu güncelle, %1$s</string>

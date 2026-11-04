@@ -425,7 +425,7 @@
     <string name="widget_next_label">SajdaTime: الصلاة التالية</string>
     <string name="widget_today_label">SajdaTime: صلوات اليوم</string>
     <string name="widget_next_desc">الصلاة التالية ووقتها، مع عدّ تنازلي.</string>
-    <string name="widget_today_desc">أوقات اليوم الستة كلها مع تمييز الوقت التالي.</string>
+    <string name="widget_today_desc">أوقات اليوم الستة كلها مع تمييز الصلاة الحالية.</string>
     <string name="widget_tomorrow">غدًا</string>
     <string name="widget_no_location">افتح SajdaTime لتحديد موقعك</string>
     <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining. -->
@@ -437,7 +437,7 @@
     <string name="widget_suhoor_ends">نهاية السحور</string>
     <string name="widget_iftar">الإفطار</string>
     <string name="widget_strip_label">SajdaTime: الصلوات الخمس في سطر</string>
-    <string name="widget_strip_desc">الصلوات الخمس في سطر واحد مع تمييز الصلاة التالية.</string>
+    <string name="widget_strip_desc">الصلوات الخمس في سطر واحد مع تمييز الصلاة الحالية.</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
     <string name="widget_strip_suhoor">السحور</string>
     <string name="widget_update_location">تحديث الموقع، %1$s</string>

@@ -366,7 +366,7 @@
     <string name="widget_next_label">SajdaTime: salat berikutnya</string>
     <string name="widget_today_label">SajdaTime: salat hari ini</string>
     <string name="widget_next_desc">Salat berikutnya dan waktunya, dengan hitung mundur.</string>
-    <string name="widget_today_desc">Enam waktu hari ini dengan yang berikutnya ditandai.</string>
+    <string name="widget_today_desc">Enam waktu hari ini, dengan yang sekarang ditandai.</string>
     <string name="widget_tomorrow">Besok</string>
     <string name="widget_no_location">Buka SajdaTime untuk mengatur lokasi Anda</string>
     <string name="widget_a11y_next">Salat berikutnya %1$s pukul %2$s, dalam %3$s</string>
@@ -376,7 +376,7 @@
     <string name="widget_suhoor_ends">Sahur berakhir</string>
     <string name="widget_iftar">Buka puasa</string>
     <string name="widget_strip_label">SajdaTime: salat lima waktu sebaris</string>
-    <string name="widget_strip_desc">Salat lima waktu dalam satu baris, yang berikutnya ditandai.</string>
+    <string name="widget_strip_desc">Salat lima waktu dalam satu baris, yang sekarang ditandai.</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
     <string name="widget_strip_suhoor">Sahur</string>
     <string name="widget_update_location">Perbarui lokasi, %1$s</string>
