@@ -697,7 +697,7 @@ same notice has no close button and never hides while the permission is missing.
 **Home screen widgets** (hero countdown, 18 Oct 2026; research in
 `docs/plans/2026-10-widget-redesign/RESEARCH.md`; the Today strip and the sky, 1.6 step 8,
 `STEP-8-DESIGN.md`). Three widgets; the launcher chooses between layouts or size entries on Android 12
-and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
+and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's thirteen entries):
 
 | Widget | Layout | Shows |
 |---|---|---|
@@ -705,7 +705,7 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
 | Next prayer | wide (from 270 by 158dp, or 170 (192 from 1.1x text) in Urdu, Arabic and Bengali) | the small widget's countdown beside the six rows |
 | Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
 | Today | large (from 250 wide by 306dp tall, 352 from 1.1x text, 358 and 412 in Urdu, Arabic and Bengali; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
-| Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 78dp tall (86 in Urdu, Arabic, Bengali)); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 78dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
+| Today strip (1.6) | one layout, thirteen size entries (250, 300 or 400dp wide, 40, 50 (56) or 78dp tall (86 in Urdu, Arabic, Bengali), then the hero heights); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 78dp tall; the town chip from 380dp; at 1.3 text, and under 50dp tall (56), the next prayer alone, no chip |
 
 - **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
   in dp because it is already three times the body text and a large font setting pushed the prayer

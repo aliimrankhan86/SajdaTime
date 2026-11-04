@@ -58,7 +58,7 @@ import kotlin.math.roundToInt
  * layout each, which left the content stranded in a corner of the larger widget One UI gives.
  *
  * **Three widgets since step 8 (1.6.0).** The Today strip (`strip`, `widget_strip.xml`) is five columns in one
- * row, built four ways from the one layout ([stripSizes]); the Next prayer and Today widgets share its body
+ * row, built at several sizes from the one layout ([stripSizes]); the Next prayer and Today widgets share its body
  * ([stripBody]) since 1.7.0.
  *
  * The countdown is a `Chronometer`, which the launcher's process ticks, so it costs this app no wake
@@ -197,28 +197,38 @@ internal object WidgetRenderer {
     /**
      * Today strip, 4 cells by 1: thin (no glyph row) or with glyphs, and without or with the town chip
      * (from 380dp). All four are the one layout, so the builder is given the size, not a layout id
-     * (STEP-8-DESIGN section 14, item 2). The launcher picks the largest that fits, the smallest when none does.
+     * (STEP-8-DESIGN section 14, item 2). The launcher picks the entry that fits best, the smallest when none does.
      */
     // 1.7.0 (Ali, 3 Nov 2026: "row level widget with icons and prayer time ... adjusted to half a row"): the glyph
     // now sits beside the name, so it fits one cell tall (design E2); from 300dp wide it shows, below that names and
     // times only. Under 250dp (half a row, two cells) the next prayer alone: glyph, name, time.
     private fun stripSizes(context: Context): List<SizeF> {
         val tall = stripTallHeight(context)
+        val five = stripFiveHeight(context)
+        // The FIRST entry is what Android below 12 gets at every size, so it stays the five column thin form (as before).
+        // The 40dp entries are the floor: the five columns want 45 to 49.5dp, so under `five` the next prayer alone shows
+        // (Ali, 4 Nov 2026: "next prayer only" for the thinnest strip); from `five` the five columns return.
         return listOf(
-            SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, tall), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
-            SizeF(400f, 40f), SizeF(400f, tall), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
+            SizeF(250f, five), SizeF(250f, 40f), SizeF(110f, 40f), SizeF(300f, 40f), SizeF(300f, five), SizeF(300f, tall), SizeF(300f, STRIP_HERO_HEIGHT_DP), SizeF(300f, STRIP_HERO_BIG_DP),
+            SizeF(400f, 40f), SizeF(400f, five), SizeF(400f, tall), SizeF(400f, STRIP_HERO_HEIGHT_DP), SizeF(400f, STRIP_HERO_BIG_DP),
         )
     }
     private const val STRIP_GLYPH_WIDTH_DP = 300f
     // Measured 3 Nov 2026 (needed_heights): the glyph row wants 72.8dp (77.3 at 1.15x) and the hero tier 124.6dp
     // (130.3 at 1.15x); they were 64 and 110, which cut the times and the underline off. Seen at 124dp: complete.
-    // The thin tier (40dp) wants 45 to 49.5: it is the floor, so it is still cut when a launcher gives 40 to 45dp.
+    // The five column thin tier wants 45 to 49.5 (51 in Urdu and Arabic), so under 50 (56) the next prayer alone shows instead
+    // (Ali, 4 Nov 2026); below Android 12 the first entry (five columns) is used at every size and can still be cut at 40 to 45dp.
     // Urdu and Arabic want 78.9 and 84.2 (1.15x), 139.0 and 146.7, 145.5 and 151.6: so 86 (Latin script 78), 148 and 152.
     private const val STRIP_TALL_HEIGHT_DP = 78f
     // One UI gives a one row strip about 79dp: the glyph row must still show there (it wants 72.8, 77.3 at 1.15x in Latin
     // script), so the Latin value is 78, not 86. Urdu, Arabic and Bengali want 84.2 at 1.15x.
     private fun stripTallHeight(context: Context): Float =
         if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 86f else STRIP_TALL_HEIGHT_DP
+    // The five column thin form (names and times, no glyphs): measured 4 Nov 2026 in strip_thin_windows, see HANDOVER for the
+    // figures. Under this height the strip shows the next prayer alone.
+    private const val STRIP_FIVE_HEIGHT_DP = 50f
+    private fun stripFiveHeight(context: Context): Float =
+        if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 56f else STRIP_FIVE_HEIGHT_DP
     private const val STRIP_HALF_WIDTH_DP = 250f
     private const val STRIP_HERO_HEIGHT_DP = 148f
     private const val STRIP_HERO_BIG_DP = 152f
@@ -230,7 +240,7 @@ internal object WidgetRenderer {
     private fun forText(context: Context, sizes: List<Pair<SizeF, Int>>) =
         if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.take(1) else sizes
 
-    /** Below Android 12 a launcher takes one RemoteViews, so it gets the smallest (thin) entry at every size. */
+    /** Below Android 12 a launcher takes one RemoteViews, so it gets the first entry (the five column thin one) at every size. */
     fun strip(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -351,7 +361,7 @@ internal object WidgetRenderer {
     }
 
     /**
-     * The Today strip at one of its four sizes. Written both ways for everything that differs between
+     * The Today strip at one of its sizes. Written both ways for everything that differs between
      * them (the glyph row, the chip, the padding, which of columns and the large text row shows).
      */
     private fun stripViews(context: Context, state: WidgetState, now: Instant, size: SizeF): RemoteViews {
@@ -362,7 +372,7 @@ internal object WidgetRenderer {
         val glyphs = tall && size.width >= STRIP_GLYPH_WIDTH_DP
         applyDirection(context, views)
         applyTap(context, views)
-        // The thin entry gives the content 2dp above and below to fit 40dp; the tall one has room for 4dp.
+        // The thin entries give the content 2dp above and below to fit 40dp (the next prayer alone, or five columns from 50); the tall one has room for 4dp.
         val side = dp(context, 4f)
         val edge = dp(context, if (tall) 4f else 2f)
         val heroEntry = size.height >= STRIP_HERO_HEIGHT_DP
@@ -373,9 +383,9 @@ internal object WidgetRenderer {
         // the Next prayer widget, with the next prayer big on top once the widget is two cells tall.
         views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, stripBody(state.period)))
         // From 1.3 text the five columns would cut names and times (STEP-8-DESIGN section 3), so the next
-        // prayer alone is shown at the user's size, at every one of the four entries.
+        // prayer alone is shown at the user's size, at every entry.
         // Half a row (under 250dp wide) shows the next prayer alone too: five columns cannot fit two cells.
-        val large = context.resources.configuration.fontScale >= LARGE_TEXT || size.width < STRIP_HALF_WIDTH_DP
+        val large = context.resources.configuration.fontScale >= LARGE_TEXT || size.width < STRIP_HALF_WIDTH_DP || size.height < stripFiveHeight(context)
         // fillChip shows or hides by whether there is a town; the width then decides whether there is room, and
         // large text never has it (Opus review, 25 Oct 2026: it squeezed the one prayer that is left).
         fillChip(context, views, state)
@@ -385,6 +395,8 @@ internal object WidgetRenderer {
         val next = state.next
         if (!state.hasLocation || today == null || next == null) {
             for (slot in WidgetState.PRAYERS) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
+            // widget_message lives inside the row, which a thin or large text entry hides when there is a location: written both ways.
+            views.setViewVisibility(R.id.widget_strip_row, View.VISIBLE)
             views.setViewVisibility(R.id.widget_strip_next, View.GONE)
             views.setTextViewText(R.id.widget_message, context.getString(R.string.widget_no_location))
             views.setViewVisibility(R.id.widget_message, View.VISIBLE)

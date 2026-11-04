@@ -589,6 +589,42 @@ class WidgetRenderEvidenceTest {
         File(dir, "strip-glyph.csv").writeText(csv.toString())
     }
 
+    // ---- Strip thin windows (4 Nov 2026) --------------------------------------------------------------
+
+    @Test
+    fun strip_thin_windows() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val picDir = File(dir, "strip-thin").apply { deleteRecursively(); mkdirs() }
+        val at = Instant.parse("2026-11-04T09:00:00Z")
+        val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+        val csv = StringBuilder("lang,fs,w,h,neededDp,fits,columnsShown\n")
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.15f, 1.3f, 2.0f)) for (w in listOf(250, 300, 400)) for (h in listOf(40, 44, 48, 50, 52, 56, 60, 70)) {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            var needed = -1f
+            var columnsShown = false
+            instrumentation.runOnMainSync {
+                try {
+                    val (host, n) = hostAt(ctx, WidgetRenderer::strip, state, at, w, h, rtl = lang == "ur" || lang == "ar")
+                    needed = n
+                    // The rule (Ali, 4 Nov 2026): under 50dp (56 in the tall scripts) the strip shows the next prayer alone. Recorded
+                    // here as columnsShown; WidgetResourcesTest guards the source of the rule.
+                    columnsShown = shown(host.findViewById<View>(R.id.widget_strip_row))
+                    if (w == 300 && scale == 1.0f && h in listOf(40, 48, 50, 56)) {
+                        FileOutputStream(File(picDir, "strip_${lang}_${w}x${h}.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+                    }
+                } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) }
+            }
+            csv.append("$lang,$scale,$w,$h,${"%.1f".format(needed)},${if (needed in 0f..h + 0.5f) "yes" else "no"},$columnsShown\n")
+        }
+        File(dir, "strip-thin.csv").writeText(csv.toString())
+    }
+
     private fun shown(v: View): Boolean {
         var x: View? = v
         while (x != null) {

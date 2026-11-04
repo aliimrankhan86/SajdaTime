@@ -256,4 +256,19 @@ class WidgetResourcesTest {
             for (line in lines) assertFalse("$language: $line", line.contains('—'))
         }
     }
+
+    // Ali, 4 Nov 2026: the thinnest strip shows the next prayer alone, because five columns want 45 to 49.5dp and the floor is 40.
+    // A source guard (the renderer needs a device to run): drop any of these and a 40dp strip is cut again.
+    @Test
+    fun thin_strip_shows_the_next_prayer_alone_under_the_five_column_height() {
+        val source = File(root, "app/src/main/java/com/sajdatime/app/widget/WidgetRenderer.kt").readText()
+        assertTrue("strip must switch to the next prayer alone under stripFiveHeight",
+            source.contains("size.height < stripFiveHeight(context)"))
+        assertTrue("stripFiveHeight must be 50dp (56 in the tall scripts)",
+            source.contains("STRIP_FIVE_HEIGHT_DP = 50f") && source.contains("56f"))
+        assertTrue("the first strip entry (all Android below 12 gets) must be the five column one",
+            source.contains("SizeF(250f, five), SizeF(250f, 40f)"))
+        assertTrue("the no location branch must write widget_strip_row visible",
+            source.contains("setViewVisibility(R.id.widget_strip_row, View.VISIBLE)"))
+    }
 }
