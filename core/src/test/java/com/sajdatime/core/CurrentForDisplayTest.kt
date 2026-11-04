@@ -1,6 +1,4 @@
-package com.sajdatime.wear
-
-import com.sajdatime.core.PrayerSlot
+package com.sajdatime.core
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

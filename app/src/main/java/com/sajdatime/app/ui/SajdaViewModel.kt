@@ -19,6 +19,7 @@ import com.sajdatime.core.NightTimes
 import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.currentForDisplay
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
@@ -715,7 +716,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             // Before today's Fajr the engine's current prayer is yesterday's Isha, which the list (today's times)
             // would mark with a time about 17 hours away. Nothing is Now until Fajr starts (4 Nov 2026, review).
             val current = PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
-                ?.takeIf { !now.isBefore(today.times.getValue(PrayerSlot.FAJR)) }
+                ?.let { currentForDisplay(it, now, today.times.getValue(PrayerSlot.FAJR)) }
             // Built from the same `today` the list shows, so the card cannot disagree with it.
             // Recomputed on every trigger that already exists: Fajr and Maghrib are prayers, so
             // the phase changes exactly when `next` rolls over, and the date change tick covers

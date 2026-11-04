@@ -8,6 +8,7 @@ import com.sajdatime.core.HijriDay
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.currentForDisplay
 import com.sajdatime.core.Sky
 import com.sajdatime.core.SkyPeriod
 import java.time.Instant
@@ -150,7 +151,7 @@ data class WidgetState(
             val labels = settings.ramadanCardEnabled
             // Nothing is current before today's Fajr: the engine's answer is yesterday's Isha, not on today's list.
             val rawCurrent = PrayerEngine.currentPrayer(coordinates, prefs, now, zone)
-            val current = rawCurrent?.takeIf { !now.isBefore(today[PrayerSlot.FAJR]) }
+            val current = currentForDisplay(rawCurrent, now, today[PrayerSlot.FAJR])
             return WidgetState(
                 hasLocation = true,
                 today = today,

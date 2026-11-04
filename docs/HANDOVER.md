@@ -6094,8 +6094,23 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 **Where it is.** Branch `claude/1-7-0`, committed and pushed (`15f37bc` widgets, `07e69ad` release prep, `3142074` planning files to Drive,
 `979a324` CLAUDE.md note, later docs and the watch test). Phone 11 / 1.7.0 and **watch 1003 / 1.7.0, both ship** (the watch Times list marks the
-current prayer, commit `6041c48`; earlier notes saying it stays 1.5.0 were wrong). Gate green: 349 app, 252 core, 30 wear tests. Device suite 49 of
+current prayer, commit `6041c48`; earlier notes saying it stays 1.5.0 were wrong). Gate green: 349 app, 255 core, 27 wear tests. Device suite 49 of
 49. Nothing merged into `main`; no pull request yet. Public Play page: "Updated on 23 Oct 2026" (1.5.0); **1.6.0 is submitted and in review**.
+
+**Independent review round, 4 Nov 2026 night (Opus on the code, Fable on release readiness), and what was fixed because of it.** Opus found that the
+widget entry list did not fit real launchers: the wide Next card's countdown was cut to one or two characters (the big number was sized to the
+whole width, not its column); a launcher's one row (54 to 79dp on Xiaomi and Samsung) cut the Next card, which needs 97dp; the two-row card cut
+its day bars; the compact Today list was cut between 240 and 286dp. All four were real and are fixed: (1) the countdown is sized to the widest
+"10:12:34" and, in the wide card, to its own column; (2) a TINY one-line Next card for slots under about 100dp, the short card from there, the full
+card with bars from 140dp (more at larger text); Android 11 and below keep the short card (a pre-12 provider file asks for 110dp; a v31 file asks
+for one row); (3) compact Today steps of 2, 3, 4, 5 and 6 rows from measured needs per text size and script; (4) the large Today and wide Next
+heights are interpolated between measured sizes. **The test that proves it:** `WidgetRenderEvidenceTest#every_slot_height_fits` renders every slot
+height (Next 40 to 260dp, Today 240 to 560dp) at six text sizes up to 2.0x, in English, Urdu, Arabic and Bengali, at midday and after Isha, and
+fails if any entry needs more than its slot; it passes, as do `release_entry_needs` (now asserting) and the 6 device widget tests at 1.0, 1.3 and 2.0
+text. Entry widths are deliberately a little under the minimum widths (170 and 230dp): when no entry fits Android takes the smallest card.
+The "nothing is current before Fajr" rule is now one function in `:core` (`currentForDisplay`, tested), used by the phone, the widgets and the watch.
+The release script's own widgets-font-2 FAIL was the same family (the device test host had no size, so it got the smallest entry): fixed.
+Fable's findings (the checklist, stale state blocks, agent briefs pointing at deleted paths) are fixed as listed in the commit messages.
 
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
 `RELEASE-1.7.0.md`; (2) run the watch on the `sajdawear` emulator and look at the Times list; (3) Ali approves the one-line watch note drafted in

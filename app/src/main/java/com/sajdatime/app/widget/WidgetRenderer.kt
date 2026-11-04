@@ -84,105 +84,145 @@ internal object WidgetRenderer {
     // 188.2 at 1.15x, Bengali 150.9 and 169.9; the small one fits 162 in all three.
     // Measured needs of the full small layout: 131.8dp (134.9 at 1.15x) in Latin script, 137.1 (141.3) in Urdu and Arabic,
     // 133.7 (137.5) in Bengali, so the bars come back from 140 (137.1 and 138.3 at 1.2x and 1.25x, measured) and from 150 in those three scripts.
-    private fun nextBarsHeight(context: Context): Float = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) 150f else 140f
+    private fun nextBarsHeight(context: Context): Float {
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        val scale = context.resources.configuration.fontScale
+        // Measured (every_slot_height_fits, 4 Nov 2026) needs of the full card: 141.3 and 142.9 (en 1.1, 1.15), 151.2 (en 1.5), 167.6 (en 2.0),
+        // 158.9 (ur 1.5), 179 (ur, ar 2.0), 170.3 (bn 2.0), each plus about 4dp.
+        return when {
+            scale >= 1.6f -> if (tall) 183f else 172f
+            scale >= 1.4f -> if (tall) 163f else 156f
+            scale >= 1.1f -> if (tall) 156f else 148f
+            else -> if (tall) 150f else 140f
+        }
+    }
 
     private fun nextSizes(context: Context): List<Pair<SizeF, Int>> {
-        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        val grown = context.resources.configuration.fontScale >= 1.1f
-        // Re-measured 4 Nov 2026 with the 6dp rows (release_entry_needs): the wide card wants 214 to 215dp at 1.0x and 241.5 to 243.8 at
-        // 1.25x in every language, so it is offered from 218 (222 in Urdu and Arabic) and 254 (256) from 1.1x, which covers up to 1.29x; a shorter slot gets the small card.
-        val wideHeight = if (tall) (if (grown) 256f else 222f) else if (grown) 254f else 218f
-        // Two entries of the small layout: from 140dp (150 in Urdu, Arabic and Bengali) it shows the five day bars; below that it hides them so the town
-        // chip is not cut (Ali, 3 Nov 2026: "drop the bars when short").
+        val wideHeight = wideNextHeight(context)
+        // Three entries of the small layout (Opus review, 4 Nov 2026: a launcher's one row is 54 to 79dp on Xiaomi and Samsung, far under
+        // the 97dp the short card needs, and the list had no step below 110): the TINY one (name and time on one line, nothing cut in
+        // 40dp), the SHORT one (town chip, no day bars) from [nextShortHeight], and the full one with the five bars from [nextBarsHeight].
+        // The launcher uses the largest entry that fits, so each step is only used when the slot holds it.
         return listOf(
-            SizeF(180f, 110f) to R.layout.widget_next_prayer,
-            SizeF(180f, nextBarsHeight(context)) to R.layout.widget_next_prayer,
+            SizeF(NEXT_ENTRY_WIDTH_DP, TINY_NEXT_DP) to R.layout.widget_next_prayer,
+            SizeF(NEXT_ENTRY_WIDTH_DP, nextShortHeight(context)) to R.layout.widget_next_prayer,
+            SizeF(NEXT_ENTRY_WIDTH_DP, nextBarsHeight(context)) to R.layout.widget_next_prayer,
             SizeF(270f, wideHeight) to R.layout.widget_next_prayer_wide,
         )
     }
 
     /**
-     * Today: the compact list from its minimum, the large card (date, countdown, the day) from 306dp (see [todaySizes] for the measured heights)
+     * Widths of the entries below the wide one. Deliberately a little UNDER the widgets' minimum widths (180 and 250dp): when no entry fits
+     * the slot Android uses the smallest card, so a launcher that reports 245dp for a four cell widget would otherwise have got the one-line
+     * card or two rows (found 4 Nov 2026 when the device tests, which host a widget with 8dp of default padding a side, did exactly that).
+     */
+    private const val NEXT_ENTRY_WIDTH_DP = 170f
+    private const val TODAY_ENTRY_WIDTH_DP = 230f
+
+    /** The one-line next prayer card (no town chip, no countdown): the height it is drawn for. */
+    private const val TINY_NEXT_DP = 40f
+
+    /**
+     * Height from which the SHORT small card (town chip, no day bars) is used; below it the tiny one. Measured needs of the short card
+     * (padding 6dp, or 2dp in tall scripts and from 1.3x): 96.8 (en 1.0), 100.2 (1.15), 96.8 (1.3), 97.9 (ur 1.3), 105.1 (ur 1.5),
+     * 119.2 (en 2.0), each plus about 3dp; re-checked by the evidence run.
+     */
+    private fun nextShortHeight(context: Context): Float {
+        val scale = context.resources.configuration.fontScale
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        return when {
+            scale >= 1.6f -> 124f
+            scale >= 1.4f -> 110f
+            scale >= 1.1f -> if (tall) 106f else 104f
+            else -> if (tall) 102f else 100f
+        }
+    }
+
+    /**
+     * Today: the compact list from its minimum, the large card (date, countdown, the day) from its measured height ([largeTodayHeight])
      * tall, which is what the header, the card and six rows need at the normal text size (rendered).
      */
     private fun todaySizes(context: Context): List<Pair<SizeF, Int>> {
-        // Urdu and Arabic script sits taller than Latin at the same size: rendered on 18 Oct 2026, the
-        // large card at 280dp held four of their six rows, and all six from 330dp. Bengali joined them on
-        // 30 Oct 2026: its vowel signs sit above and below the line, so its rows are as tall.
-        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        // Measured 3 Nov 2026 (needed_heights): the large card wants 296dp at normal text and 322dp at 1.15x, since the
-        // 15sp rows and the band's extra room (08bb2b8); the 280dp it used to take clipped the last row. Urdu, Arabic and
-        // Bengali: measured the same day, the large card wants 340.6dp (Urdu), 339.8 (Arabic), 309.0 (Bengali) and 369.9, 365.0,
-        // 336.8 at 1.15x, (daytime figures, replaced by the evening maxima below).
-        val grown = context.resources.configuration.fontScale >= 1.1f
-        // Re-measured 4 Nov 2026 at four times of day (compact_today_windows): after Isha the card shows tomorrow's countdown and
-        // wants 10 to 19dp more than in the day (302.5 at 1.0x, 347.8 at 1.25x in English; 354.7 and 408.4 in Urdu, 353.9 and 402.3
-        // in Arabic, 320.4 and 366.9 in Bengali), so every evening a widget at the old heights cut its last row. These are those
-        // maxima plus about 4dp.
-        // 1.3x to 1.6x (Ali, 4 Nov 2026: "see if something can be done for larger text"): the large card is kept for a slot tall enough to
-        // hold it, with the compact list (all six rows) as the graceful fallback below that; measured at 1.3x on the emulator: the card filled a
-        // 464dp slot with no spare, so 480 (540 for the tall scripts, not measured).
-        val big = context.resources.configuration.fontScale >= LARGE_TEXT
-        // RE-MEASURED 4 Nov 2026 (WidgetRenderEvidenceTest#release_entry_needs: four languages, six text sizes, six times of day, Ramadan
-        // included; the maximum plus 2 to 4dp). The older 306/352/358/412 above were measured when the rows had no padding; the 6dp row
-        // padding (Ali, 4 Nov 2026) raised the need to 401 (en), 417.5 (ur, ar), 386 (bn) at 1.0x; 438 (en) and 468 (ur) at 1.25x, 447 and 478 at 1.3x (the 1.1 to 1.29 entries are set to that edge);
-        // 477 (en) and 513 (ur, ar) at 1.5x. A launcher slot below the threshold gets the compact list with all six rows instead.
-        val largeHeight = when {
-            big -> if (tall) 520f else 484f
-            grown -> if (tall) 478f else 448f
-            else -> if (tall) 422f else 405f
-        }
+        // The large card's height is measured per text size and script (largeTodayHeight); the old 3 Nov figures here (296, 322, 340) are gone.
+        val largeHeight = largeTodayHeight(context)
         // The first compact entry shows as many rows as 180dp holds; from the second (the height six rows need, see
         // [compactSixRowsHeight]) all six show. Same layout, so todayViews is given the size.
-        val six = compactSixRowsHeight(context)
-        return listOfNotNull(
-            SizeF(250f, COMPACT_MIN_DP) to R.layout.widget_today,
-            if (six > COMPACT_MIN_DP) SizeF(250f, six) to R.layout.widget_today else null,
-            SizeF(250f, maxOf(largeHeight, six + 1f)) to R.layout.widget_today_large,
-        )
+        val steps = compactSteps(context)
+        val six = steps.last().second
+        // Steps for 3, 4, 5 and 6 compact rows (Opus review, 4 Nov 2026: the provider floor is 240dp, not the 290 the old single entry
+        // assumed, so a 250dp slot cut its sixth row): each is used only when the slot holds it, and compactSlots shows that many rows.
+        return steps.map { (_, h) -> SizeF(TODAY_ENTRY_WIDTH_DP, h) to R.layout.widget_today } +
+            (SizeF(TODAY_ENTRY_WIDTH_DP, maxOf(largeHeight, six + 1f)) to R.layout.widget_today_large)
+    }
+
+    /** Height the large Today card is offered from: measured need at this text size and script, plus 5dp (WidgetRenderEvidenceTest#release_entry_needs). */
+    internal fun largeTodayHeight(context: Context): Float {
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        return interpolate(context.resources.configuration.fontScale, if (tall) LARGE_TODAY_TALL_NEED else LARGE_TODAY_NEED) + 5f
+    }
+
+    /** Height the wide Next card is offered from: measured need plus 5dp. Only offered below 1.3x text (see [forText]). */
+    internal fun wideNextHeight(context: Context): Float {
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        return interpolate(context.resources.configuration.fontScale, if (tall) WIDE_NEXT_TALL_NEED else WIDE_NEXT_NEED) + 5f
+    }
+
+    // Measured 4 Nov 2026 (release_entry_needs: every language, six times of day, Ramadan; the maximum of each text size). Between the
+    // measured sizes the need is interpolated, so an in-between text size (an OEM step) is never left short. English; Urdu and Arabic together.
+    private val LARGE_TODAY_NEED = listOf(1.0f to 401f, 1.1f to 416f, 1.15f to 425.5f, 1.25f to 438.1f, 1.3f to 447.2f, 1.5f to 477.3f, 1.6f to 492f)
+    private val LARGE_TODAY_TALL_NEED = listOf(1.0f to 417.5f, 1.1f to 438.5f, 1.15f to 451.4f, 1.25f to 467.8f, 1.3f to 478.5f, 1.5f to 513.1f, 1.6f to 530f)
+    private val WIDE_NEXT_NEED = listOf(1.0f to 214.1f, 1.1f to 225.5f, 1.15f to 230.1f, 1.25f to 241.5f, 1.3f to 246f)
+    private val WIDE_NEXT_TALL_NEED = listOf(1.0f to 214.9f, 1.1f to 221f, 1.15f to 227.8f, 1.25f to 243.8f, 1.3f to 250f)
+
+    private fun interpolate(x: Float, knots: List<Pair<Float, Float>>): Float {
+        if (x <= knots.first().first) return knots.first().second
+        for (i in 1 until knots.size) {
+            val (x1, y1) = knots[i]
+            if (x <= x1) {
+                val (x0, y0) = knots[i - 1]
+                return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+            }
+        }
+        return knots.last().second
     }
 
     private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
 
     /**
-     * The compact Today list is 180dp tall and six rows no longer fit from 1.1x text or in the tall scripts (measured 3 Nov 2026:
-     * six rows want 193dp at 1.15x, 206 at 1.25x, 282 at 2.0, 203 in Urdu). With these counts the first entry measures 126 to 180dp
-     * in English, Urdu, Arabic and Bengali from 1.0x to 2.0x, and [compactSixRowsHeight] (measured, with margin) gives six rows to a taller widget.
-     * already passed, so nothing is cut half way: the window starts at the next prayer (sunrise is never next) and, when that leaves too
-     * few rows, starts earlier. Row counts follow the measured heights per row; see HANDOVER.
+     * What each compact Today step needs, per text size [COMPACT_SCALES]: rows 3, 4, 5, 6; English, then Urdu, Arabic and Bengali (the
+     * maximum of the three). Measured 4 Nov 2026 by WidgetRenderEvidenceTest#compact_rows_need (evening, tomorrow's countdown, the
+     * worst case); the entry is the need plus 3dp, interpolated between the sizes.
      */
-    /** The height six compact rows need, so a taller widget keeps all of them (measured 3 Nov 2026, see HANDOVER). */
-    /** The compact Today card, 290dp (Ali, 4 Nov 2026: taller, so the rows can sit with even gaps). Also the provider minimum. */
-    const val COMPACT_MIN_DP = 290f
+    private val COMPACT_SCALES = floatArrayOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)
+    private val COMPACT_NEED_EN = mapOf(
+        2 to floatArrayOf(131.8f, 135.6f, 138.3f, 142.1f, 145.5f, 155.8f, 160.4f, 178.7f),
+        3 to floatArrayOf(171.8f, 177.5f, 181.3f, 186.3f, 190.9f, 205.0f, 211.0f, 235.0f),
+        4 to floatArrayOf(211.8f, 219.4f, 224.4f, 230.5f, 236.2f, 254.1f, 261.7f, 291.4f),
+        5 to floatArrayOf(251.8f, 261.3f, 267.4f, 274.7f, 281.5f, 303.2f, 312.4f, 347.8f),
+        6 to floatArrayOf(285.7f, 297.1f, 304.4f, 312.8f, 320.8f, 346.3f, 357.0f, 398.1f),
+    )
+    private val COMPACT_NEED_TALL = mapOf(
+        2 to floatArrayOf(131.0f, 135.6f, 138.3f, 144.4f, 148.6f, 159.6f, 165.0f, 186.3f),
+        3 to floatArrayOf(170.7f, 177.5f, 181.3f, 189.7f, 195.4f, 210.7f, 217.9f, 246.5f),
+        4 to floatArrayOf(210.3f, 219.4f, 224.4f, 235.0f, 242.3f, 261.7f, 270.9f, 306.7f),
+        5 to floatArrayOf(249.9f, 261.3f, 267.4f, 280.4f, 289.1f, 312.8f, 323.8f, 366.9f),
+        6 to floatArrayOf(283.4f, 297.1f, 304.4f, 319.6f, 329.9f, 357.7f, 370.7f, 421.0f),
+    )
 
-    private fun compactSixRowsHeight(context: Context): Float {
+    /** The compact steps: rows to the height they are offered from, ascending (3, 4, 5, 6). */
+    private fun compactSteps(context: Context): List<Pair<Int, Float>> {
         val scale = context.resources.configuration.fontScale
-        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        return when {
-            scale >= 1.6f -> if (tall) 435f else 390f
-            scale >= LARGE_TEXT -> if (tall) 390f else 340f
-            scale >= 1.1f -> if (tall) 340f else 320f
-            else -> if (tall) 310f else COMPACT_MIN_DP
-        }
+        val table = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) COMPACT_NEED_TALL else COMPACT_NEED_EN
+        return (2..6).map { rows -> rows to interpolate(scale, COMPACT_SCALES.toList().zip(table.getValue(rows).toList())) + 3f }
     }
+
+    private fun compactSixRowsHeight(context: Context): Float = compactSteps(context).last().second
 
     private fun compactSlots(context: Context, state: WidgetState, size: SizeF): List<PrayerSlot> {
         // Below Android 12 only the first entry exists and its real height is unknown, so all six rows stay (as before 3 Nov 2026).
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || size.height >= compactSixRowsHeight(context)) return PrayerSlot.entries
-        val scale = context.resources.configuration.fontScale
-        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        val count = when {
-            tall -> when {
-                scale >= 1.6f -> 2
-                scale >= LARGE_TEXT -> 3
-                scale >= 1.1f -> 4
-                else -> 5
-            }
-            scale >= 1.6f -> 3
-            scale >= LARGE_TEXT -> 4
-            scale >= 1.1f -> 5
-            else -> 6
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || size.height >= compactSixRowsHeight(context) - 0.5f) return PrayerSlot.entries
+        val steps = compactSteps(context)
+        val count = steps.lastOrNull { it.second <= size.height + 0.5f }?.first?.coerceAtMost(5) ?: 2
         val all = PrayerSlot.entries
         val start = state.current?.let(all::indexOf) ?: state.next?.takeIf { !it.isTomorrow }?.let { all.indexOf(it.slot) } ?: (all.size - count)
         return all.subList(start.coerceAtMost(all.size - count), (start.coerceAtMost(all.size - count)) + count)
@@ -203,12 +243,19 @@ internal object WidgetRenderer {
 
     fun nextPrayer(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        return responsive(forText(context, nextSizes(context))) { layout, size -> nextViews(context, state, now, layout, size) }
+        // Android 11 and below take ONE layout, the short card (the pre-12 provider file asks for a 110dp slot): index 1, never the tiny one.
+        return responsive(nextForText(context, nextSizes(context)), preSIndex = 1) { layout, size -> nextViews(context, state, now, layout, size) }
+    }
+
+    /** Test hook (WidgetRenderEvidenceTest): the compact Today card showing exactly [rows] rows (3 to 6), whatever the slot. */
+    internal fun todayCompactRows(base: Context, state: WidgetState, now: Instant, rows: Int): RemoteViews {
+        val context = AppLocale.wrap(base)
+        return todayViews(context, state, now, R.layout.widget_today, SizeF(250f, compactSteps(context).first { it.first == rows }.second))
     }
 
     fun today(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
-        // At large text the large card is dropped (see LARGE_TEXT) but every compact entry stays, so a tall widget keeps all six rows.
+        // At large text the large card is dropped (from LARGE_TEXT_NO_CARD, 1.6x, it is not offered at all) but every compact entry stays, so a tall widget keeps all six rows.
         val sizes = todaySizes(context).let { all ->
             if (context.resources.configuration.fontScale >= LARGE_TEXT_NO_CARD) all.filter { it.second == R.layout.widget_today } else all
         }
@@ -271,11 +318,16 @@ internal object WidgetRenderer {
         }
     }
 
-    private fun responsive(sizes: List<Pair<SizeF, Int>>, build: (Int, SizeF) -> RemoteViews): RemoteViews =
+    /** At large text the wide Next card (rows beside the countdown) is dropped; every small step stays, so a tall slot still shows the town and the countdown. */
+    private fun nextForText(context: Context, sizes: List<Pair<SizeF, Int>>) =
+        if (context.resources.configuration.fontScale >= LARGE_TEXT) sizes.filter { it.second != R.layout.widget_next_prayer_wide } else sizes
+
+    private fun responsive(sizes: List<Pair<SizeF, Int>>, preSIndex: Int = 0, build: (Int, SizeF) -> RemoteViews): RemoteViews =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && sizes.size > 1) {
             RemoteViews(sizes.associate { (size, layout) -> size to build(layout, size) })
         } else {
-            build(sizes.first().second, sizes.first().first)
+            val entry = sizes[preSIndex.coerceAtMost(sizes.lastIndex)]
+            build(entry.second, entry.first)
         }
 
     private fun nextViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int, size: SizeF): RemoteViews {
@@ -283,15 +335,15 @@ internal object WidgetRenderer {
         val wide = layout == R.layout.widget_next_prayer_wide
         applyDirection(context, views)
         applyTap(context, views)
-        // The short small layout (the 110dp entry, normal text): no day bars, a 32 instead of 36 countdown and 8dp top and
-        // bottom padding instead of 12, so it needs about 106dp (measured 118.9 with only the bars gone) and the town chip is
-        // not cut. Padding is written on EVERY render: both entries share one layout, so the launcher reapplies actions onto
+        // The short small layout (from nextShortHeight, about 100dp): no day bars, a 26 instead of 36 countdown and 6dp (2dp in tall
+        // scripts and from 1.3x) top and bottom padding instead of 12, so it needs 96.8 to 105dp (measured) and the town chip is not cut. Padding is written on EVERY render: both entries share one layout, so the launcher reapplies actions onto
         // the view it already has and a value left from the other entry would stay.
-        val short = !wide && size.height < nextBarsHeight(context)
+        val tiny = !wide && size.height < nextShortHeight(context)
+        val short = !wide && !tiny && size.height < nextBarsHeight(context)
         // Urdu, Arabic and Bengali sit taller: the short variant wanted 111.2dp (115.4 at 1.15x) with the Latin 32 and 8, so
-        // they get a 28 countdown and 6dp padding (measured 102.5 and 106.7 in Urdu and Arabic, 99.0 and 102.9 in Bengali).
+        // they get a 22 countdown, 2dp padding and a 16sp name (measured needs in nextShortHeight).
         val tallScript = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        val padV = if (short) (if (tallScript || context.resources.configuration.fontScale >= LARGE_TEXT) 2f else 6f) else 12f
+        val padV = if (tiny) 2f else if (short) (if (tallScript || context.resources.configuration.fontScale >= LARGE_TEXT) 2f else 6f) else 12f
         if (!wide) views.setViewPadding(R.id.widget_root, dp(context, 8f), dp(context, padV), dp(context, 8f), dp(context, padV))
         // The body is the period's sky in light and the app's green in dark (stripBody), written after the paint
         // so it wins over the paper body the paint pins, and on every render so a period that ends is replaced.
@@ -314,19 +366,43 @@ internal object WidgetRenderer {
                 views.setViewVisibility(R.id.widget_divider, View.GONE)
                 for (slot in PrayerSlot.entries) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
             }
+            views.setViewVisibility(R.id.widget_chip_row, View.VISIBLE)
+            views.setInt(R.id.widget_title_row, "setGravity", Gravity.START or Gravity.CENTER_VERTICAL)
             views.setContentDescription(R.id.widget_root, context.getString(R.string.widget_no_location))
             return views
         }
 
-        val baseDp = if (wide) WIDE_COUNTDOWN_DP else if (short) (if (tallScript) SHORT_TALL_COUNTDOWN_DP else SHORT_COUNTDOWN_DP) else SMALL_COUNTDOWN_DP
+        val baseDp = if (wide) WIDE_COUNTDOWN_DP else if (short || tiny) (if (tallScript) SHORT_TALL_COUNTDOWN_DP else SHORT_COUNTDOWN_DP) else SMALL_COUNTDOWN_DP
+        // What the big number will show: the countdown, or the clock time when exact alarms are off. Sized to the widest of it, never to the
+        // clock time alone ("3:14:59" is wider than "12:15"), and in the wide card to its own column, not the whole width.
+        val heroText = if (state.countdownAllowed) COUNTDOWN_TEMPLATE else TimeFormat.clock(context, next.at)
         // The spare height goes to the time, not to an empty band (owner, 4 Nov 2026: "wasting too much space").
-        val heroDp = if (short) baseDp else heroDp(context, size, baseDp, TimeFormat.clock(context, next.at))
+        val heroDp = when {
+            wide -> heroDp(context, size, baseDp, heroText, roomDp = wideColumnDp(size.width), grow = false)
+            short || tiny -> baseDp
+            else -> heroDp(context, size, baseDp, heroText)
+        }
         fillHero(context, views, state, next, now, heroDp, sky = true)
         // Written back: a recycled view that showed the no location message had the name at 14sp and two lines.
         // Arabic and Urdu names are 30dp tall at 18sp: on the 104dp default the chip's foot was cut (emulator, 4 Nov 2026), so 16sp there.
         views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, if (short && tallScript) NAME_SP - 2f else NAME_SP)
         views.setInt(R.id.widget_name, "setMaxLines", 1)
-        if (short) views.setViewVisibility(R.id.widget_progress, View.GONE)
+        if (short || tiny) views.setViewVisibility(R.id.widget_progress, View.GONE)
+        // The tiny card: the title row alone, name and the time at its end, bigger. The chip row, the countdown and the big time are
+        // hidden; written both ways because the launcher reuses the view when the slot grows.
+        views.setViewVisibility(R.id.widget_chip_row, if (tiny) View.GONE else View.VISIBLE)
+        val tinySp = when {
+            context.resources.configuration.fontScale >= 1.6f -> 10f
+            context.resources.configuration.fontScale >= 1.3f -> 12f
+            else -> NAME_SP
+        }
+        views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, if (tiny) tinySp else TIME_SP)
+        if (tiny) views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, tinySp)
+        if (tiny) {
+            views.setViewVisibility(R.id.widget_time, View.VISIBLE)
+            views.setViewVisibility(R.id.widget_countdown, View.GONE)
+            views.setViewVisibility(R.id.widget_hero_time, View.GONE)
+        }
         // Right to left, small card (Ali, 4 Nov 2026: "balance it"): the name and the time hang off the right edge and leave the left
         // 60 percent of the one-row card empty, so it reads wider than the English one. Centred there; English keeps its start edge.
         // Written both ways because the launcher reuses the view. The countdown and time use textAlignment "gravity" in the layout.
@@ -534,19 +610,29 @@ internal object WidgetRenderer {
      * The next prayer's time at a size that uses the height left over by the header, the town chip and the day bars,
      * never past what fits the width. Falls back to [baseDp] when the widget is no taller than the content needs.
      */
-    private fun heroDp(context: Context, size: SizeF, baseDp: Float, time: String): Float {
+    private fun heroDp(context: Context, size: SizeF, baseDp: Float, text: String, roomDp: Float = size.width - 28f, grow: Boolean = true): Float {
         val metrics = context.resources.displayMetrics
         val spare = size.height - NEXT_CHROME_DP
-        var dp = minOf(baseDp + spare * 0.8f, baseDp * 2.4f)
+        var dp = if (grow) minOf(baseDp + spare * 0.8f, baseDp * 2.4f) else baseDp
         val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.create("sans-serif-light", android.graphics.Typeface.NORMAL) }
-        val room = (size.width - 28f) * metrics.density
-        while (dp > baseDp) {
+        val room = roomDp * metrics.density
+        val floor = if (grow) baseDp else HERO_FLOOR_DP
+        while (dp > floor) {
             paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, metrics)
-            if (paint.measureText(time) <= room) return dp
+            if (paint.measureText(text) <= room) return dp
             dp -= 1f
         }
-        return baseDp
+        return floor
     }
+
+    /** The widest countdown the Chronometer shows ("h:mm:ss", up to two hour digits): the size is chosen so it never wraps or is cut (Opus review, 4 Nov 2026). */
+    private const val COUNTDOWN_TEMPLATE = "10:12:34"
+
+    /** The smallest time size the wide Next card's countdown column may shrink to. */
+    private const val HERO_FLOOR_DP = 16f
+
+    /** Width of the countdown column of the wide Next card: the layout weighs it 1 against 1.3 for the rows, minus the card's padding and the divider. */
+    private fun wideColumnDp(widthDp: Float): Float = (widthDp - 28f - 8f) / 2.3f - 4f
 
     /** Height the header, the town chip and the day bars take on the next prayer card, from the measured layouts. */
     private const val NEXT_CHROME_DP = 100f
@@ -779,6 +865,9 @@ internal object WidgetRenderer {
 
     /** The context line is 12sp in the layouts; the no location message uses 14sp. Both are written every time. */
     private const val CONTEXT_SP = 12f
+
+    /** The small time in the title row beside the name (the layout's own 14sp). */
+    private const val TIME_SP = 14f
     private const val MESSAGE_SP = 14f
 
     /** The Next prayer widgets' prayer name, 16sp in both layouts; rewritten after the message size. */
@@ -791,7 +880,7 @@ internal object WidgetRenderer {
      */
     private const val SMALL_COUNTDOWN_DP = 36f
     // Ali, 4 Nov 2026 ("make it smaller"): the one-row Medium is about 103dp on the emulator, so the short countdown
-    // steps down from 32 to 26 (24 in tall scripts) to fit under 100dp. Measure again on a phone before changing.
+    // steps down from 32 to 26 (22 in tall scripts) to fit under 100dp. Measure again on a phone before changing.
     private const val SHORT_COUNTDOWN_DP = 26f
     private const val SHORT_TALL_COUNTDOWN_DP = 22f
     private const val WIDE_COUNTDOWN_DP = 34f
@@ -1114,10 +1203,10 @@ internal object WidgetRenderer {
      * uses, so it is the distance to [at] from now added to that clock's reading. Only called when the
      * refresh alarm is exact (see [fillHero]).
      */
-    private fun applyCountdown(views: RemoteViews, id: Int, at: Instant, now: Instant, format: String? = null) {
+    private fun applyCountdown(views: RemoteViews, id: Int, at: Instant, now: Instant) {
         views.setViewVisibility(id, View.VISIBLE)
         views.setChronometerCountDown(id, true)
-        views.setChronometer(id, SystemClock.elapsedRealtime() + (at.toEpochMilli() - now.toEpochMilli()), format, true)
+        views.setChronometer(id, SystemClock.elapsedRealtime() + (at.toEpochMilli() - now.toEpochMilli()), null, true)
     }
 
     /** Distinct from the scheduler's open intent (request code 0), so neither replaces the other. */

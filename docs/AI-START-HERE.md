@@ -29,7 +29,7 @@ when a release publishes.
 | Branch | What it is | What you do with it |
 |---|---|---|
 | `main` | Exactly what users have: **1.5.0**, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes the next release only when Ali says go, by `RELEASE-<version>.md`; Ali presses every merge, submit and publish button |
-| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 40 commits ahead of `main`, all pushed (see git log for the latest commit), nothing merged, versionCode 11 / 1.7.0 and the watch 1003 / 1.7.0 are set (4 Nov 2026); the checklist is `docs/release-tools/RELEASE-1.7.0.md`. Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
+| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 70 commits ahead of `main` (1.6.0 is already merged into `main`), all pushed (see git log for the latest commit), nothing merged, versionCode 11 / 1.7.0 and the watch 1003 / 1.7.0 are set (4 Nov 2026); the checklist is `docs/release-tools/RELEASE-1.7.0.md`. Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
 | `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system. Check the public Play page before acting on it | Do not cut new work from here; use `claude/1-7-0` |
 | your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-7-0` | Commit and push here. Merging into `claude/1-7-0` only when Ali says so, after review; Ali presses every merge, submit and publish button |
 

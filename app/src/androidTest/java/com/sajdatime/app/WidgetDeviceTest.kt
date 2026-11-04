@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.os.SystemClock
+import android.util.SizeF
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
@@ -102,6 +103,16 @@ class WidgetDeviceTest {
         host.startListening()
         var view: AppWidgetHostView? = null
         instrumentation.runOnMainSync { view = host.createView(context, id, manager.getAppWidgetInfo(id)) }
+        // Lay the host out at a realistic size, as a launcher does (a host that was never laid out has no size). Without it a host with sized layouts may choose the SMALLEST entry (2 compact
+        // rows, the one-line Next card), which is right for a 40dp slot but not what these tests are about (4 Nov 2026: the new low steps
+        // made the theme test time out waiting for a Dhuhr row that a 2 row card does not show).
+        val size = when (provider) {
+            TodayWidgetProvider::class.java -> SizeF(270f, 320f) // the host's default padding takes 8dp a side
+            NextPrayerWidgetProvider::class.java -> SizeF(200f, 125f)
+            else -> SizeF(300f, 64f)
+        }
+        layoutAt(view!!, size.width.toInt(), size.height.toInt())
+        instrumentation.runOnMainSync { view!!.updateAppWidgetSize(android.os.Bundle(), listOf(size)) }
         // A bound widget gets no first update by itself, so ask for one here (the other tests do the same after a
         // change). Without it the Today and strip tests waited forever for text that was never drawn (4 Nov 2026).
         runBlocking { WidgetUpdater.refreshAll(context) }
@@ -298,7 +309,13 @@ class WidgetDeviceTest {
         try {
             val (_, today) = bindOrFail(TodayWidgetProvider::class.java)
             val (_, next) = bindOrFail(NextPrayerWidgetProvider::class.java)
-            waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
+            try {
+                waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
+            } catch (e: AssertionError) {
+                var info = ""
+                instrumentation.runOnMainSync { info = listOf("fajr","sunrise","dhuhr","asr","maghrib","isha").joinToString(",") { n -> n + ":" + today.textOf("widget_name_" + n)?.text + "/" + today.textOf("widget_name_" + n)?.visibility } + " hostH=" + today.height + " root=" + (today.findViewById<View>(R.id.widget_root) != null) + " today dhuhr=" + today.textOf("widget_name_dhuhr")?.text + " vis=" + today.textOf("widget_name_dhuhr")?.visibility + "; next name=" + next.textOf("widget_name")?.text }
+                throw AssertionError(e.message + " [" + info + "]")
+            }
             val phoneDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
             val light = ThemeChoice.LIGHT to R.color.widget_light_on_surface
             val dark = ThemeChoice.DARK to R.color.widget_dark_on_surface

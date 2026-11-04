@@ -189,17 +189,18 @@ class WidgetResourcesTest {
 
     @Test
     fun `the sizes are the ones the layouts were designed for`() {
-        val next = read("xml/widget_next_prayer_info.xml")
+        val next = read("xml-v31/widget_next_prayer_info.xml")
         assertTrue(next.contains("""android:targetCellWidth="3"""") && next.contains("""android:targetCellHeight="1""""))
-        // Neither widget may be resized below the size its content was drawn for.
-        assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minResizeHeight="100dp""""))
+        // A launcher ignores a minResizeHeight larger than minHeight (Opus review, 4 Nov 2026), so the real floor is minHeight and the
+        // content must cope with it: the Next card has a tiny one-line entry (TINY_NEXT_DP) for a slot under 100dp. Written as the truth.
+        assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minHeight="40dp"""") && next.contains("""android:minResizeHeight="40dp""""))
         val today = read("xml/widget_today_info.xml")
         // Default 4 by 3 (Ali, 4 Nov 2026): a new widget opens as the compact card with no spare height. The 4 by 4
         // default made the emulator's launcher open a tall 3 by 5 slot with an empty band under the rows.
         assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
-        // The Today widget must never be resizable below the height its six rows need. 290dp since 4 Nov 2026 (Ali asked for
-        // the compact card to be taller, so its rows can sit with even gaps); WidgetRenderer.COMPACT_MIN_DP is the same figure.
-        assertTrue(today.contains("""android:minResizeHeight="290dp""""))
+        // The real floor is minHeight 240dp (a larger minResizeHeight is ignored by launchers): below the six row height the compact
+        // list shows 3, 4 or 5 rows (WidgetRenderer.todaySizes), so nothing is cut at 240dp.
+        assertTrue(today.contains("""android:minHeight="240dp"""") && today.contains("""android:minResizeHeight="240dp""""))
         // The strip is one cell tall everywhere. 40dp and not 60: a launcher that sizes by 70n minus 30 would
         // round a 60dp minimum up to two cells (STEP-8-DESIGN section 3).
         val strip = read("xml/widget_today_strip_info.xml")

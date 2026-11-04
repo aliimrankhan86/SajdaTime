@@ -66,8 +66,8 @@ class WidgetRenderEvidenceTest {
 
         val cases = listOf(
             Case("strip", listOf(250 to 64, 300 to 64, 300 to 110, 300 to 150, 360 to 110, 150 to 110), WidgetRenderer::strip),
-            Case("next", listOf(110 to 110, 180 to 110, 270 to 110, 270 to 150, 180 to 150), WidgetRenderer::nextPrayer),
-            Case("today", listOf(180 to 180, 250 to 180, 250 to 250, 330 to 250, 330 to 330), WidgetRenderer::today),
+            Case("next", listOf(180 to 40, 180 to 60, 180 to 80, 180 to 100, 110 to 110, 180 to 110, 270 to 110, 270 to 150, 180 to 150, 180 to 170, 270 to 222, 270 to 260), WidgetRenderer::nextPrayer),
+            Case("today", listOf(250 to 200, 250 to 240, 250 to 260, 250 to 290, 330 to 330, 250 to 420), WidgetRenderer::today),
         )
         val csv = StringBuilder("widget,wDp,hDp,fontScale,theme,problems\n")
         for (case in cases) for ((w, h) in case.sizes) for (scale in listOf(1.0f, 1.15f, 1.3f, 2.0f)) for (dark in listOf(false, true)) {
@@ -469,7 +469,8 @@ class WidgetRenderEvidenceTest {
         val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
         val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z", "2027-02-22T09:00:00Z", "2027-02-22T21:30:00Z")
         val csv = StringBuilder("widget,lang,fs,at,neededDp\n")
-        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f)) for (t in times) {
+        val misses = mutableListOf<String>()
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.05f, 1.1f, 1.15f, 1.2f, 1.25f, 1.28f, 1.3f, 1.4f, 1.5f, 1.55f)) for (t in times) {
             val at = Instant.parse(t)
             val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
             val config = Configuration(base.resources.configuration).apply {
@@ -485,12 +486,86 @@ class WidgetRenderEvidenceTest {
                 var needed = -1f
                 instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
                 csv.append("$name,$lang,$scale,${t.substring(0, 16)},${"%.1f".format(needed)}\n")
+                // The entry heights must hold what the card needs at this text size (the thresholds are interpolated, so any size is covered).
+                val limit = if (name == "today") WidgetRenderer.largeTodayHeight(ctx) else WidgetRenderer.wideNextHeight(ctx)
+                val offered = scale < (if (name == "today") 1.6f else 1.3f)
+                if (offered && needed > limit) misses.add("$name $lang $scale $t needs $needed, offered from $limit")
             }
         }
         File(dir, "release_needs.csv").writeText(csv.toString())
+        org.junit.Assert.assertTrue("entry heights below the measured need: " + misses.joinToString("; "), misses.isEmpty())
     }
 
     private data class Quad(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val h: Int)
+
+    /**
+     * The test that matters most: for EVERY slot height a launcher could give, at every text size, in four languages, at a midday and an
+     * after Isha time, the entry the launcher would choose must fit the slot (needed height <= slot height). Next card: slots 40 to 260dp
+     * wide 180; Today card: slots 240 to 560dp wide 250. Text sizes where a widget is deliberately degraded (2.0x text on the Next card
+     * below 124dp needs the tiny line, which is checked here too) are included: nothing is excused. Output: fit_every_slot.csv of failures.
+     */
+    @Test
+    fun every_slot_height_fits() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val times = listOf("2026-11-04T12:30:00Z", "2026-11-04T21:30:00Z")
+        val fails = mutableListOf<String>()
+        val scales = listOf(1.0f, 1.1f, 1.15f, 1.3f, 1.5f, 2.0f)
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in scales) for (t in times) {
+            val at = Instant.parse(t)
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            for ((name, build, w, heights) in listOf(
+                Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
+                Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+            )) for (h in heights) {
+                var needed = -1f
+                instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
+                if (needed < 0 || needed > h + 0.5f) fails.add("$name $lang fs$scale ${t.substring(11, 16)} slot ${h}dp needs ${"%.1f".format(needed)}")
+            }
+        }
+        File(dir, "fit_every_slot.csv").writeText(fails.joinToString("\n"))
+        org.junit.Assert.assertTrue("${fails.size} slots do not fit: " + fails.take(40).joinToString("; "), fails.isEmpty())
+    }
+
+    private data class Slots(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val heights: List<Int>)
+
+    /** What each compact Today step (3, 4, 5, 6 rows) needs, per language and text size: the figures behind COMPACT_NEED_EN and COMPACT_NEED_TALL. */
+    @Test
+    fun compact_rows_need() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z", "2027-02-22T21:30:00Z")
+        val csv = StringBuilder("lang,fs,rows,neededDp\n")
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (rows in 2..6) {
+            var worst = 0f
+            for (tt in times) {
+                val at = Instant.parse(tt)
+                val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+                val config = Configuration(base.resources.configuration).apply {
+                    fontScale = scale
+                    setLocale(java.util.Locale.forLanguageTag(lang))
+                    uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+                }
+                val ctx = base.createConfigurationContext(config)
+                instrumentation.runOnMainSync {
+                    val density = ctx.resources.displayMetrics.density
+                    val host = AppWidgetHostView(ctx)
+                    host.updateAppWidget(WidgetRenderer.todayCompactRows(ctx, state, at, rows))
+                    val wPx = (250 * density).toInt()
+                    host.measure(View.MeasureSpec.makeMeasureSpec(wPx, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+                    worst = maxOf(worst, host.measuredHeight / density)
+                }
+            }
+            csv.append("$lang,$scale,$rows,${"%.1f".format(worst)}\n")
+        }
+        File(dir, "compact_rows_need.csv").writeText(csv.toString())
+    }
 
     // ---- Next prayer, short variants --------------------------------------------------------------
 

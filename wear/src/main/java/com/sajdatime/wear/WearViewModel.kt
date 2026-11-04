@@ -21,6 +21,7 @@ import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.currentForDisplay
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import kotlinx.coroutines.Dispatchers
@@ -360,10 +361,3 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 }
-
-/**
- * The prayer the watch marks as current (1.7.0, like the phone). Before today's Fajr the engine answers yesterday's Isha, which must
- * not be marked: nothing is current until Fajr. Pulled out of the view model so a unit test can pin it.
- */
-internal fun currentForDisplay(current: PrayerSlot?, now: java.time.Instant, fajr: java.time.Instant): PrayerSlot? =
-    current?.takeIf { !now.isBefore(fajr) }
