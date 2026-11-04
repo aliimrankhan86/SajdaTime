@@ -99,7 +99,7 @@ internal object WidgetRenderer {
     }
 
     /**
-     * Today: the compact list from its minimum, the large card (date, countdown, the day) from 300dp (see [todaySizes] for the measured heights)
+     * Today: the compact list from its minimum, the large card (date, countdown, the day) from 306dp (see [todaySizes] for the measured heights)
      * tall, which is what the header, the card and six rows need at the normal text size (rendered).
      */
     private fun todaySizes(context: Context): List<Pair<SizeF, Int>> {
@@ -110,9 +110,13 @@ internal object WidgetRenderer {
         // Measured 3 Nov 2026 (needed_heights): the large card wants 296dp at normal text and 322dp at 1.15x, since the
         // 15sp rows and the band's extra room (08bb2b8); the 280dp it used to take clipped the last row. Urdu, Arabic and
         // Bengali: measured the same day, the large card wants 340.6dp (Urdu), 339.8 (Arabic), 309.0 (Bengali) and 369.9, 365.0,
-        // 336.8 at 1.15x, so 346 and 374 for all three; 336 and 384 from 1.1x since 1.25x measured 334.1 (Latin) and the tall scripts add about 10 (estimated).
+        // 336.8 at 1.15x, (daytime figures, replaced by the evening maxima below).
         val grown = context.resources.configuration.fontScale >= 1.1f
-        val largeHeight = if (tall) (if (grown) 384f else 346f) else (if (grown) 336f else 300f)
+        // Re-measured 4 Nov 2026 at four times of day (compact_today_windows): after Isha the card shows tomorrow's countdown and
+        // wants 10 to 19dp more than in the day (302.5 at 1.0x, 347.8 at 1.25x in English; 354.7 and 408.4 in Urdu, 353.9 and 402.3
+        // in Arabic, 320.4 and 366.9 in Bengali), so every evening a widget at the old heights cut its last row. These are those
+        // maxima plus about 4dp.
+        val largeHeight = if (tall) (if (grown) 412f else 358f) else (if (grown) 352f else 306f)
         // The first compact entry shows as many rows as 180dp holds; from the second (the height six rows need, see
         // [compactSixRowsHeight]) all six show. Same layout, so todayViews is given the size.
         val six = compactSixRowsHeight(context)

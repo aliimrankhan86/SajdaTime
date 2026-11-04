@@ -333,8 +333,8 @@ class WidgetRenderEvidenceTest {
             Row("strip", 300, 148, all, WidgetRenderer::strip), Row("strip", 400, 148, all, WidgetRenderer::strip),
             Row("strip", 300, 152, all, WidgetRenderer::strip), Row("strip", 400, 152, all, WidgetRenderer::strip),
             Row("next", 180, 110, all, WidgetRenderer::nextPrayer), Row("next", 270, 158, all, WidgetRenderer::nextPrayer),
-            Row("today", 250, 180, all, WidgetRenderer::today), Row("today", 250, 300, listOf(1.0f), WidgetRenderer::today),
-            Row("today", 250, 324, listOf(1.15f), WidgetRenderer::today),
+            Row("today", 250, 180, all, WidgetRenderer::today), Row("today", 250, 306, listOf(1.0f), WidgetRenderer::today),
+            Row("today", 250, 352, listOf(1.15f), WidgetRenderer::today),
         )
         val pictures = setOf("strip_300x132", "next_180x132", "today_250x300")
         val csv = StringBuilder("widget,nominalW,nominalH,fs,date,neededDp,fits\n")
@@ -384,8 +384,8 @@ class WidgetRenderEvidenceTest {
         class Row(val widget: String, val w: Int, val h: Int, val scales: List<Float>, val build: (Context, WidgetState, Instant) -> RemoteViews)
         val both = listOf(1.0f, 1.15f)
         val rows = listOf(
-            Row("today", 250, 180, both, WidgetRenderer::today), Row("today", 250, 346, listOf(1.0f), WidgetRenderer::today),
-            Row("today", 250, 374, listOf(1.15f), WidgetRenderer::today),
+            Row("today", 250, 180, both, WidgetRenderer::today), Row("today", 250, 358, listOf(1.0f), WidgetRenderer::today),
+            Row("today", 250, 412, listOf(1.15f), WidgetRenderer::today),
             Row("next", 180, 110, both, WidgetRenderer::nextPrayer),
             Row("next", 270, 170, listOf(1.0f), WidgetRenderer::nextPrayer), Row("next", 270, 192, listOf(1.15f), WidgetRenderer::nextPrayer),
             Row("strip", 300, 40, both, WidgetRenderer::strip), Row("strip", 300, 86, both, WidgetRenderer::strip),
@@ -405,7 +405,7 @@ class WidgetRenderEvidenceTest {
                 try {
                     val (host, n) = hostAt(ctx, r.build, state, at, r.w, r.h)
                     needed = n
-                    if (r.widget == "today" && r.h >= 346 && lang in listOf("ur", "bn")) {
+                    if (r.widget == "today" && r.h >= 358 && lang in listOf("ur", "bn")) {
                         FileOutputStream(File(tallDir, "today_${lang}_250x${r.h}_fs${scale}_normal_light.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
                     }
                     if (r.widget == "today" && r.h == 180 && scale == 1.0f) {
@@ -432,7 +432,7 @@ class WidgetRenderEvidenceTest {
         val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z")
         val csv = StringBuilder("lang,fs,at,H,neededDp,fits\n")
         // H is the height the host is given: 180 is the first compact entry (fewer rows when short), the taller ones are the six row entry.
-        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (t in times) for (h in listOf(180, 210, 250, 300, 400)) {
+        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (t in times) for (h in listOf(180, 210, 250, 300, 360, 400, 420)) {
             val at = Instant.parse(t)
             val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
             val config = Configuration(base.resources.configuration).apply {
@@ -527,7 +527,7 @@ class WidgetRenderEvidenceTest {
             Pic("strip", "ur", 300, 148, false), Pic("strip", "ur", 300, 152, false), Pic("strip", "ur", 300, 86, false),
             Pic("strip", "ur", 300, 148, true), Pic("strip", "en", 300, 148, true),
             Pic("next", "ur", 180, 110, false), Pic("next", "ur", 270, 170, false), Pic("next", "en", 180, 110, true),
-            Pic("today", "ur", 250, 346, true), Pic("today", "en", 250, 300, true),
+            Pic("today", "ur", 250, 358, true), Pic("today", "en", 250, 306, true),
         )
         for (p in pics) {
             val build = when (p.widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }
@@ -540,7 +540,7 @@ class WidgetRenderEvidenceTest {
         val csv = StringBuilder("widget,nominal,fs,neededDp,fits\n")
         val sizes = listOf(
             "strip" to listOf(300 to 86, 300 to 148, 300 to 152), "next" to listOf(180 to 110, 180 to 136, 270 to 158),
-            "today" to listOf(250 to 180, 250 to 300, 250 to 324),
+            "today" to listOf(250 to 180, 250 to 306, 250 to 352),
         )
         for ((widget, list) in sizes) for ((w, h) in list) for (scale in listOf(1.2f, 1.25f)) {
             val build = when (widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }

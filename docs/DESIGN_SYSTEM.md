@@ -704,7 +704,7 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's four entries):
 | Next prayer | small (default, and the only one below Android 12) | glyph, name, time; the countdown at the foot; the day's five bars |
 | Next prayer | wide (from 270 by 158dp, or 170 (192 from 1.1x text) in Urdu, Arabic and Bengali) | the small widget's countdown beside the six rows |
 | Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
-| Today | large (from 250 wide by 300dp tall, 324 from 1.1x text, 346 and 374 in Urdu, Arabic and Bengali; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+| Today | large (from 250 wide by 306dp tall, 352 from 1.1x text, 358 and 412 in Urdu, Arabic and Bengali; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
 | Today strip (1.6) | one layout, four size entries (250 or 380dp wide, 40 or 78dp tall (86 in Urdu, Arabic, Bengali)); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 78dp tall; the town chip from 380dp; at 1.3 text the next prayer alone, no chip |
 
 - **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
