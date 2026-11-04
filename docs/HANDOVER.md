@@ -6092,6 +6092,12 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 4 Nov 2026 (late): Times highlights Now only; Settings theme is Follow phone or the opposite (read this first)
 
+**Checkpoint, 4 Nov 2026 (later): branch claude/1-7-0 at cc80da9, pushed.** Full gate passed on the committed code
+(clean test, bundleRelease, wear bundleRelease, lint; unit tests app 349, core 252, wear 27, 0 failures). Still
+not done: device suite, 1.7.0 store listing (English draft needs Ali's approval before translation), store
+pictures, the Quba permission email (drafted, not sent), the 3 Nov decisions A, B, F, the GitHub md move to
+Google Drive. The next session starts from private/plans/2026-11-next-release/START-PROMPT-7.md.
+
 **Ali's feedback on the Redmi, 4 Nov 2026, built and checked on the phone (not yet committed when this was written; see git log for the commit).**
 - **Times:** the "Next" chip and the green Next row are gone. Only the current prayer is highlighted, and its "Now" pill is filled with the accent (`HomeScreen.kt` `PrayerRow`, `isCurrent` drives the fill, bar, text and bell; `isNext` removed from the Times list). Widgets, the watch and the Ramadan card still mark Next. Ali's words: "Just make the now highlighted - I dont see Next adding any value". Known leftovers to decide: the widgets and the app now disagree about which row is highlighted (at 14:00 the widget marks Asr, the app marks Dhuhr); between sunrise and Dhuhr no row is highlighted (no current prayer).
 - **My prayers:** the Pause button reads "Pause tracking" (`settings_tracker_pause`, already translated in every language).
