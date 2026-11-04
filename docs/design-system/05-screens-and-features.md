@@ -1,7 +1,7 @@
-# 5. Screens and features (release 1.6.0)
+# 5. Screens and features (release 1.7.0)
 
-What ships in 1.6.0 (versionCode 10), screen by screen, top to bottom, with every state. The watch app
-is unchanged in 1.6 (1.5.0). Paths are under `app/src/main/java/com/sajdatime/app/`. Exact English
+What ships in 1.7.0 (versionCode 11), screen by screen, top to bottom, with every state. The watch app
+is 1.5.0 in 1.7.0 (its Today list marks the current prayer, as the phone does). Paths are under `app/src/main/java/com/sajdatime/app/`. Exact English
 copy is in `app/src/main/res/values/strings.xml`; string keys are given as `S:key`.
 
 Update this page in the same commit as any change to a screen.
@@ -48,7 +48,7 @@ Top to bottom:
    Allow notifications (permission card, only while blocked and an alert is on).
 6. **Today** (`titleMedium`, heading) with a compact "Timetable" button at the end (under it from
    1.5× text) → Timetable sheet, or the Ramadan table during Ramadan with the Ramadan card on.
-7. **Today list**: six rows with Next and Now, notes (jama'ah, Jumu'ah, Suhoor ends, Iftar) and bells. After
+7. **Today list**: six rows, the current prayer marked Now (1.7.0: no Next row), notes (jama'ah, Jumu'ah, Suhoor ends, Iftar) and bells. After
    Isha, an **Islamic midnight row** (1.6.0): dimmed like Sunrise, no bell, moon icon, note "Last third from X".
    Shown by the Settings toggle "Night times" (default on).
 7a. **Why these times caption** (2 Nov 2026): one centred `bodySmall` line in `onSurfaceVariant`, a 48dp tappable
@@ -63,7 +63,7 @@ Top to bottom:
 |---|---|
 | No location | Card says "Set your location to see prayer times."; no list, no mosque button |
 | Makkah fallback | Makkah times and the warning notice |
-| After Isha | "Next prayer · Tomorrow", Fajr; no row marked Next |
+| After Isha | "Next prayer · Tomorrow", Fajr; Isha is marked Now until midnight; from midnight to Fajr no row is marked |
 | Ramadan card off | No card, notice or Ramadan labels; Timetable opens the month view |
 | Offline | No change |
 | 1.5× text | Today line and rows stack |
@@ -200,7 +200,7 @@ Each: what the user gets, where it lives, the logic, the iPhone effect.
 |---|---|---|---|
 | Prayer times | Six times calculated on the phone from location, sect, madhab, method, minutes and date shift. Never the network | `core/.../PrayerEngine.kt` | Carries over (swap the Java `adhan` library and `java.time`) |
 | Next prayer and countdown | Hero card, hh:mm:ss, Tomorrow after Isha | `PrayerEngine` | Carries over |
-| Now and Next | Marks on rows; never a ruling | `PrayerEngine.currentPrayer` | Carries over |
+| Now | Marks the current row on today's list; never a ruling | `PrayerEngine.currentPrayer`, only once today's Fajr has begun | Carries over |
 | Four skies and sky mark | Period sky; arc of the day | `core/.../SkyPeriod.kt` | Carries over |
 | Bell on each row | One tap alert toggle with Undo; takes and returns the reminder | `core/.../BellRules.kt` | Carries over |
 | Prayer alerts | Off, Notification or Alarm per prayer; alarm can sound on silent and through Do Not Disturb | `notify/` | Partly: no exact alarms or DND bypass on iPhone; Time Sensitive notifications |

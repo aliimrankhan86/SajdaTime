@@ -94,7 +94,7 @@ Material 3 default type, floor 12. Everything inside a 10% circular inset; lists
 
 | Screen | Content |
 |---|---|
-| Times | Next prayer name (`primary`), countdown, clock; five prayers (no Sunrise), next in `primary`; location button; the disclaimer line; school button last |
+| Times | Next prayer name (`primary`), countdown, clock; five prayers (no Sunrise), the current prayer in `primary`; location button; the disclaimer line; school button last |
 | Qibla | Dial on `surfaceContainer` (`primaryContainer` when aligned), remaining turn arc, needle, the Kaaba at 0.66 of the radius (phone 0.70) and 0.30 across (phone 0.22); "Facing the Kaaba" or the bearing; a buzz on arrival |
 | School, Location | Full screen choices with chips and OK |
 | Tile | Label 11, prayer name 24 bold, detail 14; one entry per minute |

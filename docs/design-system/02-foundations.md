@@ -36,8 +36,8 @@ the phone.
 | Identity: the next prayer, the Qibla, tappable | `primary` | `#0B5A43` | `#4FC48F` | Decoration, washes, large fills behind white text in dark |
 | Solid button fill | `brand.cta` | `#0B5A43` | `#17805A` | Anything that is not an action |
 | Button label | `brand.onCta` | `#FFFFFF` | `#FFFFFF` | Regular weight |
-| Highlight (next row, aligned dial) | `primaryContainer` | `#D7EAE0` | `#143028` | A whole screen background |
-| Selected and quiet (tab pill, Now pill, quiet notice, Settings icon tile) | `secondaryContainer` | `#CDE3D7` | `#1E4034` | Warnings |
+| Highlight (current row, aligned dial) | `primaryContainer` | `#D7EAE0` | `#143028` | A whole screen background |
+| Selected and quiet (tab pill, quiet notice, Settings icon tile) | `secondaryContainer` | `#CDE3D7` | `#1E4034` | Warnings |
 | Withheld, warning | `tertiary` (`accent`) | `#9A6208` | `#E8B14A` | Errors, the Kaaba, decoration |
 | Warning panel | `tertiaryContainer` | `#FBF1DC` | `#2A2113` | Information (use quiet) |
 | Page | `background` | `#F7F5F3` | `#101312` | |

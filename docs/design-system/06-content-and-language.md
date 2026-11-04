@@ -145,7 +145,7 @@ screenshots to the owner as findings. Then check the real Urdu build.
 
 ## 6.8 Accessibility wording
 
-- Screen reader labels are sentences a person would say: "Asr in 2h 14m", "Fajr, Next, 5:37 am",
+- Screen reader labels are sentences a person would say: "Asr in 2h 14m", "Fajr, current prayer, 5:37 am",
   "Dhuhr alert on, notification".
 - An icon button's label is its action ("Close", "Update location, London").
 - Decorative icons have no label. Pictures that carry meaning (the Kaaba, the sky mark) are labelled

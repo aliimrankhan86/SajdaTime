@@ -63,7 +63,7 @@ Generate the Swift constants from the JSON; never retype them. Add an XCTest tha
 
 ## 9.4 Icons: Material to SF Symbol
 
-Every icon in 1.6, with its SF Symbol. A new Material icon is not finished until a row is added here.
+Every icon in 1.7, with its SF Symbol. A new Material icon is not finished until a row is added here.
 
 | Material | Where | SF Symbol |
 |---|---|---|

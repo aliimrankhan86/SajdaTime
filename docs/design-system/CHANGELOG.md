@@ -46,3 +46,19 @@ also go in `docs/DESIGN_SYSTEM.md` §9 with his words.
   while there is one platform; the JSON follows the same shape so it can be adopted later).
 - **Not checked by a test, so review:** `shape.json` (a census of radii and sizes, not enforced),
   the pages' prose, the watch.
+
+## 4 Nov 2026 (1.7.0, branch claude/1-7-0)
+
+- **Times: only the current prayer is marked.** The Next row and its chip are gone. The current prayer
+  gets the fill, the 3dp bar and a filled "Now" pill (`primary` / `onPrimary`). Why: Ali found the Next
+  chip added nothing on this screen. Rejected: keeping Next beside Now (two loud rows, no focal point).
+- **Nothing is marked when no prayer is current**: between sunrise and Dhuhr, and from midnight to
+  today's Fajr (the engine's answer there is yesterday's Isha, which is not on today's list).
+- **Widgets and watch match the Times screen.** The widget Today list and the watch Today list mark the
+  current prayer and label it Now. The day bars on the Next widget still show Next, because they are about
+  the next prayer.
+- **Theme is a two-choice control**: Follow phone (default), or the opposite of the phone's mode (Light on
+  a dark phone, Dark on a light one). Rejected: the three-way bar (offered Light where it did nothing new),
+  and a switch pair (two controls for three states).
+- **Pause tracking**: the My prayers button reads "Pause tracking" (translated in all six string folders).
+- `tokens/ui-files.json` replaces the code map table; `DesignTokensTest` reads it.

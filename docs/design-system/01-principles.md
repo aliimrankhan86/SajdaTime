@@ -77,7 +77,7 @@ These come from `CLAUDE.md` and `docs/DESIGN_SYSTEM.md`. Each was learnt the har
 9. **When unsure, ask him**, with screenshots and a recommendation first. Do not guess and report
    done.
 
-## 1.6 What the app deliberately does not do
+## What the app deliberately does not do (from 1.6)
 
 Recorded so nobody "improves" it back. Reasons in `docs/DESIGN_SYSTEM.md` §9 and `docs/HANDOVER.md` §2.
 

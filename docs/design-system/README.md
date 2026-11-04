@@ -3,9 +3,53 @@
 The single reference for how SajdaTime looks, reads and behaves, written so that any person or AI can
 extend the app, add a feature, or build the iPhone version without drifting from what ships.
 
-Taken from **release 1.6.0** (branch `claude/1-6-0`, commit `1cdae4a`, 25 Oct 2026). The values in
-`tokens/` are checked against the Android code on every build by `DesignTokensTest`, so they cannot
-quietly go stale.
+Taken from the **1.7.0 build** (branch `claude/1-7-0`, 4 Nov 2026). Earlier descriptions of the 1.6
+look are history: the Next row on the Times screen and the three-way theme bar are gone.
+
+**Where this lives.** The owner asked (4 Nov 2026) for these pages to live on his Google Drive, not in the
+repo. The move is not finished: until it is, the copies here are the ones in force. The repo keeps, and
+will keep, what the build reads: the token files in `tokens/`, `tokens/ui-files.json` (the
+list of every phone UI file, checked by `DesignTokensTest`), and `docs/DESIGN_SYSTEM.md` (owner rules,
+the enforced button inventory in §4.1, the decision log in §9). If a page on Drive and a repo file
+disagree on a value, the repo wins; tell the owner so the page is fixed.
+
+---
+
+## Philosophy: why it looks like this
+
+- **Quiet Glass.** Calm paper-coloured surfaces, one green identity, the period's sky behind the time.
+  The time is the hero. Nothing competes with the next prayer or the current one.
+- **One highlight at a time.** The Times screen and every widget mark the prayer that is current now,
+  with the same row, the same fill and the same pill. Only one row is ever marked. Nothing is marked
+  when no prayer is current: between sunrise and Dhuhr, and from midnight until today's Fajr.
+- **Green means something.** Green marks what can be tapped, the current prayer, and the Qibla. It is
+  never decoration.
+- **Dependable beats elegant.** It has to work with no signal, on an old phone, at default settings,
+  for someone who cannot read English, and right to left.
+- **The owner decides what he can see.** Visual and wording choices are his, from screenshots. A rule
+  this page does not decide is asked, not guessed. Silence is never a yes.
+- **Keep the iPhone road smooth.** Use only patterns both platforms share. Every icon names its SF
+  Symbol. Rules and calculations stay plain code that could move to iPhone.
+
+## How to add a feature on top of this
+
+Nothing here is rebuilt for each feature. A new feature is added on top of what exists, in this order:
+
+1. **Start from the pages.** Find the screen or component it resembles (the code map in
+   `tokens/ui-files.json` names every file). Reuse its components, tokens and states before inventing any.
+2. **Ask the owner for any visual or wording choice this page does not decide**, with screenshots in
+   light, dark, 2x text and Urdu. Record his answer in `docs/DESIGN_SYSTEM.md` §9 with the date and his words.
+3. **A new value is a new token.** Put it in `tokens/*.json` and in the code in the same commit.
+   `DesignTokensTest` must pass. Never write a colour, gap, size or duration in a composable.
+4. **A new phone UI file gets a row** in `tokens/ui-files.json`, and a new button gets a row in
+   `docs/DESIGN_SYSTEM.md` §4.1. The build fails otherwise.
+5. **Write the page.** Add the feature to the Drive page for the screen it lives on (the screen,
+   its states, its copy rules, its accessibility, its iPhone line). Add a dated line to the changelog.
+6. **Check the states and both directions.** Light, dark, 2x text, Urdu (right to left), and the
+   empty and error states. Say in the commit what was not seen.
+
+A change to something already shipped follows the same path, and says in the changelog what it
+replaces and why.
 
 ---
 
@@ -40,74 +84,20 @@ quietly go stale.
 | Add a new feature or screen | [`10-new-feature-playbook.md`](10-new-feature-playbook.md), start to finish |
 | Change the design system itself | §"Changing the design system" below, and [`CHANGELOG.md`](CHANGELOG.md) |
 
-## The files
+## Where things live
 
-```
-docs/design-system/
-  README.md                     this page: purpose, precedence, how to change it
-  01-principles.md              identity, Quiet Glass, the owner's fixed rules
-  02-foundations.md             colour, type, spacing, layout, shape, elevation, motion, haptics, icons
-  03-components.md              every component: anatomy, metrics, states, a11y, iPhone equivalent
-  04-patterns.md                screen anatomy, notices, dialogs, sheets, states, forms, undo, destructive
-  05-screens-and-features.md    every screen and feature in 1.6, top to bottom, every state
-  06-content-and-language.md    voice, wording rules, numbers and dates, languages, RTL
-  07-accessibility.md           contrast, targets, text size, TalkBack and VoiceOver, colour blindness
-  08-surfaces.md                widgets, Wear OS, notifications, PDF, launcher icon, store pictures
-  09-ios-mapping.md             token, component and pattern mapping to SwiftUI and Apple's rules
-  10-new-feature-playbook.md    the step by step for any new feature, with the checks
-  CHANGELOG.md                  every change to this folder, dated, with the reason
-  tokens/
-    README.md                   format of the token files and how to consume them
-    color.json                  every colour, both themes, Material role, usage (tested)
-    typography.json             type scale with sizes, line heights, weights (tested)
-    spacing.json                spacing scale and layout metrics (scale tested)
-    motion.json                 durations, easing, motion rules (tested)
-    shape.json                  corner radii, borders, elevation, component sizes (census)
-```
+| For Google Drive (the pages, target) | Kept in the repo (what the build reads) |
+|---|---|
+| `README.md` (this page) | `tokens/color.json`, `typography.json`, `spacing.json`, `motion.json`, `shape.json` |
+| `01-principles.md` to `10-new-feature-playbook.md` | `tokens/ui-files.json` (the list of phone UI files) |
+| `CHANGELOG.md` | `tokens/README.md` is on Drive; the token files are the same as in the repo |
+| | `docs/DESIGN_SYSTEM.md` (owner rules, §4.1 inventory, §9 decisions) |
 
 ## Code map: every phone UI file
 
-Under `app/src/main/java/com/sajdatime/app/ui/`. `DesignTokensTest` fails if a UI file is not named
-in these pages, so a new file means a new row here and a spec in the right page.
-
-| Folder | File | What it holds | Spec |
-|---|---|---|---|
-| `theme/` | `Color.kt` | Every colour | `tokens/color.json`, 02 §2.1 |
-| | `Theme.kt` | Material schemes, `sajdaSurface`, hero, warning, sky, Kaaba gold, dial bezel | 02 §2.1, 03 §3.0 |
-| | `Type.kt` | Type scale, `PrayerTimeTextStyle` | `tokens/typography.json`, 02 §2.2 |
-| | `Spacing.kt` | `Space` | `tokens/spacing.json`, 02 §2.3 |
-| | `Motion.kt` | `Motion` | `tokens/motion.json`, 02 §2.7 |
-| `components/` | `CtaButton.kt` | The solid button, `actionLabelStyle()` | 03 §3.1 |
-| | `Notice.kt` | Warning and quiet notices | 03 §3.3 |
-| | `PermissionAction.kt` | `PermissionButton`, `PermissionCard` | 03 §3.1, §3.3 |
-| | `Common.kt` | `DialogTitle`, `SectionHeading`, `ProgressRow`, `LocationSheet` | 03 §3.1, §3.5 |
-| | `ScreenFrame.kt` | `ScreenTitle`, `BottomBarClearance`, `readingWidth` | 03 §3.5 |
-| | `WholeWords.kt` | Shrink rather than split a word | 03 §3.5 |
-| | `Tick.kt` | The prayed checkbox | 03 §3.2 |
-| | `Bell.kt` | The alert toggle | 03 §3.2 |
-| | `DayRing.kt` | Week and history rings | 03 §3.3 |
-| | `MethodChoices.kt` | `RadioRow`, `MethodChoiceList` | 03 §3.2 |
-| | `UsageCountsConsent.kt` | The usage question, `InfoLink` | 03 §3.1, 05 §5.6 |
-| (root) | `MainScaffold.kt` | Tabs, glass bar, snackbar | 03 §3.4, 05 §5.1 |
-| | `SajdaViewModel.kt` | Screen state | 05 §5.1 |
-| | `RamadanState.kt` | Ramadan card and label state | 05 §5.2 |
-| | `RamadanTimetable.kt` | Ramadan table rows | 05 §5.2 |
-| `home/` | `HomeScreen.kt` | Times, next prayer card, list, mosque dialog, export sheet | 05 §5.2 |
-| | `Sky.kt` | Sky backdrop and mark | 03 §3.3 |
-| | `RamadanCard.kt` | Ramadan card, notice, info dialog | 05 §5.2 |
-| | `EidCard.kt` | Eid greeting | 05 §5.2 |
-| | `TimetableSheet.kt` | Timetable sheet, shared header | 05 §5.2 |
-| | `RamadanTimetableSheet.kt` | Ramadan table sheet | 05 §5.2 |
-| | `IslamicDatesSheet.kt` | Islamic dates sheet | 05 §5.2 |
-| | `MyPrayers.kt` | Last 30 days sheet | 05 §5.4 |
-| `prayers/` | `MyPrayersScreen.kt` | My prayers tab | 05 §5.4 |
-| `qibla/` | `QiblaScreen.kt` | Qibla tab and dial | 05 §5.3, 03 §3.3 |
-| `settings/` | `SettingsScreen.kt` | Settings content, every chooser | 05 §5.5 |
-| | `SettingsList.kt` | Settings look: groups, rows, theme selector | 03 §3.3 |
-| | `LanguageChooser.kt` | Language list | 05 §5.5 |
-| | `AlertCheckDialog.kt` | Alert check dialog | 05 §5.5 |
-| | `AppLanguage.kt` | Which language the app is in | 06 §6.6 |
-| `onboarding/` | `OnboardingScreen.kt` | Setup | 05 §5.6 |
+The full list (folder, file, what it holds, which page describes it) is in
+[`tokens/ui-files.json`](tokens/ui-files.json). It is checked by `DesignTokensTest`: a phone UI file
+that is not in that list fails the build.
 
 ## What wins when two sources disagree
 
@@ -117,9 +107,9 @@ in these pages, so a new file means a new row here and a spec in the right page.
 | 2 | **Open questions** | `docs/DESIGN_SYSTEM.md` §11. An OPEN item is not decided: never build an answer to it |
 | 3 | **The code** for values | `app/src/main/java/com/sajdatime/app/ui/theme/` (`Color.kt`, `Type.kt`, `Spacing.kt`, `Motion.kt`, `Theme.kt`) |
 | 4 | **`tokens/*.json`** | The same values, platform neutral. `DesignTokensTest` fails the build if 3 and 4 differ |
-| 5 | **This folder's pages** | How and when to use the values; specs for components, patterns and screens |
-| 6 | **`docs/DESIGN_SYSTEM.md` value tables** (§1 to §8) | Older copies of what is in `tokens/`; the learning loop (§10) still applies |
-| 7 | Plans in `docs/plans/` | The reasoning behind each 1.6 step. History, not instruction |
+| 5 | **The pages on Google Drive** | How and when to use the values; specs for components, patterns and screens |
+| 6 | **`docs/DESIGN_SYSTEM.md`** (§1 to §8) | Older copies of what is in `tokens/`; the learning loop (§10) still applies |
+| 7 | Plans in `docs/plans/` | The reasoning behind each past step. History, not instruction |
 
 If a page here disagrees with the code, the code is right for the value; fix the page in the same
 commit. If the code disagrees with an owner decision in §9, the code is the bug.
@@ -150,9 +140,9 @@ whether a screen reads well, whether copy is kind and accurate, shapes and compo
    dark, 2x text, Urdu). Record his answer in `docs/DESIGN_SYSTEM.md` §9 with the date and his words.
 2. Change the code and the token file **in the same commit**. Run `DesignTokensTest` and
    `ColorContrastTest`.
-3. Update the page in this folder that describes the thing, and the matching row in
+3. Update the Drive page that describes the thing, and the matching row in
    [`09-ios-mapping.md`](09-ios-mapping.md) if it has one.
-4. Add a dated line to [`CHANGELOG.md`](CHANGELOG.md): what changed, why, what was rejected.
+4. Add a dated line to the changelog on Drive: what changed, why, what was rejected.
 5. Retake `docs/store/screenshots/` if the change is visible there.
 6. Commit message explains the reasoning (project rule in `CLAUDE.md`).
 
