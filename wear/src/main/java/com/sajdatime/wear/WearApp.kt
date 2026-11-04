@@ -222,6 +222,7 @@ private fun TimesPage(
 
         val today = state.today
         val next = state.next
+        val current = state.current
 
         ScalingLazyColumn(
             state = listState,
@@ -293,7 +294,8 @@ private fun TimesPage(
 
                 items(PrayerSlot.entries.filter { it.isPrayer }) { slot ->
                     val at = today.times[slot] ?: return@items
-                    val isNext = slot == next?.slot && next.isTomorrow == false
+                    // The current prayer, as the phone's Times screen and widgets highlight it (1.7.0).
+                    val isCurrent = slot == current
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -304,7 +306,7 @@ private fun TimesPage(
                         Text(
                             text = stringResource(slot.labelRes),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isNext) {
+                            color = if (isCurrent) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurface
@@ -313,7 +315,7 @@ private fun TimesPage(
                         Text(
                             text = clock(context, at),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isNext) {
+                            color = if (isCurrent) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant

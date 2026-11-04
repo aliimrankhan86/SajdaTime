@@ -20,6 +20,7 @@ import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
+import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,8 @@ data class WearUiState(
     val settings: WearSettings = WearSettings(),
     val today: DayPrayerTimes? = null,
     val next: NextPrayer? = null,
+    /** The prayer the phone app highlights as Now (1.7.0: the watch shows the same row). Null when none is current. */
+    val current: PrayerSlot? = null,
     val now: Instant = Instant.now(),
     val qiblaBearing: Double? = null,
     val heading: Double? = null,
@@ -317,14 +320,21 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         val zone = ZoneId.systemDefault()
         val now = Instant.now()
         val computed = withContext(Dispatchers.Default) {
-            PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs) to
-                PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
+            val today = PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs)
+            Triple(
+                today,
+                PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone),
+                // Nothing is current before today's Fajr (the engine then answers yesterday's Isha).
+                PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
+                    ?.takeIf { !now.isBefore(today.times.getValue(PrayerSlot.FAJR)) },
+            )
         }
 
         _state.update {
             it.copy(
                 today = computed.first,
                 next = computed.second,
+                current = computed.third,
                 now = now,
                 needsLocation = false,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),

@@ -654,10 +654,10 @@ internal object WidgetRenderer {
             views.setTextViewText(ids.name, if (highlighted) bold(name) else name)
             views.setTextViewText(ids.time, timeText(time, highlighted))
 
-            // "Next", a Ramadan word, both, or nothing. Written every time, so a row that stops being
-            // next or stops carrying a word is cleared. Empty on the wide Next widget, where the label
-            // column is only the space that holds the time at the far end.
-            val marker = if (highlighted) context.getString(R.string.home_next_marker) else null
+            // "Now", a Ramadan word, both, or nothing. Written every time, so a row that stops being
+            // current or stops carrying a word is cleared. Empty on the wide Next widget, where the label
+            // column is only the space that holds the time at the far end. (4 Nov 2026: Now, as the app.)
+            val marker = if (highlighted) context.getString(R.string.home_now_marker) else null
             val label = when {
                 !labels -> ""
                 marker != null && word != null -> context.getString(R.string.settings_value_pair, marker, word)

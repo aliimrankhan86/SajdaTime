@@ -119,7 +119,7 @@ times align).
 | Property | Value |
 |---|---|
 | Size | 24 icon in a 48 round target, role switch |
-| On | `Icons.Rounded.Notifications` (or `Icons.Rounded.Alarm` when the style is alarm), `primary`, or `onPrimaryContainer` on the Next row |
+| On | `Icons.Rounded.Notifications` (or `Icons.Rounded.Alarm` when the style is alarm), `primary`, or `onPrimaryContainer` on the current (Now) row |
 | Off | `Icons.Outlined.NotificationsOff`, `outline` |
 | Blocked by the phone | The stored icon in `outline`; spoken with the reason |
 | Motion | Cross fade `Motion.quick()`; Undo snaps with no fade |
@@ -158,10 +158,11 @@ app to background. iPhone: `AVAudioPlayer`, same button; SF Symbols `play.fill` 
 
 ### Theme selector (`ThemeSelector`, in `settings/SettingsList.kt`)
 
-Three way sliding control: track `surfaceContainerHigh`, radius 28, inset 4; thumb `sajdaSurface` at
-radius 24 sliding with `Motion.standard()`; options 48 minimum, `labelLarge` (SemiBold selected,
-Medium not), `WholeWords`. Order: Follow phone, Light, Dark. Role radio button; `SegmentTick` haptic.
-iPhone: segmented `Picker`.
+Two-choice sliding control (1.7.0): track `surfaceContainerHigh`, radius 28, inset 4; thumb `sajdaSurface`
+at radius 24 sliding with `Motion.standard()`; options 48 minimum, `labelLarge` (SemiBold selected, Medium
+not), `WholeWords`. Choices: **Follow phone** (default), then the opposite of the phone's mode ("Light" on a
+dark phone, "Dark" on a light one); the second keeps its name once picked. Role radio button; `SegmentTick`
+haptic. iPhone: segmented `Picker` with two segments.
 
 ---
 
@@ -198,19 +199,18 @@ pills and the time (`PrayerTimeTextStyle`), then the bell.
 
 | Row state | Treatment |
 |---|---|
-| Next | `primaryContainer` fill, 3dp `primary` bar on the leading edge, filled "Next" pill (`primary` / `onPrimary`) |
-| Now | `surfaceContainerHigh` fill, tonal "Now" pill (`secondaryContainer` / `onSecondaryContainer`), no bar |
+| Now (current prayer) | `primaryContainer` fill, 3dp `primary` bar on the leading edge, filled "Now" pill (`primary` / `onPrimary`) (1.7.0: the Next row is gone from this screen) |
 | Sunrise | `surfaceContainerLow`, `onSurfaceVariant`, one step smaller. It is not a prayer |
 | Plain | Transparent |
 
-Three signals for Next (fill, bar, pill), never colour alone. Next and Now never share a row. The fill
+Three signals for Now (fill, bar, pill), never colour alone. Only one row is ever marked. The fill
 moves with `Motion.standard()` when a prayer passes. From 1.5× text the pills and time move under
-the name. Each row is one screen reader stop ("Fajr, Next, 5:37 am"); the bell is its own.
+the name. Each row is one screen reader stop ("Fajr, current prayer, 5:37 am"); the bell is its own.
 
 ### Pills
 
-`labelMedium`, padding 9 × 3, fully rounded. Next and Today: `primary` / `onPrimary`. Now:
-`secondaryContainer` / `onSecondaryContainer`. A pill marks state; it is never tappable.
+`labelMedium`, padding 9 × 3, fully rounded. Now and Today: `primary` / `onPrimary` (1.7.0; the Now
+pill was tonal before). A pill marks state; it is never tappable.
 
 ### `Notice` (`components/Notice.kt`)
 

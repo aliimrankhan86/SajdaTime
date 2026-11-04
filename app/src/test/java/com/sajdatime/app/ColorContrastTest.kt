@@ -403,7 +403,7 @@ class ColorContrastTest {
     }
 
     /**
-     * The next-prayer row is highlighted with primaryContainer. It must be visibly
+     * The current-prayer row is highlighted with primaryContainer. It must be visibly
      * distinct from the plain surface behind it, otherwise "which prayer is next" is
      * carried by nothing at all for low-vision users.
      */

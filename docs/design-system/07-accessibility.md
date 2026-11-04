@@ -24,7 +24,7 @@ Every state colour has a second signal:
 
 | State | Signals |
 |---|---|
-| Next prayer | Fill, a 3dp leading bar, a "Next" pill (and bold on widgets) |
+| Current prayer (Now) | Fill, a 3dp leading bar, a filled "Now" pill (and bold on widgets) |
 | Now | Fill and a "Now" pill |
 | Qibla aligned | Sentence with a tick, thicker bezel, a buzz |
 | Ticked | Filled circle and a drawn tick |

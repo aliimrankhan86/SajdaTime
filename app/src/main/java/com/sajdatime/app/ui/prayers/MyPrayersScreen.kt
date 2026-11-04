@@ -391,7 +391,7 @@ private fun ButtonRow(t: TrackerState, onPause: () -> Unit, onResume: () -> Unit
                     CtaButton(onClick = onPause, compact = true) {
                         Icon(Icons.Rounded.Pause, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(Space.Related))
-                        Text(stringResource(R.string.action_pause))
+                        Text(stringResource(R.string.settings_tracker_pause))
                     }
                 }
                 CtaButton(onClick = onHistory, compact = true) {

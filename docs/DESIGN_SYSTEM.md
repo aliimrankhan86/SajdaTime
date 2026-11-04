@@ -582,37 +582,26 @@ Label, then name and time on one optical line, then the countdown, then "until i
 > Fajr. A single verified surface is testable; a moving one is not.
 
 **Today list** — one card, 24dp radius, 1dp `outlineVariant` border, rows divided by
-`outlineVariant` hairlines. Four row states:
+`outlineVariant` hairlines. Four row states (1.7.0, Ali 4 Nov 2026: the Next row was removed from this
+screen, the app marks only the current prayer):
 
 | State | Treatment |
 |---|---|
-| next | `primaryContainer` fill · 3dp `primary` bar down the leading edge · "Next" pill in `primary`/`onPrimary` |
-| current | `surfaceContainerHigh` fill · "Now" pill in `secondaryContainer`/`onSecondaryContainer` · **no** leading bar |
+| current (Now) | `primaryContainer` fill · 3dp `primary` bar down the leading edge · "Now" pill filled `primary`/`onPrimary` · bell `onPrimaryContainer` |
 | sunrise | `surfaceContainerLow` fill · `onSurfaceVariant` text · one type step smaller |
+| duha (optional) | dimmed like sunrise, no bell, never current |
 | plain | transparent |
 
-> Three signals for "next", not one. Colour alone answers "which prayer is next" for
-> nobody on a greyscale display or a colour-blind palette, and that question is the entire
-> reason the screen exists.
+> The app marks one row: the prayer that is current now. Two signals (fill and bar) plus the
+> filled "Now" pill, never colour alone. The "Next" pill was removed in 1.7.0 because it added
+> nothing on this screen; the next prayer is already the countdown card at the top.
 >
-> **"Now" is deliberately the quieter of the two pills.** The screen answers two questions
-> — what is coming, and what can I still pray — and they are not equally urgent to a person
-> glancing at it. Filled versus tonal, bar versus no bar: the eye lands on "Next" first and
-> finds "Now" a beat later, which is the order people actually want them in. Two filled
-> pills a row apart were tried on paper and neither reads as the answer; the row stops
-> having a focal point at all.
->
-> The two can never appear on the same row — one time is in the future and the other has
-> passed — so the treatments cannot stack and no tie-break is needed.
->
-> `onSecondaryContainer`/`secondaryContainer` was chosen partly because `ColorContrastTest`
-> already asserts that pair in both themes. A new colour would have meant a new assertion;
-> an existing role meant the guarantee came for free.
+> Nothing is current between sunrise and Dhuhr, and nothing is current before today's Fajr
+> (the engine's answer there is yesterday's Isha, which is not on today's list). In both
+> gaps no row is marked, by design.
 >
 > Sunrise is dimmed because **it is not a prayer**. It is on the list because people need
-> it; it should not compete with the five that are. It also does something invisible: it is
-> the moment Fajr's window shuts, and it is why there is no "Now" pill anywhere on the list
-> between sunrise and Dhuhr. See `PrayerEngine.currentPrayer`.
+> it; it should not compete with the five that are. See `PrayerEngine.currentPrayer`.
 
 **Qibla dial** (restyled in step 6, 24 Oct 2026, the Pillars style in our theme) — a circle with the lift every
 card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is the lifted disc: 0.08 of the radius,
@@ -759,8 +748,11 @@ Code: `ui/settings/SettingsList.kt`.
 ## 5. Choosing a theme
 
 `ThemeChoice` is `SYSTEM` (default), `LIGHT` or `DARK`, persisted in DataStore under
-`theme_choice`, and shown as a sliding three way selector under **Settings → Appearance**
-(three chips until 17 Oct 2026; they read as filters rather than one choice).
+`theme_choice`. Shown under **Settings → Appearance** as a two-choice sliding control (1.7.0, Ali
+4 Nov 2026): **Follow phone** (default) and the opposite of the phone's mode, labelled **Light** on a
+dark phone or **Dark** on a light one. Once the second is picked it keeps its name, so the label always
+matches what the app shows. The earlier three-way bar (17 Oct 2026) and a switch pair (4 Nov, rejected
+as two controls for three states) are history.
 
 `SYSTEM` reads `isSystemInDarkTheme()`, which reports **false** when the OS expresses no
 preference — on older devices, and on any device where the user has never chosen. So

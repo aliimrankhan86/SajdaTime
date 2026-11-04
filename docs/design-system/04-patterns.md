@@ -63,7 +63,7 @@ fixed (a warning that cannot be put away is furniture; one that disappears every
 | One of a short list that applies at once | Chooser dialog with radio rows; each tap saves; Close at the foot |
 | One of a list that ends the task | Radio list that closes on pick (calculation method) |
 | On or off | Switch row; the whole row toggles |
-| One of three, visible result instantly | Sliding selector (theme) |
+| One of two, visible result instantly | Two-choice sliding selector (theme, 1.7.0) |
 | Per item style (Off, Notification, Alarm) | Chips in a flow row, one row per item |
 | A number in a range | Stepper with − and + |
 | A clock time | The Material time picker, vertical layout, text capped at 1.3× |

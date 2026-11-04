@@ -1070,7 +1070,6 @@ internal fun TodayTimeline(
 ) {
     val today = state.today ?: return
     val context = LocalContext.current
-    val next = state.next
     val night = state.night
 
     // The heading and the Timetable button share one line (it was Save as PDF until 1.6.0; the PDF now
@@ -1155,7 +1154,6 @@ internal fun TodayTimeline(
                 icon = slotGlyph(slot),
                 quiet = !slot.isPrayer,
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
-                isNext = next != null && slot == next.slot && !next.isTomorrow,
                 isCurrent = slot == state.current,
                 note = rowNote(
                     ramadan = when {
@@ -1195,7 +1193,7 @@ internal fun TodayTimeline(
                             alarm = (style ?: state.settings.lastAlertStyle[slot]) == AlertStyle.ALARM,
                             blocked = notificationsBlocked,
                             prayerName = stringResource(slot.labelRes),
-                            onNext = next != null && slot == next.slot && !next.isTomorrow,
+                            onNext = slot == state.current,
                             snap = snapBell == slot,
                             onChange = { on -> onBell(slot, on) },
                         )
@@ -1212,8 +1210,8 @@ internal fun TodayTimeline(
             if (index != slots.lastIndex || night != null) {
                 HorizontalDivider(color = scheme.outlineVariant)
             }
-            // 1.7.0: the optional Duha window, one dimmed row after Sunrise. Not a prayer row: no bell, never Next
-            // or Now, no alert, not in the PDF, widgets or watch. Off by default, Sunni only (the ViewModel decides).
+            // 1.7.0: the optional Duha window, one dimmed row after Sunrise. Not a prayer row: no bell, never Now
+            // (the Duha row has no current state), no alert, not in the PDF, widgets or watch. Off by default, Sunni only (the ViewModel decides).
             if (slot == PrayerSlot.SUNRISE && duha != null) {
                 val start = TimeFormat.clock(context, duha.start)
                 val end = TimeFormat.clock(context, duha.end)
@@ -1222,7 +1220,6 @@ internal fun TodayTimeline(
                     icon = painterResource(R.drawable.sky_glyph_day),
                     quiet = true,
                     time = start,
-                    isNext = false,
                     isCurrent = false,
                     note = stringResource(R.string.duha_until, end.replace(' ', '\u00A0')),
                     description = stringResource(R.string.duha_row_a11y, start, end),
@@ -1232,7 +1229,7 @@ internal fun TodayTimeline(
             }
         }
         // Islamic midnight and the last third of the night, one dimmed row after Isha (1.6.0). Not a prayer:
-        // no bell, never Next or Now, and no word that calls it a prayer time or a ruling.
+        // no bell, never Now, and no word that calls it a prayer time or a ruling.
         if (night != null) {
             val midnight = TimeFormat.clock(context, night.midnight)
             val lastThird = TimeFormat.clock(context, night.lastThirdStart)
@@ -1241,7 +1238,6 @@ internal fun TodayTimeline(
                 icon = rememberVectorPainter(Icons.Outlined.DarkMode),
                 quiet = true,
                 time = midnight,
-                isNext = false,
                 isCurrent = false,
                 note = stringResource(R.string.night_last_third_from, lastThird.replace(' ', '\u00A0')),
                 description = stringResource(R.string.night_row_a11y, midnight, lastThird),
@@ -1308,21 +1304,18 @@ private fun windowTargetLabel(target: WindowTarget): String = stringResource(
 /**
  * One row of the day.
  *
- * Four states, and each is carried by more than colour, because this screen answers two
+ * Three states, and each is carried by more than colour, because this screen answers two
  * questions — what is coming, and what can I still pray — and a colour wash alone answers
  * neither for anyone on a greyscale display or a colour-blind palette:
  *
- *  - next    — highlighted surface, a 3dp accent bar down the leading edge, and a "Next"
- *              pill in words
- *  - current — a quieter lift off the card and a "Now" pill, deliberately softer than
- *              next: two loud rows next to each other and neither reads as the answer
+ *  - current — highlighted surface, a 3dp accent bar down the leading edge, and a "Now"
+ *              pill in words. 1.7.0: "Next" no longer marks a row on this screen (Ali, 4 Nov
+ *              2026: it added nothing); the countdown at the top already says what is next.
  *  - sunrise, and the night row (Midnight, 1.6.0) — dimmed and set in smaller type, because they are not
  *              prayers and should not compete with the five that are
  *  - the rest — plain
  *
- * `isNext` and `isCurrent` can never both be true for the same row — one time is in the
- * future and the other has passed — so the two treatments cannot stack and the `when`
- * chains below need no tie-break.
+ * `isCurrent` is the only highlight on this screen, so the `when` chains below need no tie-break.
  */
 @Composable
 private fun PrayerRow(
@@ -1331,7 +1324,6 @@ private fun PrayerRow(
     /** Not a prayer (sunrise, midnight): smaller, dimmed, no bell. */
     quiet: Boolean,
     time: String,
-    isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
     /** What a screen reader says for the whole row, when it is not the label and time read in turn. */
@@ -1343,57 +1335,42 @@ private fun PrayerRow(
     trailing: @Composable () -> Unit,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val dimmed = quiet && !isNext
+    val dimmed = quiet && !isCurrent
 
     val background = when {
-        isNext -> scheme.primaryContainer
-        isCurrent -> scheme.surfaceContainerHigh
+        isCurrent -> scheme.primaryContainer
         dimmed -> scheme.surfaceContainerLow
         else -> Color.Transparent
     }
     val contentColor = when {
-        isNext -> scheme.onSurface
+        isCurrent -> scheme.onSurface
         dimmed -> scheme.onSurfaceVariant
         else -> scheme.onSurface
     }
-    val iconColor = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant
+    val iconColor = if (isCurrent) scheme.onPrimaryContainer else scheme.onSurfaceVariant
     val accent = scheme.primary
     val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
     // The fill and the bar move to the next row over Motion.standard when a prayer passes (motion row 8,
     // step 5), read only inside drawBehind so nothing recomposes per frame. On open they start at the target.
     val fill by animateColorAsState(background, Motion.standard(), label = "rowFill")
-    val bar by animateColorAsState(if (isNext) accent else Color.Transparent, Motion.standard(), label = "rowBar")
+    val bar by animateColorAsState(if (isCurrent) accent else Color.Transparent, Motion.standard(), label = "rowBar")
 
     // At 1.5 text and above the pill and time drop under the name, as step 2's dates rows do: at 320dp and 2.0
     // the bell's 48dp squeezed the name until "Fajr" broke one letter a line (STEP-3-DESIGN §7). The bell
     // stays at the end either way. Below 1.5 the row is unchanged.
     val stacked = LocalDensity.current.fontScale >= 1.5f
     val markersAndTime: @Composable () -> Unit = {
-        if (isNext) {
-            // Not colour alone: the next prayer also carries a text marker.
-            Text(
-                text = stringResource(R.string.home_next_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onPrimary,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(accent)
-                    .padding(horizontal = 9.dp, vertical = 3.dp),
-            )
-            Spacer(Modifier.width(10.dp))
-        }
         if (isCurrent) {
-            // Tonal rather than filled, so it reads as a note beside the loud "Next" pill
-            // instead of arguing with it. onSecondaryContainer/secondaryContainer is an
-            // already-asserted pair in ColorContrastTest, in both themes.
+            // 1.7.0: filled with the accent, as the Next pill was, because the Now pill is now the
+            // only marker on this screen (Ali, 4 Nov 2026). onPrimary on primary is the standard pair.
             val nowLabel = stringResource(R.string.home_now_marker_a11y)
             Text(
                 text = stringResource(R.string.home_now_marker),
                 style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSecondaryContainer,
+                color = scheme.onPrimary,
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(scheme.secondaryContainer)
+                    .background(scheme.primary)
                     .padding(horizontal = 9.dp, vertical = 3.dp)
                     // "Now" alone is meaningless read aloud in a list of times.
                     .semantics { contentDescription = nowLabel },
@@ -1412,7 +1389,7 @@ private fun PrayerRow(
         modifier = Modifier
             .fillMaxWidth()
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
+            // One stop for a screen reader: "Fajr, current prayer, 5:37 am", not three swipes (research D1).
             .semantics(mergeDescendants = true) { if (description != null) contentDescription = description }
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this
@@ -1463,22 +1440,22 @@ private fun PrayerRow(
                 Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
             }
             // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
-            // a pill beside the name: the row already holds the name, a Next or Now marker and the
+            // a pill beside the name: the row already holds the name, a Now marker and the
             // time, and a third item squeezes them at 360dp.
             if (note != null) {
                 Text(
                     text = note,
                     style = MaterialTheme.typography.labelMedium,
                     // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
-                    // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
-                    color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                    // highlighted (Now) row, onSurfaceVariant on the plain rows.
+                    color = if (isCurrent) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                 )
             }
             if (warning != null) {
                 Text(
                     text = warning,
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
-                    // onTertiaryContainer is the accent family's own text: 7.39:1 on the Next highlight (Fable, D2).
+                    // onTertiaryContainer is the accent family's own text: 7.39:1 on the highlighted row (Fable, D2).
                     color = scheme.onTertiaryContainer,
                 )
             }
@@ -1487,7 +1464,7 @@ private fun PrayerRow(
             }
         }
         if (!stacked) {
-            // A gap so a long jama'ah note never touches the Next or Now pill (Fable, step 7 pictures).
+            // A gap so a long jama'ah note never touches the Now pill (Fable, step 7 pictures).
             // The note wraps one line earlier at 360dp instead, which STEP-7-DESIGN §3 allows.
             Spacer(Modifier.width(8.dp))
             markersAndTime()
