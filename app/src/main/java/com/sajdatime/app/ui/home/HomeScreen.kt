@@ -69,6 +69,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -1396,7 +1398,10 @@ private fun PrayerRow(
             // gets the same pixels without asking the layout to measure twice.
             .drawBehind {
                 drawRect(fill)
-                drawRect(bar, size = Size(barWidth, size.height))
+                // The bar is on the leading edge: the left in left to right, the right in right to left (4 Nov 2026;
+                // Codex's Arabic and Urdu captures showed it stuck on the left).
+                val barX = if (layoutDirection == LayoutDirection.Rtl) size.width - barWidth else 0f
+                drawRect(bar, topLeft = Offset(barX, 0f), size = Size(barWidth, size.height))
             }
             // Vertical padding plus a floor, not a fixed height: at a large system font
             // size the row has to grow rather than crop the prayer name. 50, not 56, since
