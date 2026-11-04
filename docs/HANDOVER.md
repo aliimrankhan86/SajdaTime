@@ -6092,10 +6092,14 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 
 ### 📍 STATE OF PLAY, 4 Nov 2026 (late): Times highlights Now only; Settings theme is Follow phone or the opposite (read this first)
 
+**Store prep, 4 Nov 2026.** Ali approved the English. Commit `c838834` records it unchanged with eight translations. The
+ledger has 16 new blocks awaiting separate Claude review and remains unstamped. The 24 phone pictures are ready for Ali's
+approval. See [the store report](store/CODEX-REPORT-1.7.0.md) for the pictures, checks and open review items. Bengali uses the
+English set. Nothing was sent to Google Play.
+
 **Checkpoint, 4 Nov 2026 (later): branch claude/1-7-0 at cc80da9, pushed.** Full gate passed on the committed code
 (clean test, bundleRelease, wear bundleRelease, lint; unit tests app 349, core 252, wear 27, 0 failures). Still
-not done: device suite, 1.7.0 store listing (English draft needs Ali's approval before translation), store
-pictures, the Quba permission email (drafted, not sent), the 3 Nov decisions A, B, F, the GitHub md move to
+open at that checkpoint: device suite, the Quba permission email (drafted, not sent), the 3 Nov decisions A, B, F, the GitHub md move to
 Google Drive. The next session starts from private/plans/2026-11-next-release/START-PROMPT-7.md.
 
 **Ali's feedback on the Redmi, 4 Nov 2026, built and checked on the phone (not yet committed when this was written; see git log for the commit).**
@@ -6104,7 +6108,7 @@ Google Drive. The next session starts from private/plans/2026-11-next-release/ST
 - **Settings, Theme:** one two-button bar. "Follow phone" (the default) and the opposite of the phone's mode: "Light" when the phone is dark, "Dark" when it is light. Once the second is picked it keeps that name. Rejected on the way: a Follow phone switch plus a Dark switch (two controls for three states; Ali asked why). Light is only reachable from the phone's own setting or from the second button on a dark phone. Mapping: `SettingsList.kt` `ThemeSelector`; `isSystemInDarkTheme()` decides the label. Checked on the Redmi with night mode on and off; the tap path was tested earlier with Dark (before the label change).
 - **Reviewer:** an Opus review of the earlier version found the bell on the Now row still tinted as Next (fixed: `onNext = slot == state.current`), and stale comments (fixed). It also flagged that the switch row broke the Settings row form (now superseded by the bar) and that the design-system docs (`docs/design-system/03-components.md` rows, `04-patterns.md`, `07-accessibility.md`, `09-ios-mapping.md`, `DESIGN_SYSTEM.md` section 5 "sliding three way selector") still describe the old look. Those docs are NOT yet updated: a known gap.
 - **Verified:** `./gradlew test` passed (exit 0, no failures) after the Now pill and bell changes; `compileDebugKotlin` passes; not run: lint, `bundleRelease`, the device suite, light mode 2x text, Urdu, Arabic, TalkBack.
-- **Not done (release prep still open):** the 1.7.0 store listing English draft (Ali approves before translation), the store pictures, `release-1.7.0.sh`, the design-system doc updates above, and a new full gate. Release day only when Ali says so.
+- **Release prep still open:** separate language review, Ali’s approval of the pictures, the design-system doc updates above, and the release day checks. Release day only when Ali says so.
 
 ### 📍 STATE OF PLAY, 3 Nov 2026 (evening): 1.7.0 IS BUILT ON `claude/1-7-0` AND KEPT READY TO RELEASE (read this first)
 
