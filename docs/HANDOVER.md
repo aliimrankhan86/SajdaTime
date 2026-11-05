@@ -6128,6 +6128,12 @@ ellipsizes before the time is cut. Known and left: the Today default on Android 
 no-location message in a slot under 80dp is not tested; the evidence tests always set London. The watch was looked at on the emulator (current prayer
 marked, nothing behind the bezel, both round sizes, 1.0x and 1.3x).
 
+**release-1.7.0.sh on `6b6bf20` (5 Nov 2026, early morning): every line PASS or TAKEN, no FAIL.** Gate and lint green (349 app, 255 core, 27 wear);
+phone bundle 11 / 1.7.0 and watch bundle 1003 / 1.7.0 signed by Ali's key, permissions unchanged, phone bundle 10,077,452 bytes; device suite 52 of 52;
+widgets-font-2 6 of 6; widgets-fit-every-slot and widgets-entry-heights pass; Ramadan, PDF, timetable checks pass. Skipped on purpose: store pictures
+(approved already), a real phone. The signed bundles are in the temporary, gitignored `SajdaTime-1.7.0/` folder for upload day; delete it after
+uploading.
+
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
 `RELEASE-1.7.0.md` (the 5 Nov result is below if it was run); (2) Ali approves the one-line watch note drafted in
 `docs/store/LISTING.md`, Claude translates it and stamps the ledger; (3) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after

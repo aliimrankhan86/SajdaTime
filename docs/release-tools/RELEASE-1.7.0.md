@@ -16,8 +16,8 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 
 ## Still to do before release day (Claude)
 
-1. Run `bash docs/release-tools/release-1.7.0.sh` on the final committed code and paste its `summary.txt` here: every line PASS or TAKEN. It has NOT been run for 1.7.0 yet.
-2. Run the watch once on the `sajdawear` emulator (`tools/wear-verify.sh`) and look at the Times list: the current prayer is marked, nothing before Fajr. Record it in HANDOVER.
+1. DONE 5 Nov 2026 on `6b6bf20`: every line PASS or TAKEN, no FAIL (HANDOVER section 11, first block). Re-run it if any code changes before release day.
+2. DONE 5 Nov 2026: `tools/wear-verify.sh` on both round sizes at 1.0x and 1.3x, the current prayer is marked and nothing is behind the bezel.
 3. Watch "What's new" for the Wear track: one English line is drafted in `docs/store/LISTING.md` ("1.7.0 watch note, DRAFT"); Ali approves it, then Claude translates it into the eight languages and stamps the ledger.
 4. Retake the one watch Times picture (`docs/store/upload/wear-os/w1-times.png`, still the 1.5.0 one) so it matches the app.
 
