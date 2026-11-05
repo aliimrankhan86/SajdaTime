@@ -6144,6 +6144,7 @@ widgets-font-2 6 of 6; widgets-fit-every-slot and widgets-entry-heights pass; Ra
 uploading.
 
 **Ali's standing instruction (5 Nov 2026):** when the weekly limit refreshes, a new session does everything remaining plus his pending confirmations and finishes the release. Right after the release: clean up so only ONE folder remains (the latest codebase on the last merged branch), move what is worth keeping to Drive (markdown only), delete the rest (including `SajdaTime-1.7.0/` once he has uploaded). Never delete before he has uploaded the bundles.
+He added: keep ONLY what belongs in the latest codebase, nothing "just in case"; after release keep the codebase accurate and ALL markdown files in Drive. Caveat for that session: `CLAUDE.md` stays in the repo as a short pointer (auto-loaded), and any file a test, the website or the store reads stays too; check before moving each `.md`.
 
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
 `RELEASE-1.7.0.md` (done 5 Nov: all PASS, see above); (2) Ali approves the one-line watch note drafted in
