@@ -79,12 +79,13 @@ internal object WidgetRenderer {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         val scale = context.resources.configuration.fontScale
         // Measured (every_slot_height_fits, 4 Nov 2026) needs of the full card (it is sized to the widest of the countdown and the time): 141.3 and 142.9 (en 1.1, 1.15), 151.2 (en 1.5), 167.6 (en 2.0),
-        // 158.9 (ur 1.5), 179 (ur, ar 2.0), 170.3 (bn 2.0), each plus about 4dp.
+        // 158.9 (ur 1.5), 179 (ur, ar 2.0), 170.3 (bn 2.0), each plus about 4dp; Arabic with exact alarms off (the clock time in the big place,
+        // its letters taller than digits) needs 158.9 at 1.0x, 168 at 1.3x, 175.6 at 1.5x, 195.8 at 2.0x (every_slot_height_fits, 5 Nov 2026).
         return when {
-            scale >= 1.6f -> if (tall) 183f else 172f
-            scale >= 1.4f -> if (tall) 163f else 156f
-            scale >= 1.1f -> if (tall) 156f else 148f
-            else -> if (tall) 150f else 140f
+            scale >= 1.6f -> if (tall) 202f else 172f
+            scale >= 1.4f -> if (tall) 181f else 156f
+            scale >= 1.1f -> if (tall) 172f else 148f
+            else -> if (tall) 164f else 140f
         }
     }
 
@@ -115,7 +116,9 @@ internal object WidgetRenderer {
         val metrics = context.resources.displayMetrics
         val line = next.slot.label(context) + "  " + TimeFormat.clock(context, next.at)
         val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.DEFAULT_BOLD }
-        val room = (widthDp + 20f - 16f - 22f - 12f) * metrics.density // the widest narrow slot (180), minus its padding, the mark and gaps
+        val room = (widthDp + 20f - 16f - 22f - 12f) * metrics.density // the narrowest slot, minus its padding, the mark and gaps
+        // Floor 10sp, below the 12sp widget floor on purpose and only here: at 1.5x text and more a 40dp slot (a 70n-30 launcher's one row) cannot
+        // hold more, and the name ellipsizes before the time is cut (HANDOVER, 5 Nov 2026).
         var sp = minOf(NAME_SP, capSp).coerceAtLeast(10f)
         while (sp > 10f) {
             paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, metrics)
@@ -131,15 +134,16 @@ internal object WidgetRenderer {
     /**
      * Height from which the SHORT small card (town chip, no day bars) is used; below it the tiny one. Measured needs of the short card
      * (padding 6dp, or 2dp in tall scripts and from 1.3x): 96.8 (en 1.0), 100.2 (1.15), 96.8 (1.3), 97.9 (ur 1.3), 105.1 (ur 1.5),
-     * 119.2 (en 2.0), each plus about 3dp; re-checked by the evidence run.
+     * 119.2 (en 2.0), each plus about 3dp; Arabic with exact alarms off (letters taller than digits in the big time) needs 109 at 1.3x, 116.2
+     * at 1.5x and 134.9 at 2.0x (every_slot_height_fits, 5 Nov 2026).
      */
     private fun nextShortHeight(context: Context): Float {
         val scale = context.resources.configuration.fontScale
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         return when {
-            scale >= 1.6f -> 124f
-            scale >= 1.4f -> 110f
-            scale >= 1.1f -> if (tall) 106f else 104f
+            scale >= 1.6f -> if (tall) 140f else 124f
+            scale >= 1.4f -> if (tall) 121f else 110f
+            scale >= 1.1f -> if (tall) 112f else 104f
             else -> if (tall) 102f else 100f
         }
     }
@@ -167,7 +171,7 @@ internal object WidgetRenderer {
         return interpolate(context.resources.configuration.fontScale, if (tall) LARGE_TODAY_TALL_NEED else LARGE_TODAY_NEED) + 5f
     }
 
-    /** Height the wide Next card is offered from: measured need plus 5dp. Only offered below 1.3x text (see [forText]). */
+    /** Height the wide Next card is offered from: measured need plus 5dp. Only offered below 1.3x text (see [nextForText]). */
     internal fun wideNextHeight(context: Context): Float {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
         return interpolate(context.resources.configuration.fontScale, if (tall) WIDE_NEXT_TALL_NEED else WIDE_NEXT_NEED) + 5f
@@ -176,7 +180,7 @@ internal object WidgetRenderer {
     // Measured 4 Nov 2026 (release_entry_needs: every language, six times of day, Ramadan; the maximum of each text size). Between the
     // measured sizes the need is interpolated, so an in-between text size (an OEM step) is never left short. English; Urdu and Arabic together.
     private val LARGE_TODAY_NEED = listOf(1.0f to 401f, 1.1f to 416f, 1.15f to 425.5f, 1.25f to 438.1f, 1.3f to 447.2f, 1.5f to 477.3f, 1.6f to 492f)
-    private val LARGE_TODAY_TALL_NEED = listOf(1.0f to 417.5f, 1.1f to 438.5f, 1.15f to 451.4f, 1.25f to 467.8f, 1.3f to 478.5f, 1.5f to 513.1f, 1.6f to 530f)
+    private val LARGE_TODAY_TALL_NEED = listOf(1.0f to 434f, 1.1f to 452f, 1.15f to 462f, 1.25f to 484f, 1.3f to 492f, 1.5f to 534f, 1.6f to 552f)
     private val WIDE_NEXT_NEED = listOf(1.0f to 214.1f, 1.1f to 225.5f, 1.15f to 230.1f, 1.25f to 241.5f, 1.28f to 248.4f, 1.3f to 252f)
     private val WIDE_NEXT_TALL_NEED = listOf(1.0f to 214.9f, 1.1f to 221f, 1.15f to 227.8f, 1.25f to 243.8f, 1.28f to 250.7f, 1.3f to 255f)
 
@@ -235,12 +239,9 @@ internal object WidgetRenderer {
     }
 
     /**
-     * From this text size the second layout of each widget stops showing the whole day (rendered at 1.3
-     * and 2.0 on 18 Oct 2026): the wide Next layout's times no longer fit beside the countdown, and the
-     * large Today card leaves room for three of the six rows. So each widget keeps its first layout at
-     * every size: the Next widget its countdown, the Today widget all six times. The font
-     * scale is read at each redraw, so a change of it reaches the widget at the next one (the next prayer,
-     * midnight, or opening the app), not at once. Not seen on a device.
+     * From this text size (1.3x) the wide Next card is dropped (its rows no longer fit beside the countdown: [nextForText]); every small step
+     * stays. The large Today card is still offered up to [LARGE_TEXT_NO_CARD] when the slot holds it, with the compact list as the fallback.
+     * The font scale is read at each redraw, so a change reaches the widget at the next one (the next prayer, midnight, or opening the app).
      */
     private const val LARGE_TEXT = 1.3f
 
@@ -340,7 +341,7 @@ internal object WidgetRenderer {
         applyDirection(context, views)
         applyTap(context, views)
         // The short small layout (from nextShortHeight, about 100dp): no day bars, a 26 instead of 36 countdown and 6dp (2dp in tall
-        // scripts and from 1.3x) top and bottom padding instead of 12, so it needs 96.8 to 105dp (measured) and the town chip is not cut. Padding is written on EVERY render: both entries share one layout, so the launcher reapplies actions onto
+        // scripts and from 1.3x) top and bottom padding instead of 12, so it needs 96.8 to 105dp (measured) and the town chip is not cut. Padding is written on EVERY render: the entries share one layout, so the launcher reapplies actions onto
         // the view it already has and a value left from the other entry would stay.
         val tiny = !wide && size.height < nextShortHeight(context)
         val short = !wide && !tiny && size.height < nextBarsHeight(context)
@@ -400,11 +401,13 @@ internal object WidgetRenderer {
         // The tiny line's size: the largest up to 18sp whose drawn height stays about 26dp (22 in the tall scripts), so the line keeps the same
         // drawn size from 1.4x text instead of shrinking below the 1.0x one; then narrowed until "name time" fits the width.
         val scaleNow = context.resources.configuration.fontScale
-        val tinySp = if (tiny) tinyLineSp(context, size.width, next, (if (tallScript) 22f else 26f) / scaleNow) else NAME_SP
+        val tinySp = if (tiny) tinyLineSp(context, size.width, next, (if (tallScript) 20f else 26f) / scaleNow) else NAME_SP
         views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, if (tiny) tinySp else TIME_SP)
         if (tiny) views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, tinySp)
         // The line sits in the middle of a slot taller than itself (a Samsung row is 79dp); every other form starts at the top.
         views.setInt(R.id.widget_root, "setGravity", if (tiny) Gravity.CENTER_VERTICAL else (Gravity.TOP or Gravity.START))
+        // The weighted spacer would take all the spare height and leave nothing to centre (Opus re-review): gone in the one-line form.
+        views.setViewVisibility(R.id.widget_spacer, if (tiny) View.GONE else View.VISIBLE)
         if (tiny) {
             views.setViewVisibility(R.id.widget_time, View.VISIBLE)
             views.setViewVisibility(R.id.widget_countdown, View.GONE)
@@ -413,7 +416,8 @@ internal object WidgetRenderer {
             // worse mistake. The time comes first, so it is the end of the line that an ellipsis takes.
             val extra = listOfNotNull(
                 if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
-                if (state.nextIsApproximate) context.getString(R.string.notif_approximate) else null,
+                if (state.nextIsApproximate) context.getString(R.string.notif_approximate)
+                else state.ramadanWordFor(next.slot, state.ramadanOnNextDay)?.let { wordText(context, it) },
             )
             val timeWithContext = android.text.SpannableStringBuilder(timeText(TimeFormat.clock(context, next.at), false))
             if (extra.isNotEmpty()) timeWithContext.append(" · ").append(extra.joinToString(" · "))

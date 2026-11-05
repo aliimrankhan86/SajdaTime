@@ -10,7 +10,7 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 
 ## Done (4 Nov 2026)
 
-- Gate `clean test lint :app:bundleRelease :wear:bundleRelease`: 349 app, 255 core, 27 wear tests, 0 failures. Device suite 49 of 49 on the emulator at `26aae84`; after the widget fixes of 4 Nov night the device widget tests pass at 1.0, 1.3 and 2.0 text and `release-1.7.0.sh` is to be re-run in full.
+- Gate `clean test lint :app:bundleRelease :wear:bundleRelease`: 349 app, 255 core, 27 wear tests, 0 failures. Device suite 49 of 49 at `26aae84`; after the widget fixes of 4 to 5 Nov the six device widget tests pass at 1.0, 1.3 and 2.0 text and the every-slot proof passes in full. `release-1.7.0.sh` is re-run on the final commit (result recorded in HANDOVER section 11).
 - Store listing 1.7.0 (English and eight locales) approved and stamped in the translation ledger; phone pictures approved; Redmi Note 13 Pro checks done.
 - Widget entry heights measured and set (HANDOVER section 11).
 

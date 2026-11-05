@@ -6112,24 +6112,28 @@ The "nothing is current before Fajr" rule is now one function in `:core` (`curre
 The release script's own widgets-font-2 FAIL was the same family (the device test host had no size, so it got the smallest entry): fixed.
 Fable's findings (the checklist, stale state blocks, agent briefs pointing at deleted paths) are fixed as listed in the commit messages.
 
-**Second Opus re-review, 5 Nov 2026, and where it stopped (Ali: "whatever test you have done is enough").** Opus found: the full Next card was still cut
-when exact alarms are off (the big number was sized to the clock time, not the countdown); the device tests were silently drawing the one-line card
-(host padding left 164dp under the 170dp entry width), so their Next checks proved little; the one-line card shrank at larger text and hid the
-time before the name; and docs/comments overclaims. Fixed in the next commit: the big number now fits the widest of countdown and time; entry widths
-160 and 226dp; the one-line card keeps a constant drawn size, narrows to fit "name time", carries "Tomorrow" and the approximate marker, and centres
-vertically; Android 11 and below get their own provider files (Next 110dp, Today 290dp); device tests host at 200dp; every-slot and entry-height
-proofs are steps of `release-1.7.0.sh`; stale comments, RTL claim and doc counts corrected. **NOT verified after these last fixes:** the extended
-every-slot proof (now with exact alarms off, 1.25x) was stopped before it finished, the release script was not re-run, and Opus did not re-review them.
-Gate (unit tests, lint, both bundles) is green: 349 app, 255 core, 27 wear. The watch was looked at on the emulator: the current prayer is marked and
-nothing is behind the bezel at both round sizes at 1.0x and 1.3x. Run the two skipped checks before releasing.
+**Third review round, 5 Nov 2026 (Opus twice, Fable once) and where it ended.** The reviews found, and these are fixed and proven: the countdown cut
+on the wide Next card; the Next card too tall for a one-row launcher (54 to 79dp on Samsung and Xiaomi); the two-row card cutting its day bars; the
+compact Today list cut between 240 and 286dp; the full card cut with exact alarms off (big number sized to the clock time); the device tests silently
+drawing the one-line card (host padding); the one-line card not centred (a weighted spacer took the spare height), shrinking at larger text and
+cutting the time before the name; Arabic needing taller steps when exact alarms are off (its letters are taller than digits); and docs and comments that
+overclaimed. Final design: Next prayer steps TINY (name and time, one line, centred, carries Tomorrow, the approximate marker and the Ramadan word) /
+SHORT (town chip) / FULL (day bars) / WIDE; compact Today steps of 2 to 6 rows from measured needs; entry widths 160 and 226dp (under the minimum
+widths, so a host with padding never falls to the smallest card); Android 11 and below get their own provider files (Next 110dp, Today 290dp) and
+keep the short card and the six-row list. **Proof, run to the end on the final code:** `WidgetRenderEvidenceTest#every_slot_height_fits` (every Next
+slot 40 to 260dp and Today 240 to 560dp, text sizes 1.0 to 2.0 in seven steps, English, Urdu, Arabic and Bengali, midday and after Isha, exact alarms on
+and off) passes; `release_entry_needs` asserts the large Today and wide Next heights; the six device widget tests pass at 1.0, 1.3 and 2.0 text. One
+deliberate exception: the one-line card goes below the 12sp widget floor (to 10sp) from 1.5x text, because a 40dp slot cannot hold more; the name
+ellipsizes before the time is cut. Known and left: the Today default on Android 11 and below is 290dp (180dp in 1.6.0), Ali's 4 Nov choice; the
+no-location message in a slot under 80dp is not tested; the evidence tests always set London. The watch was looked at on the emulator (current prayer
+marked, nothing behind the bezel, both round sizes, 1.0x and 1.3x).
 
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
-`RELEASE-1.7.0.md`; (2) run the watch on the `sajdawear` emulator and look at the Times list; (3) Ali approves the one-line watch note drafted in
-`docs/store/LISTING.md`, Claude translates it and stamps the ledger; (4) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after
+`RELEASE-1.7.0.md` (the 5 Nov result is below if it was run); (2) Ali approves the one-line watch note drafted in
+`docs/store/LISTING.md`, Claude translates it and stamps the ledger; (3) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after
 1.6.0 is live, or replace it? (recommended: wait); whether the large Today widget card may lose some row padding so it shows on a plain 4 by 4.
 
-**Checks that were not done:** a picture of Bengali, Urdu dark and Arabic 1.3x widgets on a launcher (the measurement run covers them in numbers);
-the release script end to end; the signed bundle size.
+**Checks that were not done:** a real phone (Redmi, Samsung); Bengali, Urdu dark and Arabic 1.3x pictures on a launcher (the every-slot proof covers them in numbers); a pre-Android-12 device.
 
 **Everything below this block is history** (the widget "parked" block, the 3 Nov block and older): read it for reasoning, not as a task list.
 Its statements "NOT committed", "the watch stays 1.5.0", "private/ is deleted on release day", "start from private/plans/..." are superseded here.

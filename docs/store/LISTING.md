@@ -1464,4 +1464,4 @@ Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
 
 ## 1.7.0 watch note, DRAFT 4 Nov 2026 (for the Wear OS release's What's new; Ali approves, then Claude translates into the eight languages and stamps the ledger)
 
-The watch now speaks Bengali and marks the prayer that is current, like the phone.
+The watch is now in Bengali and marks the prayer that is current, like the phone.
