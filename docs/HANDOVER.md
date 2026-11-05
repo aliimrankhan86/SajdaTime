@@ -6135,6 +6135,8 @@ exact alarms off (same revert). Also: the no-location path now writes the spacer
 exception to the 12sp widget floor that is NOT yet in `docs/design-system/tokens/typography.json` (Ali to confirm). Because the last two edits
 came after the green release script above, the script is re-run once more on the final commit; its result replaces the line above if it differs.
 
+**release-1.7.0.sh on the FINAL commit `e9b89c6` (5 Nov 2026, 02:16): every line PASS or TAKEN, 0 FAIL.** Gate green (349 app, 255 core, 27 wear), lint clean, device suite 53 of 53, bundles 11 and 1003 signed, phone bundle 10,080,761 bytes. The line below is the earlier run on `6b6bf20`.
+
 **release-1.7.0.sh on `6b6bf20` (5 Nov 2026, early morning): every line PASS or TAKEN, no FAIL.** Gate and lint green (349 app, 255 core, 27 wear);
 phone bundle 11 / 1.7.0 and watch bundle 1003 / 1.7.0 signed by Ali's key, permissions unchanged, phone bundle 10,077,452 bytes; device suite 52 of 52;
 widgets-font-2 6 of 6; widgets-fit-every-slot and widgets-entry-heights pass; Ramadan, PDF, timetable checks pass. Skipped on purpose: store pictures
