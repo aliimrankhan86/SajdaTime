@@ -8,6 +8,8 @@ File auto-loaded. Deliberately short. **Full handover: [`docs/HANDOVER.md`](docs
 
 > **Planning files live in Google Drive, not here** (Ali, 4 Nov 2026: "keep one source of truth"). Folder "SajdaTime (private)" (id `1zRnPLe6oeGYssAUolFEfpxjwdEGhXbvP`; its `00 READ ME FIRST` says what is where): plans and prompts, research, screenshots, old planning moved from GitHub, signed bundles. There is no `private/` folder on the Mac any more and `docs/plans` is gone from the repo. New plans, research and evidence go to Drive (Claude's job to keep it current); the repo keeps only what builds, tests, the store or the website needs.
 
+> **Standing rule: keep it clean, always** (Ali, 5 Nov 2026). Applies to the whole SajdaTime project and every extension of it (watch, widgets, any later module or iPhone work). (1) **Codebase and Mac:** one folder, the latest codebase; delete unnecessary folders, worktrees, stale branches, build outputs and leftovers as you go, never "just in case"; only what builds, tests, the store or the website needs stays. (2) **Google Drive notes:** keep only what is necessary, organised in the numbered folders, all markdown (design system, philosophy, handover, plans, research) filed in the right one, duplicates and stale versions trashed. Never delete before Ali has uploaded release bundles. Check before deleting that nothing reads the file.
+
 ---
 
 ## ⚠️ First thing, every session — before you ask him anything
