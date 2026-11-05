@@ -268,6 +268,11 @@ if [ -n "$EMU_SERIAL" ]; then
     pull_renders widgets-ramadan
     "$ADB" shell settings put system font_scale 2.0 >/dev/null 2>&1
     instrument widgets-font-2 -e class com.sajdatime.app.WidgetDeviceTest
+    "$ADB" shell settings put system font_scale 1.0 >/dev/null 2>&1
+    # The proof that no widget slot is cut: every Next height 40 to 260dp and Today 240 to 560dp, six text sizes, four languages, exact alarms
+    # on and off. Takes about ten minutes. (WidgetRenderEvidenceTest is skipped in the normal suite unless widgetEvidence is true.)
+    instrument widgets-fit-every-slot -e widgetEvidence true -e class com.sajdatime.app.WidgetRenderEvidenceTest#every_slot_height_fits
+    instrument widgets-entry-heights -e widgetEvidence true -e class com.sajdatime.app.WidgetRenderEvidenceTest#release_entry_needs
     pull_renders widgets-font-2
     "$ADB" shell settings put system font_scale 1.0 >/dev/null 2>&1
     instrument ramadan-pdf -e class com.sajdatime.app.RamadanPdfDeviceTest

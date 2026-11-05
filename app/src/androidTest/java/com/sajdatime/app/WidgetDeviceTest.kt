@@ -108,7 +108,7 @@ class WidgetDeviceTest {
         // made the theme test time out waiting for a Dhuhr row that a 2 row card does not show).
         val size = when (provider) {
             TodayWidgetProvider::class.java -> SizeF(270f, 320f) // the host's default padding takes 8dp a side
-            NextPrayerWidgetProvider::class.java -> SizeF(200f, 125f)
+            NextPrayerWidgetProvider::class.java -> SizeF(200f, 126f)
             else -> SizeF(300f, 64f)
         }
         layoutAt(view!!, size.width.toInt(), size.height.toInt())
@@ -269,7 +269,7 @@ class WidgetDeviceTest {
     fun the_next_prayer_widget_shows_the_next_prayer_its_time_and_the_right_context_line() {
         val (_, view) = bindOrFail(NextPrayerWidgetProvider::class.java)
         waitFor("the Next widget's first draw") { view.textOf("widget_name")?.text?.isNotEmpty() == true }
-        save("widget-next-${tag()}", layoutAt(view, 180, 132))
+        save("widget-next-${tag()}", layoutAt(view, 200, 148))
 
         val (state, _) = stateNow()
         val next = state.next!!
@@ -334,7 +334,7 @@ class WidgetDeviceTest {
                 waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected }
                 val tag = "theme-${choice.name.lowercase()}"
                 save("widget-today-$tag", layoutAt(today, 250, 290))
-                save("widget-next-$tag", layoutAt(next, 180, 110))
+                save("widget-next-$tag", layoutAt(next, 200, 126))
             }
         } finally {
             runBlocking {

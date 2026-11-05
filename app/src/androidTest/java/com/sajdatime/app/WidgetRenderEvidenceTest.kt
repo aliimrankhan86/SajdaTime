@@ -489,7 +489,7 @@ class WidgetRenderEvidenceTest {
                 // The entry heights must hold what the card needs at this text size (the thresholds are interpolated, so any size is covered).
                 val limit = if (name == "today") WidgetRenderer.largeTodayHeight(ctx) else WidgetRenderer.wideNextHeight(ctx)
                 val offered = scale < (if (name == "today") 1.6f else 1.3f)
-                if (offered && needed > limit) misses.add("$name $lang $scale $t needs $needed, offered from $limit")
+                if (needed < 0) misses.add("$name $lang $scale $t did not render") else if (offered && needed > limit) misses.add("$name $lang $scale $t needs $needed, offered from $limit")
             }
         }
         File(dir, "release_needs.csv").writeText(csv.toString())
@@ -510,10 +510,11 @@ class WidgetRenderEvidenceTest {
         val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
         val times = listOf("2026-11-04T12:30:00Z", "2026-11-04T21:30:00Z")
         val fails = mutableListOf<String>()
-        val scales = listOf(1.0f, 1.1f, 1.15f, 1.3f, 1.5f, 2.0f)
-        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in scales) for (t in times) {
+        val scales = listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 2.0f)
+        // exact = false is the state of a phone that never allowed exact alarms (Android 14 and later by default): the big number is the clock time.
+        for (exact in listOf(true, false)) for (lang in listOf("en", "ur", "ar", "bn")) for (scale in scales) for (t in times) {
             val at = Instant.parse(t)
-            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, exact) }
             val config = Configuration(base.resources.configuration).apply {
                 fontScale = scale
                 setLocale(java.util.Locale.forLanguageTag(lang))
@@ -526,7 +527,7 @@ class WidgetRenderEvidenceTest {
             )) for (h in heights) {
                 var needed = -1f
                 instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
-                if (needed < 0 || needed > h + 0.5f) fails.add("$name $lang fs$scale ${t.substring(11, 16)} slot ${h}dp needs ${"%.1f".format(needed)}")
+                if (needed < 0 || needed > h + 0.5f) fails.add("$name $lang fs$scale ${t.substring(11, 16)} exact=$exact slot ${h}dp needs ${"%.1f".format(needed)}")
             }
         }
         File(dir, "fit_every_slot.csv").writeText(fails.joinToString("\n"))

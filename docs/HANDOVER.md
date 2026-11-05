@@ -6112,6 +6112,17 @@ The "nothing is current before Fajr" rule is now one function in `:core` (`curre
 The release script's own widgets-font-2 FAIL was the same family (the device test host had no size, so it got the smallest entry): fixed.
 Fable's findings (the checklist, stale state blocks, agent briefs pointing at deleted paths) are fixed as listed in the commit messages.
 
+**Second Opus re-review, 5 Nov 2026, and where it stopped (Ali: "whatever test you have done is enough").** Opus found: the full Next card was still cut
+when exact alarms are off (the big number was sized to the clock time, not the countdown); the device tests were silently drawing the one-line card
+(host padding left 164dp under the 170dp entry width), so their Next checks proved little; the one-line card shrank at larger text and hid the
+time before the name; and docs/comments overclaims. Fixed in the next commit: the big number now fits the widest of countdown and time; entry widths
+160 and 226dp; the one-line card keeps a constant drawn size, narrows to fit "name time", carries "Tomorrow" and the approximate marker, and centres
+vertically; Android 11 and below get their own provider files (Next 110dp, Today 290dp); device tests host at 200dp; every-slot and entry-height
+proofs are steps of `release-1.7.0.sh`; stale comments, RTL claim and doc counts corrected. **NOT verified after these last fixes:** the extended
+every-slot proof (now with exact alarms off, 1.25x) was stopped before it finished, the release script was not re-run, and Opus did not re-review them.
+Gate (unit tests, lint, both bundles) is green: 349 app, 255 core, 27 wear. The watch was looked at on the emulator: the current prayer is marked and
+nothing is behind the bezel at both round sizes at 1.0x and 1.3x. Run the two skipped checks before releasing.
+
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
 `RELEASE-1.7.0.md`; (2) run the watch on the `sajdawear` emulator and look at the Times list; (3) Ali approves the one-line watch note drafted in
 `docs/store/LISTING.md`, Claude translates it and stamps the ledger; (4) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after
@@ -6174,8 +6185,7 @@ Uncommitted on `claude/1-7-0` (working tree only, nothing pushed). Ali asked to 
     fallback. From 1.6x only the compact list is offered (`LARGE_TEXT_NO_CARD`). Next card at 1.3x: 2dp padding so the town chip
     is not clipped.
   - **Medium card balanced in right to left (Ali, 4 Nov 2026: "yes balance it"):** name and time are centred in Urdu and Arabic
-    (`widget_title_row`, `setGravity`, `textAlignment="gravity"` on the countdown and time; `WidgetResourcesTest` allows that value on
-    this layout only). English is unchanged. Checked in Urdu on the emulator.
+    (the countdown and big time centre; the title row only when its small time is hidden). English is unchanged. Checked in Urdu on the emulator.
   - **Repo cleanup (Ali, 4 Nov 2026, safe tier only):** deleted the JVM `hs_err` and `replay` logs, `.DS_Store` files,
     `design-extract-output/`, `graphify-out/` and ran `gradlew clean`. Left alone on purpose: `SajdaTime-1.x/` release folders,
     `docs/plans` (269 files), `.codex/`. **`private/` (334 MB, gitignored, only on this Mac) is to be deleted when the release is

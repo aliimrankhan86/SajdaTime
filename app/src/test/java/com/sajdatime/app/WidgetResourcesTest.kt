@@ -32,7 +32,7 @@ class WidgetResourcesTest {
     private val todayLayouts = listOf("layout/widget_today.xml", "layout/widget_today_large.xml")
     private val stripLayouts = listOf("layout/widget_strip.xml")
     private val layouts = nextLayouts + todayLayouts + stripLayouts
-    private val providers = listOf("xml/widget_next_prayer_info.xml", "xml/widget_today_info.xml", "xml/widget_today_strip_info.xml")
+    private val providers = listOf("xml/widget_next_prayer_info.xml", "xml-v31/widget_next_prayer_info.xml", "xml/widget_today_info.xml", "xml-v31/widget_today_info.xml", "xml/widget_today_strip_info.xml")
     private val languages = stringFolders
 
     private fun withoutComments(xml: String) = xml.replace(Regex("<!--.*?-->", RegexOption.DOT_MATCHES_ALL), "")
@@ -162,6 +162,8 @@ class WidgetResourcesTest {
     fun `each provider points at its own layout, an existing preview image and its description`() {
         val pairs = mapOf(
             "xml/widget_next_prayer_info.xml" to Triple("widget_next_prayer", "widget_preview_next", "widget_next_desc"),
+            "xml-v31/widget_next_prayer_info.xml" to Triple("widget_next_prayer", "widget_preview_next", "widget_next_desc"),
+            "xml-v31/widget_today_info.xml" to Triple("widget_today", "widget_preview_today", "widget_today_desc"),
             "xml/widget_today_info.xml" to Triple("widget_today", "widget_preview_today", "widget_today_desc"),
             "xml/widget_today_strip_info.xml" to Triple("widget_strip", "widget_preview_strip", "widget_strip_desc"),
         )
@@ -194,7 +196,10 @@ class WidgetResourcesTest {
         // A launcher ignores a minResizeHeight larger than minHeight (Opus review, 4 Nov 2026), so the real floor is minHeight and the
         // content must cope with it: the Next card has a tiny one-line entry (TINY_NEXT_DP) for a slot under 100dp. Written as the truth.
         assertTrue(next.contains("""android:minResizeWidth="180dp"""") && next.contains("""android:minHeight="40dp"""") && next.contains("""android:minResizeHeight="40dp""""))
-        val today = read("xml/widget_today_info.xml")
+        val today = read("xml-v31/widget_today_info.xml")
+        // Android 11 and below take one layout, the six row list: their provider files keep the slots those layouts need.
+        assertTrue(read("xml/widget_today_info.xml").contains("""android:minHeight="290dp""""))
+        assertTrue(read("xml/widget_next_prayer_info.xml").contains("""android:minHeight="110dp""""))
         // Default 4 by 3 (Ali, 4 Nov 2026): a new widget opens as the compact card with no spare height. The 4 by 4
         // default made the emulator's launcher open a tall 3 by 5 slot with an empty band under the rows.
         assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
