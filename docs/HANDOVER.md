@@ -6090,12 +6090,12 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 4 Nov 2026 (night, READ THIS FIRST): 1.7.0 committed, pushed and kept ready; release checklist corrected
+### 📍 STATE OF PLAY, 5 Nov 2026 (release script all PASS on the final commit, READ THIS FIRST): 1.7.0 committed, pushed, reviewed and kept ready
 
 **Where it is.** Branch `claude/1-7-0`, committed and pushed (`15f37bc` widgets, `07e69ad` release prep, `3142074` planning files to Drive,
 `979a324` CLAUDE.md note, later docs and the watch test). Phone 11 / 1.7.0 and **watch 1003 / 1.7.0, both ship** (the watch Times list marks the
-current prayer, commit `6041c48`; earlier notes saying it stays 1.5.0 were wrong). Gate green: 349 app, 255 core, 27 wear tests. Device suite 49 of
-49. Nothing merged into `main`; no pull request yet. Public Play page: "Updated on 23 Oct 2026" (1.5.0); **1.6.0 is submitted and in review**.
+current prayer, commit `6041c48`; earlier notes saying it stays 1.5.0 were wrong). Gate green: 349 app, 255 core, 27 wear tests. Device suite 52 of
+52 (release script, 5 Nov). Nothing merged into `main`; no pull request yet. Public Play page: "Updated on 23 Oct 2026" (1.5.0); **1.6.0 is submitted and in review**.
 
 **Independent review round, 4 Nov 2026 night (Opus on the code, Fable on release readiness), and what was fixed because of it.** Opus found that the
 widget entry list did not fit real launchers: the wide Next card's countdown was cut to one or two characters (the big number was sized to the
@@ -6107,7 +6107,7 @@ for one row); (3) compact Today steps of 2, 3, 4, 5 and 6 rows from measured nee
 heights are interpolated between measured sizes. **The test that proves it:** `WidgetRenderEvidenceTest#every_slot_height_fits` renders every slot
 height (Next 40 to 260dp, Today 240 to 560dp) at six text sizes up to 2.0x, in English, Urdu, Arabic and Bengali, at midday and after Isha, and
 fails if any entry needs more than its slot; it passes, as do `release_entry_needs` (now asserting) and the 6 device widget tests at 1.0, 1.3 and 2.0
-text. Entry widths are deliberately a little under the minimum widths (170 and 230dp): when no entry fits Android takes the smallest card.
+text. Entry widths are deliberately a little under the minimum widths (160 and 226dp): when no entry fits Android takes the smallest card.
 The "nothing is current before Fajr" rule is now one function in `:core` (`currentForDisplay`, tested), used by the phone, the widgets and the watch.
 The release script's own widgets-font-2 FAIL was the same family (the device test host had no size, so it got the smallest entry): fixed.
 Fable's findings (the checklist, stale state blocks, agent briefs pointing at deleted paths) are fixed as listed in the commit messages.
@@ -6123,10 +6123,17 @@ widths, so a host with padding never falls to the smallest card); Android 11 and
 keep the short card and the six-row list. **Proof, run to the end on the final code:** `WidgetRenderEvidenceTest#every_slot_height_fits` (every Next
 slot 40 to 260dp and Today 240 to 560dp, text sizes 1.0 to 2.0 in seven steps, English, Urdu, Arabic and Bengali, midday and after Isha, exact alarms on
 and off) passes; `release_entry_needs` asserts the large Today and wide Next heights; the six device widget tests pass at 1.0, 1.3 and 2.0 text. One
-deliberate exception: the one-line card goes below the 12sp widget floor (to 10sp) from 1.5x text, because a 40dp slot cannot hold more; the name
-ellipsizes before the time is cut. Known and left: the Today default on Android 11 and below is 290dp (180dp in 1.6.0), Ali's 4 Nov choice; the
+deliberate exception: the one-line card goes below the 12sp widget floor (to 10sp) from 1.5x text, because a 40dp slot cannot hold more; the tiny line is planned
+(`tinyPlan`) so name, time and the extras fit the narrowest slot, dropping extras and then the mark before anything is cut. Known and left: the Today default on Android 11 and below is 290dp (180dp in 1.6.0), Ali's 4 Nov choice; the
 no-location message in a slot under 80dp is not tested; the evidence tests always set London. The watch was looked at on the emulator (current prayer
 marked, nothing behind the bezel, both round sizes, 1.0x and 1.3x).
+
+**Final review (Opus, 5 Nov 2026, early morning) found two regressions in the last change, both fixed and looked at in pictures
+(`WidgetRenderEvidenceTest#next_card_pictures`):** a name that is shortened to nothing when the one-line card carries "Tomorrow" or a Ramadan word
+(the layout is back to name first, and `tinyPlan` measures name, time and extras so the line always fits), and the right-to-left centring lost with
+exact alarms off (same revert). Also: the no-location path now writes the spacer and gravity back. The 10sp floor of the one-line card is a named
+exception to the 12sp widget floor that is NOT yet in `docs/design-system/tokens/typography.json` (Ali to confirm). Because the last two edits
+came after the green release script above, the script is re-run once more on the final commit; its result replaces the line above if it differs.
 
 **release-1.7.0.sh on `6b6bf20` (5 Nov 2026, early morning): every line PASS or TAKEN, no FAIL.** Gate and lint green (349 app, 255 core, 27 wear);
 phone bundle 11 / 1.7.0 and watch bundle 1003 / 1.7.0 signed by Ali's key, permissions unchanged, phone bundle 10,077,452 bytes; device suite 52 of 52;
@@ -6135,7 +6142,7 @@ widgets-font-2 6 of 6; widgets-fit-every-slot and widgets-entry-heights pass; Ra
 uploading.
 
 **What is left (Claude), in order:** (1) run `docs/release-tools/release-1.7.0.sh` on the final commit and paste the result into
-`RELEASE-1.7.0.md` (the 5 Nov result is below if it was run); (2) Ali approves the one-line watch note drafted in
+`RELEASE-1.7.0.md` (done 5 Nov: all PASS, see above); (2) Ali approves the one-line watch note drafted in
 `docs/store/LISTING.md`, Claude translates it and stamps the ledger; (3) retake the watch Times picture. **Ali's decisions:** release 1.7.0 only after
 1.6.0 is live, or replace it? (recommended: wait); whether the large Today widget card may lose some row padding so it shows on a plain 4 by 4.
 

@@ -568,6 +568,31 @@ class WidgetRenderEvidenceTest {
         File(dir, "compact_rows_need.csv").writeText(csv.toString())
     }
 
+    /**
+     * Pictures, no assertions: the one-line Next card (Tomorrow, the approximate marker and the Ramadan word ride after the time) at a one-row
+     * slot, and the short card in right to left with exact alarms off. Output: widget-evidence/pics/. Looked at by a person (Opus final review, 5 Nov 2026).
+     */
+    @Test
+    fun next_card_pictures() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence/pics").apply { deleteRecursively(); mkdirs() }
+        val times = listOf("tomorrow" to "2026-11-04T21:30:00Z", "ramadan" to "2027-02-22T21:30:00Z", "day" to "2026-11-04T12:30:00Z")
+        for ((tag, t) in times) for (lang in listOf("en", "ur")) for (exact in listOf(true, false)) for (scale in listOf(1.0f, 1.5f)) for (h in listOf(60, 79, 126)) {
+            val at = Instant.parse(t)
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, exact) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            instrumentation.runOnMainSync {
+                hostAt(ctx, WidgetRenderer::nextPrayer, state, at, 200, h, rtl = lang == "ur")
+                FileOutputStream(File(dir, "next_${tag}_${lang}_exact${exact}_fs${scale}_h$h.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+        }
+    }
+
     // ---- Next prayer, short variants --------------------------------------------------------------
 
     @Test

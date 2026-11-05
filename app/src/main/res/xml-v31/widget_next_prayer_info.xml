@@ -2,7 +2,7 @@
 <!--
   Next prayer, Android 12 and up: one cell tall by default (Ali, 4 Nov 2026: "one row"), 3 wide. minHeight 40dp is the real floor (a larger
   minResizeHeight is ignored by launchers), so the content copes with a slot that small: below the short card's height (about 100dp,
-  WidgetRenderer.nextShortHeight) it draws the tiny one-line form (name and time); from there the short card (town chip), from 140 to 183dp
+  WidgetRenderer.nextShortHeight) it draws the tiny one-line form (name and time); from there the short card (town chip), from 140 to 202dp (by text size and script)
   the full card with the five bars, and from 218 to 254dp (by text size and script) the wide card with the day beside the countdown. A
   launcher's one row is 54 to 79dp on Xiaomi and Samsung and about 104dp on a Pixel, so the card must work at every one of those: the device
   evidence test every_slot_height_fits fails a step of release-1.7.0.sh (not the Gradle build) if any slot from 40 to 260dp does not fit. updatePeriodMillis is 0

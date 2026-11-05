@@ -1,4 +1,4 @@
-# SajdaTime: project brief (snapshot 4 Nov 2026 night; Play "Updated on" 23 Oct 2026: 1.5.0 is live; 1.6.0 submitted 2 Nov, in review; 1.7.0 built and kept ready)
+# SajdaTime: project brief (snapshot 5 Nov 2026; Play "Updated on" 23 Oct 2026: 1.5.0 is live; 1.6.0 submitted 2 Nov, in review; 1.7.0 built and kept ready)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 

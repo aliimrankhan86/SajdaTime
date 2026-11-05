@@ -72,8 +72,8 @@ internal object WidgetRenderer {
      * Next prayer, a ladder of steps (Android 12 and later; the launcher uses the largest entry that fits inside the widget, and the smallest when
      * none does, which is why the entry widths are under the minimum widths): TINY (name and time, one line), SHORT (town chip, no day bars),
      * the full small card with the five bars, and the wide card (countdown beside the day). Heights are what each form needs, measured with
-     * AppWidgetHostView and an unspecified height (WidgetRenderEvidenceTest); every_slot_height_fits proves no slot from 40 to 260dp is cut, in
-     * English, Urdu, Arabic and Bengali at six text sizes.
+     * AppWidgetHostView and an unspecified height (WidgetRenderEvidenceTest); every_slot_height_fits is run by release-1.7.0.sh and checks the HEIGHT of every slot from 40 to 260dp, in
+     * English, Urdu, Arabic and Bengali at seven text sizes, exact alarms on and off (not centring, order or width: see next_card_pictures).
      */
     private fun nextBarsHeight(context: Context): Float {
         val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
@@ -111,21 +111,38 @@ internal object WidgetRenderer {
     private const val NEXT_ENTRY_WIDTH_DP = 160f
     private const val TODAY_ENTRY_WIDTH_DP = 226f
 
-    /** Largest size up to 18sp, at most [capSp], at which the tiny card's "name time" stays on its one line in the narrowest slot. */
-    private fun tinyLineSp(context: Context, widthDp: Float, next: NextPrayer, capSp: Float): Float {
+    /** What the tiny line shows: its size, which extras ride after the time, and whether the mark is dropped to make room. */
+    private class TinyPlan(val sp: Float, val extras: List<String>, val hideGlyph: Boolean)
+
+    /**
+     * Plans the tiny card's one line so it always fits the NARROWEST real slot (a 180dp widget in a host with 8dp of padding a side leaves about
+     * 140dp of row): first the largest size from [capSp] down to 10sp with every extra ("Tomorrow", the approximate marker, the Ramadan word),
+     * then with fewer extras (the last goes first), then without the 22dp mark. The name is measured with the time and extras because the name
+     * keeps its width and the time takes what is left: a line that does not fit would lose its end, not show an ellipsis (Opus final review, 5 Nov
+     * 2026). Floor 10sp, below the 12sp widget floor on purpose and only here: at 1.5x text and more a 40dp slot (a 70n-30 launcher's one row)
+     * cannot hold more.
+     */
+    private fun tinyPlan(context: Context, next: NextPrayer, extras: List<String>, capSp: Float): TinyPlan {
         val metrics = context.resources.displayMetrics
-        val line = next.slot.label(context) + "  " + TimeFormat.clock(context, next.at)
+        val name = next.slot.label(context)
+        val time = TimeFormat.clock(context, next.at)
         val paint = android.graphics.Paint().apply { typeface = android.graphics.Typeface.DEFAULT_BOLD }
-        val room = (widthDp + 20f - 16f - 22f - 12f) * metrics.density // the narrowest slot, minus its padding, the mark and gaps
-        // Floor 10sp, below the 12sp widget floor on purpose and only here: at 1.5x text and more a 40dp slot (a 70n-30 launcher's one row) cannot
-        // hold more, and the name ellipsizes before the time is cut (HANDOVER, 5 Nov 2026).
-        var sp = minOf(NAME_SP, capSp).coerceAtLeast(10f)
-        while (sp > 10f) {
+        fun fits(sp: Float, shown: List<String>, glyph: Boolean): Boolean {
             paint.textSize = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, metrics)
-            if (paint.measureText(line) <= room) return sp
-            sp -= 0.5f
+            val line = name + "  " + time + (if (shown.isEmpty()) "" else " · " + shown.joinToString(" · "))
+            val room = (140f - (if (glyph) 22f else 0f)) * metrics.density
+            return paint.measureText(line) <= room
         }
-        return 10f
+        val top = minOf(NAME_SP, capSp).coerceAtLeast(10f)
+        for (glyph in listOf(true, false)) for (count in extras.size downTo 0) {
+            val shown = extras.take(count)
+            var sp = top
+            while (sp >= 10f) {
+                if (fits(sp, shown, glyph)) return TinyPlan(sp, shown, !glyph)
+                sp -= 0.5f
+            }
+        }
+        return TinyPlan(10f, emptyList(), true)
     }
 
     /** The one-line next prayer card (no town chip, no countdown): the height it is drawn for. */
@@ -372,6 +389,8 @@ internal object WidgetRenderer {
                 for (slot in PrayerSlot.entries) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
             }
             views.setViewVisibility(R.id.widget_chip_row, View.VISIBLE)
+            views.setViewVisibility(R.id.widget_spacer, View.VISIBLE)
+            views.setInt(R.id.widget_root, "setGravity", Gravity.TOP or Gravity.START)
             views.setInt(R.id.widget_title_row, "setGravity", Gravity.START or Gravity.CENTER_VERTICAL)
             views.setContentDescription(R.id.widget_root, context.getString(R.string.widget_no_location))
             return views
@@ -398,10 +417,16 @@ internal object WidgetRenderer {
         // The tiny card: the title row alone, name and the time at its end, bigger. The chip row, the countdown and the big time are
         // hidden; written both ways because the launcher reuses the view when the slot grows.
         views.setViewVisibility(R.id.widget_chip_row, if (tiny) View.GONE else View.VISIBLE)
-        // The tiny line's size: the largest up to 18sp whose drawn height stays about 26dp (22 in the tall scripts), so the line keeps the same
+        // The tiny line's size: the largest up to 18sp whose drawn height stays about 26dp (20 in the tall scripts), so the line keeps the same
         // drawn size from 1.4x text instead of shrinking below the 1.0x one; then narrowed until "name time" fits the width.
         val scaleNow = context.resources.configuration.fontScale
-        val tinySp = if (tiny) tinyLineSp(context, size.width, next, (if (tallScript) 20f else 26f) / scaleNow) else NAME_SP
+        val tinyExtras = listOfNotNull(
+            if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
+            if (state.nextIsApproximate) context.getString(R.string.notif_approximate)
+            else state.ramadanWordFor(next.slot, state.ramadanOnNextDay)?.let { wordText(context, it) },
+        )
+        val plan = if (tiny) tinyPlan(context, next, tinyExtras, (if (tallScript) 20f else 26f) / scaleNow) else null
+        val tinySp = plan?.sp ?: NAME_SP
         views.setTextViewTextSize(R.id.widget_time, TypedValue.COMPLEX_UNIT_SP, if (tiny) tinySp else TIME_SP)
         if (tiny) views.setTextViewTextSize(R.id.widget_name, TypedValue.COMPLEX_UNIT_SP, tinySp)
         // The line sits in the middle of a slot taller than itself (a Samsung row is 79dp); every other form starts at the top.
@@ -412,15 +437,10 @@ internal object WidgetRenderer {
             views.setViewVisibility(R.id.widget_time, View.VISIBLE)
             views.setViewVisibility(R.id.widget_countdown, View.GONE)
             views.setViewVisibility(R.id.widget_hero_time, View.GONE)
-            // What the sublabel would say ("Tomorrow", the approximate marker) rides after the time: a guess shown as a measurement is the
-            // worse mistake. The time comes first, so it is the end of the line that an ellipsis takes.
-            val extra = listOfNotNull(
-                if (next.isTomorrow) context.getString(R.string.widget_tomorrow) else null,
-                if (state.nextIsApproximate) context.getString(R.string.notif_approximate)
-                else state.ramadanWordFor(next.slot, state.ramadanOnNextDay)?.let { wordText(context, it) },
-            )
+            // What the sublabel would say rides after the time, as many as fit (tinyPlan); the mark goes first when there is no room.
             val timeWithContext = android.text.SpannableStringBuilder(timeText(TimeFormat.clock(context, next.at), false))
-            if (extra.isNotEmpty()) timeWithContext.append(" · ").append(extra.joinToString(" · "))
+            if (plan!!.extras.isNotEmpty()) timeWithContext.append(" · ").append(plan.extras.joinToString(" · "))
+            if (plan.hideGlyph) views.setViewVisibility(R.id.widget_glyph, View.GONE)
             views.setTextViewText(R.id.widget_time, timeWithContext)
         }
         // Right to left, small card (Ali, 4 Nov 2026: "balance it"): the countdown or time hung off the right edge and left the left 60 percent of

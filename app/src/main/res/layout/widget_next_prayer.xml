@@ -56,12 +56,9 @@
             android:layout_height="22dp"
             android:importantForAccessibility="no"
             android:src="@drawable/widget_mark" />
-        <!-- The name takes the spare width and gives way first (an ellipsis) so the time is never the one cut: the time is wrap_content,
-             at the end of the row (Opus re-review, 5 Nov 2026). -->
         <TextView
             android:id="@+id/widget_name"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:ellipsize="end"
@@ -73,9 +70,10 @@
             android:textStyle="bold" />
         <TextView
             android:id="@+id/widget_time"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
+            android:layout_weight="1"
             android:ellipsize="end"
             android:fontFeatureSettings="tnum"
             android:importantForAccessibility="no"
