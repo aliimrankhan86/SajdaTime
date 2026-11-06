@@ -330,8 +330,10 @@ class WidgetDeviceTest {
                     WidgetUpdater.refreshAll(context)
                 }
                 val expected = context.getColor(ink)
-                waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected }
-                waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected }
+                // Diagnosis added 6 Nov 2026: this wait timed out in 2 of 52 runs (see WidgetUpdater.lock), so a failure says what the view held.
+                fun why(v: View, name: String): String { var t = ""; instrumentation.runOnMainSync { val tv = v.textOf(name); t = " [expected=${Integer.toHexString(expected)} actual=${tv?.currentTextColor?.let { Integer.toHexString(it) }} text=${tv?.text} size=${v.width}x${v.height}]" }; return t }
+                try { waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected } } catch (e: AssertionError) { throw AssertionError(e.message + why(today, "widget_name_dhuhr")) }
+                try { waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected } } catch (e: AssertionError) { throw AssertionError(e.message + why(next, "widget_name")) }
                 val tag = "theme-${choice.name.lowercase()}"
                 save("widget-today-$tag", layoutAt(today, 250, 290))
                 save("widget-next-$tag", layoutAt(next, 200, 126))

@@ -499,7 +499,7 @@ class WidgetRenderEvidenceTest {
     private data class Quad(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val h: Int)
 
     /**
-     * The test that matters most: for EVERY slot height a launcher could give, at every text size, in four languages, at a midday and an
+     * The test that matters most: for EVERY slot height a launcher could give, at every text size, in six languages (en, ur, ar, bn, id, tr), at a midday and an
      * after Isha time, the entry the launcher would choose must fit the slot (needed height <= slot height). Next card: slots 40 to 260dp
      * wide 180; Today card: slots 240 to 560dp wide 250. Text sizes where a widget is deliberately degraded (2.0x text on the Next card
      * below 124dp needs the tiny line, which is checked here too) are included: nothing is excused. Output: fit_every_slot.csv of failures.
@@ -512,7 +512,7 @@ class WidgetRenderEvidenceTest {
         val fails = mutableListOf<String>()
         val scales = listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 2.0f)
         // exact = false is the state of a phone that never allowed exact alarms (Android 14 and later by default): the big number is the clock time.
-        for (exact in listOf(true, false)) for (lang in listOf("en", "ur", "ar", "bn")) for (scale in scales) for (t in times) {
+        for (exact in listOf(true, false)) for (lang in listOf("en", "ur", "ar", "bn", "id", "tr")) for (scale in scales) for (t in times) {
             val at = Instant.parse(t)
             val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, exact) }
             val config = Configuration(base.resources.configuration).apply {
@@ -532,6 +532,74 @@ class WidgetRenderEvidenceTest {
         }
         File(dir, "fit_every_slot.csv").writeText(fails.joinToString("\n"))
         org.junit.Assert.assertTrue("${fails.size} slots do not fit: " + fails.take(40).joinToString("; "), fails.isEmpty())
+    }
+
+    /** Same fit check at other places (Makkah, Karachi, Jakarta, Tromso, far north), English and Turkish. Only the times and the chip name should differ, so heights should not. The polar approximate state is NOT reached (the sun still rises at Tromso on 4 Nov). */
+    @Test
+    fun every_slot_height_fits_other_places() {
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val fails = mutableListOf<String>()
+        val places = listOf(Triple("Makkah", Coordinates(21.4225, 39.8262), "Asia/Riyadh"), Triple("Karachi", Coordinates(24.8607, 67.0011), "Asia/Karachi"),
+            Triple("Jakarta", Coordinates(-6.2088, 106.8456), "Asia/Jakarta"), Triple("Tromso", Coordinates(69.6492, 18.9553), "Europe/Oslo"))
+        val times = listOf("2026-11-04T05:30:00Z", "2026-11-04T12:30:00Z", "2026-11-04T21:30:00Z")
+        for ((pn, c, z) in places) {
+            runBlocking { SettingsRepository(base).setLocation(c, pn) }
+            for (lang in listOf("en", "tr")) for (scale in listOf(1.0f, 1.3f)) for (t in times) {
+                val at = Instant.parse(t)
+                val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, ZoneId.of(z), true) }
+                val config = Configuration(base.resources.configuration).apply {
+                    fontScale = scale; setLocale(java.util.Locale.forLanguageTag(lang))
+                    uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+                }
+                val ctx = base.createConfigurationContext(config)
+                for ((name, build, w, heights) in listOf(
+                    Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
+                    Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+                )) for (h in heights) {
+                    var needed = -1f
+                    instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
+                    if (needed < 0 || needed > h + 0.5f) fails.add("$name $pn $lang fs$scale ${t.substring(11, 16)} slot ${h}dp needs ${"%.1f".format(needed)}")
+                }
+            }
+        }
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") } // leave the emulator as the other tests expect
+        File(dir, "fit_other_places.csv").writeText(fails.joinToString("\n"))
+        org.junit.Assert.assertTrue("${fails.size} slots do not fit: " + fails.take(40).joinToString("; "), fails.isEmpty())
+    }
+
+    /**
+     * The no-location message (a fresh install with no place yet) in every slot of all three widgets, six languages, three text sizes.
+     * Measured 6 Nov 2026: the message needs MORE than a thin slot offers (Next card: English 45dp, Urdu and Arabic 57dp at 1.0x, 73dp at
+     * 1.3x), so on a one-row launcher slot (54 to 79dp) in Urdu or Arabic, or English at 1.3x text up to 56dp, its second line can be cut.
+     * That is written to fit_no_location.csv, NOT asserted (an open choice for Ali: leave it, or give the message its own short line).
+     * The strip (one cell tall) is in the same CSV; its figures are not asserted either. Asserted: nothing is cut from 80dp up at 1.0x and 1.3x text, and the Today card never. 2.0x text does not matter (Ali, 4 Nov 2026).
+     */
+    @Test
+    fun no_location_message_fits_every_slot() {
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
+        val fails = mutableListOf<String>()
+        val at = Instant.parse("2026-11-04T12:30:00Z")
+        val state = runBlocking { WidgetState.build(SettingsRepository(base).current().copy(coordinates = null), at, zone, true) }
+        org.junit.Assert.assertFalse("state must have no location", state.hasLocation)
+        for (lang in listOf("en", "ur", "ar", "bn", "id", "tr")) for (scale in listOf(1.0f, 1.3f, 2.0f)) {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale; setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            }
+            val ctx = base.createConfigurationContext(config)
+            for ((name, build, w, heights) in listOf(
+                Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
+                Slots("strip", WidgetRenderer::strip, 300, (40..120 step 4).toList()),
+                Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+            )) for (h in heights) {
+                var needed = -1f
+                instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h, rtl = lang == "ur" || lang == "ar").second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
+                if (needed < 0 || needed > h + 0.5f) fails.add("$name $lang fs$scale slot ${h}dp needs ${"%.1f".format(needed)}")
+            }
+        }
+        File(dir, "fit_no_location.csv").writeText(fails.joinToString("\n"))
+        val asserted = fails.filter { f -> val m = Regex("slot (\\d+)dp").find(f)!!; !f.contains("fs2.0") && (f.startsWith("today") || m.groupValues[1].toInt() >= 80) }
+        org.junit.Assert.assertTrue("${asserted.size} slots do not fit: " + asserted.take(40).joinToString("; "), asserted.isEmpty())
     }
 
     private data class Slots(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val heights: List<Int>)
