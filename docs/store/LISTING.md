@@ -1462,6 +1462,6 @@ Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
   in particular shows its bearing-from-north state because the Wear AVD has no
   magnetometer — a real state, but not the best version of that screen.
 
-## 1.7.0 watch note, DRAFT 4 Nov 2026 (for the Wear OS release's What's new; Ali approves, then Claude translates into the eight languages and stamps the ledger)
+## 1.7.0 watch note, APPROVED by Ali 6 Nov 2026, translated into the eight languages in LISTING-LOCALES.md (for the Wear OS release's What's new)
 
 The watch is now in Bengali and marks the prayer that is current, like the phone.

@@ -6090,7 +6090,11 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 5 Nov 2026 (release script all PASS on the final commit, READ THIS FIRST): 1.7.0 committed, pushed, reviewed and kept ready
+### 📍 STATE OF PLAY, 6 Nov 2026 (READ THIS FIRST): 1.7.0 kept ready, NOT being published now (Ali)
+
+**6 Nov 2026 session, what changed and why.** Ali's decisions (AskUserQuestion): **do not publish 1.7.0 now, keep it ready** (Play still shows "Updated on 23 Oct 2026", so 1.6.0 is not live; the post-release one-folder cleanup of the Mac and Drive therefore has NOT started and waits for his upload of both bundles); **the English watch note is approved** and is translated into the eight languages in `docs/store/LISTING-LOCALES.md` ("1.7.0 watch note", Opus review fixed Urdu بنگالی, Arabic, Indonesian, Hindi wording; ledger stamped in the same commit); **the 10sp exception of the one-line Next card is confirmed** and now in `typography.json` (worded as it really behaves: any text size when the one line needs it, the 140dp row, plus the 40dp slot from 1.5x; the Opus review found "from 1.5x" alone was wrong); **large Today card padding: tried 3dp, then reverted to 6dp.** Measured on the emulator: 3dp brings the large card's need to about 364dp (369dp offered) from about 401dp, which still does not reach a plain 4x4 (a Redmi slot is about 232dp) and makes rows tighter than the 4dp Ali called squashed; Ali chose to keep 6dp. So the code is unchanged since `e9b89c6` and the release script result below still holds for it. The watch Times picture (`w1-times.png`, raw and upload) was retaken on the `sajdawear_large` emulator (454 by 454, Manchester, clock 15:06, Asr marked as current, 1.7.0 build). Recipe that worked: `adb root`, set clock and zone, a mock network location (`cmd location providers add-test-provider network`, then `set-test-provider-location network --location 53.4808,-2.2426` repeatedly), grant coarse location; the AVD is read-only so an install is lost at each restart: install after the last boot. Not done: a real phone widget test (no phone attached; Ali's), retaking `06-widget-today.png` (the code did not change). Gate on this tree: 349 app, 255 core, 27 wear, lint clean.
+
+### STATE OF PLAY, 5 Nov 2026 (release script all PASS on the final commit; the 6 Nov block above is newer): 1.7.0 committed, pushed, reviewed and kept ready
 
 **Where it is.** Branch `claude/1-7-0`, committed and pushed (`15f37bc` widgets, `07e69ad` release prep, `3142074` planning files to Drive,
 `979a324` CLAUDE.md note, later docs and the watch test). Phone 11 / 1.7.0 and **watch 1003 / 1.7.0, both ship** (the watch Times list marks the
@@ -6132,7 +6136,7 @@ marked, nothing behind the bezel, both round sizes, 1.0x and 1.3x).
 (`WidgetRenderEvidenceTest#next_card_pictures`):** a name that is shortened to nothing when the one-line card carries "Tomorrow" or a Ramadan word
 (the layout is back to name first, and `tinyPlan` measures name, time and extras so the line always fits), and the right-to-left centring lost with
 exact alarms off (same revert). Also: the no-location path now writes the spacer and gravity back. The 10sp floor of the one-line card is a named
-exception to the 12sp widget floor that is NOT yet in `docs/design-system/tokens/typography.json` (Ali to confirm). Because the last two edits
+exception to the 12sp widget floor that is in `docs/design-system/tokens/typography.json` since 6 Nov 2026 (Ali confirmed). Because the last two edits
 came after the green release script above, the script is re-run once more on the final commit; its result replaces the line above if it differs.
 
 **release-1.7.0.sh on the FINAL commit `e9b89c6` (5 Nov 2026, 02:16): every line PASS or TAKEN, 0 FAIL.** Gate green (349 app, 255 core, 27 wear), lint clean, device suite 53 of 53, bundles 11 and 1003 signed, phone bundle 10,080,761 bytes. The line below is the earlier run on `6b6bf20`.

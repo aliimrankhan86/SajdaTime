@@ -1472,6 +1472,66 @@ SajdaTime एक मददगार है, कोई दीनी अथॉर�
 
 ---
 
+## 1.7.0 watch note, approved by Ali 6 Nov 2026 (Wear OS What's new, paste on release day)
+
+English (approved): `The watch is now in Bengali and marks the prayer that is current, like the phone.` The eight translations below, all well under Play's 500 limit; the English is in `LISTING.md`.
+
+### Arabic (ar), 1.7.0 watch note
+
+**Watch What's new**
+```
+ساعة Wear OS الآن بالبنغالية، وتُميّز الصلاة الحالية مثل الهاتف.
+```
+
+### Urdu (ur), 1.7.0 watch note
+
+**Watch What's new**
+```
+گھڑی اب بنگالی میں ہے اور موجودہ نماز کو نشان زد کرتی ہے، بالکل فون کی طرح۔
+```
+
+### Turkish (tr-TR), 1.7.0 watch note
+
+**Watch What's new**
+```
+Saat artık Bengalce ve telefon gibi şu anki namazı işaretliyor.
+```
+
+### Indonesian (id-ID), 1.7.0 watch note
+
+**Watch What's new**
+```
+Jam tangan kini tersedia dalam bahasa Bengali dan menandai salat saat ini, seperti di ponsel.
+```
+
+### Malay (ms-MY), 1.7.0 watch note
+
+**Watch What's new**
+```
+Jam tangan kini dalam bahasa Bengali dan menandakan solat semasa, sama seperti telefon.
+```
+
+### Bengali (bn-BD), 1.7.0 watch note
+
+**Watch What's new**
+```
+ঘড়ি এখন বাংলায় পাওয়া যায় এবং ফোনের মতোই বর্তমান নামাজ চিহ্নিত করে।
+```
+
+### French (fr-FR), 1.7.0 watch note
+
+**Watch What's new**
+```
+La montre est désormais en bengali et marque la prière en cours, comme le téléphone.
+```
+
+### Hindi (hi-IN), 1.7.0 watch note
+
+**Watch What's new**
+```
+घड़ी अब बांग्ला में है और फ़ोन की तरह मौजूदा नमाज़ को चिह्नित करती है।
+```
+
 ## 1.5.0 listings, FINAL 19 Oct 2026, full descriptions rebuilt 21 Oct 2026 from the regrouped English (live since 23 Oct 2026, superseded by 1.6.0 on its release day)
 
 **23 Oct 2026, every full description:** the Wear line now names the watch's Qibla, Arabic and Bengali also name the 15 to 60
