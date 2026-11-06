@@ -536,15 +536,20 @@ class WidgetRenderEvidenceTest {
 
     private data class Slots(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val heights: List<Int>)
 
-    /** What each compact Today step (3, 4, 5, 6 rows) needs, per language and text size: the figures behind COMPACT_NEED_EN and COMPACT_NEED_TALL. */
+    /**
+     * What each compact Today step (2 to 6 rows) needs, per language and text size: the figures behind COMPACT_NEED_EN and COMPACT_NEED_TALL
+     * (the maximum over five times of day, with each time's own figure beside it: the five are the same for six rows, 6 Nov 2026).
+     */
     @Test
     fun compact_rows_need() {
         runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
         val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
         val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z", "2027-02-22T21:30:00Z")
-        val csv = StringBuilder("lang,fs,rows,neededDp\n")
+        // One column per time of day as well as the worst, so a state that needs more than the others (6 Nov 2026) can be seen.
+        val csv = StringBuilder("lang,fs,rows,neededDp," + times.joinToString(",") { it.substring(5, 16) } + "\n")
         for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (rows in 2..6) {
             var worst = 0f
+            val each = mutableListOf<Float>()
             for (tt in times) {
                 val at = Instant.parse(tt)
                 val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
@@ -560,12 +565,44 @@ class WidgetRenderEvidenceTest {
                     host.updateAppWidget(WidgetRenderer.todayCompactRows(ctx, state, at, rows))
                     val wPx = (250 * density).toInt()
                     host.measure(View.MeasureSpec.makeMeasureSpec(wPx, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
-                    worst = maxOf(worst, host.measuredHeight / density)
+                    val need = host.measuredHeight / density
+                    each += need
+                    worst = maxOf(worst, need)
                 }
             }
-            csv.append("$lang,$scale,$rows,${"%.1f".format(worst)}\n")
+            csv.append("$lang,$scale,$rows,${"%.1f".format(worst)}," + each.joinToString(",") { "%.1f".format(it) } + "\n")
         }
         File(dir, "compact_rows_need.csv").writeText(csv.toString())
+    }
+
+    /**
+     * Pictures of the compact Today list in a plain 4 by 4 slot (279dp on Ali's Redmi, 6 Nov 2026) and the slots either side of it, English,
+     * 1.0x and 1.3x text, light and dark, an ordinary afternoon and a Ramadan afternoon and evening. Asserts only that nothing needs more than
+     * the slot; what the launcher would draw is in widget-evidence/pics-compact/ for a person to look at.
+     */
+    @Test
+    fun compact_slot_pictures() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence/pics-compact").apply { deleteRecursively(); mkdirs() }
+        val times = listOf("day" to "2026-11-06T16:05:00Z", "ramadan" to "2027-02-22T16:05:00Z", "ramadan-night" to "2027-02-22T21:30:00Z")
+        val fails = mutableListOf<String>()
+        for ((tag, t) in times) for (dark in listOf(false, true)) for (scale in listOf(1.0f, 1.3f)) for (h in listOf(250, 279, 300)) {
+            val at = Instant.parse(t)
+            val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag("en"))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or (if (dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+            }
+            val ctx = base.createConfigurationContext(config)
+            var needed = -1f
+            instrumentation.runOnMainSync {
+                needed = hostAt(ctx, WidgetRenderer::today, state, at, 266, h).second
+                FileOutputStream(File(dir, "today_${tag}_${if (dark) "dark" else "light"}_fs${scale}_h$h.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+            if (needed < 0 || needed > h + 0.5f) fails.add("$tag dark=$dark fs$scale slot ${h}dp needs ${"%.1f".format(needed)}")
+        }
+        org.junit.Assert.assertTrue("compact slots cut: " + fails.joinToString("; "), fails.isEmpty())
     }
 
     /**

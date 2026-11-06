@@ -216,9 +216,20 @@ internal object WidgetRenderer {
     private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
 
     /**
-     * What each compact Today step needs, per text size [COMPACT_SCALES]: rows 3, 4, 5, 6; English, then Urdu, Arabic and Bengali (the
-     * maximum of the three). Measured 4 Nov 2026 by WidgetRenderEvidenceTest#compact_rows_need (evening, tomorrow's countdown, the
-     * worst case); the entry is the need plus 3dp, interpolated between the sizes.
+     * What each compact Today step needs, per text size [COMPACT_SCALES]: rows 2 to 6; English, then Urdu, Arabic and Bengali (the
+     * maximum of the three). Measured 4 Nov 2026 by WidgetRenderEvidenceTest#compact_rows_need over five times of day (before Fajr,
+     * midday, Maghrib, after Isha, a Ramadan evening); the entry is the need plus 3dp, interpolated between the sizes.
+     *
+     * These are NOT a worst case over states (checked 6 Nov 2026, compact_rows_need now prints every time of day beside the maximum):
+     * the six row need is the same figure at all five times (285.7 at 1.0x English), because the list has no countdown line, the row
+     * label ("Now", "Suhoor ends", "Iftar") is one line of 13sp beside 16sp names and never adds height, and the approximate footer
+     * shares the chip's line. The only state difference is 6dp for 2 to 5 rows: a window that ends at Isha has no row margin under it.
+     * So 285.7 is the plain layout: 10dp padding twice, six 34dp rows (22dp line at 16sp, 6dp above and below, Ali's choice), five 6dp gaps,
+     * the 10dp gap and 22dp chip. A plain 4 by 4 slot of 279dp is 6.7dp short of six rows at 1.0x on a Pixel; offering six rows there
+     * would cut Isha or the chip on every stock launcher, so the steps stay. The 90dp of blank under the chip that Ali's Redmi showed in
+     * that slot (6 Nov 2026) is not these tables: HyperOS reports the slot at the phone's density (about 279dp) and draws the widget's
+     * content about a fifth smaller (every 6dp gap 13px, not 17; 16sp capitals 25px, not 31; measured from his screenshots), so five rows
+     * that need 246dp take about 195 there. A widget cannot see that scale, so only a design change could use the space (DESIGN_SYSTEM section 11).
      */
     private val COMPACT_SCALES = floatArrayOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)
     private val COMPACT_NEED_EN = mapOf(
