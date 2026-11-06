@@ -220,31 +220,29 @@ internal object WidgetRenderer {
      * maximum of the three). Measured 4 Nov 2026 by WidgetRenderEvidenceTest#compact_rows_need over five times of day (before Fajr,
      * midday, Maghrib, after Isha, a Ramadan evening); the entry is the need plus 3dp, interpolated between the sizes.
      *
-     * These are NOT a worst case over states (checked 6 Nov 2026, compact_rows_need now prints every time of day beside the maximum):
-     * the six row need is the same figure at all five times (285.7 at 1.0x English), because the list has no countdown line, the row
-     * label ("Now", "Suhoor ends", "Iftar") is one line of 13sp beside 16sp names and never adds height, and the approximate footer
-     * shares the chip's line. The only state difference is 6dp for 2 to 5 rows: a window that ends at Isha has no row margin under it.
-     * So 285.7 is the plain layout: 10dp padding twice, six 34dp rows (22dp line at 16sp, 6dp above and below, Ali's choice), five 6dp gaps,
-     * the 10dp gap and 22dp chip. A plain 4 by 4 slot of 279dp is 6.7dp short of six rows at 1.0x on a Pixel; offering six rows there
-     * would cut Isha or the chip on every stock launcher, so the steps stay. The 90dp of blank under the chip that Ali's Redmi showed in
-     * that slot (6 Nov 2026) is not these tables: HyperOS reports the slot at the phone's density (about 279dp) and draws the widget's
-     * content about a fifth smaller (every 6dp gap 13px, not 17; 16sp capitals 25px, not 31; measured from his screenshots), so five rows
-     * that need 246dp take about 195 there. A widget cannot see that scale, so only a design change could use the space (DESIGN_SYSTEM section 11).
+     * These are NOT a worst case over states (checked 6 Nov 2026, compact_rows_need prints every time of day beside the maximum): the six
+     * row need is the same figure at all five times, because the list has no countdown line and a row label ("Now", "Suhoor ends",
+     * "Iftar") never adds height. The plain layout is 6dp padding twice, six 34dp rows, five 6dp gaps, the 7dp gap and the 22dp chip.
+     * Ali, 6 Nov 2026 ("Yes, trim padding"): the card's top and bottom padding went from 10dp to 6dp and the gap above the chip from
+     * 10dp to 7dp (11dp in all) so six rows (275.0dp at 1.0x English, entry 278.0) fit the 279dp of a plain 4 by 4 slot, where the old
+     * 285.7 left Fajr out of a Redmi's slot; every figure below was re-measured after the change. The rows keep their 6dp (his 4 Nov choice).
+     * HyperOS also draws widget content about a fifth smaller than the slot it reports (measured from his screenshots), so on that
+     * phone some blank can remain; a widget cannot see that scale.
      */
     private val COMPACT_SCALES = floatArrayOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)
     private val COMPACT_NEED_EN = mapOf(
-        2 to floatArrayOf(131.8f, 135.6f, 138.3f, 142.1f, 145.5f, 155.8f, 160.4f, 178.7f),
-        3 to floatArrayOf(171.8f, 177.5f, 181.3f, 186.3f, 190.9f, 205.0f, 211.0f, 235.0f),
-        4 to floatArrayOf(211.8f, 219.4f, 224.4f, 230.5f, 236.2f, 254.1f, 261.7f, 291.4f),
-        5 to floatArrayOf(251.8f, 261.3f, 267.4f, 274.7f, 281.5f, 303.2f, 312.4f, 347.8f),
-        6 to floatArrayOf(285.7f, 297.1f, 304.4f, 312.8f, 320.8f, 346.3f, 357.0f, 398.1f),
+        2 to floatArrayOf(121.1f, 125.0f, 127.6f, 131.4f, 134.9f, 145.1f, 149.7f, 168.0f),
+        3 to floatArrayOf(161.1f, 166.9f, 170.7f, 175.6f, 180.2f, 194.3f, 200.4f, 224.4f),
+        4 to floatArrayOf(201.1f, 208.8f, 213.7f, 219.8f, 225.5f, 243.4f, 251.0f, 280.8f),
+        5 to floatArrayOf(241.1f, 250.7f, 256.8f, 264.0f, 270.9f, 292.6f, 301.7f, 337.1f),
+        6 to floatArrayOf(275.0f, 286.5f, 293.7f, 302.1f, 310.1f, 335.6f, 346.3f, 387.4f),
     )
     private val COMPACT_NEED_TALL = mapOf(
-        2 to floatArrayOf(131.0f, 135.6f, 138.3f, 144.4f, 148.6f, 159.6f, 165.0f, 186.3f),
-        3 to floatArrayOf(170.7f, 177.5f, 181.3f, 189.7f, 195.4f, 210.7f, 217.9f, 246.5f),
-        4 to floatArrayOf(210.3f, 219.4f, 224.4f, 235.0f, 242.3f, 261.7f, 270.9f, 306.7f),
-        5 to floatArrayOf(249.9f, 261.3f, 267.4f, 280.4f, 289.1f, 312.8f, 323.8f, 366.9f),
-        6 to floatArrayOf(283.4f, 297.1f, 304.4f, 319.6f, 329.9f, 357.7f, 370.7f, 421.0f),
+        2 to floatArrayOf(120.4f, 125.0f, 127.6f, 133.7f, 137.9f, 149.0f, 154.3f, 175.6f),
+        3 to floatArrayOf(160.0f, 166.9f, 170.7f, 179.0f, 184.8f, 200.0f, 207.2f, 235.8f),
+        4 to floatArrayOf(199.6f, 208.8f, 213.7f, 224.4f, 231.6f, 251.0f, 260.2f, 296.0f),
+        5 to floatArrayOf(239.2f, 250.7f, 256.8f, 269.7f, 278.5f, 302.1f, 313.1f, 356.2f),
+        6 to floatArrayOf(272.8f, 286.5f, 293.7f, 309.0f, 319.2f, 347.0f, 360.0f, 410.3f),
     )
 
     /** The compact steps: rows to the height they are offered from, ascending (3, 4, 5, 6). */

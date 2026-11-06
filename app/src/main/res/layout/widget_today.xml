@@ -34,9 +34,9 @@
     android:background="@drawable/widget_background"
     android:orientation="vertical"
     android:paddingStart="8dp"
-    android:paddingTop="10dp"
+    android:paddingTop="6dp"
     android:paddingEnd="8dp"
-    android:paddingBottom="10dp"
+    android:paddingBottom="6dp"
     tools:ignore="UselessLeaf,NestedWeights,UseCompoundDrawables">
 
     <TextView
@@ -517,7 +517,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="7dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
         <!-- No mark here: the current prayer's row already carries it. The footer is the location chip and the countdown,
