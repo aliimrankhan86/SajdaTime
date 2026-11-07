@@ -6090,13 +6090,23 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 7 Nov 2026 (later), Suhoor alarm failure FIXED (READ THIS FIRST): 1.7.0 still kept ready, NOT published
+### 📍 STATE OF PLAY, 7 Nov 2026 (latest), badge, widgets and watch sync gap CLOSED (READ THIS FIRST): 1.7.0 still kept ready, NOT published
+
+**Ali: "what status badge - the phone is plugged do the quick test and record it. I want everything finished". Done.**
+- **What it was:** after the Suhoor fix the alarms read the stored settings under the lock, but the callers still redrew the status badge (the silent next prayer notification) and the widgets, and the view model published to the watch, with the copy they had read earlier. A late caller could post the badge again after it was switched off.
+- **Fix (faa4151):** `PrayerAlarmScheduler.rescheduleAndRefresh` reads the stored settings inside the lock and uses that one copy for the alarms, `OngoingBadge` and `WidgetUpdater`, and returns it so the view model publishes the same copy to the watch. All six callers use it.
+- **Proof:** new `SuhoorReminderDeviceTest.a_refresh_holding_old_settings_cannot_bring_back_a_switched_off_badge` fails on the old behaviour and passes now (3 of 3 in the class). Full gate green. Release script on faa4151's tree: 22 PASS, 0 FAIL, Suhoor and badge 3 of 3.
+- **Real phone (Redmi Note 13 Pro, sideload copy beside Play, 7 Nov 2026):** installed, walked through setup (Makkah, usage counts No thanks, no exact alarm grant), opens, no crash, 20 alarm entries in dumpsys alarm, badge posted (id 1000, channel next_prayer_badge, ongoing and silent). **Not done on the phone:** switching the badge off there (the emulator test proves it), exact alarm permission, watch (not to be tested).
+- **Release bundles now (built on the faa4151 tree, ALL earlier hashes void):** `app-release.aab` sha256 `4b191539cfb3e38283c367b88f7eb66297757f06740e227d0aa337de33709b1f`, `wear-release.aab` sha256 `b30fa292865a49a3db51b2d11338018187fada536b2e07209e244ddb2efbfb66`. Check with `shasum -a 256` before trusting. The watch hash changes on every build.
+- **Nothing is parked.** Left: release day on Ali's "ready to release" (check 1.6.0 is live on Play first). The block below is history.
+
+### History: STATE OF PLAY, 7 Nov 2026 (later), Suhoor alarm failure FIXED
 
 **Ali: "what do you need to finish the suhoor alarm? if nothing then fix now". Done, with proof.**
 - **Cause (proven, not guessed):** `PrayerAlarmScheduler.reschedule` used the settings its caller had read earlier. Six callers read the settings and then reschedule with nothing between. One that read before the reminder was switched off and ran after laid the reminder back down, and nothing removed it until the next reschedule. The release script makes it likely: moving the clock three months fires every overdue alarm at once (logged: ten receiver reschedules in one second, then the daily worker at 23:00:07, a fraction of a second before the test's write). The earlier "leftover state" idea was wrong. Users: harmless in practice, the receiver re-checks the setting when a reminder fires.
 - **Fix:** `reschedule` takes a process wide lock and reads the stored settings inside it (the passed copy is only a fallback). No caller changed.
 - **Proof:** new `SuhoorReminderDeviceTest.a_reschedule_holding_old_settings_cannot_bring_back_a_switched_off_reminder` hands in a stale copy on purpose. On the old code it fails with the script's exact message (expected 0 but was 1); with the fix it passes. The class then passed 8 of 8 repeats at the Ramadan clock. Full gate green (349 app, 255 core, 27 wear, lint clean). Release script on 6ade021: 22 PASS, 0 FAIL, device suite 57 of 57, suhoor-reminder-alarms PASS (2 tests). One script pass alone proves little (it passed 1 time in 3 before); the deterministic test is the proof.
-- **Not covered:** badge, widgets and watch sync still use the settings copy their caller read (the known widget gap, unchanged).
+- **Not covered then (closed later the same day, see the block above):** badge, widgets and watch sync still used the settings copy their caller read.
 - **Release bundles now (built on 6ade021, ALL earlier hashes void):** `SajdaTime-1.7.0/app-release.aab` sha256 `f9c8cd5d1978a0e66a3a029b8d2e705da40f89481e8b76ba162303b9f2b6dc09`, `wear-release.aab` sha256 `11f8016bf0771784d3c0a69e25060925cd5df7c29e69b07af2dc64447809be88`. Check with `shasum -a 256` before trusting.
 - **Nothing is parked any more.** Left: release day on Ali's "ready to release" (check 1.6.0 is live on Play first), and the small known gaps below.
 
