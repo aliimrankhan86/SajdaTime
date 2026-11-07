@@ -14,7 +14,10 @@ import com.sajdatime.core.Sect
  *    Hatamzadeh-Varmazyar. Checked by transcription (whisper.cpp, medium model) to be a complete Shia
  *    adhan in order: "ashhadu anna aliyyan waliyyullah", "hayya ala khayr al-amal" twice, closing
  *    "la ilaha illallah" twice. Studio clean (noise floor about -92 dB, no clipping). CC BY-SA needs the
- *    credit and a link to the licence, which About gives; the file is unmodified.
+ *    credit and a link to the licence, which About gives.
+ *
+ * Since 7 Nov 2026 both files are SHORTENED copies (Sunni 1.75x, Shia pauses cut then 1.5x, Ali's choice
+ * after listening); About says so, and the Shia copy stays CC BY-SA. Method: docs/licences/ADHAN.md.
  *
  * Each school sees only its own, under the one label "Adhan". Do not add a recording without a licence
  * that allows it in an app, checked on its source page, and without the owner's approval: he listened

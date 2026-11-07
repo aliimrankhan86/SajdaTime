@@ -238,7 +238,7 @@
     <string name="about_data">Data dan pustaka</string>
     <string name="about_data_desc">Waktu salat dihitung dengan adhan-java dari Batoul Apps (MIT). Pencarian kota memakai API geocoding Open-Meteo, berlisensi CC BY 4.0.</string>
     <string name="about_adhan">Rekaman azan</string>
-    <string name="about_adhan_desc">Azan Sunni: direkam oleh Adam-synagda, CC0.\nAzan Syiah: dilantunkan oleh Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nKeduanya melalui Wikimedia Commons.</string>
+    <string name="about_adhan_desc">Azan Sunni: direkam oleh Adam-synagda, CC0.\nAzan Syiah: dilantunkan oleh Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nKeduanya melalui Wikimedia Commons. Keduanya dipersingkat untuk aplikasi ini.</string>
     <string name="about_adhan_link_source">Sumber azan Sunni</string>
     <string name="about_adhan_link_shia">Sumber azan Syiah</string>
     <string name="about_adhan_link_licence">Lisensi CC BY-SA 4.0</string>

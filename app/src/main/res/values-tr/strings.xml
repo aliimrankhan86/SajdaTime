@@ -238,7 +238,7 @@
     <string name="about_data">Veriler ve kütüphaneler</string>
     <string name="about_data_desc">Namaz vakitleri Batoul Apps tarafından geliştirilen adhan-java (MIT) ile hesaplanır. Şehir arama, CC BY 4.0 lisanslı Open-Meteo geocoding API\'sini kullanır.</string>
     <string name="about_adhan">Ezan kayıtları</string>
-    <string name="about_adhan_desc">Sünni ezanı: Adam-synagda kaydı, CC0.\nŞii ezanı: Saeed Hatamzadeh-Varmazyar okudu, CC BY-SA 4.0.\nİkisi de Wikimedia Commons aracılığıyla.</string>
+    <string name="about_adhan_desc">Sünni ezanı: Adam-synagda kaydı, CC0.\nŞii ezanı: Saeed Hatamzadeh-Varmazyar okudu, CC BY-SA 4.0.\nİkisi de Wikimedia Commons aracılığıyla. İkisi de bu uygulama için kısaltıldı.</string>
     <string name="about_adhan_link_source">Sünni ezanının kaynağı</string>
     <string name="about_adhan_link_shia">Şii ezanının kaynağı</string>
     <string name="about_adhan_link_licence">CC BY-SA 4.0 lisansı</string>

@@ -264,7 +264,7 @@
     <string name="about_data">البيانات والمكتبات</string>
     <string name="about_data_desc">تُحسب مواقيت الصلاة بمكتبة adhan-java من Batoul Apps (MIT). ويستخدم البحث عن المدن واجهة Open-Meteo geocoding API، المرخّصة بموجب CC BY 4.0.</string>
     <string name="about_adhan">تسجيلات الأذان</string>
-    <string name="about_adhan_desc">الأذان السنّي: تسجيل ⁨Adam-synagda⁩، ⁨CC0⁩.\nالأذان الشيعي: بصوت ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩.\nكلاهما عبر ⁨Wikimedia Commons⁩.</string>
+    <string name="about_adhan_desc">الأذان السنّي: تسجيل ⁨Adam-synagda⁩، ⁨CC0⁩.\nالأذان الشيعي: بصوت ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩.\nكلاهما عبر ⁨Wikimedia Commons⁩. كلاهما مختصر لهذا التطبيق.</string>
     <string name="about_adhan_link_source">مصدر الأذان السنّي</string>
     <string name="about_adhan_link_shia">مصدر الأذان الشيعي</string>
     <string name="about_adhan_link_licence">ترخيص ⁨CC BY-SA 4.0⁩</string>

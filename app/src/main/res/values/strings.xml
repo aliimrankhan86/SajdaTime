@@ -411,7 +411,7 @@
     <string name="about_data">Data and libraries</string>
     <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
     <string name="about_adhan">Adhan recordings</string>
-    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons.</string>
+    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons. Both are shortened for this app.</string>
     <string name="about_adhan_link_source">Sunni source</string>
     <string name="about_adhan_link_shia">Shia source</string>
     <string name="about_adhan_link_licence">CC BY-SA 4.0 licence</string>

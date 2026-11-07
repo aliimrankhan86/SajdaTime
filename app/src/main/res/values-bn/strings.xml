@@ -251,7 +251,7 @@
     <string name="about_data">ডেটা ও লাইব্রেরি</string>
     <string name="about_data_desc">নামাজের সময় Batoul Apps এর adhan-java (MIT) দিয়ে হিসাব করা হয়। শহর খোঁজায় Open-Meteo geocoding API ব্যবহার হয়, CC BY 4.0 লাইসেন্সে।</string>
     <string name="about_adhan">আজানের রেকর্ডিং</string>
-    <string name="about_adhan_desc">সুন্নি আজান: রেকর্ড করেছেন Adam-synagda, CC0।\nশিয়া আজান: কণ্ঠ দিয়েছেন Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0।\nদুটিই Wikimedia Commons থেকে।</string>
+    <string name="about_adhan_desc">সুন্নি আজান: রেকর্ড করেছেন Adam-synagda, CC0।\nশিয়া আজান: কণ্ঠ দিয়েছেন Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0।\nদুটিই Wikimedia Commons থেকে। দুটিই এই অ্যাপের জন্য ছোট করা হয়েছে।</string>
     <string name="about_adhan_link_source">সুন্নি আজানের উৎস</string>
     <string name="about_adhan_link_shia">শিয়া আজানের উৎস</string>
     <string name="about_adhan_link_licence">CC BY-SA 4.0 লাইসেন্স</string>

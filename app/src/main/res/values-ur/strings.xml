@@ -243,7 +243,7 @@
     <string name="about_data">ڈیٹا اور لائبریریاں</string>
     <string name="about_data_desc">نماز کے اوقات کا حساب Batoul Apps کی adhan-java (MIT) سے کیا جاتا ہے۔ شہر کی تلاش Open-Meteo geocoding API استعمال کرتی ہے، جو CC BY 4.0 کے تحت لائسنس یافتہ ہے۔</string>
     <string name="about_adhan">اذان کی ریکارڈنگز</string>
-    <string name="about_adhan_desc">سنی اذان: ریکارڈنگ ⁨Adam-synagda⁩، ⁨CC0⁩۔\nشیعہ اذان: آواز ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩۔\nدونوں بذریعہ ⁨Wikimedia Commons⁩۔</string>
+    <string name="about_adhan_desc">سنی اذان: ریکارڈنگ ⁨Adam-synagda⁩، ⁨CC0⁩۔\nشیعہ اذان: آواز ⁨Saeed Hatamzadeh-Varmazyar⁩، ⁨CC BY-SA 4.0⁩۔\nدونوں بذریعہ ⁨Wikimedia Commons⁩۔ دونوں اس ایپ کے لیے مختصر کی گئی ہیں۔</string>
     <string name="about_adhan_link_source">سنی اذان کا ماخذ</string>
     <string name="about_adhan_link_shia">شیعہ اذان کا ماخذ</string>
     <string name="about_adhan_link_licence">⁨CC BY-SA 4.0⁩ لائسنس</string>

@@ -49,13 +49,26 @@ class BuiltInAdhanDeviceTest {
 
     @Test
     fun each_stored_address_opens_the_whole_file() {
-        val sizes = mapOf(BuiltInAdhan.ADHAN to 1_229_032L, BuiltInAdhan.SHIA_ADHAN to 2_289_817L)
+        val sizes = mapOf(BuiltInAdhan.ADHAN to 976_404L, BuiltInAdhan.SHIA_ADHAN to 1_045_913L)
         sizes.forEach { (adhan, bytes) ->
             val uri = Uri.parse(adhan.uri(context.packageName))
             context.contentResolver.openAssetFileDescriptor(uri, "r").use { fd ->
                 assertNotNull("$adhan does not open", fd)
                 assertEquals("$adhan is not the file in docs/licences/ADHAN.md", bytes, fd!!.length)
             }
+        }
+    }
+
+    /** Opus in Ogg (the shortened recordings) must decode on the device, not just open as a file. */
+    @Test
+    fun each_adhan_decodes_to_its_expected_length() {
+        val seconds = mapOf(BuiltInAdhan.ADHAN to 88, BuiltInAdhan.SHIA_ADHAN to 94)
+        seconds.forEach { (adhan, expected) ->
+            val player = android.media.MediaPlayer.create(context, Uri.parse(adhan.uri(context.packageName)))
+            assertNotNull("$adhan does not decode", player)
+            val ms = player.duration
+            player.release()
+            assertEquals("$adhan length", expected * 1000.0, ms.toDouble(), 1500.0)
         }
     }
 
