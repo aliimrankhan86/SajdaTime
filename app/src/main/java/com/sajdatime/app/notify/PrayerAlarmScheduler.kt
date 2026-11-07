@@ -13,6 +13,7 @@ import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.MainActivity
 import com.sajdatime.app.data.AppSettings
+import com.sajdatime.app.data.SettingsRepository
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -72,7 +73,30 @@ object PrayerAlarmScheduler {
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
-    fun reschedule(context: Context, settings: AppSettings) {
+    /** One reschedule at a time, for the whole process. See [reschedule]. */
+    private val rescheduleLock = Any()
+
+    /**
+     * Lays down every alarm from the settings as they are stored right now.
+     *
+     * [passed] is what the caller read earlier. It is only a fallback, used if the stored settings cannot
+     * be read. Six callers (the alarm receivers, the daily worker, the time change receiver, the view model)
+     * each read the settings, then call this, with nothing between the two. A reschedule that read before a
+     * person switched the suhoor reminder off, and ran after, laid the reminder back down: nothing then
+     * removed it until the next reschedule. It showed as the release script's flaky "a reminder exists while
+     * it is switched off" (6 to 7 Nov 2026), reproduced on demand by
+     * SuhoorReminderDeviceTest.a_reschedule_holding_old_settings_cannot_bring_back_a_switched_off_reminder.
+     * Reading inside the lock means the last reschedule to run always reflects the latest stored settings,
+     * so a late one is harmless. Cost: a burst of reschedules now runs one after another, which is the
+     * same total work, only ordered.
+     */
+    fun reschedule(context: Context, passed: AppSettings) = synchronized(rescheduleLock) {
+        val settings = runCatching { kotlinx.coroutines.runBlocking { SettingsRepository(context).current() } }
+            .getOrDefault(passed)
+        rescheduleFrom(context, settings)
+    }
+
+    private fun rescheduleFrom(context: Context, settings: AppSettings) {
         val coordinates = settings.coordinates ?: return
         val manager = ContextCompat.getSystemService(context, AlarmManager::class.java) ?: return
 
