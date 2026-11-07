@@ -6090,7 +6090,17 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 7 Nov 2026, shortened adhans in (READ THIS FIRST): 1.7.0 still kept ready, NOT published
+### 📍 STATE OF PLAY, 7 Nov 2026 (later), Suhoor alarm failure FIXED (READ THIS FIRST): 1.7.0 still kept ready, NOT published
+
+**Ali: "what do you need to finish the suhoor alarm? if nothing then fix now". Done, with proof.**
+- **Cause (proven, not guessed):** `PrayerAlarmScheduler.reschedule` used the settings its caller had read earlier. Six callers read the settings and then reschedule with nothing between. One that read before the reminder was switched off and ran after laid the reminder back down, and nothing removed it until the next reschedule. The release script makes it likely: moving the clock three months fires every overdue alarm at once (logged: ten receiver reschedules in one second, then the daily worker at 23:00:07, a fraction of a second before the test's write). The earlier "leftover state" idea was wrong. Users: harmless in practice, the receiver re-checks the setting when a reminder fires.
+- **Fix:** `reschedule` takes a process wide lock and reads the stored settings inside it (the passed copy is only a fallback). No caller changed.
+- **Proof:** new `SuhoorReminderDeviceTest.a_reschedule_holding_old_settings_cannot_bring_back_a_switched_off_reminder` hands in a stale copy on purpose. On the old code it fails with the script's exact message (expected 0 but was 1); with the fix it passes. The class then passed 8 of 8 repeats at the Ramadan clock. Full gate green (349 app, 255 core, 27 wear, lint clean). Release script on 6ade021: 22 PASS, 0 FAIL, device suite 57 of 57, suhoor-reminder-alarms PASS (2 tests). One script pass alone proves little (it passed 1 time in 3 before); the deterministic test is the proof.
+- **Not covered:** badge, widgets and watch sync still use the settings copy their caller read (the known widget gap, unchanged).
+- **Release bundles now (built on 6ade021, ALL earlier hashes void):** `SajdaTime-1.7.0/app-release.aab` sha256 `f9c8cd5d1978a0e66a3a029b8d2e705da40f89481e8b76ba162303b9f2b6dc09`, `wear-release.aab` sha256 `11f8016bf0771784d3c0a69e25060925cd5df7c29e69b07af2dc64447809be88`. Check with `shasum -a 256` before trusting.
+- **Nothing is parked any more.** Left: release day on Ali's "ready to release" (check 1.6.0 is live on Play first), and the small known gaps below.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 7 Nov 2026, shortened adhans in:
 
 **Ali chose shorter built-in adhans (7 Nov 2026): "sunni 1.75x is fine for shia 1.5x is fine ... these are only adhan we are going to use onwards".** Few people want the 2 to 3 minute call. Why tempo and silence, not cut phrases: every word stays; a 42 s clip with phrases cut was rejected on 17 Oct 2026 as an incomplete adhan. Ali listened to 1.1x, 1.5x and 1.75x previews and approved these two.
 - **Sunni** `adhan.ogg`: the CC0 source at 1.75x tempo, 88 s, 976,404 bytes, sha256 `449ca062d64564c5face0407c5856618cc4a865ec4d3a52757eeabc58e7c3c2e`. Only ~1 s of silence exists, so tempo is the only way.
@@ -6100,7 +6110,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Not tested:** playback on the Redmi or any real phone; Android 7 to 8 decoding of Opus in Ogg (Android 5+ is documented to play it, the emulator is newer); iPhone is unaffected (Android audio assets only).
 - **Release bundles now (built on e93a34d, ALL earlier hashes void):** `SajdaTime-1.7.0/app-release.aab` sha256 `f75a8ba32af28fbf020c51c2a862ea19375b73a56364a53895117796402fc761`, `wear-release.aab` sha256 `d951a4fe0ef25d9f61b4a5b25e662dd1dfc9992fc737c6d16200bd1dfaa94709`. The watch file has no adhan in it; its hash differs only because each build is signed afresh. Check with `shasum -a 256` before trusting.
 - **Fajr adhan: CLOSED (Ali, 7 Nov 2026: "same adhan for all times").** No separate Fajr recording (no safe source existed). One adhan per school plays for all five prayers; the app has a single alarm sound setting, nothing per prayer, so this needs no code. The 3 Nov permission email and the Quba Mosque email no longer block anything.
-- **Still open, none blocks 1.7.0:** the Suhoor alarm failure stays PARKED (begin by logging callers of `PrayerAlarmScheduler.reschedule` in a script run); the earlier "Still NOT proven" list below. Release day only on Ali's "ready to release"; 1.6.0 was not yet live on Play on 6 Nov, so check that first.
+- **Still open, none blocks 1.7.0:** the Suhoor alarm failure was PARKED here and is FIXED in the block above; the earlier "Still NOT proven" list below. Release day only on Ali's "ready to release"; 1.6.0 was not yet live on Play on 6 Nov, so check that first.
 
 ### 📍 (history, the block above is newer) STATE OF PLAY, 6 Nov 2026 night, proof round: the "not proven" list worked through; one widget redraw race fixed; 1.7.0 still kept ready, NOT published
 
