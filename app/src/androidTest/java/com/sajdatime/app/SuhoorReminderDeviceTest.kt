@@ -181,4 +181,29 @@ class SuhoorReminderDeviceTest {
             DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER).size,
         )
     }
+
+    /**
+     * The same stale copy, for the status badge. The badge and widgets used to be redrawn from the copy of
+     * the settings each caller had read, so a late caller could post the badge again after it was switched
+     * off. rescheduleAndRefresh reads the stored settings inside the lock and uses them for all three.
+     */
+    @Test
+    fun a_refresh_holding_old_settings_cannot_bring_back_a_switched_off_badge() {
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        val before = runBlocking { repository.current().ongoingBadge }
+        try {
+            runBlocking { repository.setOngoingBadge(true) }
+            val stale = runBlocking { repository.current() }
+            runBlocking { repository.setOngoingBadge(false) }
+            PrayerAlarmScheduler.rescheduleAndRefresh(context, stale)
+            Thread.sleep(1000)
+            assertTrue(
+                "a refresh with old settings brought the switched off badge back",
+                manager.activeNotifications.none { it.id == com.sajdatime.app.notify.Notifications.ID_ONGOING },
+            )
+        } finally {
+            runBlocking { repository.setOngoingBadge(before) }
+            PrayerAlarmScheduler.rescheduleAndRefresh(context, runBlocking { repository.current() })
+        }
+    }
 }

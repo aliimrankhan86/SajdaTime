@@ -49,7 +49,6 @@ import com.sajdatime.app.R
 import com.sajdatime.app.data.WatchSync
 import com.sajdatime.app.notify.DailyRescheduleWorker
 import com.sajdatime.app.notify.Notifications
-import com.sajdatime.app.notify.OngoingBadge
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.widget.WidgetUpdater
@@ -755,10 +754,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
         withContext(Dispatchers.Default) {
             val context = getApplication<Application>()
-            PrayerAlarmScheduler.reschedule(context, settings)
-            OngoingBadge.refresh(context, settings)
-            WidgetUpdater.refreshAll(context, settings)
-            WatchSync.publish(context, settings)
+            val latest = PrayerAlarmScheduler.rescheduleAndRefresh(context, settings)
+            WatchSync.publish(context, latest)
         }
     }
 

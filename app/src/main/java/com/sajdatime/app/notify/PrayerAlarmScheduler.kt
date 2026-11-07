@@ -96,6 +96,22 @@ object PrayerAlarmScheduler {
         rescheduleFrom(context, settings)
     }
 
+    /**
+     * [reschedule] plus the status badge and the widgets, all from the SAME stored settings read inside
+     * the lock. Before this, the callers refreshed the badge and widgets with the copy of the settings
+     * they had read earlier, so a late caller could redraw them with a setting that had since been
+     * changed (7 Nov 2026, Ali: close the gap the Suhoor fix left). Returns the settings used, for
+     * callers that also publish them (the watch sync).
+     */
+    fun rescheduleAndRefresh(context: Context, passed: AppSettings): AppSettings = synchronized(rescheduleLock) {
+        val settings = runCatching { kotlinx.coroutines.runBlocking { SettingsRepository(context).current() } }
+            .getOrDefault(passed)
+        rescheduleFrom(context, settings)
+        OngoingBadge.refresh(context, settings)
+        com.sajdatime.app.widget.WidgetUpdater.refreshAll(context, settings)
+        settings
+    }
+
     private fun rescheduleFrom(context: Context, settings: AppSettings) {
         val coordinates = settings.coordinates ?: return
         val manager = ContextCompat.getSystemService(context, AlarmManager::class.java) ?: return
