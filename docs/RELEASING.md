@@ -1119,6 +1119,17 @@ back, and writes PASS, FAIL or CHECK lines to `build/release-1.4.0/summary.txt`.
 publishes `docs/` (the privacy policy) through GitHub Pages**, so merge when you are ready to submit,
 not before (`docs/HANDOVER.md` §15 lessons 124 and 137).
 
+**On Ali's own phones, only ever install a `.sideload` package.** The release script's bundletool steps
+inspect `app-release.aab` (`build-apks --device-spec`, `dump manifest`) and install nothing from it; its
+phone step (`TEST_PHONE=1`) installs the sideload app and its sideload test APK only, and its emulator step
+runs `installDebug` with `ANDROID_SERIAL` set to the emulator. Never `install-apks` an APK set built from
+the release bundle, never `adb install` a release APK, and never `installRelease` or `installDebug` unless
+`ANDROID_SERIAL` names an emulator: each one installs `com.sajdatime.app` itself (the debug build has no
+suffix). Android refuses it over the Play copy, and the copy is lost when someone uninstalls to get past
+that. The Redmi lost its Play copy that way on 12 Nov 2026 and nobody noticed for hours. Before and after any session with a
+phone attached, read `adb shell pm list packages --show-versioncode | grep sajdatime` and check the Play
+copy is still there (`docs/HANDOVER.md` §15 lesson 193).
+
 ### Shipping an improvement *during* the closed test
 
 This is the likely next thing to happen, so the mechanics are written down rather than

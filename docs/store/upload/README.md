@@ -142,29 +142,24 @@ Two things that are not obvious:
   "the system is withholding this" banner. The banner is honest and should stay in the app;
   it just is not what the screenshot is there to show.
 
-### The compass needs feeding
+### Qibla screenshots
 
-An emulator has no magnetometer, so the Qibla screen reads *"You are facing 0°"* — which is
-what the previous store screenshot showed, and it is not a state any real user sees. Set
-the sensors by hand:
+The phone capture uses the London seed at 1080 × 1920 and 420 dpi. Give the emulator a simulated magnetic
+field before opening Qibla, and confirm the captured dial agrees with the turn instruction.
 
 ```bash
-adb emu sensor set acceleration 0:0:9.81        # flat, screen up
-adb emu sensor set magnetic-field -17.3:10:-45  # heading 60°, northern-hemisphere dip
+adb -s emulator-5554 emu sensor set acceleration 0:0:9.81
+adb -s emulator-5554 emu sensor set magnetic-field -42:24:-7
 ```
 
-That yields "You are facing 60°" against a Qibla of 118°, and the app correctly says
-*"Turn right 58°"*. Checking that 118 − 60 = 58 in the captured image is a free end-to-end
-test of the compass maths, so it is worth doing every time.
+The 12 Nov 2026 pictures show a 79° heading and 40° right turn towards the 119° London bearing. Checking
+that 119 − 79 = 40 in the captured image is a free test that the London bearing is right, so do it every time.
+Since 12 Nov the printed turn is worked out from the two printed numbers, so also check the dial itself: the
+green hand sits 40° clockwise of the wedge and reaches the Kaaba, and the wedge stays at twelve o'clock. A short scroll in Arabic and Urdu fits the
+title and Details above the floating tab bar. Copy each raw capture directly to its matching upload folder.
 
 ### Wear OS
 
-Captured from the `sajdawear_large` AVD at 454 × 454 (Play wants 1:1, minimum 384). The
-watch is a **horizontal pager**: the Qibla is one swipe left from the times list, not a
-separate activity.
-
-The watch AVD has no magnetometer either, and unlike the phone there is no sensor value
-that fakes one convincingly — so the watch Qibla page shows the bearing-from-north
-presentation rather than the live "facing" one. That is a real state the app has, on a
-watch whose compass is unavailable, so it is honest; it is simply not the best version of
-that screen. Retake it on real hardware if that ever becomes possible.
+Use the `sajdawear_large` AVD at 454 × 454 (Play wants 1:1, minimum 384). Swipe left from Times to reach Qibla. The refreshed capture
+shows the live hand, Kaaba and fixed wedge. A simulated field of `39:20:-17` produced a clear gap between
+the hand and wedge on the watch emulator. The bearing depends on the watch's saved location.

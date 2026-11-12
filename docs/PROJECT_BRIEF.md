@@ -1,4 +1,4 @@
-# SajdaTime: project brief (snapshot 12 Nov 2026; 1.6.0 is live, Ali saw the update on his phone 11 Nov; 1.7.0 built, ON HOLD, changed overnight 12 Nov)
+# SajdaTime: project brief (snapshot 12 Nov 2026, night; 1.6.0 is live, Play page "Updated on 2 Nov 2026"; 1.7.0 built, ON HOLD for Ali's own Qibla turn, NOT published)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
@@ -6,12 +6,16 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Phone 1.6.0** (versionCode 10) is live: Ali saw it as an update on his own phone on 11 Nov 2026 (submitted 2 Nov, 9 days in review). The 1.5.0 lines below are the earlier record.
 - **1.7.0 is on hold on `claude/1-7-0`.** The Qibla hand now points at the Kaaba on phone and watch.
   The top mark stays fixed. A doubtful compass reading prompts calibration. A high confidence reading enters
-  the facing state within 2° and leaves it past 4°. On the Redmi the raw sensor probe agreed with the app,
-  and the calibration warning appeared. The comparison with the phone's compass still varied, so the
-  real-world direction check remains open. The Redmi counted and saved 237 Tasbeeh taps and reset to zero.
-  The Timetable shows today and six more days. Save as PDF offers the month, with Ramadan as a choice when
-  available. My prayers is on by default and usage counts stay opt in. The store has six listing languages.
-  Release checks and remaining approvals are in `docs/HANDOVER.md` §11.
+  the facing state within 2° and leaves it past 4°. The turn printed always adds up with the Facing printed
+  (12 Nov). Ali said the direction was "quite off" (which build he held is not recorded, so 1.7.0 is treated as
+  an open defect until his own turn on it). Nothing measured shows either build pointing wrongly; the Redmi's own
+  compass and the app differ by 5 to 6° on the desk, the same gap 1.6.0 shows, and the "118 over 353" an earlier
+  session read from the pictures was the Details panel, not a fault. Ali closed the 1.6 needle wish: accuracy first, keep the 1.7.0 dial.
+  Tests pass (app 365, core 269, wear 27, device suite 102 on the emulator). **Open, Ali's hands only:** one turn
+  with the 1.7.0 test copy against Google Maps away from the desk, the figure of eight calibration check, and his
+  look at the pictures. Both phones have the Play copy only. The Timetable shows today and six more days. Save as
+  PDF offers the month, with Ramadan as a choice when available. My prayers is on by default and usage counts stay
+  opt in. The store has six listing languages. Details: `docs/HANDOVER.md` §11.
 - **Phone 1.5.0** (versionCode 9) and **watch 1.5.0** (versionCode 1002), submitted 23 Oct 2026; the public Play page says "Updated on 23 Oct 2026" (checked 25 Oct 2026). Watch testing is finished, so never raise it. What 1.5.0 contains is the record under "1.5.0 (released)" below: the Quiet Glass design, Arabic as the fifth language, the built-in adhan, reminders before prayer, the redesigned widgets, Turkey times matching Diyanet, the suhoor reminder on by default.
 - **Languages:** English, Arabic, Urdu, Turkish, Indonesian and Bengali. Arabic and Urdu read right to left.
 - **Privacy policy:** https://aliimrankhan86.github.io/SajdaTime/privacy.html, dated 23 Oct 2026.

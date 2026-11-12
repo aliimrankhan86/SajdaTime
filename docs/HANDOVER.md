@@ -6092,35 +6092,66 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 12 Nov 2026 evening: Qibla confidence and layout fixed on the 1.7.0 branch; physical direction check remains open
+### 📍 STATE OF PLAY, 12 Nov 2026 night: 1.7.0 Qibla fixed and tested on the emulator; Ali's own turn with the test copy is the one open check; NOT published
 
-- **Live:** the public Google Play page says Updated on 2 Nov 2026. The Redmi's Play copy reports 1.6.0, code 10.
-  Work is on `claude/1-7-0`. The 1.7.0 sideload remains beside it.
+- **Live:** the public Google Play page says Updated on 2 Nov 2026 (read again 12 Nov, night), so 1.6.0. Work is on
+  `claude/1-7-0` at `f13497b` plus the docs commit that carries this block; nothing merged, uploaded or published.
+  **Both phones carry the Play copy only**: Ali had the test copies removed on 12 Nov evening. The Redmi lost its
+  Play copy earlier that day and Ali reinstalled it at 20:03 (1.6.0, versionCode 10): §15 lesson 193.
 - **Qibla:** on phone and watch the hand points to the Kaaba, and a fixed wedge marks the top of the device.
   The change follows the Redmi report that the old fixed green hand looked like the direction to follow. Both devices
   listen to the magnetic field as well as the rotation vector. Low, unreliable, unknown or a badly disturbed field
   puts the calibration instruction in place of live guidance. Medium retains direction with a figure of eight hint.
   High confidence enters the facing state at 2° and exits past 4°. The haptic rearms past 8° so the known 7° wobble
   stays quiet. The Qibla tab holds portrait on phones and reserves the measured floating bar below its scroll area.
-  Tab names have equal edge padding and shrink when a word would split. A 320 dp, 2× replay found Turkish
-  `Namazlarım` and Indonesian `Pengaturan` needed a lower fallback. The tab label sizing now allows that
-  and the six locale replay passed. See DESIGN_SYSTEM §9.
+  Tab names have equal edge padding and shrink when a word would split. See DESIGN_SYSTEM §9.
+- **The printed turn adds up (`f13497b`):** the turn is worked out from the two whole numbers on screen, so Facing
+  plus the turn always gives the bearing. Two device tests were added to `QiblaDialDeviceTest`, but neither was shown
+  to fail on the code before it: the first recomputes the same expression, and the second passes on the old code
+  because at high accuracy a 0.4° gap already reads as facing. Nothing yet tests the medium state where the bearing
+  becomes the headline.
+- **"Fault 1" in `build/review-1.7.0/deepseek/QUITE-OFF-TRACED.md` is NOT a fault. Do not build a fix for it.**
+  "118° from north" in that picture is the Details panel, not the headline. The headline shows the bearing only when
+  the printed turn is 0, which means the printed Facing equals it ("118° from north" over "Facing 118°"), and only at
+  medium accuracy, since at high a heading that close is already "You are now facing the Kaaba".
+  **Optional, waiting for Ali's yes, not built:** label the Details bearing as the Kaaba's direction (six languages,
+  `ux-lead` first).
+- **Ali said "it will still off, it was quite off" (12 Nov evening). Which build he held is not recorded.** His
+  earlier "almost (not exactly)" was the live 1.6 on his Samsung, and 1.7.0 has not been judged by him on a phone, so
+  treat the 1.7.0 direction as an open defect until his own turn on it says otherwise. Nothing measured shows either
+  build pointing wrongly: on the Redmi at 20:17, live 1.6 read Facing 353°, turn right 126° (353 + 126 − 360 = 119)
+  while the phone's own compass read N 355°. If he held 1.6, its green needle meant "where you face", not the Kaaba,
+  which would explain it; 1.7.0 points the hand at the Kaaba. **The 1.6 needle is closed by Ali** ("accuracy is the
+  key"): keep the 1.7.0 dial and never reopen the look without a new measurement.
 - **Redmi evidence:** the independent raw sensor probe got 118.497° from both bearing calculations, with +1.23°
   magnetic declination. App and raw heading were both 187.99° (60 still samples over 12 seconds), and the Kaaba mark
-  was 0.4 px from its expected position. The screen stayed upright after a landscape request. The photos independently
-  show the new calibration warning with no facing claim. A separate MIUI comparison did not meet the three-round
-  requirement. The first stillness precheck drifted by 6°. The retry passed the stillness check (183°→184°)
-  and still differed by 5–6° before any declination correction. The 1.6.0 portrait baseline is 187° / 191° / 187°.
-  There is no evidence for applying a constant offset to match MIUI. The Tasbeeh photos show count, rounds and total as
-  33/1/33, 4/1/37, 6/7/237 after 200 more taps, 6/7/237 after restart, then 0/0/0 after Start again.
-- **Emulator:** the focused suite recorded 42 passing tests across the dial, vibration, large text and Tasbeeh.
-  After reserving the Qibla viewport above the tabs, the two layout measurements passed again. The watch emulator
-  hid the dial during an injected field disturbance and restored the hand and fixed mark on recovery.
-  The final release script and picture refresh are being checked separately.
-- **Release still on hold.** The independent real-world turn against a map, same-minute MIUI calibration plus recovery,
-  and Ali's review of the pictures remain open. The app verifies the calculated direction against the readings it
-  receives. The phone's compass and its surroundings determine how accurate those readings are. Signed bundle checks,
-  store approval and the release steps follow the checklist. Evidence stays under `build/review-1.7.0/`.
+  was 0.4 px from its expected position. The calibration warning appeared with no facing claim. The three-round MIUI
+  comparison on the desk did not pass: 5–6° apart after a passed stillness check, before any declination correction
+  (3.8–4.8° if MIUI shows magnetic north). The live 1.6.0 showed the same kind of gap in portrait (MIUI 187°, 1.6.0
+  Facing 191°, MIUI 187°), so it is older than 1.7.0. It is a gap between two apps reading one chip, so the desk
+  cannot explain it; about 1.2° of it may be declination and the rest is unexplained. The Redmi read 53.2 µT on the
+  desk against a normal 49.2 (S23 Ultra in the same room 49.4), which is why the real check is away from the desk.
+  No constant offset is added: it would need an independent north reference. Tasbeeh on the Redmi:
+  33/1/33, 4/1/37, 6/7/237 after 200 more taps, 6/7/237 after restart, 0/0/0 after Start again.
+- **Verified on `f13497b`:** full gate BUILD SUCCESSFUL, app 365, core 269, wear 27, 0 failed; lint 0 errors in app,
+  core and wear; on emulator-5554 `QiblaDialDeviceTest` OK (17) and the full device suite OK (102). Qibla store pictures
+  refreshed in five phone languages and on the watch (`be8232d`). Earlier the same evening: the focused emulator suite
+  (42) across the dial, vibration, large text and Tasbeeh; a 320 dp, 2× replay in six locales (Turkish `Namazlarım`
+  and Indonesian `Pengaturan` needed the lower tab label fallback, now allowed); the watch emulator hid the dial
+  during an injected field disturbance and restored the hand and wedge on recovery. Measured at 2× text on a fresh
+  emulator install: Details ends at y=1911, the tab bar starts at y=2044. After a landscape request the phone tab
+  stayed upright. **Not run on the Redmi:** it
+  refused every install after 20:10 (`INSTALL_FAILED_USER_RESTRICTED`).
+- **Release still on hold. What is left needs Ali's hands, in this order:** (1) one turn with the 1.7.0 test copy in
+  his hand, away from the desk, against Google Maps (`ANDROID_SERIAL=<redmi> ./gradlew installSideload`, then run
+  `QiblaDialDeviceTest` there while he is present); (2) the same-minute MIUI calibration pair, which needs his figure
+  of eight; (3) his look at the pictures in `build/review-1.7.0/`. Then signed bundles on his Mac, his Merge, the Play
+  Console one screen at a time (six listing languages from `docs/store`, the three extra listing pages deleted), his
+  Submit. The working list is `build/PENDING-1.7.0.md`.
+- **Engineering gaps, recorded, not blocking by anyone's decision yet** (`build/DEEPSEEK-AUDIT-1.7.0.md` items 4
+  and 5): the watch starts a compass only when the rotation vector exists (`WearViewModel`, about line 279) and has
+  no accelerometer plus magnetometer fallback like the phone; and there is no true landscape capture (`09f` is the
+  portrait screen after a rotation request, which proves only that it stays upright).
 
 ### 📍 (history, the block above is newer) STATE OF PLAY, 12 Nov 2026 early morning: 1.6.0 LIVE; 1.7.0 ON HOLD and CHANGED overnight (Qibla hand, tasbeeh, 7 day Timetable, one PDF); emulator only, NOT on a phone, NOT published
 
@@ -11899,3 +11930,5 @@ matters more than the stable hashes, that is the trade being made.
 191. **A pointer is an instrument: restyle it and you can change what people read without touching the maths** (11 Nov 2026). The 1.6.0 Qibla needle was made rounder, fatter and shorter and the Kaaba mark smaller, every number reviewed and every picture approved, and on the day it went live Ali reported the direction "a bit off". No calculation had changed. Pictures taken at "Turn right 58" cannot show whether two marks can be lined up; only the facing picture, and a few degrees either side of it, can. For any dial, gauge or pointer: keep the tip fine, make it reach the thing it points at, write those two as a test (`QiblaDialGeometryTest`), and look at pictures taken on, and 3 degrees off, the target before calling it done.
 
 192. **A control tapped fast must count on the finger landing, not on the click** (12 Nov 2026). The tasbeeh's Count was an ordinary button, and an ordinary button fires when the finger lifts, only if it has not moved past the touch slop and only for one finger at a time. On the emulator, where a test "click" is a perfect down and up, every test passed. On Ali's Redmi, real thumbs slid a little and overlapped, and beads went missing; a test with 200 taps shaped like real ones gave 100. Three things had to be right together: count on the down (`changedToDownIgnoreConsumed`, because a moving scroll or sheet marks the down before the child sees it), consume the whole touch (or the button's click counts it again, and the sheet follows a sliding thumb and then swallows the next touch while it springs back), and keep `onClick` for TalkBack, Switch Access and a keyboard, which have no finger. A test "click" is not a tap: for anything pressed quickly or repeatedly, write the test with sliding and overlapping fingers, and try it on a real phone.
+
+193. **Read the package name back; never assume what a build installs as** (12 Nov 2026). Ali's Redmi lost `com.sajdatime.app`, his Play copy of 1.6.0, and nobody noticed for hours; he reinstalled it from Google Play at 20:03 (read back as 1.6.0, versionCode 10). The cause is not proven, but the record points one way: the Play copy was on the phone at 17:56 (`final-play-1.6.0-portrait-*`) and still noted at 18:21 (`proof/results.md`); the release script's phone step was skipped; then at about 19:30, with Play Protect blocking the sideload copy, a session installed a "debug copy" to run a sensor probe and uninstalled it afterwards, noting it as `com.sajdatime.app.debug` and "the Play copy was never touched" (`build/review-1.7.0/deepseek/RESULTS-qibla-19h35.md`). This project's debug build has **no package suffix** (`app/build.gradle.kts`: only `.sideload` and `.rtl` have one), so a debug copy *is* `com.sajdatime.app`: it cannot install over the Play copy (Play signs it with a key we do not hold), so the Play copy has to go first, and uninstalling the debug copy afterwards leaves nothing. Anything that installs the Play package name has the same effect: `installDebug`, `installRelease`, `adb install` of a release APK, `bundletool install-apks` from the release bundle. Rules now in `CLAUDE.md` and `docs/RELEASING.md` ("Before every future update"): only a `.sideload` package ever goes on his phones, and before and after any phone session read `adb shell pm list packages --show-versioncode | grep sajdatime` and write the Play copy's version down.

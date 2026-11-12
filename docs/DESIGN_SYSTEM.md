@@ -1396,6 +1396,13 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   departure beyond 8° to rearm, so the measured 7° stationary wobble and recovery from calibration stay quiet.
   The phone Qibla tab holds portrait and restores normal rotation on exit. The heading remains display relative
   on large screens where Android can ignore that lock.
+  **The two printed numbers always add up** (`f13497b`, after Ali reported the direction "quite off" on 12 Nov): the
+  turn is worked out from the whole degree Facing and bearing on screen, never rounded on its own, so a reader's
+  own subtraction gives the turn printed. The headline shows the bearing ("118° from north") only when that turn
+  is 0, so it can only sit over the same number ("Facing 118°"). The bearing in Details is a fact about the Kaaba,
+  Facing a fact about the phone, the turn the instruction. Rejected: removing the Facing line or rewording the
+  bearing headline as a fix for a contradiction (the "118 over 353" an earlier session read from the pictures was
+  the Details panel, not the headline). Open for Ali, not built: naming the Details bearing as the Kaaba's direction (six languages).
 - **12 Nov 2026, the Ramadan card's two lines are centred (Ali, from the emulator pictures: "centre the 'Iftar in'
   countdown line and the 'Fast today' line horizontally in the card, in every language including right to
   left").** The countdown (`titleLarge` bold, tabular digits so a centred line does not shift each second) and

@@ -70,3 +70,6 @@ graphify-out/
 /private/
 
 /docs/design-system/widget-review/
+
+# Codex agent config on this Mac (Ali's other tool). Per machine, never committed (12 Nov 2026).
+/.codex/
