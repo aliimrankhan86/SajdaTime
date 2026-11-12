@@ -11,14 +11,14 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 ## Done (4 Nov 2026)
 
 - Gate `clean test lint :app:bundleRelease :wear:bundleRelease`: 349 app, 255 core, 27 wear tests, 0 failures. Device suite 49 of 49 at `26aae84`; after the widget fixes of 4 to 5 Nov the six device widget tests pass at 1.0, 1.3 and 2.0 text and the every-slot proof passes in full. `release-1.7.0.sh` is re-run on the final commit (result recorded in HANDOVER section 11).
-- Store listing 1.7.0 (English and eight locales) approved and stamped in the translation ledger; phone pictures approved; Redmi Note 13 Pro checks done.
+- Store listing 1.7.0 (English and eight locales) approved and stamped in the translation ledger; phone pictures approved; Redmi Note 13 Pro checks done. **Changed 12 Nov 2026:** six store languages only and new description lines (`docs/store/LISTING.md`); the new English What's new waits for Ali's approval, then its five translations.
 - Widget entry heights measured and set (HANDOVER section 11).
 
 ## Still to do before release day (Claude)
 
 1. DONE 5 Nov 2026 on `6b6bf20`: every line PASS or TAKEN, no FAIL (HANDOVER section 11, first block). Re-run it if any code changes before release day.
 2. DONE 5 Nov 2026: `tools/wear-verify.sh` on both round sizes at 1.0x and 1.3x, the current prayer is marked and nothing is behind the bezel.
-3. Watch "What's new" for the Wear track: one English line is drafted in `docs/store/LISTING.md` ("1.7.0 watch note, DRAFT"); Ali approves it, then Claude translates it into the eight languages and stamps the ledger.
+3. Watch "What's new" for the Wear track: one English line is drafted in `docs/store/LISTING.md` ("1.7.0 watch note, DRAFT"); Ali approves it, then Claude translates it and stamps the ledger. DONE 6 Nov 2026; since 12 Nov 2026 only the five translations for the six store languages are kept.
 4. Retake the one watch Times picture (`docs/store/upload/wear-os/w1-times.png`, still the 1.5.0 one) so it matches the app.
 
 ## Release day, in order
@@ -27,7 +27,7 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 1. **Claude:** `docs/release-tools/set-release-date.sh "<d Month yyyy>" 1.7.0` (moves `docs/privacy.html` "Last updated" and the date in `UsageCountsTest`); data handling has not changed in 1.7.0, so the page text stays. Gate, commit, push.
 2. **Ali:** opens and merges the pull request `claude/1-7-0` into `main` (none exists yet).
 3. **Claude:** `./gradlew :app:bundleRelease :wear:bundleRelease` on `main`; **Ali** signs and uploads both (the key is his alone, `docs/RELEASING.md`).
-4. **Ali + Claude, one screen at a time:** Play Console, production release for the phone (paste the listing and What's new), then the Wear OS release (the watch note). Ali presses Send on each.
+4. **Ali + Claude, one screen at a time:** Play Console, production release for the phone (paste the listing and What's new), then the Wear OS release (the watch note). Ali presses Send on each. **Six store languages only from 1.7.0 (Ali, 12 Nov 2026):** paste English, Arabic, Urdu, Bengali, Turkish and Indonesian, and in Store listings, Manage translations, **delete the three other translations** (Malay, French, Hindi) so no old 1.6.0 text stays live in them; Ali presses each delete.
 5. After Google's review: check the public page "Updated on" date signed out, then record it in HANDOVER, PROJECT_BRIEF and GBrain, and re-baseline the daily health check.
 
 The script writes the bundles to a temporary `~/Developer/SajdaTime/SajdaTime-1.7.0/` (gitignored). Delete that folder after the upload; the signed phone bundle may be copied to Drive folder 99 if Ali wants a record.

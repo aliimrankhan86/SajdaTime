@@ -231,24 +231,31 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.7.0 listing, English APPROVED by Ali 4 Nov 2026 ("approve it", using the 1.6.0 text and the new items); not live; translations NEXT
+### 1.7.0 listing, English full description changed by Ali 12 Nov 2026 (his six decisions, listed below); What's new is a DRAFT WAITING FOR ALI'S APPROVAL; not live
 
-Made from the approved 1.6.0 text below (sells the whole app first, then What's new, HANDOVER 5.38). Changes: Duha, time left and
+Made from the approved 1.6.0 text below (sells the whole app first, then What's new, HANDOVER 5.38). Changes on 4 Nov: Duha, time left and
 sky on the prayer list, widgets line, Match your mosque line (the old "shift the Islamic date" bullet is gone from it; the shift
-now sits with the Islamic dates). Short description unchanged (see above). Characters: full 3950 / 4000, What's new 286 / 500.
+now sits with the Islamic dates). Short description unchanged (see above).
 Checked 4 Nov 2026 against the code: Duha is Sunni only and off by default; the Hijri shift is a stepper of up to two days ("Shift the date"), which is what "shiftable by a day or two" says.
 
-What's new:
+**Changes on 12 Nov 2026 (Ali's decisions):** the store listing is in six languages only, the same six as the app (English, Arabic,
+Urdu, Bengali, Turkish, Indonesian); the languages moved to the second line of every description and the old languages bullet under
+For everyone is gone; the Timetable bullet says what 1.7.0 does (today and the next six days, whole month or Ramadan PDF in one tap);
+a Tasbeeh bullet under My prayers; the adhan bullet gains "Hear it first" (the sound preview). Characters, counted by script on
+12 Nov 2026: full description 3994 / 4000, What's new draft 411 / 500. The five translations are in `LISTING-LOCALES.md`.
+
+What's new, DRAFT 12 Nov 2026, **waiting for Ali's approval** (411 / 500). Not translated yet: the five translations are made once
+he approves the English. The text Ali approved on 4 Nov (407 characters by script; the "286" once written here was a miscount; no Tasbeeh, Timetable or Qibla needle) is replaced by this:
 
 ```
-Times and the widgets now mark the prayer that is current, with one clear Now marker. Choose Follow phone for the theme, or the opposite of your phone's. New Duha window (optional). The time left and a sky band on Times. Redrawn widgets that fit more sizes. Match your mosque shows each time beside your change. The Hijri date shift moved to the Islamic dates. Where your mosque differs, follow your mosque.
+New: a Tasbeeh counter in My prayers, with targets of 33, 99, 100 or none. The Timetable now shows today and the next six days, and Save as PDF gives the whole month in one tap. A slimmer Qibla needle that is easier to line up. Times and widgets mark the current prayer with one Now marker. Optional Duha window. Time left and a sky band on Times. Redrawn widgets. Where your mosque differs, follow your mosque.
 ```
 
 Full description:
 
 ```
 SajdaTime gives you prayer times (namaz, salah or salat), adhan alerts, a Qibla compass and a private salah tracker, for Sunni and Shia Muslims, on your phone and Wear OS watch.
-Worked out on your phone, no signal needed. No ads, no account.
+In English, Arabic, Urdu, Bengali, Turkish and Indonesian. Worked out on your phone, no signal needed. No ads, no account.
 
 PRAYER TIMES AND QIBLA
 
@@ -257,12 +264,12 @@ PRAYER TIMES AND QIBLA
 • The Hijri date (Islamic calendar) and the Islamic dates of the year, with Shia dates, shiftable by a day or two
 • Qibla direction: a true north compass that says which way to turn and buzzes facing the Kaaba
 • Islamic midnight, the last third of the night, and which method made your times
-• Timetable for this month and next, and a PDF of a day, week, month or Ramadan
+• Timetable for today and the next six days, and the whole month or Ramadan as a PDF in one tap
 
 ALERTS AND ADHAN
 
 • Each prayer: off, a notification, or an alarm loud enough for Fajr, even with the app closed.
-• Adhan (azan) for Sunni and Shia, or any sound on your phone
+• Adhan (azan) for Sunni and Shia, or any sound on your phone. Hear it first
 • A quiet reminder 5 to 30 minutes before a prayer, a silent next prayer notification
 • A bell on each prayer turns its alert on or off
 • Alert check: what your phone is blocking
@@ -272,6 +279,7 @@ MY PRAYERS
 • Private: tick each prayer, see your week as rings and 30 days as a calendar
 • It records, never judges. Optional streak, Pause, move it to a new phone
 • Fasts to make up: one count that goes down as you make them up
+• Tasbeeh counter: 33, 99, 100 or no target
 
 RAMADAN AND EID
 
@@ -286,7 +294,6 @@ WIDGETS AND WEAR OS
 
 FOR EVERYONE
 
-• English, Arabic, Urdu, Bengali, Turkish and Indonesian, set in the app or by your phone
 • Light and dark themes, large text, screen readers
 
 YOUR SCHOOL, YOUR MOSQUE
@@ -1462,6 +1469,6 @@ Run `./tools/build-store-assets.sh` to regenerate everything under `upload/`.
   in particular shows its bearing-from-north state because the Wear AVD has no
   magnetometer — a real state, but not the best version of that screen.
 
-## 1.7.0 watch note, APPROVED by Ali 6 Nov 2026, translated into the eight languages in LISTING-LOCALES.md (for the Wear OS release's What's new)
+## 1.7.0 watch note, APPROVED by Ali 6 Nov 2026, translated into the five other store languages in LISTING-LOCALES.md (for the Wear OS release's What's new)
 
 The watch is now in Bengali and marks the prayer that is current, like the phone.
