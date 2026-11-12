@@ -75,6 +75,12 @@
     },
     {
       "folder": "components/",
+      "file": "Buzz.kt",
+      "holds": "One short vibration (Qibla arrival, tasbeeh beads)",
+      "spec": "DESIGN_SYSTEM §4, Qibla dial"
+    },
+    {
+      "folder": "components/",
       "file": "Bell.kt",
       "holds": "The alert toggle",
       "spec": "03 §3.2"
@@ -174,6 +180,12 @@
       "file": "MyPrayersScreen.kt",
       "holds": "My prayers tab",
       "spec": "05 §5.4"
+    },
+    {
+      "folder": "prayers/",
+      "file": "TasbeehSheet.kt",
+      "holds": "Tasbeeh door and sheet",
+      "spec": "DESIGN_SYSTEM §9, 12 Nov 2026"
     },
     {
       "folder": "qibla/",

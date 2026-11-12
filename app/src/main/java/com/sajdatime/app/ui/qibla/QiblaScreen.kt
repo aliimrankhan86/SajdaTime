@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.testTag
 import com.sajdatime.app.ui.theme.dialBezel
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.buzz
 import com.sajdatime.app.ui.components.shrinkToFit
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
@@ -429,7 +430,7 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             // The needle: fixed at the top with a compass ("you"), at the bearing without
             // one. Screen space, not dial space, which is the whole point.
             rotate(degrees = needleRotation, pivot = centre) {
-                drawNeedle(centre, radius, scheme.primary)
+                drawNeedle(centre, radius, scheme.primary, hole = face)
             }
 
             // Last, so it covers whatever it lands on: a cardinal letter when the Qibla is
@@ -532,75 +533,82 @@ private fun DrawScope.drawCardinals(
 }
 
 /**
- * The needle's shape, in shares of the dial radius, y down, dial centre at (0, 0). Internal so
+ * The needle's shape, in shares of the dial radius, dial centre at the origin. Internal so
  * `QiblaDialGeometryTest` can hold the numbers to the Kaaba mark's.
  *
- * **Slimmed and sharpened on 11 Nov 2026, the night 1.6.0 went live.** Ali, on his own phone: the needle
- * had been made thicker, it "seems a bit off", "not as accurate as before". The direction maths had not
- * changed since 1.5.0 (`CompassRepository` and `QiblaEngine` are byte for byte the same); what changed in
- * 1.6.0 was the pointer. The step 6 teardrop was 0.24 of the radius across, ended at 0.64 with a round
- * stroked tip, and stopped under the Kaaba mark's lower edge, while the mark itself shrank from 0.30 to 0.22.
- * A blunt tip resting under a small mark can sit anywhere along the mark's base and look "arrived", so the
- * dial could no longer be read to better than several degrees. The 1.5.0 needle was a sharp triangle,
- * 0.15 across, whose tip ran through the middle of the mark.
+ * **A watch hand, since 12 Nov 2026: a slim blade from a ring at the centre to a fine point, with a short
+ * tail behind the ring.** Two reports from Ali in one night made it:
+ * 1. On the 1.6.0 he had just received (11 Nov): the needle had been made thicker, it "seems a bit off",
+ *    "not as accurate as before". The direction maths had not changed since 1.5.0 (`CompassRepository` and
+ *    `QiblaEngine` are byte for byte the same); what changed in 1.6.0 was the pointer. The step 6 teardrop
+ *    was 0.24 of the radius across, ended at 0.64 with a round stroked tip, and stopped under the Kaaba
+ *    mark's lower edge, while the mark itself shrank from 0.30 to 0.22. A blunt tip resting under a small
+ *    mark can sit anywhere along the mark's base and look "arrived", so the dial could not be read to
+ *    better than several degrees.
+ * 2. On the slimmed teardrop that answered it (12 Nov): "not looking nice to me ... make it better looking
+ *    but accuracy is the most important criteria ... Clean design." He left the look to us.
  *
- * So: still the Pillars teardrop Ali chose (24 Oct 2026), but 0.15 across like the 1.5.0 needle, with a
- * fine point that ends at [NEEDLE_TIP], one hundredth short of the Kaaba mark's centre ([KAABA_DISTANCE]).
- * On alignment the point runs up into the middle of the cube (the mark is drawn last, over it), and where
- * it enters the mark it is about a tenth of the cube's width, so "is it centred?" can be answered by eye.
- * No stroke any more: the round join was what blunted the tip.
+ * So the shape is the one instrument makers settled on for exactly this job, reading a direction against a
+ * mark: straight edges that the eye can extend, a point that ends at [NEEDLE_TIP] (inside the Kaaba mark,
+ * one hundredth short of its centre, [KAABA_DISTANCE]), a ring that says where the pivot is, and a tail that
+ * balances it. Where the blade enters the mark it is under a tenth of the cube's width, so "is it centred?"
+ * is answered by eye. Chosen from four drawn side by side (the slim teardrop, this hand, a compass lozenge,
+ * a shaft with an arrowhead): the lozenge is as readable but heavier; the arrowhead hides the very point
+ * that has to be read.
  *
- * Rejected: keeping the fat teardrop and adding a hairline index (two marks for "you"); enlarging the Kaaba
- * mark back to 0.30 (it would run into the letters, the ticks and the bezel: see [KAABA_DISTANCE]).
+ * Do not fatten, shorten or round it again: the test fails if you do.
  */
 internal const val NEEDLE_TIP = 0.69f
-internal const val NEEDLE_END_RADIUS = 0.075f
-internal const val NEEDLE_END_CENTRE = 0.07f
+
+/** Half the blade's width at its widest, where it meets the ring. The whole blade is 0.064 across. */
+internal const val NEEDLE_HALF_WIDTH = 0.032f
+
+/** How far above the centre the blade is at its widest; from there it runs straight to the point. */
+internal const val NEEDLE_SHOULDER = 0.06f
+
+/** The tail's length behind the centre, and its half width at the end (a little narrower than the blade). */
+internal const val NEEDLE_TAIL = 0.16f
+internal const val NEEDLE_TAIL_HALF_WIDTH = 0.026f
+
+/** The ring at the pivot, and the hole in it. The widest thing about the needle: 0.14 across. */
+internal const val NEEDLE_HUB = 0.07f
+internal const val NEEDLE_HUB_HOLE = 0.028f
 
 /**
- * The left flank as one cubic, tip first, as (x, y) pairs: tip, two control points, the point where it
- * lands tangent on the round end. The right flank is its mirror image, which is what keeps the tip on
- * the dial's vertical centre line.
+ * Half the blade's width at [up] shares of the radius above the centre: straight from the shoulder to
+ * nothing at the tip. The path below is drawn from the same numbers; the test reads the shape from here.
  */
-internal val NEEDLE_FLANK = floatArrayOf(
-    0f, -NEEDLE_TIP,
-    -0.010f, -0.42f,
-    -NEEDLE_END_RADIUS, -0.18f,
-    -NEEDLE_END_RADIUS, NEEDLE_END_CENTRE,
-)
+internal fun needleHalfWidthAt(up: Float): Float = when {
+    up >= NEEDLE_TIP -> 0f
+    up >= NEEDLE_SHOULDER -> NEEDLE_HALF_WIDTH * (NEEDLE_TIP - up) / (NEEDLE_TIP - NEEDLE_SHOULDER)
+    else -> NEEDLE_HALF_WIDTH
+}
 
 /**
- * The needle path, a slim teardrop: tip at (0, -[NEEDLE_TIP]), a round end centred at (0, 0.07) with radius
- * 0.075, bottom at 0.145, all in shares of `r`, dial centre at (`cx`, `cy`), y down. The left flank lands
- * tangent to the round end, the arc runs through the bottom, the right flank returns to the tip. The key
- * under the dial draws the same path.
+ * The blade and tail as one outline, dial centre at (`cx`, `cy`), y down: the point, down the left edge
+ * to the shoulder, on to the tail's end, across, and back up the right edge. Every x on the right is the
+ * left's negated, which is what keeps the point on the dial's centre line.
  */
 private fun needlePath(cx: Float, cy: Float, r: Float): Path = Path().apply {
-    val f = NEEDLE_FLANK
-    val e = NEEDLE_END_RADIUS
-    val c = NEEDLE_END_CENTRE
-    moveTo(cx + f[0] * r, cy + f[1] * r)
-    cubicTo(cx + f[2] * r, cy + f[3] * r, cx + f[4] * r, cy + f[5] * r, cx + f[6] * r, cy + f[7] * r)
-    arcTo(
-        Rect(cx - e * r, cy + (c - e) * r, cx + e * r, cy + (c + e) * r),
-        startAngleDegrees = 180f,
-        sweepAngleDegrees = -180f,
-        forceMoveTo = false,
-    )
-    // The mirror image of the left flank, walked back to the tip.
-    cubicTo(cx - f[4] * r, cy + f[5] * r, cx - f[2] * r, cy + f[3] * r, cx - f[0] * r, cy + f[1] * r)
+    moveTo(cx, cy - NEEDLE_TIP * r)
+    lineTo(cx - NEEDLE_HALF_WIDTH * r, cy - NEEDLE_SHOULDER * r)
+    lineTo(cx - NEEDLE_TAIL_HALF_WIDTH * r, cy + NEEDLE_TAIL * r)
+    lineTo(cx + NEEDLE_TAIL_HALF_WIDTH * r, cy + NEEDLE_TAIL * r)
+    lineTo(cx + NEEDLE_HALF_WIDTH * r, cy - NEEDLE_SHOULDER * r)
     close()
 }
 
 /**
- * The needle: a slim teardrop from a fine point to a round end past the centre. With a compass it is
- * fixed at the top and means "the way you are pointing"; without one it is turned to the Qibla bearing.
- * Its point ([NEEDLE_TIP]) sits inside the Kaaba mark when the two coincide, see [KAABA_DISTANCE], so on
- * alignment the arrow visibly runs into the middle of the Kaaba. No hub: the round end is the pivot.
- * Filled only; see [NEEDLE_TIP] for why the stroke went.
+ * The needle: the blade, then the ring over it, then the hole in the ring in [hole] (whatever is behind
+ * the needle: the dial's face, or the page in the key). With a compass it is fixed at the top and means
+ * "the way you are pointing"; without one it is turned to the Qibla bearing. Its point sits inside the
+ * Kaaba mark when the two coincide, see [KAABA_DISTANCE], so on alignment the hand visibly runs into the
+ * middle of the Kaaba.
  */
-private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
+private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color, hole: Color) {
     drawPath(path = needlePath(centre.x, centre.y, radius), color = colour)
+    drawCircle(color = colour, radius = radius * NEEDLE_HUB, center = centre)
+    drawCircle(color = hole, radius = radius * NEEDLE_HUB_HOLE, center = centre)
 }
 
 /**
@@ -617,8 +625,8 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * the minor ticks, but the drawn artwork (the plinth of `ic_kaaba.xml`) reaches only 0.816 at worst, under
  * the ticks and the aligned bezel. The mark overlaps the letters' band and is drawn last.
  *
- * The needle's point is *inside* the box when the two coincide, one hundredth short of the mark's centre,
- * which is what makes the arrow run into the middle of the Kaaba on alignment rather than stop beside it
+ * The hand's point is *inside* the box when the two coincide, one hundredth short of the mark's centre,
+ * which is what makes the hand run into the middle of the Kaaba on alignment rather than stop beside it
  * or under it. It stays just inside the letters' band (0.695), so it never touches a letter. The watch
  * keeps its own dial and its own shares (0.66 and 0.30 for the mark); see `WearApp.kt`.
  */
@@ -633,34 +641,8 @@ internal const val KAABA_SIZE = 0.22f
  */
 private const val ARRIVAL_QUIET_MILLIS = 5_000L
 
-/**
- * The arrival buzz, straight from the Vibrator. `performHapticFeedback(LongPress)` until step 6 was
- * silent on any phone whose touch feedback setting is off, which is the default on many Samsung and
- * Xiaomi phones, so the message appeared and nothing was felt (Ali, 24 Oct 2026: the vibration must
- * happen). A vibration with no attributes is still filed as touch and muted the same way (emulator,
- * 24 Oct: "ignored_for_settings" with touch feedback off), so it is marked media, which that switch
- * does not govern; the phone's own vibration settings still apply, as they should. 70 ms: one tap.
- */
-private fun arrivalBuzz(context: android.content.Context) {
-    val vibrator = if (android.os.Build.VERSION.SDK_INT >= 31) {
-        context.getSystemService(android.os.VibratorManager::class.java)?.defaultVibrator
-    } else {
-        @Suppress("DEPRECATION")
-        context.getSystemService(android.os.Vibrator::class.java)
-    }
-    if (vibrator == null || !vibrator.hasVibrator()) return
-    when {
-        android.os.Build.VERSION.SDK_INT >= 33 -> vibrator.vibrate(
-            android.os.VibrationEffect.createOneShot(70, android.os.VibrationEffect.DEFAULT_AMPLITUDE),
-            android.os.VibrationAttributes.createForUsage(android.os.VibrationAttributes.USAGE_MEDIA),
-        )
-        android.os.Build.VERSION.SDK_INT >= 26 -> @Suppress("DEPRECATION") vibrator.vibrate(
-            android.os.VibrationEffect.createOneShot(70, android.os.VibrationEffect.DEFAULT_AMPLITUDE),
-            android.media.AudioAttributes.Builder().setUsage(android.media.AudioAttributes.USAGE_MEDIA).build(),
-        )
-        else -> @Suppress("DEPRECATION") vibrator.vibrate(70)
-    }
-}
+/** The arrival buzz: one tap, 70 ms. Why it goes through the Vibrator and not a haptic constant: [buzz]. */
+private fun arrivalBuzz(context: android.content.Context) = buzz(context, 70)
 
 /**
  * The Kaaba itself, on the ring at the Qibla bearing: "it is over there".
@@ -808,7 +790,7 @@ private fun DialLegend() {
     val kaaba = painterResource(CoreR.drawable.ic_kaaba)
     val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
 
-    // Marks sized from the text line, so they grow with it; the Kaaba and the teardrop fill 0.75 of the box.
+    // Marks sized from the text line, so they grow with it; the Kaaba fills 0.75 of the box, the hand all of it.
     val box = textLineHeight()
     val markSize = box * 0.75f
 
@@ -843,13 +825,20 @@ private fun DialLegend() {
             }
         }
         Key(stringResource(R.string.qibla_legend_facing)) {
-            // The dial's own teardrop in miniature, from the same path, so the key matches what it explains.
-            Canvas(Modifier.size(markSize)) {
-                // The shape spans -NEEDLE_TIP to the round end's bottom, so r is the box over that span and
-                // the dial centre sits half the difference of the two below the middle of the box.
-                val bottom = NEEDLE_END_CENTRE + NEEDLE_END_RADIUS
-                val r = size.height / (NEEDLE_TIP + bottom)
-                drawPath(path = needlePath(size.width / 2f, size.height / 2f + (NEEDLE_TIP - bottom) / 2f * r, r), color = scheme.primary)
+            // The dial's own hand in miniature, from the same numbers, so the key matches what it explains.
+            // It takes the whole line height, not the Kaaba's 0.75 of it: the hand is slim, and at 0.75
+            // its blade was under a dp wide.
+            val page = scheme.background
+            Canvas(Modifier.size(box)) {
+                // The shape spans the tip above the centre to the tail below it, so r is the box over that
+                // span and the dial centre sits half the difference of the two below the middle.
+                val r = size.height / (NEEDLE_TIP + NEEDLE_TAIL)
+                drawNeedle(
+                    centre = Offset(size.width / 2f, size.height / 2f + (NEEDLE_TIP - NEEDLE_TAIL) / 2f * r),
+                    radius = r,
+                    colour = scheme.primary,
+                    hole = page,
+                )
             }
         }
     }

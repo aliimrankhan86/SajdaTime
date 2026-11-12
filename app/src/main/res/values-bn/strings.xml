@@ -117,15 +117,10 @@
     <!-- Prayer names are written inside timetable_day_a11y on purpose. -->
     <string name="action_timetable">সময়সূচি</string>
     <string name="timetable_title">সময়সূচি</string>
-    <string name="timetable_month_a11y">%1$s এর নামাজের সময়</string>
     <string name="timetable_day_a11y">%1$s। ফজর %2$s। সূর্যোদয় %3$s। যোহর %4$s। আসর %5$s। মাগরিব %6$s। এশা %7$s।</string>
     <string name="timetable_today_a11y">আজ, %1$s</string>
     <string name="export_sheet_title">আপনার সময়সূচি সেভ করুন</string>
     <string name="export_sheet_body">আমরা %1$s এর নামাজের সময়ের একটি PDF বানাব। তারপর আপনি এটি সেভ বা প্রিন্ট করতে, অথবা কাউকে পাঠাতে পারবেন।</string>
-    <string name="export_today">শুধু আজ</string>
-    <string name="export_today_desc">এক দিন, ছয়টি সময়</string>
-    <string name="export_week">পরের 7 দিন</string>
-    <string name="export_week_desc">আজ এবং তার পরের ছয় দিন</string>
     <string name="export_month">পুরো এই মাস</string>
     <string name="export_month_desc">মাসের 1 তারিখ থেকে শেষ পর্যন্ত প্রতিদিন</string>
     <string name="export_saved">ডাউনলোডে %1$s নামে সেভ হয়েছে</string>
@@ -647,4 +642,13 @@
     <string name="exact_alarm_dialog_more">Android এটি তার নিজস্ব স্ক্রিনে জিজ্ঞেস করে। পরে সেটিংসে বদলাতে পারবেন।</string>
     <string name="tab_settings_attention_a11y">সেটিংস, মনোযোগ দরকার</string>
     <string name="home_fajr_exact_a11y">%1$s, %2$s, ঠিক সময়ে বাজতে নাও পারে</string>
+    <string name="tasbeeh_title">তাসবিহ</string>
+    <string name="tasbeeh_line">এক ট্যাপে আপনার জিকির গুনুন।</string>
+    <string name="tasbeeh_count">গুনুন</string>
+    <string name="tasbeeh_reset">আবার শুরু করুন</string>
+    <string name="tasbeeh_change_target">লক্ষ্য বদলান</string>
+    <string name="tasbeeh_target">লক্ষ্য: %1$d</string>
+    <string name="tasbeeh_no_target">কোনো লক্ষ্য নেই</string>
+    <string name="tasbeeh_rounds">রাউন্ড: %1$d</string>
+    <string name="tasbeeh_state">%2$d এর মধ্যে %1$d</string>
 </resources>

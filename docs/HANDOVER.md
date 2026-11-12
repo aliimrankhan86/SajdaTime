@@ -2043,6 +2043,7 @@ the state of play also updates `docs/AI-WORKER-BRIEF.md` sections 2, 4 and 5.
 Ali chose from pictures on 23 Oct 2026: "B: calendar grid" and "Yes, build it". Design by Fable:
 `docs/plans/2026-10-release-1.6.0/STEP-1-DESIGN.md` (its §9 and 13 win). The rules, each tested in `:core`
 (`TrackerLogicTest`, `WeekStripTest`) unless marked:
+- **On by default since 1.7.0 (Ali, 12 Nov 2026); it was off by default in 1.6.0.** See `AppSettings.trackerEnabled`.
 - **Where.** A fourth tab: Times, Qibla, My prayers, Settings. Times has no ticks any more. The tab sends no usage
   count (`Destination.PRAYERS -> null`; `UsageCountsTest` pins the three counted screens).
 - **Where the rings begin (`tracker_started`, in the tracker store).** Set on each switch on: today, unless a tick
@@ -2107,6 +2108,7 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
   ahead** (the plan said so): `state.ramadan` is null until three days before (`RamadanState.kt:76-77`), and someone
   tapping Timetable in January expects January. Ali chose "From day 1". The Ramadan PDF is still offered 30 days
   ahead in the chooser.
+- **SUPERSEDED 12 Nov 2026 (Ali): the sheet lists today and the six days after it, today first, no month headings; Save as PDF makes the whole month in one tap, and the chooser appears only with the Ramadan PDF (month, Ramadan). The two bullets below are the 1.6.0 record.**
 - **Month sheet.** This month and next (Ali: "This month and next"), sticky month headings, one card per day with
   six times, opened with today's card just under the pinned heading (scrolled down by the heading's measured
   height: a sticky header draws over the first visible item). Today in `primaryContainer` with the Today pill.
@@ -2144,7 +2146,7 @@ Rejected: an iPhone style switch for notifications (only the phone can allow the
 - **The dial is the Pillars style in our theme** (Ali, 24 Oct 2026: "I want that style of compass and needle but in
   my own theme"; STEP-6-DESIGN §15/§16). A teardrop needle in `primary` (reverses the earlier rejection, on his word),
   a lifted bezel from `dialBezel()` (`surface` light, `surfaceContainerHighest` dark) that turns `primary` on
-  arrival, 60 `outline` ticks, letters inside, the Kaaba at 0.70. **The teardrop was slimmed on 11 Nov 2026** (Ali: thicker, "seems a bit off"): 0.15 of the radius across, a fine point ending at 0.69 inside the Kaaba mark, no stroke; `QiblaDialGeometryTest` and `QiblaDialDeviceTest` hold it. Do not fatten or shorten it again. **No hub and no turn arc** (Pillars has neither;
+  arrival, 60 `outline` ticks, letters inside, the Kaaba at 0.70. **The needle is a slim watch hand since 12 Nov 2026** (Ali, 11 Nov: the teardrop is thicker, "seems a bit off"; 12 Nov: "make it better looking but accuracy is the most important"): a straight blade 0.064 of the radius across from a ring at the centre to a fine point at 0.69 inside the Kaaba mark, with a short tail; `QiblaDialGeometryTest` and `QiblaDialDeviceTest` hold it. Do not fatten, shorten or round it again. **No hub and no turn arc** (Pillars has neither;
   the turn is said in words above the dial). Don't add them back without Ali. **Decided 25 Oct 2026:** Ali chose the
   instruction under the title, the white lifted bezel, the amber notice with Set location and no arc (the
   recommendation each time); the dark bezel `surfaceContainerHighest` is Fable's choice from pictures. The four
@@ -6090,7 +6092,35 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 11 Nov 2026 night (latest, READ THIS FIRST): 1.6.0 is LIVE; 1.7.0 is ON HOLD for the Qibla needle, fixed in code and proven on an emulator, NOT yet checked on a phone, NOT published
+### 📍 STATE OF PLAY, 12 Nov 2026 early morning (latest, READ THIS FIRST): 1.6.0 LIVE; 1.7.0 ON HOLD and CHANGED overnight (Qibla hand, tasbeeh, 7 day Timetable, one PDF); emulator only, NOT on a phone, NOT published
+
+**Ali's overnight brief, 12 Nov 2026, 00:26 to 00:45, before sleeping ("Do it autonomously and make good logical reasons"):** an audit before 1.7.0; usage counts on by default; a digital tasbeeh "which works properly"; check and fix the codebase and its security; simplicity; the Timetable shows only the next 7 days with today first and Save as PDF gives the whole month; and the Qibla needle "is not looking nice ... make it better looking but accuracy is the most important criteria ... Clean design". He said not to check the UI or translations in every language. **Everything below was built without him seeing a picture. He looks before anything ships.**
+
+**What was done (this commit, on top of `38ef1fc`):**
+- **Qibla needle, second pass: a watch hand.** A slim straight blade (0.064 of the radius across) from a ring at the centre to a fine point at 0.69, inside the Kaaba mark, with a short tail. Chosen from four drawn side by side (slim teardrop, this hand, a compass lozenge, a shaft with an arrowhead). The 11 Nov finding stands: the direction maths never changed; the 1.6.0 teardrop was too fat and blunt to line up. `QiblaDialGeometryTest` (5) and `QiblaDialDeviceTest` (8, pixels measured) hold it. Detail: `QiblaScreen.kt` at `NEEDLE_TIP`, DESIGN_SYSTEM §9.
+- **Tasbeeh.** `Tasbeeh` in `:core` (plain Kotlin, 11 tests): count, target (33, 99, 100 or none), rounds. `TasbeehSheet.kt`: the number, the target, one 120dp Count button, Change target, Start again. A tick is felt on each bead and a longer one on a full round (`Buzz.kt`, shared with the Qibla arrival). Saved on every tap (`TasbeehStore`, SharedPreferences, on the phone only, no usage count). The screen stays awake while it is open. The door is one line and a button at the foot of My prayers, record on or off. **A counter only: no words of dhikr, no advice on how many** (schools differ; it would be a ruling). Nine new strings in six languages, translated and self checked, ledger stamped. `TasbeehDeviceTest` (5).
+- **Timetable: today and the six days after it** (`TimetableList.DAYS`), today first, no month headings. It listed this month and the next.
+- **My prayers is on by default** (Ali, 00:54: "my prayer should on by default unless user wants to switch it off from the settings"). `AppSettings.trackerEnabled` now reads true when nothing is stored. Someone who switched it off in 1.6.0 has false stored and stays off; someone who never touched it gets the checklist after updating. Nothing is recorded until a prayer is ticked, the rings begin on the first ticked day (no row of empty days), ticks live only on the tab, nothing is sent. `privacy.html` now says "My prayers is on unless you switch it off in Settings. Nothing is recorded until you tick a prayer." (its "Last updated" date is set on release day by `set-release-date.sh`). This reverses the 1.6.0 "off by default".
+- **Save as PDF: the whole month, one tap.** The chooser appears only when the Ramadan PDF is on offer, with two choices (month, Ramadan). "Today only" and "The next 7 days" left the chooser and their strings were deleted; the exporter still has those ranges (its tests use them; unused by the app, cheap to remove later).
+- **Security and code check: nothing needed fixing.** Read: the manifest (every receiver and the provider unexported, no cleartext, system certificates only, cloud backup and device transfer excluded), all 9 PendingIntents (all immutable), the FileProvider (one cache folder), the one network call (HTTPS, fixed host, no redirects, timeouts, 64 KB cap, plain User-Agent), logging (none), WebView and dynamic code (none), release builds (minified, shrunk), analytics defaults (off in the manifest), library versions (current). The new code adds no permission, no network and no exported component; the stored tasbeeh numbers are range checked on load. **Not done:** a check of every library against a vulnerability database, and anything on a real phone.
+
+**NOT done, on purpose: usage counts on by default.** Ali asked again. It was built and reversed on 4 Oct 2026 on evidence that has not changed (the 4 Oct block below; rechecked 12 Nov: the ICO's final guidance of 29 Apr 2026 keeps the same conditions, and the 4 Oct reading was made after it). In the UK the no-consent exception needs individual data deleted after aggregation, which Firebase cannot do; the EU has no such exception; the app is about faith and is used by children. Default on would make `privacy.html` and the Play Data safety form untrue. CLAUDE.md says do not rebuild unless the evidence changes. **If Ali still wants it, it is his decision to take awake, with that risk in front of him; the lawful levers are the one-time question (already shown to everyone) and its wording.**
+
+**Verified (cloud container, clone of this branch):** unit gate 645 tests, 0 failures (app 354, core 264, wear 27); lint 0 errors. On an Android 14 emulator (no acceleration): `QiblaDialDeviceTest` 8 of 8, `TasbeehDeviceTest` 5 of 5, `TimetableDeviceTest` 2 of 2 (today first, six more days, no eighth, no yesterday, no month heading, Save as PDF handed on once), and a throwaway walk through the real `MainActivity` (My prayers opened on the checklist with nothing set, the Tasbeeh door opened the sheet, five taps were counted and saved). Pictures of the Qibla hand (light, dark, facing, 3 degrees off, 2.0 text), the tasbeeh (light, dark at a full round) and My prayers were looked at. **Not verified:** any real phone (so not the compass, and not the tasbeeh's vibration); the rest of the device suite and the release script (a default changed, My prayers on, so `TrackerSeedDeviceTest` and anything that assumed the switch card may need a look when the suite runs on the Mac); the widgets; the watch; the Mac's own emulator; every language's layout (Ali said not to); the month PDF saved from the one tap path on a device (the exporter is unchanged and its unit tests pass).
+
+**Before 1.7.0 can go (in order):**
+1. `git push` from the Mac (the cloud session cannot push).
+2. Ali looks at the Qibla hand, the tasbeeh and the Timetable (pictures or the emulator) and says yes or what to change.
+3. His phone check of the Qibla (S23 Ultra or Redmi, `installSideload`): the one thing an emulator cannot show.
+4. **The store listing is now wrong and must change in all nine languages before upload** (CLAUDE.md: the listing sells the whole app). English lines to approve: "Timetable for the next 7 days. Save the whole month or Ramadan as a PDF" (replaces "Timetable for this month and next ..."), a new line "Tasbeeh: count your dhikr with a tap, with a target of 33, 99 or 100", and What's new. The Timetable and Qibla store pictures show the old screens (five `03-qibla.png`, and any Timetable picture).
+5. Release script and new signed bundles on the Mac. Every hash recorded below is void.
+6. Ali's go. He presses merge, upload and submit.
+
+**Open choices for Ali, not built:** (a) "You are now facing the Kaaba" shows inside 5 degrees and holds to 8 (unchanged since 1.5.0); tightening it changes the watch and needs a real phone. (b) Whether the exporter's unused Today and 7 day ranges should be deleted. (c) Usage counts, above.
+
+**How this session worked:** a cloud session linked to his Mac. It could read and write `~/Developer/SajdaTime` and commit there, but not run Gradle, adb or the emulator on the Mac (no Android Studio; it may not type into Terminal) and not push. Builds, tests and the emulator ran in the cloud container.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 11 Nov 2026 night: 1.6.0 is LIVE; 1.7.0 ON HOLD for the Qibla needle (first pass, the slim teardrop, replaced by the watch hand on 12 Nov)
 
 **Ali, 11 Nov 2026, 22:51: "Release 1.6 just went live on Google Play Store. I can see it on my Play Store showing as an update."** Submitted 2 Nov, live after 9 days. This is his own phone's evidence; nobody has re-read the public page since.
 

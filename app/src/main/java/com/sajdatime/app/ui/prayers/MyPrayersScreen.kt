@@ -161,6 +161,10 @@ private fun OffCard(state: UiState, tracker: TrackerActions) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp),
     )
+    // The tasbeeh does not depend on the record being on (12 Nov 2026).
+    Spacer(Modifier.height(Space.Section))
+    TasbeehDoor()
+    Spacer(Modifier.height(Space.Section))
 }
 
 /** 3a: today line, notices, today card, button row, week card. */
@@ -214,6 +218,8 @@ private fun Checklist(
         FastsRow(t, onMadeUpOne = { tracker.adjustFastsToMakeUp(-1) })
         Spacer(Modifier.height(Space.Section))
     }
+    TasbeehDoor()
+    Spacer(Modifier.height(Space.Section))
 
     if (history) {
         TrackerHistorySheet(

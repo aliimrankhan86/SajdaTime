@@ -107,15 +107,10 @@
     <string name="action_save_pdf">PDF olarak kaydet</string>
     <string name="action_timetable">Vakit çizelgesi</string>
     <string name="timetable_title">Vakit çizelgesi</string>
-    <string name="timetable_month_a11y">%1$s namaz vakitleri</string>
     <string name="timetable_day_a11y">%1$s. Sabah %2$s. Güneş %3$s. Öğle %4$s. İkindi %5$s. Akşam %6$s. Yatsı %7$s.</string>
     <string name="timetable_today_a11y">Bugün, %1$s</string>
     <string name="export_sheet_title">Vakit çizelgenizi kaydedin</string>
     <string name="export_sheet_body">Namaz vakitlerinizin PDF dosyasını hazırlayacağız. Konum: %1$s. Ardından dosyayı kaydedebilir, yazdırabilir ya da birine gönderebilirsiniz.</string>
-    <string name="export_today">Yalnızca bugün</string>
-    <string name="export_today_desc">Bir gün, altı vakit</string>
-    <string name="export_week">Önümüzdeki 7 gün</string>
-    <string name="export_week_desc">Bugün ve sonraki altı gün</string>
     <string name="export_month">Bu ayın tamamı</string>
     <string name="export_month_desc">Ayın 1\'inden sonuna kadar her gün</string>
     <string name="export_saved">İndirilenler klasörüne kaydedildi: %1$s</string>
@@ -616,4 +611,13 @@
     <string name="exact_alarm_dialog_more">Android bunu kendi ekranında sorar. Daha sonra Ayarlar\'dan değiştirebilirsiniz.</string>
     <string name="tab_settings_attention_a11y">Ayarlar, dikkat gerekiyor</string>
     <string name="home_fajr_exact_a11y">%1$s, %2$s, zamanında çalmayabilir</string>
+    <string name="tasbeeh_title">Tesbih</string>
+    <string name="tasbeeh_line">Zikrinizi dokunarak sayın.</string>
+    <string name="tasbeeh_count">Say</string>
+    <string name="tasbeeh_reset">Baştan başla</string>
+    <string name="tasbeeh_change_target">Hedefi değiştir</string>
+    <string name="tasbeeh_target">Hedef: %1$d</string>
+    <string name="tasbeeh_no_target">Hedef yok</string>
+    <string name="tasbeeh_rounds">Tur: %1$d</string>
+    <string name="tasbeeh_state">%1$d / %2$d</string>
 </resources>

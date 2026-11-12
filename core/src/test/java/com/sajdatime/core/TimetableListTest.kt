@@ -8,32 +8,22 @@ import java.time.LocalDate
 class TimetableListTest {
 
     @Test
-    fun `on 31 October the list is October then November`() {
-        val months = TimetableList.months(LocalDate.of(2026, 10, 31))
-        assertEquals(listOf(LocalDate.of(2026, 10, 1), LocalDate.of(2026, 11, 1)), months.map { it.first })
-        assertEquals(listOf(31, 30), months.map { it.length })
+    fun `the sheet lists today and the six days after it`() {
+        val days = TimetableList.days(LocalDate.of(2026, 11, 12))
+        assertEquals(7, days.size)
+        assertEquals(LocalDate.of(2026, 11, 12), days.first())
+        assertEquals(LocalDate.of(2026, 11, 18), days.last())
     }
 
     @Test
-    fun `December runs into January of the next year`() {
-        val months = TimetableList.months(LocalDate.of(2026, 12, 15))
-        assertEquals(listOf(LocalDate.of(2026, 12, 1), LocalDate.of(2027, 1, 1)), months.map { it.first })
+    fun `the week runs across a month end and a year end`() {
+        assertEquals(LocalDate.of(2026, 11, 2), TimetableList.days(LocalDate.of(2026, 10, 27)).last())
+        assertEquals(LocalDate.of(2027, 1, 5), TimetableList.days(LocalDate.of(2026, 12, 30)).last())
     }
 
     @Test
-    fun `a leap February has 29 days`() {
-        assertEquals(29, TimetableList.months(LocalDate.of(2028, 2, 10)).first().length)
-    }
-
-    @Test
-    fun `today is the day of the month, so the 1st is 1 and 31 October is 31`() {
-        assertEquals(1, TimetableList.todayIndex(LocalDate.of(2026, 10, 1)))
-        assertEquals(31, TimetableList.todayIndex(LocalDate.of(2026, 10, 31)))
-    }
-
-    @Test
-    fun `a count of one gives this month only`() {
-        assertEquals(1, TimetableList.months(LocalDate.of(2026, 10, 24), count = 1).size)
+    fun `the week runs across a leap day`() {
+        assertEquals(LocalDate.of(2028, 3, 3), TimetableList.days(LocalDate.of(2028, 2, 26)).last())
     }
 
     @Test

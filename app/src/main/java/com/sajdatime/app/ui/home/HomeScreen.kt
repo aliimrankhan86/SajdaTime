@@ -350,15 +350,20 @@ fun HomeScreen(
         )
     }
 
+    // Save as PDF makes the whole month (Ali, 12 Nov 2026). With nothing else to offer that is one tap;
+    // when the Ramadan PDF is on offer too, the chooser shows the two.
+    val savePdf = {
+        if (ramadanExportYear != null) exportSheet = true else onExport(PrayerPdfExporter.Range.THIS_MONTH)
+    }
     if (timetable) {
         if (ramadanView) {
             RamadanTimetableSheet(
                 state = state,
                 sheetState = timetableSheetState,
-                // The chooser, not the Ramadan PDF straight away: this table is now the only door to
-                // Save as PDF in Ramadan, and Today, 7 days and the month must stay reachable (Q7; Ali,
-                // 24 Oct 2026, "Show the choices"). The chooser offers Ramadan too in Ramadan.
-                onExport = { exportSheet = true },
+                // The chooser, not the Ramadan PDF straight away: this table is the only door to Save as
+                // PDF in Ramadan, and the month must stay reachable beside the Ramadan PDF (Q7; Ali, 24 Oct
+                // 2026, "Show the choices").
+                onExport = savePdf,
                 onShiftDate = {
                     timetable = false
                     onOpenSetting(SettingsChooser.ISLAMIC_DATES)
@@ -366,11 +371,11 @@ fun HomeScreen(
                 onDismiss = { timetable = false },
             )
         } else {
-            // The chooser below opens over this sheet and the sheet stays after a save.
+            // The sheet stays after a save.
             TimetableSheet(
                 state = state,
                 sheetState = timetableSheetState,
-                onExport = { exportSheet = true },
+                onExport = savePdf,
                 onDismiss = { timetable = false },
             )
         }
@@ -926,7 +931,9 @@ private fun ExportSheet(
             )
             Spacer(Modifier.height(Space.Group))
 
-            PrayerPdfExporter.Range.entries
+            // The month, and Ramadan when it is on offer. "Today only" and "The next 7 days" went on
+            // 12 Nov 2026 (Ali): the Timetable itself now shows the week, and the PDF is for the month.
+            listOf(PrayerPdfExporter.Range.THIS_MONTH, PrayerPdfExporter.Range.RAMADAN)
                 .filter { it != PrayerPdfExporter.Range.RAMADAN || ramadanYear != null }
                 .forEach { range ->
                     ExportOption(range = range, ramadanYear = ramadanYear, onClick = { onPick(range) })
@@ -942,10 +949,9 @@ private fun ExportSheet(
 @Composable
 private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onClick: () -> Unit) {
     val (titleRes, subtitleRes) = when (range) {
-        PrayerPdfExporter.Range.TODAY -> R.string.export_today to R.string.export_today_desc
-        PrayerPdfExporter.Range.NEXT_7_DAYS -> R.string.export_week to R.string.export_week_desc
-        PrayerPdfExporter.Range.THIS_MONTH -> R.string.export_month to R.string.export_month_desc
         PrayerPdfExporter.Range.RAMADAN -> R.string.export_ramadan to R.string.export_ramadan_desc
+        // The chooser offers no other range; the exporter still knows Today and 7 days (its tests use them).
+        else -> R.string.export_month to R.string.export_month_desc
     }
 
     Column(

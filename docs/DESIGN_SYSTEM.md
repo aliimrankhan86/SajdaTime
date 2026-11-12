@@ -537,6 +537,10 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
 | Settings, Notification sound and Alarm sound dialogs (1.7.0) | Hear it, then Stop while playing: one compact button under the sound choices, 16dp under the radio group, with a `bodyMedium` help line 4dp under it; plays the chosen sound through the alert's own audio usage, never changes a volume | A | 40 visual, 48 target | `SoundPreview.kt` |
 | Settings, Fast reminders dialog (1.6.0) | No buttons of its own: three switch rows (Monday and Thursday; White Days; Ashura, Arafah and the six days of Shawwal) under one help line, the X and the foot "Close". No `CtaButton` | E, D | | `SettingsScreen.kt` |
+| My prayers tab | Tasbeeh, at the end of "Count your dhikr with a tap." (record on or off) | A, compact | 40 drawn, 48 target, wraps | `TasbeehSheet.kt` |
+| Tasbeeh sheet | Count, the one large button under the number | A | 120, full | `TasbeehSheet.kt` |
+| Tasbeeh sheet | Change target (start) and Start again (end), one row under Count, wrapping at large text | A, compact | 40 drawn, 48 target, wraps | `TasbeehSheet.kt` |
+| Tasbeeh sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TasbeehSheet.kt`, `Common.kt` |
 | My prayers tab | the tick at the start of each prayer row | Tick (`Tick.kt`), a toggle | 24 drawn, 48 target | `MyPrayersScreen.kt`, `Tick.kt` |
 | My prayers tab | Pause (pause icon) at the start, Last 30 days (calendar icon) at the end, under the today card | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
 | My prayers tab, while paused | Resume (play icon) at the end, beside "Tracking is paused" | A, compact | 40 drawn, 48 target, wraps | `MyPrayersScreen.kt` |
@@ -608,7 +612,7 @@ card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is t
 `surface` in light and `surfaceContainerHighest` in dark (`dialBezel()`, a different role per theme because the dark
 hairline is invisible against the page). Inside it the face, `surfaceVariant`. Sixty ticks, one every 6°, in
 `outline` (minor 0.845 to 0.87, cardinal from 0.80, round caps); the letters at 0.74, E S W `onSurfaceVariant`
-Normal and N `primary` Medium. The needle is **you**: a slim `primary` teardrop (0.15 of the radius across, a fine point at 0.69 that runs into the Kaaba mark on arrival, round end past the centre; slimmed 11 Nov 2026, see §9,
+Normal and N `primary` Medium. The needle is **you**: a slim `primary` watch hand (a straight blade 0.064 of the radius across, from a ring at the centre to a fine point at 0.69 that runs into the Kaaba mark on arrival, with a short tail; 12 Nov 2026, see §9,
 no hub), fixed at the top with a compass (it points at the bearing without one). There is no arc: the Kaaba's side
 of the dial and the sentence ("Turn right 58°") say how far to turn. Inside ±5° the face fills with
 `primaryContainer`, the bezel turns `primary` and thickens to 0.11, all over 250 ms (150 ms on leaving), the line
@@ -1367,13 +1371,32 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     the own name only (19 Oct entry). Settings subtitle (Ali chose A from the pictures, "A go ahead"): only the language showing, "اردو (Urdu)", or "Phone language · اردو (Urdu)" while following the phone; B, all five, ran to three lines in Urdu and tore "العربية (Arabic)" across two. Rejected: the English name
     following the app language (four translations that drift), flags (a flag is a country), one line "اردو · Urdu"
     (wraps mid pair at large text).
-- **11 Nov 2026, the Qibla needle slimmed and sharpened (Ali, on the 1.6.0 he had just received: the needle is
-  thicker, "seems a bit off", "not as accurate as before"):** the step 6 teardrop was 0.24 of the radius across with
-  a blunt stroked tip at 0.64, under a Kaaba mark only 0.22 across, so the two could not be lined up by eye. It is
-  the same teardrop style, now 0.15 across (the 1.5.0 needle's width) with a fine point at 0.69, inside the mark, and
-  no stroke. The mark, letters, ticks and bezel did not move. **A pointer must be fine where it meets what it points
-  at, and must reach it**: `QiblaDialGeometryTest` fails the build otherwise. Rejected: a hairline index on the fat
-  teardrop (two marks for "you"); a larger Kaaba mark (runs into the letters and ticks).
+- **11 and 12 Nov 2026, the Qibla needle becomes a slim watch hand (Ali, on the 1.6.0 he had just received: the
+  needle is thicker, "seems a bit off", "not as accurate as before"; then, on a slimmed teardrop: "not looking nice
+  to me ... make it better looking but accuracy is the most important criteria ... Clean design"):** the step 6
+  teardrop was 0.24 of the radius across with a blunt stroked tip at 0.64, under a Kaaba mark only 0.22 across, so
+  the two could not be lined up by eye. Now a straight blade, 0.064 across, from a ring at the centre (0.14 across,
+  with a hole) to a fine point at 0.69 inside the mark, and a short tail. The mark, letters, ticks and bezel did not
+  move. **A pointer must be fine where it meets what it points at, and must reach it**: `QiblaDialGeometryTest`
+  fails the build otherwise. This replaces the Pillars teardrop Ali chose on 24 Oct, on his word that the look was
+  ours to improve. Rejected, drawn side by side: the slim teardrop (he did not like it), a compass lozenge
+  (readable, heavier), a shaft with an arrowhead (hides the point that has to be read), a hairline index on the
+  fat teardrop, a larger Kaaba mark (runs into the letters and ticks).
+- **12 Nov 2026, the tasbeeh, the 7 day Timetable and one PDF (Ali, overnight brief: "add a digital tasbeeh ...
+  Which works properly", "the timetable should show only the timing of the next 7 days. The save as pdf should
+  have for the whole month", "there should be simplicity in the app"):**
+  - **Tasbeeh:** a sheet opened from one line and a compact button at the foot of My prayers (record on or
+    off). The count in `displayLarge` (green on a full round), the target under it, one 120dp Count button, then
+    Change target and Start again. A counter only: no words of dhikr and no advice on how many, because that
+    differs between schools and would be a ruling. Not a fifth tab (the bar holds four and the app must stay
+    simple), not a tap anywhere surface (not a button to TalkBack, and not in the design system). **Built without
+    Ali seeing pictures: his to look at before release.**
+  - **Timetable:** today and the six days after it, no month headings. It was about sixty cards.
+  - **My prayers on by default** (Ali, the same night): the tab opens on the checklist. The one row switch card
+    is now what someone sees only after switching it off in Settings.
+  - **Save as PDF:** makes the whole month in one tap. The chooser now appears only when the Ramadan PDF is on
+    offer too, with those two choices. "Today only" and "The next 7 days" are gone from the chooser: the screen
+    shows the week. This narrows Ali's 24 Oct "Show the choices" to the two that are left.
 
 ---
 

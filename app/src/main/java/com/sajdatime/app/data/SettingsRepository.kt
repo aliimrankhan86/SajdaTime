@@ -236,11 +236,17 @@ data class AppSettings(
      */
     val prayerReminderFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
     /**
-     * "My prayers", the private tracker (1.6.0). **Off by default**: nothing new appears on the Times
-     * screen unless the user puts it there. Switching it off keeps the record; only Delete clears it.
-     * The record itself lives in [TrackerRepository], never here and never in the usage counts.
+     * "My prayers", the private tracker (1.6.0). **On by default since 1.7.0** (Ali, 12 Nov 2026: "my
+     * prayer should on by default unless user wants to switch it off from the settings"); it was off by
+     * default in 1.6.0. Nothing is stored for a key never written, so on means: the tab opens on the
+     * checklist, not on a switch. It costs nobody anything they did not choose: the ticks live only on
+     * the My prayers tab (Times has none), nothing is recorded until a prayer is ticked, the rings begin
+     * on the first day something is ticked ([com.sajdatime.core.TrackerLogic.started], so no row of
+     * empty days greets anyone), and nothing is sent. Someone who switched it off in 1.6.0 has `false`
+     * stored and stays off. Switching it off keeps the record; only Delete clears it. The record itself
+     * lives in [TrackerRepository], never here and never in the usage counts.
      */
-    val trackerEnabled: Boolean = false,
+    val trackerEnabled: Boolean = true,
     /** Whether the "days in a row" line shows. Off by default (Ali, 16 Oct 2026): a streak is opt in. */
     val trackerShowStreak: Boolean = false,
     /**
@@ -711,7 +717,7 @@ class SettingsRepository(private val context: Context) {
             prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
                 .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
-            trackerEnabled = this[Keys.TRACKER_ENABLED] ?: false,
+            trackerEnabled = this[Keys.TRACKER_ENABLED] ?: true,
             trackerShowStreak = this[Keys.TRACKER_STREAK] ?: false,
             jamaah = JamaahCodec.decode(this[Keys.JAMAAH]),
             jamaahReminderMinutes = (this[Keys.JAMAAH_REMINDER] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,

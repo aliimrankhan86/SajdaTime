@@ -2,14 +2,17 @@ package com.sajdatime.app
 
 import com.sajdatime.app.ui.qibla.KAABA_DISTANCE
 import com.sajdatime.app.ui.qibla.KAABA_SIZE
-import com.sajdatime.app.ui.qibla.NEEDLE_END_CENTRE
-import com.sajdatime.app.ui.qibla.NEEDLE_END_RADIUS
-import com.sajdatime.app.ui.qibla.NEEDLE_FLANK
+import com.sajdatime.app.ui.qibla.NEEDLE_HALF_WIDTH
+import com.sajdatime.app.ui.qibla.NEEDLE_HUB
+import com.sajdatime.app.ui.qibla.NEEDLE_HUB_HOLE
+import com.sajdatime.app.ui.qibla.NEEDLE_SHOULDER
+import com.sajdatime.app.ui.qibla.NEEDLE_TAIL
+import com.sajdatime.app.ui.qibla.NEEDLE_TAIL_HALF_WIDTH
 import com.sajdatime.app.ui.qibla.NEEDLE_TIP
+import com.sajdatime.app.ui.qibla.needleHalfWidthAt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import kotlin.math.abs
 
 /**
  * Holds the Qibla needle's shape to the Kaaba mark's, so the pointer can always be read by eye.
@@ -29,36 +32,19 @@ class QiblaDialGeometryTest {
     private val wallHalfWidth = KAABA_SIZE * 14f / 24f / 2f
     private val markNearEdge = KAABA_DISTANCE - KAABA_SIZE / 2f
 
-    /** Half the needle's width at height [y] (negative is up), by bisection along the flank's cubic. */
-    private fun halfWidthAt(y: Float): Float {
-        val f = NEEDLE_FLANK
-        fun at(t: Float, i: Int): Float {
-            val u = 1 - t
-            return u * u * u * f[i] + 3 * u * u * t * f[i + 2] + 3 * u * t * t * f[i + 4] + t * t * t * f[i + 6]
-        }
-        var lo = 0f
-        var hi = 1f
-        repeat(40) {
-            val mid = (lo + hi) / 2
-            if (at(mid, 1) < y) lo = mid else hi = mid
-        }
-        return abs(at(lo, 0))
+    @Test
+    fun `the point is on the centre line and the blade runs straight to it`() {
+        // The path mirrors every x, so a width of nothing at the tip is the whole of "the needle points
+        // straight up". A tip a hair to one side is a compass that is always off.
+        assertEquals(0f, needleHalfWidthAt(NEEDLE_TIP), 0f)
+        assertEquals(NEEDLE_HALF_WIDTH, needleHalfWidthAt(NEEDLE_SHOULDER), 0.0001f)
+        // Straight edges: half way from shoulder to tip it is half as wide.
+        val half = (NEEDLE_TIP + NEEDLE_SHOULDER) / 2f
+        assertEquals(NEEDLE_HALF_WIDTH / 2f, needleHalfWidthAt(half), 0.0001f)
     }
 
     @Test
-    fun the_tip_is_on_the_centre_line_and_the_flanks_mirror_each_other() {
-        // The right flank is drawn as the left one with x negated, so the tip being at x 0 is the whole
-        // of "the needle points straight up". A tip a hair to one side is a compass that is always off.
-        assertEquals(0f, NEEDLE_FLANK[0], 0f)
-        assertEquals(-NEEDLE_TIP, NEEDLE_FLANK[1], 0f)
-        // Lands on the round end's widest point, tangent to it (the last control point is straight above).
-        assertEquals(-NEEDLE_END_RADIUS, NEEDLE_FLANK[6], 0f)
-        assertEquals(NEEDLE_END_CENTRE, NEEDLE_FLANK[7], 0f)
-        assertEquals(NEEDLE_FLANK[6], NEEDLE_FLANK[4], 0f)
-    }
-
-    @Test
-    fun the_tip_ends_inside_the_kaaba_mark_and_short_of_the_letters() {
+    fun `the tip ends inside the kaaba mark and short of the letters`() {
         assertTrue("the tip must reach into the mark, not stop under it", NEEDLE_TIP > markNearEdge + KAABA_SIZE / 4f)
         assertTrue("the tip must not run past the mark's centre", NEEDLE_TIP <= KAABA_DISTANCE)
         // The letters' band starts at 0.695 (0.74 less half of 0.09).
@@ -66,35 +52,32 @@ class QiblaDialGeometryTest {
     }
 
     @Test
-    fun the_needle_is_a_fine_point_where_it_meets_the_mark() {
+    fun `the needle is a fine point where it meets the mark`() {
         // Where the needle enters the mark it must be a small part of the wall's width, or it cannot be
         // centred by eye. The 1.6.0 teardrop was blunt here (0.01 plus a 0.0125 stroke) under a 0.064 wall.
-        val entering = halfWidthAt(-markNearEdge)
+        val entering = needleHalfWidthAt(markNearEdge)
         assertTrue("needle is $entering wide at the mark's edge, wall is $wallHalfWidth", entering <= wallHalfWidth / 8f)
     }
 
     @Test
-    fun the_needle_is_no_wider_than_the_one_people_could_read() {
+    fun `nothing about the needle is wider than the one people could read`() {
         // 0.075 was the 1.5.0 needle's half width. The fat 1.6.0 teardrop was 0.12.
-        assertTrue(NEEDLE_END_RADIUS <= 0.075f)
-        var widest = 0f
-        var y = -NEEDLE_TIP
-        while (y <= NEEDLE_END_CENTRE) {
-            widest = maxOf(widest, halfWidthAt(y))
-            y += 0.01f
-        }
-        assertTrue("flank bulges to $widest", widest <= NEEDLE_END_RADIUS + 0.0005f)
+        assertTrue(NEEDLE_HUB <= 0.075f)
+        assertTrue(NEEDLE_HALF_WIDTH < NEEDLE_HUB)
+        assertTrue(NEEDLE_TAIL_HALF_WIDTH <= NEEDLE_HALF_WIDTH)
+        assertTrue("the hole must leave a ring", NEEDLE_HUB_HOLE < NEEDLE_HUB / 2f)
     }
 
     @Test
-    fun the_flank_narrows_all_the_way_to_the_tip() {
+    fun `the blade narrows all the way to the tip and the tail is the short end`() {
         var previous = Float.MAX_VALUE
-        var y = NEEDLE_END_CENTRE
-        while (y >= -NEEDLE_TIP + 0.005f) {
-            val now = halfWidthAt(y)
-            assertTrue("needle widens going up at $y", now <= previous + 0.0005f)
+        var up = NEEDLE_SHOULDER
+        while (up <= NEEDLE_TIP) {
+            val now = needleHalfWidthAt(up)
+            assertTrue("needle widens going up at $up", now <= previous)
             previous = now
-            y -= 0.01f
+            up += 0.01f
         }
+        assertTrue("the tail must be clearly shorter than the blade", NEEDLE_TAIL < NEEDLE_TIP / 3f)
     }
 }

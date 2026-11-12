@@ -107,15 +107,10 @@
     <string name="action_save_pdf">Simpan PDF</string>
     <string name="action_timetable">Jadwal</string>
     <string name="timetable_title">Jadwal</string>
-    <string name="timetable_month_a11y">Waktu salat %1$s</string>
     <string name="timetable_day_a11y">%1$s. Subuh %2$s. Terbit %3$s. Zuhur %4$s. Asar %5$s. Magrib %6$s. Isya %7$s.</string>
     <string name="timetable_today_a11y">Hari ini, %1$s</string>
     <string name="export_sheet_title">Simpan jadwal Anda</string>
     <string name="export_sheet_body">Kami akan membuat PDF waktu salat Anda untuk %1$s. Setelah itu Anda bisa menyimpan, mencetak, atau mengirimkannya kepada seseorang.</string>
-    <string name="export_today">Hari ini saja</string>
-    <string name="export_today_desc">Satu hari, enam waktu</string>
-    <string name="export_week">7 hari ke depan</string>
-    <string name="export_week_desc">Hari ini dan enam hari setelahnya</string>
     <string name="export_month">Sebulan penuh ini</string>
     <string name="export_month_desc">Setiap hari dari tanggal 1 sampai akhir bulan</string>
     <string name="export_saved">Disimpan di Download sebagai %1$s</string>
@@ -602,4 +597,13 @@
     <string name="exact_alarm_dialog_more">Android menanyakannya di layarnya sendiri. Anda dapat mengubahnya nanti di Pengaturan.</string>
     <string name="tab_settings_attention_a11y">Pengaturan, perlu perhatian</string>
     <string name="home_fajr_exact_a11y">%1$s, %2$s, mungkin tidak berbunyi tepat waktu</string>
+    <string name="tasbeeh_title">Tasbih</string>
+    <string name="tasbeeh_line">Hitung zikir Anda dengan ketukan.</string>
+    <string name="tasbeeh_count">Hitung</string>
+    <string name="tasbeeh_reset">Mulai lagi</string>
+    <string name="tasbeeh_change_target">Ubah target</string>
+    <string name="tasbeeh_target">Target: %1$d</string>
+    <string name="tasbeeh_no_target">Tanpa target</string>
+    <string name="tasbeeh_rounds">Putaran: %1$d</string>
+    <string name="tasbeeh_state">%1$d dari %2$d</string>
 </resources>

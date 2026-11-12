@@ -110,15 +110,10 @@
     <string name="action_save_pdf">PDF محفوظ کریں</string>
     <string name="action_timetable">اوقات نامہ</string>
     <string name="timetable_title">اوقات نامہ</string>
-    <string name="timetable_month_a11y">%1$s کے نماز کے اوقات</string>
     <string name="timetable_day_a11y">%1$s۔ فجر %2$s۔ طلوع آفتاب %3$s۔ ظہر %4$s۔ عصر %5$s۔ مغرب %6$s۔ عشاء %7$s۔</string>
     <string name="timetable_today_a11y">آج، %1$s</string>
     <string name="export_sheet_title">اپنا نظام الاوقات محفوظ کریں</string>
     <string name="export_sheet_body">ہم %1$s کے لیے آپ کے نماز کے اوقات کی PDF بنائیں گے۔ پھر آپ اسے محفوظ کر سکتے ہیں، پرنٹ کر سکتے ہیں یا کسی کو بھیج سکتے ہیں۔</string>
-    <string name="export_today">صرف آج</string>
-    <string name="export_today_desc">ایک دن، چھ اوقات</string>
-    <string name="export_week">اگلے 7 دن</string>
-    <string name="export_week_desc">آج اور اس کے بعد کے چھ دن</string>
     <string name="export_month">یہ پورا مہینہ</string>
     <string name="export_month_desc">مہینے کی پہلی تاریخ سے آخر تک ہر دن</string>
     <string name="export_saved">ڈاؤن لوڈز میں %1$s کے نام سے محفوظ ہو گئی</string>
@@ -622,4 +617,13 @@
     <string name="exact_alarm_dialog_more">اینڈرائیڈ یہ اپنی ہی اسکرین پر پوچھتا ہے۔ آپ بعد میں سیٹنگز سے بدل سکتے ہیں۔</string>
     <string name="tab_settings_attention_a11y">سیٹنگز، توجہ درکار ہے</string>
     <string name="home_fajr_exact_a11y">%1$s، %2$s، ہو سکتا ہے وقت پر نہ بجے</string>
+    <string name="tasbeeh_title">تسبیح</string>
+    <string name="tasbeeh_line">ایک ٹیپ سے اپنا ذکر گنیں۔</string>
+    <string name="tasbeeh_count">گنیں</string>
+    <string name="tasbeeh_reset">دوبارہ شروع کریں</string>
+    <string name="tasbeeh_change_target">ہدف بدلیں</string>
+    <string name="tasbeeh_target">ہدف: %1$d</string>
+    <string name="tasbeeh_no_target">کوئی ہدف نہیں</string>
+    <string name="tasbeeh_rounds">دور: %1$d</string>
+    <string name="tasbeeh_state">%2$d میں سے %1$d</string>
 </resources>
