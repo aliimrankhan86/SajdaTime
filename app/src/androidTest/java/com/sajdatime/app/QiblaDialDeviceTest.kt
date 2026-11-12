@@ -28,9 +28,12 @@ import com.sajdatime.app.ui.qibla.QiblaBody
 import com.sajdatime.app.ui.theme.SajdaTimeTheme
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.core.Coordinates
+import com.sajdatime.core.QiblaEngine
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import kotlin.math.roundToInt
 import org.junit.runner.RunWith
 import kotlin.math.abs
 import kotlin.math.cos
@@ -223,6 +226,38 @@ class QiblaDialDeviceTest {
         compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertDoesNotExist()
         compose.onNodeWithText(context.getString(R.string.qibla_heading_now, 119)).assertDoesNotExist()
         compose.onNodeWithTag("qibla_dial", useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun the_turn_printed_always_equals_the_two_printed_directions_subtracted() {
+        // 12 Nov 2026: the turn was rounded from the unrounded heading while the facing was rounded on its
+        // own, so the screen could say "Facing 225 degrees, turn left 11" where the reader's subtraction gives
+        // 14. A reader who checks the two lines found the app disagreeing with itself. Every half degree over
+        // the whole circle must now add up.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val bearing = QiblaEngine.wholeDegrees(qibla)
+        for (halfStep in 0 until 720) {
+            val heading = halfStep / 2.0 + 0.4
+            val facing = QiblaEngine.wholeDegrees(heading)
+            val turnForTheReader = abs(QiblaEngine.relativeTurn(facing.toDouble(), bearing.toDouble())).roundToInt()
+            // What the screen is built from: the same two rounded numbers.
+            val printedFacing = QiblaEngine.wholeDegrees(heading)
+            val printedTurn = abs(QiblaEngine.relativeTurn(printedFacing.toDouble(), bearing.toDouble())).roundToInt()
+            assertEquals("heading $heading", turnForTheReader, printedTurn)
+            if (printedTurn != 0) {
+                assertTrue("heading $heading: the turn text must exist", printedTurn >= 1)
+            }
+        }
+        assertTrue(context.getString(R.string.qibla_facing).isNotEmpty())
+    }
+
+    @Test
+    fun a_heading_that_rounds_onto_the_bearing_says_facing_rather_than_a_one_degree_turn() {
+        // Facing prints 119 while the raw heading is 118.6 and the raw turn is 0.4 degrees.
+        show(heading = qibla + 0.4)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_turn_left, 0)).assertDoesNotExist()
     }
 
     @Test

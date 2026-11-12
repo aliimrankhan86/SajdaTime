@@ -762,10 +762,15 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
         heading == null -> stringResource(R.string.qibla_no_compass, QiblaEngine.wholeDegrees(qiblaTrueBearing))
         aligned -> stringResource(R.string.qibla_facing)
         else -> {
-            val turn = QiblaEngine.relativeTurn(heading, qiblaTrueBearing)
+            // One number, derived from the other, so the two lines on screen always add up: a reader
+            // who subtracts the facing from the Qibla bearing must get the turn printed beside it. Rounding
+            // the turn on its own beat the facing by up to a degree before (12 Nov 2026).
+            val shownBearing = QiblaEngine.wholeDegrees(qiblaTrueBearing)
+            val shownHeading = QiblaEngine.wholeDegrees(heading)
+            val turn = QiblaEngine.relativeTurn(shownHeading.toDouble(), shownBearing.toDouble())
             val degrees = kotlin.math.abs(turn).roundToInt()
             when {
-                degrees == 0 -> stringResource(R.string.qibla_bearing, QiblaEngine.wholeDegrees(qiblaTrueBearing))
+                degrees == 0 -> stringResource(R.string.qibla_bearing, shownBearing)
                 turn > 0 -> stringResource(R.string.qibla_turn_right, degrees)
                 else -> stringResource(R.string.qibla_turn_left, degrees)
             }
