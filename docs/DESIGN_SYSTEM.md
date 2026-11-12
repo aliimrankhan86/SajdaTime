@@ -94,6 +94,8 @@ mistakes he has now had to point out, so they are rules, not taste.
    the icon above, or keep the text to one line.
 3. **One left edge.** Everything stacked in a card starts at the card's content edge, one `x`. Tile edges, titles,
    sentences and buttons share it. Text inside a tile is inset by the tile's own padding, the same on every tile.
+   **One exception, Ali's, 12 Nov 2026:** on the Ramadan card the countdown line ("Iftar in ...", and the sentence
+   that takes its place after iftar) and "Fast today ..." are centred in the card, in every language (§9).
 4. **Same size across siblings.** The same kind of text (a name, a time, a label) is the same size and weight in
    every sibling. No per-column autosize in a widget: it makes one time smaller than its neighbour. Pick a size
    that fits the longest string ("Maghrib", "12:45 pm", the longest Urdu name) and use it for all.
@@ -1382,6 +1384,16 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   ours to improve. Rejected, drawn side by side: the slim teardrop (he did not like it), a compass lozenge
   (readable, heavier), a shaft with an arrowhead (hides the point that has to be read), a hairline index on the
   fat teardrop, a larger Kaaba mark (runs into the letters and ticks).
+- **12 Nov 2026, the Ramadan card's two lines are centred (Ali, from the emulator pictures: "centre the 'Iftar in'
+  countdown line and the 'Fast today' line horizontally in the card, in every language including right to
+  left").** The countdown (`titleLarge` bold, tabular digits so a centred line does not shift each second) and
+  "Fast today" (`bodyLarge`) sit in the middle of the card; the sentence that replaces the countdown after iftar
+  shares its place and is centred with it. This is the one exception to §0.5 rule 3 (one left edge); the tiles,
+  the date hint and the button row keep the edge. `RamadanCardLayoutDeviceTest` measures it (4 tests, left to
+  right and right to left, three phases; shown to fail with the centring removed). **Left as it was, waiting for
+  Ali:** the "approximate" line shown in the far north still starts at the edge under the two centred lines.
+  The Ramadan store pictures (`04-ramadan-dark.png`, five languages) now show the old placement and are retaken
+  on release day with the Qibla and Timetable ones.
 - **12 Nov 2026, the tasbeeh, the 7 day Timetable and one PDF (Ali, overnight brief: "add a digital tasbeeh ...
   Which works properly", "the timetable should show only the timing of the next 7 days. The save as pdf should
   have for the whole month", "there should be simplicity in the app"):**

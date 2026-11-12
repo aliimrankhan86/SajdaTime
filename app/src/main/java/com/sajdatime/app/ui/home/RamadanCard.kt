@@ -40,6 +40,7 @@ import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.Notice
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -114,8 +115,8 @@ internal fun RamadanSection(
 }
 
 /**
- * Suhoor ends and iftar for this place, the countdown to whichever is next, the length of the fast
- * and how it differs from yesterday, and tomorrow's two times.
+ * Suhoor ends and iftar for this place, the countdown to whichever is next and the length of the fast
+ * (the last two centred in the card, Ali, 12 Nov 2026).
  *
  * Suhoor ends at Fajr and iftar is at Maghrib because those are the two times the app already
  * calculates and labels. The words say "as calculated" in the info dialog and nothing here adds an
@@ -123,7 +124,7 @@ internal fun RamadanSection(
  * "reward".
  */
 @Composable
-private fun RamadanCard(
+internal fun RamadanCard(
     ramadan: RamadanState,
     now: Instant,
     showDateHint: Boolean,
@@ -144,7 +145,8 @@ private fun RamadanCard(
             // tiles on it are paper, and the next one is solid green.
             .clip(RoundedCornerShape(24.dp))
             .background(scheme.primaryContainer)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .testTag("ramadan_card"),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
@@ -190,10 +192,18 @@ private fun RamadanCard(
         }
         Spacer(Modifier.height(Space.Paragraph))
 
-        Countdown(ramadan = ramadan, now = now, phase = phase)
+        // The countdown and the fast length sit in the middle of the card (Ali, 12 Nov 2026), the same in
+        // every language: centre has no start or end, so right to left needs nothing extra. Each line is
+        // as wide as its words and placed in the middle, and textAlign centres the lines if it wraps.
+        Countdown(
+            ramadan = ramadan,
+            now = now,
+            phase = phase,
+            modifier = Modifier.align(Alignment.CenterHorizontally).testTag("ramadan_countdown"),
+        )
 
         Spacer(Modifier.height(Space.Tight))
-        FastLine(ramadan = ramadan)
+        FastLine(ramadan = ramadan, modifier = Modifier.align(Alignment.CenterHorizontally).testTag("ramadan_fast"))
 
         if (ramadan.today.approximated) {
             // The polar banner above names the latitude. This line keeps the marking on the card
@@ -304,10 +314,15 @@ private fun TimeColumn(label: String, glyph: Int, time: String, isNext: Boolean,
  * month, in words that leave Eid to the mosque.
  */
 @Composable
-private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.Phase) {
+private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.Phase, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val primary = MaterialTheme.colorScheme.onPrimaryContainer
-    val style = MaterialTheme.typography.titleLarge.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+    // Equal width digits (tokens/typography.json, countdowns): the line is centred, so a digit that changed
+    // width would move every word of it each second, not only its end.
+    val style = MaterialTheme.typography.titleLarge.copy(
+        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+        fontFeatureSettings = "tnum",
+    )
 
     when (phase) {
         RamadanState.Phase.BEFORE_SUHOOR_END, RamadanState.Phase.FASTING -> {
@@ -322,7 +337,8 @@ private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.P
                 text = stringResource(resource, TimeFormat.countdownClock(context, now, target)),
                 style = style,
                 color = primary,
-                modifier = Modifier.clearAndSetSemantics { contentDescription = spoken },
+                textAlign = TextAlign.Center,
+                modifier = modifier.clearAndSetSemantics { contentDescription = spoken },
             )
         }
 
@@ -335,14 +351,14 @@ private fun Countdown(ramadan: RamadanState, now: Instant, phase: RamadanState.P
             } else {
                 stringResource(R.string.ramadan_month_ends_today)
             }
-            Text(text = text, style = style, color = primary)
+            Text(text = text, style = style, color = primary, textAlign = TextAlign.Center, modifier = modifier)
         }
     }
 }
 
 /** "Fast today 12h 37m": the one fact about the fast. The change from yesterday and tomorrow's times were dropped (Ali, 3 Nov 2026: too much). */
 @Composable
-private fun FastLine(ramadan: RamadanState) {
+private fun FastLine(ramadan: RamadanState, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Text(
         text = stringResource(
@@ -351,6 +367,8 @@ private fun FastLine(ramadan: RamadanState) {
         ),
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onPrimaryContainer,
+        textAlign = TextAlign.Center,
+        modifier = modifier,
     )
 }
 
