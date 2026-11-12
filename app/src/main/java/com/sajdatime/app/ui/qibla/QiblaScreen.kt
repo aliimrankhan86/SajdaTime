@@ -45,8 +45,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -70,7 +70,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.painter.Painter
@@ -404,8 +403,9 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             // The bezel is the lifted disc (shadow in light, hairline in dark, the lift every card has);
             // the Canvas draws the face over it, inside the bezel band.
             .sajdaSurface(CircleShape, bezel)
-            // The dial is decorative; the spoken direction lives in DirectionBlock.
-            .clearAndSetSemantics { },
+            // The dial is decorative; the spoken direction lives in DirectionBlock. The tag is the only
+            // thing left on it: QiblaDialDeviceTest finds the dial by it to measure where the marks land.
+            .clearAndSetSemantics { testTag = "qibla_dial" },
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.fillMaxSize()) {
@@ -532,39 +532,75 @@ private fun DrawScope.drawCardinals(
 }
 
 /**
- * The needle path, a teardrop: tip at (0, -0.64), a round end centred at (0, 0.10) with radius 0.12, bottom
- * at 0.22 (STEP-6-DESIGN 15.2 and 16.4), all in shares of `r`, dial centre at (`cx`, `cy`), y down. The
- * left flank lands tangent to the round end, the arc runs through the bottom, the right flank returns
- * to the tip. The key under the dial draws the same path.
+ * The needle's shape, in shares of the dial radius, y down, dial centre at (0, 0). Internal so
+ * `QiblaDialGeometryTest` can hold the numbers to the Kaaba mark's.
+ *
+ * **Slimmed and sharpened on 11 Nov 2026, the night 1.6.0 went live.** Ali, on his own phone: the needle
+ * had been made thicker, it "seems a bit off", "not as accurate as before". The direction maths had not
+ * changed since 1.5.0 (`CompassRepository` and `QiblaEngine` are byte for byte the same); what changed in
+ * 1.6.0 was the pointer. The step 6 teardrop was 0.24 of the radius across, ended at 0.64 with a round
+ * stroked tip, and stopped under the Kaaba mark's lower edge, while the mark itself shrank from 0.30 to 0.22.
+ * A blunt tip resting under a small mark can sit anywhere along the mark's base and look "arrived", so the
+ * dial could no longer be read to better than several degrees. The 1.5.0 needle was a sharp triangle,
+ * 0.15 across, whose tip ran through the middle of the mark.
+ *
+ * So: still the Pillars teardrop Ali chose (24 Oct 2026), but 0.15 across like the 1.5.0 needle, with a
+ * fine point that ends at [NEEDLE_TIP], one hundredth short of the Kaaba mark's centre ([KAABA_DISTANCE]).
+ * On alignment the point runs up into the middle of the cube (the mark is drawn last, over it), and where
+ * it enters the mark it is about a tenth of the cube's width, so "is it centred?" can be answered by eye.
+ * No stroke any more: the round join was what blunted the tip.
+ *
+ * Rejected: keeping the fat teardrop and adding a hairline index (two marks for "you"); enlarging the Kaaba
+ * mark back to 0.30 (it would run into the letters, the ticks and the bezel: see [KAABA_DISTANCE]).
+ */
+internal const val NEEDLE_TIP = 0.69f
+internal const val NEEDLE_END_RADIUS = 0.075f
+internal const val NEEDLE_END_CENTRE = 0.07f
+
+/**
+ * The left flank as one cubic, tip first, as (x, y) pairs: tip, two control points, the point where it
+ * lands tangent on the round end. The right flank is its mirror image, which is what keeps the tip on
+ * the dial's vertical centre line.
+ */
+internal val NEEDLE_FLANK = floatArrayOf(
+    0f, -NEEDLE_TIP,
+    -0.010f, -0.42f,
+    -NEEDLE_END_RADIUS, -0.18f,
+    -NEEDLE_END_RADIUS, NEEDLE_END_CENTRE,
+)
+
+/**
+ * The needle path, a slim teardrop: tip at (0, -[NEEDLE_TIP]), a round end centred at (0, 0.07) with radius
+ * 0.075, bottom at 0.145, all in shares of `r`, dial centre at (`cx`, `cy`), y down. The left flank lands
+ * tangent to the round end, the arc runs through the bottom, the right flank returns to the tip. The key
+ * under the dial draws the same path.
  */
 private fun needlePath(cx: Float, cy: Float, r: Float): Path = Path().apply {
-    moveTo(cx, cy - 0.64f * r)
-    cubicTo(cx - 0.05f * r, cy - 0.38f * r, cx - 0.12f * r, cy - 0.12f * r, cx - 0.12f * r, cy + 0.10f * r)
+    val f = NEEDLE_FLANK
+    val e = NEEDLE_END_RADIUS
+    val c = NEEDLE_END_CENTRE
+    moveTo(cx + f[0] * r, cy + f[1] * r)
+    cubicTo(cx + f[2] * r, cy + f[3] * r, cx + f[4] * r, cy + f[5] * r, cx + f[6] * r, cy + f[7] * r)
     arcTo(
-        Rect(cx - 0.12f * r, cy - 0.02f * r, cx + 0.12f * r, cy + 0.22f * r),
+        Rect(cx - e * r, cy + (c - e) * r, cx + e * r, cy + (c + e) * r),
         startAngleDegrees = 180f,
         sweepAngleDegrees = -180f,
         forceMoveTo = false,
     )
-    cubicTo(cx + 0.12f * r, cy - 0.12f * r, cx + 0.05f * r, cy - 0.38f * r, cx, cy - 0.64f * r)
+    // The mirror image of the left flank, walked back to the tip.
+    cubicTo(cx - f[4] * r, cy + f[5] * r, cx - f[2] * r, cy + f[3] * r, cx - f[0] * r, cy + f[1] * r)
     close()
 }
 
 /**
- * The needle: a teardrop from the tip to a round end past the centre. With a compass it is fixed at
- * the top and means "the way you are pointing"; without one it is turned to the Qibla bearing. Its tip
- * (0.64, 0.6525 with the stroke) sits inside the Kaaba mark's box when the two coincide, see
- * [KAABA_DISTANCE], so on alignment the arrow visibly ends at the Kaaba. No hub: the round end is the pivot.
+ * The needle: a slim teardrop from a fine point to a round end past the centre. With a compass it is
+ * fixed at the top and means "the way you are pointing"; without one it is turned to the Qibla bearing.
+ * Its point ([NEEDLE_TIP]) sits inside the Kaaba mark when the two coincide, see [KAABA_DISTANCE], so on
+ * alignment the arrow visibly runs into the middle of the Kaaba. No hub: the round end is the pivot.
+ * Filled only; see [NEEDLE_TIP] for why the stroke went.
  */
 private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
-    val teardrop = needlePath(centre.x, centre.y, radius)
-    drawPath(path = teardrop, color = colour)
-    // Stroked as well as filled, with round joins, so the tip rounds off.
-    drawPath(
-        path = teardrop,
-        color = colour,
-        style = Stroke(width = radius * 0.025f, join = StrokeJoin.Round, cap = StrokeCap.Round),
-    )
+    drawPath(path = needlePath(centre.x, centre.y, radius), color = colour)
 }
 
 /**
@@ -575,18 +611,19 @@ private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color) {
  * the tick ring as the dial got smaller.
  *
  * **One budget, five numbers, outside in (STEP-6-DESIGN 16.1): bezel inner edge 0.92 (0.89 aligned); ticks
- * 0.845 to 0.87 (cardinal from 0.80); letters 0.695 to 0.785; Kaaba ink 0.59 to 0.816; needle tip 0.6525.**
- * Move one and check the others. The mark's box is 0.59 to 0.81 at a cardinal bearing and its corner
- * reaches 0.856 at a diagonal one, crossing the minor ticks, but the drawn artwork (the plinth of
- * `ic_kaaba.xml`) reaches only 0.816 at worst, under the ticks and the aligned bezel. The mark overlaps
- * the letters' band and is drawn last.
+ * 0.845 to 0.87 (cardinal from 0.80); letters 0.695 to 0.785; Kaaba ink 0.59 to 0.816; needle tip 0.69.**
+ * Move one and check the others (`QiblaDialGeometryTest` holds the needle's and the mark's together). The
+ * mark's box is 0.59 to 0.81 at a cardinal bearing and its corner reaches 0.856 at a diagonal one, crossing
+ * the minor ticks, but the drawn artwork (the plinth of `ic_kaaba.xml`) reaches only 0.816 at worst, under
+ * the ticks and the aligned bezel. The mark overlaps the letters' band and is drawn last.
  *
- * The needle tip is *inside* the box when the two coincide, which is what makes the arrow end at the
- * Kaaba on alignment rather than beside it or through it. The watch keeps its own dial and its own
- * shares (0.66 and 0.30 for the mark); see `WearApp.kt`.
+ * The needle's point is *inside* the box when the two coincide, one hundredth short of the mark's centre,
+ * which is what makes the arrow run into the middle of the Kaaba on alignment rather than stop beside it
+ * or under it. It stays just inside the letters' band (0.695), so it never touches a letter. The watch
+ * keeps its own dial and its own shares (0.66 and 0.30 for the mark); see `WearApp.kt`.
  */
-private const val KAABA_DISTANCE = 0.70f
-private const val KAABA_SIZE = 0.22f
+internal const val KAABA_DISTANCE = 0.70f
+internal const val KAABA_SIZE = 0.22f
 
 /**
  * The shortest gap between two arrival buzzes. Long enough to swallow a compass settling
@@ -807,11 +844,12 @@ private fun DialLegend() {
         }
         Key(stringResource(R.string.qibla_legend_facing)) {
             // The dial's own teardrop in miniature, from the same path, so the key matches what it explains.
-            // Fill only: at this size the dial's round stroke is invisible.
             Canvas(Modifier.size(markSize)) {
-                // The shape spans -0.64r to 0.22r, so r is the box over 0.86 and the centre sits 0.21r below the middle.
-                val r = size.height / 0.86f
-                drawPath(path = needlePath(size.width / 2f, size.height / 2f + 0.21f * r, r), color = scheme.primary)
+                // The shape spans -NEEDLE_TIP to the round end's bottom, so r is the box over that span and
+                // the dial centre sits half the difference of the two below the middle of the box.
+                val bottom = NEEDLE_END_CENTRE + NEEDLE_END_RADIUS
+                val r = size.height / (NEEDLE_TIP + bottom)
+                drawPath(path = needlePath(size.width / 2f, size.height / 2f + (NEEDLE_TIP - bottom) / 2f * r, r), color = scheme.primary)
             }
         }
     }

@@ -608,7 +608,7 @@ card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is t
 `surface` in light and `surfaceContainerHighest` in dark (`dialBezel()`, a different role per theme because the dark
 hairline is invisible against the page). Inside it the face, `surfaceVariant`. Sixty ticks, one every 6°, in
 `outline` (minor 0.845 to 0.87, cardinal from 0.80, round caps); the letters at 0.74, E S W `onSurfaceVariant`
-Normal and N `primary` Medium. The needle is **you**: a `primary` teardrop (tip at 0.64, round end past the centre,
+Normal and N `primary` Medium. The needle is **you**: a slim `primary` teardrop (0.15 of the radius across, a fine point at 0.69 that runs into the Kaaba mark on arrival, round end past the centre; slimmed 11 Nov 2026, see §9,
 no hub), fixed at the top with a compass (it points at the bearing without one). There is no arc: the Kaaba's side
 of the dial and the sentence ("Turn right 58°") say how far to turn. Inside ±5° the face fills with
 `primaryContainer`, the bezel turns `primary` and thickens to 0.11, all over 250 ms (150 ms on leaving), the line
@@ -1367,6 +1367,14 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     the own name only (19 Oct entry). Settings subtitle (Ali chose A from the pictures, "A go ahead"): only the language showing, "اردو (Urdu)", or "Phone language · اردو (Urdu)" while following the phone; B, all five, ran to three lines in Urdu and tore "العربية (Arabic)" across two. Rejected: the English name
     following the app language (four translations that drift), flags (a flag is a country), one line "اردو · Urdu"
     (wraps mid pair at large text).
+- **11 Nov 2026, the Qibla needle slimmed and sharpened (Ali, on the 1.6.0 he had just received: the needle is
+  thicker, "seems a bit off", "not as accurate as before"):** the step 6 teardrop was 0.24 of the radius across with
+  a blunt stroked tip at 0.64, under a Kaaba mark only 0.22 across, so the two could not be lined up by eye. It is
+  the same teardrop style, now 0.15 across (the 1.5.0 needle's width) with a fine point at 0.69, inside the mark, and
+  no stroke. The mark, letters, ticks and bezel did not move. **A pointer must be fine where it meets what it points
+  at, and must reach it**: `QiblaDialGeometryTest` fails the build otherwise. Rejected: a hairline index on the fat
+  teardrop (two marks for "you"); a larger Kaaba mark (runs into the letters and ticks).
+
 ---
 
 ## 10. The learning loop
