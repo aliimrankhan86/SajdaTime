@@ -648,5 +648,6 @@
     <string name="tasbeeh_target">লক্ষ্য: %1$d</string>
     <string name="tasbeeh_no_target">কোনো লক্ষ্য নেই</string>
     <string name="tasbeeh_rounds">রাউন্ড: %1$d</string>
+    <string name="tasbeeh_total">মোট: %1$d</string>
     <string name="tasbeeh_state">%2$d এর মধ্যে %1$d</string>
 </resources>

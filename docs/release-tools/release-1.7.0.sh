@@ -77,7 +77,7 @@ EOF
   LINT="$(for f in */build/reports/lint-results-debug.xml; do printf '%s %s errors, ' "${f%%/*}" "$(grep -cE 'severity="(Error|Fatal)"' "$f")"; done)"
   # Gate counts at 25 Oct 2026 (core 238 tests, 1 of them skipped; app 335 since DesignTokensTest added 12; wear 27). Update with the code.
   # 12 Nov 2026: app 354, core 266 (tasbeeh, Timetable list, Qibla geometry added), wear 27.
-  EXPECTED_COUNTS="app 354 tests 0 failed, core 266 tests 0 failed, wear 27 tests 0 failed"
+  EXPECTED_COUNTS="app 354 tests 0 failed, core 267 tests 0 failed, wear 27 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass

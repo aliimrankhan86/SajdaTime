@@ -623,5 +623,6 @@
     <string name="tasbeeh_target">ہدف: %1$d</string>
     <string name="tasbeeh_no_target">کوئی ہدف نہیں</string>
     <string name="tasbeeh_rounds">دور: %1$d</string>
+    <string name="tasbeeh_total">کل تعداد: %1$d</string>
     <string name="tasbeeh_state">%2$d میں سے %1$d</string>
 </resources>

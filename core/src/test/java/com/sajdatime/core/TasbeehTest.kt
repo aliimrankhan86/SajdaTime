@@ -23,10 +23,11 @@ class TasbeehTest {
     }
 
     @Test
-    fun `the 33rd tap reaches the target and the count stays on 33 until the next tap`() {
+    fun `the 33rd tap reaches the target and adds the round on that tap`() {
         val full = Tasbeeh().taps(33)
         assertEquals(33, full.count)
-        assertEquals(0, full.rounds)
+        assertEquals(1, full.rounds)
+        assertEquals(33L, full.total)
         assertTrue(full.reached)
     }
 
@@ -35,7 +36,20 @@ class TasbeehTest {
         val next = Tasbeeh().taps(34)
         assertEquals(1, next.count)
         assertEquals(1, next.rounds)
+        assertEquals(34L, next.total)
         assertFalse(next.reached)
+    }
+
+    @Test
+    fun `the total goes up by one on every tap, through every round`() {
+        for (target in Tasbeeh.TARGETS) {
+            var t = Tasbeeh(target = target)
+            for (beads in 1..350) {
+                t = t.tap()
+                assertEquals("target $target after $beads", beads.toLong(), t.total)
+                if (target > 0) assertEquals("target $target after $beads", beads / target, t.rounds)
+            }
+        }
     }
 
     @Test
@@ -48,7 +62,7 @@ class TasbeehTest {
         }
         assertEquals(3, reached)
         assertEquals(33, t.count)
-        assertEquals(2, t.rounds)
+        assertEquals(3, t.rounds)
         assertEquals(99L, t.total)
     }
 
@@ -101,7 +115,8 @@ class TasbeehTest {
     fun `the count stops at the cap and does not overflow`() {
         val t = Tasbeeh(count = Tasbeeh.MAX, target = 0).tap()
         assertEquals(Tasbeeh.MAX, t.count)
-        val r = Tasbeeh(count = 33, target = 33, rounds = Tasbeeh.MAX).tap()
+        val r = Tasbeeh(count = 32, target = 33, rounds = Tasbeeh.MAX).tap()
+        assertEquals(33, r.count)
         assertEquals(Tasbeeh.MAX, r.rounds)
     }
 
@@ -110,6 +125,8 @@ class TasbeehTest {
         assertEquals(Tasbeeh(0, 33, 0), Tasbeeh.restore(-5, 7, -1))
         assertEquals(Tasbeeh(33, 33, 2), Tasbeeh.restore(500, 33, 2))
         assertEquals(Tasbeeh(12, 99, 1), Tasbeeh.restore(12, 99, 1))
+        // A full round is a counted round: it cannot come back beside zero rounds.
+        assertEquals(Tasbeeh(33, 33, 1), Tasbeeh.restore(33, 33, 0))
         assertEquals(Tasbeeh(Tasbeeh.MAX, 0, 0), Tasbeeh.restore(Int.MAX_VALUE, 0, 0))
         // And what restore returns always taps cleanly.
         assertEquals(1, Tasbeeh.restore(500, 33, 2).tap().count)

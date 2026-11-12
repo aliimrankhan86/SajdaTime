@@ -46,6 +46,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
+import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -108,10 +115,14 @@ internal fun TasbeehDoor() {
  * - **The ring.** The count, large, inside a ring that fills as the round goes: where you are in the round
  *   is seen without reading. On a full round the ring closes and it and the number turn green. With no
  *   target the ring is a plain track.
+ * - **The total**, one quiet line under the ring: every bead since the last start. The ring's number
+ *   begins again each round, and a fast thumb is at 1 or 4 before the eye has seen 33; the total only
+ *   climbs (Ali on his phone, 12 Nov 2026). Not shown with no target, where the ring's number is it.
  * - **The target**, as four choices side by side (33, 99, 100, and ∞ for no target). It was a button that
  *   stepped through them, so three of the four were out of sight and reaching one could take three taps.
  *   Choosing the one already in use does nothing; choosing another starts again ([Tasbeeh.withTarget]).
- * - **Count.** One wide button low on the sheet, under the thumb, found without looking. Still a real
+ * - **Count.** One wide button low on the sheet, under the thumb, found without looking. It counts the
+ *   moment a finger lands, once per finger, and a finger on it cannot scroll or drag the sheet. Still a real
  *   button and not a "tap anywhere" surface: TalkBack and Switch Access need one, and it is the app's own
  *   call to action (DESIGN_SYSTEM 4.1).
  * - **Start again**, small and last, away from the thumb's path so it is not hit by mistake.
@@ -165,6 +176,18 @@ internal fun TasbeehBody(onClose: () -> Unit) {
         }
         Spacer(Modifier.height(Space.Group))
         CountRing(tasbeeh)
+        if (tasbeeh.target > 0) {
+            // Every bead since the last start. The number in the ring begins again each round, and a
+            // fast thumb is past 33 before the eye catches it: this one only ever climbs (Ali, 12 Nov
+            // 2026). With no target the ring's number is already the total, so there is no second line.
+            Spacer(Modifier.height(Space.Related))
+            Text(
+                text = stringResource(R.string.tasbeeh_total, tasbeeh.total),
+                style = MaterialTheme.typography.titleMedium.copy(fontFeatureSettings = "tnum"),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.testTag("tasbeeh_total"),
+            )
+        }
         Spacer(Modifier.height(Space.Section))
         TargetChoice(current = tasbeeh.target, onChoose = { keep(tasbeeh.withTarget(it)) })
         Spacer(Modifier.height(Space.Group))
@@ -174,17 +197,50 @@ internal fun TasbeehBody(onClose: () -> Unit) {
         } else {
             tasbeeh.count.toString()
         }
+        fun bead() {
+            val next = tasbeeh.tap()
+            keep(next)
+            buzz(context, if (next.reached) 150 else 15)
+        }
+        // A bead is counted the moment a finger lands, once for every finger. It used to count when the
+        // finger lifted (a button's click), and on Ali's Redmi fast taps went missing (12 Nov 2026): a
+        // finger that slid a little lost its click to the page's scroll, and with two thumbs the second
+        // landed before the first lifted.
+        //
+        // So this button takes its touches whole. Every change is consumed: the button's own click
+        // never sees a finger (it would count the same touch again on the lift), and a finger that
+        // starts here cannot scroll the page or drag the sheet. That last part matters as much: a sheet
+        // nudged by a sliding thumb springs back for a fifth of a second and swallows the next touch as
+        // its own. "IgnoreConsumed" for the same reason: the page and the sheet see a touch before the
+        // button does and may mark it. Scroll or close the sheet from anywhere else on it.
+        // The button's click (onClick) is left for what has no finger: TalkBack, Switch Access and a
+        // keyboard. The press is shown by hand, because the button no longer sees it.
+        // bead() may only read state (it is captured once). Pinned by TasbeehDeviceTest (200 fast taps).
+        val presses = remember { MutableInteractionSource() }
         CtaButton(
-            onClick = {
-                val next = tasbeeh.tap()
-                keep(next)
-                buzz(context, if (next.reached) 150 else 15)
-            },
+            onClick = { bead() },
+            interactionSource = presses,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(88.dp)
                 .testTag("tasbeeh_tap")
-                .semantics { stateDescription = spoken },
+                .semantics { stateDescription = spoken }
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        val held = mutableMapOf<PointerId, PressInteraction.Press>()
+                        while (true) {
+                            awaitPointerEvent(PointerEventPass.Initial).changes.forEach { change ->
+                                if (change.changedToDownIgnoreConsumed()) {
+                                    bead()
+                                    PressInteraction.Press(change.position).also { held[change.id] = it; presses.tryEmit(it) }
+                                } else if (change.changedToUpIgnoreConsumed()) {
+                                    held.remove(change.id)?.let { presses.tryEmit(PressInteraction.Release(it)) }
+                                }
+                                change.consume()
+                            }
+                        }
+                    }
+                },
         ) {
             Text(stringResource(R.string.tasbeeh_count), style = MaterialTheme.typography.titleLarge)
         }
@@ -235,7 +291,7 @@ private fun CountRing(tasbeeh: Tasbeeh) {
             )
             if (tasbeeh.target > 0) {
                 Text(
-                    text = stringResource(R.string.tasbeeh_rounds, tasbeeh.rounds + if (tasbeeh.reached) 1 else 0),
+                    text = stringResource(R.string.tasbeeh_rounds, tasbeeh.rounds),
                     style = MaterialTheme.typography.bodyMedium,
                     color = scheme.onSurfaceVariant,
                     modifier = Modifier.testTag("tasbeeh_rounds"),

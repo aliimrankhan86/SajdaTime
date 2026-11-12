@@ -603,5 +603,6 @@
     <string name="tasbeeh_target">Target: %1$d</string>
     <string name="tasbeeh_no_target">Tanpa target</string>
     <string name="tasbeeh_rounds">Putaran: %1$d</string>
+    <string name="tasbeeh_total">Total: %1$d</string>
     <string name="tasbeeh_state">%1$d dari %2$d</string>
 </resources>

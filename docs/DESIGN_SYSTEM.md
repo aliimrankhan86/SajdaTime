@@ -1403,8 +1403,13 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
     cannot miss it". **A door people must not miss goes above anything whose height changes.**
     The sheet, second design the same morning (Ali: "modern UX, clean and easy
     and comfortable to use"): the count inside a ring that fills as the round goes (green and closed on a full
-    round), the four targets as one row of choices (33, 99, 100, ∞) in the look of the theme control, one 88dp
-    Count button low on the sheet, and a small Start again last. The target row is a choice control, not a
+    round), a quiet Total line under the ring (every bead since the last start; shown with a target only; added
+    12 Nov midday after Ali's phone test: the ring's number begins again each round and a fast thumb is past 33
+    before the eye sees it), the four targets as one row of choices (33, 99, 100, ∞) in the look of the theme control, one 88dp
+    Count button low on the sheet, and a small Start again last. **Count takes its touches whole (Ali's phone, 12 Nov):**
+    a bead counts the moment a finger lands, once per finger, and a finger that starts on Count cannot scroll the
+    page or drag the sheet; the press is drawn by hand. Do not turn it back into a plain click on release: fast
+    taps go missing (HANDOVER §15). The target row is a choice control, not a
     button, so it is not in the button inventory. A counter only: no words of dhikr and no advice on how many, because that
     differs between schools and would be a ruling. Not a fifth tab (the bar holds four and the app must stay
     simple), not a tap anywhere surface (not a button to TalkBack, and not in the design system). **Built without

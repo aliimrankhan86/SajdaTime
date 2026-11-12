@@ -16,16 +16,25 @@ data class Tasbeeh(
     val target: Int = DEFAULT_TARGET,
     val rounds: Int = 0,
 ) {
-    /** True on the tap that completes a round, and until the next tap. The screen buzzes on it. */
+    /**
+     * True on the tap that completes a round, and until the next tap. The screen buzzes on it. That same
+     * tap adds the round to [rounds], so while this is true the round on screen is already counted.
+     */
     val reached: Boolean get() = target > 0 && count == target
 
     /**
      * One bead. With a target, the tap after a full round starts the next round at 1, so the count on
      * screen is always "this many in this round". With no target it simply climbs.
+     *
+     * The round is added on the tap that reaches the target, not on the one after (Ali on his phone,
+     * 12 Nov 2026). It was the tap after: while the count sat on the target the stored rounds were one
+     * short and the screen added it back for show. Now what is stored is what is shown, on every tap.
+     * There is no pause at the target: the next tap always counts.
      */
-    fun tap(): Tasbeeh = when {
-        target > 0 && count >= target -> copy(count = 1, rounds = (rounds + 1).coerceAtMost(MAX))
-        else -> copy(count = (count + 1).coerceAtMost(MAX))
+    fun tap(): Tasbeeh {
+        val next = if (target > 0 && count >= target) 1 else (count + 1).coerceAtMost(MAX)
+        val completes = target > 0 && next == target
+        return copy(count = next, rounds = if (completes) (rounds + 1).coerceAtMost(MAX) else rounds)
     }
 
     /** Back to nothing counted. The target stays: it is a preference, not part of the count. */
@@ -40,8 +49,15 @@ data class Tasbeeh(
     fun withTarget(newTarget: Int): Tasbeeh =
         if (newTarget == target || newTarget !in TARGETS) this else Tasbeeh(count = 0, target = newTarget, rounds = 0)
 
-    /** How many beads in all, for the spoken summary. */
-    val total: Long get() = if (target > 0) rounds.toLong() * target + count else count.toLong()
+    /**
+     * How many beads in all since the last start, shown under the ring. On a full round the beads on
+     * screen are already inside [rounds], so they are not added a second time.
+     */
+    val total: Long get() = when {
+        target <= 0 -> count.toLong()
+        reached -> rounds.toLong() * target
+        else -> rounds.toLong() * target + count
+    }
 
     companion object {
         const val DEFAULT_TARGET = 33
@@ -54,13 +70,16 @@ data class Tasbeeh(
 
         /**
          * What was stored, made safe: a target that is not one of ours becomes the default, and a
-         * count is brought inside its round. A file edited or damaged outside the app cannot put the
-         * counter in a state [tap] never produces.
+         * count is brought inside its round, so a file edited or damaged outside the app still gives
+         * numbers that count on cleanly from the next tap.
          */
         fun restore(count: Int, target: Int, rounds: Int): Tasbeeh {
             val safeTarget = if (target in TARGETS) target else DEFAULT_TARGET
             val top = if (safeTarget > 0) safeTarget else MAX
-            return Tasbeeh(count.coerceIn(0, top), safeTarget, rounds.coerceIn(0, MAX))
+            val safeCount = count.coerceIn(0, top)
+            // A full round on screen is always a counted round ([tap]), so it cannot sit beside zero rounds.
+            val least = if (safeTarget > 0 && safeCount == safeTarget) 1 else 0
+            return Tasbeeh(safeCount, safeTarget, rounds.coerceIn(least, MAX))
         }
     }
 }
