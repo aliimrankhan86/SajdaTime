@@ -6102,13 +6102,16 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   puts the calibration instruction in place of live guidance. Medium retains direction with a figure of eight hint.
   High confidence enters the facing state at 2° and exits past 4°. The haptic rearms past 8° so the known 7° wobble
   stays quiet. The Qibla tab holds portrait on phones and reserves the measured floating bar below its scroll area.
-  Tab names have equal edge padding and shrink when a word would split. See DESIGN_SYSTEM §9.
+  Tab names have equal edge padding and shrink when a word would split. A 320 dp, 2× replay found Turkish
+  `Namazlarım` and Indonesian `Pengaturan` needed a lower fallback. The tab label sizing now allows that
+  and the six locale replay passed. See DESIGN_SYSTEM §9.
 - **Redmi evidence:** the independent raw sensor probe got 118.497° from both bearing calculations, with +1.23°
   magnetic declination. App and raw heading were both 187.99° (60 still samples over 12 seconds), and the Kaaba mark
   was 0.4 px from its expected position. The screen stayed upright after a landscape request. The photos independently
   show the new calibration warning with no facing claim. A separate MIUI comparison did not meet the three-round
-  requirement: the stillness precheck drifted by 6°, and one later round differed by 4–5° before any declination
-  correction. The 1.6.0 portrait baseline is 187° / 191° / 187°. The Tasbeeh photos show count, rounds and total as
+  requirement. The first stillness precheck drifted by 6°. The retry passed the stillness check (183°→184°)
+  and still differed by 5–6° before any declination correction. The 1.6.0 portrait baseline is 187° / 191° / 187°.
+  There is no evidence for applying a constant offset to match MIUI. The Tasbeeh photos show count, rounds and total as
   33/1/33, 4/1/37, 6/7/237 after 200 more taps, 6/7/237 after restart, then 0/0/0 after Start again.
 - **Emulator:** the focused suite recorded 42 passing tests across the dial, vibration, large text and Tasbeeh.
   After reserving the Qibla viewport above the tabs, the two layout measurements passed again. The watch emulator

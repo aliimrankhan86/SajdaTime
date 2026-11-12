@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
  */
 val LocalBottomBarClearance = compositionLocalOf { 88.dp }
 
-/** The last thing in every scrolling screen: room to scroll the final row clear of the bar. */
+/** Measured room beneath the last control, inside the scroll area or below its viewport. */
 @Composable
 fun BottomBarClearance() {
     Spacer(Modifier.height(LocalBottomBarClearance.current))

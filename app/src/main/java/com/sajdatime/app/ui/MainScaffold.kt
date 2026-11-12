@@ -263,8 +263,8 @@ fun MainScaffold(
     }
 
     // Quiet Glass (17 Oct 2026): no bottomBar slot. The tab bar floats over the content in the
-    // same Box, so the screens scroll softly underneath it; each screen ends with
-    // BottomBarClearance() so its last row can still be scrolled clear of the bar.
+    // same Box. Screens use the measured bar height to keep their last controls accessible.
+    // Qibla reserves that height outside its scroll area so Details stays clear on short screens.
     // The top inset is no longer taken here (1.6, step 5): Times draws its sky under the status bar, and the
     // other three tabs take the same inset one level down (ReadingFrame), so nothing else moves.
     Scaffold(
@@ -472,7 +472,8 @@ internal fun GlassTabBar(
                     // Wraps between words, shrinks only while a word would split. One line that shrinks was
                     // tried on 30 Oct 2026 and measured worse: on a 320dp phone at 2.0 "My prayers" and
                     // "আমার নামাজ" still ended in an ellipsis at the floor (LargeTextAndTalkBackDeviceTest).
-                    autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize),
+                    // The narrowest slots need to go below the normal size for long single words.
+                    autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize, minimumFractionOfNormal = 0.6f),
                 )
             }
         }

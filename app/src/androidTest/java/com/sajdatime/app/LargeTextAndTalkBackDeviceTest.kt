@@ -1,5 +1,8 @@
 package com.sajdatime.app
 
+import android.content.res.Configuration
+import java.util.Locale
+
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -14,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsActions
@@ -134,6 +138,24 @@ class LargeTextAndTalkBackDeviceTest {
         )
         // The fourth tab (1.6.0): its label must be there and whole at the same text size.
         assertWhole(word(R.string.nav_tracker))
+    }
+
+    @Test
+    fun the_longest_translated_tab_labels_fit_with_padding_at_double_text() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val cases = listOf("id" to Destination.SETTINGS, "tr" to Destination.PRAYERS).map { (language, tab) ->
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(Locale.forLanguageTag(language))
+            context.createConfigurationContext(config).resources to tab
+        }
+        atText(2f) {
+            cases.forEach { (resources, tab) ->
+                CompositionLocalProvider(LocalResources provides resources) {
+                    GlassTabBar(current = tab, onSelect = {})
+                }
+            }
+        }
+        cases.forEach { (resources, tab) -> assertWhole(resources.getString(tab.labelRes)) }
     }
 
     @Test

@@ -13,7 +13,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   available. My prayers is on by default and usage counts stay opt in. The store has six listing languages.
   Release checks and remaining approvals are in `docs/HANDOVER.md` §11.
 - **Phone 1.5.0** (versionCode 9) and **watch 1.5.0** (versionCode 1002), submitted 23 Oct 2026; the public Play page says "Updated on 23 Oct 2026" (checked 25 Oct 2026). Watch testing is finished, so never raise it. What 1.5.0 contains is the record under "1.5.0 (released)" below: the Quiet Glass design, Arabic as the fifth language, the built-in adhan, reminders before prayer, the redesigned widgets, Turkey times matching Diyanet, the suhoor reminder on by default.
-- **Languages:** English, Arabic, Urdu, Turkish and Indonesian. Arabic and Urdu read right to left.
+- **Languages:** English, Arabic, Urdu, Turkish, Indonesian and Bengali. Arabic and Urdu read right to left.
 - **Privacy policy:** https://aliimrankhan86.github.io/SajdaTime/privacy.html, dated 23 Oct 2026.
 
 ## Next release after 1.6.0: 1.7.0 (branch `claude/1-7-0`, built and kept ready; not merged; versionCode 11, versionName 1.7.0 set 4 Nov 2026 at Ali's go-ahead for release prep)
