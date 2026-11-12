@@ -63,7 +63,7 @@ else result tree "CHECK ($(git rev-parse --short HEAD) plus uncommitted changes,
 step "3. Full release gate: clean, unit tests, lint, both bundles"
 # --no-build-cache so every test really runs: with the cache on, clean can still restore test results.
 GATE=fail
-if ./gradlew --no-build-cache clean test lint :app:bundleRelease :wear:bundleRelease; then
+if ./gradlew --no-build-cache clean test :app:bundleRelease :wear:bundleRelease && ./gradlew lint; then
   # No apostrophe anywhere in this heredoc, not even in a comment: bash 3.2 cannot parse it inside $( ).
   COUNTS="$(python3 - <<'EOF'
 import glob, xml.etree.ElementTree as ET
@@ -77,7 +77,7 @@ EOF
   LINT="$(for f in */build/reports/lint-results-debug.xml; do printf '%s %s errors, ' "${f%%/*}" "$(grep -cE 'severity="(Error|Fatal)"' "$f")"; done)"
   # Gate counts at 25 Oct 2026 (core 238 tests, 1 of them skipped; app 335 since DesignTokensTest added 12; wear 27). Update with the code.
   # 12 Nov 2026: app 354, core 266 (tasbeeh, Timetable list, Qibla geometry added), wear 27.
-  EXPECTED_COUNTS="app 354 tests 0 failed, core 267 tests 0 failed, wear 27 tests 0 failed"
+  EXPECTED_COUNTS="app 365 tests 0 failed, core 269 tests 0 failed, wear 27 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass
@@ -118,11 +118,8 @@ if check_bundle bundle "$AAB" 11 1.7.0 yes; then
   # What Google Play would install on an English-only Galaxy S23 Ultra, from this exact file.
   echo '{"supportedAbis":["arm64-v8a"],"supportedLocales":["en-GB"],"screenDensity":480,"sdkVersion":35}' > "$OUT/s23-en.json"
   rm -rf "$OUT/s23-en" && mkdir -p "$OUT/s23-en"
-  # A throwaway key, only to unpack the bundle for this check. It signs nothing that ships.
-  [ -f "$OUT/throwaway.jks" ] || "$JAVA_HOME/bin/keytool" -genkeypair -keystore "$OUT/throwaway.jks" -storepass throwaway \
-       -keypass throwaway -alias t -keyalg RSA -keysize 2048 -validity 30 -dname "CN=throwaway split check" >/dev/null 2>&1
+  # Bundletool uses its default debug signer for this local split inspection.
   if java -jar "$BT" build-apks --bundle="$AAB" --output="$OUT/s23-en.apks" --device-spec="$OUT/s23-en.json" --overwrite \
-       --ks="$OUT/throwaway.jks" --ks-pass=pass:throwaway --ks-key-alias=t --key-pass=pass:throwaway \
      && unzip -q -o "$OUT/s23-en.apks" -d "$OUT/s23-en"; then
     LANGS="$(for a in "$OUT"/s23-en/splits/*.apk; do "$AAPT2" dump resources "$a" 2>/dev/null; done \
       | awk '/string\/app_language_tag$/{f=1;next} f&&/resource 0x/{f=0} f' | grep -o '([a-z]*)' | sort -u | tr -d '\n')"

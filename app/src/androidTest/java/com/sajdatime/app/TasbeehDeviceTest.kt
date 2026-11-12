@@ -29,7 +29,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TasbeehDeviceTest {
 
-    @get:Rule val compose = createComposeRule()
+    // Upright before the screen opens: the sheet holds itself upright, and a phone lying flat on its side
+    // would have it made again under the test (see UprightRule).
+    @get:Rule(order = 0) val upright = UprightRule()
+    @get:Rule(order = 1) val compose = createComposeRule()
 
     private val context get() = InstrumentationRegistry.getInstrumentation().targetContext
     private fun word(id: Int, vararg args: Any): String = context.getString(id, *args)

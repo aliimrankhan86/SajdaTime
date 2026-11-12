@@ -94,7 +94,7 @@ import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.R as CoreR
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.theme.kiswahGold
 import com.sajdatime.app.ui.theme.sajdaSurface
@@ -108,16 +108,14 @@ fun QiblaScreen(
     onUseGps: () -> Unit,
     onSearchCity: (String) -> Unit,
 ) {
-    // Same large start aligned title as the other two tabs (Quiet Glass), then the direction
-    // block and the dial under it, then room to scroll clear of the floating tab bar.
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        ScreenTitle(stringResource(R.string.qibla_title))
-        QiblaBody(state, onUseGps, onSearchCity)
-        Spacer(Modifier.height(Space.Section))
+    // Reserve the measured bar below the scroll area. On short screens, a button
+    // partially in view must stay clear of the floating tabs before it is scrolled.
+    Column(Modifier.fillMaxSize()) {
+        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            ScreenTitle(stringResource(R.string.qibla_title))
+            QiblaBody(state, onUseGps, onSearchCity)
+            Spacer(Modifier.height(Space.Section))
+        }
         BottomBarClearance()
     }
 }
@@ -166,68 +164,63 @@ internal fun QiblaBody(
 
 @Composable
 private fun QiblaLocated(state: UiState, qibla: Double, context: android.content.Context) {
-    // Worked out once, here, and handed to both halves. The dial and the sentence are
-    // two renderings of the same fact, and with hysteresis "aligned" now depends on
-    // what it was a moment ago — so two independent copies could disagree, and the
-    // screen would say you had arrived under a dial that said you had not.
-    //
-    // The buzz is decided in this same effect, deliberately. It used to live down in
-    // GuidanceText (now DirectionBlock), and when `aligned` moved up here that put one effect cycle between
-    // the heading landing and the flag catching up. In that gap GuidanceText saw a real
-    // heading with `aligned` still false, wrote down "not arrived yet", and then read
-    // the flag turning true as an arrival — so the phone buzzed every single time the
-    // screen was opened while already facing the Kaaba. Measured on the S23 Ultra:
-    // 00:29:18.393, 0.4 s after the tab was tapped. Deciding both together removes the
-    // gap that the bug lived in.
-    val heading = state.compassHeading
-    var aligned by rememberSaveable { mutableStateOf(false) }
-    // False until the first heading of the session has been read. Opening the screen
-    // already facing the Kaaba is not an arrival, and must not be announced as one.
-    var haveRead by rememberSaveable { mutableStateOf(false) }
-    // And never twice in quick succession. Hysteresis stops the endless buzzing of a
-    // phone at rest, but a compass that has just been switched on genuinely swings
-    // while it settles, and those swings are wider than any sensible release angle:
-    // with hysteresis alone the S23 Ultra still buzzed 4 times in the 26 seconds after
-    // the screen opened, then fell silent for the rest of the run. One arrival is worth
-    // announcing; four in half a minute is a fault the user feels in their hand.
-    var lastBuzzAt by rememberSaveable { mutableLongStateOf(0L) }
-    LaunchedEffect(heading, qibla) {
-        if (heading == null) return@LaunchedEffect
-        val now = QiblaEngine.staysAligned(aligned, heading, qibla)
-        val since = SystemClock.elapsedRealtime() - lastBuzzAt
-        if (now && !aligned && haveRead && since > ARRIVAL_QUIET_MILLIS) {
-            arrivalBuzz(context)
-            lastBuzzAt = SystemClock.elapsedRealtime()
+    val accuracy = state.compassAccuracy
+    val heading = state.compassHeading.takeIf { accuracy.allowsHeading }
+    val arrivalHeading = heading.takeIf { accuracy.allowsArrival }
+    var wasAligned by remember { mutableStateOf(false) }
+    var buzzArmed by remember { mutableStateOf(false) }
+    var lastBuzzAt by remember { mutableLongStateOf(0L) }
+    // Gate the dial and text on the current reading, including the frame before the effect runs.
+    val aligned = arrivalHeading != null && QiblaEngine.staysAligned(wasAligned, arrivalHeading, qibla)
+    LaunchedEffect(arrivalHeading, qibla) {
+        wasAligned = aligned
+        if (arrivalHeading == null) {
+            buzzArmed = false
+        } else if (aligned) {
+            if (buzzArmed && SystemClock.elapsedRealtime() - lastBuzzAt > ARRIVAL_QUIET_MILLIS) {
+                arrivalBuzz(context)
+                lastBuzzAt = SystemClock.elapsedRealtime()
+            }
+            buzzArmed = false
+        } else if (QiblaEngine.hasLeftArrivalZone(arrivalHeading, qibla)) {
+            // A stationary compass can wander past the 4° visual release. Rearm only
+            // after a larger turn, so that wobble and calibration recovery stay quiet.
+            buzzArmed = true
         }
-        aligned = now
-        haveRead = true
     }
 
     Spacer(Modifier.height(Space.Paragraph))
-    DirectionBlock(state = state, qiblaTrueBearing = qibla, aligned = aligned)
-    // Permanent, so it can sit above the dial beside the number it explains without anything
-    // ever moving. Calibration and "may wander" come and go with the phone in the hand, so
-    // they go below Details instead (AccuracyNotice).
-    if (state.compassAccuracy == CompassAccuracy.UNAVAILABLE) {
-        Spacer(Modifier.height(Space.Group))
-        Notice(brief = stringResource(R.string.qibla_sensor_missing))
+    if (accuracy.needsCalibration) {
+        Notice(brief = stringResource(R.string.qibla_calibrate))
+    } else {
+        val displayState = state.copy(compassHeading = heading)
+        DirectionBlock(state = displayState, qiblaTrueBearing = qibla, aligned = aligned)
+        if (accuracy == CompassAccuracy.UNAVAILABLE) {
+            Spacer(Modifier.height(Space.Group))
+            Notice(brief = stringResource(R.string.qibla_sensor_missing))
+        }
+        if (accuracy == CompassAccuracy.MEDIUM) {
+            Spacer(Modifier.height(Space.Group))
+            Text(
+                text = stringResource(R.string.qibla_accuracy_medium),
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Spacer(Modifier.height(Space.Section))
+        CompassDial(state = displayState, qiblaTrueBearing = qibla, aligned = aligned)
+        Spacer(Modifier.height(Space.Section))
+        if (heading != null) DialLegend()
     }
-
-    Spacer(Modifier.height(Space.Section))
-    CompassDial(state = state, qiblaTrueBearing = qibla, aligned = aligned)
-    Spacer(Modifier.height(Space.Section))
-    if (heading != null) DialLegend()
     val place = state.settings.placeName(context)
     if (place.isNotBlank()) {
-        if (heading != null) Spacer(Modifier.height(Space.Paragraph))
+        if (heading != null || accuracy.needsCalibration) Spacer(Modifier.height(Space.Paragraph))
         PlaceRow(place)
     }
     Spacer(Modifier.height(Space.Group))
     DetailsBlock(state = state, hasCompass = heading != null)
-    if (state.compassAccuracy == CompassAccuracy.LOW || state.compassAccuracy == CompassAccuracy.MEDIUM) {
-        Spacer(Modifier.height(Space.Group))
-        AccuracyNotice(state.compassAccuracy)
-    }
+
 }
 
 @Composable
@@ -307,7 +300,7 @@ private fun DetailsBlock(state: UiState, hasCompass: Boolean) {
             if (hasCompass && state.qiblaBearing != null) {
                 Spacer(Modifier.height(Space.Tight))
                 Text(
-                    text = stringResource(R.string.qibla_bearing, state.qiblaBearing.roundToInt()),
+                    text = stringResource(R.string.qibla_bearing, QiblaEngine.wholeDegrees(state.qiblaBearing)),
                     style = style,
                     color = ink,
                     textAlign = TextAlign.Center,
@@ -339,25 +332,42 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
     // Kaaba mark rides on it at the Qibla bearing — so the mark is always "where the Kaaba
     // is" in the room. When there is no compass the dial is held still with north at the
     // top, and the needle swings round to the bearing instead (see below).
+    //
+    // The target is carried on from the last one by the shortest way round ([continuousTurn]), never
+    // set to minus the heading outright: a heading stepping from 359.9 to 0.1 would otherwise send the
+    // ring, the letters, the hand and the Kaaba round a whole turn in 120 ms. Anyone whose Qibla is near
+    // north (the Kenyan coast) would see that every time they came to rest on it. There since the first
+    // dial; found by review on 12 Nov 2026.
+    val turned = remember { FloatArray(1) { -(heading ?: 0.0).toFloat() } }
+    turned[0] = continuousTurn(turned[0], -(heading ?: 0.0).toFloat())
     val dialRotation by animateFloatAsState(
-        targetValue = if (heading != null) -heading.toFloat() else 0f,
+        targetValue = turned[0],
         animationSpec = tween(durationMillis = 120),
         label = "dial",
     )
 
-    // **The needle is you, not the Qibla.** It points the way the phone points — straight
-    // up the screen — and stays there while the dial and the Kaaba turn round it. Turn
-    // until the needle touches the Kaaba.
+    // **The hand points at the Kaaba.** Its angle on the screen is the Qibla bearing minus the heading,
+    // the same number the sentence above the dial prints ("Turn right 39°"), and the Kaaba mark rides on
+    // its point, so hand and mark can never say two different things. "You" is the small fixed mark at
+    // the top of the dial ([drawTopMark]): turn until the hand stands straight up into it.
     //
-    // It used to be the other way round: the needle swung to the Qibla bearing with the
-    // Kaaba mark sitting on its tip, and "you" was a short grey tick at the rim. Read cold,
-    // that dial showed a compass needle already pointing at the Kaaba, so the two marks
-    // looked like one thing and the question "am I facing it?" had no visible answer — the
-    // owner's report on 15 Aug 2026 was that the needle and the Kaaba were "attached". A
-    // compass needle is read as "me" by everyone who has held a compass, so that is what it
-    // is now. Without a compass there is no "me", and the needle does the only useful thing
-    // left: it points at the Kaaba, which on a north-up dial is the bearing from north.
-    val needleRotation = if (heading != null) 0f else qiblaTrueBearing.toFloat()
+    // This is the third meaning the hand has had, and the history matters:
+    //  1. Until 15 Aug 2026 it pointed at the Kaaba with the mark on its tip, and "you" was a short grey
+    //     tick at the rim. The owner said hand and mark looked "attached": with nothing strong marking
+    //     "you", the dial looked as if it were already pointing at the Kaaba whichever way he stood.
+    //  2. From then until 12 Nov 2026 the hand was "you": fixed straight up, with the Kaaba mark turning
+    //     round the ring. Correct, and read wrongly: on 12 Nov, on his Redmi, the screen said "Facing 80",
+    //     "Turn right 39" and the mark sat 39 degrees to the right, all true, and he followed the big
+    //     green hand, which pointed straight ahead, the wrong way. Every Qibla app teaches people that the
+    //     arrow is the Qibla, and many of our users cannot read the sentence. This was the cause of his
+    //     "seems a bit off" reports since 1.6.0. Ali: "we can't afford it telling the wrong direction".
+    //  3. Now: the hand is the Kaaba again, and what was missing in 1 is supplied: a fixed top mark,
+    //     named in the key, and an arrival that changes the whole dial, the sentence and buzzes.
+    // Do not make the hand "you" again.
+    //
+    // Without a compass the ring is held with north at the top, the heading counts as zero, and the same
+    // sum puts the hand at the bearing from north.
+    val needleRotation = handRotation(dialRotation, qiblaTrueBearing)
 
     // Loaded here rather than inside the Canvas: painterResource is a composable and the
     // draw lambda is not one. Same for the gold — kiswahGold reads a CompositionLocal.
@@ -425,21 +435,24 @@ private fun CompassDial(state: UiState, qiblaTrueBearing: Double, aligned: Boole
             // people have to tilt their head at, and the whole point of the screen is to
             // be read while turning. North is the app's green and heavier than the other
             // three: it is the one bearing that anchors the rest.
-            drawCardinals(centre, radius, dialRotation, measurer, scheme.onSurfaceVariant, scheme.primary)
+            drawCardinals(centre, radius, dialRotation, measurer, scheme.onSurfaceVariant, scheme.onSurface)
 
-            // The needle: fixed at the top with a compass ("you"), at the bearing without
-            // one. Screen space, not dial space, which is the whole point.
+            // "The top of your phone": fixed, quiet, and only with a compass (without one the top is north
+            // and there is no "you" to mark). On the bezel, so it takes the bezel's opposite on arrival.
+            if (heading != null) drawTopMark(centre, radius, if (aligned) scheme.onPrimary else scheme.onSurfaceVariant)
+
+            // The hand, at the Qibla. It shares the ring's animated turn, so hand, mark and letters move
+            // as one piece.
             rotate(degrees = needleRotation, pivot = centre) {
                 drawNeedle(centre, radius, scheme.primary, hole = face)
             }
 
             // Last, so it covers whatever it lands on: a cardinal letter when the Qibla is
-            // near due north, and the needle's tip when you are facing the Qibla — the
-            // moment the two marks are meant to meet.
+            // near due north, and always the hand's point, which ends inside it.
             drawKaaba(
                 centre = centre,
                 radius = radius,
-                bearingDegrees = dialRotation + qiblaTrueBearing.toFloat(),
+                bearingDegrees = needleRotation,
                 silhouette = kaaba,
                 detail = kaabaDetail,
                 tint = scheme.onSurface,
@@ -585,6 +598,40 @@ internal fun needleHalfWidthAt(up: Float): Float = when {
 }
 
 /**
+ * Where the hand and the Kaaba mark stand on the screen, in degrees clockwise from straight up: the Qibla
+ * bearing minus the heading. [dialRotation] is the ring's turn, which is minus the heading (zero without a
+ * compass), so this is also "the bearing, on a ring turned that far". `QiblaDialGeometryTest` holds it.
+ */
+internal fun handRotation(dialRotation: Float, qiblaBearing: Double): Float = dialRotation + qiblaBearing.toFloat()
+
+/**
+ * The ring's next turn: [target] reached from [previous] by the shortest way round, so the result may lie
+ * outside 0 to 360 and is equal to [target] only as an angle. See `CompassDial`.
+ */
+internal fun continuousTurn(previous: Float, target: Float): Float =
+    previous + QiblaEngine.relativeTurn(previous.toDouble(), target.toDouble()).toFloat()
+
+/**
+ * The fixed mark at the top of the dial, "the top of your phone": a small wedge on the bezel pointing in.
+ * Base at [TOP_MARK_BASE] of the radius, point at [TOP_MARK_TIP], just past the tick ring's outer end
+ * (0.877) and well clear of the Kaaba mark when the hand stands under it (its ink ends at 0.816).
+ * Deliberately small: the hand is the instruction, this is only where the hand has to end up.
+ */
+internal const val TOP_MARK_BASE = 0.985f
+internal const val TOP_MARK_TIP = 0.875f
+internal const val TOP_MARK_HALF_WIDTH = 0.05f
+
+private fun topMarkPath(cx: Float, cy: Float, r: Float): Path = Path().apply {
+    moveTo(cx, cy - TOP_MARK_TIP * r)
+    lineTo(cx - TOP_MARK_HALF_WIDTH * r, cy - TOP_MARK_BASE * r)
+    lineTo(cx + TOP_MARK_HALF_WIDTH * r, cy - TOP_MARK_BASE * r)
+    close()
+}
+
+private fun DrawScope.drawTopMark(centre: Offset, radius: Float, colour: Color) =
+    drawPath(path = topMarkPath(centre.x, centre.y, radius), color = colour)
+
+/**
  * The blade and tail as one outline, dial centre at (`cx`, `cy`), y down: the point, down the left edge
  * to the shoulder, on to the tail's end, across, and back up the right edge. Every x on the right is the
  * left's negated, which is what keeps the point on the dial's centre line.
@@ -600,10 +647,9 @@ private fun needlePath(cx: Float, cy: Float, r: Float): Path = Path().apply {
 
 /**
  * The needle: the blade, then the ring over it, then the hole in the ring in [hole] (whatever is behind
- * the needle: the dial's face, or the page in the key). With a compass it is fixed at the top and means
- * "the way you are pointing"; without one it is turned to the Qibla bearing. Its point sits inside the
- * Kaaba mark when the two coincide, see [KAABA_DISTANCE], so on alignment the hand visibly runs into the
- * middle of the Kaaba.
+ * the needle: the dial's face, or the page in the key). Drawn pointing up; the dial turns it to the Qibla
+ * ([handRotation]). Its point sits inside the Kaaba mark, see [KAABA_DISTANCE], so the hand always runs
+ * into the middle of the Kaaba.
  */
 private fun DrawScope.drawNeedle(centre: Offset, radius: Float, colour: Color, hole: Color) {
     drawPath(path = needlePath(centre.x, centre.y, radius), color = colour)
@@ -713,14 +759,15 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
     val heading = state.compassHeading
 
     val message = when {
-        heading == null -> stringResource(R.string.qibla_no_compass, qiblaTrueBearing.roundToInt())
+        heading == null -> stringResource(R.string.qibla_no_compass, QiblaEngine.wholeDegrees(qiblaTrueBearing))
         aligned -> stringResource(R.string.qibla_facing)
         else -> {
             val turn = QiblaEngine.relativeTurn(heading, qiblaTrueBearing)
-            if (turn > 0) {
-                stringResource(R.string.qibla_turn_right, turn.roundToInt())
-            } else {
-                stringResource(R.string.qibla_turn_left, (-turn).roundToInt())
+            val degrees = kotlin.math.abs(turn).roundToInt()
+            when {
+                degrees == 0 -> stringResource(R.string.qibla_bearing, QiblaEngine.wholeDegrees(qiblaTrueBearing))
+                turn > 0 -> stringResource(R.string.qibla_turn_right, degrees)
+                else -> stringResource(R.string.qibla_turn_left, degrees)
             }
         }
     }
@@ -768,7 +815,7 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
         if (heading != null) {
             Spacer(Modifier.height(Space.Tight))
             Text(
-                text = stringResource(R.string.qibla_heading_now, heading.roundToInt()),
+                text = stringResource(R.string.qibla_heading_now, QiblaEngine.wholeDegrees(heading)),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFeatureSettings = "tnum"),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Start,
@@ -778,21 +825,18 @@ private fun DirectionBlock(state: UiState, qiblaTrueBearing: Double, aligned: Bo
 }
 
 /**
- * The two marks on the dial, drawn small and named. Without it the arrow and the cube are
- * just shapes, and "which one am I?" is the first thing anyone asks. The keys are the marks
- * themselves in miniature — a needle and a Kaaba — rather than colour swatches, so the
- * legend still works for someone who cannot tell green from grey. Hidden when there is no
- * compass, because then there is no "you" on the dial to explain.
+ * The two marks on the dial, drawn small and named: the green hand is the Kaaba, the wedge is the top of
+ * your phone. Without it they are just shapes, and "which one am I?" is the first thing anyone asks. The
+ * keys are the marks themselves in miniature rather than colour swatches, so the key still works for
+ * someone who cannot tell green from grey. Hidden when there is no compass, because then there is no "you"
+ * on the dial to explain.
  */
 @Composable
 private fun DialLegend() {
     val scheme = MaterialTheme.colorScheme
-    val kaaba = painterResource(CoreR.drawable.ic_kaaba)
-    val kaabaDetail = painterResource(CoreR.drawable.ic_kaaba_detail)
 
-    // Marks sized from the text line, so they grow with it; the Kaaba fills 0.75 of the box, the hand all of it.
+    // Marks sized from the text line, so they grow with it.
     val box = textLineHeight()
-    val markSize = box * 0.75f
 
     @Composable
     fun Key(label: String, mark: @Composable () -> Unit) {
@@ -816,19 +860,11 @@ private fun DialLegend() {
         modifier = Modifier.clearAndSetSemantics { },
     ) {
         Key(stringResource(R.string.qibla_legend_kaaba)) {
-            // Both layers, as on the dial: silhouette, then the hizam and door in gold on
-            // top of it. The legend has to match the dial exactly — a key drawn in
-            // different colours from the thing it explains is worse than no key.
-            Box(Modifier.size(markSize)) {
-                Icon(painter = kaaba, contentDescription = null, tint = scheme.onSurface, modifier = Modifier.size(markSize))
-                Icon(painter = kaabaDetail, contentDescription = null, tint = kiswahGold(), modifier = Modifier.size(markSize))
-            }
-        }
-        Key(stringResource(R.string.qibla_legend_facing)) {
-            // The dial's own hand in miniature, from the same numbers, so the key matches what it explains.
-            // It takes the whole line height, not the Kaaba's 0.75 of it: the hand is slim, and at 0.75
-            // its blade was under a dp wide.
+            // The dial's own hand in miniature, from the same numbers, so the key matches what it explains:
+            // the green hand is the Kaaba (the mark on its point is a picture and needs no key). It takes
+            // the whole line height: the hand is slim, and at 0.75 its blade was under a dp wide.
             val page = scheme.background
+            val green = scheme.primary
             Canvas(Modifier.size(box)) {
                 // The shape spans the tip above the centre to the tail below it, so r is the box over that
                 // span and the dial centre sits half the difference of the two below the middle.
@@ -836,26 +872,18 @@ private fun DialLegend() {
                 drawNeedle(
                     centre = Offset(size.width / 2f, size.height / 2f + (NEEDLE_TIP - NEEDLE_TAIL) / 2f * r),
                     radius = r,
-                    colour = scheme.primary,
+                    colour = green,
                     hole = page,
                 )
             }
         }
+        Key(stringResource(R.string.qibla_legend_top)) {
+            // The top mark, enlarged: on the dial's own scale it would be a speck here.
+            val ink = scheme.onSurfaceVariant
+            Canvas(Modifier.size(box)) {
+                val r = size.height * 0.6f / (TOP_MARK_BASE - TOP_MARK_TIP)
+                drawTopMark(Offset(size.width / 2f, size.height * 0.2f + TOP_MARK_BASE * r), r, ink)
+            }
+        }
     }
-}
-
-@Composable
-private fun AccuracyNotice(accuracy: CompassAccuracy) {
-    // Only surfaced when it changes what the user should do. A "high accuracy" badge on
-    // every screen is noise; "calibrate before you trust this" is not.
-    val messageRes = when (accuracy) {
-        CompassAccuracy.LOW -> R.string.qibla_calibrate
-        // UNAVAILABLE is permanent and has its own notice above the dial.
-        CompassAccuracy.UNAVAILABLE -> return
-        CompassAccuracy.MEDIUM -> R.string.qibla_accuracy_medium
-        CompassAccuracy.HIGH -> return
-    }
-
-    // A warning Notice with no title (17 Oct 2026): the one sentence is the whole message.
-    Notice(brief = stringResource(messageRes))
 }

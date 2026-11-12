@@ -52,6 +52,30 @@ import java.time.Duration
 import java.time.Instant
 
 /**
+ * Holds the screen upright while the caller is showing, and gives it back after. For the two things held
+ * in one hand and read at a glance, the Qibla dial and the tasbeeh (12 Nov 2026).
+ *
+ * Why: a phone laid flat keeps whichever way it was last tilted, so on the owner's desk the app came up on
+ * its side. There the dial's "top of your phone" mark sat at the phone's edge and the dial was a third of
+ * the height, and the tasbeeh's Count button was below the fold, out of the thumb's reach. Large screens
+ * ignore the request from Android 16, which is why `CompassRepository` still corrects the heading for a
+ * turned screen.
+ */
+// The lock is the point here.
+@android.annotation.SuppressLint("SourceLockedOrientationActivity")
+@Composable
+fun KeepUpright() {
+    val activity = androidx.activity.compose.LocalActivity.current
+    androidx.compose.runtime.DisposableEffect(activity) {
+        val before = activity?.requestedOrientation
+        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose {
+            activity?.requestedOrientation = before ?: android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+}
+
+/**
  * A dialog's title with a close X at the top right (owner, 18 Oct 2026). The X is the one
  * place every phone user looks for "get me out"; the text button at the bottom stays for
  * people who read to the end. The X is a 48dp IconButton, drawn up and out so its glyph

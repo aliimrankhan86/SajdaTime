@@ -6092,7 +6092,34 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 12 Nov 2026 early morning (latest, READ THIS FIRST): 1.6.0 LIVE; 1.7.0 ON HOLD and CHANGED overnight (Qibla hand, tasbeeh, 7 day Timetable, one PDF); emulator only, NOT on a phone, NOT published
+### 📍 STATE OF PLAY, 12 Nov 2026 evening: Qibla confidence and layout fixed on the 1.7.0 branch; physical direction check remains open
+
+- **Live:** the public Google Play page says Updated on 2 Nov 2026. The Redmi's Play copy reports 1.6.0, code 10.
+  Work is on `claude/1-7-0`. The 1.7.0 sideload remains beside it.
+- **Qibla:** on phone and watch the hand points to the Kaaba, and a fixed wedge marks the top of the device.
+  The change follows the Redmi report that the old fixed green hand looked like the direction to follow. Both devices
+  listen to the magnetic field as well as the rotation vector. Low, unreliable, unknown or a badly disturbed field
+  puts the calibration instruction in place of live guidance. Medium retains direction with a figure of eight hint.
+  High confidence enters the facing state at 2° and exits past 4°. The haptic rearms past 8° so the known 7° wobble
+  stays quiet. The Qibla tab holds portrait on phones and reserves the measured floating bar below its scroll area.
+  Tab names have equal edge padding and shrink when a word would split. See DESIGN_SYSTEM §9.
+- **Redmi evidence:** the independent raw sensor probe got 118.497° from both bearing calculations, with +1.23°
+  magnetic declination. App and raw heading were both 187.99° (60 still samples over 12 seconds), and the Kaaba mark
+  was 0.4 px from its expected position. The screen stayed upright after a landscape request. The photos independently
+  show the new calibration warning with no facing claim. A separate MIUI comparison did not meet the three-round
+  requirement: the stillness precheck drifted by 6°, and one later round differed by 4–5° before any declination
+  correction. The 1.6.0 portrait baseline is 187° / 191° / 187°. The Tasbeeh photos show count, rounds and total as
+  33/1/33, 4/1/37, 6/7/237 after 200 more taps, 6/7/237 after restart, then 0/0/0 after Start again.
+- **Emulator:** the focused suite recorded 42 passing tests across the dial, vibration, large text and Tasbeeh.
+  After reserving the Qibla viewport above the tabs, the two layout measurements passed again. The watch emulator
+  hid the dial during an injected field disturbance and restored the hand and fixed mark on recovery.
+  The final release script and picture refresh are being checked separately.
+- **Release still on hold.** The independent real-world turn against a map, same-minute MIUI calibration plus recovery,
+  and Ali's review of the pictures remain open. The app verifies the calculated direction against the readings it
+  receives. The phone's compass and its surroundings determine how accurate those readings are. Signed bundle checks,
+  store approval and the release steps follow the checklist. Evidence stays under `build/review-1.7.0/`.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 12 Nov 2026 early morning: 1.6.0 LIVE; 1.7.0 ON HOLD and CHANGED overnight (Qibla hand, tasbeeh, 7 day Timetable, one PDF); emulator only, NOT on a phone, NOT published
 
 **Ali's overnight brief, 12 Nov 2026, 00:26 to 00:45, before sleeping ("Do it autonomously and make good logical reasons"):** an audit before 1.7.0; usage counts on by default; a digital tasbeeh "which works properly"; check and fix the codebase and its security; simplicity; the Timetable shows only the next 7 days with today first and Save as PDF gives the whole month; and the Qibla needle "is not looking nice ... make it better looking but accuracy is the most important criteria ... Clean design". He said not to check the UI or translations in every language. **Everything below was built without him seeing a picture. He looks before anything ships.**
 

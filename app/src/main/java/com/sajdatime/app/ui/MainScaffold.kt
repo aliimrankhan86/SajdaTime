@@ -79,6 +79,7 @@ import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.ui.components.KeepUpright
 import com.sajdatime.app.ui.components.LocalBottomBarClearance
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.components.WholeWords
@@ -253,8 +254,10 @@ fun MainScaffold(
         }
     }
 
+    if (destination == Destination.QIBLA) KeepUpright()
+
     // The magnetometer only runs while the Qibla tab is actually on screen.
-    DisposableEffect(destination) {
+    DisposableEffect(destination, state.settings.coordinates) {
         onQiblaVisible(destination == Destination.QIBLA)
         onDispose { onQiblaVisible(false) }
     }
@@ -460,6 +463,7 @@ internal fun GlassTabBar(
                 Spacer(Modifier.height(Space.Tight))
                 Text(
                     text = stringResource(item.labelRes),
+                    modifier = Modifier.padding(horizontal = Space.Tight),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                     ).scaledLineHeight(),

@@ -136,13 +136,13 @@
     <string name="qibla_facing">Şu anda Kâbe yönüne bakıyorsunuz</string>
     <string name="qibla_heading_now">Baktığınız yön: %1$d°</string>
     <string name="qibla_legend_kaaba">Kâbe</string>
-    <string name="qibla_legend_facing">Baktığınız yön</string>
+    <string name="qibla_legend_top">Telefonunuzun üst kenarı</string>
     <string name="qibla_turn_left">Sola dönün: %1$d°</string>
     <string name="qibla_turn_right">Sağa dönün: %1$d°</string>
     <string name="qibla_no_compass">Gerçek kuzeyden %1$d° yöne dönün</string>
     <string name="qibla_calibrate">Pusulanın ayarlanması gerekiyor. Telefonunuzu tutun ve birkaç kez havada 8 rakamı çizer gibi hareket ettirin.</string>
     <string name="qibla_sensor_missing">Bu telefonda pusula yok. Bu yüzden size açıyı verebiliriz ama yönü gösteremeyiz.</string>
-    <string name="qibla_accuracy_medium">Okuma biraz oynayabilir. Daha sabit bir sonuç için metallerden, mıknatıslardan ve hoparlörlerden uzaklaşın.</string>
+    <string name="qibla_accuracy_medium">Daha sabit bir sonuç için telefonunuzu 8 çizer gibi hareket ettirin.</string>
 
     <!-- Settings -->
     <string name="title_settings">Ayarlar</string>

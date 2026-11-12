@@ -13,12 +13,14 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import com.sajdatime.app.data.AppSettings
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.ui.UiState
 import com.sajdatime.app.ui.qibla.KAABA_DISTANCE
 import com.sajdatime.app.ui.qibla.KAABA_SIZE
@@ -35,8 +37,9 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Measures the Qibla dial's own pixels: the needle is on the dial's centre line, and the Kaaba mark is
- * drawn where the bearing says, to within a pixel and a half.
+ * Measures the Qibla dial's own pixels: the hand lies on the line to the Kaaba (the bearing minus the
+ * heading, clockwise from straight up), the Kaaba mark is on that same line to within a pixel and a half,
+ * and the fixed top mark is dead centre.
  *
  * Written 11 Nov 2026, after Ali reported the direction "seems a bit off" on the day 1.6.0 went live. The
  * emulator's compass cannot be turned (HANDOVER section 15, lesson 182), so the screen is given a heading and
@@ -56,9 +59,11 @@ class QiblaDialDeviceTest {
 
     private fun show(
         heading: Double,
+        bearing: Double = qibla,
         theme: ThemeChoice = ThemeChoice.LIGHT,
         fontScale: Float = 1f,
         direction: LayoutDirection = LayoutDirection.Ltr,
+        accuracy: CompassAccuracy = CompassAccuracy.HIGH,
     ) = compose.setContent {
         val density = LocalDensity.current
         CompositionLocalProvider(
@@ -76,8 +81,8 @@ class QiblaDialDeviceTest {
                                 cityName = "London",
                             ),
                             compassHeading = heading,
-                            compassAccuracy = CompassAccuracy.HIGH,
-                            qiblaBearing = qibla,
+                            compassAccuracy = accuracy,
+                            qiblaBearing = bearing,
                             qiblaDistanceKm = 4788.0,
                         ),
                         onUseGps = {},
@@ -116,59 +121,135 @@ class QiblaDialDeviceTest {
         return (sumX / count).toFloat() to (sumY / count).toFloat()
     }
 
-    /** The middle of the run of pixels that are not the face on row [y], looking [reach] either side of [x]. */
-    private fun middleOfRun(picture: Bitmap, x: Float, y: Float, reach: Float, face: Int): Pair<Float, Int> {
-        var first = -1
-        var last = -1
-        for (px in (x - reach).toInt()..(x + reach).toInt()) {
-            if (far(picture.getPixel(px, y.toInt()), face)) {
-                if (first < 0) first = px
-                last = px
+    /**
+     * Cuts across the hand's line [along] shares of the radius out from the centre, at [turn] degrees
+     * clockwise from straight up, looking [reach] pixels either side. Returns how far the middle of what is
+     * drawn there is from the line (plus is clockwise) and how wide it is, in pixels.
+     */
+    private fun across(picture: Bitmap, r: Float, turn: Double, along: Float, reach: Float, face: Int): Pair<Float, Float> {
+        val a = Math.toRadians(turn)
+        val x0 = picture.width / 2f + along * r * sin(a).toFloat()
+        val y0 = picture.height / 2f - along * r * cos(a).toFloat()
+        var first = Float.NaN
+        var last = Float.NaN
+        var t = -reach
+        while (t <= reach) {
+            val px = (x0 + t * cos(a).toFloat()).toInt()
+            val py = (y0 + t * sin(a).toFloat()).toInt()
+            if (far(picture.getPixel(px, py), face)) {
+                if (first.isNaN()) first = t
+                last = t
             }
+            t += 0.25f
         }
-        assertTrue("nothing drawn on row $y", first >= 0)
-        return (first + last + 1) / 2f to (last - first + 1)
+        assertTrue("nothing drawn $along of the way out at $turn degrees", !first.isNaN())
+        return (first + last) / 2f to (last - first)
     }
 
-    private fun check(heading: Double, theme: ThemeChoice, fontScale: Float, direction: LayoutDirection) {
-        show(heading, theme, fontScale, direction)
+    private fun check(
+        heading: Double,
+        theme: ThemeChoice,
+        fontScale: Float,
+        direction: LayoutDirection,
+        bearing: Double = qibla,
+    ) {
+        show(heading, bearing, theme, fontScale, direction)
         val picture = dial()
         val cx = picture.width / 2f
         val cy = picture.height / 2f
         val r = minOf(picture.width, picture.height) / 2f
         val label = "heading $heading, $theme, text $fontScale, $direction"
+        // Where the hand and the Kaaba must be: the bearing minus the heading, clockwise from straight up.
+        val turn = bearing - heading
 
-        // A clean piece of the face: lower left, inside the letters, away from the needle and the mark
-        // (the mark is in the upper half for every heading this test uses).
-        val face = picture.getPixel((cx - 0.38f * r).toInt(), (cy + 0.38f * r).toInt())
+        // A clean piece of the face: inside the letters, a third of a turn round from the hand.
+        val clean = Math.toRadians(turn + 120.0)
+        val face = picture.getPixel((cx + 0.38f * r * sin(clean)).toInt(), (cy - 0.38f * r * cos(clean)).toInt())
 
-        // The needle, at three heights: each time the middle of it is the dial's centre line.
-        for (share in listOf(0.05f, 0.25f, 0.45f)) {
-            val (middle, width) = middleOfRun(picture, cx, cy - share * r, 0.2f * r, face)
-            assertTrue("$label: needle is ${middle - cx}px off the centre line at $share", abs(middle - cx) <= 1f)
-            assertTrue("$label: needle is ${width}px wide at $share, dial radius ${r}px", width <= 0.16f * r)
+        // The hand, cut across at two places along that line: each time its middle is on the line. This is
+        // the check that would have caught 12 Nov 2026, when the hand stood straight up whatever the turn.
+        for (share in listOf(0.25f, 0.45f)) {
+            val (off, width) = across(picture, r, turn, share, 0.2f * r, face)
+            assertTrue("$label: the hand is ${off}px off the line to the Kaaba at $share", abs(off) <= 1.25f)
+            assertTrue("$label: the hand is ${width}px wide at $share, dial radius ${r}px", width <= 0.16f * r)
         }
+        // And it has a direction: nothing of it that far out on the opposite side (the tail is short).
+        val behind = Math.toRadians(turn + 180.0)
+        assertTrue(
+            "$label: the hand points away from the Kaaba",
+            !far(picture.getPixel((cx + 0.45f * r * sin(behind)).toInt(), (cy - 0.45f * r * cos(behind)).toInt()), face),
+        )
 
-        // The Kaaba mark, where the bearing puts it: the dial is turned by minus the heading, so the mark
-        // is (Qibla minus heading) clockwise from straight up, at KAABA_DISTANCE of the radius.
-        val angle = Math.toRadians(qibla - heading)
+        // The Kaaba mark, on the same line at KAABA_DISTANCE of the radius. The box holds all of its ink
+        // (0.078 of the radius either side, 0.086 below) and stops short of the tick ring; the hand's point
+        // inside it is a hair of green that moves the middle by a third of a pixel at most.
+        val angle = Math.toRadians(turn)
         val wantX = cx + KAABA_DISTANCE * r * sin(angle).toFloat()
         val wantY = cy - KAABA_DISTANCE * r * cos(angle).toFloat()
-        if (abs(qibla - heading) > 12.0) {
-            // Clear of the needle: measure the whole mark. The box holds all of its ink (0.078 of the radius
-            // either side, 0.086 below) and stops short of the tick ring.
-            val (gotX, gotY) = centreOfInk(picture, wantX, wantY, 0.095f * r, face)
-            // The artwork is centred left to right in its box. Top to bottom its ink (the wall, y 3.5 to 20
-            // of 24, and the plinth under it) balances 0.59 of a unit below the middle of the box.
-            val inkY = wantY + 0.59f / 24f * KAABA_SIZE * r
-            assertTrue("$label: Kaaba is ${gotX - wantX}px sideways from its bearing", abs(gotX - wantX) <= 1.5f)
-            assertTrue("$label: Kaaba is ${gotY - inkY}px up or down from its bearing", abs(gotY - inkY) <= 1.5f)
-        } else {
-            // On or near the needle, which runs into it from below: measure the wall on the row through the
-            // mark's centre, above the needle's tip.
-            val (middle, _) = middleOfRun(picture, wantX, wantY, KAABA_SIZE * r * 0.6f, face)
-            assertTrue("$label: Kaaba is ${middle - wantX}px sideways from its bearing", abs(middle - wantX) <= 1.5f)
-        }
+        val (gotX, gotY) = centreOfInk(picture, wantX, wantY, 0.095f * r, face)
+        // The artwork is centred left to right in its box. Top to bottom its ink (the wall, y 3.5 to 20
+        // of 24, and the plinth under it) balances 0.59 of a unit below the middle of the box.
+        val inkY = wantY + 0.59f / 24f * KAABA_SIZE * r
+        assertTrue("$label: Kaaba is ${gotX - wantX}px sideways from its bearing", abs(gotX - wantX) <= 1.5f)
+        assertTrue("$label: Kaaba is ${gotY - inkY}px up or down from its bearing", abs(gotY - inkY) <= 1.5f)
+
+        // The fixed mark for "the top of your phone": on the bezel, dead centre at the top, whatever the turn.
+        val bezel = picture.getPixel((cx + 0.955f * r * sin(Math.toRadians(30.0))).toInt(), (cy - 0.955f * r * cos(Math.toRadians(30.0))).toInt())
+        val (off, width) = across(picture, r, 0.0, 0.955f, 0.12f * r, bezel)
+        assertTrue("$label: the top mark is ${off}px off centre", abs(off) <= 1.25f)
+        assertTrue("$label: the top mark is ${width}px wide, dial radius ${r}px", width <= 0.1f * r)
+    }
+
+    @Test
+    fun at_heading_80_in_slough_the_hand_and_the_kaaba_are_38_and_a_half_degrees_right_of_up() {
+        // Ali's Redmi, 12 Nov 2026: "Facing 80", "Turn right 39", and a hand that pointed straight up.
+        check(heading = 80.0, bearing = 118.5, theme = ThemeChoice.LIGHT, fontScale = 1f, direction = LayoutDirection.Ltr)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_turn_right, 39)).assertExists()
+    }
+
+    @Test
+    fun at_heading_118_and_a_half_in_slough_the_hand_stands_straight_up_and_the_screen_says_facing() {
+        check(heading = 118.5, bearing = 118.5, theme = ThemeChoice.LIGHT, fontScale = 1f, direction = LayoutDirection.Ltr)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertExists()
+    }
+
+    @Test
+    fun low_accuracy_hides_the_heading_and_aligned_dial_even_at_the_bearing() {
+        show(heading = qibla, accuracy = CompassAccuracy.LOW)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_calibrate)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertDoesNotExist()
+        compose.onNodeWithText(context.getString(R.string.qibla_heading_now, 119)).assertDoesNotExist()
+        compose.onNodeWithTag("qibla_dial", useUnmergedTree = true).assertDoesNotExist()
+    }
+
+    @Test
+    fun medium_accuracy_keeps_the_direction_with_a_calibration_hint() {
+        show(heading = qibla - 30.0, accuracy = CompassAccuracy.MEDIUM)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_accuracy_medium)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_turn_right, 30)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertDoesNotExist()
+    }
+
+    @Test
+    fun the_hand_swings_left_when_the_kaaba_is_to_the_left() {
+        check(heading = 200.0, bearing = 118.5, theme = ThemeChoice.LIGHT, fontScale = 1f, direction = LayoutDirection.Ltr)
+    }
+
+    @Test
+    fun the_hand_points_back_over_the_shoulder_when_the_kaaba_is_behind() {
+        check(heading = 320.0, bearing = 118.5, theme = ThemeChoice.DARK, fontScale = 1f, direction = LayoutDirection.Ltr)
+    }
+
+    @Test
+    fun just_short_of_north_reads_facing_0_never_360() {
+        show(heading = 359.7)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_heading_now, 0)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_heading_now, 360)).assertDoesNotExist()
     }
 
     @Test
@@ -183,9 +264,10 @@ class QiblaDialDeviceTest {
 
     @Test
     fun three_degrees_off_shows_as_three_degrees_off() {
-        // Inside the 5 degree arrival band, so the sentence says "facing"; the picture must still show the
-        // true offset and not snap the mark onto the needle.
         check(heading = qibla - 3.0, theme = ThemeChoice.LIGHT, fontScale = 1f, direction = LayoutDirection.Ltr)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        compose.onNodeWithText(context.getString(R.string.qibla_turn_right, 3)).assertExists()
+        compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertDoesNotExist()
     }
 
     @Test

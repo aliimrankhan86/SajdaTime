@@ -1,14 +1,18 @@
 package com.sajdatime.app
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -20,12 +24,16 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.hasNoClickAction
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -35,8 +43,11 @@ import com.sajdatime.app.ui.home.DayCard
 import com.sajdatime.app.ui.home.LocationHeader
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.ui.UiState
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.ui.qibla.QiblaBody
+import com.sajdatime.app.ui.qibla.QiblaScreen
+import com.sajdatime.app.ui.components.LocalBottomBarClearance
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import com.sajdatime.core.NextPrayer
@@ -108,10 +119,55 @@ class LargeTextAndTalkBackDeviceTest {
 
     @Test
     fun the_tab_labels_never_split_a_word_at_the_largest_text() {
-        atText(2f) { GlassTabBar(current = Destination.SETTINGS, onSelect = {}) }
-        assertWhole(word(R.string.nav_settings))
+        var labelPadding = 0f
+        atText(2f) {
+            labelPadding = with(LocalDensity.current) { Space.Tight.toPx() }
+            GlassTabBar(current = Destination.SETTINGS, onSelect = {})
+        }
+        val settings = word(R.string.nav_settings)
+        assertWhole(settings)
+        val settingsTab = compose.onNode(hasText(settings) and hasClickAction()).fetchSemanticsNode()
+        val labelWidthLimit = layoutOf(settings).layoutInput.constraints.maxWidth
+        assertTrue(
+            "Settings label width limit ${labelWidthLimit}px must leave ${labelPadding}px per edge in ${settingsTab.size.width}px",
+            labelWidthLimit <= settingsTab.size.width - 2f * labelPadding + 2f,
+        )
         // The fourth tab (1.6.0): its label must be there and whole at the same text size.
         assertWhole(word(R.string.nav_tracker))
+    }
+
+    @Test
+    fun qibla_details_scrolls_clear_of_the_floating_bar_at_double_text() {
+        var barTop = 0f
+        var sectionGap = 0f
+        atText(2f) {
+            val density = LocalDensity.current
+            var barHeight by remember { mutableStateOf(0.dp) }
+            sectionGap = with(density) { Space.Section.toPx() }
+            Box(Modifier.width(320.dp).height(520.dp)) {
+                CompositionLocalProvider(LocalBottomBarClearance provides barHeight) {
+                    QiblaScreen(qiblaState(), onUseGps = {}, onSearchCity = {})
+                }
+                GlassTabBar(
+                    current = Destination.QIBLA,
+                    onSelect = {},
+                    modifier = Modifier.align(Alignment.BottomCenter).onSizeChanged {
+                        barHeight = with(density) { it.height.toDp() }
+                        barTop = with(density) { 520.dp.toPx() } - it.height
+                    },
+                )
+            }
+        }
+        compose.onNode(hasText(word(R.string.qibla_title)) and hasNoClickAction()).assertIsDisplayed()
+        val scrollBottom = compose.onNode(hasScrollAction()).fetchSemanticsNode().boundsInRoot.bottom
+        assertTrue("Qibla scroll viewport reaches ${scrollBottom}px, into the bar at ${barTop}px", scrollBottom <= barTop + 1f)
+        val root = compose.onRoot()
+        repeat(2) { root.performTouchInput { swipeUp(startY = height * 0.5f, endY = height * 0.14f) } }
+        val details = compose.onNode(hasText(word(R.string.notice_show_details)) and hasClickAction())
+        details.assertIsDisplayed()
+        val gap = barTop - details.fetchSemanticsNode().touchBoundsInRoot.bottom
+        assertTrue("Details touch target only clears the bar by ${gap}px (expected ${sectionGap}px)", gap + 2f >= sectionGap)
+        assertWhole(word(R.string.nav_settings))
     }
 
     /**
@@ -301,7 +357,7 @@ class LargeTextAndTalkBackDeviceTest {
     fun the_qibla_key_stays_inside_the_screen_at_the_largest_text() {
         atText(2f) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
         val width = with(compose.density) { 320.dp.toPx() }
-        for (label in listOf(word(R.string.qibla_legend_kaaba), word(R.string.qibla_legend_facing))) {
+        for (label in listOf(word(R.string.qibla_legend_kaaba), word(R.string.qibla_legend_top))) {
             // The key clears its semantics, so its words are only in the unmerged tree.
             val node = compose.onNode(hasText(label), useUnmergedTree = true)
             node.assertIsDisplayed()

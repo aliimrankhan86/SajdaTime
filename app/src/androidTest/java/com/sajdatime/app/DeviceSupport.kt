@@ -1,6 +1,7 @@
 package com.sajdatime.app
 
 import android.app.Instrumentation
+import android.app.UiAutomation
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
 import java.io.FileInputStream
@@ -27,6 +28,31 @@ internal object DeviceSupport {
      */
     val requireRamadanClock: Boolean
         get() = InstrumentationRegistry.getArguments().getString("requireRamadanClock") == "true"
+
+    /**
+     * Turns the screen upright and holds it there; call what it returns to put the owner's rotation back.
+     *
+     * For tests that draw their own screen. A phone lying flat keeps whichever way it was last tilted, so
+     * on the owner's desk the test activity came up on its side; the tasbeeh then asked to be upright
+     * (`KeepUpright`), Android made the activity again, and the test's screen was gone ("No compose
+     * hierarchies found", the Redmi, 12 Nov 2026).
+     */
+    fun holdUpright(): () -> Unit {
+        val user = shell("settings get system user_rotation").trim()
+        val auto = shell("settings get system accelerometer_rotation").trim()
+        instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_0)
+        // The turn is animated and anything already on screen is made again; a screen drawn before it
+        // settles is lost with the old activity.
+        Thread.sleep(1_500)
+        return {
+            // Upright first, then let go: letting go from its side left the emulator on its side.
+            instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_FREEZE_0)
+            instrumentation.uiAutomation.setRotation(UiAutomation.ROTATION_UNFREEZE)
+            // `settings get` prints "null" for a key that was never set: then there is nothing to put back.
+            if (user.toIntOrNull() != null) shell("settings put system user_rotation $user")
+            if (auto.toIntOrNull() != null) shell("settings put system accelerometer_rotation $auto")
+        }
+    }
 
     /** Where the pictures go. The shell can pull this folder without any special access. */
     fun renderDir(): File =
@@ -72,4 +98,17 @@ internal object DeviceSupport {
             }
             .sorted()
     }
+}
+
+/**
+ * [DeviceSupport.holdUpright] as a rule, for tests whose screen is opened by another rule: give it
+ * `order = 0` and the Compose rule `order = 1`, so the screen has stopped turning before anything is drawn.
+ */
+class UprightRule : org.junit.rules.ExternalResource() {
+    private var putBack: () -> Unit = {}
+    override fun before() {
+        putBack = DeviceSupport.holdUpright()
+    }
+
+    override fun after() = putBack()
 }

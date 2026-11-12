@@ -127,7 +127,7 @@ mistakes he has now had to point out, so they are rules, not taste.
 | onSurfaceHighlight | `onPrimaryContainer` | `#8FD9B8` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#161A19` | The Qibla dial face |
 | dialBezel | `surfaceContainerHighest` (read through `dialBezel()`, not a role of its own) | `#262C29` | The Qibla dial's bezel when not aligned; `primary` when aligned |
-| primary | `primary` | `#4FC48F` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill |
+| primary | `primary` | `#4FC48F` | Accent bar, Qibla hand and aligned bezel, "Next" pill |
 | onPrimary | `onPrimary` | `#062117` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#1E4034` | The selected tab pill |
 | onSurface | `onSurface` | `#E7EAE8` | Body text, prayer times |
@@ -152,7 +152,7 @@ mistakes he has now had to point out, so they are rules, not taste.
 | onSurfaceHighlight | `onPrimaryContainer` | `#0F2A1F` | Labels on that highlight |
 | dialFace | `surfaceVariant` | `#EDEFE8` | The Qibla dial face |
 | dialBezel | `surface` (read through `dialBezel()`, not a role of its own) | `#FDFCFB` | The Qibla dial's bezel when not aligned, lifted by the card shadow; `primary` when aligned |
-| primary | `primary` | `#0B5A43` | Accent bar, Qibla needle, north letter and aligned bezel, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
+| primary | `primary` | `#0B5A43` | Accent bar, Qibla hand and aligned bezel, "Next" pill, every link and action (was `#0E6B4F` until 17 Oct 2026, see §9) |
 | onPrimary | `onPrimary` | `#FFFFFF` | Text on a filled primary surface |
 | navPill | `secondaryContainer` | `#CDE3D7` | The selected tab pill |
 | onSurface | `onSurface` | `#1B211E` | Body text, prayer times |
@@ -614,12 +614,13 @@ card has (shadow in light, hairline in dark, `sajdaSurface`). Its **bezel** is t
 `surface` in light and `surfaceContainerHighest` in dark (`dialBezel()`, a different role per theme because the dark
 hairline is invisible against the page). Inside it the face, `surfaceVariant`. Sixty ticks, one every 6°, in
 `outline` (minor 0.845 to 0.87, cardinal from 0.80, round caps); the letters at 0.74, E S W `onSurfaceVariant`
-Normal and N `primary` Medium. The needle is **you**: a slim `primary` watch hand (a straight blade 0.064 of the radius across, from a ring at the centre to a fine point at 0.69 that runs into the Kaaba mark on arrival, with a short tail; 12 Nov 2026, see §9,
-no hub), fixed at the top with a compass (it points at the bearing without one). There is no arc: the Kaaba's side
-of the dial and the sentence ("Turn right 58°") say how far to turn. Inside ±5° the face fills with
-`primaryContainer`, the bezel turns `primary` and thickens to 0.11, all over 250 ms (150 ms on leaving), the line
-above the dial turns green with a tick, and the phone buzzes once: three signals that are not colour (the
-sentence with its tick, the thicker bezel, the buzz).
+Normal and N `onSurface` Medium. The slim `primary` hand points at **the Kaaba**, with its tip in the mark at
+every heading. The wedge on the bezel is fixed straight up and marks **the top of the phone**. With no compass
+the dial is north up and shows the bearing. The sentence gives the same turn as the hand. A high confidence
+heading enters the aligned state within 2° and leaves past 4°. The face fills with `primaryContainer`, the bezel
+turns `primary` and thickens to 0.11 (250 ms in, 150 ms out), and the sentence gains a tick. An arrival after a
+genuine turn also buzzes. Medium confidence keeps the direction with a quiet calibration hint. Low, unreliable
+or unknown readings show the calibration notice in place of the live dial and turn.
 
 **The Kaaba mark** sits at 0.70 of the dial radius, 0.22 across, in
 `onSurface` with its band and door in `kiswahGold()`. Same
@@ -1384,6 +1385,17 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
   ours to improve. Rejected, drawn side by side: the slim teardrop (he did not like it), a compass lozenge
   (readable, heavier), a shaft with an arrowhead (hides the point that has to be read), a hairline index on the
   fat teardrop, a larger Kaaba mark (runs into the letters and ticks).
+- **12 Nov 2026, Qibla guidance and compass confidence.** The same green hand on phone and watch now points
+  to the Kaaba. The small fixed wedge marks the top of the device. On 15 Aug the hand was fixed at the top
+  because the old tick did not show clearly which way the phone faced. The 25 Oct dial removed the turn arc.
+  On the Redmi, the user then followed the prominent fixed hand instead of the Kaaba mark despite the correct
+  turn sentence. The fine hand and separate top wedge give the instruction visually.
+  Both devices combine the rotation vector and magnetometer reports. An abnormal field strength also blocks live
+  guidance. Low, unreliable and unknown show a figure of eight notice; medium keeps direction and a quiet hint.
+  High confidence arrives within 2° and releases past 4°, using the unrounded angles. The buzz still needs a
+  departure beyond 8° to rearm, so the measured 7° stationary wobble and recovery from calibration stay quiet.
+  The phone Qibla tab holds portrait and restores normal rotation on exit. The heading remains display relative
+  on large screens where Android can ignore that lock.
 - **12 Nov 2026, the Ramadan card's two lines are centred (Ali, from the emulator pictures: "centre the 'Iftar in'
   countdown line and the 'Fast today' line horizontally in the card, in every language including right to
   left").** The countdown (`titleLarge` bold, tabular digits so a centred line does not shift each second) and

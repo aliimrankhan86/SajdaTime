@@ -9,7 +9,13 @@ import com.sajdatime.app.ui.qibla.NEEDLE_SHOULDER
 import com.sajdatime.app.ui.qibla.NEEDLE_TAIL
 import com.sajdatime.app.ui.qibla.NEEDLE_TAIL_HALF_WIDTH
 import com.sajdatime.app.ui.qibla.NEEDLE_TIP
+import com.sajdatime.app.ui.qibla.TOP_MARK_BASE
+import com.sajdatime.app.ui.qibla.TOP_MARK_HALF_WIDTH
+import com.sajdatime.app.ui.qibla.TOP_MARK_TIP
+import com.sajdatime.app.ui.qibla.continuousTurn
+import com.sajdatime.app.ui.qibla.handRotation
 import com.sajdatime.app.ui.qibla.needleHalfWidthAt
+import com.sajdatime.core.QiblaEngine
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -79,5 +85,64 @@ class QiblaDialGeometryTest {
             up += 0.01f
         }
         assertTrue("the tail must be clearly shorter than the blade", NEEDLE_TAIL < NEEDLE_TIP / 3f)
+    }
+
+    /** Degrees apart on a circle, 0 to 180. */
+    private fun apart(a: Double, b: Double): Double = kotlin.math.abs((((a - b) % 360.0) + 540.0) % 360.0 - 180.0)
+
+    @Test
+    fun `the hand stands at the bearing minus the heading`() {
+        // Ali, 12 Nov 2026, on his Redmi: "Facing 80", "Turn right 39", and the hand pointing straight up.
+        // He followed the hand. The hand is the Kaaba now, and this is the sum that says so. The dial is
+        // turned by minus the heading, so `handRotation` is given that, as `CompassDial` gives it.
+        val slough = 118.5
+        for (heading in listOf(0.0, 80.0, 118.5, 200.0, 300.0, 359.0)) {
+            val hand = handRotation(-heading.toFloat(), slough).toDouble()
+            assertEquals("heading $heading", 0.0, apart(hand, slough - heading), 0.001)
+            // The same number the sentence prints ("Turn right 39"), so the hand and the words agree.
+            assertEquals("heading $heading", 0.0, apart(hand, QiblaEngine.relativeTurn(heading, slough)), 0.001)
+        }
+        assertEquals("80 from north, Kaaba at 118.5: 38.5 right of straight up", 38.5f, handRotation(-80f, slough), 0.001f)
+        assertEquals("facing it: straight up", 0f, handRotation(-118.5f, slough), 0.001f)
+    }
+
+    @Test
+    fun `the hand is right across north, either way round`() {
+        // Heading 350 with the Kaaba at 10 is 20 to the right, not 340 to the left, and the other way about.
+        assertEquals(0.0, apart(handRotation(-350f, 10.0).toDouble(), 20.0), 0.001)
+        assertEquals(0.0, apart(handRotation(-10f, 350.0).toDouble(), -20.0), 0.001)
+        assertEquals(0.0, apart(handRotation(-359.5f, 0.5).toDouble(), 1.0), 0.001)
+    }
+
+    @Test
+    fun `without a compass the hand stands at the bearing from north`() {
+        // No heading: the ring is not turned (north up), so the hand is at the bearing itself.
+        assertEquals(118.5f, handRotation(0f, 118.5), 0.001f)
+    }
+
+    @Test
+    fun `the top mark is small, on the centre line, and clear of the kaaba when the hand is under it`() {
+        assertTrue("it points in from the rim", TOP_MARK_TIP < TOP_MARK_BASE && TOP_MARK_BASE <= 1f)
+        // The Kaaba's ink reaches 0.816 at a cardinal bearing (see KAABA_DISTANCE): facing the Kaaba the two
+        // must not touch, or the mark hides the very moment it is there for.
+        assertTrue("clear of the Kaaba mark", TOP_MARK_TIP > 0.816f + 0.03f)
+        assertTrue("quieter than the hand", TOP_MARK_BASE - TOP_MARK_TIP < NEEDLE_TIP / 4f && TOP_MARK_HALF_WIDTH < 0.07f)
+    }
+
+    @Test
+    fun `the ring never spins a whole turn when the heading crosses north`() {
+        // Heading 359.9 then 0.1: the ring's turn goes from -359.9 on to -360.1, two tenths, not back to
+        // -0.1, which is 359.8 the other way and a full spin on screen.
+        assertEquals(-360.1f, continuousTurn(-359.9f, -0.1f), 0.001f)
+        assertEquals(-359.9f, continuousTurn(-360.1f, -359.9f), 0.001f)
+        // Several times round, it keeps going the short way and still means the same angle.
+        var turn = 0f
+        for (heading in listOf(90f, 180f, 270f, 359f, 1f, 90f, 180f, 270f, 359f, 1f)) {
+            val next = continuousTurn(turn, -heading)
+            assertTrue("heading $heading moved the ring ${next - turn}", kotlin.math.abs(next - turn) <= 180f)
+            assertEquals(0.0, apart(next.toDouble(), -heading.toDouble()), 0.01)
+            turn = next
+        }
+        assertEquals(-721f, turn, 0.01f)
     }
 }

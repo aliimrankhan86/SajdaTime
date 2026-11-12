@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
 import com.sajdatime.app.data.TasbeehStore
 import com.sajdatime.app.ui.components.CtaButton
+import com.sajdatime.app.ui.components.KeepUpright
 import com.sajdatime.app.ui.components.DialogTitle
 import com.sajdatime.app.ui.components.TasbeehIcon
 import com.sajdatime.app.ui.components.buzz
@@ -135,6 +136,8 @@ internal fun TasbeehDoor() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TasbeehSheet(onDismiss: () -> Unit) {
+    // On its side the Count button is below the fold: see KeepUpright.
+    KeepUpright()
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),

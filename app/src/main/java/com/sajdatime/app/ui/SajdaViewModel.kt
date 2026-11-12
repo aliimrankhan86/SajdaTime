@@ -27,7 +27,7 @@ import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.data.CompassRepository
 import com.sajdatime.app.data.LocationRepository
 import com.sajdatime.app.data.FirebaseUsageSink
@@ -669,6 +669,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
+        _state.update { it.copy(compassHeading = null, compassAccuracy = CompassAccuracy.UNKNOWN) }
         compassJob = viewModelScope.launch {
             compassRepository.headings(coordinates).collect { reading ->
                 _state.update {

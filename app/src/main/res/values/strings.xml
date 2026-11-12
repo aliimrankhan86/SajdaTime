@@ -274,17 +274,15 @@
     <string name="qibla_needs_location">Set your location to find the Qibla.</string>
     <string name="qibla_facing">You are now facing the Kaaba</string>
     <string name="qibla_heading_now">Facing %1$d°</string>
-    <!-- The dial's legend. The needle is *you* — it points the way the phone points and
-         stays put while the dial and the Kaaba turn round it. Turn until it touches the
-         Kaaba. -->
+    <!-- The hand points at the Kaaba; the fixed wedge marks the top of the phone. -->
     <string name="qibla_legend_kaaba">The Kaaba</string>
-    <string name="qibla_legend_facing">Where you are facing</string>
+    <string name="qibla_legend_top">Top of your phone</string>
     <string name="qibla_turn_left">Turn left %1$d°</string>
     <string name="qibla_turn_right">Turn right %1$d°</string>
     <string name="qibla_no_compass">Face %1$d° from true north</string>
     <string name="qibla_calibrate">The compass needs calibrating. Hold your phone and move it in a figure of eight a few times.</string>
     <string name="qibla_sensor_missing">This phone has no compass, so we can give you the angle but cannot point the way.</string>
-    <string name="qibla_accuracy_medium">The reading may wander a little. Move away from metal, magnets and speakers for a steadier result.</string>
+    <string name="qibla_accuracy_medium">Move your phone in a figure of eight for a steadier reading.</string>
 
     <!--
       Settings.

@@ -15,6 +15,7 @@ import android.os.CancellationSignal
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.Madhab
@@ -47,6 +48,7 @@ data class WearUiState(
     val now: Instant = Instant.now(),
     val qiblaBearing: Double? = null,
     val heading: Double? = null,
+    val compassAccuracy: CompassAccuracy = CompassAccuracy.UNAVAILABLE,
     val needsLocation: Boolean = false,
     /** A fix has been asked for and has not arrived yet, and there is no place to show meanwhile. */
     val locating: Boolean = false,
@@ -267,41 +269,75 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
     fun setQiblaVisible(visible: Boolean) {
         compassJob?.cancel()
         compassJob = null
-        if (!visible) {
-            _state.update { it.copy(heading = null) }
-            return
-        }
+        _state.update { it.copy(heading = null, compassAccuracy = CompassAccuracy.UNAVAILABLE) }
+        if (!visible) return
 
         val coordinates = _state.value.settings.coordinates ?: return
         val context = getApplication<Application>()
         val manager = ContextCompat.getSystemService(context, SensorManager::class.java) ?: return
         val rotationVector = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR) ?: return
+        val magnetometer = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        val declination = runCatching {
+        val model = runCatching {
             GeomagneticField(
                 coordinates.latitude.toFloat(),
                 coordinates.longitude.toFloat(),
                 0f,
                 System.currentTimeMillis(),
-            ).declination.toDouble()
-        }.getOrDefault(0.0)
+            )
+        }.getOrNull()
+        val declination = model?.declination?.toDouble() ?: 0.0
+        val expectedField = (model?.fieldStrength ?: 0f) / 1000f
 
         val rotation = FloatArray(9)
         val orientation = FloatArray(3)
+        var heading: Double? = null
+        var vectorAccuracy: Int? = null
+        var magnetAccuracy: Int? = null
+        var field: Float? = null
+
+        fun publish() {
+            val accuracy = if (magnetometer != null && field == null) {
+                CompassAccuracy.UNKNOWN
+            } else {
+                CompassAccuracy.fromSensorReports(
+                    vectorAccuracy,
+                    magnetAccuracy,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true,
+                )
+            }
+            _state.update { it.copy(heading = heading, compassAccuracy = accuracy) }
+        }
+        publish()
+
         val listener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
-                SensorManager.getRotationMatrixFromVector(rotation, event.values)
-                SensorManager.getOrientation(rotation, orientation)
-                val azimuth = Math.toDegrees(orientation[0].toDouble())
-                _state.update {
-                    it.copy(heading = QiblaEngine.normalise(azimuth + declination))
+                if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
+                    magnetAccuracy = event.accuracy
+                    val (x, y, z) = event.values
+                    val now = kotlin.math.sqrt(x * x + y * y + z * z)
+                    field = field?.let { it * 0.9f + now * 0.1f } ?: now
+                } else {
+                    SensorManager.getRotationMatrixFromVector(rotation, event.values)
+                    SensorManager.getOrientation(rotation, orientation)
+                    val azimuth = Math.toDegrees(orientation[0].toDouble())
+                    heading = QiblaEngine.normalise(azimuth + declination)
                 }
+                publish()
             }
 
-            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+                when (sensor?.type) {
+                    Sensor.TYPE_ROTATION_VECTOR -> vectorAccuracy = accuracy
+                    Sensor.TYPE_MAGNETIC_FIELD -> magnetAccuracy = accuracy
+                    else -> return
+                }
+                publish()
+            }
         }
 
         manager.registerListener(listener, rotationVector, SensorManager.SENSOR_DELAY_UI)
+        magnetometer?.let { manager.registerListener(listener, it, SensorManager.SENSOR_DELAY_NORMAL) }
         compassJob = viewModelScope.launch {
             try {
                 while (true) delay(60_000)

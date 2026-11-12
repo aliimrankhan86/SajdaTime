@@ -36,6 +36,7 @@
     <string name="wear_madhab_note">يتغيّر العصر فقط، ويتأخر عند الحنفية.</string>
     <string name="wear_qibla_needs_location">حدّد موقعك لتجد القبلة</string>
     <string name="wear_qibla_facing">باتجاه الكعبة</string>
+    <string name="wear_qibla_calibrate">حرّك ساعتك على شكل الرقم 8.</string>
     <string name="wear_qibla_bearing">%1$d°</string>
     <string name="wear_qibla_from_true_north">من الشمال الحقيقي</string>
     <string name="wear_duration_h_m">%1$d س %2$d د</string>

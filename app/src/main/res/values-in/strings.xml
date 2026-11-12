@@ -136,13 +136,13 @@
     <string name="qibla_facing">Anda kini menghadap Ka\'bah</string>
     <string name="qibla_heading_now">Menghadap %1$d°</string>
     <string name="qibla_legend_kaaba">Ka\'bah</string>
-    <string name="qibla_legend_facing">Arah hadap Anda</string>
+    <string name="qibla_legend_top">Bagian atas ponsel Anda</string>
     <string name="qibla_turn_left">Putar ke kiri %1$d°</string>
     <string name="qibla_turn_right">Putar ke kanan %1$d°</string>
     <string name="qibla_no_compass">Hadap %1$d° dari utara sejati</string>
     <string name="qibla_calibrate">Kompas perlu dikalibrasi. Pegang ponsel Anda dan gerakkan membentuk angka delapan beberapa kali.</string>
     <string name="qibla_sensor_missing">Ponsel ini tidak punya kompas, jadi kami bisa memberi sudutnya tetapi tidak bisa menunjukkan arahnya.</string>
-    <string name="qibla_accuracy_medium">Hasilnya mungkin sedikit bergeser. Menjauhlah dari logam, magnet, dan pengeras suara agar lebih stabil.</string>
+    <string name="qibla_accuracy_medium">Gerakkan ponsel Anda membentuk angka delapan agar hasilnya lebih stabil.</string>
 
     <!-- Settings -->
     <string name="title_settings">Pengaturan</string>
