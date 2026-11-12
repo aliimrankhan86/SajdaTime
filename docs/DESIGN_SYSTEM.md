@@ -537,7 +537,7 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Settings, Alert check dialog (1.6.0) | One solid button under each failing check (Allow notifications, Allow exact alarms, Open battery settings, Allow), 8dp under its status line; always "Open app settings" at the foot, 8dp under the closing paragraph; Close and the X | A (`PermissionButton`, `CtaButton`); E, D | 52, full | `AlertCheckDialog.kt` |
 | Settings, Notification sound and Alarm sound dialogs (1.7.0) | Hear it, then Stop while playing: one compact button under the sound choices, 16dp under the radio group, with a `bodyMedium` help line 4dp under it; plays the chosen sound through the alert's own audio usage, never changes a volume | A | 40 visual, 48 target | `SoundPreview.kt` |
 | Settings, Fast reminders dialog (1.6.0) | No buttons of its own: three switch rows (Monday and Thursday; White Days; Ashura, Arafah and the six days of Shawwal) under one help line, the X and the foot "Close". No `CtaButton` | E, D | | `SettingsScreen.kt` |
-| My prayers tab | Tasbeeh, at the end of "Count your dhikr with a tap." (record on or off) | A, compact | 40 drawn, 48 target, wraps | `TasbeehSheet.kt` |
+| My prayers tab | Tasbeeh, with a tapping hand: the first thing on the tab, directly under the title, in every state (record on, off, paused, loading) | A | 64, full | `TasbeehSheet.kt` |
 | Tasbeeh sheet | Count, the one large button under the number | A | 120, full | `TasbeehSheet.kt` |
 | Tasbeeh sheet | Change target (start) and Start again (end), one row under Count, wrapping at large text | A, compact | 40 drawn, 48 target, wraps | `TasbeehSheet.kt` |
 | Tasbeeh sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TasbeehSheet.kt`, `Common.kt` |
@@ -1385,8 +1385,11 @@ Dated, newest first. Each entry says what was chosen, what was rejected and why,
 - **12 Nov 2026, the tasbeeh, the 7 day Timetable and one PDF (Ali, overnight brief: "add a digital tasbeeh ...
   Which works properly", "the timetable should show only the timing of the next 7 days. The save as pdf should
   have for the whole month", "there should be simplicity in the app"):**
-  - **Tasbeeh:** a sheet opened from one line and a compact button at the foot of My prayers (record on or
-    off). The count in `displayLarge` (green on a full round), the target under it, one 120dp Count button, then
+  - **Tasbeeh:** a sheet opened from one tall, full width button that is the first thing on My prayers, directly
+    under the title, in every state of the tab. Two earlier placements lasted hours (a compact button at the foot
+    of the page, then full width under today's prayers); Ali: "it cannot be lost ... properly placed so user
+    cannot miss it". **A door people must not miss goes above anything whose height changes.**
+    The count in `displayLarge` (green on a full round), the target under it, one 120dp Count button, then
     Change target and Start again. A counter only: no words of dhikr and no advice on how many, because that
     differs between schools and would be a ruling. Not a fifth tab (the bar holds four and the app must stay
     simple), not a tap anywhere surface (not a button to TalkBack, and not in the design system). **Built without

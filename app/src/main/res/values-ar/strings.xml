@@ -714,7 +714,6 @@
     <string name="tab_settings_attention_a11y">الإعدادات، تحتاج إلى انتباه</string>
     <string name="home_fajr_exact_a11y">%1$s، %2$s، قد لا يرن في وقته</string>
     <string name="tasbeeh_title">التسبيح</string>
-    <string name="tasbeeh_line">احسب أذكارك بلمسة واحدة.</string>
     <string name="tasbeeh_count">عدّ</string>
     <string name="tasbeeh_reset">البدء من جديد</string>
     <string name="tasbeeh_change_target">تغيير الهدف</string>

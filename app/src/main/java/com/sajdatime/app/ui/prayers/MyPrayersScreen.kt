@@ -114,6 +114,14 @@ fun MyPrayersScreen(
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenTitle(stringResource(R.string.nav_tracker))
+        // The tasbeeh's door: first thing on the tab, above everything that comes and goes. It is outside
+        // the loading gate and the on or off switch below on purpose, so there is no state of this screen
+        // (record on, off, paused, still loading, no location) in which it is missing or moves (Ali, 12 Nov
+        // 2026: "it needs to be properly placed so user cannot miss it").
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            Spacer(Modifier.height(Space.Related))
+            TasbeehDoor()
+        }
         // Nothing is drawn until the settings have loaded, so the switch card never flashes for
         // someone who has tracking on.
         if (!state.loading && state.trackerLoaded) {
@@ -161,10 +169,6 @@ private fun OffCard(state: UiState, tracker: TrackerActions) {
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = Modifier.padding(horizontal = 16.dp),
     )
-    // The tasbeeh does not depend on the record being on (12 Nov 2026).
-    Spacer(Modifier.height(Space.Section))
-    TasbeehDoor()
-    Spacer(Modifier.height(Space.Section))
 }
 
 /** 3a: today line, notices, today card, button row, week card. */
@@ -218,8 +222,6 @@ private fun Checklist(
         FastsRow(t, onMadeUpOne = { tracker.adjustFastsToMakeUp(-1) })
         Spacer(Modifier.height(Space.Section))
     }
-    TasbeehDoor()
-    Spacer(Modifier.height(Space.Section))
 
     if (history) {
         TrackerHistorySheet(

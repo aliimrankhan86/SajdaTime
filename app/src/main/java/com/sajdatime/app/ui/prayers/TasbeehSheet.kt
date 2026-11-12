@@ -7,7 +7,13 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.TouchApp
+import androidx.compose.material3.Icon
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,28 +47,33 @@ import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.core.Tasbeeh
 
 /**
- * The door to the tasbeeh on My prayers: one line and one compact button, the Fasts row's own shape.
- * It is there whether or not the prayer record is switched on, because counting dhikr does not depend
- * on it. It owns the sheet, so the screen only places it.
+ * The door to the tasbeeh: one tall, full width button, the first thing on the My prayers tab.
+ *
+ * Third placement in one night, each at Ali's word (12 Nov 2026):
+ * 1. A line of text with a compact button at the foot of the page. "The button could be bigger. It could
+ *    go lost easily."
+ * 2. Full width, under today's prayers. "Think harder ... it cannot be lost ... it needs to be properly
+ *    placed so user cannot miss it."
+ * 3. This: directly under the tab's title, above the checklist, 64dp tall, in every state of the screen.
+ *
+ * Why here. Under the prayers it sat below a card whose height changes (five rows, notices, a paused
+ * line), so at large text or on a small phone it slid off the first screen, and with the record switched
+ * off it sat somewhere else again. Under the title it is at one fixed place that nothing above can push:
+ * whoever opens the tab sees it before anything else, without scrolling, at any text size. The caller
+ * puts it outside the loading gate and the on or off switch, so it never disappears or moves.
+ *
+ * Not a fifth tab: Ali asked for it on My prayers or in Settings, the bar is built for four, and a tab for
+ * a counter is more weight than it earns. Not in Settings: Settings is where things are changed, not
+ * used, and a second door is a second thing to keep in step. It owns the sheet, so the screen only
+ * places it.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun TasbeehDoor() {
     var open by rememberSaveable { mutableStateOf(false) }
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalArrangement = Arrangement.spacedBy(Space.Related),
-    ) {
-        Text(
-            text = stringResource(R.string.tasbeeh_line),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.CenterVertically),
-        )
-        CtaButton(onClick = { open = true }, compact = true) {
-            Text(stringResource(R.string.tasbeeh_title))
-        }
+    CtaButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("tasbeeh_door")) {
+        Icon(Icons.Outlined.TouchApp, contentDescription = null, modifier = Modifier.size(24.dp))
+        Spacer(Modifier.width(Space.Related))
+        Text(stringResource(R.string.tasbeeh_title))
     }
     if (open) TasbeehSheet(onDismiss = { open = false })
 }
