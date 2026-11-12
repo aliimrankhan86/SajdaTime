@@ -119,7 +119,8 @@ fun MyPrayersScreen(
         // (record on, off, paused, still loading, no location) in which it is missing or moves (Ali, 12 Nov
         // 2026: "it needs to be properly placed so user cannot miss it").
         Column(Modifier.padding(horizontal = 16.dp)) {
-            Spacer(Modifier.height(Space.Related))
+            // 12 here and the title's own 4 make 16 above the button, the same as the 16 below it.
+            Spacer(Modifier.height(Space.Paragraph))
             TasbeehDoor()
         }
         // Nothing is drawn until the settings have loaded, so the switch card never flashes for

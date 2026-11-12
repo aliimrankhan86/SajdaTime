@@ -614,7 +614,6 @@
     <string name="tasbeeh_title">Tesbih</string>
     <string name="tasbeeh_count">Say</string>
     <string name="tasbeeh_reset">Baştan başla</string>
-    <string name="tasbeeh_change_target">Hedefi değiştir</string>
     <string name="tasbeeh_target">Hedef: %1$d</string>
     <string name="tasbeeh_no_target">Hedef yok</string>
     <string name="tasbeeh_rounds">Tur: %1$d</string>

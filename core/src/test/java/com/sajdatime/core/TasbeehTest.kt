@@ -77,16 +77,24 @@ class TasbeehTest {
     }
 
     @Test
-    fun `changing the target walks 33, 99, 100, none and back, starting again each time`() {
-        var t = Tasbeeh().taps(20)
-        val seen = mutableListOf<Int>()
-        repeat(4) {
-            t = t.nextTarget()
-            seen += t.target
-            assertEquals(0, t.count)
-            assertEquals(0, t.rounds)
+    fun `choosing another target starts again from nothing`() {
+        val counting = Tasbeeh().taps(40)
+        for (target in listOf(99, 100, 0)) {
+            assertEquals(Tasbeeh(0, target, 0), counting.withTarget(target))
         }
-        assertEquals(listOf(99, 100, 0, 33), seen)
+    }
+
+    @Test
+    fun `choosing the target already in use keeps the count`() {
+        val counting = Tasbeeh().taps(40)
+        assertEquals(counting, counting.withTarget(33))
+    }
+
+    @Test
+    fun `a target that is not offered is ignored`() {
+        val counting = Tasbeeh().taps(5)
+        assertEquals(counting, counting.withTarget(7))
+        assertEquals(counting, counting.withTarget(-1))
     }
 
     @Test

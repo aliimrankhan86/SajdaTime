@@ -81,6 +81,12 @@
     },
     {
       "folder": "components/",
+      "file": "TasbeehIcon.kt",
+      "holds": "The prayer beads icon on the Tasbeeh button",
+      "spec": "DESIGN_SYSTEM §9, 12 Nov 2026"
+    },
+    {
+      "folder": "components/",
       "file": "Bell.kt",
       "holds": "The alert toggle",
       "spec": "03 §3.2"

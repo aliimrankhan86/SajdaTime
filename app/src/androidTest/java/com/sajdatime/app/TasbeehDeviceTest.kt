@@ -69,16 +69,24 @@ class TasbeehDeviceTest {
     }
 
     @Test
-    fun changing_the_target_starts_again_and_start_again_keeps_the_target() {
+    fun choosing_another_target_starts_again_and_start_again_keeps_the_target() {
         open()
         tap(5)
-        compose.onNodeWithTag("tasbeeh_target").performClick()
+        compose.onNodeWithTag("tasbeeh_target_99").performClick()
         count().assertTextEquals("0")
         assertEquals(Tasbeeh(count = 0, target = 99, rounds = 0), TasbeehStore(context).load())
         tap(3)
         compose.onNodeWithTag("tasbeeh_reset").performClick()
         count().assertTextEquals("0")
         assertEquals(Tasbeeh(count = 0, target = 99, rounds = 0), TasbeehStore(context).load())
+    }
+
+    @Test
+    fun choosing_the_target_already_in_use_keeps_the_count() {
+        open()
+        tap(4)
+        compose.onNodeWithTag("tasbeeh_target_33").performClick()
+        count().assertTextEquals("4")
     }
 
     @Test

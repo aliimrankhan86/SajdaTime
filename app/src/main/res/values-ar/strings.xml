@@ -716,7 +716,6 @@
     <string name="tasbeeh_title">التسبيح</string>
     <string name="tasbeeh_count">عدّ</string>
     <string name="tasbeeh_reset">البدء من جديد</string>
-    <string name="tasbeeh_change_target">تغيير الهدف</string>
     <string name="tasbeeh_target">الهدف: %1$d</string>
     <string name="tasbeeh_no_target">بلا هدف</string>
     <string name="tasbeeh_rounds">الدورات: %1$d</string>

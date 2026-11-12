@@ -32,13 +32,13 @@ data class Tasbeeh(
     fun reset(): Tasbeeh = copy(count = 0, rounds = 0)
 
     /**
-     * The next target in [TARGETS], starting again from nothing. A count of 60 means nothing against
-     * a new target of 33, so changing the target is a fresh start rather than a sum to explain.
+     * Counting to [newTarget] instead, starting again from nothing. A count of 60 means nothing against
+     * a new target of 33, so changing the target is a fresh start rather than a sum to explain. Choosing
+     * the target already in use changes nothing, so a stray tap on it cannot wipe a count. A target that
+     * is not one of [TARGETS] is ignored.
      */
-    fun nextTarget(): Tasbeeh {
-        val next = TARGETS[(TARGETS.indexOf(target) + 1).mod(TARGETS.size)]
-        return Tasbeeh(count = 0, target = next, rounds = 0)
-    }
+    fun withTarget(newTarget: Int): Tasbeeh =
+        if (newTarget == target || newTarget !in TARGETS) this else Tasbeeh(count = 0, target = newTarget, rounds = 0)
 
     /** How many beads in all, for the spoken summary. */
     val total: Long get() = if (target > 0) rounds.toLong() * target + count else count.toLong()

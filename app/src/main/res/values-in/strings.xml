@@ -600,7 +600,6 @@
     <string name="tasbeeh_title">Tasbih</string>
     <string name="tasbeeh_count">Hitung</string>
     <string name="tasbeeh_reset">Mulai lagi</string>
-    <string name="tasbeeh_change_target">Ubah target</string>
     <string name="tasbeeh_target">Target: %1$d</string>
     <string name="tasbeeh_no_target">Tanpa target</string>
     <string name="tasbeeh_rounds">Putaran: %1$d</string>

@@ -854,7 +854,6 @@
     <string name="tasbeeh_title">Tasbeeh</string>
     <string name="tasbeeh_count">Count</string>
     <string name="tasbeeh_reset">Start again</string>
-    <string name="tasbeeh_change_target">Change target</string>
     <string name="tasbeeh_target">Target: %1$d</string>
     <string name="tasbeeh_no_target">No target</string>
     <string name="tasbeeh_rounds">Rounds: %1$d</string>
