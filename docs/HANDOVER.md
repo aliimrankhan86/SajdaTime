@@ -6165,9 +6165,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   Console one screen at a time (six listing languages from `docs/store`, the three extra listing pages deleted), his
   Submit. The working list is `build/PENDING-1.7.0.md`.
 - **Engineering gaps, recorded, not blocking by anyone's decision yet** (`build/DEEPSEEK-AUDIT-1.7.0.md` items 4
-  and 5): the watch starts a compass only when the rotation vector exists (`WearViewModel`, about line 279) and has
-  no accelerometer plus magnetometer fallback like the phone; and there is no true landscape capture (`09f` is the
-  portrait screen after a rotation request, which proves only that it stays upright).
+  and 5): the watch starts a compass only when the rotation vector exists (`WearViewModel`, about line 278) and has
+  no accelerometer plus magnetometer fallback like the phone. **Read 12 Nov, night: what such a watch shows is an
+  honest bearing-only state** (heading null, accuracy UNAVAILABLE; `WearApp.kt` prints the bearing, "119°", with
+  "from true north" under it and makes no turn or facing claim), so no fix is needed for release; a fallback is
+  Ali's call. And there is no true landscape capture (`09f` is the portrait screen after a rotation request, which
+  proves only that it stays upright).
+- **Open question, settles the night rounds' margin: does the Redmi's compass app (`com.miui.compass` 16.2.8.0) show
+  true or magnetic north?** Not found in any Xiaomi documentation. Its open-source ancestor (MiCode/Compass, 2011)
+  reads `TYPE_ORIENTATION` with no declination, i.e. magnetic north; the current app is closed. Tonight's numbers
+  lean slightly to true north (MIUI read about 1° above SajdaTime; magnetic would put it about 1.2° below) but sensor
+  fusion differences of a few degrees between apps make that weak. Thirty seconds with the phone attached settles
+  it: `adb shell pm path com.miui.compass`, `adb pull` that APK, `unzip` it and search the `classes*.dex` files for
+  `GeomagneticField` or `getDeclination` (present means it corrects to true north). Never run anything from it.
 
 ### 📍 (history, the block above is newer) STATE OF PLAY, 12 Nov 2026 early morning: 1.6.0 LIVE; 1.7.0 ON HOLD and CHANGED overnight (Qibla hand, tasbeeh, 7 day Timetable, one PDF); emulator only, NOT on a phone, NOT published
 
