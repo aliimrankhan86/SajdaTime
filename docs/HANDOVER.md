@@ -6092,12 +6092,14 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 12 Nov 2026 night: 1.7.0 Qibla fixed and tested on the emulator; Ali's own turn with the test copy is the one open check; NOT published
+### 📍 STATE OF PLAY, 12 Nov 2026, 23:00: 1.7.0 Qibla agrees with the Redmi's own compass (three still rounds, within 2° if it shows true north); Ali's own turn is the one open check; NOT published
 
 - **Live:** the public Google Play page says Updated on 2 Nov 2026 (read again 12 Nov, night), so 1.6.0. Work is on
-  `claude/1-7-0` at `f13497b` plus the docs commit that carries this block; nothing merged, uploaded or published.
-  **Both phones carry the Play copy only**: Ali had the test copies removed on 12 Nov evening. The Redmi lost its
-  Play copy earlier that day and Ali reinstalled it at 20:03 (1.6.0, versionCode 10): §15 lesson 193.
+  `claude/1-7-0`: app code as at `f13497b`, plus docs and one emulator test commit; nothing merged, uploaded or published.
+  The Redmi lost its Play copy earlier on 12 Nov and Ali reinstalled it at 20:03 (1.6.0, versionCode 10): §15
+  lesson 193. **At 22:35 the 1.7.0 test copy went back on the Redmi beside it, at Ali's word, left on for his own
+  turn** (installed from the phone's own installer; adb installs are refused with no prompt). Its notifications are
+  revoked so it cannot ring beside the Play copy. The S23 Ultra carries the Play copy only.
 - **Qibla:** on phone and watch the hand points to the Kaaba, and a fixed wedge marks the top of the device.
   The change follows the Redmi report that the old fixed green hand looked like the direction to follow. Both devices
   listen to the magnetic field as well as the rotation vector. Low, unreliable, unknown or a badly disturbed field
@@ -6106,10 +6108,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   stays quiet. The Qibla tab holds portrait on phones and reserves the measured floating bar below its scroll area.
   Tab names have equal edge padding and shrink when a word would split. See DESIGN_SYSTEM §9.
 - **The printed turn adds up (`f13497b`):** the turn is worked out from the two whole numbers on screen, so Facing
-  plus the turn always gives the bearing. Two device tests were added to `QiblaDialDeviceTest`, but neither was shown
-  to fail on the code before it: the first recomputes the same expression, and the second passes on the old code
-  because at high accuracy a 0.4° gap already reads as facing. Nothing yet tests the medium state where the bearing
-  becomes the headline.
+  plus the turn always gives the bearing. **Held by two sweep tests (12 Nov, 23:00) that fail on the code before the
+  fix:** at medium accuracy every half degree round the circle (a bearing of exactly 118.5, which prints as 119; Slough is
+  118.48) must print the reader's subtraction and the bearing only over the same Facing; at high accuracy, an upward
+  walk 5° either side of the Kaaba must say facing from exactly 116.5 to 122.5 (2° in, 4° out) and nowhere else,
+  otherwise a turn that adds up, never the bearing. Run against the old `QiblaScreen.kt` both
+  failed ("Turn right 118" where the subtraction gives 119; "Turn right 4" where it gives 5). Last night's test that
+  only recomputed the same expression was deleted; `QiblaDialDeviceTest` is 18 tests.
 - **"Fault 1" in `build/review-1.7.0/deepseek/QUITE-OFF-TRACED.md` is NOT a fault. Do not build a fix for it.**
   "118° from north" in that picture is the Details panel, not the headline. The headline shows the bearing only when
   the printed turn is 0, which means the printed Facing equals it ("118° from north" over "Facing 118°"), and only at
@@ -6123,7 +6128,16 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   while the phone's own compass read N 355°. If he held 1.6, its green needle meant "where you face", not the Kaaba,
   which would explain it; 1.7.0 points the hand at the Kaaba. **The 1.6 needle is closed by Ali** ("accuracy is the
   key"): keep the 1.7.0 dial and never reopen the look without a new measurement.
-- **Redmi evidence:** the independent raw sensor probe got 118.497° from both bearing calculations, with +1.23°
+- **Redmi, night rounds 22:41 to 22:48 (`build/review-1.7.0/proof/results.md`, "Night rounds"; every number read
+  from the pictures):** first both apps refused a direction in the same minute (MIUI "To calibrate"; SajdaTime the
+  figure of eight notice, no dial, no facing claim). The compass recovered by itself by 22:44 (no deliberate figure
+  of eight). Three rounds, MIUI read before and after each SajdaTime picture 7 s apart: MIUI 88/87, 88/88, 87/88;
+  SajdaTime Facing 87, 87, 86, Turn right 31, 31, 32; hand measured 31 to 33°, within about 1° of the turn; an
+  independent reviewer read every picture again and got the same numbers. **Passes if MIUI shows true north**
+  (Facing within 2°). If MIUI shows magnetic north the gaps are 1.2 to 3.2°, one reading 0.2 over the 3° limit;
+  which north MIUI shows is not settled. The separate 20 s stillness pair turned out byte-identical, so it proves
+  nothing on its own; the in-round MIUI pairs carry the stillness.
+- **Redmi evidence, earlier the same day:** the independent raw sensor probe got 118.497° from both bearing calculations, with +1.23°
   magnetic declination. App and raw heading were both 187.99° (60 still samples over 12 seconds), and the Kaaba mark
   was 0.4 px from its expected position. The calibration warning appeared with no facing claim. The three-round MIUI
   comparison on the desk did not pass: 5–6° apart after a passed stillness check, before any declination correction
@@ -6133,19 +6147,21 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   desk against a normal 49.2 (S23 Ultra in the same room 49.4), which is why the real check is away from the desk.
   No constant offset is added: it would need an independent north reference. Tasbeeh on the Redmi:
   33/1/33, 4/1/37, 6/7/237 after 200 more taps, 6/7/237 after restart, 0/0/0 after Start again.
-- **Verified on `f13497b`:** full gate BUILD SUCCESSFUL, app 365, core 269, wear 27, 0 failed; lint 0 errors in app,
-  core and wear; on emulator-5554 `QiblaDialDeviceTest` OK (17) and the full device suite OK (102). Qibla store pictures
+- **Verified on this commit (12 Nov, 23:00):** full gate (`clean test lint :app:bundleRelease :wear:bundleRelease`)
+  BUILD SUCCESSFUL, app 365, core 269, wear 27, 0 failed, lint 0 errors in app, core and wear (unit test results came
+  from Gradle's cache; only an emulator test changed); on emulator-5554 the full device suite OK (103) and, after the
+  high sweep was tightened, `QiblaDialDeviceTest` OK (18). Qibla store pictures
   refreshed in five phone languages and on the watch (`be8232d`). Earlier the same evening: the focused emulator suite
   (42) across the dial, vibration, large text and Tasbeeh; a 320 dp, 2× replay in six locales (Turkish `Namazlarım`
   and Indonesian `Pengaturan` needed the lower tab label fallback, now allowed); the watch emulator hid the dial
   during an injected field disturbance and restored the hand and wedge on recovery. Measured at 2× text on a fresh
   emulator install: Details ends at y=1911, the tab bar starts at y=2044. After a landscape request the phone tab
-  stayed upright. **Not run on the Redmi:** it
-  refused every install after 20:10 (`INSTALL_FAILED_USER_RESTRICTED`).
-- **Release still on hold. What is left needs Ali's hands, in this order:** (1) one turn with the 1.7.0 test copy in
-  his hand, away from the desk, against Google Maps (`ANDROID_SERIAL=<redmi> ./gradlew installSideload`, then run
-  `QiblaDialDeviceTest` there while he is present); (2) the same-minute MIUI calibration pair, which needs his figure
-  of eight; (3) his look at the pictures in `build/review-1.7.0/`. Then signed bundles on his Mac, his Merge, the Play
+  stayed upright. **On the Redmi, adb installs are
+  still refused** (`INSTALL_FAILED_USER_RESTRICTED`, no prompt); the test copy went on through the phone's own
+  installer, its test helper did not, so the device tests ran on the emulator only.
+- **Release still on hold. What is left needs Ali's hands:** (1) one turn with the 1.7.0 test copy (already on the
+  Redmi as "SajdaTime (test)") in his hand, away from the desk, against Google Maps; (2) his look at the pictures in
+  `build/review-1.7.0/`. Then signed bundles on his Mac, his Merge, the Play
   Console one screen at a time (six listing languages from `docs/store`, the three extra listing pages deleted), his
   Submit. The working list is `build/PENDING-1.7.0.md`.
 - **Engineering gaps, recorded, not blocking by anyone's decision yet** (`build/DEEPSEEK-AUDIT-1.7.0.md` items 4

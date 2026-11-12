@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.Density
@@ -60,6 +62,9 @@ class QiblaDialDeviceTest {
     /** London: the bearing the app works out for it. Clear of every cardinal letter. */
     private val qibla = 118.99
 
+    /** The heading on screen; a sweep moves it after [show] has drawn the screen once. */
+    private val liveHeading = mutableDoubleStateOf(0.0)
+
     private fun show(
         heading: Double,
         bearing: Double = qibla,
@@ -67,30 +72,33 @@ class QiblaDialDeviceTest {
         fontScale: Float = 1f,
         direction: LayoutDirection = LayoutDirection.Ltr,
         accuracy: CompassAccuracy = CompassAccuracy.HIGH,
-    ) = compose.setContent {
-        val density = LocalDensity.current
-        CompositionLocalProvider(
-            LocalDensity provides Density(density.density, fontScale = fontScale),
-            LocalLayoutDirection provides direction,
-        ) {
-            SajdaTimeTheme(choice = theme) {
-                Box(Modifier.width(360.dp).background(MaterialTheme.colorScheme.background)) {
-                    QiblaBody(
-                        state = UiState(
-                            loading = false,
-                            settings = AppSettings(
-                                onboardingComplete = true,
-                                coordinates = Coordinates(51.5074, -0.1278),
-                                cityName = "London",
+    ) {
+        liveHeading.doubleValue = heading
+        compose.setContent {
+            val density = LocalDensity.current
+            CompositionLocalProvider(
+                LocalDensity provides Density(density.density, fontScale = fontScale),
+                LocalLayoutDirection provides direction,
+            ) {
+                SajdaTimeTheme(choice = theme) {
+                    Box(Modifier.width(360.dp).background(MaterialTheme.colorScheme.background)) {
+                        QiblaBody(
+                            state = UiState(
+                                loading = false,
+                                settings = AppSettings(
+                                    onboardingComplete = true,
+                                    coordinates = Coordinates(51.5074, -0.1278),
+                                    cityName = "London",
+                                ),
+                                compassHeading = liveHeading.doubleValue,
+                                compassAccuracy = accuracy,
+                                qiblaBearing = bearing,
+                                qiblaDistanceKm = 4788.0,
                             ),
-                            compassHeading = heading,
-                            compassAccuracy = accuracy,
-                            qiblaBearing = bearing,
-                            qiblaDistanceKm = 4788.0,
-                        ),
-                        onUseGps = {},
-                        onSearchCity = {},
-                    )
+                            onUseGps = {},
+                            onSearchCity = {},
+                        )
+                    }
                 }
             }
         }
@@ -229,35 +237,75 @@ class QiblaDialDeviceTest {
     }
 
     @Test
-    fun the_turn_printed_always_equals_the_two_printed_directions_subtracted() {
-        // 12 Nov 2026: the turn was rounded from the unrounded heading while the facing was rounded on its
-        // own, so the screen could say "Facing 225 degrees, turn left 11" where the reader's subtraction gives
-        // 14. A reader who checks the two lines found the app disagreeing with itself. Every half degree over
-        // the whole circle must now add up.
-        val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val bearing = QiblaEngine.wholeDegrees(qibla)
-        for (halfStep in 0 until 720) {
-            val heading = halfStep / 2.0 + 0.4
-            val facing = QiblaEngine.wholeDegrees(heading)
-            val turnForTheReader = abs(QiblaEngine.relativeTurn(facing.toDouble(), bearing.toDouble())).roundToInt()
-            // What the screen is built from: the same two rounded numbers.
-            val printedFacing = QiblaEngine.wholeDegrees(heading)
-            val printedTurn = abs(QiblaEngine.relativeTurn(printedFacing.toDouble(), bearing.toDouble())).roundToInt()
-            assertEquals("heading $heading", turnForTheReader, printedTurn)
-            if (printedTurn != 0) {
-                assertTrue("heading $heading: the turn text must exist", printedTurn >= 1)
-            }
-        }
-        assertTrue(context.getString(R.string.qibla_facing).isNotEmpty())
-    }
-
-    @Test
     fun a_heading_that_rounds_onto_the_bearing_says_facing_rather_than_a_one_degree_turn() {
         // Facing prints 119 while the raw heading is 118.6 and the raw turn is 0.4 degrees.
         show(heading = qibla + 0.4)
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         compose.onNodeWithText(context.getString(R.string.qibla_facing)).assertExists()
         compose.onNodeWithText(context.getString(R.string.qibla_turn_left, 0)).assertDoesNotExist()
+    }
+
+    private fun shown(text: String) = compose.onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
+
+    @Test
+    fun at_medium_accuracy_every_heading_prints_a_turn_that_adds_up_and_the_bearing_only_over_itself() {
+        // A bearing of exactly 118.5 is where rounding bites (Slough itself is 118.48 and prints 118): 118.5
+        // prints as 119, so a turn rounded from the raw numbers
+        // (the code before f13497b) said "Turn left 82" beside "Facing 200" and, at 118.3, printed the
+        // bearing "119° from north" as the headline over "Facing 118°". Medium accuracy has no arrival
+        // state, so every heading round the circle shows the plain instruction. Fails on the old code.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val bearing = 118.5
+        val shownBearing = QiblaEngine.wholeDegrees(bearing)
+        show(heading = 0.2, bearing = bearing, accuracy = CompassAccuracy.MEDIUM)
+        for (step in 0 until 720) {
+            val heading = step / 2.0 + 0.2
+            liveHeading.doubleValue = heading
+            compose.waitForIdle()
+            val facing = QiblaEngine.wholeDegrees(heading)
+            val turn = QiblaEngine.relativeTurn(facing.toDouble(), shownBearing.toDouble()).roundToInt()
+            val headline = when {
+                turn == 0 -> context.getString(R.string.qibla_bearing, shownBearing)
+                turn > 0 -> context.getString(R.string.qibla_turn_right, turn)
+                else -> context.getString(R.string.qibla_turn_left, -turn)
+            }
+            assertTrue("heading $heading: expected \"$headline\"", shown(headline))
+            assertTrue("heading $heading: expected Facing $facing", shown(context.getString(R.string.qibla_heading_now, facing)))
+            if (turn != 0) {
+                assertTrue("heading $heading: the bearing is the headline over Facing $facing",
+                    !shown(context.getString(R.string.qibla_bearing, shownBearing)))
+            }
+            assertTrue("heading $heading: facing the Kaaba claimed at medium", !shown(context.getString(R.string.qibla_facing)))
+        }
+    }
+
+    @Test
+    fun at_high_accuracy_near_the_kaaba_it_is_facing_or_a_turn_that_adds_up_never_the_bearing() {
+        // Walk upwards from 5 degrees short of a 118.5 bearing to 5 past it. Arrival is 2 degrees in and 4 out,
+        // so the screen says facing from exactly 116.5 to 122.5 and nowhere else; elsewhere the turn printed
+        // must be the printed bearing minus the printed facing (116.4 printed "Turn right 2" beside "Facing 116"
+        // before f13497b); the Facing line is always there and the bearing is never the headline.
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val bearing = 118.5
+        val shownBearing = QiblaEngine.wholeDegrees(bearing)
+        show(heading = bearing - 5.0, bearing = bearing)
+        for (step in 0..100) {
+            val heading = bearing - 5.0 + step / 10.0
+            liveHeading.doubleValue = heading
+            compose.waitForIdle()
+            val facingKaaba = shown(context.getString(R.string.qibla_facing))
+            val expectFacing = heading >= bearing - 2.0 && heading <= bearing + 4.0
+            assertEquals("heading $heading: facing the Kaaba", expectFacing, facingKaaba)
+            assertTrue("heading $heading: expected Facing line",
+                shown(context.getString(R.string.qibla_heading_now, QiblaEngine.wholeDegrees(heading))))
+            if (!facingKaaba) {
+                val turn = QiblaEngine.relativeTurn(QiblaEngine.wholeDegrees(heading).toDouble(), shownBearing.toDouble()).roundToInt()
+                val text = if (turn > 0) context.getString(R.string.qibla_turn_right, turn) else context.getString(R.string.qibla_turn_left, -turn)
+                assertTrue("heading $heading: expected \"$text\"", turn != 0 && shown(text))
+            }
+            assertTrue("heading $heading: the bearing is the headline at high accuracy",
+                !shown(context.getString(R.string.qibla_bearing, shownBearing)))
+        }
     }
 
     @Test

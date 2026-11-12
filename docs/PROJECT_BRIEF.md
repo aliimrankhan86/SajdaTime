@@ -8,12 +8,15 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   The top mark stays fixed. A doubtful compass reading prompts calibration. A high confidence reading enters
   the facing state within 2° and leaves it past 4°. The turn printed always adds up with the Facing printed
   (12 Nov). Ali said the direction was "quite off" (which build he held is not recorded, so 1.7.0 is treated as
-  an open defect until his own turn on it). Nothing measured shows either build pointing wrongly; the Redmi's own
-  compass and the app differ by 5 to 6° on the desk, the same gap 1.6.0 shows, and the "118 over 353" an earlier
-  session read from the pictures was the Details panel, not a fault. Ali closed the 1.6 needle wish: accuracy first, keep the 1.7.0 dial.
-  Tests pass (app 365, core 269, wear 27, device suite 102 on the emulator). **Open, Ali's hands only:** one turn
-  with the 1.7.0 test copy against Google Maps away from the desk, the figure of eight calibration check, and his
-  look at the pictures. Both phones have the Play copy only. The Timetable shows today and six more days. Save as
+  an open defect until his own turn on it). **12 Nov, 22:41 to 22:48, on the Redmi, phone still:** both the phone's
+  own compass and the 1.7.0 test copy asked for calibration in the same minute; once the compass settled, three
+  rounds agreed within 2° (phone 87 to 88°, SajdaTime 86 to 87°) if the phone's compass shows true north (up to
+  3.2° if it shows magnetic north, which is not settled), the turn printed added up, and the hand measured within
+  about 1° of it. Earlier on the desk they had differed by 5 to 6°. The "118 over 353" an earlier session read
+  from the pictures was the Details panel, not a fault. Ali closed the 1.6 needle wish: accuracy first, keep the 1.7.0 dial.
+  Tests pass (app 365, core 269, wear 27 unit tests, 0 failed, lint 0 errors; device suite 103 tests OK on the emulator). **Open, Ali's hands only:** one turn with the
+  1.7.0 test copy (on the Redmi as "SajdaTime (test)") against Google Maps away from the desk, and his look at the
+  pictures. The Timetable shows today and six more days. Save as
   PDF offers the month, with Ramadan as a choice when available. My prayers is on by default and usage counts stay
   opt in. The store has six listing languages. Details: `docs/HANDOVER.md` §11.
 - **Phone 1.5.0** (versionCode 9) and **watch 1.5.0** (versionCode 1002), submitted 23 Oct 2026; the public Play page says "Updated on 23 Oct 2026" (checked 25 Oct 2026). Watch testing is finished, so never raise it. What 1.5.0 contains is the record under "1.5.0 (released)" below: the Quiet Glass design, Arabic as the fifth language, the built-in adhan, reminders before prayer, the redesigned widgets, Turkey times matching Diyanet, the suhoor reminder on by default.
