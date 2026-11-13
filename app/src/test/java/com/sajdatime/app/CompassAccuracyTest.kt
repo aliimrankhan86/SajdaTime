@@ -69,6 +69,26 @@ class CompassAccuracyTest {
     }
 
     @Test
+    fun `the Redmi's field that pointed up instead of down is caught though its strength passed`() {
+        // Redmi Note 13 Pro on its desk, 13 Nov 2026, lying flat and face up: raw field and identity rotation
+        // (flat, so device axes are the world axes up to heading, which dip does not depend on).
+        val flat = floatArrayOf(1f, 0f, 0f, 0f, 1f, 0f, 0f, 0f, 1f)
+        val measured = CompassAccuracy.fieldDipDegrees(flat, -36.7f, -48.2f, 20.0f)
+        assertEquals(-18.3, measured, 0.5)
+        assertFalse(CompassAccuracy.fieldLooksDisturbed(63.8f, 49f))
+        assertTrue(CompassAccuracy.dipLooksWrong(measured, expected = 67.0, wasWrong = false))
+        // An honest UK field flat on a table: 19 horizontal, 45 down (z is up, so down is negative z).
+        val honest = CompassAccuracy.fieldDipDegrees(flat, 0f, 19f, -45f)
+        assertEquals(67.1, honest, 0.5)
+        assertFalse(CompassAccuracy.dipLooksWrong(honest, expected = 67.0, wasWrong = false))
+        // A building's few degrees pass; the edge does not flicker.
+        assertFalse(CompassAccuracy.dipLooksWrong(55.0, 67.0, wasWrong = false))
+        assertTrue(CompassAccuracy.dipLooksWrong(46.0, 67.0, wasWrong = false))
+        assertTrue(CompassAccuracy.dipLooksWrong(52.0, 67.0, wasWrong = true))
+        assertFalse(CompassAccuracy.dipLooksWrong(56.0, 67.0, wasWrong = true))
+    }
+
+    @Test
     fun `a disturbed field is never called high, and never hides a call to calibrate`() {
         assertEquals(CompassAccuracy.LOW, accuracy(vector = high, magnet = high, disturbed = true))
         assertEquals(CompassAccuracy.LOW, accuracy(vector = null, magnet = null, disturbed = true))

@@ -87,6 +87,12 @@ class CompassRepository(private val context: Context) {
         var magnetAccuracy: Int? = null
         val expectedField = (magneticModel?.fieldStrength ?: 0f) / 1000f
         var field: Float? = null
+        // The field's direction against Earth's: a magnet nearby shows here when the strength looks normal.
+        val expectedDip = magneticModel?.inclination?.toDouble()
+        val rawField = FloatArray(3)
+        var haveRawField = false
+        var haveRotation = false
+        var dipWrong = false
 
         fun publish() {
             val heading = smoothed ?: return
@@ -97,7 +103,7 @@ class CompassRepository(private val context: Context) {
                 CompassAccuracy.fromSensorReports(
                     vectorAccuracy,
                     magnetAccuracy,
-                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong,
                 )
             }
             trySend(CompassReading(QiblaEngine.normalise(heading + declination), accuracy))
@@ -110,10 +116,20 @@ class CompassRepository(private val context: Context) {
                     val (x, y, z) = event.values
                     val now = kotlin.math.sqrt(x * x + y * y + z * z)
                     field = field?.let { it * 0.9f + now * 0.1f } ?: now
+                    for (i in 0..2) rawField[i] = if (haveRawField) rawField[i] * 0.9f + event.values[i] * 0.1f else event.values[i]
+                    haveRawField = true
+                    if (expectedDip != null && haveRotation) {
+                        dipWrong = CompassAccuracy.dipLooksWrong(
+                            CompassAccuracy.fieldDipDegrees(rotation, rawField[0], rawField[1], rawField[2]),
+                            expectedDip,
+                            dipWrong,
+                        )
+                    }
                 }
                 val azimuthDegrees: Double = when (event.sensor.type) {
                     Sensor.TYPE_ROTATION_VECTOR -> {
                         SensorManager.getRotationMatrixFromVector(rotation, event.values)
+                        haveRotation = true
                         azimuthOf(rotation, remapped, orientation)
                     }
 
@@ -121,7 +137,7 @@ class CompassRepository(private val context: Context) {
                         event.values.copyInto(gravity, endIndex = 3)
                         haveGravity = true
                         if (!haveGeomagnetic) return
-                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic) ?: return
+                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic)?.also { haveRotation = true } ?: return
                     }
 
                     Sensor.TYPE_MAGNETIC_FIELD -> {
@@ -133,7 +149,7 @@ class CompassRepository(private val context: Context) {
                         event.values.copyInto(geomagnetic, endIndex = 3)
                         haveGeomagnetic = true
                         if (!haveGravity) return
-                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic) ?: return
+                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic)?.also { haveRotation = true } ?: return
                     }
 
                     else -> return

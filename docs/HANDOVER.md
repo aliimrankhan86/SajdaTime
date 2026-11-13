@@ -6092,7 +6092,39 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 12 Nov 2026, 23:00: 1.7.0 Qibla agrees with the Redmi's own compass (three still rounds, within 2° if it shows true north); Ali's own turn is the one open check; NOT published
+### 📍 STATE OF PLAY, 13 Nov 2026, 10:30: 1.7.0 Qibla now refuses a field that points the wrong way; the Redmi's desk was one; NOT published
+
+- **Found (Redmi, USB, charging, flat on its desk, 10:24):** raw magnetometer (`qmc6308`) read (-36.7, -48.2, +20.0) µT,
+  63.8 total against Slough's about 49 (30% over, under the old 35% limit, so it passed). Its horizontal part was about
+  60 µT where Slough has about 19, and the field pointed about 18° **up** where Slough's points about 67° **down**.
+  A tilt-compensated heading worked out by hand from the raw accelerometer and field (142.0) and the rotation vector
+  (143.8) agreed with the app (145 = 143.8 + 1.22 declination), so the app's sums are right. **The chip's field was not
+  Earth's.** Consequence: the phone's own MIUI compass and SajdaTime both read that same chip, so agreement between
+  them (the 12 Nov night rounds) proved nothing about true direction. Do not use "matches MIUI" as an accuracy test again.
+- **MIUI compass question settled:** `com.miui.compass` (`/data/app/MIUICompassGlobal`) has no `GeomagneticField` or
+  declination string in its dex: it shows magnetic north. SajdaTime shows true north (+1.2° in Slough), so a 1 to 2°
+  difference from MIUI is expected and correct.
+- **Fixed:** `CompassAccuracy.fieldDipDegrees` + `dipLooksWrong` (core, plain Kotlin): the measured field's angle below
+  the horizon (from the rotation matrix, no accelerometer needed) is compared with the World Magnetic Model's inclination
+  (`GeomagneticField.inclination`, same source as the declination). More than 20° off counts as disturbed (leaves
+  below 12°, so an edge case does not flicker); disturbed already forces LOW, i.e. the calibration notice and no
+  facing claim. Wired in `CompassRepository` (phone, both sensor paths) and `WearViewModel` (watch). Test:
+  `CompassAccuracyTest` "the Redmi's field that pointed up..." (real numbers). **Rejected:** only tightening the
+  strength limit (would not catch a magnet that leaves the total near normal; would also refuse honest steel buildings);
+  adding a constant offset (no independent north reference).
+- **Verified:** full gate (`clean test lint :app:bundleRelease :wear:bundleRelease`) passed; `installSideload` on the
+  Redmi (adb install worked this time) and, with the Redmi on its desk, the Qibla tab now shows the calibration notice
+  instead of the confident "Turn left 27°" it showed 90 seconds earlier. **Not verified:** the Samsung S23 Ultra, which
+  locked on a PIN screen (never entered) before its 1.7.0 test copy (`.sideload`, installed 10:23, beside its Play copy)
+  could be opened; the watch (compiled only); the Redmi away from its desk, where the fix should let guidance return.
+- **Known wording gap, not built, Ali's call (`ux-lead` + six languages first):** the notice says "figure of eight". A
+  phone on a magnetic stand, case or charger will not fix that way; a line about moving away from magnets, cases and
+  chargers would help. Phone-side fact: the Redmi's chip also carries a large hard-iron offset (its bias estimate was
+  about 118 µT), so this device may refuse more often than the Samsung.
+- **Ali's remaining check:** one turn with the test copy away from the desk and cable, on both phones, against Google
+  Maps. Samsung needs unlocking first. Wireless debugging pairing on the Samsung was done 13 Nov (it expires).
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 12 Nov 2026, 23:00: 1.7.0 Qibla agrees with the Redmi's own compass (three still rounds, within 2° if it shows true north); Ali's own turn is the one open check; NOT published
 
 - **Live:** the public Google Play page says Updated on 2 Nov 2026 (read again 12 Nov, night), so 1.6.0. Work is on
   `claude/1-7-0`: app code as at `f13497b`, plus docs and one emulator test commit; nothing merged, uploaded or published.

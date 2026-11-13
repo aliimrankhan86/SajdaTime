@@ -295,6 +295,12 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         var vectorAccuracy: Int? = null
         var magnetAccuracy: Int? = null
         var field: Float? = null
+        // Direction of the field against Earth's, as on the phone (CompassAccuracy.dipLooksWrong).
+        val expectedDip = model?.inclination?.toDouble()
+        val rawField = FloatArray(3)
+        var haveRawField = false
+        var haveRotation = false
+        var dipWrong = false
 
         fun publish() {
             val accuracy = if (magnetometer != null && field == null) {
@@ -303,7 +309,7 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                 CompassAccuracy.fromSensorReports(
                     vectorAccuracy,
                     magnetAccuracy,
-                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong,
                 )
             }
             _state.update { it.copy(heading = heading, compassAccuracy = accuracy) }
@@ -317,8 +323,18 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                     val (x, y, z) = event.values
                     val now = kotlin.math.sqrt(x * x + y * y + z * z)
                     field = field?.let { it * 0.9f + now * 0.1f } ?: now
+                    for (i in 0..2) rawField[i] = if (haveRawField) rawField[i] * 0.9f + event.values[i] * 0.1f else event.values[i]
+                    haveRawField = true
+                    if (expectedDip != null && haveRotation) {
+                        dipWrong = CompassAccuracy.dipLooksWrong(
+                            CompassAccuracy.fieldDipDegrees(rotation, rawField[0], rawField[1], rawField[2]),
+                            expectedDip,
+                            dipWrong,
+                        )
+                    }
                 } else {
                     SensorManager.getRotationMatrixFromVector(rotation, event.values)
+                    haveRotation = true
                     SensorManager.getOrientation(rotation, orientation)
                     val azimuth = Math.toDegrees(orientation[0].toDouble())
                     heading = QiblaEngine.normalise(azimuth + declination)
