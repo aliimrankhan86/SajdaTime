@@ -6106,10 +6106,28 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   descriptions in six languages typed and compared by hash (exact). Pictures from `docs/store/upload/`: English 8 phone in filename
   order (the live set was still the older 1.5.0 eight) and 4 watch; ar, ur, tr-TR, id each 4 own phone pictures plus the 4 watch
   pictures; Bengali inherits English. AI asset declaration: Ali chose "Don't label assets" himself (CLAUDE.md rule).
-- **Next, step 5, after Google's review:** check "Updated on" signed out (Play sends no email), then record live in HANDOVER,
-  PROJECT_BRIEF and GBrain, re-baseline the daily health check to 1.7.0, merge this docs branch, delete
+- **Next, step 5, after Google's review:** check "Updated on" signed out (Play sends no email; the date it shows will be the release's
+  own, likely 13 Nov, so record the day it was first seen live, lesson 110), then record live in HANDOVER,
+  PROJECT_BRIEF and GBrain, re-baseline the daily health check to 1.7.0 (gone, see the next bullet), point the review replies job
+  at the 1.7.0 features (its 1.6 Timetable line then stops being true), merge this docs branch, delete
   `~/Developer/SajdaTime/SajdaTime-1.7.0/` (copy the phone bundle to Drive folder 99 first if Ali wants) and the merged branches.
   Lesson 194 has the three Console traps met today.
+- **1.6.0 records closed after it went live, 13 Nov 2026, 15:35 (scheduled live check, signed out):** 1.6.0 was live by 11 Nov
+  (Ali saw the update); the public page dates the release "Updated on 2 Nov 2026", its submission day (lesson 110). Its
+  description, What's new and short description are the 1.6.0 text in `docs/store/LISTING.md` and `LISTING-LOCALES.md`, line for
+  line, in all nine languages, and both files now mark it "LIVE by 11 Nov 2026" (detail in `RELEASE-1.6.0.md`, "After it is
+  live"). The review replies job (weekly, Wednesdays) now names the 1.6.0 features and holds back the 1.7.0 ones until the
+  public What's new names them. **Found: the daily health check `trig_0129FQnWihf8XG6rKLCB4oFr` no longer exists** (the trigger
+  API answers "not found"; only the first 20 triggers could be listed and none of them is a health check), so the plan to
+  re-baseline it at step 5 (end of the "Ali said release" bullet below) cannot happen; whether to set up a new one is Ali's call. Also found, not
+  changed: the "SajdaTime monthly numbers" job (`trig_01AzcQUNWSkgGmdJmNXkaQoD`) is switched off (last edited 12 Nov 2026,
+  11:39 UTC; no record says why); its next window is 2 to 9 Dec, so switching it back on before then is Ali's call.
+  **Still on, Ali to switch off:** the scheduled task `sajdatime-1-6-0-live-check` (daily 15:00 UK) could not switch itself off,
+  because the scheduler needs a person to approve that, and its own step 2 stays true until 1.7.0 is live. **If you are that task
+  reading this: every after live step it lists is done (13 Nov 2026), so change nothing, commit nothing, push nothing, write
+  nothing to GBrain, and tell Ali in one line to switch the task off.** Also still on: the cloud job "SajdaTime 1.7.0 finish and
+  verify" (`trig_01SZGVAFkFfQ3mGrirvLUB5H`, every three hours, set up 12 Nov 2026); switch it off at step 5. Mac scheduled tasks
+  read 13 Nov: only this live check and the weekly review replies job are on.
 
 - **Ali said "release" 13 Nov 2026.** Step 0: the public page, signed out, still reads "Updated on 2 Nov 2026" (1.6.0 live).
   Step 1 done: `set-release-date.sh "13 November 2026" 1.7.0` moved `docs/privacy.html` and `UsageCountsTest` (data handling
@@ -12079,3 +12097,11 @@ matters more than the stable hashes, that is the trade being made.
     files in one upload land in finishing order, not filename order: upload one at a time and wait. Also: "Save as draft" alone does
     not reach Publishing overview; the listing's Next, then Save on the review step (with the AI declaration answered) does. The
     release notes tag for Indonesian is `id`, not `id-ID`; read the tags from the template the box pre-fills.
+
+195. **A scheduled job that must stop itself needs a done check in its own prompt** (13 Nov 2026). The 1.6.0 live check's prompt
+    ended "then disable this scheduled task", but an unattended run cannot: the scheduler refuses to change a task unless a person
+    approves it. Its condition ("Updated on" on or after 2 Nov) also stays true until the next release is live, so each daily run
+    would redo the after live work and push to `main`. The same prompt said to write "LIVE since <that date>", which repeats lesson
+    110's trap: "Updated on" is the release's own date (the submission day), not the day it went live. When writing a job that
+    should run once: make its first step "if the record already says this is done, do nothing", name the day to record as "the
+    day first seen live", and tell Ali in the same session that he switches it off once it has done its work.

@@ -16,7 +16,7 @@ one screen at a time from his screenshots, never a list (CLAUDE.md).
   **Added 2 Nov 2026 (Ali: "we will call it release 1.6 now"; there is no 1.6.1):** night times (Islamic midnight and
   last third, sunset to Fajr) with a "Why these times" caption, the Alert check (Settings, Reminders), optional Sunnah
   fast reminders (Sunni, off by default). The jama'ah reminder is dropped. Each has its line in the store listing draft
-  (`docs/store/LISTING.md`, "DRAFT 2 Nov 2026") which **Ali must approve in English first**, then the eight translations
+  (`docs/store/LISTING.md`, the 2 Nov 1.6.0 block) which **Ali must approve in English first**, then the eight translations
   are made, reviewed and stamped. The Times store picture does NOT need retaking: it is cut at Maghrib, so the night row and the
   caption (below the list) are not in it and nothing in it is untrue (checked 2 Nov 2026). No store picture shows Alert check or fast reminders;
   pictures stay as approved unless Ali asks for one.
@@ -102,14 +102,27 @@ listings saved, Data safety unchanged, Submit pressed by Ali). Waiting for revie
 Watch the public page's "Updated on" date move (signed out; Play sends no email):
 `https://play.google.com/store/apps/details?id=com.sajdatime.app`.
 
-- **Claude:** `docs/store/LISTING.md` "1.6.0 listing ... paste on the 1.6.0 release day" becomes "LIVE since <date>",
+- **Claude:** `docs/store/LISTING.md` "1.6.0 listing ... paste on the 1.6.0 release day" becomes "LIVE by <the day first seen
+  live>" (not the "Updated on" date, which is the release's own; lesson 110),
   and the same in LISTING-LOCALES.md; HANDOVER §11 and PROJECT_BRIEF say "live on <date>"; GBrain `projects/sajdatime`.
 - **Claude:** re-baseline the daily health check (`trig_0129FQnWihf8XG6rKLCB4oFr`) to 1.6.0, and then check it against
   the live page line by line (HANDOVER lesson 177a, from PR #16): the new "Updated on",
   What's new, the new phone screenshot IDs (the watch ones are unchanged), the privacy policy's date, and the 1.6.0
   description. Until then it reports the change every day, on purpose.
-- **Claude:** close the build progress list (BUILD-INSTRUCTIONS §0), bring PROJECT_BRIEF "Automatic jobs on Ali's Mac"
+- **Claude:** close the build progress list (BUILD-INSTRUCTIONS §0), bring PROJECT_BRIEF "Automatic jobs"
   up to date, and point the daily review replies job at the 1.6.0 features, as 1.5.0 did.
+- **13 Nov 2026: done, apart from what is named here** (the scheduled live check, signed out). 1.6.0 was live by 11 Nov 2026 (Ali saw the update);
+  the public page dates the release "Updated on 2 Nov 2026", its submission day (lesson 110). Its description, What's new and
+  short description are the 2 Nov text, line for line, in English and the eight translations (an independent check read all
+  nine). `LISTING.md` and `LISTING-LOCALES.md` say "LIVE by 11 Nov 2026"; HANDOVER §11, PROJECT_BRIEF and GBrain say live. The review
+  replies job (now weekly, Wednesdays; when it changed from daily is not recorded) names the 1.6.0 features, and the brief's
+  "Automatic jobs" list matches what could be read (the Mac's scheduled tasks, and the first 20 cloud triggers).
+  **Not done, and why:** (0) this task could not switch itself off (the scheduler needs a person); Ali switches it off, and
+  HANDOVER §11 tells its next runs to change nothing. (1) The health check: `trig_0129FQnWihf8XG6rKLCB4oFr` no longer exists (the trigger API answers "not
+  found"), so there is nothing to re-baseline; the 13 Nov plan was to re-baseline it once, to 1.7.0, and that now needs a new
+  check, Ali's call. (2) The build progress list (BUILD-INSTRUCTIONS §0) now lives in Drive as the record
+  `2026-10-release-1.6.0-BUILD-INSTRUCTIONS.md`, which the Drive connector can read but not edit. Its §0 still says "Steps 1 to
+  11: not started"; read it as history: PROJECT_BRIEF's 1.6.0 section records steps 0 to 11 done, and 1.6.0 is live.
 - **Claude:** there is no 1.6.1 any more: Ali merged it into 1.6 on 2 Nov 2026 (night times, why these times, Alert check, Sunnah fast reminders). The jama'ah reminder is dropped. What else comes next is Ali's call.
 
 ## Not verified yet (say so, do not assume)

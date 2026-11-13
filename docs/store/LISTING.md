@@ -21,6 +21,10 @@ SajdaTime: Prayer Times, Qibla
 
 ## Short description (max 80)
 
+> **Live since 1.6.0 (live by 11 Nov 2026, checked signed out 13 Nov 2026), unchanged in 1.7.0:** "Offline prayer times
+> (namaz), adhan, Qibla and a private salah tracker. Wear OS." (`80 / 80`, the 25 Oct 1.6.0 block below). The line and
+> notes that follow here are the 1.3.0 to 1.5.0 record.
+
 ```
 Offline prayer times (namaz) and Qibla compass for Sunni and Shia. No accounts.
 ```
@@ -324,7 +328,7 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-### 1.6.0 full description and What's new, DRAFT 2 Nov 2026: APPROVED by Ali 2 Nov 2026 ("Approve text"), translations next (adds night times, "Why these times", Alert check, Sunnah fast reminders)
+### 1.6.0 full description and What's new, LIVE by 11 Nov 2026 (Ali saw the update that day; the public page dates the release "Updated on 2 Nov 2026", the day it was submitted, HANDOVER lesson 110); checked signed out 13 Nov 2026: the live description and What's new are this block's text, line for line; superseded when 1.7.0 goes live. Approved by Ali 2 Nov 2026 ("Approve text"); adds night times, "Why these times", Alert check, Sunnah fast reminders
 
 Under HANDOVER §5.38 each new feature gets its line in the same release. Made from the approved 30 Oct text (block above).
 Added: Islamic midnight and last third of the night plus the "which method made your times" caption; Alert check;
@@ -413,7 +417,7 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-### 1.6.0 full description, APPROVED by Ali 30 Oct 2026 ("Yes, use it"): this replaces the 25 Oct full description below
+### 1.6.0 full description, APPROVED by Ali 30 Oct 2026 ("Yes, use it"), SUPERSEDED 2 Nov 2026 by the block above before release day, so never live (it replaced the 25 Oct full description below)
 
 Written under Ali's hard rule of 30 Oct 2026 (HANDOVER §5.38: the whole app first). Drafted by Fable (`ux-lead`), every
 claim checked in code, Opus review: its fixes taken (the typed town line now names Open-Meteo as `docs/privacy.html`
@@ -492,7 +496,7 @@ There is no paid tier, no subscription and nothing locked away. SajdaTime is giv
 I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
 ```
 
-### 1.6.0 listing, 25 Oct 2026: paste on the 1.6.0 release day (short description, full description, What's new)
+### 1.6.0 listing, 25 Oct 2026 (short description, full description, What's new): its short description LIVE by 11 Nov 2026 (checked signed out 13 Nov 2026); its full description and What's new were replaced before release day by the 2 Nov block above
 
 Designed by Fable (`STEP-11-DESIGN.md` §2 and §3), checked by the plan verifier against the code on `claude/1-6-0`.
 **Owner's decisions, 25 Oct 2026 ("Yes all recommended options"):** the short description below (option C), and the
