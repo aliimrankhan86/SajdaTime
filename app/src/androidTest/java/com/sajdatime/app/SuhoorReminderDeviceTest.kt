@@ -145,4 +145,65 @@ class SuhoorReminderDeviceTest {
         assertEquals("switching it off left a reminder behind", 0, settledReminders(pkg, 0).size)
         assertEquals("a prayer alarm moved or went", prayersBefore, settledPrayers(pkg, prayersBefore))
     }
+
+    /**
+     * The fault behind the release script's flaky "a reminder exists while it is switched off": a reschedule
+     * that read the settings before the person switched the reminder off, and wrote after. The app has six
+     * callers (alarm receivers, the daily worker, the time change receiver, the view model), each reading
+     * the settings first and rescheduling second, with nothing between them. Here the stale copy is made
+     * on purpose and handed in after the switch off, so no timing luck is needed. It must not bring the
+     * reminder back, because the scheduler now reads the stored settings itself, inside its lock.
+     */
+    @Test
+    fun a_reschedule_holding_old_settings_cannot_bring_back_a_switched_off_reminder() {
+        val zone = ZoneId.systemDefault()
+        val settings = runBlocking { repository.current() }
+        val expected = SuhoorReminderPlan.plan(london, settings.calculationPrefs, 30, LocalDate.now(zone), Instant.now())
+        if (DeviceSupport.requireRamadanClock) {
+            assertTrue("The clock was meant to be inside Ramadan 1448", expected.isNotEmpty())
+        } else {
+            assumeTrue("The clock is not inside Ramadan 1448", expected.isNotEmpty())
+        }
+        val pkg = context.packageName
+
+        runBlocking { repository.setSuhoorReminderMinutes(30) }
+        val stale = runBlocking { repository.current() }
+        reschedule()
+        assertEquals("the reminder should be there while it is on", expected.size, settledReminders(pkg, expected.size).size)
+
+        runBlocking { repository.setSuhoorReminderMinutes(0) }
+        // The old copy arrives after the switch off, exactly as a worker that read it a moment earlier would.
+        PrayerAlarmScheduler.reschedule(context, stale)
+        Thread.sleep(1500)
+        assertEquals(
+            "a reschedule with old settings brought the switched off reminder back",
+            0,
+            DeviceSupport.alarmTimes(pkg, PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER).size,
+        )
+    }
+
+    /**
+     * The same stale copy, for the status badge. The badge and widgets used to be redrawn from the copy of
+     * the settings each caller had read, so a late caller could post the badge again after it was switched
+     * off. rescheduleAndRefresh reads the stored settings inside the lock and uses them for all three.
+     */
+    @Test
+    fun a_refresh_holding_old_settings_cannot_bring_back_a_switched_off_badge() {
+        val manager = context.getSystemService(android.app.NotificationManager::class.java)
+        val before = runBlocking { repository.current().ongoingBadge }
+        try {
+            runBlocking { repository.setOngoingBadge(true) }
+            val stale = runBlocking { repository.current() }
+            runBlocking { repository.setOngoingBadge(false) }
+            PrayerAlarmScheduler.rescheduleAndRefresh(context, stale)
+            Thread.sleep(1000)
+            assertTrue(
+                "a refresh with old settings brought the switched off badge back",
+                manager.activeNotifications.none { it.id == com.sajdatime.app.notify.Notifications.ID_ONGOING },
+            )
+        } finally {
+            runBlocking { repository.setOngoingBadge(before) }
+            PrayerAlarmScheduler.rescheduleAndRefresh(context, runBlocking { repository.current() })
+        }
+    }
 }

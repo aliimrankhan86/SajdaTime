@@ -31,6 +31,7 @@
     <string name="wear_madhab_note">Hanya Asar yang berubah. Hanafi lebih akhir.</string>
     <string name="wear_qibla_needs_location">Atur lokasi Anda untuk menemukan kiblat</string>
     <string name="wear_qibla_facing">Menghadap Ka\'bah</string>
+    <string name="wear_qibla_calibrate">Gerakkan jam tangan Anda membentuk angka delapan.</string>
     <string name="wear_qibla_bearing">%1$d°</string>
     <string name="wear_qibla_from_true_north">dari utara sejati</string>
     <string name="wear_duration_h_m">%1$d j %2$d mnt</string>

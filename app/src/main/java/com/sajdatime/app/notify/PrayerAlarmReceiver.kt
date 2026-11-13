@@ -14,7 +14,6 @@ import java.time.LocalDate
 import java.time.ZoneId
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.app.data.SettingsRepository
-import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,9 +59,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     )
                 }
                 // Same chain as a prayer, so a person with every alert off still gets the next window.
-                PrayerAlarmScheduler.reschedule(appContext, settings)
-                OngoingBadge.refresh(appContext, settings)
-                WidgetUpdater.refreshAll(appContext, settings)
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
             } finally {
                 pendingResult.finish()
             }
@@ -92,9 +89,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     Notifications.postFastReminder(appContext, reason, fajrAt)
                 }
                 // Same chain as a prayer, so the next window is laid down while awake.
-                PrayerAlarmScheduler.reschedule(appContext, settings)
-                OngoingBadge.refresh(appContext, settings)
-                WidgetUpdater.refreshAll(appContext, settings)
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
             } finally {
                 pendingResult.finish()
             }
@@ -130,9 +125,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     )
                 }
                 // Same chain as a prayer: lay down the next window and refresh the badge while awake.
-                PrayerAlarmScheduler.reschedule(appContext, settings)
-                OngoingBadge.refresh(appContext, settings)
-                WidgetUpdater.refreshAll(appContext, settings)
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
             } finally {
                 pendingResult.finish()
             }
@@ -168,9 +161,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
                     )
                 }
                 // Chain the next horizon and refresh the badge while we are already awake.
-                PrayerAlarmScheduler.reschedule(appContext, settings)
-                OngoingBadge.refresh(appContext, settings)
-                WidgetUpdater.refreshAll(appContext, settings)
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
             } finally {
                 pendingResult.finish()
             }

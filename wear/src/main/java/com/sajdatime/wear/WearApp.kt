@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -131,7 +132,7 @@ fun WearApp(viewModel: WearViewModel, onRequestLocationPermission: () -> Unit = 
     val pager = rememberPagerState(pageCount = { 2 })
     var settingsPage by rememberSaveable { mutableStateOf(SettingsPage.NONE) }
 
-    LaunchedEffect(pager.currentPage) {
+    LaunchedEffect(pager.currentPage, state.settings.coordinates) {
         viewModel.setQiblaVisible(pager.currentPage == PAGE_QIBLA)
     }
 
@@ -222,6 +223,7 @@ private fun TimesPage(
 
         val today = state.today
         val next = state.next
+        val current = state.current
 
         ScalingLazyColumn(
             state = listState,
@@ -293,7 +295,8 @@ private fun TimesPage(
 
                 items(PrayerSlot.entries.filter { it.isPrayer }) { slot ->
                     val at = today.times[slot] ?: return@items
-                    val isNext = slot == next?.slot && next.isTomorrow == false
+                    // The current prayer, as the phone's Times screen and widgets highlight it (1.7.0).
+                    val isCurrent = slot == current
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -304,7 +307,7 @@ private fun TimesPage(
                         Text(
                             text = stringResource(slot.labelRes),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isNext) {
+                            color = if (isCurrent) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurface
@@ -313,7 +316,7 @@ private fun TimesPage(
                         Text(
                             text = clock(context, at),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isNext) {
+                            color = if (isCurrent) {
                                 MaterialTheme.colorScheme.primary
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
@@ -718,42 +721,48 @@ private fun QiblaPage(state: WearUiState) {
                 return@Box
             }
 
-            val heading = state.heading
-            // Hysteresis, same rule and same reasons as the phone: a bare threshold buzzed
-            // the owner's phone 26 times in 76 seconds while it lay still on a desk. A wrist
-            // is the worse place to get that wrong, because a watch is always against skin.
-            // The buzz is fired here, in the same effect that decides `aligned`, because a
-            // cycle of daylight between the two is exactly what made the phone buzz on
-            // every open. See QiblaEngine.staysAligned and QiblaScreen.
+            val accuracy = state.compassAccuracy
+            val heading = state.heading.takeIf { accuracy.allowsHeading }
+            val arrivalHeading = heading.takeIf { accuracy.allowsArrival }
             val haptics = LocalHapticFeedback.current
-            var aligned by rememberSaveable { mutableStateOf(false) }
-            // False until the first heading is read: raising the watch while already facing
-            // the Kaaba records that, rather than announcing an arrival that never happened.
-            var haveRead by rememberSaveable { mutableStateOf(false) }
-            // And no second buzz within five seconds of the last, so a compass settling
-            // after the screen wakes cannot drum on the wrist. Measured on the phone: with
-            // hysteresis alone it still buzzed 4 times in the 26 seconds after opening.
-            var lastBuzzAt by rememberSaveable { mutableLongStateOf(0L) }
-            LaunchedEffect(heading, qibla) {
-                if (heading == null) return@LaunchedEffect
-                val now = QiblaEngine.staysAligned(aligned, heading, qibla)
-                val since = SystemClock.elapsedRealtime() - lastBuzzAt
-                if (now && !aligned && haveRead && since > ARRIVAL_QUIET_MILLIS) {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    lastBuzzAt = SystemClock.elapsedRealtime()
+            var wasAligned by remember { mutableStateOf(false) }
+            var buzzArmed by remember { mutableStateOf(false) }
+            var lastBuzzAt by remember { mutableLongStateOf(0L) }
+            val aligned = arrivalHeading != null && QiblaEngine.staysAligned(wasAligned, arrivalHeading, qibla)
+            LaunchedEffect(arrivalHeading, qibla) {
+                wasAligned = aligned
+                if (arrivalHeading == null) {
+                    buzzArmed = false
+                } else if (aligned) {
+                    if (buzzArmed && SystemClock.elapsedRealtime() - lastBuzzAt > ARRIVAL_QUIET_MILLIS) {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        lastBuzzAt = SystemClock.elapsedRealtime()
+                    }
+                    buzzArmed = false
+                } else if (QiblaEngine.hasLeftArrivalZone(arrivalHeading, qibla)) {
+                    buzzArmed = true
                 }
-                aligned = now
-                haveRead = true
+            }
+            if (accuracy.needsCalibration) {
+                Text(
+                    text = stringResource(R.string.wear_qibla_calibrate),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                )
+                return@Box
             }
             // Green, aligned or not — the same rule as the phone. A colour that changes
             // underneath the needle invites the reading that the direction has changed.
             val needleColour = MaterialTheme.colorScheme.primary
-            // The needle is *you*: fixed at the top, the way the watch points, while the
-            // dial and the Kaaba turn round it. Turn until it touches the Kaaba. Without a
-            // compass there is no "you", so it points at the Kaaba instead — the bearing
-            // from north on a north-up dial. Same rule as the phone; the reasoning and the
-            // owner's report that led to it are in QiblaScreen.kt.
-            val needleRotation = if (heading != null) 0f else qibla.toFloat()
+            // The arrow points at the Kaaba: its angle is the Qibla bearing minus the heading, the same
+            // place the Kaaba mark is drawn, so the two always agree. "You" is the small fixed mark at
+            // the top of the dial: turn until the arrow stands straight up under it. Same rule as the
+            // phone since 12 Nov 2026, when the owner followed a hand that meant "you" the wrong way;
+            // the three meanings the hand has had are in QiblaScreen.kt. Without a compass the heading
+            // counts as zero, so the arrow stands at the bearing from north.
+            val needleRotation = (qibla - (heading ?: 0.0)).toFloat()
+            val topMarkColour = MaterialTheme.colorScheme.onSurface
             val dialColour = if (aligned) {
                 MaterialTheme.colorScheme.primaryContainer
             } else {
@@ -809,10 +818,22 @@ private fun QiblaPage(state: WearUiState) {
                     }
                 }
 
-                // The needle floats between the rim and the middle rather than starting
-                // at the centre, so it never lies across the readout. Screen space, not
-                // dial space: it is fixed at the top with a compass and turned to the
-                // bearing without one.
+                // "The top of your watch": a small fixed wedge at the rim, only with a compass. The arc
+                // above starts at it and runs round to the arrow.
+                if (heading != null) {
+                    drawPath(
+                        path = Path().apply {
+                            moveTo(centre.x, centre.y - radius * 0.86f)
+                            lineTo(centre.x - radius * 0.06f, centre.y - radius * 0.99f)
+                            lineTo(centre.x + radius * 0.06f, centre.y - radius * 0.99f)
+                            close()
+                        },
+                        color = topMarkColour,
+                    )
+                }
+
+                // The arrow floats between the rim and the middle rather than starting
+                // at the centre, so it never lies across the readout. Turned to the Kaaba.
                 //
                 // The tip stops at 0.60 rather than the 0.86 it used to, which is just
                 // short of the Kaaba mark rather than inside it. Buried, what was left
@@ -835,12 +856,11 @@ private fun QiblaPage(state: WearUiState) {
                     )
                 }
 
-                // Last, so it covers whatever it lands on — the needle's tip, when you are
-                // facing the Qibla and the two marks are meant to meet.
+                // Last, so it covers whatever it lands on. The arrow's tip always ends just under it.
                 drawKaaba(
                     centre = centre,
                     radius = radius,
-                    bearingDegrees = (qibla - (heading ?: 0.0)).toFloat(),
+                    bearingDegrees = needleRotation,
                     silhouette = kaaba,
                     detail = kaabaDetail,
                     tint = kaabaColour,
@@ -855,7 +875,7 @@ private fun QiblaPage(state: WearUiState) {
                     text = if (aligned) {
                         stringResource(R.string.wear_qibla_facing)
                     } else {
-                        stringResource(R.string.wear_qibla_bearing, qibla.roundToInt())
+                        stringResource(R.string.wear_qibla_bearing, QiblaEngine.wholeDegrees(qibla))
                     },
                     textAlign = TextAlign.Center,
                     style = if (aligned) {
@@ -865,7 +885,15 @@ private fun QiblaPage(state: WearUiState) {
                     },
                     color = needleColour,
                 )
-                if (heading == null) {
+                if (accuracy.allowsHeading && !accuracy.allowsArrival) {
+                    Text(
+                        text = stringResource(R.string.wear_qibla_calibrate),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth(0.60f),
+                    )
+                } else if (heading == null) {
                     Text(
                         text = stringResource(R.string.wear_qibla_from_true_north),
                         style = MaterialTheme.typography.bodySmall,

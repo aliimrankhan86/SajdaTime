@@ -59,15 +59,26 @@ object QiblaEngine {
         return if (diff > 180.0) diff - 360.0 else diff
     }
 
+    /** Follow the shortest arc. Averaging unit vectors can stall at exactly opposite headings. */
+    fun smoothHeading(previous: Double, target: Double, fraction: Double): Double =
+        normalise(previous + relativeTurn(previous, target) * fraction)
+
     /** True when the device is pointing close enough to call it aligned. */
     fun isAligned(current: Double, target: Double, toleranceDegrees: Double = 3.0): Boolean =
         abs(relativeTurn(current, target)) <= toleranceDegrees
 
     /** It takes this much to arrive. */
-    const val ALIGN_GRAB_DEGREES = 5.0
+    const val ALIGN_GRAB_DEGREES = 2.0
 
     /** And this much to be told you have left, which is deliberately wider. See [staysAligned]. */
-    const val ALIGN_RELEASE_DEGREES = 8.0
+    const val ALIGN_RELEASE_DEGREES = 4.0
+
+    /**
+     * Arm another vibration only after a larger departure than the visual release.
+     * The previous 8° release absorbed a measured 7° wobble on a stationary phone.
+     */
+    fun hasLeftArrivalZone(current: Double, target: Double): Boolean =
+        !isAligned(current, target, toleranceDegrees = 8.0)
 
     /**
      * Arrival, with hysteresis: harder to leave than to enter.
@@ -120,6 +131,13 @@ object QiblaEngine {
             cos(lat1) * cos(lat2) * sin(deltaLon / 2) * sin(deltaLon / 2)
         return 2 * EARTH_RADIUS_KM * atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
     }
+
+    /**
+     * A compass angle as the whole number to print, 0 to 359: 359.6 is 0, never "360°", and a hair under
+     * north is 0 as well. Phone and watch both print through this (12 Nov 2026; Kilifi on the Kenyan coast
+     * has a Qibla of 359.95).
+     */
+    fun wholeDegrees(degrees: Double): Int = Math.floorMod(Math.round(degrees).toInt(), 360)
 
     fun normalise(degrees: Double): Double {
         val wrapped = degrees % 360.0

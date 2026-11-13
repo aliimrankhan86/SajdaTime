@@ -1,5 +1,6 @@
 package com.sajdatime.app.ui.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
@@ -53,11 +54,14 @@ fun CtaButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     compact: Boolean = false,
+    // Only for a button that handles its own touches and shows the press itself (the tasbeeh's Count).
+    interactionSource: MutableInteractionSource? = null,
     content: @Composable RowScope.() -> Unit,
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
+        interactionSource = interactionSource,
         colors = ctaButtonColors(),
         contentPadding = if (compact) CompactPadding else ButtonDefaults.ContentPadding,
         modifier = modifier.heightIn(min = if (compact) 40.dp else 52.dp),

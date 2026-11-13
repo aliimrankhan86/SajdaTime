@@ -102,6 +102,8 @@ class ColorContrastTest {
         Pair("light onSurfaceVariant/surfaceVariant", LightOnSurfaceVariant, LightSurfaceVariant, 4.5),
         Pair("light onSurfaceVariant/background", LightOnSurfaceVariant, LightBackground, 4.5),
         Pair("light onPrimary/primary", LightOnPrimary, LightPrimary, 4.5),
+        Pair("light widget row onSurface/primaryContainer", LightOnSurface, LightPrimaryContainer, 4.5),
+        Pair("light widget row onSurfaceVariant/primaryContainer", LightOnSurfaceVariant, LightPrimaryContainer, 4.5),
         Pair("light onPrimaryContainer/primaryContainer", LightOnPrimaryContainer, LightPrimaryContainer, 4.5),
         Pair("light onSecondary/secondary", LightOnSecondary, LightSecondary, 4.5),
         Pair("light onAccent/accent", LightOnAccent, LightAccent, 4.5),
@@ -130,6 +132,8 @@ class ColorContrastTest {
         Pair("dark onSurfaceVariant/surfaceVariant", DarkOnSurfaceVariant, DarkSurfaceVariant, 4.5),
         Pair("dark onSurfaceVariant/background", DarkOnSurfaceVariant, DarkBackground, 4.5),
         Pair("dark onPrimary/primary", DarkOnPrimary, DarkPrimary, 4.5),
+        Pair("dark widget row onSurface/primaryContainer", DarkOnSurface, DarkPrimaryContainer, 4.5),
+        Pair("dark widget row onSurfaceVariant/primaryContainer", DarkOnSurfaceVariant, DarkPrimaryContainer, 4.5),
         Pair("dark onPrimaryContainer/primaryContainer", DarkOnPrimaryContainer, DarkPrimaryContainer, 4.5),
         Pair("dark onSecondary/secondary", DarkOnSecondary, DarkSecondary, 4.5),
         Pair("dark onAccent/accent", DarkOnAccent, DarkAccent, 4.5),
@@ -403,7 +407,7 @@ class ColorContrastTest {
     }
 
     /**
-     * The next-prayer row is highlighted with primaryContainer. It must be visibly
+     * The current-prayer row is highlighted with primaryContainer. It must be visibly
      * distinct from the plain surface behind it, otherwise "which prayer is next" is
      * carried by nothing at all for low-vision users.
      */

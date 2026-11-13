@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The current prayer on the five-prayers strip: the highlight fill with a 2dp border so it reads at a glance.
+     Strip only; the Today card keeps the 1dp highlight. WidgetThemeTest fails the build if the copies drift. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_highlight" />
+    <stroke android:width="2dp" android:color="@color/widget_primary" />
+    <corners android:radius="12dp" />
+</shape>

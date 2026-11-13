@@ -1,7 +1,5 @@
 package com.sajdatime.app.ui.home
 
-import android.icu.text.DateFormat as IcuDateFormat
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,8 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PictureAsPdf
@@ -34,14 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -59,25 +51,23 @@ import com.sajdatime.app.ui.components.DialogTitle
 import com.sajdatime.app.ui.theme.PrayerTimeTextStyle
 import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.sajdaSurface
-import com.sajdatime.core.AppLocale
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.TimetableGrid
 import com.sajdatime.core.TimetableList
-import com.sajdatime.core.TimetableMonth
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.labelRes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.GregorianCalendar
 
 /**
- * The Timetable (STEP-4-DESIGN): this month and the next as day cards, opened on today's card.
- * Save as PDF opens the existing chooser over this sheet (the caller owns it), and the sheet stays
- * open after a save. If today's times vanish while it is open it closes rather than show nothing.
+ * The Timetable: today and the six days after it as day cards (Ali, 12 Nov 2026; it was this month and
+ * the next until then, see [TimetableList]). Save as PDF is the door to the whole month: the caller
+ * decides whether that is one tap or the chooser, and the sheet stays open after a save. If today's
+ * times vanish while it is open it closes rather than show nothing.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun TimetableSheet(
     state: UiState,
@@ -93,26 +83,11 @@ internal fun TimetableSheet(
         return
     }
     val prefs = state.settings.calculationPrefs
-    // Months and their days come as one value, so at midnight on the last day the new headings never
-    // sit over the old month's days for a frame (Opus review).
-    val runs by produceState(emptyList<Pair<TimetableMonth, List<DayPrayerTimes>>>(), coordinates, prefs, today) {
+    val days by produceState(emptyList<DayPrayerTimes>(), coordinates, prefs, today) {
         value = withContext(Dispatchers.Default) {
-            TimetableList.months(today).map { it to PrayerEngine.computeRange(coordinates, it.first, it.length, prefs) }
+            PrayerEngine.computeRange(coordinates, today, TimetableList.DAYS, prefs)
         }
     }
-    val listState = rememberLazyListState()
-    var headingPx by remember { mutableIntStateOf(0) }
-    // Opens on today once, when the days and the pinned heading's height are known. The pinned heading
-    // is drawn over the first visible item, so today is scrolled down by its height to sit just under it.
-    LaunchedEffect(runs.isNotEmpty() && headingPx > 0) {
-        if (runs.isNotEmpty() && headingPx > 0) {
-            listState.scrollToItem(TimetableList.todayIndex(today))
-            listState.scrollBy(-headingPx.toFloat())
-        }
-    }
-    val locale = AppLocale.of(context)
-    // ICU, not java.time: below API 26 the desugared java.time prints a standalone month as a number.
-    val monthFormat = remember(locale) { IcuDateFormat.getInstanceForSkeleton("yMMMM", locale) }
     val fontScale = LocalDensity.current.fontScale
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -127,30 +102,18 @@ internal fun TimetableSheet(
                 // 32 for the list's sides and 32 for the card's.
                 val columns = TimetableGrid.columns((maxWidth - 64.dp).value, fontScale)
                 LazyColumn(
-                    state = listState,
                     contentPadding = PaddingValues(
                         start = 16.dp,
                         end = 16.dp,
                         bottom = Space.Section + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
                     ),
                 ) {
-                    runs.forEachIndexed { index, (month, days) ->
-                        // The gap before a later month is its own item, so the pinned heading carries no band.
-                        if (index > 0) item(key = "gap$index") { Spacer(Modifier.height(Space.Section)) }
-                        stickyHeader(key = "month$index") {
-                            val name = monthFormat.format(GregorianCalendar(month.first.year, month.first.monthValue - 1, 1).time)
-                            MonthHeading(
-                                name,
-                                modifier = if (index == 0) Modifier.onSizeChanged { headingPx = it.height } else Modifier,
-                            )
-                        }
-                        items(days, key = { it.date.toEpochDay() }) { day ->
-                            Column(Modifier.padding(bottom = Space.Paragraph)) {
-                                DayCard(day = day, isToday = day.date == today, columns = columns)
-                            }
+                    items(days, key = { it.date.toEpochDay() }) { day ->
+                        Column(Modifier.padding(bottom = Space.Paragraph)) {
+                            DayCard(day = day, isToday = day.date == today, columns = columns)
                         }
                     }
-                    runs.flatMap { it.second }.firstNotNullOfOrNull { it.approximatedFrom }?.let { from ->
+                    days.firstNotNullOfOrNull { it.approximatedFrom }?.let { from ->
                         item(key = "footer") {
                             Text(
                                 text = stringResource(R.string.pdf_approximate_note, from.toInt()),
@@ -209,23 +172,6 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
         }
         Spacer(Modifier.height(Space.Group))
     }
-}
-
-/** Pinned while its days scroll under it; drawn on the sheet's own colour so nothing shows through. */
-@Composable
-private fun MonthHeading(name: String, modifier: Modifier = Modifier) {
-    val spoken = stringResource(R.string.timetable_month_a11y, name)
-    Text(
-        text = name,
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurface,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .padding(bottom = Space.Related)
-            .padding(horizontal = 8.dp)
-            .semantics { heading(); contentDescription = spoken },
-    )
 }
 
 /**

@@ -13,10 +13,13 @@ import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.Madhab
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.Night
+import com.sajdatime.core.CurrentWindow
+import com.sajdatime.core.DuhaWindow
 import com.sajdatime.core.NightTimes
 import com.sajdatime.core.PlaceLabelPolicy
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.currentForDisplay
 import com.sajdatime.core.QiblaEngine
 import com.sajdatime.core.Sect
 import com.sajdatime.app.data.AlertStyle
@@ -24,7 +27,7 @@ import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.CityLookup
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.data.CompassRepository
 import com.sajdatime.app.data.LocationRepository
 import com.sajdatime.app.data.FirebaseUsageSink
@@ -46,7 +49,6 @@ import com.sajdatime.app.R
 import com.sajdatime.app.data.WatchSync
 import com.sajdatime.app.notify.DailyRescheduleWorker
 import com.sajdatime.app.notify.Notifications
-import com.sajdatime.app.notify.OngoingBadge
 import com.sajdatime.app.notify.PrayerAlarmScheduler
 import com.sajdatime.app.pdf.PrayerPdfExporter
 import com.sajdatime.app.widget.WidgetUpdater
@@ -212,6 +214,10 @@ data class UiState(
     val jamaah: Map<PrayerSlot, JamaahResult> = emptyMap(),
     /** Midnight and the last third of the night now on, or null with the setting off or no usable night. */
     val night: NightTimes? = null,
+    /** What the Now row counts to (1.7.0), or null when no prayer is current. */
+    val window: CurrentWindow? = null,
+    /** The Duha window for today, or null with the row off, a Shia user, or no usable window. */
+    val duha: DuhaWindow? = null,
     /** The prayer record, while "My prayers" is on. See [TrackerState]. */
     val tracker: TrackerState? = null,
     /** True when a record exists, even with the tracker off, so Settings can always offer Delete. */
@@ -315,7 +321,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 val sunrisePassed = snapshot.current == PrayerSlot.FAJR &&
                     snapshot.today?.times?.get(PrayerSlot.SUNRISE)
                         ?.let { !now.isBefore(it) } == true
-                if (prayerPassed || dayChanged || sunrisePassed) recalculate()
+                // The "time left" line counts to a time that is not always a prayer (Islamic midnight), so it
+                // needs its own trigger too, or "Until Islamic midnight" froze at 1m for hours (review, 3 Nov 2026).
+                val windowPassed = snapshot.window?.let { !now.isBefore(it.at) } == true
+                if (prayerPassed || dayChanged || sunrisePassed || windowPassed) recalculate()
                 // My prayers keeps its own day, because with no saved place there is no `today` above
                 // and nothing else would roll it over: ticks after midnight went to yesterday (review).
                 else if (snapshot.tracker?.let { it.today != LocalDate.now(ZoneId.systemDefault()) } == true) publishTracker()
@@ -461,6 +470,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
     fun setNightTimesEnabled(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setNightTimesEnabled(enabled) }
+
+    fun setDuhaEnabled(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setDuhaEnabled(enabled) }
 
     fun dismissRamadanNotice(hijriYear: Int) =
         viewModelScope.launch { settingsRepository.dismissRamadanNotice(hijriYear) }
@@ -657,6 +669,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             return
         }
 
+        _state.update { it.copy(compassHeading = null, compassAccuracy = CompassAccuracy.UNKNOWN) }
         compassJob = viewModelScope.launch {
             compassRepository.headings(coordinates).collect { reading ->
                 _state.update {
@@ -688,7 +701,7 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     private suspend fun recalculate() {
         val settings = _state.value.settings
         val coordinates: Coordinates = settings.coordinates ?: run {
-            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null) }
+            _state.update { it.copy(today = null, next = null, current = null, ramadan = null, eid = null, jamaah = emptyMap(), night = null, window = null, duha = null) }
             // The "open SajdaTime to set a location" widget still follows a Theme change (19 Oct 2026).
             withContext(Dispatchers.Default) { WidgetUpdater.refreshAll(getApplication<Application>(), settings) }
             return
@@ -700,7 +713,10 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
         val computed = withContext(Dispatchers.Default) {
             val today = PrayerEngine.compute(coordinates, LocalDate.now(zone), settings.calculationPrefs)
             val next: NextPrayer = PrayerEngine.nextPrayer(coordinates, settings.calculationPrefs, now, zone)
+            // Before today's Fajr the engine's current prayer is yesterday's Isha, which the list (today's times)
+            // would mark with a time about 17 hours away. Nothing is Now until Fajr starts (4 Nov 2026, review).
             val current = PrayerEngine.currentPrayer(coordinates, settings.calculationPrefs, now, zone)
+                ?.let { currentForDisplay(it, now, today.times.getValue(PrayerSlot.FAJR)) }
             // Built from the same `today` the list shows, so the card cannot disagree with it.
             // Recomputed on every trigger that already exists: Fajr and Maghrib are prayers, so
             // the phase changes exactly when `next` rolls over, and the date change tick covers
@@ -709,7 +725,14 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
             val eid = HijriCalendar.eidOn(today.date, settings.calculationPrefs.hijriOffset)
             val jamaah = JamaahPlan.on(today, zone, settings.jamaah)
             val night = if (settings.nightTimesEnabled) Night.at(coordinates, settings.calculationPrefs, now, zone) else null
-            Computed(today, next, current, ramadan, eid, jamaah, night)
+            val window = CurrentWindow.at(coordinates, settings.calculationPrefs, now, zone, settings.nightTimesEnabled)
+            // Sunni only: classical Shia scholars hold Duha is not legislated, so the app does not take a side (Fable, B).
+            val duha = if (settings.duhaEnabled && settings.calculationPrefs.sect == Sect.SUNNI) {
+                DuhaWindow.of(today.times[PrayerSlot.SUNRISE], today.times[PrayerSlot.DHUHR], today.approximated)
+            } else {
+                null
+            }
+            Computed(today, next, current, ramadan, eid, jamaah, night, window, duha)
         }
 
         publishTracker()
@@ -722,6 +745,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
                 eid = computed.eid,
                 jamaah = computed.jamaah,
                 night = computed.night,
+                window = computed.window,
+                duha = computed.duha,
                 now = now,
                 qiblaBearing = QiblaEngine.bearingToKaaba(coordinates),
                 qiblaDistanceKm = QiblaEngine.distanceToKaabaKm(coordinates),
@@ -730,10 +755,8 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
 
         withContext(Dispatchers.Default) {
             val context = getApplication<Application>()
-            PrayerAlarmScheduler.reschedule(context, settings)
-            OngoingBadge.refresh(context, settings)
-            WidgetUpdater.refreshAll(context, settings)
-            WatchSync.publish(context, settings)
+            val latest = PrayerAlarmScheduler.rescheduleAndRefresh(context, settings)
+            WatchSync.publish(context, latest)
         }
     }
 
@@ -773,4 +796,6 @@ private data class Computed(
     val eid: EidDay?,
     val jamaah: Map<PrayerSlot, JamaahResult>,
     val night: NightTimes?,
+    val window: CurrentWindow?,
+    val duha: DuhaWindow?,
 )

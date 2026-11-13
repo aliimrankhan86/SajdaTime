@@ -1038,6 +1038,105 @@
         "$value": "#A9B2AE4D"
       },
       "usage": "To come bars and the divider on a sky: onSurfaceVariant at 30%."
+    },
+    "widget_strip_dawn_top": {
+      "$type": "color",
+      "androidRes": "widget_strip_dawn_top",
+      "light": {
+        "$value": "#EADFE3"
+      },
+      "dark": {
+        "$value": "#1C3B34"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_dawn_mid": {
+      "$type": "color",
+      "androidRes": "widget_strip_dawn_mid",
+      "light": {
+        "$value": "#F0E9EC"
+      },
+      "dark": {
+        "$value": "#142C26"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_day_top": {
+      "$type": "color",
+      "androidRes": "widget_strip_day_top",
+      "light": {
+        "$value": "#D6E8DC"
+      },
+      "dark": {
+        "$value": "#18382D"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_day_mid": {
+      "$type": "color",
+      "androidRes": "widget_strip_day_mid",
+      "light": {
+        "$value": "#E6EFE9"
+      },
+      "dark": {
+        "$value": "#122B22"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_evening_top": {
+      "$type": "color",
+      "androidRes": "widget_strip_evening_top",
+      "light": {
+        "$value": "#ECD8BB"
+      },
+      "dark": {
+        "$value": "#25392A"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_evening_mid": {
+      "$type": "color",
+      "androidRes": "widget_strip_evening_mid",
+      "light": {
+        "$value": "#F1E5D3"
+      },
+      "dark": {
+        "$value": "#192A1F"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_night_top": {
+      "$type": "color",
+      "androidRes": "widget_strip_night_top",
+      "light": {
+        "$value": "#D0DBE1"
+      },
+      "dark": {
+        "$value": "#12302F"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_night_mid": {
+      "$type": "color",
+      "androidRes": "widget_strip_night_mid",
+      "light": {
+        "$value": "#DFE6EA"
+      },
+      "dark": {
+        "$value": "#0D2323"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_strip_foot": {
+      "$type": "color",
+      "androidRes": "widget_strip_foot",
+      "light": {
+        "$value": "#F7F5F3"
+      },
+      "dark": {
+        "$value": "#0F241D"
+      },
+      "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
     }
   },
   "wear": {

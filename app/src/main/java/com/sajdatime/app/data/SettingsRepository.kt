@@ -183,6 +183,8 @@ data class AppSettings(
     val ramadanCardEnabled: Boolean = true,
     /** Islamic midnight and the last third of the night under Isha on Times (1.6.0). On for everyone; Times only. */
     val nightTimesEnabled: Boolean = true,
+    /** 1.7.0: the optional Duha row. Off by default, Sunni only (the row is never shown to Shia users). */
+    val duhaEnabled: Boolean = false,
     /**
      * The Hijri year whose notice the user closed, or 0. A year and not a flag, so the notice
      * returns next Ramadan without anything having to reset it.
@@ -234,11 +236,17 @@ data class AppSettings(
      */
     val prayerReminderFor: Set<PrayerSlot> = PrayerSlot.entries.filter { it.isPrayer }.toSet(),
     /**
-     * "My prayers", the private tracker (1.6.0). **Off by default**: nothing new appears on the Times
-     * screen unless the user puts it there. Switching it off keeps the record; only Delete clears it.
-     * The record itself lives in [TrackerRepository], never here and never in the usage counts.
+     * "My prayers", the private tracker (1.6.0). **On by default since 1.7.0** (Ali, 12 Nov 2026: "my
+     * prayer should on by default unless user wants to switch it off from the settings"); it was off by
+     * default in 1.6.0. Nothing is stored for a key never written, so on means: the tab opens on the
+     * checklist, not on a switch. It costs nobody anything they did not choose: the ticks live only on
+     * the My prayers tab (Times has none), nothing is recorded until a prayer is ticked, the rings begin
+     * on the first day something is ticked ([com.sajdatime.core.TrackerLogic.started], so no row of
+     * empty days greets anyone), and nothing is sent. Someone who switched it off in 1.6.0 has `false`
+     * stored and stays off. Switching it off keeps the record; only Delete clears it. The record itself
+     * lives in [TrackerRepository], never here and never in the usage counts.
      */
-    val trackerEnabled: Boolean = false,
+    val trackerEnabled: Boolean = true,
     /** Whether the "days in a row" line shows. Off by default (Ali, 16 Oct 2026): a streak is opt in. */
     val trackerShowStreak: Boolean = false,
     /**
@@ -566,6 +574,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setRamadanCardEnabled(enabled: Boolean) = edit { it[Keys.RAMADAN_CARD] = enabled }
 
     suspend fun setNightTimesEnabled(enabled: Boolean) = edit { it[Keys.NIGHT_TIMES] = enabled }
+    suspend fun setDuhaEnabled(enabled: Boolean) = edit { it[Keys.DUHA] = enabled }
 
     /** Closes the Ramadan notice for [hijriYear] only, so it returns the following year. */
     suspend fun dismissRamadanNotice(hijriYear: Int) = edit {
@@ -621,6 +630,7 @@ class SettingsRepository(private val context: Context) {
         val THEME = stringPreferencesKey("theme_choice")
         val RAMADAN_CARD = booleanPreferencesKey("ramadan_card_enabled")
         val NIGHT_TIMES = booleanPreferencesKey("night_times_enabled")
+        val DUHA = booleanPreferencesKey("duha_enabled")
         val RAMADAN_NOTICE_DISMISSED_YEAR = intPreferencesKey("ramadan_notice_dismissed_year")
         val EID_GREETING_DISMISSED_CODE = intPreferencesKey("eid_greeting_dismissed_code")
         val SUHOOR_MINUTES = intPreferencesKey("suhoor_reminder_minutes")
@@ -697,6 +707,7 @@ class SettingsRepository(private val context: Context) {
             themeChoice = enumOr(this[Keys.THEME], ThemeChoice.SYSTEM),
             ramadanCardEnabled = this[Keys.RAMADAN_CARD] ?: true,
             nightTimesEnabled = this[Keys.NIGHT_TIMES] ?: true,
+            duhaEnabled = this[Keys.DUHA] ?: false,
             ramadanNoticeDismissedYear = this[Keys.RAMADAN_NOTICE_DISMISSED_YEAR] ?: 0,
             eidGreetingDismissedCode = this[Keys.EID_GREETING_DISMISSED_CODE] ?: 0,
             suhoorReminderMinutes = (this[Keys.SUHOOR_MINUTES] ?: AppSettings.SUHOOR_DEFAULT_MINUTES)
@@ -706,7 +717,7 @@ class SettingsRepository(private val context: Context) {
             prayerReminderMinutes = (this[Keys.PRAYER_REMINDER_MINUTES] ?: 0)
                 .takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             prayerReminderFor = decodeSlots(this[Keys.PRAYER_REMINDER_FOR]),
-            trackerEnabled = this[Keys.TRACKER_ENABLED] ?: false,
+            trackerEnabled = this[Keys.TRACKER_ENABLED] ?: true,
             trackerShowStreak = this[Keys.TRACKER_STREAK] ?: false,
             jamaah = JamaahCodec.decode(this[Keys.JAMAAH]),
             jamaahReminderMinutes = (this[Keys.JAMAAH_REMINDER] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,

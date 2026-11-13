@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The SajdaTime mark (the launcher icon's mihrab and minarets) on its green tile, for the Today
-  widget's header and its "set your location" state only. Not on the small widgets: a mark there costs
-  the prayer name its room, and Apple's widget guidance is not to spend a widget's space on branding.
+  The SajdaTime mark (the launcher icon's mihrab and minarets) on its green tile, for the Today widget's header and its "set your location" state, and (1.7.0, Ali, 3 Nov 2026) in place of the current prayer's glyph on every widget, so people remember which app it is.
 
   The two colours are written out, not theme roles, exactly as in ic_launcher_foreground.xml and
   ic_launcher_background.xml: this is the app's icon, which looks the same in light and dark, so it is

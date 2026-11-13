@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Next prayer widget, wide: from 270 by 150dp on Android 12 and later (WidgetRenderer.NEXT_SIZES).
+  The Next prayer widget, wide: from 270 by 158dp (170, or 192 from 1.1x text, in Urdu, Arabic and Bengali) on Android 12 and later (WidgetRenderer.NEXT_SIZES).
   The small widget's countdown block on the start side (the time on its own line under the name, where
   beside it the name left it no room), and the whole day on the end side, the six rows
   spread over the height. The rows use the Today widget's ids, so one function fills both. Their
@@ -53,8 +53,7 @@
                 android:layout_width="22dp"
                 android:layout_height="22dp"
                 android:importantForAccessibility="no"
-                android:src="@drawable/widget_glyph_fajr"
-                android:tint="@color/widget_primary" />
+                android:src="@drawable/widget_mark" />
             <TextView
                 android:id="@+id/widget_name"
                 android:layout_width="wrap_content"
@@ -65,7 +64,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
         <TextView
@@ -79,7 +78,7 @@
             android:maxLines="1"
             android:textAlignment="viewStart"
             android:textColor="@color/widget_on_surface_variant"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -265,6 +264,13 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_glyph_fajr"
                 android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_fajr"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_name_fajr"
                 android:layout_width="wrap_content"
@@ -275,7 +281,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_fajr"
                 android:layout_width="0dp"
@@ -288,7 +294,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_fajr"
                 android:layout_width="wrap_content"
@@ -299,7 +305,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -334,7 +340,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_sunrise"
                 android:layout_width="0dp"
@@ -347,7 +353,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_sunrise"
                 android:layout_width="wrap_content"
@@ -358,7 +364,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -383,6 +389,13 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_glyph_fajr"
                 android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_dhuhr"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_name_dhuhr"
                 android:layout_width="wrap_content"
@@ -393,7 +406,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_dhuhr"
                 android:layout_width="0dp"
@@ -406,7 +419,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_dhuhr"
                 android:layout_width="wrap_content"
@@ -417,7 +430,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -442,6 +455,13 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_glyph_fajr"
                 android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_asr"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_name_asr"
                 android:layout_width="wrap_content"
@@ -452,7 +472,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_asr"
                 android:layout_width="0dp"
@@ -465,7 +485,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_asr"
                 android:layout_width="wrap_content"
@@ -476,7 +496,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -501,6 +521,13 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_glyph_fajr"
                 android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_maghrib"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_name_maghrib"
                 android:layout_width="wrap_content"
@@ -511,7 +538,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_maghrib"
                 android:layout_width="0dp"
@@ -524,7 +551,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_maghrib"
                 android:layout_width="wrap_content"
@@ -535,7 +562,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -560,6 +587,13 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/widget_glyph_fajr"
                 android:tint="@color/widget_on_surface_variant" />
+            <ImageView
+                android:id="@+id/widget_logo_isha"
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/widget_mark"
+                android:visibility="gone" />
             <TextView
                 android:id="@+id/widget_name_isha"
                 android:layout_width="wrap_content"
@@ -570,7 +604,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
             <TextView
                 android:id="@+id/widget_label_isha"
                 android:layout_width="0dp"
@@ -583,7 +617,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewStart"
                 android:textColor="@color/widget_on_surface_variant"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
             <TextView
                 android:id="@+id/widget_time_isha"
                 android:layout_width="wrap_content"
@@ -594,7 +628,7 @@
                 android:maxLines="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/widget_on_surface"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"

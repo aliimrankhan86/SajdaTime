@@ -10,29 +10,13 @@ import android.hardware.display.DisplayManager
 import android.view.Display
 import android.view.Surface
 import androidx.core.content.ContextCompat
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.core.Coordinates
+import com.sajdatime.core.HeadingCrossCheck
 import com.sajdatime.core.QiblaEngine
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-
-/** How much the compass can be trusted right now. */
-enum class CompassAccuracy {
-    /** Sensors report a reliable field. */
-    HIGH,
-
-    /** Usable, but the reading may wander by several degrees. */
-    MEDIUM,
-
-    /** Needs a figure-of-eight recalibration before the direction means anything. */
-    LOW,
-
-    /** No usable compass hardware, or the sensor has not reported yet. */
-    UNAVAILABLE,
-}
 
 data class CompassReading(
     /** Device heading in degrees clockwise from **true** north. */
@@ -77,7 +61,8 @@ class CompassRepository(private val context: Context) {
             return@callbackFlow
         }
 
-        val declination = declinationAt(at)
+        val magneticModel = magneticModelAt(at)
+        val declination = magneticModel?.declination?.toDouble() ?: 0.0
         val rotationVector = manager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
         val accelerometer = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val magnetometer = manager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
@@ -97,18 +82,64 @@ class CompassRepository(private val context: Context) {
         var haveGeomagnetic = false
         var smoothed: Double? = null
 
-        // Seeded HIGH rather than UNAVAILABLE. We only reach this line once a real sensor
-        // has been found, and many devices report a fused rotation vector without ever
-        // calling onAccuracyChanged. Starting at UNAVAILABLE made those devices show
-        // "this phone has no compass" directly beneath a perfectly working compass.
-        // A genuinely uncalibrated device is told to us via onAccuracyChanged(LOW).
-        var accuracy = CompassAccuracy.HIGH
+        // Fused rotation vectors can be silent about accuracy. Wait for the first magnet reading
+        // when the hardware has one, then use the worse report from the two sensors.
+        var vectorAccuracy: Int? = null
+        var magnetAccuracy: Int? = null
+        val expectedField = (magneticModel?.fieldStrength ?: 0f) / 1000f
+        var field: Float? = null
+        // The field's direction against Earth's: a magnet nearby shows here when the strength looks normal.
+        val expectedDip = magneticModel?.inclination?.toDouble()
+        val rawField = FloatArray(3)
+        var haveRawField = false
+        var haveRotation = false
+        var dipWrong = false
+        // The fused heading against one worked out from the magnet alone, while still (HeadingCrossCheck).
+        val crossCheck = HeadingCrossCheck()
+
+        fun publish() {
+            val heading = smoothed ?: return
+            val waitingForMagnet = magnetometer != null && field == null
+            val accuracy = if (waitingForMagnet) {
+                CompassAccuracy.UNKNOWN
+            } else {
+                CompassAccuracy.fromSensorReports(
+                    vectorAccuracy,
+                    magnetAccuracy,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong || crossCheck.disagrees,
+                )
+            }
+            trySend(CompassReading(QiblaEngine.normalise(heading + declination), accuracy))
+        }
 
         val listener = object : SensorEventListener {
             override fun onSensorChanged(event: SensorEvent) {
+                if (event.sensor.type == Sensor.TYPE_MAGNETIC_FIELD) {
+                    magnetAccuracy = event.accuracy
+                    val (x, y, z) = event.values
+                    val now = kotlin.math.sqrt(x * x + y * y + z * z)
+                    field = field?.let { it * 0.9f + now * 0.1f } ?: now
+                    for (i in 0..2) rawField[i] = if (haveRawField) rawField[i] * 0.9f + event.values[i] * 0.1f else event.values[i]
+                    haveRawField = true
+                    if (expectedDip != null && haveRotation) {
+                        dipWrong = CompassAccuracy.dipLooksWrong(
+                            CompassAccuracy.fieldDipDegrees(rotation, rawField[0], rawField[1], rawField[2]),
+                            expectedDip,
+                            dipWrong,
+                        )
+                    }
+                    if (rotationVector != null && haveRotation) {
+                        crossCheck.update(
+                            fused = QiblaEngine.normalise(Math.toDegrees(kotlin.math.atan2(rotation[1].toDouble(), rotation[4].toDouble()))),
+                            rawMagnet = HeadingCrossCheck.magnetHeading(rotation, rawField[0], rawField[1], rawField[2]),
+                            nowMs = event.timestamp / 1_000_000L,
+                        )
+                    }
+                }
                 val azimuthDegrees: Double = when (event.sensor.type) {
                     Sensor.TYPE_ROTATION_VECTOR -> {
                         SensorManager.getRotationMatrixFromVector(rotation, event.values)
+                        haveRotation = true
                         azimuthOf(rotation, remapped, orientation)
                     }
 
@@ -116,49 +147,46 @@ class CompassRepository(private val context: Context) {
                         event.values.copyInto(gravity, endIndex = 3)
                         haveGravity = true
                         if (!haveGeomagnetic) return
-                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic) ?: return
+                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic)?.also { haveRotation = true } ?: return
                     }
 
                     Sensor.TYPE_MAGNETIC_FIELD -> {
+                        // With a rotation vector the magnet chip is listened to for its accuracy only.
+                        if (rotationVector != null) {
+                            publish()
+                            return
+                        }
                         event.values.copyInto(geomagnetic, endIndex = 3)
                         haveGeomagnetic = true
                         if (!haveGravity) return
-                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic) ?: return
+                        legacyAzimuth(rotation, remapped, orientation, gravity, geomagnetic)?.also { haveRotation = true } ?: return
                     }
 
                     else -> return
                 }
 
-                // Circular low-pass filter. Averaging degrees directly would swing wildly
-                // across the 359 -> 0 boundary, so the smoothing is done on the unit
-                // vector and converted back.
+                // Follow the shortest arc, including when crossing north.
                 val target = QiblaEngine.normalise(azimuthDegrees)
-                val heading = smoothed?.let { previous -> smoothAngle(previous, target) } ?: target
+                val heading = smoothed?.let { previous -> QiblaEngine.smoothHeading(previous, target, SMOOTHING) } ?: target
                 smoothed = heading
 
-                trySend(
-                    CompassReading(
-                        trueHeading = QiblaEngine.normalise(heading + declination),
-                        accuracy = accuracy,
-                    ),
-                )
+                publish()
             }
 
             override fun onAccuracyChanged(sensor: Sensor?, value: Int) {
-                accuracy = when (value) {
-                    SensorManager.SENSOR_STATUS_ACCURACY_HIGH -> CompassAccuracy.HIGH
-                    SensorManager.SENSOR_STATUS_ACCURACY_MEDIUM -> CompassAccuracy.MEDIUM
-                    SensorManager.SENSOR_STATUS_ACCURACY_LOW,
-                    SensorManager.SENSOR_STATUS_UNRELIABLE,
-                    -> CompassAccuracy.LOW
-
-                    else -> CompassAccuracy.UNAVAILABLE
+                when (sensor?.type) {
+                    Sensor.TYPE_ROTATION_VECTOR -> vectorAccuracy = value
+                    Sensor.TYPE_MAGNETIC_FIELD -> magnetAccuracy = value
+                    else -> return
                 }
+                publish()
             }
         }
 
         if (rotationVector != null) {
             manager.registerListener(listener, rotationVector, SensorManager.SENSOR_DELAY_GAME)
+            // Slowly: only its accuracy is wanted (see onSensorChanged).
+            magnetometer?.let { manager.registerListener(listener, it, SensorManager.SENSOR_DELAY_NORMAL) }
         } else {
             manager.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_GAME)
             manager.registerListener(listener, magnetometer, SensorManager.SENSOR_DELAY_GAME)
@@ -171,14 +199,11 @@ class CompassRepository(private val context: Context) {
      * Magnetic declination at the user's position, from Android's built-in World
      * Magnetic Model. East is positive.
      */
-    fun declinationAt(at: Coordinates): Double = runCatching {
-        GeomagneticField(
-            at.latitude.toFloat(),
-            at.longitude.toFloat(),
-            0f,
-            System.currentTimeMillis(),
-        ).declination.toDouble()
-    }.getOrDefault(0.0)
+    fun declinationAt(at: Coordinates): Double = magneticModelAt(at)?.declination?.toDouble() ?: 0.0
+
+    private fun magneticModelAt(at: Coordinates): GeomagneticField? = runCatching {
+        GeomagneticField(at.latitude.toFloat(), at.longitude.toFloat(), 0f, System.currentTimeMillis())
+    }.getOrNull()
 
     private fun legacyAzimuth(
         rotation: FloatArray,
@@ -234,14 +259,6 @@ class CompassRepository(private val context: Context) {
             ?.getDisplay(Display.DEFAULT_DISPLAY)
             ?.rotation
             ?: Surface.ROTATION_0
-
-    private fun smoothAngle(previous: Double, target: Double): Double {
-        val previousRad = Math.toRadians(previous)
-        val targetRad = Math.toRadians(target)
-        val x = previousRad.let { cos(it) } * (1 - SMOOTHING) + cos(targetRad) * SMOOTHING
-        val y = previousRad.let { sin(it) } * (1 - SMOOTHING) + sin(targetRad) * SMOOTHING
-        return QiblaEngine.normalise(Math.toDegrees(atan2(y, x)))
-    }
 
     private companion object {
         /**

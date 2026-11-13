@@ -77,12 +77,12 @@ class RamadanPdfRangeTest {
     }
 
     @Test
-    fun `the Timetable's first month is the PDF's This month, so screen and file cannot disagree`() {
+    fun `the Timetable's week starts on the day the PDF's month contains, so screen and file cannot disagree`() {
         val today = LocalDate.of(2027, 2, 22)
-        val first = TimetableList.months(today).first()
         val span = PrayerPdfExporter.spanOf(Range.THIS_MONTH, today, prefs)
-        assertEquals(span.start, first.first)
-        assertEquals(span.days, first.length)
+        assertEquals(today, TimetableList.days(today).first())
+        assertEquals(LocalDate.of(2027, 2, 1), span.start)
+        assertEquals(28, span.days)
     }
 
     @Test

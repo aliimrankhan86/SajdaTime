@@ -2,7 +2,7 @@
 <!--
   Today strip (1.6 step 8): the five prayers in one row, 4 cells by 1. minHeight is 40dp and not the plan's
   60dp because launchers that size a widget by 70n minus 30 round a 60dp minimum up to two cells, which would
-  land the strip as 4 by 2 there; 40dp is one cell everywhere, and the layout fits it (widget_strip.xml).
+  land the strip as 4 by 2 there; 40dp is one cell everywhere, and the layout fits it on Android 12 and later (widget_strip.xml); below that it can be cut at 40 to 45dp.
   The file is named widget_today_strip_info.xml, as BUILD-INSTRUCTIONS, DETAILED-PLAN 8.11 and GAP-REVIEW-1
   all say; STEP-8-DESIGN section 14 item 11.
 -->
@@ -12,7 +12,8 @@
     android:initialLayout="@layout/widget_strip"
     android:minWidth="250dp"
     android:minHeight="40dp"
-    android:minResizeWidth="250dp"
+    android:minResizeWidth="110dp"
+    android:maxResizeHeight="150dp"
     android:minResizeHeight="40dp"
     android:previewImage="@drawable/widget_preview_strip"
     android:previewLayout="@layout/widget_strip"

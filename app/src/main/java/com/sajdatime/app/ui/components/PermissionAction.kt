@@ -17,6 +17,8 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.rounded.WarningAmber
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -39,6 +41,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.foundation.clickable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -127,14 +130,51 @@ fun PermissionCard(
     // DESIGN_SYSTEM §4 forbids; the user did the right thing and needs no badge for it
     // (research F21, 17 Oct 2026). Onboarding keeps its "Allowed" line via PermissionButton.
     if (granted) return
-    Notice(
-        title = title,
-        brief = body,
-        icon = icon,
-        actionLabel = stringResource(R.string.action_allow),
-        actionSpokenAs = title,
-        onAction = onClick,
-        onDismiss = onDismiss,
-        modifier = modifier,
-    )
+    // 1.7.0 (Ali, 3 Nov 2026: the amber card "takes too much space" and looks bad): a single row, not a card.
+    // An amber tile with the icon, the title and one line under it, and a compact solid amber Allow at the end.
+    // The X (Times only) is the one close, after the button.
+    val scheme = MaterialTheme.colorScheme
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth().heightIn(min = 56.dp),
+    ) {
+        Box(
+            Modifier.size(36.dp).clip(RoundedCornerShape(10.dp)).background(scheme.tertiaryContainer),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, contentDescription = null, tint = scheme.onTertiaryContainer, modifier = Modifier.size(20.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        val allow = stringResource(R.string.action_allow)
+        // Kind B compact: solid amber, 40dp drawn, 48dp to touch.
+        val allowButton: @Composable () -> Unit = {
+            Button(
+                onClick = onClick,
+                colors = ButtonDefaults.buttonColors(containerColor = scheme.tertiary, contentColor = scheme.onTertiary),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.heightIn(min = 40.dp).semantics { contentDescription = "$allow, $title" },
+            ) {
+                Text(allow, style = actionLabelStyle())
+            }
+        }
+        // At 1.5 text and above the button drops under the words, so the title does not wrap word by word.
+        val stacked = androidx.compose.ui.platform.LocalDensity.current.fontScale >= 1.5f
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = scheme.onSurface)
+            Text(body, style = MaterialTheme.typography.bodySmall, color = scheme.onSurfaceVariant)
+            if (stacked) {
+                Spacer(Modifier.height(Space.Related))
+                allowButton()
+            }
+        }
+        if (!stacked) {
+            Spacer(Modifier.width(12.dp))
+            allowButton()
+        }
+        if (onDismiss != null) {
+            IconButton(onClick = onDismiss) {
+                Icon(Icons.Outlined.Close, contentDescription = stringResource(R.string.action_close))
+            }
+        }
+    }
 }

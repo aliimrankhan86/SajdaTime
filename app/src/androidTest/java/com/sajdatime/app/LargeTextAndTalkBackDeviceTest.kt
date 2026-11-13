@@ -1,15 +1,23 @@
 package com.sajdatime.app
 
+import android.content.res.Configuration
+import java.util.Locale
+
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.SemanticsActions
@@ -20,12 +28,16 @@ import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.hasNoClickAction
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -35,8 +47,11 @@ import com.sajdatime.app.ui.home.DayCard
 import com.sajdatime.app.ui.home.LocationHeader
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.ui.UiState
-import com.sajdatime.app.data.CompassAccuracy
+import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.app.ui.qibla.QiblaBody
+import com.sajdatime.app.ui.qibla.QiblaScreen
+import com.sajdatime.app.ui.components.LocalBottomBarClearance
+import com.sajdatime.app.ui.theme.Space
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import com.sajdatime.core.NextPrayer
@@ -108,10 +123,73 @@ class LargeTextAndTalkBackDeviceTest {
 
     @Test
     fun the_tab_labels_never_split_a_word_at_the_largest_text() {
-        atText(2f) { GlassTabBar(current = Destination.SETTINGS, onSelect = {}) }
-        assertWhole(word(R.string.nav_settings))
+        var labelPadding = 0f
+        atText(2f) {
+            labelPadding = with(LocalDensity.current) { Space.Tight.toPx() }
+            GlassTabBar(current = Destination.SETTINGS, onSelect = {})
+        }
+        val settings = word(R.string.nav_settings)
+        assertWhole(settings)
+        val settingsTab = compose.onNode(hasText(settings) and hasClickAction()).fetchSemanticsNode()
+        val labelWidthLimit = layoutOf(settings).layoutInput.constraints.maxWidth
+        assertTrue(
+            "Settings label width limit ${labelWidthLimit}px must leave ${labelPadding}px per edge in ${settingsTab.size.width}px",
+            labelWidthLimit <= settingsTab.size.width - 2f * labelPadding + 2f,
+        )
         // The fourth tab (1.6.0): its label must be there and whole at the same text size.
         assertWhole(word(R.string.nav_tracker))
+    }
+
+    @Test
+    fun the_longest_translated_tab_labels_fit_with_padding_at_double_text() {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val cases = listOf("id" to Destination.SETTINGS, "tr" to Destination.PRAYERS).map { (language, tab) ->
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(Locale.forLanguageTag(language))
+            context.createConfigurationContext(config).resources to tab
+        }
+        atText(2f) {
+            cases.forEach { (resources, tab) ->
+                CompositionLocalProvider(LocalResources provides resources) {
+                    GlassTabBar(current = tab, onSelect = {})
+                }
+            }
+        }
+        cases.forEach { (resources, tab) -> assertWhole(resources.getString(tab.labelRes)) }
+    }
+
+    @Test
+    fun qibla_details_scrolls_clear_of_the_floating_bar_at_double_text() {
+        var barTop = 0f
+        var sectionGap = 0f
+        atText(2f) {
+            val density = LocalDensity.current
+            var barHeight by remember { mutableStateOf(0.dp) }
+            sectionGap = with(density) { Space.Section.toPx() }
+            Box(Modifier.width(320.dp).height(520.dp)) {
+                CompositionLocalProvider(LocalBottomBarClearance provides barHeight) {
+                    QiblaScreen(qiblaState(), onUseGps = {}, onSearchCity = {})
+                }
+                GlassTabBar(
+                    current = Destination.QIBLA,
+                    onSelect = {},
+                    modifier = Modifier.align(Alignment.BottomCenter).onSizeChanged {
+                        barHeight = with(density) { it.height.toDp() }
+                        barTop = with(density) { 520.dp.toPx() } - it.height
+                    },
+                )
+            }
+        }
+        compose.onNode(hasText(word(R.string.qibla_title)) and hasNoClickAction()).assertIsDisplayed()
+        val scrollBottom = compose.onNode(hasScrollAction()).fetchSemanticsNode().boundsInRoot.bottom
+        assertTrue("Qibla scroll viewport reaches ${scrollBottom}px, into the bar at ${barTop}px", scrollBottom <= barTop + 1f)
+        val root = compose.onRoot()
+        repeat(2) { root.performTouchInput { swipeUp(startY = height * 0.5f, endY = height * 0.14f) } }
+        val details = compose.onNode(hasText(word(R.string.notice_show_details)) and hasClickAction())
+        details.assertIsDisplayed()
+        val gap = barTop - details.fetchSemanticsNode().touchBoundsInRoot.bottom
+        assertTrue("Details touch target only clears the bar by ${gap}px (expected ${sectionGap}px)", gap + 2f >= sectionGap)
+        assertWhole(word(R.string.nav_settings))
     }
 
     /**
@@ -154,7 +232,7 @@ class LargeTextAndTalkBackDeviceTest {
                 var minutes by remember { mutableIntStateOf(0) }
                 StepperRow(
                     label = "Fajr",
-                    value = if (minutes == 0) stringResource(R.string.adjustment_none) else stringResource(R.string.adjustment_minutes, minutes),
+                    value = if (minutes == 0) stringResource(R.string.adjustment_zero_minutes) else stringResource(R.string.adjustment_minutes, minutes),
                     canDecrease = true,
                     canIncrease = true,
                     onDecrease = { minutes-- },
@@ -163,7 +241,7 @@ class LargeTextAndTalkBackDeviceTest {
             }
         }
         val separator = word(R.string.list_separator)
-        compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.settings_adjustments_none))
+        compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.adjustment_zero_minutes))
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite))
         compose.onNodeWithContentDescription(word(R.string.action_increase, "Fajr")).performClick()
         compose.onNodeWithContentDescription("Fajr" + separator + word(R.string.adjustment_minutes, 1)).assertExists()
@@ -228,11 +306,15 @@ class LargeTextAndTalkBackDeviceTest {
         it.config.getOrNull(SemanticsProperties.ContentDescription)?.any { d -> d.startsWith(prefix) } == true
     }
 
-    /** At 2.0 on 320dp the name wins: the sky mark is not drawn and the city is whole (STEP-5-DESIGN section 4). */
+    /**
+     * At 2.0 the city is whole and the sky band is still there. Until b7886bc (3 Nov 2026) a small corner mark hid at this
+     * size (STEP-5-DESIGN section 4); the full width band that replaced it sits under the date line, so it needs no
+     * room from the name and stays at every text size. This test said the mark hides and had been failing since then.
+     */
     @Test
-    fun the_sky_mark_hides_at_the_largest_text_and_the_city_stays_whole() {
+    fun the_sky_band_stays_at_the_largest_text_and_the_city_stays_whole() {
         atText(2f) { LocationHeader(state = dawnState("London"), now = dawnState("London").now, onClick = {}, onOpenDates = {}) }
-        compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn))).assertDoesNotExist()
+        compose.onNode(hasDescriptionStartingWith(word(R.string.sky_dawn))).assertExists()
         assertWhole("London")
     }
 
@@ -297,7 +379,7 @@ class LargeTextAndTalkBackDeviceTest {
     fun the_qibla_key_stays_inside_the_screen_at_the_largest_text() {
         atText(2f) { QiblaBody(qiblaState(), onUseGps = {}, onSearchCity = {}) }
         val width = with(compose.density) { 320.dp.toPx() }
-        for (label in listOf(word(R.string.qibla_legend_kaaba), word(R.string.qibla_legend_facing))) {
+        for (label in listOf(word(R.string.qibla_legend_kaaba), word(R.string.qibla_legend_top))) {
             // The key clears its semantics, so its words are only in the unmerged tree.
             val node = compose.onNode(hasText(label), useUnmergedTree = true)
             node.assertIsDisplayed()

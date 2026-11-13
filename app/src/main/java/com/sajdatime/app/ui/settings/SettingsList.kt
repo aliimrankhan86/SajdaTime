@@ -1,10 +1,5 @@
 package com.sajdatime.app.ui.settings
 
-import com.sajdatime.app.ui.theme.Motion
-import com.sajdatime.app.ui.theme.Space
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.icons.outlined.StarOutline
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -12,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -26,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -42,6 +39,8 @@ import androidx.compose.material.icons.outlined.MailOutline
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PhoneAndroid
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,7 +58,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
@@ -71,16 +69,15 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.withLink
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.TextLinkStyles
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
@@ -88,6 +85,8 @@ import com.sajdatime.app.ui.components.BottomBarClearance
 import com.sajdatime.app.ui.components.ScreenTitle
 import com.sajdatime.app.ui.components.WholeWords
 import com.sajdatime.app.ui.components.scaledLineHeight
+import com.sajdatime.app.ui.theme.Motion
+import com.sajdatime.app.ui.theme.Space
 import com.sajdatime.app.ui.theme.ThemeChoice
 import com.sajdatime.app.ui.theme.sajdaSurface
 import kotlin.math.roundToInt
@@ -106,11 +105,11 @@ import kotlin.math.roundToInt
  *  - Section titles in sentence case, grey: the capitals were letterspaced green shouting.
  *  - "Free, forever", "Made by" and "Data and libraries" fold behind their titles, because
  *    About was eight equal rows of paragraphs and read like a document, not a menu.
- *  - The theme is a sliding three way selector, not three chips that looked like filters.
+ *  - The theme is a two way choice: Follow phone, or the opposite of the phone's mode (Dark or Light).
  *
  * Rejected: no cards at all ("Clean Minimal": grouping then rests on spacing alone, and its
  * stock segmented button wrapped "Follow phone" at a large font); a green summary card for the
- * prayer setup ("Premium Contemporary": primaryContainer means next prayer and facing the
+ * prayer setup ("Premium Contemporary": primaryContainer means the current prayer and facing the
  * Qibla, and using it here dilutes that). Screenshots of all three: HANDOVER §11.
  */
 
@@ -332,7 +331,7 @@ private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, ti
 }
 
 /**
- * Light, dark, or follow the phone, as one choice with a thumb that slides to it.
+ * Follow the phone, or the opposite of the phone's mode, as one choice with a thumb that slides to it.
  *
  * Here rather than in a dialog because, unlike every other setting, the result is visible the
  * instant it is tapped. Each option is a radio button to a screen reader and the set is one
@@ -343,13 +342,21 @@ private fun FoldRow(item: SettingsItem.Link, leading: @Composable () -> Unit, ti
 @Composable
 private fun ThemeSelector(current: ThemeChoice, onSelect: (ThemeChoice) -> Unit) {
     val scheme = MaterialTheme.colorScheme
-    val options = ThemeChoice.entries
+    // Two choices: Follow phone (the default), and the opposite of what the phone shows right now,
+    // so the second button reads Dark on a light phone and Light on a dark one. Once a mode is picked
+    // the second button keeps that mode's name, so the label always matches what the app shows.
+    val other = when (current) {
+        ThemeChoice.SYSTEM -> if (isSystemInDarkTheme()) ThemeChoice.LIGHT else ThemeChoice.DARK
+        else -> current
+    }
+    val options = listOf(ThemeChoice.SYSTEM, other)
     val labels = mapOf(
         ThemeChoice.SYSTEM to R.string.theme_system,
         ThemeChoice.LIGHT to R.string.theme_light,
         ThemeChoice.DARK to R.string.theme_dark,
     )
-    val position by animateFloatAsState(options.indexOf(current).toFloat(), Motion.standard(), label = "thumb")
+    val selectedIndex = options.indexOf(current)
+    val position by animateFloatAsState(maxOf(selectedIndex, 0).toFloat(), Motion.standard(), label = "thumb")
     var width by remember { mutableIntStateOf(0) }
     val inset = 4.dp
     val insetPx = with(LocalDensity.current) { inset.roundToPx() }

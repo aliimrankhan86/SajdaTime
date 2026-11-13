@@ -10,19 +10,19 @@ Android, widgets and Wear OS. It must work for the masses: an old phone, no sign
 a setting, a user who cannot read English, and right-to-left readers (Arabic, Urdu).
 
 Read before you answer: `CLAUDE.md`, `docs/design-system/README.md` and the pages it points to for the job (tokens, components, patterns, screens, iPhone mapping, the new feature playbook), `docs/DESIGN_SYSTEM.md` (§0 first, then §4.1, §9, §10, §11), and for 1.6
-`docs/plans/2026-10-release-1.6.0/BUILD-INSTRUCTIONS.md` and the `DETAILED-PLAN.md` section for the step.
+`2026-10-release-1.6.0-BUILD-INSTRUCTIONS.md` (Drive, 03 Plans and decisions) and the `DETAILED-PLAN.md` section for the step.
 
 **What Ali has already decided and given you. Build on it; never start from a blank page or a generic template.**
 Ali, 23 Oct 2026: "we have already defined the design system and everything, and I've provided all the references
 as well ... so Fable can use it and create a better user journey, user experience, user interface for me."
 - The design system: `docs/DESIGN_SYSTEM.md` (Quiet Glass §8, colour §1, spacing §2, type §3, components §4, Wear
   §6, every past decision and why §9, open questions §11). It outranks any outside advice or skill.
-- The 1.6 references Ali gave: the Pillars study (`docs/plans/2026-10-release-1.6.0/PILLARS-STUDY.md`, layout and
+- The 1.6 references Ali gave: the Pillars study (`2026-10-release-1.6.0-PILLARS-STUDY.md` (Drive, 03 Plans and decisions), layout and
   UX thinking only, never its look or artwork), the independent UX guidance `UX.md`, the earlier review
   `FABLE-REVIEW.md`, the ten user journeys word for word in `DETAILED-PLAN.md` §6.1 with the wording pass §6.2 and
   languages §7, his 27 answers in `BUILD-INSTRUCTIONS.md` §3, and the screens in that folder's `screens/`.
-- What he chose before, as pictures: `docs/plans/2026-10-widget-redesign/` (the hero countdown widget he picked from
-  three designs, and `RESEARCH.md`), `docs/plans/2026-10-times-gloss/` (the Times screen gloss, solid buttons,
+- What he chose before, as pictures: `2026-10-widget-redesign-*` (Drive, 03 Plans and decisions) (the hero countdown widget he picked from
+  three designs, and `RESEARCH.md`), the Times gloss notes (Drive, 03 Plans and decisions; its pictures were not kept) (the Times screen gloss, solid buttons,
   dialogs and setup he approved), and `docs/store/screenshots/` (the app as users see it today).
 - Competitor and feature research: `docs/research/2026-10-next-release-features.md`.
 

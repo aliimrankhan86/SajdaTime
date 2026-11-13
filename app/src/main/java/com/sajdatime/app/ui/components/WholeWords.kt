@@ -18,16 +18,17 @@ import androidx.compose.ui.unit.em
  * 320dp wide phone at 2.0 "Settings" became "Setting" over "s" and "Follow phone" lost a letter
  * to each line; at 2.0 on an ordinary phone Indonesian "Pengaturan" and Turkish "Telefona uy"
  * did the same (emulator, 19 Oct 2026). Wrapping between words is fine and stays. Only a break
- * inside a word makes the size step down, a tenth at a time, to no less than 60% of [max] and
- * never below the label's size at the normal text size, so at the size people normally use
- * nothing changes at all. Pass the style's own size as [max], and the style through
+ * inside a word makes the size step down, a tenth at a time. The floor is the label's normal size
+ * unless its slot needs a smaller [minimumFractionOfNormal]. Pass the style's own size as [max], and the style through
  * [scaledLineHeight] so its line spacing shrinks with it.
  */
-data class WholeWords(private val max: TextUnit) : TextAutoSize {
+data class WholeWords(
+    private val max: TextUnit,
+    private val minimumFractionOfNormal: Float = 1f,
+) : TextAutoSize {
     override fun TextAutoSizeLayoutScope.getFontSize(constraints: Constraints, text: AnnotatedString): TextUnit {
-        // Never below the size it has at the phone's normal text size (DESIGN_SYSTEM §3), and never
-        // above max: at a Small text size 1 / fontScale is over 1, and the label grew (review, 19 Oct 2026).
-        val floor = max * maxOf(0.6f, minOf(1f, 1f / fontScale))
+        // Cap the floor at max: at Small text 1 / fontScale is over 1 and once made labels grow.
+        val floor = max * minOf(1f, 1f / fontScale) * minimumFractionOfNormal
         var size = max
         while (size > floor) {
             val layout = performLayout(constraints, text, size)

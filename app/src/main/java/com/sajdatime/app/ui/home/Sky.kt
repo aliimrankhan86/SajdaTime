@@ -4,10 +4,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,13 +16,15 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
@@ -33,7 +34,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.sajdatime.app.R
@@ -49,24 +49,13 @@ import kotlin.math.sin
 /*
  * The skies of Times (1.6, step 5; docs/plans/2026-10-release-1.6.0/STEP-5-DESIGN.md). A fixed
  * three stop sky behind the header and the next prayer card, and a small mark at the end of the
- * city row: a glyph for the period riding an arc of five dots, the five prayers.
+ * city row: a glyph for the period riding an arc of five dots, the five prayers. Since 1.7 it is
+ * the full width band [SkyBand] under the date line.
  */
 
 
 // Once per process the passed arc draws in (Q11); later returns to Times start at the end.
 private var skyDrawn = false
-
-private val MarkWidth = 104.dp
-private val MarkHeight = 36.dp
-private val GlyphSize = 18.dp
-
-// The arc: chord 96dp, ends at y 28, apex at y 12 -> radius 80dp, centre (52, 92).
-private const val ARC_RADIUS = 80f
-private const val ARC_CENTRE_X = 52f
-private const val ARC_CENTRE_Y = 92f
-private val ARC_HALF_ANGLE = asin(48f / ARC_RADIUS) // radians, half the arc's sweep
-private val ARC_LENGTH = ARC_RADIUS * 2f * ARC_HALF_ANGLE // dp
-private const val GAP_TO_GLYPH = 11f // the glyph's 9dp radius plus a 2dp gap
 
 /**
  * The sky's colours as a lambda read inside the draw. On a period change they cross-fade over
@@ -121,25 +110,34 @@ internal fun Modifier.skyBackdrop(colours: () -> SkyColours): Modifier = drawBeh
 
 /** The period's glyph: the app's own widget drawings (Ali chose them over the row icons, 24 Oct 2026, Q2). */
 @Composable
-private fun SkyGlyph(period: SkyPeriod, tint: Color, modifier: Modifier) {
+private fun skyGlyphPainter(period: SkyPeriod): Painter {
     val drawable = when (period) {
         SkyPeriod.DAWN -> R.drawable.widget_glyph_fajr
         SkyPeriod.DAY -> R.drawable.sky_glyph_day
         SkyPeriod.EVENING -> R.drawable.widget_glyph_maghrib
         SkyPeriod.NIGHT -> R.drawable.widget_glyph_isha
     }
-    Icon(painterResource(drawable), contentDescription = null, tint = tint, modifier = modifier)
+    return painterResource(drawable)
 }
 
-/** Angle from the arc's vertical, in radians, at [u] (0 Fajr end, 1 Isha end) along the arc. */
-private fun arcAngle(u: Float) = -ARC_HALF_ANGLE + u * 2f * ARC_HALF_ANGLE
+private val BandHeight = 52.dp
+private val BandInset = 20.dp // arc ends this far from each side
+private val DiscSize = 32.dp
+private val GlyphSize = 20.dp
+private val TickSize = 8.dp
+private const val RISE = 20f // dp, ends to apex
+private const val ENDS_Y = 34f // dp from the band's top
+private const val GAP_TO_MARKER = 18f // the disc's 16dp radius plus a 2dp gap
 
 /**
- * The sky mark: one spoken node, never actionable. [progress] is [com.sajdatime.core.Sky.progress];
- * [spoken] is built by the caller in composition ("Dawn, until 7:40 am").
+ * The sky band (1.7, design G, Ali 3 Nov 2026: the old corner mark was "too small and easier to miss"): a full width
+ * arc under the date line, five ticks for the five prayers, and a lit disc with the period's glyph riding it at
+ * [progress] ([com.sajdatime.core.Sky.progress], 0 Fajr end, 1 Isha end). Ticks already reached are filled, ticks
+ * to come are rings, so the difference is not colour alone. One spoken node ([spoken], "Day, until 3:12 pm"),
+ * never actionable, no words drawn. Right to left mirrors once, in x, as the old mark did.
  */
 @Composable
-internal fun SkyMark(period: SkyPeriod, progress: Float, spoken: String, modifier: Modifier = Modifier) {
+internal fun SkyBand(period: SkyPeriod, progress: Float, spoken: String, modifier: Modifier = Modifier) {
     val scheme = MaterialTheme.colorScheme
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val drawIn = remember { Animatable(if (skyDrawn) 1f else 0f) }
@@ -149,59 +147,70 @@ internal fun SkyMark(period: SkyPeriod, progress: Float, spoken: String, modifie
             drawIn.animateTo(1f, Motion.draw())
         }
     }
-    val arcInk = scheme.onSurfaceVariant
-    val passedInk = scheme.primary
-    // AbsoluteAlignment.TopLeft: the default TopStart puts the glyph at the right edge in right to left,
-    // and the mirrored absoluteOffset would then add on top of it (review, 24 Oct).
-    Box(
-        modifier.size(MarkWidth, MarkHeight).semantics { contentDescription = spoken },
-        contentAlignment = AbsoluteAlignment.TopLeft,
-    ) {
+    val glyph = skyGlyphPainter(period)
+    val track = scheme.onSurfaceVariant
+    val ink = scheme.primary
+    val paper = scheme.surface
+    Box(modifier.fillMaxWidth().height(BandHeight).semantics { contentDescription = spoken }) {
         Canvas(Modifier.fillMaxSize().clearAndSetSemantics {}) {
             val d = density
-            val r = ARC_RADIUS * d
-            // The circle's centre sits on the mark's vertical axis, so mirroring leaves its box where it is.
-            val topLeft = Offset((ARC_CENTRE_X - ARC_RADIUS) * d, (ARC_CENTRE_Y - ARC_RADIUS) * d)
-            fun sweep(u0: Float, u1: Float, ink: Color, width: Dp) {
+            val chord = size.width - 2 * BandInset.toPx()
+            val rise = RISE * d
+            val r = chord * chord / (8f * rise) + rise / 2f
+            val half = asin(chord / 2f / r)
+            val cx = size.width / 2f
+            val cy = (ENDS_Y - RISE) * d + r // circle centre; apex sits at y = ENDS_Y - RISE
+            fun angle(u: Float) = -half + u * 2f * half
+            fun sweep(u0: Float, u1: Float, colour: Color, width: Dp) {
                 // Mirroring once: in right to left the angle flips about the arc's vertical axis.
-                val a = if (rtl) -arcAngle(u1) else arcAngle(u0)
-                val b = if (rtl) -arcAngle(u0) else arcAngle(u1)
+                val a = if (rtl) -angle(u1) else angle(u0)
+                val b = if (rtl) -angle(u0) else angle(u1)
                 drawArc(
-                    color = ink,
-                    startAngle = (-90f + a * 180f / PI.toFloat()),
+                    color = colour,
+                    startAngle = -90f + a * 180f / PI.toFloat(),
                     sweepAngle = (b - a) * 180f / PI.toFloat(),
                     useCenter = false,
-                    topLeft = topLeft,
+                    topLeft = Offset(cx - r, cy - r),
                     size = Size(2 * r, 2 * r),
                     style = Stroke(width = width.toPx(), cap = StrokeCap.Round),
                 )
             }
-            sweep(0f, 1f, arcInk, 1.5.dp)
+            fun point(u: Float): Offset {
+                val th = angle(u)
+                val x = cx + r * sin(th)
+                return Offset(if (rtl) size.width - x else x, cy - r * cos(th))
+            }
             val shown = progress * drawIn.value
-            val passedEnd = shown - GAP_TO_GLYPH / ARC_LENGTH
-            if (passedEnd > 0f) sweep(0f, passedEnd, passedInk, 2.5.dp)
+            val arcLength = r * 2f * half
+            sweep(0f, 1f, track, 1.5.dp)
+            val passedEnd = shown - GAP_TO_MARKER * d / arcLength
+            if (passedEnd > 0f) sweep(0f, passedEnd, ink, 3.dp)
             for (i in 0..4) {
-                val th = arcAngle(i / 4f)
-                val x = (ARC_CENTRE_X + ARC_RADIUS * sin(th)) * d
-                val y = (ARC_CENTRE_Y - ARC_RADIUS * cos(th)) * d
-                drawCircle(arcInk, radius = 2.dp.toPx(), center = Offset(if (rtl) size.width - x else x, y))
+                val u = i / 4f
+                val at = point(u)
+                if (u <= shown) {
+                    drawCircle(ink, radius = TickSize.toPx() / 2f, center = at)
+                } else {
+                    drawCircle(paper, radius = TickSize.toPx() / 2f, center = at)
+                    drawCircle(track, radius = TickSize.toPx() / 2f, center = at, style = Stroke(1.5.dp.toPx()))
+                }
+            }
+            val m = point(shown)
+            val glow = 30.dp.toPx()
+            drawCircle(
+                Brush.radialGradient(
+                    0f to ink.copy(alpha = 0.32f), 0.6f to ink.copy(alpha = 0.10f), 1f to Color.Transparent,
+                    center = m, radius = glow,
+                ),
+                radius = glow,
+                center = m,
+            )
+            drawCircle(paper, radius = DiscSize.toPx() / 2f, center = m)
+            drawCircle(ink, radius = DiscSize.toPx() / 2f, center = m, style = Stroke(1.5.dp.toPx()))
+            val g = GlyphSize.toPx()
+            translate(m.x - g / 2f, m.y - g / 2f) {
+                with(glyph) { draw(Size(g, g), colorFilter = ColorFilter.tint(ink)) }
             }
         }
-        SkyGlyph(
-            period = period,
-            tint = passedInk,
-            modifier = Modifier
-                .size(GlyphSize)
-                .absoluteOffset {
-                    val th = arcAngle(progress * drawIn.value)
-                    val x = (ARC_CENTRE_X + ARC_RADIUS * sin(th)).dp.toPx()
-                    val y = (ARC_CENTRE_Y - ARC_RADIUS * cos(th)).dp.toPx()
-                    val half = GlyphSize.toPx() / 2f
-                    // The one mirror: absoluteOffset does not flip with the layout direction.
-                    val mx = if (rtl) MarkWidth.toPx() - x else x
-                    IntOffset((mx - half).toInt(), (y - half).toInt())
-                }
-                .clearAndSetSemantics {},
-        )
     }
 }

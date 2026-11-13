@@ -8,6 +8,7 @@ import com.sajdatime.core.HijriDay
 import com.sajdatime.core.NextPrayer
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.currentForDisplay
 import com.sajdatime.core.Sky
 import com.sajdatime.core.SkyPeriod
 import java.time.Instant
@@ -63,6 +64,8 @@ data class WidgetState(
      * the range the calendar covers, and the header then shows the ordinary date alone.
      */
     val date: LocalDate? = null,
+    /** The prayer the app highlights as Now (PrayerEngine.currentPrayer), or null when none is current. */
+    val current: PrayerSlot? = null,
     val hijri: HijriDay? = null,
     /**
      * The saved place label exactly as the Times screen holds it ("London, United Kingdom"), and
@@ -88,7 +91,11 @@ data class WidgetState(
     val period: SkyPeriod = SkyPeriod.DAY,
 ) {
     /** The Times screen's rule: the next prayer, and only if it is still today. Sunrise is never next. */
-    fun isHighlighted(slot: PrayerSlot): Boolean = next != null && slot == next.slot && !next.isTomorrow
+    /**
+     * The row the widgets highlight is the current prayer, the same row the Times screen highlights (Ali,
+     * 4 Nov 2026: the widgets and the app must agree). Null between sunrise and Dhuhr, when nothing is current.
+     */
+    fun isHighlighted(slot: PrayerSlot): Boolean = current != null && slot == current
 
     /** "Suhoor ends" for a Fajr and "Iftar" for a Maghrib on a Ramadan day, nothing otherwise. */
     fun ramadanWordFor(slot: PrayerSlot, ramadanOnThatDay: Boolean): RamadanWord? =
@@ -142,6 +149,9 @@ data class WidgetState(
             val next = PrayerEngine.nextPrayer(coordinates, prefs, now, zone)
             val nextDate = next.at.atZone(zone).toLocalDate()
             val labels = settings.ramadanCardEnabled
+            // Nothing is current before today's Fajr: the engine's answer is yesterday's Isha, not on today's list.
+            val rawCurrent = PrayerEngine.currentPrayer(coordinates, prefs, now, zone)
+            val current = currentForDisplay(rawCurrent, now, today[PrayerSlot.FAJR])
             return WidgetState(
                 hasLocation = true,
                 today = today,
@@ -156,7 +166,8 @@ data class WidgetState(
                 cityName = settings.cityName,
                 usingDefaultLocation = settings.usingDefaultLocation,
                 theme = settings.themeChoice,
-                period = Sky.periodOf(PrayerEngine.currentPrayer(coordinates, prefs, now, zone)),
+                period = Sky.periodOf(rawCurrent),
+                current = current,
             )
         }
 

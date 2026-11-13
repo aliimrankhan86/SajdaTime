@@ -31,6 +31,7 @@
     <string name="wear_madhab_note">صرف عصر بدلتی ہے۔ حنفی عصر بعد میں ہے۔</string>
     <string name="wear_qibla_needs_location">قبلہ معلوم کرنے کے لیے اپنا مقام مقرر کریں</string>
     <string name="wear_qibla_facing">رخ خانہ کعبہ کی طرف ہے</string>
+    <string name="wear_qibla_calibrate">اپنی گھڑی کو 8 کی شکل میں گھمائیں۔</string>
     <string name="wear_qibla_bearing">%1$d°</string>
     <string name="wear_qibla_from_true_north">اصل شمال سے</string>
     <string name="wear_duration_h_m">%1$d گھنٹے %2$d منٹ</string>

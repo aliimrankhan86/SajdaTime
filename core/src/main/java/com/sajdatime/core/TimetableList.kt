@@ -3,20 +3,19 @@ package com.sajdatime.core
 import java.time.LocalDate
 import kotlin.math.floor
 
-/** One Gregorian month of the Timetable sheet: its first day and how many days it has. */
-data class TimetableMonth(val first: LocalDate, val length: Int)
-
-/** What the Timetable sheet lists (STEP-4-DESIGN §9). Plain rules, so the screen only draws them. */
+/**
+ * What the Timetable sheet lists. Plain rules, so the screen only draws them.
+ *
+ * Today and the six days after it (Ali, 12 Nov 2026: "the timetable should show only the timing of the
+ * next 7 days. The save as pdf should have for the whole month"). Until then it listed this month and the
+ * next, about sixty cards, to answer a question most people ask about this week. The month lives in the
+ * PDF, which is the form people print and pin up.
+ */
 object TimetableList {
-    /** This month, then the next: a sheet opened on the 31st must show tomorrow. */
-    fun months(today: LocalDate, count: Int = 2): List<TimetableMonth> =
-        (0 until count).map {
-            val first = today.withDayOfMonth(1).plusMonths(it.toLong())
-            TimetableMonth(first, first.lengthOfMonth())
-        }
+    const val DAYS = 7
 
-    /** Index of today's card in a list laid out as [heading, days..., heading, days...]. */
-    fun todayIndex(today: LocalDate): Int = today.dayOfMonth
+    /** The days the sheet shows, today first. They run across a month end without ceremony. */
+    fun days(today: LocalDate): List<LocalDate> = (0 until DAYS).map { today.plusDays(it.toLong()) }
 }
 
 /** How many times sit across one day card, so a time is never cut and a word never breaks. */

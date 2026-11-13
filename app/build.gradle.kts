@@ -67,8 +67,8 @@ android {
         //
         // 10 / 1.6.0, 25 Oct 2026: My prayers tracker, bells, Timetable, jama'ah times, skies, the
         // widget strip. Phone only: the watch stays 1002 / 1.5.0 (docs/plans/2026-10-release-1.6.0/).
-        versionCode = 10
-        versionName = "1.6.0"
+        versionCode = 11
+        versionName = "1.7.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
@@ -329,4 +329,12 @@ dependencies {
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // The same empty activity for the sideload build, but only while the device tests are being run on
+    // the owner's phone (`-PtestBuildType=sideload`): a plain `installSideload` stays what ships, plus the
+    // suffix. Without it every test that draws its own screen fails there with "Unable to resolve
+    // activity" (12 Nov 2026). The release script's phone step passes the property too, so the copy it
+    // installs carries this one extra empty activity; nothing else differs.
+    if (providers.gradleProperty("testBuildType").orNull == "sideload") {
+        "sideloadImplementation"(libs.androidx.ui.test.manifest)
+    }
 }

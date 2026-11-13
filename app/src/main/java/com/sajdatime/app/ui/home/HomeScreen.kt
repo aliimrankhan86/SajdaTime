@@ -10,6 +10,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -42,6 +45,7 @@ import androidx.compose.material.icons.rounded.Brightness6
 import androidx.compose.material.icons.rounded.Mosque
 import androidx.compose.material.icons.rounded.NightsStay
 import androidx.compose.material.icons.rounded.NotificationsOff
+import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.WbTwilight
 import androidx.compose.material3.AlertDialog
@@ -65,14 +69,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -116,6 +126,7 @@ import com.sajdatime.core.HijriCalendar
 import com.sajdatime.core.JamaahResult
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.WindowTarget
 import com.sajdatime.core.Sect
 import com.sajdatime.core.Sky
 import com.sajdatime.core.SkyPeriod
@@ -137,6 +148,7 @@ fun HomeScreen(
     onDismissRamadanNotice: (hijriYear: Int) -> Unit,
     onDismissEid: (code: Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
+    onSetHijriOffset: (Int) -> Unit,
     /** Opens Settings with the named chooser already showing. See [SettingsChooser]. */
     onOpenSetting: (SettingsChooser) -> Unit,
     /** A user's tap on a prayer's bell: the prayer and whether it is now on (MainScaffold shows the message). */
@@ -157,6 +169,14 @@ fun HomeScreen(
     var explaining by rememberSaveable { mutableStateOf(false) }
     var ramadanInfo by rememberSaveable { mutableStateOf(false) }
     var islamicDates by rememberSaveable { mutableStateOf(false) }
+    var exactDialog by rememberSaveable { mutableStateOf(false) }
+    if (exactDialog) {
+        val context = LocalContext.current
+        ExactAlarmDialog(
+            onAllow = { exactDialog = false; PrayerAlarmScheduler.requestExactAlarmPermission(context) },
+            onClose = { exactDialog = false; onDismissExactAlarmNotice() },
+        )
+    }
     val exportSheetState = rememberModalBottomSheetState()
     // Full height at once: it is a table of thirty rows, and a half open sheet shows five of them.
     val timetableSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -259,7 +279,6 @@ fun HomeScreen(
             Modifier.padding(horizontal = 16.dp).readingWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-        DefaultLocationBanner(state, onFix = { locationSheet = true })
         PolarBanner(state)
         // Below the two banners that say the times may be for the wrong place or approximate,
         // so a card of suhoor and iftar times is never the first thing read about a doubtful
@@ -273,10 +292,9 @@ fun HomeScreen(
             state = state,
             onOpenInfo = { ramadanInfo = true },
             onOpenTimetable = { timetable = true },
-            onShiftDate = { onOpenSetting(SettingsChooser.ADJUSTMENTS) },
+            onShiftDate = { onOpenSetting(SettingsChooser.ISLAMIC_DATES) },
             onDismissNotice = onDismissRamadanNotice,
         )
-        ExactAlarmBanner(state, onDismiss = onDismissExactAlarmNotice)
         NotificationsBanner(visible = notificationsWarning, onAllow = onAllowNotifications, onDismiss = onDismissNotificationsNotice)
         Spacer(Modifier.height(Space.Group))
         TodayTimeline(
@@ -286,6 +304,8 @@ fun HomeScreen(
             onBell = onBell,
             snapBell = snapBell,
             notificationsBlocked = notificationsBlocked,
+            exactWarning = exactWarning,
+            onExactAlarm = { exactDialog = true },
         )
         WhyTheseTimes(state)
         MosqueDifferenceDoor(
@@ -321,7 +341,7 @@ fun HomeScreen(
             onDismiss = { ramadanInfo = false },
             onOpenDateShift = {
                 ramadanInfo = false
-                onOpenSetting(SettingsChooser.ADJUSTMENTS)
+                onOpenSetting(SettingsChooser.ISLAMIC_DATES)
             },
             onHideCard = {
                 ramadanInfo = false
@@ -330,27 +350,32 @@ fun HomeScreen(
         )
     }
 
+    // Save as PDF makes the whole month (Ali, 12 Nov 2026). With nothing else to offer that is one tap;
+    // when the Ramadan PDF is on offer too, the chooser shows the two.
+    val savePdf = {
+        if (ramadanExportYear != null) exportSheet = true else onExport(PrayerPdfExporter.Range.THIS_MONTH)
+    }
     if (timetable) {
         if (ramadanView) {
             RamadanTimetableSheet(
                 state = state,
                 sheetState = timetableSheetState,
-                // The chooser, not the Ramadan PDF straight away: this table is now the only door to
-                // Save as PDF in Ramadan, and Today, 7 days and the month must stay reachable (Q7; Ali,
-                // 24 Oct 2026, "Show the choices"). The chooser offers Ramadan too in Ramadan.
-                onExport = { exportSheet = true },
+                // The chooser, not the Ramadan PDF straight away: this table is the only door to Save as
+                // PDF in Ramadan, and the month must stay reachable beside the Ramadan PDF (Q7; Ali, 24 Oct
+                // 2026, "Show the choices").
+                onExport = savePdf,
                 onShiftDate = {
                     timetable = false
-                    onOpenSetting(SettingsChooser.ADJUSTMENTS)
+                    onOpenSetting(SettingsChooser.ISLAMIC_DATES)
                 },
                 onDismiss = { timetable = false },
             )
         } else {
-            // The chooser below opens over this sheet and the sheet stays after a save.
+            // The sheet stays after a save.
             TimetableSheet(
                 state = state,
                 sheetState = timetableSheetState,
-                onExport = { exportSheet = true },
+                onExport = savePdf,
                 onDismiss = { timetable = false },
             )
         }
@@ -361,10 +386,7 @@ fun HomeScreen(
             today = state.today?.date ?: state.now.atZone(ZoneId.systemDefault()).toLocalDate(),
             offsetDays = state.settings.calculationPrefs.hijriOffset,
             sect = state.settings.sect,
-            onShiftDate = {
-                islamicDates = false
-                onOpenSetting(SettingsChooser.ADJUSTMENTS)
-            },
+            onSetOffset = onSetHijriOffset,
             onDismiss = { islamicDates = false },
         )
     }
@@ -432,68 +454,71 @@ internal fun LocationHeader(state: UiState, now: Instant, onClick: () -> Unit, o
     // green meaning tappable, and no extra caret). The 6dp the whole row used to have above and
     // below is split between them, so the header is no taller than the date line's own target.
     Column(Modifier.fillMaxWidth().padding(top = Space.Tight)) {
-        // The sky mark (step 5) sits at the end of this row as a sibling of the clickable city, never inside
-        // it: clickable merges its descendants, so a mark inside would be read as part of "London, Change
-        // location" and a tap on it would open the sheet. It hides when the name needs the room (Sky.markFits).
-        BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val density = LocalDensity.current
-            val measurer = rememberTextMeasurer()
-            val style = MaterialTheme.typography.headlineMedium
-            val nameWidth = remember(city, style, density) { measurer.measure(city, style, maxLines = 1).size.width.toFloat() }
-            val today = state.today
-            val showMark = today != null &&
-                Sky.markFits(nameWidth, constraints.maxWidth.toFloat(), density.density, density.fontScale)
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .weight(1f, fill = !showMark)
-                        .clip(RoundedCornerShape(16.dp))
-                        .clickable(role = Role.Button, onClick = onClick)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                        .semantics { contentDescription = spokenLocation },
-                ) {
-                    Text(
-                        text = city,
-                        style = MaterialTheme.typography.headlineMedium,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        // A long town name, or one in a tall script, shrinks before it is cut short.
-                        autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
-                        modifier = Modifier.weight(1f, fill = false),
-                    )
-                    Spacer(Modifier.width(2.dp))
-                    // A name alone reads as a label. The green caret is what says "you can change
-                    // this", which is the single most common thing a traveller needs.
-                    Icon(
-                        Icons.Rounded.ArrowDropDown,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp),
-                    )
-                }
-                if (showMark && today != null) {
-                    val context = LocalContext.current
-                    val period = Sky.periodOf(state.current)
-                    // Once a minute, not on the clock's every second tick.
-                    val minute = now.epochSecond / 60
-                    val progress = remember(minute, today) { Sky.progress(now, today.prayersOnly) }
-                    val periodName = stringResource(
-                        when (period) {
-                            SkyPeriod.DAWN -> R.string.sky_dawn
-                            SkyPeriod.DAY -> R.string.sky_day
-                            SkyPeriod.EVENING -> R.string.sky_evening
-                            SkyPeriod.NIGHT -> R.string.sky_night
-                        },
-                    )
-                    val end = Sky.endOf(period, today, now, state.next?.takeIf { it.slot == PrayerSlot.FAJR }?.at)
-                    val spoken = end?.let { stringResource(R.string.sky_now_a11y, periodName, TimeFormat.clock(context, it)) } ?: periodName
-                    Spacer(Modifier.width(8.dp))
-                    SkyMark(period = period, progress = progress, spoken = spoken)
+        // 1.7.0 (Option 2, Ali 3 Nov 2026): while the times are Makkah's because no location is set, the prompt is
+        // a button beside the title it is about, not a card between the hero and Today. FlowRow drops it under the
+        // city when the name is long or the text is large.
+        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+        FlowRow(
+            verticalArrangement = Arrangement.Center,
+            itemVerticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(16.dp))
+                    .clickable(role = Role.Button, onClick = onClick)
+                    .padding(horizontal = 4.dp, vertical = 2.dp)
+                    .semantics { contentDescription = spokenLocation },
+            ) {
+                Text(
+                    text = city,
+                    style = MaterialTheme.typography.headlineMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    // A long town name, or one in a tall script, shrinks before it is cut short.
+                    autoSize = shrinkToFit(MaterialTheme.typography.headlineMedium.fontSize),
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                Spacer(Modifier.width(2.dp))
+                // A name alone reads as a label. The green caret is what says "you can change
+                // this", which is the single most common thing a traveller needs.
+                Icon(
+                    Icons.Rounded.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(28.dp),
+                )
+            }
+            if (state.settings.usingDefaultLocation) {
+                CtaButton(onClick = onClick, compact = true, modifier = Modifier.padding(start = 4.dp)) {
+                    Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(Modifier.width(Space.Related))
+                    Text(stringResource(R.string.action_set_location))
                 }
             }
         }
         DateLine(now, state.settings.hijriOffsetDays, onOpenDates)
+        // The sky band (1.7, design G): where the day stands, a sibling of the two targets above, never inside one.
+        val today = state.today
+        if (today != null) {
+            val context = LocalContext.current
+            val period = Sky.periodOf(state.current)
+            // Once a minute, not on the clock's every second tick.
+            val minute = now.epochSecond / 60
+            val progress = remember(minute, today) { Sky.progress(now, today.prayersOnly) }
+            val periodName = stringResource(
+                when (period) {
+                    SkyPeriod.DAWN -> R.string.sky_dawn
+                    SkyPeriod.DAY -> R.string.sky_day
+                    SkyPeriod.EVENING -> R.string.sky_evening
+                    SkyPeriod.NIGHT -> R.string.sky_night
+                },
+            )
+            val end = Sky.endOf(period, today, now, state.next?.takeIf { it.slot == PrayerSlot.FAJR }?.at)
+            val spoken = end?.let { stringResource(R.string.sky_now_a11y, periodName, TimeFormat.clock(context, it)) } ?: periodName
+            SkyBand(period = period, progress = progress, spoken = spoken)
+        }
     }
 }
 
@@ -906,7 +931,9 @@ private fun ExportSheet(
             )
             Spacer(Modifier.height(Space.Group))
 
-            PrayerPdfExporter.Range.entries
+            // The month, and Ramadan when it is on offer. "Today only" and "The next 7 days" went on
+            // 12 Nov 2026 (Ali): the Timetable itself now shows the week, and the PDF is for the month.
+            listOf(PrayerPdfExporter.Range.THIS_MONTH, PrayerPdfExporter.Range.RAMADAN)
                 .filter { it != PrayerPdfExporter.Range.RAMADAN || ramadanYear != null }
                 .forEach { range ->
                     ExportOption(range = range, ramadanYear = ramadanYear, onClick = { onPick(range) })
@@ -922,10 +949,9 @@ private fun ExportSheet(
 @Composable
 private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onClick: () -> Unit) {
     val (titleRes, subtitleRes) = when (range) {
-        PrayerPdfExporter.Range.TODAY -> R.string.export_today to R.string.export_today_desc
-        PrayerPdfExporter.Range.NEXT_7_DAYS -> R.string.export_week to R.string.export_week_desc
-        PrayerPdfExporter.Range.THIS_MONTH -> R.string.export_month to R.string.export_month_desc
         PrayerPdfExporter.Range.RAMADAN -> R.string.export_ramadan to R.string.export_ramadan_desc
+        // The chooser offers no other range; the exporter still knows Today and 7 days (its tests use them).
+        else -> R.string.export_month to R.string.export_month_desc
     }
 
     Column(
@@ -948,19 +974,6 @@ private fun ExportOption(range: PrayerPdfExporter.Range, ramadanYear: Int?, onCl
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-}
-
-/** Says plainly that the times on screen are not for where the user actually is. */
-@Composable
-private fun DefaultLocationBanner(state: UiState, onFix: () -> Unit) {
-    if (!state.settings.usingDefaultLocation) return
-    Spacer(Modifier.height(Space.Group))
-    Notice(
-        title = stringResource(R.string.home_default_location_title),
-        brief = stringResource(R.string.home_default_location_body),
-        actionLabel = stringResource(R.string.action_set_location),
-        onAction = onFix,
-    )
 }
 
 /**
@@ -1008,24 +1021,26 @@ private fun PolarBanner(state: UiState) {
     )
 }
 
+/**
+ * Opens from the Fajr row's warning line. The X is the only way out (Ali, 3 Nov 2026: a "Close" under it made no
+ * sense beside the X). Closing hides the Fajr line for the day (`exactAlarmNoticeDismissed`), Settings keeps showing
+ * the problem. "Allow" goes to Android's own screen for exact alarms.
+ */
 @Composable
-private fun ExactAlarmBanner(state: UiState, onDismiss: () -> Unit) {
-    val context = LocalContext.current
-    val show = !PrayerAlarmScheduler.canScheduleExact(context) && !state.settings.exactAlarmNoticeDismissed
-
-    // No entrance; closing fades and folds away so the cards below do not jump (24 Oct 2026).
-    AnimatedVisibility(show, enter = EnterTransition.None, exit = fadeOut(Motion.quick()) + shrinkVertically(Motion.quick())) {
-        Column {
-            Spacer(Modifier.height(Space.Group))
-            PermissionCard(
-                title = stringResource(R.string.settings_exact_alarms_title),
-                body = stringResource(R.string.settings_exact_alarms_brief),
-                granted = false,
-                onClick = { PrayerAlarmScheduler.requestExactAlarmPermission(context) },
-                onDismiss = onDismiss,
-            )
-        }
-    }
+private fun ExactAlarmDialog(onAllow: () -> Unit, onClose: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onClose,
+        title = { DialogTitle(stringResource(R.string.settings_exact_alarms_title), onClose) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                ExplainerParagraph(stringResource(R.string.settings_exact_alarms_brief), first = true)
+                ExplainerParagraph(stringResource(R.string.exact_alarm_dialog_more))
+            }
+        },
+        confirmButton = {
+            CtaButton(onClick = onAllow, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.action_allow)) }
+        },
+    )
 }
 
 /**
@@ -1058,10 +1073,11 @@ internal fun TodayTimeline(
     onBell: (PrayerSlot, Boolean) -> Unit,
     snapBell: PrayerSlot?,
     notificationsBlocked: Boolean,
+    exactWarning: Boolean = false,
+    onExactAlarm: () -> Unit = {},
 ) {
     val today = state.today ?: return
     val context = LocalContext.current
-    val next = state.next
     val night = state.night
 
     // The heading and the Timetable button share one line (it was Save as PDF until 1.6.0; the PDF now
@@ -1110,6 +1126,23 @@ internal fun TodayTimeline(
 
     val scheme = MaterialTheme.colorScheme
     val slots = PrayerSlot.entries.filter { today.times[it] != null }
+    val duha = state.duha
+
+    // "Until Maghrib · 2h 14m" on the Now row (1.7.0). Whole minutes rounded up, never seconds, so the line
+    // changes once a minute. The window is only ever the next time on this list (CurrentWindow).
+    val window = state.window?.takeIf { it.current == state.current }
+    val remainingMinutes = if (window == null) 0L else (window.remaining(state.now).seconds + 59).coerceAtLeast(60) / 60
+    val timeLeftText = window?.let {
+        stringResource(
+            R.string.current_until,
+            windowTargetLabel(it.target),
+            if (remainingMinutes >= 60) {
+                stringResource(R.string.duration_h_m, remainingMinutes / 60, remainingMinutes % 60)
+            } else {
+                stringResource(R.string.duration_m, remainingMinutes)
+            },
+        )
+    }
 
     // During Ramadan, and only then, Fajr is also where suhoor ends and Maghrib is iftar. The
     // labels come from the same state as the card, so they start with day 1 on the user's own
@@ -1126,10 +1159,9 @@ internal fun TodayTimeline(
         slots.forEachIndexed { index, slot ->
             PrayerRow(
                 label = stringResource(slot.labelRes),
-                icon = slotIcon(slot),
+                icon = slotGlyph(slot),
                 quiet = !slot.isPrayer,
                 time = TimeFormat.clock(context, today.times.getValue(slot)),
-                isNext = next != null && slot == next.slot && !next.isTomorrow,
                 isCurrent = slot == state.current,
                 note = rowNote(
                     ramadan = when {
@@ -1139,20 +1171,44 @@ internal fun TodayTimeline(
                         else -> null
                     },
                     jamaah = state.jamaah[slot],
+                    timeLeft = if (slot == state.current) timeLeftText else null,
                 ),
+                description = if (exactWarning && slot == PrayerSlot.FAJR) {
+                    stringResource(R.string.home_fajr_exact_a11y, stringResource(slot.labelRes), TimeFormat.clock(context, today.times.getValue(slot)))
+                } else if (slot == state.current && window != null && state.jamaah[slot] == null &&
+                    !(ramadanView && (slot == PrayerSlot.FAJR || slot == PrayerSlot.MAGHRIB))
+                ) {
+                    stringResource(
+                        R.string.current_row_a11y,
+                        stringResource(slot.labelRes),
+                        TimeFormat.clock(context, today.times.getValue(slot)),
+                        windowTargetLabel(window.target),
+                        spokenDuration(remainingMinutes),
+                    )
+                } else {
+                    null
+                },
+                // 1.7.0: the exact alarm warning lives on the Fajr row, the alarm it endangers (Option 2).
+                warning = if (exactWarning && slot == PrayerSlot.FAJR) stringResource(R.string.home_fajr_exact_note) else null,
+                onClick = if (exactWarning && slot == PrayerSlot.FAJR) onExactAlarm else null,
                 trailing = {
                     if (slot.isPrayer) {
                         // A crossed bell keeps the style it had while it fades, so an alarm does not flip to a bell.
                         val style = state.settings.alertFor[slot]
+                        Box(contentAlignment = Alignment.TopEnd) {
                         Bell(
                             on = style != null,
                             alarm = (style ?: state.settings.lastAlertStyle[slot]) == AlertStyle.ALARM,
                             blocked = notificationsBlocked,
                             prayerName = stringResource(slot.labelRes),
-                            onNext = next != null && slot == next.slot && !next.isTomorrow,
+                            onNext = slot == state.current,
                             snap = snapBell == slot,
                             onChange = { on -> onBell(slot, on) },
                         )
+                        if (exactWarning && slot == PrayerSlot.FAJR) {
+                            Box(Modifier.offset(x = (-10).dp, y = 10.dp).size(8.dp).background(scheme.tertiary, CircleShape))
+                        }
+                        }
                     } else {
                         // Sunrise has no bell; the space keeps its time in line with the others.
                         Spacer(Modifier.width(48.dp))
@@ -1162,18 +1218,34 @@ internal fun TodayTimeline(
             if (index != slots.lastIndex || night != null) {
                 HorizontalDivider(color = scheme.outlineVariant)
             }
+            // 1.7.0: the optional Duha window, one dimmed row after Sunrise. Not a prayer row: no bell, never Now
+            // (the Duha row has no current state), no alert, not in the PDF, widgets or watch. Off by default, Sunni only (the ViewModel decides).
+            if (slot == PrayerSlot.SUNRISE && duha != null) {
+                val start = TimeFormat.clock(context, duha.start)
+                val end = TimeFormat.clock(context, duha.end)
+                PrayerRow(
+                    label = stringResource(R.string.duha_row),
+                    icon = painterResource(R.drawable.sky_glyph_day),
+                    quiet = true,
+                    time = start,
+                    isCurrent = false,
+                    note = stringResource(R.string.duha_until, end.replace(' ', '\u00A0')),
+                    description = stringResource(R.string.duha_row_a11y, start, end),
+                    trailing = { Spacer(Modifier.width(48.dp)) },
+                )
+                HorizontalDivider(color = scheme.outlineVariant)
+            }
         }
         // Islamic midnight and the last third of the night, one dimmed row after Isha (1.6.0). Not a prayer:
-        // no bell, never Next or Now, and no word that calls it a prayer time or a ruling.
+        // no bell, never Now, and no word that calls it a prayer time or a ruling.
         if (night != null) {
             val midnight = TimeFormat.clock(context, night.midnight)
             val lastThird = TimeFormat.clock(context, night.lastThirdStart)
             PrayerRow(
                 label = stringResource(R.string.night_midnight),
-                icon = Icons.Outlined.DarkMode,
+                icon = rememberVectorPainter(Icons.Outlined.DarkMode),
                 quiet = true,
                 time = midnight,
-                isNext = false,
                 isCurrent = false,
                 note = stringResource(R.string.night_last_third_from, lastThird.replace(' ', '\u00A0')),
                 description = stringResource(R.string.night_row_a11y, midnight, lastThird),
@@ -1189,7 +1261,7 @@ internal fun TodayTimeline(
  * window is never shown as a time: the line says "Check your jama'ah time" in the same height.
  */
 @Composable
-private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
+private fun rowNote(ramadan: String?, jamaah: JamaahResult?, timeLeft: String? = null): String? {
     val context = LocalContext.current
     val jamaahText = when (jamaah) {
         null -> null
@@ -1201,98 +1273,112 @@ private fun rowNote(ramadan: String?, jamaah: JamaahResult?): String? {
         )
         JamaahResult.Before, is JamaahResult.After -> stringResource(R.string.jamaah_check)
     }
-    return when {
+    val base = when {
         ramadan != null && jamaahText != null -> stringResource(R.string.settings_value_pair, ramadan, jamaahText)
         else -> ramadan ?: jamaahText
     }
+    // "Check your jama'ah time" wins: two warnings on one line is noise (Fable, DESIGN-A-B-C-F, A).
+    return when {
+        timeLeft == null || jamaah == JamaahResult.Before || jamaah is JamaahResult.After -> base
+        base == null -> timeLeft
+        else -> stringResource(R.string.settings_value_pair, base, timeLeft)
+    }
 }
+
+/** "2 hours 14 minutes" for a screen reader: "2h 14m" would be read as letters. */
+@Composable
+private fun spokenDuration(minutes: Long): String {
+    val h = (minutes / 60).toInt()
+    val m = (minutes % 60).toInt()
+    val hours = if (h > 0) pluralStringResource(R.plurals.duration_a11y_hours, h, h) else null
+    val mins = if (m > 0 || h == 0) pluralStringResource(R.plurals.duration_a11y_minutes, m, m) else null
+    return listOfNotNull(hours, mins).joinToString(" ")
+}
+
+/** The label of what the Now row counts to. Always a row the user can see in the list. */
+@Composable
+private fun windowTargetLabel(target: WindowTarget): String = stringResource(
+    when (target) {
+        WindowTarget.SUNRISE -> PrayerSlot.SUNRISE.labelRes
+        WindowTarget.DHUHR -> PrayerSlot.DHUHR.labelRes
+        WindowTarget.ASR -> PrayerSlot.ASR.labelRes
+        WindowTarget.MAGHRIB -> PrayerSlot.MAGHRIB.labelRes
+        WindowTarget.ISHA -> PrayerSlot.ISHA.labelRes
+        WindowTarget.FAJR -> PrayerSlot.FAJR.labelRes
+        WindowTarget.MIDNIGHT -> R.string.night_midnight
+    },
+)
 
 /**
  * One row of the day.
  *
- * Four states, and each is carried by more than colour, because this screen answers two
+ * Three states, and each is carried by more than colour, because this screen answers two
  * questions — what is coming, and what can I still pray — and a colour wash alone answers
  * neither for anyone on a greyscale display or a colour-blind palette:
  *
- *  - next    — highlighted surface, a 3dp accent bar down the leading edge, and a "Next"
- *              pill in words
- *  - current — a quieter lift off the card and a "Now" pill, deliberately softer than
- *              next: two loud rows next to each other and neither reads as the answer
+ *  - current — highlighted surface, a 3dp accent bar down the leading edge, and a "Now"
+ *              pill in words. 1.7.0: "Next" no longer marks a row on this screen (Ali, 4 Nov
+ *              2026: it added nothing); the countdown at the top already says what is next.
  *  - sunrise, and the night row (Midnight, 1.6.0) — dimmed and set in smaller type, because they are not
  *              prayers and should not compete with the five that are
  *  - the rest — plain
  *
- * `isNext` and `isCurrent` can never both be true for the same row — one time is in the
- * future and the other has passed — so the two treatments cannot stack and the `when`
- * chains below need no tie-break.
+ * `isCurrent` is the only highlight on this screen, so the `when` chains below need no tie-break.
  */
 @Composable
 private fun PrayerRow(
     label: String,
-    icon: ImageVector,
+    icon: Painter,
     /** Not a prayer (sunrise, midnight): smaller, dimmed, no bell. */
     quiet: Boolean,
     time: String,
-    isNext: Boolean,
     isCurrent: Boolean,
     note: String?,
     /** What a screen reader says for the whole row, when it is not the label and time read in turn. */
     description: String? = null,
+    /** A warning line under the note, amber family (exact alarms on Fajr); the row then opens the dialog. */
+    warning: String? = null,
+    onClick: (() -> Unit)? = null,
     /** The bell, after the time. Its 48dp target takes the row's end padding. */
     trailing: @Composable () -> Unit,
 ) {
     val scheme = MaterialTheme.colorScheme
-    val dimmed = quiet && !isNext
+    val dimmed = quiet && !isCurrent
 
     val background = when {
-        isNext -> scheme.primaryContainer
-        isCurrent -> scheme.surfaceContainerHigh
+        isCurrent -> scheme.primaryContainer
         dimmed -> scheme.surfaceContainerLow
         else -> Color.Transparent
     }
     val contentColor = when {
-        isNext -> scheme.onSurface
+        isCurrent -> scheme.onSurface
         dimmed -> scheme.onSurfaceVariant
         else -> scheme.onSurface
     }
-    val iconColor = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant
+    val iconColor = if (isCurrent) scheme.onPrimaryContainer else scheme.onSurfaceVariant
     val accent = scheme.primary
     val barWidth = with(LocalDensity.current) { 3.dp.toPx() }
     // The fill and the bar move to the next row over Motion.standard when a prayer passes (motion row 8,
     // step 5), read only inside drawBehind so nothing recomposes per frame. On open they start at the target.
     val fill by animateColorAsState(background, Motion.standard(), label = "rowFill")
-    val bar by animateColorAsState(if (isNext) accent else Color.Transparent, Motion.standard(), label = "rowBar")
+    val bar by animateColorAsState(if (isCurrent) accent else Color.Transparent, Motion.standard(), label = "rowBar")
 
     // At 1.5 text and above the pill and time drop under the name, as step 2's dates rows do: at 320dp and 2.0
     // the bell's 48dp squeezed the name until "Fajr" broke one letter a line (STEP-3-DESIGN §7). The bell
     // stays at the end either way. Below 1.5 the row is unchanged.
     val stacked = LocalDensity.current.fontScale >= 1.5f
     val markersAndTime: @Composable () -> Unit = {
-        if (isNext) {
-            // Not colour alone: the next prayer also carries a text marker.
-            Text(
-                text = stringResource(R.string.home_next_marker),
-                style = MaterialTheme.typography.labelMedium,
-                color = scheme.onPrimary,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(accent)
-                    .padding(horizontal = 9.dp, vertical = 3.dp),
-            )
-            Spacer(Modifier.width(10.dp))
-        }
         if (isCurrent) {
-            // Tonal rather than filled, so it reads as a note beside the loud "Next" pill
-            // instead of arguing with it. onSecondaryContainer/secondaryContainer is an
-            // already-asserted pair in ColorContrastTest, in both themes.
+            // 1.7.0: filled with the accent, as the Next pill was, because the Now pill is now the
+            // only marker on this screen (Ali, 4 Nov 2026). onPrimary on primary is the standard pair.
             val nowLabel = stringResource(R.string.home_now_marker_a11y)
             Text(
                 text = stringResource(R.string.home_now_marker),
                 style = MaterialTheme.typography.labelMedium,
-                color = scheme.onSecondaryContainer,
+                color = scheme.onPrimary,
                 modifier = Modifier
                     .clip(RoundedCornerShape(50))
-                    .background(scheme.secondaryContainer)
+                    .background(scheme.primary)
                     .padding(horizontal = 9.dp, vertical = 3.dp)
                     // "Now" alone is meaningless read aloud in a list of times.
                     .semantics { contentDescription = nowLabel },
@@ -1310,14 +1396,18 @@ private fun PrayerRow(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            // One stop for a screen reader: "Fajr, Next, 5:37 am", not three swipes (research D1).
+            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
+            // One stop for a screen reader: "Fajr, current prayer, 5:37 am", not three swipes (research D1).
             .semantics(mergeDescendants = true) { if (description != null) contentDescription = description }
             // drawBehind rather than a sibling Box: a full-height stripe next to a row
             // whose height is driven by the text needs intrinsic measurement, and this
             // gets the same pixels without asking the layout to measure twice.
             .drawBehind {
                 drawRect(fill)
-                drawRect(bar, size = Size(barWidth, size.height))
+                // The bar is on the leading edge: the left in left to right, the right in right to left (4 Nov 2026;
+                // Codex's Arabic and Urdu captures showed it stuck on the left).
+                val barX = if (layoutDirection == LayoutDirection.Rtl) size.width - barWidth else 0f
+                drawRect(bar, topLeft = Offset(barX, 0f), size = Size(barWidth, size.height))
             }
             // Vertical padding plus a floor, not a fixed height: at a large system font
             // size the row has to grow rather than crop the prayer name. 50, not 56, since
@@ -1331,14 +1421,18 @@ private fun PrayerRow(
             // fills the row's 50dp floor: 12dp above and below a 48dp target made every row 72dp and pushed
             // Isha under the tab bar on the 823dp frame (the tick, e98b2a6).
             .padding(start = 18.dp, end = 6.dp)
-            .padding(vertical = 1.dp),
+            .padding(vertical = if (note != null && warning != null) Space.Tight else 1.dp),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = iconColor,
-            modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
-        )
+        // One 21dp box for every row, so the names of Sunrise and Midnight start on the same line as the prayers
+        // (Opus audit, 3 Nov 2026: the smaller icon with the same gap put them 2.7dp left).
+        Box(Modifier.size(21.dp), contentAlignment = Alignment.Center) {
+            Icon(
+                painter = icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(if (dimmed) 18.dp else 21.dp),
+            )
+        }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
@@ -1350,24 +1444,38 @@ private fun PrayerRow(
                 },
                 color = contentColor,
             )
+            // 1.7.0 (F): on a quiet row at 1.5 text and above the time sits under the name and the note last.
+            // Note first put the midnight time under "Last third from 22:20", where it read as the last third's time.
+            // Nothing is shrunk: the caption is enlarged by the user, so it wraps (Ali, 3 Nov 2026).
+            if (stacked && quiet) {
+                Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
+            }
             // "Suhoor ends" under Fajr and "Iftar" under Maghrib in Ramadan. A second line and not
-            // a pill beside the name: the row already holds the name, a Next or Now marker and the
+            // a pill beside the name: the row already holds the name, a Now marker and the
             // time, and a third item squeezes them at 360dp.
             if (note != null) {
                 Text(
                     text = note,
                     style = MaterialTheme.typography.labelMedium,
                     // Both are contrast pairs ColorContrastTest asserts: onPrimaryContainer on the
-                    // highlighted row, onSurfaceVariant on the plain and the "Now" rows.
-                    color = if (isNext) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
+                    // highlighted (Now) row, onSurfaceVariant on the plain rows.
+                    color = if (isCurrent) scheme.onPrimaryContainer else scheme.onSurfaceVariant,
                 )
             }
-            if (stacked) {
+            if (warning != null) {
+                Text(
+                    text = warning,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Medium),
+                    // onTertiaryContainer is the accent family's own text: 7.39:1 on the highlighted row (Fable, D2).
+                    color = scheme.onTertiaryContainer,
+                )
+            }
+            if (stacked && !quiet) {
                 Row(verticalAlignment = Alignment.CenterVertically) { markersAndTime() }
             }
         }
         if (!stacked) {
-            // A gap so a long jama'ah note never touches the Next or Now pill (Fable, step 7 pictures).
+            // A gap so a long jama'ah note never touches the Now pill (Fable, step 7 pictures).
             // The note wraps one line earlier at 360dp instead, which STEP-7-DESIGN §3 allows.
             Spacer(Modifier.width(8.dp))
             markersAndTime()
@@ -1376,14 +1484,21 @@ private fun PrayerRow(
     }
 }
 
-private fun slotIcon(slot: PrayerSlot): ImageVector = when (slot) {
-    PrayerSlot.FAJR -> Icons.Rounded.Brightness3
-    PrayerSlot.SUNRISE -> Icons.Rounded.WbTwilight
-    PrayerSlot.DHUHR -> Icons.Rounded.WbSunny
-    PrayerSlot.ASR -> Icons.Rounded.Brightness5
-    PrayerSlot.MAGHRIB -> Icons.Rounded.Brightness6
-    PrayerSlot.ISHA -> Icons.Rounded.NightsStay
-}
+/**
+ * The same glyphs as the widgets, the Ramadan tiles and the sky band (Ali, 3 Nov 2026: "icons should be meaningful"): each one
+ * shows where the sun is at that time, so one prayer has one picture everywhere. Material's Brightness icons said nothing.
+ */
+@Composable
+private fun slotGlyph(slot: PrayerSlot): Painter = painterResource(
+    when (slot) {
+        PrayerSlot.FAJR -> R.drawable.widget_glyph_fajr
+        PrayerSlot.SUNRISE -> R.drawable.widget_glyph_sunrise
+        PrayerSlot.DHUHR -> R.drawable.widget_glyph_dhuhr
+        PrayerSlot.ASR -> R.drawable.widget_glyph_asr
+        PrayerSlot.MAGHRIB -> R.drawable.widget_glyph_maghrib
+        PrayerSlot.ISHA -> R.drawable.widget_glyph_isha
+    },
+)
 
 /**
  * Hijri date, e.g. "16 Safar 1448".

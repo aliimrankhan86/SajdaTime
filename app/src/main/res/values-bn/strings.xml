@@ -71,7 +71,7 @@
 
     <!-- Disclaimer. Never soften or shorten. The dua request lives only in its last paragraph. -->
     <string name="disclaimer_title">দায়মুক্তি</string>
-    <string name="disclaimer_body">SajdaTime একটি সহায়ক, কোনো ধর্মীয় কর্তৃপক্ষ নয়।\n\nএই সময়গুলো আমাকে কোনো মসজিদ, কোনো আলেম বা কোনো কর্তৃপক্ষ দেয়নি। আপনার ফোন সূর্যের অবস্থান থেকে এগুলো হিসাব করে, ইসলামি কর্তৃপক্ষ ও আলেমদের প্রকাশিত হিসাবের পদ্ধতি ব্যবহার করে। আমি মুফতি নই, আলিম নই, ফিকহের বিশেষজ্ঞও নই, এবং এই অ্যাপটি কৃত্রিম বুদ্ধিমত্তার সাহায্যে তৈরি। সফটওয়্যারে ত্রুটি থাকতে পারে, ফোনে ভুল অবস্থান বা ভুল ঘড়ি থাকতে পারে, ব্যাটারি বাঁচাতে গিয়ে ফোন অ্যালার্ট দেরিতে দিতে পারে, আর আমারও সহজেই ভুল হতে পারে।\n\nতাই অনুগ্রহ করে এখানে যা দেখছেন তা একটি হিসাব হিসেবে নিন, কোনো বিধান হিসেবে নয়। যেখানে SajdaTime আর আপনার মসজিদ একমত নয়, সেখানে আপনার মসজিদ অনুসরণ করুন। কোনো সময় বা দিক আপনার কাছে ঠিক মনে না হলে, বা আপনি নিশ্চিত না হলে, তাঁদের বা পরামর্শ দেওয়ার যোগ্য অন্য কাউকে জিজ্ঞেস করুন। অ্যাপটি বিনামূল্যে এবং যেমন আছে তেমনই দেওয়া হয়েছে, কোনো ওয়ারেন্টি ও নির্ভুলতার কোনো প্রতিশ্রুতি ছাড়া, তাই যেখানে একদম সঠিক হওয়া আপনার কাছে জরুরি, সেখানে অনুগ্রহ করে শুধু এর ওপর নির্ভর করবেন না।\n\nআপনি ঘড়ি ব্যবহার করলে, অনুগ্রহ করে এটিকে শেষ কথা নয়, একটি সুবিধা হিসেবে দেখুন। ঘড়ির কম্পাস ফোনের চেয়ে ছোট এবং আকাশ দেখার সুযোগ কম, আর এটি এমন অবস্থান থেকে কাজ করতে পারে যা আপনার ফোন কিছু সময় আগে পেয়েছিল। বিশেষ করে কিবলার জন্য, দুটির মধ্যে ফোনই বেশি নির্ভুল। যখন জরুরি, তখন ফোনে মিলিয়ে নিন।\n\nনামাজ কখন শুরু হয় তা নিয়ে সব মসজিদ একমত নয়। এশায় পার্থক্য সবচেয়ে বেশি। ব্রিটেনে ও তার আরও উত্তরে এক পদ্ধতি আর আরেক পদ্ধতির ব্যবধান এক ঘণ্টারও বেশি হতে পারে, কারণ আলেমরা আকাশের আভা মিলিয়ে যাওয়া ভিন্নভাবে মাপেন। আমি এর মীমাংসা করতে পারি না, আর অ্যাপটিও সে চেষ্টা করে না। এখানকার সময় আপনার মসজিদের সাথে না মিললে, তাঁরা কোন পদ্ধতি ব্যবহার করেন জিজ্ঞেস করুন এবং সেটিংসে, হিসাবের পদ্ধতি অংশে সেটি বেছে নিন। এরপরও কয়েক মিনিটের ব্যবধান থাকলে, “মসজিদের শুরুর সময়ের সাথে মেলান” দিয়ে প্রতিটি নামাজ এবং তারিখও হাতে ঠিক করতে পারবেন। যেখানে পার্থক্য থেকে যায়, সেখানে আপনার মসজিদ অনুসরণ করুন।\n\nআরেকটি কথা। এই অ্যাপ দেখায় কখন একটি নামাজের ওয়াক্ত শুরু হয়। তারপর আপনার মসজিদ জামাতের জন্য নিজস্ব সময় ঠিক করে, সাধারণত একটু পরে, তাই সেখানকার বোর্ড আর এখানকার সময় প্রায়ই আলাদা হবে। কোনোটিই ভুল নয়।\n\nআর একটি অনুরোধ, যদি সম্ভব হয়: অনুগ্রহ করে আপনার দোয়ায় আমাকে, আমার পরিবারকে এবং আমার মা বাবাকে স্মরণ রাখবেন।</string>
+    <string name="disclaimer_body">SajdaTime একটি সহায়ক, কোনো ধর্মীয় কর্তৃপক্ষ নয়।\n\nএই সময়গুলো আমাকে কোনো মসজিদ, কোনো আলেম বা কোনো কর্তৃপক্ষ দেয়নি। আপনার ফোন সূর্যের অবস্থান থেকে এগুলো হিসাব করে, ইসলামি কর্তৃপক্ষ ও আলেমদের প্রকাশিত হিসাবের পদ্ধতি ব্যবহার করে। আমি মুফতি নই, আলিম নই, ফিকহের বিশেষজ্ঞও নই, এবং এই অ্যাপটি কৃত্রিম বুদ্ধিমত্তার সাহায্যে তৈরি। সফটওয়্যারে ত্রুটি থাকতে পারে, ফোনে ভুল অবস্থান বা ভুল ঘড়ি থাকতে পারে, ব্যাটারি বাঁচাতে গিয়ে ফোন অ্যালার্ট দেরিতে দিতে পারে, আর আমারও সহজেই ভুল হতে পারে।\n\nতাই অনুগ্রহ করে এখানে যা দেখছেন তা একটি হিসাব হিসেবে নিন, কোনো বিধান হিসেবে নয়। যেখানে SajdaTime আর আপনার মসজিদ একমত নয়, সেখানে আপনার মসজিদ অনুসরণ করুন। কোনো সময় বা দিক আপনার কাছে ঠিক মনে না হলে, বা আপনি নিশ্চিত না হলে, তাঁদের বা পরামর্শ দেওয়ার যোগ্য অন্য কাউকে জিজ্ঞেস করুন। অ্যাপটি বিনামূল্যে এবং যেমন আছে তেমনই দেওয়া হয়েছে, কোনো ওয়ারেন্টি ও নির্ভুলতার কোনো প্রতিশ্রুতি ছাড়া, তাই যেখানে একদম সঠিক হওয়া আপনার কাছে জরুরি, সেখানে অনুগ্রহ করে শুধু এর ওপর নির্ভর করবেন না।\n\nআপনি ঘড়ি ব্যবহার করলে, অনুগ্রহ করে এটিকে শেষ কথা নয়, একটি সুবিধা হিসেবে দেখুন। ঘড়ির কম্পাস ফোনের চেয়ে ছোট এবং আকাশ দেখার সুযোগ কম, আর এটি এমন অবস্থান থেকে কাজ করতে পারে যা আপনার ফোন কিছু সময় আগে পেয়েছিল। বিশেষ করে কিবলার জন্য, দুটির মধ্যে ফোনই বেশি নির্ভুল। যখন জরুরি, তখন ফোনে মিলিয়ে নিন।\n\nনামাজ কখন শুরু হয় তা নিয়ে সব মসজিদ একমত নয়। এশায় পার্থক্য সবচেয়ে বেশি। ব্রিটেনে ও তার আরও উত্তরে এক পদ্ধতি আর আরেক পদ্ধতির ব্যবধান এক ঘণ্টারও বেশি হতে পারে, কারণ আলেমরা আকাশের আভা মিলিয়ে যাওয়া ভিন্নভাবে মাপেন। আমি এর মীমাংসা করতে পারি না, আর অ্যাপটিও সে চেষ্টা করে না। এখানকার সময় আপনার মসজিদের সাথে না মিললে, তাঁরা কোন পদ্ধতি ব্যবহার করেন জিজ্ঞেস করুন এবং সেটিংসে, হিসাবের পদ্ধতি অংশে সেটি বেছে নিন। এরপরও কয়েক মিনিটের ব্যবধান থাকলে, “মসজিদের শুরুর সময়ের সাথে মেলান” দিয়ে প্রতিটি নামাজ হাতে ঠিক করতে পারবেন। যেখানে পার্থক্য থেকে যায়, সেখানে আপনার মসজিদ অনুসরণ করুন।\n\nআরেকটি কথা। এই অ্যাপ দেখায় কখন একটি নামাজের ওয়াক্ত শুরু হয়। তারপর আপনার মসজিদ জামাতের জন্য নিজস্ব সময় ঠিক করে, সাধারণত একটু পরে, তাই সেখানকার বোর্ড আর এখানকার সময় প্রায়ই আলাদা হবে। কোনোটিই ভুল নয়।\n\nআর একটি অনুরোধ, যদি সম্ভব হয়: অনুগ্রহ করে আপনার দোয়ায় আমাকে, আমার পরিবারকে এবং আমার মা বাবাকে স্মরণ রাখবেন।</string>
 
     <!-- Home -->
     <string name="home_next_prayer">পরের নামাজ</string>
@@ -103,8 +103,6 @@
     <string name="home_countdown_a11y">%2$s পরে %1$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s। %2$s</string>
-    <string name="home_default_location_title">মক্কার সময়</string>
-    <string name="home_default_location_body">আপনার অবস্থান এখনো ঠিক করা হয়নি, তাই এই সময়গুলো মক্কার।</string>
     <string name="action_change_location">অবস্থান বদলান</string>
 
     <!-- Location sheet -->
@@ -119,15 +117,10 @@
     <!-- Prayer names are written inside timetable_day_a11y on purpose. -->
     <string name="action_timetable">সময়সূচি</string>
     <string name="timetable_title">সময়সূচি</string>
-    <string name="timetable_month_a11y">%1$s এর নামাজের সময়</string>
     <string name="timetable_day_a11y">%1$s। ফজর %2$s। সূর্যোদয় %3$s। যোহর %4$s। আসর %5$s। মাগরিব %6$s। এশা %7$s।</string>
     <string name="timetable_today_a11y">আজ, %1$s</string>
     <string name="export_sheet_title">আপনার সময়সূচি সেভ করুন</string>
     <string name="export_sheet_body">আমরা %1$s এর নামাজের সময়ের একটি PDF বানাব। তারপর আপনি এটি সেভ বা প্রিন্ট করতে, অথবা কাউকে পাঠাতে পারবেন।</string>
-    <string name="export_today">শুধু আজ</string>
-    <string name="export_today_desc">এক দিন, ছয়টি সময়</string>
-    <string name="export_week">পরের 7 দিন</string>
-    <string name="export_week_desc">আজ এবং তার পরের ছয় দিন</string>
     <string name="export_month">পুরো এই মাস</string>
     <string name="export_month_desc">মাসের 1 তারিখ থেকে শেষ পর্যন্ত প্রতিদিন</string>
     <string name="export_saved">ডাউনলোডে %1$s নামে সেভ হয়েছে</string>
@@ -153,15 +146,15 @@
     <string name="qibla_needs_location">কিবলা খুঁজতে আপনার অবস্থান দিন।</string>
     <string name="qibla_facing">আপনি এখন কাবার দিকে মুখ করে আছেন</string>
     <string name="qibla_heading_now">%1$d° দিকে মুখ</string>
-    <!-- The needle is the user: it points the way the phone points. -->
+    <!-- The hand points at the Kaaba; the fixed wedge marks the top of the phone. -->
     <string name="qibla_legend_kaaba">কাবা</string>
-    <string name="qibla_legend_facing">আপনি যেদিকে মুখ করে আছেন</string>
+    <string name="qibla_legend_top">আপনার ফোনের উপরের দিক</string>
     <string name="qibla_turn_left">বাঁয়ে %1$d° ঘুরুন</string>
     <string name="qibla_turn_right">ডানে %1$d° ঘুরুন</string>
     <string name="qibla_no_compass">প্রকৃত উত্তর থেকে %1$d° দিকে মুখ করুন</string>
     <string name="qibla_calibrate">কম্পাস ঠিক করা দরকার। ফোনটি হাতে ধরে কয়েকবার 8 এর আকারে ঘোরান।</string>
     <string name="qibla_sensor_missing">এই ফোনে কম্পাস নেই, তাই আমরা কোণটি বলতে পারি কিন্তু দিক দেখাতে পারি না।</string>
-    <string name="qibla_accuracy_medium">মাপ একটু নড়াচড়া করতে পারে। আরও স্থির ফলের জন্য ধাতু, চুম্বক ও স্পিকার থেকে দূরে সরে যান।</string>
+    <string name="qibla_accuracy_medium">আরও স্থির ফল পেতে ফোনটি 8 সংখ্যার মতো করে নাড়ান।</string>
 
     <!-- Settings -->
     <string name="title_settings">সেটিংস</string>
@@ -223,7 +216,7 @@
 
     <!-- Optional usage counts. The consent text must state the material facts in full. Never use the word for "tracking". -->
     <string name="consent_title">SajdaTime আরও ভালো করতে সাহায্য করবেন?</string>
-    <string name="consent_body">SajdaTime বিনামূল্যে এবং এতে কোনো বিজ্ঞাপন নেই। আপনি হ্যাঁ বললে, অ্যাপটি উন্নত করার জন্য এটি কিছু ব্যবহারের পরিসংখ্যান Google Analytics এ পাঠায়। এগুলো আপনার নামের সাথে নয়, একটি এলোমেলো আইডির সাথে যুক্ত, এবং যুক্তরাজ্যের বাইরে প্রক্রিয়া করা হতে পারে। বিস্তারিত রেকর্ড 14 মাস রাখা হয়।\n\nনামাজের অ্যাপ ব্যবহার আপনার বিশ্বাস সম্পর্কে কিছু প্রকাশ করতে পারে, তাই এটি আপনার পছন্দ, আর না বললে অ্যাপে কিছুই বদলায় না। SajdaTime কখনো আপনার GPS অবস্থান বা নামাজের সেটিংস পাঠায় না।\n\nআপনি হ্যাঁ না বলা পর্যন্ত কিছুই পাঠানো হয় না। যেকোনো সময় সেটিংস থেকে এটি বন্ধ করতে পারেন। এর দায়িত্বে আছেন আলী ইমরান খান, যিনি অ্যাপটি তৈরি করেছেন।</string>
+    <string name="consent_body">SajdaTime বিনামূল্যে, এতে কোনো বিজ্ঞাপন নেই এবং এটি একজন মানুষ তৈরি করেন। কিছু ব্যবহারের পরিসংখ্যান দেখায় কোন স্ক্রিন ভালো কাজ করছে আর মানুষ কোথায় আটকে যায়, যাতে সেগুলো ঠিক করা যায়। SajdaTime কখনো আপনার GPS অবস্থান বা নামাজের সেটিংস পাঠায় না।\n\nআপনি হ্যাঁ বললে পরিসংখ্যানগুলো Google Analytics এ যায়। এগুলো আপনার নামের সাথে নয়, একটি এলোমেলো আইডির সাথে যুক্ত, এবং যুক্তরাজ্যের বাইরে প্রক্রিয়া করা হতে পারে। বিস্তারিত রেকর্ড 14 মাস রাখা হয়।\n\nনামাজের অ্যাপ ব্যবহার আপনার বিশ্বাস সম্পর্কে কিছু প্রকাশ করতে পারে, তাই এটি আপনার পছন্দ, আর না বললে অ্যাপে কিছুই বদলায় না। আপনি হ্যাঁ না বলা পর্যন্ত কিছুই পাঠানো হয় না। যেকোনো সময় সেটিংস থেকে এটি বন্ধ করতে পারেন। এর দায়িত্বে আছেন আলী ইমরান খান, যিনি অ্যাপটি তৈরি করেছেন।</string>
     <string name="settings_language_title">ভাষা</string>
     <string name="language_unavailable">এই ফোনে নেই</string>
     <string name="language_phone">ফোনের ভাষা</string>
@@ -253,7 +246,7 @@
     <string name="about_data">ডেটা ও লাইব্রেরি</string>
     <string name="about_data_desc">নামাজের সময় Batoul Apps এর adhan-java (MIT) দিয়ে হিসাব করা হয়। শহর খোঁজায় Open-Meteo geocoding API ব্যবহার হয়, CC BY 4.0 লাইসেন্সে।</string>
     <string name="about_adhan">আজানের রেকর্ডিং</string>
-    <string name="about_adhan_desc">সুন্নি আজান: রেকর্ড করেছেন Adam-synagda, CC0।\nশিয়া আজান: কণ্ঠ দিয়েছেন Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0।\nদুটিই Wikimedia Commons থেকে।</string>
+    <string name="about_adhan_desc">সুন্নি আজান: রেকর্ড করেছেন Adam-synagda, CC0।\nশিয়া আজান: কণ্ঠ দিয়েছেন Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0।\nদুটিই Wikimedia Commons থেকে। দুটিই এই অ্যাপের জন্য ছোট করা হয়েছে।</string>
     <string name="about_adhan_link_source">সুন্নি আজানের উৎস</string>
     <string name="about_adhan_link_shia">শিয়া আজানের উৎস</string>
     <string name="about_adhan_link_licence">CC BY-SA 4.0 লাইসেন্স</string>
@@ -305,9 +298,11 @@
     <string name="settings_adjustments_reset">সব আগের মতো করুন</string>
     <string name="settings_hijri_offset">ইসলামি তারিখ</string>
     <string name="settings_hijri_offset_label">তারিখ সরান</string>
-    <string name="settings_hijri_offset_help">এখানকার ইসলামি তারিখ হিসাব করা। আপনার মসজিদ স্থানীয়ভাবে চাঁদ দেখলে, এক দিন আগে বা পরে হতে পারে। এতে রমজান ও ঈদও সরে যায়।</string>
     <!-- Shown when a prayer has no correction: the dash glyph, as in every other language. -->
-    <string name="adjustment_none">\u2014</string>
+    <string name="adjustment_zero_minutes">0 মিনিট</string>
+    <string name="adjustment_zero_days">0 দিন</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">এখন %1$s</string>
     <!-- Always signed: "+5 min", "-3 min". The sign is the information. -->
     <string name="adjustment_minutes">%+d মিনিট</string>
     <plurals name="adjustment_days">
@@ -318,7 +313,6 @@
         <item quantity="one">%dটি নামাজে পরিবর্তন</item>
         <item quantity="other">%dটি নামাজে পরিবর্তন</item>
     </plurals>
-    <string name="adjustment_summary_hijri">তারিখ %1$s</string>
     <!-- Quoted so Android keeps the trailing space. -->
     <string name="list_separator">", "</string>
     <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->
@@ -338,18 +332,7 @@
     <string name="ramadan_next_suhoor_tomorrow">আগামীকাল সাহরি শেষ %1$s</string>
     <string name="ramadan_month_ends_today">এই ক্যালেন্ডার অনুযায়ী আজ রমজানের শেষ দিন। আপনার মসজিদ ঈদের ঘোষণা দেবে।</string>
     <string name="ramadan_fast_length">আজকের রোজা %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">গতকালের চেয়ে %d মিনিট বেশি</item>
-        <item quantity="other">গতকালের চেয়ে %d মিনিট বেশি</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">গতকালের চেয়ে %d মিনিট কম</item>
-        <item quantity="other">গতকালের চেয়ে %d মিনিট কম</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">গতকালের সমান</string>
     <!-- Joins the fast length and the change. -->
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
-    <string name="ramadan_tomorrow_line">আগামীকাল: সাহরি শেষ %1$s, ইফতার %2$s</string>
     <string name="ramadan_info_a11y">রমজানের এই সময়গুলো সম্পর্কে</string>
     <string name="ramadan_info_title">রমজানের এই সময়গুলো সম্পর্কে</string>
     <string name="ramadan_info_calc">SajdaTime আপনার অবস্থানের জন্য হিসাব করা ফজর ও মাগরিব দেখায় এবং সেগুলোকে সাহরির শেষ ও ইফতারের সময় হিসেবে ধরে।</string>
@@ -403,7 +386,7 @@
     <string name="widget_next_label">SajdaTime: পরের নামাজ</string>
     <string name="widget_today_label">SajdaTime: আজকের নামাজ</string>
     <string name="widget_next_desc">পরের নামাজ ও তার সময়, বাকি সময়সহ।</string>
-    <string name="widget_today_desc">আজকের ছয়টি সময়, পরেরটি চিহ্নিত।</string>
+    <string name="widget_today_desc">আজকের ছয়টি সময়, এখনকারটি চিহ্নিত।</string>
     <string name="widget_tomorrow">আগামীকাল</string>
     <string name="widget_no_location">অবস্থান ঠিক করতে SajdaTime খুলুন</string>
     <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining. -->
@@ -415,7 +398,7 @@
     <string name="widget_suhoor_ends">সাহরি শেষ</string>
     <string name="widget_iftar">ইফতার</string>
     <string name="widget_strip_label">SajdaTime: এক সারিতে পাঁচ ওয়াক্ত</string>
-    <string name="widget_strip_desc">পাঁচ ওয়াক্ত নামাজ এক সারিতে, পরেরটি চিহ্নিত।</string>
+    <string name="widget_strip_desc">পাঁচ ওয়াক্ত নামাজ এক সারিতে, এখনকারটি চিহ্নিত।</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day. -->
     <string name="widget_strip_suhoor">সাহরি</string>
     <string name="widget_update_location">অবস্থান আপডেট করুন, %1$s</string>
@@ -529,17 +512,39 @@
         <item quantity="one">%d দিন পরে</item>
         <item quantity="other">%d দিন পরে</item>
     </plurals>
-    <string name="dates_footer">উম্মুল কুরা ক্যালেন্ডার, আপনার তারিখ সরানোসহ। স্থানীয়ভাবে চাঁদ দেখায় এক দিনের পার্থক্য হতে পারে।</string>
+    <string name="dates_footer">তারিখগুলো উম্মুল কুরা ক্যালেন্ডার অনুসারে। আপনার মসজিদ চাঁদ দেখলে, এক দিন আগে বা পরে হতে পারে। আপনার সরানো এখানকার প্রতিটি তারিখ সরায়, রমজান ও ঈদসহ।</string>
     <string name="dates_unavailable">এই বছরের ইসলামি তারিখ পাওয়া যাচ্ছে না।</string>
     <!-- Spoken only, for the date under the city on Times. -->
     <string name="dates_header_a11y">ইসলামি তারিখ। আজ %1$s</string>
     <string name="settings_islamic_dates">ইসলামি তারিখ</string>
     <string name="settings_islamic_dates_desc">রমজান, দুই ঈদ ও অন্যান্য গুরুত্বপূর্ণ তারিখ</string>
+    <string name="settings_islamic_dates_shifted">সরানো হয়েছে: %1$s</string>
     <string name="night_midnight">ইসলামি মধ্যরাত</string>
     <string name="night_last_third_from">শেষ তৃতীয়াংশ %1$s থেকে</string>
     <string name="night_row_a11y">ইসলামি মধ্যরাত %1$s। রাতের শেষ তৃতীয়াংশ %2$s থেকে।</string>
     <string name="settings_night_times">রাতের সময়</string>
     <string name="settings_night_times_desc">এশার নিচে ইসলামি মধ্যরাত ও রাতের শেষ তৃতীয়াংশ দেখায়</string>
+    <string name="current_until">%1$s পর্যন্ত · %2$s</string>
+    <string name="current_row_a11y">%1$s, বর্তমান নামাজ, %2$s, %3$s পর্যন্ত, %4$s</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="one">%d ঘণ্টা</item>
+        <item quantity="other">%d ঘণ্টা</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="one">%d মিনিট</item>
+        <item quantity="other">%d মিনিট</item>
+    </plurals>
+    <string name="action_hear_it">শুনুন</string>
+    <string name="action_stop">থামান</string>
+    <string name="preview_alarm_help">অ্যালার্মের ভলিউমে বাজে, অ্যালার্ট যেমন বাজবে।</string>
+    <string name="preview_notification_help">নোটিফিকেশনের ভলিউমে বাজে, অ্যালার্ট যেমন বাজবে।</string>
+    <string name="preview_alarm_muted">আপনার অ্যালার্মের ভলিউম কমানো, তাই শুনতে পাবেন না।</string>
+    <string name="preview_notification_silent">আপনার ফোন সাইলেন্টে আছে, তাই শুনতে পাবেন না।</string>
+    <string name="duha_row">চাশত</string>
+    <string name="duha_until">%1$s পর্যন্ত</string>
+    <string name="duha_row_a11y">চাশত %1$s থেকে %2$s পর্যন্ত।</string>
+    <string name="settings_duha">চাশত</string>
+    <string name="settings_duha_desc">সূর্যোদয়ের পর চাশতের (দুহা) সময় দেখায়: সূর্যোদয়ের প্রায় %1$d মিনিট পর থেকে যোহরের প্রায় %2$d মিনিট আগ পর্যন্ত</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">সমন্বয় করা</string>
     <string name="why_times_sunni">এই সময়গুলোতে %1$s এবং আসরের জন্য %2$s মাযহাব ব্যবহার করা হয়েছে।</string>
@@ -633,4 +638,16 @@
     <string name="notif_fast_ashura">আগামীকাল সুন্নত রোজা (আশুরা)। সাহরি শেষ হবে %1$s।</string>
     <string name="notif_fast_arafah">আগামীকাল সুন্নত রোজা (এই ক্যালেন্ডার অনুযায়ী আরাফার দিন)। দিনটির জন্য আপনার মসজিদ অনুসরণ করুন। সাহরি শেষ হবে %1$s।</string>
     <string name="notif_fast_shawwal">আগামীকাল সুন্নত রোজা (শাওয়ালের ছয় রোজার একটি)। সাহরি শেষ হবে %1$s।</string>
+    <string name="home_fajr_exact_note">ঠিক সময়ে বাজতে নাও পারে</string>
+    <string name="exact_alarm_dialog_more">Android এটি তার নিজস্ব স্ক্রিনে জিজ্ঞেস করে। পরে সেটিংসে বদলাতে পারবেন।</string>
+    <string name="tab_settings_attention_a11y">সেটিংস, মনোযোগ দরকার</string>
+    <string name="home_fajr_exact_a11y">%1$s, %2$s, ঠিক সময়ে বাজতে নাও পারে</string>
+    <string name="tasbeeh_title">তাসবিহ</string>
+    <string name="tasbeeh_count">গুনুন</string>
+    <string name="tasbeeh_reset">আবার শুরু করুন</string>
+    <string name="tasbeeh_target">লক্ষ্য: %1$d</string>
+    <string name="tasbeeh_no_target">কোনো লক্ষ্য নেই</string>
+    <string name="tasbeeh_rounds">রাউন্ড: %1$d</string>
+    <string name="tasbeeh_total">মোট: %1$d</string>
+    <string name="tasbeeh_state">%2$d এর মধ্যে %1$d</string>
 </resources>

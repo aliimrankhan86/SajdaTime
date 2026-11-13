@@ -10,6 +10,7 @@ import com.sajdatime.app.notify.PrayerAlarmScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 
@@ -20,8 +21,23 @@ import java.time.ZoneId
  */
 object WidgetUpdater {
 
+    /**
+     * One redraw at a time. Found 6 Nov 2026: device test `the_widgets_follow_the_apps_theme...` failed 2 runs in 52 with the old theme
+     * colours still on the widget 15s after a change. Most likely cause (plausible, NOT proven: nothing logged who pushed what): the
+     * provider's lifecycle redraw (bind, resize) reads the settings on a background thread, read the old theme just before the change
+     * and pushed just after the change's own redraw. The redraws now queue here, and the one that reads its own settings
+     * (`refreshAll(context)`, the provider's) reads them INSIDE the lock, so it can no longer be older than a redraw that went before it.
+     * 80 runs after, 0 failed (a weak result by itself: about 1 chance in 7 of that split with no effect).
+     * KNOWN GAP: the callers that pass their own settings (the alarm receivers, the worker, the view model) still read them before
+     * taking the lock, so one of those can still paint older settings over newer; the widget then corrects itself at the next redraw
+     * (the next prayer, a system event, or opening the app). Fixing that means moving every read inside the lock.
+     */
+    private val lock = Any()
+
     /** Redraws every placed instance. Returns true when at least one exists. */
-    fun refreshAll(context: Context, settings: AppSettings): Boolean {
+    fun refreshAll(context: Context, settings: AppSettings): Boolean = synchronized(lock) { redraw(context, settings) }
+
+    private fun redraw(context: Context, settings: AppSettings): Boolean {
         val manager = AppWidgetManager.getInstance(context) ?: return false
         val nextIds = manager.getAppWidgetIds(ComponentName(context, NextPrayerWidgetProvider::class.java))
         val todayIds = manager.getAppWidgetIds(ComponentName(context, TodayWidgetProvider::class.java))
@@ -62,8 +78,10 @@ object WidgetUpdater {
     }
 
     /** As above, reading the settings itself, for the callers that have none to hand. */
-    suspend fun refreshAll(context: Context): Boolean =
-        refreshAll(context, SettingsRepository(context).current())
+    suspend fun refreshAll(context: Context): Boolean = withContext(Dispatchers.IO) {
+        // ponytail: blocks one background thread for a DataStore read inside the lock. A Mutex (both versions suspend) would avoid that; every caller is already in a coroutine.
+        synchronized(lock) { redraw(context, kotlinx.coroutines.runBlocking { SettingsRepository(context).current() }) }
+    }
 
     /**
      * The lifecycle callbacks of the three providers arrive on the main thread inside onReceive, and reading

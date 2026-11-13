@@ -1,6 +1,5 @@
 package com.sajdatime.app.ui.settings
 
-import androidx.annotation.VisibleForTesting
 import com.sajdatime.app.ui.components.ctaIconButtonColors
 import com.sajdatime.app.ui.components.CtaButton
 import com.sajdatime.app.data.placeName
@@ -30,6 +29,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.selection.selectable
@@ -43,6 +43,8 @@ import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.WbSunny
+import com.sajdatime.core.DuhaWindow
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
@@ -190,6 +192,7 @@ fun SettingsScreen(
     onSetOngoingBadge: (Boolean) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
     onSetNightTimes: (Boolean) -> Unit,
+    onSetDuha: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
@@ -257,7 +260,7 @@ fun SettingsScreen(
     val prayerTimes = SettingsSection(
         SettingsSectionId.PRAYER_TIMES,
         stringResource(R.string.settings_group_prayer_times),
-        listOf(
+        listOfNotNull(
             SettingsItem.Link(
                 key = "location",
                 icon = Icons.Outlined.LocationOn,
@@ -309,7 +312,7 @@ fun SettingsScreen(
                 key = "adjustments",
                 icon = Icons.Outlined.MoreTime,
                 title = stringResource(R.string.settings_adjustments),
-                subtitle = adjustmentSummary(settings.adjustments, settings.hijriOffsetDays),
+                subtitle = adjustmentSummary(settings.adjustments),
                 onClick = { open = SettingsChooser.ADJUSTMENTS },
             ),
             // 1.6.0: the same sheet the date under the city opens, here for anyone who looks in
@@ -318,7 +321,13 @@ fun SettingsScreen(
                 key = "islamic_dates",
                 icon = Icons.Outlined.Event,
                 title = stringResource(R.string.settings_islamic_dates),
-                subtitle = stringResource(R.string.settings_islamic_dates_desc),
+                // The date shift is shown only once it is not zero, as the Jama'ah row does (ux-lead, 3 Nov 2026): it moved
+                // out of Match your mosque, and a shift set months ago would otherwise be visible only inside the sheet.
+                subtitle = if (settings.hijriOffsetDays == 0) {
+                    stringResource(R.string.settings_islamic_dates_desc)
+                } else {
+                    stringResource(R.string.settings_islamic_dates_shifted, dayLabel(settings.hijriOffsetDays))
+                },
                 onClick = { open = SettingsChooser.ISLAMIC_DATES },
             ),
             // 1.6.0: on for everyone, Times screen only (not the PDF, widgets or watch).
@@ -330,6 +339,21 @@ fun SettingsScreen(
                 checked = settings.nightTimesEnabled,
                 onCheckedChange = onSetNightTimes,
             ),
+            // 1.7.0: the optional Duha row. Off by default and Sunni only: classical Shia scholars hold it is not
+            // legislated, so showing the row would be the app taking a side (Fable, DESIGN-A-B-C-F, B).
+            // iPhone: carries over (SF Symbol sun.max).
+            SettingsItem.Toggle(
+                key = "duha",
+                icon = Icons.Outlined.WbSunny,
+                title = stringResource(R.string.settings_duha),
+                subtitle = stringResource(
+                    R.string.settings_duha_desc,
+                    DuhaWindow.START_AFTER_SUNRISE_MINUTES.toInt(),
+                    DuhaWindow.END_BEFORE_DHUHR_MINUTES.toInt(),
+                ),
+                checked = settings.duhaEnabled,
+                onCheckedChange = onSetDuha,
+            ).takeIf { settings.sect == Sect.SUNNI },
         ),
     )
 
@@ -375,6 +399,7 @@ fun SettingsScreen(
         defaultLabel = R.string.settings_notification_sound_default,
         onPickPhone = onPickNotificationSound,
         onPickBuiltIn = onPickBuiltInNotificationAdhan,
+        alarm = false,
     )
     val alarmSound = SoundChoice(
         sect = settings.sect,
@@ -382,6 +407,7 @@ fun SettingsScreen(
         defaultLabel = R.string.settings_alarm_sound_default,
         onPickPhone = onPickAlarmSound,
         onPickBuiltIn = onPickBuiltInAdhan,
+        alarm = true,
         respectsSilent = settings.alarmRespectsSilent,
         onSetRespectsSilent = onSetAlarmRespectsSilent,
     )
@@ -740,10 +766,8 @@ fun SettingsScreen(
             }
             AdjustmentsDialog(
                 adjustments = settings.adjustments,
-                hijriOffsetDays = settings.hijriOffsetDays,
                 calculated = calculated,
                 onSetAdjustment = onSetAdjustment,
-                onSetHijriOffset = onSetHijriOffset,
                 onReset = onResetAdjustments,
                 // One state variable holds the open chooser, so this closes this dialog as it
                 // opens the method list: the user is moved on, not stacked.
@@ -763,8 +787,7 @@ fun SettingsScreen(
             today = state.today?.date ?: LocalDate.now(),
             offsetDays = settings.calculationPrefs.hijriOffset,
             sect = settings.sect,
-            // One chooser open at a time: the sheet makes way for the date shift.
-            onShiftDate = { open = SettingsChooser.ADJUSTMENTS },
+            onSetOffset = onSetHijriOffset,
             onDismiss = { open = null },
         )
 
@@ -1440,6 +1463,8 @@ private class SoundChoice(
     @StringRes val defaultLabel: Int,
     val onPickPhone: () -> Unit,
     val onPickBuiltIn: (BuiltInAdhan) -> Unit,
+    /** True for the alarm sound, false for the notification sound: the preview plays through the same usage. */
+    val alarm: Boolean,
     val respectsSilent: Boolean = true,
     val onSetRespectsSilent: ((Boolean) -> Unit)? = null,
 )
@@ -1501,6 +1526,7 @@ private fun SoundChoices(sound: SoundChoice) {
             onSelect = sound.onPickPhone,
         )
     }
+    SoundPreview(uri = sound.uri, alarm = sound.alarm, respectsSilent = sound.respectsSilent)
     sound.onSetRespectsSilent?.let { PlayOnSilentRow(sound.respectsSilent, it) }
 }
 
@@ -1880,12 +1906,17 @@ private fun rememberRingtoneTitle(uri: String): String? {
 }
 
 /**
- * "Match your mosque": the per-prayer corrections and the Hijri date shift, in one place.
+ * "Match your mosque": the per-prayer corrections.
  *
- * They are one dialog rather than two rows because from where the user is standing they
- * answer one question — *my mosque says something different* — and splitting them would
- * make someone decide, before they had any information, whether their disagreement was
- * about minutes or about days.
+ * Until 3 Nov 2026 the Hijri date shift lived here too, on the argument that from where the user is
+ * standing both answer "my mosque says something different" and that asking them to choose between
+ * minutes and days first was unfair. Ali reversed that: Muslim Pro and Al Adhan keep the date shift with
+ * the dates, so it now sits at the foot of the Islamic dates sheet ([IslamicDatesSheet]) and every
+ * "Shift the date" button routes there. What was given up: the date shift is no longer visible from this
+ * dialog or its Settings summary. Do not move it back without asking him.
+ *
+ * Under each prayer is its calculated time and, once adjusted, "now" the corrected one, so a board time
+ * can be compared without leaving the dialog.
  *
  * Steppers rather than a text field or a slider. A field invites "12:45" into a box that
  * wants "5" and needs validation, an error state and a keyboard; a slider cannot be landed
@@ -1897,11 +1928,9 @@ private fun rememberRingtoneTitle(uri: String): String? {
 @Composable
 private fun AdjustmentsDialog(
     adjustments: Map<PrayerSlot, Int>,
-    hijriOffsetDays: Int,
     /** Today's uncorrected times, or null before there is a location to calculate for. */
     calculated: Map<PrayerSlot, Instant>?,
     onSetAdjustment: (PrayerSlot, Int) -> Unit,
-    onSetHijriOffset: (Int) -> Unit,
     onReset: () -> Unit,
     onChooseMethod: () -> Unit,
     onDismiss: () -> Unit,
@@ -1935,8 +1964,24 @@ private fun AdjustmentsDialog(
         PrayerSlot.entries.forEach { slot ->
             val minutes = adjustments[slot] ?: 0
             val label = slot.label(context)
+            // Calculated time, then "now" the corrected one when it differs: "5:50 pm · now 5:53 pm".
+            // Non breaking spaces keep "3:26 am" and "now 3:26 am" whole, so the line wraps only at the
+            // dot. Each part is bidi isolated: in Urdu the 12 hour clock starts with Latin "PM", which
+            // would otherwise set the whole line left to right and put "now" beside the wrong time.
+            val timeLine = calculated?.get(slot)?.let { at ->
+                val base = TimeFormat.clock(context, at, zone).noBreak().bidiIsolated()
+                if (minutes == 0) base else stringResource(
+                    R.string.settings_value_pair,
+                    base,
+                    stringResource(
+                        R.string.adjustment_now_time,
+                        TimeFormat.clock(context, at.plusSeconds(60L * minutes), zone).noBreak().bidiIsolated(),
+                    ),
+                )
+            }
             StepperRow(
                 label = label,
+                supporting = timeLine,
                 value = minuteLabel(minutes),
                 canDecrease = minutes > -CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
                 canIncrease = minutes < CalculationPrefs.MAX_ADJUSTMENT_MINUTES,
@@ -1954,33 +1999,13 @@ private fun AdjustmentsDialog(
             }
         }
 
-        HorizontalDivider(Modifier.padding(vertical = Space.Related))
-        SectionLabel(stringResource(R.string.settings_hijri_offset))
-        Text(
-            text = stringResource(R.string.settings_hijri_offset_help),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = Space.Group),
-        )
-        StepperRow(
-            label = stringResource(R.string.settings_hijri_offset_label),
-            value = dayLabel(hijriOffsetDays),
-            canDecrease = hijriOffsetDays > -CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
-            canIncrease = hijriOffsetDays < CalculationPrefs.MAX_HIJRI_OFFSET_DAYS,
-            onDecrease = { onSetHijriOffset(hijriOffsetDays - 1) },
-            onIncrease = { onSetHijriOffset(hijriOffsetDays + 1) },
-        )
-
-        if (adjustments.isNotEmpty() || hijriOffsetDays != 0) {
+        if (adjustments.isNotEmpty()) {
             // Its own row, full width (so centred), a Section below the steppers it resets: the
             // owner asked for it wider and easier to press (18 Oct 2026). Full width is also the
             // DESIGN_SYSTEM 4.1 rule for a button alone on its line.
             Spacer(Modifier.height(Space.Section))
             CtaButton(
-                onClick = {
-                    onReset()
-                    onSetHijriOffset(0)
-                },
+                onClick = onReset,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_adjustments_reset))
@@ -2138,7 +2163,6 @@ private fun TimeEntryDialog(
  * tap, so that is accepted (independent review, 19 Oct 2026).
  */
 @Composable
-@VisibleForTesting
 internal fun StepperRow(
     label: String,
     value: String,
@@ -2146,82 +2170,95 @@ internal fun StepperRow(
     canIncrease: Boolean,
     onDecrease: () -> Unit,
     onIncrease: () -> Unit,
+    /** A second line under the label, e.g. the prayer's time. */
+    supporting: String? = null,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Space.Tight),
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f),
-        )
-        FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
-            Icon(
-                Icons.Outlined.Remove,
-                contentDescription = stringResource(R.string.action_decrease, label),
-            )
+    // From 1.5x text the label and its time take the full width and the controls sit under them:
+    // beside the controls "Maghrib" broke mid word and "12:19 pm" onto two lines (emulator, 2x, 3 Nov 2026).
+    val stacked = LocalDensity.current.fontScale >= 1.5f
+    val labelBlock: @Composable (Modifier) -> Unit = { modifier ->
+        Column(modifier) {
+            Text(text = label, style = MaterialTheme.typography.bodyLarge)
+            if (supporting != null) {
+                Text(
+                    text = supporting,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
         }
-        // The language's own list comma: "، " in Urdu and Arabic.
-        val separator = stringResource(R.string.list_separator)
-        val spoken = if (value == stringResource(R.string.adjustment_none)) {
-            stringResource(R.string.settings_adjustments_none)
-        } else {
-            value
-        }
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            // Wide enough for "-30 min" so the plus button does not shuffle sideways as
-            // the number grows a digit or loses its sign.
-            modifier = Modifier
-                .width(64.dp)
-                .semantics {
-                    contentDescription = label + separator + spoken
-                    liveRegion = LiveRegionMode.Polite
-                },
-        )
-        FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
-            Icon(
-                Icons.Outlined.Add,
-                contentDescription = stringResource(R.string.action_increase, label),
+    }
+    // The language's own list comma: "، " in Urdu and Arabic.
+    val separator = stringResource(R.string.list_separator)
+    val controls: @Composable (Modifier) -> Unit = { modifier ->
+        Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            FilledIconButton(onClick = onDecrease, enabled = canDecrease, colors = ctaIconButtonColors()) {
+                Icon(
+                    Icons.Outlined.Remove,
+                    contentDescription = stringResource(R.string.action_decrease, label),
+                )
+            }
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                // At least wide enough for "-30 min" so the plus button does not shuffle sideways as
+                // the number grows a digit or loses its sign; it grows with the text size and never
+                // wraps ("0 min" broke onto two lines in a fixed 64dp box at 2x text, 3 Nov 2026).
+                softWrap = false,
+                modifier = Modifier
+                    .padding(horizontal = Space.Related)
+                    .widthIn(min = 64.dp)
+                    .semantics {
+                        contentDescription = label + separator + value
+                        liveRegion = LiveRegionMode.Polite
+                    },
             )
+            FilledIconButton(onClick = onIncrease, enabled = canIncrease, colors = ctaIconButtonColors()) {
+                Icon(
+                    Icons.Outlined.Add,
+                    contentDescription = stringResource(R.string.action_increase, label),
+                )
+            }
+        }
+    }
+    if (stacked) {
+        Column(Modifier.fillMaxWidth().padding(vertical = Space.Tight)) {
+            labelBlock(Modifier.fillMaxWidth())
+            Spacer(Modifier.height(Space.Related))
+            controls(Modifier.fillMaxWidth())
+        }
+    } else {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth().padding(vertical = Space.Tight),
+        ) {
+            labelBlock(Modifier.weight(1f))
+            controls(Modifier)
         }
     }
 }
 
-/** "+5 min", "-3 min", or a dash for no change. */
+private fun String.noBreak() = replace(' ', '\u00A0')
+
+/** "+5 min", "-3 min", or "0 min" for no change. */
 @Composable
 private fun minuteLabel(minutes: Int): String = when {
-    minutes == 0 -> stringResource(R.string.adjustment_none)
+    minutes == 0 -> stringResource(R.string.adjustment_zero_minutes)
     else -> stringResource(R.string.adjustment_minutes, minutes)
 }
 
-/** "+1 day", "-2 days", or a dash. Plural-aware, because Arabic and Urdu are not English. */
+/** "+1 day", "-2 days", or "0 days". Plural-aware, because Arabic and Urdu are not English. */
 @Composable
-private fun dayLabel(days: Int): String = when {
-    days == 0 -> stringResource(R.string.adjustment_none)
+internal fun dayLabel(days: Int): String = when {
+    days == 0 -> stringResource(R.string.adjustment_zero_days)
     else -> pluralStringResource(R.plurals.adjustment_days, abs(days), days)
 }
 
 /** The settings-row summary: what is set, without opening the dialog. */
 @Composable
-private fun adjustmentSummary(adjustments: Map<PrayerSlot, Int>, hijriOffsetDays: Int): String {
-    val parts = buildList {
-        val count = adjustments.count { it.value != 0 }
-        if (count > 0) add(pluralStringResource(R.plurals.adjustment_summary_times, count, count))
-        if (hijriOffsetDays != 0) {
-            add(
-                stringResource(
-                    R.string.adjustment_summary_hijri,
-                    pluralStringResource(R.plurals.adjustment_days, abs(hijriOffsetDays), hijriOffsetDays),
-                ),
-            )
-        }
-    }
-    return if (parts.isEmpty()) stringResource(R.string.settings_adjustments_none)
-    else parts.joinToString(stringResource(R.string.list_separator))
+private fun adjustmentSummary(adjustments: Map<PrayerSlot, Int>): String {
+    val count = adjustments.count { it.value != 0 }
+    return if (count == 0) stringResource(R.string.settings_adjustments_none)
+    else pluralStringResource(R.plurals.adjustment_summary_times, count, count)
 }

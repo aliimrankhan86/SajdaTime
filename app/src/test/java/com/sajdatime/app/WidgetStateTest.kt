@@ -83,22 +83,30 @@ class WidgetStateTest {
     }
 
     @Test
-    fun `before Fajr the next prayer is today's Fajr and only it is highlighted`() {
+    fun `before Fajr the next prayer is today's Fajr and nothing is highlighted, since no prayer is current yet`() {
         val state = build("2027-02-22", "04:00")
         assertTrue(state.hasLocation)
         assertEquals(PrayerSlot.FAJR, state.next!!.slot)
         assertFalse(state.next.isTomorrow)
-        for (slot in PrayerSlot.entries) {
-            assertEquals("$slot", slot == PrayerSlot.FAJR, state.isHighlighted(slot))
-        }
+        // Yesterday's Isha is the engine's current prayer here; it is not on today's list, so nothing is marked (4 Nov 2026, review).
+        for (slot in PrayerSlot.entries) assertFalse("$slot", state.isHighlighted(slot))
     }
 
     @Test
-    fun `after Isha the next prayer is tomorrow's Fajr and nothing is highlighted`() {
+    fun `just after Fajr the current prayer, Fajr, is the only one highlighted`() {
+        // Sunrise is later in the morning, so 09:00 is past it and has no current prayer; Fajr is checked a minute after it begins.
+        val fajr = build("2027-02-22", "09:00").today!![PrayerSlot.FAJR]
+        val state = WidgetState.build(settings(), fajr.plusSeconds(60), zone, true)
+        assertEquals(PrayerSlot.FAJR, state.current)
+        for (slot in PrayerSlot.entries) assertEquals("$slot", slot == PrayerSlot.FAJR, state.isHighlighted(slot))
+    }
+
+    @Test
+    fun `after Isha the next prayer is tomorrow's Fajr and Isha, the current prayer, is the one highlighted`() {
         val state = build("2027-02-22", "23:30")
         assertEquals(PrayerSlot.FAJR, state.next!!.slot)
         assertTrue(state.next.isTomorrow)
-        for (slot in PrayerSlot.entries) assertFalse("$slot", state.isHighlighted(slot))
+        for (slot in PrayerSlot.entries) assertEquals("$slot", slot == PrayerSlot.ISHA, state.isHighlighted(slot))
     }
 
     @Test
@@ -241,8 +249,9 @@ class WidgetStateTest {
             assertEquals("$moment", 5, bars.size)
             assertEquals("$moment $bars", bars.sortedBy { it.ordinal }, bars)
             assertTrue("$moment $bars", bars.count { it == Segment.NEXT } <= 1)
+            // The highlight is the current prayer (1.7.0), so a highlighted prayer has already passed: its bar is done.
             for ((i, slot) in WidgetState.PRAYERS.withIndex()) {
-                assertEquals("$slot at $moment", state.isHighlighted(slot), bars[i] == Segment.NEXT)
+                if (state.isHighlighted(slot)) assertEquals("$slot at $moment", Segment.DONE, bars[i])
             }
             moment = moment.plusSeconds(60)
         }

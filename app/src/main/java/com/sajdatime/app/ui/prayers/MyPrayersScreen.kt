@@ -72,6 +72,7 @@ import com.sajdatime.app.ui.components.DayRing
 import com.sajdatime.app.ui.components.weekRingDp
 import com.sajdatime.app.ui.components.LocationSheet
 import com.sajdatime.app.ui.components.Notice
+import com.sajdatime.app.ui.components.SetLocationPrompt
 import com.sajdatime.app.ui.components.NoticeTone
 import com.sajdatime.app.ui.components.RingKind
 import com.sajdatime.app.ui.components.ScreenTitle
@@ -113,6 +114,15 @@ fun MyPrayersScreen(
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenTitle(stringResource(R.string.nav_tracker))
+        // The tasbeeh's door: first thing on the tab, above everything that comes and goes. It is outside
+        // the loading gate and the on or off switch below on purpose, so there is no state of this screen
+        // (record on, off, paused, still loading, no location) in which it is missing or moves (Ali, 12 Nov
+        // 2026: "it needs to be properly placed so user cannot miss it").
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            // 12 here and the title's own 4 make 16 above the button, the same as the 16 below it.
+            Spacer(Modifier.height(Space.Paragraph))
+            TasbeehDoor()
+        }
         // Nothing is drawn until the settings have loaded, so the switch card never flashes for
         // someone who has tracking on.
         if (!state.loading && state.trackerLoaded) {
@@ -195,11 +205,7 @@ private fun Checklist(
     }
     Spacer(Modifier.height(Space.Related))
     if (noLocation) {
-        Notice(
-            brief = stringResource(R.string.home_no_location),
-            actionLabel = stringResource(R.string.action_set_location),
-            onAction = { locationSheet = true },
-        )
+        SetLocationPrompt(stringResource(R.string.home_no_location), onClick = { locationSheet = true })
         Spacer(Modifier.height(Space.Group))
     }
     if (t.data.readOnly) {
@@ -394,7 +400,7 @@ private fun ButtonRow(t: TrackerState, onPause: () -> Unit, onResume: () -> Unit
                     CtaButton(onClick = onPause, compact = true) {
                         Icon(Icons.Rounded.Pause, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(Space.Related))
-                        Text(stringResource(R.string.action_pause))
+                        Text(stringResource(R.string.settings_tracker_pause))
                     }
                 }
                 CtaButton(onClick = onHistory, compact = true) {

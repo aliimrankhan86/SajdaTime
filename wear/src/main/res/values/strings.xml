@@ -114,6 +114,7 @@
 
     <string name="wear_qibla_needs_location">Set your location to find the Qibla</string>
     <string name="wear_qibla_facing">Facing the Kaaba</string>
+    <string name="wear_qibla_calibrate">Move your watch in a figure of eight.</string>
     <string name="wear_qibla_bearing">%1$d°</string>
     <string name="wear_qibla_from_true_north">from true north</string>
 

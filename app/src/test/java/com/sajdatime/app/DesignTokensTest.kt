@@ -19,7 +19,7 @@ import java.io.File
  *
  * Both directions are checked: a value changed on one side only fails, and so does a colour, gap, timing
  * or type style added to the code without its token. The fix is always the same commit: change the Kotlin,
- * change the JSON, say why in docs/design-system/CHANGELOG.md.
+ * change the JSON, say why in the design-system changelog (on Google Drive, see docs/design-system/tokens/).
  *
  * Colours, gaps and timings are read from the source, as DesignRulesTest reads it, because their files
  * are one value per line and the token file names the Kotlin symbol. Type is read from the compiled
@@ -269,20 +269,6 @@ class DesignTokensTest {
         assertTrue("color.json assets out of date: $missing", missing.isEmpty())
     }
 
-    /**
-     * A hex written in a page must be a token, so prose cannot quote a colour the code no longer has. The
-     * pages explain; the token file holds the value.
-     */
-    @Test
-    fun `every colour quoted in the pages is a token`() {
-        val known = allColourValues(json("color.json"))
-        val quoted = File(root, "docs/design-system").walkTopDown().filter { it.extension == "md" }.flatMap { file ->
-            Regex("""#[0-9A-Fa-f]{6}(?:[0-9A-Fa-f]{2})?(?![0-9A-Za-z])""").findAll(file.readText())
-                .map { it.value.uppercase() }.filter { it !in known }.map { "${file.name}: $it" }
-        }.toSet()
-        assertTrue("Quoted in docs/design-system but not in color.json: $quoted", quoted.isEmpty())
-    }
-
     /** actionLabelStyle() is composable, so its one line is read rather than called. */
     @Test
     fun `the action label in the doc is actionLabelStyle`() {
@@ -296,18 +282,18 @@ class DesignTokensTest {
     }
 
     /**
-     * Every file of phone UI code is named somewhere in docs/design-system/, so a new screen, sheet or
-     * component cannot be added without its spec being written (the same idea as the button inventory in
-     * DESIGN_SYSTEM.md section 4.1, widened to every UI file).
+     * Every file of phone UI code is named in tokens/ui-files.json (or DESIGN_SYSTEM.md), so a new screen,
+     * sheet or component cannot be added without a row for it. The narrative pages moved to Google Drive
+     * (4 Nov 2026), so this list is what the build can see.
      */
     @Test
     fun `every phone UI file is described in the design system`() {
-        val docs = File(root, "docs/design-system").walkTopDown().filter { it.extension == "md" }
+        val docs = listOf(File(root, "docs/DESIGN_SYSTEM.md"), File(root, "docs/design-system/tokens/ui-files.json"))
             .joinToString("\n") { it.readText() }
         val ui = File(root, "app/src/main/java/com/sajdatime/app/ui").walkTopDown()
             .filter { it.extension == "kt" }.map { it.name }.toList()
         assertTrue("Found only ${ui.size} UI files", ui.size > 20)
-        val undocumented = ui.filter { "`$it`" !in docs }.sorted()
-        assertTrue("Describe these in docs/design-system/ (name them in backticks): $undocumented", undocumented.isEmpty())
+        val undocumented = ui.filter { "\"$it\"" !in docs }.sorted()
+        assertTrue("Add these to docs/design-system/tokens/ui-files.json: $undocumented", undocumented.isEmpty())
     }
 }

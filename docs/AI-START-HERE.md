@@ -2,7 +2,7 @@
 
 Self-contained. Read all of it before you change anything or ask Ali a question. It tells you what the app
 is, what is live, which branch to use, how the design system works, the rules that cause the most mistakes,
-and how to finish. Kept current by every session that moves the project (last updated 30 Oct 2026).
+and how to finish. Kept current by every session that moves the project (last updated 3 Nov 2026).
 
 `AGENTS.md` (loaded by Codex, Cursor and similar tools) and `CLAUDE.md` (loaded by Claude) both point here.
 
@@ -16,7 +16,8 @@ calculated on the phone and never need the network. It must work for the masses:
 people who never change a setting, people who cannot read English, right to left readers.
 
 **Ali** is the owner. He is not technical. Write to him in plain UK English, recommendation first, short, no
-hyphens or em dashes. He decides anything visual, from screenshots. When unsure, ask him (with a
+hyphens or em dashes. He decides anything visual, from screenshots. Before he sees any visual, run the §0.5
+sameness check and, for anything non trivial, an Opus audit. When unsure, ask him (with a
 recommendation) instead of guessing. Never ask him to test the watch.
 
 ## 2. What is live, and which branch to use
@@ -27,9 +28,10 @@ when a release publishes.
 
 | Branch | What it is | What you do with it |
 |---|---|---|
-| `main` | Exactly what users have: **1.5.0**, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes 1.6 only on release day, by `docs/release-tools/RELEASE-1.6.0.md` (Ali, 25 Oct 2026) |
-| `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system | **Work from here.** Cut your own branch from it |
-| your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-6-0` | Commit and push here. Merging into `claude/1-6-0` only when Ali says so, after review |
+| `main` | **1.6.0** (merged 2 Nov 2026, submitted, in Google's review); what users have is 1.5.0, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes the next release only when Ali says go, by `RELEASE-<version>.md`; Ali presses every merge, submit and publish button |
+| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 70 commits ahead of `main` (1.6.0 is already merged into `main`), all pushed (see git log for the latest commit), nothing merged, versionCode 11 / 1.7.0 and the watch 1003 / 1.7.0 are set (4 Nov 2026); the checklist is `docs/release-tools/RELEASE-1.7.0.md`. Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
+| `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system. Check the public Play page before acting on it | Do not cut new work from here; use `claude/1-7-0` |
+| your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-7-0` | Commit and push here. Merging into `claude/1-7-0` only when Ali says so, after review; Ali presses every merge, submit and publish button |
 
 Every other branch was deleted on 30 Oct 2026 at Ali's word ("delete the old branches ... which could cause confusion"):
 all of them were already wholly inside `claude/1-6-0`, except two dropped on purpose, kept as tags
@@ -40,8 +42,7 @@ design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then r
 If GitHub shows a yellow "Compare & pull request" bar for `claude/1-6-0`, do not use it: that would merge
 unreleased 1.6 into `main`.
 
-Version numbers: phone 1.6.0 (versionCode 10) on `claude/1-6-0`; watch stays 1.5.0 (1002). Release day
-checkpoints: pull request into `main` by 11 Dec 2026, submit by 15 Dec 2026 (before Ramadan).
+Version numbers: phone 1.7.0 / versionCode 11 and watch 1.7.0 / 1003 on `claude/1-7-0` (the watch changed, so it ships). Release steps when Ali says go for 1.7.0: bump versionCode to 11 (and the watch if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (it did not). Ali presses every merge, submit and publish button.
 
 ## 3. Read before you work, in this order
 
@@ -60,16 +61,18 @@ Four tabs, fixed order: **Times, Qibla, My prayers, Settings**. Floating glass t
 as a dialog or bottom sheet over the tab. Code under `app/src/main/java/com/sajdatime/app/`; rules and
 calculations in `core/` (plain Kotlin, portable to iPhone); watch in `wear/`.
 
-- **Times**: the current period's sky (dawn, day, evening, night), the city, Gregorian and Hijri date (opens
-  Islamic dates), the next prayer card with a countdown, notices (Makkah fallback, approximate times, Eid,
-  Ramadan, permissions), six prayer rows with Now and Next and a bell each, Timetable with Save as PDF, and
-  "Different from your mosque?".
+- **Times**: the current period's sky (dawn, day, evening, night), a sky band under the date (a full width arc
+  of the five prayers, ticks fill as prayers pass), the city, Gregorian and Hijri date (opens Islamic dates),
+  the next prayer card with a countdown, notices (Makkah fallback, approximate times, Eid, Ramadan,
+  permissions), six prayer rows with Now and Next and a bell each, time left on the Now row, an optional Duha
+  row (off by default, Sunni only), Timetable with Save as PDF, and "Different from your mosque?".
 - **Qibla**: a turn sentence first, the dial (the needle is you, the Kaaba stays upright), legend, details.
 - **My prayers**: a private checklist, off by default; ticks, pause, week rings, Last 30 days, fasts to make up.
   Records, never judges.
 - **Settings**: prayer times (location, school, method, jama'ah times, match your mosque, Islamic dates),
   appearance (theme, language), reminders, My prayers, About (disclaimer first).
-- Also: three home screen widgets, notifications, Ramadan card and timetable, the Wear OS app and tile.
+- Also: three home screen widgets (all restyled to one look in 1.7.0; sizes set from measured heights, `WidgetRenderEvidenceTest`, run with `-e widgetEvidence true`, see HANDOVER section 11),
+  notifications, Ramadan card and timetable, the Wear OS app and tile.
 
 Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic, Bengali (30 Oct 2026). Urdu and Arabic are right
 to left. Adding one: the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find a new
@@ -165,7 +168,7 @@ Platform:
 ```
 
 - Unit test counts on 30 Oct 2026: **app 338, core 238 (1 skipped), wear 27**. If you add tests, update
-  `EXPECTED_COUNTS` in `docs/release-tools/release-1.6.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
+  `EXPECTED_COUNTS` in `docs/release-tools/release-1.7.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
 - Run the checks in `docs/design-system/10-new-feature-playbook.md` §6 and paste the counts. Never write
   "done", "every" or "all" without them.
 - Any visual change: screenshots in light, dark, 2x text and Urdu, shown to Ali with the install command and

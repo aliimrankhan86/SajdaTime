@@ -33,6 +33,7 @@
     <string name="wear_madhab_note">শুধু আসর বদলায়। হানাফিতে পরে।</string>
     <string name="wear_qibla_needs_location">কিবলা খুঁজতে অবস্থান সেট করুন</string>
     <string name="wear_qibla_facing">কাবার দিকে</string>
+    <string name="wear_qibla_calibrate">ঘড়িটি 8 সংখ্যার মতো করে নাড়ান।</string>
     <string name="wear_qibla_bearing">%1$d°</string>
     <string name="wear_qibla_from_true_north">প্রকৃত উত্তর থেকে</string>
     <string name="wear_duration_h_m">%1$d ঘ %2$d মি</string>

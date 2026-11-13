@@ -30,4 +30,14 @@
     <color name="widget_sky_night_mid">#0C1320</color>
     <color name="widget_sky_foot">#101312</color>
     <color name="widget_sky_track">#4DA9B2AE</color>
+    <!-- Dark twins of the strip body colours in values/colors.xml. -->
+    <color name="widget_strip_dawn_top">#1C3B34</color>
+    <color name="widget_strip_dawn_mid">#142C26</color>
+    <color name="widget_strip_day_top">#18382D</color>
+    <color name="widget_strip_day_mid">#122B22</color>
+    <color name="widget_strip_evening_top">#25392A</color>
+    <color name="widget_strip_evening_mid">#192A1F</color>
+    <color name="widget_strip_night_top">#12302F</color>
+    <color name="widget_strip_night_mid">#0D2323</color>
+    <color name="widget_strip_foot">#0F241D</color>
 </resources>

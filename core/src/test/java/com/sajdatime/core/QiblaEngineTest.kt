@@ -109,44 +109,34 @@ class QiblaEngineTest {
         assertEquals(13240.0, QiblaEngine.distanceToKaabaKm(Coordinates(-33.8688, 151.2093)), 60.0)
     }
 
-    /**
-     * The hysteresis is the whole point, so it is pinned rather than left to be tidied
-     * into a single tolerance by a later reader who sees two constants and assumes one is
-     * redundant. Collapsing them buzzed the owner's phone 26 times in 76 seconds while it
-     * lay untouched on a desk — see [QiblaEngine.staysAligned].
-     */
     @Test
-    fun `arriving takes five degrees but leaving takes eight`() {
-        // Coming in: 6 degrees off is not yet arrival, 5 is.
-        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 159.0, target = 153.0))
-        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 158.0, target = 153.0))
-
-        // Already there: the same 6 degrees does not throw you out again. This is the exact
-        // band the S23 Ultra was wobbling across.
-        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 159.0, target = 153.0))
-        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 161.0, target = 153.0))
-
-        // But a real turn away still registers.
-        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 162.0, target = 153.0))
-        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 167.0, target = 153.0))
+    fun `arriving takes two degrees but leaving takes four`() {
+        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 155.01, target = 153.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 155.0, target = 153.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 157.0, target = 153.0))
+        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 157.01, target = 153.0))
     }
 
     @Test
-    fun `the release angle is wider than the grab angle`() {
-        // If these ever meet, the hysteresis is gone and the buzzing is back.
-        assertTrue(QiblaEngine.ALIGN_RELEASE_DEGREES > QiblaEngine.ALIGN_GRAB_DEGREES)
+    fun `the vibration rearms beyond eight degrees`() {
+        assertFalse(QiblaEngine.hasLeftArrivalZone(current = 161.0, target = 153.0))
+        assertTrue(QiblaEngine.hasLeftArrivalZone(current = 161.01, target = 153.0))
     }
 
     @Test
     fun `hysteresis works across the 360 degree seam`() {
-        // The wobble does not care that the Qibla happens to sit near north.
-        // 357 -> 2 is a 5 degree turn: inside the grab angle either way.
-        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 357.0, target = 2.0))
-        // 355 -> 2 is 7 degrees: too far to arrive, near enough to stay.
-        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 355.0, target = 2.0))
-        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 355.0, target = 2.0))
-        // 353 -> 2 is 9 degrees, past the release angle, so it is a genuine turn away.
-        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 353.0, target = 2.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = false, current = 359.0, target = 1.0))
+        assertFalse(QiblaEngine.staysAligned(wasAligned = false, current = 358.0, target = 1.0))
+        assertTrue(QiblaEngine.staysAligned(wasAligned = true, current = 357.0, target = 1.0))
+        assertFalse(QiblaEngine.staysAligned(wasAligned = true, current = 356.0, target = 1.0))
+    }
+
+    @Test
+    fun `heading smoothing crosses north and settles after a half turn`() {
+        assertEquals(0.0, QiblaEngine.smoothHeading(359.0, 1.0, 0.5), 0.001)
+        var heading = 0.0
+        repeat(30) { heading = QiblaEngine.smoothHeading(heading, 180.0, 0.18) }
+        assertEquals(180.0, heading, 0.5)
     }
 
     @Test
@@ -155,5 +145,16 @@ class QiblaEngineTest {
             val result = QiblaEngine.normalise(input)
             assertTrue("normalise($input) = $result out of range", result >= 0.0 && result < 360.0)
         }
+    }
+
+    @Test
+    fun `a printed angle is a whole number from 0 to 359, never 360`() {
+        assertEquals(0, QiblaEngine.wholeDegrees(359.5))
+        assertEquals(0, QiblaEngine.wholeDegrees(360.0))
+        assertEquals(359, QiblaEngine.wholeDegrees(359.4))
+        assertEquals(0, QiblaEngine.wholeDegrees(-0.4))
+        assertEquals(359, QiblaEngine.wholeDegrees(-0.6))
+        assertEquals(119, QiblaEngine.wholeDegrees(118.5))
+        assertEquals(118, QiblaEngine.wholeDegrees(118.49))
     }
 }

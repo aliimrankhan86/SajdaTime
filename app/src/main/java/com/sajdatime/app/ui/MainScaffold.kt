@@ -20,6 +20,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import com.sajdatime.app.notify.PrayerAlarmScheduler
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -73,6 +79,7 @@ import com.sajdatime.app.data.AlertStyle
 import com.sajdatime.app.data.BuiltInAdhan
 import com.sajdatime.app.data.Screen
 import com.sajdatime.app.pdf.PrayerPdfExporter
+import com.sajdatime.app.ui.components.KeepUpright
 import com.sajdatime.app.ui.components.LocalBottomBarClearance
 import com.sajdatime.app.ui.components.UsageCountsConsentDialog
 import com.sajdatime.app.ui.components.WholeWords
@@ -138,6 +145,7 @@ fun MainScaffold(
     onDismissEid: (Int) -> Unit,
     onSetRamadanCard: (Boolean) -> Unit,
     onSetNightTimes: (Boolean) -> Unit,
+    onSetDuha: (Boolean) -> Unit,
     onSetSuhoorMinutes: (Int) -> Unit,
     onSetSuhoorStyle: (AlertStyle) -> Unit,
     onSetSuhoorAdhan: (Boolean) -> Unit,
@@ -246,15 +254,17 @@ fun MainScaffold(
         }
     }
 
+    if (destination == Destination.QIBLA) KeepUpright()
+
     // The magnetometer only runs while the Qibla tab is actually on screen.
-    DisposableEffect(destination) {
+    DisposableEffect(destination, state.settings.coordinates) {
         onQiblaVisible(destination == Destination.QIBLA)
         onDispose { onQiblaVisible(false) }
     }
 
     // Quiet Glass (17 Oct 2026): no bottomBar slot. The tab bar floats over the content in the
-    // same Box, so the screens scroll softly underneath it; each screen ends with
-    // BottomBarClearance() so its last row can still be scrolled clear of the bar.
+    // same Box. Screens use the measured bar height to keep their last controls accessible.
+    // Qibla reserves that height outside its scroll area so Details stays clear on short screens.
     // The top inset is no longer taken here (1.6, step 5): Times draws its sky under the status bar, and the
     // other three tabs take the same inset one level down (ReadingFrame), so nothing else moves.
     Scaffold(
@@ -287,6 +297,7 @@ fun MainScaffold(
                         onDismissRamadanNotice = onDismissRamadanNotice,
                         onDismissEid = onDismissEid,
                         onSetRamadanCard = onSetRamadanCard,
+                        onSetHijriOffset = onSetHijriOffset,
                         onOpenSetting = openSetting,
                         onBell = onBell,
                         snapBell = undoneBell,
@@ -325,6 +336,7 @@ fun MainScaffold(
                             onSetOngoingBadge = onSetOngoingBadge,
                             onSetRamadanCard = onSetRamadanCard,
                             onSetNightTimes = onSetNightTimes,
+                            onSetDuha = onSetDuha,
                             onSetSuhoorMinutes = onSetSuhoorMinutes,
                             onSetSuhoorStyle = onSetSuhoorStyle,
                             onSetSuhoorAdhan = onSetSuhoorAdhan,
@@ -351,6 +363,7 @@ fun MainScaffold(
             GlassTabBar(
                 current = destination,
                 onSelect = { destination = it },
+                settingsNeedsAttention = !PrayerAlarmScheduler.canScheduleExact(LocalContext.current),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .onSizeChanged { barHeight = with(density) { it.height.toDp() } },
@@ -376,6 +389,8 @@ internal fun GlassTabBar(
     current: Destination,
     onSelect: (Destination) -> Unit,
     modifier: Modifier = Modifier,
+    /** An 8dp accent dot on the Settings tab while a permission is withheld (Option 2, 3 Nov 2026). */
+    settingsNeedsAttention: Boolean = false,
 ) {
     val scheme = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(32.dp)
@@ -397,6 +412,7 @@ internal fun GlassTabBar(
     ) {
         Destination.entries.forEach { item ->
             val selected = item == current
+            val attention = settingsNeedsAttention && item == Destination.SETTINGS
             val pill by animateColorAsState(
                 if (selected) scheme.secondaryContainer else Color.Transparent,
                 label = "tab pill",
@@ -411,6 +427,14 @@ internal fun GlassTabBar(
                             onSelect(item)
                         }
                     }
+                    .then(
+                        if (attention) {
+                            val spoken = stringResource(R.string.tab_settings_attention_a11y)
+                            Modifier.semantics { contentDescription = spoken }
+                        } else {
+                            Modifier
+                        },
+                    )
                     .padding(vertical = 8.dp),
             ) {
                 Box(
@@ -418,7 +442,17 @@ internal fun GlassTabBar(
                         .clip(RoundedCornerShape(50))
                         .background(pill)
                         .padding(horizontal = 20.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
+                    if (attention) {
+                        Box(
+                            Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 6.dp, y = (-2).dp)
+                                .size(8.dp)
+                                .background(scheme.tertiary, CircleShape),
+                        )
+                    }
                     Icon(
                         imageVector = if (selected) item.selectedIcon else item.icon,
                         contentDescription = null,
@@ -429,6 +463,7 @@ internal fun GlassTabBar(
                 Spacer(Modifier.height(Space.Tight))
                 Text(
                     text = stringResource(item.labelRes),
+                    modifier = Modifier.padding(horizontal = Space.Tight),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
                     ).scaledLineHeight(),
@@ -437,7 +472,8 @@ internal fun GlassTabBar(
                     // Wraps between words, shrinks only while a word would split. One line that shrinks was
                     // tried on 30 Oct 2026 and measured worse: on a 320dp phone at 2.0 "My prayers" and
                     // "আমার নামাজ" still ended in an ellipsis at the floor (LargeTextAndTalkBackDeviceTest).
-                    autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize),
+                    // The narrowest slots need to go below the normal size for long single words.
+                    autoSize = WholeWords(MaterialTheme.typography.labelMedium.fontSize, minimumFractionOfNormal = 0.6f),
                 )
             }
         }

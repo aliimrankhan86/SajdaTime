@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -49,6 +50,30 @@ import com.sajdatime.app.ui.LocationProblem
 import com.sajdatime.app.ui.UiState
 import java.time.Duration
 import java.time.Instant
+
+/**
+ * Holds the screen upright while the caller is showing, and gives it back after. For the two things held
+ * in one hand and read at a glance, the Qibla dial and the tasbeeh (12 Nov 2026).
+ *
+ * Why: a phone laid flat keeps whichever way it was last tilted, so on the owner's desk the app came up on
+ * its side. There the dial's "top of your phone" mark sat at the phone's edge and the dial was a third of
+ * the height, and the tasbeeh's Count button was below the fold, out of the thumb's reach. Large screens
+ * ignore the request from Android 16, which is why `CompassRepository` still corrects the heading for a
+ * turned screen.
+ */
+// The lock is the point here.
+@android.annotation.SuppressLint("SourceLockedOrientationActivity")
+@Composable
+fun KeepUpright() {
+    val activity = androidx.activity.compose.LocalActivity.current
+    androidx.compose.runtime.DisposableEffect(activity) {
+        val before = activity?.requestedOrientation
+        activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onDispose {
+            activity?.requestedOrientation = before ?: android.content.pm.ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        }
+    }
+}
 
 /**
  * A dialog's title with a close X at the top right (owner, 18 Oct 2026). The X is the one
@@ -258,6 +283,31 @@ fun LocationSheet(
                 Spacer(Modifier.height(Space.Related))
                 ProgressRow(stringResource(R.string.location_looking_up))
             }
+        }
+    }
+}
+
+/**
+ * No location yet (1.7.0, Option 2): one sentence and a compact green button, centred, not a card. Used where the
+ * screen has nothing to show without a place (Qibla, My prayers). Times puts the same button beside the city.
+ */
+@Composable
+fun SetLocationPrompt(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    androidx.compose.foundation.layout.Column(
+        modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+        Spacer(Modifier.height(Space.Related))
+        CtaButton(onClick = onClick, compact = true) {
+            Icon(Icons.Outlined.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(Space.Related))
+            Text(stringResource(R.string.action_set_location))
         }
     }
 }

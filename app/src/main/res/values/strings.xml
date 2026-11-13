@@ -124,7 +124,7 @@
       Keep all four if this is ever reworded. Dropping any one of them is a change of
       substance dressed as an edit, and the fourth is the owner's own request.
     -->
-    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer, and the date, by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
+    <string name="disclaimer_body">SajdaTime is a helper, not a religious authority.\n\nThese times are not given to me by a mosque, a scholar, or any authority. Your phone works them out from the position of the sun, using calculation methods that Islamic authorities and scholars have published. I am not a Mufti, Aalim, or an expert in fiqh, and this app was built with the help of artificial intelligence. Software can carry faults, a phone can hold the wrong location or the wrong clock, a phone saving its battery can delay an alert, and I can simply be wrong.\n\nSo please take what you see here as a calculation and not a ruling. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction looks off to you, or you are unsure, ask them or someone else qualified to advise you. The app is free and is given as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.\n\nIf you use the watch, please treat it as a convenience rather than the last word. A watch has a smaller compass and a poorer view of the sky than a phone, and it may be working from a location your phone found some time ago. For the Qibla especially, your phone is the more accurate of the two. When it matters, check there.\n\nMosques do not all agree on when a prayer starts. Isha varies the most. In Britain and further north the gap between one method and another can be over an hour, because scholars measure the fading of the twilight differently. I cannot settle that, and the app does not try to. If the times here do not match your mosque, ask them which method they use and pick it in Settings, under Calculation method. If a few minutes still separate you after that, Match your mosque lets you adjust each prayer by hand. Where a difference remains, follow your mosque.\n\nOne more thing. This app shows when a prayer becomes due. Your mosque then sets its own time for the congregation, usually a little later, so the board there and the times here will often differ. Neither is wrong.\n\nAnd one request, if you would: please remember me, my family, and my parents in your duas.</string>
 
     <!-- Home -->
     <string name="home_next_prayer">Next prayer</string>
@@ -211,8 +211,6 @@
     <string name="home_countdown_a11y">%1$s in %2$s</string>
     <!-- Spoken for the location row: the place, then what tapping it does. -->
     <string name="home_location_a11y">%1$s. %2$s</string>
-    <string name="home_default_location_title">Times for Makkah</string>
-    <string name="home_default_location_body">Your location is not set yet, so these times are for Makkah.</string>
     <string name="action_change_location">Change location</string>
 
     <!-- Location sheet -->
@@ -234,15 +232,10 @@
     <!-- 1.6.0 step 4, the Timetable (STEP-4-DESIGN §8). Prayer names are written inside timetable_day_a11y on purpose: religious terms, translated by the translator, never joined in code. -->
     <string name="action_timetable">Timetable</string>
     <string name="timetable_title">Timetable</string>
-    <string name="timetable_month_a11y">Prayer times for %1$s</string>
     <string name="timetable_day_a11y">%1$s. Fajr %2$s. Sunrise %3$s. Dhuhr %4$s. Asr %5$s. Maghrib %6$s. Isha %7$s.</string>
     <string name="timetable_today_a11y">Today, %1$s</string>
     <string name="export_sheet_title">Save your timetable</string>
     <string name="export_sheet_body">We will make a PDF of your prayer times for %1$s. You can then save it, print it, or send it to someone.</string>
-    <string name="export_today">Today only</string>
-    <string name="export_today_desc">One day, six times</string>
-    <string name="export_week">The next 7 days</string>
-    <string name="export_week_desc">Today and the six days after it</string>
     <string name="export_month">This whole month</string>
     <string name="export_month_desc">Every day from the 1st to the end of the month</string>
     <string name="export_saved">Saved to Downloads as %1$s</string>
@@ -281,17 +274,15 @@
     <string name="qibla_needs_location">Set your location to find the Qibla.</string>
     <string name="qibla_facing">You are now facing the Kaaba</string>
     <string name="qibla_heading_now">Facing %1$d°</string>
-    <!-- The dial's legend. The needle is *you* — it points the way the phone points and
-         stays put while the dial and the Kaaba turn round it. Turn until it touches the
-         Kaaba. -->
+    <!-- The hand points at the Kaaba; the fixed wedge marks the top of the phone. -->
     <string name="qibla_legend_kaaba">The Kaaba</string>
-    <string name="qibla_legend_facing">Where you are facing</string>
+    <string name="qibla_legend_top">Top of your phone</string>
     <string name="qibla_turn_left">Turn left %1$d°</string>
     <string name="qibla_turn_right">Turn right %1$d°</string>
     <string name="qibla_no_compass">Face %1$d° from true north</string>
     <string name="qibla_calibrate">The compass needs calibrating. Hold your phone and move it in a figure of eight a few times.</string>
     <string name="qibla_sensor_missing">This phone has no compass, so we can give you the angle but cannot point the way.</string>
-    <string name="qibla_accuracy_medium">The reading may wander a little. Move away from metal, magnets and speakers for a steadier result.</string>
+    <string name="qibla_accuracy_medium">Move your phone in a figure of eight for a steadier reading.</string>
 
     <!--
       Settings.
@@ -378,8 +369,8 @@
     <!-- Optional usage counts. Wording rules: docs/ANALYTICS_PLAN.md section 7.2. The consent text
          must state the material facts in full (who receives it, the random ID, what is and is not
          sent). Do not shorten it, and do not use the word "tracking". -->
-    <string name="consent_title">Help improve SajdaTime?</string>
-    <string name="consent_body">SajdaTime is free and has no ads. If you say yes, it sends a few usage counts to Google Analytics so the app can be improved. They are tied to a random ID, not your name, and may be processed outside the UK. Detailed records are kept for 14 months.\n\nUsing a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. SajdaTime never sends your GPS position or your prayer settings.\n\nUntil you choose yes, nothing is sent. You can switch it off in Settings at any time. The person responsible is Ali Imran Khan, who made the app.</string>
+    <string name="consent_title">Help make SajdaTime better?</string>
+    <string name="consent_body">SajdaTime is free, has no ads and is made by one person. A few usage counts show which screens work and where people get stuck, so they can be fixed. SajdaTime never sends your GPS position or your prayer settings.\n\nIf you say yes, the counts go to Google Analytics. They are tied to a random ID, not your name, and may be processed outside the UK. Detailed records are kept for 14 months.\n\nUsing a prayer app can say something about your faith, so this is your choice, and nothing changes in the app if you say no. Until you choose yes, nothing is sent. You can switch it off in Settings at any time. The person responsible is Ali Imran Khan, who made the app.</string>
     <string name="settings_language_title">Language</string>
     <string name="language_unavailable">Not available on this phone</string>
     <string name="language_name_pair" translatable="false">%1$s (%2$s)</string>
@@ -413,7 +404,7 @@
     <string name="about_data">Data and libraries</string>
     <string name="about_data_desc">Prayer times calculated with adhan-java by Batoul Apps (MIT). City search uses the Open-Meteo geocoding API, licensed CC BY 4.0.</string>
     <string name="about_adhan">Adhan recordings</string>
-    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons.</string>
+    <string name="about_adhan_desc">Sunni adhan: recorded by Adam-synagda, CC0.\nShia adhan: sung by Saeed Hatamzadeh-Varmazyar, CC BY-SA 4.0.\nBoth via Wikimedia Commons. Both are shortened for this app.</string>
     <string name="about_adhan_link_source">Sunni source</string>
     <string name="about_adhan_link_shia">Shia source</string>
     <string name="about_adhan_link_licence">CC BY-SA 4.0 licence</string>
@@ -474,10 +465,12 @@
     <string name="settings_adjustments_reset">Reset all</string>
     <string name="settings_hijri_offset">Islamic date</string>
     <string name="settings_hijri_offset_label">Shift the date</string>
-    <string name="settings_hijri_offset_help">The Islamic date here is calculated. If your mosque sights the moon locally, it can be a day either way. This also moves Ramadan and Eid.</string>
-    <!-- Shown when a prayer has no correction. A dash reads faster down a column of six
-         rows than the word "none" repeated six times. -->
-    <string name="adjustment_none">\u2014</string>
+    <!-- Shown when nothing is adjusted. Owner, 3 Nov 2026: "0 min" and "0 days" say what the
+         number is; the old dash did not. -->
+    <string name="adjustment_zero_minutes">0 min</string>
+    <string name="adjustment_zero_days">0 days</string>
+    <!-- Joined after a time with settings_value_pair: "5:50 pm · now 5:53 pm". -->
+    <string name="adjustment_now_time">now %1$s</string>
     <!-- Always signed: "+5 min", "-3 min". The sign is the information. -->
     <string name="adjustment_minutes">%+d min</string>
     <plurals name="adjustment_days">
@@ -488,12 +481,11 @@
         <item quantity="one">%d prayer adjusted</item>
         <item quantity="other">%d prayers adjusted</item>
     </plurals>
-    <string name="adjustment_summary_hijri">Date %1$s</string>
     <!-- Joins the two halves of the summary line. Quoted because Android strips leading
          and trailing whitespace from an unquoted string resource, which silently turned
-         "2 prayers adjusted, Date +1 day" into "...adjusted,Date +1 day" on screen. -->
+         a joined summary into "...adjusted,Date +1 day" on screen. -->
     <string name="list_separator">", "</string>
-    <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name. -->
+    <!-- Spoken by a screen reader on the stepper buttons. %1$s is the prayer name or "Shift the date". -->
     <string name="action_decrease">Decrease %1$s</string>
     <string name="action_increase">Increase %1$s</string>
     <!-- Header line of a prayer alert whose time was projected from another latitude,
@@ -525,18 +517,7 @@
     <string name="ramadan_next_suhoor_tomorrow">Suhoor ends tomorrow at %1$s</string>
     <string name="ramadan_month_ends_today">On this calendar today is the last day of Ramadan. Your mosque will announce Eid.</string>
     <string name="ramadan_fast_length">Fast today %1$s</string>
-    <plurals name="ramadan_fast_change_longer">
-        <item quantity="one">%d minute longer than yesterday</item>
-        <item quantity="other">%d minutes longer than yesterday</item>
-    </plurals>
-    <plurals name="ramadan_fast_change_shorter">
-        <item quantity="one">%d minute shorter than yesterday</item>
-        <item quantity="other">%d minutes shorter than yesterday</item>
-    </plurals>
-    <string name="ramadan_fast_change_same">the same as yesterday</string>
     <!-- Joins the fast length and the change: "Fast today 12h 18m, 3 minutes longer than yesterday". -->
-    <string name="ramadan_fast_line">%1$s, %2$s</string>
-    <string name="ramadan_tomorrow_line">Tomorrow: suhoor ends %1$s, iftar %2$s</string>
     <string name="ramadan_info_a11y">About these Ramadan times</string>
     <string name="ramadan_info_title">About these Ramadan times</string>
     <string name="ramadan_info_calc">SajdaTime shows Fajr and Maghrib as calculated for your location and uses them as the end of suhoor and the time of iftar.</string>
@@ -605,7 +586,7 @@
     <string name="widget_next_label">SajdaTime: next prayer</string>
     <string name="widget_today_label">SajdaTime: today\'s prayers</string>
     <string name="widget_next_desc">The next prayer and its time, with a countdown.</string>
-    <string name="widget_today_desc">All six times for today with the next one marked.</string>
+    <string name="widget_today_desc">All six times for today, with the current one marked.</string>
     <string name="widget_tomorrow">Tomorrow</string>
     <string name="widget_no_location">Open SajdaTime to set your location</string>
     <!-- Spoken once for the whole widget. %1$s prayer, %2$s clock time, %3$s remaining such as "1h 20m". -->
@@ -617,7 +598,7 @@
     <string name="widget_suhoor_ends">Suhoor ends</string>
     <string name="widget_iftar">Iftar</string>
     <string name="widget_strip_label">SajdaTime: five prayers in a row</string>
-    <string name="widget_strip_desc">All five prayers in one row, the next one marked.</string>
+    <string name="widget_strip_desc">All five prayers in one row, with the current one marked.</string>
     <!-- The Fajr column's name on the Today strip on a Ramadan day (STEP-8-DESIGN Q3); Turkish timetables head it İmsak. -->
     <string name="widget_strip_suhoor">Suhoor</string>
     <string name="widget_update_location">Update location, %1$s</string>
@@ -731,18 +712,43 @@
         <item quantity="one">in %d day</item>
         <item quantity="other">in %d days</item>
     </plurals>
-    <string name="dates_footer">Umm al-Qura calendar, with your date shift. Local moon sighting may differ by a day.</string>
+    <string name="dates_footer">Dates follow the Umm al-Qura calendar. If your mosque sights the moon, they can be a day either way. Your shift moves every date here, including Ramadan and Eid.</string>
     <string name="dates_unavailable">Islamic dates are not available for this year.</string>
     <!-- Spoken only, for the date under the city on Times. %1$s is today's Hijri date. -->
     <string name="dates_header_a11y">Islamic dates. Today is %1$s</string>
     <string name="settings_islamic_dates">Islamic dates</string>
     <string name="settings_islamic_dates_desc">Ramadan, the two Eids and other key dates</string>
+    <string name="settings_islamic_dates_shifted">Shifted by %1$s</string>
     <!-- Night times (1.6.0): one dimmed row after Isha on Times. Calculated facts only: no ruling, no act named. -->
     <string name="night_midnight">Islamic midnight</string>
     <string name="night_last_third_from">Last third from %1$s</string>
     <string name="night_row_a11y">Islamic midnight %1$s. Last third of the night from %2$s.</string>
     <string name="settings_night_times">Night times</string>
     <string name="settings_night_times_desc">Shows Islamic midnight and the last third of the night under Isha</string>
+    <!-- 1.7.0: time left on the Now row. Counts only to the next time on the list, never an "ends" ruling. -->
+    <string name="current_until">Until %1$s · %2$s</string>
+    <string name="current_row_a11y">%1$s, current prayer, %2$s, until %3$s, %4$s</string>
+    <plurals name="duration_a11y_hours">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <plurals name="duration_a11y_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <!-- 1.7.0: optional Duha row, Sunni only, off by default. Minutes are PROPOSED and wait for Ali. -->
+    <!-- 1.7.0: "Hear it" in the sound dialogs. -->
+    <string name="action_hear_it">Hear it</string>
+    <string name="action_stop">Stop</string>
+    <string name="preview_alarm_help">Plays at your alarm volume, like the alert will.</string>
+    <string name="preview_notification_help">Plays at your notification volume, like the alert will.</string>
+    <string name="preview_alarm_muted">Your alarm volume is turned down, so you will not hear it.</string>
+    <string name="preview_notification_silent">Your phone is on silent, so you will not hear it.</string>
+    <string name="duha_row">Duha</string>
+    <string name="duha_until">Until %1$s</string>
+    <string name="duha_row_a11y">Duha from %1$s until %2$s.</string>
+    <string name="settings_duha">Duha</string>
+    <string name="settings_duha_desc">Shows the Duha window (Chasht) after Sunrise: from about %1$d minutes after sunrise until about %2$d minutes before Dhuhr</string>
     <!-- Why these times (2 Nov 2026): caption under the list + first sentence of the mosque dialog. -->
     <string name="why_times_adjusted">adjusted</string>
     <string name="why_times_sunni">These times use %1$s with %2$s Asr.</string>
@@ -838,4 +844,17 @@
     <string name="notif_fast_ashura">Tomorrow is a Sunnah fast (Ashura). Suhoor ends at %1$s.</string>
     <string name="notif_fast_arafah">Tomorrow is a Sunnah fast (Day of Arafah, on this calendar). Follow your mosque for the day. Suhoor ends at %1$s.</string>
     <string name="notif_fast_shawwal">Tomorrow is a Sunnah fast (one of the six days of Shawwal). Suhoor ends at %1$s.</string>
+    <string name="home_fajr_exact_note">May not ring on time</string>
+    <string name="exact_alarm_dialog_more">Android asks for this on its own screen. You can change it later in Settings.</string>
+    <string name="tab_settings_attention_a11y">Settings, needs attention</string>
+    <string name="home_fajr_exact_a11y">%1$s, %2$s, may not ring on time</string>
+    <!-- The tasbeeh (12 Nov 2026): a counter only. No words of dhikr and no advice on how many. -->
+    <string name="tasbeeh_title">Tasbeeh</string>
+    <string name="tasbeeh_count">Count</string>
+    <string name="tasbeeh_reset">Start again</string>
+    <string name="tasbeeh_target">Target: %1$d</string>
+    <string name="tasbeeh_no_target">No target</string>
+    <string name="tasbeeh_rounds">Rounds: %1$d</string>
+    <string name="tasbeeh_total">Total: %1$d</string>
+    <string name="tasbeeh_state">%1$d of %2$d</string>
 </resources>

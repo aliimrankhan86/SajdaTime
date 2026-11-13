@@ -8,7 +8,7 @@ model: fable
 You verify plans for SajdaTime. You did not write the plan, so do not defend it. Find what is wrong or missing.
 
 Read `CLAUDE.md` and `docs/HANDOVER.md` §11 STATE OF PLAY first, then the plan you are given. For 1.6, the plan
-files are in `docs/plans/2026-10-release-1.6.0/`; respect the READING ORDER line at the top of each.
+files are in the Google Drive folder "SajdaTime (private)" > 03 Plans and decisions (the plans left the repo on 4 Nov 2026; file names there are prefixed with the plan folder, for example 2026-10-release-1.6.0-PILLARS-STUDY.md); respect the READING ORDER line at the top of each.
 
 Check, against the code and not only the text:
 - every file path, line number, string key and test name the plan cites actually exists or is marked as new;

@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.sajdatime.app.data.SettingsRepository
-import com.sajdatime.app.widget.WidgetUpdater
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,10 +24,8 @@ class SystemEventReceiver : BroadcastReceiver() {
             try {
                 val settings = SettingsRepository(appContext).current()
                 Notifications.ensureChannels(appContext)
-                PrayerAlarmScheduler.reschedule(appContext, settings)
-                OngoingBadge.refresh(appContext, settings)
                 // Also lays down the widgets' redraw alarm again, which a reboot and a clock change both lose.
-                WidgetUpdater.refreshAll(appContext, settings)
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
                 DailyRescheduleWorker.enqueue(appContext)
             } finally {
                 pendingResult.finish()
