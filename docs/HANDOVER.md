@@ -6092,7 +6092,24 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 13 Nov 2026, 14:00: 1.7.0 RELEASE DAY under way; privacy page dated, pull request open for Ali to merge; NOT published
+### 📍 STATE OF PLAY, 13 Nov 2026, 15:05: 1.7.0 SUBMITTED, phone and watch IN GOOGLE'S REVIEW; NOT live yet
+
+- **Submitted 13 Nov 2026 about 15:00 UK.** Ali pressed "Submit 21 changes for review"; Publishing overview then read "Changes
+  in review" (managed publishing off, so it goes live by itself when approved). The 21: Production 11 (1.7.0), Production (Wear
+  OS) 1003 (1.7.0), both 100% and all countries; French, Hindi and Malay translations removed; full description, phone pictures
+  and watch pictures changed in English, Arabic, Urdu, Turkish and Indonesian; Bengali full description (it uses the English
+  pictures). PR 18 merged by Ali at 13:59 UTC, so `docs/privacy.html` on Pages reads 13 November 2026.
+- **What went in, all read back from the Console:** release notes in six languages, each typed as keystrokes and compared by
+  SHA-256 with `LISTING.md` / `LISTING-LOCALES.md` (exact), "6 of 9 languages" before the three were removed; watch notes the same.
+  Phone bundle 11, API 24+, target 36, no device lost (12,600 phones); watch 1003, API 30+, 82 watches, none lost. One warning on
+  each, the usual "no native debug symbols" (Ali asked; told it is harmless, two Google libraries, `docs/RELEASING.md`). Full
+  descriptions in six languages typed and compared by hash (exact). Pictures from `docs/store/upload/`: English 8 phone in filename
+  order (the live set was still the older 1.5.0 eight) and 4 watch; ar, ur, tr-TR, id each 4 own phone pictures plus the 4 watch
+  pictures; Bengali inherits English. AI asset declaration: Ali chose "Don't label assets" himself (CLAUDE.md rule).
+- **Next, step 5, after Google's review:** check "Updated on" signed out (Play sends no email), then record live in HANDOVER,
+  PROJECT_BRIEF and GBrain, re-baseline the daily health check to 1.7.0, merge this docs branch, delete
+  `~/Developer/SajdaTime/SajdaTime-1.7.0/` (copy the phone bundle to Drive folder 99 first if Ali wants) and the merged branches.
+  Lesson 194 has the three Console traps met today.
 
 - **Ali said "release" 13 Nov 2026.** Step 0: the public page, signed out, still reads "Updated on 2 Nov 2026" (1.6.0 live).
   Step 1 done: `set-release-date.sh "13 November 2026" 1.7.0` moved `docs/privacy.html` and `UsageCountsTest` (data handling
@@ -12051,3 +12068,14 @@ matters more than the stable hashes, that is the trade being made.
 192. **A control tapped fast must count on the finger landing, not on the click** (12 Nov 2026). The tasbeeh's Count was an ordinary button, and an ordinary button fires when the finger lifts, only if it has not moved past the touch slop and only for one finger at a time. On the emulator, where a test "click" is a perfect down and up, every test passed. On Ali's Redmi, real thumbs slid a little and overlapped, and beads went missing; a test with 200 taps shaped like real ones gave 100. Three things had to be right together: count on the down (`changedToDownIgnoreConsumed`, because a moving scroll or sheet marks the down before the child sees it), consume the whole touch (or the button's click counts it again, and the sheet follows a sliding thumb and then swallows the next touch while it springs back), and keep `onClick` for TalkBack, Switch Access and a keyboard, which have no finger. A test "click" is not a tap: for anything pressed quickly or repeatedly, write the test with sliding and overlapping fingers, and try it on a real phone.
 
 193. **Read the package name back; never assume what a build installs as** (12 Nov 2026). Ali's Redmi lost `com.sajdatime.app`, his Play copy of 1.6.0, and nobody noticed for hours; he reinstalled it from Google Play at 20:03 (read back as 1.6.0, versionCode 10). The cause is not proven, but the record points one way: the Play copy was on the phone at 17:56 (`final-play-1.6.0-portrait-*`) and still noted at 18:21 (`proof/results.md`); the release script's phone step was skipped; then at about 19:30, with Play Protect blocking the sideload copy, a session installed a "debug copy" to run a sensor probe and uninstalled it afterwards, noting it as `com.sajdatime.app.debug` and "the Play copy was never touched" (`build/review-1.7.0/deepseek/RESULTS-qibla-19h35.md`). This project's debug build has **no package suffix** (`app/build.gradle.kts`: only `.sideload` and `.rtl` have one), so a debug copy *is* `com.sajdatime.app`: it cannot install over the Play copy (Play signs it with a key we do not hold), so the Play copy has to go first, and uninstalling the debug copy afterwards leaves nothing. Anything that installs the Play package name has the same effect: `installDebug`, `installRelease`, `adb install` of a release APK, `bundletool install-apks` from the release bundle. Rules now in `CLAUDE.md` and `docs/RELEASING.md` ("Before every future update"): only a `.sideload` package ever goes on his phones, and before and after any phone session read `adb shell pm list packages --show-versioncode | grep sajdatime` and write the Play copy's version down.
+
+194. **Play Console store pictures: three traps, met filling the 1.7.0 listing by Claude in Chrome** (13 Nov 2026). (1) Giving a
+    translated listing its own phone pictures stops it inheriting the default's watch pictures too: its Wear OS box goes empty, so
+    add the watch pictures to every language that has its own phone pictures (ar, ur, tr-TR, id here; Bengali kept inheriting).
+    (2) The asset side panel's upload stays bound to the box that opened it: pressing another box's "Add assets" while the panel is
+    open and uploading through the same file input put Turkish's four watch pictures into its phone box. Close the panel, open it
+    from the target box, and read each box's count ("4/8") before saving. Publishing overview showed it: Turkish had no "Change
+    Wear OS screenshots" line while the others did, so count the overview's lines against what you meant to change. (3) Several
+    files in one upload land in finishing order, not filename order: upload one at a time and wait. Also: "Save as draft" alone does
+    not reach Publishing overview; the listing's Next, then Save on the review step (with the AI declaration answered) does. The
+    release notes tag for Indonesian is `id`, not `id-ID`; read the tags from the template the box pre-fills.

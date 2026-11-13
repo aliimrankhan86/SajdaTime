@@ -1,10 +1,12 @@
-# SajdaTime: project brief (snapshot 13 Nov 2026, 14:00; 1.6.0 is live, Play page "Updated on 2 Nov 2026"; 1.7.0 release day: Ali declared it ready, privacy page dated 13 Nov, waiting for his merge and Play Console upload, NOT published)
+# SajdaTime: project brief (snapshot 13 Nov 2026, 15:05; 1.6.0 is live, Play page "Updated on 2 Nov 2026"; 1.7.0 phone and watch SUBMITTED 13 Nov, in Google's review, NOT live yet)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
 ## What is live on Google Play
 - **Phone 1.6.0** (versionCode 10) is live: Ali saw it as an update on his own phone on 11 Nov 2026 (submitted 2 Nov, 9 days in review). The 1.5.0 lines below are the earlier record.
-- **1.7.0 release day, 13 Nov 2026.** Ali said it is ready; his own outdoor Qibla turn is no longer a gate. The lines below are the record of how it got there.
+- **1.7.0 submitted 13 Nov 2026, in Google's review.** Phone (11) and watch (1003), everyone, all countries. The store listing now
+  has six languages (French, Hindi and Malay removed), new descriptions and new pictures. It goes live by itself when Google
+  approves; the proof is the public page's "Updated on" date, as Google sends no email. The lines below are the record of how it got there.
 - **1.7.0 on `claude/1-7-0`.** The Qibla hand now points at the Kaaba on phone and watch.
   The top mark stays fixed. A doubtful compass reading prompts calibration. A high confidence reading enters
   the facing state within 2° and leaves it past 4°. The turn printed always adds up with the Facing printed
