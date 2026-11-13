@@ -11,7 +11,7 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 ## Done (4 Nov 2026)
 
 - Gate `clean test lint :app:bundleRelease :wear:bundleRelease`: 349 app, 255 core, 27 wear tests, 0 failures. Device suite 49 of 49 at `26aae84`; after the widget fixes of 4 to 5 Nov the six device widget tests pass at 1.0, 1.3 and 2.0 text and the every-slot proof passes in full. `release-1.7.0.sh` is re-run on the final commit (result recorded in HANDOVER section 11).
-- Store listing 1.7.0 (English and eight locales) approved and stamped in the translation ledger; phone pictures approved; Redmi Note 13 Pro checks done. **Changed 12 Nov 2026:** six store languages only and new description lines (`docs/store/LISTING.md`); the new English What's new waits for Ali's approval, then its five translations.
+- Store listing 1.7.0 (English and eight locales) approved and stamped in the translation ledger; phone pictures approved; Redmi Note 13 Pro checks done. **Changed 12 Nov 2026:** six store languages only and new description lines (`docs/store/LISTING.md`); **13 Nov 2026: What's new written to Ali's brief (features, then fixes, accurate, six languages only), checked against the code, translated, back translated by an independent Opus review, ledger stamped. The whole listing is ready to paste; nothing waits on Ali but release day.**
 - Widget entry heights measured and set (HANDOVER section 11).
 - **Latest numbers, 12 Nov 2026 23:00 at `1145085`:** gate 365 app, 269 core, 27 wear, 0 failed, lint 0 errors; device suite 103 of 103 on emulator-5554; translation ledger 0 to review. Qibla checked against the Redmi's own compass (HANDOVER section 11, first block).
 

@@ -6145,6 +6145,15 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   phone on a magnetic stand, case or charger will not fix that way; a line about moving away from magnets, cases and
   chargers would help. Phone-side fact: the Redmi's chip also carries a large hard-iron offset (its bias estimate was
   about 118 µT), so this device may refuse more often than the Samsung.
+- **Store listing 1.7.0 parked, ready to paste (13 Nov 2026, Ali: "write about the app, its features, and if there's any bug
+  fixes ... only be accurate, only mention about the languages we support ... Once it's all done, don't ask me back and forth
+  ... park it. And when I tell you we are ready for release, then you do the pending on Google Console").** What's new
+  rewritten in six languages (English 468 / 500, all under 500): new features, then two Qibla fixes users could see.
+  Checked against the code; an independent Opus review corrected three overstatements (only the Today widget prints "Now";
+  the 1.7.0 hand points to the Kaaba, 1.6.0's stood for the phone; the calibrate fix has two triggers, not only magnets)
+  and two Indonesian words. Ledger stamped. Left out on purpose: the Suhoor and badge settings fixes (users never saw them).
+  The full description (Ali's of 12 Nov) names only the six languages. **Do not ask Ali to approve it again; on his "ready
+  for release" go straight to the release day steps in `docs/release-tools/RELEASE-1.7.0.md`.**
 - **Ali's remaining check:** one turn with the test copy away from the desk and cable, on both phones, against Google
   Maps. Samsung needs unlocking first. Wireless debugging pairing on the Samsung was done 13 Nov (it expires).
 

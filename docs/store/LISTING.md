@@ -231,7 +231,7 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
-### 1.7.0 listing, English full description changed by Ali 12 Nov 2026 (his six decisions, listed below); What's new is a DRAFT WAITING FOR ALI'S APPROVAL; not live
+### 1.7.0 listing, READY TO PASTE (full description changed by Ali 12 Nov 2026; What's new written 13 Nov 2026 to his brief); not live
 
 Made from the approved 1.6.0 text below (sells the whole app first, then What's new, HANDOVER 5.38). Changes on 4 Nov: Duha, time left and
 sky on the prayer list, widgets line, Match your mosque line (the old "shift the Islamic date" bullet is gone from it; the shift
@@ -244,11 +244,11 @@ For everyone is gone; the Timetable bullet says what 1.7.0 does (today and the n
 a Tasbeeh bullet under My prayers; the adhan bullet gains "Hear it first" (the sound preview). Characters, counted by script on
 12 Nov 2026: full description 3994 / 4000, What's new draft 411 / 500. The five translations are in `LISTING-LOCALES.md`.
 
-What's new, DRAFT 12 Nov 2026, **waiting for Ali's approval** (411 / 500). Not translated yet: the five translations are made once
-he approves the English. The text Ali approved on 4 Nov (407 characters by script; the "286" once written here was a miscount; no Tasbeeh, Timetable or Qibla needle) is replaced by this:
+What's new, 13 Nov 2026, 468 / 500, written to Ali's brief that day: "write about the app, its features, and if there's any bug fixes ... only be accurate, only mention about the languages we support", then park it. Every line checked against `git log main..claude/1-7-0` and the code, and by an independent Opus review. Left out on purpose: the Suhoor reminder fix (6ade021; the stray reminder was always silent, so users never saw it) and the badge and widget settings fix (faa4151, same reason). Not mentioned for lack of room: the shorter adhan recordings (e93a34d) and the theme choice "Follow phone" or its opposite. Widgets: only Today prints "Now"; the strip marks the current prayer by its shape, hence "mark the current prayer". Qibla: in 1.6.0 the hand stood for the phone; in 1.7.0 it points to the Kaaba. The five translations are in `LISTING-LOCALES.md`.
 
 ```
-New: a Tasbeeh counter in My prayers, with targets of 33, 99, 100 or none. The Timetable now shows today and the next six days, and Save as PDF gives the whole month in one tap. A slimmer Qibla needle that is easier to line up. Times and widgets mark the current prayer with one Now marker. Optional Duha window. Time left and a sky band on Times. Redrawn widgets. Where your mosque differs, follow your mosque.
+New: a Tasbeeh counter in My prayers. The Timetable shows today and the next six days; Save as PDF makes the whole month in one tap. Redrawn widgets mark the current prayer, as Times does. Times adds time left, a sky band and optional Duha. The Qibla hand now points to the Kaaba. Preview a sound before you pick it.
+Fixed: on Qibla, the turn and the facing now always add up, and it asks you to calibrate when the compass cannot be trusted, instead of pointing wrong.
 ```
 
 Full description:

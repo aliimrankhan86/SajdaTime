@@ -44,17 +44,17 @@ Translated from the 1.7.0 English in [LISTING.md](LISTING.md). The titles and sh
 
 **Six store languages from 1.7.0 (Ali, 12 Nov 2026):** English and these five, the same six as the app. The full descriptions below carry his changes of 12 Nov (`LISTING.md` lists them): languages on the second line, the corrected Timetable bullet, the Tasbeeh bullet, "hear it first" on the adhan bullet, the old languages bullet gone.
 
-**What's new below is the OLD text (approved 4 Nov) and is NOT to be pasted.** The English What's new was redrafted on 12 Nov and waits for Ali's approval; the five translations are made after he approves it.
+**What's new below is the 1.7.0 text, written 13 Nov 2026 to Ali's brief of that day** (what the app adds, then fixes; accurate only; the six languages only), checked against the code and back translated by an independent Opus review, fixes applied. Ready to paste on release day.
 
 Counts include spaces and line breaks, excluding the final line break and Markdown fences. Recounted by script on 12 Nov 2026.
 
-| Language | Full description | What's new (old text) |
+| Language | Full description | What's new (13 Nov) |
 |---|---:|---:|
-| Arabic (ar) | 3649 / 4000 | 351 / 500 |
-| Urdu (ur) | 3932 / 4000 | 357 / 500 |
-| Turkish (tr-TR) | 3991 / 4000 | 402 / 500 |
-| Indonesian (id-ID) | 3997 / 4000 | 414 / 500 |
-| Bengali (bn-BD) | 3992 / 4000 | 329 / 500 |
+| Arabic (ar) | 3649 / 4000 | 490 / 500 |
+| Urdu (ur) | 3932 / 4000 | 484 / 500 |
+| Turkish (tr-TR) | 3991 / 4000 | 475 / 500 |
+| Indonesian (id-ID) | 3997 / 4000 | 489 / 500 |
+| Bengali (bn-BD) | 3992 / 4000 | 451 / 500 |
 
 ### Arabic (ar), 1.7.0
 
@@ -131,10 +131,11 @@ Counts include spaces and line breaks, excluding the final line break and Markdo
 لا أطلب في المقابل إلا شيئًا واحدًا: أرجو أن تذكرني وعائلتي ووالديّ في دعائك. جزاكم الله خيرًا.
 ```
 
-**What's new** `351 / 500` (old text of 4 Nov, not to be pasted)
+**What's new** `490 / 500` (13 Nov 2026, from the 1.7.0 English; reviewed)
 
 ```
-في «المواقيت» والتطبيقات المصغّرة، علامة «الآن» تبيّن الصلاة الحالية. للمظهر، اختر «حسب الهاتف» أو عكس مظهره. وقت الضحى اختياري. الوقت المتبقي وشريط السماء في «المواقيت». تطبيقات مصغّرة بتصميم جديد يناسب مقاسات أكثر. «طابِق أوقات الدخول مع مسجدك» يعرض كل وقت بجانب تعديلك. نُقل تعديل التاريخ الهجري إلى «التواريخ الإسلامية». وعند الاختلاف، اتبع مسجدك.
+جديد: عدّاد «التسبيح» في «صلواتي». يعرض «جدول المواقيت» اليوم والأيام الستة التالية، و«حفظ بصيغة PDF» يُخرج الشهر كله بلمسة واحدة. التطبيقات المصغّرة بتصميمها الجديد تُبرز الصلاة الحالية كما في «المواقيت». وفي «المواقيت» أيضًا الوقت المتبقي وشريط السماء ووقت الضحى الاختياري. عقرب القبلة يشير الآن إلى الكعبة. استمع إلى الصوت قبل اختياره.
+إصلاحات: في «القبلة» صار مقدار الاستدارة يتّفق دائمًا مع الاتجاه المعروض، وتطلب معايرة البوصلة حين لا يمكن الوثوق بقراءتها، بدل أن تشير إلى اتجاه خاطئ.
 ```
 
 ### Urdu (ur), 1.7.0
@@ -212,10 +213,11 @@ Counts include spaces and line breaks, excluding the final line break and Markdo
 بدلے میں میری بس ایک گزارش ہے: براہِ کرم مجھے، میرے گھر والوں اور میرے والدین کو اپنی دعاؤں میں یاد رکھیں۔ جزاک اللہ خیر۔
 ```
 
-**What's new** `357 / 500` (old text of 4 Nov, not to be pasted)
+**What's new** `484 / 500` (13 Nov 2026, from the 1.7.0 English; reviewed)
 
 ```
-اوقات اور ویجٹ میں «ابھی» کا ایک نشان موجودہ نماز دکھاتا ہے۔ تھیم «فون کے مطابق» یا اس کے الٹ رکھیں۔ چاشت کا اختیاری وقت۔ اوقات میں باقی وقت اور آسمان کی پٹی۔ نئے ڈیزائن کے ویجٹ زیادہ سائز میں فٹ ہوتے ہیں۔ مسجد سے اوقات ملاتے ہوئے ہر نماز کا وقت اپنی تبدیلی کے ساتھ دیکھیں۔ ہجری تاریخ کی تبدیلی اب «اسلامی تاریخیں» میں ہے۔ فرق ہو تو اپنی مسجد کی پیروی کریں۔
+نیا: «میری نمازیں» میں «تسبیح» کاؤنٹر۔ «اوقات نامہ» آج اور اگلے چھ دن دکھاتا ہے، اور «PDF محفوظ کریں» ایک ٹیپ میں پورا مہینہ بنا دیتا ہے۔ نئے ڈیزائن کے ویجٹ بھی «اوقات» کی طرح موجودہ نماز نمایاں کرتے ہیں۔ اوقات میں باقی وقت، آسمان کی پٹی اور چاشت کا اختیاری وقت۔ قبلہ کی سوئی اب خانہ کعبہ کی طرف اشارہ کرتی ہے۔ آواز چننے سے پہلے سن لیں۔
+درستیاں: قبلہ میں مڑنے کے درجے اور رخ اب ہمیشہ آپس میں ملتے ہیں، اور کمپاس پر بھروسا نہ ہو سکے تو غلط سمت دکھانے کے بجائے کیلیبریٹ کرنے کو کہتا ہے۔
 ```
 
 ### Turkish (tr-TR), 1.7.0
@@ -293,10 +295,11 @@ Vakitler, Batoul Apps'in yaygın olarak kullanılan açık kaynaklı kütüphane
 Karşılığında tek bir şey istiyorum: lütfen beni, ailemi ve anne babamı dualarınızda anın. Allah razı olsun.
 ```
 
-**What's new** `402 / 500` (old text of 4 Nov, not to be pasted)
+**What's new** `475 / 500` (13 Nov 2026, from the 1.7.0 English; reviewed)
 
 ```
-Vakitler ve widget'larda «Şimdi» etiketi içinde bulunulan namaz vaktini gösterir. Tema için «Telefona uy» veya telefonun tersini seçin. İsteğe bağlı Kuşluk vakti. Vakitler'de kalan süre ve gökyüzü şeridi. Yeni tasarımlı widget'lar daha çok boyuta sığar. Camiye göre ayarlarken her vakti değişikliğinizin yanında görün. Hicri tarih ayarı İslami tarihler'e taşındı. Fark varsa caminizin vakitlerine uyun.
+Yeni: Namazlarım'da Tesbih sayacı. Vakit çizelgesi bugünü ve sonraki altı günü gösterir; PDF olarak kaydet tek dokunuşla bütün ayı hazırlar. Yeni tasarımlı widget'lar da Vakitler gibi şu anki namazı öne çıkarır. Vakitler'de kalan süre, gökyüzü şeridi ve isteğe bağlı Kuşluk vakti. Kıble ibresi artık Kâbe'yi gösterir. Sesi seçmeden önce dinleyin.
+Düzeltmeler: Kıble'de dönüş ve yön artık hep birbirini tutar; pusulaya güvenilemediğinde yanlış yön göstermek yerine ayar ister.
 ```
 
 ### Indonesian (id-ID), 1.7.0
@@ -374,10 +377,11 @@ Tidak ada versi berbayar, langganan, atau fitur yang dikunci. SajdaTime diberika
 Saya hanya minta satu hal sebagai balasan: mohon doakan saya, keluarga saya, dan orang tua saya. Jazakallahu khairan.
 ```
 
-**What's new** `414 / 500` (old text of 4 Nov, not to be pasted)
+**What's new** `489 / 500` (13 Nov 2026, from the 1.7.0 English; reviewed)
 
 ```
-Di Waktu dan widget, satu penanda “Sekarang” menunjukkan waktu salat yang sedang berlangsung. Tema “Ikuti ponsel” atau kebalikannya. Rentang waktu Duha opsional. Sisa waktu dan pita langit di Waktu. Widget berdesain baru muat di lebih banyak ukuran. Saat menyesuaikan dengan masjid, lihat tiap waktu di samping perubahan Anda. Penggeseran tanggal Hijriah kini ada di Tanggal Islam. Jika berbeda, ikuti masjid Anda.
+Baru: penghitung Tasbih di Salat saya. Jadwal menampilkan hari ini dan enam hari berikutnya; Simpan PDF membuat sebulan penuh dengan sekali ketuk. Widget berdesain baru menandai salat saat ini, seperti Waktu. Di Waktu ada sisa waktu, pita langit, dan Duha opsional. Jarum Kiblat kini menunjuk Ka'bah. Dengarkan suara sebelum memilihnya.
+Perbaikan: di Kiblat, angka putar dan arah hadap kini selalu cocok, dan jika kompas tidak dapat dipercaya, meminta kalibrasi, bukan menunjuk arah salah.
 ```
 
 ### Bengali (bn-BD), 1.7.0
@@ -455,10 +459,11 @@ SajdaTime একটি সহায়ক, কোনো ধর্মীয় �
 বিনিময়ে আমার একটাই অনুরোধ: অনুগ্রহ করে আপনার দোয়ায় আমাকে, আমার পরিবারকে ও আমার মা বাবাকে রাখবেন। জাযাকাল্লাহু খাইরান।
 ```
 
-**What's new** `329 / 500` (old text of 4 Nov, not to be pasted)
+**What's new** `451 / 500` (13 Nov 2026, from the 1.7.0 English; reviewed)
 
 ```
-সময় ট্যাব ও উইজেটে «এখন» চিহ্নে চলতি ওয়াক্ত দেখা যায়। থিম «ফোনের মতো» বা তার উল্টো রাখুন। চাশতের ঐচ্ছিক সময়। সময় ট্যাবে বাকি সময় ও আকাশের ফালি। নতুন নকশার উইজেট আরও বেশি মাপে আঁটে। মসজিদের সময় মেলাতে প্রতিটি সময়ের পাশে আপনার বদল দেখুন। হিজরি তারিখ সরানোর ব্যবস্থা এখন «ইসলামি তারিখ» অংশে। অমিল হলে মসজিদের সময় মেনে চলুন।
+নতুন: «আমার নামাজ»-এ তাসবিহ কাউন্টার। সময়সূচিতে আজ ও পরের ছয় দিন; «PDF হিসেবে সেভ করুন» এক ট্যাপে পুরো মাস তৈরি করে। নতুন নকশার উইজেটেও সময় ট্যাবের মতো চলতি ওয়াক্ত চিহ্নিত থাকে। সময় ট্যাবে বাকি সময়, আকাশের ফালি ও চাশতের ঐচ্ছিক সময়। কিবলার কাঁটা এখন কাবার দিকে নির্দেশ করে। বেছে নেওয়ার আগে আওয়াজ শুনে নিন।
+ঠিক করা হয়েছে: কিবলায় ঘোরার মাপ ও মুখের দিক এখন সবসময় মেলে, আর কম্পাসের রিডিং ভরসাযোগ্য না হলে ভুল দিক না দেখিয়ে কম্পাস ঠিক করতে বলে।
 ```
 
 ## 1.6.0 listings, 25 Oct 2026: paste on the 1.6.0 release day
