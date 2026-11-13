@@ -6117,6 +6117,13 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   instead of the confident "Turn left 27°" it showed 90 seconds earlier. **Not verified:** the Samsung S23 Ultra, which
   locked on a PIN screen (never entered) before its 1.7.0 test copy (`.sideload`, installed 10:23, beside its Play copy)
   could be opened; the watch (compiled only); the Redmi away from its desk, where the fix should let guidance return.
+- **Samsung S23 Ultra, 13 Nov 10:37 (unlocked by Ali; onboarded the `.sideload` copy, Qibla tab opened):** it also shows the
+  calibration notice and no guidance, and stays so after 20 s. Raw `AK09918` field (31.4, -4.6, -51.6) = 60.7 µT (about
+  24% over Slough's 49) with dip about 58° against about 67° expected, so 9° off: **under the new dip limit and under the
+  35% strength limit, so the notice here comes from the sensor's own accuracy report, not from the new check.** Both
+  phones, side by side in the same room, read 61 to 64 µT: the desk or room is magnetically disturbed, which agrees with
+  the Redmi finding. The Samsung's chip is sane; its surroundings are not. Still unproven: guidance returning
+  on either phone away from the desk (needs a person to carry them outdoors; not done).
 - **Known wording gap, not built, Ali's call (`ux-lead` + six languages first):** the notice says "figure of eight". A
   phone on a magnetic stand, case or charger will not fix that way; a line about moving away from magnets, cases and
   chargers would help. Phone-side fact: the Redmi's chip also carries a large hard-iron offset (its bias estimate was
