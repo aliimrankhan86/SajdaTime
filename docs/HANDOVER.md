@@ -6092,7 +6092,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 13 Nov 2026, 15:05: 1.7.0 SUBMITTED, phone and watch IN GOOGLE'S REVIEW; NOT live yet
+### 📍 STATE OF PLAY, 13 Nov 2026, 15:45: 1.7.0 SUBMITTED, phone and watch IN GOOGLE'S REVIEW; NOT live yet; Mac, Drive and GBrain cleaned
 
 - **Submitted 13 Nov 2026 about 15:00 UK.** Ali pressed "Submit 21 changes for review"; Publishing overview then read "Changes
   in review" (managed publishing off, so it goes live by itself when approved). The 21: Production 11 (1.7.0), Production (Wear
@@ -6109,9 +6109,26 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Next, step 5, after Google's review:** check "Updated on" signed out (Play sends no email; the date it shows will be the release's
   own, likely 13 Nov, so record the day it was first seen live, lesson 110), then record live in HANDOVER,
   PROJECT_BRIEF and GBrain, re-baseline the daily health check to 1.7.0 (gone, see the next bullet), point the review replies job
-  at the 1.7.0 features (its 1.6 Timetable line then stops being true), merge this docs branch, delete
-  `~/Developer/SajdaTime/SajdaTime-1.7.0/` (copy the phone bundle to Drive folder 99 first if Ali wants) and the merged branches.
-  Lesson 194 has the three Console traps met today.
+  at the 1.7.0 features (its 1.6 Timetable line then stops being true), merge this docs branch and delete it (the bundle folder
+  and the merged branches are already gone, next bullet). Lesson 194 has the three Console traps met today.
+- **Cleaned 13 Nov 2026, 15:40, at Ali's word** ("I want only to keep the latest codebase folder and no screenshots anymore ...
+  no stale or old folder also nothing in gbrain"; his answers: delete all on the Mac, trash Drive screenshots, stale GBrain only,
+  keep the extension code). **Mac:** branches `claude/1-6-0`, `claude/1-7-0` (local and GitHub), `ccr-9e25a943-855wxx`,
+  `codex/design-docs-fix` deleted (all merged); `build/` emptied except `build/review-replies/` (the weekly review replies job
+  writes there); `SajdaTime-1.7.0/` (Play holds the bundles; Ali kept no copy), `app|core|wear/build`, `.gradle`, `.codex` deleted.
+  `~/Developer/sajdatime-extension`: `node_modules`, `dist`, `artifacts`, `test-results` and two merged local branches deleted,
+  code untouched. The store's own pictures in `docs/store/` stay (the store and the next release need them). **Drive:** no
+  screenshots were there (text only by design); the 1.6.0 bundle folder 99 and the 7 Nov READ ME were moved to the Drive bin; new
+  `00 READ ME FIRST (13 Nov 2026, v6).md`. **GBrain:** stale facts retired and the rest merged (SajdaTime: 5 facts left, state,
+  phones, three preferences); `projects/sajdatime` rewritten lean; `projects/index` rows corrected; `projects/sajdatime-extension`
+  corrected to "1.0.1 live on Chrome and Edge since 2 Nov" with its 29 build-progress facts retired; the 1.6 plan and extension
+  plan pages compressed to pointers (the full texts are in Drive and the extension repo's `docs/PLAN.md`). **Still running, Ali
+  switches off in the Claude app, Scheduled:** `sajdatime-1-6-0-live-check` (its job is done), `sajdatime-edge-publish-watch`
+  (Edge 1.0.1 has been live since 2 Nov), and the one-off resume tasks `sajdatime-1-7-overnight`, `sajdatime-chrome-upload-resume`,
+  `sajdatime-resume-after-reset`, `sajdatime-resume-size-pass`, `sajdatime-resume-widgets`, `sajdatime-resume-widgets-2` if any
+  still show as on. The cloud routine "SajdaTime 1.7.0 finish and verify" (`trig_01SZGVAFkFfQ3mGrirvLUB5H`, every 3 hours) was
+  still on and read `build/PENDING-1.7.0.md`, now deleted: switched OFF at Ali's yes, 13 Nov 2026 15:45 (read back
+  `enabled: false`; paused, not deleted, at claude.ai/code/routines).
 - **1.6.0 records closed after it went live, 13 Nov 2026, 15:35 (scheduled live check, signed out):** 1.6.0 was live by 11 Nov
   (Ali saw the update); the public page dates the release "Updated on 2 Nov 2026", its submission day (lesson 110). Its
   description, What's new and short description are the 1.6.0 text in `docs/store/LISTING.md` and `LISTING-LOCALES.md`, line for
