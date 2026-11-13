@@ -6092,7 +6092,15 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 13 Nov 2026, 12:45: 1.7.0 READY TO ROLL (signed bundles, listing, pictures all done); waits only for Ali's "release"; NOT published
+### 📍 STATE OF PLAY, 13 Nov 2026, 14:00: 1.7.0 RELEASE DAY under way; privacy page dated, pull request open for Ali to merge; NOT published
+
+- **Ali said "release" 13 Nov 2026.** Step 0: the public page, signed out, still reads "Updated on 2 Nov 2026" (1.6.0 live).
+  Step 1 done: `set-release-date.sh "13 November 2026" 1.7.0` moved `docs/privacy.html` and `UsageCountsTest` (data handling
+  unchanged, so no other page text moved); gate green (app 366, core 276, wear 27, 0 failed, lint 0 errors). Next is step 2,
+  Ali merges the pull request (merging publishes the dated privacy page through Pages). **The signed bundles below stay
+  valid:** `git diff c30e7fe` touches no file under `app/src/main`, `core/src/main`, `wear/src/main` or any `build.gradle.kts`,
+  so step 3 uploads them as they are instead of building on `main`. The daily health check is re-baselined once, to 1.7.0, at
+  step 5 (not to 1.6.0 first: one move, not two).
 
 - **Release run 13 Nov 2026 12:15 on `c30e7fe` (app code unchanged since), `STORE_SHOTS=1` on `sajdastore`:** every line PASS or
   TAKEN. Gate app 366, core 276, wear 27 tests, 0 failed, lint 0 errors (the only CHECK was the script's expected counts, now

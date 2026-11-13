@@ -25,6 +25,8 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 
 ## Release day, in order
 
+**13 Nov 2026: steps 0 and 1 DONE** (page still "Updated on 2 Nov 2026"; privacy dated 13 November 2026, gate green). Step 3: the bundles in `SajdaTime-1.7.0/` are uploaded as they are, since no shipped code changed after they were signed (HANDOVER §11 first block).
+
 0. **Is 1.6.0 live?** Yes: the public page read "Updated on 2 Nov 2026" on 12 Nov. Check again on the day, signed out (CLAUDE.md). Do the 1.6.0 live chores first (mark the listing live, re-baseline the daily health check, PROJECT_BRIEF). If 1.6.0 is still in Google's review, **Ali decides**: wait for it, or replace it with 1.7.0 (which can show errors in the Console). Recommendation: wait.
 1. **Claude:** `docs/release-tools/set-release-date.sh "<d Month yyyy>" 1.7.0` (moves `docs/privacy.html` "Last updated" and the date in `UsageCountsTest`); data handling has not changed in 1.7.0, so the page text stays. Gate, commit, push.
 2. **Ali:** opens and merges the pull request `claude/1-7-0` into `main` (none exists yet).
