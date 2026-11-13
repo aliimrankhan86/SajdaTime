@@ -12,6 +12,7 @@ import android.view.Surface
 import androidx.core.content.ContextCompat
 import com.sajdatime.core.CompassAccuracy
 import com.sajdatime.core.Coordinates
+import com.sajdatime.core.HeadingCrossCheck
 import com.sajdatime.core.QiblaEngine
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -93,6 +94,8 @@ class CompassRepository(private val context: Context) {
         var haveRawField = false
         var haveRotation = false
         var dipWrong = false
+        // The fused heading against one worked out from the magnet alone, while still (HeadingCrossCheck).
+        val crossCheck = HeadingCrossCheck()
 
         fun publish() {
             val heading = smoothed ?: return
@@ -103,7 +106,7 @@ class CompassRepository(private val context: Context) {
                 CompassAccuracy.fromSensorReports(
                     vectorAccuracy,
                     magnetAccuracy,
-                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong || crossCheck.disagrees,
                 )
             }
             trySend(CompassReading(QiblaEngine.normalise(heading + declination), accuracy))
@@ -123,6 +126,13 @@ class CompassRepository(private val context: Context) {
                             CompassAccuracy.fieldDipDegrees(rotation, rawField[0], rawField[1], rawField[2]),
                             expectedDip,
                             dipWrong,
+                        )
+                    }
+                    if (rotationVector != null && haveRotation) {
+                        crossCheck.update(
+                            fused = QiblaEngine.normalise(Math.toDegrees(kotlin.math.atan2(rotation[1].toDouble(), rotation[4].toDouble()))),
+                            rawMagnet = HeadingCrossCheck.magnetHeading(rotation, rawField[0], rawField[1], rawField[2]),
+                            nowMs = event.timestamp / 1_000_000L,
                         )
                     }
                 }

@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.sajdatime.core.CompassAccuracy
+import com.sajdatime.core.HeadingCrossCheck
 import com.sajdatime.core.Coordinates
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.Madhab
@@ -301,6 +302,7 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
         var haveRawField = false
         var haveRotation = false
         var dipWrong = false
+        val crossCheck = HeadingCrossCheck()
 
         fun publish() {
             val accuracy = if (magnetometer != null && field == null) {
@@ -309,7 +311,7 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                 CompassAccuracy.fromSensorReports(
                     vectorAccuracy,
                     magnetAccuracy,
-                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong,
+                    disturbed = field?.let { CompassAccuracy.fieldLooksDisturbed(it, expectedField) } == true || dipWrong || crossCheck.disagrees,
                 )
             }
             _state.update { it.copy(heading = heading, compassAccuracy = accuracy) }
@@ -330,6 +332,13 @@ class WearViewModel(application: Application) : AndroidViewModel(application) {
                             CompassAccuracy.fieldDipDegrees(rotation, rawField[0], rawField[1], rawField[2]),
                             expectedDip,
                             dipWrong,
+                        )
+                    }
+                    if (haveRotation) {
+                        crossCheck.update(
+                            fused = QiblaEngine.normalise(Math.toDegrees(kotlin.math.atan2(rotation[1].toDouble(), rotation[4].toDouble()))),
+                            rawMagnet = HeadingCrossCheck.magnetHeading(rotation, rawField[0], rawField[1], rawField[2]),
+                            nowMs = event.timestamp / 1_000_000L,
                         )
                     }
                 } else {

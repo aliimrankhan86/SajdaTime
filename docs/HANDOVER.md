@@ -6124,6 +6124,23 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   phones, side by side in the same room, read 61 to 64 µT: the desk or room is magnetically disturbed, which agrees with
   the Redmi finding. The Samsung's chip is sane; its surroundings are not. Still unproven: guidance returning
   on either phone away from the desk (needs a person to carry them outdoors; not done).
+- **Samsung, 10:41 to 10:52, the finding that matters most: its fused heading and its raw magnet heading disagreed by 32 to 35°
+  on a phone lying perfectly still, in clean air (44 µT, dip 58°).** Rotation vector 131.3°, heading worked out from the
+  raw field and gravity 163.5°, neither moved for over a minute, restarting the app changed nothing (the fusion keeps its
+  state in the sensor service). The app was showing "Turn left 14°, Facing 133°" on the fused one. **Which was right could
+  not be told from the phone** (no independent north; Ali had moved it between rooms and a bed at 121 µT, so the fusion
+  was probably carrying a heading learned in a disturbed field). After Ali picked it up and put it down again the two agreed
+  to 1.5° (150.2 and 148.7, app "Facing 151°, Turn left 32°", 151 − 32 = 119). Ali's "quite off" on his Samsung could be this.
+  **Fixed as detection, not as a guess:** `HeadingCrossCheck` (core): while the fused heading has been still 1.5 s, hold it
+  against a heading from the magnet and the fused matrix's gravity; more than 20° apart (clears under 12°) forces LOW, the
+  calibration notice, no facing claim. Never judged while turning, so finding the Qibla is untouched. Phone (rotation
+  vector path) and watch. `HeadingCrossCheckTest` (7): the real 131.3 v 163.4, the Redmi's 1.8°, a 30°/s turn with a lagging
+  magnet, hysteresis, across north, the magnet maths. **Rejected:** preferring the raw magnet heading (it is just as
+  wrong in a disturbed field; UK horizontal field is only about 19 µT, so an 8 µT bias is 25°); trusting the fused one
+  (the case above). **Gate 13 Nov 10:52:** clean test lint both bundles green, 669 unit tests 0 failed, new build installed on both
+  phones. **Not verified:** the new check firing on the Samsung itself (the disagreement was gone when it was
+  picked up before the build arrived); the watch (compiled only). A background keep-alive (wake key every 10 s, PID in
+  `/tmp/claude-501/keepalive.pid`) kept the unplugged Samsung unlocked at Ali's instruction; it changes no phone setting.
 - **Known wording gap, not built, Ali's call (`ux-lead` + six languages first):** the notice says "figure of eight". A
   phone on a magnetic stand, case or charger will not fix that way; a line about moving away from magnets, cases and
   chargers would help. Phone-side fact: the Redmi's chip also carries a large hard-iron offset (its bias estimate was
