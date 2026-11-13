@@ -17,11 +17,11 @@ Written 4 Nov 2026, corrected the same night after an independent check (Fable a
 
 ## Still to do before release day (Claude)
 
-1. `release-1.7.0.sh`: DONE 5 Nov 2026 on `6b6bf20` (every line PASS or TAKEN) and run again 12 Nov 18:20 before the Qibla rounding fix. **NOT yet run on the current code** (`f13497b` changed the app): run it once Ali's own Qibla turn is OK, since it makes the signed bundles.
+1. **DONE 13 Nov 2026 12:15 on `c30e7fe`: every line PASS or TAKEN, signed bundles and pictures ready (HANDOVER §11 first block has the hashes).** History: `release-1.7.0.sh` DONE 5 Nov 2026 on `6b6bf20` (every line PASS or TAKEN) and run again 12 Nov 18:20 before the Qibla rounding fix. **NOT yet run on the current code** (`f13497b` changed the app): run it once Ali's own Qibla turn is OK, since it makes the signed bundles.
 2. DONE 5 Nov 2026: `tools/wear-verify.sh` on both round sizes at 1.0x and 1.3x, the current prayer is marked and nothing is behind the bezel.
 3. Watch "What's new" for the Wear track: one English line is drafted in `docs/store/LISTING.md` ("1.7.0 watch note, DRAFT"); Ali approves it, then Claude translates it and stamps the ledger. DONE 6 Nov 2026; since 12 Nov 2026 only the five translations for the six store languages are kept.
 4. DONE 6 Nov 2026 (`c34d3c9`): the watch Times picture was retaken; since then only the watch Qibla page changed, and its picture was refreshed 12 Nov (`be8232d`).
-5. **Before release day, Ali:** his own turn with "SajdaTime (test)" on the Redmi against Google Maps, and his look at `build/review-1.7.0/`.
+5. **No longer a gate (Ali declared 1.7.0 ready, 13 Nov 2026); optional:** his own turn with "SajdaTime (test)" on the Redmi against Google Maps, and his look at `build/review-1.7.0/`.
 
 ## Release day, in order
 

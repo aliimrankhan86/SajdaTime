@@ -6092,7 +6092,27 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 13 Nov 2026, 10:30: 1.7.0 Qibla now refuses a field that points the wrong way; the Redmi's desk was one; NOT published
+### 📍 STATE OF PLAY, 13 Nov 2026, 12:45: 1.7.0 READY TO ROLL (signed bundles, listing, pictures all done); waits only for Ali's "release"; NOT published
+
+- **Release run 13 Nov 2026 12:15 on `c30e7fe` (app code unchanged since), `STORE_SHOTS=1` on `sajdastore`:** every line PASS or
+  TAKEN. Gate app 366, core 276, wear 27 tests, 0 failed, lint 0 errors (the only CHECK was the script's expected counts, now
+  updated); device suite 95 of 95 plus the Ramadan, widget and Suhoor checks. **Signed bundles to upload** (Ali's key, CN=Ali Imran
+  Khan) in `~/Developer/SajdaTime/SajdaTime-1.7.0/`: `app-release.aab` 11 / 1.7.0, 8,892,359 bytes, sha256
+  `28eccea66ccce724aff0548295849eb2fffb161919035f6d03f55fc9c26636dd`; `wear-release.aab` 1003 / 1.7.0, 3,719,071 bytes, sha256
+  `354cd2d5a6e15c6315f90d06fd5b68f5d29eb3596db55e16f5b25004ba707a29`. Any later change to app, core or wear code voids them: re-run.
+- **Store pictures current (`docs/store/upload/`, rebuilt by `tools/build-store-assets.sh`, upload copies byte equal to raw):** 01 to
+  04 retaken in en, ar, ur, tr, id. 02 now shows the Tasbeeh button (the 4 Nov set did not); 03 Qibla "Turn right 58°, Facing 61°"
+  (adds up to 119); 04 Ramadan has the centred lines. The script took 04 unscrolled, hiding the timetable button under the tab bar,
+  so it was retaken with a slow 340 px swipe, now in the script, and with notifications granted (the script's last reset had removed
+  them, so an Allow banner showed). English 05 to 08 (widgets, Today widget, Settings theme, Match your mosque) were checked against
+  today's strings and kept. The script's own extra 06-timetable and 07-alerts-and-adhan captures were deleted: the approved English
+  set is the eight in the upload folder. Watch pictures unchanged (Qibla refreshed 12 Nov). Bengali uses the English pictures.
+- **Phones after the run:** both still carry the Play copy (`com.sajdatime.app` 10) and the test copy (`.sideload` 11). The run used
+  only the emulator.
+- **On Ali's "release":** `docs/release-tools/RELEASE-1.7.0.md`, release day steps 0 to 5. The listing text is final (below); do
+  not ask him to approve it again. His own outdoor Qibla turn is no longer a gate: he declared it ready on 13 Nov.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 13 Nov 2026, 10:30: 1.7.0 Qibla now refuses a field that points the wrong way; the Redmi's desk was one; NOT published
 
 - **Found (Redmi, USB, charging, flat on its desk, 10:24):** raw magnetometer (`qmc6308`) read (-36.7, -48.2, +20.0) µT,
   63.8 total against Slough's about 49 (30% over, under the old 35% limit, so it passed). Its horizontal part was about
