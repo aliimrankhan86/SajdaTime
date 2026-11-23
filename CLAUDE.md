@@ -146,6 +146,20 @@ Change taught you something (platform trap, wrong assumption, bug class reading 
 
 ---
 
+## After every release: clean up, without asking (owner, 23 Nov 2026)
+
+**The owner wants everything left clean after each release, and wants the assistant to manage it, not to be asked.** Do it as part of closing the release, in this order, and say what you did in one short line:
+
+1. **Prove it is live first:** the public Play page, signed out, "Updated on" date. Never clean on the strength of "it should be live".
+2. **Records:** new STATE OF PLAY block in `docs/HANDOVER.md` §11 (old one marked history), `docs/PROJECT_BRIEF.md` title and live section, GBrain `projects/sajdatime`. All three must agree.
+3. **Branches:** delete the merged release branches, local and on GitHub. A branch whose work is already in `main` is safe to remove.
+4. **Local files:** delete temporary signed bundles folders, scratch notes and checklists that are finished (`build/PENDING-*.md`, `build/AFTER-RELEASE-*.md`), stale review pictures and old emulators' leftovers. Keep what a later session needs to understand the project.
+5. **Never touch:** the signing key, `keystore.properties`, any `*.jks`, or anything unmerged. Never delete work that is not in `main`.
+6. **Hand-offs:** the owner presses Merge himself. Everything else here needs no question.
+7. **Say what you could not check** (for example the watch release, which the public phone page cannot show).
+
+---
+
 ## Before you say you are finished
 
 ```bash
