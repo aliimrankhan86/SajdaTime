@@ -6092,7 +6092,21 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 13 Nov 2026, 15:45: 1.7.0 SUBMITTED, phone and watch IN GOOGLE'S REVIEW; NOT live yet; Mac, Drive and GBrain cleaned
+### 📍 STATE OF PLAY, 23 Nov 2026: 1.7.0 IS LIVE on Google Play (phone); nothing pending
+
+- **Proof:** the public Play page, read signed out on 23 Nov 2026 (claude.ai project session, built-in browser, en_GB), says "Updated on
+  13 Nov 2026" and shows the 1.7.0 What's new (Tasbeeh counter, 7-day Timetable and month PDF, redrawn widgets, Qibla hand points at the
+  Kaaba, turn and facing add up, calibrate notice). 5.0 from 10 reviews, 100+ downloads, six listing languages. The page shows no
+  version number, so "1.7.0" is read from that text and from the repo (PR #18 merged 13 Nov 13:59, PR #19 15:45). The date 13 Nov is when
+  Google published it, the same day as submission, so review was fast.
+- **Not confirmed:** the watch 1003. It was submitted with the phone (see the block below) but the public phone page cannot show it.
+- **Pending work: none.** The daily health check was removed on purpose on 13 Nov (`016e309`), so there is nothing to re-baseline. The
+  temporary `SajdaTime-1.7.0/` bundle folder is already deleted. A helper read of the Play page on 23 Nov returned "Updated on 20 Aug
+  2026" and 1.1-era text: that was a stale or wrong fetch, the direct read above is the one to trust.
+- **For the next session:** the rules in `CLAUDE.md` are unchanged. Qibla, discoverability ("SajdaTime" is found, "prayer times" not yet,
+  because Play ranks on installs and ratings) and the 1.7.0 wording are all recorded in the block below. Do not reopen them.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 13 Nov 2026, 15:45: 1.7.0 SUBMITTED, phone and watch IN GOOGLE'S REVIEW; NOT live yet; Mac, Drive and GBrain cleaned
 
 - **Submitted 13 Nov 2026 about 15:00 UK.** Ali pressed "Submit 21 changes for review"; Publishing overview then read "Changes
   in review" (managed publishing off, so it goes live by itself when approved). The 21: Production 11 (1.7.0), Production (Wear

@@ -1,8 +1,13 @@
-# SajdaTime: project brief (snapshot 13 Nov 2026, 15:05; 1.6.0 is live, Play page "Updated on 2 Nov 2026"; 1.7.0 phone and watch SUBMITTED 13 Nov, in Google's review, NOT live yet)
+# SajdaTime: project brief (snapshot 23 Nov 2026; 1.7.0 is LIVE, Play page "Updated on 13 Nov 2026"; phone and watch)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
 ## What is live on Google Play
+- **Phone 1.7.0 (versionCode 11) is LIVE (checked signed out on 23 Nov 2026).** The public page says "Updated on 13 Nov 2026", shows
+  five-star 5.0 from 10 reviews, 100+ downloads, six listing languages, and the 1.7.0 What's new (Tasbeeh, Timetable, Qibla hand points
+  at the Kaaba, turn and facing add up, calibrate notice). The page shows no version number, so 1.7.0 is read from that text. The
+  watch (1003) was submitted with it; the public page cannot show it, so treat it as live but unconfirmed. The lines below that say
+  "submitted" or "in Google's review" are the record of how it got here and are now history.
 - **Phone 1.6.0** (versionCode 10) is live: Ali saw it as an update on his own phone on 11 Nov 2026 (submitted 2 Nov, 9 days in review). The public page dates it "Updated on 2 Nov 2026" (the release's own date, not the day it went live) and shows the 1.6.0 description and What's new word for word (checked signed out, 13 Nov 2026). The 1.5.0 lines below are the earlier record.
 - **1.7.0 submitted 13 Nov 2026, in Google's review.** Phone (11) and watch (1003), everyone, all countries. The store listing now
   has six languages (French, Hindi and Malay removed), new descriptions and new pictures. It goes live by itself when Google
