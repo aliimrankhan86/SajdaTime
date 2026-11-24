@@ -1,8 +1,8 @@
-# SajdaTime: project brief (snapshot 24 Nov 2026; 1.7.0 is LIVE; 1.7.1, the Today widget redrawn, is built and waiting to be merged)
+# SajdaTime: project brief (snapshot 24 Nov 2026; 1.7.0 is LIVE; 1.7.1, the Today widget redrawn, is MERGED into main (PR 22) and SUBMITTED on 24 Nov 2026, in Google's review)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.7.1, the Today widget redrawn (built 24 Nov 2026; pull request open, not merged, not uploaded)
+## Next release: 1.7.1, the Today widget redrawn (built, merged and submitted 24 Nov 2026; in Google's review)
 - **Ali's scope:** "1.7.1 is just improve the widget design. That's it." Phone 12 / 1.7.1; the watch is unchanged and not uploaded.
 - **What changed:** the Today widget matches the mockup Ali approved (light and dark): the date and Hijri date with the town
   chip, a countdown card (ticking clock and "until it begins"), and one list card where the next prayer has a green fill, a bar
@@ -12,7 +12,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Store:** nothing in the listing changes except one line of What's new, in the six languages (Ali, 24 Nov 2026).
 - **Checked:** tests and lint green, every widget size measured on the emulator in six languages and nine text sizes, pictures
   judged by the design lead, two independent code reviews. **Not checked:** a real phone and a real home screen.
-- **Ali's next steps:** the project session merges; Ali uploads the signed bundle, pastes the What's new line, presses Submit.
+- **Status:** submitted by Ali on 24 Nov 2026 (draft 12 (1.7.1), Submit 1 change for review). Nothing for Ali to press. Live when the public Play page's "Updated on" moves past 13 Nov 2026.
 
 ## What is live on Google Play
 - **Phone 1.7.0 (versionCode 11) is LIVE (checked signed out on 23 Nov 2026).** The public page says "Updated on 13 Nov 2026", shows
