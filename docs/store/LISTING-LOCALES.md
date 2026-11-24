@@ -38,6 +38,50 @@ feature graphic are reused automatically unless you upload language-specific one
 
 ---
 
+## 1.7.1 What's new, 24 Nov 2026 (Ali's brief: one line about the widget redesign; every other listing text stays as it is)
+
+Translated from the 1.7.1 English in [LISTING.md](LISTING.md). Each uses the widget's own name in that language (the widget picker label) and the app's words for the next and current prayer. Counts include spaces.
+
+### Arabic (ar), 1.7.1
+
+**What's new** `134 / 500` (24 Nov 2026, from the 1.7.1 English)
+
+```
+تصميم جديد للتطبيق المصغّر «صلوات اليوم»: عدّ تنازلي أوضح، وقائمة أهدأ تميّز الصلاة التالية والصلاة الحالية، وتخطيط يناسب النص الكبير.
+```
+
+### Urdu (ur), 1.7.1
+
+**What's new** `167 / 500` (24 Nov 2026, from the 1.7.1 English)
+
+```
+«آج کی نمازیں» ویجٹ کا نیا ڈیزائن: زیادہ واضح الٹی گنتی، ایک زیادہ پرسکون فہرست جو اگلی اور موجودہ نماز نمایاں کرتی ہے، اور ایسی ترتیب جو بڑے متن میں بھی ٹھیک رہتی ہے۔
+```
+
+### Turkish (tr-TR), 1.7.1
+
+**What's new** `158 / 500` (24 Nov 2026, from the 1.7.1 English)
+
+```
+Bugünün namazları widget'ı yenilendi: daha net bir geri sayım, sıradaki ve şu anki vakti işaretleyen daha sade bir liste ve büyük yazıyla da uyumlu bir düzen.
+```
+
+### Indonesian (id-ID), 1.7.1
+
+**What's new** `193 / 500` (24 Nov 2026, from the 1.7.1 English)
+
+```
+Widget «Salat hari ini» didesain ulang: hitung mundur yang lebih jelas, daftar yang lebih tenang dengan salat berikutnya dan salat saat ini ditandai, serta tata letak yang pas untuk teks besar.
+```
+
+### Bengali (bn-BD), 1.7.1
+
+**What's new** `143 / 500` (24 Nov 2026, from the 1.7.1 English)
+
+```
+নতুন নকশায় «আজকের নামাজ» উইজেট: আরও স্পষ্ট কাউন্টডাউন, পরের নামাজ ও চলতি ওয়াক্ত চিহ্নিত করা আরও শান্ত তালিকা, আর বড় লেখাতেও মানানসই বিন্যাস।
+```
+
 ## 1.7.0 listings, 4 Nov 2026, full descriptions changed 12 Nov 2026
 
 Translated from the 1.7.0 English in [LISTING.md](LISTING.md). The titles and short descriptions remain in the 1.6.0 sections below. Bengali uses the English phone pictures.

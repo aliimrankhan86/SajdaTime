@@ -895,17 +895,6 @@
       },
       "usage": "Bottom stop of the paper widget body (widget only)."
     },
-    "widget_highlight_top": {
-      "$type": "color",
-      "androidRes": "widget_highlight_top",
-      "light": {
-        "$value": "#E6F3EC"
-      },
-      "dark": {
-        "$value": "#18382D"
-      },
-      "usage": "Top stop of the large Today countdown card. Dark equals DarkHeroTop by value only (WidgetColorsTest holds a literal)."
-    },
     "widget_sheen": {
       "$type": "color",
       "androidRes": "widget_sheen",
@@ -1137,6 +1126,116 @@
         "$value": "#0F241D"
       },
       "usage": "Today strip widget body (1.7.0): the period sky in light, the app's dark green (the DarkHero family) in dark, so the strip sits on the theme's green."
+    },
+    "widget_on_primary": {
+      "$type": "color",
+      "androidRes": "widget_on_primary",
+      "light": {
+        "$value": "#FFFFFF"
+      },
+      "dark": {
+        "$value": "#062117"
+      },
+      "usage": "Text of the Today widget's filled \"Next\" pill (onPrimary)."
+    },
+    "widget_secondary_container": {
+      "$type": "color",
+      "androidRes": "widget_secondary_container",
+      "light": {
+        "$value": "#CDE3D7"
+      },
+      "dark": {
+        "$value": "#1E4034"
+      },
+      "usage": "The Today widget's quieter \"Now\" pill (secondaryContainer)."
+    },
+    "widget_on_secondary_container": {
+      "$type": "color",
+      "androidRes": "widget_on_secondary_container",
+      "light": {
+        "$value": "#12372A"
+      },
+      "dark": {
+        "$value": "#8FD9B8"
+      },
+      "usage": "Text of the \"Now\" pill (onSecondaryContainer)."
+    },
+    "widget_surface_low": {
+      "$type": "color",
+      "androidRes": "widget_surface_low",
+      "light": {
+        "$value": "#FAF8F5"
+      },
+      "dark": {
+        "$value": "#141817"
+      },
+      "usage": "The Today widget's dimmed Sunrise row (surfaceContainerLow)."
+    },
+    "widget_hero_top": {
+      "$type": "color",
+      "androidRes": "widget_hero_top",
+      "light": {
+        "$value": "#D6E8DC"
+      },
+      "dark": {
+        "$value": "#143028"
+      },
+      "usage": "Top stop of the Today countdown card: the light hero gradient (LightHeroStart); flat primaryContainer in dark."
+    },
+    "widget_hero_mid": {
+      "$type": "color",
+      "androidRes": "widget_hero_mid",
+      "light": {
+        "$value": "#DDE2CE"
+      },
+      "dark": {
+        "$value": "#143028"
+      },
+      "usage": "Middle stop of the Today countdown card (LightHeroMiddle); flat primaryContainer in dark."
+    },
+    "widget_hero_foot": {
+      "$type": "color",
+      "androidRes": "widget_hero_foot",
+      "light": {
+        "$value": "#E4D2B4"
+      },
+      "dark": {
+        "$value": "#143028"
+      },
+      "usage": "Bottom stop of the Today countdown card (LightHeroEnd); flat primaryContainer in dark."
+    },
+    "widget_hero_ink": {
+      "$type": "color",
+      "androidRes": "widget_hero_ink",
+      "light": {
+        "$value": "#0A2419"
+      },
+      "dark": {
+        "$value": "#E7EAE8"
+      },
+      "usage": "The Today countdown card's prayer name and countdown (LightOnHero; onSurface in dark)."
+    },
+    "widget_hero_label": {
+      "$type": "color",
+      "androidRes": "widget_hero_label",
+      "light": {
+        "$value": "#2C4A3C"
+      },
+      "dark": {
+        "$value": "#8FD9B8"
+      },
+      "usage": "The countdown card's \"Next prayer\" label (LightOnHeroLabel; onPrimaryContainer in dark)."
+    },
+    "widget_hero_soft": {
+      "$type": "color",
+      "androidRes": "widget_hero_soft",
+      "light": {
+        "$value": "#3E5C4C"
+      },
+      "dark": {
+        "$value": "#B8C4BE"
+      },
+      "usage": "The countdown card's time, \"until it begins\" and context line (LightOnHeroSecondary; secondary in dark)."
     }
   },
   "wear": {

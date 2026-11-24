@@ -50,6 +50,9 @@ class WidgetRenderEvidenceTest {
     }
 
     private val instrumentation = InstrumentationRegistry.getInstrumentation()
+
+    /** The Today widget with no reported width, so every decision is the form's narrowest (the worst case for height). */
+    private val todayWidget: (Context, WidgetState, Instant) -> RemoteViews = { c, s, n -> WidgetRenderer.today(c, s, n) }
     private val base: Context = instrumentation.targetContext
     private val zone = ZoneId.of("Europe/London")
 
@@ -67,7 +70,7 @@ class WidgetRenderEvidenceTest {
         val cases = listOf(
             Case("strip", listOf(250 to 64, 300 to 64, 300 to 110, 300 to 150, 360 to 110, 150 to 110), WidgetRenderer::strip),
             Case("next", listOf(180 to 40, 180 to 60, 180 to 80, 180 to 100, 110 to 110, 180 to 110, 270 to 110, 270 to 150, 180 to 150, 180 to 170, 270 to 222, 270 to 260), WidgetRenderer::nextPrayer),
-            Case("today", listOf(250 to 200, 250 to 240, 250 to 260, 250 to 290, 330 to 330, 250 to 420), WidgetRenderer::today),
+            Case("today", listOf(250 to 200, 250 to 240, 250 to 260, 250 to 290, 330 to 330, 250 to 420), todayWidget),
         )
         val csv = StringBuilder("widget,wDp,hDp,fontScale,theme,problems\n")
         for (case in cases) for ((w, h) in case.sizes) for (scale in listOf(1.0f, 1.15f, 1.3f, 2.0f)) for (dark in listOf(false, true)) {
@@ -152,7 +155,7 @@ class WidgetRenderEvidenceTest {
             Sweep("strip", listOf(300, 360), (56..240 step 4).toList(), WidgetRenderer::strip),
             Sweep("next", listOf(180, 270), (90..260 step 4).toList(), WidgetRenderer::nextPrayer),
             Sweep("next", listOf(110), (90..200 step 10).toList(), WidgetRenderer::nextPrayer),
-            Sweep("today", listOf(180, 250, 330), (110..420 step 10).toList(), WidgetRenderer::today),
+            Sweep("today", listOf(180, 250, 330), (110..420 step 10).toList(), todayWidget),
         )
         val csv = StringBuilder("widget,wDp,fontScale,cleanHeights,stableFrom,firstDirtyBelowStable,layoutAtMinHeight,layoutAtStable\n")
         for (sw in sweeps) for (w in sw.widths) for (scale in listOf(1.0f, 1.15f, 1.3f, 2.0f)) {
@@ -230,7 +233,7 @@ class WidgetRenderEvidenceTest {
         val cases = listOf(
             Triple("strip", listOf(300 to 40, 300 to 64, 300 to 110, 300 to 150, 400 to 110, 400 to 150, 360 to 110, 360 to 150), WidgetRenderer::strip),
             Triple("next", listOf(180 to 110, 270 to 150, 270 to 110, 180 to 150), WidgetRenderer::nextPrayer),
-            Triple("today", listOf(250 to 180, 250 to 280, 330 to 330), WidgetRenderer::today),
+            Triple("today", listOf(250 to 180, 250 to 280, 330 to 330), todayWidget),
         )
         val csv = StringBuilder("widget,W,Hnominal,fs,date,rootNeededDp,hostNeededDp\n")
         for ((dateName, at) in dates) {
@@ -333,8 +336,8 @@ class WidgetRenderEvidenceTest {
             Row("strip", 300, 148, all, WidgetRenderer::strip), Row("strip", 400, 148, all, WidgetRenderer::strip),
             Row("strip", 300, 152, all, WidgetRenderer::strip), Row("strip", 400, 152, all, WidgetRenderer::strip),
             Row("next", 180, 110, all, WidgetRenderer::nextPrayer), Row("next", 270, 158, all, WidgetRenderer::nextPrayer),
-            Row("today", 250, 180, all, WidgetRenderer::today), Row("today", 250, 306, listOf(1.0f), WidgetRenderer::today),
-            Row("today", 250, 352, listOf(1.15f), WidgetRenderer::today),
+            Row("today", 250, 180, all, todayWidget), Row("today", 250, 306, listOf(1.0f), todayWidget),
+            Row("today", 250, 352, listOf(1.15f), todayWidget),
         )
         val pictures = setOf("strip_300x132", "next_180x132", "today_250x300")
         val csv = StringBuilder("widget,nominalW,nominalH,fs,date,neededDp,fits\n")
@@ -384,8 +387,8 @@ class WidgetRenderEvidenceTest {
         class Row(val widget: String, val w: Int, val h: Int, val scales: List<Float>, val build: (Context, WidgetState, Instant) -> RemoteViews)
         val both = listOf(1.0f, 1.15f)
         val rows = listOf(
-            Row("today", 250, 180, both, WidgetRenderer::today), Row("today", 250, 358, listOf(1.0f), WidgetRenderer::today),
-            Row("today", 250, 412, listOf(1.15f), WidgetRenderer::today),
+            Row("today", 250, 180, both, todayWidget), Row("today", 250, 358, listOf(1.0f), todayWidget),
+            Row("today", 250, 412, listOf(1.15f), todayWidget),
             Row("next", 180, 110, both, WidgetRenderer::nextPrayer),
             Row("next", 270, 170, listOf(1.0f), WidgetRenderer::nextPrayer), Row("next", 270, 192, listOf(1.15f), WidgetRenderer::nextPrayer),
             Row("strip", 300, 40, both, WidgetRenderer::strip), Row("strip", 300, 86, both, WidgetRenderer::strip),
@@ -444,7 +447,7 @@ class WidgetRenderEvidenceTest {
             var needed = -1f
             instrumentation.runOnMainSync {
                 try {
-                    needed = hostAt(ctx, WidgetRenderer::today, state, at, 250, h).second
+                    needed = hostAt(ctx, todayWidget, state, at, 250, h).second
                     if (t.contains("12:30") || t.contains("21:30")) {
                         FileOutputStream(File(dir, "compact_${lang}_fs${scale}_${t.substring(11, 13)}_h$h.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
                     }
@@ -458,8 +461,8 @@ class WidgetRenderEvidenceTest {
     }
 
     /**
-     * What the LARGE Today card and the WIDE Next card want, measured given a slot far taller than either (so the launcher's size
-     * choice picks them), per language, text size, time of day and Ramadan. The thresholds in WidgetRenderer.todaySizes and nextSizes
+     * What the WIDE Next card wants (the Today widget's needs are today_needs since 1.7.1), measured given a slot far taller than it (so
+     * the launcher's size choice picks it), per language, text size, time of day and Ramadan. The thresholds in WidgetRenderer.nextSizes
      * must be at least the maximum of each row here (4 Nov 2026: the 6dp row padding raised the large card from about 302 to 400dp and
      * the wide Next card from 149 to 214dp, and the thresholds had not followed). Output: release_needs.csv.
      */
@@ -479,16 +482,16 @@ class WidgetRenderEvidenceTest {
                 uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
             }
             val ctx = base.createConfigurationContext(config)
+            // The Today widget's needs are today_needs (1.7.1: one layout, list and card forms).
             for ((name, build, w, h) in listOf(
-                Quad("today", WidgetRenderer::today, 250, 700),
                 Quad("next", WidgetRenderer::nextPrayer, 270, 400),
             )) {
                 var needed = -1f
                 instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
                 csv.append("$name,$lang,$scale,${t.substring(0, 16)},${"%.1f".format(needed)}\n")
                 // The entry heights must hold what the card needs at this text size (the thresholds are interpolated, so any size is covered).
-                val limit = if (name == "today") WidgetRenderer.largeTodayHeight(ctx) else WidgetRenderer.wideNextHeight(ctx)
-                val offered = scale < (if (name == "today") 1.6f else 1.3f)
+                val limit = WidgetRenderer.wideNextHeight(ctx)
+                val offered = scale < 1.3f
                 if (needed < 0) misses.add("$name $lang $scale $t did not render") else if (offered && needed > limit) misses.add("$name $lang $scale $t needs $needed, offered from $limit")
             }
         }
@@ -499,16 +502,18 @@ class WidgetRenderEvidenceTest {
     private data class Quad(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val h: Int)
 
     /**
-     * The test that matters most: for EVERY slot height a launcher could give, at every text size, in six languages (en, ur, ar, bn, id, tr), at a midday and an
-     * after Isha time, the entry the launcher would choose must fit the slot (needed height <= slot height). Next card: slots 40 to 260dp
-     * wide 180; Today card: slots 240 to 560dp wide 250. Text sizes where a widget is deliberately degraded (2.0x text on the Next card
+     * The test that matters most: for EVERY slot height a launcher could give, at every text size, in six languages (en, ur, ar, bn, id, tr), at
+     * midday, the hour before Maghrib, after Isha and a Ramadan afternoon, the entry the launcher would choose must fit the slot (needed height
+     * <= slot height). Next card: slots 40 to 260dp wide 180; Today (1.7.1): slots 240 to 760dp at 250, 320 and 380dp wide. Text sizes where a widget is deliberately degraded (2.0x text on the Next card
      * below 124dp needs the tiny line, which is checked here too) are included: nothing is excused. Output: fit_every_slot.csv of failures.
      */
     @Test
     fun every_slot_height_fits() {
         runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
         val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
-        val times = listOf("2026-11-04T12:30:00Z", "2026-11-04T21:30:00Z")
+        // 15:00 is the hour before Maghrib: Asr is Now and Maghrib, the longest English name, carries the Next pill (1.7.1); the
+        // Ramadan afternoon adds "Iftar" beside it.
+        val times = listOf("2026-11-04T12:30:00Z", "2026-11-04T15:00:00Z", "2026-11-04T21:30:00Z", "2027-02-22T16:05:00Z")
         val fails = mutableListOf<String>()
         val scales = listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 2.0f)
         // exact = false is the state of a phone that never allowed exact alarms (Android 14 and later by default): the big number is the clock time.
@@ -521,13 +526,16 @@ class WidgetRenderEvidenceTest {
                 uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
             }
             val ctx = base.createConfigurationContext(config)
+            // Today since 1.7.1: the card is offered at three widths (WidgetRenderer.CARD_WIDTHS), so three slot widths, up to 760dp tall.
             for ((name, build, w, heights) in listOf(
                 Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
-                Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+                Slots("today", todayWidget, 250, (240..760 step 10).toList()),
+                Slots("today", todayWidget, 320, (240..760 step 20).toList()),
+                Slots("today", todayWidget, 380, (240..760 step 20).toList()),
             )) for (h in heights) {
                 var needed = -1f
                 instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
-                if (needed < 0 || needed > h + 0.5f) fails.add("$name $lang fs$scale ${t.substring(11, 16)} exact=$exact slot ${h}dp needs ${"%.1f".format(needed)}")
+                if (needed < 0 || needed > h + 0.5f) fails.add("$name ${w}w $lang fs$scale ${t.substring(11, 16)} exact=$exact slot ${h}dp needs ${"%.1f".format(needed)}")
             }
         }
         File(dir, "fit_every_slot.csv").writeText(fails.joinToString("\n"))
@@ -554,11 +562,12 @@ class WidgetRenderEvidenceTest {
                 val ctx = base.createConfigurationContext(config)
                 for ((name, build, w, heights) in listOf(
                     Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
-                    Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+                    Slots("today", todayWidget, 250, (240..760 step 10).toList()),
+                    Slots("today", todayWidget, 340, (240..760 step 20).toList()),
                 )) for (h in heights) {
                     var needed = -1f
                     instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h).second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
-                    if (needed < 0 || needed > h + 0.5f) fails.add("$name $pn $lang fs$scale ${t.substring(11, 16)} slot ${h}dp needs ${"%.1f".format(needed)}")
+                    if (needed < 0 || needed > h + 0.5f) fails.add("$name ${w}w $pn $lang fs$scale ${t.substring(11, 16)} slot ${h}dp needs ${"%.1f".format(needed)}")
                 }
             }
         }
@@ -590,7 +599,7 @@ class WidgetRenderEvidenceTest {
             for ((name, build, w, heights) in listOf(
                 Slots("next", WidgetRenderer::nextPrayer, 180, (40..260 step 4).toList()),
                 Slots("strip", WidgetRenderer::strip, 300, (40..120 step 4).toList()),
-                Slots("today", WidgetRenderer::today, 250, (240..560 step 10).toList()),
+                Slots("today", todayWidget, 250, (240..560 step 10).toList()),
             )) for (h in heights) {
                 var needed = -1f
                 instrumentation.runOnMainSync { try { needed = hostAt(ctx, build, state, at, w, h, rtl = lang == "ur" || lang == "ar").second } catch (e: Throwable) { Log.e("WidgetEvidence", "crash", e) } }
@@ -605,42 +614,114 @@ class WidgetRenderEvidenceTest {
     private data class Slots(val name: String, val build: (Context, WidgetState, Instant) -> RemoteViews, val w: Int, val heights: List<Int>)
 
     /**
-     * What each compact Today step (2 to 6 rows) needs, per language and text size: the figures behind COMPACT_NEED_EN and COMPACT_NEED_TALL
-     * (the maximum over five times of day, with each time's own figure beside it: the five are the same for six rows, 6 Nov 2026).
+     * What each Today form needs (1.7.1, one layout): the list with 1 to 6 rows, and the card at each of its three widths with the rows it
+     * shows at that text size, per language and text size, the maximum over seven times of day (before Fajr, midday, the hour before
+     * Maghrib, evening, after Isha, a Ramadan afternoon and night), each measured at its form's own narrowest width. These are the figures
+     * behind WidgetRenderer.LIST_NEED_* and CARD_NEED_* (logged as Kotlin, tag WidgetNeeds), and the test fails if an entry is offered
+     * below what its form needs. Output: today_needs.csv.
      */
     @Test
-    fun compact_rows_need() {
+    fun today_needs() {
         runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
         val dir = File(base.getExternalFilesDir(null), "widget-evidence").apply { mkdirs() }
-        val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z", "2027-02-22T21:30:00Z")
-        // One column per time of day as well as the worst, so a state that needs more than the others (6 Nov 2026) can be seen.
-        val csv = StringBuilder("lang,fs,rows,neededDp," + times.joinToString(",") { it.substring(5, 16) } + "\n")
-        for (lang in listOf("en", "ur", "ar", "bn")) for (scale in listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)) for (rows in 2..6) {
-            var worst = 0f
-            val each = mutableListOf<Float>()
-            for (tt in times) {
-                val at = Instant.parse(tt)
-                val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
-                val config = Configuration(base.resources.configuration).apply {
-                    fontScale = scale
-                    setLocale(java.util.Locale.forLanguageTag(lang))
-                    uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
-                }
-                val ctx = base.createConfigurationContext(config)
-                instrumentation.runOnMainSync {
-                    val density = ctx.resources.displayMetrics.density
-                    val host = AppWidgetHostView(ctx)
-                    host.updateAppWidget(WidgetRenderer.todayCompactRows(ctx, state, at, rows))
-                    val wPx = (250 * density).toInt()
-                    host.measure(View.MeasureSpec.makeMeasureSpec(wPx, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
-                    val need = host.measuredHeight / density
-                    each += need
-                    worst = maxOf(worst, need)
-                }
+        // Three Ramadan times: before Fajr ("Suhoor ends" on the Next row), the afternoon ("Iftar" on Maghrib's), the night.
+        val times = listOf("2026-11-04T04:00:00Z", "2026-11-04T12:30:00Z", "2026-11-04T15:00:00Z", "2026-11-04T17:30:00Z", "2026-11-04T21:30:00Z",
+            "2027-02-22T04:00:00Z", "2027-02-22T16:05:00Z", "2027-02-22T21:30:00Z")
+        val scales = listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.28f, 1.3f, 1.5f, 1.6f, 2.0f)
+        // The renderer's groups (WidgetRenderer.needGroup): English; Turkish and Indonesian, whose pill words are longer (Opus review,
+        // 24 Nov 2026: "Sekarang", "Berikutnya"); Urdu, Arabic and Bengali.
+        fun group(lang: String) = when (lang) { "en" -> "en"; "tr", "in" -> "latin"; else -> "tall" }
+        val csv = StringBuilder("lang,fs,form,neededDp,offeredDp\n")
+        val worst = mutableMapOf<String, Float>() // "<script> <form> <scale>" to the need
+        val misses = mutableListOf<String>()
+        for (lang in listOf("en", "tr", "in", "ur", "ar", "bn")) for (scale in scales) {
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = scale
+                setLocale(java.util.Locale.forLanguageTag(lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
             }
-            csv.append("$lang,$scale,$rows,${"%.1f".format(worst)}," + each.joinToString(",") { "%.1f".format(it) } + "\n")
+            val ctx = base.createConfigurationContext(config)
+            val entries = WidgetRenderer.todayEntries(ctx)
+            for ((form, entry) in entries) {
+                val (offeredDp, widthDp) = entry
+                var need = 0f
+                for (tt in times) {
+                    val at = Instant.parse(tt)
+                    val state = runBlocking { WidgetState.build(SettingsRepository(base).current(), at, zone, true) }
+                    instrumentation.runOnMainSync {
+                        val density = ctx.resources.displayMetrics.density
+                        val host = AppWidgetHostView(ctx)
+                        if (lang == "ur" || lang == "ar") host.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                        host.updateAppWidget(WidgetRenderer.todayForm(ctx, state, at, form))
+                        host.measure(View.MeasureSpec.makeMeasureSpec((widthDp * density).toInt(), View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+                        need = maxOf(need, host.measuredHeight / density)
+                    }
+                }
+                val key = "${group(lang)} $form $scale"
+                worst[key] = maxOf(worst[key] ?: 0f, need)
+                csv.append("$lang,$scale,$form,${"%.1f".format(need)},${"%.1f".format(offeredDp)}\n")
+                if (need > offeredDp + 0.5f) misses += "$lang fs$scale $form needs ${"%.1f".format(need)}, offered from ${"%.1f".format(offeredDp)}"
+            }
         }
-        File(dir, "compact_rows_need.csv").writeText(csv.toString())
+        File(dir, "today_needs.csv").writeText(csv.toString())
+        for (script in listOf("en", "latin", "tall")) for (form in WidgetRenderer.todayEntries(base).keys) {
+            Log.i("WidgetNeeds", "$script $form: " + scales.joinToString(", ") { "%.1ff".format(worst.getValue("$script $form $it")) })
+        }
+        org.junit.Assert.assertTrue("Today entries offered below their need: " + misses.joinToString("; "), misses.isEmpty())
+    }
+
+    /**
+     * The 1.7.1 Today pictures for Ali and the review (light, dark, 2.0x text, Urdu, Arabic, the smallest size), drawn the way a
+     * launcher draws them at a few real slot sizes, in the hour before Maghrib (Asr is Now, Maghrib carries the Next pill) and on a
+     * Ramadan evening. No assertions: what clips is the fit tests' job. Output: widget-evidence/today-1.7.1/.
+     */
+    @Test
+    fun today_pictures() {
+        runBlocking { SettingsRepository(base).setLocation(Coordinates(51.5074, -0.1278), "London") }
+        val dir = File(base.getExternalFilesDir(null), "widget-evidence/today-1.7.1").apply { deleteRecursively(); mkdirs() }
+        data class Shot(val name: String, val lang: String, val scale: Float, val dark: Boolean, val w: Int, val h: Int, val at: String = "2026-11-04T15:00:00Z", val located: Boolean = true)
+        val shots = listOf(
+            Shot("light_card", "en", 1.0f, false, 360, 600), Shot("dark_card", "en", 1.0f, true, 360, 600),
+            // 11:00, the day sky: its mint top is the countdown card's own top colour, so the card needs its hairline here.
+            Shot("light_card_day_sky", "en", 1.0f, false, 360, 600, "2026-11-04T11:00:00Z"),
+            Shot("light_card_narrow", "en", 1.0f, false, 260, 660), Shot("light_list_4x3", "en", 1.0f, false, 340, 290),
+            Shot("dark_list_4x3", "en", 1.0f, true, 340, 290), Shot("light_smallest", "en", 1.0f, false, 250, 240),
+            Shot("light_list_after_isha", "en", 1.0f, false, 340, 290, "2026-11-04T21:30:00Z"),
+            Shot("light_no_location", "en", 1.0f, false, 340, 290, located = false),
+            Shot("light_font1.3_card", "en", 1.3f, false, 360, 640),
+            Shot("light_font2_card", "en", 2.0f, false, 360, 760), Shot("light_font2_list", "en", 2.0f, false, 360, 420),
+            Shot("dark_font2_card", "en", 2.0f, true, 360, 760),
+            Shot("urdu_light_card", "ur", 1.0f, false, 360, 640), Shot("urdu_dark_list", "ur", 1.0f, true, 340, 300),
+            Shot("arabic_dark_card", "ar", 1.0f, true, 360, 640), Shot("arabic_light_list", "ar", 1.0f, false, 340, 300),
+            Shot("light_ramadan_card", "en", 1.0f, false, 360, 620, "2027-02-22T16:05:00Z"),
+            Shot("light_after_isha_card", "en", 1.0f, false, 360, 600, "2026-11-04T21:30:00Z"),
+        )
+        for (shot in shots) {
+            val at = Instant.parse(shot.at)
+            val settings = runBlocking { SettingsRepository(base).current() }.let { if (shot.located) it else it.copy(coordinates = null) }
+            val state = runBlocking { WidgetState.build(settings, at, zone, true) }
+            val config = Configuration(base.resources.configuration).apply {
+                fontScale = shot.scale
+                setLocale(java.util.Locale.forLanguageTag(shot.lang))
+                uiMode = (uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or (if (shot.dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO)
+            }
+            val ctx = base.createConfigurationContext(config)
+            instrumentation.runOnMainSync {
+                val density = ctx.resources.displayMetrics.density
+                val wPx = (shot.w * density).toInt()
+                val hPx = (shot.h * density).toInt()
+                val host = AppWidgetHostView(ctx)
+                if (shot.lang == "ur" || shot.lang == "ar") host.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                host.updateAppWidgetSize(Bundle(), listOf(SizeF(shot.w.toFloat(), shot.h.toFloat())))
+                // The slot's width as a launcher reports it (WidgetUpdater passes OPTION_APPWIDGET_MIN_WIDTH).
+                host.updateAppWidget(WidgetRenderer.today(ctx, state, at, shot.w.toFloat()))
+                host.measure(View.MeasureSpec.makeMeasureSpec(wPx, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(hPx, View.MeasureSpec.EXACTLY))
+                host.layout(0, 0, wPx, hPx)
+                val bitmap = Bitmap.createBitmap(wPx, hPx, Bitmap.Config.ARGB_8888)
+                Canvas(bitmap).apply { drawColor(Color.parseColor(if (shot.dark) "#1C1F1E" else "#C9D2CE")); host.draw(this) }
+                FileOutputStream(File(dir, "${shot.name}_${shot.w}x${shot.h}.png")).use { bitmap.compress(Bitmap.CompressFormat.PNG, 100, it) }
+            }
+        }
     }
 
     /**
@@ -665,7 +746,7 @@ class WidgetRenderEvidenceTest {
             val ctx = base.createConfigurationContext(config)
             var needed = -1f
             instrumentation.runOnMainSync {
-                needed = hostAt(ctx, WidgetRenderer::today, state, at, 266, h).second
+                needed = hostAt(ctx, todayWidget, state, at, 266, h).second
                 FileOutputStream(File(dir, "today_${tag}_${if (dark) "dark" else "light"}_fs${scale}_h$h.png")).use { lastBitmap!!.compress(Bitmap.CompressFormat.PNG, 100, it) }
             }
             if (needed < 0 || needed > h + 0.5f) fails.add("$tag dark=$dark fs$scale slot ${h}dp needs ${"%.1f".format(needed)}")
@@ -771,7 +852,7 @@ class WidgetRenderEvidenceTest {
             Pic("today", "ur", 250, 358, true), Pic("today", "en", 250, 306, true),
         )
         for (p in pics) {
-            val build = when (p.widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }
+            val build = when (p.widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> todayWidget }
             instrumentation.runOnMainSync {
                 hostAt(ctxFor(p.lang, 1.0f, p.dark), build, state, at, p.w, p.h, rtl = p.lang == "ur" || p.lang == "ar")
                 val name = "${p.widget}_${p.lang}_${p.w}x${p.h}_fs1.0_normal_${if (p.dark) "dark" else "light"}"
@@ -784,7 +865,7 @@ class WidgetRenderEvidenceTest {
             "today" to listOf(250 to 180, 250 to 306, 250 to 352),
         )
         for ((widget, list) in sizes) for ((w, h) in list) for (scale in listOf(1.2f, 1.25f)) {
-            val build = when (widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> WidgetRenderer::today }
+            val build = when (widget) { "strip" -> WidgetRenderer::strip; "next" -> WidgetRenderer::nextPrayer; else -> todayWidget }
             var needed = -1f
             instrumentation.runOnMainSync { needed = hostAt(ctxFor("en", scale, false), build, state, at, w, h).second }
             val line = "$widget,${w}x$h,$scale,${"%.1f".format(needed)},${if (needed <= h + 0.5f) "yes" else "no"}"

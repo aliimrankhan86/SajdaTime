@@ -31,7 +31,6 @@
     -->
     <color name="widget_surface_top">#FFFFFF</color>
     <color name="widget_surface_bottom">#EEF1EC</color>
-    <color name="widget_highlight_top">#E6F3EC</color>
     <color name="widget_sheen">#00FFFFFF</color>
     <color name="widget_edge">#FFC9CFC9</color>
 
@@ -49,7 +48,6 @@
     <color name="widget_light_outline_variant">#C9CFC9</color>
     <color name="widget_light_surface_top">#FFFFFF</color>
     <color name="widget_light_surface_bottom">#EEF1EC</color>
-    <color name="widget_light_highlight_top">#E6F3EC</color>
     <color name="widget_light_sheen">#00FFFFFF</color>
     <color name="widget_light_edge">#FFC9CFC9</color>
     <color name="widget_dark_surface">#171B1A</color>
@@ -60,7 +58,6 @@
     <color name="widget_dark_outline_variant">#2A312E</color>
     <color name="widget_dark_surface_top">#252C29</color>
     <color name="widget_dark_surface_bottom">#121514</color>
-    <color name="widget_dark_highlight_top">#18382D</color>
     <color name="widget_dark_sheen">#12FFFFFF</color>
     <color name="widget_dark_edge">#29FFFFFF</color>
 
@@ -132,4 +129,40 @@
     <color name="widget_dark_strip_night_top">#12302F</color>
     <color name="widget_dark_strip_night_mid">#0D2323</color>
     <color name="widget_dark_strip_foot">#0F241D</color>
+    <!--
+      The Today widget's 1.7.1 parts (Ali approved the mockup 24 Nov 2026): the "Next" pill (on_primary on primary), the quieter
+      "Now" pill (secondary_container), the dimmed Sunrise row (surface_low), and the countdown card. The card is the app's light
+      hero gradient with its own three inks (LightHero*, LightOnHero*, DESIGN_SYSTEM §1) and, in dark, flat primaryContainer; both
+      with an outline_variant hairline. Each is the Color.kt role of the same name.
+    -->
+    <color name="widget_on_primary">#FFFFFF</color>
+    <color name="widget_secondary_container">#CDE3D7</color>
+    <color name="widget_on_secondary_container">#12372A</color>
+    <color name="widget_surface_low">#FAF8F5</color>
+    <color name="widget_hero_top">#D6E8DC</color>
+    <color name="widget_hero_mid">#DDE2CE</color>
+    <color name="widget_hero_foot">#E4D2B4</color>
+    <color name="widget_hero_ink">#0A2419</color>
+    <color name="widget_hero_label">#2C4A3C</color>
+    <color name="widget_hero_soft">#3E5C4C</color>
+    <color name="widget_light_on_primary">#FFFFFF</color>
+    <color name="widget_light_secondary_container">#CDE3D7</color>
+    <color name="widget_light_on_secondary_container">#12372A</color>
+    <color name="widget_light_surface_low">#FAF8F5</color>
+    <color name="widget_light_hero_top">#D6E8DC</color>
+    <color name="widget_light_hero_mid">#DDE2CE</color>
+    <color name="widget_light_hero_foot">#E4D2B4</color>
+    <color name="widget_light_hero_ink">#0A2419</color>
+    <color name="widget_light_hero_label">#2C4A3C</color>
+    <color name="widget_light_hero_soft">#3E5C4C</color>
+    <color name="widget_dark_on_primary">#062117</color>
+    <color name="widget_dark_secondary_container">#1E4034</color>
+    <color name="widget_dark_on_secondary_container">#8FD9B8</color>
+    <color name="widget_dark_surface_low">#141817</color>
+    <color name="widget_dark_hero_top">#143028</color>
+    <color name="widget_dark_hero_mid">#143028</color>
+    <color name="widget_dark_hero_foot">#143028</color>
+    <color name="widget_dark_hero_ink">#E7EAE8</color>
+    <color name="widget_dark_hero_label">#8FD9B8</color>
+    <color name="widget_dark_hero_soft">#B8C4BE</color>
 </resources>

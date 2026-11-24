@@ -693,43 +693,55 @@ same notice has no close button and never hides while the permission is missing.
 **Home screen widgets** (hero countdown, 18 Oct 2026; research in
 `docs/plans/2026-10-widget-redesign/RESEARCH.md`; the Today strip and the sky, 1.6 step 8,
 `STEP-8-DESIGN.md`). Three widgets; the launcher chooses between layouts or size entries on Android 12
-and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's thirteen entries):
+and later (`WidgetRenderer.NEXT_SIZES`, `todayForms`, the strip's thirteen entries):
 
 | Widget | Layout | Shows |
 |---|---|---|
 | Next prayer | small (default, and the only one below Android 12) | glyph, name, time; the countdown at the foot; the day's five bars |
 | Next prayer | wide (from 270 by 158dp, or 170 (192 from 1.1x text) in Urdu, Arabic and Bengali) | the small widget's countdown beside the six rows |
-| Today | compact (from 250 by 180dp) | the six rows with glyphs, weighted to fill |
-| Today | large (from 250 wide by 306dp tall, 352 from 1.1x text, 358 and 412 in Urdu, Arabic and Bengali; placed at 4 by 4) | mark, full date and Hijri date; the countdown card; the six rows |
+| Today (1.7.1) | one layout. LIST (from 250 by 240dp; placed at 4 by 3; the only form below Android 12): twelve size entries, 1 to 6 rows at two widths (one row, the next prayer alone, is the floor at large text) (six rows from 278dp tall at 300dp wide, so they fit the Redmi's 279dp 4 by 4) | the date and the town chip, then one list card of rows, no glyphs |
+| Today (1.7.1) | CARD (three widths: from 553dp tall at 350dp wide, 601 at 300, 668 at 245, normal text English; more in Urdu, Arabic and Bengali and at larger text) | the date over the Hijri date, the town chip beside them or under them; the countdown card; the list card, six rows (three from 1.3x text: Now, Next and the one after) |
 | Today strip (1.6) | one layout, thirteen size entries (250, 300 or 400dp wide, 40, 50 (56) or 78dp tall (86 in Urdu, Arabic, Bengali), then the hero heights); placed at 4 by 1 | five columns Fajr to Isha, the next in the pill; glyphs from 78dp tall; the town chip from 380dp; at 1.3 text, and under 50dp tall (56), the next prayer alone, no chip |
 
-- **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp, sized
-  in dp because it is already three times the body text and a large font setting pushed the prayer
-  name off a 110dp widget. Names and times stay in sp.
-- **Prayer glyphs show where the sun is**, so they read without the language: Fajr rays above an empty
+- **The countdown is the hero**: system sans in the light weight, tabular figures, 34 to 38dp (46dp on the Today card),
+  sized in dp because it is already three times the body text and a large font setting pushed the prayer
+  name off a 110dp widget. Names and times stay in sp. It is a `Chronometer` the launcher ticks ("04:34", "00:45",
+  "1:04:34"): no wake ups and never stale. "4 min" text was rejected for the Today card on 24 Nov 2026 (§9).
+- **The Today widget since 1.7.1** (Ali approved the mockup 24 Nov 2026; §9): the countdown card is the app's light hero
+  gradient with its three inks in light, flat `primaryContainer` in dark, an `outlineVariant` hairline in both (in light too
+  since Fable's check: the gradient's mint top is the day sky's own top, so without it the card had no top edge from sunrise to
+  Asr), 22dp corners, 18dp padding so its text starts where the rows' text does.
+  The list card is paper with a hairline rim and hairlines between rows, 22dp corners. Rows: the NEXT prayer has the
+  `primaryContainer` fill, a 3dp `primary` bar on the leading edge and the filled "Next" pill (`primary`/`onPrimary`), in
+  the medium weight; the CURRENT prayer the quieter "Now" pill (`secondaryContainer`/`onSecondaryContainer`), no fill or bar;
+  Sunrise the `surfaceContainerLow` fill, `onSurfaceVariant`, 15sp against 17. No glyphs, no day bars. A row whose name,
+  pill and time do not fit one line puts the pill (and a Ramadan word) on a second line, so the time is never cut; the
+  card's town chip, the prayer's time and "until it begins" each move under their neighbour the same way.
+- **Prayer glyphs show where the sun is** (the Next prayer widget, its wide rows and the strip; not on Today since 1.7.1), so they read without the language: Fajr rays above an empty
   horizon, Sunrise a rising half sun, Dhuhr the sun over a post with no shadow, Asr a post whose shadow
   equals its height (the Asr rule), Maghrib a setting half sun, Isha a crescent and star. One Asr glyph
   for every madhab. Drawn white, tinted in the layout from a widget colour (never from code).
-- **The day's five bars** (Sunrise is not a prayer): done in `primary`, next outlined in `primary`, to
-  come in `outlineVariant`. Shape as well as fill separates next from done.
-- **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the
-  large Today widget and its empty state only. Never on a small widget.
+- **The day's five bars** (Sunrise is not a prayer; the Next prayer widget only since 1.7.1): done in `primary`, next
+  outlined in `primary`, to come in `outlineVariant`. Shape as well as fill separates next from done.
+- **The mark** (launcher mihrab and minarets, gold on green, written as the icon's own hex) on the strip's
+  thin form and the current column, and the wide Next card's current row. Never on a small widget; the Today widget's
+  header lost it in 1.7.1 (the mockup's header is the date and the town).
 - **Glossy finish** (owner, 18 Oct 2026, "Apple premium style"): the surface is a FIXED three stop
   gradient (lighter at the top), a white sheen over the top half that fades out (7 percent in dark,
   none in light, where the top stop is already white), and a rim (16 percent white in dark, the
   hairline in light). The countdown card has the same treatment in the highlight colour. Opaque on
   purpose. `WidgetColorsTest` holds every ink to AA on every stop and on the top stop under the
   sheen; it caught the first dark card top (#1C4034, 4.30:1) and set it to #18382D.
-- **The location chip**: a highlight pill with a pin, the town and an update arrow, on every widget
-  (under the countdown on Next, at the end of the large Today header, at the foot of the compact
-  Today). It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
+- **The location chip**: a pill with a pin, the town and an update arrow, on every widget
+  (under the countdown on Next, at the end of the Today header). On Today since 1.7.1 it is outlined (1.5dp `primary`, no
+  fill, 14sp bold, at least 36dp tall), and on the card it moves under the date when it does not fit beside it. It is its own TalkBack button ("Update location, London"). Pressing it opens the app, and
   opening the app is what updates the location (onResume); it cannot update without opening the app,
-  because location is read only in the foreground. The large header uses the short date ("Sun, 18
-  Oct") so the chip never cuts it short in English; since 30 Oct 2026 it also shrinks 14 to 10sp before any cut
-  (Bengali "শুক্র 30 অক্টোবর" read "শুক্র 30 অ…" beside the chip). The Hijri line under it shrinks from 12 to as small as 9sp
-  rather than cut the year (it read "2 Rabi al-Awwal 14…" beside "Manchester" on a 5 column home
-  screen; owner's choice, 18 Oct 2026, §9). Verified on a real launcher (Pixel Launcher, Android 16),
-  pressing the chip opens the app.
+  because location is read only in the foreground. The Today header uses the short date ("Sun, 18
+  Oct"). Until 1.7.0 the date and the Hijri line shrank (14 to 10sp, 12 to 9sp) beside the chip; since 1.7.1 nothing shrinks
+  below 14sp: on the card the chip moves under the date when the date or the Hijri date would not fit one line beside it (the
+  Hijri date may take two lines), and on the list form, whose height is measured with one header line, the date gives way and
+  the chip stays (a long town on a widget under about 300dp wide, or large text; the 1.7.0 compact list had no date at all).
+  Verified on a real launcher (Pixel Launcher, Android 16, 18 Oct 2026), pressing the chip opens the app.
 - **The sky on the Next prayer widget** (1.6 step 8, Ali chose it for both Next layouts from the pictures, 25 Oct 2026): the body is the
   current period's sky (the phone's sixteen stops), sheen and rim unchanged. The chip and the highlighted
   row get a 1dp `primary` rim (`widget_highlight` is 1.0:1 on the light day top), and the "to come" bars
@@ -740,7 +752,7 @@ and later (`WidgetRenderer.NEXT_SIZES`, `todaySizes`, the strip's thirteen entri
   under the 12sp floor beside the Hijri line, set by the main session on 25 Oct 2026 and shown to Ali in
   the 250dp picture); the names and times also ellipsise, so any cut shows.
 - **The town the times are for** on every widget (the owner's request, 18 Oct 2026): under the countdown on
-  the small Next widget (above it on the wide one), at the end of the large Today header, in the compact Today footer, on the strip only from 380dp wide and not at large text. Only the
+  the small Next widget (above it on the wide one), at the end of the Today header (1.7.1), on the strip only from 380dp wide and not at large text. Only the
   town ("London", not "London, United Kingdom"); Makkah in the app's language when it is the fallback.
   1.4.0 had none because a home screen is seen by others; the owner decided "times for where?" matters
   more.
@@ -888,6 +900,23 @@ dependency), not done yet because it means downloading the icon files.
 
 Dated, newest first. Each entry says what was chosen, what was rejected and why, so nobody
 "improves" it back.
+
+- **24 Nov 2026, the Today widget redrawn (Ali approved the mockup, light and dark: "I like both light and dark"; built by
+  Claude Code from the claude.ai project session's spec; three open points settled by that session in `build/widget-review.md`).**
+  One layout in two forms (§4 table). **The widget marks rows differently from the app's Times list, on purpose:** Times marks
+  only the current prayer (fill, bar, filled "Now" pill; 4 Nov 2026) because its countdown card always sits above the list. The
+  widget marks the NEXT prayer strongly (fill, bar, filled "Next" pill) and the current one with the quieter "Now" pill, because
+  at its default size (4 by 3, the list form) there is no countdown card, so the list is the only place the next prayer can be
+  found. This is the mockup Ali approved. Do not "align" it with Times. **Rejected:** "4 min" for the countdown (the mockup's):
+  Android's Chronometer only prints m:ss or h:mm:ss, and plain text would need the app to redraw the widget every minute while
+  the screen is on, a battery cost and a number that can lag on phones that hold apps back (HyperOS); the ticking countdown is
+  free and never wrong ("dependable wins", CLAUDE.md). Rows set to 0dp with a weight (equal slices crushed a two line row;
+  wrap_content with a weight instead). A gradient in dark (the spec: flat there). Per prayer glyphs and the day bars on Today
+  (nothing said what the bars counted). **Kept as built, after Fable's check:** no Hijri date on the list form (six rows must fit
+  a 4 by 4; the 1.7.0 compact list had none either); the Sunrise row is a step smaller in type but as tall as its neighbours (an
+  invisible 17sp copy of its name holds the line); the chip's icons are in sp so they grow with its text. **Open, not 1.7.1:**
+  after Isha the list form marks no Next row, because the list shows today's times and the next prayer is tomorrow's Fajr; a
+  "Next" pill on Fajr with tomorrow's time is a later choice for Ali (§11).
 
 - **3 Nov 2026, Ramadan card made to stand out; strip widget restyled from a Pillars screenshot (Ali).** Ali: the
   Ramadan cards "don't stand out ... colours should make it easier to see at a glance. The tiles are not clear".
@@ -1487,6 +1516,7 @@ the date and his words, and delete it here.
 
 | Id | Raised | Question | Recommendation given to him | Status |
 |---|---|---|---|---|
+| 1.7.1-after-isha | 24 Nov 2026 (Fable's check of the 1.7.1 pictures) | After Isha, should the Today widget's list mark Fajr "Next" with tomorrow's time (today's and tomorrow's Fajr differ by a minute or two)? | Not in 1.7.1 (Ali: "just improve the widget design"); decide for a later release | OPEN |
 | 1.6-timetable | 24 Oct 2026 | Timetable on Ramadan from day 1 or 30 days before; this month or this and next; Hijri on cards? | Day 1; two months; no Hijri | ANSWERED 24 Oct 2026: Ramadan view from day 1, this and next month, no Hijri on cards (built, step 4; remove this row when merged) |
 | 1.6-dark-skies | 23 Oct 2026 | Dark versions of the four skies, or the same as light? | Dark versions; decide from four pairs | DECIDED 24 Oct 2026 from the eight pictures: dark versions, night kept this deep ("Keep it this deep"); also four light hues kept, light skies kept pale, widget drawings as glyphs |
 | 1.6-ramadan-cards | 23 Oct 2026 | Ramadan timetable as day cards or the approved table? | Cards; decide side by side | ANSWERED 24 Oct 2026: keep the table (Ali, from step 4 pictures) |

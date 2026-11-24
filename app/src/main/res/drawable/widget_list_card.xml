@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Today widget's one list card (1.7.1): paper, a hairline rim, 22dp corners. Rows sit inside its 4dp padding, so a
+     marked row's rounded fill never reaches the card's corners (a RemoteViews cannot clip to an outline below Android 12). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_surface" />
+    <stroke android:width="1dp" android:color="@color/widget_outline_variant" />
+    <corners android:radius="22dp" />
+</shape>

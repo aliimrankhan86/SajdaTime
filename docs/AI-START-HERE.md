@@ -20,6 +20,9 @@ hyphens or em dashes. He decides anything visual, from screenshots. Before he se
 sameness check and, for anything non trivial, an Opus audit. When unsure, ask him (with a
 recommendation) instead of guessing. Never ask him to test the watch.
 
+How a job is split between Ali, Claude Code on his Mac and the claude.ai project session (the `build/` progress and review
+files): `docs/AI-WORKFLOW.md`.
+
 ## 2. What is live, and which branch to use
 
 Check what is live yourself: the public page
@@ -28,10 +31,9 @@ when a release publishes.
 
 | Branch | What it is | What you do with it |
 |---|---|---|
-| `main` | **1.6.0** (merged 2 Nov 2026, submitted, in Google's review); what users have is 1.5.0, live since 23 Oct 2026 | **Never push to it, never merge into it, never open a pull request into it.** It takes the next release only when Ali says go, by `RELEASE-<version>.md`; Ali presses every merge, submit and publish button |
-| `claude/1-7-0` | **Release 1.7.0**, built 3 Nov 2026 on top of 1.6.0, about 70 commits ahead of `main` (1.6.0 is already merged into `main`), all pushed (see git log for the latest commit), nothing merged, versionCode 11 / 1.7.0 and the watch 1003 / 1.7.0 are set (4 Nov 2026); the checklist is `docs/release-tools/RELEASE-1.7.0.md`. Read `docs/HANDOVER.md` section 11, first block | **Work from here for anything new.** |
-| `claude/1-6-0` | **Release 1.6.0**, built, approved by Ali from pictures, not yet released; plus the design system. Check the public Play page before acting on it | Do not cut new work from here; use `claude/1-7-0` |
-| your branch | `claude/<task>` or `deepseek/<task>`, cut from `claude/1-7-0` | Commit and push here. Merging into `claude/1-7-0` only when Ali says so, after review; Ali presses every merge, submit and publish button |
+| `main` | **1.7.0**, live on Google Play since 13 Nov 2026 (phone 11, watch 1003) | Never push to it or merge into it yourself. Cut new work from it |
+| `claude/widget-today-redesign` | **1.7.1**, the Today widget redrawn (Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it."), phone 12 / 1.7.1, watch unchanged; pull request open, not merged | The claude.ai project session verifies and merges it; Ali presses upload and submit. Read `docs/HANDOVER.md` §11, first block |
+| your branch | `claude/<task>` or `deepseek/<task>`, cut from `main` (from the 1.7.1 branch while it is open, if your work touches the widgets) | Commit and push here; a pull request into `main` only when Ali says so, after review |
 
 Every other branch was deleted on 30 Oct 2026 at Ali's word ("delete the old branches ... which could cause confusion"):
 all of them were already wholly inside `claude/1-6-0`, except two dropped on purpose, kept as tags
@@ -39,10 +41,7 @@ all of them were already wholly inside `claude/1-6-0`, except two dropped on pur
 design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then remove it"), kept as tag
 `archive/ds-deviations-record`: the deviations themselves are listed in `docs/design-system/03-components.md` §3.6. Tag `v1.5.0` marks what is live.
 
-If GitHub shows a yellow "Compare & pull request" bar for `claude/1-6-0`, do not use it: that would merge
-unreleased 1.6 into `main`.
-
-Version numbers: phone 1.7.0 / versionCode 11 and watch 1.7.0 / 1003 on `claude/1-7-0` (the watch changed, so it ships). Release steps when Ali says go for 1.7.0: bump versionCode to 11 (and the watch if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (it did not). Ali presses every merge, submit and publish button.
+Version numbers: phone 1.7.1 / versionCode 12 on `claude/widget-today-redesign` (the watch stays 1.7.0 / 1003: `:core` and `:wear` did not change). Release steps for any release: bump the phone versionCode (and the watch only if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (it did not). Ali presses every merge, submit and publish button.
 
 ## 3. Read before you work, in this order
 

@@ -1,28 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Today widget's countdown card: the highlight colour the Times screen's next prayer card uses,
-     with the same glossy finish as the widget (a fixed gradient and the sheen). Both stops are
-     contrast tested (WidgetColorsTest). -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:angle="270"
-                android:endColor="@color/widget_highlight"
-                android:startColor="@color/widget_highlight_top"
-                android:type="linear" />
-            <corners android:radius="18dp" />
-        </shape>
-    </item>
-    <item>
-        <shape android:shape="rectangle">
-            <gradient
-                android:angle="270"
-                android:centerColor="@android:color/transparent"
-                android:centerY="0.5"
-                android:endColor="@android:color/transparent"
-                android:startColor="@color/widget_sheen"
-                android:type="linear" />
-            <corners android:radius="18dp" />
-        </shape>
-    </item>
-</layer-list>
+<!-- The Today widget's countdown card (1.7.1, Ali approved the mockup 24 Nov 2026): in light the app's fixed hero
+     gradient, mint to sand (DESIGN_SYSTEM §1); in dark flat primaryContainer, never a gradient (the three dark stops are the same
+     colour). An outlineVariant hairline in both: in light the gradient's mint top is the day sky's own top colour, so without it the
+     card had no top edge between sunrise and Asr (Fable, 24 Nov 2026). WidgetColorsTest holds every ink to AA on every stop. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:centerColor="@color/widget_hero_mid"
+        android:endColor="@color/widget_hero_foot"
+        android:startColor="@color/widget_hero_top"
+        android:type="linear" />
+    <stroke android:width="1dp" android:color="@color/widget_outline_variant" />
+    <corners android:radius="22dp" />
+</shape>

@@ -172,46 +172,56 @@ class WidgetDeviceTest {
     // ---- Today -------------------------------------------------------------------------------
 
     @Test
-    fun the_today_widget_shows_six_rows_the_next_one_marked_and_the_ramadan_words_only_in_ramadan() {
+    fun the_today_widget_shows_six_rows_the_next_and_current_marked_and_the_ramadan_words_only_in_ramadan() {
         val (_, view) = bindOrFail(TodayWidgetProvider::class.java)
-        // Isha is the last row and is always shown, even on the short card (compact Today shows the next prayer onward).
-        waitFor("the Today widget's first draw") { view.textOf("widget_time_isha")?.text?.isNotEmpty() == true }
+        // The first draw: some row has its time. Not Isha's: since 1.7.1 a short list at large text shows a run from the next prayer
+        // that can stop before Isha (three rows at 2x text in this host, 24 Nov 2026).
+        val slotKeys = PrayerSlot.entries.map { it.name.lowercase() }
+        waitFor("the Today widget's first draw") { slotKeys.any { view.textOf("widget_time_$it")?.text?.isNotEmpty() == true } }
         val bitmap = layoutAt(view, 250, 290)
         save("widget-today-${tag()}", bitmap)
         // The large card (4 by 4): the same host, taller, so the launcher would pick the large layout.
         save("widget-today-large-${tag()}", layoutAt(view, 250, 330))
 
         val (state, _) = stateNow()
-        // The widget marks the current prayer with the Now label (1.7.0, 4 Nov 2026), not Next.
+        // 1.7.1 (Ali approved the mockup, 24 Nov 2026): today's next prayer carries the filled "Next" pill and the current one the
+        // quieter "Now" pill, each beside the name or on the row's second line when the row is too narrow (WidgetRenderer.fillTodayRows).
         val marker = appContext.getString(R.string.home_now_marker)
+        val nextMarker = appContext.getString(R.string.home_next_marker)
+        val nextToday = state.next?.takeIf { !it.isTomorrow }?.slot
+        // The text of whichever of these views is drawn: visible, and so is the line it sits in.
+        fun shown(vararg names: String) = names.mapNotNull { view.textOf(it) }
+            .filter { it.visibility == View.VISIBLE && (it.parent as? View)?.visibility == View.VISIBLE }
+            .joinToString(" ") { it.text.toString() }.trim()
         val suhoor = appContext.getString(R.string.widget_suhoor_ends)
         val iftar = appContext.getString(R.string.widget_iftar)
         val fontScale = context.resources.configuration.fontScale
 
-        // A short card (the compact Today, 3 Nov 2026) shows the next prayer onward and hides the rows before it:
-        // the shown rows must run unbroken from some prayer to Isha, and a hidden row is not checked.
+        // The shown rows are the run the renderer chooses for that many rows: the list's (from the current prayer, or today's next,
+        // moved back so it ends at Isha at the latest) or the card's (the five prayers). Which run at which moment is pinned at fixed
+        // times by WidgetStateTest; here, that the bound widget draws one of them. A hidden row is not checked.
         // The row is the name's grandparent: the frame that the layout hides, not the inner line it sits in.
         val shown = PrayerSlot.entries.filter { slot ->
             (view.textOf("widget_name_${slot.name.lowercase()}")?.parent?.parent as? View)?.visibility == View.VISIBLE
         }
         assertTrue("no prayer row is shown", shown.isNotEmpty())
-        assertEquals(
-            "the shown rows are not a run ending at Isha",
-            PrayerSlot.entries.drop(PrayerSlot.entries.indexOf(shown.first())), shown,
+        assertTrue(
+            "the shown rows $shown are neither the list's nor the card's run of ${shown.size}",
+            shown == state.listSlots(shown.size) || shown == state.cardSlots(shown.size),
         )
         for (slot in PrayerSlot.entries) {
             if (slot !in shown) continue
             val key = slot.name.lowercase()
             val name = view.textOf("widget_name_$key")
             val time = view.textOf("widget_time_$key")
-            val label = view.textOf("widget_label_$key")
             assertNotNull("row $key has no name view", name)
             assertEquals("row $key name", slot.label(appContext), name!!.text.toString())
             assertTrue("row $key has no time", time!!.text.isNotEmpty())
             if (fontScale <= 1.0f) assertFalse("the name of row $key is cut off at normal font size", ellipsised(name))
 
-            val labelText = label!!.text.toString()
-            assertEquals("row $key marker", state.isHighlighted(slot), labelText.contains(marker))
+            val labelText = shown("widget_label_$key", "widget_label2_$key")
+            assertEquals("row $key Next pill", if (slot == nextToday) nextMarker else "", shown("widget_pill_next_$key", "widget_pill_next2_$key"))
+            assertEquals("row $key Now pill", if (state.isHighlighted(slot) && slot != nextToday) marker else "", shown("widget_pill_now_$key", "widget_pill_now2_$key"))
             val expectedWord = when {
                 slot == PrayerSlot.FAJR && state.ramadanToday -> suhoor
                 slot == PrayerSlot.MAGHRIB && state.ramadanToday -> iftar
@@ -309,13 +319,19 @@ class WidgetDeviceTest {
         try {
             val (_, today) = bindOrFail(TodayWidgetProvider::class.java)
             val (_, next) = bindOrFail(NextPrayerWidgetProvider::class.java)
+            // A prayer row the Today widget draws (not Sunrise, whose ink is the dimmed one). Not always Dhuhr's: since 1.7.1 a short
+            // list at large text shows a run that can leave any row out (two rows, Maghrib and Isha, after Isha at 2x, 24 Nov 2026).
+            fun drawnRow(): String? = listOf("fajr", "dhuhr", "asr", "maghrib", "isha").firstOrNull { k ->
+                today.textOf("widget_name_$k")?.let { it.text.isNotEmpty() && (it.parent?.parent as? View)?.visibility == View.VISIBLE } == true
+            }?.let { "widget_name_$it" }
             try {
-                waitFor("the first draw") { today.textOf("widget_name_dhuhr")?.text?.isNotEmpty() == true && next.textOf("widget_name")?.text?.isNotEmpty() == true }
+                waitFor("the first draw") { drawnRow() != null && next.textOf("widget_name")?.text?.isNotEmpty() == true }
             } catch (e: AssertionError) {
                 var info = ""
                 instrumentation.runOnMainSync { info = listOf("fajr","sunrise","dhuhr","asr","maghrib","isha").joinToString(",") { n -> n + ":" + today.textOf("widget_name_" + n)?.text + "/" + today.textOf("widget_name_" + n)?.visibility } + " hostH=" + today.height + " root=" + (today.findViewById<View>(R.id.widget_root) != null) + " today dhuhr=" + today.textOf("widget_name_dhuhr")?.text + " vis=" + today.textOf("widget_name_dhuhr")?.visibility + "; next name=" + next.textOf("widget_name")?.text }
                 throw AssertionError(e.message + " [" + info + "]")
             }
+            val row = drawnRow()!!
             val phoneDark = (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
             val light = ThemeChoice.LIGHT to R.color.widget_light_on_surface
             val dark = ThemeChoice.DARK to R.color.widget_dark_on_surface
@@ -332,7 +348,7 @@ class WidgetDeviceTest {
                 val expected = context.getColor(ink)
                 // Diagnosis added 6 Nov 2026: this wait timed out in 2 of 52 runs (see WidgetUpdater.lock), so a failure says what the view held.
                 fun why(v: View, name: String): String { var t = ""; instrumentation.runOnMainSync { val tv = v.textOf(name); t = " [expected=${Integer.toHexString(expected)} actual=${tv?.currentTextColor?.let { Integer.toHexString(it) }} text=${tv?.text} size=${v.width}x${v.height}]" }; return t }
-                try { waitFor("the Today widget under $choice") { today.textOf("widget_name_dhuhr")?.currentTextColor == expected } } catch (e: AssertionError) { throw AssertionError(e.message + why(today, "widget_name_dhuhr")) }
+                try { waitFor("the Today widget under $choice") { today.textOf(row)?.currentTextColor == expected } } catch (e: AssertionError) { throw AssertionError(e.message + why(today, row)) }
                 try { waitFor("the Next widget under $choice") { next.textOf("widget_name")?.currentTextColor == expected } } catch (e: AssertionError) { throw AssertionError(e.message + why(next, "widget_name")) }
                 val tag = "theme-${choice.name.lowercase()}"
                 save("widget-today-$tag", layoutAt(today, 250, 290))

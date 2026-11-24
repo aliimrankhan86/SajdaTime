@@ -8,7 +8,9 @@ import android.os.Build
 import android.os.SystemClock
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.format.DateUtils
 import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import android.util.SizeF
 import android.util.TypedValue
 import android.view.Gravity
@@ -30,6 +32,7 @@ import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.SkyPeriod
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.label
+import java.time.Duration
 import java.time.Instant
 import kotlin.math.roundToInt
 
@@ -54,8 +57,8 @@ import kotlin.math.roundToInt
  *     `_fixed` layout, which is the same layout inside a frame. Why a second id: see that file.
  *
  * **Several layouts per widget since 18 Oct 2026 (the hero countdown design), a ladder of steps since 4 Nov 2026.** On Android 12 and later the
- * launcher is handed all of them and picks by the widget's size without waking the app ([nextSizes], [todaySizes]): Next prayer from a one-line
- * form up to the wide card, Today from 2 compact rows up to the large card. Below 12 only one is used: the short Next card, the compact Today list. The 1.4.0 widgets had one fixed
+ * launcher is handed all of them and picks by the widget's size without waking the app ([nextSizes], [todayForms]): Next prayer from a one-line
+ * form up to the wide card, Today from its list form (1 to 6 rows) up to the card (since 1.7.1 one layout, [todayForms]). Below 12 only one is used: the short Next card, the six row Today list. The 1.4.0 widgets had one fixed
  * layout each, which left the content stranded in a corner of the larger widget One UI gives.
  *
  * **Three widgets since step 8 (1.6.0).** The Today strip (`strip`, `widget_strip.xml`) is five columns in one
@@ -166,27 +169,155 @@ internal object WidgetRenderer {
     }
 
     /**
-     * Today: the compact list from its minimum, the large card (date, countdown, the day) from its measured height ([largeTodayHeight])
-     * tall, which is what the header, the card and six rows need at the normal text size (rendered).
+     * Today, one layout in two forms since 1.7.1 (Ali approved the mockup 24 Nov 2026; [todayViews]). The LIST form (the date and the
+     * town chip over one list card of 1 to 6 rows) from the provider's floor, then the CARD form (the header with the Hijri date, the
+     * countdown card, then six rows, or Now, Next and the one after from [LARGE_TEXT]) from its measured height, at three widths
+     * ([CARD_WIDTHS]): the narrower the slot, the sooner the town chip, the prayer's time and "until it begins" each move to a line of
+     * their own. The launcher uses the fitting entry nearest the slot's size (HANDOVER §15 lesson 197).
      */
-    private fun todaySizes(context: Context): List<Pair<SizeF, Int>> {
-        // The large card's height is measured per text size and script (largeTodayHeight); the old 3 Nov figures here (296, 322, 340) are gone.
-        val largeHeight = largeTodayHeight(context)
-        // The first compact entry shows as many rows as 180dp holds; from the second (the height six rows need, see
-        // [compactSixRowsHeight]) all six show. Same layout, so todayViews is given the size.
-        val steps = compactSteps(context)
-        val six = steps.last().second
-        // Steps for 3, 4, 5 and 6 compact rows (Opus review, 4 Nov 2026: the provider floor is 240dp, not the 290 the old single entry
-        // assumed, so a 250dp slot cut its sixth row): each is used only when the slot holds it, and compactSlots shows that many rows.
-        return steps.map { (_, h) -> SizeF(TODAY_ENTRY_WIDTH_DP, h) to R.layout.widget_today } +
-            (SizeF(TODAY_ENTRY_WIDTH_DP, maxOf(largeHeight, six + 1f)) to R.layout.widget_today_large)
+    private class TodayForm(val card: Boolean, val rows: Int, val entry: SizeF, val widthDp: Float) {
+        fun atLeast(dp: Float) = if (dp > widthDp) TodayForm(card, rows, entry, dp) else this
     }
 
-    /** Height the large Today card is offered from: measured need at this text size and script, plus 5dp (WidgetRenderEvidenceTest#release_entry_needs). */
-    internal fun largeTodayHeight(context: Context): Float {
-        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
-        return interpolate(context.resources.configuration.fontScale, if (tall) LARGE_TODAY_TALL_NEED else LARGE_TODAY_NEED) + 5f
+    private fun todayForms(context: Context): List<TodayForm> {
+        val scale = context.resources.configuration.fontScale
+        val group = needGroup(context)
+        val list = LIST_WIDTHS.flatMapIndexed { i, (entryWidth, width) ->
+            // From one row: at 2x text even two rows need more than the 240dp floor (Opus review, 24 Nov 2026), so the smallest
+            // entry is the date and the chip over the next prayer alone.
+            (1..6).map { rows ->
+                val need = interpolate(scale, TODAY_SCALES.zip(LIST_NEEDS[group][i].getValue(rows).toList()))
+                TodayForm(card = false, rows = rows, entry = SizeF(entryWidth, need + 3f), widthDp = width)
+            }
+        }
+        val rows = cardRows(context)
+        val cards = CARD_WIDTHS.mapIndexed { i, (entryWidth, width) ->
+            // Only the text sizes that show the same number of rows (six below LARGE_TEXT, three from it): between 1.28 and 1.3 an
+            // interpolation across the two would offer a six row card from a three row height (Opus review, 24 Nov 2026).
+            val knots = TODAY_SCALES.zip(CARD_NEEDS[group][i].toList()).filter { (s, _) -> (s >= LARGE_TEXT) == (scale >= LARGE_TEXT) }
+            val need = interpolate(scale, knots)
+            TodayForm(card = true, rows = rows, entry = SizeF(entryWidth, need + rows * ROW_AIR_DP + 3f), widthDp = width)
+        }
+        return list + cards
     }
+
+    /** Which table: English, the other Latin script languages (Turkish, Indonesian: longer pill words), or Urdu, Arabic and Bengali. */
+    private fun needGroup(context: Context): Int = when (AppLocale.of(context).language) {
+        "en" -> 0
+        in TALL_SCRIPT_LANGUAGES -> 2
+        else -> 1
+    }
+
+    /** Six rows on the card, or from [LARGE_TEXT] Now, Next and the prayer after (the spec's large text rule), so nothing is cut. */
+    private fun cardRows(context: Context): Int = if (context.resources.configuration.fontScale >= LARGE_TEXT) 3 else 6
+
+    /**
+     * The card's widths: (entry width, the narrowest real width that entry can be drawn at). The renderer decides what fits on one
+     * line at that real width, never at the slot's own (a RemoteViews entry is chosen by the launcher without asking the app, the
+     * fitting entry nearest the slot's size). Most phones give a four cell widget 320 to 390dp. Fifteen entries with the list's
+     * twelve, under the 16 a RemoteViews may hold.
+     */
+    private val CARD_WIDTHS = listOf(TODAY_ENTRY_WIDTH_DP to 245f, 300f to 300f, 350f to 350f)
+
+    /**
+     * The list's widths, the same idea: from 245dp (a four cell widget in a host that takes 8dp a side, 4 Nov 2026) the next row's pill
+     * goes under "Maghrib" in English, which costs a line; from 300dp it stays beside it, so six rows still fit a 4 by 4.
+     */
+    private val LIST_WIDTHS = listOf(TODAY_ENTRY_WIDTH_DP to 245f, 300f to 300f)
+
+    /**
+     * Height added to each card row over its measured need: the rows are weighted, so this is where the spare height goes and what
+     * makes a row about 46dp tall (the mockup). It also absorbs a header or countdown line that moves under its neighbour in a state
+     * the measurement did not see (a long town name, a long gap before the next prayer), so nothing is cut.
+     */
+    private const val ROW_AIR_DP = 16f
+
+    /**
+     * Measured needs (WidgetRenderEvidenceTest#today_needs, 24 Nov 2026, the maximum over eight times of day including three in
+     * Ramadan and the hour before Maghrib), per text size [TODAY_SCALES], for each [needGroup]: English; Turkish and Indonesian;
+     * Urdu, Arabic and Bengali (the maximum of each group). The list by width ([LIST_WIDTHS]) and rows (1 to 6); the card by width
+     * ([CARD_WIDTHS]) with [cardRows] rows and no air.
+     */
+    private val TODAY_SCALES = listOf(1.0f, 1.1f, 1.15f, 1.25f, 1.28f, 1.3f, 1.5f, 1.6f, 2.0f)
+    private val LIST_NEEDS = listOf(
+        // English
+        listOf(
+            mapOf(
+                1 to floatArrayOf(128.4f, 131.8f, 133.3f, 136.8f, 138.7f, 139.0f, 149.0f, 152.8f, 166.1f),
+                2 to floatArrayOf(162.7f, 167.6f, 197.3f, 204.2f, 208.0f, 208.8f, 226.7f, 233.1f, 256.0f),
+                3 to floatArrayOf(197.0f, 203.4f, 233.9f, 242.3f, 246.9f, 248.0f, 269.3f, 277.3f, 305.9f),
+                4 to floatArrayOf(231.2f, 239.2f, 270.5f, 280.4f, 285.7f, 287.2f, 312.0f, 321.5f, 355.8f),
+                5 to floatArrayOf(265.5f, 275.0f, 307.0f, 318.5f, 324.6f, 326.5f, 354.7f, 365.7f, 405.7f),
+                6 to floatArrayOf(299.8f, 310.9f, 343.6f, 356.6f, 363.4f, 365.7f, 397.3f, 409.9f, 455.6f),
+            ),
+            mapOf(
+                1 to floatArrayOf(103.6f, 105.1f, 105.9f, 107.4f, 138.7f, 139.0f, 149.0f, 152.8f, 166.1f),
+                2 to floatArrayOf(137.9f, 141.0f, 142.5f, 145.5f, 177.5f, 178.3f, 192.0f, 197.0f, 256.0f),
+                3 to floatArrayOf(172.2f, 176.8f, 179.0f, 183.6f, 216.4f, 217.5f, 234.7f, 241.1f, 305.9f),
+                4 to floatArrayOf(206.5f, 212.6f, 215.6f, 221.7f, 255.2f, 256.8f, 277.3f, 285.3f, 355.8f),
+                5 to floatArrayOf(240.8f, 248.4f, 252.2f, 259.8f, 294.1f, 296.0f, 320.0f, 329.5f, 405.7f),
+                6 to floatArrayOf(275.0f, 284.2f, 288.8f, 297.9f, 333.0f, 335.2f, 362.7f, 373.7f, 455.6f),
+            ),
+        ),
+        // Turkish and Indonesian
+        listOf(
+            mapOf(
+                1 to floatArrayOf(128.4f, 131.8f, 133.3f, 136.8f, 138.7f, 139.0f, 149.0f, 152.8f, 166.1f),
+                2 to floatArrayOf(187.4f, 194.3f, 197.3f, 204.2f, 208.0f, 208.8f, 226.7f, 233.1f, 256.0f),
+                3 to floatArrayOf(221.7f, 230.1f, 233.9f, 242.3f, 246.9f, 248.0f, 269.3f, 277.3f, 305.9f),
+                4 to floatArrayOf(256.0f, 265.9f, 270.5f, 280.4f, 285.7f, 287.2f, 312.0f, 321.5f, 355.8f),
+                5 to floatArrayOf(290.3f, 301.7f, 307.0f, 318.5f, 324.6f, 326.5f, 354.7f, 365.7f, 405.7f),
+                6 to floatArrayOf(324.6f, 337.5f, 343.6f, 356.6f, 363.4f, 365.7f, 397.3f, 409.9f, 455.6f),
+            ),
+            mapOf(
+                1 to floatArrayOf(103.6f, 131.8f, 133.3f, 136.8f, 138.7f, 139.0f, 149.0f, 152.8f, 166.1f),
+                2 to floatArrayOf(137.9f, 167.6f, 169.9f, 204.2f, 208.0f, 208.8f, 226.7f, 233.1f, 256.0f),
+                3 to floatArrayOf(172.2f, 203.4f, 206.5f, 242.3f, 246.9f, 248.0f, 269.3f, 277.3f, 305.9f),
+                4 to floatArrayOf(206.5f, 239.2f, 243.0f, 280.4f, 285.7f, 287.2f, 312.0f, 321.5f, 355.8f),
+                5 to floatArrayOf(240.8f, 275.0f, 279.6f, 318.5f, 324.6f, 326.5f, 354.7f, 365.7f, 405.7f),
+                6 to floatArrayOf(275.0f, 310.9f, 316.2f, 356.6f, 363.4f, 365.7f, 397.3f, 409.9f, 455.6f),
+            ),
+        ),
+        // Urdu, Arabic and Bengali
+        listOf(
+            mapOf(
+                1 to floatArrayOf(126.5f, 129.9f, 139.8f, 144.8f, 146.3f, 147.0f, 159.2f, 163.4f, 179.8f),
+                2 to floatArrayOf(157.0f, 190.5f, 195.0f, 220.2f, 223.2f, 224.8f, 247.2f, 254.5f, 283.4f),
+                3 to floatArrayOf(187.4f, 222.5f, 228.2f, 259.8f, 263.2f, 265.5f, 292.2f, 301.3f, 337.5f),
+                4 to floatArrayOf(217.9f, 254.5f, 261.3f, 299.4f, 303.2f, 306.3f, 337.1f, 348.2f, 391.6f),
+                5 to floatArrayOf(248.0f, 286.5f, 294.1f, 339.0f, 343.2f, 347.0f, 382.1f, 395.0f, 445.7f),
+                6 to floatArrayOf(278.5f, 318.5f, 327.2f, 378.7f, 383.2f, 387.8f, 427.0f, 441.9f, 499.8f),
+            ),
+            mapOf(
+                1 to floatArrayOf(103.6f, 105.1f, 106.7f, 109.0f, 109.3f, 110.1f, 149.3f, 153.1f, 179.8f),
+                2 to floatArrayOf(137.9f, 141.0f, 144.0f, 148.6f, 149.3f, 150.9f, 227.4f, 233.9f, 283.4f),
+                3 to floatArrayOf(172.2f, 176.8f, 181.3f, 188.2f, 189.3f, 191.6f, 267.4f, 275.4f, 337.5f),
+                4 to floatArrayOf(206.5f, 212.6f, 218.7f, 227.8f, 229.3f, 232.4f, 307.4f, 317.0f, 391.6f),
+                5 to floatArrayOf(240.8f, 248.4f, 256.0f, 267.4f, 269.3f, 273.1f, 347.0f, 358.5f, 445.7f),
+                6 to floatArrayOf(275.0f, 284.2f, 293.3f, 307.0f, 309.3f, 313.9f, 387.0f, 400.0f, 499.8f),
+            ),
+        ),
+    )
+    private val CARD_NEEDS = listOf(
+        // English
+        listOf(
+            floatArrayOf(568.8f, 591.2f, 626.7f, 680.8f, 694.9f, 557.0f, 605.3f, 623.2f, 717.0f),
+            floatArrayOf(502.1f, 522.7f, 532.2f, 597.3f, 608.4f, 498.3f, 539.0f, 553.9f, 688.8f),
+            floatArrayOf(454.1f, 471.2f, 479.2f, 526.1f, 536.4f, 425.9f, 539.0f, 553.9f, 609.9f),
+        ),
+        // Turkish and Indonesian
+        listOf(
+            floatArrayOf(613.7f, 639.6f, 651.0f, 696.0f, 710.5f, 572.6f, 656.8f, 677.0f, 751.2f),
+            floatArrayOf(502.1f, 547.0f, 557.3f, 653.7f, 667.0f, 528.8f, 601.5f, 643.8f, 723.0f),
+            floatArrayOf(502.1f, 522.7f, 532.2f, 553.1f, 564.2f, 454.1f, 544.0f, 590.1f, 684.2f),
+        ),
+        // Urdu, Arabic and Bengali
+        listOf(
+            floatArrayOf(621.7f, 651.0f, 694.5f, 763.0f, 773.7f, 609.1f, 665.5f, 684.2f, 850.3f),
+            floatArrayOf(548.2f, 569.5f, 619.4f, 649.5f, 657.9f, 528.0f, 622.5f, 640.0f, 762.3f),
+            floatArrayOf(518.9f, 569.5f, 586.3f, 613.7f, 621.0f, 491.0f, 576.4f, 592.8f, 712.8f),
+        ),
+    )
 
     /** Height the wide Next card is offered from: measured need plus 5dp. Only offered below 1.3x text (see [nextForText]). */
     internal fun wideNextHeight(context: Context): Float {
@@ -196,8 +327,6 @@ internal object WidgetRenderer {
 
     // Measured 4 Nov 2026 (release_entry_needs: every language, six times of day, Ramadan; the maximum of each text size). Between the
     // measured sizes the need is interpolated, so an in-between text size (an OEM step) is never left short. English; Urdu and Arabic together.
-    private val LARGE_TODAY_NEED = listOf(1.0f to 401f, 1.1f to 416f, 1.15f to 425.5f, 1.25f to 438.1f, 1.3f to 447.2f, 1.5f to 477.3f, 1.6f to 492f)
-    private val LARGE_TODAY_TALL_NEED = listOf(1.0f to 434f, 1.1f to 452f, 1.15f to 462f, 1.25f to 484f, 1.3f to 492f, 1.5f to 534f, 1.6f to 552f)
     private val WIDE_NEXT_NEED = listOf(1.0f to 214.1f, 1.1f to 225.5f, 1.15f to 230.1f, 1.25f to 241.5f, 1.28f to 248.4f, 1.3f to 252f)
     private val WIDE_NEXT_TALL_NEED = listOf(1.0f to 214.9f, 1.1f to 221f, 1.15f to 227.8f, 1.25f to 243.8f, 1.28f to 250.7f, 1.3f to 255f)
 
@@ -216,63 +345,11 @@ internal object WidgetRenderer {
     private val TALL_SCRIPT_LANGUAGES = setOf("ur", "ar", "bn")
 
     /**
-     * What each compact Today step needs, per text size [COMPACT_SCALES]: rows 2 to 6; English, then Urdu, Arabic and Bengali (the
-     * maximum of the three). Measured 4 Nov 2026 by WidgetRenderEvidenceTest#compact_rows_need over five times of day (before Fajr,
-     * midday, Maghrib, after Isha, a Ramadan evening); the entry is the need plus 3dp, interpolated between the sizes.
-     *
-     * These are NOT a worst case over states (checked 6 Nov 2026, compact_rows_need prints every time of day beside the maximum): the six
-     * row need is the same figure at all five times, because the list has no countdown line and a row label ("Now", "Suhoor ends",
-     * "Iftar") never adds height. The plain layout is 6dp padding twice, six 34dp rows, five 6dp gaps, the 7dp gap and the 22dp chip.
-     * Ali, 6 Nov 2026 ("Yes, trim padding"): the card's top and bottom padding went from 10dp to 6dp and the gap above the chip from
-     * 10dp to 7dp (11dp in all) so six rows (275.0dp at 1.0x English, entry 278.0) fit the 279dp of a plain 4 by 4 slot, where the old
-     * 285.7 left Fajr out of a Redmi's slot; every figure below was re-measured after the change. The rows keep their 6dp (his 4 Nov choice).
-     * HyperOS also draws widget content about a fifth smaller than the slot it reports (measured from his screenshots), so on that
-     * phone some blank can remain; a widget cannot see that scale.
-     */
-    private val COMPACT_SCALES = floatArrayOf(1.0f, 1.1f, 1.15f, 1.25f, 1.3f, 1.5f, 1.6f, 2.0f)
-    private val COMPACT_NEED_EN = mapOf(
-        2 to floatArrayOf(121.1f, 125.0f, 127.6f, 131.4f, 134.9f, 145.1f, 149.7f, 168.0f),
-        3 to floatArrayOf(161.1f, 166.9f, 170.7f, 175.6f, 180.2f, 194.3f, 200.4f, 224.4f),
-        4 to floatArrayOf(201.1f, 208.8f, 213.7f, 219.8f, 225.5f, 243.4f, 251.0f, 280.8f),
-        5 to floatArrayOf(241.1f, 250.7f, 256.8f, 264.0f, 270.9f, 292.6f, 301.7f, 337.1f),
-        6 to floatArrayOf(275.0f, 286.5f, 293.7f, 302.1f, 310.1f, 335.6f, 346.3f, 387.4f),
-    )
-    private val COMPACT_NEED_TALL = mapOf(
-        2 to floatArrayOf(120.4f, 125.0f, 127.6f, 133.7f, 137.9f, 149.0f, 154.3f, 175.6f),
-        3 to floatArrayOf(160.0f, 166.9f, 170.7f, 179.0f, 184.8f, 200.0f, 207.2f, 235.8f),
-        4 to floatArrayOf(199.6f, 208.8f, 213.7f, 224.4f, 231.6f, 251.0f, 260.2f, 296.0f),
-        5 to floatArrayOf(239.2f, 250.7f, 256.8f, 269.7f, 278.5f, 302.1f, 313.1f, 356.2f),
-        6 to floatArrayOf(272.8f, 286.5f, 293.7f, 309.0f, 319.2f, 347.0f, 360.0f, 410.3f),
-    )
-
-    /** The compact steps: rows to the height they are offered from, ascending (3, 4, 5, 6). */
-    private fun compactSteps(context: Context): List<Pair<Int, Float>> {
-        val scale = context.resources.configuration.fontScale
-        val table = if (AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES) COMPACT_NEED_TALL else COMPACT_NEED_EN
-        return (2..6).map { rows -> rows to interpolate(scale, COMPACT_SCALES.toList().zip(table.getValue(rows).toList())) + 3f }
-    }
-
-    private fun compactSixRowsHeight(context: Context): Float = compactSteps(context).last().second
-
-    private fun compactSlots(context: Context, state: WidgetState, size: SizeF): List<PrayerSlot> {
-        // Below Android 12 only the first entry exists and its real height is unknown, so all six rows stay (as before 3 Nov 2026).
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || size.height >= compactSixRowsHeight(context) - 0.5f) return PrayerSlot.entries
-        val steps = compactSteps(context)
-        val count = steps.lastOrNull { it.second <= size.height + 0.5f }?.first?.coerceAtMost(5) ?: 2
-        val all = PrayerSlot.entries
-        val start = state.current?.let(all::indexOf) ?: state.next?.takeIf { !it.isTomorrow }?.let { all.indexOf(it.slot) } ?: (all.size - count)
-        return all.subList(start.coerceAtMost(all.size - count), (start.coerceAtMost(all.size - count)) + count)
-    }
-
-    /**
      * From this text size (1.3x) the wide Next card is dropped (its rows no longer fit beside the countdown: [nextForText]); every small step
-     * stays. The large Today card is still offered up to [LARGE_TEXT_NO_CARD] when the slot holds it, with the compact list as the fallback.
-     * The font scale is read at each redraw, so a change reaches the widget at the next one (the next prayer, midnight, or opening the app).
+     * stays. The Today card shows three rows from here ([cardRows]). The font scale is read at each redraw, so a change reaches the
+     * widget at the next one (the next prayer, midnight, or opening the app).
      */
     private const val LARGE_TEXT = 1.3f
-
-    /** From this text size the large Today card is not offered at all (it wants about 470dp); the compact list keeps all six rows. */
-    private const val LARGE_TEXT_NO_CARD = 1.6f
 
     fun nextPrayer(base: Context, state: WidgetState, now: Instant): RemoteViews {
         val context = AppLocale.wrap(base)
@@ -280,19 +357,32 @@ internal object WidgetRenderer {
         return responsive(nextForText(context, nextSizes(context)), preSIndex = 1) { layout, size -> nextViews(context, state, now, layout, size) }
     }
 
-    /** Test hook (WidgetRenderEvidenceTest): the compact Today card showing exactly [rows] rows (3 to 6), whatever the slot. */
-    internal fun todayCompactRows(base: Context, state: WidgetState, now: Instant, rows: Int): RemoteViews {
+    /** Test hook (WidgetRenderEvidenceTest): one Today form by its [todayKey], whatever the slot. */
+    internal fun todayForm(base: Context, state: WidgetState, now: Instant, key: String): RemoteViews {
         val context = AppLocale.wrap(base)
-        return todayViews(context, state, now, R.layout.widget_today, SizeF(250f, compactSteps(context).first { it.first == rows }.second))
+        return todayViews(context, state, now, todayForms(context).first { todayKey(it) == key })
     }
 
-    fun today(base: Context, state: WidgetState, now: Instant): RemoteViews {
+    /** Test hook: each Today entry by [todayKey] to (the height it is offered from, the real width its decisions assume). */
+    internal fun todayEntries(base: Context): Map<String, Pair<Float, Float>> =
+        todayForms(AppLocale.wrap(base)).associate { todayKey(it) to (it.entry.height to it.widthDp) }
+
+    /** "list 300 6" (the list at the 300dp entry width, six rows), "card 350". */
+    private fun todayKey(form: TodayForm): String =
+        if (form.card) "card ${form.entry.width.toInt()}" else "list ${form.entry.width.toInt()} ${form.rows}"
+
+    /**
+     * [minWidthDp] is the width the launcher reports for this instance (OPTION_APPWIDGET_MIN_WIDTH, 0 when unknown). It only ever
+     * widens what each form assumes when it decides whether a line fits ([TodayForm.widthDp]), so a wide slot keeps a pill beside
+     * its name at large text (Fable, 24 Nov 2026). It cannot add a line, so the measured entry heights stay upper bounds.
+     */
+    fun today(base: Context, state: WidgetState, now: Instant, minWidthDp: Float = 0f): RemoteViews {
         val context = AppLocale.wrap(base)
-        // At large text the large card is dropped (from LARGE_TEXT_NO_CARD, 1.6x, it is not offered at all) but every compact entry stays, so a tall widget keeps all six rows.
-        val sizes = todaySizes(context).let { all ->
-            if (context.resources.configuration.fontScale >= LARGE_TEXT_NO_CARD) all.filter { it.second == R.layout.widget_today } else all
-        }
-        return responsive(sizes) { layout, size -> todayViews(context, state, now, layout, size) }
+        // 16dp under the reported width: a host may still pad the widget by 8dp a side (the device test's host does).
+        val forms = todayForms(context).map { it.atLeast(minWidthDp - 16f) }
+        // Below Android 12 a launcher takes one RemoteViews: the six row list, at every size (the pre-12 provider asks for 290dp).
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return todayViews(context, state, now, forms.first { !it.card && it.rows == 6 })
+        return RemoteViews(forms.associate { it.entry to todayViews(context, state, now, it) })
     }
 
     /**
@@ -466,32 +556,34 @@ internal object WidgetRenderer {
         if (wide) {
             views.setViewVisibility(R.id.widget_divider, View.VISIBLE)
             views.setImageViewResource(R.id.widget_divider, skin(state, R.drawable.widget_divider_sky))
-            fillRows(context, views, state, labels = false, band = true, bandSideDp = 4f)
+            fillRows(context, views, state, labels = false, bandSideDp = 4f)
         }
 
         views.setContentDescription(R.id.widget_root, withPlace(context, state, nextSentence(context, next, now)))
         return views
     }
 
-    private fun todayViews(context: Context, state: WidgetState, now: Instant, @LayoutRes layout: Int, size: SizeF): RemoteViews {
-        val views = themedViews(context, state, layout)
-        val large = layout == R.layout.widget_today_large
+    /**
+     * The Today widget in one of its forms ([todayForms]). Everything that differs between the forms and between states is written on
+     * every render, both ways, because the entries share one layout and the launcher reuses the views it already has.
+     */
+    private fun todayViews(context: Context, state: WidgetState, now: Instant, form: TodayForm): RemoteViews {
+        val views = themedViews(context, state, R.layout.widget_today)
         applyDirection(context, views)
         applyTap(context, views)
-        // 1.7.0: the same body as the strip (period sky in light, the app's dark green in dark), written after the paint.
+        // The same body as the strip and the Next widget (period sky in light, the app's dark green in dark), written after the paint.
         views.setInt(R.id.widget_root, "setBackgroundResource", skin(state, stripBody(state.period)))
-        fillChip(context, views, state)
-        views.setInt(R.id.widget_place_chip, "setBackgroundResource", skin(state, R.drawable.widget_pill_sky))
-        if (large) fillHeader(context, views, state)
-        else views.setViewVisibility(R.id.widget_compact_countdown, View.GONE)
+        // The list form keeps 8dp above and below, so six rows still fit a plain 4 by 4 (279dp on the Redmi, Ali 6 Nov 2026).
+        val edge = dp(context, if (form.card) 12f else 8f)
+        views.setViewPadding(R.id.widget_root, dp(context, 12f), edge, dp(context, 12f), edge)
+        fillTodayHeader(context, views, state, form)
 
         val today = state.today
         val next = state.next
         if (!state.hasLocation || today == null || next == null) {
-            // The rows (and the countdown card) are hidden, which leaves an honest card with one
-            // message in it. The large widget keeps its header: the date needs no location.
-            for (slot in PrayerSlot.entries) views.setViewVisibility(ROWS.getValue(slot).row, View.GONE)
-            if (large) views.setViewVisibility(R.id.widget_hero, View.GONE)
+            // One honest message under the date, which needs no location.
+            views.setViewVisibility(R.id.widget_hero, View.GONE)
+            views.setViewVisibility(R.id.widget_list, View.GONE)
             views.setTextViewText(R.id.widget_message, context.getString(R.string.widget_no_location))
             views.setViewVisibility(R.id.widget_message, View.VISIBLE)
             views.setViewVisibility(R.id.widget_footer, View.GONE)
@@ -499,15 +591,12 @@ internal object WidgetRenderer {
             return views
         }
         views.setViewVisibility(R.id.widget_message, View.GONE)
-        if (large) {
-            views.setViewVisibility(R.id.widget_hero, View.VISIBLE)
-            fillHero(context, views, state, next, now, LARGE_COUNTDOWN_DP)
-        }
-        // The compact card has no countdown line: the location chip alone (Ali, 4 Nov 2026: "we don't need" the next
-        // prayer and its countdown here). Hidden every time, because a launcher may reuse the view.
-        views.setViewVisibility(R.id.widget_compact_countdown, View.GONE)
+        views.setViewVisibility(R.id.widget_list, View.VISIBLE)
+        views.setViewVisibility(R.id.widget_hero, if (form.card) View.VISIBLE else View.GONE)
+        if (form.card) fillTodayHero(context, views, state, next, now, form.widthDp)
 
-        val spoken = fillRows(context, views, state, labels = true, band = large, bandSideDp = 8f, shown = if (large) PrayerSlot.entries else compactSlots(context, state, size))
+        val shown = if (form.card) state.cardSlots(form.rows) else listSlots(state, form.rows)
+        val spoken = fillTodayRows(context, views, state, today, next, shown, form)
 
         if (today.approximated) {
             views.setTextViewText(R.id.widget_footer, context.getString(R.string.notif_approximate))
@@ -523,6 +612,229 @@ internal object WidgetRenderer {
         )
         return views
     }
+
+    /** The list's rows ([WidgetState.listSlots]); all six below Android 12, where the slot's height is unknown. */
+    private fun listSlots(state: WidgetState, rows: Int): List<PrayerSlot> =
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) PrayerSlot.entries else state.listSlots(rows)
+
+    /**
+     * The header: the date over the Hijri date (the card only), the town chip at the end. On the card the chip moves under the date
+     * when the date or the Hijri date would not fit one line beside it at the form's narrowest width (the spec: "it wraps under the
+     * date"). The list form's height is measured with one header line, so there the chip never moves: the date gives way instead.
+     */
+    private fun fillTodayHeader(context: Context, views: RemoteViews, state: WidgetState, form: TodayForm) {
+        val date = state.date?.let { TimeFormat.date(context, it) }
+        val hijri = if (form.card) hijriText(context, state) else null
+        val place = if (state.hasLocation) place(context, state) else null
+        fillChip(context, views, state)
+        fillChip(context, views, state, R.id.widget_place_chip_below, R.id.widget_place_below)
+        val chipDp = place?.let {
+            CHIP_CHROME_DP + CHIP_ICONS_SP * context.resources.configuration.fontScale + minOf(textDp(context, it, 14f, Typeface.DEFAULT_BOLD), CHIP_PLACE_MAX_DP)
+        } ?: 0f
+        val textDp = listOfNotNull(date?.let { textDp(context, it, 17f, MEDIUM) }, hijri?.let { textDp(context, it, 14f) }).maxOrNull() ?: 0f
+        val fits = place == null || textDp + 8f + chipDp <= form.widthDp - 24f
+        val below = form.card && !fits
+        views.setViewVisibility(R.id.widget_place_chip, if (place != null && !below) View.VISIBLE else View.GONE)
+        views.setViewVisibility(R.id.widget_place_chip_below, if (place != null && below) View.VISIBLE else View.GONE)
+        val showDate = date != null && (form.card || fits)
+        views.setTextViewText(R.id.widget_date, date.orEmpty())
+        views.setViewVisibility(R.id.widget_date, if (showDate) View.VISIBLE else View.GONE)
+        views.setTextViewText(R.id.widget_hijri, hijri.orEmpty())
+        views.setViewVisibility(R.id.widget_hijri, if (hijri != null) View.VISIBLE else View.GONE)
+    }
+
+    /** The chip's own width without the town and its icons: padding 11 and 12, the 5dp and 6dp gaps. */
+    private const val CHIP_CHROME_DP = 34f
+
+    /** The chip's pin (16sp) and arrow (14sp): in sp since 24 Nov 2026, so they grow with the town's text. */
+    private const val CHIP_ICONS_SP = 30f
+
+    /** The town's widest, the layout's maxWidth. */
+    private const val CHIP_PLACE_MAX_DP = 150f
+
+    /**
+     * The countdown card: "Next prayer" (with "Tomorrow" after Isha, as the app's card), the name and its time on one line, the
+     * approximate marker or the Ramadan word, then the countdown with "until it begins" beside it. The time and "until it begins" each
+     * move under their neighbour when the two do not fit one line at the form's narrowest width ([widthDp]).
+     *
+     * The countdown stays the Chronometer the launcher ticks (24 Nov 2026, widget-review.md: dependable and no wake ups, rather than
+     * the mockup's "4 min", which would need a redraw every minute). It reads "04:34", "00:45" under a minute and "1:04:34" over an hour.
+     * Without exact alarms the time takes the big place instead, and "until it begins" goes, as before (see [fillHero]).
+     */
+    private fun fillTodayHero(context: Context, views: RemoteViews, state: WidgetState, next: NextPrayer, now: Instant, widthDp: Float) {
+        val inner = widthDp - 24f - 36f
+        val name = next.slot.label(context)
+        val clock = TimeFormat.clock(context, next.at)
+        views.setTextViewText(
+            R.id.widget_hero_label,
+            if (next.isTomorrow) {
+                context.getString(R.string.settings_value_pair, context.getString(R.string.home_next_prayer), context.getString(R.string.widget_tomorrow))
+            } else {
+                context.getString(R.string.home_next_prayer)
+            },
+        )
+        views.setTextViewText(R.id.widget_name, name)
+        // A projected polar time is marked before the Ramadan word: a guess presented as a measurement is the worse mistake.
+        val context2 = if (state.nextIsApproximate) {
+            context.getString(R.string.notif_approximate)
+        } else {
+            state.ramadanWordFor(next.slot, state.ramadanOnNextDay)?.let { wordText(context, it) }
+        }
+        views.setTextViewText(R.id.widget_sublabel, context2.orEmpty())
+        views.setViewVisibility(R.id.widget_sublabel, if (context2 != null) View.VISIBLE else View.GONE)
+
+        views.setTextViewTextSize(R.id.widget_countdown, TypedValue.COMPLEX_UNIT_DIP, TODAY_COUNTDOWN_DP)
+        views.setTextViewTextSize(R.id.widget_hero_time, TypedValue.COMPLEX_UNIT_DIP, TODAY_COUNTDOWN_DP)
+        val until = context.getString(R.string.home_until)
+        views.setTextViewText(R.id.widget_until, until)
+        views.setTextViewText(R.id.widget_until_below, until)
+        views.setTextViewText(R.id.widget_time, timeText(clock, emphasis = false))
+        views.setTextViewText(R.id.widget_time_below, timeText(clock, emphasis = false))
+        if (state.countdownAllowed) {
+            applyCountdown(views, R.id.widget_countdown, next.at, now)
+            views.setViewVisibility(R.id.widget_hero_time, View.GONE)
+            val timeBeside = textDp(context, name, 24f, MEDIUM) + 10f + textDp(context, widestClock(context), 17f, tabular = true) <= inner
+            views.setViewVisibility(R.id.widget_time, if (timeBeside) View.VISIBLE else View.GONE)
+            views.setViewVisibility(R.id.widget_time_below, if (timeBeside) View.GONE else View.VISIBLE)
+            // The Chronometer only gets shorter until the next redraw (at the prayer), so its text now is the widest it will be.
+            val counting = DateUtils.formatElapsedTime(Duration.between(now, next.at).seconds.coerceAtLeast(0))
+            val untilBeside = textDp(context, counting, TODAY_COUNTDOWN_DP, LIGHT, TypedValue.COMPLEX_UNIT_DIP) + 10f +
+                textDp(context, until, 17f) <= inner
+            views.setViewVisibility(R.id.widget_until, if (untilBeside) View.VISIBLE else View.GONE)
+            views.setViewVisibility(R.id.widget_until_below, if (untilBeside) View.GONE else View.VISIBLE)
+        } else {
+            views.setViewVisibility(R.id.widget_countdown, View.GONE)
+            views.setTextViewText(R.id.widget_hero_time, timeText(clock, emphasis = false))
+            views.setViewVisibility(R.id.widget_hero_time, View.VISIBLE)
+            for (id in listOf(R.id.widget_time, R.id.widget_time_below, R.id.widget_until, R.id.widget_until_below)) views.setViewVisibility(id, View.GONE)
+        }
+    }
+
+    /** The countdown card's big number, in dp (see the layout): the mockup's 46. */
+    private const val TODAY_COUNTDOWN_DP = 46f
+
+    /**
+     * The Today rows (1.7.1). The next prayer's row (today's, not tomorrow's Fajr after Isha) gets the fill with the bar on its leading
+     * edge, the filled "Next" pill and the medium weight; the current prayer the quieter "Now" pill; Sunrise its dimmed fill (its
+     * smaller, paler type is in the layout). A row whose name, pill and time do not fit one line puts the pill (on the card, with the
+     * Ramadan word) on a second line, so no pill cuts the time; in the list the word stays beside the name and shortens, or drops out
+     * when there is no room at all. A hairline sits under every shown row but the last shown. Returns one spoken phrase per row, all
+     * six, for the widget's single description.
+     */
+    private fun fillTodayRows(
+        context: Context, views: RemoteViews, state: WidgetState, today: DayPrayerTimes, next: NextPrayer, shown: List<PrayerSlot>, form: TodayForm,
+    ): List<String> {
+        val all = PrayerSlot.entries
+        val nextSlot = state.nextToday
+        val inner = form.widthDp - 24f - 8f - 28f
+        val tall = AppLocale.of(context).language in TALL_SCRIPT_LANGUAGES
+        // The card's rows take 4dp and share the spare height (ROW_AIR_DP); the list's keep 5dp (2dp in the taller scripts) so six fit 4 by 4.
+        val padV = dp(context, if (form.card) 4f else if (tall) 2f else 5f)
+        val widest = widestClock(context)
+        val side = dp(context, 14f)
+        // A hairline under every shown row but the last shown: the three row card leaves Sunrise out, so the hairline under Fajr
+        // is the one between Fajr and Dhuhr there.
+        for (i in 0 until all.lastIndex) {
+            val hair = TODAY_ROWS.getValue(all[i]).hair ?: continue
+            views.setViewVisibility(hair, if (all[i] in shown && all.drop(i + 1).any { it in shown }) View.VISIBLE else View.GONE)
+        }
+        val spoken = mutableListOf<String>()
+        for (slot in all) {
+            val ids = ROWS.getValue(slot)
+            val extra = TODAY_ROWS.getValue(slot)
+            val name = slot.label(context)
+            val time = TimeFormat.clock(context, today[slot])
+            val word = state.ramadanWordFor(slot, state.ramadanToday)?.let { wordText(context, it) }
+            spoken += context.getString(R.string.widget_a11y_row, if (word != null) context.getString(R.string.settings_value_pair, name, word) else name, time)
+            if (slot !in shown) {
+                views.setViewVisibility(ids.row, View.GONE)
+                continue
+            }
+            val isNext = slot == nextSlot
+            val isNow = !isNext && state.isHighlighted(slot)
+            views.setViewVisibility(ids.row, View.VISIBLE)
+            views.setViewPadding(ids.row, side, padV, side, padV)
+            when {
+                isNext -> views.setInt(ids.row, "setBackgroundResource", skin(state, R.drawable.widget_row_next))
+                slot == PrayerSlot.SUNRISE -> views.setInt(ids.row, "setBackgroundResource", skin(state, R.drawable.widget_row_sunrise))
+                else -> views.setInt(ids.row, "setBackgroundColor", android.graphics.Color.TRANSPARENT)
+            }
+            views.setTextViewText(ids.name, if (isNext) medium(name) else name)
+            if (slot == PrayerSlot.SUNRISE) views.setTextViewText(R.id.widget_strut_sunrise, name)
+            views.setTextViewText(ids.time, if (isNext) medium(timeText(time, emphasis = false)) else timeText(time, emphasis = false))
+
+            val pill = when {
+                isNext -> context.getString(R.string.home_next_marker)
+                isNow -> context.getString(R.string.home_now_marker)
+                else -> null
+            }
+            val sp = if (slot == PrayerSlot.SUNRISE) 15f else 17f
+            // Measured with the widest time the clock can show, not this row's: London's "4:28 pm" fitted one line at 1.3x where
+            // Karachi's "5:41 pm" did not, so heights measured in London were short in Karachi (fit test, 24 Nov 2026). With the widest
+            // time the choice depends only on the language, the text size and the width, which the tables are measured for.
+            // The list never gives a Ramadan word a line of its own: its heights are the year's (six rows in a 4 by 4, Ali 6 Nov 2026),
+            // so in the list the word stays beside the name and shortens with an ellipsis when there is no room, as in 1.7.0; the card
+            // has the air for it. A pill that does not fit moves under the name in both forms.
+            val wordDp = if (form.card) word?.let { textDp(context, it, 14f) } ?: 0f else 0f
+            val needDp = textDp(context, name, sp, if (isNext) MEDIUM else Typeface.DEFAULT) + textDp(context, widest, sp, tabular = true) + 16f +
+                (pill?.let { 8f + 18f + textDp(context, it, 14f, MEDIUM) } ?: 0f) + wordDp
+            val inline = (pill == null && (word == null || !form.card)) || needDp <= inner
+            for (id in listOf(extra.pillNext, extra.pillNow, extra.pillNext2, extra.pillNow2)) views.setTextViewText(id, pill.orEmpty())
+            views.setViewVisibility(extra.pillNext, if (isNext && inline) View.VISIBLE else View.GONE)
+            views.setViewVisibility(extra.pillNow, if (isNow && inline) View.VISIBLE else View.GONE)
+            views.setViewVisibility(extra.pillNext2, if (isNext && !inline) View.VISIBLE else View.GONE)
+            views.setViewVisibility(extra.pillNow2, if (isNow && !inline) View.VISIBLE else View.GONE)
+            views.setTextViewText(ids.label, if (inline) word.orEmpty() else "")
+            views.setTextViewText(extra.label2, if (inline) "" else word.orEmpty())
+            views.setViewVisibility(extra.line2, if (inline) View.GONE else View.VISIBLE)
+        }
+        return spoken
+    }
+
+    /** The Today rows' own views, beyond the [ROWS] ids they share with the wide Next card. No hairline after Isha. */
+    private class TodayRowIds(val pillNext: Int, val pillNow: Int, val pillNext2: Int, val pillNow2: Int, val label2: Int, val line2: Int, val hair: Int?)
+
+    private val TODAY_ROWS = mapOf(
+        PrayerSlot.FAJR to TodayRowIds(R.id.widget_pill_next_fajr, R.id.widget_pill_now_fajr, R.id.widget_pill_next2_fajr, R.id.widget_pill_now2_fajr, R.id.widget_label2_fajr, R.id.widget_line2_fajr, R.id.widget_hair_fajr),
+        PrayerSlot.SUNRISE to TodayRowIds(R.id.widget_pill_next_sunrise, R.id.widget_pill_now_sunrise, R.id.widget_pill_next2_sunrise, R.id.widget_pill_now2_sunrise, R.id.widget_label2_sunrise, R.id.widget_line2_sunrise, R.id.widget_hair_sunrise),
+        PrayerSlot.DHUHR to TodayRowIds(R.id.widget_pill_next_dhuhr, R.id.widget_pill_now_dhuhr, R.id.widget_pill_next2_dhuhr, R.id.widget_pill_now2_dhuhr, R.id.widget_label2_dhuhr, R.id.widget_line2_dhuhr, R.id.widget_hair_dhuhr),
+        PrayerSlot.ASR to TodayRowIds(R.id.widget_pill_next_asr, R.id.widget_pill_now_asr, R.id.widget_pill_next2_asr, R.id.widget_pill_now2_asr, R.id.widget_label2_asr, R.id.widget_line2_asr, R.id.widget_hair_asr),
+        PrayerSlot.MAGHRIB to TodayRowIds(R.id.widget_pill_next_maghrib, R.id.widget_pill_now_maghrib, R.id.widget_pill_next2_maghrib, R.id.widget_pill_now2_maghrib, R.id.widget_label2_maghrib, R.id.widget_line2_maghrib, R.id.widget_hair_maghrib),
+        PrayerSlot.ISHA to TodayRowIds(R.id.widget_pill_next_isha, R.id.widget_pill_now_isha, R.id.widget_pill_next2_isha, R.id.widget_pill_now2_isha, R.id.widget_label2_isha, R.id.widget_line2_isha, null),
+    )
+
+    // Lazy: the unit tests load this object on the JVM, where Typeface cannot be created.
+    private val MEDIUM: Typeface by lazy { Typeface.create("sans-serif-medium", Typeface.NORMAL) }
+    private val LIGHT: Typeface by lazy { Typeface.create("sans-serif-light", Typeface.NORMAL) }
+
+    /**
+     * [text]'s drawn width in dp at [size] sp (scaled by the font setting as the launcher draws it, non linearly from Android 14), or
+     * at [size] dp with [unit] COMPLEX_UNIT_DIP (the countdown, never scaled).
+     */
+    private fun textDp(
+        context: Context, text: CharSequence, size: Float, typeface: Typeface = Typeface.DEFAULT, unit: Int = TypedValue.COMPLEX_UNIT_SP,
+        tabular: Boolean = false,
+    ): Float {
+        val metrics = context.resources.displayMetrics
+        val paint = android.graphics.Paint().apply {
+            this.typeface = typeface
+            textSize = TypedValue.applyDimension(unit, size, metrics)
+            // The layouts draw times with tabular figures (fontFeatureSettings tnum), so every digit is as wide as the widest.
+            if (tabular) fontFeatureSettings = "tnum"
+        }
+        return paint.measureText(text.toString()) / metrics.density
+    }
+
+    /**
+     * The widest time this phone's clock can show: two hour digits ("12:58 pm", or "12:58" on a 24 hour clock, as wide as "23:58" in
+     * tabular figures), in the app's language. Line fit decisions use it so they do not change with the place or the hour.
+     */
+    private fun widestClock(context: Context): String =
+        TimeFormat.clock(context, java.time.LocalTime.of(12, 58))
+
+    /** The medium weight (the mockup's semibold) for the next prayer's row. A span, because a RemoteViews cannot set a weight. */
+    private fun medium(text: CharSequence): CharSequence =
+        SpannableString(text).apply { setSpan(TypefaceSpan("sans-serif-medium"), 0, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE) }
 
     /**
      * The Today strip at one of its sizes. Written both ways for everything that differs between
@@ -739,7 +1051,7 @@ internal object WidgetRenderer {
     // --- the parts ------------------------------------------------------------------------
 
     /**
-     * The countdown block, shared by both Next layouts and the large Today card: the next prayer's
+     * The countdown block of both Next layouts (the Today widget has its own, [fillTodayHero]): the next prayer's
      * glyph, name and time, one small line of context, the countdown (or the time in its place) and
      * the day's five bars.
      */
@@ -815,11 +1127,11 @@ internal object WidgetRenderer {
     }
 
     /**
-     * The six rows. Returns one spoken phrase per row for the widget's single description. [band] is the larger
-     * forms (wide Next, large Today), whose highlighted row takes the rimmed band; otherwise the 4dp underline marks it.
+     * The wide Next card's six rows (the Today widget has its own, [fillTodayRows]). Returns one spoken phrase per row for the
+     * widget's single description. The highlighted row takes the rimmed band.
      */
     private fun fillRows(
-        context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, band: Boolean, bandSideDp: Float = 0f,
+        context: Context, views: RemoteViews, state: WidgetState, labels: Boolean, bandSideDp: Float = 0f,
         shown: List<PrayerSlot> = PrayerSlot.entries,
     ): List<String> {
         val today = state.today ?: return emptyList()
@@ -840,7 +1152,6 @@ internal object WidgetRenderer {
 
             views.setViewVisibility(ids.row, View.VISIBLE)
             views.setInt(ids.row, "setBackgroundResource", rowSurface(state, highlighted))
-            if (!band) views.setViewVisibility(ids.underline, View.GONE)
             val side = dp(context, bandSideDp)
             // 6dp above and below each prayer: the rows read as full bars, not squashed lines (Ali, 4 Nov 2026: too cramped at 0;
             // 4 Nov 2026 Redmi check: 4dp still looked squashed at 16sp). Six of these plus 6dp gaps fit the 290dp minimum.
@@ -881,31 +1192,13 @@ internal object WidgetRenderer {
     }
 
     /**
-     * The large Today widget's header: the date in full and the Hijri date under it. Keyed on the
-     * calendar day in the state, which the redraw alarm already moves on at midnight.
+     * The Hijri date as the Times screen's header builds it (HomeScreen.hijriToday): month names from the string array, and only the
+     * month isolated, which is what keeps "7 Jumada al-Ula 1448" in order for a right to left reader (BidiTest). Null when there is none.
      */
-    private fun fillHeader(context: Context, views: RemoteViews, state: WidgetState) {
-        val date = state.date
-        if (date == null) {
-            views.setViewVisibility(R.id.widget_header, View.GONE)
-            return
-        }
-        views.setViewVisibility(R.id.widget_header, View.VISIBLE)
-        // The Times screen's short date ("Fri 19 Feb"). The full "Friday 19 February" was cut short
-        // beside the location chip at the large widget's 250dp minimum (rendered, 18 Oct 2026).
-        views.setTextViewText(R.id.widget_date, TimeFormat.date(context, date))
-
-        // The same construction as the Times screen's header (HomeScreen.hijriToday): month names from
-        // the string array, and only the month isolated, which is what keeps "7 Jumada al-Ula 1448" in
-        // order for a right to left reader (BidiTest).
-        val hijri = state.hijri
-        val month = hijri?.let { context.resources.getStringArray(R.array.hijri_months).getOrNull(it.month - 1) }
-        if (hijri != null && month != null) {
-            views.setTextViewText(R.id.widget_hijri, context.getString(R.string.hijri_date_format, hijri.day, month.bidiIsolated(), hijri.year))
-            views.setViewVisibility(R.id.widget_hijri, View.VISIBLE)
-        } else {
-            views.setViewVisibility(R.id.widget_hijri, View.GONE)
-        }
+    private fun hijriText(context: Context, state: WidgetState): String? {
+        val hijri = state.hijri ?: return null
+        val month = context.resources.getStringArray(R.array.hijri_months).getOrNull(hijri.month - 1) ?: return null
+        return context.getString(R.string.hijri_date_format, hijri.day, month.bidiIsolated(), hijri.year)
     }
 
     // --- shared helpers -------------------------------------------------------------------
@@ -934,7 +1227,6 @@ internal object WidgetRenderer {
     private const val SHORT_COUNTDOWN_DP = 26f
     private const val SHORT_TALL_COUNTDOWN_DP = 22f
     private const val WIDE_COUNTDOWN_DP = 34f
-    private const val LARGE_COUNTDOWN_DP = 38f
 
     /** Everything the countdown block owns, hidden together when there is nothing to count down to. */
     private val HERO_IDS = listOf(
@@ -943,8 +1235,8 @@ internal object WidgetRenderer {
 
     private val SEGMENTS = listOf(R.id.widget_seg_1, R.id.widget_seg_2, R.id.widget_seg_3, R.id.widget_seg_4, R.id.widget_seg_5)
 
-    /** The view ids of one row. Both Today layouts and the wide Next layout use the same ones. */
-    private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int, val underline: Int)
+    /** The view ids of one row. The Today layout and the wide Next layout use the same ones; the strip uses some (no Sunrise, no label). */
+    private class RowIds(val row: Int, val glyph: Int, val name: Int, val label: Int, val time: Int)
 
     /** The strip's per column mark (the app's logo, in place of the glyph) and underline. */
     /** The app mark that stands in for a prayer's glyph on the current row of the larger layouts. */
@@ -957,12 +1249,12 @@ internal object WidgetRenderer {
     )
 
     private val ROWS = mapOf(
-        PrayerSlot.FAJR to RowIds(R.id.widget_row_fajr, R.id.widget_glyph_fajr, R.id.widget_name_fajr, R.id.widget_label_fajr, R.id.widget_time_fajr, R.id.widget_row_underline_fajr),
-        PrayerSlot.SUNRISE to RowIds(R.id.widget_row_sunrise, R.id.widget_glyph_sunrise, R.id.widget_name_sunrise, R.id.widget_label_sunrise, R.id.widget_time_sunrise, R.id.widget_row_underline_sunrise),
-        PrayerSlot.DHUHR to RowIds(R.id.widget_row_dhuhr, R.id.widget_glyph_dhuhr, R.id.widget_name_dhuhr, R.id.widget_label_dhuhr, R.id.widget_time_dhuhr, R.id.widget_row_underline_dhuhr),
-        PrayerSlot.ASR to RowIds(R.id.widget_row_asr, R.id.widget_glyph_asr, R.id.widget_name_asr, R.id.widget_label_asr, R.id.widget_time_asr, R.id.widget_row_underline_asr),
-        PrayerSlot.MAGHRIB to RowIds(R.id.widget_row_maghrib, R.id.widget_glyph_maghrib, R.id.widget_name_maghrib, R.id.widget_label_maghrib, R.id.widget_time_maghrib, R.id.widget_row_underline_maghrib),
-        PrayerSlot.ISHA to RowIds(R.id.widget_row_isha, R.id.widget_glyph_isha, R.id.widget_name_isha, R.id.widget_label_isha, R.id.widget_time_isha, R.id.widget_row_underline_isha),
+        PrayerSlot.FAJR to RowIds(R.id.widget_row_fajr, R.id.widget_glyph_fajr, R.id.widget_name_fajr, R.id.widget_label_fajr, R.id.widget_time_fajr),
+        PrayerSlot.SUNRISE to RowIds(R.id.widget_row_sunrise, R.id.widget_glyph_sunrise, R.id.widget_name_sunrise, R.id.widget_label_sunrise, R.id.widget_time_sunrise),
+        PrayerSlot.DHUHR to RowIds(R.id.widget_row_dhuhr, R.id.widget_glyph_dhuhr, R.id.widget_name_dhuhr, R.id.widget_label_dhuhr, R.id.widget_time_dhuhr),
+        PrayerSlot.ASR to RowIds(R.id.widget_row_asr, R.id.widget_glyph_asr, R.id.widget_name_asr, R.id.widget_label_asr, R.id.widget_time_asr),
+        PrayerSlot.MAGHRIB to RowIds(R.id.widget_row_maghrib, R.id.widget_glyph_maghrib, R.id.widget_name_maghrib, R.id.widget_label_maghrib, R.id.widget_time_maghrib),
+        PrayerSlot.ISHA to RowIds(R.id.widget_row_isha, R.id.widget_glyph_isha, R.id.widget_name_isha, R.id.widget_label_isha, R.id.widget_time_isha),
     )
 
     // --- a theme chosen in the app ---------------------------------------------------------
@@ -1012,7 +1304,6 @@ internal object WidgetRenderer {
         R.layout.widget_next_prayer to R.layout.widget_next_prayer_fixed,
         R.layout.widget_next_prayer_wide to R.layout.widget_next_prayer_wide_fixed,
         R.layout.widget_today to R.layout.widget_today_fixed,
-        R.layout.widget_today_large to R.layout.widget_today_large_fixed,
         R.layout.widget_strip to R.layout.widget_strip_fixed,
     )
 
@@ -1021,6 +1312,12 @@ internal object WidgetRenderer {
         R.color.widget_on_surface to (R.color.widget_light_on_surface to R.color.widget_dark_on_surface),
         R.color.widget_on_surface_variant to (R.color.widget_light_on_surface_variant to R.color.widget_dark_on_surface_variant),
         R.color.widget_primary to (R.color.widget_light_primary to R.color.widget_dark_primary),
+        // The Today widget's pills and countdown card (1.7.1).
+        R.color.widget_on_primary to (R.color.widget_light_on_primary to R.color.widget_dark_on_primary),
+        R.color.widget_on_secondary_container to (R.color.widget_light_on_secondary_container to R.color.widget_dark_on_secondary_container),
+        R.color.widget_hero_ink to (R.color.widget_light_hero_ink to R.color.widget_dark_hero_ink),
+        R.color.widget_hero_label to (R.color.widget_light_hero_label to R.color.widget_dark_hero_label),
+        R.color.widget_hero_soft to (R.color.widget_light_hero_soft to R.color.widget_dark_hero_soft),
     )
 
     internal val FIXED_DRAWABLES = mapOf(
@@ -1033,7 +1330,6 @@ internal object WidgetRenderer {
         R.drawable.widget_strip_current to (R.drawable.widget_strip_current_light to R.drawable.widget_strip_current_dark),
         R.drawable.widget_seg_done to (R.drawable.widget_seg_done_light to R.drawable.widget_seg_done_dark),
         R.drawable.widget_seg_next to (R.drawable.widget_seg_next_light to R.drawable.widget_seg_next_dark),
-        R.drawable.widget_underline to (R.drawable.widget_underline_light to R.drawable.widget_underline_dark),
         R.drawable.widget_strip_dawn to (R.drawable.widget_strip_dawn_light to R.drawable.widget_strip_dawn_dark),
         R.drawable.widget_strip_day to (R.drawable.widget_strip_day_light to R.drawable.widget_strip_day_dark),
         R.drawable.widget_strip_evening to (R.drawable.widget_strip_evening_light to R.drawable.widget_strip_evening_dark),
@@ -1047,6 +1343,13 @@ internal object WidgetRenderer {
         R.drawable.widget_pill_sky to (R.drawable.widget_pill_sky_light to R.drawable.widget_pill_sky_dark),
         R.drawable.widget_seg_todo_sky to (R.drawable.widget_seg_todo_sky_light to R.drawable.widget_seg_todo_sky_dark),
         R.drawable.widget_divider_sky to (R.drawable.widget_divider_sky_light to R.drawable.widget_divider_sky_dark),
+        // 1.7.1: the Today widget's list card, its row fills, the two pills and the outlined town chip.
+        R.drawable.widget_list_card to (R.drawable.widget_list_card_light to R.drawable.widget_list_card_dark),
+        R.drawable.widget_row_next to (R.drawable.widget_row_next_light to R.drawable.widget_row_next_dark),
+        R.drawable.widget_row_sunrise to (R.drawable.widget_row_sunrise_light to R.drawable.widget_row_sunrise_dark),
+        R.drawable.widget_pill_next to (R.drawable.widget_pill_next_light to R.drawable.widget_pill_next_dark),
+        R.drawable.widget_pill_now to (R.drawable.widget_pill_now_light to R.drawable.widget_pill_now_dark),
+        R.drawable.widget_chip_outline to (R.drawable.widget_chip_outline_light to R.drawable.widget_chip_outline_dark),
     )
 
     /** The Today strip's own body: the period's sky in light, the app's dark green in dark (1.7.0). */
@@ -1070,7 +1373,7 @@ internal object WidgetRenderer {
         Paint(R.id.widget_place_update, Ink.TINT, R.color.widget_primary),
     )
 
-    /** The countdown block. The large Today card names the prayer in green and its time in full ink. */
+    /** The countdown block of the two Next layouts. */
     private fun heroPaints(name: Int, time: Int) = listOf(
         Paint(R.id.widget_name, Ink.TEXT, name),
         Paint(R.id.widget_time, Ink.TEXT, time),
@@ -1091,8 +1394,53 @@ internal object WidgetRenderer {
         )
     }
 
-    /** The compact Today's overlay underlines; the larger forms mark the current row with a band instead. */
-    private val ROW_UNDERLINE_PAINTS = ROWS.values.map { Paint(it.underline, Ink.IMAGE, R.drawable.widget_underline) }
+    /**
+     * The Today widget (1.7.1): the header and its two town chips, the countdown card, the list card and its rows. The rows' fills
+     * (next, Sunrise) are switched by the renderer after the paint, so they are not here.
+     */
+    private fun todayChipPaints(chip: Int, pin: Int, place: Int, update: Int) = listOf(
+        Paint(chip, Ink.BACKGROUND, R.drawable.widget_chip_outline),
+        Paint(pin, Ink.TINT, R.color.widget_primary),
+        Paint(place, Ink.TEXT, R.color.widget_primary),
+        Paint(update, Ink.TINT, R.color.widget_primary),
+    )
+
+    private val TODAY_PAINTS: List<Paint> by lazy {
+        listOf(
+            ROOT_PAINT,
+            Paint(R.id.widget_date, Ink.TEXT, R.color.widget_on_surface),
+            Paint(R.id.widget_hijri, Ink.TEXT, R.color.widget_on_surface_variant),
+            Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
+            Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
+            Paint(R.id.widget_hero, Ink.BACKGROUND, R.drawable.widget_hero_background),
+            Paint(R.id.widget_hero_label, Ink.TEXT, R.color.widget_hero_label),
+            Paint(R.id.widget_name, Ink.TEXT, R.color.widget_hero_ink),
+            Paint(R.id.widget_time, Ink.TEXT, R.color.widget_hero_soft),
+            Paint(R.id.widget_time_below, Ink.TEXT, R.color.widget_hero_soft),
+            Paint(R.id.widget_sublabel, Ink.TEXT, R.color.widget_hero_soft),
+            Paint(R.id.widget_countdown, Ink.TEXT, R.color.widget_hero_ink),
+            Paint(R.id.widget_hero_time, Ink.TEXT, R.color.widget_hero_ink),
+            Paint(R.id.widget_until, Ink.TEXT, R.color.widget_hero_soft),
+            Paint(R.id.widget_until_below, Ink.TEXT, R.color.widget_hero_soft),
+            Paint(R.id.widget_list, Ink.BACKGROUND, R.drawable.widget_list_card),
+        ) + todayChipPaints(R.id.widget_place_chip, R.id.widget_place_pin, R.id.widget_place, R.id.widget_place_update) +
+            todayChipPaints(R.id.widget_place_chip_below, R.id.widget_place_pin_below, R.id.widget_place_below, R.id.widget_place_update_below) +
+            ROWS.flatMap { (slot, ids) ->
+                val ink = if (slot == PrayerSlot.SUNRISE) R.color.widget_on_surface_variant else R.color.widget_on_surface
+                val extra = TODAY_ROWS.getValue(slot)
+                listOfNotNull(
+                    Paint(ids.name, Ink.TEXT, ink),
+                    Paint(ids.label, Ink.TEXT, R.color.widget_on_surface_variant),
+                    Paint(ids.time, Ink.TEXT, ink),
+                    Paint(extra.label2, Ink.TEXT, R.color.widget_on_surface_variant),
+                    extra.hair?.let { Paint(it, Ink.IMAGE, R.drawable.widget_divider) },
+                ) + listOf(extra.pillNext, extra.pillNext2).flatMap {
+                    listOf(Paint(it, Ink.TEXT, R.color.widget_on_primary), Paint(it, Ink.BACKGROUND, R.drawable.widget_pill_next))
+                } + listOf(extra.pillNow, extra.pillNow2).flatMap {
+                    listOf(Paint(it, Ink.TEXT, R.color.widget_on_secondary_container), Paint(it, Ink.BACKGROUND, R.drawable.widget_pill_now))
+                }
+            }
+    }
 
     /** The strip's five columns: the Today row's inks without the label column or sunrise. */
     private val STRIP_COLUMN_PAINTS = WidgetState.PRAYERS.flatMap { slot ->
@@ -1115,21 +1463,7 @@ internal object WidgetRenderer {
         R.layout.widget_next_prayer to listOf(ROOT_PAINT) + heroPaints(R.color.widget_on_surface, R.color.widget_on_surface_variant) + CHIP_PAINTS,
         R.layout.widget_next_prayer_wide to listOf(ROOT_PAINT, Paint(R.id.widget_divider, Ink.IMAGE, R.drawable.widget_divider)) +
             heroPaints(R.color.widget_on_surface, R.color.widget_on_surface_variant) + CHIP_PAINTS + ROW_PAINTS,
-        R.layout.widget_today to listOf(
-            ROOT_PAINT,
-            Paint(R.id.widget_compact_countdown, Ink.TEXT, R.color.widget_on_surface),
-            Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
-            Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
-        ) + ROW_PAINTS + ROW_UNDERLINE_PAINTS + CHIP_PAINTS,
-        R.layout.widget_today_large to listOf(
-            ROOT_PAINT,
-            Paint(R.id.widget_date, Ink.TEXT, R.color.widget_on_surface),
-            Paint(R.id.widget_hijri, Ink.TEXT, R.color.widget_on_surface_variant),
-            Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
-            Paint(R.id.widget_hero, Ink.BACKGROUND, R.drawable.widget_hero_background),
-            Paint(R.id.widget_footer, Ink.TEXT, R.color.widget_on_surface_variant),
-        ) + heroPaints(R.color.widget_primary, R.color.widget_on_surface) +
-            Paint(R.id.widget_glyph, Ink.TINT, R.color.widget_primary) + ROW_PAINTS + CHIP_PAINTS,
+        R.layout.widget_today to TODAY_PAINTS,
         R.layout.widget_strip to listOf(
             ROOT_PAINT,
             Paint(R.id.widget_message, Ink.TEXT, R.color.widget_on_surface),
@@ -1236,16 +1570,18 @@ internal object WidgetRenderer {
      * Its own tap and spoken label make it a button TalkBack can find; the action is the same as the
      * rest of the widget. Hidden with no location: the widget then says how to set one.
      */
-    private fun fillChip(context: Context, views: RemoteViews, state: WidgetState) {
+    private fun fillChip(
+        context: Context, views: RemoteViews, state: WidgetState, chip: Int = R.id.widget_place_chip, text: Int = R.id.widget_place,
+    ) {
         val place = if (state.hasLocation) place(context, state) else null
         if (place == null) {
-            views.setViewVisibility(R.id.widget_place_chip, View.GONE)
+            views.setViewVisibility(chip, View.GONE)
             return
         }
-        views.setTextViewText(R.id.widget_place, place)
-        views.setViewVisibility(R.id.widget_place_chip, View.VISIBLE)
-        views.setContentDescription(R.id.widget_place_chip, context.getString(R.string.widget_update_location, place.bidiIsolated()))
-        views.setOnClickPendingIntent(R.id.widget_place_chip, openApp(context, CHIP_REQUEST_CODE))
+        views.setTextViewText(text, place)
+        views.setViewVisibility(chip, View.VISIBLE)
+        views.setContentDescription(chip, context.getString(R.string.widget_update_location, place.bidiIsolated()))
+        views.setOnClickPendingIntent(chip, openApp(context, CHIP_REQUEST_CODE))
     }
 
     /**

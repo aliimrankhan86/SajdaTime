@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Today, Android 11 and below: a launcher takes ONE layout there (the compact list with all six rows, 286dp at normal text), so the slot is
-  290dp, as it was set on 4 Nov 2026. Android 12 and up use res/xml-v31/widget_today_info.xml (floor 240dp, the list adapts from 2 to 6 rows).
+  Today, Android 11 and below: a launcher takes ONE layout there (the list with all six rows), so the slot is 290dp, as it was set on 4 Nov
+  2026. Since 1.7.1 six rows need 275dp when the widget reports a width of 316dp or more (WidgetUpdater passes each widget's reported
+  width), and up to 300dp on a narrower one (325 in Turkish and Indonesian), where a pill moves under its name; in a 290dp slot the
+  rows' text can then be cut by a few dp at its foot (Android 11 and below were dropped by Ali, few users; recorded, not fixed).
+  Android 12 and up use res/xml-v31/widget_today_info.xml (floor 240dp, the list adapts from 1 to 6 rows).
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -12,7 +15,6 @@
     android:minResizeWidth="250dp"
     android:minResizeHeight="290dp"
     android:previewImage="@drawable/widget_preview_today"
-    android:previewLayout="@layout/widget_today"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="4"
     android:targetCellHeight="3"

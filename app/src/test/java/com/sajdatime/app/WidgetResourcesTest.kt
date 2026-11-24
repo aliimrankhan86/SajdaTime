@@ -29,7 +29,7 @@ class WidgetResourcesTest {
     }
 
     private val nextLayouts = listOf("layout/widget_next_prayer.xml", "layout/widget_next_prayer_wide.xml")
-    private val todayLayouts = listOf("layout/widget_today.xml", "layout/widget_today_large.xml")
+    private val todayLayouts = listOf("layout/widget_today.xml")
     private val stripLayouts = listOf("layout/widget_strip.xml")
     private val layouts = nextLayouts + todayLayouts + stripLayouts
     private val providers = listOf("xml/widget_next_prayer_info.xml", "xml-v31/widget_next_prayer_info.xml", "xml/widget_today_info.xml", "xml-v31/widget_today_info.xml", "xml/widget_today_strip_info.xml")
@@ -105,8 +105,17 @@ class WidgetResourcesTest {
         val expected = mapOf(
             "layout/widget_next_prayer.xml" to hero + chip,
             "layout/widget_next_prayer_wide.xml" to hero + rows + chip,
-            "layout/widget_today.xml" to listOf("widget_message", "widget_footer") + rows + slots.map { "widget_row_underline_$it" } + chip,
-            "layout/widget_today_large.xml" to listOf("widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero") + hero + rows + chip,
+            // 1.7.1: one Today layout, the list and the card (WidgetRenderer.todayViews). No glyphs and no day bars.
+            "layout/widget_today.xml" to listOf(
+                "widget_message", "widget_footer", "widget_header", "widget_date", "widget_hijri", "widget_hero", "widget_hero_label",
+                "widget_name", "widget_time", "widget_time_below", "widget_sublabel", "widget_countdown", "widget_hero_time", "widget_until",
+                "widget_until_below", "widget_list", "widget_place_chip_below", "widget_place_below",
+            ) + slots.flatMap {
+                listOf(
+                    "widget_row_$it", "widget_name_$it", "widget_label_$it", "widget_time_$it", "widget_pill_next_$it", "widget_pill_now_$it",
+                    "widget_pill_next2_$it", "widget_pill_now2_$it", "widget_label2_$it", "widget_line2_$it",
+                )
+            } + slots.dropLast(1).map { "widget_hair_$it" } + chip,
             // The strip: five columns (no sunrise, no label), the large text row, the message, the chip.
             "layout/widget_strip.xml" to listOf("widget_message", "widget_strip_next", "widget_glyph", "widget_name", "widget_time", "widget_sublabel") +
                 slots.filter { it != "sunrise" }.flatMap { listOf("widget_row_$it", "widget_glyph_$it", "widget_name_$it", "widget_time_$it") } + chip,
@@ -114,22 +123,6 @@ class WidgetResourcesTest {
         for ((layout, ids) in expected) {
             val xml = read(layout)
             for (id in listOf("widget_root") + ids) assertTrue("$layout lacks $id", xml.contains("""@+id/$id""""))
-            if (layout == "layout/widget_today.xml") {
-                for (slot in slots) {
-                    val row = Regex("""<FrameLayout\b[^>]*android:id="@\+id/widget_row_$slot"[^>]*>(.*?)</FrameLayout>""", RegexOption.DOT_MATCHES_ALL)
-                        .find(xml)?.groupValues?.get(1)
-                    assertTrue("$layout: $slot needs an overlay container", row != null)
-                    val bar = Regex("""<ImageView\b[^>]*android:id="@\+id/widget_row_underline_$slot"[^>]*/>""", RegexOption.DOT_MATCHES_ALL)
-                        .find(row!!)?.value.orEmpty()
-                    for (attribute in listOf(
-                        "layout_width=\"match_parent\"", "layout_height=\"4dp\"", "layout_gravity=\"bottom\"",
-                        "src=\"@drawable/widget_underline\"", "visibility=\"gone\"", "importantForAccessibility=\"no\"", "layout_marginBottom=\"-4dp\"",
-                    )) assertTrue("$layout: $slot underline lacks $attribute", bar.contains("android:$attribute"))
-                    // Without these the bar goes back over the text (seen on a Redmi, 4 Nov 2026) or is clipped away.
-                    val rowTag = Regex("""<FrameLayout\b[^>]*android:id="@\+id/widget_row_$slot"[^>]*>""").find(xml)?.value.orEmpty()
-                    assertTrue("$layout: $slot row must not clip to padding", rowTag.contains("android:clipToPadding=\"false\""))
-                }
-            }
         }
     }
 
@@ -172,7 +165,13 @@ class WidgetResourcesTest {
             val xml = withoutComments(read(provider))
             val (layout, preview, description) = expected
             assertTrue("$provider initialLayout", xml.contains("""android:initialLayout="@layout/$layout""""))
-            assertTrue("$provider previewLayout", xml.contains("""android:previewLayout="@layout/$layout""""))
+            // Today has no previewLayout since 1.7.1: with no data the new layout is an empty card with hairlines, so the picker
+            // shows the picture instead (Opus review, 24 Nov 2026). The other two keep theirs.
+            if (layout == "widget_today") {
+                assertFalse("$provider previewLayout", xml.contains("android:previewLayout"))
+            } else {
+                assertTrue("$provider previewLayout", xml.contains("""android:previewLayout="@layout/$layout""""))
+            }
             assertTrue("$provider previewImage", xml.contains("""android:previewImage="@drawable/$preview""""))
             assertTrue("$provider description", xml.contains("""android:description="@string/$description""""))
             assertTrue("$provider shows no home screen category", xml.contains("""android:widgetCategory="home_screen""""))
@@ -204,7 +203,7 @@ class WidgetResourcesTest {
         // default made the emulator's launcher open a tall 3 by 5 slot with an empty band under the rows.
         assertTrue(today.contains("""android:targetCellWidth="4"""") && today.contains("""android:targetCellHeight="3""""))
         // The real floor is minHeight 240dp (a larger minResizeHeight is ignored by launchers): below the six row height the compact
-        // list shows 3, 4 or 5 rows (WidgetRenderer.todaySizes), so nothing is cut at 240dp.
+        // list shows 1 to 5 rows (WidgetRenderer.todayForms, 1.7.1), so nothing is cut at 240dp.
         assertTrue(today.contains("""android:minHeight="240dp"""") && today.contains("""android:minResizeHeight="240dp""""))
         // The strip is one cell tall everywhere. 40dp and not 60: a launcher that sizes by 70n minus 30 would
         // round a 60dp minimum up to two cells (STEP-8-DESIGN section 3).
@@ -241,7 +240,9 @@ class WidgetResourcesTest {
     fun `every colour the widget files use is defined in both themes`() {
         val drawables = listOf(
             "widget_background", "widget_row_highlight", "widget_strip_current", "widget_row_plain", "widget_hero_background", "widget_divider", "widget_chip",
-            "widget_seg_done", "widget_seg_next", "widget_seg_todo", "widget_underline",
+            "widget_seg_done", "widget_seg_next", "widget_seg_todo",
+            // 1.7.1: the Today widget's list card, row fills, pills and outlined chip.
+            "widget_list_card", "widget_row_next", "widget_row_sunrise", "widget_pill_next", "widget_pill_now", "widget_chip_outline",
             // Step 8: the Next prayer widget's skies, and what has to stay visible on them.
             "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
             "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
