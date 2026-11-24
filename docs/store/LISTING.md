@@ -235,6 +235,19 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
+### 1.7.1 What's new, 24 Nov 2026 (Ali's brief through the claude.ai project session); the full and short descriptions stay the 1.7.0 text below; not live
+
+Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it." and, for the store: leave all existing listing content in
+Play Console as it is, in every language; the only new text is one line of What's new about the widget redesign, in the six
+languages. Written to the brief he gave through the project session (clearer countdown, calmer list, works at large text).
+Checked against the code: the countdown card shows when the widget is tall enough (at the default 4 by 3 it is the list), the
+list marks the next prayer ("Next" pill, fill and bar) and the current one ("Now" pill), and at 1.3x text and more the card shows
+three rows so nothing is cut. The five translations are in `LISTING-LOCALES.md`. 145 / 500.
+
+```
+Redrawn Today widget: a clearer countdown, a calmer list that marks the next prayer and the current one, and a layout that works with large text.
+```
+
 ### 1.7.0 listing, READY TO PASTE (full description changed by Ali 12 Nov 2026; What's new written 13 Nov 2026 to his brief); not live
 
 Made from the approved 1.6.0 text below (sells the whole app first, then What's new, HANDOVER 5.38). Changes on 4 Nov: Duha, time left and

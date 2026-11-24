@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The quieter "Now" pill on the Today widget's current row (1.7.1): secondaryContainer, its word in onSecondaryContainer. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_secondary_container" />
+    <corners android:radius="100dp" />
+</shape>

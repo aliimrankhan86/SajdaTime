@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A copy of widget_row_next.xml with each colour fixed to its dark value, for a widget whose theme
+     is chosen in the app (Settings, Theme). WidgetThemeTest fails the build if the two drift. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/widget_dark_highlight" />
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+    <item
+        android:width="3dp"
+        android:bottom="10dp"
+        android:gravity="start|fill_vertical"
+        android:top="10dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/widget_dark_primary" />
+            <corners android:radius="1.5dp" />
+        </shape>
+    </item>
+</layer-list>

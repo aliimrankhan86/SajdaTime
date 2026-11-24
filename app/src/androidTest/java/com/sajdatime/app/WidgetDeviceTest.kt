@@ -172,7 +172,7 @@ class WidgetDeviceTest {
     // ---- Today -------------------------------------------------------------------------------
 
     @Test
-    fun the_today_widget_shows_six_rows_the_next_one_marked_and_the_ramadan_words_only_in_ramadan() {
+    fun the_today_widget_shows_six_rows_the_next_and_current_marked_and_the_ramadan_words_only_in_ramadan() {
         val (_, view) = bindOrFail(TodayWidgetProvider::class.java)
         // Isha is the last row and is always shown, even on the short card (compact Today shows the next prayer onward).
         waitFor("the Today widget's first draw") { view.textOf("widget_time_isha")?.text?.isNotEmpty() == true }
@@ -182,8 +182,15 @@ class WidgetDeviceTest {
         save("widget-today-large-${tag()}", layoutAt(view, 250, 330))
 
         val (state, _) = stateNow()
-        // The widget marks the current prayer with the Now label (1.7.0, 4 Nov 2026), not Next.
+        // 1.7.1 (Ali approved the mockup, 24 Nov 2026): today's next prayer carries the filled "Next" pill and the current one the
+        // quieter "Now" pill, each beside the name or on the row's second line when the row is too narrow (WidgetRenderer.fillTodayRows).
         val marker = appContext.getString(R.string.home_now_marker)
+        val nextMarker = appContext.getString(R.string.home_next_marker)
+        val nextToday = state.next?.takeIf { !it.isTomorrow }?.slot
+        // The text of whichever of these views is drawn: visible, and so is the line it sits in.
+        fun shown(vararg names: String) = names.mapNotNull { view.textOf(it) }
+            .filter { it.visibility == View.VISIBLE && (it.parent as? View)?.visibility == View.VISIBLE }
+            .joinToString(" ") { it.text.toString() }.trim()
         val suhoor = appContext.getString(R.string.widget_suhoor_ends)
         val iftar = appContext.getString(R.string.widget_iftar)
         val fontScale = context.resources.configuration.fontScale
@@ -204,14 +211,14 @@ class WidgetDeviceTest {
             val key = slot.name.lowercase()
             val name = view.textOf("widget_name_$key")
             val time = view.textOf("widget_time_$key")
-            val label = view.textOf("widget_label_$key")
             assertNotNull("row $key has no name view", name)
             assertEquals("row $key name", slot.label(appContext), name!!.text.toString())
             assertTrue("row $key has no time", time!!.text.isNotEmpty())
             if (fontScale <= 1.0f) assertFalse("the name of row $key is cut off at normal font size", ellipsised(name))
 
-            val labelText = label!!.text.toString()
-            assertEquals("row $key marker", state.isHighlighted(slot), labelText.contains(marker))
+            val labelText = shown("widget_label_$key", "widget_label2_$key")
+            assertEquals("row $key Next pill", if (slot == nextToday) nextMarker else "", shown("widget_pill_next_$key", "widget_pill_next2_$key"))
+            assertEquals("row $key Now pill", if (state.isHighlighted(slot) && slot != nextToday) marker else "", shown("widget_pill_now_$key", "widget_pill_now2_$key"))
             val expectedWord = when {
                 slot == PrayerSlot.FAJR && state.ramadanToday -> suhoor
                 slot == PrayerSlot.MAGHRIB && state.ramadanToday -> iftar

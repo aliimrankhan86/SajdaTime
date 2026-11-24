@@ -15,7 +15,6 @@
          that reads as the edge of a glass pane. See values/colors.xml. -->
     <color name="widget_surface_top">#252C29</color>
     <color name="widget_surface_bottom">#121514</color>
-    <color name="widget_highlight_top">#18382D</color>
     <color name="widget_sheen">#12FFFFFF</color>
     <color name="widget_edge">#29FFFFFF</color>
 
@@ -40,4 +39,15 @@
     <color name="widget_strip_night_top">#12302F</color>
     <color name="widget_strip_night_mid">#0D2323</color>
     <color name="widget_strip_foot">#0F241D</color>
+    <!-- The Today widget's 1.7.1 parts: see values/colors.xml. -->
+    <color name="widget_on_primary">#062117</color>
+    <color name="widget_secondary_container">#1E4034</color>
+    <color name="widget_on_secondary_container">#8FD9B8</color>
+    <color name="widget_surface_low">#141817</color>
+    <color name="widget_hero_top">#143028</color>
+    <color name="widget_hero_mid">#143028</color>
+    <color name="widget_hero_foot">#143028</color>
+    <color name="widget_hero_ink">#E7EAE8</color>
+    <color name="widget_hero_label">#8FD9B8</color>
+    <color name="widget_hero_soft">#B8C4BE</color>
 </resources>

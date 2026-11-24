@@ -1,6 +1,12 @@
 package com.sajdatime.app
 
 import androidx.compose.ui.graphics.Color
+import com.sajdatime.app.ui.theme.DarkOnPrimary
+import com.sajdatime.app.ui.theme.DarkOnPrimaryContainer
+import com.sajdatime.app.ui.theme.DarkOnSecondaryContainer
+import com.sajdatime.app.ui.theme.DarkSecondary
+import com.sajdatime.app.ui.theme.DarkSecondaryContainer
+import com.sajdatime.app.ui.theme.DarkSurfaceContainerLow
 import com.sajdatime.app.ui.theme.DarkOnSurface
 import com.sajdatime.app.ui.theme.DarkOnSurfaceVariant
 import com.sajdatime.app.ui.theme.DarkOutlineVariant
@@ -16,6 +22,16 @@ import com.sajdatime.app.ui.theme.DarkSkyFoot
 import com.sajdatime.app.ui.theme.DarkSkyNightMid
 import com.sajdatime.app.ui.theme.DarkSkyNightTop
 import com.sajdatime.app.ui.theme.DarkSurface
+import com.sajdatime.app.ui.theme.LightHeroEnd
+import com.sajdatime.app.ui.theme.LightHeroMiddle
+import com.sajdatime.app.ui.theme.LightHeroStart
+import com.sajdatime.app.ui.theme.LightOnHero
+import com.sajdatime.app.ui.theme.LightOnHeroLabel
+import com.sajdatime.app.ui.theme.LightOnHeroSecondary
+import com.sajdatime.app.ui.theme.LightOnPrimary
+import com.sajdatime.app.ui.theme.LightOnSecondaryContainer
+import com.sajdatime.app.ui.theme.LightSecondaryContainer
+import com.sajdatime.app.ui.theme.LightSurfaceContainerLow
 import com.sajdatime.app.ui.theme.LightOnSurface
 import com.sajdatime.app.ui.theme.LightOnSurfaceVariant
 import com.sajdatime.app.ui.theme.LightOutlineVariant
@@ -78,7 +94,6 @@ class WidgetColorsTest {
         // values are written here once and the pairs below hold them to AA.
         "widget_surface_top" to Color(0xFFFFFFFF),
         "widget_surface_bottom" to Color(0xFFEEF1EC),
-        "widget_highlight_top" to Color(0xFFE6F3EC),
         // The four skies behind the Next prayer widget (step 8): the phone's own stops.
         "widget_sky_dawn_top" to LightSkyDawnTop,
         "widget_sky_dawn_mid" to LightSkyDawnMid,
@@ -99,6 +114,17 @@ class WidgetColorsTest {
         "widget_strip_night_top" to Color(0xFFD0DBE1),
         "widget_strip_night_mid" to Color(0xFFDFE6EA),
         "widget_strip_foot" to Color(0xFFF7F5F3),
+        // The Today widget (1.7.1): the pills, the Sunrise row, and the countdown card (the app's light hero and its inks).
+        "widget_on_primary" to LightOnPrimary,
+        "widget_secondary_container" to LightSecondaryContainer,
+        "widget_on_secondary_container" to LightOnSecondaryContainer,
+        "widget_surface_low" to LightSurfaceContainerLow,
+        "widget_hero_top" to LightHeroStart,
+        "widget_hero_mid" to LightHeroMiddle,
+        "widget_hero_foot" to LightHeroEnd,
+        "widget_hero_ink" to LightOnHero,
+        "widget_hero_label" to LightOnHeroLabel,
+        "widget_hero_soft" to LightOnHeroSecondary,
     )
     private val dark = mapOf(
         "widget_surface" to DarkSurface,
@@ -109,7 +135,6 @@ class WidgetColorsTest {
         "widget_outline_variant" to DarkOutlineVariant,
         "widget_surface_top" to Color(0xFF252C29),
         "widget_surface_bottom" to Color(0xFF121514),
-        "widget_highlight_top" to Color(0xFF18382D),
         "widget_sky_dawn_top" to DarkSkyDawnTop,
         "widget_sky_dawn_mid" to DarkSkyDawnMid,
         "widget_sky_day_top" to DarkSkyDayTop,
@@ -128,6 +153,17 @@ class WidgetColorsTest {
         "widget_strip_night_top" to Color(0xFF12302F),
         "widget_strip_night_mid" to Color(0xFF0D2323),
         "widget_strip_foot" to Color(0xFF0F241D),
+        "widget_on_primary" to DarkOnPrimary,
+        "widget_secondary_container" to DarkSecondaryContainer,
+        "widget_on_secondary_container" to DarkOnSecondaryContainer,
+        "widget_surface_low" to DarkSurfaceContainerLow,
+        // Flat in dark (the spec: never a gradient there): all three stops are primaryContainer.
+        "widget_hero_top" to DarkPrimaryContainer,
+        "widget_hero_mid" to DarkPrimaryContainer,
+        "widget_hero_foot" to DarkPrimaryContainer,
+        "widget_hero_ink" to DarkOnSurface,
+        "widget_hero_label" to DarkOnPrimaryContainer,
+        "widget_hero_soft" to DarkSecondary,
     )
 
     @Test
@@ -200,12 +236,20 @@ class WidgetColorsTest {
         Pair("text on the foot of the gradient", "widget_on_surface", "widget_surface_bottom", 4.5),
         Pair("secondary text on the foot of the gradient", "widget_on_surface_variant", "widget_surface_bottom", 4.5),
         Pair("green on the foot of the gradient", "widget_primary", "widget_surface_bottom", 4.5),
-        Pair("text on the top of the countdown card", "widget_on_surface", "widget_highlight_top", 4.5),
-        Pair("secondary text on the top of the countdown card", "widget_on_surface_variant", "widget_highlight_top", 4.5),
-        Pair("green on the top of the countdown card", "widget_primary", "widget_highlight_top", 4.5),
         // The location chip: green pin, town and arrow on the highlight pill.
         Pair("the location chip", "widget_primary", "widget_highlight", 4.5),
-    )
+        // The Today widget (1.7.1): its two pills, the Sunrise row, and the countdown card's three inks on each of its three stops.
+        Pair("the Next pill", "widget_on_primary", "widget_primary", 4.5),
+        Pair("the Now pill", "widget_on_secondary_container", "widget_secondary_container", 4.5),
+        Pair("the Now pill against the list card", "widget_secondary_container", "widget_surface", 1.1),
+        Pair("the Sunrise row's text", "widget_on_surface_variant", "widget_surface_low", 4.5),
+        Pair("text on the next row", "widget_on_surface", "widget_highlight", 4.5),
+    ) + listOf("widget_hero_ink", "widget_hero_label", "widget_hero_soft").flatMap { ink ->
+        listOf("widget_hero_top", "widget_hero_mid", "widget_hero_foot").map { stop -> Pair("$ink on $stop", ink, stop, 4.5) }
+    } + listOf("dawn", "day", "evening", "night").flatMap { sky ->
+        // The town chip has no fill since 1.7.1, so its town in primary sits on the body itself: text contrast, not the 3:1 of a mark.
+        listOf("widget_strip_${sky}_top", "widget_strip_${sky}_mid", "widget_strip_foot").map { stop -> Pair("the town chip on $stop", "widget_primary", stop, 4.5) }
+    }
 
     /** An 8 digit (#AARRGGBB) widget colour, for the translucent sheen. */
     private fun translucent(folder: String, name: String): Long {
@@ -224,13 +268,10 @@ class WidgetColorsTest {
     private fun checkSheen(theme: String, folder: String) {
         val xml = colours(folder)
         val top = composite(translucent(folder, "widget_sheen"), xml.getValue("widget_surface_top"))
-        val cardTop = composite(translucent(folder, "widget_sheen"), xml.getValue("widget_highlight_top"))
         for (ink in listOf("widget_on_surface", "widget_on_surface_variant", "widget_primary")) {
             val fg = asColor(xml.getValue(ink))
             val r1 = Wcag.contrast(fg, top)
-            val r2 = Wcag.contrast(fg, cardTop)
             assertTrue("$theme $ink under the sheen: %.2f:1".format(r1), r1 >= 4.5)
-            assertTrue("$theme $ink on the card under the sheen: %.2f:1".format(r2), r2 >= 4.5)
         }
     }
 

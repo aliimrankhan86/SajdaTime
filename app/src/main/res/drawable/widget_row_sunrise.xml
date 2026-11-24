@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Today widget's Sunrise row (1.7.1): dimmed, because Sunrise is not a prayer (DESIGN_SYSTEM §4). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_surface_low" />
+    <corners android:radius="12dp" />
+</shape>

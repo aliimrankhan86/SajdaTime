@@ -67,8 +67,13 @@ android {
         //
         // 10 / 1.6.0, 25 Oct 2026: My prayers tracker, bells, Timetable, jama'ah times, skies, the
         // widget strip. Phone only: the watch stays 1002 / 1.5.0 (docs/plans/2026-10-release-1.6.0/).
-        versionCode = 11
-        versionName = "1.7.0"
+        //
+        // 11 / 1.7.0, 13 Nov 2026: Tasbeeh, the 7 day Timetable, the Qibla hand on the Kaaba; phone and watch (1003 / 1.7.0).
+        //
+        // 12 / 1.7.1, 24 Nov 2026: the Today widget redrawn (Ali approved the mockup that day). Phone only: :core and :wear did
+        // not change, so the watch stays 1003 / 1.7.0 and its bundle is not uploaded.
+        versionCode = 12
+        versionName = "1.7.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }

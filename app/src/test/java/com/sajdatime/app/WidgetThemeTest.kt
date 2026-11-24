@@ -29,7 +29,6 @@ class WidgetThemeTest {
         "widget_next_prayer" to R.layout.widget_next_prayer,
         "widget_next_prayer_wide" to R.layout.widget_next_prayer_wide,
         "widget_today" to R.layout.widget_today,
-        "widget_today_large" to R.layout.widget_today_large,
         "widget_strip" to R.layout.widget_strip,
     )
 
@@ -114,6 +113,8 @@ class WidgetThemeTest {
                 "widget_sky_dawn", "widget_sky_day", "widget_sky_evening", "widget_sky_night",
                 "widget_pill_sky", "widget_seg_todo_sky", "widget_divider_sky",
                 "widget_strip_dawn", "widget_strip_day", "widget_strip_evening", "widget_strip_night",
+                // 1.7.1: the Today widget's next and Sunrise row fills.
+                "widget_row_next", "widget_row_sunrise",
             )
         val themed = drawables.filter { hasCopies(it) }.toSet()
         val fixedDrawables = WidgetRenderer.FIXED_DRAWABLES.map { (k, v) ->
@@ -156,7 +157,8 @@ class WidgetThemeTest {
             .filter { it.startsWith("widget_") && !it.endsWith("_light") && !it.endsWith("_dark") }
         val themed = sources.filter { read("drawable/$it.xml").contains("@color/widget_") }
         // Includes the plain row surface, which follows the widget theme.
-        assertEquals(22, themed.size)
+        // 1.7.1: the underline went with the old compact Today; the list card, two row fills, two pills and the chip came.
+        assertEquals(27, themed.size)
         for (name in themed) {
             val source = withoutComments(read("drawable/$name.xml"))
             for (theme in listOf("light", "dark")) {

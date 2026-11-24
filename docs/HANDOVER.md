@@ -2305,6 +2305,37 @@ the search words in `VISIBILITY-KEYWORDS.md` stay. Wording is drafted by `ux-lea
 Opus review, Ali approves the English before the translations. This replaced the 25 Oct 2026 choice to leave "Fasts to
 make up" out of the listing.
 
+### 5.42 The Today widget, 1.7.1 (Ali approved the mockup 24 Nov 2026: "I like both light and dark"; "1.7.1 is just improve the widget design. That's it.")
+
+- **One layout, two forms** (`widget_today.xml`; `WidgetRenderer.todayForms`, `todayViews`). The LIST: the date and the town chip,
+  then one list card of 1 to 6 rows (one row: the next prayer alone, the floor at large text), at two widths (245 and 300dp real),
+  from the provider floor (250 by 240dp); the only form
+  below Android 12 (six rows). The CARD: the date over the Hijri date with the town chip beside or under them, the countdown card,
+  then the list card with six rows, or three from 1.3x text (Now, Next and the one after, Sunrise left out), at three widths
+  (245, 300, 350dp real). 15 RemoteViews entries (Android's limit is 16). The launcher uses the fitting entry nearest the slot.
+- **Entry heights are measured** (`WidgetRenderEvidenceTest#today_needs`, the maximum over eight times of day (three in Ramadan),
+  nine text sizes, in three groups: English; Turkish and Indonesian; Urdu, Arabic and Bengali) and the card adds 16dp per row (`ROW_AIR_DP`) so rows are about 46dp and a line that moves under its
+  neighbour in an unmeasured state (a long town name) is absorbed. Six list rows need 275dp at 300dp wide (entry 278), so a plain
+  4 by 4 (279dp on the Redmi) still shows them all (Ali, 6 Nov 2026). Each Today instance is drawn with the width its launcher
+  reports (`WidgetUpdater`, OPTION_APPWIDGET_MIN_WIDTH less 16dp), which can only keep more on one line than the tables assume.
+- **Marks:** the next prayer of today (never tomorrow's Fajr after Isha) gets the `primaryContainer` fill, a 3dp `primary` bar on
+  the leading edge (layer-list gravity start, so it mirrors) and the filled "Next" pill, medium weight; the current prayer the quieter
+  "Now" pill; Sunrise the dimmed fill and a step smaller. This differs from the Times list on purpose (DESIGN_SYSTEM §9, 24 Nov 2026).
+- **The countdown stays a Chronometer** ("04:34", "00:45", "1:04:34"; 46dp on the card). "4 min" was rejected: it needs a redraw a
+  minute. Without exact alarms the time takes the big place and "until it begins" goes, as on the Next widget.
+- **No time is cut by a pill:** a row whose name, pill and time would not fit one line at its form's width puts the pill on a
+  second line (on the card the Ramadan word too); the card's town chip, the prayer's time and "until it begins" move under their
+  neighbour the same way. Each fit is judged with the widest time the clock can show ("12:58 pm", tabular), never the row's own,
+  so it does not change with the place or the hour (lesson 199). In the list a Ramadan word never takes a line of its own (the list's heights are the year's, six rows in
+  a 4 by 4): it shortens with an ellipsis, or drops out when the row has no room at all, as in 1.7.0. **Still possible, as in 1.7.0:** at 2x text on a widget under about 300dp
+  wide a long name and its time ("Maghrib 4:28 PM") do not fit and the time ellipsises. Rows are `wrap_content` with a weight,
+  never `0dp` (lesson 196).
+- Removed: the per prayer glyphs, the five day bars and the app mark on Today (the Next widget and the strip keep theirs).
+- The countdown card has an `outlineVariant` hairline in light as well as dark (the light gradient's top equals the day sky's top);
+  the Sunrise row holds its siblings' height with an invisible 17sp copy of its name; the chip's icons are in sp.
+- No new string, no new usage count event, no data change, `docs/privacy.html` unchanged. iPhone: Android only (a WidgetKit widget
+  would take the same two forms; the tables are Android measurements).
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -2688,6 +2719,16 @@ give ~4.3 MB and ~3.5 MB `.aab` files.
 ---
 
 ## 10. What has been verified on a device, and how
+
+**1.7.1 Today widget (24 Nov 2026, Mac session, emulator `sajda`, Android 16, Pixel 1080x2400).** Measured with
+`WidgetRenderEvidenceTest#today_needs` (each form's height given an unspecified height, at its narrowest width, en, tr, in, ur, ar, bn,
+nine text sizes, eight times of day): six list rows need 275.0dp at 300dp wide in every language (entry 278, the Redmi's 4 by 4 is
+279); the one row floor 166.1dp at 2x English, 179.8 in Urdu and Arabic (the widget's floor is 240); the card 454.1dp at 350dp
+wide, 502.1 at 300, 568.8 at 245 (normal text, English) before its 16dp of air per row. The fit proof once failed in Karachi
+at 1.3x (a time a few dp wider than London's put Maghrib's pill on a second line the London tables had not measured); line fit
+is now decided with the widest time the clock can show (lesson 199). Pictures in `build/widget-1.7.1/` (deleted
+after review, CLAUDE.md). Found only by pictures: rows weighted at 0dp crushed a two line row (lesson 196); the light countdown card
+had no edge on the day sky. Not done: a real phone, a real launcher.
 
 **1.6.0 alert check, battery test (2 Nov 2026, Redmi Note 13 Pro, HyperOS).** `com.sajdatime.app.sideload` set to
 Restricted (`RUN_ANY_IN_BACKGROUND` deny, standby bucket restricted), process killed, Home. Clock moved to 16:33:30
@@ -6092,7 +6133,30 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 23 Nov 2026: 1.7.0 IS LIVE on Google Play (phone); nothing pending
+### 📍 STATE OF PLAY, 24 Nov 2026: 1.7.1 (the Today widget redrawn) BUILT on `claude/widget-today-redesign`, pull request open, NOT merged, NOT uploaded
+
+- **What 1.7.1 is** (Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it."): the Today widget redrawn from the
+  mockup he approved ("I like both light and dark"), built from the claude.ai project session's spec (`build/widget-today-redesign.md`,
+  local, gitignored) with its decisions in `build/widget-review.md`; the step by step record is `build/widget-progress.md`. Rules in
+  §5.42, the design in DESIGN_SYSTEM §4 and §9 (24 Nov 2026), lessons 196 to 199. Phone 12 / 1.7.1; the watch is unchanged (1003 /
+  1.7.0, `:core` and `:wear` not touched) and is not uploaded.
+- **Store (Ali, 24 Nov 2026, 17:45):** leave every existing listing text and picture in Play Console as it is, in every language; the
+  only new text is one line of What's new, in `docs/store/LISTING.md` (English, 145 / 500) and `LISTING-LOCALES.md` (five, 134 to
+  193). Store picture 06 therefore still shows the 1.7.0 Today widget, on Ali's word.
+- **Verified (emulator `sajda`, Android 16):** gate `clean test lint :app:bundleRelease :wear:bundleRelease` green (app 367, core 276,
+  wear 27, lint 0 errors); `today_needs` (every Today entry at or above its measured need, six languages, nine text sizes, eight
+  times incl. three in Ramadan); the fit proof passed 5 of 5 (every Today slot 240 to 760dp tall at 250, 320 and 380dp wide, six languages, seven text sizes, four times incl. a Ramadan afternoon, exact alarms on and off; Makkah, Karachi, Jakarta and Tromso; the no location message; the Next card unchanged); 19 pictures (light, dark, day sky, 1.3x and 2x text, Urdu, Arabic, smallest size,
+  Ramadan, after Isha, no location) judged by Fable (design) and two Opus review passes, every finding fixed or recorded.
+- **Not verified:** a real phone (the Redmi's HyperOS reports one widget width and may draw another: the per instance width needs a
+  look there); a real launcher home screen (the pictures are drawn the way a launcher draws them, by `AppWidgetHostView`); Android
+  11 and below (one layout; a 290dp slot can cut a few dp off the rows' text when a pill moves under its name, recorded in the
+  provider file); the on device suite and the signed bundles (`release-1.7.1.sh`, run after the first push; its result is added to this block).
+- **Open, not 1.7.1:** after Isha should the list mark Fajr "Next" with tomorrow's time (DESIGN_SYSTEM §11, `1.7.1-after-isha`).
+- **Next, in order:** the project session verifies and merges the pull request; Ali uploads the signed bundle (`~/Developer/SajdaTime/
+  SajdaTime-1.7.1/`, from `docs/release-tools/release-1.7.1.sh`) and pastes the one line of What's new in six languages, then presses
+  Submit. After it is live: the after release cleanup in CLAUDE.md.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 23 Nov 2026: 1.7.0 IS LIVE on Google Play (phone); nothing pending
 
 - **Proof:** the public Play page, read signed out on 23 Nov 2026 (claude.ai project session, built-in browser, en_GB), says "Updated on
   13 Nov 2026" and shows the 1.7.0 What's new (Tasbeeh counter, 7-day Timetable and month PDF, redrawn widgets, Qibla hand points at the
@@ -12136,3 +12200,24 @@ matters more than the stable hashes, that is the trade being made.
     110's trap: "Updated on" is the release's own date (the submission day), not the day it went live. When writing a job that
     should run once: make its first step "if the record already says this is done, do nothing", name the day to record as "the
     day first seen live", and tell Ali in the same session that he switches it off once it has done its work.
+
+196. **In a LinearLayout, `0dp` with a weight splits the WHOLE height by weight, not the spare** (24 Nov 2026, the Today widget).
+     The new list rows were `0dp` and weighted so a tall slot has no empty band. At the smallest slot the Maghrib row, whose
+     "Next" pill had moved to a second line, got the same slice as the one line rows and its pill was crushed to a sliver, while
+     the measured need (taken with an unspecified height, where weighted rows wrap their content) said everything fitted. Use
+     `wrap_content` with the weight: each row keeps its own height and only the spare is shared. Only a picture caught it.
+
+197. **A widget's size entries are chosen by the launcher, never by the app: the fitting entry NEAREST the slot, at most 16 of
+     them** (24 Nov 2026). Anything decided at render (does this fit one line?) must be decided for the narrowest real width that
+     entry can be drawn at, not the slot's. The Today list first assumed the 245dp floor everywhere, which put Maghrib's pill on
+     a second line on a normal 340dp widget and made six rows need 297dp; a second list width (300dp) brought it to 272dp (275 once the Sunrise row was made as tall as the others).
+
+198. **A widget countdown in minutes cannot be free** (24 Nov 2026). Android's `Chronometer` prints only m:ss or h:mm:ss and is
+     ticked by the launcher at no cost to the app; "4 min" as text would need the app to redraw every minute the screen is on,
+     and stays right only while exact alarms fire on time. The mockup's "4 min" was set aside for the ticking clock.
+
+199. **A layout choice measured in one town must not depend on that town's numbers** (24 Nov 2026, the Today widget). Whether a
+     pill fitted beside "Maghrib" was decided with the row's own time; London's "4:28 pm" fitted at 1.3x text and Karachi's
+     "5:41 pm" did not (proportional digits, a few dp), so the widget's heights, measured in London, were 17dp short in Karachi
+     and the fit test for other places failed. Decide with the widest value the field can hold ("12:58 pm", tabular figures as
+     drawn), so the choice depends only on what the tables are measured for: language, text size, width.

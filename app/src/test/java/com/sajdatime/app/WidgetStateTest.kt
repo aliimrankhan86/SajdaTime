@@ -276,4 +276,45 @@ class WidgetStateTest {
         assertEquals("", state.copy(cityName = "").town)
         assertTrue(WidgetState.build(settings().copy(usingDefaultLocation = true), at("2027-02-22", "04:00"), zone, true).usingDefaultLocation)
     }
+
+    /**
+     * The Today widget's rows (1.7.1) at fixed moments of 4 Nov 2026 in London (Fajr 05:05, Sunrise 06:59, Dhuhr 11:45, Asr 14:01,
+     * Maghrib 16:28, Isha 18:16): which run of rows each form shows, and which row is "Next". Opus review, 24 Nov 2026: the device test
+     * checked these against the code's own expression at whatever time it ran.
+     */
+    @Test
+    fun `the Today widget shows the right run of rows and marks today's next prayer only`() {
+        val f = PrayerSlot.FAJR; val sr = PrayerSlot.SUNRISE; val d = PrayerSlot.DHUHR
+        val a = PrayerSlot.ASR; val m = PrayerSlot.MAGHRIB; val i = PrayerSlot.ISHA
+        build("2026-11-04", "04:00").let { s -> // before Fajr: nothing current, Fajr is next
+            assertEquals(f, s.nextToday)
+            assertEquals(listOf(f, d, a), s.cardSlots(3))
+            assertEquals(listOf(f, sr, d), s.listSlots(3))
+            assertEquals(listOf(f), s.listSlots(1)) // the large text floor: the next prayer alone
+        }
+        build("2026-11-04", "06:00").let { s -> // Fajr is current until sunrise, Dhuhr next; the card leaves Sunrise out
+            assertEquals(d, s.nextToday)
+            assertEquals(listOf(f, d, a), s.cardSlots(3))
+            assertEquals(listOf(f, sr, d), s.listSlots(3))
+        }
+        build("2026-11-04", "09:00").let { s -> // sunrise to Dhuhr: nothing current, the run starts at the next prayer
+            assertEquals(d, s.nextToday)
+            assertEquals(listOf(d, a, m), s.cardSlots(3))
+            assertEquals(listOf(d, a), s.listSlots(2))
+        }
+        build("2026-11-04", "15:00").let { s -> // Asr current, Maghrib next; a run that would pass Isha moves back
+            assertEquals(m, s.nextToday)
+            assertEquals(listOf(a, m, i), s.cardSlots(3))
+            assertEquals(listOf(d, a, m, i), s.listSlots(4))
+            assertEquals(listOf(m), s.listSlots(1))
+        }
+        build("2026-11-04", "21:30").let { s -> // after Isha the next prayer is tomorrow's Fajr: no row of today is Next
+            assertNull(s.nextToday)
+            assertTrue(s.next!!.isTomorrow)
+            assertEquals(listOf(a, m, i), s.cardSlots(3))
+            assertEquals(PrayerSlot.entries, s.listSlots(6))
+            assertEquals(PrayerSlot.entries, s.cardSlots(6))
+            assertEquals(listOf(i), s.listSlots(1)) // no next prayer today: the current one
+        }
+    }
 }

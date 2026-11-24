@@ -97,6 +97,33 @@ data class WidgetState(
      */
     fun isHighlighted(slot: PrayerSlot): Boolean = current != null && slot == current
 
+    /**
+     * The Today widget's "Next" row (1.7.1): today's next prayer, or null after Isha, when the next prayer is tomorrow's Fajr and the
+     * rows are today's times (the countdown card names it instead).
+     */
+    val nextToday: PrayerSlot? get() = next?.takeIf { !it.isTomorrow }?.slot
+
+    /**
+     * The Today widget's list rows (1.7.1): [rows] in a run from the current prayer, or today's next one, moved back so the run ends at
+     * Isha at the latest; the last [rows] after Isha and with no location. One row (the large text floor) is the next prayer itself,
+     * or the current one after Isha.
+     */
+    fun listSlots(rows: Int): List<PrayerSlot> =
+        if (rows == 1) listOf(nextToday ?: current ?: PrayerSlot.ISHA) else window(PrayerSlot.entries, rows)
+
+    /**
+     * The Today card's rows: all six, or (fewer) a run from the five prayers in the same way, Sunrise left out because it is not a
+     * prayer and would take one of three rows: the current prayer, the next and the one after.
+     */
+    fun cardSlots(rows: Int): List<PrayerSlot> = if (rows >= PrayerSlot.entries.size) PrayerSlot.entries else window(PRAYERS, rows)
+
+    private fun window(all: List<PrayerSlot>, rows: Int): List<PrayerSlot> {
+        if (rows >= all.size) return all
+        val start = current?.let(all::indexOf)?.takeIf { it >= 0 } ?: nextToday?.let(all::indexOf) ?: (all.size - rows)
+        val first = start.coerceAtMost(all.size - rows)
+        return all.subList(first, first + rows)
+    }
+
     /** "Suhoor ends" for a Fajr and "Iftar" for a Maghrib on a Ramadan day, nothing otherwise. */
     fun ramadanWordFor(slot: PrayerSlot, ramadanOnThatDay: Boolean): RamadanWord? =
         if (!ramadanOnThatDay) {

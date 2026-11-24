@@ -64,14 +64,19 @@ object WidgetUpdater {
         // Every redraw lays down the next one, so any trigger in the app keeps the chain alive and a
         // chain that was lost (reboot, force stop) is rebuilt by the first redraw that follows.
         runCatching { WidgetRefreshScheduler.scheduleNext(context, state, now, zone) }
-        // The views are built once per provider and pushed to every instance of it, so the engine runs
+        // The state is built once and the views once per provider (Today once per instance), so the engine runs
         // once per refresh however many widgets are on the screen. A launcher that refuses an update
         // must never take the caller down, which may be the alarm receiver that is about to chain the
         // next prayer.
         if (!anyWidget) return false
         runCatching {
             if (nextIds.isNotEmpty()) manager.updateAppWidget(nextIds, WidgetRenderer.nextPrayer(context, state, now))
-            if (todayIds.isNotEmpty()) manager.updateAppWidget(todayIds, WidgetRenderer.today(context, state, now))
+            // Today is drawn per instance since 1.7.1: each gets its own reported width, so a wide widget keeps its pills on one
+            // line (WidgetRenderer.today). Usually there is one.
+            for (id in todayIds) {
+                val minWidth = manager.getAppWidgetOptions(id)?.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH) ?: 0
+                manager.updateAppWidget(id, WidgetRenderer.today(context, state, now, minWidth.toFloat()))
+            }
             if (stripIds.isNotEmpty()) manager.updateAppWidget(stripIds, WidgetRenderer.strip(context, state, now))
         }
         return true

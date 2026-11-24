@@ -2,9 +2,9 @@
 <!--
   Today: the default placement is 4 cells by 3 (Ali, 4 Nov 2026). At 4 by 4 the emulator's launcher opened a tall 3 by 5 slot, and the large
   card left an empty band under the rows; the owner does not want a taller widget by default. The real floor is minHeight 240dp (a larger
-  minResizeHeight is ignored by launchers): below the height six rows need (286dp at normal text) the compact list shows 2, 3, 4 or 5 rows
-  (WidgetRenderer.compactSteps, measured per text size), so nothing is cut. The large card (date, countdown card, the day) is offered from
-  its measured height, about 405dp at normal text and more at larger text (WidgetRenderer.largeTodayHeight).
+  minResizeHeight is ignored by launchers). Since 1.7.1 one layout in two forms (WidgetRenderer.todayForms, measured per text size and
+  language): the list with 1 to 6 rows (six from 278dp at a 300dp width, 303 at 245), and the card with the countdown from about 553dp
+  at normal text. No previewLayout since 1.7.1: with no data the layout is an empty card, so the picker shows the picture.
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,7 +15,6 @@
     android:minResizeWidth="250dp"
     android:minResizeHeight="240dp"
     android:previewImage="@drawable/widget_preview_today"
-    android:previewLayout="@layout/widget_today"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="4"
     android:targetCellHeight="3"
