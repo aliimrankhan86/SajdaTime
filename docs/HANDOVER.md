@@ -6133,7 +6133,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 24 Nov 2026: 1.7.1 (the Today widget redrawn) BUILT on `claude/widget-today-redesign`, pull request open, NOT merged, NOT uploaded
+### 📍 STATE OF PLAY, 24 Nov 2026 evening: 1.7.1 (the Today widget redrawn) MERGED into `main` (PR 22) and SUBMITTED, in Google's review (not live yet)
 
 - **What 1.7.1 is** (Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it."): the Today widget redrawn from the
   mockup he approved ("I like both light and dark"), built from the claude.ai project session's spec (`build/widget-today-redesign.md`,
@@ -6153,9 +6153,9 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   11 and below (one layout; a 290dp slot can cut a few dp off the rows' text when a pill moves under its name, recorded in the
   provider file).
 - **Open, not 1.7.1:** after Isha should the list mark Fajr "Next" with tomorrow's time (DESIGN_SYSTEM §11, `1.7.1-after-isha`).
-- **Next, in order:** the project session verifies and merges the pull request; Ali uploads the signed bundle (`~/Developer/SajdaTime/
-  SajdaTime-1.7.1/`, from `docs/release-tools/release-1.7.1.sh`) and pastes the one line of What's new in six languages, then presses
-  Submit. After it is live: the after release cleanup in CLAUDE.md.
+- **Merged (24 Nov 2026, evening):** the project session checked the gate numbers, the release run and the pictures (no faults seen), then merged PR 22 into `main` (merge commit `4e0b042`) and deleted `claude/widget-today-redesign` on GitHub and on the Mac; only `main` is left. The review pictures, the local signed bundle folder `SajdaTime-1.7.1/` and the temporary `build/` notes were then deleted at Ali's word (rebuild the bundle with `docs/release-tools/release-1.7.1.sh` if ever needed; Google Play holds the uploaded one).
+- **Submitted (24 Nov 2026, evening):** the signed bundle 12 / 1.7.1 was uploaded into the draft "12 (1.7.1)" (six What's new lines already in it), and Ali pressed Submit 1 change for review in Play Console, Publishing overview. It showed "Changes in review", running quick checks (up to 15 minutes), then Google's review. Phone only; the watch stays 1003 / 1.7.0. Only warning: no debug symbols (usual).
+- **Next, in order:** nothing for Ali to press. When the public Play page's "Updated on" moves past 13 Nov 2026, prove it live, mark 1.7.1 LIVE here, in PROJECT_BRIEF and in GBrain, then do the last of the after release cleanup in CLAUDE.md. Google sends no email when a review passes.
 
 ### 📍 (history, the block above is newer) STATE OF PLAY, 23 Nov 2026: 1.7.0 IS LIVE on Google Play (phone); nothing pending
 
