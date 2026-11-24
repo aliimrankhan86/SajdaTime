@@ -20,6 +20,9 @@ hyphens or em dashes. He decides anything visual, from screenshots. Before he se
 sameness check and, for anything non trivial, an Opus audit. When unsure, ask him (with a
 recommendation) instead of guessing. Never ask him to test the watch.
 
+How a job is split between Ali, Claude Code on his Mac and the claude.ai project session (the `build/` progress and review
+files): `docs/AI-WORKFLOW.md`.
+
 ## 2. What is live, and which branch to use
 
 Check what is live yourself: the public page

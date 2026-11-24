@@ -15,8 +15,8 @@ Written 24 Nov 2026 after release 1.7.0 and the 1.7.1 widget redesign. It record
 
 ## A normal release or change, in order
 1. Design shown first as a private artifact page (light, dark, large text, Urdu), Ali says yes.
-2. Brief written to build/. Claude Code builds on a branch, full gate and lint, device tests, pictures in light, dark, 2x text, Urdu, Arabic, smallest size. Independent reviewer (Opus) before commit.
-3. Project session reads the pictures and the diff, then merges on GitHub (Ali's standing word), deletes the branch.
+2. Brief written to build/. Claude Code builds on a branch, full gate and lint, device tests, pictures in light, dark, 2x text, Urdu, Arabic, smallest size. Fable (`ux-lead`) judges the pictures and an independent reviewer (Opus) checks the diff before commit. A widget change also means measuring its heights again on the emulator (`WidgetRenderEvidenceTest#today_needs`, then the fit tests).
+3. Project session reads the pictures and the diff, then merges on GitHub when Ali has said so for that job (as for 1.7.1), and deletes the branch. Without that word Ali presses Merge himself (CLAUDE.md).
 4. Store: only new What's new text in the six languages (en-GB, ar, bn-BD, id, tr-TR, ur), existing listing text untouched unless Ali says. Draft release in Play Console, signed bundle uploaded, Ali presses Send for review.
 5. Prove it is live from the public Play page "Updated on" date, signed out. Then clean up (CLAUDE.md "After every release") and update HANDOVER §11, PROJECT_BRIEF and GBrain together.
 

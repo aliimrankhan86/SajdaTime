@@ -6147,10 +6147,11 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   wear 27, lint 0 errors); `today_needs` (every Today entry at or above its measured need, six languages, nine text sizes, eight
   times incl. three in Ramadan); the fit proof passed 5 of 5 (every Today slot 240 to 760dp tall at 250, 320 and 380dp wide, six languages, seven text sizes, four times incl. a Ramadan afternoon, exact alarms on and off; Makkah, Karachi, Jakarta and Tromso; the no location message; the Next card unchanged); 19 pictures (light, dark, day sky, 1.3x and 2x text, Urdu, Arabic, smallest size,
   Ramadan, after Isha, no location) judged by Fable (design) and two Opus review passes, every finding fixed or recorded.
+- **Release run:** `release-1.7.1.sh` on `f359712` (24 Nov 2026, 19:37 to 20:05 UTC) passed every line but one: gate, both bundles signed by Ali's key (phone 12 / 1.7.1, 8,921,191 bytes, sha256 `5863dbb6...6fbc`, in `~/Developer/SajdaTime/SajdaTime-1.7.1/`; the watch 1003 built as a check only), languages, permissions, size, device suite 96 of 96, the Ramadan clock stages, widgets in Ramadan, fit proof, entry heights, Today needs, the PDFs. The one FAIL, the widget tests at 2x text, was two tests that waited for a row (Isha, Dhuhr) the new short list can leave out; fixed in the tests only, the six widget tests then passed at 1.0x, 1.3x and 2.0x, so the signed bundle (built from unchanged app code) stands.
 - **Not verified:** a real phone (the Redmi's HyperOS reports one widget width and may draw another: the per instance width needs a
   look there); a real launcher home screen (the pictures are drawn the way a launcher draws them, by `AppWidgetHostView`); Android
   11 and below (one layout; a 290dp slot can cut a few dp off the rows' text when a pill moves under its name, recorded in the
-  provider file); the on device suite and the signed bundles (`release-1.7.1.sh`, run after the first push; its result is added to this block).
+  provider file).
 - **Open, not 1.7.1:** after Isha should the list mark Fajr "Next" with tomorrow's time (DESIGN_SYSTEM §11, `1.7.1-after-isha`).
 - **Next, in order:** the project session verifies and merges the pull request; Ali uploads the signed bundle (`~/Developer/SajdaTime/
   SajdaTime-1.7.1/`, from `docs/release-tools/release-1.7.1.sh`) and pastes the one line of What's new in six languages, then presses
