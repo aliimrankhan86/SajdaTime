@@ -148,7 +148,7 @@ Change taught you something (platform trap, wrong assumption, bug class reading 
 
 ## After every release: clean up, without asking (owner, 23 Nov 2026; widened 26 Nov 2026)
 
-**The owner wants everything left clean and accurate after each release, and wants the assistant to manage it, not to be asked** (26 Nov 2026: "remove old git branches and other stuff to keep my codebase clean and accurate ... notes for an AI to understand it easily. Keep gbrain accurate and optimised ... keep google drive clean and accurate"). Do it as part of closing the release, in this order, and say what you did in a few short lines:
+**The owner wants everything left clean and accurate after each release, and wants the assistant to manage it, not to be asked** (26 Nov 2026: "remove old git branches and other stuff to keep my codebase clean and accurate ... notes for an AI to understand it easily. Keep gbrain accurate and optimised ... keep google drive clean and accurate"). He should never have to ask for it or repeat it (26 Nov 2026: "these clean up jobs should always be remember and recorded so i dont have to repeat again"). Do it as part of closing the release, in this order, and say what you did in a few short lines:
 
 1. **Prove it is live first:** the public Play page, signed out, "Updated on" date. Never clean on the strength of "it should be live". (If the owner asks for the clean up sooner, as on 26 Nov 2026, do it then and record the live proof when it comes.)
 2. **Records:** new STATE OF PLAY block in `docs/HANDOVER.md` §11 (old one marked history), `docs/PROJECT_BRIEF.md` title and live section. All must agree with GBrain (step 7).
