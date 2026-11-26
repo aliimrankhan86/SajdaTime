@@ -196,24 +196,31 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
             Text(stringResource(R.string.action_share_picture))
         }
     }
-    // Two half width buttons run out of room sooner than one: "Share picture" needs about 143dp and has about 120 at 1.3
-    // (ux-lead, 26 Nov 2026), so the pair stacks from 1.3; the single button keeps the Today line's 1.5.
-    val large = LocalDensity.current.fontScale >= if (onShare != null) 1.3f else 1.5f
+    val fontScale = LocalDensity.current.fontScale
+    val large = fontScale >= 1.5f
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
         ProvideTextStyle(MaterialTheme.typography.headlineSmall) { DialogTitle(text = title, onClose = onClose) }
         Spacer(Modifier.height(Space.Tight))
         if (onShare != null) {
             placeText(Modifier.fillMaxWidth())
             Spacer(Modifier.height(Space.Related))
-            if (large) {
-                button(Modifier.fillMaxWidth())
-                Spacer(Modifier.height(Space.Related))
-                share(Modifier.fillMaxWidth())
-            } else {
-                // Equal heights when one label wraps and the other does not (DESIGN_SYSTEM 0.5.1).
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.Related), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
-                    button(Modifier.weight(1f).fillMaxHeight())
-                    share(Modifier.weight(1f).fillMaxHeight())
+            // Side by side only where both labels fit on one line: each button needs about 168dp at 1.0 text ("Share
+            // picture" with its icon and padding), so the pair needs 352 of line, scaled by the text size. Below that
+            // (a 360dp phone, 1.3 text, 320dp at any size) they stack full width. A text size rule alone left both labels
+            // on two lines at 320dp (ux-lead, 26 Nov 2026, measured on the emulator).
+            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                if (maxWidth.value / fontScale < 352f) {
+                    Column(Modifier.fillMaxWidth()) {
+                        button(Modifier.fillMaxWidth())
+                        Spacer(Modifier.height(Space.Related))
+                        share(Modifier.fillMaxWidth())
+                    }
+                } else {
+                    // Equal heights should a translation still wrap one label (DESIGN_SYSTEM 0.5.1).
+                    Row(horizontalArrangement = Arrangement.spacedBy(Space.Related), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                        button(Modifier.weight(1f).fillMaxHeight())
+                        share(Modifier.weight(1f).fillMaxHeight())
+                    }
                 }
             }
         } else if (large) {
