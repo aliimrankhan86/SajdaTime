@@ -48,14 +48,22 @@ class QuietRemindersDeviceTest {
         PrayerAlarmScheduler.reschedule(context, repository.current())
     }
 
-    /** Reschedules until [action]'s alarms number [count] (the app's own reschedules can race, see SuhoorReminderDeviceTest). */
+    /**
+     * Reschedules until [action]'s alarms number [count] (the app's own reschedules can race, see SuhoorReminderDeviceTest).
+     * Only alarms inside the window the scheduler plans and cancels (to two days ahead) are counted: after a clock or date
+     * moved backwards (the emulator's clock was moved for the firing checks, 26 Nov 2026) the phone can still hold one laid
+     * down further ahead, outside `cancelAll`'s reach. That is true of every reminder family; it is replaced by the same
+     * request code when its day comes into the window, and the receiver drops it if the reminder was switched off.
+     */
     private fun settled(action: String, count: Int): List<LocalDateTime> {
-        var found = DeviceSupport.alarmTimes(context.packageName, action)
+        val last = LocalDate.now().plusDays(2)
+        fun read() = DeviceSupport.alarmTimes(context.packageName, action).filter { !it.toLocalDate().isAfter(last) }
+        var found = read()
         repeat(20) {
             if (found.size == count) return found
             Thread.sleep(500)
             runBlocking { PrayerAlarmScheduler.reschedule(context, repository.current()) }
-            found = DeviceSupport.alarmTimes(context.packageName, action)
+            found = read()
         }
         return found
     }
