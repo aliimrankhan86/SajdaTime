@@ -15,10 +15,13 @@ import com.sajdatime.app.R
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.placeName
 import com.sajdatime.app.notify.TimeFormat
+import com.sajdatime.core.CalcMethod
 import com.sajdatime.core.DayPrayerTimes
 import com.sajdatime.core.HijriCalendar
+import com.sajdatime.core.Madhab
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
+import com.sajdatime.core.Sect
 import com.sajdatime.core.bidiIsolated
 import com.sajdatime.core.label
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +61,7 @@ object TodayPicture {
         val canvas = Canvas(bitmap)
         canvas.drawColor(colours.page)
 
-        val card = RectF(56f, 56f, SIZE - 56f, 952f)
+        val card = RectF(56f, 56f, SIZE - 56f, 968f)
         canvas.drawRoundRect(card, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = colours.card })
         canvas.drawRoundRect(card, 56f, 56f, Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = colours.line
@@ -86,7 +89,7 @@ object TodayPicture {
             canvas.line(time, false, y, timePaint, left, right, width, rtl)
         }
 
-        val method = PrayerEngine.resolveMethod(settings.calculationPrefs).label(context).bidiIsolated()
+        val method = methodAndSchool(context, settings)
         val methodLine = if (day.approximated) {
             context.getString(R.string.home_date_line, method, context.getString(R.string.ramadan_approx_marker))
         } else {
@@ -96,7 +99,7 @@ object TodayPicture {
 
         val footer = paint(32f, colours.accent, bold = true).apply { textAlign = Paint.Align.CENTER }
         val words = context.getString(R.string.share_picture_footer)
-        canvas.drawText(marked(TextUtils.ellipsize(words, footer, SIZE - 112f, TextUtils.TruncateAt.END).toString(), rtl), SIZE / 2f, 1022f, footer)
+        canvas.drawText(marked(TextUtils.ellipsize(words, footer, SIZE - 112f, TextUtils.TruncateAt.END).toString(), rtl), SIZE / 2f, 1034f, footer)
         return bitmap
     }
 
@@ -115,6 +118,28 @@ object TodayPicture {
             .apply { clipData = android.content.ClipData.newRawUri(title, uri) }
             .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         context.startActivity(Intent.createChooser(send, title))
+    }
+
+    /**
+     * "Muslim World League · Shafi'i", the Times screen's own line under the list (HomeScreen.WhyTheseTimes) without its
+     * "adjusted" note, which a recipient cannot act on. The school matters on a picture sent to a mosque group: Hanafi Asr
+     * is later (ux-lead, 26 Nov 2026). ponytail: the madhab names repeat madhabLabel's four lines, which is composable only.
+     */
+    private fun methodAndSchool(context: Context, settings: AppSettings): String {
+        val prefs = settings.calculationPrefs
+        val resolved = PrayerEngine.resolveMethod(prefs)
+        if (prefs.sect == Sect.SHIA && resolved == CalcMethod.JAFARI) return context.getString(R.string.why_times_shia_caption)
+        val method = resolved.label(context).bidiIsolated()
+        if (prefs.sect == Sect.SHIA) return method
+        val school = context.getString(
+            when (prefs.madhab) {
+                Madhab.HANAFI -> R.string.madhab_hanafi
+                Madhab.SHAFII -> R.string.madhab_shafii
+                Madhab.MALIKI -> R.string.madhab_maliki
+                Madhab.HANBALI -> R.string.madhab_hanbali
+            },
+        )
+        return context.getString(R.string.settings_value_pair, method, school)
     }
 
     /** "Thu 26 Nov · 25 Jumada al-Ula 1448", built as the Times screen's header builds it (HomeScreen.hijriToday). */

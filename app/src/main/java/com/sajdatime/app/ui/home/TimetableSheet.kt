@@ -41,6 +41,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.PictureAsPdf
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -195,7 +196,9 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
             Text(stringResource(R.string.action_share_picture))
         }
     }
-    val large = LocalDensity.current.fontScale >= 1.5f
+    // Two half width buttons run out of room sooner than one: "Share picture" needs about 143dp and has about 120 at 1.3
+    // (ux-lead, 26 Nov 2026), so the pair stacks from 1.3; the single button keeps the Today line's 1.5.
+    val large = LocalDensity.current.fontScale >= if (onShare != null) 1.3f else 1.5f
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
         ProvideTextStyle(MaterialTheme.typography.headlineSmall) { DialogTitle(text = title, onClose = onClose) }
         Spacer(Modifier.height(Space.Tight))
@@ -343,7 +346,8 @@ private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
                 val shape = RoundedCornerShape(16.dp)
                 val frame = Modifier.fillMaxWidth().aspectRatio(1f).clip(shape)
                 picture?.let { Image(it.asImageBitmap(), contentDescription = described, modifier = frame) }
-                    ?: Box(frame.background(scheme.surfaceVariant))
+                    // A spinner while it draws (1 to 3 s on the emulator), so the dialog never looks empty (ux-lead).
+                    ?: Box(frame.background(scheme.surfaceVariant), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             }
         },
         confirmButton = {

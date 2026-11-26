@@ -60,7 +60,7 @@ object Notifications {
      * The adhkar and Friday reminders' channel (1.8.0), shared by both (brief). Not [CHANNEL_FAST]: that one
      * is named "Fast reminders" in the phone's settings and is a Sunni only feature, so muting fasts would mute
      * adhkar and a Shia user would see a fasting entry. Quiet like [CHANNEL_REMINDERS] (no sound, one short
-     * buzz): the morning one comes half an hour after Fajr, when many are back asleep.
+     * buzz); the adhkar posts are silent on top of that (setSilent, Ali 26 Nov 2026), so only the Friday one buzzes.
      */
     const val CHANNEL_QUIET = "quiet_reminders"
     const val ACTION_OPEN_TASBEEH = "com.sajdatime.app.action.OPEN_TASBEEH"
@@ -653,10 +653,9 @@ object Notifications {
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(if (evening) R.string.notif_adhkar_evening else R.string.notif_adhkar_morning))
             .setContentText(context.getString(R.string.notif_adhkar_body))
-            // Below Android O these stand in for the channel: no sound, one short buzz.
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setSound(null)
-            .setVibrate(REMINDER_VIBRATION)
+            // Fully silent, not even the channel's one buzz (Ali, 26 Nov 2026: the morning one comes half an hour after
+            // Fajr, when many are back asleep). It waits in the list; the Friday reminder on the same channel still buzzes.
+            .setSilent(true)
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setContentIntent(openTasbeehIntent(context))
@@ -667,7 +666,7 @@ object Notifications {
     /**
      * "Jumu'ah today at 1:15 pm. A good day to read Surah Al-Kahf." when [jumuahAt] is given, else "It's
      * Friday. Dhuhr is at 12:05 pm. ..." Information only: nothing says the prayer is obligatory. Quiet, on the
-     * adhkar channel, never a usage count. It clears itself at midnight, when "today" stops being true.
+     * adhkar channel (one short buzz), never a usage count. It clears itself at midnight, when "today" stops being true.
      */
     fun postFridayReminder(base: Context, jumuahAt: Instant?, dhuhrAt: Instant, approximate: Boolean = false) {
         val context = AppLocale.wrap(base)

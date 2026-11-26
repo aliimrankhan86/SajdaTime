@@ -1,13 +1,23 @@
-# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1, the Today widget redrawn, is LIVE; 1.8.0 started on `claude/1-8-0`)
+# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 BUILT and tested on `claude/1-8-0`, waiting for Ali's Merge)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.8.0 (started 26 Nov 2026, nothing built yet)
-- **Ali's scope (26 Nov 2026):** a morning and evening adhkar reminder (after Fajr and after Asr, off by default), a Friday reminder
-  an hour before Jumu'ah with Surah Al-Kahf (off by default), and sharing today's times as a picture. Phone only, 13 / 1.8.0.
+## Next release: 1.8.0 (built 26 Nov 2026 on `claude/1-8-0`; Ali presses Merge, then Send for review)
+- **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
+  - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
+    sunrise) and after Asr (no later than 15 minutes before Maghrib). A quiet notification, "A quiet moment for
+    remembrance."; tapping it opens the Tasbeeh. No adhkar text yet (later release).
+  - **Friday reminder with Surah Al-Kahf** (off by default): an hour before your Jumu'ah time if you typed one (Sunni), or
+    an hour before Dhuhr. "Jumu'ah today at ..." or "It's Friday. Dhuhr is at ...", then "A good day to read Surah Al-Kahf."
+    Not merged with any other reminder (the reminder before Dhuhr stays as you set it).
+  - **Share today's times as a picture**, from the Timetable, beside Save as PDF: a square picture with the town, both dates,
+    the six times, the method and "SajdaTime. Free, no ads. On Google Play". Nothing is sent until you press Share.
+- **Store text:** Ali chose "Tighten wording" (26 Nov 2026): every feature kept, the three added, the methods line names six
+  methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted on release day.
+- **Checked:** full gate green; new and touched device tests green; every reminder fired on the emulator with the clock moved
+  (English and Arabic); pictures in light, dark, 2x text, Arabic, Urdu, Bengali and a long town name; an independent code review
+  (its fixes are in). **Not checked:** a real phone.
 - **Dates:** ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027, before the Ramadan freeze (18 Jan to 9 Mar 2027).
-- **Status:** branch `claude/1-8-0` made and the version set. The scheduled build task cannot build or test from its cloud session
-  (no Android tools there), so the features wait for Claude Code on the Mac.
 
 ## Last release: 1.7.1, the Today widget redrawn (LIVE: the public Play page says "Updated on 24 Nov 2026", read signed out 26 Nov 2026)
 - **Ali's scope:** "1.7.1 is just improve the widget design. That's it." Phone 12 / 1.7.1; the watch is unchanged and not uploaded.

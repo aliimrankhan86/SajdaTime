@@ -104,7 +104,7 @@
 
     <!-- Export -->
     <string name="action_save_timetable">Vakit çizelgesini PDF olarak kaydet</string>
-    <string name="action_save_pdf">PDF olarak kaydet</string>
+    <string name="action_save_pdf">PDF kaydet</string>
     <string name="action_timetable">Vakit çizelgesi</string>
     <string name="timetable_title">Vakit çizelgesi</string>
     <string name="timetable_day_a11y">%1$s. Sabah %2$s. Güneş %3$s. Öğle %4$s. İkindi %5$s. Akşam %6$s. Yatsı %7$s.</string>
@@ -626,7 +626,7 @@
     <string name="notif_adhkar_body">Zikir için sakin bir an.</string>
     <string name="channel_quiet_reminders">Zikir ve Cuma hatırlatıcıları</string>
     <string name="settings_friday">Cuma hatırlatıcısı</string>
-    <string name="settings_friday_desc">Cuma günleri öğle namazından veya Cuma vaktinizden bir saat önce sessiz bir bildirim</string>
+    <string name="settings_friday_desc">Cuma namazından veya öğleden bir saat önce sessiz bir bildirim</string>
     <string name="notif_friday_jumuah">Bugün Cuma namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
     <string name="notif_friday_dhuhr">Bugün Cuma. Öğle namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
     <string name="action_share_picture">Resim paylaş</string>

@@ -2336,6 +2336,56 @@ make up" out of the listing.
 - No new string, no new usage count event, no data change, `docs/privacy.html` unchanged. iPhone: Android only (a WidgetKit widget
   would take the same two forms; the tables are Android measurements).
 
+### 5.43 Morning and evening adhkar reminder, 1.8.0 (Ali, 26 Nov 2026: "morning after Fajr, evening after Asr")
+
+Settings, Reminders, "Morning and evening adhkar", a switch under Fast reminders, **off by default, Sunni and Shia alike**.
+Morning at **Fajr + 30 minutes, no later than sunrise - 10**; evening at **Asr + 30, no later than Maghrib - 15**, from the
+times the user sees (adjustments applied). A window too short to fit one after the prayer begins (projected far north days,
+heavy adjustments) gets **none**, never one at the adhan's minute. `AdhkarReminderPlan` (in `notify/ExtraReminderPlans.kt`),
+action `ADHKAR_REMINDER`, request codes `60,000 + dayOfYear * 2 + (1 evening)`, today to two days ahead, laid down before the
+early return, cancelled in `cancelAll`, not an alarm clock. The receiver drops one switched off since or arriving after
+sunrise or Maghrib. Notification "Morning adhkar" / "Evening adhkar", body "A quiet moment for remembrance.", no words of
+dhikr (needs sourcing for both traditions, a later release), no timeout. **Tap opens My prayers with the Tasbeeh open**
+(own intent action `OPEN_TASBEEH`, read in `MainActivity.onCreate` only without saved state and not from Recents).
+**Channel `quiet_reminders`** ("Adhkar and Friday reminders"), shared with 5.44: not the fast channel, which is named "Fast
+reminders" and Sunni only; quiet like the reminder before prayer (no sound, one short buzz), created on first post. **The
+adhkar posts are fully silent on top of that (`setSilent`, no buzz)**: Ali chose it on 26 Nov 2026, because the morning one
+comes half an hour after Fajr when many are back asleep. The Friday reminder keeps the channel's one buzz. No usage count. Seen on the emulator (26 Nov 2026,
+clock moved): fired at 06:07 and 14:08, Arabic at 06:09, tap opened the Tasbeeh. iPhone effect: carries over in idea; the
+planner is plain Kotlin in `:app` (same recorded gap as `FastReminderPlan`), SF Symbol `sun.horizon`.
+
+### 5.44 Friday reminder with Surah Al-Kahf, 1.8.0 (Ali, 26 Nov 2026: "1 hour before Jumu'ah")
+
+Settings switch "Friday reminder", **off by default**, for everyone. An hour before Jumu'ah on Fridays in the phone's own
+time zone. **Sunni user with a Jumu'ah time typed (shown by `JamaahPlan`):** an hour before it, "Jumu'ah today at 1:15 pm. A
+good day to read Surah Al-Kahf." **Everyone else (a Sunni user without one, every Shia user):** an hour before Dhuhr, "It's
+Friday. Dhuhr is at 12:05 pm. A good day to read Surah Al-Kahf." Why: the app never names a time Jumu'ah that the user did
+not give it (the Times screen does the same), and the Jafari line names Dhuhr, so it is timed from Dhuhr (timed from a typed
+Jumu'ah it said "Dhuhr is at 12:05" at 12:15; review, 26 Nov 2026). Information only. **Not merged with any other reminder,
+on purpose:** the brief's "one notification, never two" names the jama'ah reminder for Jumu'ah, which is switched off; a
+filter that dropped the heads up before Dhuhr beside it was built and **removed** (it failed when the Friday reminder fired
+first, and it took away a heads up the user chose, which matters to those who pray Dhuhr on Friday). Do not rebuild it.
+`FridayReminderPlan`, action `FRIDAY_REMINDER`, codes `70,000 + dayOfYear`, same scheduler footing as 5.43; the receiver drops
+one switched off, no longer Friday where the phone is, or arriving once the prayer it is timed from has begun. Quiet channel
+of 5.43, clears at midnight, marked approximate on a projected day, tap opens the app. No usage count. Seen on the emulator
+(26 Nov 2026): 10:49 for Dhuhr 11:49, and in Arabic. iPhone effect: as 5.43, SF Symbol `book`.
+
+### 5.45 Share today's times as a picture, 1.8.0 (brief of 26 Nov 2026: how a free app with no marketing gets found)
+
+Timetable sheet, "Share picture" beside "Save as PDF" (both on a line under the place, equal shares and heights; stacked at
+1.5 text). **Not the Times header:** DESIGN_SYSTEM section 3 (Sky) allows nothing but the header's three texts on a sky. Opens
+a dialog: the X, a square preview, one Share button (appears when the picture is ready). **Nothing is written or sent until
+Share;** nothing in the app asks anyone to share; no usage count, the existing share event is not reused. The picture
+(`share/TodayPicture.kt`): 1080 square PNG in the theme in use, town name (ellipsis), Gregorian and Hijri date as the Times
+header builds it, the six times (Jumu'ah in Dhuhr's line on a Friday when set), the resolved method small with "approx." on a
+projected day, footer "SajdaTime. Free, no ads. On Google Play". The method line names the school as the Times
+screen does ("Muslim World League · Shafi'i", the Jafari caption for Shia), without "adjusted": Hanafi Asr is later, and the
+picture goes to people who do not know the sender's settings (ux-lead, 26 Nov 2026). Canvas drawText with the PDF's right to left mark rule, so
+Arabic and Urdu mirror and digits stay Western. Written to `cache/exports` (the PDF's FileProvider path) off the main thread,
+one file overwritten. Privacy page updated in the same release (what the picture shows, including that the method can show
+Sunni or Shia). On the emulator the picture takes 1 to 3 s to draw. iPhone effect: carries over in idea (the drawing is
+Android Canvas; iOS would draw its own), SF Symbol `square.and.arrow.up`.
+
 ## 6. Notification and alarm architecture
 
 ### Reliability — five independent reschedule triggers
@@ -6133,7 +6183,26 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 26 Nov 2026: 1.7.1 IS LIVE on Google Play (phone); 1.8.0 started on `claude/1-8-0`
+### 📍 STATE OF PLAY, 26 Nov 2026 evening: 1.8.0 BUILT and tested on `claude/1-8-0`, waiting for Ali's Merge (1.7.1 is live)
+
+- **What 1.8.0 is (phone 13 / 1.8.0, watch untouched):** morning and evening adhkar reminder (5.43), Friday reminder with Surah
+  Al-Kahf (5.44), share today's times as a picture (5.45). Built in Claude Code on the Mac on 26 Nov 2026, item by item, each
+  item committed with its reasons. Checklist and log: `build/release-1.8.0-progress.md` (local, gitignored).
+- **Checked:** full gate green (`clean test lint :app:bundleRelease :wear:bundleRelease`); new `QuietRemindersDeviceTest` and the
+  touched device tests green on emulator-5554 (API 36); each reminder fired for real with the clock moved, in English and Arabic;
+  tap opens the Tasbeeh; share preview and the phone's share sheet; 32 pictures in `build/review-1.8.0/` (light, dark, 2x,
+  Arabic, Urdu, Bengali, long town name). Independent Opus review: its eight findings fixed (95f8819), notably the "never two"
+  filter removed and the Shia Friday timing (5.44), and the privacy page now names the picture.
+- **Store text ready to paste on release day:** `docs/store/LISTING.md` and `LISTING-LOCALES.md`, 1.8.0 blocks. Ali chose
+  "Tighten wording" on 26 Nov 2026 to fit 4000 characters.
+- **Not checked:** a real phone (One UI, HyperOS delivery of the new reminders); the picture's draw time on a real phone (1 to 3 s
+  on the emulator).
+- **Found, not 1.8.0:** the Timetable day cards in Urdu print "AM 5:37" (meridiem first). Pre-existing; for a later release.
+- **Next (whose job):** Ali presses Merge on the PR after seeing the pictures. Then Claude: signed bundle (`docs/RELEASING.md`),
+  `docs/release-tools/set-release-date.sh` (privacy date), Play Console draft with the six What's new and descriptions; Ali
+  presses Send for review.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 26 Nov 2026: 1.7.1 IS LIVE on Google Play (phone); 1.8.0 started on `claude/1-8-0`
 
 - **1.7.1 live:** the public Play page, read signed out on 26 Nov 2026 at 14:05 UTC (en_GB), says "Updated on 24 Nov 2026", so the
   redrawn Today widget (12 / 1.7.1) is public. The watch stays 1003 / 1.7.0 (not uploaded with 1.7.1). After release clean up:

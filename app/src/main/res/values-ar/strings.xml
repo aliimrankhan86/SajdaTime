@@ -728,7 +728,7 @@
     <string name="notif_adhkar_body">لحظة هادئة للذكر.</string>
     <string name="channel_quiet_reminders">تذكيرات الأذكار والجمعة</string>
     <string name="settings_friday">تذكير الجمعة</string>
-    <string name="settings_friday_desc">إشعار هادئ يوم الجمعة قبل الظهر أو وقت صلاة الجمعة لديك بساعة</string>
+    <string name="settings_friday_desc">إشعار هادئ قبل صلاة الجمعة أو الظهر بساعة</string>
     <string name="notif_friday_jumuah">صلاة الجمعة اليوم الساعة %1$s. يوم طيب لقراءة سورة الكهف.</string>
     <string name="notif_friday_dhuhr">اليوم الجمعة. الظهر الساعة %1$s. يوم طيب لقراءة سورة الكهف.</string>
     <string name="action_share_picture">شارك صورة</string>
