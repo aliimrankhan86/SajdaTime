@@ -522,6 +522,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setFastReminder(kind: com.sajdatime.core.FastKind, on: Boolean) =
         viewModelScope.launch { settingsRepository.setFastReminder(kind, on) }
 
+    fun setAdhkarReminder(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setAdhkarReminder(enabled) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 

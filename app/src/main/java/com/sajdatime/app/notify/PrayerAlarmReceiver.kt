@@ -32,6 +32,29 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             PrayerAlarmScheduler.ACTION_SUHOOR_REMINDER -> onSuhoorReminder(context, intent)
             PrayerAlarmScheduler.ACTION_PRAYER_REMINDER -> onPrayerReminder(context, intent)
             PrayerAlarmScheduler.ACTION_FAST_REMINDER -> onFastReminder(context, intent)
+            PrayerAlarmScheduler.ACTION_ADHKAR_REMINDER -> onAdhkarReminder(context, intent)
+        }
+    }
+
+    private fun onAdhkarReminder(context: Context, intent: Intent) {
+        if (!intent.hasExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS)) return
+        val endsAt = Instant.ofEpochMilli(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS, 0L))
+        val evening = intent.getBooleanExtra(PrayerAlarmScheduler.EXTRA_EVENING, false)
+
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val settings = SettingsRepository(appContext).current()
+                if (shouldPostAdhkarReminder(settings, endsAt, Instant.now())) {
+                    Notifications.postAdhkarReminder(appContext, evening)
+                }
+                // Same chain as a prayer, so the next window is laid down while awake.
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 

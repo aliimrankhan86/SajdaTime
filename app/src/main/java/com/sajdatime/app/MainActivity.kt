@@ -163,6 +163,9 @@ class MainActivity : ComponentActivity() {
      */
     private var notificationsBlocked by mutableStateOf(false)
 
+    /** Set by a tap on the adhkar reminder (1.8.0), cleared once My prayers has opened the tasbeeh. */
+    private var tasbeehRequested by mutableStateOf(false)
+
     private fun readNotificationsBlocked() = !AlertCheck.notificationsAllowed(this)
 
     /**
@@ -213,6 +216,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The reminder's flags (NEW_TASK, CLEAR_TOP, standard launch mode) start a fresh screen, so it arrives
+        // here. Not on a rotation, which brings back the same intent with saved state.
+        tasbeehRequested = savedInstanceState == null && intent?.action == Notifications.ACTION_OPEN_TASBEEH
         // The window's direction must come from the app's language (AppLocale.wrap above), not be
         // left to the platform. Below Android 13 a language picked in the app restarts this screen
         // with recreate(), and on the Android 12 emulator (19 Oct 2026) the new screen kept the old
@@ -332,12 +338,15 @@ class MainActivity : ComponentActivity() {
                                 onSetPrayerReminderMinutes = viewModel::setPrayerReminderMinutes,
                                 onSetPrayerReminder = viewModel::setPrayerReminder,
                                 onSetFastReminder = viewModel::setFastReminder,
+                                onSetAdhkar = viewModel::setAdhkarReminder,
                                 onSetAnalytics = viewModel::setAnalyticsEnabled,
                                 onScreenViewed = viewModel::recordScreen,
                                 tracker = trackerActions,
                                 jamaah = jamaahActions,
                                 bell = bellActions,
                                 notificationsBlocked = notificationsBlocked,
+                                tasbeehRequested = tasbeehRequested,
+                                onTasbeehHandled = { tasbeehRequested = false },
                             )
                         }
                     }

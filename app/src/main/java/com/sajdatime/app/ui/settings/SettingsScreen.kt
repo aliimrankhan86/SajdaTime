@@ -44,6 +44,7 @@ import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material.icons.outlined.WbTwilight
 import com.sajdatime.core.DuhaWindow
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.DarkMode
@@ -199,6 +200,7 @@ fun SettingsScreen(
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetFastReminder: (FastKind, Boolean) -> Unit,
+    onSetAdhkar: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
@@ -480,6 +482,16 @@ fun SettingsScreen(
                 },
                 onClick = { open = SettingsChooser.FAST_REMINDERS },
             ).takeIf { settings.sect == Sect.SUNNI },
+            // Morning and evening adhkar (1.8.0): off until chosen, for Sunni and Shia alike, a quiet
+            // notification after Fajr and Asr. iPhone: carries over (SF Symbol sun.horizon).
+            SettingsItem.Toggle(
+                key = "adhkar",
+                icon = Icons.Outlined.WbTwilight,
+                title = stringResource(R.string.settings_adhkar),
+                subtitle = stringResource(R.string.settings_adhkar_desc),
+                checked = settings.adhkarReminder,
+                onCheckedChange = onSetAdhkar,
+            ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
             SettingsItem.Toggle(
