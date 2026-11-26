@@ -6185,7 +6185,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 26 Nov 2026 evening: 1.8.0 BUILT and tested on `claude/1-8-0`, waiting for Ali's Merge (1.7.1 is live)
+### 📍 STATE OF PLAY, 26 Nov 2026 evening: 1.8.0 BUILT and tested, PR #24 open, waiting for Ali's Merge (1.7.1 is live)
 
 - **What 1.8.0 is (phone 13 / 1.8.0, watch untouched):** morning and evening adhkar reminder (5.43), Friday reminder with Surah
   Al-Kahf (5.44), share today's times as a picture (5.45). Built in Claude Code on the Mac on 26 Nov 2026, item by item, each
@@ -6194,13 +6194,16 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   touched device tests green on emulator-5554 (API 36); each reminder fired for real with the clock moved, in English and Arabic;
   tap opens the Tasbeeh; share preview and the phone's share sheet; 32 pictures in `build/review-1.8.0/` (light, dark, 2x,
   Arabic, Urdu, Bengali, long town name). Independent Opus review: its eight findings fixed (95f8819), notably the "never two"
-  filter removed and the Shia Friday timing (5.44), and the privacy page now names the picture.
+  filter removed and the Shia Friday timing (5.44), and the privacy page now names the picture. Fable judged the pictures (five
+  fixes in: the picture names the school, a spinner while it draws, the header pair stacks by width, shorter Friday subtitle,
+  shorter "Save as PDF" in bn and tr). A second Opus review of those fixes, the store text and the records: fixed (c25ca7f).
+  Ali chose on 26 Nov 2026: "Tighten wording" for the listing, and fully silent adhkar.
 - **Store text ready to paste on release day:** `docs/store/LISTING.md` and `LISTING-LOCALES.md`, 1.8.0 blocks. Ali chose
   "Tighten wording" on 26 Nov 2026 to fit 4000 characters.
 - **Not checked:** a real phone (One UI, HyperOS delivery of the new reminders); the picture's draw time on a real phone (1 to 3 s
   on the emulator).
 - **Found, not 1.8.0:** the Timetable day cards in Urdu print "AM 5:37" (meridiem first). Pre-existing; for a later release.
-- **Next (whose job):** Ali presses Merge on the PR after seeing the pictures. Then Claude: signed bundle (`docs/RELEASING.md`),
+- **Next (whose job):** Ali presses Merge on PR #24 after seeing the pictures (three picture sheets sent to him). Then Claude: signed bundle (`docs/RELEASING.md`),
   `docs/release-tools/set-release-date.sh` (privacy date), Play Console draft with the six What's new and descriptions; Ali
   presses Send for review.
 

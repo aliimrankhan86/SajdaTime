@@ -2,7 +2,7 @@
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.8.0 (built 26 Nov 2026 on `claude/1-8-0`; Ali presses Merge, then Send for review)
+## Next release: 1.8.0 (built 26 Nov 2026, PR #24 open; Ali presses Merge, then Send for review)
 - **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
   - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
     sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,
@@ -16,7 +16,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted on release day.
 - **Checked:** full gate green on the final code; new and touched device tests green; every reminder fired on the emulator with the clock moved
   (English and Arabic); pictures in light, dark, 2x text, Arabic, Urdu, Bengali and a long town name; an independent code review
-  (its fixes are in). **Not checked:** a real phone.
+  (its fixes are in), the design lead's picture review (its fixes are in) and a second code review (its fixes are in). **Not checked:** a real phone.
 - **Dates:** ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027, before the Ramadan freeze (18 Jan to 9 Mar 2027).
 
 ## Last release: 1.7.1, the Today widget redrawn (LIVE: the public Play page says "Updated on 24 Nov 2026", read signed out 26 Nov 2026)
