@@ -11,6 +11,7 @@ import com.sajdatime.core.JamaahTimes
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
+import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -150,4 +151,55 @@ object AdhkarReminderPlan {
     private val AFTER_START: Duration = Duration.ofMinutes(30)
     private val BEFORE_SUNRISE: Duration = Duration.ofMinutes(10)
     private val BEFORE_MAGHRIB: Duration = Duration.ofMinutes(15)
+}
+
+/**
+ * The Friday reminder with Surah Al-Kahf (1.8.0). [jumuahAt] is the user's own Jumu'ah time when one is set
+ * and inside Dhuhr's window, else null; [dhuhrAt] is Dhuhr as the user sees it.
+ */
+data class FridayReminder(val date: LocalDate, val at: Instant, val dhuhrAt: Instant, val jumuahAt: Instant?) {
+    /**
+     * The time the line names as Jumu'ah, or null for the "It's Friday. Dhuhr is at" line. Jumu'ah only for a
+     * Sunni user with a Jumu'ah time typed in: the app never calls a time Jumu'ah that the user did not give it
+     * (the Times screen does the same), and the Jafari line names Dhuhr (brief). Information, never an obligation.
+     */
+    fun jumuahLineFor(sect: Sect): Instant? = jumuahAt.takeIf { sect == Sect.SUNNI }
+}
+
+object FridayReminderPlan {
+
+    /**
+     * An hour before Jumu'ah on each Friday from today to two days ahead, in the phone's own time zone, still in
+     * the future (Ali, 26 Nov 2026). Before the user's Jumu'ah time when [JamaahPlan] would show it (set, typed
+     * in this zone, inside Dhuhr's window), otherwise before Dhuhr, adjustments included either way.
+     */
+    fun plan(
+        coordinates: Coordinates,
+        prefs: CalculationPrefs,
+        enabled: Boolean,
+        jamaah: JamaahTimes,
+        today: LocalDate,
+        now: Instant,
+        zone: ZoneId,
+    ): List<FridayReminder> {
+        if (!enabled) return emptyList()
+        return (0L..2L).map { today.plusDays(it) }.filter { it.dayOfWeek == DayOfWeek.FRIDAY }.mapNotNull { date ->
+            val day = PrayerEngine.compute(coordinates, date, prefs)
+            val jumuah = (JamaahPlan.on(day, zone, jamaah)[PrayerSlot.DHUHR] as? JamaahResult.InWindow)?.at
+            val dhuhr = day[PrayerSlot.DHUHR]
+            FridayReminder(date, (jumuah ?: dhuhr).minus(BEFORE), dhuhr, jumuah).takeIf { it.at.isAfter(now) }
+        }
+    }
+
+    /**
+     * True when a "Dhuhr in N minutes" heads up at [at] would land within 15 minutes of a Friday reminder. The
+     * brief's rule is one notification, never two; the jama'ah reminder it names is switched off
+     * (InertReminderSettingsTest), so the heads up before Dhuhr is the one that can collide. The Friday one,
+     * which names the time as well, is kept, as the suhoor reminder is kept over Fajr's.
+     */
+    fun overlaps(at: Instant, friday: List<FridayReminder>): Boolean =
+        friday.any { Duration.between(it.at, at).abs() <= MERGE_WITHIN }
+
+    private val BEFORE: Duration = Duration.ofMinutes(60)
+    private val MERGE_WITHIN: Duration = Duration.ofMinutes(15)
 }

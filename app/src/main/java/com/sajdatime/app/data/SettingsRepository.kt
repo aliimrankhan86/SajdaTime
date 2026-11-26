@@ -268,6 +268,8 @@ data class AppSettings(
     val fastReminders: Set<FastKind> = emptySet(),
     /** Morning and evening adhkar reminder (1.8.0): off by default, a quiet notification for Sunni and Shia alike. */
     val adhkarReminder: Boolean = false,
+    /** Friday reminder with Surah Al-Kahf (1.8.0): off by default, an hour before Jumu'ah or Dhuhr. */
+    val fridayReminder: Boolean = false,
     /**
      * The style each prayer had when its alert last went off (the bell or the alerts dialog), so the
      * bell turns it back on as it was (1.6.0 step 3). A prayer with no entry comes back as a notification.
@@ -544,6 +546,7 @@ class SettingsRepository(private val context: Context) {
     }
 
     suspend fun setAdhkarReminder(enabled: Boolean) = edit { it[Keys.ADHKAR_REMINDER] = enabled }
+    suspend fun setFridayReminder(enabled: Boolean) = edit { it[Keys.FRIDAY_REMINDER] = enabled }
 
     suspend fun setThemeChoice(choice: ThemeChoice) = edit { it[Keys.THEME] = choice.name }
 
@@ -648,6 +651,7 @@ class SettingsRepository(private val context: Context) {
         val JAMAAH_REMINDER = intPreferencesKey("jamaah_reminder_minutes")
         val FAST_REMINDERS = stringPreferencesKey("fast_reminders")
         val ADHKAR_REMINDER = booleanPreferencesKey("adhkar_reminder")
+        val FRIDAY_REMINDER = booleanPreferencesKey("friday_reminder")
         val LAST_ALERT_STYLE = stringPreferencesKey("last_alert_style")
         val BELL_REMOVED_REMINDER = stringPreferencesKey("bell_removed_reminder")
         val NOTIFICATIONS_NOTICE_DISMISSED = booleanPreferencesKey("notifications_notice_dismissed")
@@ -728,6 +732,7 @@ class SettingsRepository(private val context: Context) {
             jamaahReminderMinutes = (this[Keys.JAMAAH_REMINDER] ?: 0).takeIf { it in AppSettings.PRAYER_REMINDER_CHOICES } ?: 0,
             fastReminders = decodeFastKinds(this[Keys.FAST_REMINDERS]),
             adhkarReminder = this[Keys.ADHKAR_REMINDER] ?: false,
+            fridayReminder = this[Keys.FRIDAY_REMINDER] ?: false,
             lastAlertStyle = this[Keys.LAST_ALERT_STYLE]?.let(AlertCodec::decode).orEmpty(),
             bellRemovedReminder = decodeBellRemoved(this[Keys.BELL_REMOVED_REMINDER]),
             notificationsNoticeDismissed = this[Keys.NOTIFICATIONS_NOTICE_DISMISSED] ?: false,

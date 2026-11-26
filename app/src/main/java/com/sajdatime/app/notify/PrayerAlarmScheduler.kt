@@ -79,6 +79,15 @@ object PrayerAlarmScheduler {
     const val EXTRA_EVENING = "evening"
     internal const val ADHKAR_REMINDER_REQUEST_BASE = 60_000
 
+    /**
+     * The Friday reminder (1.8.0): off until chosen, a quiet notification an hour before Jumu'ah or Dhuhr. Its
+     * own action and codes `70,000 + dayOfYear`, so 70,001 to 70,366. [EXTRA_AT_MILLIS] carries Dhuhr,
+     * [EXTRA_JUMUAH_AT_MILLIS] the user's Jumu'ah time when one is set.
+     */
+    const val ACTION_FRIDAY_REMINDER = "com.sajdatime.app.action.FRIDAY_REMINDER"
+    const val EXTRA_JUMUAH_AT_MILLIS = "jumuah_at"
+    internal const val FRIDAY_REMINDER_REQUEST_BASE = 70_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -172,6 +181,15 @@ object PrayerAlarmScheduler {
             schedule(context, manager, adhkarIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
+        // Same footing again. Planned here, before the prayer reminders, so a heads up before Dhuhr that would
+        // land within 15 minutes of it is dropped below: one notification, never two (brief).
+        val friday = runCatching {
+            FridayReminderPlan.plan(coordinates, settings.calculationPrefs, settings.fridayReminder, settings.jamaah, today, now, zone)
+        }.getOrDefault(emptyList())
+        friday.forEach { reminder ->
+            schedule(context, manager, fridayIntent(context, reminder), reminder.at, asAlarmClock = false)
+        }
+
         val upcoming = upcoming(coordinates, settings, today, now)
 
         // Also before the early return: a reminder is wanted with or without that prayer's alert.
@@ -182,6 +200,7 @@ object PrayerAlarmScheduler {
         runCatching {
             PrayerReminderPlan.plan(upcoming, settings.prayerReminderMinutes, settings.prayerReminderFor, now)
                 .filterNot { it.slot == PrayerSlot.FAJR && it.at in suhoorTimes }
+                .filterNot { it.slot == PrayerSlot.DHUHR && FridayReminderPlan.overlaps(it.at, friday) }
         }.getOrDefault(emptyList()).forEach { reminder ->
             // asAlarmClock = false: a heads up must not become the phone's "next alarm" on the lock
             // screen or end a Do Not Disturb schedule early (independent review, 17 Oct 2026). It
@@ -370,6 +389,7 @@ object PrayerAlarmScheduler {
             cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
             cancelPending(context, manager, ACTION_FAST_REMINDER, fastRequestCode(date))
             listOf(false, true).forEach { cancelPending(context, manager, ACTION_ADHKAR_REMINDER, adhkarRequestCode(date, it)) }
+            cancelPending(context, manager, ACTION_FRIDAY_REMINDER, fridayRequestCode(date))
         }
     }
 
@@ -445,6 +465,19 @@ object PrayerAlarmScheduler {
         )
     }
 
+    private fun fridayIntent(context: Context, reminder: FridayReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_FRIDAY_REMINDER)
+            .putExtra(EXTRA_AT_MILLIS, reminder.dhuhrAt.toEpochMilli())
+        reminder.jumuahAt?.let { intent.putExtra(EXTRA_JUMUAH_AT_MILLIS, it.toEpochMilli()) }
+        return PendingIntent.getBroadcast(
+            context,
+            fridayRequestCode(reminder.date),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     private fun prayerReminderIntent(context: Context, reminder: PrayerReminder): PendingIntent {
         val date = reminder.prayerAt.atZone(ZoneId.systemDefault()).toLocalDate()
         val intent = Intent(context, PrayerAlarmReceiver::class.java)
@@ -488,4 +521,8 @@ object PrayerAlarmScheduler {
     /** Stable per (day, morning or evening), in its own range. */
     internal fun adhkarRequestCode(date: LocalDate, evening: Boolean): Int =
         ADHKAR_REMINDER_REQUEST_BASE + date.dayOfYear * 2 + if (evening) 1 else 0
+
+    /** Stable per Friday, in its own range. */
+    internal fun fridayRequestCode(date: LocalDate): Int =
+        FRIDAY_REMINDER_REQUEST_BASE + date.dayOfYear
 }

@@ -267,6 +267,19 @@ internal fun shouldPostAdhkarReminder(settings: AppSettings, endsAt: Instant, no
     settings.adhkarReminder && now.isBefore(endsAt)
 
 /**
+ * Whether an arriving Friday reminder should still be shown: switched off since, not Friday any more where the
+ * phone is now (it travelled across the date line), or arriving once the time it names has begun, is silence.
+ */
+internal fun shouldPostFridayReminder(
+    settings: AppSettings,
+    namedAt: Instant,
+    now: Instant,
+    zone: ZoneId = ZoneId.systemDefault(),
+): Boolean = settings.fridayReminder &&
+    now.atZone(zone).dayOfWeek == java.time.DayOfWeek.FRIDAY &&
+    now.isBefore(namedAt)
+
+/**
  * Whether an arriving fast reminder should still be shown, on the settings of the moment it fires:
  * not Sunni, or that kind switched off, or the day no longer a fast on the calendar they use now, is
  * silence. So is arriving on the wrong day: "Tomorrow is a fast" is only true on the evening before.
