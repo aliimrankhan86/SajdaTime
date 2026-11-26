@@ -6185,7 +6185,19 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 26 Nov 2026, 18:15: 1.8.0 MERGED, signed bundle built, Play draft ready; waiting for Ali to attach the bundle and press Send for review (1.7.1 is live)
+### 📍 STATE OF PLAY, 26 Nov 2026, 18:15: 1.8.0 SUBMITTED, in Google's review; NOT live yet (1.7.1 is live)
+
+- **Submitted:** Ali uploaded the signed bundle 13 / 1.8.0 into the draft "13 (1.8.0)" and pressed Submit 7 changes for review in
+  Publishing overview (the release, full rollout, plus the full description in six languages) on 26 Nov 2026, about 18:14 UK.
+  The page then read "Changes in review", quick checks up to 15 minutes, then Google's review (up to 9 days has been seen).
+  Release preview before Save: 12,527 phones and 6,912 tablets supported, none lost; 4.7 MB for new installs; only warning
+  the usual "no debug symbols". Phone only; the watch stays 1003 / 1.7.0.
+- **Next (Claude, unasked):** when the public Play page, signed out, says "Updated on" later than 24 Nov 2026, record 1.8.0
+  live (HANDOVER, PROJECT_BRIEF, GBrain), then the CLAUDE.md "After every release" clean up: delete `claude/1-8-0` local and
+  on GitHub, `~/Developer/SajdaTime/SajdaTime-1.8.0/`, `build/release-1.8.0*`, `build/review-1.8.0/`. Nothing pending for Ali.
+- Everything below in this block is how it got here (26 Nov, before the submit).
+
+#### Before the submit (26 Nov 2026, 18:15)
 
 - **Merged:** Ali merged PR #24 into `main` (ab68ad4) on 26 Nov 2026, 17:53 UTC. Then on `main`: privacy page dated
   26 November 2026 with `set-release-date.sh` (1.8.0 changed the page: it names the shared picture), and
@@ -6199,7 +6211,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   id, tr-TR, ur (6 of 6). Default store listing: full description replaced with the 1.8.0 text in the same six languages, each
   saved and read back, then saved to Publishing overview ("Changes ready to send for review"; AI declaration left at
   "Don't label assets"). **Nothing is sent.** Short description, title and pictures untouched.
-- **Next (whose job):** Ali: (1) Production, open draft "13 (1.8.0)", drag in `app-release.aab` from `SajdaTime-1.8.0/` (the
+- **Was next, now DONE (see the top of this block):** Ali: (1) Production, open draft "13 (1.8.0)", drag in `app-release.aab` from `SajdaTime-1.8.0/` (the
   browser tool cannot upload a bundle), Next, Save; (2) Publishing overview, Send changes for review. Then Claude: watch the
   public Play page signed out for "Updated on" moving; when live, the CLAUDE.md "After every release" clean up (delete
   `claude/1-8-0` local and on GitHub, `SajdaTime-1.8.0/`, `build/release-1.8.0*`, `build/review-1.8.0/`).

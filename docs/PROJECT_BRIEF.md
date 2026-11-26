@@ -1,12 +1,12 @@
-# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 MERGED into `main`; Play draft ready, waiting for Ali to attach the bundle and Send for review)
+# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 SUBMITTED 26 Nov 2026, in Google's review, not live yet)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.8.0 (merged 26 Nov 2026; Play draft ready; Ali attaches the bundle, then presses Send for review)
+## Next release: 1.8.0 (SUBMITTED 26 Nov 2026, in Google's review; nothing pending for Ali)
 - **Where it stands (26 Nov 2026, evening):** Ali merged PR #24. Signed bundle 13 / 1.8.0 built from `main` and checked
   (`~/Developer/SajdaTime/SajdaTime-1.8.0/app-release.aab`). In Play Console: production draft "13 (1.8.0)" with What's new in
-  six languages, and the new full description in six languages saved to Publishing overview. **Nothing sent to Google yet.**
-  Ali's two steps: attach the bundle to the draft (Next, Save), then Send for review in Publishing overview.
+  six languages, and the new full description in six languages. Ali uploaded the bundle and pressed Submit 7 changes for
+  review (about 18:14 UK). Live when the public Play page's "Updated on" moves past 24 Nov 2026.
 - **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
   - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
     sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,
