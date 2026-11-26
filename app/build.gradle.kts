@@ -72,8 +72,11 @@ android {
         //
         // 12 / 1.7.1, 24 Nov 2026: the Today widget redrawn (Ali approved the mockup that day). Phone only: :core and :wear did
         // not change, so the watch stays 1003 / 1.7.0 and its bundle is not uploaded.
-        versionCode = 12
-        versionName = "1.7.1"
+        //
+        // 13 / 1.8.0 (set 26 Nov 2026): morning and evening adhkar reminder, Friday reminder with Surah Al-Kahf, share today's
+        // times as a picture (brief build/release-1.8.0.md). Phone only: the watch stays 1003 / 1.7.0 and is not uploaded.
+        versionCode = 13
+        versionName = "1.8.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
