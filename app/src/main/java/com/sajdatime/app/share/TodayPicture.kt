@@ -11,6 +11,7 @@ import android.text.TextPaint
 import android.text.TextUtils
 import android.view.View
 import androidx.core.content.FileProvider
+import androidx.core.graphics.createBitmap
 import com.sajdatime.app.R
 import com.sajdatime.app.data.AppSettings
 import com.sajdatime.app.data.placeName
@@ -57,7 +58,7 @@ object TodayPicture {
     /** [context] must be in the app's language (the activity is): every word and digit comes from it. */
     fun render(context: Context, settings: AppSettings, day: DayPrayerTimes, jumuahAt: Instant?, colours: Colours): Bitmap {
         val rtl = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
-        val bitmap = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(SIZE, SIZE)
         val canvas = Canvas(bitmap)
         canvas.drawColor(colours.page)
 
