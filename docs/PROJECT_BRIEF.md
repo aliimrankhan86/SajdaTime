@@ -1,8 +1,15 @@
-# SajdaTime: project brief (snapshot 24 Nov 2026; 1.7.0 is LIVE; 1.7.1, the Today widget redrawn, is MERGED into main (PR 22) and SUBMITTED on 24 Nov 2026, in Google's review)
+# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1, the Today widget redrawn, is LIVE; 1.8.0 started on `claude/1-8-0`)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.7.1, the Today widget redrawn (built, merged and submitted 24 Nov 2026; in Google's review)
+## Next release: 1.8.0 (started 26 Nov 2026, nothing built yet)
+- **Ali's scope (26 Nov 2026):** a morning and evening adhkar reminder (after Fajr and after Asr, off by default), a Friday reminder
+  an hour before Jumu'ah with Surah Al-Kahf (off by default), and sharing today's times as a picture. Phone only, 13 / 1.8.0.
+- **Dates:** ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027, before the Ramadan freeze (18 Jan to 9 Mar 2027).
+- **Status:** branch `claude/1-8-0` made and the version set. The scheduled build task cannot build or test from its cloud session
+  (no Android tools there), so the features wait for Claude Code on the Mac.
+
+## Last release: 1.7.1, the Today widget redrawn (LIVE: the public Play page says "Updated on 24 Nov 2026", read signed out 26 Nov 2026)
 - **Ali's scope:** "1.7.1 is just improve the widget design. That's it." Phone 12 / 1.7.1; the watch is unchanged and not uploaded.
 - **What changed:** the Today widget matches the mockup Ali approved (light and dark): the date and Hijri date with the town
   chip, a countdown card (ticking clock and "until it begins"), and one list card where the next prayer has a green fill, a bar
@@ -12,9 +19,10 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Store:** nothing in the listing changes except one line of What's new, in the six languages (Ali, 24 Nov 2026).
 - **Checked:** tests and lint green, every widget size measured on the emulator in six languages and nine text sizes, pictures
   judged by the design lead, two independent code reviews. **Not checked:** a real phone and a real home screen.
-- **Status:** submitted by Ali on 24 Nov 2026 (draft 12 (1.7.1), Submit 1 change for review). Nothing for Ali to press. Live when the public Play page's "Updated on" moves past 13 Nov 2026.
+- **Status:** LIVE. Submitted by Ali on 24 Nov 2026; the public Play page showed "Updated on 24 Nov 2026" when read signed out on 26 Nov 2026.
 
 ## What is live on Google Play
+- **Phone 1.7.1 (versionCode 12) is LIVE (checked signed out on 26 Nov 2026):** "Updated on 24 Nov 2026". The watch stays 1003 / 1.7.0. The 1.7.0 lines below are the earlier record.
 - **Phone 1.7.0 (versionCode 11) is LIVE (checked signed out on 23 Nov 2026).** The public page says "Updated on 13 Nov 2026", shows
   five-star 5.0 from 10 reviews, 100+ downloads, six listing languages, and the 1.7.0 What's new (Tasbeeh, Timetable, Qibla hand points
   at the Kaaba, turn and facing add up, calibrate notice). The page shows no version number, so 1.7.0 is read from that text. The

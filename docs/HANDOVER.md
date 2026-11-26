@@ -6133,7 +6133,20 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 24 Nov 2026 evening: 1.7.1 (the Today widget redrawn) MERGED into `main` (PR 22) and SUBMITTED, in Google's review (not live yet)
+### 📍 STATE OF PLAY, 26 Nov 2026: 1.7.1 IS LIVE on Google Play (phone); 1.8.0 started on `claude/1-8-0`
+
+- **1.7.1 live:** the public Play page, read signed out on 26 Nov 2026 at 14:05 UTC (en_GB), says "Updated on 24 Nov 2026", so the
+  redrawn Today widget (12 / 1.7.1) is public. The watch stays 1003 / 1.7.0 (not uploaded with 1.7.1). After release clean up:
+  only `main` was left already and `build/` holds nothing finished, so nothing needed deleting.
+- **1.8.0 (phone 13 / 1.8.0, watch untouched):** scope agreed with Ali on 26 Nov 2026: morning and evening adhkar reminder, Friday
+  reminder with Surah Al-Kahf, share today's times as a picture. Brief `build/release-1.8.0.md`, checklist and resume point
+  `build/release-1.8.0-progress.md` (both local, gitignored). Ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027 (Ramadan
+  freeze 18 Jan to 9 Mar 2027). Branch made, version set; no feature built yet.
+- **Blocked (26 Nov 2026):** the scheduled task "SajdaTime 1.8.0 build" runs in a cloud session whose shell on the Mac is a Linux
+  sandbox with Java 11, no Android SDK, no emulator and no GitHub SSH; Terminal cannot be typed into from there. So it cannot build,
+  test or push. The feature work needs Claude Code on the Mac (see the progress file).
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 24 Nov 2026 evening: 1.7.1 (the Today widget redrawn) MERGED into `main` (PR 22) and SUBMITTED, in Google's review (not live yet)
 
 - **What 1.7.1 is** (Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it."): the Today widget redrawn from the
   mockup he approved ("I like both light and dark"), built from the claude.ai project session's spec (`build/widget-today-redesign.md`,
