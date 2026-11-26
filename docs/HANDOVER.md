@@ -6206,8 +6206,11 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   binned or moved one by one through Claude's Drive connector, only with their whole folder; so keepers were copied
   into new folders through the connector, and new Drive files must be made through it. The rule is now `CLAUDE.md`
   "After every release" steps 5 to 7.
-- **Next:** Ali tells Claude when 1.8.0 is live (his word, 26 Nov 2026; no scheduled live check). Claude then confirms it
-  on the public Play page, signed out ("Updated on" later than 24 Nov 2026), and records 1.8.0 live in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
+- **Next:** a one-off cloud routine, "SajdaTime 1.8.0 live check and close (one run, 10 Dec)" (`trig_01BRUNxRpTPEG5M23ny4CmKa`,
+  10 Dec 2026 10:07 UK), checks the public Play page signed out, records live or "not live yet", re-checks the clean state
+  (only `main`, Drive tidy), pushes, and emails Ali the result (Ali, 26 Nov 2026: "you should clean up regardless in 2 weeks
+  time because I wont remember to inform you"). It cannot reach GBrain, so the next Claude Code session copies its block
+  into GBrain unasked. If a session learns sooner that it is live, it records it in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
   else is left to clean. If Google rejects it: fix on a `claude/` branch from `main`, phone versionCode 14. Nothing pending for Ali.
 - Everything below in this block is how it got here (26 Nov, before the submit).
 
