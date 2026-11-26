@@ -77,10 +77,10 @@ class FridayReminderPlanTest {
 
     @Test fun `the Jumu'ah line is for a Sunni user with a Jumu'ah time, the Dhuhr line for everyone else`() {
         val set = FridayReminderPlan.plan(london, prefs, true, jumuah(13, 15), friday, startOf(friday), zone).single()
-        assertEquals(set.jumuahAt, set.jumuahLineFor(Sect.SUNNI))
-        assertNull(set.jumuahLineFor(Sect.SHIA))
+        assertEquals(set.jumuahAt, FridayReminderPlan.jumuahLine(set.jumuahAt, Sect.SUNNI))
+        assertNull(FridayReminderPlan.jumuahLine(set.jumuahAt, Sect.SHIA))
         val unset = FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, startOf(friday), zone).single()
-        assertNull(unset.jumuahLineFor(Sect.SUNNI))
+        assertNull(FridayReminderPlan.jumuahLine(unset.jumuahAt, Sect.SUNNI))
     }
 
     @Test fun `a heads up before Dhuhr within 15 minutes of it is the one dropped`() {
@@ -98,7 +98,7 @@ class FridayReminderPlanTest {
         assertEquals(0, FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, dhuhr.minus(min(59)), zone).size)
     }
 
-    @Test fun `the receiver drops one switched off, not on Friday, or once the time it names has begun`() {
+    @Test fun `the receiver drops one switched off, not on Friday, or once the prayer it is timed from has begun`() {
         val dhuhr = PrayerEngine.compute(london, friday, prefs)[PrayerSlot.DHUHR]
         val on = AppSettings(fridayReminder = true)
         assertTrue(shouldPostFridayReminder(on, dhuhr, dhuhr.minus(min(60)), zone))

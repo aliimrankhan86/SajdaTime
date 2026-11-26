@@ -33,6 +33,33 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             PrayerAlarmScheduler.ACTION_PRAYER_REMINDER -> onPrayerReminder(context, intent)
             PrayerAlarmScheduler.ACTION_FAST_REMINDER -> onFastReminder(context, intent)
             PrayerAlarmScheduler.ACTION_ADHKAR_REMINDER -> onAdhkarReminder(context, intent)
+            PrayerAlarmScheduler.ACTION_FRIDAY_REMINDER -> onFridayReminder(context, intent)
+        }
+    }
+
+    private fun onFridayReminder(context: Context, intent: Intent) {
+        if (!intent.hasExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS)) return
+        val dhuhrAt = Instant.ofEpochMilli(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_AT_MILLIS, 0L))
+        val jumuahAt = if (intent.hasExtra(PrayerAlarmScheduler.EXTRA_JUMUAH_AT_MILLIS)) {
+            Instant.ofEpochMilli(intent.getLongExtra(PrayerAlarmScheduler.EXTRA_JUMUAH_AT_MILLIS, 0L))
+        } else {
+            null
+        }
+
+        val appContext = context.applicationContext
+        val pendingResult = goAsync()
+
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
+                val settings = SettingsRepository(appContext).current()
+                if (shouldPostFridayReminder(settings, jumuahAt ?: dhuhrAt, Instant.now())) {
+                    Notifications.postFridayReminder(appContext, FridayReminderPlan.jumuahLine(jumuahAt, settings.sect), dhuhrAt)
+                }
+                // Same chain as a prayer, so the next window is laid down while awake.
+                PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
+            } finally {
+                pendingResult.finish()
+            }
         }
     }
 
@@ -268,16 +295,18 @@ internal fun shouldPostAdhkarReminder(settings: AppSettings, endsAt: Instant, no
 
 /**
  * Whether an arriving Friday reminder should still be shown: switched off since, not Friday any more where the
- * phone is now (it travelled across the date line), or arriving once the time it names has begun, is silence.
+ * phone is now (it travelled across the date line), or arriving once the prayer it is timed from ([timedFrom],
+ * the Jumu'ah time when set, else Dhuhr) has begun, is silence. Not the time the line names: a Shia user's line
+ * names Dhuhr, which is before a typed Jumu'ah time, so judging by it would drop every one of theirs.
  */
 internal fun shouldPostFridayReminder(
     settings: AppSettings,
-    namedAt: Instant,
+    timedFrom: Instant,
     now: Instant,
     zone: ZoneId = ZoneId.systemDefault(),
 ): Boolean = settings.fridayReminder &&
     now.atZone(zone).dayOfWeek == java.time.DayOfWeek.FRIDAY &&
-    now.isBefore(namedAt)
+    now.isBefore(timedFrom)
 
 /**
  * Whether an arriving fast reminder should still be shown, on the settings of the moment it fires:

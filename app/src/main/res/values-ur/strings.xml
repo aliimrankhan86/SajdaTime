@@ -631,4 +631,8 @@
     <string name="notif_adhkar_evening">شام کے اذکار</string>
     <string name="notif_adhkar_body">ذکر کے لیے ایک پرسکون لمحہ۔</string>
     <string name="channel_quiet_reminders">اذکار اور جمعہ کی یاددہانیاں</string>
+    <string name="settings_friday">جمعہ کی یاددہانی</string>
+    <string name="settings_friday_desc">جمعہ کو ظہر یا آپ کے جمعہ کے وقت سے ایک گھنٹہ پہلے ایک خاموش اطلاع</string>
+    <string name="notif_friday_jumuah">آج جمعہ %1$s پر ہے۔ سورۃ الکہف پڑھنے کے لیے اچھا دن ہے۔</string>
+    <string name="notif_friday_dhuhr">آج جمعہ ہے۔ ظہر %1$s پر ہے۔ سورۃ الکہف پڑھنے کے لیے اچھا دن ہے۔</string>
 </resources>

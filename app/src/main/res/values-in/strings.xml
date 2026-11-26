@@ -611,4 +611,8 @@
     <string name="notif_adhkar_evening">Dzikir petang</string>
     <string name="notif_adhkar_body">Saat yang tenang untuk berzikir.</string>
     <string name="channel_quiet_reminders">Pengingat dzikir dan Jumat</string>
+    <string name="settings_friday">Pengingat Jumat</string>
+    <string name="settings_friday_desc">Notifikasi tanpa suara setiap Jumat, satu jam sebelum Zuhur atau waktu Jumat Anda</string>
+    <string name="notif_friday_jumuah">Salat Jumat hari ini pukul %1$s. Hari yang baik untuk membaca Surah Al-Kahfi.</string>
+    <string name="notif_friday_dhuhr">Hari ini Jumat. Zuhur pukul %1$s. Hari yang baik untuk membaca Surah Al-Kahfi.</string>
 </resources>

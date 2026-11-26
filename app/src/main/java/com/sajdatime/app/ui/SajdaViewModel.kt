@@ -525,6 +525,9 @@ class SajdaViewModel(application: Application) : AndroidViewModel(application) {
     fun setAdhkarReminder(enabled: Boolean) =
         viewModelScope.launch { settingsRepository.setAdhkarReminder(enabled) }
 
+    fun setFridayReminder(enabled: Boolean) =
+        viewModelScope.launch { settingsRepository.setFridayReminder(enabled) }
+
     fun setThemeChoice(choice: ThemeChoice) =
         viewModelScope.launch { settingsRepository.setThemeChoice(choice) }
 

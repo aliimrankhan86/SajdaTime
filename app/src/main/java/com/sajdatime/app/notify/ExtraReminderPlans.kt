@@ -157,14 +157,7 @@ object AdhkarReminderPlan {
  * The Friday reminder with Surah Al-Kahf (1.8.0). [jumuahAt] is the user's own Jumu'ah time when one is set
  * and inside Dhuhr's window, else null; [dhuhrAt] is Dhuhr as the user sees it.
  */
-data class FridayReminder(val date: LocalDate, val at: Instant, val dhuhrAt: Instant, val jumuahAt: Instant?) {
-    /**
-     * The time the line names as Jumu'ah, or null for the "It's Friday. Dhuhr is at" line. Jumu'ah only for a
-     * Sunni user with a Jumu'ah time typed in: the app never calls a time Jumu'ah that the user did not give it
-     * (the Times screen does the same), and the Jafari line names Dhuhr (brief). Information, never an obligation.
-     */
-    fun jumuahLineFor(sect: Sect): Instant? = jumuahAt.takeIf { sect == Sect.SUNNI }
-}
+data class FridayReminder(val date: LocalDate, val at: Instant, val dhuhrAt: Instant, val jumuahAt: Instant?)
 
 object FridayReminderPlan {
 
@@ -197,6 +190,14 @@ object FridayReminderPlan {
      * (InertReminderSettingsTest), so the heads up before Dhuhr is the one that can collide. The Friday one,
      * which names the time as well, is kept, as the suhoor reminder is kept over Fajr's.
      */
+    /**
+     * The time the line names as Jumu'ah, or null for the "It's Friday. Dhuhr is at" line. Jumu'ah only for a
+     * Sunni user with a Jumu'ah time typed in: the app never calls a time Jumu'ah that the user did not give it
+     * (the Times screen does the same), and the Jafari line names Dhuhr (brief). Information, never an obligation.
+     * Read on the sect of the moment the reminder fires.
+     */
+    fun jumuahLine(jumuahAt: Instant?, sect: Sect): Instant? = jumuahAt.takeIf { sect == Sect.SUNNI }
+
     fun overlaps(at: Instant, friday: List<FridayReminder>): Boolean =
         friday.any { Duration.between(it.at, at).abs() <= MERGE_WITHIN }
 

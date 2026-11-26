@@ -625,4 +625,8 @@
     <string name="notif_adhkar_evening">Akşam zikirleri</string>
     <string name="notif_adhkar_body">Zikir için sakin bir an.</string>
     <string name="channel_quiet_reminders">Zikir ve Cuma hatırlatıcıları</string>
+    <string name="settings_friday">Cuma hatırlatıcısı</string>
+    <string name="settings_friday_desc">Cuma günleri öğle namazından veya Cuma vaktinizden bir saat önce sessiz bir bildirim</string>
+    <string name="notif_friday_jumuah">Bugün Cuma namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
+    <string name="notif_friday_dhuhr">Bugün Cuma. Öğle namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
 </resources>

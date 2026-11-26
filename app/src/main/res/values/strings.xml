@@ -864,4 +864,9 @@
     <string name="notif_adhkar_evening">Evening adhkar</string>
     <string name="notif_adhkar_body">A quiet moment for remembrance.</string>
     <string name="channel_quiet_reminders">Adhkar and Friday reminders</string>
+    <!-- 1.8.0: Friday reminder. Information only: nothing says the prayer is obligatory for everyone. -->
+    <string name="settings_friday">Friday reminder</string>
+    <string name="settings_friday_desc">A quiet notification on Fridays, an hour before Dhuhr or your Jumu\'ah time</string>
+    <string name="notif_friday_jumuah">Jumu\'ah today at %1$s. A good day to read Surah Al-Kahf.</string>
+    <string name="notif_friday_dhuhr">It\'s Friday. Dhuhr is at %1$s. A good day to read Surah Al-Kahf.</string>
 </resources>

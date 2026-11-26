@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
@@ -201,6 +202,7 @@ fun SettingsScreen(
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetFastReminder: (FastKind, Boolean) -> Unit,
     onSetAdhkar: (Boolean) -> Unit,
+    onSetFriday: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
@@ -491,6 +493,16 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_adhkar_desc),
                 checked = settings.adhkarReminder,
                 onCheckedChange = onSetAdhkar,
+            ),
+            // Friday reminder with Surah Al-Kahf (1.8.0): off until chosen, for everyone, the line chosen by
+            // sect when it fires. iPhone: carries over (SF Symbol book).
+            SettingsItem.Toggle(
+                key = "friday",
+                icon = Icons.AutoMirrored.Outlined.MenuBook,
+                title = stringResource(R.string.settings_friday),
+                subtitle = stringResource(R.string.settings_friday_desc),
+                checked = settings.fridayReminder,
+                onCheckedChange = onSetFriday,
             ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.

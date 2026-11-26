@@ -101,6 +101,9 @@ object Notifications {
     /** One slot: the evening's replaces the morning's if it was never read. */
     private const val ID_ADHKAR = 6000
 
+    /** One slot: one Friday's. */
+    private const val ID_FRIDAY = 7000
+
     /** One short buzz for the heads up before a prayer: a nudge, not an alert. */
     private val REMINDER_VIBRATION = longArrayOf(0, 200)
 
@@ -659,6 +662,37 @@ object Notifications {
             .setContentIntent(openTasbeehIntent(context))
 
         post(context, ID_ADHKAR, builder.build())
+    }
+
+    /**
+     * "Jumu'ah today at 1:15 pm. A good day to read Surah Al-Kahf." when [jumuahAt] is given, else "It's
+     * Friday. Dhuhr is at 12:05 pm. ..." Information only: nothing says the prayer is obligatory. Quiet, on the
+     * adhkar channel, never a usage count, no timeout (Friday lasts all day).
+     */
+    fun postFridayReminder(base: Context, jumuahAt: Instant?, dhuhrAt: Instant) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+        ensureQuietChannel(context)
+
+        val body = if (jumuahAt != null) {
+            context.getString(R.string.notif_friday_jumuah, TimeFormat.clock(context, jumuahAt))
+        } else {
+            context.getString(R.string.notif_friday_dhuhr, TimeFormat.clock(context, dhuhrAt))
+        }
+        val builder = NotificationCompat.Builder(context, CHANNEL_QUIET)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.settings_friday))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSound(null)
+            .setVibrate(REMINDER_VIBRATION)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setContentIntent(openAppIntent(context))
+
+        post(context, ID_FRIDAY, builder.build())
     }
 
     private fun ensureQuietChannel(context: Context) {
