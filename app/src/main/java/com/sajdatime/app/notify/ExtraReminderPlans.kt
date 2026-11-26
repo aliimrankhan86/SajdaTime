@@ -117,3 +117,37 @@ object FastReminderPlan {
      */
     private val AFTER_ISHA: Duration = Duration.ofMinutes(10)
 }
+
+/** "Morning adhkar" after Fajr, or "Evening adhkar" after Asr (1.8.0). [endsAt] is sunrise or Maghrib. */
+data class AdhkarReminder(val date: LocalDate, val evening: Boolean, val at: Instant, val endsAt: Instant)
+
+object AdhkarReminderPlan {
+
+    /**
+     * Morning at Fajr + 30 minutes but no later than sunrise - 10; evening at Asr + 30 but no later
+     * than Maghrib - 15 (Ali, 26 Nov 2026). From the times the user sees, adjustments included, today
+     * to two days ahead, still in the future. Never AT Fajr or Asr, when the adhan rings (see
+     * [FastReminderPlan]'s AFTER_ISHA): a window too short to fit one after the prayer begins (a
+     * projected far north day) gets none rather than one that rings with the adhan.
+     */
+    fun plan(coordinates: Coordinates, prefs: CalculationPrefs, enabled: Boolean, today: LocalDate, now: Instant): List<AdhkarReminder> {
+        if (!enabled) return emptyList()
+        return (0L..2L).flatMap { offset ->
+            val date = today.plusDays(offset)
+            val day = PrayerEngine.compute(coordinates, date, prefs)
+            listOfNotNull(
+                one(date, false, day[PrayerSlot.FAJR], day[PrayerSlot.SUNRISE], BEFORE_SUNRISE),
+                one(date, true, day[PrayerSlot.ASR], day[PrayerSlot.MAGHRIB], BEFORE_MAGHRIB),
+            )
+        }.filter { it.at.isAfter(now) }
+    }
+
+    private fun one(date: LocalDate, evening: Boolean, start: Instant, end: Instant, margin: Duration): AdhkarReminder? {
+        val at = minOf(start.plus(AFTER_START), end.minus(margin))
+        return AdhkarReminder(date, evening, at, end).takeIf { at.isAfter(start) }
+    }
+
+    private val AFTER_START: Duration = Duration.ofMinutes(30)
+    private val BEFORE_SUNRISE: Duration = Duration.ofMinutes(10)
+    private val BEFORE_MAGHRIB: Duration = Duration.ofMinutes(15)
+}

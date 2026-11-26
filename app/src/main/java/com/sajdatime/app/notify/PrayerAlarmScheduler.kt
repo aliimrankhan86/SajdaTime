@@ -70,6 +70,15 @@ object PrayerAlarmScheduler {
     const val EXTRA_FAST_REASON = "fast_reason"
     internal const val FAST_REMINDER_REQUEST_BASE = 50_000
 
+    /**
+     * The morning and evening adhkar reminder (1.8.0): off until chosen, a quiet notification. Its own
+     * action and codes `60,000 + dayOfYear * 2 + (1 for evening)`, so 60,002 to 60,733, above every
+     * band before it. [EXTRA_AT_MILLIS] carries the window's end (sunrise or Maghrib).
+     */
+    const val ACTION_ADHKAR_REMINDER = "com.sajdatime.app.action.ADHKAR_REMINDER"
+    const val EXTRA_EVENING = "evening"
+    internal const val ADHKAR_REMINDER_REQUEST_BASE = 60_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -154,6 +163,13 @@ object PrayerAlarmScheduler {
             )
         }.getOrDefault(emptyList()).forEach { reminder ->
             schedule(context, manager, fastIntent(context, reminder), reminder.at, asAlarmClock = false)
+        }
+
+        // Same footing as the fast reminder: before the early return, wrapped, never an alarm clock.
+        runCatching {
+            AdhkarReminderPlan.plan(coordinates, settings.calculationPrefs, settings.adhkarReminder, today, now)
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, adhkarIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
         val upcoming = upcoming(coordinates, settings, today, now)
@@ -353,6 +369,7 @@ object PrayerAlarmScheduler {
             }
             cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
             cancelPending(context, manager, ACTION_FAST_REMINDER, fastRequestCode(date))
+            listOf(false, true).forEach { cancelPending(context, manager, ACTION_ADHKAR_REMINDER, adhkarRequestCode(date, it)) }
         }
     }
 
@@ -415,6 +432,19 @@ object PrayerAlarmScheduler {
         )
     }
 
+    private fun adhkarIntent(context: Context, reminder: AdhkarReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_ADHKAR_REMINDER)
+            .putExtra(EXTRA_AT_MILLIS, reminder.endsAt.toEpochMilli())
+            .putExtra(EXTRA_EVENING, reminder.evening)
+        return PendingIntent.getBroadcast(
+            context,
+            adhkarRequestCode(reminder.date, reminder.evening),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     private fun prayerReminderIntent(context: Context, reminder: PrayerReminder): PendingIntent {
         val date = reminder.prayerAt.atZone(ZoneId.systemDefault()).toLocalDate()
         val intent = Intent(context, PrayerAlarmReceiver::class.java)
@@ -454,4 +484,8 @@ object PrayerAlarmScheduler {
     /** Stable per evening the reminder rings on, in its own range. */
     internal fun fastRequestCode(eve: LocalDate): Int =
         FAST_REMINDER_REQUEST_BASE + eve.dayOfYear
+
+    /** Stable per (day, morning or evening), in its own range. */
+    internal fun adhkarRequestCode(date: LocalDate, evening: Boolean): Int =
+        ADHKAR_REMINDER_REQUEST_BASE + date.dayOfYear * 2 + if (evening) 1 else 0
 }

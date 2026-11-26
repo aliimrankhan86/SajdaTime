@@ -237,6 +237,13 @@ internal fun shouldPostPrayerReminder(
 }
 
 /**
+ * Whether an arriving adhkar reminder should still be shown: switched off since, or arriving after its
+ * window has closed ([endsAt], sunrise or Maghrib, after a long Doze or a phone that was off), is silence.
+ */
+internal fun shouldPostAdhkarReminder(settings: AppSettings, endsAt: Instant, now: Instant): Boolean =
+    settings.adhkarReminder && now.isBefore(endsAt)
+
+/**
  * Whether an arriving fast reminder should still be shown, on the settings of the moment it fires:
  * not Sunni, or that kind switched off, or the day no longer a fast on the calendar they use now, is
  * silence. So is arriving on the wrong day: "Tomorrow is a fast" is only true on the evening before.
