@@ -42,7 +42,7 @@ Written 24 Nov 2026 after release 1.7.0 and the 1.7.1 widget redesign; release d
 3. Store listings, Edit default listing: replace the full description language by language ("Next language"), Save as draft each, read each back. Then Next, leave the AI declaration on "Don't label assets", Save. Only that Save puts it in Publishing overview.
 4. Ali drags the `.aab` into the draft (the browser tool cannot upload a bundle). Claude presses Next, checks the preview (devices lost must be 0; "no debug symbols" is the usual only warning), Save.
 5. Publishing overview lists every change (1.8.0: 7 = the release plus six descriptions). Ali presses Submit. It reads "Changes in review".
-6. Records (HANDOVER §11, PROJECT_BRIEF, AI-START-HERE §2, AI-WORKER-BRIEF §2, GBrain), then the clean up; then watch the public page.
+6. Records (HANDOVER §11, PROJECT_BRIEF, AI-START-HERE §2, AI-WORKER-BRIEF §2, GBrain), then the clean up in `CLAUDE.md` "After every release" (branches, local files, AI notes, Google Drive, GBrain); then watch the public page.
 
 ## Example: 1.8.0 (26 Nov 2026)
 Three features in one release (adhkar reminder, Friday reminder, share today's times as a picture). Brief and checklist in build/ written by the project session, built item by item in Claude Code on branch `claude/1-8-0`, versionCode 13 / 1.8.0, watch untouched at 1003 / 1.7.0, Play draft "13 (1.8.0)" with What's new and the full description in six languages.

@@ -40,7 +40,7 @@ Every other branch was deleted on 30 Oct 2026 at Ali's word ("delete the old bra
 all of them were already wholly inside `claude/1-6-0`, except two dropped on purpose, kept as tags
 `archive/analytics-default-on-1-4-0` and `archive/customer-review-pain-points-9d35kl`. DeepSeek's picture record of the
 design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then remove it"), kept as tag
-`archive/ds-deviations-record`: the deviations themselves are listed in `docs/design-system/03-components.md` §3.6. Tag `v1.5.0` is old (it marks 1.5.0, not what is live now); releases since are not tagged, the public Play page is the record.
+`archive/ds-deviations-record`: the deviations themselves are listed in `03-components.md` (Drive "SajdaTime (private)" > 01 Design system) §3.6. Tag `v1.5.0` is old (it marks 1.5.0, not what is live now); releases since are not tagged, the public Play page is the record.
 
 Version numbers: phone 1.8.0 / versionCode 13 on `main` (the watch stays 1.7.0 / 1003: `:core` and `:wear` did not change); the next phone release is versionCode 14. Release steps for any release: bump the phone versionCode (and the watch only if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (`set-release-date.sh` on release day; 1.8.0 did it on 26 Nov 2026). The release script is `docs/release-tools/release-<version>.sh`, copied from the last one (`release-1.8.0.sh` now). Ali presses every merge, submit and publish button.
 
@@ -49,11 +49,11 @@ Version numbers: phone 1.8.0 / versionCode 13 on `main` (the watch stays 1.7.0 /
 1. `CLAUDE.md`: the hard rules. Several are owner decisions that must never be reversed.
 2. `docs/HANDOVER.md` section 11, **the first 📍 block only**: what is true now, what is left, whose job it is.
    Everything below that block is dated history: reasoning, not tasks. Do not invent work from it.
-3. `docs/design-system/README.md`, then the page it points to for your job (section 5 below).
+3. `README.md` (Drive "SajdaTime (private)" > 01 Design system), then the page it points to for your job (section 5 below).
 4. A helper model (DeepSeek or similar): `docs/AI-WORKER-BRIEF.md`, which sets your limits. Never
    translations, user facing words, alarms, widgets, usage counts, privacy, signing, calculations, data
    logic or design, even with a spec.
-5. For a specific feature: `docs/design-system/05-screens-and-features.md`, then the code it names.
+5. For a specific feature: `05-screens-and-features.md` (Drive "SajdaTime (private)" > 01 Design system), then the code it names.
 
 ## 4. The app in one screen
 
@@ -75,7 +75,7 @@ calculations in `core/` (plain Kotlin, portable to iPhone); watch in `wear/`.
   notifications, Ramadan card and timetable, the Wear OS app and tile.
 
 Languages: English, Urdu, Turkish, Indonesian (`values-in`), Arabic, Bengali (30 Oct 2026). Urdu and Arabic are right
-to left. Adding one: the checklist in `docs/design-system/06-content-and-language.md` §6.6; the tests find a new
+to left. Adding one: the checklist in `06-content-and-language.md` (Drive "SajdaTime (private)" > 01 Design system) §6.6; the tests find a new
 `values-<lang>/` folder on disk and fail until it is registered. Text held to one line shrinks to fit (`shrinkToFit`).
 
 Not in 1.6, do not build without Ali: the jama'ah reminder (dropped, 2 Nov 2026: mosque times are not reliable). Sunnah fast reminders ARE in 1.6.0 since 2 Nov 2026 (HANDOVER 5.41); their old note, kept as history: (1.6.1, logic built and
@@ -84,7 +84,7 @@ anything that sells or nags.
 
 ## 5. The design system (added 25 Oct 2026)
 
-`docs/design-system/` is the reference for anything a user sees.
+The design system pages (Google Drive, "SajdaTime (private)" > 01 Design system; the token JSON is in `docs/design-system/tokens/`) are the reference for anything a user sees.
 
 | Page | Use it for |
 |---|---|
@@ -108,7 +108,7 @@ How it stays true:
   watch colour, gap, duration or type style differs between the code and `tokens/`, if any hex quoted in a
   page is not a token, or if a phone UI file is not named in the pages.
 - So: change a value in `app/src/main/java/com/sajdatime/app/ui/theme/` **and** the token JSON in the same
-  commit, and add a line to `docs/design-system/CHANGELOG.md`. Add a UI file → describe it in the right page
+  commit, and add a line to `CHANGELOG.md` (Drive "SajdaTime (private)" > 01 Design system). Add a UI file → describe it in the right page
   and add it to the README code map. Add a colour pair → add it to `ColorContrastTest`.
 - **Never invent a value.** A new colour, size, gap or timing is a design decision for Ali.
 - `docs/DESIGN_SYSTEM.md` still owns Ali's rules (§0, read before any visual change), the **button inventory**
@@ -169,7 +169,7 @@ Platform:
 
 - Unit test counts on 30 Oct 2026: **app 338, core 238 (1 skipped), wear 27**. If you add tests, update
   `EXPECTED_COUNTS` in `docs/release-tools/release-1.7.0.sh` and the counts in `docs/AI-WORKER-BRIEF.md`.
-- Run the checks in `docs/design-system/10-new-feature-playbook.md` §6 and paste the counts. Never write
+- Run the checks in `10-new-feature-playbook.md` (Drive "SajdaTime (private)" > 01 Design system) §6 and paste the counts. Never write
   "done", "every" or "all" without them.
 - Any visual change: screenshots in light, dark, 2x text and Urdu, shown to Ali with the install command and
   the commit he should see. He decides.

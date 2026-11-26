@@ -65,7 +65,7 @@ Docs you will meet:
 | `docs/PROJECT_BRIEF.md` | one plain page for Ali |
 | `docs/DESIGN_SYSTEM.md` | the visual rules ("Quiet Glass"); §4.1 lists every button in the app |
 | `docs/privacy.html` | the published privacy policy, a promise to users |
-| the Google Drive folder "SajdaTime (private)" > 03 Plans and decisions (the plans left the repo on 4 Nov 2026; file names there are prefixed with the plan folder, for example 2026-10-release-1.6.0-PILLARS-STUDY.md) | the 1.6 plans and step designs |
+| the Google Drive folder "SajdaTime (private)" (`00 READ ME FIRST.md` first) | the design system pages (01), the design references Ali gave (02), licences and research (03); nothing else |
 | `docs/store/` | Play listing text and store pictures |
 | `.claude/agents/*.md` | Claude's own helper roles (yours sits beside `mechanic` and `implementer`) |
 
@@ -83,7 +83,7 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 **Read `docs/AI-START-HERE.md` first** (the full briefing for any AI).
 
 **Which branch:** cut your branch from `main` (it holds 1.8.0, in Google's review; 1.7.1 is live until it passes). It is
-the only branch. Read `docs/design-system/README.md` before anything visual.
+the only branch. Read `README.md` (Drive "SajdaTime (private)" > 01 Design system) before anything visual.
 
 Full gate (12 Nov 2026, release 1.7.0): app 365 tests, core 269 (1 skipped), wear 27, 0 failures. A change that
 adds tests moves these numbers; `docs/release-tools/release-1.7.0.sh` holds them in `EXPECTED_COUNTS`.

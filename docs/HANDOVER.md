@@ -6198,6 +6198,14 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   build log; every decision is in 5.43 to 5.45), `build/review-1.8.0/` (32 review pictures, findings recorded in words), and
   the Gradle outputs (`app|core|wear/build`, `.gradle`). Kept: `build/review-replies/` (the weekly review replies job writes
   there), `.codex/` (Codex's copy of the agent roles, recreated by that tool after the 13 Nov clean up).
+- **Google Drive trimmed the same evening** (Ali: "google drive folder shouldn't be heavy and populated so keep it accurate
+  and optimised"): about 156 files became 23 in three folders: `01 Design system` (the pages' only copy, CHANGELOG now
+  has 1.7.1 and 1.8.0), `02 Design references Ali gave` (the 1.6.0 inputs `ux-lead` and `plan-verifier` read),
+  `03 Licences and research`. Binned (30 days): the 4 Nov snapshots of repo files, 1.6.0 and 1.7.0 plans, prompts and
+  logs, and research and translation reviews that are also in the repo. Lesson: files uploaded by other tools cannot be
+  binned or moved one by one through Claude's Drive connector, only with their whole folder; so keepers were copied
+  into new folders through the connector, and new Drive files must be made through it. The rule is now `CLAUDE.md`
+  "After every release" steps 5 to 7.
 - **Next (Claude, unasked):** when the public Play page, signed out, says "Updated on" later than 24 Nov 2026, record 1.8.0
   live in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
   else is left to clean. If Google rejects it: fix on a `claude/` branch from `main`, phone versionCode 14. Nothing pending for Ali.
