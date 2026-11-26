@@ -6209,11 +6209,11 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 - **Next:** a one-off cloud routine, "SajdaTime 1.8.0 live check and close (one run, 10 Dec)" (`trig_01BRUNxRpTPEG5M23ny4CmKa`,
   10 Dec 2026 10:07 UK), checks the public Play page signed out, records live or "not live yet", re-checks the clean state
   (only `main`, Drive tidy), pushes, and emails Ali the result (Ali, 26 Nov 2026: "you should clean up regardless in 2 weeks
-  time because I wont remember to inform you"). The email ends by asking him (his request: "Ask me on that day after the
-  email is fired so I can inform you") to paste one line into Claude Code on the Mac: **"10 Dec check email received: 1.8.0
-  is live / not live yet. Please finish closing 1.8.0 from HANDOVER section 11."** When that line arrives: `git pull`, read
-  the routine's new block here, copy it into GBrain (`projects/sajdatime`, `projects/index` row), do anything the email
-  flagged (a pull request to merge is Ali's press; a Play Console picture if not live), then tell him it is closed. If a session learns sooner that it is live, it records it in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
+  time because I wont remember to inform you"). The email is information only: Ali, 26 Nov 2026, "I am away from computer so you can do it yourself", so it asks him
+  for nothing unless a pull request needs his Merge. GBrain cannot be reached from the cloud: the next Claude Code session
+  on the Mac, for whatever reason it starts, compares GBrain with this section and updates `projects/sajdatime` and the
+  `projects/index` row itself (CLAUDE.md Memory rule), merges a records-only pull request the routine may have opened,
+  and if 1.8.0 is still not live looks read only at Play Console, Publishing overview. If a session learns sooner that it is live, it records it in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
   else is left to clean. If Google rejects it: fix on a `claude/` branch from `main`, phone versionCode 14. Nothing pending for Ali.
 - Everything below in this block is how it got here (26 Nov, before the submit).
 
