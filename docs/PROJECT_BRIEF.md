@@ -1,8 +1,12 @@
-# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 BUILT and tested on `claude/1-8-0`, waiting for Ali's Merge)
+# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 MERGED into `main`; Play draft ready, waiting for Ali to attach the bundle and Send for review)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.8.0 (built 26 Nov 2026, PR #24 open; Ali presses Merge, then Send for review)
+## Next release: 1.8.0 (merged 26 Nov 2026; Play draft ready; Ali attaches the bundle, then presses Send for review)
+- **Where it stands (26 Nov 2026, evening):** Ali merged PR #24. Signed bundle 13 / 1.8.0 built from `main` and checked
+  (`~/Developer/SajdaTime/SajdaTime-1.8.0/app-release.aab`). In Play Console: production draft "13 (1.8.0)" with What's new in
+  six languages, and the new full description in six languages saved to Publishing overview. **Nothing sent to Google yet.**
+  Ali's two steps: attach the bundle to the draft (Next, Save), then Send for review in Publishing overview.
 - **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
   - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
     sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,
@@ -13,7 +17,7 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
   - **Share today's times as a picture**, from the Timetable, beside Save as PDF: a square picture with the town, both dates,
     the six times, the method and school (shows Sunni or Shia; the privacy page says so) and "SajdaTime. Free, no ads. On Google Play". Nothing is sent until you press Share.
 - **Store text:** Ali chose "Tighten wording" (26 Nov 2026): every feature kept, the three added, the methods line names six
-  methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted on release day.
+  methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted into Play Console on 26 Nov 2026.
 - **Checked:** full gate green on the final code; new and touched device tests green; every reminder fired on the emulator with the clock moved
   (English and Arabic); pictures in light, dark, 2x text, Arabic, Urdu, Bengali and a long town name; an independent code review
   (its fixes are in), the design lead's picture review (its fixes are in) and a second code review (its fixes are in). **Not checked:** a real phone.

@@ -73,8 +73,8 @@ EOF
   # Gate counts at 25 Oct 2026 (core 238 tests, 1 of them skipped; app 335 since DesignTokensTest added 12; wear 27). Update with the code.
   # 12 Nov 2026: app 354, core 266 (tasbeeh, Timetable list, Qibla geometry added), wear 27.
   # 24 Nov 2026 (1.7.1): app 367 (WidgetStateTest gained the Today rows test), core 276, wear 27.
-  # 26 Nov 2026 (1.8.0): counts not pinned in advance, the gate line reports CHECK with the real numbers.
-  EXPECTED_COUNTS="app 367 tests 0 failed, core 276 tests 0 failed, wear 27 tests 0 failed"
+  # 26 Nov 2026 (1.8.0): app 385 (adhkar, Friday and picture tests), core 276, wear 27.
+  EXPECTED_COUNTS="app 385 tests 0 failed, core 276 tests 0 failed, wear 27 tests 0 failed"
   if [ "$COUNTS" = "$EXPECTED_COUNTS" ]; then result gate "PASS ($COUNTS; lint: ${LINT%, })"
   else result gate "CHECK (counts are $COUNTS, expected $EXPECTED_COUNTS; lint: ${LINT%, })"; fi
   GATE=pass

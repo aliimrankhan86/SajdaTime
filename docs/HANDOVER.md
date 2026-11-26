@@ -6185,7 +6185,28 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
 > got here. Read the first block. Everything after the HISTORY marker is evidence and reasoning,
 > not instructions.**
 
-### 📍 STATE OF PLAY, 26 Nov 2026 evening: 1.8.0 BUILT and tested, PR #24 open, waiting for Ali's Merge (1.7.1 is live)
+### 📍 STATE OF PLAY, 26 Nov 2026, 18:15: 1.8.0 MERGED, signed bundle built, Play draft ready; waiting for Ali to attach the bundle and press Send for review (1.7.1 is live)
+
+- **Merged:** Ali merged PR #24 into `main` (ab68ad4) on 26 Nov 2026, 17:53 UTC. Then on `main`: privacy page dated
+  26 November 2026 with `set-release-date.sh` (1.8.0 changed the page: it names the shared picture), and
+  `docs/release-tools/release-1.8.0.sh` (88057b4).
+- **Release run** (`release-1.8.0.sh` on 88057b4, which is the pushed `main`): gate green (app 385, core 276, wear 27 tests,
+  0 failed; lint 0 errors), phone bundle signed by Ali's key, 13 / 1.8.0, 8,957,573 bytes, sha256 `c1738972...42c99ba`, in
+  `~/Developer/SajdaTime/SajdaTime-1.8.0/` (gitignored); English-only phone gets all six languages; permissions unchanged (twelve);
+  size within 300 KB of 1.7.1. Watch 1003 / 1.7.0 built as a check only, not uploaded. The script has no emulator step on
+  purpose: Ali's "test only what is new" (the new and touched device tests ran green on `claude/1-8-0`, whose tree is `main`'s).
+- **Play Console (Claude in Chrome, 26 Nov 2026):** production draft "13 (1.8.0)" saved with What's new in en-GB, ar, bn-BD,
+  id, tr-TR, ur (6 of 6). Default store listing: full description replaced with the 1.8.0 text in the same six languages, each
+  saved and read back, then saved to Publishing overview ("Changes ready to send for review"; AI declaration left at
+  "Don't label assets"). **Nothing is sent.** Short description, title and pictures untouched.
+- **Next (whose job):** Ali: (1) Production, open draft "13 (1.8.0)", drag in `app-release.aab` from `SajdaTime-1.8.0/` (the
+  browser tool cannot upload a bundle), Next, Save; (2) Publishing overview, Send changes for review. Then Claude: watch the
+  public Play page signed out for "Updated on" moving; when live, the CLAUDE.md "After every release" clean up (delete
+  `claude/1-8-0` local and on GitHub, `SajdaTime-1.8.0/`, `build/release-1.8.0*`, `build/review-1.8.0/`).
+- **Not checked:** a real phone (One UI, HyperOS delivery of the new reminders); the picture's draw time on a real phone.
+- **Found, not 1.8.0:** the Timetable day cards in Urdu print "AM 5:37" (meridiem first). Pre-existing; for a later release.
+
+### 📍 (history, the block above is newer) STATE OF PLAY, 26 Nov 2026 evening: 1.8.0 BUILT and tested, PR #24 open, waiting for Ali's Merge (1.7.1 is live)
 
 - **What 1.8.0 is (phone 13 / 1.8.0, watch untouched):** morning and evening adhkar reminder (5.43), Friday reminder with Surah
   Al-Kahf (5.44), share today's times as a picture (5.45). Built in Claude Code on the Mac on 26 Nov 2026, item by item, each
