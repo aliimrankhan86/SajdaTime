@@ -620,7 +620,7 @@
     <string name="tasbeeh_total">Toplam: %1$d</string>
     <string name="tasbeeh_state">%1$d / %2$d</string>
     <string name="settings_adhkar">Sabah ve akşam zikirleri</string>
-    <string name="settings_adhkar_desc">Sabah ve İkindi namazlarından sonra sessiz bir bildirim</string>
+    <string name="settings_adhkar_desc">Sabah ve ikindi namazlarından sonra sessiz bir bildirim</string>
     <string name="notif_adhkar_morning">Sabah zikirleri</string>
     <string name="notif_adhkar_evening">Akşam zikirleri</string>
     <string name="notif_adhkar_body">Zikir için sakin bir an.</string>
@@ -634,4 +634,5 @@
     <string name="action_share">Paylaş</string>
     <string name="share_picture_footer">SajdaTime. Ücretsiz, reklamsız. Google Play\'de</string>
     <string name="share_picture_a11y">%1$s için bugünün namaz vakitlerini gösteren resim</string>
+    <string name="share_picture_failed">Resim paylaşılamadı. Lütfen tekrar deneyin.</string>
 </resources>

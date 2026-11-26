@@ -30,8 +30,10 @@ class ScreenSeedDeviceTest {
     fun seed_london_and_skip_the_first_run_screens() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val repository = SettingsRepository(context)
+        // `-e city <name>` keeps London's position under another name, for the long name checks (1.8.0 share picture).
+        val city = InstrumentationRegistry.getArguments().getString("city") ?: "London"
         runBlocking {
-            repository.setLocation(Coordinates(51.5074, -0.1278), "London")
+            repository.setLocation(Coordinates(51.5074, -0.1278), city)
             repository.completeOnboarding()
             // Answer the usage counts question with No, as a person who tapped "No thanks" would have. Without
             // this the question sits on top of every screenshot. Nothing is sent: No only records the answer.
@@ -39,7 +41,7 @@ class ScreenSeedDeviceTest {
             // The seed leaves the method on Automatic, which would show the loud "Does this match your
             // mosque?" notice; dismissing it gives the quiet door every store picture shows.
             repository.dismissMethodNotice()
-            assertEquals("London", repository.current().cityName)
+            assertEquals(city, repository.current().cityName)
             assertTrue(repository.current().analyticsAnswered)
         }
     }

@@ -655,8 +655,8 @@
     <string name="notif_adhkar_morning">সকালের জিকির</string>
     <string name="notif_adhkar_evening">সন্ধ্যার জিকির</string>
     <string name="notif_adhkar_body">জিকিরের জন্য একটি শান্ত মুহূর্ত।</string>
-    <string name="channel_quiet_reminders">জিকির ও জুমার রিমাইন্ডার</string>
-    <string name="settings_friday">জুমার রিমাইন্ডার</string>
+    <string name="channel_quiet_reminders">জিকির ও শুক্রবারের রিমাইন্ডার</string>
+    <string name="settings_friday">শুক্রবারের রিমাইন্ডার</string>
     <string name="settings_friday_desc">শুক্রবারে যোহর বা আপনার জুমার সময়ের এক ঘণ্টা আগে একটি শান্ত নোটিফিকেশন</string>
     <string name="notif_friday_jumuah">আজ জুমা %1$s। সূরা কাহফ পড়ার জন্য একটি ভালো দিন।</string>
     <string name="notif_friday_dhuhr">আজ শুক্রবার। যোহর %1$s। সূরা কাহফ পড়ার জন্য একটি ভালো দিন।</string>
@@ -665,4 +665,5 @@
     <string name="action_share">শেয়ার করুন</string>
     <string name="share_picture_footer">SajdaTime। বিনামূল্যে, কোনো বিজ্ঞাপন নেই। Google Play তে</string>
     <string name="share_picture_a11y">%1$s এর আজকের নামাজের সময়ের ছবি</string>
+    <string name="share_picture_failed">ছবি শেয়ার করা যায়নি। আবার চেষ্টা করুন।</string>
 </resources>

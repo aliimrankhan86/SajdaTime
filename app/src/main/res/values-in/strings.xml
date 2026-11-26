@@ -609,7 +609,7 @@
     <string name="settings_adhkar_desc">Notifikasi tanpa suara setelah Subuh dan setelah Asar</string>
     <string name="notif_adhkar_morning">Dzikir pagi</string>
     <string name="notif_adhkar_evening">Dzikir petang</string>
-    <string name="notif_adhkar_body">Saat yang tenang untuk berzikir.</string>
+    <string name="notif_adhkar_body">Saat yang tenang untuk berdzikir.</string>
     <string name="channel_quiet_reminders">Pengingat dzikir dan Jumat</string>
     <string name="settings_friday">Pengingat Jumat</string>
     <string name="settings_friday_desc">Notifikasi tanpa suara setiap Jumat, satu jam sebelum Zuhur atau waktu Jumat Anda</string>
@@ -620,4 +620,5 @@
     <string name="action_share">Bagikan</string>
     <string name="share_picture_footer">SajdaTime. Gratis, tanpa iklan. Di Google Play</string>
     <string name="share_picture_a11y">Gambar waktu salat hari ini untuk %1$s</string>
+    <string name="share_picture_failed">Gambar tidak dapat dibagikan. Silakan coba lagi.</string>
 </resources>

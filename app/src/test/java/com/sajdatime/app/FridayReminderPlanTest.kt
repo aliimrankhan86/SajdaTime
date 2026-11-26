@@ -34,7 +34,7 @@ class FridayReminderPlanTest {
     private fun jumuah(h: Int, m: Int, zoneId: String = zone.id) = JamaahTimes(jumuah = LocalTime.of(h, m), zoneId = zoneId)
 
     @Test fun `with no Jumu'ah time it is an hour before Dhuhr, on Fridays only`() {
-        val plan = FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), thursday, startOf(thursday), zone)
+        val plan = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, JamaahTimes(), thursday, startOf(thursday), zone)
         val r = plan.single()
         assertEquals(friday, r.date)
         val dhuhr = PrayerEngine.compute(london, friday, prefs)[PrayerSlot.DHUHR]
@@ -42,11 +42,11 @@ class FridayReminderPlanTest {
         assertEquals(dhuhr, r.dhuhrAt)
         assertNull(r.jumuahAt)
         // A week with no Friday inside the three days planned gets nothing.
-        assertEquals(0, FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday.plusDays(1), startOf(friday.plusDays(1)), zone).size)
+        assertEquals(0, FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, JamaahTimes(), friday.plusDays(1), startOf(friday.plusDays(1)), zone).size)
     }
 
     @Test fun `with a Jumu'ah time it is an hour before that`() {
-        val r = FridayReminderPlan.plan(london, prefs, true, jumuah(13, 15), friday, startOf(friday), zone).single()
+        val r = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, jumuah(13, 15), friday, startOf(friday), zone).single()
         assertEquals(friday.atTime(13, 15).atZone(zone).toInstant(), r.jumuahAt)
         assertEquals(friday.atTime(12, 15).atZone(zone).toInstant(), r.at)
     }
@@ -54,7 +54,7 @@ class FridayReminderPlanTest {
     @Test fun `a Jumu'ah time outside Dhuhr's window, or typed in another time zone, falls back to Dhuhr`() {
         val dhuhr = PrayerEngine.compute(london, friday, prefs)[PrayerSlot.DHUHR]
         for (j in listOf(jumuah(11, 0), jumuah(13, 15, "Asia/Karachi"))) {
-            val r = FridayReminderPlan.plan(london, prefs, true, j, friday, startOf(friday), zone).single()
+            val r = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, j, friday, startOf(friday), zone).single()
             assertNull("$j", r.jumuahAt)
             assertEquals("$j", dhuhr.minus(min(60)), r.at)
         }
@@ -62,40 +62,35 @@ class FridayReminderPlanTest {
 
     @Test fun `mosque adjustments move Dhuhr and the reminder with it`() {
         val adjusted = prefs.copy(adjustments = mapOf(PrayerSlot.DHUHR to 10))
-        val plain = FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, startOf(friday), zone).single()
-        val moved = FridayReminderPlan.plan(london, adjusted, true, JamaahTimes(), friday, startOf(friday), zone).single()
+        val plain = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, JamaahTimes(), friday, startOf(friday), zone).single()
+        val moved = FridayReminderPlan.plan(london, adjusted, Sect.SUNNI, true, JamaahTimes(), friday, startOf(friday), zone).single()
         assertEquals(plain.at.plus(min(10)), moved.at)
     }
 
     @Test fun `Friday is the phone's own Friday, here and on the far side of the date line`() {
         val auckland = ZoneId.of("Pacific/Auckland")
         val akl = Coordinates(-36.85, 174.76)
-        val r = FridayReminderPlan.plan(akl, prefs, true, JamaahTimes(), thursday, startOf(thursday, auckland), auckland).single()
+        val r = FridayReminderPlan.plan(akl, prefs, Sect.SUNNI, true, JamaahTimes(), thursday, startOf(thursday, auckland), auckland).single()
         assertEquals(DayOfWeek.FRIDAY, r.at.atZone(auckland).dayOfWeek)
         assertEquals(friday, r.at.atZone(auckland).toLocalDate())
     }
 
-    @Test fun `the Jumu'ah line is for a Sunni user with a Jumu'ah time, the Dhuhr line for everyone else`() {
-        val set = FridayReminderPlan.plan(london, prefs, true, jumuah(13, 15), friday, startOf(friday), zone).single()
-        assertEquals(set.jumuahAt, FridayReminderPlan.jumuahLine(set.jumuahAt, Sect.SUNNI))
-        assertNull(FridayReminderPlan.jumuahLine(set.jumuahAt, Sect.SHIA))
-        val unset = FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, startOf(friday), zone).single()
-        assertNull(FridayReminderPlan.jumuahLine(unset.jumuahAt, Sect.SUNNI))
-    }
-
-    @Test fun `a heads up before Dhuhr within 15 minutes of it is the one dropped`() {
-        val r = FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, startOf(friday), zone)
-        assertTrue(FridayReminderPlan.overlaps(r.single().at, r))
-        assertTrue(FridayReminderPlan.overlaps(r.single().at.plus(min(15)), r))
-        assertTrue(FridayReminderPlan.overlaps(r.single().at.minus(min(15)), r))
-        assertFalse(FridayReminderPlan.overlaps(r.single().at.plus(min(16)), r))
-        assertFalse(FridayReminderPlan.overlaps(r.single().at, emptyList()))
+    @Test fun `the Jumu'ah line and its timing are for a Sunni user with a Jumu'ah time, Dhuhr's for everyone else`() {
+        val dhuhr = PrayerEngine.compute(london, friday, prefs)[PrayerSlot.DHUHR]
+        val sunni = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, jumuah(13, 15), friday, startOf(friday), zone).single()
+        assertEquals(friday.atTime(13, 15).atZone(zone).toInstant(), sunni.jumuahAt)
+        // A Shia user's line names Dhuhr, so it comes an hour before Dhuhr, not after Dhuhr has begun.
+        val shia = FridayReminderPlan.plan(london, prefs, Sect.SHIA, true, jumuah(13, 15), friday, startOf(friday), zone).single()
+        assertNull(shia.jumuahAt)
+        assertEquals(dhuhr.minus(min(60)), shia.at)
+        val unset = FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, JamaahTimes(), friday, startOf(friday), zone).single()
+        assertNull(unset.jumuahAt)
     }
 
     @Test fun `off is none, and one already past is dropped`() {
-        assertEquals(0, FridayReminderPlan.plan(london, prefs, false, JamaahTimes(), friday, startOf(friday), zone).size)
+        assertEquals(0, FridayReminderPlan.plan(london, prefs, Sect.SUNNI, false, JamaahTimes(), friday, startOf(friday), zone).size)
         val dhuhr = PrayerEngine.compute(london, friday, prefs)[PrayerSlot.DHUHR]
-        assertEquals(0, FridayReminderPlan.plan(london, prefs, true, JamaahTimes(), friday, dhuhr.minus(min(59)), zone).size)
+        assertEquals(0, FridayReminderPlan.plan(london, prefs, Sect.SUNNI, true, JamaahTimes(), friday, dhuhr.minus(min(59)), zone).size)
     }
 
     @Test fun `the receiver drops one switched off, not on Friday, or once the prayer it is timed from has begun`() {

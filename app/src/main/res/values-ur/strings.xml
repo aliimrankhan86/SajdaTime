@@ -640,4 +640,5 @@
     <string name="action_share">شیئر کریں</string>
     <string name="share_picture_footer">SajdaTime۔ مفت، کوئی اشتہار نہیں۔ Google Play پر</string>
     <string name="share_picture_a11y">%1$s کے لیے آج کے نماز کے اوقات کی تصویر</string>
+    <string name="share_picture_failed">تصویر شیئر نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
 </resources>

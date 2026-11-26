@@ -667,9 +667,9 @@ object Notifications {
     /**
      * "Jumu'ah today at 1:15 pm. A good day to read Surah Al-Kahf." when [jumuahAt] is given, else "It's
      * Friday. Dhuhr is at 12:05 pm. ..." Information only: nothing says the prayer is obligatory. Quiet, on the
-     * adhkar channel, never a usage count, no timeout (Friday lasts all day).
+     * adhkar channel, never a usage count. It clears itself at midnight, when "today" stops being true.
      */
-    fun postFridayReminder(base: Context, jumuahAt: Instant?, dhuhrAt: Instant) {
+    fun postFridayReminder(base: Context, jumuahAt: Instant?, dhuhrAt: Instant, approximate: Boolean = false) {
         val context = AppLocale.wrap(base)
         if (!canPost(context)) return
         ensureChannels(context)
@@ -691,9 +691,14 @@ object Notifications {
             .setCategory(NotificationCompat.CATEGORY_REMINDER)
             .setAutoCancel(true)
             .setContentIntent(openAppIntent(context))
+            .setTimeoutAfter(Duration.between(Instant.now(), endOfToday()).toMillis().coerceAtLeast(1L))
+            .markIfApproximate(context, approximate)
 
         post(context, ID_FRIDAY, builder.build())
     }
+
+    private fun endOfToday(): Instant =
+        java.time.LocalDate.now().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
 
     private fun ensureQuietChannel(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return

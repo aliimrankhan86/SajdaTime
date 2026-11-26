@@ -53,7 +53,7 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             try {
                 val settings = SettingsRepository(appContext).current()
                 if (shouldPostFridayReminder(settings, jumuahAt ?: dhuhrAt, Instant.now())) {
-                    Notifications.postFridayReminder(appContext, FridayReminderPlan.jumuahLine(jumuahAt, settings.sect), dhuhrAt)
+                    Notifications.postFridayReminder(appContext, jumuahAt, dhuhrAt, settings.isApproximateOn(dhuhrAt))
                 }
                 // Same chain as a prayer, so the next window is laid down while awake.
                 PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)

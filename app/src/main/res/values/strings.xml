@@ -875,4 +875,5 @@
     <string name="action_share">Share</string>
     <string name="share_picture_footer">SajdaTime. Free, no ads. On Google Play</string>
     <string name="share_picture_a11y">A picture of today\'s prayer times for %1$s</string>
+    <string name="share_picture_failed">Could not share the picture. Please try again.</string>
 </resources>

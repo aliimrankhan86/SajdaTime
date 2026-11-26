@@ -181,12 +181,13 @@ object PrayerAlarmScheduler {
             schedule(context, manager, adhkarIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
-        // Same footing again. Planned here, before the prayer reminders, so a heads up before Dhuhr that would
-        // land within 15 minutes of it is dropped below: one notification, never two (brief).
-        val friday = runCatching {
-            FridayReminderPlan.plan(coordinates, settings.calculationPrefs, settings.fridayReminder, settings.jamaah, today, now, zone)
-        }.getOrDefault(emptyList())
-        friday.forEach { reminder ->
+        // Same footing again. The brief's "one notification, never two" names the jama'ah reminder for Jumu'ah,
+        // which is switched off (InertReminderSettingsTest), so there is nothing to merge with. The heads up before
+        // Dhuhr is deliberately NOT dropped beside it: it is a different message the user chose, and on Friday
+        // many people pray Dhuhr (independent review, 26 Nov 2026).
+        runCatching {
+            FridayReminderPlan.plan(coordinates, settings.calculationPrefs, settings.sect, settings.fridayReminder, settings.jamaah, today, now, zone)
+        }.getOrDefault(emptyList()).forEach { reminder ->
             schedule(context, manager, fridayIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
@@ -200,7 +201,6 @@ object PrayerAlarmScheduler {
         runCatching {
             PrayerReminderPlan.plan(upcoming, settings.prayerReminderMinutes, settings.prayerReminderFor, now)
                 .filterNot { it.slot == PrayerSlot.FAJR && it.at in suhoorTimes }
-                .filterNot { it.slot == PrayerSlot.DHUHR && FridayReminderPlan.overlaps(it.at, friday) }
         }.getOrDefault(emptyList()).forEach { reminder ->
             // asAlarmClock = false: a heads up must not become the phone's "next alarm" on the lock
             // screen or end a Do Not Disturb schedule early (independent review, 17 Oct 2026). It

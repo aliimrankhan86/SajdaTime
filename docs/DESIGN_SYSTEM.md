@@ -520,8 +520,8 @@ fails if a Kotlin file containing a button is missing from the **File** column.
 | Times, Ramadan card | Shift the date, days 1 and 2 only | A, compact | 40 drawn, 48 target, wraps | `RamadanCard.kt` |
 | Times, Ramadan card | Get the full Ramadan timetable, filling its row, 24dp above and below; (i) after it, 8dp apart, centred on it | A; info icon | 52, fills the row (weight); 48 | `RamadanCard.kt` |
 | Times, Ramadan info dialog | Close, and the X | E, D | | `RamadanCard.kt` |
-| Timetable sheet | Save as PDF (PDF icon) and Share picture (share icon), side by side on their own line under the place, equal shares with a `Space.Related` gap; stacked full width at 1.5 text and above (1.8.0: two buttons do not fit beside the place, and the Times sky takes no action, §3 Sky) | A, compact | 40 drawn, 48 target, wraps, weight 1 each | `TimetableSheet.kt` |
-| Share today's times (dialog over the Timetable) | Share (share icon), the dialog's one action, under the square preview; nothing is sent before it | A | 52, full | `TimetableSheet.kt` |
+| Timetable sheet | Save as PDF (PDF icon) and Share picture (share icon, SF Symbol square.and.arrow.up), side by side, equal heights (§0.5.1), on their own line under the place, equal shares with a `Space.Related` gap; stacked full width at 1.5 text and above (1.8.0: two buttons do not fit beside the place, and the Times sky takes no action, §3 Sky) | A, compact | 40 drawn, 48 target, wraps, weight 1 each | `TimetableSheet.kt` |
+| Share today's times (dialog over the Timetable) | Share (share icon 24, SF Symbol square.and.arrow.up), the dialog's one action, under the square preview, shown once the picture is ready; nothing is sent before it | A | 52, full | `TimetableSheet.kt` |
 | Share today's times | the X, alone at the top end (`DialogTitle`) | D | 48 | `TimetableSheet.kt`, `Common.kt` |
 | Timetable sheet | the X, alone at the top end (`DialogTitle`) | D | 48 | `TimetableSheet.kt`, `Common.kt` |
 | Ramadan timetable | Save as PDF moves to the place line; the X alone at the top end (shared header) | A, compact; D | 40 drawn, 48 target, wraps | `RamadanTimetableSheet.kt` |

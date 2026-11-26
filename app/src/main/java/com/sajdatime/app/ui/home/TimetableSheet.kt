@@ -1,6 +1,10 @@
 package com.sajdatime.app.ui.home
 
 import android.graphics.Bitmap
+import android.widget.Toast
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -107,7 +111,6 @@ internal fun TimetableSheet(
     }
     val fontScale = LocalDensity.current.fontScale
     var sharing by rememberSaveable { mutableStateOf(false) }
-    if (sharing) SharePictureDialog(state, onDismiss = { sharing = false })
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth()) {
@@ -147,6 +150,8 @@ internal fun TimetableSheet(
             }
         }
     }
+    // After the sheet, so its window opens on top when both come back after a rotation (review, 26 Nov 2026).
+    if (sharing) SharePictureDialog(state, onDismiss = { sharing = false })
 }
 
 /**
@@ -182,6 +187,7 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
             Text(stringResource(R.string.action_save_pdf))
         }
     }
+    // iPhone: SF Symbol square.and.arrow.up.
     val share: @Composable (Modifier) -> Unit = { modifier ->
         CtaButton(onClick = { onShare?.invoke() }, compact = true, modifier = modifier) {
             Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -201,9 +207,10 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
                 Spacer(Modifier.height(Space.Related))
                 share(Modifier.fillMaxWidth())
             } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(Space.Related), modifier = Modifier.fillMaxWidth()) {
-                    button(Modifier.weight(1f))
-                    share(Modifier.weight(1f))
+                // Equal heights when one label wraps and the other does not (DESIGN_SYSTEM 0.5.1).
+                Row(horizontalArrangement = Arrangement.spacedBy(Space.Related), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+                    button(Modifier.weight(1f).fillMaxHeight())
+                    share(Modifier.weight(1f).fillMaxHeight())
                 }
             }
         } else if (large) {
@@ -326,6 +333,7 @@ private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
         value = withContext(Dispatchers.Default) { TodayPicture.render(context, state.settings, day, jumuahAt, colours) }
     }
     val scope = rememberCoroutineScope()
+    var busy by remember { mutableStateOf(false) }
     val described = stringResource(R.string.share_picture_a11y, state.settings.placeName(context).bidiIsolated())
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -339,12 +347,21 @@ private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
             }
         },
         confirmButton = {
+            // Shown once the picture is ready (a moment), never as a grey placeholder (DESIGN_SYSTEM 4.1).
+            val ready = picture ?: return@AlertDialog
             CtaButton(
-                onClick = { picture?.let { scope.launch { runCatching { TodayPicture.share(context, it) } } } },
-                enabled = picture != null,
+                onClick = {
+                    if (busy) return@CtaButton
+                    busy = true
+                    scope.launch {
+                        runCatching { TodayPicture.share(context, ready) }
+                            .onFailure { Toast.makeText(context, R.string.share_picture_failed, Toast.LENGTH_SHORT).show() }
+                        busy = false
+                    }
+                },
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(24.dp))
                 Spacer(Modifier.width(Space.Related))
                 Text(stringResource(R.string.action_share))
             }
