@@ -70,6 +70,24 @@ object PrayerAlarmScheduler {
     const val EXTRA_FAST_REASON = "fast_reason"
     internal const val FAST_REMINDER_REQUEST_BASE = 50_000
 
+    /**
+     * The morning and evening adhkar reminder (1.8.0): off until chosen, a quiet notification. Its own
+     * action and codes `60,000 + dayOfYear * 2 + (1 for evening)`, so 60,002 to 60,733, above every
+     * band before it. [EXTRA_AT_MILLIS] carries the window's end (sunrise or Maghrib).
+     */
+    const val ACTION_ADHKAR_REMINDER = "com.sajdatime.app.action.ADHKAR_REMINDER"
+    const val EXTRA_EVENING = "evening"
+    internal const val ADHKAR_REMINDER_REQUEST_BASE = 60_000
+
+    /**
+     * The Friday reminder (1.8.0): off until chosen, a quiet notification an hour before Jumu'ah or Dhuhr. Its
+     * own action and codes `70,000 + dayOfYear`, so 70,001 to 70,366. [EXTRA_AT_MILLIS] carries Dhuhr,
+     * [EXTRA_JUMUAH_AT_MILLIS] the Jumu'ah time the line names (a Sunni user's typed time; see FridayReminderPlan).
+     */
+    const val ACTION_FRIDAY_REMINDER = "com.sajdatime.app.action.FRIDAY_REMINDER"
+    const val EXTRA_JUMUAH_AT_MILLIS = "jumuah_at"
+    internal const val FRIDAY_REMINDER_REQUEST_BASE = 70_000
+
     /** How far ahead to lay down alarms. Two days survives a missed daily job. */
     private const val HORIZON_DAYS = 2
 
@@ -154,6 +172,23 @@ object PrayerAlarmScheduler {
             )
         }.getOrDefault(emptyList()).forEach { reminder ->
             schedule(context, manager, fastIntent(context, reminder), reminder.at, asAlarmClock = false)
+        }
+
+        // Same footing as the fast reminder: before the early return, wrapped, never an alarm clock.
+        runCatching {
+            AdhkarReminderPlan.plan(coordinates, settings.calculationPrefs, settings.adhkarReminder, today, now)
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, adhkarIntent(context, reminder), reminder.at, asAlarmClock = false)
+        }
+
+        // Same footing again. The brief's "one notification, never two" names the jama'ah reminder for Jumu'ah,
+        // which is switched off (InertReminderSettingsTest), so there is nothing to merge with. The heads up before
+        // Dhuhr is deliberately NOT dropped beside it: it is a different message the user chose, and on Friday
+        // many people pray Dhuhr (independent review, 26 Nov 2026).
+        runCatching {
+            FridayReminderPlan.plan(coordinates, settings.calculationPrefs, settings.sect, settings.fridayReminder, settings.jamaah, today, now, zone)
+        }.getOrDefault(emptyList()).forEach { reminder ->
+            schedule(context, manager, fridayIntent(context, reminder), reminder.at, asAlarmClock = false)
         }
 
         val upcoming = upcoming(coordinates, settings, today, now)
@@ -353,6 +388,8 @@ object PrayerAlarmScheduler {
             }
             cancelPending(context, manager, ACTION_SUHOOR_REMINDER, suhoorRequestCode(date))
             cancelPending(context, manager, ACTION_FAST_REMINDER, fastRequestCode(date))
+            listOf(false, true).forEach { cancelPending(context, manager, ACTION_ADHKAR_REMINDER, adhkarRequestCode(date, it)) }
+            cancelPending(context, manager, ACTION_FRIDAY_REMINDER, fridayRequestCode(date))
         }
     }
 
@@ -415,6 +452,32 @@ object PrayerAlarmScheduler {
         )
     }
 
+    private fun adhkarIntent(context: Context, reminder: AdhkarReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_ADHKAR_REMINDER)
+            .putExtra(EXTRA_AT_MILLIS, reminder.endsAt.toEpochMilli())
+            .putExtra(EXTRA_EVENING, reminder.evening)
+        return PendingIntent.getBroadcast(
+            context,
+            adhkarRequestCode(reminder.date, reminder.evening),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
+    private fun fridayIntent(context: Context, reminder: FridayReminder): PendingIntent {
+        val intent = Intent(context, PrayerAlarmReceiver::class.java)
+            .setAction(ACTION_FRIDAY_REMINDER)
+            .putExtra(EXTRA_AT_MILLIS, reminder.dhuhrAt.toEpochMilli())
+        reminder.jumuahAt?.let { intent.putExtra(EXTRA_JUMUAH_AT_MILLIS, it.toEpochMilli()) }
+        return PendingIntent.getBroadcast(
+            context,
+            fridayRequestCode(reminder.date),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
+
     private fun prayerReminderIntent(context: Context, reminder: PrayerReminder): PendingIntent {
         val date = reminder.prayerAt.atZone(ZoneId.systemDefault()).toLocalDate()
         val intent = Intent(context, PrayerAlarmReceiver::class.java)
@@ -454,4 +517,12 @@ object PrayerAlarmScheduler {
     /** Stable per evening the reminder rings on, in its own range. */
     internal fun fastRequestCode(eve: LocalDate): Int =
         FAST_REMINDER_REQUEST_BASE + eve.dayOfYear
+
+    /** Stable per (day, morning or evening), in its own range. */
+    internal fun adhkarRequestCode(date: LocalDate, evening: Boolean): Int =
+        ADHKAR_REMINDER_REQUEST_BASE + date.dayOfYear * 2 + if (evening) 1 else 0
+
+    /** Stable per Friday, in its own range. */
+    internal fun fridayRequestCode(date: LocalDate): Int =
+        FRIDAY_REMINDER_REQUEST_BASE + date.dayOfYear
 }

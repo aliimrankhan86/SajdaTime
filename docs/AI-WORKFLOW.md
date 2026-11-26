@@ -20,6 +20,14 @@ Written 24 Nov 2026 after release 1.7.0 and the 1.7.1 widget redesign. It record
 4. Store: only new What's new text in the six languages (en-GB, ar, bn-BD, id, tr-TR, ur), existing listing text untouched unless Ali says. Draft release in Play Console, signed bundle uploaded, Ali presses Send for review.
 5. Prove it is live from the public Play page "Updated on" date, signed out. Then clean up (CLAUDE.md "After every release") and update HANDOVER §11, PROJECT_BRIEF and GBrain together.
 
+## Test only what is new (Ali, 26 Nov 2026)
+- Shipped text and translations are already tested. `docs/translation/reviewed.json` records every checked string per language with a hash. Re-check a string only if it is new or its hash changed, in all six languages, then add it to the file.
+- Pictures and device tests cover only new or changed screens and code. The automatic gate still runs in full. Write in the job's progress file what was checked, so nothing is tested twice.
+
+## Always tell Ali whether work is running (Ali, 26 Nov 2026)
+- He does not want to wait without knowing. Whenever a session or scheduled run stops, finishes, is blocked or needs him, tell him in plain words straight away (a push notification when he may be away): "Stopped" or "Still working", why, and the exact one line to paste or the one button to press next.
+- Never end silently, and never leave him to guess whether anything is still happening.
+
 ## Traps that cost time
 - Play sends no email when a review passes. Check the public page date.
 - Never install the Play package name on his phones, only the `.sideload` copy.

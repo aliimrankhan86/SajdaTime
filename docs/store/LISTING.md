@@ -235,6 +235,96 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 
 `3,770 / 4000`, measured on 16 Oct 2026: the raw public Play page carries this block byte for byte (sha256 beginning `ff4dccf3`).
 
+### 1.8.0 listing, READY TO PASTE on release day (written 26 Nov 2026); not live
+
+Ali's rule (HANDOVER 5.38): the full description sells the whole app first, every feature named; What's new says what changed.
+The 1.7.0 full description was 3994 / 4000, so the three 1.8.0 features (adhkar reminder, Friday reminder with Surah Al-Kahf,
+share today's times as a picture) needed room. **Ali chose "Tighten wording" on 26 Nov 2026** (multiple choice): keep every
+feature, shorten only wording. Changes against the 1.7.0 text: the Timetable bullet gains the picture (and loses "in one tap"); a new bullet "Optional reminders: morning and evening adhkar, Surah Al-Kahf on Fridays" under Alerts and adhan; the 13 methods line names six well known methods instead of all thirteen (the count stays); the Free paragraph drops "no subscription". To fit their limits, Turkish names five methods (no Karachi), Indonesian names Kemenag/MUIS in place of ISNA and Karachi and also writes "1 atau 2 hari" and "salin papan masjid". Store picture 06 (Timetable) still shows the 1.7.0 header without Share picture: left on purpose, the brief keeps the rest of the listing untouched. What's new describes the picture rather than asking anyone to share it (review, 26 Nov 2026). Checked against the code on the branch: the adhkar
+reminder comes after Fajr and after Asr; the Friday one an hour before the user's Jumu'ah time (Sunni with a time typed) or
+Dhuhr; the picture is shared from the Timetable. Counts by script (Python len): full description 3991 / 4000,
+What's new 244 / 500. The five translations are in `LISTING-LOCALES.md`, mirroring these edits.
+
+What's new:
+
+```
+New: optional morning and evening adhkar reminders, after Fajr and after Asr; tap one to open the Tasbeeh. An optional Friday reminder an hour before Jumu'ah or Dhuhr, with Surah Al-Kahf. Today's times as a picture, to share from the Timetable.
+```
+
+Full description:
+
+```
+SajdaTime gives you prayer times (namaz, salah or salat), adhan alerts, a Qibla compass and a private salah tracker, for Sunni and Shia Muslims, on your phone and Wear OS watch.
+In English, Arabic, Urdu, Bengali, Turkish and Indonesian. Worked out on your phone, no signal needed. No ads, no account.
+
+PRAYER TIMES AND QIBLA
+
+• Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha, time left, and a changing sky
+• Optional Duha window (Sunni)
+• The Hijri date (Islamic calendar) and the Islamic dates of the year, with Shia dates, shiftable by a day or two
+• Qibla direction: a true north compass that says which way to turn and buzzes facing the Kaaba
+• Islamic midnight, the last third of the night, and which method made your times
+• Timetable for today and the next six days, the month or Ramadan as a PDF, and today's times as a picture to share
+
+ALERTS AND ADHAN
+
+• Each prayer: off, a notification, or an alarm loud enough for Fajr, even with the app closed.
+• Adhan (azan) for Sunni and Shia, or any sound on your phone. Hear it first
+• A quiet reminder 5 to 30 minutes before a prayer, a silent next prayer notification
+• A bell on each prayer turns its alert on or off
+• Alert check: what your phone is blocking
+• Optional reminders: morning and evening adhkar, Surah Al-Kahf on Fridays
+
+MY PRAYERS
+
+• Private: tick each prayer, see your week as rings and 30 days as a calendar
+• It records, never judges. Optional streak, Pause, move it to a new phone
+• Fasts to make up: one count that goes down as you make them up
+• Tasbeeh counter: 33, 99, 100 or no target
+
+RAMADAN AND EID
+
+• Suhoor (sehri) and iftar times, a countdown, the fast's length, a Ramadan table, and a greeting on Eid al-Fitr and Eid al-Adha
+• A suhoor reminder 15 to 60 minutes before suhoor ends, on by default in Ramadan
+• Optional reminders the evening before a Sunnah fast: Mondays, Thursdays, White Days, Ashura, Arafah, Shawwal
+
+WIDGETS AND WEAR OS
+
+• Three widgets: next prayer, today's times, five prayers in a row
+• Wear OS app, tile and Qibla, with your phone or alone
+
+FOR EVERYONE
+
+• Light and dark themes, large text, screen readers
+
+YOUR SCHOOL, YOUR MOSQUE
+
+• Sunni: Hanafi, Shafi'i, Maliki, Hanbali, each with its Asr rule
+• Shia: Jafari / Ithna Ashari, with the correct Maghrib rule
+• 13 calculation methods, including Muslim World League, ISNA, Umm al-Qura, Karachi, Diyanet and Jafari
+• Your mosque's jama'ah (iqamah) and Jumu'ah times
+• Match your mosque: see each time, move a prayer up to 30 minutes or copy its board
+
+YOUR PRIVACY
+
+• Nothing to buy, no accounts, no login
+• Optional usage counts, off unless you say yes. No crash reports
+• Approximate location, read while the app is open, or type your town instead. Your coordinates never go to the developer or the usage counts
+• Your town's name comes from your phone's place service, usually Google. A town you type is looked up online there, or by Open-Meteo
+
+HONEST ABOUT WHAT IT IS
+
+SajdaTime is a helper, not a religious authority. Your phone works these times out from the position of the sun using published calculation methods; they are not supplied by any mosque, scholar or authority. The app was written by one person, with the help of artificial intelligence, and it can get things wrong. Where SajdaTime and your mosque disagree, follow your mosque. If a time or a direction ever looks off, or you are unsure, please ask them or someone else qualified to advise you.
+
+Prayer times are calculated using adhan-java by Batoul Apps, a widely used open-source library, and are checked against independent reference timetables before each release. Even so, the app is given free and as it is, with no warranty and no promise of accuracy, so where being exact matters to you, please do not rely on it alone.
+
+FREE, AND STAYING FREE
+
+No paid tier, nothing locked away. SajdaTime is given freely as an ongoing charity for the Ummah.
+
+I ask only one thing in return: please remember me, my family, and my parents in your duas. JazakAllah Kher.
+```
+
 ### 1.7.1 What's new, 24 Nov 2026 (Ali's brief through the claude.ai project session); the full and short descriptions stay the 1.7.0 text below; not live
 
 Ali, 24 Nov 2026: "1.7.1 is just improve the widget design. That's it." and, for the store: leave all existing listing content in

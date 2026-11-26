@@ -152,12 +152,17 @@ fun MainScaffold(
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetFastReminder: (com.sajdatime.core.FastKind, Boolean) -> Unit,
+    onSetAdhkar: (Boolean) -> Unit,
+    onSetFriday: (Boolean) -> Unit,
     onSetAnalytics: (Boolean) -> Unit,
     onScreenViewed: (Screen) -> Unit,
     tracker: TrackerActions,
     jamaah: JamaahActions,
     bell: BellActions,
     notificationsBlocked: Boolean,
+    /** The adhkar reminder was tapped (1.8.0): show My prayers with the tasbeeh open, then [onTasbeehHandled]. */
+    tasbeehRequested: Boolean = false,
+    onTasbeehHandled: () -> Unit = {},
 ) {
     // Saveable, not remember. With a plain remember, rotating the phone rebuilt the
     // composition from scratch and dropped the user back on Times — so anyone holding
@@ -254,6 +259,8 @@ fun MainScaffold(
         }
     }
 
+    LaunchedEffect(tasbeehRequested) { if (tasbeehRequested) destination = Destination.PRAYERS }
+
     if (destination == Destination.QIBLA) KeepUpright()
 
     // The magnetometer only runs while the Qibla tab is actually on screen.
@@ -318,6 +325,8 @@ fun MainScaffold(
                             onPause = pauseToday,
                             onUseGps = onRefreshLocation,
                             onSearchCity = onSearchCity,
+                            openTasbeeh = tasbeehRequested,
+                            onTasbeehOpened = onTasbeehHandled,
                         )
                     }
 
@@ -343,6 +352,8 @@ fun MainScaffold(
                             onSetPrayerReminderMinutes = onSetPrayerReminderMinutes,
                             onSetPrayerReminder = onSetPrayerReminder,
                             onSetFastReminder = onSetFastReminder,
+                            onSetAdhkar = onSetAdhkar,
+                            onSetFriday = onSetFriday,
                             onSetAlarmOnApproximateDays = onSetAlarmOnApproximateDays,
                             onPickAlarmSound = onPickAlarmSound,
                             onPickBuiltInAdhan = onPickBuiltInAdhan,

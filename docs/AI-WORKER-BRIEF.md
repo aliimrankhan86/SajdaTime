@@ -22,9 +22,10 @@ ask Ali to test anything or to do a step for you.
 - **Dependable beats elegant.** Prayer times are worked out on the phone with no network, ever.
 - **Languages in the app:** English, Arabic, Urdu, Turkish, Indonesian. Arabic and Urdu read right to left.
 
-## 2. Where things stand (25 Oct 2026)
+## 2. Where things stand (26 Nov 2026; `docs/AI-START-HERE.md` §2 and HANDOVER §11 first block are current, the lines below this one are the 25 Oct record)
 
-- **Live on Play:** 1.5.0 (phone versionCode 9, watch versionCode 1002).
+- **Live on Play now:** 1.7.1 (phone 12, watch 1003 / 1.7.0). **Next:** 1.8.0 on `claude/1-8-0`, waiting for Ali's Merge.
+- **25 Oct record, Live on Play then:** 1.5.0 (phone versionCode 9, watch versionCode 1002).
 - **Next release: 1.6.0** (phone versionCode 10; the watch is not uploaded again). Built and approved on branch
   `claude/1-6-0`. Pull request into `main` by 11 Dec 2026, Ali presses "Send for review" by 15 Dec 2026, before
   Ramadan (starts about 8 Feb 2027). Release steps: `docs/release-tools/RELEASE-1.6.0.md`.
@@ -85,8 +86,8 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 **Read `docs/AI-START-HERE.md` first** (the full briefing for any AI).
 
-**Which branch:** cut your branch from `claude/1-6-0`, never from `main` (Ali, 25 Oct 2026). `main` holds what is live
-(1.5.0) and only takes 1.6 on release day. Read `docs/design-system/README.md` before anything visual.
+**Which branch:** cut your branch from `main` (it holds what is live, 1.7.1); `claude/1-6-0` was merged and is gone. Ask
+before touching code that `claude/1-8-0` changes while its pull request is open. Read `docs/design-system/README.md` before anything visual.
 
 Full gate (12 Nov 2026, release 1.7.0): app 365 tests, core 269 (1 skipped), wear 27, 0 failures. A change that
 adds tests moves these numbers; `docs/release-tools/release-1.7.0.sh` holds them in `EXPECTED_COUNTS`.

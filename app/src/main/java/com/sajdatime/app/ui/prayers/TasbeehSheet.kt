@@ -30,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -97,8 +98,15 @@ import com.sajdatime.core.Tasbeeh
  * space below it (Ali: "make the button better with even spacing and add an icon there of tasbeeh").
  */
 @Composable
-internal fun TasbeehDoor() {
+internal fun TasbeehDoor(openNow: Boolean = false, onOpened: () -> Unit = {}) {
     var open by rememberSaveable { mutableStateOf(false) }
+    // The adhkar reminder's tap (1.8.0) arrives here as [openNow], consumed once so rotation cannot reopen it.
+    LaunchedEffect(openNow) {
+        if (openNow) {
+            open = true
+            onOpened()
+        }
+    }
     CtaButton(onClick = { open = true }, modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp).testTag("tasbeeh_door")) {
         Icon(TasbeehIcon, contentDescription = null, modifier = Modifier.size(24.dp))
         Spacer(Modifier.width(Space.Related))

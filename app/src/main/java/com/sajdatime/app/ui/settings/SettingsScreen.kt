@@ -38,12 +38,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Alarm
 import androidx.compose.material.icons.outlined.EventAvailable
 import androidx.compose.material.icons.outlined.EventRepeat
 import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material.icons.outlined.WbSunny
+import androidx.compose.material.icons.outlined.WbTwilight
 import com.sajdatime.core.DuhaWindow
 import androidx.compose.material.icons.outlined.Contrast
 import androidx.compose.material.icons.outlined.DarkMode
@@ -199,6 +201,8 @@ fun SettingsScreen(
     onSetPrayerReminderMinutes: (Int) -> Unit,
     onSetPrayerReminder: (PrayerSlot, Boolean) -> Unit,
     onSetFastReminder: (FastKind, Boolean) -> Unit,
+    onSetAdhkar: (Boolean) -> Unit,
+    onSetFriday: (Boolean) -> Unit,
     onSetAlarmOnApproximateDays: (Boolean) -> Unit,
     onPickAlarmSound: () -> Unit,
     onPickBuiltInAdhan: (BuiltInAdhan) -> Unit,
@@ -480,6 +484,26 @@ fun SettingsScreen(
                 },
                 onClick = { open = SettingsChooser.FAST_REMINDERS },
             ).takeIf { settings.sect == Sect.SUNNI },
+            // Morning and evening adhkar (1.8.0): off until chosen, for Sunni and Shia alike, a quiet
+            // notification after Fajr and Asr. iPhone: carries over (SF Symbol sun.horizon).
+            SettingsItem.Toggle(
+                key = "adhkar",
+                icon = Icons.Outlined.WbTwilight,
+                title = stringResource(R.string.settings_adhkar),
+                subtitle = stringResource(R.string.settings_adhkar_desc),
+                checked = settings.adhkarReminder,
+                onCheckedChange = onSetAdhkar,
+            ),
+            // Friday reminder with Surah Al-Kahf (1.8.0): off until chosen, for everyone, the line chosen by
+            // sect when it fires. iPhone: carries over (SF Symbol book).
+            SettingsItem.Toggle(
+                key = "friday",
+                icon = Icons.AutoMirrored.Outlined.MenuBook,
+                title = stringResource(R.string.settings_friday),
+                subtitle = stringResource(R.string.settings_friday_desc),
+                checked = settings.fridayReminder,
+                onCheckedChange = onSetFriday,
+            ),
             // A plain on/off stays inline. Sending the user into a chooser to flip one
             // switch would be worse than the flat list this screen replaced.
             SettingsItem.Toggle(

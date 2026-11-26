@@ -57,6 +57,15 @@ object Notifications {
     const val CHANNEL_FAST = "fast_reminders"
 
     /**
+     * The adhkar and Friday reminders' channel (1.8.0), shared by both (brief). Not [CHANNEL_FAST]: that one
+     * is named "Fast reminders" in the phone's settings and is a Sunni only feature, so muting fasts would mute
+     * adhkar and a Shia user would see a fasting entry. Quiet like [CHANNEL_REMINDERS] (no sound, one short
+     * buzz); the adhkar posts are silent on top of that (setSilent, Ali 26 Nov 2026), so only the Friday one buzzes.
+     */
+    const val CHANNEL_QUIET = "quiet_reminders"
+    const val ACTION_OPEN_TASBEEH = "com.sajdatime.app.action.OPEN_TASBEEH"
+
+    /**
      * Versioned by sound: a channel's sound cannot be changed after creation, so a new
      * tone means a new channel id and the old channel is deleted.
      */
@@ -88,6 +97,12 @@ object Notifications {
 
     /** One slot: tomorrow evening's replaces tonight's if it was never read. */
     private const val ID_FAST = 5000
+
+    /** One slot: the evening's replaces the morning's if it was never read. */
+    private const val ID_ADHKAR = 6000
+
+    /** One slot: one Friday's. */
+    private const val ID_FRIDAY = 7000
 
     /** One short buzz for the heads up before a prayer: a nudge, not an alert. */
     private val REMINDER_VIBRATION = longArrayOf(0, 200)
@@ -140,6 +155,7 @@ object Notifications {
             // the reminder on never sees an empty "Fast reminders" entry in the phone's settings. Here
             // only to put the name in the app's language, as for the suhoor channel.
             if (manager.getNotificationChannel(CHANNEL_FAST) != null) ensureFastChannel(context)
+            if (manager.getNotificationChannel(CHANNEL_QUIET) != null) ensureQuietChannel(context)
 
             manager.createNotificationChannel(
                 NotificationChannel(
@@ -622,6 +638,91 @@ object Notifications {
             ),
         ) }
     }
+
+    /**
+     * "Morning adhkar / A quiet moment for remembrance." Never a command, never a usage count, and no
+     * timeout: the line is true all day. Tapping it opens the tasbeeh on My prayers.
+     */
+    fun postAdhkarReminder(base: Context, evening: Boolean) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+        ensureQuietChannel(context)
+
+        val builder = NotificationCompat.Builder(context, CHANNEL_QUIET)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(if (evening) R.string.notif_adhkar_evening else R.string.notif_adhkar_morning))
+            .setContentText(context.getString(R.string.notif_adhkar_body))
+            // Fully silent, not even the channel's one buzz (Ali, 26 Nov 2026: the morning one comes half an hour after
+            // Fajr, when many are back asleep). It waits in the list; the Friday reminder on the same channel still buzzes.
+            .setSilent(true)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setContentIntent(openTasbeehIntent(context))
+
+        post(context, ID_ADHKAR, builder.build())
+    }
+
+    /**
+     * "Jumu'ah today at 1:15 pm. A good day to read Surah Al-Kahf." when [jumuahAt] is given, else "It's
+     * Friday. Dhuhr is at 12:05 pm. ..." Information only: nothing says the prayer is obligatory. Quiet, on the
+     * adhkar channel (one short buzz), never a usage count. It clears itself at midnight, when "today" stops being true.
+     */
+    fun postFridayReminder(base: Context, jumuahAt: Instant?, dhuhrAt: Instant, approximate: Boolean = false) {
+        val context = AppLocale.wrap(base)
+        if (!canPost(context)) return
+        ensureChannels(context)
+        ensureQuietChannel(context)
+
+        val body = if (jumuahAt != null) {
+            context.getString(R.string.notif_friday_jumuah, TimeFormat.clock(context, jumuahAt))
+        } else {
+            context.getString(R.string.notif_friday_dhuhr, TimeFormat.clock(context, dhuhrAt))
+        }
+        val builder = NotificationCompat.Builder(context, CHANNEL_QUIET)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.settings_friday))
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setSound(null)
+            .setVibrate(REMINDER_VIBRATION)
+            .setCategory(NotificationCompat.CATEGORY_REMINDER)
+            .setAutoCancel(true)
+            .setContentIntent(openAppIntent(context))
+            .setTimeoutAfter(Duration.between(Instant.now(), endOfToday()).toMillis().coerceAtLeast(1L))
+            .markIfApproximate(context, approximate)
+
+        post(context, ID_FRIDAY, builder.build())
+    }
+
+    private fun endOfToday(): Instant =
+        java.time.LocalDate.now().plusDays(1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+
+    private fun ensureQuietChannel(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
+        synchronized(channelLock) { context.getSystemService(NotificationManager::class.java)?.createNotificationChannel(
+            NotificationChannel(
+                CHANNEL_QUIET,
+                context.getString(R.string.channel_quiet_reminders),
+                NotificationManager.IMPORTANCE_DEFAULT,
+            ).apply {
+                setSound(null, null)
+                enableVibration(true)
+                vibrationPattern = REMINDER_VIBRATION
+            },
+        ) }
+    }
+
+    /** Its own action, so FLAG_UPDATE_CURRENT can never put this extra on [openAppIntent]'s shared PendingIntent. */
+    private fun openTasbeehIntent(context: Context): PendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        Intent(context, MainActivity::class.java)
+            .setAction(ACTION_OPEN_TASBEEH)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
 
     private fun fastBodyRes(reason: FastReason): Int = when (reason) {
         FastReason.MONDAY -> R.string.notif_fast_monday

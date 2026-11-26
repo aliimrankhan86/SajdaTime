@@ -11,6 +11,7 @@ import com.sajdatime.core.JamaahTimes
 import com.sajdatime.core.PrayerEngine
 import com.sajdatime.core.PrayerSlot
 import com.sajdatime.core.Sect
+import java.time.DayOfWeek
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
@@ -116,4 +117,81 @@ object FastReminderPlan {
      * (review, 2 Nov 2026; seen firing in the same minute on the Redmi). Ten minutes clears it.
      */
     private val AFTER_ISHA: Duration = Duration.ofMinutes(10)
+}
+
+/** "Morning adhkar" after Fajr, or "Evening adhkar" after Asr (1.8.0). [endsAt] is sunrise or Maghrib. */
+data class AdhkarReminder(val date: LocalDate, val evening: Boolean, val at: Instant, val endsAt: Instant)
+
+object AdhkarReminderPlan {
+
+    /**
+     * Morning at Fajr + 30 minutes but no later than sunrise - 10; evening at Asr + 30 but no later
+     * than Maghrib - 15 (Ali, 26 Nov 2026). From the times the user sees, adjustments included, today
+     * to two days ahead, still in the future. Never AT Fajr or Asr, when the adhan rings (see
+     * [FastReminderPlan]'s AFTER_ISHA): a window too short to fit one after the prayer begins (a
+     * projected far north day) gets none rather than one that rings with the adhan.
+     */
+    fun plan(coordinates: Coordinates, prefs: CalculationPrefs, enabled: Boolean, today: LocalDate, now: Instant): List<AdhkarReminder> {
+        if (!enabled) return emptyList()
+        return (0L..2L).flatMap { offset ->
+            val date = today.plusDays(offset)
+            val day = PrayerEngine.compute(coordinates, date, prefs)
+            listOfNotNull(
+                one(date, false, day[PrayerSlot.FAJR], day[PrayerSlot.SUNRISE], BEFORE_SUNRISE),
+                one(date, true, day[PrayerSlot.ASR], day[PrayerSlot.MAGHRIB], BEFORE_MAGHRIB),
+            )
+        }.filter { it.at.isAfter(now) }
+    }
+
+    private fun one(date: LocalDate, evening: Boolean, start: Instant, end: Instant, margin: Duration): AdhkarReminder? {
+        val at = minOf(start.plus(AFTER_START), end.minus(margin))
+        return AdhkarReminder(date, evening, at, end).takeIf { at.isAfter(start) }
+    }
+
+    private val AFTER_START: Duration = Duration.ofMinutes(30)
+    private val BEFORE_SUNRISE: Duration = Duration.ofMinutes(10)
+    private val BEFORE_MAGHRIB: Duration = Duration.ofMinutes(15)
+}
+
+/**
+ * The Friday reminder with Surah Al-Kahf (1.8.0). [jumuahAt] is the time the line names as Jumu'ah, or null for
+ * the "It's Friday. Dhuhr is at" line; [dhuhrAt] is Dhuhr as the user sees it. The reminder is an hour before
+ * whichever of the two the line names.
+ */
+data class FridayReminder(val date: LocalDate, val at: Instant, val dhuhrAt: Instant, val jumuahAt: Instant?)
+
+object FridayReminderPlan {
+
+    /**
+     * An hour before Jumu'ah on each Friday from today to two days ahead, in the phone's own time zone, still in
+     * the future (Ali, 26 Nov 2026). Before the user's Jumu'ah time when [JamaahPlan] would show it (set, typed
+     * in this zone, inside Dhuhr's window), otherwise before Dhuhr, adjustments included either way.
+     *
+     * The Jumu'ah line, and its timing, only for a Sunni user with a Jumu'ah time typed in: the app never calls a
+     * time Jumu'ah that the user did not give it (the Times screen does the same), and the Jafari line names
+     * Dhuhr (brief), so a Shia user's reminder is an hour before Dhuhr. Timed from the Jumu'ah time it would say
+     * "Dhuhr is at 12:05" at 12:15, after Dhuhr began (independent review, 26 Nov 2026). Information only.
+     * Every settings change reschedules, so a change of sect re-plans the line.
+     */
+    fun plan(
+        coordinates: Coordinates,
+        prefs: CalculationPrefs,
+        sect: Sect,
+        enabled: Boolean,
+        jamaah: JamaahTimes,
+        today: LocalDate,
+        now: Instant,
+        zone: ZoneId,
+    ): List<FridayReminder> {
+        if (!enabled) return emptyList()
+        return (0L..2L).map { today.plusDays(it) }.filter { it.dayOfWeek == DayOfWeek.FRIDAY }.mapNotNull { date ->
+            val day = PrayerEngine.compute(coordinates, date, prefs)
+            val jumuah = (JamaahPlan.on(day, zone, jamaah)[PrayerSlot.DHUHR] as? JamaahResult.InWindow)?.at
+                ?.takeIf { sect == Sect.SUNNI }
+            val dhuhr = day[PrayerSlot.DHUHR]
+            FridayReminder(date, (jumuah ?: dhuhr).minus(BEFORE), dhuhr, jumuah).takeIf { it.at.isAfter(now) }
+        }
+    }
+
+    private val BEFORE: Duration = Duration.ofMinutes(60)
 }

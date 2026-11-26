@@ -625,4 +625,20 @@
     <string name="tasbeeh_rounds">دور: %1$d</string>
     <string name="tasbeeh_total">کل تعداد: %1$d</string>
     <string name="tasbeeh_state">%2$d میں سے %1$d</string>
+    <string name="settings_adhkar">صبح و شام کے اذکار</string>
+    <string name="settings_adhkar_desc">فجر کے بعد اور عصر کے بعد ایک خاموش اطلاع</string>
+    <string name="notif_adhkar_morning">صبح کے اذکار</string>
+    <string name="notif_adhkar_evening">شام کے اذکار</string>
+    <string name="notif_adhkar_body">ذکر کے لیے ایک پرسکون لمحہ۔</string>
+    <string name="channel_quiet_reminders">اذکار اور جمعہ کی یاددہانیاں</string>
+    <string name="settings_friday">جمعہ کی یاددہانی</string>
+    <string name="settings_friday_desc">جمعہ یا ظہر سے ایک گھنٹہ پہلے ایک خاموش اطلاع</string>
+    <string name="notif_friday_jumuah">آج جمعہ %1$s پر ہے۔ سورۃ الکہف پڑھنے کے لیے اچھا دن ہے۔</string>
+    <string name="notif_friday_dhuhr">آج جمعہ ہے۔ ظہر %1$s پر ہے۔ سورۃ الکہف پڑھنے کے لیے اچھا دن ہے۔</string>
+    <string name="action_share_picture">تصویر شیئر کریں</string>
+    <string name="share_picture_title">آج کے اوقات شیئر کریں</string>
+    <string name="action_share">شیئر کریں</string>
+    <string name="share_picture_footer">SajdaTime۔ مفت، کوئی اشتہار نہیں۔ Google Play پر</string>
+    <string name="share_picture_a11y">%1$s کے لیے آج کے نماز کے اوقات کی تصویر</string>
+    <string name="share_picture_failed">تصویر شیئر نہیں ہو سکی۔ براہ کرم دوبارہ کوشش کریں۔</string>
 </resources>

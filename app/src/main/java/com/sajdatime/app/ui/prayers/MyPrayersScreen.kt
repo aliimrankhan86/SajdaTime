@@ -111,6 +111,8 @@ fun MyPrayersScreen(
     onPause: () -> Unit,
     onUseGps: () -> Unit,
     onSearchCity: (String) -> Unit,
+    openTasbeeh: Boolean = false,
+    onTasbeehOpened: () -> Unit = {},
 ) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         ScreenTitle(stringResource(R.string.nav_tracker))
@@ -121,7 +123,7 @@ fun MyPrayersScreen(
         Column(Modifier.padding(horizontal = 16.dp)) {
             // 12 here and the title's own 4 make 16 above the button, the same as the 16 below it.
             Spacer(Modifier.height(Space.Paragraph))
-            TasbeehDoor()
+            TasbeehDoor(openTasbeeh, onTasbeehOpened)
         }
         // Nothing is drawn until the settings have loaded, so the switch card never flashes for
         // someone who has tracking on.

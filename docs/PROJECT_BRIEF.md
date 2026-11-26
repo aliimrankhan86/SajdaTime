@@ -1,8 +1,25 @@
-# SajdaTime: project brief (snapshot 24 Nov 2026; 1.7.0 is LIVE; 1.7.1, the Today widget redrawn, is MERGED into main (PR 22) and SUBMITTED on 24 Nov 2026, in Google's review)
+# SajdaTime: project brief (snapshot 26 Nov 2026; 1.7.1 is LIVE; 1.8.0 BUILT and tested on `claude/1-8-0`, waiting for Ali's Merge)
 
 The source of truth is `docs/HANDOVER.md` §11. This file is the short version Ali's claude.ai project reads live from GitHub (raw.githubusercontent.com/aliimrankhan86/SajdaTime/main/docs/PROJECT_BRIEF.md), so **every commit that moves the project updates it too** (CLAUDE.md commit rule). If they disagree, HANDOVER wins.
 
-## Next release: 1.7.1, the Today widget redrawn (built, merged and submitted 24 Nov 2026; in Google's review)
+## Next release: 1.8.0 (built 26 Nov 2026, PR #24 open; Ali presses Merge, then Send for review)
+- **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
+  - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
+    sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,
+    26 Nov 2026): "A quiet moment for remembrance."; tapping it opens the Tasbeeh. No adhkar text yet (later release).
+  - **Friday reminder with Surah Al-Kahf** (off by default): an hour before your Jumu'ah time if you typed one (Sunni), or
+    an hour before Dhuhr. "Jumu'ah today at ..." or "It's Friday. Dhuhr is at ...", then "A good day to read Surah Al-Kahf."
+    Not merged with any other reminder (the reminder before Dhuhr stays as you set it).
+  - **Share today's times as a picture**, from the Timetable, beside Save as PDF: a square picture with the town, both dates,
+    the six times, the method and school (shows Sunni or Shia; the privacy page says so) and "SajdaTime. Free, no ads. On Google Play". Nothing is sent until you press Share.
+- **Store text:** Ali chose "Tighten wording" (26 Nov 2026): every feature kept, the three added, the methods line names six
+  methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted on release day.
+- **Checked:** full gate green on the final code; new and touched device tests green; every reminder fired on the emulator with the clock moved
+  (English and Arabic); pictures in light, dark, 2x text, Arabic, Urdu, Bengali and a long town name; an independent code review
+  (its fixes are in), the design lead's picture review (its fixes are in) and a second code review (its fixes are in). **Not checked:** a real phone.
+- **Dates:** ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027, before the Ramadan freeze (18 Jan to 9 Mar 2027).
+
+## Last release: 1.7.1, the Today widget redrawn (LIVE: the public Play page says "Updated on 24 Nov 2026", read signed out 26 Nov 2026)
 - **Ali's scope:** "1.7.1 is just improve the widget design. That's it." Phone 12 / 1.7.1; the watch is unchanged and not uploaded.
 - **What changed:** the Today widget matches the mockup Ali approved (light and dark): the date and Hijri date with the town
   chip, a countdown card (ticking clock and "until it begins"), and one list card where the next prayer has a green fill, a bar
@@ -12,9 +29,10 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Store:** nothing in the listing changes except one line of What's new, in the six languages (Ali, 24 Nov 2026).
 - **Checked:** tests and lint green, every widget size measured on the emulator in six languages and nine text sizes, pictures
   judged by the design lead, two independent code reviews. **Not checked:** a real phone and a real home screen.
-- **Status:** submitted by Ali on 24 Nov 2026 (draft 12 (1.7.1), Submit 1 change for review). Nothing for Ali to press. Live when the public Play page's "Updated on" moves past 13 Nov 2026.
+- **Status:** LIVE. Submitted by Ali on 24 Nov 2026; the public Play page showed "Updated on 24 Nov 2026" when read signed out on 26 Nov 2026.
 
 ## What is live on Google Play
+- **Phone 1.7.1 (versionCode 12) is LIVE (checked signed out on 26 Nov 2026):** "Updated on 24 Nov 2026". The watch stays 1003 / 1.7.0. The 1.7.0 lines below are the earlier record.
 - **Phone 1.7.0 (versionCode 11) is LIVE (checked signed out on 23 Nov 2026).** The public page says "Updated on 13 Nov 2026", shows
   five-star 5.0 from 10 reviews, 100+ downloads, six listing languages, and the 1.7.0 What's new (Tasbeeh, Timetable, Qibla hand points
   at the Kaaba, turn and facing add up, calibrate notice). The page shows no version number, so 1.7.0 is read from that text. The
