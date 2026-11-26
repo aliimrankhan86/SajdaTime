@@ -660,4 +660,9 @@
     <string name="settings_friday_desc">শুক্রবারে যোহর বা আপনার জুমার সময়ের এক ঘণ্টা আগে একটি শান্ত নোটিফিকেশন</string>
     <string name="notif_friday_jumuah">আজ জুমা %1$s। সূরা কাহফ পড়ার জন্য একটি ভালো দিন।</string>
     <string name="notif_friday_dhuhr">আজ শুক্রবার। যোহর %1$s। সূরা কাহফ পড়ার জন্য একটি ভালো দিন।</string>
+    <string name="action_share_picture">ছবি শেয়ার করুন</string>
+    <string name="share_picture_title">আজকের সময় শেয়ার করুন</string>
+    <string name="action_share">শেয়ার করুন</string>
+    <string name="share_picture_footer">SajdaTime। বিনামূল্যে, কোনো বিজ্ঞাপন নেই। Google Play তে</string>
+    <string name="share_picture_a11y">%1$s এর আজকের নামাজের সময়ের ছবি</string>
 </resources>

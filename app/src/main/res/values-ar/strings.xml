@@ -731,4 +731,9 @@
     <string name="settings_friday_desc">إشعار هادئ يوم الجمعة قبل الظهر أو وقت صلاة الجمعة لديك بساعة</string>
     <string name="notif_friday_jumuah">الجمعة اليوم الساعة %1$s. يوم طيب لقراءة سورة الكهف.</string>
     <string name="notif_friday_dhuhr">اليوم الجمعة. الظهر الساعة %1$s. يوم طيب لقراءة سورة الكهف.</string>
+    <string name="action_share_picture">شارك صورة</string>
+    <string name="share_picture_title">شارك مواقيت اليوم</string>
+    <string name="action_share">شارك</string>
+    <string name="share_picture_footer">SajdaTime. مجاني، بلا إعلانات. على Google Play</string>
+    <string name="share_picture_a11y">صورة لمواقيت الصلاة اليوم في %1$s</string>
 </resources>

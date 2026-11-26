@@ -1,5 +1,22 @@
 package com.sajdatime.app.ui.home
 
+import android.graphics.Bitmap
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.AlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
+import com.sajdatime.app.share.TodayPicture
+import com.sajdatime.core.JamaahResult
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -89,6 +106,8 @@ internal fun TimetableSheet(
         }
     }
     val fontScale = LocalDensity.current.fontScale
+    var sharing by rememberSaveable { mutableStateOf(false) }
+    if (sharing) SharePictureDialog(state, onDismiss = { sharing = false })
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(Modifier.fillMaxWidth()) {
@@ -97,6 +116,7 @@ internal fun TimetableSheet(
                 place = state.settings.placeName(context),
                 onExport = onExport,
                 onClose = onDismiss,
+                onShare = { sharing = true },
             )
             BoxWithConstraints(Modifier.weight(1f, fill = false)) {
                 // 32 for the list's sides and 32 for the card's.
@@ -133,9 +153,14 @@ internal fun TimetableSheet(
  * Title with the close X, then the place with Save as PDF beside it. Shared with the Ramadan table so
  * both doors open the same header. At 1.5 text and above the button drops under the place, full
  * width: the Today line's rule.
+ *
+ * With [onShare] (the Timetable only, 1.8.0) there are two buttons, too many to sit beside the place, so
+ * both go on a line of their own under it, equal shares with a gap, and stack full width at 1.5 text and
+ * above. Here and not on the Times screen: nothing but the header's three texts may sit on a sky
+ * (DESIGN_SYSTEM 3, Sky), so the Times header has no action slot.
  */
 @Composable
-internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit, onClose: () -> Unit) {
+internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit, onClose: () -> Unit, onShare: (() -> Unit)? = null) {
     val placeText: @Composable (Modifier) -> Unit = { modifier ->
         Column(modifier) {
             Text(
@@ -157,10 +182,31 @@ internal fun TimetableHeader(title: String, place: String, onExport: () -> Unit,
             Text(stringResource(R.string.action_save_pdf))
         }
     }
+    val share: @Composable (Modifier) -> Unit = { modifier ->
+        CtaButton(onClick = { onShare?.invoke() }, compact = true, modifier = modifier) {
+            Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(Space.Related))
+            Text(stringResource(R.string.action_share_picture))
+        }
+    }
+    val large = LocalDensity.current.fontScale >= 1.5f
     Column(Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
         ProvideTextStyle(MaterialTheme.typography.headlineSmall) { DialogTitle(text = title, onClose = onClose) }
         Spacer(Modifier.height(Space.Tight))
-        if (LocalDensity.current.fontScale >= 1.5f) {
+        if (onShare != null) {
+            placeText(Modifier.fillMaxWidth())
+            Spacer(Modifier.height(Space.Related))
+            if (large) {
+                button(Modifier.fillMaxWidth())
+                Spacer(Modifier.height(Space.Related))
+                share(Modifier.fillMaxWidth())
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(Space.Related), modifier = Modifier.fillMaxWidth()) {
+                    button(Modifier.weight(1f))
+                    share(Modifier.weight(1f))
+                }
+            }
+        } else if (large) {
             placeText(Modifier.fillMaxWidth())
             Spacer(Modifier.height(Space.Related))
             button(Modifier.fillMaxWidth())
@@ -255,4 +301,53 @@ internal fun DayCard(day: DayPrayerTimes, isToday: Boolean, columns: Int) {
             }
         }
     }
+}
+
+/**
+ * The preview of today's picture with one Share button (1.8.0). Nothing is written or sent until Share is
+ * pressed; nothing here ever asks anyone to share. Drawn in the theme in use, off the main thread; the picture
+ * is a fixed square that scales to the dialog's width, so the dialog itself is what follows 2x text.
+ */
+@Composable
+private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val day = state.today ?: return
+    val scheme = MaterialTheme.colorScheme
+    val colours = TodayPicture.Colours(
+        page = scheme.background.toArgb(),
+        card = scheme.surface.toArgb(),
+        ink = scheme.onSurface.toArgb(),
+        quiet = scheme.onSurfaceVariant.toArgb(),
+        accent = scheme.primary.toArgb(),
+        line = scheme.outlineVariant.toArgb(),
+    )
+    val jumuahAt = (state.jamaah[PrayerSlot.DHUHR] as? JamaahResult.InWindow)?.takeIf { it.isJumuah }?.at
+    val picture by produceState<Bitmap?>(null, state.settings, day, jumuahAt, colours) {
+        value = withContext(Dispatchers.Default) { TodayPicture.render(context, state.settings, day, jumuahAt, colours) }
+    }
+    val scope = rememberCoroutineScope()
+    val described = stringResource(R.string.share_picture_a11y, state.settings.placeName(context).bidiIsolated())
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { DialogTitle(stringResource(R.string.share_picture_title), onDismiss) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState())) {
+                val shape = RoundedCornerShape(16.dp)
+                val frame = Modifier.fillMaxWidth().aspectRatio(1f).clip(shape)
+                picture?.let { Image(it.asImageBitmap(), contentDescription = described, modifier = frame) }
+                    ?: Box(frame.background(scheme.surfaceVariant))
+            }
+        },
+        confirmButton = {
+            CtaButton(
+                onClick = { picture?.let { scope.launch { runCatching { TodayPicture.share(context, it) } } } },
+                enabled = picture != null,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Outlined.Share, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(Space.Related))
+                Text(stringResource(R.string.action_share))
+            }
+        },
+    )
 }

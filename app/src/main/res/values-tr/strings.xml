@@ -629,4 +629,9 @@
     <string name="settings_friday_desc">Cuma günleri öğle namazından veya Cuma vaktinizden bir saat önce sessiz bir bildirim</string>
     <string name="notif_friday_jumuah">Bugün Cuma namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
     <string name="notif_friday_dhuhr">Bugün Cuma. Öğle namazı saat %1$s. Kehf Suresi\'ni okumak için güzel bir gün.</string>
+    <string name="action_share_picture">Resim paylaş</string>
+    <string name="share_picture_title">Bugünün vakitlerini paylaş</string>
+    <string name="action_share">Paylaş</string>
+    <string name="share_picture_footer">SajdaTime. Ücretsiz, reklamsız. Google Play\'de</string>
+    <string name="share_picture_a11y">%1$s için bugünün namaz vakitlerini gösteren resim</string>
 </resources>

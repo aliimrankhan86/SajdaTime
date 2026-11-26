@@ -869,4 +869,10 @@
     <string name="settings_friday_desc">A quiet notification on Fridays, an hour before Dhuhr or your Jumu\'ah time</string>
     <string name="notif_friday_jumuah">Jumu\'ah today at %1$s. A good day to read Surah Al-Kahf.</string>
     <string name="notif_friday_dhuhr">It\'s Friday. Dhuhr is at %1$s. A good day to read Surah Al-Kahf.</string>
+    <!-- 1.8.0: today's times as a picture. Nothing in the app asks anyone to share it. -->
+    <string name="action_share_picture">Share picture</string>
+    <string name="share_picture_title">Share today\'s times</string>
+    <string name="action_share">Share</string>
+    <string name="share_picture_footer">SajdaTime. Free, no ads. On Google Play</string>
+    <string name="share_picture_a11y">A picture of today\'s prayer times for %1$s</string>
 </resources>

@@ -615,4 +615,9 @@
     <string name="settings_friday_desc">Notifikasi tanpa suara setiap Jumat, satu jam sebelum Zuhur atau waktu Jumat Anda</string>
     <string name="notif_friday_jumuah">Salat Jumat hari ini pukul %1$s. Hari yang baik untuk membaca Surah Al-Kahfi.</string>
     <string name="notif_friday_dhuhr">Hari ini Jumat. Zuhur pukul %1$s. Hari yang baik untuk membaca Surah Al-Kahfi.</string>
+    <string name="action_share_picture">Bagikan gambar</string>
+    <string name="share_picture_title">Bagikan jadwal hari ini</string>
+    <string name="action_share">Bagikan</string>
+    <string name="share_picture_footer">SajdaTime. Gratis, tanpa iklan. Di Google Play</string>
+    <string name="share_picture_a11y">Gambar waktu salat hari ini untuk %1$s</string>
 </resources>
