@@ -22,15 +22,11 @@ ask Ali to test anything or to do a step for you.
 - **Dependable beats elegant.** Prayer times are worked out on the phone with no network, ever.
 - **Languages in the app:** English, Arabic, Urdu, Turkish, Indonesian. Arabic and Urdu read right to left.
 
-## 2. Where things stand (26 Nov 2026; `docs/AI-START-HERE.md` §2 and HANDOVER §11 first block are current, the lines below this one are the 25 Oct record)
+## 2. Where things stand (26 Nov 2026; `docs/AI-START-HERE.md` §2 and HANDOVER §11 first block are current)
 
-- **Live on Play now:** 1.7.1 (phone 12, watch 1003 / 1.7.0). **Next:** 1.8.0 on `claude/1-8-0`, waiting for Ali's Merge.
-- **25 Oct record, Live on Play then:** 1.5.0 (phone versionCode 9, watch versionCode 1002).
-- **Next release: 1.6.0** (phone versionCode 10; the watch is not uploaded again). Built and approved on branch
-  `claude/1-6-0`. Pull request into `main` by 11 Dec 2026, Ali presses "Send for review" by 15 Dec 2026, before
-  Ramadan (starts about 8 Feb 2027). Release steps: `docs/release-tools/RELEASE-1.6.0.md`.
-- **Merged into 1.6.0 on 2 Nov 2026 (Ali: "we will call it release 1.6 now"): Sunnah fast reminders. The jama'ah reminder is dropped. Old note:** a jama'ah reminder and Sunnah fast reminders. Their rules are written and tested
-  (`core/FastingDays.kt`, `app/.../notify/ExtraReminderPlans.kt`) but nothing schedules them yet. Do not wire them up.
+- **Live on Play now:** 1.7.1 (phone 12, watch 1003 / 1.7.0). **1.8.0** (phone 13: adhkar reminder, Friday reminder,
+  share today's times as a picture) is merged into `main` and in Google's review since 26 Nov 2026.
+- **Branches:** only `main`. Cut yours from it.
 - **The single source of truth for "what is true now"** is the first block (marked 📍) at the top of `docs/HANDOVER.md`
   section 11. Its title names the latest step; an older block titled "STATE OF PLAY, 24 Oct 2026" further down is
   history. If this file and that first block disagree, that block wins. Every later block is old record, never a task
@@ -57,7 +53,7 @@ Inside `app/src/main/java/com/sajdatime/app/`:
 - `notify/` alarms and notifications. **Highest risk area in the app. Never change it.**
 - `widget/` home screen widgets. `pdf/` the timetable PDF.
 
-Strings: `app/src/main/res/values/strings.xml` (English) and `values-ar`, `values-ur`, `values-tr`, `values-in`.
+Strings: `app/src/main/res/values/strings.xml` (English) and `values-ar`, `values-ur`, `values-tr`, `values-in`, `values-bn`.
 Indonesian is `values-in`, **not** `values-id` (Android's legacy code; `values-id` would never be used).
 
 Docs you will meet:
@@ -86,8 +82,8 @@ export JAVA_HOME=$(/usr/libexec/java_home -v 21)
 
 **Read `docs/AI-START-HERE.md` first** (the full briefing for any AI).
 
-**Which branch:** cut your branch from `main` (it holds what is live, 1.7.1); `claude/1-6-0` was merged and is gone. Ask
-before touching code that `claude/1-8-0` changes while its pull request is open. Read `docs/design-system/README.md` before anything visual.
+**Which branch:** cut your branch from `main` (it holds 1.8.0, in Google's review; 1.7.1 is live until it passes). It is
+the only branch. Read `docs/design-system/README.md` before anything visual.
 
 Full gate (12 Nov 2026, release 1.7.0): app 365 tests, core 269 (1 skipped), wear 27, 0 failures. A change that
 adds tests moves these numbers; `docs/release-tools/release-1.7.0.sh` holds them in `EXPECTED_COUNTS`.
@@ -188,7 +184,7 @@ make it pass.**
 
 **How to hand work back:**
 
-1. Work on a branch named `deepseek/<short-task>` made from the branch you were told (usually `claude/1-6-0`). This
+1. Work on a branch named `deepseek/<short-task>` made from the branch you were told (usually `main`). This
    branch is a scratch space: committing and pushing it is allowed so nothing is lost, but it is not part of the project
    until Claude has reviewed it.
 2. Commit there (and push that branch only, if you can) with a message that says what was wrong or asked, what you changed, why this way, what you ran (paste

@@ -31,17 +31,18 @@ when a release publishes.
 
 | Branch | What it is | What you do with it |
 |---|---|---|
-| `main` | **1.7.1**, live on Google Play since 24 Nov 2026 (phone 12, watch 1003 / 1.7.0) | Never push to it or merge into it yourself. Cut new work from it |
-| `claude/1-8-0` | **1.8.0**: adhkar reminder, Friday reminder with Surah Al-Kahf, share today's times as a picture (HANDOVER 5.43 to 5.45), phone 13 / 1.8.0, watch unchanged; built and tested, pull request open, not merged | Ali presses Merge; then the signed bundle and the Play draft. Read `docs/HANDOVER.md` §11, first block |
-| your branch | `claude/<task>` or `deepseek/<task>`, cut from `main` (from `claude/1-8-0` while it is open, if your work touches reminders, Settings or the Timetable) | Commit and push here; a pull request into `main` only when Ali says so, after review |
+| `main` | **1.8.0** (phone 13, watch 1003 / 1.7.0): adhkar reminder, Friday reminder with Surah Al-Kahf, share today's times as a picture (HANDOVER 5.43 to 5.45). Submitted to Google on 26 Nov 2026, in review; **1.7.1 stays the live version until the public page's "Updated on" moves** | Never push to it or merge into it yourself. Cut new work from it |
+| your branch | `claude/<task>` or `deepseek/<task>`, cut from `main` | Commit and push here; a pull request into `main` only when Ali says so, after review |
+
+`main` is the only branch (26 Nov 2026: `claude/1-8-0` was merged and deleted on the Mac and on GitHub).
 
 Every other branch was deleted on 30 Oct 2026 at Ali's word ("delete the old branches ... which could cause confusion"):
 all of them were already wholly inside `claude/1-6-0`, except two dropped on purpose, kept as tags
 `archive/analytics-default-on-1-4-0` and `archive/customer-review-pain-points-9d35kl`. DeepSeek's picture record of the
 design deviations was dropped on 31 Oct 2026 (Ali: "if it is not required then remove it"), kept as tag
-`archive/ds-deviations-record`: the deviations themselves are listed in `docs/design-system/03-components.md` §3.6. Tag `v1.5.0` marks what is live.
+`archive/ds-deviations-record`: the deviations themselves are listed in `docs/design-system/03-components.md` §3.6. Tag `v1.5.0` is old (it marks 1.5.0, not what is live now); releases since are not tagged, the public Play page is the record.
 
-Version numbers: phone 1.8.0 / versionCode 13 on `claude/1-8-0` (the watch stays 1.7.0 / 1003: `:core` and `:wear` did not change). Release steps for any release: bump the phone versionCode (and the watch only if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (1.8.0: it did, the shared picture; `set-release-date.sh` on release day). Ali presses every merge, submit and publish button.
+Version numbers: phone 1.8.0 / versionCode 13 on `main` (the watch stays 1.7.0 / 1003: `:core` and `:wear` did not change); the next phone release is versionCode 14. Release steps for any release: bump the phone versionCode (and the watch only if it changes), retake `docs/store/screenshots/` (Times, Ramadan, widget), update the store listing so it sells the whole app first then the changes (`CLAUDE.md` rule, HANDOVER §5.38), `RELEASE-<version>.md`, the privacy page date only if data handling changed (`set-release-date.sh` on release day; 1.8.0 did it on 26 Nov 2026). The release script is `docs/release-tools/release-<version>.sh`, copied from the last one (`release-1.8.0.sh` now). Ali presses every merge, submit and publish button.
 
 ## 3. Read before you work, in this order
 

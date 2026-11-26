@@ -6,7 +6,8 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 - **Where it stands (26 Nov 2026, evening):** Ali merged PR #24. Signed bundle 13 / 1.8.0 built from `main` and checked
   (`~/Developer/SajdaTime/SajdaTime-1.8.0/app-release.aab`). In Play Console: production draft "13 (1.8.0)" with What's new in
   six languages, and the new full description in six languages. Ali uploaded the bundle and pressed Submit 7 changes for
-  review (about 18:14 UK). Live when the public Play page's "Updated on" moves past 24 Nov 2026.
+  review (about 18:14 UK). Live when the public Play page's "Updated on" moves past 24 Nov 2026. Cleaned up the same
+  evening at Ali's word: `main` is the only branch; the temporary bundle, build notes and review pictures are deleted.
 - **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
   - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
     sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,

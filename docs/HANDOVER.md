@@ -6192,9 +6192,15 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   The page then read "Changes in review", quick checks up to 15 minutes, then Google's review (up to 9 days has been seen).
   Release preview before Save: 12,527 phones and 6,912 tablets supported, none lost; 4.7 MB for new installs; only warning
   the usual "no debug symbols". Phone only; the watch stays 1003 / 1.7.0.
+- **Cleaned up already (26 Nov 2026, Ali: "do the clean up job"), so the live proof comes after, not before, this time:**
+  `claude/1-8-0` deleted on the Mac and on GitHub (wholly inside `main`; `main` is the only branch), the signed bundle folder
+  `SajdaTime-1.8.0/` (Play holds the uploaded bundle; `release-1.8.0.sh` rebuilds it), `build/release-1.8.0*` (the brief and
+  build log; every decision is in 5.43 to 5.45), `build/review-1.8.0/` (32 review pictures, findings recorded in words), and
+  the Gradle outputs (`app|core|wear/build`, `.gradle`). Kept: `build/review-replies/` (the weekly review replies job writes
+  there), `.codex/` (Codex's copy of the agent roles, recreated by that tool after the 13 Nov clean up).
 - **Next (Claude, unasked):** when the public Play page, signed out, says "Updated on" later than 24 Nov 2026, record 1.8.0
-  live (HANDOVER, PROJECT_BRIEF, GBrain), then the CLAUDE.md "After every release" clean up: delete `claude/1-8-0` local and
-  on GitHub, `~/Developer/SajdaTime/SajdaTime-1.8.0/`, `build/release-1.8.0*`, `build/review-1.8.0/`. Nothing pending for Ali.
+  live in this block, `docs/PROJECT_BRIEF.md`, `docs/AI-START-HERE.md` §2, `docs/AI-WORKER-BRIEF.md` §2 and GBrain. Nothing
+  else is left to clean. If Google rejects it: fix on a `claude/` branch from `main`, phone versionCode 14. Nothing pending for Ali.
 - Everything below in this block is how it got here (26 Nov, before the submit).
 
 #### Before the submit (26 Nov 2026, 18:15)
@@ -6213,8 +6219,7 @@ Play services missing; a signed bundle; Play Console, Data safety and the privac
   "Don't label assets"). **Nothing is sent.** Short description, title and pictures untouched.
 - **Was next, now DONE (see the top of this block):** Ali: (1) Production, open draft "13 (1.8.0)", drag in `app-release.aab` from `SajdaTime-1.8.0/` (the
   browser tool cannot upload a bundle), Next, Save; (2) Publishing overview, Send changes for review. Then Claude: watch the
-  public Play page signed out for "Updated on" moving; when live, the CLAUDE.md "After every release" clean up (delete
-  `claude/1-8-0` local and on GitHub, `SajdaTime-1.8.0/`, `build/release-1.8.0*`, `build/review-1.8.0/`).
+  public Play page signed out for "Updated on" moving (the clean up was done early, see the top of this block).
 - **Not checked:** a real phone (One UI, HyperOS delivery of the new reminders); the picture's draw time on a real phone.
 - **Found, not 1.8.0:** the Timetable day cards in Urdu print "AM 5:37" (meridiem first). Pre-existing; for a later release.
 
