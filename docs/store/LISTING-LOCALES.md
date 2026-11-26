@@ -40,25 +40,24 @@ feature graphic are reused automatically unless you upload language-specific one
 
 ## 1.8.0 listings, 26 Nov 2026 (paste on release day; not live)
 
-Translated from the 1.8.0 English in [LISTING.md](LISTING.md): the 1.7.0 full descriptions below with the same four edits
-(Timetable bullet with the picture, the new reminders bullet, the shorter methods line, the Free paragraph without "no
-subscription"), Ali's "Tighten wording" choice of 26 Nov 2026. Terms as in the app's strings (adhkar, Surah Al-Kahf in each
-language's own form). Checked by Claude, no native review (owner's rule). Counts by script, spaces and line breaks included.
+Translated from the 1.8.0 English in [LISTING.md](LISTING.md): the 1.7.0 full descriptions below with the same edits, Ali's
+"Tighten wording" choice of 26 Nov 2026. Edits: the Timetable bullet gains the picture (and loses "in one tap"); a new bullet "Optional reminders: morning and evening adhkar, Surah Al-Kahf on Fridays" under Alerts and adhan; the 13 methods line names six well known methods instead of all thirteen (the count stays); the Free paragraph drops "no subscription". To fit their limits, Turkish names five methods (no Karachi), Indonesian names Kemenag/MUIS in place of ISNA and Karachi and also writes "1 atau 2 hari" and "salin papan masjid". Store picture 06 (Timetable) still shows the 1.7.0 header without Share picture: left on purpose, the brief keeps the rest of the listing untouched. What's new describes the picture rather than asking anyone to share it (review, 26 Nov 2026). Terms as in the app's strings (adhkar, Surah Al-Kahf in each language's
+own form). Checked by Claude, no native review (owner's rule). Counts by script, spaces and line breaks included.
 
 | Language | Full description | What's new |
 |---|---:|---:|
-| Arabic (ar) | 3621 / 4000 | 205 / 500 |
-| Urdu (ur) | 3961 / 4000 | 223 / 500 |
-| Turkish (tr-TR) | 3994 / 4000 | 274 / 500 |
-| Indonesian (id-ID) | 3997 / 4000 | 240 / 500 |
-| Bengali (bn-BD) | 3995 / 4000 | 207 / 500 |
+| Arabic (ar) | 3621 / 4000 | 209 / 500 |
+| Urdu (ur) | 3961 / 4000 | 222 / 500 |
+| Turkish (tr-TR) | 3994 / 4000 | 279 / 500 |
+| Indonesian (id-ID) | 3997 / 4000 | 249 / 500 |
+| Bengali (bn-BD) | 3990 / 4000 | 208 / 500 |
 
 ### Arabic (ar), 1.8.0
 
-**What's new** `205 / 500`
+**What's new** `209 / 500`
 
 ```
-جديد: تذكير اختياري بأذكار الصباح والمساء بعد الفجر وبعد العصر، والنقر عليه يفتح التسبيح. وتذكير اختياري يوم الجمعة قبل صلاة الجمعة أو الظهر بساعة، مع سورة الكهف. وشارك مواقيت اليوم صورةً من جدول المواقيت.
+جديد: تذكير اختياري بأذكار الصباح والمساء بعد الفجر وبعد العصر، والنقر عليه يفتح التسبيح. وتذكير اختياري يوم الجمعة قبل صلاة الجمعة أو الظهر بساعة، مع سورة الكهف. ومواقيت اليوم صورةً للمشاركة من جدول المواقيت.
 ```
 
 **Full description** `3621 / 4000`
@@ -137,10 +136,10 @@ language's own form). Checked by Claude, no native review (owner's rule). Counts
 
 ### Urdu (ur), 1.8.0
 
-**What's new** `223 / 500`
+**What's new** `222 / 500`
 
 ```
-نیا: فجر اور عصر کے بعد صبح و شام کے اذکار کی اختیاری یاددہانی، ٹیپ کرنے پر تسبیح کھلتی ہے۔ جمعہ کی اختیاری یاددہانی، جمعہ یا ظہر سے ایک گھنٹہ پہلے، سورۃ الکہف کے ساتھ۔ اوقات نامہ سے آج کے اوقات تصویر کی صورت میں شیئر کریں۔
+نیا: فجر اور عصر کے بعد صبح و شام کے اذکار کی اختیاری یاددہانی، ٹیپ کرنے پر تسبیح کھلتی ہے۔ جمعہ کی اختیاری یاددہانی، جمعہ یا ظہر سے ایک گھنٹہ پہلے، سورۃ الکہف کے ساتھ۔ آج کے اوقات کی تصویر، اوقات نامہ سے شیئر کرنے کے لیے۔
 ```
 
 **Full description** `3961 / 4000`
@@ -219,10 +218,10 @@ language's own form). Checked by Claude, no native review (owner's rule). Counts
 
 ### Turkish (tr-TR), 1.8.0
 
-**What's new** `274 / 500`
+**What's new** `279 / 500`
 
 ```
-Yeni: sabah ve ikindi namazlarından sonra isteğe bağlı sabah ve akşam zikirleri hatırlatıcısı; dokununca Tesbih açılır. İsteğe bağlı cuma hatırlatıcısı: Cuma ya da öğle namazından bir saat önce, Kehf Suresi ile. Bugünün vakitlerini vakit çizelgesinden resim olarak paylaşın.
+Yeni: sabah ve ikindi namazlarından sonra isteğe bağlı sabah ve akşam zikirleri hatırlatıcısı; dokununca Tesbih açılır. İsteğe bağlı cuma hatırlatıcısı: Cuma ya da öğle namazından bir saat önce, Kehf Suresi ile. Bugünün vakitleri resim olarak, vakit çizelgesinden paylaşmak için.
 ```
 
 **Full description** `3994 / 4000`
@@ -301,10 +300,10 @@ Karşılığında tek bir şey istiyorum: lütfen beni, ailemi ve anne babamı d
 
 ### Indonesian (id-ID), 1.8.0
 
-**What's new** `240 / 500`
+**What's new** `249 / 500`
 
 ```
-Baru: pengingat opsional dzikir pagi dan petang setelah Subuh dan Asar; ketuk untuk membuka Tasbih. Pengingat Jumat opsional satu jam sebelum salat Jumat atau Zuhur, dengan Surah Al-Kahfi. Bagikan jadwal hari ini sebagai gambar dari Jadwal.
+Baru: pengingat opsional dzikir pagi dan petang setelah Subuh dan Asar; ketuk untuk membuka Tasbih. Pengingat Jumat opsional satu jam sebelum salat Jumat atau Zuhur, dengan Surah Al-Kahfi. Jadwal hari ini sebagai gambar, untuk dibagikan dari Jadwal.
 ```
 
 **Full description** `3997 / 4000`
@@ -383,13 +382,13 @@ Saya hanya minta satu hal sebagai balasan: mohon doakan saya, keluarga saya, dan
 
 ### Bengali (bn-BD), 1.8.0
 
-**What's new** `207 / 500`
+**What's new** `208 / 500`
 
 ```
-নতুন: ফজর ও আসরের পরে ঐচ্ছিক সকাল ও সন্ধ্যার জিকিরের রিমাইন্ডার; ট্যাপ করলে তাসবিহ খোলে। শুক্রবারে জুমা বা যোহরের এক ঘণ্টা আগে ঐচ্ছিক রিমাইন্ডার, সূরা কাহফসহ। সময়সূচি থেকে আজকের সময় ছবি হিসেবে শেয়ার করুন।
+নতুন: ফজর ও আসরের পরে ঐচ্ছিক সকাল ও সন্ধ্যার জিকিরের রিমাইন্ডার; ট্যাপ করলে তাসবিহ খোলে। শুক্রবারে জুমা বা যোহরের এক ঘণ্টা আগে ঐচ্ছিক রিমাইন্ডার, সূরা কাহফসহ। আজকের সময়ের ছবি, সময়সূচি থেকে শেয়ার করার জন্য।
 ```
 
-**Full description** `3995 / 4000`
+**Full description** `3990 / 4000`
 
 ```
 SajdaTime সুন্নি ও শিয়া মুসলমানদের জন্য নামাজের (সালাত) সময়সূচি, আজানের অ্যালার্ট, কিবলা কম্পাস ও ব্যক্তিগত নামাজ ট্র্যাকার নিয়ে আসে, আপনার ফোন ও Wear OS ঘড়িতে।
@@ -439,7 +438,7 @@ SajdaTime সুন্নি ও শিয়া মুসলমানদের 
 
 • সুন্নি: হানাফি, শাফেয়ি, মালিকি ও হাম্বলি, প্রতিটির জন্য আসরের নিয়ম
 • শিয়া: জাফরি / ইসনা আশারি, মাগরিবের সঠিক নিয়মসহ
-• ১৩টি গণনা পদ্ধতি, যার মধ্যে মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, করাচি, দিয়ানেত ও জাফরি
+• ১৩টি গণনা পদ্ধতি, যেমন মুসলিম ওয়ার্ল্ড লীগ, ISNA, উম্মুল কুরা, করাচি, দিয়ানেত ও জাফরি
 • আপনার মসজিদের জামাত (ইকামত) ও জুমার সময়
 • মসজিদের শুরুর সময়ের সাথে মেলান: প্রতিটি সময় দেখুন, ৩০ মিনিট পর্যন্ত সরান বা বোর্ডের সময় নিন
 

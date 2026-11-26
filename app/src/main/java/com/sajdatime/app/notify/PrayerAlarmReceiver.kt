@@ -53,7 +53,8 @@ class PrayerAlarmReceiver : BroadcastReceiver() {
             try {
                 val settings = SettingsRepository(appContext).current()
                 if (shouldPostFridayReminder(settings, jumuahAt ?: dhuhrAt, Instant.now())) {
-                    Notifications.postFridayReminder(appContext, jumuahAt, dhuhrAt, settings.isApproximateOn(dhuhrAt))
+                    // Marked approximate only when the line names Dhuhr: a typed Jumu'ah time is the mosque's, never projected.
+                    Notifications.postFridayReminder(appContext, jumuahAt, dhuhrAt, jumuahAt == null && settings.isApproximateOn(dhuhrAt))
                 }
                 // Same chain as a prayer, so the next window is laid down while awake.
                 PrayerAlarmScheduler.rescheduleAndRefresh(appContext, settings)
@@ -296,8 +297,7 @@ internal fun shouldPostAdhkarReminder(settings: AppSettings, endsAt: Instant, no
 /**
  * Whether an arriving Friday reminder should still be shown: switched off since, not Friday any more where the
  * phone is now (it travelled across the date line), or arriving once the prayer it is timed from ([timedFrom],
- * the Jumu'ah time when set, else Dhuhr) has begun, is silence. Not the time the line names: a Shia user's line
- * names Dhuhr, which is before a typed Jumu'ah time, so judging by it would drop every one of theirs.
+ * the Jumu'ah time the line names, else Dhuhr) has begun, is silence.
  */
 internal fun shouldPostFridayReminder(
     settings: AppSettings,

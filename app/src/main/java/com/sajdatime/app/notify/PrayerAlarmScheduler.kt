@@ -82,7 +82,7 @@ object PrayerAlarmScheduler {
     /**
      * The Friday reminder (1.8.0): off until chosen, a quiet notification an hour before Jumu'ah or Dhuhr. Its
      * own action and codes `70,000 + dayOfYear`, so 70,001 to 70,366. [EXTRA_AT_MILLIS] carries Dhuhr,
-     * [EXTRA_JUMUAH_AT_MILLIS] the user's Jumu'ah time when one is set.
+     * [EXTRA_JUMUAH_AT_MILLIS] the Jumu'ah time the line names (a Sunni user's typed time; see FridayReminderPlan).
      */
     const val ACTION_FRIDAY_REMINDER = "com.sajdatime.app.action.FRIDAY_REMINDER"
     const val EXTRA_JUMUAH_AT_MILLIS = "jumuah_at"

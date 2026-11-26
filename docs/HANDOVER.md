@@ -2372,8 +2372,9 @@ of 5.43, clears at midnight, marked approximate on a projected day, tap opens th
 
 ### 5.45 Share today's times as a picture, 1.8.0 (brief of 26 Nov 2026: how a free app with no marketing gets found)
 
-Timetable sheet, "Share picture" beside "Save as PDF" (both on a line under the place, equal shares and heights; stacked at
-1.5 text). **Not the Times header:** DESIGN_SYSTEM section 3 (Sky) allows nothing but the header's three texts on a sky. Opens
+Timetable sheet, "Share picture" beside "Save as PDF" (both on a line under the place, equal shares and heights; stacked
+when the line is under 352dp scaled by the text size, which covers a 360dp phone, 1.3 text and 320dp; a text size rule alone
+left both labels on two lines at 320dp). **Not the Times header:** DESIGN_SYSTEM section 3 (Sky) allows nothing but the header's three texts on a sky. Opens
 a dialog: the X, a square preview, one Share button (appears when the picture is ready). **Nothing is written or sent until
 Share;** nothing in the app asks anyone to share; no usage count, the existing share event is not reused. The picture
 (`share/TodayPicture.kt`): 1080 square PNG in the theme in use, town name (ellipsis), Gregorian and Hijri date as the Times
@@ -2384,7 +2385,8 @@ picture goes to people who do not know the sender's settings (ux-lead, 26 Nov 20
 Arabic and Urdu mirror and digits stay Western. Written to `cache/exports` (the PDF's FileProvider path) off the main thread,
 one file overwritten. Privacy page updated in the same release (what the picture shows, including that the method can show
 Sunni or Shia). On the emulator the picture takes 1 to 3 s to draw. iPhone effect: carries over in idea (the drawing is
-Android Canvas; iOS would draw its own), SF Symbol `square.and.arrow.up`.
+Android Canvas; iOS would draw its own), SF Symbol `square.and.arrow.up`. The privacy page names the school too (it shows
+Sunni or Shia, and the madhab).
 
 ## 6. Notification and alarm architecture
 

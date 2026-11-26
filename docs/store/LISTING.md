@@ -240,18 +240,15 @@ Only one thing is ever asked in return: please remember me, my family, and my pa
 Ali's rule (HANDOVER 5.38): the full description sells the whole app first, every feature named; What's new says what changed.
 The 1.7.0 full description was 3994 / 4000, so the three 1.8.0 features (adhkar reminder, Friday reminder with Surah Al-Kahf,
 share today's times as a picture) needed room. **Ali chose "Tighten wording" on 26 Nov 2026** (multiple choice): keep every
-feature, shorten only wording. Changes against the 1.7.0 text: the Timetable bullet gains the picture (and loses "in one tap");
-a new bullet under Alerts and adhan; the 13 methods line names six well known methods instead of all thirteen (the count stays);
-the Free paragraph drops "no subscription". Nothing else changed. Checked against the code on the branch: the adhkar reminder
-comes after Fajr and after Asr; the Friday one an hour before the user's Jumu'ah time (Sunni with a time typed) or Dhuhr; the
-picture is shared from the Timetable. Counts by script: full description 3994 / 4000, What's new 240 / 500.
-The five translations are in `LISTING-LOCALES.md`, mirroring these edits (Turkish leaves Karachi and Indonesian ISNA out of the
-method names to fit their limit).
+feature, shorten only wording. Changes against the 1.7.0 text: the Timetable bullet gains the picture (and loses "in one tap"); a new bullet "Optional reminders: morning and evening adhkar, Surah Al-Kahf on Fridays" under Alerts and adhan; the 13 methods line names six well known methods instead of all thirteen (the count stays); the Free paragraph drops "no subscription". To fit their limits, Turkish names five methods (no Karachi), Indonesian names Kemenag/MUIS in place of ISNA and Karachi and also writes "1 atau 2 hari" and "salin papan masjid". Store picture 06 (Timetable) still shows the 1.7.0 header without Share picture: left on purpose, the brief keeps the rest of the listing untouched. What's new describes the picture rather than asking anyone to share it (review, 26 Nov 2026). Checked against the code on the branch: the adhkar
+reminder comes after Fajr and after Asr; the Friday one an hour before the user's Jumu'ah time (Sunni with a time typed) or
+Dhuhr; the picture is shared from the Timetable. Counts by script (Python len): full description 3991 / 4000,
+What's new 244 / 500. The five translations are in `LISTING-LOCALES.md`, mirroring these edits.
 
 What's new:
 
 ```
-New: optional morning and evening adhkar reminders, after Fajr and after Asr; tap one to open the Tasbeeh. An optional Friday reminder an hour before Jumu'ah or Dhuhr, with Surah Al-Kahf. Share today's times as a picture from the Timetable.
+New: optional morning and evening adhkar reminders, after Fajr and after Asr; tap one to open the Tasbeeh. An optional Friday reminder an hour before Jumu'ah or Dhuhr, with Surah Al-Kahf. Today's times as a picture, to share from the Timetable.
 ```
 
 Full description:
@@ -276,7 +273,7 @@ ALERTS AND ADHAN
 • A quiet reminder 5 to 30 minutes before a prayer, a silent next prayer notification
 • A bell on each prayer turns its alert on or off
 • Alert check: what your phone is blocking
-• Optional morning and evening adhkar reminders, and Surah Al-Kahf on Fridays
+• Optional reminders: morning and evening adhkar, Surah Al-Kahf on Fridays
 
 MY PRAYERS
 

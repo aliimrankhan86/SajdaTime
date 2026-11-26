@@ -5,16 +5,16 @@ The source of truth is `docs/HANDOVER.md` §11. This file is the short version A
 ## Next release: 1.8.0 (built 26 Nov 2026 on `claude/1-8-0`; Ali presses Merge, then Send for review)
 - **Ali's scope (26 Nov 2026):** three things, phone only, 13 / 1.8.0. The watch is untouched.
   - **Morning and evening adhkar reminder** (off by default): half an hour after Fajr (no later than 10 minutes before
-    sunrise) and after Asr (no later than 15 minutes before Maghrib). A quiet notification, "A quiet moment for
-    remembrance."; tapping it opens the Tasbeeh. No adhkar text yet (later release).
+    sunrise) and after Asr (no later than 15 minutes before Maghrib). Fully silent, no sound and no buzz (Ali's choice,
+    26 Nov 2026): "A quiet moment for remembrance."; tapping it opens the Tasbeeh. No adhkar text yet (later release).
   - **Friday reminder with Surah Al-Kahf** (off by default): an hour before your Jumu'ah time if you typed one (Sunni), or
     an hour before Dhuhr. "Jumu'ah today at ..." or "It's Friday. Dhuhr is at ...", then "A good day to read Surah Al-Kahf."
     Not merged with any other reminder (the reminder before Dhuhr stays as you set it).
   - **Share today's times as a picture**, from the Timetable, beside Save as PDF: a square picture with the town, both dates,
-    the six times, the method and "SajdaTime. Free, no ads. On Google Play". Nothing is sent until you press Share.
+    the six times, the method and school (shows Sunni or Shia; the privacy page says so) and "SajdaTime. Free, no ads. On Google Play". Nothing is sent until you press Share.
 - **Store text:** Ali chose "Tighten wording" (26 Nov 2026): every feature kept, the three added, the methods line names six
   methods instead of thirteen, the Free paragraph is shorter. All six languages fit (3621 to 3997 / 4000). Pasted on release day.
-- **Checked:** full gate green; new and touched device tests green; every reminder fired on the emulator with the clock moved
+- **Checked:** full gate green on the final code; new and touched device tests green; every reminder fired on the emulator with the clock moved
   (English and Arabic); pictures in light, dark, 2x text, Arabic, Urdu, Bengali and a long town name; an independent code review
   (its fixes are in). **Not checked:** a real phone.
 - **Dates:** ready for Ali's Merge by 20 Dec 2026, submitted by 6 Jan 2027, before the Ramadan freeze (18 Jan to 9 Mar 2027).

@@ -161,8 +161,8 @@ internal fun TimetableSheet(
  * width: the Today line's rule.
  *
  * With [onShare] (the Timetable only, 1.8.0) there are two buttons, too many to sit beside the place, so
- * both go on a line of their own under it, equal shares with a gap, and stack full width at 1.5 text and
- * above. Here and not on the Times screen: nothing but the header's three texts may sit on a sky
+ * both go on a line of their own under it, equal shares with a gap, and stack full width when that line is too
+ * narrow for both labels (see the width rule below). Here and not on the Times screen: nothing but the header's three texts may sit on a sky
  * (DESIGN_SYSTEM 3, Sky), so the Times header has no action slot.
  */
 @Composable
@@ -354,7 +354,7 @@ private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
                 val frame = Modifier.fillMaxWidth().aspectRatio(1f).clip(shape)
                 picture?.let { Image(it.asImageBitmap(), contentDescription = described, modifier = frame) }
                     // A spinner while it draws (1 to 3 s on the emulator), so the dialog never looks empty (ux-lead).
-                    ?: Box(frame.background(scheme.surfaceVariant), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                    ?: Box(frame.background(scheme.surfaceVariant), contentAlignment = Alignment.Center) { CircularProgressIndicator(strokeWidth = 2.dp) }
             }
         },
         confirmButton = {
@@ -365,8 +365,13 @@ private fun SharePictureDialog(state: UiState, onDismiss: () -> Unit) {
                     if (busy) return@CtaButton
                     busy = true
                     scope.launch {
-                        runCatching { TodayPicture.share(context, ready) }
-                            .onFailure { Toast.makeText(context, R.string.share_picture_failed, Toast.LENGTH_SHORT).show() }
+                        try {
+                            TodayPicture.share(context, ready)
+                        } catch (e: kotlinx.coroutines.CancellationException) {
+                            throw e // the dialog closed mid write: nothing failed, so nothing is said
+                        } catch (e: Exception) {
+                            Toast.makeText(context, R.string.share_picture_failed, Toast.LENGTH_SHORT).show()
+                        }
                         busy = false
                     }
                 },
